@@ -1,0 +1,99 @@
+definitions:
+  Duration:
+    description: It holds *durationpb.Duration which is generated types for google/protobuf/duration.proto.
+    title: Duration is encoded as a string message which represents a signed span
+      of time.
+    type: object
+    x-go-package: aperture.tech/aperture/pkg/config
+  FluxNinjaPluginConfig:
+    properties:
+      api_key:
+        description: API Key for this agent.
+        type: string
+        x-go-name: APIKey
+      fluxninja_endpoint:
+        description: Address to grpc or http(s) server listening in agent service.
+          To use http protocol, the address must start with http(s)://.
+        type: string
+        x-go-name: FluxNinjaEndpoint
+        x-go-validate: omitempty,hostname_port|url|fqdn
+      heartbeat_interval:
+        description: Interval between each heartbeat.
+        format: string
+        type: string
+        x-go-default: 5s
+        x-go-name: HeartbeatInterval
+        x-go-validate: gte=0s
+    title: FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration
+      plugin.
+    type: object
+    x-go-package: aperture.tech/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig
+  SentryConfig:
+    description: Configuration for Sentry
+    properties:
+      attach_stack_trace:
+        description: Configure to generate and attach stacktraces to capturing message
+          calls
+        type: boolean
+        x-go-default: "true"
+        x-go-name: AttachStacktrace
+      debug:
+        description: Debug enables printing of Sentry SDK debug messages
+        type: boolean
+        x-go-default: "true"
+        x-go-name: Debug
+      disabled:
+        description: Sentry crash report disabled
+        type: boolean
+        x-go-default: "false"
+        x-go-name: Disabled
+      dsn:
+        description: |-
+          If DSN is not set, the client is effectively disabled
+          You can set test project's dsn to send log events: <https://7d7c8b13c9a44a31befe58199f59e4da@o574197.ingest.sentry.io/5758807>
+        type: string
+        x-go-name: Dsn
+      environment:
+        description: Environment
+        type: string
+        x-go-default: production
+        x-go-name: Environment
+      sample_rate:
+        description: Sample rate for event submission i.e. 0.0 to 1.0
+        format: double
+        type: number
+        x-go-default: "1.0"
+        x-go-name: SampleRate
+      traces_sample_rate:
+        description: Sample rate for sampling traces i.e. 0.0 to 1.0
+        format: double
+        type: number
+        x-go-default: "0.2"
+        x-go-name: TracesSampleRate
+    type: object
+    x-go-package: aperture.tech/aperture/plugins/service/aperture-plugin-fluxninja/sentry
+info: {}
+paths:
+  /fluxninja_plugin:
+    post:
+      operationId: FluxNinjaPlugin
+      parameters:
+      - in: body
+        schema:
+          $ref: '#/definitions/FluxNinjaPluginConfig'
+      - in: body
+        name: sentry
+        schema:
+          $ref: '#/definitions/SentryConfig'
+      - in: body
+        name: client_grpc
+        schema:
+          $ref: '#/definitions/GRPCClientConfig'
+      - in: body
+        name: client_http
+        schema:
+          $ref: '#/definitions/HTTPClientConfig'
+      tags:
+      - plugin-configuration
+      x-fn-config-env: true
+swagger: "2.0"

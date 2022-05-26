@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package aperture.common.config.v1;
+
+import "google/protobuf/any.proto";
+
+message ConfigPropertiesWrapper {
+  // An arbitrary config message.
+  google.protobuf.Any config = 1;
+  // Name of the Agent Group associated with this config.
+  string agent_group_name = 2;
+  // Name of the Policy.
+  string policy_name = 3;
+  // Hash of the entire Policy spec.
+  string policy_hash = 4;
+  // The index of a Component in the Cirucuit Components list.
+  int64 component_index = 5;
+}

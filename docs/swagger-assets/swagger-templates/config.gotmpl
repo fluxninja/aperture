@@ -1,0 +1,274 @@
+{{- define "fnSchemaSimple" }}{{/* renders a simple property */}}
+  {{- if .IsAliased -}}
+ [{{- dropPackage .GoType }}](#{{ dasherize (dropPackage .GoType) -}})
+  {{- else if .IsArray }}
+    {{- if .Items }}
+      {{- if and .Items.IsPrimitive (not .Items.IsAliased) -}}
+ {{- dropPackage .GoType -}}
+      {{- else -}}
+ [[]{{- dropPackage .Items.GoType }}](#{{ dasherize (dropPackage .Items.GoType) -}})
+      {{- end -}}
+    {{- else -}}
+ []any{{ printf " " -}}
+    {{- end -}}
+  {{- else if .IsMap -}}
+    {{- if .ElemType }}
+      {{- if and .ElemType.IsPrimitive (not .ElemType.IsAliased) (not .ElemType.IsInterface) -}}
+ {{ schemaDocMapType . -}}
+      {{- else if .ElemType.IsInterface -}}
+ map of any{{ printf " " -}}
+      {{- else -}}
+ map of [{{- dropPackage .ElemType.GoType }}](#{{ dasherize (dropPackage .ElemType.GoType) -}})
+      {{- end -}}
+    {{- else -}}
+ map of any{{ printf " " -}}
+    {{- end -}}
+  {{- else if .IsPrimitive -}}
+ {{- dropPackage .GoType -}}
+  {{- else -}}
+ [{{- dropPackage .GoType }}](#{{ dasherize (dropPackage .GoType) -}})
+  {{- end -}}
+{{- end }}
+
+{{- define "fnConstraints" }}
+  {{- if .Pattern -}}
+ Pattern: `{{ .Pattern }}`
+  {{- end -}}
+  {{- if .Minimum -}}
+ Minimum: `{{ json .Minimum }}`
+  {{- end -}}
+  {{- if .Maximum -}}
+ Maximum: `{{ json .Maximum }}`
+  {{- end -}}
+  {{- if .Required -}}
+ Required: `✓`
+  {{- end -}}
+  {{- if (index .Extensions "x-go-validate")  -}}
+ `{{ index .Extensions "x-go-validate" }}`
+  {{- end -}}
+{{- end -}}
+
+{{/* Like fnConstraints, but appropriate to rendering within body of text */ -}}
+{{- define "fnConstraintsInline" }}
+  {{- with .Pattern -}}
+    , pattern: `{{ . }}`
+  {{- end -}}
+  {{- if .Minimum -}}
+    , minimum: `{{ json . }}`
+  {{- end -}}
+  {{- with .Maximum -}}
+    , maximum: `{{ json . }}`
+  {{- end -}}
+  {{- if .Required -}}
+    , **required**
+  {{- end -}}
+  {{- with .Extensions }}
+    {{- with (index . "x-go-validate")  -}}
+      , `{{ . }}`
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- define "fnDefault" }}
+  {{- if .Default -}}
+ Default: `{{ json .Default }}`
+  {{- end -}}
+  {{- if (index .Extensions "x-go-default") -}}
+ `{{ index .Extensions "x-go-default" }}`
+  {{- end -}}
+{{- end -}}
+
+{{/* Like fnDefault, but appropriate to rendering within body of text */ -}}
+{{- define "fnDefaultInline" }}
+  {{- with .Default -}}
+    , default: `{{ json . }}`
+  {{- end -}}
+  {{- with .Extensions }}
+    {{- with (index . "x-go-default") -}}
+      , default: `{{ . }}`
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- define "fnProperty" }}
+    {{- template "fnSchemaSimple" . -}}
+    {{- template "fnConstraintsInline" . -}}
+    {{- template "fnDefaultInline" . -}}
+{{- end -}}
+
+{{- define "fnModel" }}{{/* renders a definition */}}
+{{- .Title }}
+
+{{ .Description }}
+
+{{ if .ExternalDocs }}
+{{ template "externalDoc" . }}
+{{- end }}
+{{ template "fnModelSchema" .}}
+{{- end }}
+
+{{- define "fnModelSchema" }}{{/* renders a schema */}}
+  {{- if .IsArray }}
+    {{- if .IsAliased }}
+ [[]{{- dropPackage .GoType }}](#{{ dasherize (dropPackage .GoType) -}})
+    {{- else if .Items }}
+      {{- if and .Items.IsPrimitive (not .Items.IsAliased) -}}
+ {{- schemaDocType . -}}
+      {{- else -}}
+ [][{{- dropPackage .Items.GoType }}](#{{ dasherize (dropPackage .Items.GoType) -}})
+      {{- end -}}
+    {{- else -}}
+ []any{{ printf " " -}}
+    {{- end -}}
+  {{- else if and .IsMap (not .IsAdditionalProperties) -}}
+    {{- if .IsAliased -}}
+ [{{- dropPackage .GoType }}](#{{ dasherize (dropPackage .GoType) -}})
+    {{- else if .ElemType }}
+      {{- if and .ElemType.IsPrimitive (not .ElemType.IsAliased) (not .ElemType.IsInterface) -}}
+ {{ schemaDocMapType . -}}
+      {{- else if .ElemType.IsInterface -}}
+ map of any{{ printf " " -}}
+      {{- else -}}
+ map of [{{- dropPackage .ElemType.GoType }}](#{{ dasherize (dropPackage .ElemType.GoType) -}})
+      {{- end -}}
+    {{- else -}}
+ map of any{{ printf " " -}}
+    {{- end -}}
+  {{- else if and .IsAliased .IsPrimitive (not .IsSuperAlias) -}}
+
+| Property | Type | Default | Constraints | Description |
+|----------|------|---------|-------------|-------------|
+| `{{ .OriginalName }}` | {{ schemaDocType . }} | {{ template "fnDefault" . }} | {{ template "fnConstraints" . }} | {{ trimSpace .Description }} |
+{{ printf "\n" }}
+  {{- else if or (and .IsAliased (not (.IsAdditionalProperties))) (and .IsComplexObject (not .Properties) (not .AllOf)) -}}
+[{{- dropPackage .GoType }}](#{{ dasherize (dropPackage .GoType) -}})
+  {{- else if and .IsInterface (not .IsAliased) (not .IsMap) -}}
+any
+  {{- else -}}
+    {{- range .AllOf }}
+      {{- if .IsAnonymous }}
+* inlined member (*{{ .Name }}*)
+
+{{ template "fnModelSchema" . }}
+      {{- else if or .IsComplexObject .IsPrimitive }}
+* composed type [{{- dropPackage .GoType }}](#{{ dasherize (dropPackage .GoType) -}})
+      {{- else }}
+* {{ template "fnModelSchema" . }}
+      {{- end }}
+    {{- end }}
+    {{- if .Properties }}
+#### {{ if .IsTuple }}Tuple members{{ else }}Properties{{ end }}
+
+      {{- range .Properties }}
+<dl>
+<dt>{{ .OriginalName }}</dt>
+<dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
+
+({{- template "fnProperty" . -}})
+{{- if or .Title .Description}} {{ end -}}
+{{- .Title -}}
+{{- if and .Title .Description }}{{ printf "\n\n" }}{{ end -}}
+{{- .Description }}
+
+</dd>
+</dl>
+      {{- end }}
+    {{- end }}
+  {{- end -}}
+{{- end }}
+
+{{- define "summary" -}}
+{{- if le (len .) 80 -}}
+    {{- . -}}
+{{- else -}}
+    {{- slice . 0 80 }}…
+{{- end -}}
+{{- end -}}
+
+# {{ .Info.Description }} Configuration Reference{{/* an index of all config keys */}}
+
+## Table of contents
+
+{{- $alltags := .Tags }}
+{{- range .OperationGroups }}
+
+### {{ upper (humanize .PackageAlias) }}
+
+| Key | Reference |
+|-----|-----------|
+  {{- range .Operations }}
+| {{ if slice .Path 1 }}`{{ slice .Path 1 }}`{{ end }} | [{{ .Name }}](#{{ dasherize .Name }}) |
+  {{- end }}
+  {{- printf "\n" }}
+{{- end }}
+
+### Object Index
+
+{{ range .Models -}}
+* [{{ .Name }}](#{{ dasherize .Name }})
+    {{- if .Title }} – {{ .Title -}}
+    {{- else if .Description }} – {{ template "summary" .Description -}}
+    {{- end }}
+{{ end }}
+
+## Reference{{/* all config sections */}}
+
+{{- range .Operations }}
+ {{- $opname := .Name }}
+
+### <span id="{{ dasherize .Name }}"></span> *{{ .Name }}*
+{{ if .Summary }}{{ printf "\n" }}{{ trimSpace .Summary }}{{ end }}
+
+
+{{ if slice .Path 1 }}Key: ```{{ slice .Path 1 }}```{{ end }}
+
+{{ if index .Extensions "x-fn-config-env" }}Env-Var Prefix: ```{{ upper (snakize (slice .BasePath 1)) }}_{{ if .Path }}{{ (upper (snakize (slice .Path 1))) }}_{{ end }}```{{ end }}
+
+#### Members
+
+{{- $base := .BasePath }}
+{{- $path := .Path }}
+{{- $env := index .Extensions "x-fn-config-env" }}
+  {{- if .QueryParams }}
+<dl>
+{{- range .QueryParams }}
+<dt>{{ .Name }}</dt>
+<dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
+
+(
+    {{- template "fnProperty" . -}}
+    {{ if $env  }}, env-var: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}{{ end }}`{{ end -}}
+){{ with .Description }} {{ . }}{{ end }}
+
+</dd>
+{{- end }}
+</dl>
+  {{- end }}
+  {{- if .HasBodyParams }}
+
+<dl>
+{{- range .Params }}
+{{- if .IsBodyParam }}
+
+<dt>{{ .Name }}</dt>
+<dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
+
+{{ if $env  }} Env-Var Prefix: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}_{{ end }}`{{ end }}
+Type: {{ template "fnSchemaSimple" . -}}
+{{ end }}
+</dd>
+{{- end }}
+</dl>
+{{- end }}{{/* end .HasBodyParams */}}
+{{- end }}{{/* end .Operations */}}
+
+## Objects
+{{- range .Models }}
+
+### <span id="{{ dasherize .Name }}"></span> {{ .Name }}
+{{ template "fnModel" . }}
+{{- end }}
+
+<!---
+Generated File Ends
+-->

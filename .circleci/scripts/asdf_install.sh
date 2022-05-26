@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+set -x
+
+# shellcheck disable=SC2153
+readarray -t tools <<< "${TOOLS?}"
+if [ "${#tools[@]}" -eq 1 ] && [ -z "${tools[0]:-}" ]; then
+  # Parameter was set to empty string
+  tools=()
+fi
+
+# If we need to setup python
+if <<< "${TOOLS}" grep '^python$'; then
+  # See https://github.com/pyenv/pyenv/wiki#suggested-build-environment
+  sudo apt-get update
+  sudo apt-get install make build-essential libssl-dev zlib1g-dev \
+    libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+    libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+fi
+
+./scripts/fn_manage_tools.sh setup "${tools[@]}"

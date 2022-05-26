@@ -1,0 +1,55 @@
+flowchart TD
+  subgraph Cloud["FluxNinja Cloud (Enterprise Edition)"]
+    subgraph CloudAnalytics["Large-scale Data"]
+      CloudDiscovery[("Discovery DB")]
+      CloudServiceHealth[("Service Metrics")]
+      CloudFlowAnalytics[("Flow Metrics")]
+    end
+    subgraph ControlPlane["Control Plane"]
+      CloudNotifications["Alerts & Notifications"]
+      CloudPolicyBuilder["Interactive Policy Builder (Planned)"]
+      CloudBehaviorModeling["AI-driven Behavior Modeling (Planned)"]
+    end
+  end
+  subgraph User VPC
+    subgraph Controller["Aperture Controller"]
+      subgraph ControllerDB["Controller DB"]
+        MetricsDB[("Metrics (Prometheus)")]
+        ETCD[("K/V Store (Etcd)")]
+      end
+      subgraph DecisionEngine["Decision Engine"]
+        ControlLoop["Policy Control Loop"]
+        PolicyManagement["Policy Management"]
+        AgentManagement["Agent Management"]
+      end
+    end
+    subgraph KubernetesNode["Kubernetes Node"]
+      subgraph Agent["Aperture Agent"]
+        subgraph MetricsService["Metrics Service"]
+          AgentDiscovery["Service Discovery"]
+          AgentMetrics["Metrics Collection"]
+        end
+        subgraph AgentFlowControl["Flow Control Service"]
+          ConcurrencyControl["Concurrency Control"]
+          Quotas["API Quotas"]
+        end
+      end
+      subgraph ServiceAPod["Service A Pod"]
+        subgraph ServiceA["Service A"]
+          FeaturesA["Features & Frameworks"]
+          PluginA["Aperture Library"]
+        end
+        MeshA["Service Mesh (Envoy)"]
+      end
+      subgraph ServiceBPod["Service B Pod"]
+        MeshB["Service Mesh (Envoy)"]
+      end
+    end
+  end
+Cloud <--> Controller
+Controller <--> KubernetesNode
+ServiceA <-..-> MeshA
+MeshA <-. API Traffic .-> MeshB
+MeshA <-- Decisions & Metrics --> AgentFlowControl
+PluginA <-- Decisions & Metrics --> AgentFlowControl
+FeaturesA <-- Decisions & Metrics --> PluginA

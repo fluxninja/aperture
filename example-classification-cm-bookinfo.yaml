@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: classification
+  namespace: aperture-system
+  labels:
+    aperture.tech/validate: "true"
+data:
+  default.productpage.yaml: |
+    selector:
+      namespace: bookinfo
+      service: productpage
+      control_point: { traffic: ingress }
+    rules:
+      ua:
+        extractor:
+          from: request.http.headers.user-agent
+      user:
+        rego:
+          query: data.user_from_cookie.user
+          source: |
+            package user_from_cookie
+            cookies := split(input.attributes.request.http.headers.cookie, "; ")
+            cookie := cookies[_]
+            cookie.startswith("session=")
+            session := substring(cookie, count("session="), -1)
+            parts := split(session, ".")
+            object := json.unmarshal(base64url.decode(parts[0]))
+            user := object.user
+
+  default.reviewsv2.yaml: |
+    selector:
+      namespace: bookinfo
+      service: reviews
+      label_matcher:
+        match_labels:
+          kube_version: v2
+      control_point: { traffic: egress }
+    rules:
+      reviews-version:
+        rego:
+          query: '"two"'
+          source: "package pkg"
+
+  default.reviewsv3.yaml: |
+    selector:
+      namespace: bookinfo
+      service: reviews
+      label_matcher:
+        match_labels:
+          kube_version: v3
+      control_point: { traffic: egress }
+    rules:
+      reviews-version:
+        rego:
+          query: '"three"'
+          source: "package pkg"

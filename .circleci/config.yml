@@ -1,0 +1,154 @@
+version: 2.1
+
+# this allows to use CircleCI's dynamic configuration feature
+setup: true
+
+executors:
+  base-cimg-executor:
+    docker:
+      - image: cimg/base:2021.07
+
+# TODO: Sync this with continue-workflows.yml
+commands:
+  asdf_install:
+    description: "Install tools using ASDF"
+    parameters:
+      tools:
+        type: string
+        description: "Newline separated list of tools to install. If empty, will install everything."
+        default: ""
+    steps:
+      - run:
+          name: Install ASDF
+          command: |
+            git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.8.1
+            printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
+      # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
+      - restore_cache:
+          name: Restore ASDF cache
+          keys:
+            - v1-asdf-cache-{{ checksum ".tool-versions" }}
+            - v1-asdf-cache-
+      - run:
+          name: Install ASDF tools
+          environment:
+            TOOLS: << parameters.tools >>
+          command: .circleci/scripts/asdf_install.sh
+  asdf_save_cache:
+    steps:
+      - save_cache:
+          name: Save ASDF cache
+          key: v1-asdf-cache-{{ checksum ".tool-versions" }}
+          paths:
+            - ~/.asdf/downloads/
+            - ~/.asdf/installs/
+            - ~/.asdf/keyrings/
+            - ~/.asdf/plugins/
+            - ~/.asdf/repository/
+            - ~/.asdf/shims/
+            - ~/.asdf/tmp/
+
+jobs:
+  nightly:
+    working_directory: ~/RM
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - asdf_install: &nightly_tools
+          tools: |-
+            python
+            gcloud
+            terraform
+            kubectl
+            helmfile
+      - run:
+          name: Prepare for nightly
+          command: .circleci/scripts/nightly_bootstrap.sh
+      - asdf_save_cache
+      - run:
+          name: Run nightly
+          working_directory: ops/apps/opsninja
+          command: inv nightly
+  demo:
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - asdf_install: *nightly_tools
+      - run:
+          name: Prepare for demo
+          command: .circleci/scripts/demo_bootstrap.sh
+      - asdf_save_cache
+      - run:
+          name: Run demo
+          working_directory: ops/apps/opsninja
+          command: inv demo
+  release-components:
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - asdf_install:
+          tools: |-
+            python
+            gcloud
+            terraform
+            kubectl
+            helmfile
+      - run:
+          name: Install opsninja dependencies
+          working_directory: ops/apps/opsninja
+          command: |
+            pip install .
+            asdf reshim
+      - run:
+          name: Schedule release jobs
+          working_directory: ops/apps/opsninja
+          command: inv release.circleci-release --tag << pipeline.git.tag >>
+
+orbs:
+  path-filtering: circleci/path-filtering@0.1.1
+
+workflows:
+  version: 2
+  filter-paths-main:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - not:
+            matches:
+              &is_not_empty_tag {
+                value: << pipeline.git.tag >>,
+                pattern: "^.+$",
+              }
+        - not: &scheduled
+            equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+    jobs:
+      - path-filtering/filter: &path_filtering_job
+          base-revision: << pipeline.git.base_revision >>
+          config-path: .circleci/continue-workflows.yml
+          mapping: |
+            (cmd|pkg|plugins|tools)/.* updated-aperture true
+            (go.mod|go.sum) updated-aperture true
+            docs/.* updated-aperture-docs true
+  filter-paths-pr:
+    when:
+      and:
+        - not:
+            equal: [main, << pipeline.git.branch >>]
+        - not:
+            matches: *is_not_empty_tag
+        - not: *scheduled
+    jobs:
+      - path-filtering/filter:
+          <<: *path_filtering_job
+          base-revision: main
+  release-components:
+    when:
+      matches: { value: << pipeline.git.tag >>, pattern: "^releases/.+$" }
+    jobs:
+      - release-components:
+          # both this and workflow's when is needed
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /releases\/.+/

@@ -1,0 +1,68 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+# If not configured otherwise, only run on commits
+default_stages:
+  - commit
+repos:
+  - repo: local
+    hooks:
+      - id: install-tools
+        name: "Install tools"
+        language: script
+        entry: ./tools/githooks/install_go_tools.sh
+        pass_filenames: false
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude: ^docs/.*svg$
+      - id: check-yaml
+        args:
+          - "--allow-multiple-documents"
+      - id: check-added-large-files
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: check-json
+      - id: detect-private-key
+        # These certs are used for ValidatingWebhook, and used within a cluster,
+        # so it should be fine to have them in repo
+        exclude: ^certs/(ca.key|key.pem)$
+      - id: mixed-line-ending
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.17
+    hooks:
+      - id: shellcheck
+  - repo: https://github.com/FluxNinja/pre-commit-golang
+    rev: v1.0.0-fn
+    hooks:
+      - id: go-generate
+      - id: go-mod-tidy-repo
+        args:
+          - -compat=1.18
+  - repo: meta
+    hooks:
+      - id: check-hooks-apply
+  # local hooks
+  - repo: local
+    hooks:
+      - id: golangci-lint
+        name: Run golangci-lint
+        entry: ./scripts/golangci_lint.sh
+        language: script
+        pass_filenames: false
+        require_serial: false
+        types:
+          - go
+        stages:
+          - commit
+        args:
+          - --fix
+      - id: generate-docs
+        name: "Docs"
+        entry: "./tools/githooks/generate_docs.sh"
+        language: script
+        files: '\.go$|\.md$|\.mmd$'
+        exclude: ^ops/.*
+        pass_filenames: false
+        description: "Generate docs"

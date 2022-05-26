@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package aperture.plugins.fluxninja.v1;
+
+import "aperture/common/info/v1/info.proto";
+import "aperture/common/peers/v1/peers.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
+
+// FluxNinjaService is used to receive health and status info from agents
+service FluxNinjaService {
+  // Report accepts information about agents' health and applied
+  // configurations/policies
+  rpc Report(ReportRequest) returns (ReportResponse) {
+    option (google.api.http) = {
+      post: "/plugins/fluxninja/v1/report"
+      body: "*"
+    };
+  }
+}
+
+message ReportRequest {
+  aperture.common.info.v1.VersionInfo version_info = 1;
+  aperture.common.info.v1.ProcessInfo process_info = 2;
+  aperture.common.info.v1.HostInfo host_info = 3;
+  string agent_group = 4;
+  repeated aperture.common.peers.v1.PeerInfo peer_infos = 5;
+  map<string, google.protobuf.Any> all_statuses = 6;
+}
+
+// ReportResponse is empty for now
+message ReportResponse {}
+
+// Policies type is packing an array of FlowControlPolicy to be used as one message and sent using type Any
+message Policies {
+  repeated FlowControlPolicy policies = 1;
+}
+
+// FlowControlPolicy is a policy used for directing traffic.
+// TODO fill it
+message FlowControlPolicy {}
+
+// Services type is packing an array of Service to be used as one message and sent using type Any
+message Services {
+  repeated Service services = 1;
+}
+
+// Service contains information about single service discovered in agent group by a
+// particular agent
+message Service {
+  string agent_group = 1;
+  string namespace = 2;
+  string name = 3;
+  int32 entities_count = 4;
+}
+
+message OverlappingServices {
+  repeated OverlappingService overlapping_services = 1;
+}
+
+// OverlappingService contains info about a service that overlaps with another one.
+message OverlappingService {
+  ServiceKey service1 = 1;
+  ServiceKey service2 = 2;
+  int32 entities_count = 3;
+}
+
+message ServiceKey {
+  string agent_group = 1;
+  string namespace = 2;
+  string name = 3;
+}

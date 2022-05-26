@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package aperture.common.status.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+//
+// gRPC service
+//
+
+// StatusService is used to query Jobs.
+service StatusService {
+  rpc GetGroupStatus(GroupStatusRequest) returns (GroupStatus) {
+    option (google.api.http) = {
+      get: "/v1/status/{group}"
+    };
+  }
+  rpc GetGroups(google.protobuf.Empty) returns (Groups) {
+    option (google.api.http) = {
+      get: "/v1/statusgroups"
+    };
+  }
+}
+
+//
+// Request/Response messages
+//
+
+message GroupStatusRequest {
+  string group = 1;
+}
+
+message Groups {
+  repeated string groups = 1;
+}
+
+//
+// Data models
+//
+
+// Groups is nested structure that holds status information about the node and a
+// pointer to the next node.
+message GroupStatus {
+  Status status = 1;
+  map<string, GroupStatus> groups = 2;
+}
+
+// Status holds details about a status that can be reported to the registry. The
+// details can either be a message (Any) or error (ErrorDetails).
+message Status {
+  oneof details {
+    google.protobuf.Any message = 1;
+    ErrorDetails error = 2;
+  }
+  google.protobuf.Timestamp timestamp = 3;
+}
+
+// ErrorDetails holds raw error message and its cause in a nested field.
+message ErrorDetails {
+  string message = 1;
+  ErrorDetails cause = 2;
+}

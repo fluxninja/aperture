@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package aperture.policy.language.v1;
+
+import "aperture/policy/language/v1/labelmatcher.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+message Selector {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      description: "Describes where a rule or actuation component should apply to."
+    }
+    example: "{\"'yaml\":{\"selector\":{\"namespace\":\"default\",\"service\":\"service1\",\"control_point\":{\"traffic\":\"ingress # Allowed values are `ingress` and `egress`.\"},\"label_matcher\":{\"match_labels\":{\"user_tier\":\"gold\"},\"match_expressions\":[{\"key\":\"query\",\"operator\":\"In\",\"values\":[\"insert\",\"delete\"]},{\"label\":\"user_agent\",\"regex\":\"^(?!.*Chrome).*Safari\"}]}}}}"
+  };
+
+  string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Describes where this selector applies to."
+  }]; // @gotags: default:"default"
+
+  string namespace = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "The namespace of the entities to select.\nIn k8s, this is the k8s' namespace."
+    extensions: {
+      key: "x-go-validate";
+      value {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
+
+  string service = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "The service (name) of the entities.\nIn k8s, this is a name of the Service object.\n\nNote: Entity may belong to multiple services."
+    extensions: {
+      key: "x-go-validate";
+      value {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
+
+  ControlPoint control_point = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Describes control point Within the entity where the policy should apply to."
+    extensions: {
+      key: "x-go-validate";
+      value {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
+
+  LabelMatcher label_matcher = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).\nThe label matcher allows to match on infra labels, flow labels and request labels.\nArbitrary label matcher can be used to match infra labels.\nFor flowcontrol policies, the matcher can be used to match flow labels.\n\nNote: For classification we can only match flow labels that were created at some **previous** control point.\n\nIn case of k8s, infra labels are labels on entities (note: there might exist some additional labels).\nFlow label names are always prefixed with `flow_`\nRequest labels are always prefixed with `request_`.\nAvailable request labels are `id` (available as `request_id`), `method`, `path`, `host`, `scheme`, `size`, `protocol`\n(mapped from fields of [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).\nAlso, (non-pseudo) headers are available as `request_header_<headername>`.\n\nNote: Request headers are only available for \"traffic\" control points."
+  }];
+}
+
+message ControlPoint {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      description: "Identifies control point within a service that the rule or policy should apply to.\nControlpoint is either a library feature name or one of \"ingress/egress\" traffic control point."
+    },
+  };
+
+  // @gotags: validate:"required"
+  oneof controlpoint {
+    string feature = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Name of FlunxNinja library's feature.\nFeature corresponds to a block of code that can be \"switched off\" which usually is a \"named opentelemetry's Span\".\n\nNote: Flowcontrol only."
+      extensions: {
+        key: "x-go-validate";
+        value {
+          string_value: "required"
+        }
+      }
+    }]; //@gotags: validate:"required"
+
+    string traffic = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Type of traffic service, either \"ingress\" or \"egress\".\nApply the policy to the whole incoming/outgoing traffic of a service.\nUsually powered by integration with a proxy (like envoy) or a web framework.\n\n* Flowcontrol: Blockable atom here is a single HTTP-transaction.\n* Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry."
+      extensions: {
+        key: "x-go-validate";
+        value {
+          string_value: "required,oneof=ingress egress"
+        }
+      }
+    }]; // @gotags: validate:"required,oneof=ingress egress"
+  }
+}

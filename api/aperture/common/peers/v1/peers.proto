@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package aperture.common.peers.v1;
+
+message PeerInfo {
+  string address = 1;
+  string hostname = 2;
+  map<string, string> services = 3;
+}

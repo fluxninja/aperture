@@ -1,0 +1,14 @@
+basePath: /aperture-controller
+info:
+  description: Aperture Controller
+paths:
+  /:
+    post:
+      operationId: Policy
+      parameters:
+      - in: body
+        schema:
+          $ref: '#/definitions/v1Policy'
+      tags:
+      - policies-configuration
+swagger: "2.0"

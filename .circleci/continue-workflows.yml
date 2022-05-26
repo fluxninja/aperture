@@ -1,0 +1,590 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.1.1
+  gcp-gcr: circleci/gcp-gcr@0.13.0
+  slack: circleci/slack@4.4.4
+  rust: circleci/rust@1.5.0
+  jira: circleci/jira@1.3.1
+  codecov: codecov/codecov@3.2.2
+
+executors:
+  base-cimg-executor:
+    docker:
+      - image: cimg/base:2021.07
+  go-cimg-executor:
+    docker:
+      - image: cimg/go:1.18
+        user: root
+  python-cimg-executor:
+    docker:
+      - image: cimg/python:3.10.4
+  base-machine-executor:
+    machine:
+      image: ubuntu-2004:202107-02
+      docker_layer_caching: true
+
+parameters:
+  updated-aperture:
+    type: boolean
+    default: true
+  updated-aperture-docs:
+    type: boolean
+    default: true
+  updated-circleci-config:
+    type: boolean
+    default: false
+
+jobs:
+  build-push-add-tag:
+    parameters:
+      attach-workspace:
+        type: boolean
+        description:
+          Boolean for whether or not to attach to an existing workspace
+        default: false
+      docker-context:
+        type: string
+        description:
+          Path to the directory containing your build context, defaults to .
+        default: .
+      dockerfile:
+        type: string
+        description: Name of dockerfile to use, defaults to Dockerfile
+        default: Dockerfile
+      executor:
+        type: executor
+        description: executor to use for this job
+        default: base-cimg-executor
+      extra_build_args:
+        type: string
+        description: Extra flags to pass to docker build
+        default: ""
+      docker_ssh:
+        type: string
+        description: SSH socket to forward to the docker build process
+        default: ""
+      dockerhub-image:
+        type: string
+        description: A name for your Docker image
+      gcr-registry:
+        type: string
+        description: Google Container Registry to push images to
+      gcr-image:
+        type: string
+        description: A name for the image pushed to GCR
+      path:
+        type: string
+        description:
+          Path to the directory containing your Dockerfile, defaults to .
+        default: .
+      remote-docker-version:
+        type: string
+        description: Specify the remote docker version
+        default: 20.10.6
+      setup-remote-docker:
+        type: boolean
+        description: Setup and use CircleCI's remote Docker environment
+        default: true
+      registry:
+        type: string
+        default: docker.io
+        description: Name of registry to use, defaults to docker.io
+      tag:
+        type: string
+        description: A Docker image tag
+        default: ${CIRCLE_SHA1:0:8}
+      target-tag:
+        type: string
+        description: Additional image tag applied when job runs on main branch
+        default: latest
+      use-docker-layer-caching:
+        type: boolean
+        description: Setup docker layer caching for optimized build
+        default: false
+      workspace-root:
+        type: string
+        description: >
+          Workspace root path that is either an absolute path or a path relative
+          to the working directory. Defaults to '.' (the working directory)
+        default: .
+    executor: <<parameters.executor>>
+    environment:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - checkout
+      - when:
+          condition: <<parameters.setup-remote-docker>>
+          steps:
+            - setup_remote_docker:
+                docker_layer_caching: <<parameters.use-docker-layer-caching>>
+                version: <<parameters.remote-docker-version>>
+      - when:
+          condition: <<parameters.attach-workspace>>
+          steps:
+            - attach_workspace:
+                at: <<parameters.workspace-root>>
+      - aperture_docker_build:
+          docker-context: <<parameters.docker-context>>
+          dockerfile: <<parameters.dockerfile>>
+          extra_build_args: <<parameters.extra_build_args>>
+          registry: <<parameters.registry>>``
+          image: <<parameters.dockerhub-image>>
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          ssh: <<parameters.docker_ssh>>
+          use-buildkit: true
+      - aperture_docker_tag:
+          source-registry: <<parameters.registry>>
+          source-image: <<parameters.dockerhub-image>>
+          source-tag: <<parameters.tag>>
+          dest-registry: <<parameters.gcr-registry>>
+          dest-image: <<parameters.gcr-image>>
+          dest-tag: <<parameters.tag>>
+      - gcp-gcr/gcr-auth
+      - gcp-gcr/push-image:
+          image: <<parameters.gcr-image>>
+          tag: <<parameters.tag>>
+
+  go-test-coverage:
+    parameters:
+      work_dir:
+        type: string
+        description: working directory
+    executor: go-cimg-executor
+    resource_class: xlarge
+    steps:
+      - checkout
+      - run:
+          name: download etcd
+          command: |
+            ETCD_VER=v3.5.3
+            DOWNLOAD_URL=https://storage.googleapis.com/etcd
+            rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+            rm -rf /tmp/etcd-download-test && mkdir -p /tmp/etcd-download-test
+            curl -L ${DOWNLOAD_URL}/${ETCD_VER}/etcd-${ETCD_VER}-linux-amd64.tar.gz -o /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+            tar xzvf /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz -C /tmp/etcd-download-test --strip-components=1 --no-same-owner
+            rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+            /tmp/etcd-download-test/etcd --version
+            mv /tmp/etcd-download-test/etcd /home/circleci/bin/etcd
+      - run:
+          name: download prometheus
+          command: |
+            PROMETHEUS_VER=2.36.1
+            DOWNLOAD_URL=https://github.com/prometheus/prometheus/releases/download
+            rm -f /tmp/prometheus-${PROMETHEUS_VER}.linux-amd64.tar.gz
+            rm -rf /tmp/prometheus-download-test && mkdir -p /tmp/prometheus-download-test
+            curl -L ${DOWNLOAD_URL}/v${PROMETHEUS_VER}/prometheus-${PROMETHEUS_VER}.linux-amd64.tar.gz -o /tmp/prometheus-${PROMETHEUS_VER}.linux-amd64.tar.gz
+            tar xvf /tmp/prometheus-${PROMETHEUS_VER}.linux-amd64.tar.gz -C /tmp/prometheus-download-test --strip-components=1 --no-same-owner
+            rm -f /tmp/prometheus-${PROMETHEUS_VER}.linux-amd64.tar.gz
+            /tmp/prometheus-download-test/prometheus --version
+            mv /tmp/prometheus-download-test/prometheus /home/circleci/bin/prometheus
+      - run:
+          name: Run tests and coverage
+          working_directory: << parameters.work_dir >>
+          command:
+            GOMAXPROCS=4 go test -v $(go list ./... | grep -v generated)
+            -coverprofile=coverage.out -covermode=atomic -coverpkg=./...
+      - codecov/upload
+      - run:
+          name: Show peak memory usage in bytes
+          command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
+          when: always
+
+  pre-commit:
+    executor: python-cimg-executor
+    resource_class: xlarge
+    steps:
+      - checkout
+      - run:
+          name: Install ASDF
+          command: |
+            git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.8.1
+            printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
+      # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
+      - restore_cache:
+          name: Restore ASDF cache
+          keys:
+            - v2-asdf-cache-{{ checksum ".tool-versions" }}
+            - v2-asdf-cache-
+      - run:
+          name: Install ASDF tools
+          command: |
+            while read -r name version; do
+              # Don't add unnecessary plugins
+              [[ "${name}" = "python" || "${name}" = "tilt" ]] && continue
+              # Don't add existing plugin
+              asdf plugin list | grep --quiet --fixed-strings --line-regexp "${name}" || asdf plugin add "${name}"
+            done < .tool-versions
+            asdf install
+      - run:
+          name: Install Common Tools
+          command: |
+            make install-go-tools
+      # when golangci-lint@v1.45.3 is released, update this to v1.45.3
+      - run:
+          name: Install golangci-lint
+          command: |
+            go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.3-0.20220419072601-f79bc883fb40
+      - run:
+          name: ASDF reshim golang
+          command: |
+            asdf reshim golang
+      - run:
+          name: Generate pre-commit cache key file
+          command: |
+            cp .pre-commit-config.yaml /tmp/pre-commit-cache-key.txt
+            python --version --version >> /tmp/pre-commit-cache-key.txt
+      - restore_cache:
+          name: Restore pre-commit cache
+          keys:
+            - v2-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
+            - v2-pc-cache-
+      - run:
+          name: Install pre-commit
+          command: |
+            pip install pre-commit==2.15.0
+            # pre-download hook environment
+            pre-commit install-hooks
+      - run:
+          name: Run pre-commit
+          # It'd be faster to run it only on files changed between current branch and target PR branch
+          # This can be done with: pre-commit run --from-ref <TARGET_BRANCH> --to-ref HEAD
+          # Unfortunately, CircleCI doesn't expose target branch
+          # Possible option is to use narrativescience/ghpr orb with get-pr-info, but this step can't be disabled
+          # So then we'd only be able to run this job on PRs, and would require separate job for running on main
+          # We use alternative approach, in which:
+          # 1) If current branch is main - pre-commit checks all files
+          # 2) Otherwise - we find common ancestor between current commit and main and run pre-commit with a base (from-ref) set to that ancestor
+          command: |
+            set -euo pipefail
+            set -x
+            # We already install tools as part of CI configuration so skip doing that from pre-commit
+            export SKIP=install-tools
+            if [ "$CIRCLE_BRANCH" = "main" ]; then
+              pre-commit run --all-files
+            else
+              base_ref="$(git merge-base main $CIRCLE_SHA1)"
+              pre-commit run --from-ref "${base_ref}" --to-ref "$CIRCLE_SHA1"
+              # TODO: Re-enable this on PR level at some point
+              ## pre-commit won't run commit-msg stage checks above, so we run it manually
+              #commits="$(git log "${base_ref}..${CIRCLE_SHA1}" --format=%H)"
+              #readarray -t commit_list \<<<"${commits}"
+              #for commit in "${commit_list[@]}"; do
+              #  ./tools/githooks/commit_check.py <(git log -n1 "${commit}" --format=%B)
+              #done
+            fi
+      - save_cache:
+          name: Save pre-commit cache
+          key: v2-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
+          paths:
+            - ~/.cache/pre-commit
+      - save_cache:
+          name: Save ASDF cache
+          key: v2-asdf-cache-{{ checksum ".tool-versions" }}
+          paths:
+            - ~/.asdf/downloads/
+            - ~/.asdf/installs/
+            - ~/.asdf/keyrings/
+            - ~/.asdf/plugins/
+            - ~/.asdf/repository/
+            - ~/.asdf/shims/
+            - ~/.asdf/tmp/
+      - run:
+          name:
+            Show diff and assert pre-commit didn't create any non-ignored files
+          command: |
+            git status
+            git add .
+            git diff --cached --exit-code
+          when: always
+
+  publish-aperture-docs:
+    executor: python-cimg-executor
+    parameters:
+      release-ref:
+        type: string
+        default: master
+        description: What release tag or branch to copy documentation from
+      dry-run:
+        type: boolean
+        default: false
+        description: Whether to push changes to the deployment repository
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"  # FluxNinja/RM R/O
+            - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff"  # FluxNinja/aperture-tech-docs R/W
+      - run:
+          name: Install opsninja and its dependencies
+          command: |
+            # We need R/O access to RM repository to be able to fetch opsninja library
+            # FIXME: make "releases" of opsninja library somehow, even as a separate repository
+            # to limit exposure.
+            export RM_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${RM_RO_KEY_FINGERPRINT}" | tr -d ':')"
+            export SSH_AUTH_SOCK=""
+            pip install 'git+ssh://git@github.com/FluxNinja/RM@master#egg=opsninja&subdirectory=ops/apps/opsninja/'
+      - asdf_install:
+          cache_name: publish-docs
+          tools: |-
+            nodejs
+      - run:
+          name: Install yarn
+          command: npm install --global yarn
+      - run:
+          name: Publish documentation updates
+          command: |
+            export LOGURU_LEVEL=TRACE
+            export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
+             args=(
+               --release=<< parameters.release-ref >>
+               --rm-repo-path=/home/circleci/project/
+               --docs-root-dir=docs/
+             )
+             if [[ "<< parameters.dry-run >>" == "true" ]]; then
+               args+=( --dry-run )
+             fi
+            fn release update-aperture-docs "${args[@]}"
+      - asdf_save_cache:
+          cache_name: publish-docs
+
+
+workflows:
+  version: 2
+
+  aperture:
+    when:
+      or:
+        - << pipeline.parameters.updated-aperture >>
+    jobs:
+      - build-push-add-tag:
+          name: image-build-aperture-agent
+          dockerhub-image: aperturecontrol/aperture-agent
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/aperture-agent
+          docker-context: .
+          dockerfile: cmd/aperture-agent/Dockerfile
+          use-docker-layer-caching: yes
+      - build-push-add-tag:
+          name: image-build-aperture-controller
+          dockerhub-image: aperturecontrol/aperture-controller
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/aperture-controller
+          docker-context: .
+          dockerfile: cmd/aperture-controller/Dockerfile
+          use-docker-layer-caching: yes
+      - go-test-coverage:
+          name: go-test-coverage-aperture
+          work_dir: .
+
+  pre-commit:
+    jobs:
+      - pre-commit
+
+  publish-aperture-docs:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-aperture-docs >>
+    jobs:
+      - publish-aperture-docs:
+          dry-run: true
+
+
+commands:
+  asdf_install:
+    description: "Install tools using ASDF"
+    parameters:
+      tools:
+        type: string
+        description:
+          "Newline separated list of tools to install. If empty, will install
+          everything."
+        default: ""
+      cache_name:
+        type: string
+        description: "Name of asdf cache"
+        default: "default"
+    steps:
+      - run:
+          name: Install ASDF
+          command: |
+            git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.2
+            printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
+            date +%m > ~/date
+      # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
+      - restore_cache:
+          name: Restore ASDF cache
+          keys:
+            - asdf-cache-v2-{{ checksum ".tool-versions" }}-{{ checksum "~/date"
+              }}-<< parameters.cache_name >>
+            - asdf-cache-v2-
+      - run:
+          name: Install ASDF tools
+          environment:
+            TOOLS: << parameters.tools >>
+          command: .circleci/scripts/asdf_install.sh
+  asdf_save_cache:
+    parameters:
+      cache_name:
+        type: string
+        description: "Name of asdf cache"
+        default: "default"
+    steps:
+      - save_cache:
+          name: Save ASDF cache
+          key:
+            asdf-cache-v2-{{ checksum ".tool-versions" }}-{{ checksum "~/date"
+            }}-<< parameters.cache_name >>
+          paths:
+            - ~/.asdf
+  aperture_docker_build:
+      description: |
+          Build and tag a Docker image (forked from circleci/docker with SSH support)
+      parameters:
+          attach-at:
+              default: ""
+              description: |
+                  Provide a path if you wish to attach a workspace. Use `./` for the working directory. `attach_workspace` attached location - where to mount folder/files that were `persist_to_workspace` in a previous step. https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
+              type: string
+          cache_from:
+              default: ""
+              description: |
+                  Comma-separated list of images, images will first be pulled, then passed as the --cache-from build argument https://docs.docker.com/engine/reference/commandline/build/
+              type: string
+          debug:
+              default: false
+              description: |
+                  Extra output for orb developers
+              type: boolean
+          docker-context:
+              default: .
+              description: |
+                  Path to the directory containing your build context, defaults to . (working directory)
+              type: string
+          dockerfile:
+              default: Dockerfile
+              description: Name of dockerfile to use, defaults to Dockerfile
+              type: string
+          extra_build_args:
+              default: ""
+              description: |
+                  Extra flags to pass to docker build. For examples, see https://docs.docker.com/engine/reference/commandline/build
+              type: string
+          image:
+              description: Name of image to build
+              type: string
+          lint-dockerfile:
+              default: false
+              description: |
+                  Lint Dockerfile before building?
+              type: boolean
+          no_output_timeout:
+              default: 10m
+              description: |
+                  Pass through a default timeout if your Docker build does not output anything for more than 10 minutes.
+              type: string
+          path:
+              default: .
+              description: |
+                  Path to the directory containing your Dockerfile, defaults to . (working directory)
+              type: string
+          registry:
+              default: docker.io
+              description: |
+                  Name of registry to use, defaults to docker.io
+              type: string
+          step-name:
+              default: Docker build
+              description: Specify a custom step name for this command, if desired
+              type: string
+          tag:
+              default: $CIRCLE_SHA1
+              description: Image tag, defaults to the value of $CIRCLE_SHA1
+              type: string
+          treat-warnings-as-errors:
+              default: false
+              description: |
+                  If linting Dockerfile, treat linting warnings as errors? (would trigger an exit code and fail the CircleCI job)
+              type: boolean
+          use-buildkit:
+              default: false
+              description: |
+                  Use buildkit to build the image. Available on Docker >= 18.09.0 https://docs.docker.com/develop/develop-images/build_enhancements/
+              type: boolean
+          ssh:
+              default: ''
+              description: |
+                  Which ssh socket to forward to the docker build process
+              type: string
+      steps:
+          - when:
+              condition: <<parameters.lint-dockerfile>>
+              steps:
+                  - docker/dockerlint:
+                      debug: <<parameters.debug>>
+                      dockerfile: <<parameters.path>>/<<parameters.dockerfile>>
+                      treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
+          - when:
+              condition: <<parameters.use-buildkit>>
+              steps:
+                  - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
+          - when:
+              condition: <<parameters.attach-at>>
+              steps:
+                  - attach_workspace:
+                      at: <<parameters.attach-at>>
+          - run:
+              command: .circleci/scripts/docker_build.sh
+              environment:
+                  PARAM_CACHE_FROM: <<parameters.cache_from>>
+                  PARAM_DOCKER_CONTEXT: <<parameters.docker-context>>
+                  PARAM_DOCKERFILE_NAME: <<parameters.dockerfile>>
+                  PARAM_DOCKERFILE_PATH: <<parameters.path>>
+                  PARAM_EXTRA_BUILD_ARGS: <<parameters.extra_build_args>>
+                  PARAM_IMAGE: <<parameters.image>>
+                  PARAM_REGISTRY: <<parameters.registry>>
+                  PARAM_TAG: <<parameters.tag>>
+                  PARAM_USE_BUILDKIT: <<parameters.use-buildkit>>
+                  PARAM_SSH_FORWARD: <<parameters.ssh>>
+              name: <<parameters.step-name>>
+              no_output_timeout: << parameters.no_output_timeout >>
+  aperture_docker_tag:
+    description: |
+      Tag source image with destination registry, image and tag
+    parameters:
+      source-registry:
+        type: string
+        description: Source registry of the image to tag
+      source-image:
+        type: string
+        description: Source image name to tag
+      source-tag:
+        type: string
+        description: Source tag to use for the source image
+      dest-registry:
+        type: string
+        description: Destination registry to use for the image
+      dest-image:
+        type: string
+        description: Destination image name to be used
+      dest-tag:
+        type: string
+        description: Destination tag to be used for the image
+      step-name:
+        type: string
+        description: Custom step name, if desired
+        default: Tag docker image
+    steps:
+      - run:
+          command: .circleci/scripts/docker_tag.sh
+          environment:
+            PARAM_SOURCE_REGISTRY: <<parameters.source-registry>>
+            PARAM_SOURCE_IMAGE: <<parameters.source-image>>
+            PARAM_SOURCE_TAG: <<parameters.source-tag>>
+            PARAM_DEST_REGISTRY: <<parameters.dest-registry>>
+            PARAM_DEST_IMAGE: <<parameters.dest-image>>
+            PARAM_DEST_TAG: <<parameters.dest-tag>>
+          name: <<parameters.step-name>>
