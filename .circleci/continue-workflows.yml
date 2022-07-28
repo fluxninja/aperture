@@ -208,14 +208,6 @@ jobs:
             nodejs
             shellcheck
             yq
-            tflint
-            jb
-            tanka
-            gcloud
-            sops
-            helm
-            kustomize
-            python
       - run:
           name: Generate pre-commit cache key file
           command: |
