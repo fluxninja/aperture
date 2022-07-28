@@ -27,10 +27,10 @@ executors:
 parameters:
   updated-aperture:
     type: boolean
-    default: true
+    default: false
   updated-aperture-docs:
     type: boolean
-    default: true
+    default: false
   updated-circleci-config:
     type: boolean
     default: false
@@ -389,9 +389,7 @@ workflows:
         - equal: [main, << pipeline.git.branch >>]
         - << pipeline.parameters.updated-aperture-docs >>
     jobs:
-      - publish-aperture-docs:
-          dry-run: true
-
+      - publish-aperture-docs
 
 commands:
   asdf_install:
