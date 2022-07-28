@@ -108,23 +108,23 @@
           "items": [
             {
               "type": "doc",
-              "id": "Reference/Config Spec/aperture-agent"
+              "id": "Reference/Config-Spec/aperture-agent"
             },
             {
               "type": "doc",
-              "id": "Reference/Config Spec/aperture-controller"
+              "id": "Reference/Config-Spec/aperture-controller"
             },
             {
               "type": "doc",
-              "id": "Reference/Config Spec/classification"
+              "id": "Reference/Config-Spec/classification"
             },
             {
               "type": "doc",
-              "id": "Reference/Config Spec/policies"
+              "id": "Reference/Config-Spec/policies"
             },
             {
               "type": "doc",
-              "id": "Reference/Config Spec/istio"
+              "id": "Reference/Config-Spec/istio"
             }
           ]
         }

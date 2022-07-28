@@ -148,7 +148,7 @@ Controller into your cluster.
 
 5. The chart also installs a `EnvoyFilter` resource for collecting data from the
    running applications. The details about the configuration and what details
-   are being collected are available at [Envoy Filter](../Reference/Config%20Spec/istio.md#envoy-filter). If
+   are being collected are available at [Envoy Filter](../Reference/Config-Spec/istio.md#envoy-filter). If
    you do not want to install the embedded Envoy Filter and want to install by
    yourself, configure below value in the `values.yaml` file and pass it with
    `helm upgrade`:
