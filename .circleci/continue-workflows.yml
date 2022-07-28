@@ -220,6 +220,10 @@ jobs:
             - v2-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
             - v2-pc-cache-
       - run:
+          name: Install pre-commit hooks
+          command: |
+            pre-commit install-hooks
+      - run:
           name: Run pre-commit
           # It'd be faster to run it only on files changed between current branch and target PR branch
           # This can be done with: pre-commit run --from-ref <TARGET_BRANCH> --to-ref HEAD
@@ -232,8 +236,6 @@ jobs:
           command: |
             set -euo pipefail
             set -x
-            # We already install tools as part of CI configuration so skip doing that from pre-commit
-            export SKIP=install-tools
             if [ "$CIRCLE_BRANCH" = "main" ]; then
               pre-commit run --all-files
             else
