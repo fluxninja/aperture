@@ -1,3 +1,12 @@
+---
+title: Istio
+slug: /reference/configuration/istio
+description: Aperture Istio page
+keywords:
+  - istio
+  - envoyfilter
+---
+
 ## Data Collected
 
 The Aperture Agent collects the below data using the Envoy Filter:

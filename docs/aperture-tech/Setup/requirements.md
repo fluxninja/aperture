@@ -1,3 +1,16 @@
+---
+title: Requirements
+slug: /setup/requirements
+description: Requirements page
+keywords:
+  - requirements
+  - integration
+  - utilization-metrics
+  - installation
+  - setup
+  - ports
+---
+
 ## Aperture Requirements
 
 Aperture provides Flow Control as a Service for reliably running modern web-scale cloud applications with little or no impact on the application code itself. Mostly all modern web-scale cloud applications can be deployed in an Aperture-enabled cluster without any changes at all. This document describes some application considerations and specific requirements of Aperture enablement.

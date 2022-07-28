@@ -91,14 +91,23 @@ Controller into your cluster.
    the FluxNinja cloud, create a `values.yaml` file with below parameters:
 
    ```yaml
-   fluxninjaPlugin:
-     enabled: true
-     endpoint: "AGENT_SERVICE_ADDRESS"
+   cloudIntegration: true
+   agent:
+     config:
+       ingestion:
+         address: "INGESTION_SERVICE_ADDRESS"
+         port: 443
+         insecure: false
      apiKeySecret:
-       agent:
-         value: "AGENT_API_KEY"
-       controller:
-         value: "CONTROLLER_API_KEY"
+       value: "AGENT_API_KEY"
+   agentController:
+     apiKeySecret:
+       value: "CONTROLLER_API_KEY"
+   heartbeats:
+     serverAddress: "AGENT_SERVICE_ADDRESS"
+     port: 443
+     tls:
+       insecureSkipVerify: true
    ```
 
    To generate the `AGENT_API_KEY` and `CONTROLLER_API_KEY`, please follow
@@ -115,14 +124,26 @@ Controller into your cluster.
    ```yaml
    etcd:
      enabled: false
-     endpoints: ["ETCD_INSTANCE_ENDPOINT"]
 
    prometheus:
      enabled: false
-     address: "PROMETHEUS_INSTANCE_ADDRESS"
 
    istio:
      enabled: false
+
+   agent:
+     config:
+       etcd:
+         endpoints: ["ETCD_INSTANCE_ENDPOINT"]
+       prometheus:
+         address: "PROMETHEUS_INSTANCE_ADDRESS"
+
+   agentController:
+     config:
+       etcd:
+         endpoints: ["ETCD_INSTANCE_ENDPOINT"]
+       prometheus:
+         address: "PROMETHEUS_INSTANCE_ADDRESS"
    ```
 
    ```bash
