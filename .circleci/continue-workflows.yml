@@ -207,7 +207,6 @@ jobs:
             mockery
             nodejs
             shellcheck
-            jq
             yq
             tflint
             jb
