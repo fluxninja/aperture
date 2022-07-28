@@ -6,7 +6,6 @@ require (
 	github.com/FluxNinja/lumberjack v0.0.0-20220311191217-5aad16738271
 	github.com/Henry-Sarabia/sliceconv v1.0.2
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
-	github.com/bufbuild/buf v1.7.0
 	github.com/buger/jsonparser v1.1.1
 	github.com/buraksezer/olric v0.0.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
@@ -17,7 +16,6 @@ require (
 	github.com/envoyproxy/go-control-plane v0.10.3
 	github.com/favadi/protoc-go-inject-tag v1.3.0
 	github.com/fluxninja/datasketches-go v0.0.0-20220128132852-065685ae83e0
-	github.com/fullstorydev/grpcurl v1.8.6
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-co-op/gocron v1.15.2-0.20220725154335-c667f3306226
@@ -37,7 +35,6 @@ require (
 	github.com/knadh/koanf v1.4.2
 	github.com/lithammer/dedent v1.1.0
 	github.com/looplab/tarjan v0.1.0
-	github.com/mikefarah/yq/v4 v4.26.1
 	github.com/mitchellh/copystructure v1.2.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/natefinch/atomic v1.0.1
@@ -58,7 +55,6 @@ require (
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
-	github.com/vektra/mockery/v2 v2.14.0
 	go.etcd.io/etcd/api/v3 v3.5.4
 	go.etcd.io/etcd/client/v3 v3.5.4
 	go.opentelemetry.io/collector v0.56.0
@@ -74,7 +70,6 @@ require (
 	golang.org/x/tools v0.1.12
 	google.golang.org/genproto v0.0.0-20220725144611-272f38e5d71b
 	google.golang.org/grpc v1.48.0
-	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/yaml.v2 v2.4.0
@@ -82,50 +77,20 @@ require (
 	k8s.io/apimachinery v0.24.3
 	k8s.io/client-go v0.24.3
 	k8s.io/klog/v2 v2.70.1
-	mvdan.cc/gofumpt v0.3.1
 )
 
 require (
-	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
-	github.com/a8m/envsubst v1.3.0 // indirect
-	github.com/alecthomas/participle/v2 v2.0.0-beta.4 // indirect
-	github.com/bufbuild/connect-go v0.2.0 // indirect
-	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
-	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
-	github.com/containerd/containerd v1.6.6 // indirect
-	github.com/containerd/typeurl v1.0.2 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
-	github.com/elliotchance/orderedmap v1.4.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
-	github.com/go-chi/chi/v5 v5.0.7 // indirect
 	github.com/go-openapi/errors v0.20.2 // indirect
 	github.com/go-openapi/runtime v0.23.3 // indirect
 	github.com/go-openapi/strfmt v0.21.2 // indirect
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/go-openapi/validate v0.22.0 // indirect
-	github.com/goccy/go-yaml v1.9.5 // indirect
-	github.com/gofrs/flock v0.8.1 // indirect
-	github.com/gofrs/uuid v4.2.0+incompatible // indirect
-	github.com/golang/glog v1.0.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/hashicorp/cronexpr v1.1.1 // indirect
 	github.com/hashicorp/nomad/api v0.0.0-20220726154010-ed202d492861 // indirect
-	github.com/jdxcode/netrc v0.0.0-20210204082910-926c7f70242a // indirect
-	github.com/jhump/protocompile v0.0.0-20220216033700-d705409f108f // indirect
-	github.com/jhump/protoreflect v1.12.1-0.20220721211354-060cc04fc18b // indirect
-	github.com/jinzhu/copier v0.3.5 // indirect
-	github.com/klauspost/pgzip v1.2.5 // indirect
-	github.com/moby/buildkit v0.10.3 // indirect
-	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
-	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheus v0.56.0 // indirect
 	github.com/pascaldekloe/name v1.0.0 // indirect
-	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
-	github.com/pkg/profile v1.6.0 // indirect
-	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
-	gopkg.in/op/go-logging.v1 v1.0.0-20160211212156-b2cb9fa56473 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

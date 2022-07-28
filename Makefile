@@ -1,11 +1,11 @@
 aperture_path := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-download:
+go-mod-tidy:
 	@echo Download go.mod dependencies
 	@GOPRIVATE=github.com/aperture-control,aperture.tech
-	@go mod download
+	@go mod tidy
 
-install-go-tools: download
+install-go-tools: go-mod-tidy
 	@echo Installing tools from tools.go
 	@./scripts/install_go_tools.sh
 
