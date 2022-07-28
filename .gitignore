@@ -27,4 +27,3 @@ go.work
 ### Go Patch ###
 /vendor/
 /Godeps/
-
