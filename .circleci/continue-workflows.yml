@@ -197,26 +197,23 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install ASDF
+          name: Set go tools version env
           command: |
-            git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.8.1
-            printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
-      # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
-      - restore_cache:
-          name: Restore ASDF cache
-          keys:
-            - v2-asdf-cache-{{ checksum ".tool-versions" }}
-            - v2-asdf-cache-
-      - run:
-          name: Install ASDF tools
-          command: |
-            while read -r name version; do
-              # Don't add unnecessary plugins
-              [[ "${name}" = "python" || "${name}" = "tilt" ]] && continue
-              # Don't add existing plugin
-              asdf plugin list | grep --quiet --fixed-strings --line-regexp "${name}" || asdf plugin add "${name}"
-            done < .tool-versions
-            asdf install
+            export GO_TOOLS_VERSION=$(grep FluxNinja/aperture .pre-commit-config.yaml -A 1 | tail -n 1 | awk '{ print $NF }' | tr -d '\n')
+      - asdf_install:
+          cache_name: pre-commit-${GO_TOOLS_VERSION}
+          tools: |-
+            pre-commit
+            bats
+            golang
+            golangci-lint
+            buf
+            mockery
+            nodejs
+            shellcheck
+            jq
+            yq
+            python
       - run:
           name: Install Common Tools
           command: |
@@ -279,17 +276,8 @@ jobs:
           key: v2-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
             - ~/.cache/pre-commit
-      - save_cache:
-          name: Save ASDF cache
-          key: v2-asdf-cache-{{ checksum ".tool-versions" }}
-          paths:
-            - ~/.asdf/downloads/
-            - ~/.asdf/installs/
-            - ~/.asdf/keyrings/
-            - ~/.asdf/plugins/
-            - ~/.asdf/repository/
-            - ~/.asdf/shims/
-            - ~/.asdf/tmp/
+      - asdf_save_cache:
+          cache_name: pre-commit-${GO_TOOLS_VERSION}
       - run:
           name:
             Show diff and assert pre-commit didn't create any non-ignored files
