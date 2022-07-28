@@ -1,7 +1,10 @@
+pre-commit 2.20.0
 bats 1.7.0
 golang 1.18.4
-hasura-cli 2.8.4
-jq 1.6
+golangci-lint 1.47.2
+grpcurl 1.8.6
+mockery 2.14.0
+buf 1.6.0
 nodejs 18.6.0
 python 3.10.5
 shellcheck 0.8.0

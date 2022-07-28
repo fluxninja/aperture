@@ -6,11 +6,13 @@ default_stages:
 repos:
   - repo: local
     hooks:
-      - id: install-tools
-        name: "Install tools"
+      - id: proto
+        name: "Proto"
+        entry: "./tools/githooks/generate_api.sh"
         language: script
-        entry: ./tools/githooks/install_go_tools.sh
+        files: '\.proto$'
         pass_filenames: false
+        description: "Protobuf generation"
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.2.0
     hooks:
@@ -43,6 +45,49 @@ repos:
   - repo: meta
     hooks:
       - id: check-hooks-apply
+  - repo: https://github.com/myint/autoflake
+    rev: v1.4
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-unused-variables
+          - --remove-all-unused-imports
+          - --exclude
+          - "__init__.py"
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        name: isort (python)
+        args:
+          - --filter-files
+          - --profile
+          - black
+  - repo: https://github.com/ambv/black
+    rev: 22.6.0
+    hooks:
+      - id: black
+        language_version: python3
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v2.7.1"
+    hooks:
+      - id: prettier
+        exclude: ^(docs/gen/.*.yaml)
+        types_or:
+          [
+            sh,
+            shell,
+            bash,
+            zsh,
+            dockerfile,
+            makefile,
+            json,
+            markdown,
+            jsonnet,
+            python3,
+            terraform,
+          ]
   # local hooks
   - repo: local
     hooks:
@@ -58,6 +103,18 @@ repos:
           - commit
         args:
           - --fix
+      - id: bats
+        name: Run bats tests
+        entry: ./tools/githooks/check_bats.sh
+        language: script
+        pass_filenames: true
+        types:
+          # Bats files are also shell files:
+          # $ identify-cli ops/argo/test.bats
+          # ["bash", "bats", "file", "non-executable", "shell", "text"]
+          - shell
+        stages:
+          - commit
       - id: generate-docs
         name: "Docs"
         entry: "./tools/githooks/generate_docs.sh"
