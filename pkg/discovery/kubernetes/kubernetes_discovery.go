@@ -64,14 +64,14 @@ func newServiceDataCache() *serviceDataCache {
 }
 
 func createServiceData(service *v1.Endpoints, nodeName string) *serviceData {
-	name := service.Name
+	fqdn := getFQDN(service)
 	pods := getServicePods(service, nodeName)
 	sort.Slice(pods, func(i, j int) bool {
 		return podInfoOrder(pods[i], pods[j])
 	})
 
 	return &serviceData{
-		Name: name,
+		Name: fqdn,
 		Pods: pods,
 	}
 }
@@ -85,9 +85,9 @@ func (sc *serviceDataCache) updateService(service *v1.Endpoints, nodeName string
 
 func (sc *serviceDataCache) updateServicePods(service *v1.Endpoints, pods []podInfo) {
 	uid := string(service.UID)
-	name := service.Name
+	fqdn := getFQDN(service)
 	sc.cache[uid] = &serviceData{
-		Name: name,
+		Name: fqdn,
 		Pods: pods,
 	}
 }
@@ -255,7 +255,7 @@ func (kc *KubernetesDiscovery) start() {
 							kc.serviceCache.updateService(endpoints, kc.nodeName)
 							kc.addRemoveFromEndpoints(endpoints, add)
 						} else {
-							if endpoints.Name != cachedData.Name {
+							if getFQDN(endpoints) != cachedData.Name {
 								kc.renameService(endpoints)
 							}
 							kc.syncPodLists(endpoints)
@@ -320,7 +320,7 @@ func (kc *KubernetesDiscovery) updatePodInTracker(podInfo podInfo) error {
 }
 
 func (kc *KubernetesDiscovery) syncPodLists(e *v1.Endpoints) {
-	serviceName := e.Name
+	serviceName := getFQDN(e)
 	cachedService, _ := kc.serviceCache.getServiceData(e)
 
 	// assume cached pods are sorted by namespace and name
@@ -382,6 +382,17 @@ func (kc *KubernetesDiscovery) syncPodLists(e *v1.Endpoints) {
 	kc.serviceCache.updateServicePods(e, currentPods)
 }
 
+// getFQDN return the full qualified domain name of a given service.
+func getFQDN(e *v1.Endpoints) string {
+	name := e.Name
+	namespace := e.Namespace
+
+	// we assume that FQDN of all kubernetes services is the default one
+	defaultFQDN := fmt.Sprintf("%v.%v.svc.cluster.local", name, namespace)
+
+	return defaultFQDN
+}
+
 // getServicePods retrieves a list of pods handled by a given service that are located on a given node.
 func getServicePods(service *v1.Endpoints, nodeName string) []podInfo {
 	var pods []podInfo
@@ -411,7 +422,7 @@ func getServicePods(service *v1.Endpoints, nodeName string) []podInfo {
 }
 
 func (kc *KubernetesDiscovery) renameService(e *v1.Endpoints) {
-	newServiceName := e.Name
+	newServiceName := getFQDN(e)
 	oldService, _ := kc.serviceCache.getServiceData(e)
 	oldServiceName := oldService.Name
 	for _, podInfo := range oldService.Pods {
@@ -426,13 +437,13 @@ func (kc *KubernetesDiscovery) renameService(e *v1.Endpoints) {
 }
 
 func (kc *KubernetesDiscovery) addRemoveFromEndpoints(e *v1.Endpoints, operation serviceCacheOperation) {
-	service := e.Name
+	serviceName := getFQDN(e)
 	pods := getServicePods(e, kc.nodeName)
 	for _, pod := range pods {
 		if operation == add {
-			kc.mapping.addService(pod.Namespace, pod.Name, service)
+			kc.mapping.addService(pod.Namespace, pod.Name, serviceName)
 		} else {
-			kc.mapping.removeService(pod.Namespace, pod.Name, service)
+			kc.mapping.removeService(pod.Namespace, pod.Name, serviceName)
 		}
 		err := kc.updatePodInTracker(pod)
 		if err != nil {
