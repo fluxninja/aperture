@@ -38,6 +38,9 @@ go-generate-swagger:
 	@echo Generating swagger specs from go code
 	@./scripts/go_generate_swagger.sh
 
+generate-docs: generate-config-markdown generate-mermaid
+	@echo Generating docs
+
 generate-config-markdown: go-generate-swagger
 	@cd ./docs && $(MAKE) generate-config-markdown
 
@@ -50,7 +53,7 @@ coverage_profile:
 show_coverage_in_browser: profile.coverprofile
 	go tool cover -html profile.coverprofile
 
-all: install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-config-markdown generate-mermaid
+all: install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs
 	@echo "Done"
 
-.PHONY: install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser
+.PHONY: install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser
