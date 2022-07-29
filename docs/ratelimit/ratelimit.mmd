@@ -1,0 +1,23 @@
+sequenceDiagram
+    actor Source
+    participant Proxy
+    participant Agent
+    participant Class as Agent - Classification
+    participant Quotas as Agent - Quotas
+    participant Destination
+
+    Source->>Proxy: request
+    Proxy->>Agent: authorization request (including preexisting flow labels)
+    Agent->>Class: metadata
+    Class-->>Agent: created flow labels
+    Agent-->>Agent: find applying policy, choose fairness key
+    Agent->>Quotas: try increment counter
+
+    Quotas-->>Agent: decision
+    Quotas-->>Proxy: decision
+
+    alt If counter successfuly incremented
+        Proxy->>Destination: forward request
+    else
+        Proxy-->>Source: 429 Too many requests
+    end

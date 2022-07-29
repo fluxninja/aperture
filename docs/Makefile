@@ -66,8 +66,15 @@ $(POLICY_MARKDOWNS): %/swagger.md: %/config-swagger.yaml
 	@rm $(@D)/gen.yaml
 	@rm $(@D)/aperture.swagger.yaml
 
+# Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid:
-	@npx -p @mermaid-js/mermaid-cli mmdc --input **/*.mmd --configFile ./mermaid-theme.json
-	@#npx -p @mermaid-js/mermaid-cli mmdc --input **/*.md --configFile ./mermaid-theme.json
+	@$(MAKE) -B **/*.mmd.png **/*.mmd.svg
+
+%.mmd.png %.mmd.svg: %.mmd ./mermaid-theme.json
+	@echo MMDC $@
+	@for fmt in svg png; \
+		do npx -p @mermaid-js/mermaid-cli mmdc \
+			--quiet --input $< --configFile ./mermaid-theme.json --output $<.$$fmt; \
+	done
 
 .PHONY: generate-config-markdown generate-mermaid
