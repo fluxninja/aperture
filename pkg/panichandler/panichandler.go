@@ -60,7 +60,7 @@ func RegisterPanicHandler(ph PanicHandler) {
 
 // Recover invokes each of the registered panic handlers, and then rethrows the panic.
 func Recover() {
-	getPanicHandlerRegistry().RecoverAndShutdown()
+	getPanicHandlerRegistry().RecoverAndCrash()
 }
 
 // crashOnce prevents multiple panics to interfere each other, process single panic.
@@ -89,28 +89,41 @@ func (r *PanicHandlerRegistry) RegisterPanicHandler(ph PanicHandler) {
 	r.Handlers = append(r.Handlers, ph)
 }
 
-// RecoverAndShutdown invokes each of the registered panic handler and then shuts down the app.
-func (r *PanicHandlerRegistry) RecoverAndShutdown() {
-	v := recover()
-	if v != nil {
-		time.Sleep(time.Second * 1)
-		defer panic(v)
-		stackTrace := Capture()
-		crashOnce.Do(func() {
-			r.mutex.RLock()
-			defer r.mutex.RUnlock()
-			wg := sync.WaitGroup{}
-			wg.Add(len(r.Handlers))
-			for _, handler := range r.Handlers {
-				h := handler
-				go func() {
-					defer wg.Done()
-					h(v, stackTrace)
-				}()
-			}
-			wg.Wait()
-		})
+// Crash invokes each of the registered panic handler and then rethrows panic to shut down the app.
+func (r *PanicHandlerRegistry) Crash(e interface{}) {
+	stackTrace := Capture()
+	waitCh := make(chan struct{})
+	crashOnce.Do(func() {
+		r.mutex.RLock()
+		defer r.mutex.RUnlock()
+		wg := sync.WaitGroup{}
+		wg.Add(len(r.Handlers))
+		for _, handler := range r.Handlers {
+			h := handler
+			go func() {
+				defer wg.Done()
+				h(e, stackTrace)
+			}()
+		}
+		wg.Wait()
+		close(waitCh)
+	})
+
+	select {
+	case <-waitCh:
+		panic(e)
+	case <-time.After(5 * time.Second):
+		panic(e)
 	}
+}
+
+// RecoverAndCrash invokes each of the registered panic handler and then shuts down the app.
+func (r *PanicHandlerRegistry) RecoverAndCrash() {
+	if v := recover(); v != nil {
+    // Note: DiodeFlush -- Check
+		time.Sleep(time.Second * 1)
+    r.Crash(v)
+  }
 }
 
 // Go calls f on a new go-routine, reporting panics to the registered handlers.
@@ -118,7 +131,7 @@ func (r *PanicHandlerRegistry) Go(f func()) {
 	go func() {
 		// SetPanicOnFault allows the runtime trigger only a panic, not a crash
 		debug.SetPanicOnFault(true)
-		defer r.RecoverAndShutdown()
+		defer r.RecoverAndCrash()
 		f()
 	}()
 }
