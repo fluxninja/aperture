@@ -382,7 +382,7 @@ commands:
           name: Restore ASDF cache
           keys:
             - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name
-              >>-{{ checksum ".tool-versions" }}
+              >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
             - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -400,7 +400,7 @@ commands:
           name: Save ASDF cache
           key:
             asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-{{
-            checksum ".tool-versions" }}
+            checksum ".tool-versions" }}-{{ checksum "go.mod" }}
           paths:
             - ~/.asdf
 
