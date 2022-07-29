@@ -12,7 +12,7 @@ import (
 	"golang.org/x/net/context"
 	"k8s.io/apimachinery/pkg/util/json"
 
-	"aperture.tech/aperture/pkg/otelcollector"
+	"github.com/FluxNinja/aperture/pkg/otelcollector"
 )
 
 var _ = Describe("Metrics Processor", func() {

@@ -7,9 +7,9 @@ import (
 	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/panic"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/panic"
 )
 
 // Module is a fx module that provides etcd client.

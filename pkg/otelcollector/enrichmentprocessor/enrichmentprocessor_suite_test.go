@@ -7,8 +7,8 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/utils"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/utils"
 )
 
 func TestEnrichmentprocessor(t *testing.T) {

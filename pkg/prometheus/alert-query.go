@@ -8,7 +8,7 @@ import (
 	prometheusmodel "github.com/prometheus/common/model"
 	"google.golang.org/protobuf/proto"
 
-	"aperture.tech/aperture/pkg/jobs"
+	"github.com/FluxNinja/aperture/pkg/jobs"
 )
 
 // AlertCallback is a callback function that gets invoked respectively when the alert gets active, inactive.

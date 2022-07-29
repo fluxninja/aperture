@@ -1,4 +1,4 @@
-module aperture.tech/aperture
+module github.com/FluxNinja/aperture
 
 go 1.18
 

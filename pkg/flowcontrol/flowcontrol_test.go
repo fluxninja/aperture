@@ -9,13 +9,13 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc/peer"
 
-	flowcontrolv1 "aperture.tech/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/entitycache"
-	"aperture.tech/aperture/pkg/flowcontrol"
-	grpcclient "aperture.tech/aperture/pkg/net/grpc"
-	"aperture.tech/aperture/pkg/platform"
-	"aperture.tech/aperture/pkg/policies/dataplane"
+	flowcontrolv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/entitycache"
+	"github.com/FluxNinja/aperture/pkg/flowcontrol"
+	grpcclient "github.com/FluxNinja/aperture/pkg/net/grpc"
+	"github.com/FluxNinja/aperture/pkg/platform"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane"
 )
 
 var (

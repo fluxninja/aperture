@@ -4,7 +4,7 @@ import (
 	"path"
 	"strconv"
 
-	"aperture.tech/aperture/pkg/policies/dataplane/component"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane/component"
 )
 
 var (

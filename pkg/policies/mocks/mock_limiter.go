@@ -7,9 +7,9 @@ package mocks
 import (
 	reflect "reflect"
 
-	flowcontrolv1 "aperture.tech/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	languagev1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	selectors "aperture.tech/aperture/pkg/selectors"
+	flowcontrolv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	languagev1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	selectors "github.com/FluxNinja/aperture/pkg/selectors"
 	gomock "github.com/golang/mock/gomock"
 )
 

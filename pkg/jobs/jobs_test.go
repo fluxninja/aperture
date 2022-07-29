@@ -14,10 +14,10 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	statusv1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/status/v1"
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/status"
+	statusv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/status"
 )
 
 var (

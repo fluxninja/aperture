@@ -8,8 +8,8 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 
-	configv1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/config/v1"
-	"aperture.tech/aperture/pkg/log"
+	configv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 // HashAndWrapWithConfProps wraps a proto message with a config properties wrapper and hashes it.

@@ -6,7 +6,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"aperture.tech/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 // TokenBucketLoadShedMetrics holds metrics related to internals of TokenBucketLoadShed.

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	"aperture.tech/aperture/pkg/peers"
+	"github.com/FluxNinja/aperture/pkg/peers"
 )
 
 // ServiceDiscovery holds fields needed to implement Olric's Service Discovery interface.

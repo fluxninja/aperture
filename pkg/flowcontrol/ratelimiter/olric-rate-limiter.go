@@ -7,7 +7,7 @@ import (
 	"github.com/buraksezer/olric"
 	"github.com/buraksezer/olric/config"
 
-	"aperture.tech/aperture/pkg/distcache"
+	"github.com/FluxNinja/aperture/pkg/distcache"
 )
 
 // OlricRateLimiter implements Limiter.

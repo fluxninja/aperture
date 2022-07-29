@@ -16,9 +16,9 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	"github.com/hashicorp/memberlist"
 
-	"aperture.tech/aperture/pkg/distcache"
-	"aperture.tech/aperture/pkg/jobs"
-	"aperture.tech/aperture/pkg/status"
+	"github.com/FluxNinja/aperture/pkg/distcache"
+	"github.com/FluxNinja/aperture/pkg/jobs"
+	"github.com/FluxNinja/aperture/pkg/status"
 )
 
 func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit int, ttl time.Duration, overrides map[string]float64) (RateLimiter, error) {

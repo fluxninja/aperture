@@ -1,5 +1,5 @@
 version: v1
-name: buf.build/aperture/api
+name: buf.build/fluxninja/aperture
 deps:
   - buf.build/googleapis/googleapis
   - buf.build/grpc-ecosystem/grpc-gateway

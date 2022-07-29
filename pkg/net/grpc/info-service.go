@@ -6,9 +6,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	infov1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/info/v1"
-	"aperture.tech/aperture/pkg/info"
-	"aperture.tech/aperture/pkg/log"
+	infov1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/info/v1"
+	"github.com/FluxNinja/aperture/pkg/info"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 // InfoService is the implementation of the infov1.InfoServiceServer interface.

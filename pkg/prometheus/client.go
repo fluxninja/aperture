@@ -9,9 +9,9 @@ import (
 	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
-	commonhttp "aperture.tech/aperture/pkg/net/http"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
+	commonhttp "github.com/FluxNinja/aperture/pkg/net/http"
 )
 
 var (

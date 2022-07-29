@@ -3,8 +3,8 @@ package grpc
 import (
 	"google.golang.org/grpc"
 
-	statusv1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/status/v1"
-	"aperture.tech/aperture/pkg/status"
+	statusv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/FluxNinja/aperture/pkg/status"
 )
 
 // StatusService is the implementation of the statusv1.StatusServiceServer interface.

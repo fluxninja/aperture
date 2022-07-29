@@ -9,7 +9,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/rs/zerolog"
 
-	"aperture.tech/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 var _ = io.WriteCloser(new(SentryWriter))

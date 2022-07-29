@@ -8,7 +8,7 @@ import (
 	"github.com/containerd/cgroups"
 	"google.golang.org/protobuf/proto"
 
-	"aperture.tech/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 type cgroupBase struct {

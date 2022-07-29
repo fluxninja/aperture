@@ -6,8 +6,8 @@ import (
 	"github.com/elastic/gmux"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 // GMuxConstructor holds fields to create an annotated instance gmux Listener.

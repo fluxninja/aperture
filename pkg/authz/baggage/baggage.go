@@ -8,8 +8,8 @@ import (
 	otel_baggage "go.opentelemetry.io/otel/baggage"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	class "aperture.tech/aperture/pkg/classification"
-	"aperture.tech/aperture/pkg/log"
+	class "github.com/FluxNinja/aperture/pkg/classification"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 // Headers is a header map in authz convention – keys are lowercase.

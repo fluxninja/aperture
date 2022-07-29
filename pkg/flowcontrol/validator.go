@@ -3,9 +3,9 @@ package flowcontrol
 import (
 	"context"
 
-	languagev1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
+	languagev1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 // CMFileValidator Flowcontrol implementation of CMFileValidator interface.

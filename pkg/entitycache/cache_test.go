@@ -2,15 +2,18 @@ package entitycache_test
 
 import (
 	"fmt"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	heartbeatv1 "aperture.tech/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
-	"aperture.tech/aperture/pkg/entitycache"
+	heartbeatv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
+	"github.com/FluxNinja/aperture/pkg/entitycache"
 )
 
-const testPrefix = "test"
-const testNS = "testNamespace"
+const (
+	testPrefix = "test"
+	testNS     = "testNamespace"
+)
 
 var _ = Describe("Cache", func() {
 	var ec *entitycache.EntityCache

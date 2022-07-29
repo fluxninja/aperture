@@ -6,14 +6,14 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	flowcontrolv1 "aperture.tech/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/multimatcher"
-	"aperture.tech/aperture/pkg/panic"
-	"aperture.tech/aperture/pkg/policies/dataplane/iface"
-	"aperture.tech/aperture/pkg/selectors"
-	"aperture.tech/aperture/pkg/services"
+	flowcontrolv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/multimatcher"
+	"github.com/FluxNinja/aperture/pkg/panic"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane/iface"
+	"github.com/FluxNinja/aperture/pkg/selectors"
+	"github.com/FluxNinja/aperture/pkg/services"
 )
 
 // multiMatcher is MultiMatcher instantiation used in this package.

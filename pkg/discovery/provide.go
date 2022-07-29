@@ -3,8 +3,8 @@ package discovery
 import (
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/discovery/kubernetes"
-	"aperture.tech/aperture/pkg/discovery/static"
+	"github.com/FluxNinja/aperture/pkg/discovery/kubernetes"
+	"github.com/FluxNinja/aperture/pkg/discovery/static"
 )
 
 // Module returns an fx.Option that provides the discovery module.

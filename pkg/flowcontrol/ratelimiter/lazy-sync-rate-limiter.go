@@ -9,8 +9,8 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/jobs"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/jobs"
 )
 
 type counter struct {

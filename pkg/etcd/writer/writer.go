@@ -4,9 +4,9 @@ import (
 	"context"
 	"runtime"
 
-	etcdclient "aperture.tech/aperture/pkg/etcd/client"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/panic"
+	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/panic"
 	"github.com/lukejoshuapark/infchan"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )

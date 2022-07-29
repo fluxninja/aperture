@@ -1,8 +1,8 @@
-//go:generate swagger generate spec --scan-models --include="aperture.tech*" --include-tag=common-configuration -o ../../docs/gen/config/aperture-controller/config-swagger.yaml
+//go:generate swagger generate spec --scan-models --include="github.com/FluxNinja*" --include-tag=common-configuration -o ../../docs/gen/config/aperture-controller/config-swagger.yaml
 
-//go:generate swagger generate spec --include="aperture.tech*" --include-tag=policies-configuration -o ../../docs/gen/policies/config-swagger.yaml
+//go:generate swagger generate spec --include="github.com/FluxNinja*" --include-tag=policies-configuration -o ../../docs/gen/policies/config-swagger.yaml
 
-//go:generate swagger generate spec --include="aperture.tech*" --include-tag=classification-configuration -o ../../docs/gen/classification/config-swagger.yaml
+//go:generate swagger generate spec --include="github.com/FluxNinja*" --include-tag=classification-configuration -o ../../docs/gen/classification/config-swagger.yaml
 
 // Aperture Controller
 //   BasePath: /aperture-controller
@@ -13,15 +13,15 @@ import (
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/cmd/aperture-controller/controller"
-	"aperture.tech/aperture/pkg/classification"
-	"aperture.tech/aperture/pkg/flowcontrol"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/otel"
-	"aperture.tech/aperture/pkg/otelcollector"
-	"aperture.tech/aperture/pkg/platform"
-	"aperture.tech/aperture/pkg/webhooks"
-	"aperture.tech/aperture/pkg/webhooks/validation"
+	"github.com/FluxNinja/aperture/cmd/aperture-controller/controller"
+	"github.com/FluxNinja/aperture/pkg/classification"
+	"github.com/FluxNinja/aperture/pkg/flowcontrol"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/otel"
+	"github.com/FluxNinja/aperture/pkg/otelcollector"
+	"github.com/FluxNinja/aperture/pkg/platform"
+	"github.com/FluxNinja/aperture/pkg/webhooks"
+	"github.com/FluxNinja/aperture/pkg/webhooks/validation"
 )
 
 func main() {

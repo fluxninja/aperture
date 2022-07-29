@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	classificationv1 "aperture.tech/aperture/api/gen/proto/go/aperture/classification/v1"
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
+	classificationv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/classification/v1"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 // CMFileValidator Classification implementation of CMFileValidator interface.

@@ -10,9 +10,9 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/policies/apis/policyapi"
-	"aperture.tech/aperture/pkg/policies/controlplane/reading"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/reading"
 )
 
 // CircuitModule returns fx options of Circuit for the main app.
