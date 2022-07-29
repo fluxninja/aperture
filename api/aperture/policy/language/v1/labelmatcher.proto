@@ -11,17 +11,23 @@ message LabelMatcher {
     }
   };
 
-  map<string, string> match_labels = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "A map of {key,value} pairs representing labels to be matched.\nA single {key,value} in the matchLabels requires that the label \"key\" is present and equal to \"value\".\n\nNote: The requirements are ANDed."
-  }];
+  map<string, string> match_labels = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "A map of {key,value} pairs representing labels to be matched.\nA single {key,value} in the matchLabels requires that the label \"key\" is present and equal to \"value\".\n\nNote: The requirements are ANDed."
+    }
+  ];
 
-  repeated K8sLabelMatcherRequirement match_expressions = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "List of k8s-style label matcher requirements.\n\nNote: The requirements are ANDed."
-  }];
+  repeated K8sLabelMatcherRequirement match_expressions = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "List of k8s-style label matcher requirements.\n\nNote: The requirements are ANDed."
+    }
+  ];
 
-  MatchExpression expression = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "An arbitrary expression to be evaluated on the labels."
-  }];
+  MatchExpression expression = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "An arbitrary expression to be evaluated on the labels."
+    }
+  ];
 }
 
 message K8sLabelMatcherRequirement {
@@ -31,29 +37,35 @@ message K8sLabelMatcherRequirement {
     }
   };
 
-  string key = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Label key that the selector applies to."
-    extensions: {
-      key: "x-go-validate";
-      value {
-        string_value: "required"
+  string key = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Label key that the selector applies to."
+      extensions: {
+        key: "x-go-validate";
+        value {
+          string_value: "required"
+        }
       }
     }
-  }]; // @gotags: validate:"required"
+  ]; // @gotags: validate:"required"
 
-  string operator = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist."
-    extensions: {
-      key: "x-go-validate";
-      value {
-        string_value: "oneof=In NotIn Exists DoesNotExists"
+  string operator = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist."
+      extensions: {
+        key: "x-go-validate";
+        value {
+          string_value: "oneof=In NotIn Exists DoesNotExists"
+        }
       }
     }
-  }]; // @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
+  ]; // @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
 
-  repeated string values = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "An array of string values that relates to the key by an operator.\nIf the operator is In or NotIn, the values array must be non-empty.\nIf the operator is Exists or DoesNotExist, the values array must be empty."
-  }];
+  repeated string values = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "An array of string values that relates to the key by an operator.\nIf the operator is In or NotIn, the values array must be non-empty.\nIf the operator is Exists or DoesNotExist, the values array must be empty."
+    }
+  ];
 }
 
 message MatchExpression {
@@ -71,42 +83,56 @@ message MatchExpression {
       }
     };
 
-    repeated MatchExpression of = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "List of subexpressions of the match expression."
-    }];
+    repeated MatchExpression of = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "List of subexpressions of the match expression."
+      }
+    ];
   }
 
   // @gotags: validate:"required"
   oneof variant {
-    MatchExpression not = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression negates the result of subexpression."
-    }];
+    MatchExpression not = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "The expression negates the result of subexpression."
+      }
+    ];
 
-    List all = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression is true when all subexpressions are true."
-    }];
+    List all = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "The expression is true when all subexpressions are true."
+      }
+    ];
 
-    List any = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression is true when any subexpression is true."
-    }];
+    List any = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "The expression is true when any subexpression is true."
+      }
+    ];
 
-    string label_exists = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression is true when label with given name exists."
-      extensions: {
-        key: "x-go-validate";
-        value {
-          string_value: "required"
+    string label_exists = 4 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "The expression is true when label with given name exists."
+        extensions: {
+          key: "x-go-validate";
+          value {
+            string_value: "required"
+          }
         }
       }
-    }]; // @gotags: validate:"required"
+    ]; // @gotags: validate:"required"
 
-    EqualsMatchExpression label_equals = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression is true when label value equals given value."
-    }];
+    EqualsMatchExpression label_equals = 5 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "The expression is true when label value equals given value."
+      }
+    ];
 
-    MatchesMatchExpression label_matches = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression is true when label matches given regex."
-    }];
+    MatchesMatchExpression label_matches = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "The expression is true when label matches given regex."
+      }
+    ];
   }
 }
 
@@ -117,19 +143,23 @@ message EqualsMatchExpression {
     }
   };
 
-  string label = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Name of the label to equal match the value."
-    extensions: {
-      key: "x-go-validate";
-      value {
-        string_value: "required"
+  string label = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Name of the label to equal match the value."
+      extensions: {
+        key: "x-go-validate";
+        value {
+          string_value: "required"
+        }
       }
     }
-  }]; // @gotags: validate:"required"
+  ]; // @gotags: validate:"required"
 
-  string value = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Exact value that the label should be equal to."
-  }];
+  string value = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Exact value that the label should be equal to."
+    }
+  ];
 }
 
 message MatchesMatchExpression {
@@ -139,23 +169,27 @@ message MatchesMatchExpression {
     }
   };
 
-  string label = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Name of the label to match the regular expression."
-    extensions: {
-      key: "x-go-validate";
-      value {
-        string_value: "required"
+  string label = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Name of the label to match the regular expression."
+      extensions: {
+        key: "x-go-validate";
+        value {
+          string_value: "required"
+        }
       }
     }
-  }]; // @gotags: validate:"required"
+  ]; // @gotags: validate:"required"
 
-  string regex = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Regular expression that should match the label value.\nIt uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax)."
-    extensions: {
-      key: "x-go-validate";
-      value {
-        string_value: "required"
+  string regex = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Regular expression that should match the label value.\nIt uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax)."
+      extensions: {
+        key: "x-go-validate";
+        value {
+          string_value: "required"
+        }
       }
     }
-  }]; // @gotags: validate:"required"
+  ]; // @gotags: validate:"required"
 }

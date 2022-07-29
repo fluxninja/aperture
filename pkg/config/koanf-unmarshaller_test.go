@@ -460,8 +460,7 @@ var _ = Describe("ProtobufUnmarshaller", func() {
 	Context("when unmarshalling a protobuf", func() {
 		selector := &languagev1.Selector{
 			AgentGroup: "ag",
-			Namespace:  "n",
-			Service:    "s",
+			Service:    "s.n.svc.cluster.local",
 			ControlPoint: &languagev1.ControlPoint{
 				Controlpoint: &languagev1.ControlPoint_Traffic{
 					Traffic: "egress",

@@ -27,9 +27,11 @@ message AllRules {
       description: "All the ruleset name to ruleset mapping."
     }
   };
-  map<string, Classifier> all_rules = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "A map of {key, value} pairs mapping from the name of the classifier to the values of the classifier."
-  }];
+  map<string, Classifier> all_rules = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "A map of {key, value} pairs mapping from the name of the classifier to the values of the classifier."
+    }
+  ];
 }
 
 message Classifier {
@@ -37,16 +39,20 @@ message Classifier {
     json_schema: {
       description: "Set of classification rules sharing a common selector."
     }
-    example: "{\"'yaml\":{\"selector\":{\"namespace\":\"default\",\"service\":\"service1\",\"control_point\":{\"traffic\":\"ingress\"}},\"rules\":{\"user\":{\"extractor\":{\"from\":\"request.http.headers.user\"}}}}}"
+    example: "{\"'yaml\":{\"selector\":{\"service\":\"service1.default.svc.cluster.local\",\"control_point\":{\"traffic\":\"ingress\"}},\"rules\":{\"user\":{\"extractor\":{\"from\":\"request.http.headers.user\"}}}}}"
   };
 
-  policy.language.v1.Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Defines where to apply the flow classification rule."
-  }];
+  policy.language.v1.Selector selector = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines where to apply the flow classification rule."
+    }
+  ];
 
-  map<string, Rule> rules = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "A map of {key, value} pairs mapping from flow label names to rules that define how to extract and propagate them."
-  }];
+  map<string, Rule> rules = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "A map of {key, value} pairs mapping from flow label names to rules that define how to extract and propagate them."
+    }
+  ];
 }
 
 message Rule {
@@ -64,30 +70,42 @@ message Rule {
       }
     };
 
-    string source = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Source code of the rego module.\n\nNote: Must include a \"package\" declaration."
-    }];
+    string source = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Source code of the rego module.\n\nNote: Must include a \"package\" declaration."
+      }
+    ];
 
-    string query = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Query string to extract a value (eg. `data.<mymodulename>.<variablename>`)\n\nNote: The module name must match the package name from the \"source\"."
-    }];
+    string query = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Query string to extract a value (eg. `data.<mymodulename>.<variablename>`)\n\nNote: The module name must match the package name from the \"source\"."
+      }
+    ];
   }
 
   oneof source {
-    Extractor extractor = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "High-level flow label declarative extractor.\nRego extractor extracts a value from the rego module."
-    }];
+    Extractor extractor = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "High-level flow label declarative extractor.\nRego extractor extracts a value from the rego module."
+      }
+    ];
 
-    Rego rego = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Rego module to extract a value from the rego module."
-    }];
+    Rego rego = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Rego module to extract a value from the rego module."
+      }
+    ];
   }
 
-  google.protobuf.BoolValue propagate = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true)."
-  }];
+  google.protobuf.BoolValue propagate = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true)."
+    }
+  ];
 
-  bool hidden = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Decides if the created flow label should be hidden from the telemetry."
-  }];
+  bool hidden = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Decides if the created flow label should be hidden from the telemetry."
+    }
+  ];
 }

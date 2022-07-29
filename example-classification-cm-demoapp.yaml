@@ -10,8 +10,7 @@ data:
     # Example of Flow Classification rules file, showcasing using "extractors" and raw rego.
 
     selector:
-      namespace: demoapp
-      service: demo1-demo-app
+      service: demo1-demo-app.demoapp.svc.cluster.local
       control_point: { traffic: ingress }
 
     rules:
