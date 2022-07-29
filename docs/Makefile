@@ -33,8 +33,8 @@ generate-config-markdown:
 				--tags=common-configuration \
 				--tags=plugin-configuration \
 				--allow-template-override \
-				--template-dir ./swagger-assets/swagger-templates \
-				--config-file ./swagger-assets/markdown-config.yaml; \
+				--template-dir ./tools/swagger/swagger-templates \
+				--config-file ./tools/swagger/markdown-config.yaml; \
 			npx prettier --write $$dir/*.md; \
 			rm $$dir/gen.yaml; \
 		done; \
@@ -60,21 +60,22 @@ $(POLICY_MARKDOWNS): %/swagger.md: %/config-swagger.yaml
 		--quiet \
 		--with-flatten=remove-unused \
 		--tags=$(shell basename $(@D))-configuration \
-		--allow-template-override --template-dir swagger-assets/swagger-templates \
-		--config-file swagger-assets/markdown-config.yaml
+		--allow-template-override --template-dir tools/swagger/swagger-templates \
+		--config-file tools/swagger/markdown-config.yaml
 	@npx prettier --write $(@D)/*.md
 	@rm $(@D)/gen.yaml
 	@rm $(@D)/aperture.swagger.yaml
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid:
-	@$(MAKE) -B **/*.mmd.png **/*.mmd.svg
+	@echo generating mermaid diagrams
+	@find . -name '*.mmd.png' -exec $(MAKE) -B {} \;
 
-%.mmd.png %.mmd.svg: %.mmd ./mermaid-theme.json
+%.mmd.png: %.mmd ./tools/mermaid/mermaid-theme.json
 	@echo MMDC $@
-	@for fmt in svg png; \
+	@for fmt in png; \
 		do npx -p @mermaid-js/mermaid-cli mmdc \
-			--quiet --input $< --configFile ./mermaid-theme.json --output $<.$$fmt; \
+			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --output $<.$$fmt; \
 	done
 
 .PHONY: generate-config-markdown generate-mermaid

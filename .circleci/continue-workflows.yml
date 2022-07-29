@@ -280,8 +280,8 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # FluxNinja/cloud R/O
-            - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff" # FluxNinja/aperture-tech-docs R/W
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
+            - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff" # fluxninja/aperture-tech-docs R/W
       - run:
           name: Install opsninja and its dependencies
           command: |
@@ -306,7 +306,7 @@ jobs:
             export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
              args=(
                --release=<< parameters.release-ref >>
-               --rm-repo-path=/home/circleci/project/
+               --source-repo-path=/home/circleci/project/
                --docs-root-dir=docs/
              )
              if [[ "<< parameters.dry-run >>" == "true" ]]; then
