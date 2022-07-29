@@ -26,6 +26,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/services"
 )
@@ -185,9 +186,9 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		// Put all non-hidden flow labels and policy details as dynamic metadata
 		DynamicMetadata: &structpb.Struct{
 			Fields: map[string]*structpb.Value{
-				"aperture.flow":              flowLabelsAsPbValueForTelemetry(flowLabels),
-				"aperture.limiter_decisions": limiterDecisionsAsPbValueForTelemetry(fcResponse.LimiterDecisions),
-				"aperture.fluxmeters":        fluxmeterIDsAsPbValueForTelemetry(fcResponse.FluxMeterIds),
+				otelcollector.LabelsLabel:           flowLabelsAsPbValueForTelemetry(flowLabels),
+				otelcollector.LimiterDecisionsLabel: limiterDecisionsAsPbValueForTelemetry(fcResponse.LimiterDecisions),
+				otelcollector.FluxMetersLabel:       fluxmeterIDsAsPbValueForTelemetry(fcResponse.FluxMeterIds),
 			},
 		},
 	}
