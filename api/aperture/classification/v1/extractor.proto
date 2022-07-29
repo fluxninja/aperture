@@ -4,12 +4,12 @@ package aperture.classification.v1;
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 
+  // Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write regod code.
+  // There are multiple variants of extractor, specify exactly one:
+  // - JSON Extractor
+  // - Address Extractor
+  // - JWT Extractor
 message Extractor {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write regod code.\nThere are multiple variants of extractor, specify exactly one:\n- JSON Extractor\n- Address Extractor\n- JWT Extractor"
-    }
-  };
 
   oneof variant {
     string from = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -35,19 +35,20 @@ message Extractor {
   }
 }
 
+  // Deserialize a json, and extract one of the fields.
+  // 
+  // Example:
+  // ```yaml
+  // from: request.http.body
+  // pointer: /user/name
+  // ```
 message JSONExtractor {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Deserialize a json, and extract one of the fields."
-    }
-    example: "{\"'yaml\":{\"from\": \"request.http.body\", \"pointer\": \"/user/name\"}}"
-  };
 
   string from = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     description: "Attribute path pointing to some strings. eg. \"request.http.body\"."
     extensions: {
-      key: "x-go-validate";
-      value {
+      key: "x-go-validate"
+      value: {
         string_value: "required"
       }
     }
@@ -58,38 +59,49 @@ message JSONExtractor {
   }];
 }
 
+  // Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`.
+  // IP addresses in attribute context are defined as objects with separate ip and port fields.
+  // This is a helper to display an address as a single string.
+  // 
+  // Note: Use with care, as it might accidentally introduce a high-cardinality flow label values.
+  // 
+  // [ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
+  // 
+  // Example:
+  // ```yaml
+  // from: "source.address # or dstination.address"
+  // ```
 message AddressExtractor {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`.\nIP addresses in attribute context are defined as objects with separate ip and port fields.\nThis is a helper to display an address as a single string.\n\nNote: Use with care, as it might accidentally introduce a high-cardinality flow label values.\n\n[ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address"
-    }
-    example: "{\"'yaml\":{\"from\": \"source.address # or dstination.address\"}}"
-  };
 
   string from = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     description: "Attribute path pointing to some string. eg. \"source.address\"."
     extensions: {
-      key: "x-go-validate";
-      value {
+      key: "x-go-validate"
+      value: {
         string_value: "required"
       }
     }
   }]; //@gotags: validate:"required"
 }
 
+  // Parse the attribute as JWT and read the payload.
+  // Specify a field to be extracted from payload using "json_pointer".
+  // 
+  // Note: The signature is not verified against the secret (we're assuming there's some 
+  // other parts of the system that handles such verification).
+  // 
+  // Example:
+  // ```yaml
+  // from: request.http.bearer
+  // json_pointer: /user/email
+  // ```
 message JWTExtractor {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Parse the attribute as JWT and read the payload.\nSpecify a field to be extracted from payload using \"json_pointer\".\n\nNote: The signature is not verified against the secret (we're assuming there's some \nother parts of the system that handles such verification)."
-    }
-    example: "{\"yaml\":{\"from\": \"request.http.bearer\", \"json_pointer\": \"/user/email\"}}"
-  };
 
   string from = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     description: "Jwt token can be pulled from any input attribute, but most likely you'd want to use \"request.http.bearer\"."
     extensions: {
-      key: "x-go-validate";
-      value {
+      key: "x-go-validate"
+      value: {
         string_value: "required"
       }
     }
@@ -100,12 +112,11 @@ message JWTExtractor {
   }];
 }
 
+  // Matches HTTP Path to given path templates.
+  // HTTP path will be matched against given path templates. 
+  // If a match occurs, the value associated with the path template will be treated as a result.
+  // In case of multiple path templates matching, the most specific one will be chosen.
 message PathTemplateMatcher {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Matches HTTP Path to given path templates.\nHTTP path will be matched against given path templates. \nIf a match occurs, the value associated with the path template will be treated as a result.\nIn case of multiple path templates matching, the most specific one will be chosen."
-    }
-  };
 
   map<string, string> template_values = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     description: "Template value keys are OpenAPI-inspired path templates.\n\n* Static path segment `/foo` matches a path segment exactly\n* `/{param}` matches arbitrary path segment.\n(The param name is ignored and can be omitted (`{}`))\n* The parameter must cover whole segment.\n* Additionally, path template can end with `/*` wildcard to match\n  arbitrary number of trailing segments (0 or more).\n* Multiple consecutive `/` are ignored, as well as trailing `/`.\n* Parametrized path segments must come after static segments.\n* `*`, if present, must come last.\n* Most specific template \"wins\" (`/foo` over `/{}` and `/{}` over `/*`).\n\nSee also <https://swagger.io/specification/#path-templating-matching>"
