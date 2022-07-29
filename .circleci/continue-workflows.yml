@@ -208,6 +208,14 @@ jobs:
             nodejs
             shellcheck
             yq
+      - restore_cache:
+          name: Restore golangci-lint cache
+          keys:
+            - v1-golangci-lint-{{ checksum "~/day" }}
+      - run:
+          name: Cache golangci-lint run
+          command: |
+            golangci-lint run || true
       - run:
           name: Generate pre-commit cache key file
           command: |
@@ -249,6 +257,12 @@ jobs:
               #  ./tools/githooks/commit_check.py <(git log -n1 "${commit}" --format=%B)
               #done
             fi
+      - save_cache:
+          name: Save golangci-lint cache
+          key: v1-golangci-lint-{{ checksum "~/day" }}
+          paths:
+            - ../.cache/golangci-lint
+          when: on_success
       - save_cache:
           name: Save pre-commit cache
           key: v2-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
@@ -376,14 +390,16 @@ commands:
           command: |
             git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.2
             printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
-            date +%m > ~/date
+            date +%m > ~/month
+            date +%d > ~/day
       # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name
+            - asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
               >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
-            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-
+            - asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
+              >>-
       - run:
           name: Install ASDF tools
           environment:
@@ -399,8 +415,8 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-{{
-            checksum ".tool-versions" }}-{{ checksum "go.mod" }}
+            asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
+            >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
           paths:
             - ~/.asdf
 
