@@ -181,7 +181,7 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	}
 
 	// append ring buffer crash log writer
-	writers = append(writers, panic.GetCrashWriter())
+	writers = append(writers, panichandler.GetCrashWriter())
 
 	multi := zerolog.MultiLevelWriter(writers...)
 

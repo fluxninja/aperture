@@ -68,8 +68,12 @@ type optionGroup []fx.Option
 // New returns a new fx.App with the provided options.
 func New(opts ...fx.Option) *fx.App {
 	options := optionGroup(opts)
+	defer func() {
+		if v := recover(); v != nil {
+			panichandler.Crash(v)
+		}
+	}()
 	panichandler.RegisterPanicHandler(OnCrash)
-	defer panichandler.Recover()
 	return fx.New(options...)
 }
 
