@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -151,4 +152,18 @@ func UnmarshalStringVal(value pcommon.Value, labelName string, output interface{
 	}
 
 	return true
+}
+
+// GetLimiterDecisions unmarshalls limiter decisions from string label.
+func GetLimiterDecisions(attributes pcommon.Map) []*flowcontrolv1.LimiterDecision {
+	var decisions []*flowcontrolv1.LimiterDecision
+	rawPolicies, exists := attributes.Get(LimiterDecisionsLabel)
+	if !exists {
+		log.Debug().Str("label", LimiterDecisionsLabel).Msg("Label does not exist")
+		return decisions
+	}
+	if !UnmarshalStringVal(rawPolicies, LimiterDecisionsLabel, &decisions) {
+		log.Debug().Str("label", LimiterDecisionsLabel).Msg("Label is not a string")
+	}
+	return decisions
 }
