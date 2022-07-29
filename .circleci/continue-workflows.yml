@@ -382,9 +382,9 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - asdf-cache-v3-{{ checksum "~/date" }}-<< parameters.cache_name
+            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name
               >>-{{ checksum ".tool-versions" }}
-            - asdf-cache-v3-{{ checksum "~/date" }}-<< parameters.cache_name >>-
+            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-
       - run:
           name: Install ASDF tools
           environment:
@@ -400,7 +400,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            asdf-cache-v3-{{ checksum "~/date" }}-<< parameters.cache_name >>-{{
+            asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-{{
             checksum ".tool-versions" }}
           paths:
             - ~/.asdf
