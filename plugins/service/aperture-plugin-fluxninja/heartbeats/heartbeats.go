@@ -254,12 +254,13 @@ func (h *heartbeats) newHeartbeat(
 	}
 
 	return &heartbeatv1.ReportRequest{
-		VersionInfo: info.GetVersionInfo(),
-		ProcessInfo: info.GetProcessInfo(),
-		HostInfo:    info.GetHostInfo(),
-		AgentGroup:  agentGroup,
-		PeerInfos:   peerInfos,
-		AllStatuses: allStasuses,
+		VersionInfo:    info.GetVersionInfo(),
+		ProcessInfo:    info.GetProcessInfo(),
+		HostInfo:       info.GetHostInfo(),
+		AgentGroup:     agentGroup,
+		ControllerInfo: h.controllerInfo,
+		PeerInfos:      peerInfos,
+		AllStatuses:    allStasuses,
 	}
 }
 
