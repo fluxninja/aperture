@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/FluxNinja/aperture/pkg/discovery/common"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/discovery/common"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
 // StaticDiscovery reads entities from config and writes them to tracker.

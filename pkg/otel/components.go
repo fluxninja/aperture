@@ -17,12 +17,12 @@ import (
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/multierr"
 
-	"github.com/FluxNinja/aperture/pkg/entitycache"
-	"github.com/FluxNinja/aperture/pkg/otelcollector/enrichmentprocessor"
-	"github.com/FluxNinja/aperture/pkg/otelcollector/loggingexporter"
-	"github.com/FluxNinja/aperture/pkg/otelcollector/metricsprocessor"
-	"github.com/FluxNinja/aperture/pkg/otelcollector/rollupprocessor"
-	"github.com/FluxNinja/aperture/pkg/policies/dataplane/iface"
+	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
+	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
 
 // AgentOTELComponents constructs OTEL Collector Factories for Agent.

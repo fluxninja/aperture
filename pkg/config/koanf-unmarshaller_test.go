@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	languagev1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 type simpleTestConfig struct {

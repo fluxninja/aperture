@@ -6,8 +6,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 func TestCache(t *testing.T) {

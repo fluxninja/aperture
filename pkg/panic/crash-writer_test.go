@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/FluxNinja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panic"
 )
 
 var _ = Describe("Crash-Writer", func() {

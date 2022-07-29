@@ -7,8 +7,8 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	"github.com/FluxNinja/aperture/pkg/config"
-	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 // Module provides authz handler

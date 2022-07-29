@@ -59,8 +59,6 @@ github.com/BurntSushi/toml v1.1.0 h1:ksErzDEI1khOiGPgpwuI7x2ebx/uXQNw7xJpn9Eq1+I
 github.com/BurntSushi/toml v1.1.0/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
-github.com/FluxNinja/lumberjack v0.0.0-20220311191217-5aad16738271 h1:uVjR1Z0kNclvC9yjI3A1WlZp+GWQDq0s56EJogOdaIk=
-github.com/FluxNinja/lumberjack v0.0.0-20220311191217-5aad16738271/go.mod h1:rwgIZPQkBIy1Pd8/AEoNQkLOKiqPis3bY16esI0zu/I=
 github.com/Henry-Sarabia/sliceconv v1.0.2 h1:1zH/sJmocRZz1g1FrmU06GsbskWLWglj6IHhFB9TdBA=
 github.com/Henry-Sarabia/sliceconv v1.0.2/go.mod h1:FNvuZcThTpCgAjQQZjPSx7PkS/DYRT6jTV3oPQGP2lU=
 github.com/Microsoft/go-winio v0.4.11/go.mod h1:VhR8bwka0BXejwEJY73c50VrPtXAaKcyvVC4A4RozmA=
@@ -470,6 +468,8 @@ github.com/fluxninja/datasketches-go v0.0.0-20220128132852-065685ae83e0 h1:gm58E
 github.com/fluxninja/datasketches-go v0.0.0-20220128132852-065685ae83e0/go.mod h1:OiaOzKtscjnrkm40xpAB11hg/RFJ9tU+ujFeAivDM3g=
 github.com/fluxninja/go-swagger v0.29.0-fn.patch.7 h1:5T3j/+aJ7NGYelSn+D3bymCq8oqn8sg/MDDi8+3yEtU=
 github.com/fluxninja/go-swagger v0.29.0-fn.patch.7/go.mod h1:hHQC4q+Cd26/JhLSXAUauYmDCTAR9u4TIALMYXZbeWM=
+github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814 h1:AHC1PtYLUw9PWqmgB9VHcxzGEm1GDYGXzC1PRtgIqqs=
+github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814/go.mod h1:kARLh/xWGaisrwkOGOWKcqk7fagFUFthOTX7mIFVJlw=
 github.com/fluxninja/olric v0.4.5-fn-patch.3 h1:VsuDgHdiSQu2Y9phZmH4AAL8lj+Dc+QXt9t9Of7gaBA=
 github.com/fluxninja/olric v0.4.5-fn-patch.3/go.mod h1:NfdWFw89lWlK9mJRV2iztZfZq9Y6iJfgY4FGTXguQBM=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=

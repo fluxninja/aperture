@@ -6,8 +6,8 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/FluxNinja/aperture/pkg/config"
-	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 const (

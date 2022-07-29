@@ -11,11 +11,11 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	"go.uber.org/fx"
 
-	"github.com/FluxNinja/aperture/pkg/config"
-	"github.com/FluxNinja/aperture/pkg/info"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/panic"
-	"github.com/FluxNinja/aperture/pkg/peers"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/peers"
 )
 
 const (

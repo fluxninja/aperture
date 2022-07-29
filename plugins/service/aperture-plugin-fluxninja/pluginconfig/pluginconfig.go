@@ -1,7 +1,7 @@
 package pluginconfig
 
 import (
-	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/config"
 )
 
 const (

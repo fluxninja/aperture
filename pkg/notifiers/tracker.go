@@ -7,11 +7,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/panic"
 )
 
-//go:generate mockgen -source tracker.go -package mocks -aux_files github.com/FluxNinja/aperture/pkg/notifiers=./watcher.go -destination ../mocks/mock-trackers.go
+//go:generate mockgen -source tracker.go -package mocks -aux_files github.com/fluxninja/aperture/pkg/notifiers=./watcher.go -destination ../mocks/mock-trackers.go
 
 // Per key trackers.
 type keyTracker struct {

@@ -1,6 +1,6 @@
 package runtime
 
-import "github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
+import "github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
 
 // TickEndCallback is a function that is called when a tick ends.
 type TickEndCallback func(tickInfo TickInfo) error

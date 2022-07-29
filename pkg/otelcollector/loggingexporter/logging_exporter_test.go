@@ -26,7 +26,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
-	"github.com/FluxNinja/aperture/pkg/otelcollector/loggingexporter/testdata"
+	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter/testdata"
 )
 
 func TestLoggingTracesExporterNoErrors(t *testing.T) {

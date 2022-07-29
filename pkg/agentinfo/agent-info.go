@@ -1,6 +1,6 @@
 package agentinfo
 
-import "github.com/FluxNinja/aperture/pkg/config"
+import "github.com/fluxninja/aperture/pkg/config"
 
 const (
 	configKey = "agent_info"

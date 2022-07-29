@@ -13,8 +13,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
 
-	"github.com/FluxNinja/aperture/pkg/info"
-	ph "github.com/FluxNinja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/info"
+	ph "github.com/fluxninja/aperture/pkg/panic"
 )
 
 const (

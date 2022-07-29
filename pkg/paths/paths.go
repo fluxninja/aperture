@@ -4,7 +4,7 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/FluxNinja/aperture/pkg/policies/dataplane/component"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 )
 
 var (

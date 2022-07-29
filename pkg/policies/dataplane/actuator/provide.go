@@ -1,8 +1,8 @@
 package actuator
 
 import (
-	"github.com/FluxNinja/aperture/pkg/policies/dataplane/actuator/concurrency"
-	"github.com/FluxNinja/aperture/pkg/policies/dataplane/actuator/rate"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/concurrency"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/rate"
 	"go.uber.org/fx"
 )
 

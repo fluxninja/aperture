@@ -13,11 +13,11 @@ import (
 	admissionv1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/FluxNinja/aperture/pkg/config"
-	"github.com/FluxNinja/aperture/pkg/log"
-	nethttp "github.com/FluxNinja/aperture/pkg/net/http"
-	"github.com/FluxNinja/aperture/pkg/net/listener"
-	"github.com/FluxNinja/aperture/pkg/net/tlsconfig"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
+	nethttp "github.com/fluxninja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 )
 
 const (

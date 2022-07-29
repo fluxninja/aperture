@@ -3,8 +3,8 @@ package flowcontrol
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	flowcontrolv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"github.com/FluxNinja/aperture/pkg/log"
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 // Metrics is used for collecting metrics about Aperture flowcontrol.

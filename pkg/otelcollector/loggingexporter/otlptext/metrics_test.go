@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
-	"github.com/FluxNinja/aperture/pkg/otelcollector/loggingexporter/testdata"
+	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter/testdata"
 )
 
 func TestMetricsText(t *testing.T) {

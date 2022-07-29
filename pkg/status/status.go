@@ -6,7 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	statusv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
 )
 
 // NewStatus creates a new instance of Status to be pushed into status registry. Use this function for creating status instead of by hand.

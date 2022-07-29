@@ -7,10 +7,10 @@ import (
 	"github.com/looplab/tarjan"
 	"go.uber.org/fx"
 
-	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
-	"github.com/FluxNinja/aperture/pkg/policies/controlplane/runtime"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
 // CircuitFactoryModule for circuit factory run via the main app.

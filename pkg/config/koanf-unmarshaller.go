@@ -22,7 +22,7 @@ import (
 
 	"github.com/Henry-Sarabia/sliceconv"
 
-	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 // Unmarshal unmarshals using _just_ bytes as source of truth (no env, no

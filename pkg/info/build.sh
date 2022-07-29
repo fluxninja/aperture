@@ -13,12 +13,12 @@ SERVICE="${SERVICE_FILE%.*}"
 
 LDFLAGS="\
     ${LDFLAGS:-} \
-    -X 'github.com/FluxNinja/aperture/pkg/info.Service=${SERVICE}' \
-    -X 'github.com/FluxNinja/aperture/pkg/info.BuildHost=${HOSTNAME}' \
-    -X 'github.com/FluxNinja/aperture/pkg/info.BuildOS=${GOOS}/${GOARCH}' \
-    -X 'github.com/FluxNinja/aperture/pkg/info.BuildTime=${BUILD_TIME}' \
-    -X 'github.com/FluxNinja/aperture/pkg/info.GitBranch=${GIT_BRANCH}' \
-    -X 'github.com/FluxNinja/aperture/pkg/info.GitCommitHash=${GIT_COMMIT_HASH}' \
-    -X 'github.com/FluxNinja/aperture/pkg/info.Prefix=${PREFIX}' \
+    -X 'github.com/fluxninja/aperture/pkg/info.Service=${SERVICE}' \
+    -X 'github.com/fluxninja/aperture/pkg/info.BuildHost=${HOSTNAME}' \
+    -X 'github.com/fluxninja/aperture/pkg/info.BuildOS=${GOOS}/${GOARCH}' \
+    -X 'github.com/fluxninja/aperture/pkg/info.BuildTime=${BUILD_TIME}' \
+    -X 'github.com/fluxninja/aperture/pkg/info.GitBranch=${GIT_BRANCH}' \
+    -X 'github.com/fluxninja/aperture/pkg/info.GitCommitHash=${GIT_COMMIT_HASH}' \
+    -X 'github.com/fluxninja/aperture/pkg/info.Prefix=${PREFIX}' \
 "
 go build --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"

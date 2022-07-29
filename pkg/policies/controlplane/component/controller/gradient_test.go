@@ -5,10 +5,10 @@ package controller_test
 . "github.com/onsi/gomega"
 "go.uber.org/fx"
 
-policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-cn "github.com/FluxNinja/aperture/pkg/policies/controlloop/controller"
-"github.com/FluxNinja/aperture/pkg/policies/mocks"
-"github.com/FluxNinja/aperture/pkg/policies/controlplane/reading"*/
+policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+cn "github.com/fluxninja/aperture/pkg/policies/controlloop/controller"
+"github.com/fluxninja/aperture/pkg/policies/mocks"
+"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"*/
 
 // TODO: Adapt this test to the new Circuit runtime
 /*var _ = Describe("Gradient", func() {

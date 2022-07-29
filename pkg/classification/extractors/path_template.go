@@ -7,7 +7,7 @@ import (
 
 // PathTemplate is an OpenAPI-inspired path template
 //
-// See github.com/FluxNinja/aperture/api/gen/proto/go/aperture/classification/v1.PathTemplateMatcher.
+// See github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1.PathTemplateMatcher.
 type PathTemplate struct {
 	Prefix              []string
 	NumParams           int

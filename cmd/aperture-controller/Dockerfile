@@ -3,7 +3,7 @@ FROM golang:1.18-buster AS base
 
 WORKDIR /src
 COPY --link . .
-ENV GOPRIVATE=github.com/aperture-control,github.com/FluxNinja
+ENV GOPRIVATE=github.com/aperture-control,github.com/fluxninja
 
 RUN --mount=type=cache,target=/go/pkg/ \
     --mount=type=cache,target=/root/.cache/go-build/ \

@@ -8,9 +8,9 @@ import (
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"github.com/FluxNinja/aperture/pkg/authz/baggage"
-	class "github.com/FluxNinja/aperture/pkg/classification"
-	"github.com/FluxNinja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/pkg/authz/baggage"
+	class "github.com/fluxninja/aperture/pkg/classification"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 func TestBaggage(t *testing.T) {

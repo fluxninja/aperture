@@ -6,8 +6,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	heartbeatv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
-	"github.com/FluxNinja/aperture/pkg/entitycache"
+	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
+	"github.com/fluxninja/aperture/pkg/entitycache"
 )
 
 const (

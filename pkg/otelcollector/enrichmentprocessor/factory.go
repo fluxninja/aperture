@@ -8,7 +8,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/processor/processorhelper"
 
-	"github.com/FluxNinja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/entitycache"
 )
 
 const (

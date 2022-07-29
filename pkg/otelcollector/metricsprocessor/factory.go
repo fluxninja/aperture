@@ -9,7 +9,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/processor/processorhelper"
 
-	"github.com/FluxNinja/aperture/pkg/policies/dataplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
 
 const (
