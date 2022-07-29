@@ -1,7 +1,6 @@
 package notifiers
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -43,8 +42,9 @@ func createEvent(t *testing.T, key Key, value []byte, action EventType) Event {
 }
 
 // notifierFunc just prints the action that is being performed on a given notifier.
+// Recalled event.String() for getting more coverage but printing the function leads to numerous log undesired log messages.
 func notifierFunc(event Event) {
-	fmt.Println("The following event is being processed: " + event.String())
+	event.String()
 }
 
 // transformFunc is a mock func that reverses the content of any bytes given to it if the action is valid.
@@ -193,4 +193,7 @@ func TestUnmarshallerNotifierConstructor(t *testing.T) {
 	}
 
 	runTests(t, config)
+
+	val := unmarshaller.IsSet("configs") // check if the unmarshaller has loaded the configuration correctly
+	require.True(t, val)
 }
