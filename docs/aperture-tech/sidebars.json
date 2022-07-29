@@ -1,0 +1,144 @@
+{
+  "docs": [
+    {
+      "type": "category",
+      "label": "Introduction",
+      "items": [
+        {
+          "type": "doc",
+          "id": "Introduction/aperture"
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Overview",
+      "items": [
+        {
+          "type": "doc",
+          "id": "Overview/motivation"
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Setup",
+      "items": [
+        {
+          "type": "doc",
+          "id": "Setup/supported-platforms"
+        },
+        {
+          "type": "doc",
+          "id": "Setup/requirements"
+        },
+        {
+          "type": "doc",
+          "id": "Setup/aperture-setup"
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Get Started",
+      "items": [
+        {
+          "type": "doc",
+          "id": "Get Started/grafana-prometheus"
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Architecture",
+      "items": [
+        {
+          "type": "category",
+          "label": "Components",
+          "items": [
+            {
+              "type": "doc",
+              "id": "Architecture/Components/aperture-controller"
+            },
+            {
+              "type": "doc",
+              "id": "Architecture/Components/aperture-agent"
+            },
+            {
+              "type": "doc",
+              "id": "Architecture/Components/fluxmeter"
+            },
+            {
+              "type": "doc",
+              "id": "Architecture/Components/actuator"
+            },
+            {
+              "type": "doc",
+              "id": "Architecture/Components/selector"
+            },
+            {
+              "type": "doc",
+              "id": "Architecture/Components/circuit"
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Workflows",
+          "items": [
+            {
+              "type": "doc",
+              "id": "Architecture/Workflows/flowcontrol-loop"
+            },
+            {
+              "type": "doc",
+              "id": "Architecture/Workflows/telemetry"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Reference",
+      "items": [
+        {
+          "type": "category",
+          "label": "Config Spec",
+          "items": [
+            {
+              "type": "doc",
+              "id": "Reference/Config-Spec/aperture-agent"
+            },
+            {
+              "type": "doc",
+              "id": "Reference/Config-Spec/aperture-controller"
+            },
+            {
+              "type": "doc",
+              "id": "Reference/Config-Spec/classification"
+            },
+            {
+              "type": "doc",
+              "id": "Reference/Config-Spec/policies"
+            },
+            {
+              "type": "doc",
+              "id": "Reference/Config-Spec/istio"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Developes",
+      "items": [
+        {
+          "type": "doc",
+          "id": "Developers/cla"
+        }
+      ]
+    }
+  ]
+}
