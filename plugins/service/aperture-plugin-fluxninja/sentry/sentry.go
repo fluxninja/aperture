@@ -8,9 +8,9 @@ import (
 
 	"github.com/getsentry/sentry-go"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/info"
-	"aperture.tech/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/info"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 const (

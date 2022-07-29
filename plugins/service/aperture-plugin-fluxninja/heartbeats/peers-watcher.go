@@ -5,9 +5,9 @@ import (
 
 	"go.uber.org/fx"
 
-	etcdclient "aperture.tech/aperture/pkg/etcd/client"
-	"aperture.tech/aperture/pkg/info"
-	"aperture.tech/aperture/pkg/peers"
+	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
+	"github.com/FluxNinja/aperture/pkg/info"
+	"github.com/FluxNinja/aperture/pkg/peers"
 )
 
 // PeersWatcherModule is a fx module that watches all agent peers.

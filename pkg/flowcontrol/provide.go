@@ -9,11 +9,11 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	flowcontrolv1 "aperture.tech/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"aperture.tech/aperture/pkg/entitycache"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/policies/dataplane/iface"
-	"aperture.tech/aperture/pkg/webhooks/validation"
+	flowcontrolv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	"github.com/FluxNinja/aperture/pkg/entitycache"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane/iface"
+	"github.com/FluxNinja/aperture/pkg/webhooks/validation"
 )
 
 // Module is a set of default providers for flowcontrol components

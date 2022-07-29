@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/status"
+	"github.com/FluxNinja/aperture/pkg/status"
 )
 
 const platformReadinessStatusName = "readiness.platform"

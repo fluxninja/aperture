@@ -5,8 +5,8 @@ package fluxmeter_test
 	. "github.com/onsi/gomega"
 	"go.uber.org/fx"
 
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"aperture.tech/aperture/pkg/policies/dataplane/fluxmeter"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane/fluxmeter"
 )
 
 var _ = Describe("Fluxmeter", func() {

@@ -8,10 +8,10 @@ import (
 
 	"gopkg.in/fsnotify.v1"
 
-	"aperture.tech/aperture/pkg/filesystem"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/notifiers"
-	"aperture.tech/aperture/pkg/panic"
+	"github.com/FluxNinja/aperture/pkg/filesystem"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/notifiers"
+	"github.com/FluxNinja/aperture/pkg/panic"
 )
 
 // watcher holds the state of the watcher.

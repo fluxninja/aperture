@@ -3,8 +3,8 @@ package dataplane
 import (
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/policies/dataplane/actuator"
-	"aperture.tech/aperture/pkg/policies/dataplane/fluxmeter"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane/actuator"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane/fluxmeter"
 )
 
 // PolicyModule returns the fx options for dataplane side pieces of policy.

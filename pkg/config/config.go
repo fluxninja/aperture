@@ -10,9 +10,9 @@ import (
 	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/filesystem"
-	"aperture.tech/aperture/pkg/info"
-	"aperture.tech/aperture/pkg/panic"
+	"github.com/FluxNinja/aperture/pkg/filesystem"
+	"github.com/FluxNinja/aperture/pkg/info"
+	"github.com/FluxNinja/aperture/pkg/panic"
 )
 
 var (

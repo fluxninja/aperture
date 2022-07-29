@@ -11,10 +11,10 @@ import (
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/otelcollector"
-	"aperture.tech/aperture/pkg/otelcollector/metricsprocessor"
-	"aperture.tech/aperture/pkg/otelcollector/rollupprocessor"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/otelcollector"
+	"github.com/FluxNinja/aperture/pkg/otelcollector/metricsprocessor"
+	"github.com/FluxNinja/aperture/pkg/otelcollector/rollupprocessor"
 )
 
 const (
@@ -324,7 +324,7 @@ func buildKubernetesPodsScrapeConfig(cfg otelConfig) map[string]interface{} {
 				"action":        "keep",
 				"regex":         cfg.NodeName,
 			},
-			// Scrape only pods which have aperture.tech/scrape=true annotation.
+			// Scrape only pods which have github.com/FluxNinja/scrape=true annotation.
 			{
 				"source_labels": []string{"__meta_kubernetes_pod_annotation_aperture_tech_scrape"},
 				"action":        "keep",

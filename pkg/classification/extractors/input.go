@@ -3,7 +3,7 @@ package extractors
 import (
 	"encoding/json"
 
-	"aperture.tech/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 var inputTemplate = func() interface{} {

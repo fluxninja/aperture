@@ -7,9 +7,9 @@ import (
 
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/net/tlsconfig"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/net/tlsconfig"
 )
 
 // ClientModule is an fx module that provides annotated HTTP client.

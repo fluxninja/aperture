@@ -11,13 +11,13 @@ import (
 	"github.com/open-policy-agent/opa/rego"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	classificationv1 "aperture.tech/aperture/api/gen/proto/go/aperture/classification/v1"
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"aperture.tech/aperture/pkg/classification/extractors"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/multimatcher"
-	"aperture.tech/aperture/pkg/selectors"
-	"aperture.tech/aperture/pkg/services"
+	classificationv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/classification/v1"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/FluxNinja/aperture/pkg/classification/extractors"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/multimatcher"
+	"github.com/FluxNinja/aperture/pkg/selectors"
+	"github.com/FluxNinja/aperture/pkg/services"
 )
 
 // activeRules is a helper struct to keep both compiled and uncompiled sets of

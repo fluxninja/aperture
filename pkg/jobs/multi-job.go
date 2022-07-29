@@ -9,10 +9,10 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/panic"
-	"aperture.tech/aperture/pkg/status"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/panic"
+	"github.com/FluxNinja/aperture/pkg/status"
 )
 
 // MultiJobConfig holds configuration for MultiJob.

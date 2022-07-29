@@ -9,9 +9,9 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
-	statusv1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/status/v1"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/status"
+	statusv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/status"
 )
 
 var (

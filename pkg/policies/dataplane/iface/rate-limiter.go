@@ -1,6 +1,6 @@
 package iface
 
-import "aperture.tech/aperture/pkg/selectors"
+import "github.com/FluxNinja/aperture/pkg/selectors"
 
 // RateLimiter interface.
 type RateLimiter interface {

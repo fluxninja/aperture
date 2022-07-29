@@ -4,7 +4,7 @@ definitions:
     title: Duration is encoded as a string message which represents a signed span
       of time.
     type: object
-    x-go-package: aperture.tech/aperture/pkg/config
+    x-go-package: github.com/FluxNinja/aperture/pkg/config
   FluxNinjaPluginConfig:
     properties:
       api_key:
@@ -27,7 +27,7 @@ definitions:
     title: FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration
       plugin.
     type: object
-    x-go-package: aperture.tech/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig
+    x-go-package: github.com/FluxNinja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig
   SentryConfig:
     description: Configuration for Sentry
     properties:
@@ -71,7 +71,7 @@ definitions:
         x-go-default: "0.2"
         x-go-name: TracesSampleRate
     type: object
-    x-go-package: aperture.tech/aperture/plugins/service/aperture-plugin-fluxninja/sentry
+    x-go-package: github.com/FluxNinja/aperture/plugins/service/aperture-plugin-fluxninja/sentry
 info: {}
 paths:
   /fluxninja_plugin:

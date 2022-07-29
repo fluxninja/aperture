@@ -18,14 +18,14 @@ import (
 	"google.golang.org/grpc/peer"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	flowcontrolv1 "aperture.tech/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	authz_baggage "aperture.tech/aperture/pkg/authz/baggage"
-	"aperture.tech/aperture/pkg/classification"
-	"aperture.tech/aperture/pkg/entitycache"
-	"aperture.tech/aperture/pkg/flowcontrol"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/selectors"
-	"aperture.tech/aperture/pkg/services"
+	flowcontrolv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	authz_baggage "github.com/FluxNinja/aperture/pkg/authz/baggage"
+	"github.com/FluxNinja/aperture/pkg/classification"
+	"github.com/FluxNinja/aperture/pkg/entitycache"
+	"github.com/FluxNinja/aperture/pkg/flowcontrol"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/selectors"
+	"github.com/FluxNinja/aperture/pkg/services"
 )
 
 // NewHandler creates new authorization handler for authz api

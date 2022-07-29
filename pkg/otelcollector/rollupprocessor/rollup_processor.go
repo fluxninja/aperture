@@ -14,8 +14,8 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/otelcollector"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/otelcollector"
 )
 
 const (

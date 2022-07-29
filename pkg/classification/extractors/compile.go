@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	classificationv1 "aperture.tech/aperture/api/gen/proto/go/aperture/classification/v1"
+	classificationv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/classification/v1"
 )
 
 // CompileToRego compiles the extractors into a rego.

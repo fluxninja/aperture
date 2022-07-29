@@ -12,7 +12,7 @@ import (
 	"k8s.io/client-go/transport"
 	"k8s.io/klog/v2"
 
-	"aperture.tech/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 // K8sClientConstructorIn holds parameter for Providek8sDynamicClient.

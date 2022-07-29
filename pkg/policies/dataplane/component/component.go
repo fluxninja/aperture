@@ -1,7 +1,7 @@
 package component
 
 import (
-	configv1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/config/v1"
+	configv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/config/v1"
 )
 
 // ComponentAPI is the interface that wraps the GetPolicyName, GetPolicyID, and GetComponentIndex methods.

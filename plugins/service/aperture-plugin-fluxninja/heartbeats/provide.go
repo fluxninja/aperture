@@ -6,16 +6,16 @@ import (
 
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/agentinfo"
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/entitycache"
-	"aperture.tech/aperture/pkg/jobs"
-	"aperture.tech/aperture/pkg/log"
-	grpcclient "aperture.tech/aperture/pkg/net/grpc"
-	httpclient "aperture.tech/aperture/pkg/net/http"
-	"aperture.tech/aperture/pkg/peers"
-	"aperture.tech/aperture/pkg/status"
-	"aperture.tech/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
+	"github.com/FluxNinja/aperture/pkg/agentinfo"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/entitycache"
+	"github.com/FluxNinja/aperture/pkg/jobs"
+	"github.com/FluxNinja/aperture/pkg/log"
+	grpcclient "github.com/FluxNinja/aperture/pkg/net/grpc"
+	httpclient "github.com/FluxNinja/aperture/pkg/net/http"
+	"github.com/FluxNinja/aperture/pkg/peers"
+	"github.com/FluxNinja/aperture/pkg/status"
+	"github.com/FluxNinja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
 )
 
 // Module returns the module for heartbeats.

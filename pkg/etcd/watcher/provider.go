@@ -8,10 +8,10 @@ import (
 
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/config"
-	etcdclient "aperture.tech/aperture/pkg/etcd/client"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/notifiers"
+	"github.com/FluxNinja/aperture/pkg/config"
+	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/notifiers"
 )
 
 // Constructor holds fields to create an annotated instance of etcd Watcher.

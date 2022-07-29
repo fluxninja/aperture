@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	grpcclient "aperture.tech/aperture/pkg/net/grpc"
-	httpclient "aperture.tech/aperture/pkg/net/http"
-	"aperture.tech/aperture/pkg/net/tlsconfig"
+	grpcclient "github.com/FluxNinja/aperture/pkg/net/grpc"
+	httpclient "github.com/FluxNinja/aperture/pkg/net/http"
+	"github.com/FluxNinja/aperture/pkg/net/tlsconfig"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/otel"
-	"aperture.tech/aperture/pkg/otelcollector"
-	"aperture.tech/aperture/pkg/utils"
-	"aperture.tech/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/otel"
+	"github.com/FluxNinja/aperture/pkg/otelcollector"
+	"github.com/FluxNinja/aperture/pkg/utils"
+	"github.com/FluxNinja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
 )
 
 const (

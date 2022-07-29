@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
-	"aperture.tech/aperture/pkg/entitycache"
+	"github.com/FluxNinja/aperture/pkg/entitycache"
 )
 
 var _ = Describe("Enrichment Processor - Metrics", func() {

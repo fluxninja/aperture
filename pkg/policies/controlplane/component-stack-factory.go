@@ -5,10 +5,10 @@ import (
 
 	"go.uber.org/fx"
 
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"aperture.tech/aperture/pkg/policies/apis/policyapi"
-	"aperture.tech/aperture/pkg/policies/controlplane/component/actuator/concurrency"
-	"aperture.tech/aperture/pkg/policies/controlplane/runtime"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/component/actuator/concurrency"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/runtime"
 )
 
 // ComponentStackFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.

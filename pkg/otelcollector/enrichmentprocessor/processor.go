@@ -12,9 +12,9 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
-	"aperture.tech/aperture/pkg/entitycache"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/otelcollector"
+	"github.com/FluxNinja/aperture/pkg/entitycache"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/otelcollector"
 )
 
 type enrichmentProcessor struct {

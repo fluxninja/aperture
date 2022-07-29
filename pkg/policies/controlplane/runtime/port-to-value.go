@@ -1,6 +1,6 @@
 package runtime
 
-import "aperture.tech/aperture/pkg/policies/controlplane/reading"
+import "github.com/FluxNinja/aperture/pkg/policies/controlplane/reading"
 
 // PortToValue is a map from port name to a slice of Readings.
 type PortToValue map[string][]reading.Reading

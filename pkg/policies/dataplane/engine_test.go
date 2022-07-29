@@ -6,11 +6,11 @@ import (
 	. "github.com/onsi/gomega"
 	goprom "github.com/prometheus/client_golang/prometheus"
 
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"aperture.tech/aperture/pkg/policies/dataplane/iface"
-	"aperture.tech/aperture/pkg/policies/mocks"
-	"aperture.tech/aperture/pkg/selectors"
-	"aperture.tech/aperture/pkg/services"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane/iface"
+	"github.com/FluxNinja/aperture/pkg/policies/mocks"
+	"github.com/FluxNinja/aperture/pkg/selectors"
+	"github.com/FluxNinja/aperture/pkg/services"
 )
 
 var _ = Describe("Dataplane Engine", func() {
