@@ -17,12 +17,13 @@
 - [SchedulerWorkloadConfig](#scheduler-workload-config) – Configuration that provides scheduling parameters such as priority for the given…
 - [WorkloadConfigDefaultWorkload](#workload-config-default-workload) – Workload defines a class of requests that preferably have similar properties suc…
 - [WorkloadConfigWorkload](#workload-config-workload) – Workload defines a class of requests that preferably have similar properties suc…
+- [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to pr…
+- [languagev1RateLimiter](#languagev1-rate-limiter)
 - [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals…
 - [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
 - [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the Arithmetic Combinator component.
 - [v1Component](#v1-component) – Computational blocks that form the circuit.
   Signals flow into the components via…
-- [v1ConcurrencyLimiter](#v1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to pr…
 - [v1Constant](#v1-constant) – Component that emits a constant value as an output signal.
 - [v1ConstantOuts](#v1-constant-outs) – Outputs for the Constant component.
 - [v1ControlPoint](#v1-control-point) – Identifies control point within a service that the rule or policy should apply t…
@@ -60,7 +61,6 @@
 - [v1Port](#v1-port) – Components are interconnected with each other via Ports.
 - [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an…
 - [v1PromQLOuts](#v1-prom-q-l-outs) – Output for the PromQL component.
-- [v1RateLimiter](#v1-rate-limiter)
 - [v1RateLimiterIns](#v1-rate-limiter-ins)
 - [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing based workload scheduler.
 - [v1SchedulerOuts](#v1-scheduler-outs) – Output for the Scheduler component.
@@ -259,6 +259,82 @@ Higher numbers means higher priority level.
 </dd>
 </dl>
 
+### <span id="languagev1-concurrency-limiter"></span> languagev1ConcurrencyLimiter
+
+Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection. It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles. Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+
+#### Properties
+
+<dl>
+<dt>load_shed_actuator</dt>
+<dd>
+
+([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a portion of requests.
+
+</dd>
+</dl>
+<dl>
+<dt>scheduler</dt>
+<dd>
+
+([V1Scheduler](#v1-scheduler), `required`) Weighted Fair Queuing based workfload scheduler.
+
+</dd>
+</dl>
+
+### <span id="languagev1-rate-limiter"></span> languagev1RateLimiter
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1RateLimiterIns](#v1-rate-limiter-ins))
+
+</dd>
+</dl>
+<dl>
+<dt>label_key</dt>
+<dd>
+
+(string)
+
+</dd>
+</dl>
+<dl>
+<dt>lazy_sync_config</dt>
+<dd>
+
+([RateLimiterLazySyncConfig](#rate-limiter-lazy-sync-config))
+
+</dd>
+</dl>
+<dl>
+<dt>limit_reset_interval</dt>
+<dd>
+
+(string)
+
+</dd>
+</dl>
+<dl>
+<dt>overrides</dt>
+<dd>
+
+([[]RateLimiterOverrideConfig](#rate-limiter-override-config))
+
+</dd>
+</dl>
+<dl>
+<dt>selector</dt>
+<dd>
+
+([V1Selector](#v1-selector))
+
+</dd>
+</dl>
+
 ### <span id="v1-arithmetic-combinator"></span> v1ArithmeticCombinator
 
 Type of combinator that computes the arithmetic operation on the operand signals.
@@ -351,7 +427,7 @@ The looped signals are saved in the tick they are generated and served in the su
 <dt>concurrency_limiter</dt>
 <dd>
 
-([V1ConcurrencyLimiter](#v1-concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+([Languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
 
 </dd>
 </dl>
@@ -423,7 +499,7 @@ The looped signals are saved in the tick they are generated and served in the su
 <dt>rate_limiter</dt>
 <dd>
 
-([V1RateLimiter](#v1-rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
+([Languagev1RateLimiter](#languagev1-rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
 
 </dd>
 </dl>
@@ -432,29 +508,6 @@ The looped signals are saved in the tick they are generated and served in the su
 <dd>
 
 ([V1Sqrt](#v1-sqrt)) Takes an input signal and emits the square root of the input signal.
-
-</dd>
-</dl>
-
-### <span id="v1-concurrency-limiter"></span> v1ConcurrencyLimiter
-
-Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection. It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles. Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
-
-#### Properties
-
-<dl>
-<dt>load_shed_actuator</dt>
-<dd>
-
-([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a portion of requests.
-
-</dd>
-</dl>
-<dl>
-<dt>scheduler</dt>
-<dd>
-
-([V1Scheduler](#v1-scheduler), `required`) Weighted Fair Queuing based workfload scheduler.
 
 </dd>
 </dl>
@@ -1371,59 +1424,6 @@ Output for the PromQL component.
 <dd>
 
 ([V1Port](#v1-port)) The result of the Prometheus query as an output signal.
-
-</dd>
-</dl>
-
-### <span id="v1-rate-limiter"></span> v1RateLimiter
-
-#### Properties
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([V1RateLimiterIns](#v1-rate-limiter-ins))
-
-</dd>
-</dl>
-<dl>
-<dt>label_key</dt>
-<dd>
-
-(string)
-
-</dd>
-</dl>
-<dl>
-<dt>lazy_sync_config</dt>
-<dd>
-
-([RateLimiterLazySyncConfig](#rate-limiter-lazy-sync-config))
-
-</dd>
-</dl>
-<dl>
-<dt>limit_reset_interval</dt>
-<dd>
-
-(string)
-
-</dd>
-</dl>
-<dl>
-<dt>overrides</dt>
-<dd>
-
-([[]RateLimiterOverrideConfig](#rate-limiter-override-config))
-
-</dd>
-</dl>
-<dl>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector))
 
 </dd>
 </dl>
