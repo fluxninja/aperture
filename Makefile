@@ -9,7 +9,12 @@ install-go-tools: go-mod-tidy
 	@echo Installing tools from tools.go
 	@./scripts/install_go_tools.sh
 
-generate-config-markdown:
+go-generate-swagger:
+	@echo Generating swagger code
+	@echo Generating swagger specs from go code
+	@./scripts/go_generate_swagger.sh
+
+generate-config-markdown: go-generate-swagger
 	@cd ./docs && $(MAKE) generate-config-markdown
 
 generate-mermaid:
