@@ -209,9 +209,9 @@ jobs:
             shellcheck
             yq
       - restore_cache:
-          name: Restore golangci-lint cache
+          name: Restore go cache
           keys:
-            - v1-golangci-lint-{{ checksum "~/day" }}
+            - v1-go-{{ checksum "~/day" }}
       - run:
           name: Cache golangci-lint run
           command: |
@@ -258,10 +258,11 @@ jobs:
               #done
             fi
       - save_cache:
-          name: Save golangci-lint cache
-          key: v1-golangci-lint-{{ checksum "~/day" }}
+          name: Save go cache
+          key: v1-go-{{ checksum "~/day" }}
           paths:
             - ../.cache/golangci-lint
+            - ../.cache/go-build
           when: on_success
       - save_cache:
           name: Save pre-commit cache
