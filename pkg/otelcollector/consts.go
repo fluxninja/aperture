@@ -35,15 +35,15 @@ const (
 	// from "just empty", eg. "", "[]" or "{}".
 	MissingAttributeSourceValue = "-"
 
-	// FlowLabel describes flow labels relevant to this traffic.
+	// LabelsLabel describes labels relevant to this traffic.
 	// This is JSON encoded field:
 	// {
 	//   "foo": "bar",
 	//   "fizz": "buzz"
 	// }.
 	//
-	FlowLabel = "aperture.flow"
-	// LabeledLabel describes if there are any flow labels matched to traffic.
+	LabelsLabel = "aperture.labels"
+	// LabeledLabel describes if there are any labels matched to traffic.
 	LabeledLabel = "labeled"
 	// StatusCodeLabel describes HTTP status code of the response.
 	StatusCodeLabel = "http.status_code"
@@ -55,10 +55,14 @@ const (
 	HTTPResponseContentLength = "http.response_content_length"
 	// FeatureDurationLabel describes duration of the feature in milliseconds.
 	FeatureDurationLabel = "feature.duration_millis"
-	// PoliciesMatchedLabel describes if there are any policies matched to traffic.
-	PoliciesMatchedLabel = "policy_ids_matched"
-	// PoliciesDroppedLabel describes if there are any policies dropped to traffic.
-	PoliciesDroppedLabel = "policy_ids_dropped"
+	// RateLimitersLabel describes rate limiters matched to the traffic.
+	RateLimitersLabel = "rate_limiters"
+	// DroppingRateLimitersLabel describes rate limiters dropping the traffic.
+	DroppingRateLimitersLabel = "dropping_rate_limiters"
+	// ConcurrencyLimitersLabel describes rate limiters matched to the traffic.
+	ConcurrencyLimitersLabel = "concurrency_limiters"
+	// DroppingConcurrencyLimitersLabel describes rate limiters dropping the traffic.
+	DroppingConcurrencyLimitersLabel = "dropping_concurrency_limiters"
 	// HostAddressLabel describes host address of the request.
 	HostAddressLabel = "net.host.address"
 	// PeerAddressLabel describes peer address of the request.

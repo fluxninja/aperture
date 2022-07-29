@@ -2,6 +2,7 @@ package metricsprocessor
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -94,9 +95,9 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		decisions := getDecisions(logRecord.Attributes())
+		decisions := otelcollector.GetLimiterDecisions(logRecord.Attributes())
 		fluxMeters := getFluxMeterIDs(logRecord.Attributes())
-		p.addPolicyLabels(logRecord.Attributes(), decisions)
+		p.addLimiterLabels(logRecord.Attributes(), decisions)
 		return p.updateMetrics(logRecord.Attributes(), decisions, fluxMeters)
 	})
 	return ld, err
@@ -105,18 +106,62 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 // ConsumeTraces receives ptrace.Traces for consumption then returns updated traces with policy labels and metrics.
 func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) (ptrace.Traces, error) {
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		decisions := getDecisions(span.Attributes())
+		decisions := otelcollector.GetLimiterDecisions(span.Attributes())
 		fluxMeters := getFluxMeterIDs(span.Attributes())
-		p.addPolicyLabels(span.Attributes(), decisions)
+		p.addLimiterLabels(span.Attributes(), decisions)
 		return p.updateMetrics(span.Attributes(), decisions, fluxMeters)
 	})
 	return td, err
 }
 
-func (p *metricsProcessor) addPolicyLabels(attributes pcommon.Map, decisions []*flowcontrolv1.LimiterDecision) {
-	matched, dropped := getIDs(decisions)
-	attributes.InsertString(otelcollector.PoliciesMatchedLabel, matched)
-	attributes.InsertString(otelcollector.PoliciesDroppedLabel, dropped)
+// addLimiterLabels adds the following labels:
+// * `rate_limiters`
+// * `dropping_rate_limiters`
+// * `concurrency_limiters`
+// * `dropping_concurrency_limiters`.
+func (p *metricsProcessor) addLimiterLabels(attributes pcommon.Map, decisions []*flowcontrolv1.LimiterDecision) {
+	labels := map[string][]string{
+		otelcollector.RateLimitersLabel:                {},
+		otelcollector.DroppingRateLimitersLabel:        {},
+		otelcollector.ConcurrencyLimitersLabel:         {},
+		otelcollector.DroppingConcurrencyLimitersLabel: {},
+	}
+	for _, decision := range decisions {
+		if decision.GetRateLimiter() != nil {
+			rawValue := []string{
+				fmt.Sprintf("policy_name:%v", decision.GetPolicyName()),
+				fmt.Sprintf("component_index:%v", decision.GetComponentIndex()),
+				fmt.Sprintf("policy_hash:%v", decision.GetPolicyHash()),
+			}
+			value := strings.Join(rawValue, ",")
+			labels[otelcollector.RateLimitersLabel] = append(labels[otelcollector.RateLimitersLabel], value)
+			if decision.Dropped {
+				labels[otelcollector.DroppingRateLimitersLabel] = append(labels[otelcollector.DroppingRateLimitersLabel], value)
+			}
+		}
+		if cl := decision.GetConcurrencyLimiter(); cl != nil {
+			rawValue := []string{
+				fmt.Sprintf("policy_name:%v", decision.GetPolicyName()),
+				fmt.Sprintf("component_index:%v", decision.GetComponentIndex()),
+				fmt.Sprintf("workload_index:%v", cl.GetWorkload()),
+				fmt.Sprintf("policy_hash:%v", decision.GetPolicyHash()),
+			}
+			value := strings.Join(rawValue, ",")
+			labels[otelcollector.ConcurrencyLimitersLabel] = append(labels[otelcollector.ConcurrencyLimitersLabel], value)
+			if decision.Dropped {
+				labels[otelcollector.DroppingConcurrencyLimitersLabel] = append(labels[otelcollector.DroppingConcurrencyLimitersLabel], value)
+			}
+		}
+	}
+	for key, rawValue := range labels {
+		value, err := json.Marshal(rawValue)
+		if err != nil {
+			// This should never happen
+			log.Debug().Str("label", key).Msg("failed to marshal value")
+			continue
+		}
+		attributes.InsertString(key, string(value))
+	}
 	attributes.Remove(otelcollector.LimiterDecisionsLabel)
 }
 
@@ -146,7 +191,10 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, decisions []*fl
 			droppedMetricsLabel: fmt.Sprintf("%t", decision.Dropped),
 		}
 
-		workload := decision.GetConcurrencyLimiter().Workload
+		workload := ""
+		if cl := decision.GetConcurrencyLimiter(); cl != nil {
+			workload = cl.GetWorkload()
+		}
 		err = p.updateMetricsForWorkload(labels, latency, workload)
 		if err != nil {
 			return err
@@ -193,19 +241,6 @@ func getLatencyLabel(attributes pcommon.Map) string {
 	return ""
 }
 
-func getDecisions(attributes pcommon.Map) []*flowcontrolv1.LimiterDecision {
-	var decisions []*flowcontrolv1.LimiterDecision
-	rawPolicies, exists := attributes.Get(otelcollector.LimiterDecisionsLabel)
-	if !exists {
-		log.Debug().Str("label", otelcollector.LimiterDecisionsLabel).Msg("Label does not exist")
-		return decisions
-	}
-	if !otelcollector.UnmarshalStringVal(rawPolicies, otelcollector.LimiterDecisionsLabel, &decisions) {
-		log.Debug().Str("label", otelcollector.LimiterDecisionsLabel).Msg("Label is not a string")
-	}
-	return decisions
-}
-
 func getFluxMeterIDs(attributes pcommon.Map) []string {
 	rawFluxMeters, exists := attributes.Get(otelcollector.FluxMetersLabel)
 	if !exists {
@@ -227,16 +262,4 @@ func getFluxMeterIDs(attributes pcommon.Map) []string {
 	}
 
 	return fluxMeters
-}
-
-func getIDs(decisions []*flowcontrolv1.LimiterDecision) (string, string) {
-	matched := make([]string, len(decisions))
-	dropped := make([]string, len(decisions))
-	for i, decision := range decisions {
-		matched[i] = decision.PolicyName
-		if decision.Dropped {
-			dropped[i] = decision.PolicyName
-		}
-	}
-	return strings.Join(matched, ","), strings.Join(dropped, ",")
 }
