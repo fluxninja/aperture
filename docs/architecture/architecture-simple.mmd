@@ -1,32 +1,13 @@
-flowchart TB
-  subgraph Cloud["FluxNinja Cloud (Enterprise Edition)"]
-    direction TB
-    subgraph CloudAnalyticsDB["Large-scale Data"]
-      direction LR
-      CloudDiscovery[("Discovery DB")]
-      CloudServiceHealth[("Metrics\n(Services and Flow)")]
-    end
-    CloudDB[(DB)]
-    subgraph ControlPlane["Control Plane"]
-      direction LR
-      CloudNotifications["Alerts & Notifications"]
-      CloudBehaviorModeling["AI-driven Behavior Modeling (Planned)"]
-      CloudEnrichment["Processing and enriching metrics"]
-    end
-    subgraph UI
-      direction LR
-      CloudPolicyBuilder["Interactive Policy Builder (Planned)"]
-      CloudAnalyticsUI["Flow analytics"]
-    end
-  end
+flowchart
   subgraph User VPC
+    direction TB
     subgraph Controller["Aperture Controller"]
       ControlLoop["Policy Control Loop"]
       PolicyManagement["Classification Rules\n& Policy Management"]
     end
     subgraph ControllerDB["Aperture Data"]
-      MetricsDB[("Short-scale metrics\n(Prometheus)")]
-      ETCD[("K/V Store (Etcd)")]
+      MetricsDB[("High-frequency short-scale\nmetrics DB")]
+      ETCD[("K/V Store")]
     end
     subgraph KubernetesNode["Kubernetes Node"]
       subgraph Agent["Aperture Agent"]
@@ -48,27 +29,27 @@ flowchart TB
           FeaturesA{{"Features & Frameworks\n(user code)"}}
           LibraryA["Aperture Library"]
         end
-        MeshA["Service Mesh Dataplane Proxy\n(Envoy)"]
+        MeshA["Service Mesh Dataplane Proxy"]
       end
       subgraph ServiceBPod["Service B Pod"]
-        MeshB["Service Mesh Dataplane Proxy\n(Envoy)"]
+        MeshB["Service Mesh Dataplane Proxy"]
       end
     end
   end
 
-Agent --> Cloud
-Controller <--> Cloud
-Controller <--> ControllerDB
+%% Agent --> Cloud
+%% Controller <--> Cloud
+Controller <--> ETCD
+MetricsDB --> Controller
 
 ETCD --> Agent
 Agent --> MetricsDB
 ServiceA <-..-> MeshA
 
-MeshA -- "Request metadata,\nMetrics" --> Agent
-Agent -- "Decisions,\nFlow Labels" --> MeshA
+MeshA <--Decisions & metadata--> Agent
 
 MeshA <-. API Traffic .-> MeshB
 
-FeaturesA <-- Decisions & Metrics--> LibraryA
-LibraryA <-- Decisions & Metrics --> Agent
+FeaturesA <--> LibraryA
+LibraryA <-- Decisions & metadata --> Agent
 Quotas <-- "shared counters synchronization\nwith other agents' quotas" --> Quotas

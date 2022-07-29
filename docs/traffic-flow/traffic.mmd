@@ -1,0 +1,46 @@
+flowchart TD
+  Source -- request --> Proxy
+  Proxy -- request metadata --> Classification
+  Classification <-- identifies service --> Services
+  subgraph Services2[Service Discovery]
+  Services["Service Discovery"]
+  end
+  SDK["FluxNinja Library"]
+  SDK --> FlowControl
+  Classification -- "matadata\n& flow labels" --> FlowControl
+
+  subgraph Controller["Controller (constantly looping)\n"]
+    MetricsDB --> Circuit --> Vars
+    Circuit["Circuit evaluator"]
+    Vars
+  end
+
+  subgraph FCS["Flow Control Service"]
+    FlowControl[Flow Control API]
+    FlowControl --> Policies
+    FlowControl <-- identifies service --> Services
+    Policies[Policies matcher] --> Schedulers
+    Policies -- matched fluxmeters --> SDK2
+    Policies --> Proxy2
+    Schedulers <--> Vars[(Actuator variables)]
+  end
+
+  Schedulers -- yes/no --> SDK2
+  Schedulers -- yes/no --> Proxy2
+  Classification -- created flow labels --> Proxy2
+  SDK2 -- feature execution --> SDK3
+  Proxy2 -- request forwarded --> Destination
+  Destination -- response --> Proxy3
+
+  SDK3 -- event\nalong with list of schedulers, fluxmeters, etc. --> Metrics
+  Proxy3 --> Metrics
+  Metrics --> MetricsDB
+  Metrics["Metrics processor"]
+  MetricsDB[("Metrics DB")]
+
+  Proxy{{Proxy}}
+  Proxy2{{Proxy}}
+  Proxy3{{Proxy}}
+  SDK{{Aperture Library}}
+  SDK2{{Aperture Library}}
+  SDK3{{Aperture Library}}
