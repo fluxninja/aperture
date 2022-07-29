@@ -1,7 +1,6 @@
 package log
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	stdlog "log"
@@ -99,7 +98,7 @@ func NewLogger(w io.Writer, useDiode bool, levelString string) Logger {
 	} else {
 		wr = w
 	}
-	zerolog := zerolog.New(wr).Level(level).With().Timestamp().Caller().Str(serviceKey, info.Service).Logger().Hook(DiodeShutdownHook{})
+	zerolog := zerolog.New(wr).Level(level).With().Timestamp().Caller().Str(serviceKey, info.Service).Logger()
 	logger := Logger{
 		logger: &zerolog,
 		w:      wr,
@@ -129,16 +128,6 @@ func closeDiodeWriter(dw diode.Writer) {
 
 // DiodeShutdownHook defines an interface to a log hook that is used creating a new logger.
 type DiodeShutdownHook struct{}
-
-// Run implements the DiodeShutdownHook interface and runs the hook with the event.
-// When the event is Fatal or Panic, it will crash the program with the event message.
-func (d DiodeShutdownHook) Run(e *zerolog.Event, level zerolog.Level, msg string) {
-	if level == zerolog.FatalLevel || level == zerolog.PanicLevel {
-		log.Error().Stack().Err(errors.New("log.Fatal() or log.Panic() called")).Msg("waiting for diode to flush. Message: " + msg)
-		WaitFlush()
-		panic(msg)
-	}
-}
 
 // WaitFlush waits a few ms to let the diode buffer to flush.
 func WaitFlush() {
@@ -328,13 +317,11 @@ func Error() *zerolog.Event {
 	return global.Error()
 }
 
-// Fatal starts a new message with fatal level. The os.Exit(1) function
-// is called by the Msg method, which terminates the program immediately after
-// writing messages to CrashReporter and invoking any registered CrashReporter.
+// Fatal starts a new message with fatal level. This is an alias for Panic.
 //
 // You must call Msg on the returned event in order to send the event.
 func (lg *Logger) Fatal() *zerolog.Event {
-	return lg.logger.Fatal()
+	return lg.logger.Panic()
 }
 
 // Fatal starts a new message with fatal level. The os.Exit(1) function
