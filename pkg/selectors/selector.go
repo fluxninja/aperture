@@ -129,10 +129,15 @@ func (p ControlPointID) String() string {
 //
 // Selector is assumed to be validated and non-nil.
 func ControlPointIDFromProto(selector *policylangv1.Selector) ControlPointID {
+	serviceNameParts := strings.Split(selector.Service, ".")
+	namespace := ""
+	if len(serviceNameParts) >= 4 {
+		namespace = serviceNameParts[len(serviceNameParts)-4]
+	}
 	return ControlPointID{
 		Service: services.ServiceID{
 			AgentGroup: selector.AgentGroup,
-			Namespace:  selector.Namespace,
+			Namespace:  namespace,
 			Service:    selector.Service,
 		},
 		ControlPoint: ControlPointFromProto(selector.ControlPoint),
