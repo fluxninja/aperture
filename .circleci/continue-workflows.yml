@@ -306,7 +306,7 @@ jobs:
             export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
              args=(
                --release=<< parameters.release-ref >>
-               --rm-repo-path=/home/circleci/project/
+               --source-repo-path=/home/circleci/project/
                --docs-root-dir=docs/
              )
              if [[ "<< parameters.dry-run >>" == "true" ]]; then
