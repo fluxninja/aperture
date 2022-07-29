@@ -270,7 +270,7 @@ jobs:
     parameters:
       release-ref:
         type: string
-        default: master
+        default: main
         description: What release tag or branch to copy documentation from
       dry-run:
         type: boolean
@@ -280,18 +280,18 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # FluxNinja/RM R/O
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # FluxNinja/cloud R/O
             - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff" # FluxNinja/aperture-tech-docs R/W
       - run:
           name: Install opsninja and its dependencies
           command: |
-            # We need R/O access to RM repository to be able to fetch opsninja library
+            # We need R/O access to cloud repository to be able to fetch opsninja library
             # FIXME: make "releases" of opsninja library somehow, even as a separate repository
             # to limit exposure.
-            export RM_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
-            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${RM_RO_KEY_FINGERPRINT}" | tr -d ':')"
+            export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
-            pip install 'git+ssh://git@github.com/fluxninja/RM@master#egg=opsninja&subdirectory=ops/apps/opsninja/'
+            pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
       - asdf_install:
           cache_name: publish-docs
           tools: |-
