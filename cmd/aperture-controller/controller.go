@@ -20,6 +20,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
+	"github.com/fluxninja/aperture/pkg/uuid"
 	"github.com/fluxninja/aperture/pkg/webhooks"
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
@@ -29,6 +30,7 @@ func main() {
 		platform.Config{}.Module(),
 		otel.ProvideAnnotatedControllerConfig(),
 		fx.Provide(
+			uuid.ProvideDefault,
 			clockwork.NewRealClock,
 			classification.ProvideCMFileValidator,
 			flowcontrol.ProvideCMFileValidator,
