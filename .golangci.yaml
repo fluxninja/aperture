@@ -44,7 +44,6 @@ linters-settings:
       - github.com/onsi/gomega
 linters:
   enable:
-    - gocritic
     - gofumpt
     - gosec
     - godot
@@ -53,6 +52,8 @@ linters:
     - misspell
     - stylecheck
   disable:
+    # disable until go1.19 support
+    - gocritic
     # unmaintained
     - deadcode
     - varcheck

@@ -235,7 +235,7 @@ func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {
 	return services.ServiceID{
 		AgentGroup: "default",
 		Namespace:  ns,
-		Service:    hostParts[0],
+		Service:    host,
 	}
 }
 

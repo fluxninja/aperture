@@ -577,7 +577,7 @@ Describes where a rule or actuation component should apply to.
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).
+([V1LabelMatcher](#v1-label-matcher)) Allows to add _additional_ condition on labels that must also be satisfied (in addition to service+control point matching).
 The label matcher allows to match on infra labels, flow labels and request labels.
 Arbitrary label matcher can be used to match infra labels.
 For flowcontrol policies, the matcher can be used to match flow labels.
@@ -596,20 +596,11 @@ Note: Request headers are only available for "traffic" control points.
 </dd>
 </dl>
 <dl>
-<dt>namespace</dt>
-<dd>
-
-(string, `required`) The namespace of the entities to select.
-In k8s, this is the k8s' namespace.
-
-</dd>
-</dl>
-<dl>
 <dt>service</dt>
 <dd>
 
 (string, `required`) The service (name) of the entities.
-In k8s, this is a name of the Service object.
+In k8s, this is the FQDN of the Service object.
 
 Note: Entity may belong to multiple services.
 
