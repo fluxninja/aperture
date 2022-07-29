@@ -14,7 +14,7 @@ import (
 	"github.com/rs/zerolog/pkgerrors"
 
 	"github.com/fluxninja/aperture/pkg/info"
-	ph "github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 const (
@@ -121,7 +121,7 @@ func (lg Logger) Close() {
 // closeDiodeWriter.
 func closeDiodeWriter(dw diode.Writer) {
 	log.Info().Msg("Closing DiodeWriter after a delay!")
-	ph.Go(func() {
+	panichandler.Go(func() {
 		WaitFlush()
 		_ = dw.Close()
 	})

@@ -11,7 +11,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/filesystem"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 // watcher holds the state of the watcher.
@@ -99,7 +99,7 @@ func (w *watcher) Start() error {
 	}
 
 	// watch events
-	panic.Go(func() {
+	panichandler.Go(func() {
 		defer w.waitGroup.Done()
 	OUTER:
 		for {

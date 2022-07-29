@@ -1,12 +1,10 @@
-package panic_test
+package panichandler_test
 
 import (
 	"bytes"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"github.com/fluxninja/aperture/pkg/panic"
 )
 
 var _ = Describe("Crash-Writer", func() {
