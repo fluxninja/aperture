@@ -16,6 +16,8 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
@@ -183,9 +185,9 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		// Put all non-hidden flow labels and policy details as dynamic metadata
 		DynamicMetadata: &structpb.Struct{
 			Fields: map[string]*structpb.Value{
-				"fn.flow":              flowLabelsAsPbValueForTelemetry(flowLabels),
-				"fn.limiter_decisions": limiterDecisionsAsPbValueForTelemetry(fcResponse.LimiterDecisions),
-				"fn.fluxmeters":        fluxmeterIDsAsPbValueForTelemetry(fcResponse.FluxMeterIds),
+				"aperture.flow":              flowLabelsAsPbValueForTelemetry(flowLabels),
+				"aperture.limiter_decisions": limiterDecisionsAsPbValueForTelemetry(fcResponse.LimiterDecisions),
+				"aperture.fluxmeters":        fluxmeterIDsAsPbValueForTelemetry(fcResponse.FluxMeterIds),
 			},
 		},
 	}
@@ -241,13 +243,13 @@ func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {
 // 1. should be 1 and generic
 // 2. should be moved to a common package along with the corresponding unmarshal method
 
-func flowLabelsAsPbValueForTelemetry(m classification.FlowLabels) *structpb.Value {
-	fields := make(map[string]*structpb.Value, len(m))
-	for k, fl := range m {
-		if fl.Flags.Hidden {
+func flowLabelsAsPbValueForTelemetry(labels classification.FlowLabels) *structpb.Value {
+	fields := make(map[string]*structpb.Value, len(labels))
+	for k, v := range labels {
+		if v.Flags.Hidden {
 			continue
 		}
-		fields[k] = structpb.NewStringValue(fl.Value)
+		fields[k] = structpb.NewStringValue(v.Value)
 	}
 	return structpb.NewStructValue(&structpb.Struct{Fields: fields})
 }
@@ -263,33 +265,31 @@ func fluxmeterIDsAsPbValueForTelemetry(fluxmeters []string) *structpb.Value {
 func limiterDecisionsAsPbValueForTelemetry(limiterDecisions []*flowcontrolv1.LimiterDecision) *structpb.Value {
 	policies := make([]*structpb.Value, len(limiterDecisions))
 	for i, ld := range limiterDecisions {
-		var structVal *structpb.Value
-
-		switch decision := ld.Decision.(type) {
-		case *flowcontrolv1.LimiterDecision_RateLimiterDecision_:
-			structVal = structpb.NewStructValue(&structpb.Struct{
-				Fields: map[string]*structpb.Value{
-					"policy_name":     structpb.NewStringValue(decision.RateLimiterDecision.PolicyName),
-					"component_index": structpb.NewNumberValue(float64(decision.RateLimiterDecision.ComponentIndex)),
-					"dropped":         structpb.NewBoolValue(ld.Dropped),
-					"reason":          structpb.NewStringValue(ld.Reason.Enum().String()),
-				},
-			})
-		case *flowcontrolv1.LimiterDecision_ConcurrencyLimiterDecision:
-			structVal = structpb.NewStructValue(&structpb.Struct{
-				Fields: map[string]*structpb.Value{
-					"policy_name":     structpb.NewStringValue(decision.ConcurrencyLimiterDecision.PolicyName),
-					"component_index": structpb.NewNumberValue(float64(decision.ConcurrencyLimiterDecision.ComponentIndex)),
-					"workload":        structpb.NewStringValue(decision.ConcurrencyLimiterDecision.Workload),
-					"dropped":         structpb.NewBoolValue(ld.Dropped),
-					"reason":          structpb.NewStringValue(ld.Reason.Enum().String()),
-				},
-			})
+		ldStruct, err := protoAsPbValue(ld)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to convert limiter decision into generic proto value")
+			continue
 		}
-
-		policies[i] = structVal
+		policies[i] = ldStruct
 	}
 	return structpb.NewListValue(&structpb.ListValue{Values: policies})
+}
+
+func protoAsPbValue(message protoreflect.ProtoMessage) (*structpb.Value, error) {
+	mBytes, err := protojson.Marshal(message)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to marshal proto message into JSON")
+		return nil, err
+
+	}
+	mStruct := new(structpb.Struct)
+	err = protojson.Unmarshal(mBytes, mStruct)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal JSON bytes into structpb.Struct")
+		return nil, err
+	}
+
+	return structpb.NewStructValue(mStruct), nil
 }
 
 // merges two flow labels maps.

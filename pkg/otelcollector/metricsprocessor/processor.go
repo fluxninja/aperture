@@ -3,7 +3,6 @@ package metricsprocessor
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -14,23 +13,24 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
-	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 const (
-	latencyHistogramMetricName = "request_latency_ms"
+	workloadLatencyMetricName = "workload_latency_ms"
 
-	metricIDLabel                = "metric_id"
-	droppedMetricsLabel          = "dropped"
-	workloadKeyNameMetricsLabel  = "workload_key_name"
-	workloadKeyValueMetricsLabel = "workload_key_value"
+	policyNameLabel     = "policy_name"
+	policyHashLabel     = "policy_hash"
+	componentIndexLabel = "component_index"
+	droppedMetricsLabel = "dropped"
+	workloadIndexLabel  = "workload_index"
 )
 
 type metricsProcessor struct {
-	cfg                     *Config
-	requestLatencyHistogram *prometheus.HistogramVec
+	cfg                      *Config
+	workloadLatencyHistogram *prometheus.HistogramVec
 }
 
 func newProcessor(cfg *Config) (*metricsProcessor, error) {
@@ -46,25 +46,26 @@ func newProcessor(cfg *Config) (*metricsProcessor, error) {
 }
 
 func (p *metricsProcessor) registerRequestLatencyHistogram() error {
-	p.requestLatencyHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name: latencyHistogramMetricName,
-		Help: "Latency of requests histogram",
+	p.workloadLatencyHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name: workloadLatencyMetricName,
+		Help: "Latency histogram of workload",
 		Buckets: prometheus.LinearBuckets(
 			p.cfg.LatencyBucketStartMS,
 			p.cfg.LatencyBucketWidthMS,
 			p.cfg.LatencyBucketCount,
 		),
 	}, []string{
-		metricIDLabel,
+		policyNameLabel,
+		policyHashLabel,
+		componentIndexLabel,
 		droppedMetricsLabel,
-		workloadKeyNameMetricsLabel,
-		workloadKeyValueMetricsLabel,
+		workloadIndexLabel,
 	})
-	err := p.cfg.promRegistry.Register(p.requestLatencyHistogram)
+	err := p.cfg.promRegistry.Register(p.workloadLatencyHistogram)
 	if err != nil {
 		if are, ok := err.(prometheus.AlreadyRegisteredError); ok {
 			// A histogram for that metric has been registered before. Use the old histogram from now on.
-			p.requestLatencyHistogram = are.ExistingCollector.(*prometheus.HistogramVec)
+			p.workloadLatencyHistogram = are.ExistingCollector.(*prometheus.HistogramVec)
 			return nil
 		}
 	}
@@ -93,10 +94,10 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		policies := getPolicies(logRecord.Attributes())
-		fluxmeters := getFluxMeterIDs(logRecord.Attributes())
-		p.addPolicyLabels(logRecord.Attributes(), policies)
-		return p.updateMetrics(logRecord.Attributes(), policies, fluxmeters)
+		decisions := getDecisions(logRecord.Attributes())
+		fluxMeters := getFluxMeterIDs(logRecord.Attributes())
+		p.addPolicyLabels(logRecord.Attributes(), decisions)
+		return p.updateMetrics(logRecord.Attributes(), decisions, fluxMeters)
 	})
 	return ld, err
 }
@@ -104,29 +105,22 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 // ConsumeTraces receives ptrace.Traces for consumption then returns updated traces with policy labels and metrics.
 func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) (ptrace.Traces, error) {
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		policies := getPolicies(span.Attributes())
-		fluxmeters := getFluxMeterIDs(span.Attributes())
-		p.addPolicyLabels(span.Attributes(), policies)
-		return p.updateMetrics(span.Attributes(), policies, fluxmeters)
+		decisions := getDecisions(span.Attributes())
+		fluxMeters := getFluxMeterIDs(span.Attributes())
+		p.addPolicyLabels(span.Attributes(), decisions)
+		return p.updateMetrics(span.Attributes(), decisions, fluxMeters)
 	})
 	return td, err
 }
 
-func (p *metricsProcessor) addPolicyLabels(
-	attributes pcommon.Map,
-	policies []policy,
-) {
-	matched, dropped := getIDs(policies)
+func (p *metricsProcessor) addPolicyLabels(attributes pcommon.Map, decisions []*flowcontrolv1.LimiterDecision) {
+	matched, dropped := getIDs(decisions)
 	attributes.InsertString(otelcollector.PoliciesMatchedLabel, matched)
 	attributes.InsertString(otelcollector.PoliciesDroppedLabel, dropped)
-	attributes.Remove(otelcollector.PoliciesLabel)
+	attributes.Remove(otelcollector.LimiterDecisionsLabel)
 }
 
-func (p *metricsProcessor) updateMetrics(
-	attributes pcommon.Map,
-	policies []policy,
-	fluxmeters []string,
-) error {
+func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, decisions []*flowcontrolv1.LimiterDecision, fluxMeters []string) error {
 	latencyLabel := getLatencyLabel(attributes)
 
 	if latencyLabel == "" {
@@ -144,59 +138,31 @@ func (p *metricsProcessor) updateMetrics(
 		return nil
 	}
 
-	for _, policy := range policies {
+	for _, decision := range decisions {
 		labels := map[string]string{
-			metricIDLabel:       policy.ID,
-			droppedMetricsLabel: fmt.Sprintf("%t", policy.Dropped),
+			policyNameLabel:     decision.PolicyName,
+			policyHashLabel:     decision.PolicyHash,
+			componentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
+			droppedMetricsLabel: fmt.Sprintf("%t", decision.Dropped),
 		}
 
-		workload := p.extractWorkloadDesc(policy.Workload)
+		workload := decision.GetConcurrencyLimiter().Workload
 		err = p.updateMetricsForWorkload(labels, latency, workload)
 		if err != nil {
 			return err
 		}
 	}
 
-	for _, fluxmeterID := range fluxmeters {
-		p.updateMetricsForFluxMeters(fluxmeterID, latency)
+	for _, fluxMeter := range fluxMeters {
+		p.updateMetricsForFluxMeters(fluxMeter, latency)
 	}
 
 	return nil
 }
 
-func (p *metricsProcessor) extractWorkloadDesc(workload string) *policydecisionsv1.WorkloadDesc {
-	workloadDesc := &policydecisionsv1.WorkloadDesc{
-		WorkloadKey:   "default_workload_key",
-		WorkloadValue: "default_workload_value",
-	}
-	re := regexp.MustCompile(`\"(.*)\"`)
-
-	arr := strings.Split(workload, " ")
-	for _, elem := range arr {
-		if strings.Contains(elem, "workload_key") {
-			match := re.FindStringSubmatch(elem)
-			if len(match) > 1 {
-				workloadDesc.WorkloadKey = match[1]
-			}
-		}
-		if strings.Contains(elem, "workload_value") {
-			match := re.FindStringSubmatch(elem)
-			if len(match) > 1 {
-				workloadDesc.WorkloadValue = match[1]
-			}
-		}
-	}
-	return workloadDesc
-}
-
-func (p *metricsProcessor) updateMetricsForWorkload(
-	labels map[string]string,
-	latency float64,
-	workload *policydecisionsv1.WorkloadDesc,
-) error {
-	labels[workloadKeyNameMetricsLabel] = workload.WorkloadKey
-	labels[workloadKeyValueMetricsLabel] = workload.WorkloadValue
-	latencyHistogram, err := p.requestLatencyHistogram.GetMetricWith(labels)
+func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64, workload string) error {
+	labels[workloadIndexLabel] = workload
+	latencyHistogram, err := p.workloadLatencyHistogram.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Getting latency histogram")
 		return err
@@ -206,8 +172,8 @@ func (p *metricsProcessor) updateMetricsForWorkload(
 	return nil
 }
 
-func (p *metricsProcessor) updateMetricsForFluxMeters(fluxmeterID string, latency float64) {
-	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxmeterID)
+func (p *metricsProcessor) updateMetricsForFluxMeters(fluxMeter string, latency float64) {
+	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxMeter)
 	fluxmeterHistogram.Observe(latency)
 }
 
@@ -227,29 +193,30 @@ func getLatencyLabel(attributes pcommon.Map) string {
 	return ""
 }
 
-func getPolicies(attributes pcommon.Map) (policies []policy) {
-	rawPolicies, exists := attributes.Get(otelcollector.PoliciesLabel)
+func getDecisions(attributes pcommon.Map) []*flowcontrolv1.LimiterDecision {
+	var decisions []*flowcontrolv1.LimiterDecision
+	rawPolicies, exists := attributes.Get(otelcollector.LimiterDecisionsLabel)
 	if !exists {
-		log.Debug().Str("label", otelcollector.PoliciesLabel).Msg("Label does not exist")
-		return
+		log.Debug().Str("label", otelcollector.LimiterDecisionsLabel).Msg("Label does not exist")
+		return decisions
 	}
-	if !otelcollector.UnmarshalStringVal(rawPolicies, otelcollector.PoliciesLabel, &policies) {
-		log.Debug().Str("label", otelcollector.PoliciesLabel).Msg("Label is not a string")
+	if !otelcollector.UnmarshalStringVal(rawPolicies, otelcollector.LimiterDecisionsLabel, &decisions) {
+		log.Debug().Str("label", otelcollector.LimiterDecisionsLabel).Msg("Label is not a string")
 	}
-	return
+	return decisions
 }
 
 func getFluxMeterIDs(attributes pcommon.Map) []string {
-	rawFluxMeters, exists := attributes.Get(otelcollector.FluxMeterIDsLabel)
+	rawFluxMeters, exists := attributes.Get(otelcollector.FluxMetersLabel)
 	if !exists {
-		log.Debug().Str("label", otelcollector.FluxMeterIDsLabel).Msg("Label does not exist")
+		log.Debug().Str("label", otelcollector.FluxMetersLabel).Msg("Label does not exist")
 		return nil
 	}
 
 	// flux meters are either send properly as a slice of strings (when sent
 	// via sdk) or as json-encoded array
 	var fluxMeters []string
-	if otelcollector.UnmarshalStringVal(rawFluxMeters, otelcollector.FluxMeterIDsLabel, &fluxMeters) {
+	if otelcollector.UnmarshalStringVal(rawFluxMeters, otelcollector.FluxMetersLabel, &fluxMeters) {
 		return fluxMeters
 	}
 
@@ -262,19 +229,13 @@ func getFluxMeterIDs(attributes pcommon.Map) []string {
 	return fluxMeters
 }
 
-type policy struct {
-	Workload string `json:"workload"`
-	ID       string `json:"id"`
-	Dropped  bool   `json:"dropped"`
-}
-
-func getIDs(policies []policy) (string, string) {
-	matched := make([]string, len(policies))
-	dropped := make([]string, len(policies))
-	for i, p := range policies {
-		matched[i] = p.ID
-		if p.Dropped {
-			dropped[i] = p.ID
+func getIDs(decisions []*flowcontrolv1.LimiterDecision) (string, string) {
+	matched := make([]string, len(decisions))
+	dropped := make([]string, len(decisions))
+	for i, decision := range decisions {
+		matched[i] = decision.PolicyName
+		if decision.Dropped {
+			dropped[i] = decision.PolicyName
 		}
 	}
 	return strings.Join(matched, ","), strings.Join(dropped, ",")

@@ -297,22 +297,25 @@ func (rateLimiter *rateLimiter) GetSelector() *policylangv1.Selector {
 func (rateLimiter *rateLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
-	label, ok, _, _ := rateLimiter.TakeN(labels, 1)
+	label, ok, remaining, current := rateLimiter.TakeN(labels, 1)
 
 	if label == "" {
 		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND
 	}
 
 	return &flowcontrolv1.LimiterDecision{
-		Decision: &flowcontrolv1.LimiterDecision_RateLimiterDecision_{
-			RateLimiterDecision: &flowcontrolv1.LimiterDecision_RateLimiterDecision{
-				PolicyName:     rateLimiter.GetPolicyName(),
-				PolicyHash:     rateLimiter.GetPolicyHash(),
-				ComponentIndex: rateLimiter.GetComponentIndex(),
+		PolicyName:     rateLimiter.GetPolicyName(),
+		PolicyHash:     rateLimiter.GetPolicyHash(),
+		ComponentIndex: rateLimiter.GetComponentIndex(),
+		Dropped:        !ok,
+		Reason:         reason,
+		Details: &flowcontrolv1.LimiterDecision_RateLimiter_{
+			RateLimiter: &flowcontrolv1.LimiterDecision_RateLimiter{
+				Label:     label,
+				Remaining: int64(remaining),
+				Current:   int64(current),
 			},
 		},
-		Dropped: !ok,
-		Reason:  reason,
 	}
 }
 
