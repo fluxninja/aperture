@@ -12,6 +12,7 @@ import (
 	"golang.org/x/net/context"
 	"k8s.io/apimachinery/pkg/util/json"
 
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
@@ -36,10 +37,10 @@ var _ = Describe("Metrics Processor", func() {
 	})
 
 	DescribeTable("Processing logs",
-		func(controlPoint string, policies []policy, expectedErr error, expectedMetrics string) {
+		func(controlPoint string, decisions []*flowcontrolv1.LimiterDecision, expectedErr error, expectedMetrics string) {
 			ctx := context.Background()
 
-			logs := someLogs(policies, controlPoint)
+			logs := someLogs(decisions, controlPoint)
 			modifiedLogs, err := processor.ConsumeLogs(ctx, logs)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -50,126 +51,139 @@ var _ = Describe("Metrics Processor", func() {
 
 			By("sending proper metrics")
 			expected := strings.NewReader(expectedMetrics)
-			err = testutil.CollectAndCompare(
-				processor.requestLatencyHistogram,
-				expected,
-				"request_latency_ms")
+			err = testutil.CollectAndCompare(processor.workloadLatencyHistogram, expected, "workload_latency_ms")
 			Expect(err).NotTo(HaveOccurred())
 
 			By("adding proper labels")
 			logRecords := allLogRecords(modifiedLogs)
 			Expect(logRecords).To(HaveLen(1))
 
-			expectedMatched, expectedDropped := getIDs(policies)
-			Expect(logRecords[0].Attributes().AsRaw()).To(
-				HaveKeyWithValue(otelcollector.PoliciesMatchedLabel, expectedMatched))
-			Expect(logRecords[0].Attributes().AsRaw()).To(
-				HaveKeyWithValue(otelcollector.PoliciesDroppedLabel, expectedDropped))
+			expectedMatched, expectedDropped := getIDs(decisions)
+			Expect(logRecords[0].Attributes().AsRaw()).To(HaveKeyWithValue(otelcollector.PoliciesMatchedLabel, expectedMatched))
+			Expect(logRecords[0].Attributes().AsRaw()).To(HaveKeyWithValue(otelcollector.PoliciesDroppedLabel, expectedDropped))
 		},
+
 		Entry("record with single policy - ingress",
 			otelcollector.ControlPointIngress,
-			[]policy{{
-				ID:       "foo",
-				Dropped:  true,
-				Workload: "workload_key:\"foo\", workload_value:\"bar\"",
-			}},
+			[]*flowcontrolv1.LimiterDecision{
+				{
+					PolicyName:     "foo",
+					PolicyHash:     "foo-hash",
+					ComponentIndex: 1,
+					Dropped:        true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+						},
+					},
+				},
+			},
 			nil,
-			`# HELP request_latency_ms Latency of requests histogram
-			# TYPE request_latency_ms histogram
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="0"} 0
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="10"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="20"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="+Inf"} 1
-			request_latency_ms_sum{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",} 5
-			request_latency_ms_count{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar"} 1
+			`# HELP workload_latency_ms Latency histogram of workload
+			# TYPE workload_latency_ms histogram
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 		),
+
 		Entry("record with single policy - feature",
 			otelcollector.ControlPointFeature,
-			[]policy{{
-				ID:       "foo",
-				Dropped:  true,
-				Workload: "workload_key:\"foo\", workload_value:\"bar\"",
-			}},
+			[]*flowcontrolv1.LimiterDecision{
+				{
+					PolicyName:     "foo",
+					PolicyHash:     "foo-hash",
+					ComponentIndex: 1,
+					Dropped:        true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+						},
+					},
+				},
+			},
 			nil,
-			`# HELP request_latency_ms Latency of requests histogram
-			# TYPE request_latency_ms histogram
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="0"} 0
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="10"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="20"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="+Inf"} 1
-			request_latency_ms_sum{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",} 5
-			request_latency_ms_count{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar"} 1
+			`# HELP workload_latency_ms Latency histogram of workload
+			# TYPE workload_latency_ms histogram
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 		),
+
 		Entry("record with two policies",
 			otelcollector.ControlPointIngress,
-			[]policy{
+			[]*flowcontrolv1.LimiterDecision{
 				{
-					ID:       "foo",
-					Dropped:  true,
-					Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+					PolicyName:     "foo",
+					PolicyHash:     "foo-hash",
+					ComponentIndex: 1,
+					Dropped:        true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+						},
+					},
 				},
 				{
-					ID:       "fizz",
-					Dropped:  false,
-					Workload: "workload_key:\"fizz\", workload_value:\"buzz\"",
+					PolicyName:     "fizz",
+					PolicyHash:     "fizz-hash",
+					ComponentIndex: 1,
+					Dropped:        true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+							Workload: "workload_key:\"fizz\", workload_value:\"buzz\"",
+						},
+					},
 				},
 				{
-					ID:       "fizz",
-					Dropped:  false,
-					Workload: "workload_key:\"fizz\", workload_value:\"hoge\"",
-				},
-			},
-			nil,
-			`# HELP request_latency_ms Latency of requests histogram
-			# TYPE request_latency_ms histogram
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz",le="0"} 0
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz",le="10"} 1
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz",le="20"} 1
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz",le="+Inf"} 1
-			request_latency_ms_sum{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz"} 5
-			request_latency_ms_count{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz"} 1
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge",le="0"} 0
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge",le="10"} 1
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge",le="20"} 1
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge",le="+Inf"} 1
-			request_latency_ms_sum{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge"} 5
-			request_latency_ms_count{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="0"} 0
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="10"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="20"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="+Inf"} 1
-			request_latency_ms_sum{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar"} 5
-			request_latency_ms_count{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar"} 1
-			`,
-		),
-		Entry("policy without priority keys",
-			otelcollector.ControlPointIngress,
-			[]policy{
-				{
-					ID:      "foo",
-					Dropped: true,
+					PolicyName:     "fizz",
+					PolicyHash:     "fizz-hash",
+					ComponentIndex: 2,
+					Dropped:        true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+							Workload: "workload_key:\"fizz\", workload_value:\"hoge\"",
+						},
+					},
 				},
 			},
 			nil,
-			`# HELP request_latency_ms Latency of requests histogram
-			# TYPE request_latency_ms histogram
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value",le="0"} 0
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value",le="10"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value",le="20"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value",le="+Inf"} 1
-			request_latency_ms_sum{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value"} 5
-			request_latency_ms_count{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value"} 1
+			`# HELP workload_latency_ms Latency histogram of workload
+			# TYPE workload_latency_ms histogram
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\""} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\""} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="0"} 0
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="10"} 1
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="20"} 1
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 5
+			workload_latency_ms_count{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
 		),
 	)
 
 	DescribeTable("Processing traces",
-		func(controlPoint string, policies []policy, expectedErr error, expectedMetrics string) {
+		func(controlPoint string, decisions []*flowcontrolv1.LimiterDecision, expectedErr error, expectedMetrics string) {
 			ctx := context.Background()
 
-			traces := someTraces(policies, controlPoint)
+			traces := someTraces(decisions, controlPoint)
 			modifiedTraces, err := processor.ConsumeTraces(ctx, traces)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -180,124 +194,139 @@ var _ = Describe("Metrics Processor", func() {
 
 			By("sending proper metrics")
 			expected := strings.NewReader(expectedMetrics)
-			err = testutil.CollectAndCompare(
-				processor.requestLatencyHistogram,
-				expected,
-				"request_latency_ms")
+			err = testutil.CollectAndCompare(processor.workloadLatencyHistogram, expected, "workload_latency_ms")
 			Expect(err).NotTo(HaveOccurred())
 
 			By("adding proper labels")
 			traceRecords := allTraceRecords(modifiedTraces)
 			Expect(traceRecords).To(HaveLen(1))
 
-			expectedMatched, expectedDropped := getIDs(policies)
+			expectedMatched, expectedDropped := getIDs(decisions)
 			Expect(traceRecords[0].Attributes().AsRaw()).To(
 				HaveKeyWithValue(otelcollector.PoliciesMatchedLabel, expectedMatched))
 			Expect(traceRecords[0].Attributes().AsRaw()).To(
 				HaveKeyWithValue(otelcollector.PoliciesDroppedLabel, expectedDropped))
 		},
+
 		Entry("record with single policy - ingress",
 			otelcollector.ControlPointIngress,
-			[]policy{{
-				ID:       "foo",
-				Dropped:  true,
-				Workload: "workload_key:\"foo\", workload_value:\"bar\"",
-			}},
+			[]*flowcontrolv1.LimiterDecision{
+				{
+					PolicyName:     "foo",
+					PolicyHash:     "foo-hash",
+					ComponentIndex: 1,
+					Dropped:        true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+						},
+					},
+				},
+			},
 			nil,
-			`# HELP request_latency_ms Latency of requests histogram
-			# TYPE request_latency_ms histogram
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="0"} 0
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="10"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="20"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="+Inf"} 1
-			request_latency_ms_sum{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",} 5
-			request_latency_ms_count{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar"} 1
+			`# HELP workload_latency_ms Latency histogram of workload
+			# TYPE workload_latency_ms histogram
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 		),
+
 		Entry("record with single policy - feature",
 			otelcollector.ControlPointFeature,
-			[]policy{{
-				ID:       "foo",
-				Dropped:  true,
-				Workload: "workload_key:\"foo\", workload_value:\"bar\"",
-			}},
+			[]*flowcontrolv1.LimiterDecision{
+				{
+					PolicyName:     "foo",
+					PolicyHash:     "foo-hash",
+					ComponentIndex: 1,
+					Dropped:        true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+						},
+					},
+				},
+			},
 			nil,
-			`# HELP request_latency_ms Latency of requests histogram
-			# TYPE request_latency_ms histogram
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="0"} 0
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="10"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="20"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="+Inf"} 1
-			request_latency_ms_sum{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",} 5
-			request_latency_ms_count{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar"} 1
+			`# HELP workload_latency_ms Latency histogram of workload
+			# TYPE workload_latency_ms histogram
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 		),
+
 		Entry("record with two policies",
 			otelcollector.ControlPointIngress,
-			[]policy{
+			[]*flowcontrolv1.LimiterDecision{
 				{
-					ID:       "foo",
-					Dropped:  true,
-					Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+					PolicyName:     "foo",
+					PolicyHash:     "foo-hash",
+					ComponentIndex: 1,
+					Dropped:        true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+						},
+					},
 				},
 				{
-					ID:       "fizz",
-					Dropped:  false,
-					Workload: "workload_key:\"fizz\", workload_value:\"buzz\"",
+					PolicyName:     "fizz",
+					PolicyHash:     "fizz-hash",
+					ComponentIndex: 1,
+					Dropped:        true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+							Workload: "workload_key:\"fizz\", workload_value:\"buzz\"",
+						},
+					},
 				},
 				{
-					ID:       "fizz",
-					Dropped:  false,
-					Workload: "workload_key:\"fizz\", workload_value:\"hoge\"",
-				},
-			},
-			nil,
-			`# HELP request_latency_ms Latency of requests histogram
-			# TYPE request_latency_ms histogram
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz",le="0"} 0
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz",le="10"} 1
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz",le="20"} 1
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz",le="+Inf"} 1
-			request_latency_ms_sum{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz"} 5
-			request_latency_ms_count{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="buzz"} 1
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge",le="0"} 0
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge",le="10"} 1
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge",le="20"} 1
-			request_latency_ms_bucket{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge",le="+Inf"} 1
-			request_latency_ms_sum{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge"} 5
-			request_latency_ms_count{dropped="false",metric_id="fizz",workload_key_name="fizz",workload_key_value="hoge"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="0"} 0
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="10"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="20"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar",le="+Inf"} 1
-			request_latency_ms_sum{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar"} 5
-			request_latency_ms_count{dropped="true",metric_id="foo",workload_key_name="foo",workload_key_value="bar"} 1
-			`,
-		),
-		Entry("policy without priority keys",
-			otelcollector.ControlPointIngress,
-			[]policy{
-				{
-					ID:      "foo",
-					Dropped: true,
+					PolicyName:     "fizz",
+					PolicyHash:     "fizz-hash",
+					ComponentIndex: 2,
+					Dropped:        true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+							Workload: "workload_key:\"fizz\", workload_value:\"hoge\"",
+						},
+					},
 				},
 			},
 			nil,
-			`# HELP request_latency_ms Latency of requests histogram
-			# TYPE request_latency_ms histogram
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value",le="0"} 0
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value",le="10"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value",le="20"} 1
-			request_latency_ms_bucket{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value",le="+Inf"} 1
-			request_latency_ms_sum{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value"} 5
-			request_latency_ms_count{dropped="true",metric_id="foo",workload_key_name="default_workload_key",workload_key_value="default_workload_value"} 1
+			`# HELP workload_latency_ms Latency histogram of workload
+			# TYPE workload_latency_ms histogram
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\""} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\""} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="0"} 0
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="10"} 1
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="20"} 1
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 5
+			workload_latency_ms_count{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
 		),
 	)
 })
 
 // someLogs will return a plog.Logs instance with single LogRecord
-func someLogs(policies []policy, controlPoint string) plog.Logs {
+func someLogs(decisions []*flowcontrolv1.LimiterDecision, controlPoint string) plog.Logs {
 	logs := plog.NewLogs()
 	logs.ResourceLogs().AppendEmpty()
 
@@ -308,9 +337,9 @@ func someLogs(policies []policy, controlPoint string) plog.Logs {
 		instrumentationLogsSlice := resourceLogsSlice.At(i).ScopeLogs()
 		for j := 0; j < instrumentationLogsSlice.Len(); j++ {
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
-			marshalled, err := json.Marshal(policies)
+			marshalled, err := json.Marshal(decisions)
 			Expect(err).NotTo(HaveOccurred())
-			logRecord.Attributes().InsertString(otelcollector.PoliciesLabel, string(marshalled))
+			logRecord.Attributes().InsertString(otelcollector.LimiterDecisionsLabel, string(marshalled))
 			logRecord.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
 			logRecord.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
 			switch controlPoint {
@@ -326,7 +355,7 @@ func someLogs(policies []policy, controlPoint string) plog.Logs {
 }
 
 // someTraces will return a ptrace.Traces instance with single SpanRecord
-func someTraces(policies []policy, controlPoint string) ptrace.Traces {
+func someTraces(decisions []*flowcontrolv1.LimiterDecision, controlPoint string) ptrace.Traces {
 	traces := ptrace.NewTraces()
 	traces.ResourceSpans().AppendEmpty()
 
@@ -337,9 +366,9 @@ func someTraces(policies []policy, controlPoint string) ptrace.Traces {
 		instrumentationSpansSlice := resourceSpansSlice.At(i).ScopeSpans()
 		for j := 0; j < instrumentationSpansSlice.Len(); j++ {
 			span := instrumentationSpansSlice.At(j).Spans().AppendEmpty()
-			marshalled, err := json.Marshal(policies)
+			marshalled, err := json.Marshal(decisions)
 			Expect(err).NotTo(HaveOccurred())
-			span.Attributes().InsertString(otelcollector.PoliciesLabel, string(marshalled))
+			span.Attributes().InsertString(otelcollector.LimiterDecisionsLabel, string(marshalled))
 			span.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
 			span.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
 			switch controlPoint {

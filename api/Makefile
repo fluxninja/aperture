@@ -14,6 +14,5 @@ buf-generate:
 	@git add ./gen/*
 
 generate: buf-update buf-generate
-	@echo Generating code from proto with buf
 
 .PHONY: generate buf-update buf-generate
