@@ -13,7 +13,7 @@ const (
 	// ControlPointFeature const for feature control point.
 	ControlPointFeature = "feature"
 
-	// PoliciesLabel describes policies relevant to this traffic.
+	// LimiterDecisionsLabel describes policies relevant to this traffic.
 	// This is JSON encoded field:
 	// [
 	//   {
@@ -24,9 +24,9 @@ const (
 	//   ...
 	// ].
 	//
-	PoliciesLabel = "fn.policies"
-	// FluxMeterIDsLabel describes the flux meter IDs matched to this traffic.
-	FluxMeterIDsLabel = "fn.fluxmeters"
+	LimiterDecisionsLabel = "aperture.limiter_decisions"
+	// FluxMetersLabel describes the flux meter IDs matched to this traffic.
+	FluxMetersLabel = "aperture.fluxmeters"
 
 	// MissingAttributeSourceValue is a special attribute value, which can
 	// happen when (eg. Envoy's) logger tries to send attribute value, but its
@@ -42,7 +42,7 @@ const (
 	//   "fizz": "buzz"
 	// }.
 	//
-	FlowLabel = "fn.flow"
+	FlowLabel = "aperture.flow"
 	// LabeledLabel describes if there are any flow labels matched to traffic.
 	LabeledLabel = "labeled"
 	// StatusCodeLabel describes HTTP status code of the response.
