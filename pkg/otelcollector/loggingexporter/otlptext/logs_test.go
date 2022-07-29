@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/pdata/plog"
 
-	"aperture.tech/aperture/pkg/otelcollector/loggingexporter/testdata"
+	"github.com/FluxNinja/aperture/pkg/otelcollector/loggingexporter/testdata"
 )
 
 func TestLogsText(t *testing.T) {

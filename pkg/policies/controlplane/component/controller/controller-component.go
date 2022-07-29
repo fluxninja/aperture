@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"aperture.tech/aperture/pkg/policies/apis/policyapi"
-	"aperture.tech/aperture/pkg/policies/controlplane/constraints"
-	"aperture.tech/aperture/pkg/policies/controlplane/reading"
-	"aperture.tech/aperture/pkg/policies/controlplane/runtime"
+	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/constraints"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/reading"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/runtime"
 )
 
 // ControllerComponent provides a runtime.Component for Controllers. It can be initialized with a Controller implementation. It exposes a ControllerStateReadAPI for Controllers.

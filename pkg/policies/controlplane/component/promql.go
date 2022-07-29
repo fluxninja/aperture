@@ -13,19 +13,19 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	statusv1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/status/v1"
+	statusv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/status/v1"
 
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/jobs"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/notifiers"
-	"aperture.tech/aperture/pkg/policies/apis/policyapi"
-	"aperture.tech/aperture/pkg/policies/controlplane/common"
-	"aperture.tech/aperture/pkg/policies/controlplane/reading"
-	"aperture.tech/aperture/pkg/policies/controlplane/runtime"
-	"aperture.tech/aperture/pkg/prometheus"
-	"aperture.tech/aperture/pkg/status"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/jobs"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/notifiers"
+	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/common"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/reading"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/FluxNinja/aperture/pkg/prometheus"
+	"github.com/FluxNinja/aperture/pkg/status"
 )
 
 var errNoQueriesReturned = errors.New("no queries returned until now")

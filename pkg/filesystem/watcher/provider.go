@@ -7,9 +7,9 @@ import (
 	"github.com/spf13/cast"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/notifiers"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/notifiers"
 )
 
 // Module is a fx module that provides filesystem watcher.

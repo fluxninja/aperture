@@ -8,11 +8,11 @@ import (
 	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/filesystem"
-	"aperture.tech/aperture/pkg/info"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/utils"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/filesystem"
+	"github.com/FluxNinja/aperture/pkg/info"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/utils"
 )
 
 const (

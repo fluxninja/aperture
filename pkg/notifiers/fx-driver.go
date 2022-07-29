@@ -9,9 +9,9 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/status"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/status"
 )
 
 // FxOptionsFunc is a function that returns fx.Option.

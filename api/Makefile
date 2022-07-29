@@ -10,6 +10,6 @@ buf-generate:
 	@buf format -w
 	@buf lint
 	@buf generate
-	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={}
+	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
 
 .PHONY: buf-update buf-generate

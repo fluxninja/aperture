@@ -3,9 +3,9 @@ package iface
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	flowcontrolv1 "aperture.tech/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"aperture.tech/aperture/pkg/selectors"
-	"aperture.tech/aperture/pkg/services"
+	flowcontrolv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	"github.com/FluxNinja/aperture/pkg/selectors"
+	"github.com/FluxNinja/aperture/pkg/services"
 )
 
 // EngineAPI is an interface for registering fluxmeters and schedulers.

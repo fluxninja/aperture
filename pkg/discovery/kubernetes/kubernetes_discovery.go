@@ -16,12 +16,12 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/watch"
 
-	"aperture.tech/aperture/pkg/discovery/common"
-	"aperture.tech/aperture/pkg/k8s"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/notifiers"
-	"aperture.tech/aperture/pkg/panic"
-	"aperture.tech/aperture/pkg/utils"
+	"github.com/FluxNinja/aperture/pkg/discovery/common"
+	"github.com/FluxNinja/aperture/pkg/k8s"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/notifiers"
+	"github.com/FluxNinja/aperture/pkg/panic"
+	"github.com/FluxNinja/aperture/pkg/utils"
 )
 
 const podIDTrackerPrefix = "kubernetes_pod_id"

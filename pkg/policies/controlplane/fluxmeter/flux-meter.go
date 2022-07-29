@@ -10,14 +10,14 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
-	configv1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/config/v1"
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	etcdclient "aperture.tech/aperture/pkg/etcd/client"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/paths"
-	"aperture.tech/aperture/pkg/policies/apis/policyapi"
-	"aperture.tech/aperture/pkg/policies/dataplane/component"
-	"aperture.tech/aperture/pkg/utils"
+	configv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/paths"
+	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane/component"
+	"github.com/FluxNinja/aperture/pkg/utils"
 )
 
 type fluxMeterConfigSync struct {

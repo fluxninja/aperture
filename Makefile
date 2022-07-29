@@ -2,7 +2,7 @@ aperture_path := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 go-mod-tidy:
 	@echo Download go.mod dependencies
-	@GOPRIVATE=github.com/aperture-control,aperture.tech
+	@GOPRIVATE=github.com/FluxNinja,github.com/aperture-control
 	@go mod tidy
 
 install-go-tools: go-mod-tidy

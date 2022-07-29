@@ -13,11 +13,11 @@ import (
 	admissionv1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
-	nethttp "aperture.tech/aperture/pkg/net/http"
-	"aperture.tech/aperture/pkg/net/listener"
-	"aperture.tech/aperture/pkg/net/tlsconfig"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
+	nethttp "github.com/FluxNinja/aperture/pkg/net/http"
+	"github.com/FluxNinja/aperture/pkg/net/listener"
+	"github.com/FluxNinja/aperture/pkg/net/tlsconfig"
 )
 
 const (

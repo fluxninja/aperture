@@ -1,4 +1,4 @@
-// Companion package for aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1
+// Companion package for github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1
 // containing convertions of proto-generated struct into golang ones and other helpers.
 package selectors
 
@@ -7,14 +7,14 @@ import (
 	"regexp"
 	"strings"
 
-	"aperture.tech/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/log"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	mm "aperture.tech/aperture/pkg/multimatcher"
-	"aperture.tech/aperture/pkg/services"
+	mm "github.com/FluxNinja/aperture/pkg/multimatcher"
+	"github.com/FluxNinja/aperture/pkg/services"
 
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 // Selector is a parsed/preprocessed version of policylangv1.Selector

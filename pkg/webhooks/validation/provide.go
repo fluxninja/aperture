@@ -1,6 +1,6 @@
 package validation
 
-import "aperture.tech/aperture/pkg/webhooks"
+import "github.com/FluxNinja/aperture/pkg/webhooks"
 
 // ProvideCMValidator provides classification config map validator
 //

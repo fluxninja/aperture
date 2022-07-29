@@ -1,7 +1,7 @@
 package pluginconfig
 
 import (
-	"aperture.tech/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/config"
 )
 
 const (

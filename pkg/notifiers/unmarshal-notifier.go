@@ -1,8 +1,8 @@
 package notifiers
 
 import (
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 // UnmarshalNotifyFunc is a function that is called when a config key is written.

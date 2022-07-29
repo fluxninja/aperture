@@ -6,11 +6,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"aperture.tech/aperture/pkg/policies/controlplane/reading"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/reading"
 )
 
 var _ = Describe("Reading", func() {
-
 	It("Creates default invalid reading", func() {
 		reading := reading.NewInvalid()
 		Expect(reading).ToNot(BeNil())

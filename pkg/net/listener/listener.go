@@ -4,8 +4,8 @@ import (
 	"context"
 	"net"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 // ListenerConfig holds configuration for socket listeners.

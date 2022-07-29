@@ -14,9 +14,9 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
-	policydecisionsv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/otelcollector"
+	policydecisionsv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/otelcollector"
 )
 
 const (

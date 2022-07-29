@@ -11,15 +11,15 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	configv1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/config/v1"
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"aperture.tech/aperture/pkg/config"
-	etcdclient "aperture.tech/aperture/pkg/etcd/client"
-	"aperture.tech/aperture/pkg/jobs"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/policies/apis/policyapi"
-	"aperture.tech/aperture/pkg/policies/controlplane/fluxmeter"
-	"aperture.tech/aperture/pkg/policies/controlplane/runtime"
+	configv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/FluxNinja/aperture/pkg/config"
+	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
+	"github.com/FluxNinja/aperture/pkg/jobs"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/fluxmeter"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/runtime"
 )
 
 // PolicyModule returns Fx options of Policy for the Main App.

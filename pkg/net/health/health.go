@@ -8,10 +8,10 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/log"
-	grpcclient "aperture.tech/aperture/pkg/net/grpc"
-	"aperture.tech/aperture/pkg/net/listener"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/log"
+	grpcclient "github.com/FluxNinja/aperture/pkg/net/grpc"
+	"github.com/FluxNinja/aperture/pkg/net/listener"
 )
 
 // HealthModule is a module that provides grpc health server for checking services status.

@@ -9,10 +9,10 @@ package component_test
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	cn "aperture.tech/aperture/pkg/policies/controlloop/controller"
-	"aperture.tech/aperture/pkg/policies/mocks"
-	"aperture.tech/aperture/pkg/policies/controlplane/reading"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	cn "github.com/FluxNinja/aperture/pkg/policies/controlloop/controller"
+	"github.com/FluxNinja/aperture/pkg/policies/mocks"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/reading"
 )
 
 var _ = Describe("Timed", func() {

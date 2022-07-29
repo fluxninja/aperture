@@ -1,4 +1,4 @@
-//go:generate swagger generate spec --scan-models --include="aperture.tech*" --include-tag=common-configuration -o ../../docs/gen/config/aperture-agent/config-swagger.yaml
+//go:generate swagger generate spec --scan-models --include="github.com/FluxNinja*" --include-tag=common-configuration -o ../../docs/gen/config/aperture-agent/config-swagger.yaml
 
 // Aperture Agent
 //   BasePath: /aperture-agent
@@ -9,24 +9,24 @@ import (
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/cmd/aperture-agent/agent"
-	"aperture.tech/aperture/pkg/agentinfo"
-	"aperture.tech/aperture/pkg/authz"
-	"aperture.tech/aperture/pkg/classification"
-	"aperture.tech/aperture/pkg/discovery"
-	"aperture.tech/aperture/pkg/distcache"
-	"aperture.tech/aperture/pkg/entitycache"
-	"aperture.tech/aperture/pkg/flowcontrol"
-	"aperture.tech/aperture/pkg/k8s"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/net/grpc"
-	"aperture.tech/aperture/pkg/net/http"
-	"aperture.tech/aperture/pkg/notifiers"
-	"aperture.tech/aperture/pkg/otel"
-	"aperture.tech/aperture/pkg/otelcollector"
-	"aperture.tech/aperture/pkg/platform"
-	"aperture.tech/aperture/pkg/policies/dataplane"
-	"aperture.tech/aperture/pkg/prometheus"
+	"github.com/FluxNinja/aperture/cmd/aperture-agent/agent"
+	"github.com/FluxNinja/aperture/pkg/agentinfo"
+	"github.com/FluxNinja/aperture/pkg/authz"
+	"github.com/FluxNinja/aperture/pkg/classification"
+	"github.com/FluxNinja/aperture/pkg/discovery"
+	"github.com/FluxNinja/aperture/pkg/distcache"
+	"github.com/FluxNinja/aperture/pkg/entitycache"
+	"github.com/FluxNinja/aperture/pkg/flowcontrol"
+	"github.com/FluxNinja/aperture/pkg/k8s"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/net/grpc"
+	"github.com/FluxNinja/aperture/pkg/net/http"
+	"github.com/FluxNinja/aperture/pkg/notifiers"
+	"github.com/FluxNinja/aperture/pkg/otel"
+	"github.com/FluxNinja/aperture/pkg/otelcollector"
+	"github.com/FluxNinja/aperture/pkg/platform"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane"
+	"github.com/FluxNinja/aperture/pkg/prometheus"
 )
 
 func main() {

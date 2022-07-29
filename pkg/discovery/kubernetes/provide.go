@@ -5,12 +5,12 @@ import (
 
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/config"
-	"aperture.tech/aperture/pkg/discovery/common"
-	"aperture.tech/aperture/pkg/k8s"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/notifiers"
-	"aperture.tech/aperture/pkg/status"
+	"github.com/FluxNinja/aperture/pkg/config"
+	"github.com/FluxNinja/aperture/pkg/discovery/common"
+	"github.com/FluxNinja/aperture/pkg/k8s"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/notifiers"
+	"github.com/FluxNinja/aperture/pkg/status"
 )
 
 var configKey = common.DiscoveryConfigKey + ".kubernetes"

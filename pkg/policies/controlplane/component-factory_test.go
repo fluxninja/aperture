@@ -8,10 +8,10 @@ import (
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"aperture.tech/aperture/pkg/policies/controlplane"
-	"aperture.tech/aperture/pkg/policies/controlplane/component"
-	"aperture.tech/aperture/pkg/policies/controlplane/component/controller"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/component"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/component/controller"
 )
 
 var _ = Describe("Component factory", func() {

@@ -4,7 +4,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/config"
 
-	"aperture.tech/aperture/pkg/policies/dataplane/iface"
+	"github.com/FluxNinja/aperture/pkg/policies/dataplane/iface"
 )
 
 // Config holds configuration for the metrics processor.

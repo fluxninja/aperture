@@ -1,8 +1,8 @@
 package notifier
 
 import (
-	"aperture.tech/aperture/pkg/filesystem"
-	"aperture.tech/aperture/pkg/notifiers"
+	"github.com/FluxNinja/aperture/pkg/filesystem"
+	"github.com/FluxNinja/aperture/pkg/notifiers"
 )
 
 // PrefixToFSNotifier holds the state of a notifier that writes raw/transformed contents of a watched prefix to a directory.

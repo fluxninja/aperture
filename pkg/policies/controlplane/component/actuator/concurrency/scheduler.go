@@ -13,17 +13,17 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	policydecisionsv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
-	policylangv1 "aperture.tech/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	etcdclient "aperture.tech/aperture/pkg/etcd/client"
-	etcdwriter "aperture.tech/aperture/pkg/etcd/writer"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/paths"
-	"aperture.tech/aperture/pkg/policies/apis/policyapi"
-	"aperture.tech/aperture/pkg/policies/controlplane/component"
-	"aperture.tech/aperture/pkg/policies/controlplane/reading"
-	"aperture.tech/aperture/pkg/policies/controlplane/runtime"
-	"aperture.tech/aperture/pkg/utils"
+	policydecisionsv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
+	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
+	etcdwriter "github.com/FluxNinja/aperture/pkg/etcd/writer"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/paths"
+	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/component"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/reading"
+	"github.com/FluxNinja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/FluxNinja/aperture/pkg/utils"
 )
 
 var (

@@ -14,15 +14,15 @@ import (
 	"go.uber.org/multierr"
 	"gopkg.in/yaml.v2"
 
-	peersv1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/peers/v1"
-	"aperture.tech/aperture/pkg/config"
-	etcdclient "aperture.tech/aperture/pkg/etcd/client"
-	etcdwatcher "aperture.tech/aperture/pkg/etcd/watcher"
-	"aperture.tech/aperture/pkg/info"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/net/listener"
-	"aperture.tech/aperture/pkg/notifiers"
-	"aperture.tech/aperture/pkg/status"
+	peersv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/peers/v1"
+	"github.com/FluxNinja/aperture/pkg/config"
+	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
+	etcdwatcher "github.com/FluxNinja/aperture/pkg/etcd/watcher"
+	"github.com/FluxNinja/aperture/pkg/info"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/net/listener"
+	"github.com/FluxNinja/aperture/pkg/notifiers"
+	"github.com/FluxNinja/aperture/pkg/status"
 )
 
 const (

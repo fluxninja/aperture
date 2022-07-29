@@ -13,9 +13,9 @@ import (
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 
-	"aperture.tech/aperture/pkg/info"
-	"aperture.tech/aperture/pkg/log"
-	"aperture.tech/aperture/pkg/panic"
+	"github.com/FluxNinja/aperture/pkg/info"
+	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/FluxNinja/aperture/pkg/panic"
 )
 
 // DefaultLogFilePath is the default path for the log files to be stored.

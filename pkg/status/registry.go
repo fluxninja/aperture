@@ -11,8 +11,8 @@ import (
 	"github.com/mitchellh/copystructure"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	statusv1 "aperture.tech/aperture/api/gen/proto/go/aperture/common/status/v1"
-	"aperture.tech/aperture/pkg/log"
+	statusv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/FluxNinja/aperture/pkg/log"
 )
 
 const defaultDelim = "."

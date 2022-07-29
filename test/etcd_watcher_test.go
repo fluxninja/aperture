@@ -9,10 +9,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	etcdnotifier "aperture.tech/aperture/pkg/etcd/notifier"
-	"aperture.tech/aperture/pkg/filesystem"
-	fsnotifier "aperture.tech/aperture/pkg/filesystem/notifier"
-	"aperture.tech/aperture/pkg/notifiers"
+	etcdnotifier "github.com/FluxNinja/aperture/pkg/etcd/notifier"
+	"github.com/FluxNinja/aperture/pkg/filesystem"
+	fsnotifier "github.com/FluxNinja/aperture/pkg/filesystem/notifier"
+	"github.com/FluxNinja/aperture/pkg/notifiers"
 )
 
 var _ = Describe("Etcd Watcher", func() {
