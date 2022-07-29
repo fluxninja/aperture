@@ -15,39 +15,47 @@ commands:
     parameters:
       tools:
         type: string
-        description: "Newline separated list of tools to install. If empty, will install everything."
+        description:
+          "Newline separated list of tools to install. If empty, will install
+          everything."
         default: ""
+      cache_name:
+        type: string
+        description: "Name of asdf cache"
+        default: "default"
     steps:
       - run:
           name: Install ASDF
           command: |
-            git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.8.1
+            git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.2
             printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
+            date +%m > ~/date
       # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - v1-asdf-cache-{{ checksum ".tool-versions" }}
-            - v1-asdf-cache-
+            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name
+              >>-{{ checksum ".tool-versions" }}
+            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-
       - run:
           name: Install ASDF tools
           environment:
             TOOLS: << parameters.tools >>
           command: .circleci/scripts/asdf_install.sh
   asdf_save_cache:
+    parameters:
+      cache_name:
+        type: string
+        description: "Name of asdf cache"
+        default: "default"
     steps:
       - save_cache:
           name: Save ASDF cache
-          key: v1-asdf-cache-{{ checksum ".tool-versions" }}
+          key:
+            asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-{{
+            checksum ".tool-versions" }}
           paths:
-            - ~/.asdf/downloads/
-            - ~/.asdf/installs/
-            - ~/.asdf/keyrings/
-            - ~/.asdf/plugins/
-            - ~/.asdf/repository/
-            - ~/.asdf/shims/
-            - ~/.asdf/tmp/
-
+            - ~/.asdf
 jobs:
   nightly:
     working_directory: ~/RM
@@ -55,6 +63,7 @@ jobs:
     steps:
       - checkout
       - asdf_install: &nightly_tools
+          cache_name: nightly
           tools: |-
             python
             gcloud
@@ -64,7 +73,8 @@ jobs:
       - run:
           name: Prepare for nightly
           command: .circleci/scripts/nightly_bootstrap.sh
-      - asdf_save_cache
+      - asdf_save_cache:
+          cache_name: nightly
       - run:
           name: Run nightly
           working_directory: ops/apps/opsninja
@@ -77,7 +87,8 @@ jobs:
       - run:
           name: Prepare for demo
           command: .circleci/scripts/demo_bootstrap.sh
-      - asdf_save_cache
+      - asdf_save_cache:
+          cache_name: nightly
       - run:
           name: Run demo
           working_directory: ops/apps/opsninja
@@ -87,6 +98,7 @@ jobs:
     steps:
       - checkout
       - asdf_install:
+          cache_name: release
           tools: |-
             python
             gcloud
@@ -103,6 +115,8 @@ jobs:
           name: Schedule release jobs
           working_directory: ops/apps/opsninja
           command: inv release.circleci-release --tag << pipeline.git.tag >>
+      - asdf_save_cache:
+          cache_name: release
 
 orbs:
   path-filtering: circleci/path-filtering@0.1.1
@@ -126,7 +140,7 @@ workflows:
           base-revision: << pipeline.git.base_revision >>
           config-path: .circleci/continue-workflows.yml
           mapping: |
-            (cmd|pkg|plugins|tools)/.* updated-aperture true
+            (cmd|pkg|plugins|tools|api)/.* updated-aperture true
             (go.mod|go.sum) updated-aperture true
             docs/.* updated-aperture-docs true
   filter-paths-pr:

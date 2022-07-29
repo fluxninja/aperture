@@ -82,6 +82,7 @@ install_plugins() {
 	fi
 	if asdf where golang &>/dev/null; then
 		printf 'Installing Go tools\n'
+		go env
 		# install go tools
 		cd "${git_root}" && make install-go-tools
 		asdf reshim golang
@@ -143,8 +144,6 @@ print_help() {
 	printf 'Commands:\n' >&2
 	printf '   add - add to asdf plugins from .tool-versions file\n' >&2
 	printf '   install - install plugins which have been added into asdf and are versioned in .tool-versions file\n' >&2
-	printf '   go - install go tools which have been added to tools.go file\n' >&2
-	printf '   misc - install misc tools needed to run Tilt etc.\n' >&2
 	printf '   setup - (default, if no command specified) and & install\n' >&2
 	printf 'Can additionally pass names of the tools to limit the install to\n' >&2
 }

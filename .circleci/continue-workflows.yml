@@ -196,55 +196,32 @@ jobs:
     resource_class: xlarge
     steps:
       - checkout
-      - run:
-          name: Install ASDF
-          command: |
-            git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.8.1
-            printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
-      # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
-      - restore_cache:
-          name: Restore ASDF cache
-          keys:
-            - v2-asdf-cache-{{ checksum ".tool-versions" }}
-            - v2-asdf-cache-
-      - run:
-          name: Install ASDF tools
-          command: |
-            while read -r name version; do
-              # Don't add unnecessary plugins
-              [[ "${name}" = "python" || "${name}" = "tilt" ]] && continue
-              # Don't add existing plugin
-              asdf plugin list | grep --quiet --fixed-strings --line-regexp "${name}" || asdf plugin add "${name}"
-            done < .tool-versions
-            asdf install
-      - run:
-          name: Install Common Tools
-          command: |
-            make install-go-tools
-      # when golangci-lint@v1.45.3 is released, update this to v1.45.3
-      - run:
-          name: Install golangci-lint
-          command: |
-            go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.3-0.20220419072601-f79bc883fb40
-      - run:
-          name: ASDF reshim golang
-          command: |
-            asdf reshim golang
+      - asdf_install:
+          cache_name: pre-commit
+          tools: |-
+            pre-commit
+            bats
+            golang
+            golangci-lint
+            buf
+            mockery
+            nodejs
+            shellcheck
+            yq
       - run:
           name: Generate pre-commit cache key file
           command: |
             cp .pre-commit-config.yaml /tmp/pre-commit-cache-key.txt
             python --version --version >> /tmp/pre-commit-cache-key.txt
+            pre-commit --version >> /tmp/pre-commit-cache-key.txt
       - restore_cache:
           name: Restore pre-commit cache
           keys:
             - v2-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
             - v2-pc-cache-
       - run:
-          name: Install pre-commit
+          name: Install pre-commit hooks
           command: |
-            pip install pre-commit==2.15.0
-            # pre-download hook environment
             pre-commit install-hooks
       - run:
           name: Run pre-commit
@@ -259,8 +236,6 @@ jobs:
           command: |
             set -euo pipefail
             set -x
-            # We already install tools as part of CI configuration so skip doing that from pre-commit
-            export SKIP=install-tools
             if [ "$CIRCLE_BRANCH" = "main" ]; then
               pre-commit run --all-files
             else
@@ -279,17 +254,8 @@ jobs:
           key: v2-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
             - ~/.cache/pre-commit
-      - save_cache:
-          name: Save ASDF cache
-          key: v2-asdf-cache-{{ checksum ".tool-versions" }}
-          paths:
-            - ~/.asdf/downloads/
-            - ~/.asdf/installs/
-            - ~/.asdf/keyrings/
-            - ~/.asdf/plugins/
-            - ~/.asdf/repository/
-            - ~/.asdf/shims/
-            - ~/.asdf/tmp/
+      - asdf_save_cache:
+          cache_name: pre-commit
       - run:
           name:
             Show diff and assert pre-commit didn't create any non-ignored files
@@ -314,8 +280,8 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"  # FluxNinja/RM R/O
-            - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff"  # FluxNinja/aperture-tech-docs R/W
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # FluxNinja/RM R/O
+            - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff" # FluxNinja/aperture-tech-docs R/W
       - run:
           name: Install opsninja and its dependencies
           command: |
@@ -349,7 +315,6 @@ jobs:
             fn release update-aperture-docs "${args[@]}"
       - asdf_save_cache:
           cache_name: publish-docs
-
 
 workflows:
   version: 2
@@ -416,9 +381,9 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - asdf-cache-v2-{{ checksum ".tool-versions" }}-{{ checksum "~/date"
-              }}-<< parameters.cache_name >>
-            - asdf-cache-v2-
+            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name
+              >>-{{ checksum ".tool-versions" }}
+            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-
       - run:
           name: Install ASDF tools
           environment:
@@ -434,121 +399,122 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            asdf-cache-v2-{{ checksum ".tool-versions" }}-{{ checksum "~/date"
-            }}-<< parameters.cache_name >>
+            asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-{{
+            checksum ".tool-versions" }}
           paths:
             - ~/.asdf
+
   aperture_docker_build:
-      description: |
-          Build and tag a Docker image (forked from circleci/docker with SSH support)
-      parameters:
-          attach-at:
-              default: ""
-              description: |
-                  Provide a path if you wish to attach a workspace. Use `./` for the working directory. `attach_workspace` attached location - where to mount folder/files that were `persist_to_workspace` in a previous step. https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
-              type: string
-          cache_from:
-              default: ""
-              description: |
-                  Comma-separated list of images, images will first be pulled, then passed as the --cache-from build argument https://docs.docker.com/engine/reference/commandline/build/
-              type: string
-          debug:
-              default: false
-              description: |
-                  Extra output for orb developers
-              type: boolean
-          docker-context:
-              default: .
-              description: |
-                  Path to the directory containing your build context, defaults to . (working directory)
-              type: string
-          dockerfile:
-              default: Dockerfile
-              description: Name of dockerfile to use, defaults to Dockerfile
-              type: string
-          extra_build_args:
-              default: ""
-              description: |
-                  Extra flags to pass to docker build. For examples, see https://docs.docker.com/engine/reference/commandline/build
-              type: string
-          image:
-              description: Name of image to build
-              type: string
-          lint-dockerfile:
-              default: false
-              description: |
-                  Lint Dockerfile before building?
-              type: boolean
-          no_output_timeout:
-              default: 10m
-              description: |
-                  Pass through a default timeout if your Docker build does not output anything for more than 10 minutes.
-              type: string
-          path:
-              default: .
-              description: |
-                  Path to the directory containing your Dockerfile, defaults to . (working directory)
-              type: string
-          registry:
-              default: docker.io
-              description: |
-                  Name of registry to use, defaults to docker.io
-              type: string
-          step-name:
-              default: Docker build
-              description: Specify a custom step name for this command, if desired
-              type: string
-          tag:
-              default: $CIRCLE_SHA1
-              description: Image tag, defaults to the value of $CIRCLE_SHA1
-              type: string
-          treat-warnings-as-errors:
-              default: false
-              description: |
-                  If linting Dockerfile, treat linting warnings as errors? (would trigger an exit code and fail the CircleCI job)
-              type: boolean
-          use-buildkit:
-              default: false
-              description: |
-                  Use buildkit to build the image. Available on Docker >= 18.09.0 https://docs.docker.com/develop/develop-images/build_enhancements/
-              type: boolean
-          ssh:
-              default: ''
-              description: |
-                  Which ssh socket to forward to the docker build process
-              type: string
-      steps:
-          - when:
-              condition: <<parameters.lint-dockerfile>>
-              steps:
-                  - docker/dockerlint:
-                      debug: <<parameters.debug>>
-                      dockerfile: <<parameters.path>>/<<parameters.dockerfile>>
-                      treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
-          - when:
-              condition: <<parameters.use-buildkit>>
-              steps:
-                  - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
-          - when:
-              condition: <<parameters.attach-at>>
-              steps:
-                  - attach_workspace:
-                      at: <<parameters.attach-at>>
-          - run:
-              command: .circleci/scripts/docker_build.sh
-              environment:
-                  PARAM_CACHE_FROM: <<parameters.cache_from>>
-                  PARAM_DOCKER_CONTEXT: <<parameters.docker-context>>
-                  PARAM_DOCKERFILE_NAME: <<parameters.dockerfile>>
-                  PARAM_DOCKERFILE_PATH: <<parameters.path>>
-                  PARAM_EXTRA_BUILD_ARGS: <<parameters.extra_build_args>>
-                  PARAM_IMAGE: <<parameters.image>>
-                  PARAM_REGISTRY: <<parameters.registry>>
-                  PARAM_TAG: <<parameters.tag>>
-                  PARAM_USE_BUILDKIT: <<parameters.use-buildkit>>
-                  PARAM_SSH_FORWARD: <<parameters.ssh>>
-              name: <<parameters.step-name>>
-              no_output_timeout: << parameters.no_output_timeout >>
+    description: |
+      Build and tag a Docker image (forked from circleci/docker with SSH support)
+    parameters:
+      attach-at:
+        default: ""
+        description: |
+          Provide a path if you wish to attach a workspace. Use `./` for the working directory. `attach_workspace` attached location - where to mount folder/files that were `persist_to_workspace` in a previous step. https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
+        type: string
+      cache_from:
+        default: ""
+        description: |
+          Comma-separated list of images, images will first be pulled, then passed as the --cache-from build argument https://docs.docker.com/engine/reference/commandline/build/
+        type: string
+      debug:
+        default: false
+        description: |
+          Extra output for orb developers
+        type: boolean
+      docker-context:
+        default: .
+        description: |
+          Path to the directory containing your build context, defaults to . (working directory)
+        type: string
+      dockerfile:
+        default: Dockerfile
+        description: Name of dockerfile to use, defaults to Dockerfile
+        type: string
+      extra_build_args:
+        default: ""
+        description: |
+          Extra flags to pass to docker build. For examples, see https://docs.docker.com/engine/reference/commandline/build
+        type: string
+      image:
+        description: Name of image to build
+        type: string
+      lint-dockerfile:
+        default: false
+        description: |
+          Lint Dockerfile before building?
+        type: boolean
+      no_output_timeout:
+        default: 10m
+        description: |
+          Pass through a default timeout if your Docker build does not output anything for more than 10 minutes.
+        type: string
+      path:
+        default: .
+        description: |
+          Path to the directory containing your Dockerfile, defaults to . (working directory)
+        type: string
+      registry:
+        default: docker.io
+        description: |
+          Name of registry to use, defaults to docker.io
+        type: string
+      step-name:
+        default: Docker build
+        description: Specify a custom step name for this command, if desired
+        type: string
+      tag:
+        default: $CIRCLE_SHA1
+        description: Image tag, defaults to the value of $CIRCLE_SHA1
+        type: string
+      treat-warnings-as-errors:
+        default: false
+        description: |
+          If linting Dockerfile, treat linting warnings as errors? (would trigger an exit code and fail the CircleCI job)
+        type: boolean
+      use-buildkit:
+        default: false
+        description: |
+          Use buildkit to build the image. Available on Docker >= 18.09.0 https://docs.docker.com/develop/develop-images/build_enhancements/
+        type: boolean
+      ssh:
+        default: ""
+        description: |
+          Which ssh socket to forward to the docker build process
+        type: string
+    steps:
+      - when:
+          condition: <<parameters.lint-dockerfile>>
+          steps:
+            - docker/dockerlint:
+                debug: <<parameters.debug>>
+                dockerfile: <<parameters.path>>/<<parameters.dockerfile>>
+                treat-warnings-as-errors: <<parameters.treat-warnings-as-errors>>
+      - when:
+          condition: <<parameters.use-buildkit>>
+          steps:
+            - run: echo 'export DOCKER_BUILDKIT=1' >> $BASH_ENV
+      - when:
+          condition: <<parameters.attach-at>>
+          steps:
+            - attach_workspace:
+                at: <<parameters.attach-at>>
+      - run:
+          command: .circleci/scripts/docker_build.sh
+          environment:
+            PARAM_CACHE_FROM: <<parameters.cache_from>>
+            PARAM_DOCKER_CONTEXT: <<parameters.docker-context>>
+            PARAM_DOCKERFILE_NAME: <<parameters.dockerfile>>
+            PARAM_DOCKERFILE_PATH: <<parameters.path>>
+            PARAM_EXTRA_BUILD_ARGS: <<parameters.extra_build_args>>
+            PARAM_IMAGE: <<parameters.image>>
+            PARAM_REGISTRY: <<parameters.registry>>
+            PARAM_TAG: <<parameters.tag>>
+            PARAM_USE_BUILDKIT: <<parameters.use-buildkit>>
+            PARAM_SSH_FORWARD: <<parameters.ssh>>
+          name: <<parameters.step-name>>
+          no_output_timeout: << parameters.no_output_timeout >>
   aperture_docker_tag:
     description: |
       Tag source image with destination registry, image and tag

@@ -6,11 +6,13 @@ default_stages:
 repos:
   - repo: local
     hooks:
-      - id: install-tools
-        name: "Install tools"
+      - id: proto
+        name: "Proto"
+        entry: "./tools/githooks/generate_api.sh"
         language: script
-        entry: ./tools/githooks/install_go_tools.sh
+        files: '\.proto$'
         pass_filenames: false
+        description: "Protobuf generation"
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.2.0
     hooks:
@@ -43,6 +45,25 @@ repos:
   - repo: meta
     hooks:
       - id: check-hooks-apply
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v2.7.1"
+    hooks:
+      - id: prettier
+        exclude: ^(docs/gen/.*.yaml)
+        types_or:
+          [
+            sh,
+            shell,
+            bash,
+            zsh,
+            dockerfile,
+            makefile,
+            json,
+            markdown,
+            jsonnet,
+            python3,
+            terraform,
+          ]
   # local hooks
   - repo: local
     hooks:
