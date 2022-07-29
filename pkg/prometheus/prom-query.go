@@ -9,8 +9,8 @@ import (
 	prometheusmodel "github.com/prometheus/common/model"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/FluxNinja/aperture/pkg/jobs"
-	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/jobs"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 // PromResultCallback is a callback that gets invoked with the result of the prom query.

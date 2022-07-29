@@ -7,7 +7,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	languagev1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	gomock "github.com/golang/mock/gomock"
 	prometheus "github.com/prometheus/client_golang/prometheus"
 )

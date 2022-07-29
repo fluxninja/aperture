@@ -21,15 +21,15 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/FluxNinja/aperture/pkg/authz"
-	"github.com/FluxNinja/aperture/pkg/classification"
-	"github.com/FluxNinja/aperture/pkg/entitycache"
-	"github.com/FluxNinja/aperture/pkg/flowcontrol"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/platform"
-	"github.com/FluxNinja/aperture/pkg/policies/dataplane"
-	"github.com/FluxNinja/aperture/pkg/webhooks"
-	"github.com/FluxNinja/aperture/pkg/webhooks/validation"
+	"github.com/fluxninja/aperture/pkg/authz"
+	"github.com/fluxninja/aperture/pkg/classification"
+	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/flowcontrol"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/platform"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane"
+	"github.com/fluxninja/aperture/pkg/webhooks"
+	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
 
 func main() {

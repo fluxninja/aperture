@@ -7,14 +7,14 @@ import (
 	"path"
 	"runtime/pprof"
 
-	"github.com/FluxNinja/lumberjack"
+	"github.com/fluxninja/lumberjack"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cast"
 	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 
-	"github.com/FluxNinja/aperture/pkg/config"
-	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 const (

@@ -1,6 +1,6 @@
 package peers
 
-import peersv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/peers/v1"
+import peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
 
 // PeerWatcher is used for tracking changes to peers.
 type PeerWatcher interface {

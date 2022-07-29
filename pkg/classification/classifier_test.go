@@ -8,13 +8,13 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	classificationv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/classification/v1"
-	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/FluxNinja/aperture/pkg/log"
+	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 
-	. "github.com/FluxNinja/aperture/pkg/classification"
-	"github.com/FluxNinja/aperture/pkg/selectors"
-	"github.com/FluxNinja/aperture/pkg/services"
+	. "github.com/fluxninja/aperture/pkg/classification"
+	"github.com/fluxninja/aperture/pkg/selectors"
+	"github.com/fluxninja/aperture/pkg/services"
 )
 
 type object = map[string]interface{}

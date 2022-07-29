@@ -10,9 +10,9 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	watchdogv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/watchdog/v1"
-	"github.com/FluxNinja/aperture/pkg/config"
-	"github.com/FluxNinja/aperture/pkg/log"
+	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/watchdog/v1"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 // WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.

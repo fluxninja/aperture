@@ -3,9 +3,9 @@ package notifier
 import (
 	"path"
 
-	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
-	etcdwriter "github.com/FluxNinja/aperture/pkg/etcd/writer"
-	"github.com/FluxNinja/aperture/pkg/notifiers"
+	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
 // KeyToEtcdNotifier holds the state of a notifier that writes raw/transformed contents of a watched key to another key in etcd.

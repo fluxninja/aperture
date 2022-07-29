@@ -9,13 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FluxNinja/lumberjack"
+	"github.com/fluxninja/lumberjack"
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 
-	"github.com/FluxNinja/aperture/pkg/info"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/panic"
 )
 
 // DefaultLogFilePath is the default path for the log files to be stored.

@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/FluxNinja/lumberjack"
+	"github.com/fluxninja/lumberjack"
 )
 
 const logCountLimit = 100

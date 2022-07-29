@@ -1,8 +1,8 @@
 package notifier
 
 import (
-	"github.com/FluxNinja/aperture/pkg/filesystem"
-	"github.com/FluxNinja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/filesystem"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
 // KeyToFSNotifier holds the state of a notifier that writes raw/transformed contents of a watched file to another file.

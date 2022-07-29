@@ -3,8 +3,8 @@ package status
 import (
 	"go.uber.org/fx"
 
-	statusv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/status/v1"
-	"github.com/FluxNinja/aperture/pkg/net/grpcgateway"
+	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 )
 
 // Module is a fx module that provides a status registry and registers status service handlers as grpcgateway handlers.

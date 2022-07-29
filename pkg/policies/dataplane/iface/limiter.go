@@ -1,9 +1,9 @@
 package iface
 
 import (
-	flowcontrolv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/FluxNinja/aperture/pkg/selectors"
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/selectors"
 )
 
 //go:generate mockgen -source=limiter.go -destination=../../mocks/mock_limiter.go -package=mocks

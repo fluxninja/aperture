@@ -3,7 +3,7 @@ package config
 import (
 	"go.uber.org/fx/fxevent"
 
-	"github.com/FluxNinja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 type logger struct {

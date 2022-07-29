@@ -7,9 +7,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 
-	statusv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/status/v1"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/metrics"
+	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 )
 
 // provideGroupWatcherMetrics provides a GroupWatcherMetrics.

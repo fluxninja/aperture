@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/FluxNinja/aperture/pkg/webhooks/validation"
+	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
 
 var _ = Describe("Validator", func() {

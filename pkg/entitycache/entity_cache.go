@@ -11,13 +11,13 @@ import (
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
 
-	heartbeatv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
-	"github.com/FluxNinja/aperture/pkg/agentinfo"
-	"github.com/FluxNinja/aperture/pkg/config"
-	"github.com/FluxNinja/aperture/pkg/discovery/common"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/notifiers"
-	"github.com/FluxNinja/aperture/pkg/services"
+	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/discovery/common"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/services"
 )
 
 const (

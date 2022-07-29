@@ -9,14 +9,14 @@ import (
 
 	"go.uber.org/fx"
 
-	configv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/config/v1"
-	policydecisionsv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
-	"github.com/FluxNinja/aperture/pkg/config"
-	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/FluxNinja/aperture/pkg/etcd/watcher"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/notifiers"
-	"github.com/FluxNinja/aperture/pkg/paths"
+	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
+	"github.com/fluxninja/aperture/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/paths"
 )
 
 type autoTokensFactory struct {

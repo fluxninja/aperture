@@ -10,9 +10,9 @@ import (
 	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 
-	"github.com/FluxNinja/aperture/pkg/filesystem"
-	"github.com/FluxNinja/aperture/pkg/info"
-	"github.com/FluxNinja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/filesystem"
+	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/panic"
 )
 
 var (

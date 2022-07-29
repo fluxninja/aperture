@@ -6,10 +6,10 @@ import (
 
 	"go.uber.org/fx"
 
-	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
-	"github.com/FluxNinja/aperture/pkg/policies/controlplane/reading"
-	"github.com/FluxNinja/aperture/pkg/policies/controlplane/runtime"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
 type deciderState int8

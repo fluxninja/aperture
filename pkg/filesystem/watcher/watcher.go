@@ -8,10 +8,10 @@ import (
 
 	"gopkg.in/fsnotify.v1"
 
-	"github.com/FluxNinja/aperture/pkg/filesystem"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/notifiers"
-	"github.com/FluxNinja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/filesystem"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/panic"
 )
 
 // watcher holds the state of the watcher.

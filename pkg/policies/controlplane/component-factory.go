@@ -5,12 +5,12 @@ import (
 
 	"go.uber.org/fx"
 
-	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
-	"github.com/FluxNinja/aperture/pkg/policies/controlplane/component"
-	"github.com/FluxNinja/aperture/pkg/policies/controlplane/component/actuator/rate"
-	"github.com/FluxNinja/aperture/pkg/policies/controlplane/component/controller"
-	"github.com/FluxNinja/aperture/pkg/policies/controlplane/runtime"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/component"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/component/actuator/rate"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/component/controller"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
 // ComponentFactoryModule for component factory run via the main app.

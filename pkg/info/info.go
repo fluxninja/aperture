@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	infov1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/info/v1"
+	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/info/v1"
 )
 
 // Default build-time variables. These values are overridden via ldflags.

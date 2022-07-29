@@ -16,10 +16,10 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/FluxNinja/aperture/pkg/config"
-	"github.com/FluxNinja/aperture/pkg/info"
-	"github.com/FluxNinja/aperture/pkg/log"
-	commonhttp "github.com/FluxNinja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/log"
+	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
 )
 
 const (

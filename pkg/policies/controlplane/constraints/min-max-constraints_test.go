@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/FluxNinja/aperture/pkg/policies/controlplane/constraints"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 )
 
 var _ = Describe("MinMaxConstraints", func() {

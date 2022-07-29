@@ -1,4 +1,4 @@
-//go:generate swagger generate spec --scan-models --include="github.com/FluxNinja/aperture/plugins/*" --include-tag=plugin-configuration -o ../../../docs/gen/config/aperture-plugin-fluxninja/plugin-swagger.yaml
+//go:generate swagger generate spec --scan-models --include="github.com/fluxninja/aperture/plugins/*" --include-tag=plugin-configuration -o ../../../docs/gen/config/aperture-plugin-fluxninja/plugin-swagger.yaml
 
 // FluxNinja Cloud Plugin
 //   BasePath: /aperture-controller
@@ -9,12 +9,12 @@ package main
 import (
 	"go.uber.org/fx"
 
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/plugins"
-	"github.com/FluxNinja/aperture/plugins/service/aperture-plugin-fluxninja/heartbeats"
-	"github.com/FluxNinja/aperture/plugins/service/aperture-plugin-fluxninja/otel"
-	"github.com/FluxNinja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
-	"github.com/FluxNinja/aperture/plugins/service/aperture-plugin-fluxninja/sentry"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/plugins"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/heartbeats"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/otel"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/sentry"
 )
 
 // Set via ldflags.

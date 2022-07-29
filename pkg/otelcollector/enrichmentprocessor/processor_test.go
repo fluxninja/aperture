@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/config"
 
-	"github.com/FluxNinja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/entitycache"
 )
 
 var _ = Describe("Enrichment Processor", func() {

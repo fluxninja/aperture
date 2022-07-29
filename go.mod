@@ -1,9 +1,8 @@
-module github.com/FluxNinja/aperture
+module github.com/fluxninja/aperture
 
 go 1.18
 
 require (
-	github.com/FluxNinja/lumberjack v0.0.0-20220311191217-5aad16738271
 	github.com/Henry-Sarabia/sliceconv v1.0.2
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/buger/jsonparser v1.1.1
@@ -16,6 +15,7 @@ require (
 	github.com/envoyproxy/go-control-plane v0.10.3
 	github.com/favadi/protoc-go-inject-tag v1.3.0
 	github.com/fluxninja/datasketches-go v0.0.0-20220128132852-065685ae83e0
+	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-co-op/gocron v1.15.2-0.20220725154335-c667f3306226

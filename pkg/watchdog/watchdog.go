@@ -13,12 +13,12 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
-	watchdogv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/watchdog/v1"
-	"github.com/FluxNinja/aperture/pkg/config"
-	"github.com/FluxNinja/aperture/pkg/jobs"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/panic"
-	"github.com/FluxNinja/aperture/pkg/status"
+	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/watchdog/v1"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/jobs"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 // swagger:operation POST /watchdog common-configuration Watchdog

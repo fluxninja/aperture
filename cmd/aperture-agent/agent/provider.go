@@ -3,9 +3,9 @@ package agent
 import (
 	"path"
 
-	"github.com/FluxNinja/aperture/pkg/agentinfo"
-	"github.com/FluxNinja/aperture/pkg/info"
-	"github.com/FluxNinja/aperture/pkg/peers"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/peers"
 )
 
 // ProvidePeersPrefix provides the peers prefix.

@@ -7,8 +7,8 @@
 package fluxninjav1
 
 import (
-	v1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/info/v1"
-	v11 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/peers/v1"
+	v1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/info/v1"
+	v11 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"

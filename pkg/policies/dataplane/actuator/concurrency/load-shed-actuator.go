@@ -11,17 +11,17 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	configv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/config/v1"
-	policydecisionsv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
-	"github.com/FluxNinja/aperture/pkg/config"
-	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/FluxNinja/aperture/pkg/etcd/watcher"
-	"github.com/FluxNinja/aperture/pkg/flowcontrol/scheduler"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/notifiers"
-	"github.com/FluxNinja/aperture/pkg/paths"
-	"github.com/FluxNinja/aperture/pkg/policies/dataplane/component"
-	"github.com/FluxNinja/aperture/pkg/status"
+	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
+	"github.com/fluxninja/aperture/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/pkg/flowcontrol/scheduler"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 type loadShedActuatorFactory struct {

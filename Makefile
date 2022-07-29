@@ -10,7 +10,7 @@ go-generate:
 
 go-mod-tidy:
 	@echo Download go.mod dependencies
-	@GOPRIVATE=github.com/FluxNinja,github.com/aperture-control
+	@GOPRIVATE=github.com/fluxninja,github.com/aperture-control
 	@go mod tidy
 
 go-test:

@@ -8,9 +8,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/FluxNinja/aperture/pkg/discovery/common"
-	"github.com/FluxNinja/aperture/pkg/mocks"
-	"github.com/FluxNinja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/discovery/common"
+	"github.com/fluxninja/aperture/pkg/mocks"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
 var (

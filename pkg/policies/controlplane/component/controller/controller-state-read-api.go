@@ -1,6 +1,6 @@
 package controller
 
-import "github.com/FluxNinja/aperture/pkg/policies/controlplane/reading"
+import "github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 
 // ControllerStateReadAPI is the interface to the Controller state.
 type ControllerStateReadAPI interface {

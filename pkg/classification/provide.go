@@ -6,17 +6,17 @@ import (
 
 	"go.uber.org/fx"
 
-	classificationv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/classification/v1"
-	configv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/common/config/v1"
-	"github.com/FluxNinja/aperture/pkg/agentinfo"
-	"github.com/FluxNinja/aperture/pkg/config"
-	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/FluxNinja/aperture/pkg/etcd/watcher"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/notifiers"
-	"github.com/FluxNinja/aperture/pkg/paths"
-	"github.com/FluxNinja/aperture/pkg/status"
-	"github.com/FluxNinja/aperture/pkg/webhooks/validation"
+	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
+	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/status"
+	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
 
 // Module is a default set of components to enable flow classification

@@ -8,15 +8,15 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
-	policydecisionsv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
-	policylangv1 "github.com/FluxNinja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	etcdclient "github.com/FluxNinja/aperture/pkg/etcd/client"
-	etcdwriter "github.com/FluxNinja/aperture/pkg/etcd/writer"
-	"github.com/FluxNinja/aperture/pkg/log"
-	"github.com/FluxNinja/aperture/pkg/paths"
-	"github.com/FluxNinja/aperture/pkg/policies/apis/policyapi"
-	"github.com/FluxNinja/aperture/pkg/policies/controlplane/runtime"
-	"github.com/FluxNinja/aperture/pkg/utils"
+	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // LoadShedActuator struct.
