@@ -11,5 +11,9 @@ buf-generate:
 	@buf lint
 	@buf generate
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
+	@git add ./gen/*
 
-.PHONY: buf-update buf-generate
+generate: buf-update buf-generate
+	@echo Generating code from proto with buf
+
+.PHONY: generate buf-update buf-generate
