@@ -82,6 +82,7 @@ install_plugins() {
 	fi
 	if asdf where golang &>/dev/null; then
 		printf 'Installing Go tools\n'
+		go env
 		# install go tools
 		cd "${git_root}" && make install-go-tools
 		asdf reshim golang
