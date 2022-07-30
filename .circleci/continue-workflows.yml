@@ -214,7 +214,7 @@ jobs:
       - restore_cache:
           name: Restore go cache
           keys:
-            - v1-go-{{ checksum "~/day" }}
+            - aperture-v1-go-cache-{{ checksum "~/day" }}
       - run:
           name: Cache golangci-lint run
           command: |
@@ -228,8 +228,9 @@ jobs:
       - restore_cache:
           name: Restore pre-commit cache
           keys:
-            - v2-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
-            - v2-pc-cache-
+            - aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt"
+              }}
+            - aperture-v1-pc-cache-
       - run:
           name: Install pre-commit hooks
           command: |
@@ -262,14 +263,15 @@ jobs:
             fi
       - save_cache:
           name: Save go cache
-          key: v1-go-{{ checksum "~/day" }}
+          key: aperture-v1-go-cache-{{ checksum "~/day" }}
           paths:
             - ../.cache/golangci-lint
             - ../.cache/go-build
           when: on_success
       - save_cache:
           name: Save pre-commit cache
-          key: v2-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
+          key:
+            aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
             - ~/.cache/pre-commit
       - asdf_save_cache:
@@ -400,10 +402,11 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
-              >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
-            - asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
-              >>-
+            - aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
+              parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
+              checksum "go.mod" }}
+            - aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
+              parameters.cache_name >>-
       - run:
           name: Install ASDF tools
           environment:
@@ -419,8 +422,9 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
-            >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
+            aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
+            parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
+            "go.mod" }}
           paths:
             - ~/.asdf
 

@@ -87,12 +87,6 @@ install_plugins() {
 		cd "${git_root}" && make install-go-tools
 		asdf reshim golang
 	fi
-	if asdf where python &>/dev/null; then
-		printf 'Installing Python tools\n'
-		pip3 install --quiet loguru
-		pip3 install --quiet requests
-		asdf reshim python
-	fi
 }
 
 setup() {
