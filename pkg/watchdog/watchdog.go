@@ -17,7 +17,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -140,7 +140,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 
 			gcs = newSentinel()
 			// start a go routine to track GC
-			panic.Go(func() {
+			panichandler.Go(func() {
 				for {
 					select {
 					case <-gcs.gcTriggered:

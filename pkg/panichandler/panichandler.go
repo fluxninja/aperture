@@ -1,9 +1,10 @@
-package panic
+package panichandler
 
 import (
 	"runtime"
 	"runtime/debug"
 	"sync"
+	"time"
 
 	"go.uber.org/fx"
 )
@@ -20,13 +21,13 @@ type PanicHandlerRegistry struct {
 	Handlers []PanicHandler
 }
 
-// PanicHandlerRegistryIn holds parameters, list of panic handlers, for ProvidePanicHandlerRegistry.
+// PanicHandlerRegistryIn holds parameters, list of panic handlers, for RegisterPanicHandlers.
 type PanicHandlerRegistryIn struct {
 	fx.In
 	Handlers []PanicHandler `group:"panic-handlers"`
 }
 
-// RegisterPanicHandlers provides a panic handler registry.
+// RegisterPanicHandlers register panic handlers to panic handler registry.
 func RegisterPanicHandlers(in PanicHandlerRegistryIn) {
 	// loop the handlers
 	for _, handler := range in.Handlers {
@@ -52,23 +53,14 @@ func Go(f func()) {
 	getPanicHandlerRegistry().Go(f)
 }
 
-// Panic is useful for testing.
-// Example usage:
-//
-// panic.Go(func() { panic.Panic("debug") }).
-//
-func Panic(debug interface{}) {
-	panic(debug)
+// Crash calls registry's internal Crash function to invoke registered panic handler.
+func Crash(v interface{}) {
+	getPanicHandlerRegistry().Crash(v)
 }
 
-// RegisterPanicHandler calls global registry's internal register panic handler function to register panic handler.
+// RegisterPanicHandler calls global registry's internal register panic handler function to panic handler registry.
 func RegisterPanicHandler(ph PanicHandler) {
 	getPanicHandlerRegistry().RegisterPanicHandler(ph)
-}
-
-// Recover invokes each of the registered panic handlers, and then rethrows the panic.
-func Recover() {
-	getPanicHandlerRegistry().Recover()
 }
 
 // crashOnce prevents multiple panics to interfere each other, process single panic.
@@ -97,35 +89,45 @@ func (r *PanicHandlerRegistry) RegisterPanicHandler(ph PanicHandler) {
 	r.Handlers = append(r.Handlers, ph)
 }
 
-// Recover invokes each of the registered panic handlers, and then rethrows the panic.
-func (r *PanicHandlerRegistry) Recover() {
-	v := recover()
-	if v != nil {
-		defer panic(v)
-		stackTrace := Capture()
-		crashOnce.Do(func() {
-			r.mutex.RLock()
-			defer r.mutex.RUnlock()
-			wg := sync.WaitGroup{}
-			wg.Add(len(r.Handlers))
-			for _, handler := range r.Handlers {
-				handler := handler
-				go func() {
-					defer wg.Done()
-					handler(v, stackTrace)
-				}()
-			}
-			wg.Wait()
-		})
+// Crash invokes each of the registered panic handler and then rethrows panic - shutting down the app.
+func (r *PanicHandlerRegistry) Crash(v interface{}) {
+	stackTrace := Capture()
+	waitCh := make(chan struct{})
+
+	crashOnce.Do(func() {
+		r.mutex.RLock()
+		defer r.mutex.RUnlock()
+		wg := sync.WaitGroup{}
+		wg.Add(len(r.Handlers))
+
+		for _, handler := range r.Handlers {
+			h := handler
+			go func() {
+				defer wg.Done()
+				h(v, stackTrace)
+			}()
+		}
+		wg.Wait()
+		close(waitCh)
+	})
+
+	select {
+	case <-waitCh:
+	case <-time.After(5 * time.Second):
 	}
+	panic(v)
 }
 
 // Go calls f on a new go-routine, reporting panics to the registered handlers.
 func (r *PanicHandlerRegistry) Go(f func()) {
 	go func() {
-		// SetPanicOnFault allows the runtime trigger only a panic, not a crash
+		// SetPanicOnFault allows the runtime trigger only a panic.
 		debug.SetPanicOnFault(true)
-		defer r.Recover()
+		defer func() {
+			if v := recover(); v != nil {
+				r.Crash(v)
+			}
+		}()
 		f()
 	}()
 }

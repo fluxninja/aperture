@@ -11,4 +11,5 @@ import (
 	_ "github.com/google/pprof"
 	_ "golang.org/x/tools/cmd/godoc"
 	_ "golang.org/x/tools/cmd/goimports"
+	_ "gotest.tools/gotestsum"
 )

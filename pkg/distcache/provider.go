@@ -14,7 +14,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/peers"
 )
 
@@ -167,7 +167,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			log.Info().Msg("Starting OTEL Collector")
-			panic.Go(func() {
+			panichandler.Go(func() {
 				err := dc.Olric.Start()
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to start olric")

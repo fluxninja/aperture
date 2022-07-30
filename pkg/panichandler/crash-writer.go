@@ -1,4 +1,4 @@
-package panic
+package panichandler
 
 import (
 	"io"

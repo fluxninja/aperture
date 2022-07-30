@@ -11,7 +11,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -144,7 +144,7 @@ func (mj *MultiJob) Execute(ctx context.Context) (proto.Message, error) {
 				_, _ = mj.gt.execute(ctx, job)
 			}
 		}
-		panic.Go(execFunc(job))
+		panichandler.Go(execFunc(job))
 	}
 	// wait for results
 	wg.Wait()

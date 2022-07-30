@@ -14,7 +14,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 // watcher holds the state of the watcher.
@@ -62,7 +62,7 @@ func (w *watcher) Start() error {
 
 	w.waitGroup.Add(1)
 
-	panic.Go(func() {
+	panichandler.Go(func() {
 		defer w.waitGroup.Done()
 		// start watch to accumulate events
 		// need to start all over again on non-recoverable error in watch response (refer https://pkg.go.dev/github.com/coreos/etcd/clientv3#Watcher)

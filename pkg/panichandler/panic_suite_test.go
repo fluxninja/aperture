@@ -1,4 +1,4 @@
-package panic_test
+package panichandler_test
 
 import (
 	"testing"
