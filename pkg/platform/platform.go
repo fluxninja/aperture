@@ -29,7 +29,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/profilers"
@@ -68,8 +68,12 @@ type optionGroup []fx.Option
 // New returns a new fx.App with the provided options.
 func New(opts ...fx.Option) *fx.App {
 	options := optionGroup(opts)
-	panic.RegisterPanicHandler(OnCrash)
-	defer panic.Recover()
+	defer func() {
+		if v := recover(); v != nil {
+			panichandler.Crash(v)
+		}
+	}()
+	panichandler.RegisterPanicHandler(OnCrash)
 	return fx.New(options...)
 }
 
@@ -212,17 +216,17 @@ func stop(app *fx.App) {
 var defaultDiagnosticDir = path.Join(config.DefaultAssetsDirectory, "diagnostic")
 
 // OnCrash is the panic handler.
-func OnCrash(e interface{}, s panic.Callstack) {
+func OnCrash(e interface{}, s panichandler.Callstack) {
 	log.Debug().Msg("Crash Reporter Registered")
 	_ = os.MkdirAll(defaultDiagnosticDir, os.ModePerm)
 	diagnosticDir := path.Join(defaultDiagnosticDir, time.Now().Format(time.RFC3339))
 
 	// Crash Log writer
 	fName := "/crash.log"
-	crashlogger := panic.NewCrashFileWriter(filepath.Join(diagnosticDir, fName))
-	crashLogWriter := panic.GetCrashWriter()
+	crashlogger := panichandler.NewCrashFileWriter(filepath.Join(diagnosticDir, fName))
+	crashLogWriter := panichandler.GetCrashWriter()
 	crashLogWriter.Flush(crashlogger)
-	panic.CloseCrashFileWriter(crashlogger)
+	panichandler.CloseCrashFileWriter(crashlogger)
 
 	// Dump Status Registry
 	groupStatus := platform.statusRegistry.Get("")

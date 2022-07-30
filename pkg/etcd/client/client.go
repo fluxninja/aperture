@@ -9,7 +9,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 // Module is a fx module that provides etcd client.
@@ -109,7 +109,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 				log.Error().Err(err).Msg("Unable to keep alive the lease")
 			}
 
-			panic.Go(func() {
+			panichandler.Go(func() {
 				for ka := range keepAlive {
 					if ka != nil {
 						continue

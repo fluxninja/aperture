@@ -20,7 +20,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 
@@ -198,7 +198,7 @@ func (kc *KubernetesDiscovery) start() {
 
 	kc.waitGroup.Add(1)
 
-	panic.Go(func() {
+	panichandler.Go(func() {
 		defer kc.waitGroup.Done()
 
 		operation := func() error {

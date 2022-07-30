@@ -15,7 +15,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 // DefaultLogFilePath is the default path for the log files to be stored.
@@ -125,7 +125,7 @@ func (constructor LoggerConstructor) provideLogger(writers []io.Writer,
 			return nil
 		},
 		OnStop: func(c context.Context) error {
-			panic.Go(func() {
+			panichandler.Go(func() {
 				logger.Close()
 				log.WaitFlush()
 				for _, writer := range writers {
@@ -181,7 +181,7 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	}
 
 	// append ring buffer crash log writer
-	writers = append(writers, panic.GetCrashWriter())
+	writers = append(writers, panichandler.GetCrashWriter())
 
 	multi := zerolog.MultiLevelWriter(writers...)
 
