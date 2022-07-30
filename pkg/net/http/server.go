@@ -14,7 +14,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 const (
@@ -168,7 +168,7 @@ func (constructor ServerConstructor) provideServer(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			panic.Go(func() {
+			panichandler.Go(func() {
 				// request shutdown if this server exits
 				defer func() { _ = shutdowner.Shutdown() }()
 

@@ -6,7 +6,7 @@ import (
 
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/lukejoshuapark/infchan"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
@@ -54,7 +54,7 @@ func NewWriter(etcdClient *etcdclient.Client, withLease bool, opts ...clientv3.O
 
 	ew.context, ew.cancel = context.WithCancel(context.Background())
 
-	panic.Go(func() {
+	panichandler.Go(func() {
 		// start processing ops
 		for {
 			select {

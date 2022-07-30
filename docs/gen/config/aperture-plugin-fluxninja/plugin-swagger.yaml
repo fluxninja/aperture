@@ -28,50 +28,6 @@ definitions:
       plugin.
     type: object
     x-go-package: github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig
-  SentryConfig:
-    description: Configuration for Sentry
-    properties:
-      attach_stack_trace:
-        description: Configure to generate and attach stacktraces to capturing message
-          calls
-        type: boolean
-        x-go-default: "true"
-        x-go-name: AttachStacktrace
-      debug:
-        description: Debug enables printing of Sentry SDK debug messages
-        type: boolean
-        x-go-default: "true"
-        x-go-name: Debug
-      disabled:
-        description: Sentry crash report disabled
-        type: boolean
-        x-go-default: "false"
-        x-go-name: Disabled
-      dsn:
-        description: |-
-          If DSN is not set, the client is effectively disabled
-          You can set test project's dsn to send log events: <https://7d7c8b13c9a44a31befe58199f59e4da@o574197.ingest.sentry.io/5758807>
-        type: string
-        x-go-name: Dsn
-      environment:
-        description: Environment
-        type: string
-        x-go-default: production
-        x-go-name: Environment
-      sample_rate:
-        description: Sample rate for event submission i.e. 0.0 to 1.0
-        format: double
-        type: number
-        x-go-default: "1.0"
-        x-go-name: SampleRate
-      traces_sample_rate:
-        description: Sample rate for sampling traces i.e. 0.0 to 1.0
-        format: double
-        type: number
-        x-go-default: "0.2"
-        x-go-name: TracesSampleRate
-    type: object
-    x-go-package: github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/sentry
 info: {}
 paths:
   /fluxninja_plugin:
@@ -81,10 +37,6 @@ paths:
       - in: body
         schema:
           $ref: '#/definitions/FluxNinjaPluginConfig'
-      - in: body
-        name: sentry
-        schema:
-          $ref: '#/definitions/SentryConfig'
       - in: body
         name: client_grpc
         schema:

@@ -16,7 +16,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 const schemeName = "file"
@@ -80,7 +80,7 @@ func Invoke(in ConstructorIn) (*service.Collector, error) {
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			log.Info().Msg("Starting OTEL Collector")
-			panic.Go(func() {
+			panichandler.Go(func() {
 				err := otelService.Run(context.Background())
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to run OTEL Collector")

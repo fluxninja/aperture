@@ -1,4 +1,4 @@
-//go:generate swagger generate spec --scan-models --include="github.com/fluxninja/aperture/plugins/*" --include-tag=plugin-configuration -o ../../../docs/gen/config/aperture-plugin-fluxninja/plugin-swagger.yaml
+//go:generate swagger generate spec --scan-models --include="github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/*" --include-tag=plugin-configuration -o ../../../docs/gen/config/aperture-plugin-fluxninja/plugin-swagger.yaml
 
 // FluxNinja Cloud Plugin
 //   BasePath: /aperture-controller
@@ -13,8 +13,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/heartbeats"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/otel"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/sentry"
 )
 
 // Set via ldflags.
@@ -36,7 +34,6 @@ type FluxNinjaPlugin struct{}
 func (fn *FluxNinjaPlugin) Module() fx.Option {
 	log.Info().Msg("Loading FluxNinjaPlugin")
 	return fx.Options(
-		sentry.SentryWriterConstructor{Key: pluginconfig.PluginConfigKey + "." + sentry.SentryConfigKey}.Annotate(),
 		heartbeats.Module(),
 		otel.ProvideAnnotatedPluginConfig(),
 	)
