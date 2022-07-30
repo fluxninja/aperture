@@ -182,10 +182,13 @@ jobs:
       - run:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
-          command:
-            GOMAXPROCS=4 go test -v $(go list ./... | grep -v generated)
-            -coverprofile=coverage.out -covermode=atomic -coverpkg=./...
+          command: |
+            GOMAXPROCS=4 gotestsum --junitfile unit-tests.xml --rerun-fails=2 --packages="./..." -- -coverprofile=coverage.out -coverpkg=./... ./...
+            mkdir -p /tmp/test-results
+            mv unit-tests.xml /tmp/test-results
       - codecov/upload
+      - store_test_results:
+          path: /tmp/test-results
       - run:
           name: Show peak memory usage in bytes
           command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
