@@ -10,6 +10,7 @@ import (
 	"github.com/rs/zerolog"
 
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 var _ = io.WriteCloser(new(SentryWriter))
@@ -19,10 +20,6 @@ const (
 )
 
 var zerologToSentryLevel = map[zerolog.Level]sentry.Level{
-	log.DebugLevel: sentry.LevelDebug,
-	log.InfoLevel:  sentry.LevelInfo,
-	log.WarnLevel:  sentry.LevelWarning,
-	log.ErrorLevel: sentry.LevelError,
 	log.FatalLevel: sentry.LevelFatal,
 	log.PanicLevel: sentry.LevelFatal,
 }
@@ -99,4 +96,15 @@ func (s *SentryWriter) Close() error {
 
 func bytesToStrUnsafe(data []byte) string {
 	return *(*string)(unsafe.Pointer(&data))
+}
+
+func RegisterSentryPanicHandler() {
+	panichandler.RegisterPanicHandler(SentryPanicHandler)
+}
+
+func SentryPanicHandler(e interface{}, s panichandler.Callstack) {
+	duration, _ := time.ParseDuration(SentryFlushWait)
+
+	sentry.CurrentHub().Recover(e)
+	sentry.Flush(duration)
 }

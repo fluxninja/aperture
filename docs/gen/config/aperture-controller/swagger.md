@@ -26,6 +26,7 @@
 | Key                | Reference                             |
 | ------------------ | ------------------------------------- |
 | `fluxninja_plugin` | [FluxNinjaPlugin](#flux-ninja-plugin) |
+| `sentry_plugin`    | [SentryPlugin](#sentry-plugin)        |
 
 ### Object Index
 
@@ -169,14 +170,6 @@ Type: [GRPCClientConfig](#g-rpc-client-config)
 
 Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_CLIENT_HTTP_`
 Type: [HTTPClientConfig](#http-client-config)
-
-</dd>
-
-<dt>sentry</dt>
-<dd>
-
-Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_SENTRY_`
-Type: [SentryConfig](#sentry-config)
 
 </dd>
 </dl>
@@ -350,6 +343,25 @@ Type: [JobGroupConfig](#job-group-config)
 
 Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_SERVICE_`
 Type: [JobConfig](#job-config)
+
+</dd>
+</dl>
+
+### <span id="sentry-plugin"></span> _SentryPlugin_
+
+Key: `sentry_plugin`
+
+Env-Var Prefix: `APERTURE_CONTROLLER_SENTRY_PLUGIN_`
+
+#### Members
+
+<dl>
+
+<dt>sentry</dt>
+<dd>
+
+Env-Var Prefix: `APERTURE_CONTROLLER_SENTRY_PLUGIN_SENTRY_`
+Type: [SentryConfig](#sentry-config)
 
 </dd>
 </dl>
@@ -1385,7 +1397,8 @@ Configuration for Sentry
 <dd>
 
 (string) If DSN is not set, the client is effectively disabled
-You can set test project's dsn to send log events: <https://7d7c8b13c9a44a31befe58199f59e4da@o574197.ingest.sentry.io/5758807>
+You can set to test project's dsn to send log events.
+i.e. oss-aperture: <https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877>
 
 </dd>
 </dl>
