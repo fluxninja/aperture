@@ -137,7 +137,7 @@ func updateClock(t *testing.T, clk clockwork.FakeClock, timeout time.Duration, f
 	}
 	t.Logf("FakeClock ticks - minRequestDelay: %v\n", minRequestDelay)
 	for {
-		time.Sleep(500 * time.Microsecond)
+		time.Sleep(1 * time.Millisecond)
 		clk.Advance(minRequestDelay)
 	}
 }
