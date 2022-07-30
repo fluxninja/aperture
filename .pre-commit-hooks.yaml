@@ -1,6 +1,0 @@
-- id: install-go-tools
-  name: "Install Go tools"
-  language: script
-  entry: ./tools/githooks/install_go_tools.sh
-  pass_filenames: false
-  always_run: true
