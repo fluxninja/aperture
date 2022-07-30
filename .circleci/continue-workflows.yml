@@ -152,7 +152,7 @@ jobs:
         type: string
         description: working directory
     executor: go-cimg-executor
-    resource_class: xlarge
+    resource_class: large
     steps:
       - checkout
       - run:
@@ -196,7 +196,7 @@ jobs:
 
   pre-commit:
     executor: python-cimg-executor
-    resource_class: xlarge
+    resource_class: large
     steps:
       - checkout
       - asdf_install:
