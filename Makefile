@@ -15,7 +15,7 @@ go-mod-tidy:
 
 go-test:
 	@echo Running go tests
-	gotestum
+	gotestsum --format=testname
 
 go-lint:
 	@echo Linting go code
@@ -48,7 +48,7 @@ generate-mermaid:
 	@cd ./docs && $(MAKE) generate-mermaid
 
 coverage_profile:
-	gotestsum -- -coverpkg=./... -coverprofile=profile.coverprofile ./...
+	gotestsum --format=testname -- -coverpkg=./... -coverprofile=profile.coverprofile ./...
 
 show_coverage_in_browser: profile.coverprofile
 	go tool cover -html profile.coverprofile
