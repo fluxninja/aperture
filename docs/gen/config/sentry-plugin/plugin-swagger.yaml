@@ -1,6 +1,5 @@
 definitions:
   SentryConfig:
-    description: Configuration for Sentry
     properties:
       attach_stack_trace:
         description: Configure to generate and attach stacktraces to capturing message
@@ -21,7 +20,7 @@ definitions:
       dsn:
         description: |-
           If DSN is not set, the client is effectively disabled
-          You can set to test project's dsn to send log events.
+          You can set test project's dsn to send log events.
           i.e. oss-aperture: <https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877>
         type: string
         x-go-name: Dsn
@@ -42,6 +41,7 @@ definitions:
         type: number
         x-go-default: "0.2"
         x-go-name: TracesSampleRate
+    title: SentryConfig holds configuration for Sentry.
     type: object
     x-go-package: github.com/fluxninja/aperture/plugins/service/sentry-plugin/sentry
 info: {}

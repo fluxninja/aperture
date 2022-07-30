@@ -13,11 +13,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// Configuration for Sentry
+// SentryConfig holds configuration for Sentry.
 // swagger:model
 type SentryConfig struct {
 	// If DSN is not set, the client is effectively disabled
-	// You can set to test project's dsn to send log events.
+	// You can set test project's dsn to send log events.
 	// i.e. oss-aperture: <https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877>
 	Dsn string `json:"dsn" default:""`
 	// Environment

@@ -33,6 +33,6 @@ func (sp *SentryPlugin) Module() fx.Option {
 	log.Info().Msg("Loading SentryPlugin")
 	return fx.Options(
 		sentry.SentryWriterConstructor{Key: Plugin}.Annotate(),
-		fx.Invoke(sentry.SentryPanicHandler),
+		fx.Invoke(sentry.RegisterSentryPanicHandler),
 	)
 }

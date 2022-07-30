@@ -57,7 +57,7 @@
 - [ProfilersConfig](#profilers-config) – ProfilersConfig holds configuration for profilers.
 - [PrometheusConfig](#prometheus-config) – PrometheusConfig holds configuration for Prometheus Server.
 - [ProxyConfig](#proxy-config) – ProxyConfig holds proxy configuration.
-- [SentryConfig](#sentry-config) – Configuration for Sentry
+- [SentryConfig](#sentry-config) – SentryConfig holds configuration for Sentry.
 - [ServerTLSConfig](#server-tls-config) – ServerTLSConfig holds configuration for setting up server TLS support.
 - [WatchdogConfig](#watchdog-config) – WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
 - [WatchdogPolicyType](#watchdog-policy-type) – WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
@@ -1452,7 +1452,7 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 
 ### <span id="sentry-config"></span> SentryConfig
 
-Configuration for Sentry
+SentryConfig holds configuration for Sentry.
 
 #### Properties
 
@@ -1485,7 +1485,7 @@ Configuration for Sentry
 <dd>
 
 (string) If DSN is not set, the client is effectively disabled
-You can set to test project's dsn to send log events.
+You can set test project's dsn to send log events.
 i.e. oss-aperture: <https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877>
 
 </dd>
