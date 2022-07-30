@@ -126,9 +126,6 @@ func closeDiodeWriter(dw diode.Writer) {
 	})
 }
 
-// DiodeShutdownHook defines an interface to a log hook that is used creating a new logger.
-type DiodeShutdownHook struct{}
-
 // WaitFlush waits a few ms to let the diode buffer to flush.
 func WaitFlush() {
 	time.Sleep(diodeFlushWait)
