@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 //go:generate mockgen -source tracker.go -package mocks -aux_files github.com/fluxninja/aperture/pkg/notifiers=./watcher.go -destination ../mocks/mock-trackers.go
@@ -342,7 +342,7 @@ func (t *DefaultTrackers) getCurrentValue(key Key, ch chan []byte) {
 // See AddKeyNotifier, AddPrefixNotifier, RemoveKeyNotifier, RemovePrefixNotifier, and Purge for more information.
 func (t *DefaultTrackers) Start() error {
 	t.waitGroup.Add(1)
-	panic.Go(func() {
+	panichandler.Go(func() {
 		defer t.waitGroup.Done()
 	OUTER:
 		for {

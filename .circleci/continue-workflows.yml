@@ -152,7 +152,7 @@ jobs:
         type: string
         description: working directory
     executor: go-cimg-executor
-    resource_class: xlarge
+    resource_class: large
     steps:
       - checkout
       - run:
@@ -182,10 +182,13 @@ jobs:
       - run:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
-          command:
-            GOMAXPROCS=4 go test -v $(go list ./... | grep -v generated)
-            -coverprofile=coverage.out -covermode=atomic -coverpkg=./...
+          command: |
+            GOMAXPROCS=4 gotestsum --junitfile unit-tests.xml --rerun-fails=2 --packages="./..." -- -race -coverprofile=coverage.out -coverpkg=./... ./...
+            mkdir -p /tmp/test-results
+            mv unit-tests.xml /tmp/test-results
       - codecov/upload
+      - store_test_results:
+          path: /tmp/test-results
       - run:
           name: Show peak memory usage in bytes
           command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
@@ -193,7 +196,7 @@ jobs:
 
   pre-commit:
     executor: python-cimg-executor
-    resource_class: xlarge
+    resource_class: large
     steps:
       - checkout
       - asdf_install:
@@ -208,6 +211,14 @@ jobs:
             nodejs
             shellcheck
             yq
+      - restore_cache:
+          name: Restore go cache
+          keys:
+            - v1-go-{{ checksum "~/day" }}
+      - run:
+          name: Cache golangci-lint run
+          command: |
+            golangci-lint run || true
       - run:
           name: Generate pre-commit cache key file
           command: |
@@ -250,6 +261,13 @@ jobs:
               #done
             fi
       - save_cache:
+          name: Save go cache
+          key: v1-go-{{ checksum "~/day" }}
+          paths:
+            - ../.cache/golangci-lint
+            - ../.cache/go-build
+          when: on_success
+      - save_cache:
           name: Save pre-commit cache
           key: v2-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
@@ -280,8 +298,8 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # FluxNinja/cloud R/O
-            - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff" # FluxNinja/aperture-tech-docs R/W
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
+            - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff" # fluxninja/aperture-tech-docs R/W
       - run:
           name: Install opsninja and its dependencies
           command: |
@@ -306,7 +324,7 @@ jobs:
             export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
              args=(
                --release=<< parameters.release-ref >>
-               --rm-repo-path=/home/circleci/project/
+               --source-repo-path=/home/circleci/project/
                --docs-root-dir=docs/
              )
              if [[ "<< parameters.dry-run >>" == "true" ]]; then
@@ -376,14 +394,16 @@ commands:
           command: |
             git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.2
             printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
-            date +%m > ~/date
+            date +%m > ~/month
+            date +%d > ~/day
       # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name
+            - asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
               >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
-            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-
+            - asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
+              >>-
       - run:
           name: Install ASDF tools
           environment:
@@ -399,8 +419,8 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-{{
-            checksum ".tool-versions" }}-{{ checksum "go.mod" }}
+            asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
+            >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
           paths:
             - ~/.asdf
 

@@ -12,7 +12,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/filesystem"
 	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/panic"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 var (
@@ -57,7 +57,7 @@ type ModuleConfig struct {
 func (config ModuleConfig) Module() fx.Option {
 	return fx.Options(
 		fx.Invoke(
-			panic.RegisterPanicHandlers,
+			panichandler.RegisterPanicHandlers,
 		),
 		fx.Provide(CommandLineConfig{UnknownFlags: config.UnknownFlags, ExitOnHelp: config.ExitOnHelp}.NewCommandLine),
 		FileUnmarshallerConstructor{

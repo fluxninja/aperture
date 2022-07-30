@@ -27,6 +27,7 @@
 | Key                | Reference                             |
 | ------------------ | ------------------------------------- |
 | `fluxninja_plugin` | [FluxNinjaPlugin](#flux-ninja-plugin) |
+| `sentry_plugin`    | [SentryPlugin](#sentry-plugin)        |
 
 ### Object Index
 
@@ -56,7 +57,7 @@
 - [ProfilersConfig](#profilers-config) – ProfilersConfig holds configuration for profilers.
 - [PrometheusConfig](#prometheus-config) – PrometheusConfig holds configuration for Prometheus Server.
 - [ProxyConfig](#proxy-config) – ProxyConfig holds proxy configuration.
-- [SentryConfig](#sentry-config) – Configuration for Sentry
+- [SentryConfig](#sentry-config) – SentryConfig holds configuration for Sentry.
 - [ServerTLSConfig](#server-tls-config) – ServerTLSConfig holds configuration for setting up server TLS support.
 - [WatchdogConfig](#watchdog-config) – WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
 - [WatchdogPolicyType](#watchdog-policy-type) – WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
@@ -168,14 +169,6 @@ Type: [GRPCClientConfig](#g-rpc-client-config)
 
 Env-Var Prefix: `APERTURE_AGENT_FLUXNINJA_PLUGIN_CLIENT_HTTP_`
 Type: [HTTPClientConfig](#http-client-config)
-
-</dd>
-
-<dt>sentry</dt>
-<dd>
-
-Env-Var Prefix: `APERTURE_AGENT_FLUXNINJA_PLUGIN_SENTRY_`
-Type: [SentryConfig](#sentry-config)
 
 </dd>
 </dl>
@@ -349,6 +342,25 @@ Type: [JobGroupConfig](#job-group-config)
 
 Env-Var Prefix: `APERTURE_AGENT_READINESS_SERVICE_`
 Type: [JobConfig](#job-config)
+
+</dd>
+</dl>
+
+### <span id="sentry-plugin"></span> _SentryPlugin_
+
+Key: `sentry_plugin`
+
+Env-Var Prefix: `APERTURE_AGENT_SENTRY_PLUGIN_`
+
+#### Members
+
+<dl>
+
+<dt>sentry</dt>
+<dd>
+
+Env-Var Prefix: `APERTURE_AGENT_SENTRY_PLUGIN_SENTRY_`
+Type: [SentryConfig](#sentry-config)
 
 </dd>
 </dl>
@@ -1440,7 +1452,7 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 
 ### <span id="sentry-config"></span> SentryConfig
 
-Configuration for Sentry
+SentryConfig holds configuration for Sentry.
 
 #### Properties
 
@@ -1473,7 +1485,8 @@ Configuration for Sentry
 <dd>
 
 (string) If DSN is not set, the client is effectively disabled
-You can set test project's dsn to send log events: <https://7d7c8b13c9a44a31befe58199f59e4da@o574197.ingest.sentry.io/5758807>
+You can set test project's dsn to send log events.
+i.e. oss-aperture: <https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877>
 
 </dd>
 </dl>

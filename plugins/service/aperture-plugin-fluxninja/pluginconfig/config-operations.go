@@ -7,10 +7,6 @@ package pluginconfig
 // - in: body
 //   schema:
 //     "$ref": "#/definitions/FluxNinjaPluginConfig"
-// - name: sentry
-//   in: body
-//   schema:
-//     "$ref": "#/definitions/SentryConfig"
 // - name: client_grpc
 //   in: body
 //   schema:
