@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	// PoliciesStatusRoot - path in status registry for policies results.
-	PoliciesStatusRoot = "policies"
+	// PoliciesRoot - path in config and status registry for policies results.
+	PoliciesRoot = "policies"
 )
 
 // PolicyBaseAPI is for read only access to base policy info.

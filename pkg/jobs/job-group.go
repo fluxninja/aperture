@@ -52,6 +52,7 @@ type SchedulerConfig struct {
 
 // JobGroupConstructor holds fields to create annotated instances of JobGroup.
 type JobGroupConstructor struct {
+	// Name of the job group - config key is <name>.scheduler and statuses are updated under <name>.status
 	Group         string
 	GW            GroupWatchers
 	DefaultConfig JobGroupConfig
