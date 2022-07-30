@@ -20,6 +20,10 @@ const (
 )
 
 var zerologToSentryLevel = map[zerolog.Level]sentry.Level{
+	log.DebugLevel: sentry.LevelDebug,
+	log.InfoLevel:  sentry.LevelInfo,
+	log.WarnLevel:  sentry.LevelWarning,
+	log.ErrorLevel: sentry.LevelError,
 	log.FatalLevel: sentry.LevelFatal,
 	log.PanicLevel: sentry.LevelFatal,
 }
