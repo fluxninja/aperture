@@ -184,7 +184,7 @@ jobs:
           working_directory: << parameters.work_dir >>
           command:
             gotestsum --junitfile unit-tests.xml -- -race
-            -coverprofile=coverage.out -covermode=atomic -coverpkg=./...
+            -coverprofile=coverage.out -covermode=atomic -coverpkg=./... ./...
       - codecov/upload
       - store_test_results:
           path: /tmp/test-results
