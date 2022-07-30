@@ -113,10 +113,9 @@ func (r *PanicHandlerRegistry) Crash(v interface{}) {
 
 	select {
 	case <-waitCh:
-		panic(v)
 	case <-time.After(5 * time.Second):
-		panic(v)
 	}
+	panic(v)
 }
 
 // Go calls f on a new go-routine, reporting panics to the registered handlers.
