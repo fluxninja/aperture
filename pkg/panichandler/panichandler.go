@@ -9,6 +9,7 @@ import (
 	"go.uber.org/fx"
 )
 
+// Test comment.
 var globalPanicHandlerRegistry *PanicHandlerRegistry
 
 func init() {
