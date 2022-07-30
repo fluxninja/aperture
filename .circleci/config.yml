@@ -29,14 +29,16 @@ commands:
           command: |
             git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.2
             printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
-            date +%m > ~/date
+            date +%m > ~/month
+            date +%d > ~/day
       # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name
+            - asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
               >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
-            - asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-
+            - asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
+              >>-
       - run:
           name: Install ASDF tools
           environment:
@@ -52,8 +54,8 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            asdf-cache-v4-{{ checksum "~/date" }}-<< parameters.cache_name >>-{{
-            checksum ".tool-versions" }}-{{ checksum "go.mod" }}
+            asdf-cache-v4-{{ checksum "~/month" }}-<< parameters.cache_name
+            >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
           paths:
             - ~/.asdf
 jobs:
