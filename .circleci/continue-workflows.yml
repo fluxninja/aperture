@@ -152,7 +152,7 @@ jobs:
         type: string
         description: working directory
     executor: go-cimg-executor
-    resource_class: xlarge
+    resource_class: large
     steps:
       - checkout
       - run:
@@ -183,8 +183,9 @@ jobs:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
           command:
-            gotestsum --junitfile unit-tests.xml -- -race
-            -coverprofile=coverage.out -covermode=atomic -coverpkg=./... ./...
+            gotestsum --junitfile unit-tests.xml --rerun-fails=2
+            --packages="./..." -- -coverprofile=coverage.out -covermode=atomic
+            -coverpkg=./... ./...
       - codecov/upload
       - store_test_results:
           path: /tmp/test-results
