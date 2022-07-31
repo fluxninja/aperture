@@ -2,19 +2,50 @@ syntax = "proto3";
 
 package aperture.policy.decisions.v1;
 
+import "protoc-gen-openapiv2/options/annotations.proto";
+
 message LoadShedDecision {
   double load_shed_factor = 1;
 }
 
 message TokensDecision {
-  uint64 default_workload_tokens = 1; // @gotags: default:"1"
+  uint64 default_workload_tokens = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-default"
+        value: {
+          number_value: 1
+        }
+      }
+    }
+  ]; // @gotags: default:"1"
+
   // Key in map is a string representation of WorkloadDesc message.
   map<string, uint64> tokens_by_workload = 2;
 }
 
 message WorkloadDesc {
-  string workload_key = 1; // @gotags: default:"default_workload_key"
-  string workload_value = 2; // @gotags: default:"default_workload_value"
+  string workload_key = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "default_workload_key"
+        }
+      }
+    }
+  ]; // @gotags: default:"default_workload_key"
+
+  string workload_value = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "default_workload_value"
+        }
+      }
+    }
+  ]; // @gotags: default:"default_workload_value"
 }
 
 message RateLimiterDecision {
