@@ -232,7 +232,7 @@ definitions:
       query:
         type: string
         description: |-
-          Query string to extract a value (eg. `data.<mymodulename>.<variablename>`)
+          Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
           Note: The module name must match the package name from the "source".
       source:

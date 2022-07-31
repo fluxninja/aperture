@@ -110,7 +110,7 @@ High-level extractor-based rules are compiled into a single rego query.
 <dt>query</dt>
 <dd>
 
-(string) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`)
+(string) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
 Note: The module name must match the package name from the "source".
 
