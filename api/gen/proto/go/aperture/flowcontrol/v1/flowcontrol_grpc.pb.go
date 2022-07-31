@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FlowControlServiceClient interface {
 	// Check wraps the given arbitrary resource and matches the given labels
-	// against Flow Control Limiters to makes a decision whether to allow/deny
+	// against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*CheckResponse, error)
 }
 
@@ -45,7 +45,7 @@ func (c *flowControlServiceClient) Check(ctx context.Context, in *CheckRequest, 
 // for forward compatibility
 type FlowControlServiceServer interface {
 	// Check wraps the given arbitrary resource and matches the given labels
-	// against Flow Control Limiters to makes a decision whether to allow/deny
+	// against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(context.Context, *CheckRequest) (*CheckResponse, error)
 }
 

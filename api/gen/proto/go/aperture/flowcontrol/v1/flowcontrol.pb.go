@@ -284,7 +284,7 @@ type CheckResponse struct {
 	Reason *Reason `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
 	// limiter_decisions contains information about decision made by each limiter.
 	LimiterDecisions []*LimiterDecision `protobuf:"bytes,3,rep,name=limiter_decisions,json=limiterDecisions,proto3" json:"limiter_decisions,omitempty"`
-	// flux meter ids that were matched for this request
+	// flux meter ids that were matched for this request.
 	FluxMeterIds []string `protobuf:"bytes,4,rep,name=flux_meter_ids,json=fluxMeterIds,proto3" json:"flux_meter_ids,omitempty"`
 }
 

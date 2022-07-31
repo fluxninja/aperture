@@ -18,7 +18,7 @@ paths:
     post:
       summary: |-
         Check wraps the given arbitrary resource and matches the given labels
-        against Flow Control Limiters to makes a decision whether to allow/deny
+        against Flow Control Limiters to makes a decision whether to allow/deny.
       operationId: FlowControlService_Check
       responses:
         "200":
@@ -42,7 +42,7 @@ paths:
     post:
       summary: |-
         Report accepts information about agents' health and applied
-        configurations/policies
+        configurations/policies.
       operationId: FluxNinjaService_Report
       responses:
         "200":
@@ -550,7 +550,7 @@ definitions:
         type: array
         items:
           type: string
-        title: flux meter ids that were matched for this request
+        description: flux meter ids that were matched for this request.
       limiter_decisions:
         type: array
         items:
@@ -1390,7 +1390,7 @@ definitions:
         $ref: '#/definitions/v1VersionInfo'
   v1ReportResponse:
     type: object
-    title: ReportResponse is empty for now
+    description: ReportResponse is empty for now.
   v1Rule:
     type: object
     properties:

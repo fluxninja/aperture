@@ -111,7 +111,7 @@ func (x *ReportRequest) GetAllStatuses() map[string]*anypb.Any {
 	return nil
 }
 
-// ReportResponse is empty for now
+// ReportResponse is empty for now.
 type ReportResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -150,7 +150,7 @@ func (*ReportResponse) Descriptor() ([]byte, []int) {
 	return file_aperture_plugins_fluxninja_v1_heartbeat_proto_rawDescGZIP(), []int{1}
 }
 
-// Policies type is packing an array of FlowControlPolicy to be used as one message and sent using type Any
+// Policies type is packing an array of FlowControlPolicy to be used as one message and sent using type Any.
 type Policies struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -199,7 +199,7 @@ func (x *Policies) GetPolicies() []*FlowControlPolicy {
 }
 
 // FlowControlPolicy is a policy used for directing traffic.
-// TODO fill it
+// TODO: fill it.
 type FlowControlPolicy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -238,7 +238,7 @@ func (*FlowControlPolicy) Descriptor() ([]byte, []int) {
 	return file_aperture_plugins_fluxninja_v1_heartbeat_proto_rawDescGZIP(), []int{3}
 }
 
-// Services type is packing an array of Service to be used as one message and sent using type Any
+// Services type is packing an array of Service to be used as one message and sent using type Any.
 type Services struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -287,7 +287,7 @@ func (x *Services) GetServices() []*Service {
 }
 
 // Service contains information about single service discovered in agent group by a
-// particular agent
+// particular agent.
 type Service struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
