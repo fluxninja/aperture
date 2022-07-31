@@ -683,7 +683,7 @@ definitions:
         x-go-validate: required,oneof=ingress egress
     description: |-
       Identifies control point within a service that the rule or policy should apply to.
-      Controlpoint is either a library feature name or one of "ingress/egress" traffic control point.
+      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
   v1Decider:
     type: object
     properties:
@@ -1477,9 +1477,10 @@ definitions:
       agent_group:
         type: string
         description: Describes where this selector applies to.
+        x-go-default: default
       control_point:
         $ref: '#/definitions/v1ControlPoint'
-        description: Describes control point Within the entity where the policy should apply to.
+        description: Describes control point within the entity where the policy should apply to.
         x-go-validate: required
       label_matcher:
         $ref: '#/definitions/v1LabelMatcher'
@@ -1492,9 +1493,9 @@ definitions:
           Note: For classification we can only match flow labels that were created at some **previous** control point.
 
           In case of k8s, infra labels are labels on entities (note: there might exist some additional labels).
-          Flow label names are always prefixed with `flow_`
+          Flow label names are always prefixed with `flow_`.
           Request labels are always prefixed with `request_`.
-          Available request labels are `id` (available as `request_id`), `method`, `path`, `host`, `scheme`, `size`, `protocol`
+          Available request labels are `id` (available as `request_id`), `method`, `path`, `host`, `scheme`, `size`, `protocol`.
           (mapped from fields of [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
           Also, (non-pseudo) headers are available as `request_header_<headername>`.
 
@@ -1522,7 +1523,7 @@ definitions:
         namespace: default
         service: service1
         control_point:
-          traffic: "ingress # Allowed values are `ingress` and `egress`."
+          traffic: ingress # Allowed values are `ingress` and `egress`.
         label_matcher:
           match_labels:
             user_tier: gold

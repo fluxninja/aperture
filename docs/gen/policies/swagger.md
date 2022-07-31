@@ -550,7 +550,7 @@ Outputs for the Constant component.
 
 
 Identifies control point within a service that the rule or policy should apply to.
-Controlpoint is either a library feature name or one of "ingress/egress" traffic control point.
+Controlpoint is either a library feature name or one of ingress/egress traffic control point.
 
 
 
@@ -1606,7 +1606,7 @@ selector:
   namespace: default
   service: service1
   control_point:
-    traffic: "ingress # Allowed values are `ingress` and `egress`."
+    traffic: ingress # Allowed values are `ingress` and `egress`.
   label_matcher:
     match_labels:
       user_tier: gold
@@ -1626,7 +1626,7 @@ selector:
 <dt>agent_group</dt>
 <dd>
 
-(string) Describes where this selector applies to.
+(string, default: `default`) Describes where this selector applies to.
 
 </dd>
 </dl>
@@ -1634,7 +1634,7 @@ selector:
 <dt>control_point</dt>
 <dd>
 
-([V1ControlPoint](#v1-control-point), `required`) Describes control point Within the entity where the policy should apply to.
+([V1ControlPoint](#v1-control-point), `required`) Describes control point within the entity where the policy should apply to.
 
 </dd>
 </dl>
@@ -1650,9 +1650,9 @@ For flowcontrol policies, the matcher can be used to match flow labels.
 Note: For classification we can only match flow labels that were created at some **previous** control point.
 
 In case of k8s, infra labels are labels on entities (note: there might exist some additional labels).
-Flow label names are always prefixed with `flow_`
+Flow label names are always prefixed with `flow_`.
 Request labels are always prefixed with `request_`.
-Available request labels are `id` (available as `request_id`), `method`, `path`, `host`, `scheme`, `size`, `protocol`
+Available request labels are `id` (available as `request_id`), `method`, `path`, `host`, `scheme`, `size`, `protocol`.
 (mapped from fields of [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
 Also, (non-pseudo) headers are available as `request_header_<headername>`.
 
