@@ -474,8 +474,8 @@ Example:
 ```yaml
 all:
   of:
-    - "label_exists: foo"
-    - "label_equals: { label = app, value = frobnicator }"
+    - label_exists: foo
+    - label_equals: { label = app, value = frobnicator }
 ```
 
 #### Properties
