@@ -381,7 +381,7 @@ definitions:
             foo = any.unpack(Foo.class);
           }
 
-      Example 3: Pack and unpack a message in Python.
+       Example 3: Pack and unpack a message in Python.
 
           foo = Foo(...)
           any = Any()
@@ -391,7 +391,7 @@ definitions:
             any.Unpack(foo)
             ...
 
-      Example 4: Pack and unpack a message in Go
+       Example 4: Pack and unpack a message in Go
 
            foo := &pb.Foo{...}
            any, err := anypb.New(foo)
@@ -412,7 +412,7 @@ definitions:
 
 
       JSON
-
+      ====
       The JSON representation of an `Any` value uses the regular
       representation of the deserialized, embedded message, with an
       additional field `@type` which contains the type URL. Example:
@@ -453,13 +453,10 @@ definitions:
       details can either be a message (Any) or error (ErrorDetails).
   v1AddressExtractor:
     type: object
-    example:
-      '''yaml':
-        from: 'source.address # or dstination.address'
     properties:
       from:
         type: string
-        description: Attribute path pointing to some string. eg. "source.address".
+        description: Attribute path pointing to some string - eg. "source.address".
         x-go-validate: required
     description: |-
       Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`.
@@ -469,6 +466,11 @@ definitions:
       Note: Use with care, as it might accidentally introduce a high-cardinality flow label values.
 
       [ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
+
+      Example:
+      ```yaml
+      from: "source.address # or dstination.address"
+      ```
   v1AllPolicies:
     type: object
     properties:
@@ -560,17 +562,6 @@ definitions:
     description: CheckResponse contains fields that represent decision made by Check call.
   v1Classifier:
     type: object
-    example:
-      '''yaml':
-        rules:
-          user:
-            extractor:
-              from: request.http.headers.user
-        selector:
-          control_point:
-            traffic: ingress
-          namespace: default
-          service: service1
     properties:
       rules:
         type: object
@@ -580,7 +571,21 @@ definitions:
       selector:
         $ref: '#/definitions/v1Selector'
         description: Defines where to apply the flow classification rule.
-    description: Set of classification rules sharing a common selector.
+    description: |-
+      Set of classification rules sharing a common selector.
+
+      Example:
+      ```yaml
+      selector:
+        namespace: default
+        service: service1
+        control_point:
+          traffic: ingress
+      rules:
+        user:
+          extractor:
+            from: request.http.headers.user
+      ```
   v1Component:
     type: object
     properties:
@@ -827,22 +832,26 @@ definitions:
     properties:
       address:
         $ref: '#/definitions/v1AddressExtractor'
-        description: Display an address as a single string. eg. `<ip>:<port>`.
+        description: Display an address as a single string - `<ip>:<port>`.
       from:
         type: string
-        example:
-          '''yaml':
-            from: request.http.headers.user-agent
         description: |-
           Use an attribute with no convertion.
-          Attribute path is a dot-separated path to attribute. Should be either:
+          Attribute path is a dot-separated path to attribute.
+
+          Should be either:
           * one of the fields of [Attribute Context][attribute-context], or
           * a special "request.http.bearer" pseudo-attribute.
           Eg. "request.http.method" or "request.http.header.user-agent"
 
-          Note: The same attribute path syntax is shared by other extractor variants, wherever attribute path is needed in their "from" syntax.
+          Note: The same attribute path syntax is shared by other extractor variants,
+          wherever attribute path is needed in their "from" syntax.
 
-          [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
+          Example:
+          ```yaml
+          from: request.http.headers.user-agent
+          ```
+          [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto"
       json:
         $ref: '#/definitions/v1JSONExtractor'
         description: Deserialize a json, and extract one of the fields.
@@ -852,7 +861,7 @@ definitions:
       path_templates:
         $ref: '#/definitions/v1PathTemplateMatcher'
         description: Match HTTP Path to given path templates.
-    description: |-
+    title: |-
       Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write regod code.
       There are multiple variants of extractor, specify exactly one:
       - JSON Extractor
@@ -986,29 +995,28 @@ definitions:
         type: string
   v1JSONExtractor:
     type: object
-    example:
-      '''yaml':
-        from: request.http.body
-        pointer: /user/name
     properties:
       from:
         type: string
-        description: Attribute path pointing to some strings. eg. "request.http.body".
+        description: Attribute path pointing to some strings - eg. "request.http.body".
         x-go-validate: required
       pointer:
         type: string
         description: |-
           Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
 
-          Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax, eg. `/foo/bar`.
-          If the pointer points into an object, it'd be stringified.
-    description: Deserialize a json, and extract one of the fields.
+          Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+          eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+    description: |-
+      Deserialize a json, and extract one of the fields.
+
+      Example:
+      ```yaml
+      from: request.http.body
+      pointer: /user/name
+      ```
   v1JWTExtractor:
     type: object
-    example:
-      yaml:
-        from: request.http.bearer
-        json_pointer: /user/email
     properties:
       from:
         type: string
@@ -1019,9 +1027,20 @@ definitions:
         description: |-
           Json pointer allowing to select a specified field from the json payload.
 
-          Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax, eg. `/foo/bar`.
-          If the pointer points into an object, it'd be stringified.
-    description: "Parse the attribute as JWT and read the payload.\nSpecify a field to be extracted from payload using \"json_pointer\".\n\nNote: The signature is not verified against the secret (we're assuming there's some \nother parts of the system that handles such verification)."
+          Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+          eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+    description: |-
+      Parse the attribute as JWT and read the payload.
+      Specify a field to be extracted from payload using "json_pointer".
+
+      Note: The signature is not verified against the secret (we're assuming there's some
+      other parts of the system that handles such verification).
+
+      Example:
+      ```yaml
+      from: request.http.bearer
+      json_pointer: /user/email
+      ```
   v1K8sLabelMatcherRequirement:
     type: object
     properties:
@@ -1068,14 +1087,14 @@ definitions:
 
           Note: The requirements are ANDed.
     description: |-
+      If multiple requirements are set, they are all ANDed.
+      An empty label matcher always matches.
+    title: |-
       Allows to define rules whether a map of labels should be considered a match or not.
       It provides three ways to define requirements:
       - matchLabels
       - matchExpressions
       - arbitrary expression
-
-      If multiple requirements are set, they are all ANDed.
-      An empty label matcher always matches.
   v1LimiterDecision:
     type: object
     properties:
@@ -1114,12 +1133,6 @@ definitions:
     description: Input for the Load Shed Actuator component.
   v1MatchExpression:
     type: object
-    example:
-      '''yaml':
-        all:
-          of:
-            - 'label_exists: foo'
-            - 'label_equals: { label = app, value = frobnicator }'
     properties:
       all:
         $ref: '#/definitions/MatchExpressionList'
@@ -1143,6 +1156,14 @@ definitions:
     description: |-
       Defines a [map<string, string> → bool] expression to be evaluated on labels.
       MatchExpression has multiple variants, exactly one should be set.
+
+      Example:
+      ```yaml
+      all:
+        of:
+          - "label_exists: foo"
+          - "label_equals: { label = app, value = frobnicator }"
+      ```
   v1MatchesMatchExpression:
     type: object
     properties:
@@ -1218,28 +1239,35 @@ definitions:
     properties:
       template_values:
         type: object
-        example:
-          /register: /register
-          /static/*: /static/*
-          /user/{userId}: /user/{userId}
         additionalProperties:
           type: string
         description: |-
           Template value keys are OpenAPI-inspired path templates.
 
-          * Static path segment `/foo` matches a path segment exactly
+          Examples:
+          ```
+          /register
+          /users/{user_id}
+          /static/*
+          ```
+
+          * Static path segment `/foo` matches a path segment exactly.
           * `/{param}` matches arbitrary path segment.
           (The param name is ignored and can be omitted (`{}`))
           * The parameter must cover whole segment.
           * Additionally, path template can end with `/*` wildcard to match
-            arbitrary number of trailing segments (0 or more).
+          arbitrary number of trailing segments (0 or more).
           * Multiple consecutive `/` are ignored, as well as trailing `/`.
           * Parametrized path segments must come after static segments.
           * `*`, if present, must come last.
-          * Most specific template "wins" (`/foo` over `/{}` and `/{}` over `/*`).
+          * Most specific template \"wins\" (`/foo` over `/{}` and `/{}` over `/*`).
 
-          See also <https://swagger.io/specification/#path-templating-matching>
-    description: "Matches HTTP Path to given path templates.\nHTTP path will be matched against given path templates. \nIf a match occurs, the value associated with the path template will be treated as a result.\nIn case of multiple path templates matching, the most specific one will be chosen."
+          See also <https://swagger.io/specification/#path-templating-matching>"
+    description: |-
+      Matches HTTP Path to given path templates.
+      HTTP path will be matched against given path templates.
+      If a match occurs, the value associated with the path template will be treated as a result.
+      In case of multiple path templates matching, the most specific one will be chosen.
   v1PeerInfo:
     type: object
     properties:
@@ -1365,30 +1393,6 @@ definitions:
     title: ReportResponse is empty for now
   v1Rule:
     type: object
-    example:
-      Example of Declarative JSON extractor:
-        '''yaml':
-          extractor:
-            json:
-              from: request.http.body
-              pointer: /user/name
-          hidden: false
-          propagate: true
-      Example of Rego module:
-        '''yaml':
-          hidden: true
-          propagate: false
-          rego:
-            query: data.user_from_cookie.user
-            source:
-              cookie: cookies[_]
-              cookie.startswith: ('session=')
-              cookies: split(input.attributes.request.http.headers.cookie, ';')
-              object: json.unmarshal(base64url.decode(parts[0]))
-              package: user_from_cookie
-              parts: split(session, '.')
-              session: substring(cookie, count('session='), -1)
-              user: object.user
     properties:
       extractor:
         $ref: '#/definitions/v1Extractor'
@@ -1415,6 +1419,33 @@ definitions:
 
       Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
       [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
+
+      Example:
+      ```yaml
+      Example of Declarative JSON extractor:
+        yaml:
+          extractor:
+            json:
+              from: request.http.body
+              pointer: /user/name
+          propagate: true
+          hidden: false
+      Example of Rego module:
+        yaml:
+          rego:
+            query: data.user_from_cookie.user
+            source:
+              package: user_from_cookie
+              cookies: "split(input.attributes.request.http.headers.cookie, ';')"
+              cookie: "cookies[_]"
+              cookie.startswith: "('session=')"
+              session: "substring(cookie, count('session='), -1)"
+              parts: "split(session, '.')"
+              object: "json.unmarshal(base64url.decode(parts[0]))"
+              user: object.user
+          propagate: false
+          hidden: true
+      ```
   v1Scheduler:
     type: object
     properties:
@@ -1442,24 +1473,6 @@ definitions:
     description: Output for the Scheduler component.
   v1Selector:
     type: object
-    example:
-      '''yaml':
-        selector:
-          control_point:
-            traffic: 'ingress # Allowed values are `ingress` and `egress`.'
-          label_matcher:
-            match_expressions:
-              - key: query
-                operator: In
-                values:
-                  - insert
-                  - delete
-              - label: user_agent
-                regex: ^(?!.*Chrome).*Safari
-            match_labels:
-              user_tier: gold
-          namespace: default
-          service: service1
     properties:
       agent_group:
         type: string
@@ -1500,7 +1513,28 @@ definitions:
 
           Note: Entity may belong to multiple services.
         x-go-validate: required
-    description: Describes where a rule or actuation component should apply to.
+    description: |-
+      Describes where a rule or actuation component should apply to.
+
+      Example:
+      ```yaml
+      selector:
+        namespace: default
+        service: service1
+        control_point:
+          traffic: "ingress # Allowed values are `ingress` and `egress`."
+        label_matcher:
+          match_labels:
+            user_tier: gold
+          match_expressions:
+            - key: query
+              operator: In
+              values:
+                - insert
+                - delete
+            - label: user_agent
+              regex: ^(?!.*Chrome).*Safari
+      ```
   v1Sqrt:
     type: object
     properties:

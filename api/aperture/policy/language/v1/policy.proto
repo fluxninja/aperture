@@ -25,407 +25,506 @@ message AllPolicies {
   map<string, Policy> all_policies = 1;
 }
 
-  // Policy is defined as a dataflow graph (circuit) of inter-connected components.
-  // Signals flow between components via ports.
-  // As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
-  // Policies are evaluated periodically in order to respond to changes in signal readings.
+// Policy is defined as a dataflow graph (circuit) of inter-connected components.
+// Signals flow between components via ports.
+// As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
+// Policies are evaluated periodically in order to respond to changes in signal readings.
 message Policy {
+  repeated Component circuit = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines a signal processing graph as a list of components."
+    }
+  ];
 
-  repeated Component circuit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Defines a signal processing graph as a list of components."
-  }];
-
-  google.protobuf.Duration evaluation_interval = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Evaluation interval (ticks) is the time period between consecutive runs of the policy circuit.\nThis interval is typically aligned with how often the corrective action (actuation) needs to be taken."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        string_value: "0.5s"
+  google.protobuf.Duration evaluation_interval = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Evaluation interval (ticks) is the time period between consecutive runs of the policy circuit.\nThis interval is typically aligned with how often the corrective action (actuation) needs to be taken."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "0.5s"
+        }
       }
     }
-  }]; // @gotags: default:"0.5s"
+  ]; // @gotags: default:"0.5s"
 
-  repeated FluxMeter flux_meters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "FluxMeters are installed in the data-plane and form the observability leg of the feedback loop."
-  }];
+  repeated FluxMeter flux_meters = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "FluxMeters are installed in the data-plane and form the observability leg of the feedback loop."
+    }
+  ];
 }
 
-  // FluxMeter gathers metrics for the traffic that matches its selector.
+// FluxMeter gathers metrics for the traffic that matches its selector.
 message FluxMeter {
+  string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Name of the flux meter."
+    }
+  ];
 
-  string name = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Name of the flux meter."
-  }];
+  Selector selector = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Policies are only applied to flows that are matched based on the fields in the selector."
+    }
+  ];
 
-  Selector selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Policies are only applied to flows that are matched based on the fields in the selector."
-  }];
-
-  repeated double histogram_buckets = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Latency histogram buckets (in ms) for this FluxMeter."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        string_value: "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+  repeated double histogram_buckets = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Latency histogram buckets (in ms) for this FluxMeter."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+        }
       }
     }
-  }]; // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+  ]; // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
 }
 
-  // Computational blocks that form the circuit.
-  // Signals flow into the components via input ports and results are emitted on output ports.
-  // Components are wired to each other based on signal names forming an execution graph of the circuit.
-  // Loops are broken by the runtime at the earliest component index that is part of the loop.
-  // The looped signals are saved in the tick they are generated and served in the subsequent tick.
+// Computational blocks that form the circuit.
+// Signals flow into the components via input ports and results are emitted on output ports.
+// Components are wired to each other based on signal names forming an execution graph of the circuit.
+// Loops are broken by the runtime at the earliest component index that is part of the loop.
+// The looped signals are saved in the tick they are generated and served in the subsequent tick.
 message Component {
-
   oneof component {
-    GradientController gradient_controller = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied. This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response."
-    }];
+    GradientController gradient_controller = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied. This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response."
+      }
+    ];
 
-    EMA ema = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Exponential Moving Average filter."
-    }];
+    EMA ema = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Exponential Moving Average filter."
+      }
+    ];
 
-    ArithmeticCombinator arithmetic_combinator = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Applies the given operator on input operands (signals) and emits the result."
-    }];
+    ArithmeticCombinator arithmetic_combinator = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Applies the given operator on input operands (signals) and emits the result."
+      }
+    ];
 
-    Decider decider = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Decider acts as a switch that emits one of the two signals based on the binary result of comparison operator on two operands."
-    }];
+    Decider decider = 4 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Decider acts as a switch that emits one of the two signals based on the binary result of comparison operator on two operands."
+      }
+    ];
 
-    ConcurrencyLimiter concurrency_limiter = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing)."
-    }];
+    ConcurrencyLimiter concurrency_limiter = 5 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing)."
+      }
+    ];
 
-    RateLimiter rate_limiter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Rate Limiter provides service protection by applying rate limiter."
-    }];
+    RateLimiter rate_limiter = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Rate Limiter provides service protection by applying rate limiter."
+      }
+    ];
 
-    PromQL promql = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Periodically runs a Prometheus query in the background and emits the result."
-    }];
+    PromQL promql = 7 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Periodically runs a Prometheus query in the background and emits the result."
+      }
+    ];
 
-    Constant constant = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Emits a constant signal."
-    }];
+    Constant constant = 8 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Emits a constant signal."
+      }
+    ];
 
-    Sqrt sqrt = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Takes an input signal and emits the square root of the input signal."
-    }];
+    Sqrt sqrt = 9 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Takes an input signal and emits the square root of the input signal."
+      }
+    ];
 
-    Extrapolator extrapolator = 10 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval."
-    }];
+    Extrapolator extrapolator = 10 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval."
+      }
+    ];
 
-    Max max = 11 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Emits the maximum of the input siganls."
-    }];
+    Max max = 11 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Emits the maximum of the input siganls."
+      }
+    ];
 
-    Min min = 12 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Emits the minimum of the input signals."
-    }];
+    Min min = 12 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Emits the minimum of the input signals."
+      }
+    ];
   }
 }
 
-  // Components are interconnected with each other via Ports.
+// Components are interconnected with each other via Ports.
 message Port {
-
-  string signal_name = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Name of the incoming or outgoing Signal on the Port."
-  }];
+  string signal_name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Name of the incoming or outgoing Signal on the Port."
+    }
+  ];
 }
 
-  // Describes the gradient values which is computed as follows: gradient = (setpoint)/(signal) \* tolerance.
-  // Limits gradient to range [min_gradient, max_gradient].
-  // Output: (gradient \* control_variable) + optimize.
+// Describes the gradient values which is computed as follows: gradient = (setpoint)/(signal) \* tolerance.
+// Limits gradient to range [min_gradient, max_gradient].
+// Output: (gradient \* control_variable) + optimize.
 message GradientController {
-    // Inputs for the Gradient Controller component.
+  // Inputs for the Gradient Controller component.
   message Ins {
+    Port signal = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Signal to be used for the gradient computation."
+      }
+    ];
 
-    Port signal = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Signal to be used for the gradient computation."
-    }];
+    Port setpoint = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Setpoint to be used for the gradient computation."
+      }
+    ];
 
-    Port setpoint = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Setpoint to be used for the gradient computation."
-    }];
+    Port optimize = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Optimize signal is added to the output of the gradient calculation."
+      }
+    ];
 
-    Port optimize = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Optimize signal is added to the output of the gradient calculation."
-    }];
+    Port max = 4 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Maximum value to limit the gradient."
+      }
+    ];
 
-    Port max = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Maximum value to limit the gradient."
-    }];
+    Port min = 5 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Minimum value to limit the gradient."
+      }
+    ];
 
-    Port min = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Minimum value to limit the gradient."
-    }];
-
-    Port control_variable = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Control variable is multiplied by the gradient to produce the output."
-    }];
+    Port control_variable = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Control variable is multiplied by the gradient to produce the output."
+      }
+    ];
   }
 
-    // Outputs for the Gradient Controller component.
+  // Outputs for the Gradient Controller component.
   message Outs {
-
-    Port output = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Computed desired value of the control variable."
-    }];
+    Port output = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Computed desired value of the control variable."
+      }
+    ];
   }
 
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Input ports of the Gradient Controller."
-  }];
+  Ins in_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Input ports of the Gradient Controller."
+    }
+  ];
 
-  Outs out_ports = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports of the Gradient Controller."
-  }];
+  Outs out_ports = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports of the Gradient Controller."
+    }
+  ];
 
-  double tolerance = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Tolerance of the gradient controller beyond which the correction is made."
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "gte=0.0"
+  double tolerance = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Tolerance of the gradient controller beyond which the correction is made."
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gte=0.0"
+        }
       }
     }
-  }]; // @gotags: validate:"gte=0.0"
+  ]; // @gotags: validate:"gte=0.0"
 
-  double min_gradient = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient]."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        number_value: -1.7976931348623157e+308
+  double min_gradient = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient]."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          number_value: -1.7976931348623157e+308
+        }
       }
     }
-  }]; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
+  ]; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
 
-  double max_gradient = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient]."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        number_value: 1.7976931348623157e+308
+  double max_gradient = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient]."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          number_value: 1.7976931348623157e+308
+        }
       }
     }
-  }]; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
+  ]; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
 }
 
-  // Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings.
-  // At any time EMA component operates in one of the following states:
-  // 1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
-  // If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
-  // 2. Normal state: The EMA is computed using following formula.
-  // If an invalid reading is received continuously for ema_window during the EMA stage, the last good EMA is emitted and the state gets reset back to Warm up state.
-  // The EMA for a series Y is calculated recursively as:
-  // EMAt = Y0 , t = 0
-  // EMAt = alpha \* Yt + (1 - alpha) \* EMAt-1 , t > 0
-  // The coefficient alpha represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.
-  // A higher alpha discounts older observations faster.
-  // The alpha is computed using ema_window: alpha = 2 / (N + 1). Where, N = ema_window / evalutation_period.
+// Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings.
+// At any time EMA component operates in one of the following states:
+// 1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
+// If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+// 2. Normal state: The EMA is computed using following formula.
+// If an invalid reading is received continuously for ema_window during the EMA stage, the last good EMA is emitted and the state gets reset back to Warm up state.
+// The EMA for a series Y is calculated recursively as:
+// EMAt = Y0 , t = 0
+// EMAt = alpha \* Yt + (1 - alpha) \* EMAt-1 , t > 0
+// The coefficient alpha represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.
+// A higher alpha discounts older observations faster.
+// The alpha is computed using ema_window: alpha = 2 / (N + 1). Where, N = ema_window / evalutation_period.
 message EMA {
-
-    // Inputs for the EMA component.
+  // Inputs for the EMA component.
   message Ins {
+    Port input = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Input signal to be used for the EMA computation."
+      }
+    ];
 
-    Port input = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Input signal to be used for the EMA computation."
-    }];
+    Port max_envelope = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Upper bound of the moving average."
+      }
+    ];
 
-    Port max_envelope = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Upper bound of the moving average."
-    }];
-
-    Port min_envelope = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Lower bound of the moving average."
-    }];
+    Port min_envelope = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Lower bound of the moving average."
+      }
+    ];
   }
 
-    // Outputs for the EMA component.
+  // Outputs for the EMA component.
   message Outs {
-
-    Port output = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Exponential moving average of the series of reading as an output signal."
-    }];
+    Port output = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Exponential moving average of the series of reading as an output signal."
+      }
+    ];
   }
 
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Input ports for the EMA component."
-  }];
+  Ins in_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Input ports for the EMA component."
+    }
+  ];
 
-  Outs out_ports = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports for the EMA component."
-  }];
+  Outs out_ports = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports for the EMA component."
+    }
+  ];
 
-  google.protobuf.Duration ema_window = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Duration of EMA sampling window."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        string_value: "5s"
+  google.protobuf.Duration ema_window = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Duration of EMA sampling window."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "5s"
+        }
       }
     }
-  }]; // @gotags: default:"5s"
+  ]; // @gotags: default:"5s"
 
-  google.protobuf.Duration warm_up_window = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Duration of EMA warming up window.\nThe initial value of the EMA is the average of signal readings received during the warm up window."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        string_value: "0s"
+  google.protobuf.Duration warm_up_window = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Duration of EMA warming up window.\nThe initial value of the EMA is the average of signal readings received during the warm up window."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "0s"
+        }
       }
     }
-  }]; // @gotags: default:"0s"
+  ]; // @gotags: default:"0s"
 
-  double correction_factor_on_min_envelope_violation = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Correction factor to apply on the output value if its in violation of the min envelope."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        number_value: 1
+  double correction_factor_on_min_envelope_violation = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Correction factor to apply on the output value if its in violation of the min envelope."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          number_value: 1
+        }
+      }
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gte=1.0"
+        }
       }
     }
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "gte=1.0"
-      }
-    }
-  }]; // @gotags: validate:"gte=1.0" default:"1.0"
+  ]; // @gotags: validate:"gte=1.0" default:"1.0"
 
-  double correction_factor_on_max_envelope_violation = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Correction factor to apply on the output value if its in violation of the max envelope."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        number_value: 1
+  double correction_factor_on_max_envelope_violation = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Correction factor to apply on the output value if its in violation of the max envelope."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          number_value: 1
+        }
+      }
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gte=0,lte=1.0"
+        }
       }
     }
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "gte=0,lte=1.0"
-      }
-    }
-  }]; // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
+  ]; // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
 }
 
-  // Type of combinator that computes the arithmetic operation on the operand signals.
-  // The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
+// Type of combinator that computes the arithmetic operation on the operand signals.
+// The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
 message ArithmeticCombinator {
-
-    // Inputs for the Arithmetic Combinator component.
+  // Inputs for the Arithmetic Combinator component.
   message Ins {
+    Port lhs = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Left hand side of the arithmetic operation."
+      }
+    ];
 
-    Port lhs = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Left hand side of the arithmetic operation."
-    }];
-
-    Port rhs = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Right hand side of the arithmetic operation."
-    }];
+    Port rhs = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Right hand side of the arithmetic operation."
+      }
+    ];
   }
-    // Outputs for the Arithmetic Combinator component.
+  // Outputs for the Arithmetic Combinator component.
   message Outs {
-
-    Port output = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Result of arithmetic operation."
-    }];
+    Port output = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Result of arithmetic operation."
+      }
+    ];
   }
 
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Input ports for the Arithmetic Combinator component."
-  }];
+  Ins in_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Input ports for the Arithmetic Combinator component."
+    }
+  ];
 
-  Outs out_ports = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports for the Arithmetic Combinator component."
-  }];
+  Outs out_ports = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports for the Arithmetic Combinator component."
+    }
+  ];
 
-  string operator = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Operator of the arithmetic operation."
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "oneof=add sub mul div xor lshift rshift"
+  string operator = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Operator of the arithmetic operation."
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "oneof=add sub mul div xor lshift rshift"
+        }
       }
     }
-  }]; // @gotags: validate:"oneof=add sub mul div xor lshift rshift"
+  ]; // @gotags: validate:"oneof=add sub mul div xor lshift rshift"
 }
 
-  // Type of combinator that computes the comparison operation on lhs and rhs signals and switches between on_true and on_false signals based on the result of the comparison.
-  // The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
-  // This component also supports time-based response, i.e. the output transitions between on_true or on_false signal if the decider condition is true or false for at least "positive_for" or "negative_for" duration.
-  // If true_for and false_for durations are zero then the transitions are instantaneous.
+// Type of combinator that computes the comparison operation on lhs and rhs signals and switches between on_true and on_false signals based on the result of the comparison.
+// The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
+// This component also supports time-based response, i.e. the output transitions between on_true or on_false signal if the decider condition is true or false for at least "positive_for" or "negative_for" duration.
+// If true_for and false_for durations are zero then the transitions are instantaneous.
 message Decider {
-
-    // Inputs for the Decider component.
+  // Inputs for the Decider component.
   message Ins {
-
-    Port lhs = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Left hand side input signal for the comparison operation."
-    }];
-    Port rhs = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Right hand side input signal for the comparison operation."
-    }];
-    Port on_true = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Output signal when the result of the operation is true."
-    }];
-    Port on_false = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Output signal when the result of the operation is false."
-    }];
+    Port lhs = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Left hand side input signal for the comparison operation."
+      }
+    ];
+    Port rhs = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Right hand side input signal for the comparison operation."
+      }
+    ];
+    Port on_true = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Output signal when the result of the operation is true."
+      }
+    ];
+    Port on_false = 4 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Output signal when the result of the operation is false."
+      }
+    ];
   }
 
-    // Outputs for the Decider component.
+  // Outputs for the Decider component.
   message Outs {
-
-    Port output = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Selected signal (on_true or on_false)."
-    }];
+    Port output = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Selected signal (on_true or on_false)."
+      }
+    ];
   }
 
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Input ports for the Decider component."
-  }];
+  Ins in_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Input ports for the Decider component."
+    }
+  ];
 
-  Outs out_ports = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports for the Decider component."
-  }];
+  Outs out_ports = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports for the Decider component."
+    }
+  ];
 
-  string operator = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Comparison operator that computes operation on lhs and rhs input signals."
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "oneof=gt lt gte lte eq neq"
+  string operator = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Comparison operator that computes operation on lhs and rhs input signals."
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "oneof=gt lt gte lte eq neq"
+        }
       }
     }
-  }]; // @gotags: validate:"oneof=gt lt gte lte eq neq"
+  ]; // @gotags: validate:"oneof=gt lt gte lte eq neq"
 
-  google.protobuf.Duration true_for = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Duration of time to wait before a transition to true state.\nIf the duration is zero, the transition will happen instantaneously."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        string_value: "0s"
+  google.protobuf.Duration true_for = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Duration of time to wait before a transition to true state.\nIf the duration is zero, the transition will happen instantaneously."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "0s"
+        }
       }
     }
-  }]; // @gotags: default:"0s"
+  ]; // @gotags: default:"0s"
 
-  google.protobuf.Duration false_for = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Duration of time to wait before a transition to false state.\nIf the duration is zero, the transition will happen instantaneously."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        string_value: "0s"
+  google.protobuf.Duration false_for = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Duration of time to wait before a transition to false state.\nIf the duration is zero, the transition will happen instantaneously."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "0s"
+        }
       }
     }
-  }]; // @gotags: default:"0s"
+  ]; // @gotags: default:"0s"
 }
 
 message RateLimiter {
@@ -453,102 +552,115 @@ message RateLimiter {
   LazySyncConfig lazy_sync_config = 6;
 }
 
-  // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection. It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles. Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
+// Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection. It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles. Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
 message ConcurrencyLimiter {
-
-  Scheduler scheduler = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Weighted Fair Queuing based workfload scheduler."
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "required"
+  Scheduler scheduler = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Weighted Fair Queuing based workfload scheduler."
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
+        }
       }
     }
-  }]; // @gotags: validate:"required"
+  ]; // @gotags: validate:"required"
 
   oneof actuation_strategy {
-    LoadShedActuator load_shed_actuator = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Actuator based on load shedding a portion of requests."
-    }];
+    LoadShedActuator load_shed_actuator = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Actuator based on load shedding a portion of requests."
+      }
+    ];
   }
 }
 
-  // Weighted Fair Queuing based workload scheduler.
+// Weighted Fair Queuing based workload scheduler.
 message Scheduler {
-
-    // Configuration that provides scheduling parameters such as priority for the given workloads.
+  // Configuration that provides scheduling parameters such as priority for the given workloads.
   message WorkloadConfig {
-
-      // Workload defines a class of requests that preferably have similar properties such as response latency.
+    // Workload defines a class of requests that preferably have similar properties such as response latency.
     message Workload {
-
-      uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level."
-        extensions: {
-          key: "x-go-validate"
-          value: {
-            string_value: "gte=0,lte=255"
+      uint32 priority = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level."
+          extensions: {
+            key: "x-go-validate"
+            value: {
+              string_value: "gte=0,lte=255"
+            }
           }
         }
-      }]; // @gotags: validate:"gte=0,lte=255"
+      ]; // @gotags: validate:"gte=0,lte=255"
 
-      uint64 tokens = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.\n"
-        extensions: {
-          key: "x-go-default"
-          value: {
-            number_value: 1
+      uint64 tokens = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.\n"
+          extensions: {
+            key: "x-go-default"
+            value: {
+              number_value: 1
+            }
           }
         }
-      }]; // @gotags: default:"1"
+      ]; // @gotags: default:"1"
 
-      google.protobuf.Duration timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled."
-        extensions: {
-          key: "x-go-default"
-          value: {
-            string_value: "0.005s"
+      google.protobuf.Duration timeout = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled."
+          extensions: {
+            key: "x-go-default"
+            value: {
+              string_value: "0.005s"
+            }
           }
         }
-      }]; // @gotags: default:"0.005s"
+      ]; // @gotags: default:"0.005s"
 
-      string label_value = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Value of label for specified workload label key."
-      }];
+      string label_value = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Value of label for specified workload label key."
+        }
+      ];
     }
 
-      // Workload defines a class of requests that preferably have similar properties such as response latency.
+    // Workload defines a class of requests that preferably have similar properties such as response latency.
     message DefaultWorkload {
-
-      uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level."
-        extensions: {
-          key: "x-go-validate"
-          value: {
-            string_value: "gte=0,lte=255"
+      uint32 priority = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level."
+          extensions: {
+            key: "x-go-validate"
+            value: {
+              string_value: "gte=0,lte=255"
+            }
           }
         }
-      }]; // @gotags: validate:"gte=0,lte=255"
+      ]; // @gotags: validate:"gte=0,lte=255"
 
-      uint64 tokens = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.\n"
-        extensions: {
-          key: "x-go-default"
-          value: {
-            number_value: 1
+      uint64 tokens = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.\n"
+          extensions: {
+            key: "x-go-default"
+            value: {
+              number_value: 1
+            }
           }
         }
-      }]; // @gotags: default:"1"
+      ]; // @gotags: default:"1"
 
-      google.protobuf.Duration timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled."
-        extensions: {
-          key: "x-go-default"
-          value: {
-            string_value: "0.005s"
+      google.protobuf.Duration timeout = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled."
+          extensions: {
+            key: "x-go-default"
+            value: {
+              string_value: "0.005s"
+            }
           }
         }
-      }]; // @gotags: default:"0.005s"
+      ]; // @gotags: default:"0.005s"
     }
 
     // TODO: this entire section is being reworked by @TanveerGill
@@ -562,25 +674,32 @@ message Scheduler {
     repeated Workload workloads = 4;
   }
 
-    // Output for the Scheduler component.
+  // Output for the Scheduler component.
   message Outs {
+    Port accepted_concurrency = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Accepted concurrency is the number of accepted tokens/sec."
+      }
+    ];
 
-    Port accepted_concurrency = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Accepted concurrency is the number of accepted tokens/sec."
-    }];
-
-    Port incoming_concurrency = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Incoming concurrency is the number of incoming tokens/sec."
-    }];
+    Port incoming_concurrency = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Incoming concurrency is the number of incoming tokens/sec."
+      }
+    ];
   }
 
-  Outs out_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports for the Scheduler component."
-  }];
+  Outs out_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports for the Scheduler component."
+    }
+  ];
 
-  Selector selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Selector decides for which service or flows the scheduler will be applied."
-  }];
+  Selector selector = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Selector decides for which service or flows the scheduler will be applied."
+    }
+  ];
 
   // TODO: this is getting reworked.
   string fairness_key = 3;
@@ -588,202 +707,239 @@ message Scheduler {
   WorkloadConfig workload_config = 4;
 }
 
-  // Takes the load shed factor input signal and publishes it to the schedulers in the data-plane.
+// Takes the load shed factor input signal and publishes it to the schedulers in the data-plane.
 message LoadShedActuator {
-
-    // Input for the Load Shed Actuator component.
+  // Input for the Load Shed Actuator component.
   message Ins {
-
-    Port load_shed_factor = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Load shedding factor is a fraction of incoming concurrency (tokens * requests) that needs to be dropped."
-    }];
+    Port load_shed_factor = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Load shedding factor is a fraction of incoming concurrency (tokens * requests) that needs to be dropped."
+      }
+    ];
   }
 
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Input ports for the Load Shed Actuator component."
-  }];
+  Ins in_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Input ports for the Load Shed Actuator component."
+    }
+  ];
 }
 
-  // Component that runs a Prometheus query periodically and returns the result as an output signal.
+// Component that runs a Prometheus query periodically and returns the result as an output signal.
 message PromQL {
-
-    // Output for the PromQL component.
+  // Output for the PromQL component.
   message Outs {
-
-    Port output = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The result of the Prometheus query as an output signal."
-    }];
+    Port output = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "The result of the Prometheus query as an output signal."
+      }
+    ];
   }
 
-  Outs out_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports for the PromQL component."
-  }];
+  Outs out_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports for the PromQL component."
+    }
+  ];
 
-  string query_string = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Describes the Prometheus query to be run."
-  }];
+  string query_string = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Describes the Prometheus query to be run."
+    }
+  ];
 
-  google.protobuf.Duration evaluation_interval = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Describes the interval between successive evaluations of the Prometheus query."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        string_value: "10s"
+  google.protobuf.Duration evaluation_interval = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Describes the interval between successive evaluations of the Prometheus query."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "10s"
+        }
       }
     }
-  }]; // @gotags: default:"10s"
+  ]; // @gotags: default:"10s"
 }
 
-  // Component that emits a constant value as an output signal.
+// Component that emits a constant value as an output signal.
 message Constant {
-
-    // Outputs for the Constant component.
+  // Outputs for the Constant component.
   message Outs {
-
-    Port output = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The constant value is emitted to the output port."
-    }];
+    Port output = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "The constant value is emitted to the output port."
+      }
+    ];
   }
 
-  Outs out_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports for the Constant component."
-  }];
+  Outs out_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports for the Constant component."
+    }
+  ];
 
-  double value = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "The constant value to be emitted."
-  }];
+  double value = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The constant value to be emitted."
+    }
+  ];
 }
 
-  // Takes an input signal and emits the square root of it multiplied by scale as an output.
-  // Sqrt: output = sqrt(input) * scale.
+// Takes an input signal and emits the square root of it multiplied by scale as an output.
+// Sqrt: output = sqrt(input) * scale.
 message Sqrt {
-
-    // Inputs for the Sqrt component.
+  // Inputs for the Sqrt component.
   message Ins {
-
-    Port input = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Input signal."
-    }];
+    Port input = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Input signal."
+      }
+    ];
   }
 
-    // Outputs for the Sqrt component.
+  // Outputs for the Sqrt component.
   message Outs {
-
-    Port output = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Output signal."
-    }];
+    Port output = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Output signal."
+      }
+    ];
   }
 
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Input ports for the Sqrt component."
-  }];
+  Ins in_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Input ports for the Sqrt component."
+    }
+  ];
 
-  Outs out_ports = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports for the Sqrt component."
-  }];
+  Outs out_ports = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports for the Sqrt component."
+    }
+  ];
 
-  double scale = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Scaling factor to be multiplied with the square root of the input signal."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        number_value: 1
+  double scale = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Scaling factor to be multiplied with the square root of the input signal."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          number_value: 1
+        }
       }
     }
-  }]; // @gotags default:"1.0"
+  ]; // @gotags default:"1.0"
 }
 
-  // Extrapolates the input signal by repeating the last valid value during the period in which it is invalid. It does so until maximum_extrapolation_interval is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+// Extrapolates the input signal by repeating the last valid value during the period in which it is invalid. It does so until maximum_extrapolation_interval is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 message Extrapolator {
-    // Inputs for the Extrapolator component.
+  // Inputs for the Extrapolator component.
   message Ins {
-
-    Port input = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Input signal for the Extrapolator component."
-    }];
+    Port input = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Input signal for the Extrapolator component."
+      }
+    ];
   }
 
-    // Outputs for the Extrapolator component.
+  // Outputs for the Extrapolator component.
   message Outs {
-
-    Port output = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Extrapolated signal."
-    }];
+    Port output = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Extrapolated signal."
+      }
+    ];
   }
 
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Input ports for the Extrapolator component."
-  }];
+  Ins in_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Input ports for the Extrapolator component."
+    }
+  ];
 
-  Outs out_ports = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports for the Extrapolator component."
-  }];
+  Outs out_ports = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports for the Extrapolator component."
+    }
+  ];
 
-  google.protobuf.Duration max_extrapolation_interval = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Maximum time interval to repeat the last valid value of input signal."
-    extensions: {
-      key: "x-go-default"
-      value: {
-        string_value: "10s"
+  google.protobuf.Duration max_extrapolation_interval = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Maximum time interval to repeat the last valid value of input signal."
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "10s"
+        }
       }
     }
-  }]; // @gotags: default:"10s"
+  ]; // @gotags: default:"10s"
 }
 
-  // Takes a list of input signals and emits the signal with the maximum value.
-  // Max: output = max([]inputs).
+// Takes a list of input signals and emits the signal with the maximum value.
+// Max: output = max([]inputs).
 message Max {
-
-    // Inputs for the Max component.
+  // Inputs for the Max component.
   message Ins {
-
-    repeated Port inputs = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Array of input signals."
-    }];
+    repeated Port inputs = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of input signals."
+      }
+    ];
   }
 
-    // Output for the Max component.
+  // Output for the Max component.
   message Outs {
-
-    Port output = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Signal with maximum value as an output signal."
-    }];
+    Port output = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Signal with maximum value as an output signal."
+      }
+    ];
   }
 
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Input ports for the Max component."
-  }];
+  Ins in_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Input ports for the Max component."
+    }
+  ];
 
-  Outs out_ports = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports for the Max component."
-  }];
+  Outs out_ports = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports for the Max component."
+    }
+  ];
 }
 
-  // Takes an array of input signals and emits the signal with the minimum value.
-  // Min: output = min([]inputs).
+// Takes an array of input signals and emits the signal with the minimum value.
+// Min: output = min([]inputs).
 message Min {
-
-    // Inputs for the Min component.
+  // Inputs for the Min component.
   message Ins {
-
-    repeated Port inputs = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Array of input signals."
-    }];
+    repeated Port inputs = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of input signals."
+      }
+    ];
   }
 
-    // Output ports for the Min component.
+  // Output ports for the Min component.
   message Outs {
-
-    Port output = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Signal with minimum value as an output signal."
-    }];
+    Port output = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Signal with minimum value as an output signal."
+      }
+    ];
   }
 
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Input ports for the Min component."
-  }];
+  Ins in_ports = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Input ports for the Min component."
+    }
+  ];
 
-  Outs out_ports = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Output ports for the Min component."
-  }];
+  Outs out_ports = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Output ports for the Min component."
+    }
+  ];
 }
