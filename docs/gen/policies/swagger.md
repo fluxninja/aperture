@@ -134,7 +134,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>enabled</dt>
 <dd>
 
-(bool)
+(bool, default: `true`)
 
 </dd>
 </dl>
@@ -142,7 +142,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>num_sync</dt>
 <dd>
 
-(int64) Number of times to lazy sync within the limit_reset_interval
+(int64, `gt=0`, default: `5`) Number of times to lazy sync within the limit_reset_interval.
 
 </dd>
 </dl>
@@ -159,7 +159,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>label_value</dt>
 <dd>
 
-(string)
+(string, `required`)
 
 </dd>
 </dl>
@@ -167,7 +167,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>limit_scale_factor</dt>
 <dd>
 
-(float64)
+(float64, default: `1`)
 
 </dd>
 </dl>
@@ -184,7 +184,7 @@ Configuration that provides scheduling parameters such as priority for the given
 <dt>auto_tokens</dt>
 <dd>
 
-(bool)
+(bool, default: `true`)
 
 </dd>
 </dl>
@@ -208,8 +208,8 @@ Configuration that provides scheduling parameters such as priority for the given
 <dt>workloads</dt>
 <dd>
 
-([[]WorkloadConfigWorkload](#workload-config-workload)) list of workloads
-workload can describe priority, tokens (if auto_tokens are set to false) and timeout
+([[]WorkloadConfigWorkload](#workload-config-workload)) List of workloads.
+Workload can describe priority, tokens (if auto_tokens are set to false) and timeout.
 
 </dd>
 </dl>
@@ -226,8 +226,7 @@ Workload defines a class of requests that preferably have similar properties suc
 <dt>priority</dt>
 <dd>
 
-(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
-Priority level ranges from 0 to 255.
+(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.
 Higher numbers means higher priority level.
 
 </dd>
@@ -236,7 +235,8 @@ Higher numbers means higher priority level.
 <dt>timeout</dt>
 <dd>
 
-(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
+(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens.
+This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
 
 </dd>
 </dl>
@@ -244,8 +244,8 @@ Higher numbers means higher priority level.
 <dt>tokens</dt>
 <dd>
 
-(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.
-
+(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+This override is applicable only if auto_tokens is set to false.
 
 </dd>
 </dl>
@@ -270,8 +270,7 @@ Workload defines a class of requests that preferably have similar properties suc
 <dt>priority</dt>
 <dd>
 
-(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
-Priority level ranges from 0 to 255.
+(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.
 Higher numbers means higher priority level.
 
 </dd>
@@ -280,7 +279,8 @@ Higher numbers means higher priority level.
 <dt>timeout</dt>
 <dd>
 
-(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
+(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens.
+This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
 
 </dd>
 </dl>
@@ -288,8 +288,8 @@ Higher numbers means higher priority level.
 <dt>tokens</dt>
 <dd>
 
-(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.
-
+(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+This override is applicable only if auto_tokens is set to false.
 
 </dd>
 </dl>
@@ -434,7 +434,8 @@ The looped signals are saved in the tick they are generated and served in the su
 <dt>gradient_controller</dt>
 <dd>
 
-([V1GradientController](#v1-gradient-controller)) Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied. This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
+([V1GradientController](#v1-gradient-controller)) Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 
 </dd>
 </dl>
@@ -482,7 +483,9 @@ The looped signals are saved in the tick they are generated and served in the su
 ### <span id="v1-concurrency-limiter"></span> v1ConcurrencyLimiter
 
 
-Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection. It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles. Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
+Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
+It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
 
 
 
@@ -755,8 +758,7 @@ The alpha is computed using ema_window: alpha = 2 / (N + 1). Where, N = ema_wind
 <dt>warm_up_window</dt>
 <dd>
 
-(string, default: `0s`) Duration of EMA warming up window.
-The initial value of the EMA is the average of signal readings received during the warm up window.
+(string, default: `0s`) Duration of EMA warming up window.\nThe initial value of the EMA is the average of signal readings received during the warm up window.
 
 </dd>
 </dl>
@@ -839,7 +841,8 @@ Label selector expression of the equal form "label == value".
 ### <span id="v1-extrapolator"></span> v1Extrapolator
 
 
-Extrapolates the input signal by repeating the last valid value during the period in which it is invalid. It does so until maximum_extrapolation_interval is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
+It does so until maximum_extrapolation_interval is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 
 
 
@@ -1475,7 +1478,7 @@ Output for the PromQL component.
 <dt>in_ports</dt>
 <dd>
 
-([V1RateLimiterIns](#v1-rate-limiter-ins))
+([V1RateLimiterIns](#v1-rate-limiter-ins), `required`)
 
 </dd>
 </dl>
@@ -1483,7 +1486,7 @@ Output for the PromQL component.
 <dt>label_key</dt>
 <dd>
 
-(string)
+(string, `required`)
 
 </dd>
 </dl>
@@ -1499,7 +1502,7 @@ Output for the PromQL component.
 <dt>limit_reset_interval</dt>
 <dd>
 
-(string)
+(string, default: `60s`)
 
 </dd>
 </dl>
@@ -1515,7 +1518,7 @@ Output for the PromQL component.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector))
+([V1Selector](#v1-selector), `required`)
 
 </dd>
 </dl>
@@ -1528,7 +1531,7 @@ Output for the PromQL component.
 <dt>limit</dt>
 <dd>
 
-([V1Port](#v1-port)) negative limit means no limit is applied
+([V1Port](#v1-port), `required`, default: `-1`) negative limit means no limit is applied.
 
 </dd>
 </dl>
