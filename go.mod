@@ -18,7 +18,7 @@ require (
 	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/go-co-op/gocron v1.15.2-0.20220725154335-c667f3306226
+	github.com/go-co-op/gocron v1.16.1
 	github.com/go-logr/zerologr v1.2.2
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/go-swagger/go-swagger v0.29.0
