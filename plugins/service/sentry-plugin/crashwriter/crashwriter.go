@@ -1,4 +1,4 @@
-package panichandler
+package crashwriter
 
 import (
 	"io"
@@ -11,6 +11,17 @@ import (
 
 const logCountLimit = 100
 
+var globalCrashWriter = getCrashWriter()
+
+// GetCrashWriter returns a global crash writer.
+func GetCrashWriter() *CrashWriter {
+	return globalCrashWriter
+}
+
+func getCrashWriter() *CrashWriter {
+	return NewCrashWriter(logCountLimit)
+}
+
 // CrashWriter defines a crash writer with buffer to store the logs when the app crashes.
 type CrashWriter struct {
 	crashLock sync.Mutex
@@ -18,6 +29,15 @@ type CrashWriter struct {
 	buffer *queue.Queue
 	// logCountLimit limits the number of lines of last logs to capture
 	logCountLimit int
+}
+
+// NewCrashWriter returns a new crash writer with new log buffer.
+func NewCrashWriter(limit int) *CrashWriter {
+	crashWriter := &CrashWriter{
+		buffer:        queue.New(),
+		logCountLimit: limit,
+	}
+	return crashWriter
 }
 
 // Write writes the crash logs to the buffer and updates CrashWriter's buffer status.
@@ -71,24 +91,4 @@ func CloseCrashFileWriter(lg *lumberjack.Logger) {
 	_ = lg.Rotate()
 	_ = lg.Close()
 	_ = os.Remove(filename)
-}
-
-var globalCrashWriter = getCrashWriter()
-
-// GetCrashWriter returns a global crash writer.
-func GetCrashWriter() *CrashWriter {
-	return globalCrashWriter
-}
-
-func getCrashWriter() *CrashWriter {
-	return NewCrashWriter(logCountLimit)
-}
-
-// NewCrashWriter returns a new crash writer with new log buffer.
-func NewCrashWriter(limit int) *CrashWriter {
-	crashWriter := &CrashWriter{
-		buffer:        queue.New(),
-		logCountLimit: limit,
-	}
-	return crashWriter
 }

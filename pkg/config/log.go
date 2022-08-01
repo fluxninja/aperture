@@ -16,6 +16,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/plugins/service/sentry-plugin/crashwriter"
 )
 
 // DefaultLogFilePath is the default path for the log files to be stored.
@@ -181,7 +182,7 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	}
 
 	// append ring buffer crash log writer
-	writers = append(writers, panichandler.GetCrashWriter())
+	writers = append(writers, crashwriter.GetCrashWriter())
 
 	multi := zerolog.MultiLevelWriter(writers...)
 

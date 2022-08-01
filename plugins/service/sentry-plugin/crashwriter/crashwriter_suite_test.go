@@ -1,4 +1,4 @@
-package panichandler_test
+package crashwriter_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestPanic(t *testing.T) {
+func TestCrashWriter(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Panic Suite")
+	RunSpecs(t, "CrashWriter Suite")
 }

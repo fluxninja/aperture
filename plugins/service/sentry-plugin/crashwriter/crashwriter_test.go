@@ -1,16 +1,16 @@
-package panichandler_test
+package crashwriter_test
 
 import (
 	"bytes"
 
-	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/plugins/service/sentry-plugin/crashwriter"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Crash-Writer", func() {
 	It("flushes logs within limit, writes all the logs", func() {
-		crashWriter := panichandler.NewCrashWriter(5)
+		crashWriter := crashwriter.NewCrashWriter(5)
 		data := [][]byte{[]byte("log 0 "), []byte("log 1 "), []byte("log 2 "), []byte("log 3 ")}
 		for _, d := range data {
 			_, err := crashWriter.Write(d)
@@ -23,7 +23,7 @@ var _ = Describe("Crash-Writer", func() {
 	})
 
 	It("flushes logs over limit, writes last 5 logs", func() {
-		crashWriter := panichandler.NewCrashWriter(5)
+		crashWriter := crashwriter.NewCrashWriter(5)
 		data := [][]byte{[]byte("log 0 "), []byte("log 1 "), []byte("log 2 "), []byte("log 3 "), []byte("log 4 "), []byte("log 5 ")}
 		for _, d := range data {
 			_, err := crashWriter.Write(d)
@@ -36,7 +36,7 @@ var _ = Describe("Crash-Writer", func() {
 	})
 
 	It("flushes logs over small limit, writes only the last log", func() {
-		crashWriter := panichandler.NewCrashWriter(1)
+		crashWriter := crashwriter.NewCrashWriter(1)
 		data := [][]byte{[]byte("log 0 "), []byte("log 1 "), []byte("log 2 "), []byte("log 3 "), []byte("log 4 "), []byte("log 5 ")}
 		for _, d := range data {
 			_, err := crashWriter.Write(d)

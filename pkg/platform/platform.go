@@ -35,6 +35,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/watchdog"
+	"github.com/fluxninja/aperture/plugins/service/sentry-plugin/crashwriter"
 )
 
 func init() {
@@ -216,17 +217,17 @@ func stop(app *fx.App) {
 var defaultDiagnosticDir = path.Join(config.DefaultAssetsDirectory, "diagnostic")
 
 // OnCrash is the panic handler.
-func OnCrash(e interface{}, s panichandler.Callstack) {
+func OnCrash(interface{}, panichandler.Callstack) {
 	log.Debug().Msg("Crash Reporter Registered")
 	_ = os.MkdirAll(defaultDiagnosticDir, os.ModePerm)
 	diagnosticDir := path.Join(defaultDiagnosticDir, time.Now().Format(time.RFC3339))
 
 	// Crash Log writer
 	fName := "/crash.log"
-	crashlogger := panichandler.NewCrashFileWriter(filepath.Join(diagnosticDir, fName))
-	crashLogWriter := panichandler.GetCrashWriter()
+	crashlogger := crashwriter.NewCrashFileWriter(filepath.Join(diagnosticDir, fName))
+	crashLogWriter := crashwriter.GetCrashWriter()
 	crashLogWriter.Flush(crashlogger)
-	panichandler.CloseCrashFileWriter(crashlogger)
+	crashwriter.CloseCrashFileWriter(crashlogger)
 
 	// Dump Status Registry
 	groupStatus := platform.statusRegistry.Get("")
