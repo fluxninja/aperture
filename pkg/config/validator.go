@@ -28,7 +28,7 @@ func ValidateStruct(rawVal interface{}) error {
 	err := globalValidate.Struct(rawVal)
 	if err != nil {
 		if _, ok := err.(*validator.InvalidValidationError); ok {
-			log.Fatal().Err(err).Msg("InvalidValidationError!")
+			log.Panic().Err(err).Msg("InvalidValidationError!")
 		} else if _, ok := err.(validator.ValidationErrors); ok {
 			for _, err := range err.(validator.ValidationErrors) {
 				errorStr := fmt.Sprintf("ValidationError<"+

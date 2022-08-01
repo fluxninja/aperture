@@ -85,7 +85,7 @@ func SetStdLogger(lg Logger) {
 func NewLogger(w io.Writer, useDiode bool, levelString string) Logger {
 	level, err := zerolog.ParseLevel(levelString)
 	if err != nil {
-		log.Fatal().Err(err).Str("level", level.String()).Msg("Unable to parse logger level")
+		log.Panic().Err(err).Str("level", level.String()).Msg("Unable to parse logger level")
 	}
 
 	var wr io.Writer
@@ -321,8 +321,7 @@ func (lg *Logger) Fatal() *zerolog.Event {
 	return lg.logger.Panic()
 }
 
-// Fatal starts a new message with fatal level. The os.Exit(1) function
-// is called by the Msg method.
+// Fatal starts a new message with fatal level.
 //
 // You must call Msg on the returned event in order to send the event.
 func Fatal() *zerolog.Event {

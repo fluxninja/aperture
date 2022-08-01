@@ -26,7 +26,7 @@ func Module() fx.Option {
 		httpclient.ClientConstructor{Name: "heartbeats-http-client", Key: pluginconfig.PluginConfigKey + ".client_http"}.Annotate(),
 		fx.Provide(Provide),
 		PeersWatcherModule(),
-		jobs.JobGroupConstructor{Group: heartbeatsGroup}.Annotate(),
+		jobs.JobGroupConstructor{Name: heartbeatsGroup}.Annotate(),
 		fx.Invoke(Invoke),
 	)
 }

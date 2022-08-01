@@ -41,7 +41,7 @@ func rateLimiterModule() fx.Option {
 				fx.ResultTags(fxNameTag),
 			),
 		),
-		jobs.JobGroupConstructor{Group: rateLimiterStatusRoot}.Annotate(),
+		jobs.JobGroupConstructor{Name: rateLimiterStatusRoot}.Annotate(),
 		fx.Invoke(
 			fx.Annotate(
 				setupRateLimiterFactory,
