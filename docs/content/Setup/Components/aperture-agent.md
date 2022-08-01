@@ -1,6 +1,6 @@
 ---
 title: Aperture Agent
-slug: /architecture/components/aperture-agent
+slug: /setup/components/aperture-agent
 description: Aperture Agent
 keywords:
   - agent
