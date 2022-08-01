@@ -60,7 +60,7 @@ func setupPolicyFxDriver(
 	lifecycle fx.Lifecycle,
 	registry *status.Registry,
 ) error {
-	circuitJobGroup, err := jobs.NewJobGroup(policyapi.PoliciesRoot, registry, 0, jobs.RescheduleMode, nil)
+	circuitJobGroup, err := jobs.NewJobGroup(policyapi.PoliciesRoot+".circuit_jobs", registry, 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create job group")
 		return err
