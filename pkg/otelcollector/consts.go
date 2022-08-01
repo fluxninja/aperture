@@ -1,7 +1,5 @@
 package otelcollector
 
-// TODO (hasit): These are commong envoy keys that need to be moved to a common package
-
 const (
 	// ControlPointLabel describes control point which reported traffic.
 	// May be 'ingress', 'egress' or 'feature'.
@@ -78,4 +76,17 @@ const (
 	// ServicesLabel describes services to which metrics refer. This is comma-separated
 	// list.
 	ServicesLabel = "services"
+)
+
+var (
+	// MultiValueFields is a map of fields which should be sent to Kafka and then
+	// to Druid as a multi value field i.e. which ones should be unmarshalled to a
+	// list.
+	MultiValueFields map[string]struct{} = map[string]struct{}{
+		RateLimitersLabel:                {},
+		DroppingRateLimitersLabel:        {},
+		ConcurrencyLimitersLabel:         {},
+		DroppingConcurrencyLimitersLabel: {},
+		FluxMetersLabel:                  {},
+	}
 )
