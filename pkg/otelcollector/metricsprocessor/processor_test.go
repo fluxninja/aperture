@@ -37,10 +37,17 @@ var _ = Describe("Metrics Processor", func() {
 	})
 
 	DescribeTable("Processing logs",
-		func(controlPoint string, decisions []*flowcontrolv1.LimiterDecision, expectedErr error, expectedMetrics string, expectedLabels map[string]string) {
+		func(
+			controlPoint string,
+			decisions []*flowcontrolv1.LimiterDecision,
+			fluxMeters []*flowcontrolv1.FluxMeter,
+			expectedErr error,
+			expectedMetrics string,
+			expectedLabels map[string]string,
+		) {
 			ctx := context.Background()
 
-			logs := someLogs(decisions, controlPoint)
+			logs := someLogs(decisions, fluxMeters, controlPoint)
 			modifiedLogs, err := processor.ConsumeLogs(ctx, logs)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -78,6 +85,7 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 			},
+			[]*flowcontrolv1.FluxMeter{},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -111,6 +119,7 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 			},
+			[]*flowcontrolv1.FluxMeter{},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -166,6 +175,7 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 			},
+			[]*flowcontrolv1.FluxMeter{},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -205,10 +215,17 @@ var _ = Describe("Metrics Processor", func() {
 	)
 
 	DescribeTable("Processing traces",
-		func(controlPoint string, decisions []*flowcontrolv1.LimiterDecision, expectedErr error, expectedMetrics string, expectedLabels map[string]string) {
+		func(
+			controlPoint string,
+			decisions []*flowcontrolv1.LimiterDecision,
+			fluxMeters []*flowcontrolv1.FluxMeter,
+			expectedErr error,
+			expectedMetrics string,
+			expectedLabels map[string]string,
+		) {
 			ctx := context.Background()
 
-			traces := someTraces(decisions, controlPoint)
+			traces := someTraces(decisions, fluxMeters, controlPoint)
 			modifiedTraces, err := processor.ConsumeTraces(ctx, traces)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -246,6 +263,7 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 			},
+			[]*flowcontrolv1.FluxMeter{},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -279,6 +297,7 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 			},
+			[]*flowcontrolv1.FluxMeter{},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -336,6 +355,7 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 			},
+			[]*flowcontrolv1.FluxMeter{},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -379,7 +399,11 @@ var _ = Describe("Metrics Processor", func() {
 })
 
 // someLogs will return a plog.Logs instance with single LogRecord
-func someLogs(decisions []*flowcontrolv1.LimiterDecision, controlPoint string) plog.Logs {
+func someLogs(
+	decisions []*flowcontrolv1.LimiterDecision,
+	fluxMeters []*flowcontrolv1.FluxMeter,
+	controlPoint string,
+) plog.Logs {
 	logs := plog.NewLogs()
 	logs.ResourceLogs().AppendEmpty()
 
@@ -390,9 +414,12 @@ func someLogs(decisions []*flowcontrolv1.LimiterDecision, controlPoint string) p
 		instrumentationLogsSlice := resourceLogsSlice.At(i).ScopeLogs()
 		for j := 0; j < instrumentationLogsSlice.Len(); j++ {
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
-			marshalled, err := json.Marshal(decisions)
+			marshalledDecisions, err := json.Marshal(decisions)
 			Expect(err).NotTo(HaveOccurred())
-			logRecord.Attributes().InsertString(otelcollector.LimiterDecisionsLabel, string(marshalled))
+			logRecord.Attributes().InsertString(otelcollector.MarshalledLimiterDecisionsLabel, string(marshalledDecisions))
+			marshalledFluxMeters, err := json.Marshal(fluxMeters)
+			Expect(err).NotTo(HaveOccurred())
+			logRecord.Attributes().InsertString(otelcollector.MarshalledFluxMetersLabel, string(marshalledFluxMeters))
 			logRecord.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
 			logRecord.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
 			switch controlPoint {
@@ -408,7 +435,11 @@ func someLogs(decisions []*flowcontrolv1.LimiterDecision, controlPoint string) p
 }
 
 // someTraces will return a ptrace.Traces instance with single SpanRecord
-func someTraces(decisions []*flowcontrolv1.LimiterDecision, controlPoint string) ptrace.Traces {
+func someTraces(
+	decisions []*flowcontrolv1.LimiterDecision,
+	fluxMeters []*flowcontrolv1.FluxMeter,
+	controlPoint string,
+) ptrace.Traces {
 	traces := ptrace.NewTraces()
 	traces.ResourceSpans().AppendEmpty()
 
@@ -419,9 +450,12 @@ func someTraces(decisions []*flowcontrolv1.LimiterDecision, controlPoint string)
 		instrumentationSpansSlice := resourceSpansSlice.At(i).ScopeSpans()
 		for j := 0; j < instrumentationSpansSlice.Len(); j++ {
 			span := instrumentationSpansSlice.At(j).Spans().AppendEmpty()
-			marshalled, err := json.Marshal(decisions)
+			marshalledDecisions, err := json.Marshal(decisions)
 			Expect(err).NotTo(HaveOccurred())
-			span.Attributes().InsertString(otelcollector.LimiterDecisionsLabel, string(marshalled))
+			span.Attributes().InsertString(otelcollector.MarshalledLimiterDecisionsLabel, string(marshalledDecisions))
+			marshalledFluxMeters, err := json.Marshal(fluxMeters)
+			Expect(err).NotTo(HaveOccurred())
+			span.Attributes().InsertString(otelcollector.MarshalledFluxMetersLabel, string(marshalledFluxMeters))
 			span.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
 			span.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
 			switch controlPoint {

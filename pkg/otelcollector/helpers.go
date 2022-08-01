@@ -157,13 +157,27 @@ func UnmarshalStringVal(value pcommon.Value, labelName string, output interface{
 // GetLimiterDecisions unmarshalls limiter decisions from string label.
 func GetLimiterDecisions(attributes pcommon.Map) []*flowcontrolv1.LimiterDecision {
 	var decisions []*flowcontrolv1.LimiterDecision
-	rawPolicies, exists := attributes.Get(LimiterDecisionsLabel)
+	rawLimiterDecisions, exists := attributes.Get(MarshalledLimiterDecisionsLabel)
 	if !exists {
-		log.Debug().Str("label", LimiterDecisionsLabel).Msg("Label does not exist")
+		log.Debug().Str("label", MarshalledLimiterDecisionsLabel).Msg("Label does not exist")
 		return decisions
 	}
-	if !UnmarshalStringVal(rawPolicies, LimiterDecisionsLabel, &decisions) {
-		log.Debug().Str("label", LimiterDecisionsLabel).Msg("Label is not a string")
+	if !UnmarshalStringVal(rawLimiterDecisions, MarshalledLimiterDecisionsLabel, &decisions) {
+		log.Debug().Str("label", MarshalledLimiterDecisionsLabel).Msg("Label is not a string")
 	}
 	return decisions
+}
+
+// GetFluxMeters unmarshalls flux meters from string label.
+func GetFluxMeters(attributes pcommon.Map) []*flowcontrolv1.FluxMeter {
+	var fluxMeters []*flowcontrolv1.FluxMeter
+	rawFluxMeters, exists := attributes.Get(MarshalledFluxMetersLabel)
+	if !exists {
+		log.Debug().Str("label", MarshalledFluxMetersLabel).Msg("Label does not exist")
+		return fluxMeters
+	}
+	if !UnmarshalStringVal(rawFluxMeters, MarshalledFluxMetersLabel, &fluxMeters) {
+		log.Debug().Str("label", MarshalledFluxMetersLabel).Msg("Label is not a string")
+	}
+	return fluxMeters
 }

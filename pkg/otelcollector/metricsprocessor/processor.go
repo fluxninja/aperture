@@ -96,8 +96,8 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
 		decisions := otelcollector.GetLimiterDecisions(logRecord.Attributes())
-		fluxMeters := getFluxMeterIDs(logRecord.Attributes())
-		p.addLimiterLabels(logRecord.Attributes(), decisions)
+		fluxMeters := otelcollector.GetFluxMeters(logRecord.Attributes())
+		p.addLimiterAndFluxMeterLabels(logRecord.Attributes(), decisions, fluxMeters)
 		return p.updateMetrics(logRecord.Attributes(), decisions, fluxMeters)
 	})
 	return ld, err
@@ -107,24 +107,30 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) (ptrace.Traces, error) {
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
 		decisions := otelcollector.GetLimiterDecisions(span.Attributes())
-		fluxMeters := getFluxMeterIDs(span.Attributes())
-		p.addLimiterLabels(span.Attributes(), decisions)
+		fluxMeters := otelcollector.GetFluxMeters(span.Attributes())
+		p.addLimiterAndFluxMeterLabels(span.Attributes(), decisions, fluxMeters)
 		return p.updateMetrics(span.Attributes(), decisions, fluxMeters)
 	})
 	return td, err
 }
 
-// addLimiterLabels adds the following labels:
+// addLimiterAndFluxMeterLabels adds the following labels:
 // * `rate_limiters`
 // * `dropping_rate_limiters`
 // * `concurrency_limiters`
-// * `dropping_concurrency_limiters`.
-func (p *metricsProcessor) addLimiterLabels(attributes pcommon.Map, decisions []*flowcontrolv1.LimiterDecision) {
+// * `dropping_concurrency_limiters`
+// * `flux_meters`.
+func (p *metricsProcessor) addLimiterAndFluxMeterLabels(
+	attributes pcommon.Map,
+	decisions []*flowcontrolv1.LimiterDecision,
+	fluxMeters []*flowcontrolv1.FluxMeter,
+) {
 	labels := map[string][]string{
 		otelcollector.RateLimitersLabel:                {},
 		otelcollector.DroppingRateLimitersLabel:        {},
 		otelcollector.ConcurrencyLimitersLabel:         {},
 		otelcollector.DroppingConcurrencyLimitersLabel: {},
+		otelcollector.FluxMetersLabel:                  {},
 	}
 	for _, decision := range decisions {
 		if decision.GetRateLimiter() != nil {
@@ -153,6 +159,15 @@ func (p *metricsProcessor) addLimiterLabels(attributes pcommon.Map, decisions []
 			}
 		}
 	}
+	for _, fluxMeter := range fluxMeters {
+		rawValue := []string{
+			fmt.Sprintf("policy_name:%v", fluxMeter.GetPolicyName()),
+			fmt.Sprintf("flux_meter_name:%v", fluxMeter.GetFluxMeterName()),
+			fmt.Sprintf("policy_hash:%v", fluxMeter.GetPolicyHash()),
+		}
+		value := strings.Join(rawValue, ",")
+		labels[otelcollector.FluxMetersLabel] = append(labels[otelcollector.FluxMetersLabel], value)
+	}
 	for key, rawValue := range labels {
 		value, err := json.Marshal(rawValue)
 		if err != nil {
@@ -162,10 +177,14 @@ func (p *metricsProcessor) addLimiterLabels(attributes pcommon.Map, decisions []
 		}
 		attributes.InsertString(key, string(value))
 	}
-	attributes.Remove(otelcollector.LimiterDecisionsLabel)
+	attributes.Remove(otelcollector.MarshalledLimiterDecisionsLabel)
 }
 
-func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, decisions []*flowcontrolv1.LimiterDecision, fluxMeters []string) error {
+func (p *metricsProcessor) updateMetrics(
+	attributes pcommon.Map,
+	decisions []*flowcontrolv1.LimiterDecision,
+	fluxMeters []*flowcontrolv1.FluxMeter,
+) error {
 	latencyLabel := getLatencyLabel(attributes)
 
 	if latencyLabel == "" {
@@ -220,8 +239,8 @@ func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, la
 	return nil
 }
 
-func (p *metricsProcessor) updateMetricsForFluxMeters(fluxMeter string, latency float64) {
-	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxMeter)
+func (p *metricsProcessor) updateMetricsForFluxMeters(fluxMeter *flowcontrolv1.FluxMeter, latency float64) {
+	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxMeter.FluxMeterId)
 	fluxmeterHistogram.Observe(latency)
 }
 
@@ -239,27 +258,4 @@ func getLatencyLabel(attributes pcommon.Map) string {
 		return otelcollector.HTTPDurationLabel
 	}
 	return ""
-}
-
-func getFluxMeterIDs(attributes pcommon.Map) []string {
-	rawFluxMeters, exists := attributes.Get(otelcollector.FluxMetersLabel)
-	if !exists {
-		log.Debug().Str("label", otelcollector.FluxMetersLabel).Msg("Label does not exist")
-		return nil
-	}
-
-	// flux meters are either send properly as a slice of strings (when sent
-	// via sdk) or as json-encoded array
-	var fluxMeters []string
-	if otelcollector.UnmarshalStringVal(rawFluxMeters, otelcollector.FluxMetersLabel, &fluxMeters) {
-		return fluxMeters
-	}
-
-	slice := rawFluxMeters.SliceVal()
-	fluxMeters = make([]string, 0, slice.Len())
-	for i := 0; i < slice.Len(); i++ {
-		fluxMeters = append(fluxMeters, slice.At(i).StringVal())
-	}
-
-	return fluxMeters
 }

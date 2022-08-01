@@ -13,20 +13,12 @@ const (
 	// ControlPointFeature const for feature control point.
 	ControlPointFeature = "feature"
 
-	// LimiterDecisionsLabel describes policies relevant to this traffic.
-	// This is JSON encoded field:
-	// [
-	//   {
-	//     "id": "<id of the policy>",
-	//     "dropped": true,
-	//     "workload": "foo:bar",
-	//   },
-	//   ...
-	// ].
-	//
-	LimiterDecisionsLabel = "aperture.limiter_decisions"
-	// FluxMetersLabel describes the flux meter IDs matched to this traffic.
-	FluxMetersLabel = "aperture.fluxmeters"
+	// MarshalledLimiterDecisionsLabel describes policies relevant to this traffic.
+	// This is JSON encoded []*flowcontrolv1.LimiterDecision.
+	MarshalledLimiterDecisionsLabel = "aperture.limiter_decisions"
+	// MarshalledFluxMetersLabel describes the flux meters matched to this traffic.
+	// This is JSON encoded []*flowcontrolv1.FluxMeter.
+	MarshalledFluxMetersLabel = "aperture.flux_meters"
 
 	// MissingAttributeSourceValue is a special attribute value, which can
 	// happen when (eg. Envoy's) logger tries to send attribute value, but its
@@ -35,14 +27,14 @@ const (
 	// from "just empty", eg. "", "[]" or "{}".
 	MissingAttributeSourceValue = "-"
 
-	// LabelsLabel describes labels relevant to this traffic.
+	// MarshalledLabelsLabel describes labels relevant to this traffic.
 	// This is JSON encoded field:
 	// {
 	//   "foo": "bar",
 	//   "fizz": "buzz"
 	// }.
 	//
-	LabelsLabel = "aperture.labels"
+	MarshalledLabelsLabel = "aperture.labels"
 	// LabeledLabel describes if there are any labels matched to traffic.
 	LabeledLabel = "labeled"
 	// StatusCodeLabel describes HTTP status code of the response.
@@ -63,6 +55,8 @@ const (
 	ConcurrencyLimitersLabel = "concurrency_limiters"
 	// DroppingConcurrencyLimitersLabel describes rate limiters dropping the traffic.
 	DroppingConcurrencyLimitersLabel = "dropping_concurrency_limiters"
+	// FluxMetersLabel describes flux meters metched to the traffic.
+	FluxMetersLabel = "flux_meters"
 	// HostAddressLabel describes host address of the request.
 	HostAddressLabel = "net.host.address"
 	// PeerAddressLabel describes peer address of the request.
