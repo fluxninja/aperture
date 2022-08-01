@@ -27,7 +27,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane"
 	"github.com/fluxninja/aperture/pkg/prometheus"
-	"github.com/fluxninja/aperture/pkg/uuid"
 )
 
 func main() {
@@ -38,7 +37,6 @@ func main() {
 		prometheus.Module(),
 		otel.ProvideAnnotatedAgentConfig(),
 		fx.Provide(
-			uuid.ProvideDefault,
 			agentinfo.ProvideAgentInfo,
 			k8s.Providek8sClient,
 			clockwork.NewRealClock,

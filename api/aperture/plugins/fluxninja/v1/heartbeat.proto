@@ -24,7 +24,7 @@ message ReportRequest {
   aperture.common.info.v1.ProcessInfo process_info = 2;
   aperture.common.info.v1.HostInfo host_info = 3;
   string agent_group = 4;
-  aperture.common.info.v1.ControllerInfo controller_info = 5;
+  ControllerInfo controller_info = 5;
   repeated aperture.common.peers.v1.PeerInfo peer_infos = 6;
   map<string, google.protobuf.Any> all_statuses = 7;
 }
@@ -70,4 +70,8 @@ message ServiceKey {
   string agent_group = 1;
   string namespace = 2;
   string name = 3;
+}
+
+message ControllerInfo {
+  string id = 1;
 }

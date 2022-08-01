@@ -44,7 +44,3 @@ message ProcessInfo {
 message HostInfo {
   string hostname = 1;
 }
-
-message ControllerInfo {
-  string id = 1;
-}
