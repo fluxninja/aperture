@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	guuid "github.com/google/uuid"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -15,7 +16,6 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
-	"gopkg.in/yaml.v2"
 
 	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/info/v1"
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
@@ -31,7 +31,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
-	"github.com/fluxninja/aperture/pkg/uuid"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
 )
 
@@ -105,46 +104,25 @@ func (h *heartbeats) start(ctx context.Context, in *ConstructorIn) error {
 	return nil
 }
 
-func (h *heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdclient.Client, UUIDProvider uuid.Provider) error {
+func (h *heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdclient.Client) error {
 	etcdPath := "/fluxninja/controllerid"
+	controllerID := guuid.NewString()
 
-	// check if controller id is already present
-	getResp, err := etcdClient.KV.Get(clientv3.WithRequireLeader(ctx), etcdPath, clientv3.WithPrefix(), clientv3.WithLease(etcdClient.LeaseID))
+	txn := etcdClient.Client.Txn(etcdClient.Client.Ctx())
+	resp, err := txn.If(clientv3.Compare(clientv3.CreateRevision(etcdPath), "=", 0)).
+		Then(clientv3.OpPut(etcdPath, controllerID)).
+		Else(clientv3.OpGet(etcdPath)).Commit()
 	if err != nil {
-		log.Error().Err(err).Str("etcdPath", etcdPath).Msg("Failed to list controller id")
+		log.Error().Err(err).Msg("Could not read/write controller id to etcd")
 		return err
 	}
 
-	if getResp.Count == 1 {
-		for _, kv := range getResp.Kvs {
-			controllerInfo := &infov1.ControllerInfo{}
-			err = config.Unmarshal(kv.Value, controllerInfo)
-			if err != nil {
-				log.Warn().Err(err).Msg("Failed to unmarshal controller info")
-				return err
-			}
-
-			h.controllerInfo = controllerInfo
-			return nil
-		}
+	if resp.Succeeded {
+		log.Warn().Msgf("DARIA LOG ETCD RESPONSE: %+v", resp)
 	}
 
-	// not present, create it
-	controllerID := UUIDProvider.New()
 	h.controllerInfo = &infov1.ControllerInfo{
 		Id: controllerID,
-	}
-
-	dat, err := yaml.Marshal(h.controllerInfo)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to marshal controller info")
-		return err
-	}
-
-	_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx), etcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to save controller info to etcd")
-		return err
 	}
 
 	return nil

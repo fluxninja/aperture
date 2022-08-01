@@ -16,7 +16,6 @@ import (
 	httpclient "github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/status"
-	"github.com/fluxninja/aperture/pkg/uuid"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
 )
 
@@ -47,7 +46,6 @@ type ConstructorIn struct {
 	AgentInfo                  *agentinfo.AgentInfo     `optional:"true"`
 	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
 	EtcdClient                 *etcdclient.Client
-	UUIDProvider               uuid.Provider
 }
 
 // Provide provides a new instance of Heartbeats.
@@ -62,7 +60,7 @@ func Provide(in ConstructorIn) (*heartbeats, error) {
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			err := heartbeats.setupControllerInfo(runCtx, in.EtcdClient, in.UUIDProvider)
+			err := heartbeats.setupControllerInfo(runCtx, in.EtcdClient)
 			if err != nil {
 				log.Error().Err(err).Msg("Could not read/create controller id in heartbeats")
 				return err
