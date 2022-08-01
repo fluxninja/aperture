@@ -60,7 +60,7 @@ func main() {
 
 	if err := app.Err(); err != nil {
 		visualize, _ := fx.VisualizeError(err)
-		log.Fatal().Err(err).Msg("fx.New failed: " + visualize)
+		log.Panic().Err(err).Msg("fx.New failed: " + visualize)
 	}
 
 	log.Info().Msg("aperture-agent app created")

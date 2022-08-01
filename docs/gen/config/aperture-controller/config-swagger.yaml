@@ -954,6 +954,17 @@ paths:
       tags:
       - common-configuration
       x-fn-config-env: true
+  /policies:
+    post:
+      operationId: PoliciesConfig
+      parameters:
+      - in: body
+        name: promql_jobs_scheduler
+        schema:
+          $ref: '#/definitions/JobGroupConfig'
+      tags:
+      - common-configuration
+      x-fn-config-env: true
   /profilers:
     post:
       operationId: Profilers

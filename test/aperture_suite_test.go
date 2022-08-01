@@ -150,7 +150,7 @@ var _ = BeforeSuite(func() {
 			flowcontrol.Register,
 		),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),
-		jobs.JobGroupConstructor{Group: jobGroupName}.Annotate(),
+		jobs.JobGroupConstructor{Name: jobGroupName}.Annotate(),
 		fx.Populate(jgIn),
 	)
 

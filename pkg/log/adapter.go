@@ -16,7 +16,7 @@ func NewZerologAdapter(logger Logger) zapcore.Core {
 	}
 	level, err := zapcore.ParseLevel(currentLevel)
 	if err != nil {
-		log.Fatal().Err(err).Str("level", level.String()).Msg("Unable to parse logger level")
+		log.Panic().Err(err).Str("level", level.String()).Msg("Unable to parse logger level")
 	}
 	encodercfg := zap.NewProductionEncoderConfig()
 	encodercfg.EncodeTime = zapcore.RFC3339TimeEncoder

@@ -58,7 +58,7 @@ type BackoffConfig struct {
 // Annotate creates an annotated instance of GRPC ClientConnectionBuilder.
 func (c ClientConstructor) Annotate() fx.Option {
 	if c.Key == "" {
-		log.Fatal().Msg("config key not provided")
+		log.Panic().Msg("config key not provided")
 	}
 
 	name := config.NameTag(c.Name)

@@ -52,7 +52,10 @@ type SchedulerConfig struct {
 
 // JobGroupConstructor holds fields to create annotated instances of JobGroup.
 type JobGroupConstructor struct {
-	Group         string
+	// Name of the job group - config key is <name> and statuses are updated under <name>.<job>
+	Name string
+	// Config key --  if it is empty then it is <name>.scheduler
+	Key           string
 	GW            GroupWatchers
 	DefaultConfig JobGroupConfig
 	SchedulerMode SchedulerMode
@@ -60,8 +63,8 @@ type JobGroupConstructor struct {
 
 // Annotate provides annotated instances of GroupWatcherMetrics and JobGroup.
 func (jgc JobGroupConstructor) Annotate() fx.Option {
-	groupTag := config.GroupTag(jgc.Group)
-	nameTag := config.NameTag(jgc.Group)
+	groupTag := config.GroupTag(jgc.Name)
+	nameTag := config.NameTag(jgc.Name)
 	return fx.Options(
 		fx.Provide(
 			fx.Annotate(
@@ -87,10 +90,13 @@ func (jgc JobGroupConstructor) provideJobGroup(
 ) (*JobGroup, error) {
 	config := jgc.DefaultConfig
 
-	key := jgc.Group + "." + schedulerConfigKey
+	key := jgc.Key
+	if key == "" {
+		key = jgc.Name + "." + schedulerConfigKey
+	}
 
 	if err := unmarshaller.UnmarshalKey(key, &config); err != nil {
-		log.Fatal().Err(err).Msg("Unable to deserialize JobGroup configuration!")
+		log.Panic().Err(err).Msg("Unable to deserialize JobGroup configuration!")
 	}
 
 	scheduler := gocron.NewScheduler(time.Local)
@@ -116,7 +122,7 @@ func (jgc JobGroupConstructor) provideJobGroup(
 		gwAll = append(gwAll, gw...)
 	}
 
-	jg, err := NewJobGroup(jgc.Group, registry, config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
+	jg, err := NewJobGroup(jgc.Name, registry, config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
 	if err != nil {
 		return nil, err
 	}

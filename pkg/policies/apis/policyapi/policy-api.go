@@ -6,9 +6,18 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 )
 
+// swagger:operation POST /policies common-configuration PoliciesConfig
+// ---
+// x-fn-config-env: true
+// parameters:
+// - name: promql_jobs_scheduler
+//   in: body
+//   schema:
+//     "$ref": "#/definitions/JobGroupConfig"
+
 const (
-	// PoliciesStatusRoot - path in status registry for policies results.
-	PoliciesStatusRoot = "policies"
+	// PoliciesRoot - path in config and status registry for policies results.
+	PoliciesRoot = "policies"
 )
 
 // PolicyBaseAPI is for read only access to base policy info.
