@@ -1,6 +1,6 @@
 ---
 title: Selector
-slug: /architecture/components/selector
+slug: /architecture/concepts/selector
 description: Selector
 keywords:
   - selector

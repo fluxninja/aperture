@@ -1,6 +1,6 @@
 ---
 title: Actuator
-slug: /architecture/components/actuator
+slug: /architecture/concepts/actuator
 description: Actuator
 keywords:
   - actuator

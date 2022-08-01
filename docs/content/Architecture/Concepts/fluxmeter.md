@@ -1,6 +1,6 @@
 ---
 title: FluxMeter
-slug: /architecture/components/fluxmeter
+slug: /architecture/concepts/fluxmeter
 description: Aperture FluxMeter
 keywords:
   - metrics

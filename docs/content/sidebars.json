@@ -35,6 +35,20 @@
         {
           "type": "doc",
           "id": "Setup/aperture-setup"
+        },
+        {
+          "type": "category",
+          "label": "Component",
+          "items": [
+            {
+              "type": "doc",
+              "id": "Setup/Components/aperture-controller"
+            },
+            {
+              "type": "doc",
+              "id": "Setup/Components/aperture-agent"
+            }
+          ]
         }
       ]
     },
@@ -54,31 +68,23 @@
       "items": [
         {
           "type": "category",
-          "label": "Components",
+          "label": "Concepts",
           "items": [
             {
               "type": "doc",
-              "id": "Architecture/Components/aperture-controller"
+              "id": "Architecture/Concepts/fluxmeter"
             },
             {
               "type": "doc",
-              "id": "Architecture/Components/aperture-agent"
+              "id": "Architecture/Concepts/actuator"
             },
             {
               "type": "doc",
-              "id": "Architecture/Components/fluxmeter"
+              "id": "Architecture/Concepts/selector"
             },
             {
               "type": "doc",
-              "id": "Architecture/Components/actuator"
-            },
-            {
-              "type": "doc",
-              "id": "Architecture/Components/selector"
-            },
-            {
-              "type": "doc",
-              "id": "Architecture/Components/circuit"
+              "id": "Architecture/Concepts/circuit"
             }
           ]
         },
@@ -132,7 +138,7 @@
     },
     {
       "type": "category",
-      "label": "Developes",
+      "label": "Developers",
       "items": [
         {
           "type": "doc",
