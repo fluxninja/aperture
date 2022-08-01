@@ -114,7 +114,7 @@ func (constructor LoggerConstructor) provideLogger(writers []io.Writer,
 	config := constructor.DefaultConfig
 
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
-		log.Fatal().Err(err).Msg("Unable to deserialize log configuration!")
+		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
 	}
 	config.writers = writers
 

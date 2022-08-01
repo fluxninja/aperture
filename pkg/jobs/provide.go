@@ -64,7 +64,7 @@ func provideServiceLivenessCheck() fx.Option {
 	}
 
 	return fx.Options(
-		JobGroupConstructor{Group: livenessGroup}.Annotate(),
+		JobGroupConstructor{Name: livenessGroup}.Annotate(),
 		mjc.Annotate(),
 	)
 }
@@ -77,7 +77,7 @@ func provideServiceReadinessCheck() fx.Option {
 	}
 
 	return fx.Options(
-		JobGroupConstructor{Group: readinessGroup}.Annotate(),
+		JobGroupConstructor{Name: readinessGroup}.Annotate(),
 		mjc.Annotate(),
 	)
 }

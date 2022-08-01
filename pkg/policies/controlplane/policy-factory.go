@@ -1,6 +1,8 @@
 package controlplane
 
 import (
+	"context"
+
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
 
@@ -13,6 +15,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/common"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -25,21 +28,15 @@ var (
 	policiesDriverFxTag = "policies-driver"
 )
 
-const (
-	circuitJobGroupTag = "circuit-job-group"
-)
-
 // PolicyFactoryModule module for policy factory.
 func PolicyFactoryModule() fx.Option {
 	return fx.Options(
-		jobs.JobGroupConstructor{Group: circuitJobGroupTag}.Annotate(),
 		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: paths.Policies}.Annotate(),
 		fx.Invoke(
 			fx.Annotate(
 				setupPolicyFxDriver,
 				fx.ParamTags(
 					config.NameTag(policiesDriverFxTag),
-					config.NameTag(circuitJobGroupTag),
 					common.FxOptionsFuncTag,
 				),
 			),
@@ -58,12 +55,17 @@ type policyFactory struct {
 // Main fx app.
 func setupPolicyFxDriver(
 	etcdWatcher notifiers.Watcher,
-	circuitJobGroup *jobs.JobGroup,
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 	registry *status.Registry,
-) {
+) error {
+	circuitJobGroup, err := jobs.NewJobGroup(policyapi.PoliciesRoot+".circuit_jobs", registry, 0, jobs.RescheduleMode, nil)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to create job group")
+		return err
+	}
+
 	factory := &policyFactory{
 		registryPath:    policiesStatusRoot,
 		circuitJobGroup: circuitJobGroup,
@@ -84,7 +86,25 @@ func setupPolicyFxDriver(
 		StatusPath:     policiesStatusRoot,
 	}
 
+	lifecycle.Append(fx.Hook{
+		OnStart: func(context.Context) error {
+			err := factory.circuitJobGroup.Start()
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+		OnStop: func(context.Context) error {
+			err := factory.circuitJobGroup.Stop()
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	})
+
 	notifiers.NotifierLifecycle(lifecycle, etcdWatcher, fxDriver)
+	return nil
 }
 
 // ProvideControllerPolicyFxOptions Per policy fx app in controller.

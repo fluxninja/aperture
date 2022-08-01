@@ -48,7 +48,7 @@ const (
 // Module is a fx module that provides annotated Watchdog jobs and triggers Watchdog checks.
 func Module() fx.Option {
 	return fx.Options(
-		jobs.JobGroupConstructor{Group: watchdogGroup}.Annotate(),
+		jobs.JobGroupConstructor{Name: watchdogGroup}.Annotate(),
 		jobs.MultiJobConstructor{Name: watchdogMultiJobName, JobGroupName: watchdogGroup}.Annotate(),
 		fx.Invoke(Constructor{Key: watchdogConfigKey}.setupWatchdog),
 	)

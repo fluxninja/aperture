@@ -1,6 +1,6 @@
 ---
 title: Circuit
-slug: /architecture/components/circuit
+slug: /architecture/concepts/circuit
 description: Circuit
 keywords:
   - circuit

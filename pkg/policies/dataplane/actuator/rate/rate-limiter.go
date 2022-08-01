@@ -41,11 +41,10 @@ func rateLimiterModule() fx.Option {
 				fx.ResultTags(fxNameTag),
 			),
 		),
-		jobs.JobGroupConstructor{Group: rateLimiterStatusRoot}.Annotate(),
 		fx.Invoke(
 			fx.Annotate(
 				setupRateLimiterFactory,
-				fx.ParamTags(fxNameTag, fxNameTag),
+				fx.ParamTags(fxNameTag),
 			),
 		),
 	)
@@ -77,7 +76,6 @@ type rateLimiterFactory struct {
 // main fx app.
 func setupRateLimiterFactory(
 	watcher notifiers.Watcher,
-	lazySyncJobGroup *jobs.JobGroup,
 	lifecycle fx.Lifecycle,
 	e iface.EngineAPI,
 	distCache *distcache.DistCache,
@@ -90,6 +88,11 @@ func setupRateLimiterFactory(
 	rateLimitDecisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient,
 		path.Join(paths.RateLimiterDecisionsPath, paths.AgentGroupPrefix(agentGroupName)))
 	if err != nil {
+		return err
+	}
+	lazySyncJobGroup, err := jobs.NewJobGroup(rateLimiterStatusRoot+".lazy_sync_jobs", statusRegistry, 0, jobs.RescheduleMode, nil)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to create lazy sync job group")
 		return err
 	}
 
@@ -113,18 +116,27 @@ func setupRateLimiterFactory(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			err := rateLimitDecisionsWatcher.Start()
+			err := lazySyncJobGroup.Start()
+			if err != nil {
+				return err
+			}
+			err = rateLimitDecisionsWatcher.Start()
 			if err != nil {
 				return err
 			}
 			return nil
 		},
 		OnStop: func(context.Context) error {
-			err := rateLimitDecisionsWatcher.Stop()
+			var err, merr error
+			err = rateLimitDecisionsWatcher.Stop()
 			if err != nil {
-				return err
+				merr = multierr.Append(merr, err)
 			}
-			return nil
+			err = lazySyncJobGroup.Stop()
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			return merr
 		},
 	})
 

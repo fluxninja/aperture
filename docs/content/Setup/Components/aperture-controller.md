@@ -1,6 +1,6 @@
 ---
 title: Aperture Controller
-slug: /architecture/components/aperture-controller
+slug: /setup/components/aperture-controller
 description: Aperture Controller
 keywords:
   - controller

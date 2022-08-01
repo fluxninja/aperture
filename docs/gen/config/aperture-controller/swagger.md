@@ -4,22 +4,23 @@
 
 ### COMMON CONFIGURATION
 
-| Key              | Reference                        |
-| ---------------- | -------------------------------- |
-| `agent_info`     | [AgentInfo](#agent-info)         |
-| `client`         | [Client](#client)                |
-| `controller`     | [Controller](#controller)        |
-| `etcd`           | [Etcd](#etcd)                    |
-| `liveness`       | [Liveness](#liveness)            |
-| `log`            | [Log](#log)                      |
-| `metrics`        | [Metrics](#metrics)              |
-| `peer_discovery` | [PeerDiscovery](#peer-discovery) |
-| `plugins`        | [Plugins](#plugins)              |
-| `profilers`      | [Profilers](#profilers)          |
-| `prometheus`     | [Prometheus](#prometheus)        |
-| `readiness`      | [Readiness](#readiness)          |
-| `server`         | [Server](#server)                |
-| `watchdog`       | [Watchdog](#watchdog)            |
+| Key              | Reference                          |
+| ---------------- | ---------------------------------- |
+| `agent_info`     | [AgentInfo](#agent-info)           |
+| `client`         | [Client](#client)                  |
+| `controller`     | [Controller](#controller)          |
+| `etcd`           | [Etcd](#etcd)                      |
+| `liveness`       | [Liveness](#liveness)              |
+| `log`            | [Log](#log)                        |
+| `metrics`        | [Metrics](#metrics)                |
+| `peer_discovery` | [PeerDiscovery](#peer-discovery)   |
+| `plugins`        | [Plugins](#plugins)                |
+| `policies`       | [PoliciesConfig](#policies-config) |
+| `profilers`      | [Profilers](#profilers)            |
+| `prometheus`     | [Prometheus](#prometheus)          |
+| `readiness`      | [Readiness](#readiness)            |
+| `server`         | [Server](#server)                  |
+| `watchdog`       | [Watchdog](#watchdog)              |
 
 ### PLUGIN CONFIGURATION
 
@@ -270,6 +271,25 @@ Env-Var Prefix: `APERTURE_CONTROLLER_PLUGINS_`
 
 Env-Var Prefix: `APERTURE_CONTROLLER_PLUGINS_`
 Type: [PluginsConfig](#plugins-config)
+
+</dd>
+</dl>
+
+### <span id="policies-config"></span> _PoliciesConfig_
+
+Key: `policies`
+
+Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_`
+
+#### Members
+
+<dl>
+
+<dt>promql_jobs_scheduler</dt>
+<dd>
+
+Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_PROMQL_JOBS_SCHEDULER_`
+Type: [JobGroupConfig](#job-group-config)
 
 </dd>
 </dl>

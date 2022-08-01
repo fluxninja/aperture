@@ -72,7 +72,7 @@ type HTTPClientConfig struct {
 // Annotate creates an annotated instance of HTTP Client.
 func (constructor ClientConstructor) Annotate() fx.Option {
 	if constructor.Key == "" {
-		log.Fatal().Msg("config key not provided")
+		log.Panic().Msg("config key not provided")
 	}
 
 	name := config.NameTag(constructor.Name)

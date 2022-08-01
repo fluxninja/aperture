@@ -64,7 +64,7 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 	config := constructor.DefaultConfig
 
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
-		log.Fatal().Err(err).Msg("Unable to deserialize sentry config")
+		log.Panic().Err(err).Msg("Unable to deserialize sentry config")
 	}
 
 	if config.Disabled {

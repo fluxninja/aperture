@@ -32,15 +32,15 @@ var errNoQueriesReturned = errors.New("no queries returned until now")
 
 const (
 	promTimeout = time.Second * 5
-
-	promQLJobGroupTag = "promql"
 )
+
+var promQLJobGroupTag = policyapi.PoliciesRoot + "promql_jobs"
 
 // PromQLModule returns fx options for PromQL in the main app.
 func PromQLModule() fx.Option {
 	// TODO: Generate documentation for concurrency parameter in job group config.
 	return fx.Options(
-		jobs.JobGroupConstructor{Group: promQLJobGroupTag}.Annotate(),
+		jobs.JobGroupConstructor{Name: promQLJobGroupTag, Key: policyapi.PoliciesRoot + ".promql_jobs_scheduler"}.Annotate(),
 		fx.Provide(fx.Annotate(
 			provideFxOptionsFunc,
 			fx.ParamTags(config.NameTag(promQLJobGroupTag)),

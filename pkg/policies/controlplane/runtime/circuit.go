@@ -47,14 +47,14 @@ func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.L
 	}, circuitMetricsLabels)
 
 	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
 			err := prometheusRegistry.Register(circuitMetrics.SignalSummaryVec)
 			if err != nil {
 				return err
 			}
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(context.Context) error {
 			unregistered := prometheusRegistry.Unregister(circuitMetrics.SignalSummaryVec)
 			if !unregistered {
 				err := fmt.Errorf("failed to unregister metric %s", signalReadingMetricName)
@@ -156,7 +156,7 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 	}
 
 	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
 			var merr error
 			for signalName, labels := range circuitMetricsLabels {
 				_, err := circuitMetrics.SignalSummaryVec.GetMetricWith(labels)
@@ -167,7 +167,7 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 			}
 			return merr
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(context.Context) error {
 			var merr error
 			for signalName, labels := range circuitMetricsLabels {
 				deleted := circuitMetrics.SignalSummaryVec.Delete(labels)

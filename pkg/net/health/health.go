@@ -11,7 +11,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
-	"github.com/fluxninja/aperture/pkg/net/listener"
 )
 
 // HealthModule is a module that provides grpc health server for checking services status.
@@ -28,7 +27,7 @@ func HealthModule() fx.Option {
 }
 
 // ProvideHealthServer creates instance of health server.
-func ProvideHealthServer(listener *listener.Listener, lifecycle fx.Lifecycle) *health.Server {
+func ProvideHealthServer(lifecycle fx.Lifecycle) *health.Server {
 	server := health.NewServer()
 
 	lifecycle.Append(fx.Hook{
