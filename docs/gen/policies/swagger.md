@@ -1560,7 +1560,7 @@ In k8s, this is the k8s' namespace.
 <dt>service</dt>
 <dd>
 
-(string, `required`) The service (name) of the entities.
+(string) The service (name) of the entities.
 In k8s, this is a name of the Service object.
 
 Note: Entity may belong to multiple services.
