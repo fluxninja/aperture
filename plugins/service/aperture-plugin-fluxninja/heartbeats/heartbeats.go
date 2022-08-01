@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	guuid "github.com/google/uuid"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -20,6 +22,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/entitycache"
+	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -54,6 +57,7 @@ type heartbeats struct {
 	clientConn       *grpc.ClientConn
 	statusRegistry   *status.Registry
 	entityCache      *entitycache.EntityCache
+	controllerInfo   *heartbeatv1.ControllerInfo
 	heartbeatsAddr   string
 	APIKey           string
 	jobName          string
@@ -95,6 +99,34 @@ func (h *heartbeats) start(ctx context.Context, in *ConstructorIn) error {
 		}
 	}
 	h.registerHearbeatsJob(job)
+
+	return nil
+}
+
+func (h *heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdclient.Client) error {
+	etcdPath := "/fluxninja/controllerid"
+	controllerID := guuid.NewString()
+
+	txn := etcdClient.Client.Txn(etcdClient.Client.Ctx())
+	resp, err := txn.If(clientv3.Compare(clientv3.CreateRevision(etcdPath), "=", 0)).
+		Then(clientv3.OpPut(etcdPath, controllerID)).
+		Else(clientv3.OpGet(etcdPath)).Commit()
+	if err != nil {
+		log.Error().Err(err).Msg("Could not read/write controller id to etcd")
+		return err
+	}
+
+	// Succeeded is true if the If condition above is true - meaning there were no controller Id in etcd
+	if !resp.Succeeded {
+		for _, res := range resp.Responses {
+			controllerID = string(res.GetResponseRange().Kvs[0].Value)
+			break
+		}
+	}
+
+	h.controllerInfo = &heartbeatv1.ControllerInfo{
+		Id: controllerID,
+	}
 
 	return nil
 }
@@ -203,12 +235,13 @@ func (h *heartbeats) newHeartbeat(
 	}
 
 	return &heartbeatv1.ReportRequest{
-		VersionInfo: info.GetVersionInfo(),
-		ProcessInfo: info.GetProcessInfo(),
-		HostInfo:    info.GetHostInfo(),
-		AgentGroup:  agentGroup,
-		PeerInfos:   peerInfos,
-		AllStatuses: allStasuses,
+		VersionInfo:    info.GetVersionInfo(),
+		ProcessInfo:    info.GetProcessInfo(),
+		HostInfo:       info.GetHostInfo(),
+		AgentGroup:     agentGroup,
+		ControllerInfo: h.controllerInfo,
+		PeerInfos:      peerInfos,
+		AllStatuses:    allStasuses,
 	}
 }
 
