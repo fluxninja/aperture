@@ -23,8 +23,8 @@ message CheckResponse {
   Reason reason = 2;
   // limiter_decisions contains information about decision made by each limiter.
   repeated LimiterDecision limiter_decisions = 3;
-  // flux meter ids that were matched for this request
-  repeated string flux_meter_ids = 4;
+  // flux meters that were matched for this request.
+  repeated FluxMeter flux_meters = 4;
 }
 
 // Reason contains fields that give futher information about error or rejection.
@@ -80,4 +80,12 @@ message LimiterDecision {
     RateLimiter rate_limiter = 6;
     ConcurrencyLimiter concurrency_limiter = 7;
   }
+}
+
+// FluxMeter describes deteail for each FluxMeter.
+message FluxMeter {
+  string policy_name = 1;
+  string policy_hash = 2;
+  string flux_meter_name = 3;
+  string flux_meter_id = 4;
 }

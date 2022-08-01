@@ -26,7 +26,6 @@ type EngineAPI interface {
 // MultiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type MultiMatchResult struct {
 	ConcurrencyLimiters []Limiter
-	// TODO: Can be FluxMeterIDs
-	FluxMeters   []FluxMeter
-	RateLimiters []RateLimiter
+	FluxMeters          []FluxMeter
+	RateLimiters        []RateLimiter
 }

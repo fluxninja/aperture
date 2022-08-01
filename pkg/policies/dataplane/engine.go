@@ -52,12 +52,15 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	// Run applicable service protection policies (schedulers) in parallel and reject request if any policy decides to reject
 	multiMatchResult := e.getMatches(controlPoint, serviceIDs, labels)
 
-	// append fluxmeter IDs
-	fluxMeters := multiMatchResult.FluxMeters
-	// TODO: change the return signature of GetMatches to return only FluxMeterIDs.
-	fluxMeterIDs := make([]string, 0, len(fluxMeters))
-	for _, fluxMeter := range fluxMeters {
-		fluxMeterIDs = append(fluxMeterIDs, fluxMeter.GetMetricID())
+	rawFluxMeters := multiMatchResult.FluxMeters
+	fluxMeters := make([]*flowcontrolv1.FluxMeter, len(rawFluxMeters))
+	for i, rawFluxMeter := range rawFluxMeters {
+		fluxMeters[i] = &flowcontrolv1.FluxMeter{
+			PolicyName:    "TODO",
+			PolicyHash:    "TODO",
+			FluxMeterName: rawFluxMeter.GetFluxMeterProto().Name,
+			FluxMeterId:   rawFluxMeter.GetMetricID(),
+		}
 	}
 
 	limiterDecisions := []*flowcontrolv1.LimiterDecision{}
@@ -96,7 +99,7 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 		resp = &flowcontrolv1.CheckResponse{
 			DecisionType:     decisionType,
 			LimiterDecisions: limiterDecisions,
-			FluxMeterIds:     fluxMeterIDs,
+			FluxMeters:       fluxMeters,
 			Reason:           decisionReason,
 		}
 		return resp

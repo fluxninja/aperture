@@ -297,6 +297,18 @@ definitions:
           Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.
         x-go-default: 1
     description: Workload defines a class of requests that preferably have similar properties such as response latency.
+  apertureflowcontrolv1FluxMeter:
+    type: object
+    properties:
+      flux_meter_id:
+        type: string
+      flux_meter_name:
+        type: string
+      policy_hash:
+        type: string
+      policy_name:
+        type: string
+    description: FluxMeter describes deteail for each FluxMeter.
   googlerpcStatus:
     type: object
     properties:
@@ -337,6 +349,23 @@ definitions:
           $ref: '#/definitions/RateLimiterOverrideConfig'
       selector:
         $ref: '#/definitions/v1Selector'
+  policylanguagev1FluxMeter:
+    type: object
+    properties:
+      histogram_buckets:
+        type: array
+        items:
+          type: number
+          format: double
+        description: Latency histogram buckets (in ms) for this FluxMeter.
+        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+      name:
+        type: string
+        description: Name of the flux meter.
+      selector:
+        $ref: '#/definitions/v1Selector'
+        description: Policies are only applied to flows that are matched based on the fields in the selector.
+    description: FluxMeter gathers metrics for the traffic that matches its selector.
   protobufAny:
     type: object
     properties:
@@ -560,11 +589,11 @@ definitions:
       decision_type:
         $ref: '#/definitions/v1DecisionType'
         description: decision_type contains what the decision was.
-      flux_meter_ids:
+      flux_meters:
         type: array
         items:
-          type: string
-        title: flux meter ids that were matched for this request
+          $ref: '#/definitions/apertureflowcontrolv1FluxMeter'
+        description: flux meters that were matched for this request.
       limiter_decisions:
         type: array
         items:
@@ -896,23 +925,6 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Extrapolated signal.
     description: Outputs for the Extrapolator component.
-  v1FluxMeter:
-    type: object
-    properties:
-      histogram_buckets:
-        type: array
-        items:
-          type: number
-          format: double
-        description: Latency histogram buckets (in ms) for this FluxMeter.
-        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
-      name:
-        type: string
-        description: Name of the flux meter.
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Policies are only applied to flows that are matched based on the fields in the selector.
-    description: FluxMeter gathers metrics for the traffic that matches its selector.
   v1GradientController:
     type: object
     properties:
@@ -1291,7 +1303,7 @@ definitions:
       flux_meters:
         type: array
         items:
-          $ref: '#/definitions/v1FluxMeter'
+          $ref: '#/definitions/policylanguagev1FluxMeter'
         description: FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
     description: |-
       Policy is defined as a dataflow graph (circuit) of inter-connected components.

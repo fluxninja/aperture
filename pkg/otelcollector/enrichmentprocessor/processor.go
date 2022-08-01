@@ -195,14 +195,14 @@ func unpackFlowLabels(attributes pcommon.Map) {
 	defer func() {
 		attributes.UpsertString(otelcollector.LabeledLabel, labeled)
 	}()
-	rawFlow, exists := attributes.Get(otelcollector.LabelsLabel)
+	rawFlow, exists := attributes.Get(otelcollector.MarshalledLabelsLabel)
 	if !exists {
 		return
 	}
-	defer attributes.Remove(otelcollector.LabelsLabel)
+	defer attributes.Remove(otelcollector.MarshalledLabelsLabel)
 
 	var flowAttributes map[string]string
-	otelcollector.UnmarshalStringVal(rawFlow, otelcollector.LabelsLabel, &flowAttributes)
+	otelcollector.UnmarshalStringVal(rawFlow, otelcollector.MarshalledLabelsLabel, &flowAttributes)
 	for k, v := range flowAttributes {
 		labeled = "true"
 		// FIXME – this is quadratic (every upsert iterates to search whether label already exists)

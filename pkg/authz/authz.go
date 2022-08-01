@@ -182,13 +182,14 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	}
 
 	flowLabels := mergeFlowLabels(oldFlowLabels, newFlowLabels)
+	log.Warn().Msgf("Creating check response. Flow labels: %v, LimiterDecisions; %v, fluxmeters: %v", flowLabels, fcResponse.LimiterDecisions, fcResponse.FluxMeters)
 	resp := ext_authz.CheckResponse{
 		// Put all non-hidden flow labels and policy details as dynamic metadata
 		DynamicMetadata: &structpb.Struct{
 			Fields: map[string]*structpb.Value{
-				otelcollector.LabelsLabel:           flowLabelsAsPbValueForTelemetry(flowLabels),
-				otelcollector.LimiterDecisionsLabel: limiterDecisionsAsPbValueForTelemetry(fcResponse.LimiterDecisions),
-				otelcollector.FluxMetersLabel:       fluxmeterIDsAsPbValueForTelemetry(fcResponse.FluxMeterIds),
+				otelcollector.MarshalledLabelsLabel:           flowLabelsAsPbValueForTelemetry(flowLabels),
+				otelcollector.MarshalledLimiterDecisionsLabel: limiterDecisionsAsPbValueForTelemetry(fcResponse.LimiterDecisions),
+				otelcollector.MarshalledFluxMetersLabel:       fluxmetersAsPbValueForTelemetry(fcResponse.FluxMeters),
 			},
 		},
 	}
@@ -255,28 +256,36 @@ func flowLabelsAsPbValueForTelemetry(labels classification.FlowLabels) *structpb
 	return structpb.NewStructValue(&structpb.Struct{Fields: fields})
 }
 
-func fluxmeterIDsAsPbValueForTelemetry(fluxmeters []string) *structpb.Value {
-	values := make([]*structpb.Value, 0, len(fluxmeters))
-	for _, fluxmeter := range fluxmeters {
-		values = append(values, structpb.NewStringValue(fluxmeter))
+func limiterDecisionsAsPbValueForTelemetry(limiterDecisions []*flowcontrolv1.LimiterDecision) *structpb.Value {
+	messages := make([]protoreflect.ProtoMessage, len(limiterDecisions))
+	for i, decision := range limiterDecisions {
+		messages[i] = decision
+	}
+	return listOfProtoMessagesAsPbValue(messages)
+}
+
+func fluxmetersAsPbValueForTelemetry(fluxmeters []*flowcontrolv1.FluxMeter) *structpb.Value {
+	messages := make([]protoreflect.ProtoMessage, len(fluxmeters))
+	for i, decision := range fluxmeters {
+		messages[i] = decision
+	}
+	return listOfProtoMessagesAsPbValue(messages)
+}
+
+func listOfProtoMessagesAsPbValue(messages []protoreflect.ProtoMessage) *structpb.Value {
+	values := make([]*structpb.Value, len(messages))
+	for i, message := range messages {
+		messageStruct, err := protoMessageAsPbValue(message)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to convert message into generic proto value")
+			continue
+		}
+		values[i] = messageStruct
 	}
 	return structpb.NewListValue(&structpb.ListValue{Values: values})
 }
 
-func limiterDecisionsAsPbValueForTelemetry(limiterDecisions []*flowcontrolv1.LimiterDecision) *structpb.Value {
-	policies := make([]*structpb.Value, len(limiterDecisions))
-	for i, ld := range limiterDecisions {
-		ldStruct, err := protoAsPbValue(ld)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to convert limiter decision into generic proto value")
-			continue
-		}
-		policies[i] = ldStruct
-	}
-	return structpb.NewListValue(&structpb.ListValue{Values: policies})
-}
-
-func protoAsPbValue(message protoreflect.ProtoMessage) (*structpb.Value, error) {
+func protoMessageAsPbValue(message protoreflect.ProtoMessage) (*structpb.Value, error) {
 	mBytes, err := protojson.Marshal(message)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to marshal proto message into JSON")
