@@ -29,7 +29,7 @@ go-build-plugins:
 	@echo Building go plugins
 	@./scripts/go_build_plugins.sh
 
-install-go-tools: go-mod-tidy
+install-go-tools:
 	@echo Installing tools from tools.go
 	@./scripts/install_go_tools.sh
 
