@@ -3,6 +3,7 @@ package metricsprocessor
 import (
 	"strings"
 
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/prometheus/client_golang/prometheus"
@@ -14,6 +15,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/policies/mocks"
 )
 
 var _ = Describe("Metrics Processor", func() {
@@ -21,11 +23,15 @@ var _ = Describe("Metrics Processor", func() {
 		pr        *prometheus.Registry
 		cfg       *Config
 		processor *metricsProcessor
+		engine    *mocks.MockEngineAPI
 	)
 
 	BeforeEach(func() {
 		pr = prometheus.NewRegistry()
+		ctrl := gomock.NewController(GinkgoT())
+		engine = mocks.NewMockEngineAPI(ctrl)
 		cfg = &Config{
+			engine:               engine,
 			promRegistry:         pr,
 			LatencyBucketStartMS: 0,
 			LatencyBucketWidthMS: 10,
@@ -46,6 +52,13 @@ var _ = Describe("Metrics Processor", func() {
 			expectedLabels map[string]string,
 		) {
 			ctx := context.Background()
+
+			expectedCalls := make([]*gomock.Call, len(fluxMeters))
+			for i, fm := range fluxMeters {
+				// TODO actually return some Histogram
+				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.FluxMeterId).Return(nil)
+			}
+			gomock.InOrder(expectedCalls...)
 
 			logs := someLogs(decisions, fluxMeters, controlPoint)
 			modifiedLogs, err := processor.ConsumeLogs(ctx, logs)
@@ -85,7 +98,14 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 			},
-			[]*flowcontrolv1.FluxMeter{},
+			[]*flowcontrolv1.FluxMeter{
+				{
+					PolicyName:    "foo",
+					PolicyHash:    "foo-hash",
+					FluxMeterName: "bar",
+					FluxMeterId:   "bar-id",
+				},
+			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -97,6 +117,7 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]string{
+				"flux_meters":                   `["policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"]`,
 				"rate_limiters":                 `[]`,
 				"dropping_rate_limiters":        `[]`,
 				"concurrency_limiters":          `["policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"]`,
@@ -225,6 +246,13 @@ var _ = Describe("Metrics Processor", func() {
 		) {
 			ctx := context.Background()
 
+			expectedCalls := make([]*gomock.Call, len(fluxMeters))
+			for i, fm := range fluxMeters {
+				// TODO actually return some Histogram
+				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.FluxMeterId).Return(nil)
+			}
+			gomock.InOrder(expectedCalls...)
+
 			traces := someTraces(decisions, fluxMeters, controlPoint)
 			modifiedTraces, err := processor.ConsumeTraces(ctx, traces)
 			if expectedErr != nil {
@@ -263,7 +291,14 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 			},
-			[]*flowcontrolv1.FluxMeter{},
+			[]*flowcontrolv1.FluxMeter{
+				{
+					PolicyName:    "foo",
+					PolicyHash:    "foo-hash",
+					FluxMeterName: "bar",
+					FluxMeterId:   "bar-id",
+				},
+			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -275,6 +310,7 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]string{
+				"flux_meters":                   `["policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"]`,
 				"rate_limiters":                 `[]`,
 				"dropping_rate_limiters":        `[]`,
 				"concurrency_limiters":          `["policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"]`,

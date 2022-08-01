@@ -178,6 +178,7 @@ func (p *metricsProcessor) addLimiterAndFluxMeterLabels(
 		attributes.InsertString(key, string(value))
 	}
 	attributes.Remove(otelcollector.MarshalledLimiterDecisionsLabel)
+	attributes.Remove(otelcollector.MarshalledFluxMetersLabel)
 }
 
 func (p *metricsProcessor) updateMetrics(
@@ -241,6 +242,10 @@ func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, la
 
 func (p *metricsProcessor) updateMetricsForFluxMeters(fluxMeter *flowcontrolv1.FluxMeter, latency float64) {
 	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxMeter.FluxMeterId)
+	if fluxmeterHistogram == nil {
+		log.Debug().Str("fluxMeterID", fluxMeter.FluxMeterId).Msg("Fluxmeter not found")
+		return
+	}
 	fluxmeterHistogram.Observe(latency)
 }
 
