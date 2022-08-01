@@ -145,6 +145,14 @@ jobs:
       - gcp-gcr/push-image:
           image: <<parameters.gcr-image>>
           tag: <<parameters.tag>>
+      - when:
+          condition:
+            equal: [main, << pipeline.git.branch >>]
+          steps:
+            - gcp-gcr/tag-image:
+                image: <<parameters.gcr-image>>
+                source-tag: <<parameters.tag>>
+                target-tag: <<parameters.target-tag>>
 
   go-test-coverage:
     parameters:
