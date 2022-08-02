@@ -49,7 +49,7 @@ var _ = Describe("Metrics Processor", func() {
 			fluxMeters []*flowcontrolv1.FluxMeter,
 			expectedErr error,
 			expectedMetrics string,
-			expectedLabels map[string]string,
+			expectedLabels map[string]interface{},
 		) {
 			ctx := context.Background()
 
@@ -79,7 +79,7 @@ var _ = Describe("Metrics Processor", func() {
 			Expect(logRecords).To(HaveLen(1))
 
 			for k, v := range expectedLabels {
-				Expect(logRecords[0].Attributes().AsRaw()).To(HaveKeyWithValue(k, MatchJSON(v)))
+				Expect(logRecords[0].Attributes().AsRaw()).To(HaveKeyWithValue(k, v))
 			}
 		},
 
@@ -116,12 +116,12 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
-			map[string]string{
-				"flux_meters":                   `["policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"]`,
-				"rate_limiters":                 `[]`,
-				"dropping_rate_limiters":        `[]`,
-				"concurrency_limiters":          `["policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"]`,
-				"dropping_concurrency_limiters": `["policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"]`,
+			map[string]interface{}{
+				"flux_meters":                   []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
+				"rate_limiters":                 []interface{}{},
+				"dropping_rate_limiters":        []interface{}{},
+				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -151,11 +151,11 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
-			map[string]string{
-				"rate_limiters":                 `[]`,
-				"dropping_rate_limiters":        `[]`,
-				"concurrency_limiters":          `["policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"]`,
-				"dropping_concurrency_limiters": `["policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"]`,
+			map[string]interface{}{
+				"rate_limiters":                 []interface{}{},
+				"dropping_rate_limiters":        []interface{}{},
+				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -219,18 +219,18 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_sum{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 5
 			workload_latency_ms_count{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
-			map[string]string{
-				"rate_limiters":          `[]`,
-				"dropping_rate_limiters": `[]`,
-				"concurrency_limiters": `[
+			map[string]interface{}{
+				"rate_limiters":          []interface{}{},
+				"dropping_rate_limiters": []interface{}{},
+				"concurrency_limiters": []interface{}{
 					"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash",
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
-					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash"
-				]`,
-				"dropping_concurrency_limiters": `[
+					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
+				},
+				"dropping_concurrency_limiters": []interface{}{
 					"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash",
-					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash"
-				]`,
+					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
+				},
 			},
 		),
 	)
@@ -242,7 +242,7 @@ var _ = Describe("Metrics Processor", func() {
 			fluxMeters []*flowcontrolv1.FluxMeter,
 			expectedErr error,
 			expectedMetrics string,
-			expectedLabels map[string]string,
+			expectedLabels map[string]interface{},
 		) {
 			ctx := context.Background()
 
@@ -272,7 +272,7 @@ var _ = Describe("Metrics Processor", func() {
 			Expect(traceRecords).To(HaveLen(1))
 
 			for k, v := range expectedLabels {
-				Expect(traceRecords[0].Attributes().AsRaw()).To(HaveKeyWithValue(k, MatchJSON(v)))
+				Expect(traceRecords[0].Attributes().AsRaw()).To(HaveKeyWithValue(k, v))
 			}
 		},
 
@@ -309,12 +309,12 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
-			map[string]string{
-				"flux_meters":                   `["policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"]`,
-				"rate_limiters":                 `[]`,
-				"dropping_rate_limiters":        `[]`,
-				"concurrency_limiters":          `["policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"]`,
-				"dropping_concurrency_limiters": `["policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"]`,
+			map[string]interface{}{
+				"flux_meters":                   []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
+				"rate_limiters":                 []interface{}{},
+				"dropping_rate_limiters":        []interface{}{},
+				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -344,11 +344,11 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
-			map[string]string{
-				"rate_limiters":                 `[]`,
-				"dropping_rate_limiters":        `[]`,
-				"concurrency_limiters":          `["policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"]`,
-				"dropping_concurrency_limiters": `["policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"]`,
+			map[string]interface{}{
+				"rate_limiters":                 []interface{}{},
+				"dropping_rate_limiters":        []interface{}{},
+				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -414,21 +414,21 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_sum{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 5
 			workload_latency_ms_count{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
-			map[string]string{
-				"rate_limiters": `[
-					"policy_name:foo,component_index:1,policy_hash:foo-hash"
-				]`,
-				"dropping_rate_limiters": `[
-					"policy_name:foo,component_index:1,policy_hash:foo-hash"
-				]`,
-				"concurrency_limiters": `[
+			map[string]interface{}{
+				"rate_limiters": []interface{}{
+					"policy_name:foo,component_index:1,policy_hash:foo-hash",
+				},
+				"dropping_rate_limiters": []interface{}{
+					"policy_name:foo,component_index:1,policy_hash:foo-hash",
+				},
+				"concurrency_limiters": []interface{}{
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
-					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash"
-				]`,
-				"dropping_concurrency_limiters": `[
+					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
+				},
+				"dropping_concurrency_limiters": []interface{}{
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
-					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash"
-				]`,
+					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
+				},
 			},
 		),
 	)

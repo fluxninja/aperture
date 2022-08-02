@@ -2,7 +2,6 @@ package metricsprocessor
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -125,12 +124,12 @@ func (p *metricsProcessor) addLimiterAndFluxMeterLabels(
 	decisions []*flowcontrolv1.LimiterDecision,
 	fluxMeters []*flowcontrolv1.FluxMeter,
 ) {
-	labels := map[string][]string{
-		otelcollector.RateLimitersLabel:                {},
-		otelcollector.DroppingRateLimitersLabel:        {},
-		otelcollector.ConcurrencyLimitersLabel:         {},
-		otelcollector.DroppingConcurrencyLimitersLabel: {},
-		otelcollector.FluxMetersLabel:                  {},
+	labels := map[string]pcommon.Value{
+		otelcollector.RateLimitersLabel:                pcommon.NewValueSlice(),
+		otelcollector.DroppingRateLimitersLabel:        pcommon.NewValueSlice(),
+		otelcollector.ConcurrencyLimitersLabel:         pcommon.NewValueSlice(),
+		otelcollector.DroppingConcurrencyLimitersLabel: pcommon.NewValueSlice(),
+		otelcollector.FluxMetersLabel:                  pcommon.NewValueSlice(),
 	}
 	for _, decision := range decisions {
 		if decision.GetRateLimiter() != nil {
@@ -140,9 +139,9 @@ func (p *metricsProcessor) addLimiterAndFluxMeterLabels(
 				fmt.Sprintf("policy_hash:%v", decision.GetPolicyHash()),
 			}
 			value := strings.Join(rawValue, ",")
-			labels[otelcollector.RateLimitersLabel] = append(labels[otelcollector.RateLimitersLabel], value)
+			labels[otelcollector.RateLimitersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 			if decision.Dropped {
-				labels[otelcollector.DroppingRateLimitersLabel] = append(labels[otelcollector.DroppingRateLimitersLabel], value)
+				labels[otelcollector.DroppingRateLimitersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 			}
 		}
 		if cl := decision.GetConcurrencyLimiter(); cl != nil {
@@ -153,9 +152,9 @@ func (p *metricsProcessor) addLimiterAndFluxMeterLabels(
 				fmt.Sprintf("policy_hash:%v", decision.GetPolicyHash()),
 			}
 			value := strings.Join(rawValue, ",")
-			labels[otelcollector.ConcurrencyLimitersLabel] = append(labels[otelcollector.ConcurrencyLimitersLabel], value)
+			labels[otelcollector.ConcurrencyLimitersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 			if decision.Dropped {
-				labels[otelcollector.DroppingConcurrencyLimitersLabel] = append(labels[otelcollector.DroppingConcurrencyLimitersLabel], value)
+				labels[otelcollector.DroppingConcurrencyLimitersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 			}
 		}
 	}
@@ -166,16 +165,10 @@ func (p *metricsProcessor) addLimiterAndFluxMeterLabels(
 			fmt.Sprintf("policy_hash:%v", fluxMeter.GetPolicyHash()),
 		}
 		value := strings.Join(rawValue, ",")
-		labels[otelcollector.FluxMetersLabel] = append(labels[otelcollector.FluxMetersLabel], value)
+		labels[otelcollector.FluxMetersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 	}
-	for key, rawValue := range labels {
-		value, err := json.Marshal(rawValue)
-		if err != nil {
-			// This should never happen
-			log.Debug().Str("label", key).Msg("failed to marshal value")
-			continue
-		}
-		attributes.InsertString(key, string(value))
+	for key, value := range labels {
+		attributes.Insert(key, value)
 	}
 	attributes.Remove(otelcollector.MarshalledLimiterDecisionsLabel)
 	attributes.Remove(otelcollector.MarshalledFluxMetersLabel)
