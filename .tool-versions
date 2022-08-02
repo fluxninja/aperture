@@ -9,3 +9,4 @@ nodejs 18.7.0
 python 3.10.5
 shellcheck 0.8.0
 yq 4.27.2
+helm 3.9.2
