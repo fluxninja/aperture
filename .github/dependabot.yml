@@ -10,7 +10,7 @@ updates:
       - "kwapik"
       - "kasajna"
     rebase-strategy: "disabled"
- 
+  
   # Go
   - package-ecosystem: "gomod"
     directory: "/"
