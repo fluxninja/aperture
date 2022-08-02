@@ -188,10 +188,14 @@ jobs:
             /tmp/prometheus-download-test/prometheus --version
             mv /tmp/prometheus-download-test/prometheus /home/circleci/bin/prometheus
       - run:
+          name: set GOMAXPROCS to 4
+          command: |
+            echo 'export GOMAXPROCS=4' >> $BASH_ENV
+      - run:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
           command: |
-            GOMAXPROCS=4 gotestsum --format=testname --junitfile unit-tests.xml --rerun-fails=2 --packages="./..." -- -race -coverprofile=coverage.out -coverpkg=./... ./...
+            gotestsum --format=testname --junitfile unit-tests.xml --rerun-fails=2 --packages="./..." -- -race -coverprofile=coverage.out -coverpkg=./... ./...
             mkdir -p /tmp/test-results
             mv unit-tests.xml /tmp/test-results
       - codecov/upload
@@ -219,6 +223,10 @@ jobs:
             nodejs
             shellcheck
             yq
+      - run:
+          name: set GOMAXPROCS to 4
+          command: |
+            echo 'export GOMAXPROCS=4' >> $BASH_ENV
       - restore_cache:
           name: Restore go cache
           keys:
