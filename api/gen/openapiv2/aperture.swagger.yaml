@@ -679,6 +679,11 @@ definitions:
     description: |-
       Identifies control point within a service that the rule or policy should apply to.
       Controlpoint is either a library feature name or one of "ingress/egress" traffic control point.
+  v1ControllerInfo:
+    type: object
+    properties:
+      id:
+        type: string
   v1Decider:
     type: object
     properties:
@@ -1350,6 +1355,8 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/protobufAny'
+      controller_info:
+        $ref: '#/definitions/v1ControllerInfo'
       host_info:
         $ref: '#/definitions/v1HostInfo'
       peer_infos:

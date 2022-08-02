@@ -26,7 +26,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.1
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/memberlist v0.3.2
 	github.com/jonboulle/clockwork v0.3.0
@@ -38,7 +38,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.1.4
-	github.com/onsi/gomega v1.19.0
+	github.com/onsi/gomega v1.20.0
 	github.com/open-policy-agent/opa v0.42.2
 	github.com/open-policy-agent/opa-envoy-plugin v0.42.1-envoy
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.56.0
@@ -66,7 +66,7 @@ require (
 	go.uber.org/multierr v1.8.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/net v0.0.0-20220728030405-41545e8bf201
-	google.golang.org/genproto v0.0.0-20220725144611-272f38e5d71b
+	google.golang.org/genproto v0.0.0-20220728213248-dd149ef739b9
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/fsnotify.v1 v1.4.7
