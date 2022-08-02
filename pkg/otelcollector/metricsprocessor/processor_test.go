@@ -1,6 +1,7 @@
 package metricsprocessor
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/golang/mock/gomock"
@@ -56,7 +57,14 @@ var _ = Describe("Metrics Processor", func() {
 			expectedCalls := make([]*gomock.Call, len(fluxMeters))
 			for i, fm := range fluxMeters {
 				// TODO actually return some Histogram
-				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.FluxMeterId).Return(nil)
+				fmID := fmt.Sprintf(
+					"agent_group-%v-policy-%v-flux_meter-%v-policy_hash-%v",
+					fm.GetAgentGroupName(),
+					fm.GetPolicyName(),
+					fm.GetFluxMeterName(),
+					fm.GetPolicyHash(),
+				)
+				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fmID).Return(nil)
 			}
 			gomock.InOrder(expectedCalls...)
 
@@ -100,10 +108,10 @@ var _ = Describe("Metrics Processor", func() {
 			},
 			[]*flowcontrolv1.FluxMeter{
 				{
-					PolicyName:    "foo",
-					PolicyHash:    "foo-hash",
-					FluxMeterName: "bar",
-					FluxMeterId:   "bar-id",
+					AgentGroupName: "ag",
+					PolicyName:     "foo",
+					PolicyHash:     "foo-hash",
+					FluxMeterName:  "bar",
 				},
 			},
 			nil,
@@ -249,7 +257,14 @@ var _ = Describe("Metrics Processor", func() {
 			expectedCalls := make([]*gomock.Call, len(fluxMeters))
 			for i, fm := range fluxMeters {
 				// TODO actually return some Histogram
-				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.FluxMeterId).Return(nil)
+				fmID := fmt.Sprintf(
+					"agent_group-%v-policy-%v-flux_meter-%v-policy_hash-%v",
+					fm.GetAgentGroupName(),
+					fm.GetPolicyName(),
+					fm.GetFluxMeterName(),
+					fm.GetPolicyHash(),
+				)
+				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fmID).Return(nil)
 			}
 			gomock.InOrder(expectedCalls...)
 
@@ -293,10 +308,10 @@ var _ = Describe("Metrics Processor", func() {
 			},
 			[]*flowcontrolv1.FluxMeter{
 				{
-					PolicyName:    "foo",
-					PolicyHash:    "foo-hash",
-					FluxMeterName: "bar",
-					FluxMeterId:   "bar-id",
+					AgentGroupName: "ag",
+					PolicyName:     "foo",
+					PolicyHash:     "foo-hash",
+					FluxMeterName:  "bar",
 				},
 			},
 			nil,

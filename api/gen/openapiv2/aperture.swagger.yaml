@@ -300,7 +300,7 @@ definitions:
   apertureflowcontrolv1FluxMeter:
     type: object
     properties:
-      flux_meter_id:
+      agent_group_name:
         type: string
       flux_meter_name:
         type: string

@@ -16,6 +16,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/paths"
 )
 
 const (
@@ -234,9 +235,15 @@ func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, la
 }
 
 func (p *metricsProcessor) updateMetricsForFluxMeters(fluxMeter *flowcontrolv1.FluxMeter, latency float64) {
-	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxMeter.FluxMeterId)
+	fluxMeterID := paths.MetricIDForFluxMeterExpanded(
+		fluxMeter.GetAgentGroupName(),
+		fluxMeter.GetPolicyName(),
+		fluxMeter.GetFluxMeterName(),
+		fluxMeter.GetPolicyHash(),
+	)
+	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxMeterID)
 	if fluxmeterHistogram == nil {
-		log.Debug().Str("fluxMeterID", fluxMeter.FluxMeterId).Msg("Fluxmeter not found")
+		log.Debug().Str("fluxMeterID", fluxMeterID).Msg("Fluxmeter not found")
 		return
 	}
 	fluxmeterHistogram.Observe(latency)

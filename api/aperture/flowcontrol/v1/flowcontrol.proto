@@ -84,8 +84,8 @@ message LimiterDecision {
 
 // FluxMeter describes deteail for each FluxMeter.
 message FluxMeter {
-  string policy_name = 1;
-  string policy_hash = 2;
-  string flux_meter_name = 3;
-  string flux_meter_id = 4;
+  string agent_group_name = 1;
+  string policy_name = 2;
+  string policy_hash = 3;
+  string flux_meter_name = 4;
 }
