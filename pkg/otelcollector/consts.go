@@ -65,6 +65,8 @@ const (
 	PeerIPLabel = "net.peer.ip"
 	// FeatureAddressLabel describes feature address of the request.
 	FeatureAddressLabel = "feature.ip"
+	// FeatureIDLabel describes the ID of the feature.
+	FeatureIDLabel = "feature.id"
 	// EntityNameLabel describes entity name e.g. pod name.
 	EntityNameLabel = "entity_name"
 	// TimestampLabel describes timestamp of the request.
