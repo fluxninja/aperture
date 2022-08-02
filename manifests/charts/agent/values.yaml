@@ -1,0 +1,554 @@
+## @section Global parameters
+
+## @param global.imageRegistry Global Docker image registry
+## @param global.imagePullSecrets Global Docker registry secret names as an array
+## @param global.istioNamespace Specifies namespace for Istio resources
+##
+global:
+  ## Global Docker image parameters
+  ## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+  ## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+  ##
+  imageRegistry: ""
+  ## E.g.
+  ## imagePullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  imagePullSecrets: []
+
+  ## Global namespace for Istio-resources.
+  ## This needs to be "aperture-system" to support with the aperture components.
+  ##
+  istioNamespace: "aperture-system"
+
+## @section Common parameters
+
+## @param kubeVersion Override Kubernetes version
+##
+kubeVersion: ""
+## @param nameOverride String to partially override common.names.name
+##
+nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname
+##
+fullnameOverride: ""
+## @param namespaceOverride String to fully override common.names.namespace
+##
+namespaceOverride: ""
+## @param commonLabels Labels to add to all deployed objects
+##
+commonLabels: {}
+## @param commonAnnotations Annotations to add to all deployed objects
+##
+commonAnnotations: {}
+## @param clusterDomain Kubernetes cluster domain name
+##
+clusterDomain: cluster.local
+## @param extraDeploy Array of extra objects to deploy with the release
+##
+extraDeploy: []
+
+## @section FluxNinja cloud integration parameters
+
+## @param fluxninjaPlugin.enabled Boolean flag for enabling FluxNinja cloud connection from Agent and Controller
+## @param fluxninjaPlugin.endpoint FluxNinja cloud instance endpoint
+## @param fluxninjaPlugin.heartbeatsInterval specifies how often to send heartbeats to the cloud
+## @param fluxninjaPlugin.tls.insecure specifies whether to communicate with FluxNinja cloud over TLS or in plain text
+## @param fluxninjaPlugin.tls.insecureSkipVerify specifies whether to verify FluxNinja cloud certificate
+## @param fluxninjaPlugin.tls.caFile specifies an alternative CA certificates bundle to use to validate FluxNinja cloud certificate
+## @param fluxninjaPlugin.apiKeySecret.agent.create Whether to create Kubernetes Secret with provided Agent API Key
+## @param fluxninjaPlugin.apiKeySecret.agent.secretKeyRef.name specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey
+## @param fluxninjaPlugin.apiKeySecret.agent.secretKeyRef.key specifies which key from the Secret for Agent API Key to use
+## @param fluxninjaPlugin.apiKeySecret.agent.value API Key to use when creating a new Agent API Key Secret
+## @param fluxninjaPlugin.apiKeySecret.controller.create Whether to create Kubernetes Secret with provided Controller API Key
+## @param fluxninjaPlugin.apiKeySecret.controller.secretKeyRef.name specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey
+## @param fluxninjaPlugin.apiKeySecret.controller.secretKeyRef.key specifies which key from the Secret for Controller API Key to use
+## @param fluxninjaPlugin.apiKeySecret.controller.value API Key to use when creating a new Controller API Key Secret
+##
+fluxninjaPlugin:
+  enabled: false
+  endpoint: ~
+  heartbeatsInterval: 30s
+  tls:
+    insecure: false
+    insecureSkipVerify: false
+    caFile:
+  apiKeySecret:
+    agent:
+      create: true
+      secretKeyRef:
+        name: ~
+        key: apiKey
+      value: ~
+    controller:
+      create: true
+      secretKeyRef:
+        name: ~
+        key: apiKey
+      value: ~
+
+## @section Agent Parameters
+
+## Agent container
+##
+agent:
+  ## @param agent.image.registry agent image registry
+  ## @param agent.image.repository agent image repository
+  ## @param agent.image.tag agent image tag (immutable tags are recommended)
+  ## @param agent.image.pullPolicy agent image pull policy
+  ## @param agent.image.pullSecrets agent image pull secrets
+  ##
+  image:
+    registry: gcr.io/devel-309501/cf-fn
+    repository: aperture-agent
+    tag: latest
+    ## Specify a imagePullPolicy
+    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+    ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+
+  ## @param agent.serverPort The agent's server port
+  serverPort: 80
+
+  ## @param agent.distributedCachePort Port for Agent's distributed cache endpoint
+  distributedCachePort: 3320
+
+  ## @param agent.memberListPort Port for Agent's member list endpoint
+  memberListPort: 3322
+
+  ## @param agent.log.prettyConsole Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
+  ## @param agent.log.nonBlocking Use non-blocking log writer (can lose logs at high throughput)
+  ## @param agent.log.level Log level. Keywords allowed - ["debug", "info", "warn", "fatal", "panic", "trace"]. Defaults to info
+  ## @param agent.log.file Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. "default" maps to /var/log/aperture/<service>.log
+  log:
+    prettyConsole: false
+    nonBlocking: true
+    level: info
+    file: stderr
+
+  ## Configure extra options for agent containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param agent.livenessProbe.enabled Enable livenessProbe on agent containers
+  ## @param agent.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param agent.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param agent.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param agent.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param agent.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  ## @param agent.readinessProbe.enabled Enable readinessProbe on agent containers
+  ## @param agent.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param agent.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param agent.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param agent.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param agent.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  ## @param agent.customLivenessProbe Custom livenessProbe that overrides the default one
+  ##
+  customLivenessProbe: {}
+  ## @param agent.customReadinessProbe Custom readinessProbe that overrides the default one
+  ##
+  customReadinessProbe: {}
+  ## agent resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ## @param agent.resources.limits The resources limits for the agent containers
+  ## @param agent.resources.requests The requested resources for the agent containers
+  ##
+  resources:
+    limits: {}
+    requests: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param agent.podSecurityContext.enabled Enabled agent pods' Security Context
+  ## @param agent.podSecurityContext.fsGroup Set agent pod's Security Context fsGroup
+  podSecurityContext:
+    enabled: false
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param agent.containerSecurityContext.enabled Enabled agent containers' Security Context
+  ## @param agent.containerSecurityContext.runAsUser Set agent containers' Security Context runAsUser
+  ## @param agent.containerSecurityContext.runAsNonRoot Set agent containers' Security Context runAsNonRoot
+  ## @param agent.containerSecurityContext.readOnlyRootFilesystem Set agent containers' Security Context runAsNonRoot
+  containerSecurityContext:
+    enabled: false
+    runAsUser: 1001
+    runAsNonRoot: false
+    readOnlyRootFilesystem: false
+
+  ## @param agent.command Override default container command (useful when using custom images)
+  ##
+  command: []
+  ## @param agent.args Override default container args (useful when using custom images)
+  ##
+  args: []
+  ## @param agent.podLabels Extra labels for agent pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param agent.podAnnotations Annotations for agent pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param agent.affinity Affinity for agent pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
+  affinity: {}
+  ## @param agent.nodeSelector Node labels for agent pods assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+  ## @param agent.tolerations Tolerations for agent pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## @param agent.terminationGracePeriodSeconds configures how long kubelet gives agent chart to terminate cleanly
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param agent.lifecycleHooks for the agent container(s) to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param agent.extraEnvVars Array with extra environment variables to add to agent nodes
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param agent.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for agent nodes
+  ##
+  extraEnvVarsCM: ""
+  ## @param agent.extraEnvVarsSecret Name of existing Secret containing extra env vars for agent nodes
+  ##
+  extraEnvVarsSecret: ""
+  ## @param agent.extraVolumes Optionally specify extra list of additional volumes for the agent pod(s)
+  ##
+  extraVolumes: []
+  ## @param agent.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the agent container(s)
+  ##
+  extraVolumeMounts: []
+  ## @param agent.sidecars Add additional sidecar containers to the agent pod(s)
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: {}
+  ## @param agent.initContainers Add additional init containers to the agent pod(s)
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: {}
+
+  ## @param agent.serviceAccount.create Specifies whether a ServiceAccount should be created
+  ## @param agent.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+  ## @param agent.serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+  ##
+  serviceAccount:
+    create: true
+    annotations: {}
+    automountServiceAccountToken: true
+
+## @section Controller Parameters
+
+## Agent Controller container
+##
+agentController:
+  ## @param agentController.image.registry agent controller image registry
+  ## @param agentController.image.repository agent controller image repository
+  ## @param agentController.image.tag agent controller image tag (immutable tags are recommended)
+  ## @param agentController.image.pullPolicy agent controller image pull policy
+  ## @param agentController.image.pullSecrets agent controller image pull secrets
+  ##
+  image:
+    registry: gcr.io/devel-309501/cf-fn
+    repository: aperture-controller
+    tag: latest
+    ## Specify a imagePullPolicy
+    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+    ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+
+  ## @param agentController.serverPort The controller's server port
+  serverPort: 80
+
+  ## @param agentController.log.prettyConsole Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
+  ## @param agentController.log.nonBlocking Use non-blocking log writer (can lose logs at high throughput)
+  ## @param agentController.log.level Log level. Keywords allowed - ["debug", "info", "warn", "fatal", "panic", "trace"]. Defaults to info
+  ## @param agentController.log.file Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. "default" maps to /var/log/aperture/<service>.log
+  log:
+    prettyConsole: false
+    nonBlocking: true
+    level: info
+    file: stderr
+
+  ## Configure extra options for agent controller containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param agentController.livenessProbe.enabled Enable livenessProbe on agent controller containers
+  ## @param agentController.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param agentController.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param agentController.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param agentController.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param agentController.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  ## @param agentController.readinessProbe.enabled Enable readinessProbe on agent controller containers
+  ## @param agentController.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param agentController.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param agentController.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param agentController.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param agentController.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  ## @param agentController.customLivenessProbe Custom livenessProbe that overrides the default one
+  ##
+  customLivenessProbe: {}
+  ## @param agentController.customReadinessProbe Custom readinessProbe that overrides the default one
+  ##
+  customReadinessProbe: {}
+  ## agent controller resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ## @param agentController.resources.limits The resources limits for the agentController containers
+  ## @param agentController.resources.requests The requested resources for the agentController containers
+  ##
+  resources:
+    limits: {}
+    requests: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param agentController.podSecurityContext.enabled Enables agentController pods' Security Context
+  ## @param agentController.podSecurityContext.fsGroup Set agentController pod's Security Context fsGroup
+  podSecurityContext:
+    enabled: false
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param agentController.containerSecurityContext.enabled Enables agentController containers' Security Context
+  ## @param agentController.containerSecurityContext.runAsUser Set agentController containers' Security Context runAsUser
+  ## @param agentController.containerSecurityContext.runAsNonRoot Set agentController containers' Security Context runAsNonRoot
+  ## @param agentController.containerSecurityContext.readOnlyRootFilesystem Set agent controller containers' Security Context runAsNonRoot
+  containerSecurityContext:
+    enabled: false
+    runAsUser: 1001
+    runAsNonRoot: false
+    readOnlyRootFilesystem: false
+
+  ## @param agentController.command Override default container command (useful when using custom images)
+  ##
+  command: []
+  ## @param agentController.args Override default container args (useful when using custom images)
+  ##
+  args: []
+  ## @param agentController.hostAliases agent controller pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param agentController.podLabels Extra labels for agent controller pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param agentController.podAnnotations Annotations for agent controller pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param agentController.affinity Affinity for agent controller pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `agentController.podAffinityPreset`, `agentController.podAntiAffinityPreset`, and `agentController.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param agentController.nodeSelector Node labels for agent controller pods assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+  ## @param agentController.tolerations Tolerations for agent controller pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## @param agentController.terminationGracePeriodSeconds Seconds Redmine pod needs to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param agentController.lifecycleHooks for the agent controller container(s) to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param agentController.extraEnvVars Array with extra environment variables to add to agent controller nodes
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param agentController.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for agentController nodes
+  ##
+  extraEnvVarsCM: ""
+  ## @param agentController.extraEnvVarsSecret Name of existing Secret containing extra env vars for agentController nodes
+  ##
+  extraEnvVarsSecret: ""
+  ## @param agentController.extraVolumes Optionally specify extra list of additional volumes for the agentController pod(s)
+  ##
+  extraVolumes: []
+  ## @param agentController.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the agentController container(s)
+  ##
+  extraVolumeMounts: []
+  ## @param agentController.sidecars Add additional sidecar containers to the agentController pod(s)
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: {}
+  ## @param agentController.initContainers Add additional init containers to the agent controller pod(s)
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: {}
+
+  ## @param agentController.serviceAccount.create Specifies whether a ServiceAccount should be created
+  ## @param agentController.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+  ## @param agentController.serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+  ##
+  serviceAccount:
+    create: true
+    annotations: {}
+    automountServiceAccountToken: true
+
+## @section Traffic Exposure Parameters
+##
+
+## agent service parameters
+##
+service:
+  agent:
+    ## @param service.agent.annotations Additional custom annotations for agent service
+    ##
+    annotations: {}
+  agentController:
+    ## @param service.agentController.annotations Additional custom annotations for agent controller service
+    ##
+    annotations: {}
+
+## @section Other Parameters
+
+## @section etcd
+## @param etcd.enabled Whether to deploy a small etcd cluster as part of this chart
+## @param etcd.endpoints List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty when etcd.enabled is set to false.
+## @param etcd.leaseTtl Lease time-to-live.
+## @param etcd.auth.rbac.create specifies whether to create the RBAC resources for Etcd
+## @param etcd.auth.token.type specifies the type of token to use
+etcd:
+  enabled: true
+  endpoints: []
+  leaseTtl: 60s
+  auth:
+    rbac:
+      create: false
+    token:
+      type: "simple"
+
+## @section prometheus
+## @param prometheus.enabled specifies whether to deploy embedded prometheus
+## @param prometheus.address specifies the address of the Prometheus server. This must not be empty when prometheus.enabled is set to false.
+## @skip prometheus.server
+## @skip prometheus.alertmanager
+## @skip prometheus.nodeExporter
+## @skip prometheus.pushgateway
+## @skip prometheus.serverFiles
+## @skip prometheus.kube-state-metrics
+prometheus:
+  enabled: true
+  address: ""
+  server:
+    image:
+      tag: v2.33.5
+    extraFlags:
+      - web.enable-remote-write-receiver
+  alertmanager:
+    enabled: false
+  nodeExporter:
+    enabled: false
+  pushgateway:
+    enabled: false
+  serverFiles:
+    prometheus.yml:
+      scrape_configs: []
+  kube-state-metrics:
+    podAnnotations:
+      "prometheus.io/scrape": "true"
+
+## @section istio
+## @param istio.enabled specifies whether to deploy embedded istio
+## @param istio.global.tag specifies the image tag for all the istio resources
+## @param istio.envoyFilter.install specifies whether to deploy EnvoyFilter
+## @param istio.envoyFilter.name specifies name for the EnvoyFilter
+## @param istio.envoyFilter.authzGrpcTimeout specifies timeout for the AuthZ gRPC connection
+## @param istio.envoyFilter.maxRequestBytes specifies allowed maximum request bytes
+istio:
+  enabled: true
+  global:
+    tag: "1.11.8"
+  envoyFilter:
+    install: true
+    name: aperture-envoy-filter
+    authzGrpcTimeout: 0.01s
+    maxRequestBytes: 8192
