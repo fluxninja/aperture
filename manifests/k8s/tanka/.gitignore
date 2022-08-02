@@ -1,0 +1,4 @@
+# We ignore vendor dirs to not keep Jsonnet Bundles in the repo
+# They can be downloaded using jb command
+vendor/
+environments/*/vendor/
