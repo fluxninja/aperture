@@ -1,0 +1,162 @@
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "common.names.fullname" . }}-controller
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: agent
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: agent-controller
+  template:
+    metadata:
+      {{- if .Values.agentController.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.agentController.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: agent-controller
+        {{- if .Values.agentController.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.agentController.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName:  {{ template "common.names.fullname" . }}-controller
+      {{- include "aperture-agent.imagePullSecrets" . | nindent 6 }}
+      {{- if .Values.agentController.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.agentController.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentController.affinity }}
+      affinity: {{- include "common.tplvalues.render" ( dict "value" .Values.agentController.affinity "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentController.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.agentController.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentController.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.agentController.tolerations "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentController.priorityClassName }}
+      priorityClassName: {{ .Values.agentController.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.agentController.schedulerName }}
+      schedulerName: {{ .Values.agentController.schedulerName | quote }}
+      {{- end }}
+      {{- if .Values.agentController.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.agentController.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentController.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.agentController.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentController.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.agentController.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- if .Values.agentController.initContainers }}
+      initContainers:
+        {{- include "common.tplvalues.render" (dict "value" .Values.agentController.initContainers "context" $) | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: aperture-agent-controller
+          image: {{ template "aperture-agent-controller.image" . }}
+          imagePullPolicy: {{ .Values.agentController.image.pullPolicy }}
+          {{- if .Values.agentController.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.agentController.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.agentController.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.agentController.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.agentController.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.agentController.args "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            - name: APERTURE_CONTROLLER_OTEL_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: APERTURE_CONTROLLER_SERVICE_DISCOVERY_KUBERNETES_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            {{- if and .Values.fluxninjaPlugin.apiKeySecret.controller.create .Values.fluxninjaPlugin.enabled }}
+            - name: APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "aperture-controller.apiKeySecretRefName" . }}
+                  key: {{ .Values.fluxninjaPlugin.apiKeySecret.controller.secretKeyRef.key }}
+                  optional: false
+            {{- end }}
+            {{- if .Values.agentController.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.agentController.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.agentController.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.agentController.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.agentController.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.agentController.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          {{- if .Values.agentController.resources }}
+          resources: {{- toYaml .Values.agentController.resources | nindent 12 }}
+          {{- end }}
+          ports:
+            - containerPort: {{ .Values.agentController.serverPort }}
+              name: "grpc"
+            - containerPort: 8086
+              name: "webhooks-port"
+          {{- if .Values.agentController.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.agentController.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /v1/status/liveness
+              port: grpc
+          {{- else if .Values.agentController.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.agentController.customLivenessProbe "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.agentController.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.agentController.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /v1/status/readiness
+              port: grpc
+          {{- else if .Values.agentController.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.agentController.customReadinessProbe "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.agentController.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.agentController.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: aperture-controller-config
+              mountPath: /etc/aperture/aperture-controller/config
+            - name: etc-aperture-flowcontrol
+              mountPath: /etc/aperture/aperture-controller/policies
+              readOnly: true
+            - name: etc-aperture-classification
+              mountPath: /etc/aperture/aperture-controller/classifiers
+              readOnly: true
+          {{- if .Values.agentController.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.agentController.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+        {{- if .Values.agentController.sidecars }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.agentController.sidecars "context" $) | nindent 8 }}
+        {{- end }}
+      volumes:
+        - name: aperture-controller-config
+          configMap:
+            name: {{ template "common.names.fullname" . }}-controller
+        - name: etc-aperture-flowcontrol
+          configMap:
+            name: flowcontrol
+            optional: true
+        - name: etc-aperture-classification
+          configMap:
+            name: classification
+            optional: true
+        {{- if .Values.agentController.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.agentController.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
