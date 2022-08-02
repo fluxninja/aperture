@@ -1,6 +1,5 @@
 version: 2
 updates:
-  # Github actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -10,8 +9,6 @@ updates:
       - "kwapik"
       - "kasajna"
     rebase-strategy: "disabled"
-  
-  # Go
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
