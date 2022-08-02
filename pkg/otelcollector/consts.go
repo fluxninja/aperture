@@ -78,15 +78,13 @@ const (
 	ServicesLabel = "services"
 )
 
-var (
-	// MultiValueFields is a map of fields which should be sent to Kafka and then
-	// to Druid as a multi value field i.e. which ones should be unmarshalled to a
-	// list.
-	MultiValueFields map[string]struct{} = map[string]struct{}{
-		RateLimitersLabel:                {},
-		DroppingRateLimitersLabel:        {},
-		ConcurrencyLimitersLabel:         {},
-		DroppingConcurrencyLimitersLabel: {},
-		FluxMetersLabel:                  {},
-	}
-)
+// MultiValueFields is a map of fields which should be sent to Kafka and then
+// to Druid as a multi value field i.e. which ones should be unmarshalled to a
+// list.
+var MultiValueFields map[string]struct{} = map[string]struct{}{
+	RateLimitersLabel:                {},
+	DroppingRateLimitersLabel:        {},
+	ConcurrencyLimitersLabel:         {},
+	DroppingConcurrencyLimitersLabel: {},
+	FluxMetersLabel:                  {},
+}

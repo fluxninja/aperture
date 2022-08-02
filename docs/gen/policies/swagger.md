@@ -19,6 +19,7 @@
 - [WorkloadConfigWorkload](#workload-config-workload) – Workload defines a class of requests that preferably have similar properties suc…
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to pr…
 - [languagev1RateLimiter](#languagev1-rate-limiter)
+- [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 - [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals…
 - [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
 - [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the Arithmetic Combinator component.
@@ -37,7 +38,6 @@
 - [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the perio…
 - [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator component.
 - [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator component.
-- [v1FluxMeter](#v1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 - [v1GradientController](#v1-gradient-controller) – Describes the gradient values which is computed as follows: gradient = (setpoint…
 - [v1GradientControllerIns](#v1-gradient-controller-ins) – Inputs for the Gradient Controller component.
 - [v1GradientControllerOuts](#v1-gradient-controller-outs) – Outputs for the Gradient Controller component.
@@ -331,6 +331,37 @@ Concurrency Limiter is an actuator component that regulates flows in order to pr
 <dd>
 
 ([V1Selector](#v1-selector))
+
+</dd>
+</dl>
+
+### <span id="policylanguagev1-flux-meter"></span> policylanguagev1FluxMeter
+
+FluxMeter gathers metrics for the traffic that matches its selector.
+
+#### Properties
+
+<dl>
+<dt>histogram_buckets</dt>
+<dd>
+
+([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) Latency histogram buckets (in ms) for this FluxMeter.
+
+</dd>
+</dl>
+<dl>
+<dt>name</dt>
+<dd>
+
+(string) Name of the flux meter.
+
+</dd>
+</dl>
+<dl>
+<dt>selector</dt>
+<dd>
+
+([V1Selector](#v1-selector)) Policies are only applied to flows that are matched based on the fields in the selector.
 
 </dd>
 </dl>
@@ -886,37 +917,6 @@ Outputs for the Extrapolator component.
 </dd>
 </dl>
 
-### <span id="v1-flux-meter"></span> v1FluxMeter
-
-FluxMeter gathers metrics for the traffic that matches its selector.
-
-#### Properties
-
-<dl>
-<dt>histogram_buckets</dt>
-<dd>
-
-([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) Latency histogram buckets (in ms) for this FluxMeter.
-
-</dd>
-</dl>
-<dl>
-<dt>name</dt>
-<dd>
-
-(string) Name of the flux meter.
-
-</dd>
-</dl>
-<dl>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector)) Policies are only applied to flows that are matched based on the fields in the selector.
-
-</dd>
-</dl>
-
 ### <span id="v1-gradient-controller"></span> v1GradientController
 
 Describes the gradient values which is computed as follows: gradient = (setpoint)/(signal) \* tolerance.
@@ -1362,7 +1362,7 @@ This interval is typically aligned with how often the corrective action (actuati
 <dt>flux_meters</dt>
 <dd>
 
-([[]V1FluxMeter](#v1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+([[]Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
 
 </dd>
 </dl>

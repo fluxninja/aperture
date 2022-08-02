@@ -85,9 +85,8 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 
 	// execute rate limiters first
 	concurrencyLimiters := make([]iface.Limiter, len(multiMatchResult.ConcurrencyLimiters))
-	for i, rl := range multiMatchResult.ConcurrencyLimiters {
-		concurrencyLimiters[i] = rl
-	}
+	copy(concurrencyLimiters, multiMatchResult.ConcurrencyLimiters)
+
 	concurrencyLimiterDecisions, concurrencyLimitersDecisionType := runLimiters(concurrencyLimiters, labels)
 	response.LimiterDecisions = append(response.LimiterDecisions, concurrencyLimiterDecisions...)
 
@@ -126,7 +125,8 @@ func runLimiters(limiters []iface.Limiter, labels selectors.Labels) ([]*flowcont
 func returnExtraTokens(
 	rateLimiters []iface.RateLimiter,
 	rateLimiterDecisions []*flowcontrolv1.LimiterDecision,
-	labels selectors.Labels) {
+	labels selectors.Labels,
+) {
 	for i, l := range rateLimiterDecisions {
 		if !l.Dropped && l.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
 			go rateLimiters[i].TakeN(labels, -1)
