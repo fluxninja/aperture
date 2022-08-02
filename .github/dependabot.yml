@@ -1,0 +1,20 @@
+version: 2
+updates:
+  # Github actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    assignees:
+      - "harjotgill"
+      - "kwapik"
+      - "kasajna"
+    rebase-strategy: "disabled"
+ 
+  # Go
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    open-pull-requests-limit: 20
