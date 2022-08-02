@@ -38,7 +38,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.1.4
-	github.com/onsi/gomega v1.19.0
+	github.com/onsi/gomega v1.20.0
 	github.com/open-policy-agent/opa v0.42.2
 	github.com/open-policy-agent/opa-envoy-plugin v0.42.1-envoy
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.56.0
