@@ -1,7 +1,9 @@
 package sentry
 
 import (
+	"context"
 	"io"
+	"time"
 
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
@@ -18,8 +20,8 @@ import (
 type SentryConfig struct {
 	// If DSN is not set, the client is effectively disabled
 	// You can set test project's dsn to send log events.
-	// i.e. oss-aperture: <https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877>
-	Dsn string `json:"dsn" default:""`
+	// oss-aperture project dsn is set as default.
+	Dsn string `json:"dsn" default:"https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877"`
 	// Environment
 	Environment string `json:"environment" default:"production"`
 	// Sample rate for sampling traces i.e. 0.0 to 1.0
@@ -60,7 +62,7 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller) (io.Writer, error) {
+func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (io.Writer, error) {
 	config := constructor.DefaultConfig
 
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
@@ -73,6 +75,19 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 	}
 
 	sentryWriter, _ := NewSentryWriter(config)
+	lifecycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			err := sentry.Init(sentryWriter.Client.Options())
+			if err != nil {
+				log.Panic().Err(err).Msg("Failed initiating Sentry")
+			}
+			return nil
+		},
+		OnStop: func(_ context.Context) error {
+			sentry.Flush(5 * time.Second)
+			return nil
+		},
+	})
 
 	return sentryWriter, nil
 }

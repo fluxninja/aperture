@@ -71,7 +71,7 @@ func (s *SentryWriter) parseLogEvent(data []byte) (*sentry.Event, bool) {
 		Logger:    "zerolog",
 	}
 
-	err = jsonparser.ObjectEach(data, func(key, value []byte, vt jsonparser.ValueType, offset int) error {
+	err = jsonparser.ObjectEach(data, func(key, value []byte, _ jsonparser.ValueType, _ int) error {
 		switch string(key) {
 		case zerolog.MessageFieldName:
 			event.Message = bytesToStrUnsafe(value)
@@ -106,7 +106,7 @@ func RegisterSentryPanicHandler() {
 	panichandler.RegisterPanicHandler(SentryPanicHandler)
 }
 
-func SentryPanicHandler(e interface{}, s panichandler.Callstack) {
+func SentryPanicHandler(e interface{}, _ panichandler.Callstack) {
 	duration, _ := time.ParseDuration(SentryFlushWait)
 
 	sentry.CurrentHub().Recover(e)
