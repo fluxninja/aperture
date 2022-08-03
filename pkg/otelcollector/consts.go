@@ -41,6 +41,10 @@ const (
 	HTTPResponseContentLength = "http.response_content_length"
 	// FeatureDurationLabel describes duration of the feature in milliseconds.
 	FeatureDurationLabel = "feature.duration_millis"
+	// DecisionTypeLabel descibes the decision type taken by policy.
+	DecisionTypeLabel = "decision_type"
+	// DecisionReasonLabel descibes the reason of the decision taken by policy.
+	DecisionReasonLabel = "decision_reason"
 	// RateLimitersLabel describes rate limiters matched to the traffic.
 	RateLimitersLabel = "rate_limiters"
 	// DroppingRateLimitersLabel describes rate limiters dropping the traffic.

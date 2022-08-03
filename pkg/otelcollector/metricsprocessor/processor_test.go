@@ -81,6 +81,7 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with single policy - ingress",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -114,6 +115,8 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
+				"decision_type":                 "DECISION_TYPE_ACCEPTED",
+				"decision_reason":               "",
 				"flux_meters":                   []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
 				"rate_limiters":                 []interface{}{},
 				"dropping_rate_limiters":        []interface{}{},
@@ -125,6 +128,12 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with single policy - feature",
 			otelcollector.ControlPointFeature,
 			&flowcontrolv1.CheckResponse{
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
+				Reason: &flowcontrolv1.Reason{
+					Reason: &flowcontrolv1.Reason_RejectReason_{
+						RejectReason: flowcontrolv1.Reason_REJECT_REASON_RATE_LIMITED,
+					},
+				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -151,6 +160,8 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
+				"decision_type":                 "DECISION_TYPE_REJECTED",
+				"decision_reason":               "reject_reason:REJECT_REASON_RATE_LIMITED",
 				"rate_limiters":                 []interface{}{},
 				"dropping_rate_limiters":        []interface{}{},
 				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
@@ -161,6 +172,12 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with two policies",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+				Reason: &flowcontrolv1.Reason{
+					Reason: &flowcontrolv1.Reason_ErrorReason_{
+						ErrorReason: flowcontrolv1.Reason_ERROR_REASON_ENTITY_LOOKUP_FAILED,
+					},
+				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -221,6 +238,8 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
 			map[string]interface{}{
+				"decision_type":          "DECISION_TYPE_ACCEPTED",
+				"decision_reason":        "error_reason:ERROR_REASON_ENTITY_LOOKUP_FAILED",
 				"rate_limiters":          []interface{}{},
 				"dropping_rate_limiters": []interface{}{},
 				"concurrency_limiters": []interface{}{
@@ -274,6 +293,7 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with single policy - ingress",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -307,6 +327,8 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
+				"decision_type":                 "DECISION_TYPE_ACCEPTED",
+				"decision_reason":               "",
 				"flux_meters":                   []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
 				"rate_limiters":                 []interface{}{},
 				"dropping_rate_limiters":        []interface{}{},
@@ -318,6 +340,12 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with single policy - feature",
 			otelcollector.ControlPointFeature,
 			&flowcontrolv1.CheckResponse{
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
+				Reason: &flowcontrolv1.Reason{
+					Reason: &flowcontrolv1.Reason_RejectReason_{
+						RejectReason: flowcontrolv1.Reason_REJECT_REASON_RATE_LIMITED,
+					},
+				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -344,6 +372,8 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
+				"decision_type":                 "DECISION_TYPE_REJECTED",
+				"decision_reason":               "reject_reason:REJECT_REASON_RATE_LIMITED",
 				"rate_limiters":                 []interface{}{},
 				"dropping_rate_limiters":        []interface{}{},
 				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
@@ -354,6 +384,12 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with two policies",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+				Reason: &flowcontrolv1.Reason{
+					Reason: &flowcontrolv1.Reason_ErrorReason_{
+						ErrorReason: flowcontrolv1.Reason_ERROR_REASON_ENTITY_LOOKUP_FAILED,
+					},
+				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -416,6 +452,8 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
 			map[string]interface{}{
+				"decision_type":   "DECISION_TYPE_ACCEPTED",
+				"decision_reason": "error_reason:ERROR_REASON_ENTITY_LOOKUP_FAILED",
 				"rate_limiters": []interface{}{
 					"policy_name:foo,component_index:1,policy_hash:foo-hash",
 				},

@@ -128,6 +128,11 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(
 		otelcollector.ConcurrencyLimitersLabel:         pcommon.NewValueSlice(),
 		otelcollector.DroppingConcurrencyLimitersLabel: pcommon.NewValueSlice(),
 		otelcollector.FluxMetersLabel:                  pcommon.NewValueSlice(),
+		otelcollector.DecisionTypeLabel:                pcommon.NewValueString(checkResponse.DecisionType.String()),
+		otelcollector.DecisionReasonLabel:              pcommon.NewValueString(""),
+	}
+	if checkResponse.Reason != nil && checkResponse.Reason.Reason != nil {
+		labels[otelcollector.DecisionReasonLabel] = pcommon.NewValueString(checkResponse.Reason.String())
 	}
 	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiter() != nil {
@@ -168,8 +173,7 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(
 	for key, value := range labels {
 		attributes.Insert(key, value)
 	}
-	// attributes.Remove(otelcollector.MarshalledLimiterDecisionsLabel)
-	// attributes.Remove(otelcollector.MarshalledFluxMetersLabel)
+	attributes.Remove(otelcollector.MarshalledCheckResponseLabel)
 }
 
 func (p *metricsProcessor) updateMetrics(
