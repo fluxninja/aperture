@@ -5,7 +5,6 @@ orbs:
   gcp-gcr: circleci/gcp-gcr@0.13.0
   slack: circleci/slack@4.4.4
   rust: circleci/rust@1.5.0
-  jira: circleci/jira@1.3.1
   codecov: codecov/codecov@3.2.2
 
 executors:
@@ -247,6 +246,7 @@ jobs:
           name: Install golangci-lint
           command: |
             go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.3
+            go env
             golangci-lint version
       - run:
           name: Install pre-commit hooks
@@ -417,10 +417,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "go.mod" }}
-            - aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -436,7 +436,7 @@ commands:
     steps:
       - save_cache:
           name: Save ASDF cache
-          key: aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
+          key: aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "go.mod" }}
           paths:
