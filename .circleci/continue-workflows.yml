@@ -243,12 +243,6 @@ jobs:
               }}
             - aperture-v1-pc-cache-
       - run:
-          name: Install golangci-lint
-          command: |
-            go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.3
-            mv $GOPATH/golangci-lint /home/circleci/bin/golangci-lint
-            golangci-lint version
-      - run:
           name: Install pre-commit hooks
           command: |
             pre-commit install-hooks
