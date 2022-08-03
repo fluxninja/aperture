@@ -78,7 +78,13 @@ your setup using the [Aperture Agent Helm chart](link_to_helm_chart).
 By following these instructions, you will have deployed the Aperture Agent and
 Controller into your cluster.
 
-1. Add the Helm chart repo in your environment:
+1. Create namespace `aperture-system` for Aperture components:
+
+   ```bash
+   kubectl create namespace aperture-system
+   ```
+
+2. Add the Helm chart repo in your environment:
 
    ```bash
    helm repo add aperture LINK_TO_THE_HELM_CHART
@@ -91,19 +97,19 @@ Controller into your cluster.
    helm dependency build aperture/agent
    ```
 
-2. Install or upgrade the chart:
+3. Install or upgrade the chart:
 
    ```bash
-   helm upgrade --install agent aperture/agent
+   helm upgrade --install agent aperture/agent -n aperture-system
    ```
 
-3. [**OPTIONAL**] If you want to connect the Aperture Agent and Controller with
+4. [**OPTIONAL**] If you want to connect the Aperture Agent and Controller with
    the FluxNinja cloud, create a `values.yaml` file with below parameters:
 
    ```yaml
    fluxninjaPlugin:
      enabled: true
-     endpoint: "AGENT_SERVICE_ADDRESS"
+     endpoint: "ORGANIZATION_URL"
      apiKeySecret:
        agent:
          value: "AGENT_API_KEY"
@@ -111,13 +117,13 @@ Controller into your cluster.
          value: "CONTROLLER_API_KEY"
    ```
 
-   To generate the `AGENT_API_KEY` and `CONTROLLER_API_KEY`, please follow
+   To generate the `ORGANIZATION_URL`, `AGENT_API_KEY` and `CONTROLLER_API_KEY`, please follow
    instructions on
    [FluxNinja Sign-Up](https://docs.dev.fluxninja.com/docs/Getting%20started/sign_up)
    to get an account and
    [Generate API Keys](https://docs.dev.fluxninja.com/docs/Agent/Agent%20Management).
 
-4. The chart installs Istio, Prometheus and Etcd instances by default. If you
+5. The chart installs Istio, Prometheus and Etcd instances by default. If you
    don't want to install and use your existing instances of Istio, Prometheus or
    Etcd, configure below values in the `values.yaml` file and pass it with
    `helm upgrade`:
@@ -136,7 +142,7 @@ Controller into your cluster.
    ```
 
    ```bash
-   helm upgrade --install agent aperture/agent -f values.yaml
+   helm upgrade --install agent aperture/agent -f values.yaml -n aperture-system
    ```
 
    A list of other configurable parameters for Istio, Etcd and Prometheus can be
@@ -146,7 +152,7 @@ Controller into your cluster.
    is enabled on your existing Prometheus instance as it is required by the
    Agent.
 
-5. The chart also installs a `EnvoyFilter` resource for collecting data from the
+6. The chart also installs a `EnvoyFilter` resource for collecting data from the
    running applications. The details about the configuration and what details
    are being collected are available at [Envoy Filter](../Reference/Config-Spec/istio.md#envoy-filter). If
    you do not want to install the embedded Envoy Filter and want to install by
@@ -160,25 +166,18 @@ Controller into your cluster.
    ```
 
    ```bash
-   helm upgrade --install agent aperture/agent -f values.yaml
+   helm upgrade --install agent aperture/agent -f values.yaml -n aperture-system
    ```
 
-6. If you want to modify the default parameters, you can create or update the
+7. If you want to modify the default parameters, you can create or update the
    `values.yaml` file and pass it with `helm upgrade`:
 
    ```bash
-   helm upgrade --install agent aperture/agent -f values.yaml
+   helm upgrade --install agent aperture/agent -f values.yaml -n aperture-system
    ```
 
    A list of configurable parameters can be found in the
    [README](link_to_chart_readme_file).
-
-7. If you want to deploy the Aperture Agent and Controller into a namespace
-   other than `default`, use the `-n` flag:
-
-   ```bash
-   NAMESPACE="aperture-system"; helm upgrade --install agent aperture/agent -f values.yaml --set global.istioNamespace=$NAMESPACE -n $NAMESPACE --create-namespace
-   ```
 
 8. Once you have successfully deployed the Helm release, confirm that the
    Aperture Agent and Controller are up and running:

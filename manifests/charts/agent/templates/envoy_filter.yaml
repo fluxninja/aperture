@@ -23,15 +23,12 @@
 - key: http.status_code
   value:
     string_value: "%RESPONSE_CODE%"
-- key: fn.flow
+- key: aperture.labels
   value:
-    string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.flow)%"
-- key: fn.policies
+    string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.labels)%"
+- key: aperture.check_response
   value:
-    string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.policies)%"
-- key: fn.fluxmeters
-  value:
-    string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.fluxmeters)%"
+    string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
 {{- end -}}
 
 {{ if .Values.istio.envoyFilter.install -}}

@@ -16,6 +16,8 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
@@ -24,6 +26,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/services"
 )
@@ -179,13 +182,17 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	}
 
 	flowLabels := mergeFlowLabels(oldFlowLabels, newFlowLabels)
+	log.Warn().Msgf("Creating check response. Flow labels: %v, LimiterDecisions; %v, fluxmeters: %v", flowLabels, fcResponse.LimiterDecisions, fcResponse.FluxMeters)
+	marshalledCheckResponse, err := protoMessageAsPbValue(fcResponse)
+	if err != nil {
+		log.Warn().Err(err).Msg("Failed marshaling check response")
+	}
 	resp := ext_authz.CheckResponse{
 		// Put all non-hidden flow labels and policy details as dynamic metadata
 		DynamicMetadata: &structpb.Struct{
 			Fields: map[string]*structpb.Value{
-				"fn.flow":              flowLabelsAsPbValueForTelemetry(flowLabels),
-				"fn.limiter_decisions": limiterDecisionsAsPbValueForTelemetry(fcResponse.LimiterDecisions),
-				"fn.fluxmeters":        fluxmeterIDsAsPbValueForTelemetry(fcResponse.FluxMeterIds),
+				otelcollector.MarshalledLabelsLabel:        flowLabelsAsPbValueForTelemetry(flowLabels),
+				otelcollector.MarshalledCheckResponseLabel: marshalledCheckResponse,
 			},
 		},
 	}
@@ -237,59 +244,32 @@ func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {
 // "The External Authorization filter supports emitting dynamic metadata as an opaque google.protobuf.Struct."
 // from envoy documentation
 
-// TODO (hasit): The following marshaling functions
-// 1. should be 1 and generic
-// 2. should be moved to a common package along with the corresponding unmarshal method
-
-func flowLabelsAsPbValueForTelemetry(m classification.FlowLabels) *structpb.Value {
-	fields := make(map[string]*structpb.Value, len(m))
-	for k, fl := range m {
-		if fl.Flags.Hidden {
+func flowLabelsAsPbValueForTelemetry(labels classification.FlowLabels) *structpb.Value {
+	fields := make(map[string]*structpb.Value, len(labels))
+	for k, v := range labels {
+		if v.Flags.Hidden {
 			continue
 		}
-		fields[k] = structpb.NewStringValue(fl.Value)
+		fields[k] = structpb.NewStringValue(v.Value)
 	}
 	return structpb.NewStructValue(&structpb.Struct{Fields: fields})
 }
 
-func fluxmeterIDsAsPbValueForTelemetry(fluxmeters []string) *structpb.Value {
-	values := make([]*structpb.Value, 0, len(fluxmeters))
-	for _, fluxmeter := range fluxmeters {
-		values = append(values, structpb.NewStringValue(fluxmeter))
+func protoMessageAsPbValue(message protoreflect.ProtoMessage) (*structpb.Value, error) {
+	mBytes, err := protojson.Marshal(message)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to marshal proto message into JSON")
+		return nil, err
+
 	}
-	return structpb.NewListValue(&structpb.ListValue{Values: values})
-}
-
-func limiterDecisionsAsPbValueForTelemetry(limiterDecisions []*flowcontrolv1.LimiterDecision) *structpb.Value {
-	policies := make([]*structpb.Value, len(limiterDecisions))
-	for i, ld := range limiterDecisions {
-		var structVal *structpb.Value
-
-		switch decision := ld.Decision.(type) {
-		case *flowcontrolv1.LimiterDecision_RateLimiterDecision_:
-			structVal = structpb.NewStructValue(&structpb.Struct{
-				Fields: map[string]*structpb.Value{
-					"policy_name":     structpb.NewStringValue(decision.RateLimiterDecision.PolicyName),
-					"component_index": structpb.NewNumberValue(float64(decision.RateLimiterDecision.ComponentIndex)),
-					"dropped":         structpb.NewBoolValue(ld.Dropped),
-					"reason":          structpb.NewStringValue(ld.Reason.Enum().String()),
-				},
-			})
-		case *flowcontrolv1.LimiterDecision_ConcurrencyLimiterDecision:
-			structVal = structpb.NewStructValue(&structpb.Struct{
-				Fields: map[string]*structpb.Value{
-					"policy_name":     structpb.NewStringValue(decision.ConcurrencyLimiterDecision.PolicyName),
-					"component_index": structpb.NewNumberValue(float64(decision.ConcurrencyLimiterDecision.ComponentIndex)),
-					"workload":        structpb.NewStringValue(decision.ConcurrencyLimiterDecision.Workload),
-					"dropped":         structpb.NewBoolValue(ld.Dropped),
-					"reason":          structpb.NewStringValue(ld.Reason.Enum().String()),
-				},
-			})
-		}
-
-		policies[i] = structVal
+	mStruct := new(structpb.Struct)
+	err = protojson.Unmarshal(mBytes, mStruct)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal JSON bytes into structpb.Struct")
+		return nil, err
 	}
-	return structpb.NewListValue(&structpb.ListValue{Values: policies})
+
+	return structpb.NewStructValue(mStruct), nil
 }
 
 // merges two flow labels maps.
