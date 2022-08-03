@@ -1,4 +1,4 @@
-package crashwriter
+package sentry
 
 import (
 	"io"

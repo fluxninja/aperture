@@ -1,4 +1,4 @@
-package crashwriter_test
+package sentry_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestCrashWriter(t *testing.T) {
+func TestSentry(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "CrashWriter Suite")
+	RunSpecs(t, "Sentry Suite")
 }

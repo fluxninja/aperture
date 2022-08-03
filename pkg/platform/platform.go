@@ -35,7 +35,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/watchdog"
-	"github.com/fluxninja/aperture/plugins/service/sentry-plugin/crashwriter"
+	"github.com/fluxninja/aperture/plugins/service/sentry-plugin/sentry"
 )
 
 func init() {
@@ -224,10 +224,10 @@ func OnCrash(interface{}, panichandler.Callstack) {
 
 	// Crash Log writer
 	fName := "/crash.log"
-	crashlogger := crashwriter.NewCrashFileWriter(filepath.Join(diagnosticDir, fName))
-	crashLogWriter := crashwriter.GetCrashWriter()
+	crashlogger := sentry.NewCrashFileWriter(filepath.Join(diagnosticDir, fName))
+	crashLogWriter := sentry.GetCrashWriter()
 	crashLogWriter.Flush(crashlogger)
-	crashwriter.CloseCrashFileWriter(crashlogger)
+	sentry.CloseCrashFileWriter(crashlogger)
 
 	// Dump Status Registry
 	groupStatus := platform.statusRegistry.Get("")
