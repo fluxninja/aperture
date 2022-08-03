@@ -183,13 +183,16 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 	flowLabels := mergeFlowLabels(oldFlowLabels, newFlowLabels)
 	log.Warn().Msgf("Creating check response. Flow labels: %v, LimiterDecisions; %v, fluxmeters: %v", flowLabels, fcResponse.LimiterDecisions, fcResponse.FluxMeters)
+	marshalledCheckResponse, err := protoMessageAsPbValue(fcResponse)
+	if err != nil {
+		log.Warn().Err(err).Msg("Failed marshaling check response")
+	}
 	resp := ext_authz.CheckResponse{
 		// Put all non-hidden flow labels and policy details as dynamic metadata
 		DynamicMetadata: &structpb.Struct{
 			Fields: map[string]*structpb.Value{
-				otelcollector.MarshalledLabelsLabel:           flowLabelsAsPbValueForTelemetry(flowLabels),
-				otelcollector.MarshalledLimiterDecisionsLabel: limiterDecisionsAsPbValueForTelemetry(fcResponse.LimiterDecisions),
-				otelcollector.MarshalledFluxMetersLabel:       fluxmetersAsPbValueForTelemetry(fcResponse.FluxMeters),
+				otelcollector.MarshalledLabelsLabel:        flowLabelsAsPbValueForTelemetry(flowLabels),
+				otelcollector.MarshalledCheckResponseLabel: marshalledCheckResponse,
 			},
 		},
 	}
@@ -241,10 +244,6 @@ func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {
 // "The External Authorization filter supports emitting dynamic metadata as an opaque google.protobuf.Struct."
 // from envoy documentation
 
-// TODO (hasit): The following marshaling functions
-// 1. should be 1 and generic
-// 2. should be moved to a common package along with the corresponding unmarshal method
-
 func flowLabelsAsPbValueForTelemetry(labels classification.FlowLabels) *structpb.Value {
 	fields := make(map[string]*structpb.Value, len(labels))
 	for k, v := range labels {
@@ -254,35 +253,6 @@ func flowLabelsAsPbValueForTelemetry(labels classification.FlowLabels) *structpb
 		fields[k] = structpb.NewStringValue(v.Value)
 	}
 	return structpb.NewStructValue(&structpb.Struct{Fields: fields})
-}
-
-func limiterDecisionsAsPbValueForTelemetry(limiterDecisions []*flowcontrolv1.LimiterDecision) *structpb.Value {
-	messages := make([]protoreflect.ProtoMessage, len(limiterDecisions))
-	for i, decision := range limiterDecisions {
-		messages[i] = decision
-	}
-	return listOfProtoMessagesAsPbValue(messages)
-}
-
-func fluxmetersAsPbValueForTelemetry(fluxmeters []*flowcontrolv1.FluxMeter) *structpb.Value {
-	messages := make([]protoreflect.ProtoMessage, len(fluxmeters))
-	for i, decision := range fluxmeters {
-		messages[i] = decision
-	}
-	return listOfProtoMessagesAsPbValue(messages)
-}
-
-func listOfProtoMessagesAsPbValue(messages []protoreflect.ProtoMessage) *structpb.Value {
-	values := make([]*structpb.Value, len(messages))
-	for i, message := range messages {
-		messageStruct, err := protoMessageAsPbValue(message)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to convert message into generic proto value")
-			continue
-		}
-		values[i] = messageStruct
-	}
-	return structpb.NewListValue(&structpb.ListValue{Values: values})
 }
 
 func protoMessageAsPbValue(message protoreflect.ProtoMessage) (*structpb.Value, error) {

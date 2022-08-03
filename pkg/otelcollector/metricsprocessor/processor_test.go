@@ -46,29 +46,16 @@ var _ = Describe("Metrics Processor", func() {
 	DescribeTable("Processing logs",
 		func(
 			controlPoint string,
-			decisions []*flowcontrolv1.LimiterDecision,
-			fluxMeters []*flowcontrolv1.FluxMeter,
+			checkResponse *flowcontrolv1.CheckResponse,
 			expectedErr error,
 			expectedMetrics string,
 			expectedLabels map[string]interface{},
 		) {
 			ctx := context.Background()
 
-			expectedCalls := make([]*gomock.Call, len(fluxMeters))
-			for i, fm := range fluxMeters {
-				// TODO actually return some Histogram
-				fmID := fmt.Sprintf(
-					"agent_group-%v-policy-%v-flux_meter-%v-policy_hash-%v",
-					fm.GetAgentGroupName(),
-					fm.GetPolicyName(),
-					fm.GetFluxMeterName(),
-					fm.GetPolicyHash(),
-				)
-				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fmID).Return(nil)
-			}
-			gomock.InOrder(expectedCalls...)
+			expectEngineCalls(engine, checkResponse)
 
-			logs := someLogs(decisions, fluxMeters, controlPoint)
+			logs := someLogs(checkResponse, controlPoint)
 			modifiedLogs, err := processor.ConsumeLogs(ctx, logs)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -93,25 +80,27 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with single policy - ingress",
 			otelcollector.ControlPointIngress,
-			[]*flowcontrolv1.LimiterDecision{
-				{
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					ComponentIndex: 1,
-					Dropped:        true,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+			&flowcontrolv1.CheckResponse{
+				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
+					{
+						PolicyName:     "foo",
+						PolicyHash:     "foo-hash",
+						ComponentIndex: 1,
+						Dropped:        true,
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+								Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+							},
 						},
 					},
 				},
-			},
-			[]*flowcontrolv1.FluxMeter{
-				{
-					AgentGroupName: "ag",
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					FluxMeterName:  "bar",
+				FluxMeters: []*flowcontrolv1.FluxMeter{
+					{
+						AgentGroupName: "ag",
+						PolicyName:     "foo",
+						PolicyHash:     "foo-hash",
+						FluxMeterName:  "bar",
+					},
 				},
 			},
 			nil,
@@ -135,20 +124,22 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with single policy - feature",
 			otelcollector.ControlPointFeature,
-			[]*flowcontrolv1.LimiterDecision{
-				{
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					ComponentIndex: 1,
-					Dropped:        true,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+			&flowcontrolv1.CheckResponse{
+				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
+					{
+						PolicyName:     "foo",
+						PolicyHash:     "foo-hash",
+						ComponentIndex: 1,
+						Dropped:        true,
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+								Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+							},
 						},
 					},
 				},
+				FluxMeters: []*flowcontrolv1.FluxMeter{},
 			},
-			[]*flowcontrolv1.FluxMeter{},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -169,42 +160,44 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with two policies",
 			otelcollector.ControlPointIngress,
-			[]*flowcontrolv1.LimiterDecision{
-				{
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					ComponentIndex: 1,
-					Dropped:        true,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+			&flowcontrolv1.CheckResponse{
+				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
+					{
+						PolicyName:     "foo",
+						PolicyHash:     "foo-hash",
+						ComponentIndex: 1,
+						Dropped:        true,
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+								Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+							},
+						},
+					},
+					{
+						PolicyName:     "fizz",
+						PolicyHash:     "fizz-hash",
+						ComponentIndex: 1,
+						Dropped:        true,
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+								Workload: "workload_key:\"fizz\", workload_value:\"buzz\"",
+							},
+						},
+					},
+					{
+						PolicyName:     "fizz",
+						PolicyHash:     "fizz-hash",
+						ComponentIndex: 2,
+						Dropped:        false,
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+								Workload: "workload_key:\"fizz\", workload_value:\"hoge\"",
+							},
 						},
 					},
 				},
-				{
-					PolicyName:     "fizz",
-					PolicyHash:     "fizz-hash",
-					ComponentIndex: 1,
-					Dropped:        true,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-							Workload: "workload_key:\"fizz\", workload_value:\"buzz\"",
-						},
-					},
-				},
-				{
-					PolicyName:     "fizz",
-					PolicyHash:     "fizz-hash",
-					ComponentIndex: 2,
-					Dropped:        false,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-							Workload: "workload_key:\"fizz\", workload_value:\"hoge\"",
-						},
-					},
-				},
+				FluxMeters: []*flowcontrolv1.FluxMeter{},
 			},
-			[]*flowcontrolv1.FluxMeter{},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -246,29 +239,16 @@ var _ = Describe("Metrics Processor", func() {
 	DescribeTable("Processing traces",
 		func(
 			controlPoint string,
-			decisions []*flowcontrolv1.LimiterDecision,
-			fluxMeters []*flowcontrolv1.FluxMeter,
+			checkResponse *flowcontrolv1.CheckResponse,
 			expectedErr error,
 			expectedMetrics string,
 			expectedLabels map[string]interface{},
 		) {
 			ctx := context.Background()
 
-			expectedCalls := make([]*gomock.Call, len(fluxMeters))
-			for i, fm := range fluxMeters {
-				// TODO actually return some Histogram
-				fmID := fmt.Sprintf(
-					"agent_group-%v-policy-%v-flux_meter-%v-policy_hash-%v",
-					fm.GetAgentGroupName(),
-					fm.GetPolicyName(),
-					fm.GetFluxMeterName(),
-					fm.GetPolicyHash(),
-				)
-				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fmID).Return(nil)
-			}
-			gomock.InOrder(expectedCalls...)
+			expectEngineCalls(engine, checkResponse)
 
-			traces := someTraces(decisions, fluxMeters, controlPoint)
+			traces := someTraces(checkResponse, controlPoint)
 			modifiedTraces, err := processor.ConsumeTraces(ctx, traces)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -293,25 +273,27 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with single policy - ingress",
 			otelcollector.ControlPointIngress,
-			[]*flowcontrolv1.LimiterDecision{
-				{
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					ComponentIndex: 1,
-					Dropped:        true,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+			&flowcontrolv1.CheckResponse{
+				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
+					{
+						PolicyName:     "foo",
+						PolicyHash:     "foo-hash",
+						ComponentIndex: 1,
+						Dropped:        true,
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+								Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+							},
 						},
 					},
 				},
-			},
-			[]*flowcontrolv1.FluxMeter{
-				{
-					AgentGroupName: "ag",
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					FluxMeterName:  "bar",
+				FluxMeters: []*flowcontrolv1.FluxMeter{
+					{
+						AgentGroupName: "ag",
+						PolicyName:     "foo",
+						PolicyHash:     "foo-hash",
+						FluxMeterName:  "bar",
+					},
 				},
 			},
 			nil,
@@ -335,20 +317,22 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with single policy - feature",
 			otelcollector.ControlPointFeature,
-			[]*flowcontrolv1.LimiterDecision{
-				{
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					ComponentIndex: 1,
-					Dropped:        true,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-							Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+			&flowcontrolv1.CheckResponse{
+				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
+					{
+						PolicyName:     "foo",
+						PolicyHash:     "foo-hash",
+						ComponentIndex: 1,
+						Dropped:        true,
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+								Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+							},
 						},
 					},
 				},
+				FluxMeters: []*flowcontrolv1.FluxMeter{},
 			},
-			[]*flowcontrolv1.FluxMeter{},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -369,44 +353,46 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with two policies",
 			otelcollector.ControlPointIngress,
-			[]*flowcontrolv1.LimiterDecision{
-				{
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					ComponentIndex: 1,
-					Dropped:        true,
-					Details: &flowcontrolv1.LimiterDecision_RateLimiter_{
-						RateLimiter: &flowcontrolv1.LimiterDecision_RateLimiter{
-							Remaining: 10,
-							Current:   5,
-							Label:     "gold",
+			&flowcontrolv1.CheckResponse{
+				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
+					{
+						PolicyName:     "foo",
+						PolicyHash:     "foo-hash",
+						ComponentIndex: 1,
+						Dropped:        true,
+						Details: &flowcontrolv1.LimiterDecision_RateLimiter_{
+							RateLimiter: &flowcontrolv1.LimiterDecision_RateLimiter{
+								Remaining: 10,
+								Current:   5,
+								Label:     "gold",
+							},
+						},
+					},
+					{
+						PolicyName:     "fizz",
+						PolicyHash:     "fizz-hash",
+						ComponentIndex: 1,
+						Dropped:        true,
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+								Workload: "workload_key:\"fizz\", workload_value:\"buzz\"",
+							},
+						},
+					},
+					{
+						PolicyName:     "fizz",
+						PolicyHash:     "fizz-hash",
+						ComponentIndex: 2,
+						Dropped:        true,
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+								Workload: "workload_key:\"fizz\", workload_value:\"hoge\"",
+							},
 						},
 					},
 				},
-				{
-					PolicyName:     "fizz",
-					PolicyHash:     "fizz-hash",
-					ComponentIndex: 1,
-					Dropped:        true,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-							Workload: "workload_key:\"fizz\", workload_value:\"buzz\"",
-						},
-					},
-				},
-				{
-					PolicyName:     "fizz",
-					PolicyHash:     "fizz-hash",
-					ComponentIndex: 2,
-					Dropped:        true,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-						ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-							Workload: "workload_key:\"fizz\", workload_value:\"hoge\"",
-						},
-					},
-				},
+				FluxMeters: []*flowcontrolv1.FluxMeter{},
 			},
-			[]*flowcontrolv1.FluxMeter{},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -451,8 +437,7 @@ var _ = Describe("Metrics Processor", func() {
 
 // someLogs will return a plog.Logs instance with single LogRecord
 func someLogs(
-	decisions []*flowcontrolv1.LimiterDecision,
-	fluxMeters []*flowcontrolv1.FluxMeter,
+	checkResponse *flowcontrolv1.CheckResponse,
 	controlPoint string,
 ) plog.Logs {
 	logs := plog.NewLogs()
@@ -465,12 +450,9 @@ func someLogs(
 		instrumentationLogsSlice := resourceLogsSlice.At(i).ScopeLogs()
 		for j := 0; j < instrumentationLogsSlice.Len(); j++ {
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
-			marshalledDecisions, err := json.Marshal(decisions)
+			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
-			logRecord.Attributes().InsertString(otelcollector.MarshalledLimiterDecisionsLabel, string(marshalledDecisions))
-			marshalledFluxMeters, err := json.Marshal(fluxMeters)
-			Expect(err).NotTo(HaveOccurred())
-			logRecord.Attributes().InsertString(otelcollector.MarshalledFluxMetersLabel, string(marshalledFluxMeters))
+			logRecord.Attributes().InsertString(otelcollector.MarshalledCheckResponseLabel, string(marshalledCheckResponse))
 			logRecord.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
 			logRecord.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
 			switch controlPoint {
@@ -487,8 +469,7 @@ func someLogs(
 
 // someTraces will return a ptrace.Traces instance with single SpanRecord
 func someTraces(
-	decisions []*flowcontrolv1.LimiterDecision,
-	fluxMeters []*flowcontrolv1.FluxMeter,
+	checkResponse *flowcontrolv1.CheckResponse,
 	controlPoint string,
 ) ptrace.Traces {
 	traces := ptrace.NewTraces()
@@ -501,12 +482,9 @@ func someTraces(
 		instrumentationSpansSlice := resourceSpansSlice.At(i).ScopeSpans()
 		for j := 0; j < instrumentationSpansSlice.Len(); j++ {
 			span := instrumentationSpansSlice.At(j).Spans().AppendEmpty()
-			marshalledDecisions, err := json.Marshal(decisions)
+			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
-			span.Attributes().InsertString(otelcollector.MarshalledLimiterDecisionsLabel, string(marshalledDecisions))
-			marshalledFluxMeters, err := json.Marshal(fluxMeters)
-			Expect(err).NotTo(HaveOccurred())
-			span.Attributes().InsertString(otelcollector.MarshalledFluxMetersLabel, string(marshalledFluxMeters))
+			span.Attributes().InsertString(otelcollector.MarshalledCheckResponseLabel, string(marshalledCheckResponse))
 			span.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
 			span.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
 			switch controlPoint {
@@ -557,4 +535,20 @@ func allTraceRecords(traces ptrace.Traces) []ptrace.Span {
 	}
 
 	return spanRecords
+}
+
+func expectEngineCalls(engine *mocks.MockEngineAPI, checkResponse *flowcontrolv1.CheckResponse) {
+	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
+	for i, fm := range checkResponse.FluxMeters {
+		// TODO actually return some Histogram
+		fmID := fmt.Sprintf(
+			"agent_group-%v-policy-%v-flux_meter-%v-policy_hash-%v",
+			fm.GetAgentGroupName(),
+			fm.GetPolicyName(),
+			fm.GetFluxMeterName(),
+			fm.GetPolicyHash(),
+		)
+		expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fmID).Return(nil)
+	}
+	gomock.InOrder(expectedCalls...)
 }

@@ -11,12 +11,8 @@ const (
 	// ControlPointFeature const for feature control point.
 	ControlPointFeature = "feature"
 
-	// MarshalledLimiterDecisionsLabel describes policies relevant to this traffic.
-	// This is JSON encoded []*flowcontrolv1.LimiterDecision.
-	MarshalledLimiterDecisionsLabel = "aperture.limiter_decisions"
-	// MarshalledFluxMetersLabel describes the flux meters matched to this traffic.
-	// This is JSON encoded []*flowcontrolv1.FluxMeter.
-	MarshalledFluxMetersLabel = "aperture.flux_meters"
+	// MarshalledCheckResponseLabel contains JSON encoded check response struct.
+	MarshalledCheckResponseLabel = "aperture.check_response"
 
 	// MissingAttributeSourceValue is a special attribute value, which can
 	// happen when (eg. Envoy's) logger tries to send attribute value, but its

@@ -95,10 +95,9 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		decisions := otelcollector.GetLimiterDecisions(logRecord.Attributes())
-		fluxMeters := otelcollector.GetFluxMeters(logRecord.Attributes())
-		p.addLimiterAndFluxMeterLabels(logRecord.Attributes(), decisions, fluxMeters)
-		return p.updateMetrics(logRecord.Attributes(), decisions, fluxMeters)
+		checkResponse := otelcollector.GetCheckResponse(logRecord.Attributes())
+		p.addCheckResponseBasedLabels(logRecord.Attributes(), checkResponse)
+		return p.updateMetrics(logRecord.Attributes(), checkResponse)
 	})
 	return ld, err
 }
@@ -106,24 +105,22 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 // ConsumeTraces receives ptrace.Traces for consumption then returns updated traces with policy labels and metrics.
 func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) (ptrace.Traces, error) {
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		decisions := otelcollector.GetLimiterDecisions(span.Attributes())
-		fluxMeters := otelcollector.GetFluxMeters(span.Attributes())
-		p.addLimiterAndFluxMeterLabels(span.Attributes(), decisions, fluxMeters)
-		return p.updateMetrics(span.Attributes(), decisions, fluxMeters)
+		checkResponse := otelcollector.GetCheckResponse(span.Attributes())
+		p.addCheckResponseBasedLabels(span.Attributes(), checkResponse)
+		return p.updateMetrics(span.Attributes(), checkResponse)
 	})
 	return td, err
 }
 
-// addLimiterAndFluxMeterLabels adds the following labels:
+// addCheckResponseBasedLabels adds the following labels:
 // * `rate_limiters`
 // * `dropping_rate_limiters`
 // * `concurrency_limiters`
 // * `dropping_concurrency_limiters`
 // * `flux_meters`.
-func (p *metricsProcessor) addLimiterAndFluxMeterLabels(
+func (p *metricsProcessor) addCheckResponseBasedLabels(
 	attributes pcommon.Map,
-	decisions []*flowcontrolv1.LimiterDecision,
-	fluxMeters []*flowcontrolv1.FluxMeter,
+	checkResponse *flowcontrolv1.CheckResponse,
 ) {
 	labels := map[string]pcommon.Value{
 		otelcollector.RateLimitersLabel:                pcommon.NewValueSlice(),
@@ -132,7 +129,7 @@ func (p *metricsProcessor) addLimiterAndFluxMeterLabels(
 		otelcollector.DroppingConcurrencyLimitersLabel: pcommon.NewValueSlice(),
 		otelcollector.FluxMetersLabel:                  pcommon.NewValueSlice(),
 	}
-	for _, decision := range decisions {
+	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiter() != nil {
 			rawValue := []string{
 				fmt.Sprintf("policy_name:%v", decision.GetPolicyName()),
@@ -159,7 +156,7 @@ func (p *metricsProcessor) addLimiterAndFluxMeterLabels(
 			}
 		}
 	}
-	for _, fluxMeter := range fluxMeters {
+	for _, fluxMeter := range checkResponse.FluxMeters {
 		rawValue := []string{
 			fmt.Sprintf("policy_name:%v", fluxMeter.GetPolicyName()),
 			fmt.Sprintf("flux_meter_name:%v", fluxMeter.GetFluxMeterName()),
@@ -171,14 +168,13 @@ func (p *metricsProcessor) addLimiterAndFluxMeterLabels(
 	for key, value := range labels {
 		attributes.Insert(key, value)
 	}
-	attributes.Remove(otelcollector.MarshalledLimiterDecisionsLabel)
-	attributes.Remove(otelcollector.MarshalledFluxMetersLabel)
+	// attributes.Remove(otelcollector.MarshalledLimiterDecisionsLabel)
+	// attributes.Remove(otelcollector.MarshalledFluxMetersLabel)
 }
 
 func (p *metricsProcessor) updateMetrics(
 	attributes pcommon.Map,
-	decisions []*flowcontrolv1.LimiterDecision,
-	fluxMeters []*flowcontrolv1.FluxMeter,
+	checkResponse *flowcontrolv1.CheckResponse,
 ) error {
 	latencyLabel := getLatencyLabel(attributes)
 
@@ -197,7 +193,7 @@ func (p *metricsProcessor) updateMetrics(
 		return nil
 	}
 
-	for _, decision := range decisions {
+	for _, decision := range checkResponse.LimiterDecisions {
 		labels := map[string]string{
 			policyNameLabel:     decision.PolicyName,
 			policyHashLabel:     decision.PolicyHash,
@@ -215,7 +211,7 @@ func (p *metricsProcessor) updateMetrics(
 		}
 	}
 
-	for _, fluxMeter := range fluxMeters {
+	for _, fluxMeter := range checkResponse.FluxMeters {
 		p.updateMetricsForFluxMeters(fluxMeter, latency)
 	}
 
