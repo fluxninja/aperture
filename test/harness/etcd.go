@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"time"
@@ -50,7 +49,7 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return nil, err
 	}
 
-	h.etcdDir, err = ioutil.TempDir("/tmp", "etcd_testserver")
+	h.etcdDir, err = os.MkdirTemp("/tmp", "etcd_testserver")
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +64,7 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		"--advertise-client-urls="+endpoint,
 	)
 	h.etcdServer.Stderr = h.errWriter
-	h.etcdServer.Stdout = ioutil.Discard
+	h.etcdServer.Stdout = io.Discard
 	h.Endpoint = endpoint
 
 	err = h.etcdServer.Start()

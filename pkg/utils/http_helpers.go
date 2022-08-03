@@ -3,7 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 )
@@ -34,7 +34,7 @@ func Get(ctx context.Context, url string, headers map[string]string, timeout tim
 	}
 
 	defer res.Body.Close()
-	all, err := ioutil.ReadAll(res.Body)
+	all, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", fmt.Errorf("error while reading response from oraclecloud metadata endpoint: %s", err)
 	}

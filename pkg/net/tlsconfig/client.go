@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 
 	"google.golang.org/grpc"
@@ -42,7 +41,7 @@ func (c *ClientTLSConfig) GetTLSConfig() (*tls.Config, error) {
 
 	if c.CAFile != "" {
 		var caCertPool *x509.CertPool
-		caCert, err := ioutil.ReadFile(c.CAFile)
+		caCert, err := os.ReadFile(c.CAFile)
 		if err != nil {
 			return nil, err
 		}
