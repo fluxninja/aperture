@@ -40,7 +40,8 @@ func Register(handler *Handler, server *grpc.Server, healthsrv *health.Server) {
 // *named* grpc.Server
 //
 // Usage:
-//     fx.Invoke(authz.OnNamedServer("foo").Register)
+//
+//	fx.Invoke(authz.OnNamedServer("foo").Register)
 func OnNamedServer(serverName string) Invocations {
 	return Invocations{
 		Register: fx.Annotate(

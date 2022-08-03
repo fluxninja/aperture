@@ -3,7 +3,6 @@ package platform
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -236,7 +235,7 @@ func OnCrash(e interface{}, s panichandler.Callstack) {
 			log.Error().Err(err).Msg("Failed to marshal group status")
 		}
 		fName = "/status.json"
-		_ = ioutil.WriteFile(filepath.Join(diagnosticDir, fName), gs, 0o600)
+		_ = os.WriteFile(filepath.Join(diagnosticDir, fName), gs, 0o600)
 	} else {
 		log.Info().Msg("No status information collected yet")
 	}
@@ -249,6 +248,6 @@ func OnCrash(e interface{}, s panichandler.Callstack) {
 			log.Error().Err(err).Msg("Failed to marshal version information")
 		}
 		fName = "/version-info.json"
-		_ = ioutil.WriteFile(filepath.Join(diagnosticDir, fName), vInfo, 0o600)
+		_ = os.WriteFile(filepath.Join(diagnosticDir, fName), vInfo, 0o600)
 	}
 }
