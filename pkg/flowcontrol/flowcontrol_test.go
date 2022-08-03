@@ -28,7 +28,6 @@ var _ = BeforeEach(func() {
 	entities.Put(&entitycache.Entity{
 		ID:         entitycache.EntityID{},
 		Services:   hardCodedServices,
-		Namespace:  hardCodedNameSpace,
 		AgentGroup: hardCodedAgentGroup,
 		IPAddress:  hardCodedIPAddress,
 	})
@@ -76,7 +75,6 @@ var _ = Describe("FlowControl Check", func() {
 
 var (
 	hardCodedServices   = []string{"service1", "service2"}
-	hardCodedNameSpace  = "aperture-system"
 	hardCodedAgentGroup = "nondefault"
 	hardCodedIPAddress  = "1.2.3.4"
 )

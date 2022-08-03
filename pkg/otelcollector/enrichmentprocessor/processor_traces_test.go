@@ -17,7 +17,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			ID:         entitycache.EntityID{},
 			IPAddress:  "192.0.2.0",
 			AgentGroup: "defaultAG",
-			Namespace:  "nspc1",
 			Services:   []string{"svc1", "svc2"},
 		})
 		processor := newProcessor(entityCache)
@@ -35,7 +34,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			"control_point": "egress",
 			"labeled":       "false",
 			"agent_group":   "defaultAG",
-			"namespace":     "nspc1",
 			"services":      "svc1,svc2",
 		}))
 	})
@@ -71,7 +69,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			ID:         entitycache.EntityID{},
 			IPAddress:  "192.0.2.0",
 			AgentGroup: "defaultAG",
-			Namespace:  "nspc1",
 			Services:   []string{"svc1", "svc2"},
 		})
 		processor := newProcessor(entityCache)
@@ -89,7 +86,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			"control_point": "ingress",
 			"labeled":       "false",
 			"agent_group":   "defaultAG",
-			"namespace":     "nspc1",
 			"services":      "svc1,svc2",
 		}))
 	})

@@ -140,7 +140,6 @@ var _ = Describe("Dataplane Engine", func() {
 			}
 			svcs := []services.ServiceID{{
 				AgentGroup: "default",
-				Namespace:  "testNamespace2",
 				Service:    "testService2.testNamespace2.svc.cluster.local",
 			}}
 			labels := selectors.NewLabels(selectors.LabelSources{
@@ -161,7 +160,6 @@ var _ = Describe("Dataplane Engine", func() {
 			}
 			svcs := []services.ServiceID{{
 				AgentGroup: "default",
-				Namespace:  "testNamespace",
 				Service:    "testService.testNamespace.svc.cluster.local",
 			}}
 			labels := selectors.NewLabels(selectors.LabelSources{
