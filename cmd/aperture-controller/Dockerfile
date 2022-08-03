@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.18-buster AS base
+FROM golang:1.19-buster AS base
 
 WORKDIR /src
 COPY --link . .
