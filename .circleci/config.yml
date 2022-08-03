@@ -106,9 +106,6 @@ jobs:
           tools: |-
             python
             gcloud
-            terraform
-            kubectl
-            helmfile
       - run:
           name: Install opsninja dependencies
           working_directory: ops/apps/opsninja
