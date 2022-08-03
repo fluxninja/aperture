@@ -11,7 +11,7 @@ IMG_REPO = "gcr.io/{project}/cf-fn".format(project=GCP_PROJECT)
 GIT_ROOT = str(local("git rev-parse --show-toplevel")).strip()
 TILT_OBJECTS = []
 APERTURE_SYSTEM_NS = "aperture-system"
-TANKA_WRAPPER = "fn-tk"
+TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
 # Mutable global state, since global values are not mutable
 GLOBAL_STATE = {}
@@ -280,7 +280,8 @@ def render_tanka(environment, env_vars):
         "Rendering tanka environment",
         environment,
     )
-
+    base_dir = environment.split("environments/")[0] or "./"
+    
     if SKIP_LOCAL_CMDS:
         return
 
@@ -288,12 +289,14 @@ def render_tanka(environment, env_vars):
         # Get base directory for Jsonnet Bundler execution
         # tanka/environments/default -> tanka/
         # environments/default -> ./
-        base_dir = environment.split("environments/")[0] or "./"
         # Make sure jb dependencies are up to date
         local(command=["jb", "install"], dir=base_dir)
 
+        # Refreshing the dependencies for the Agent chart
+        local(command=["helm", "dependency", "update", "--skip-refresh"], dir=base_dir + "charts/agent")
+
         # Fetch any vendored charts that are not included in our repository
-        local(command=[TANKA_WRAPPER, "tool", "charts", "vendor"], dir=base_dir)
+        local(command=[TANKA, "tool", "charts", "vendor"], dir=base_dir)
 
         # Skip refreshing deps the second time
         GLOBAL_STATE[GLOBAL_RAN_TANKA_DEPS_KEY] = True
@@ -304,7 +307,8 @@ def render_tanka(environment, env_vars):
         local(
             quiet=True,
             command=[
-                TANKA_WRAPPER,
+                TANKA,
+                "--ext-str=projectRoot=" + base_dir,
                 "show",
                 # Allow dumping the templates to stdout,
                 # instead of using tk export to generate files

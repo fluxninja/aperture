@@ -1,5 +1,0 @@
-{
-  "version": "1",
-  "repo_url": "https://github.com/fluxninja/aperture.git",
-  "dependencies": [{ "name": "aperture/agent", "reference": "main" }]
-}
