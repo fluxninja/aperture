@@ -136,34 +136,34 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		}))
 	})
 
-	It("Unpacks fn.flow properly", func() {
+	It("Unpacks aperture.labels properly", func() {
 		entityCache := entitycache.NewEntityCache()
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
-			"control_point": "egress",
-			"fn.flow":       `{"foo": "bar", "fizz": "buzz"}`,
+			"control_point":   "egress",
+			"aperture.labels": `{"foo": "bar", "fizz": "buzz"}`,
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
 		assertLogsEqual(ld, logsFromLabels(map[string]string{
 			"control_point": "egress",
-			"fn.flow.foo":   "bar",
-			"fn.flow.fizz":  "buzz",
+			"foo":           "bar",
+			"fizz":          "buzz",
 			"labeled":       "true",
 		}))
 	})
 
-	It("Ignores empty fn.flow", func() {
+	It("Ignores empty aperture.labels", func() {
 		entityCache := entitycache.NewEntityCache()
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
-			"control_point": "egress",
-			"fn.flow":       ``,
+			"control_point":   "egress",
+			"aperture.labels": ``,
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
@@ -174,14 +174,14 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		}))
 	})
 
-	It("Ignores minus as fn.flow", func() {
+	It("Ignores minus as aperture.labels", func() {
 		entityCache := entitycache.NewEntityCache()
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
-			"control_point": "feature",
-			"fn.flow":       `-`,
+			"control_point":   "feature",
+			"aperture.labels": `-`,
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())

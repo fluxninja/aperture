@@ -72,7 +72,7 @@ func (msg *LimiterDecision) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *LimiterDecision_RateLimiterDecision) MarshalJSON() ([]byte, error) {
+func (msg *LimiterDecision_RateLimiter) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -81,14 +81,14 @@ func (msg *LimiterDecision_RateLimiterDecision) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *LimiterDecision_RateLimiterDecision) UnmarshalJSON(b []byte) error {
+func (msg *LimiterDecision_RateLimiter) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *LimiterDecision_ConurrencyLimiterDecision) MarshalJSON() ([]byte, error) {
+func (msg *LimiterDecision_ConcurrencyLimiter) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -97,7 +97,23 @@ func (msg *LimiterDecision_ConurrencyLimiterDecision) MarshalJSON() ([]byte, err
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *LimiterDecision_ConurrencyLimiterDecision) UnmarshalJSON(b []byte) error {
+func (msg *LimiterDecision_ConcurrencyLimiter) UnmarshalJSON(b []byte) error {
+	return protojson.UnmarshalOptions{
+		DiscardUnknown: false,
+	}.Unmarshal(b, msg)
+}
+
+// MarshalJSON implements json.Marshaler
+func (msg *FluxMeter) MarshalJSON() ([]byte, error) {
+	return protojson.MarshalOptions{
+		UseEnumNumbers:  false,
+		EmitUnpopulated: true,
+		UseProtoNames:   true,
+	}.Marshal(msg)
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (msg *FluxMeter) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

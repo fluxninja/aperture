@@ -1,0 +1,16 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        # High threshold for now to prevent blocking changes with small delta
+        threshold: 10%
+        # No blocking info - in case of force pushes it references wrong commit as base
+        # and because of that calculations are incorrect
+        informational: true
+    patch:
+      default:
+        # Allow merging code without tests
+        target: 0%
+ignore:
+  - "**/generated/**"

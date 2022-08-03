@@ -35,6 +35,20 @@ func (m *MockFluxMeter) EXPECT() *MockFluxMeterMockRecorder {
 	return m.recorder
 }
 
+// GetAgentGroupName mocks base method.
+func (m *MockFluxMeter) GetAgentGroupName() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAgentGroupName")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetAgentGroupName indicates an expected call of GetAgentGroupName.
+func (mr *MockFluxMeterMockRecorder) GetAgentGroupName() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAgentGroupName", reflect.TypeOf((*MockFluxMeter)(nil).GetAgentGroupName))
+}
+
 // GetBuckets mocks base method.
 func (m *MockFluxMeter) GetBuckets() []float64 {
 	m.ctrl.T.Helper()
@@ -47,6 +61,20 @@ func (m *MockFluxMeter) GetBuckets() []float64 {
 func (mr *MockFluxMeterMockRecorder) GetBuckets() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBuckets", reflect.TypeOf((*MockFluxMeter)(nil).GetBuckets))
+}
+
+// GetComponentIndex mocks base method.
+func (m *MockFluxMeter) GetComponentIndex() int64 {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetComponentIndex")
+	ret0, _ := ret[0].(int64)
+	return ret0
+}
+
+// GetComponentIndex indicates an expected call of GetComponentIndex.
+func (mr *MockFluxMeterMockRecorder) GetComponentIndex() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetComponentIndex", reflect.TypeOf((*MockFluxMeter)(nil).GetComponentIndex))
 }
 
 // GetFluxMeterProto mocks base method.
@@ -103,6 +131,34 @@ func (m *MockFluxMeter) GetMetricName() string {
 func (mr *MockFluxMeterMockRecorder) GetMetricName() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetricName", reflect.TypeOf((*MockFluxMeter)(nil).GetMetricName))
+}
+
+// GetPolicyHash mocks base method.
+func (m *MockFluxMeter) GetPolicyHash() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPolicyHash")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetPolicyHash indicates an expected call of GetPolicyHash.
+func (mr *MockFluxMeterMockRecorder) GetPolicyHash() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyHash", reflect.TypeOf((*MockFluxMeter)(nil).GetPolicyHash))
+}
+
+// GetPolicyName mocks base method.
+func (m *MockFluxMeter) GetPolicyName() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPolicyName")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetPolicyName indicates an expected call of GetPolicyName.
+func (mr *MockFluxMeterMockRecorder) GetPolicyName() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockFluxMeter)(nil).GetPolicyName))
 }
 
 // GetSelector mocks base method.
