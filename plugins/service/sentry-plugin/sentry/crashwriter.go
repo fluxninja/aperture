@@ -11,17 +11,6 @@ import (
 
 const logCountLimit = 100
 
-var globalCrashWriter = getCrashWriter()
-
-// GetCrashWriter returns a global crash writer.
-func GetCrashWriter() *CrashWriter {
-	return globalCrashWriter
-}
-
-func getCrashWriter() *CrashWriter {
-	return NewCrashWriter(logCountLimit)
-}
-
 // CrashWriter defines a crash writer with buffer to store the logs when the app crashes.
 type CrashWriter struct {
 	crashLock sync.Mutex
@@ -56,7 +45,6 @@ func (w *CrashWriter) Write(data []byte) (n int, err error) {
 			break
 		}
 	}
-
 	return len(data), nil
 }
 
@@ -74,6 +62,27 @@ func (w *CrashWriter) Flush(lg io.Writer) {
 		}
 	}
 }
+
+/*
+func (w *CrashWriter) Get() map[string]interface{} {
+	w.crashLock.Lock()
+	defer w.crashLock.Unlock()
+
+	var crashLog map[string]interface{}
+	var data []byte
+	for {
+		if w.buffer.Length() > 0 {
+			log := w.buffer.Remove()
+			data = append(data, log.([]byte)...)
+		} else {
+			break
+		}
+	}
+
+	_ = json.Unmarshal(data, &crashLog)
+	return crashLog
+}
+*/
 
 // NewCrashFileWriter returns a lumberjack rolling logger which is used to write crash logs to the output file.
 func NewCrashFileWriter(filename string) *lumberjack.Logger {

@@ -54,10 +54,20 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 	} else {
 		group = config.GroupTag(constructor.Name)
 	}
-	return fx.Provide(
-		fx.Annotate(
-			constructor.provideSentryWriter,
-			fx.ResultTags(group),
+	return fx.Options(
+		/*
+			fx.Provide(
+				fx.Annotate(
+					provideCrashWriter,
+					fx.ResultTags(group),
+				),
+			),
+		*/
+		fx.Provide(
+			fx.Annotate(
+				constructor.provideSentryWriter,
+				fx.ResultTags(group),
+			),
 		),
 	)
 }
@@ -114,6 +124,10 @@ func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 	}
 
 	reportLevels := []zerolog.Level{
+		zerolog.DebugLevel,
+		zerolog.InfoLevel,
+		zerolog.WarnLevel,
+		zerolog.ErrorLevel,
 		zerolog.FatalLevel,
 		zerolog.PanicLevel,
 	}
@@ -123,9 +137,11 @@ func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 		levels[level] = struct{}{}
 	}
 
+	CrashWriter := NewCrashWriter(logCountLimit)
 	sentryWriter := &SentryWriter{
-		Client: client,
-		Levels: levels,
+		Client:      client,
+		Levels:      levels,
+		CrashWriter: CrashWriter,
 	}
 
 	return sentryWriter, nil

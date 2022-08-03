@@ -29,16 +29,20 @@ var zerologToSentryLevel = map[zerolog.Level]sentry.Level{
 }
 
 type SentryWriter struct {
-	Client *sentry.Client
-	Levels map[zerolog.Level]struct{}
+	Client      *sentry.Client
+	Levels      map[zerolog.Level]struct{}
+	CrashWriter *CrashWriter
 }
 
 func (s *SentryWriter) Write(data []byte) (int, error) {
 	event, ok := s.parseLogEvent(data)
+
 	if ok {
-		s.Client.CaptureEvent(event, nil, nil)
 		if event.Level == sentry.LevelFatal {
+			s.Client.CaptureEvent(event, nil, nil)
 			_ = s.Close()
+		} else {
+			_, _ = s.CrashWriter.Write(data)
 		}
 	}
 	return len(data), nil
@@ -108,7 +112,13 @@ func RegisterSentryPanicHandler() {
 
 func SentryPanicHandler(e interface{}, _ panichandler.Callstack) {
 	duration, _ := time.ParseDuration(SentryFlushWait)
-
+	/*
+		  sentry.AddBreadcrumb(&sentry.Breadcrumb{
+				Category: "Crash report",
+				Level:    sentry.LevelInfo,
+				Data:     crashLog,
+			})
+	*/
 	sentry.CurrentHub().Recover(e)
 	sentry.Flush(duration)
 }
