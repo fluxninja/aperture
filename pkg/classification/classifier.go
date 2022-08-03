@@ -227,7 +227,7 @@ func (c *Classifier) ActiveRules() []ReportedRule {
 
 // AddRules compiles a ruleset and adds it to the active rules
 //
-// The name will be used for reporting
+// # The name will be used for reporting
 //
 // To retract the rules, call Classifier.Drop.
 func (c *Classifier) AddRules(

@@ -159,16 +159,15 @@ func getTypeHash(t reflect.Type) typeHash {
 // the StructTag with name "default" and the directed value.
 // Example usage:
 //
-//     type ExampleBasic struct {
-//         Foo bool   `default:"true"`
-//         Bar string `default:"33"`
-//         Qux int8
-//         Dur time.Duration `default:"2m3s"`
-//     }
+//	type ExampleBasic struct {
+//	    Foo bool   `default:"true"`
+//	    Bar string `default:"33"`
+//	    Qux int8
+//	    Dur time.Duration `default:"2m3s"`
+//	}
 //
-//      foo := &ExampleBasic{}
-//      SetDefaults(foo)
-//
+//	 foo := &ExampleBasic{}
+//	 SetDefaults(foo)
 func SetDefaults(variable interface{}) {
 	getDefaultFiller().fill(variable)
 }
