@@ -8,6 +8,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/services"
 )
 
+//go:generate mockgen -source=engine.go -destination=../../mocks/mock_engine.go -package=mocks
+
 // EngineAPI is an interface for registering fluxmeters and schedulers.
 type EngineAPI interface {
 	ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse
@@ -26,7 +28,6 @@ type EngineAPI interface {
 // MultiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type MultiMatchResult struct {
 	ConcurrencyLimiters []Limiter
-	// TODO: Can be FluxMeterIDs
-	FluxMeters   []FluxMeter
-	RateLimiters []RateLimiter
+	FluxMeters          []FluxMeter
+	RateLimiters        []RateLimiter
 }

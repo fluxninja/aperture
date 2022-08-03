@@ -165,18 +165,6 @@ paths:
       tags:
         - StatusService
 definitions:
-  LimiterDecisionConurrencyLimiterDecision:
-    type: object
-    properties:
-      component_index:
-        type: string
-        format: int64
-      policy_hash:
-        type: string
-      policy_name:
-        type: string
-      workload:
-        type: string
   LimiterDecisionLimiterReason:
     type: string
     enum:
@@ -309,6 +297,18 @@ definitions:
           Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.
         x-go-default: 1
     description: Workload defines a class of requests that preferably have similar properties such as response latency.
+  apertureflowcontrolv1FluxMeter:
+    type: object
+    properties:
+      agent_group_name:
+        type: string
+      flux_meter_name:
+        type: string
+      policy_hash:
+        type: string
+      policy_name:
+        type: string
+    description: FluxMeter describes deteail for each FluxMeter.
   googlerpcStatus:
     type: object
     properties:
@@ -321,6 +321,51 @@ definitions:
           $ref: '#/definitions/protobufAny'
       message:
         type: string
+  languagev1ConcurrencyLimiter:
+    type: object
+    properties:
+      load_shed_actuator:
+        $ref: '#/definitions/v1LoadShedActuator'
+        description: Actuator based on load shedding a portion of requests.
+      scheduler:
+        $ref: '#/definitions/v1Scheduler'
+        description: Weighted Fair Queuing based workfload scheduler.
+        x-go-validate: required
+    description: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection. It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles. Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
+  languagev1RateLimiter:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1RateLimiterIns'
+      label_key:
+        type: string
+      lazy_sync_config:
+        $ref: '#/definitions/RateLimiterLazySyncConfig'
+      limit_reset_interval:
+        type: string
+      overrides:
+        type: array
+        items:
+          $ref: '#/definitions/RateLimiterOverrideConfig'
+      selector:
+        $ref: '#/definitions/v1Selector'
+  policylanguagev1FluxMeter:
+    type: object
+    properties:
+      histogram_buckets:
+        type: array
+        items:
+          type: number
+          format: double
+        description: Latency histogram buckets (in ms) for this FluxMeter.
+        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+      name:
+        type: string
+        description: Name of the flux meter.
+      selector:
+        $ref: '#/definitions/v1Selector'
+        description: Policies are only applied to flows that are matched based on the fields in the selector.
+    description: FluxMeter gathers metrics for the traffic that matches its selector.
   protobufAny:
     type: object
     properties:
@@ -544,11 +589,11 @@ definitions:
       decision_type:
         $ref: '#/definitions/v1DecisionType'
         description: decision_type contains what the decision was.
-      flux_meter_ids:
+      flux_meters:
         type: array
         items:
-          type: string
-        title: flux meter ids that were matched for this request
+          $ref: '#/definitions/apertureflowcontrolv1FluxMeter'
+        description: flux meters that were matched for this request.
       limiter_decisions:
         type: array
         items:
@@ -588,7 +633,7 @@ definitions:
         $ref: '#/definitions/v1ArithmeticCombinator'
         description: Applies the given operator on input operands (signals) and emits the result.
       concurrency_limiter:
-        $ref: '#/definitions/v1ConcurrencyLimiter'
+        $ref: '#/definitions/languagev1ConcurrencyLimiter'
         description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
       constant:
         $ref: '#/definitions/v1Constant'
@@ -615,7 +660,7 @@ definitions:
         $ref: '#/definitions/v1PromQL'
         description: Periodically runs a Prometheus query in the background and emits the result.
       rate_limiter:
-        $ref: '#/definitions/v1RateLimiter'
+        $ref: '#/definitions/languagev1RateLimiter'
         description: Rate Limiter provides service protection by applying rate limiter.
       sqrt:
         $ref: '#/definitions/v1Sqrt'
@@ -626,17 +671,6 @@ definitions:
       Components are wired to each other based on signal names forming an execution graph of the circuit.
       Loops are broken by the runtime at the earliest component index that is part of the loop.
       The looped signals are saved in the tick they are generated and served in the subsequent tick.
-  v1ConcurrencyLimiter:
-    type: object
-    properties:
-      load_shed_actuator:
-        $ref: '#/definitions/v1LoadShedActuator'
-        description: Actuator based on load shedding a portion of requests.
-      scheduler:
-        $ref: '#/definitions/v1Scheduler'
-        description: Weighted Fair Queuing based workfload scheduler.
-        x-go-validate: required
-    description: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection. It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles. Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
   v1Constant:
     type: object
     properties:
@@ -891,23 +925,6 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Extrapolated signal.
     description: Outputs for the Extrapolator component.
-  v1FluxMeter:
-    type: object
-    properties:
-      histogram_buckets:
-        type: array
-        items:
-          type: number
-          format: double
-        description: Latency histogram buckets (in ms) for this FluxMeter.
-        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
-      name:
-        type: string
-        description: Name of the flux meter.
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Policies are only applied to flows that are matched based on the fields in the selector.
-    description: FluxMeter gathers metrics for the traffic that matches its selector.
   v1GradientController:
     type: object
     properties:
@@ -1084,25 +1101,38 @@ definitions:
   v1LimiterDecision:
     type: object
     properties:
-      concurrency_limiter_decision:
-        $ref: '#/definitions/LimiterDecisionConurrencyLimiterDecision'
-      dropped:
-        type: boolean
-      rate_limiter_decision:
-        $ref: '#/definitions/v1LimiterDecisionRateLimiterDecision'
-      reason:
-        $ref: '#/definitions/LimiterDecisionLimiterReason'
-    description: LimiterDecision describes details for each limiter.
-  v1LimiterDecisionRateLimiterDecision:
-    type: object
-    properties:
       component_index:
         type: string
         format: int64
+      concurrency_limiter:
+        $ref: '#/definitions/v1LimiterDecisionConcurrencyLimiter'
+      dropped:
+        type: boolean
       policy_hash:
         type: string
       policy_name:
         type: string
+      rate_limiter:
+        $ref: '#/definitions/v1LimiterDecisionRateLimiter'
+      reason:
+        $ref: '#/definitions/LimiterDecisionLimiterReason'
+    description: LimiterDecision describes details for each limiter.
+  v1LimiterDecisionConcurrencyLimiter:
+    type: object
+    properties:
+      workload:
+        type: string
+  v1LimiterDecisionRateLimiter:
+    type: object
+    properties:
+      current:
+        type: string
+        format: int64
+      label:
+        type: string
+      remaining:
+        type: string
+        format: int64
   v1LoadShedActuator:
     type: object
     properties:
@@ -1273,7 +1303,7 @@ definitions:
       flux_meters:
         type: array
         items:
-          $ref: '#/definitions/v1FluxMeter'
+          $ref: '#/definitions/policylanguagev1FluxMeter'
         description: FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
     description: |-
       Policy is defined as a dataflow graph (circuit) of inter-connected components.
@@ -1316,23 +1346,6 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: The result of the Prometheus query as an output signal.
     description: Output for the PromQL component.
-  v1RateLimiter:
-    type: object
-    properties:
-      in_ports:
-        $ref: '#/definitions/v1RateLimiterIns'
-      label_key:
-        type: string
-      lazy_sync_config:
-        $ref: '#/definitions/RateLimiterLazySyncConfig'
-      limit_reset_interval:
-        type: string
-      overrides:
-        type: array
-        items:
-          $ref: '#/definitions/RateLimiterOverrideConfig'
-      selector:
-        $ref: '#/definitions/v1Selector'
   v1RateLimiterIns:
     type: object
     properties:
@@ -1346,6 +1359,7 @@ definitions:
         $ref: '#/definitions/ReasonErrorReason'
       reject_reason:
         $ref: '#/definitions/ReasonRejectReason'
+    description: Reason contains fields that give futher information about error or rejection.
   v1ReportRequest:
     type: object
     properties:

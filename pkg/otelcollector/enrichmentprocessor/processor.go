@@ -188,25 +188,25 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 	attributes.UpsertString(otelcollector.ServicesLabel, strings.Join(hostEntity.Services, ","))
 }
 
-// unpackFlowLabels tries to parse `fn.flow` attribute as json, and adds unmarshalled
-// attributes as `fn.flow.<name>`.
+// unpackFlowLabels tries to parse `LabelsLabel` attribute as json, and adds
+// unmarshalled attributes to given map.
 func unpackFlowLabels(attributes pcommon.Map) {
 	labeled := "false"
 	defer func() {
 		attributes.UpsertString(otelcollector.LabeledLabel, labeled)
 	}()
-	rawFlow, exists := attributes.Get(otelcollector.FlowLabel)
+	rawFlow, exists := attributes.Get(otelcollector.MarshalledLabelsLabel)
 	if !exists {
 		return
 	}
-	defer attributes.Remove(otelcollector.FlowLabel)
+	defer attributes.Remove(otelcollector.MarshalledLabelsLabel)
 
 	var flowAttributes map[string]string
-	otelcollector.UnmarshalStringVal(rawFlow, otelcollector.FlowLabel, &flowAttributes)
-	for fnKey, fnValue := range flowAttributes {
+	otelcollector.UnmarshalStringVal(rawFlow, otelcollector.MarshalledLabelsLabel, &flowAttributes)
+	for k, v := range flowAttributes {
 		labeled = "true"
 		// FIXME – this is quadratic (every upsert iterates to search whether label already exists)
-		attributes.UpsertString(fmt.Sprintf("%s.%s", otelcollector.FlowLabel, fnKey), fnValue)
+		attributes.UpsertString(k, v)
 	}
 }
 

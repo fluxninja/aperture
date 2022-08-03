@@ -474,14 +474,14 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowc
 	}
 
 	return &flowcontrolv1.LimiterDecision{
-		Decision: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterDecision{
-			ConcurrencyLimiterDecision: &flowcontrolv1.LimiterDecision_ConurrencyLimiterDecision{
-				PolicyName:     conLimiter.GetPolicyName(),
-				PolicyHash:     conLimiter.GetPolicyHash(),
-				ComponentIndex: conLimiter.GetComponentIndex(),
-				Workload:       workload.String(),
+		PolicyName:     conLimiter.GetPolicyName(),
+		PolicyHash:     conLimiter.GetPolicyHash(),
+		ComponentIndex: conLimiter.GetComponentIndex(),
+		Dropped:        !accepted,
+		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+			ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+				Workload: workload.String(),
 			},
 		},
-		Dropped: !accepted,
 	}
 }
