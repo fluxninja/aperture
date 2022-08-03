@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"encoding/json"
 	"io"
 	"time"
 	"unsafe"
@@ -9,8 +10,10 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/rs/zerolog"
 
+	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 var _ = io.WriteCloser(new(SentryWriter))
@@ -29,9 +32,10 @@ var zerologToSentryLevel = map[zerolog.Level]sentry.Level{
 }
 
 type SentryWriter struct {
-	Client      *sentry.Client
-	Levels      map[zerolog.Level]struct{}
-	CrashWriter *CrashWriter
+	Client         *sentry.Client
+	Levels         map[zerolog.Level]struct{}
+	CrashWriter    *CrashWriter
+	StatusRegistry *status.Registry
 }
 
 func (s *SentryWriter) Write(data []byte) (int, error) {
@@ -106,19 +110,67 @@ func bytesToStrUnsafe(data []byte) string {
 	return *(*string)(unsafe.Pointer(&data))
 }
 
-func RegisterSentryPanicHandler() {
-	panichandler.RegisterPanicHandler(SentryPanicHandler)
-}
+// func RegisterSentryPanicHandler() {}
 
-func SentryPanicHandler(e interface{}, _ panichandler.Callstack) {
+func (s *SentryWriter) SentryPanicHandler(e interface{}, _ panichandler.Callstack) {
 	duration, _ := time.ParseDuration(SentryFlushWait)
-	/*
-		  sentry.AddBreadcrumb(&sentry.Breadcrumb{
-				Category: "Crash report",
-				Level:    sentry.LevelInfo,
-				Data:     crashLog,
-			})
-	*/
+
+	// Crash Log
+	var crashLogData map[string]interface{}
+	crashLog := s.CrashWriter.GetCrashLog()
+	err := json.Unmarshal(crashLog, &crashLogData)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal crash log")
+	}
+
+	sentry.AddBreadcrumb(&sentry.Breadcrumb{
+		Category: "Crash report",
+		Level:    sentry.LevelInfo,
+		Data:     crashLogData,
+	})
+
+	// Dump Status Registry
+	var statusData map[string]interface{}
+	status := s.StatusRegistry.Get("")
+	if status != nil {
+		groupStatus, err := json.MarshalIndent(status, "", " ")
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to marshal status registry")
+		}
+
+		err = json.Unmarshal(groupStatus, &statusData)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to unmarshal status registry")
+		}
+
+		sentry.AddBreadcrumb(&sentry.Breadcrumb{
+			Category: "Status Registry",
+			Level:    sentry.LevelInfo,
+			Data:     statusData,
+		})
+	}
+
+	// Service Version Information
+	var versionData map[string]interface{}
+	versionInfo := info.GetVersionInfo()
+	if versionInfo != nil {
+		vInfo, err := json.MarshalIndent(versionInfo, "", " ")
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to marshal version information")
+		}
+
+		err = json.Unmarshal(vInfo, &versionData)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to unmarshal version information")
+		}
+
+		sentry.AddBreadcrumb(&sentry.Breadcrumb{
+			Category: "Version Information",
+			Level:    sentry.LevelInfo,
+			Data:     versionData,
+		})
+	}
+
 	sentry.CurrentHub().Recover(e)
 	sentry.Flush(duration)
 }

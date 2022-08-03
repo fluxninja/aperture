@@ -13,6 +13,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 // SentryConfig holds configuration for Sentry.
@@ -55,14 +57,6 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 		group = config.GroupTag(constructor.Name)
 	}
 	return fx.Options(
-		/*
-			fx.Provide(
-				fx.Annotate(
-					provideCrashWriter,
-					fx.ResultTags(group),
-				),
-			),
-		*/
 		fx.Provide(
 			fx.Annotate(
 				constructor.provideSentryWriter,
@@ -72,7 +66,7 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (io.Writer, error) {
+func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusReg *status.Registry, lifecycle fx.Lifecycle) (io.Writer, error) {
 	config := constructor.DefaultConfig
 
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
@@ -139,10 +133,12 @@ func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 
 	CrashWriter := NewCrashWriter(logCountLimit)
 	sentryWriter := &SentryWriter{
-		Client:      client,
-		Levels:      levels,
-		CrashWriter: CrashWriter,
+		Client:         client,
+		Levels:         levels,
+		CrashWriter:    CrashWriter,
+		StatusRegistry: status.NewRegistry(""),
 	}
 
+	panichandler.RegisterPanicHandler(sentryWriter.SentryPanicHandler)
 	return sentryWriter, nil
 }

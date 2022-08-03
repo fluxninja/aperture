@@ -34,17 +34,14 @@ func (w *CrashWriter) Write(data []byte) (n int, err error) {
 	w.crashLock.Lock()
 	defer w.crashLock.Unlock()
 
+	// Removes the element from the front of the queue when number of elements stored in the queue exceeds the logCountLimit.
+	if w.buffer.Length() > w.logCountLimit-1 {
+		_ = w.buffer.Remove()
+	}
+
 	// Puts data on the end of the queue buffer.
 	w.buffer.Add(data)
 
-	// Removes the element from the front of the queue when number of elements stored in the queue exceeds the logCountLimit.
-	for {
-		if w.buffer.Length() > w.logCountLimit {
-			_ = w.buffer.Remove()
-		} else {
-			break
-		}
-	}
 	return len(data), nil
 }
 
@@ -63,26 +60,22 @@ func (w *CrashWriter) Flush(lg io.Writer) {
 	}
 }
 
-/*
-func (w *CrashWriter) Get() map[string]interface{} {
+func (w *CrashWriter) GetCrashLog() []byte {
 	w.crashLock.Lock()
 	defer w.crashLock.Unlock()
-
-	var crashLog map[string]interface{}
 	var data []byte
+
 	for {
 		if w.buffer.Length() > 0 {
 			log := w.buffer.Remove()
-			data = append(data, log.([]byte)...)
+      data = append(data, log.([]byte)...)
 		} else {
 			break
 		}
 	}
 
-	_ = json.Unmarshal(data, &crashLog)
-	return crashLog
+	return data
 }
-*/
 
 // NewCrashFileWriter returns a lumberjack rolling logger which is used to write crash logs to the output file.
 func NewCrashFileWriter(filename string) *lumberjack.Logger {
