@@ -220,11 +220,6 @@ jobs:
             shellcheck
             yq
       - run:
-          name: install golangci-lint
-          command: |
-            go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.3
-            golangci-lint version
-      - run:
           name: set GOMAXPROCS to 4
           command: |
             echo 'export GOMAXPROCS=4' >> $BASH_ENV
@@ -406,6 +401,11 @@ commands:
         description: "Name of asdf cache"
         default: "default"
     steps:
+      - run:
+          name: Install golangci-lint
+          command: |
+            go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.3
+            golangci-lint version
       - run:
           name: Install ASDF
           command: |
