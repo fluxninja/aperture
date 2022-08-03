@@ -2,6 +2,7 @@ package metricsprocessor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -96,6 +97,9 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
 		checkResponse := otelcollector.GetCheckResponse(logRecord.Attributes())
+		if checkResponse == nil {
+			return errors.New("failed getting check response from attributes")
+		}
 		p.addCheckResponseBasedLabels(logRecord.Attributes(), checkResponse)
 		return p.updateMetrics(logRecord.Attributes(), checkResponse)
 	})
@@ -106,6 +110,9 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) (ptrace.Traces, error) {
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
 		checkResponse := otelcollector.GetCheckResponse(span.Attributes())
+		if checkResponse == nil {
+			return errors.New("failed getting check response from attributes")
+		}
 		p.addCheckResponseBasedLabels(span.Attributes(), checkResponse)
 		return p.updateMetrics(span.Attributes(), checkResponse)
 	})
