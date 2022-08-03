@@ -281,7 +281,7 @@ def render_tanka(environment, env_vars):
         environment,
     )
     base_dir = environment.split("environments/")[0] or "./"
-    
+
     if SKIP_LOCAL_CMDS:
         return
 
