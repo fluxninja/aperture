@@ -120,6 +120,8 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 }
 
 // addCheckResponseBasedLabels adds the following labels:
+// * `decision_type`
+// * `decision_reason`
 // * `rate_limiters`
 // * `dropping_rate_limiters`
 // * `concurrency_limiters`
