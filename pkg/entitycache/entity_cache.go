@@ -129,25 +129,24 @@ func ProvideEntityCache(in FxIn) (*EntityCache, error) {
 		UnmarshalNotifyFunc: entityCache.processUpdate,
 	}
 
-	in.Lifecycle.Append(
-		fx.Hook{
-			OnStart: func(context.Context) error {
-				err := in.EntityTrackers.AddPrefixNotifier(configPrefixNotifier)
-				if err != nil {
-					log.Error().Err(err).Msg("failed to add config prefix notifier")
-					return err
-				}
-				return nil
-			},
-			OnStop: func(context.Context) error {
-				err := in.EntityTrackers.RemovePrefixNotifier(configPrefixNotifier)
-				if err != nil {
-					log.Error().Err(err).Msg("failed to remove prefix notifier")
-					return err
-				}
-				return nil
-			},
-		})
+	in.Lifecycle.Append(fx.Hook{
+		OnStart: func(context.Context) error {
+			err := in.EntityTrackers.AddPrefixNotifier(configPrefixNotifier)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to add config prefix notifier")
+				return err
+			}
+			return nil
+		},
+		OnStop: func(context.Context) error {
+			err := in.EntityTrackers.RemovePrefixNotifier(configPrefixNotifier)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to remove prefix notifier")
+				return err
+			}
+			return nil
+		},
+	})
 
 	return entityCache, nil
 }
@@ -355,6 +354,10 @@ func eachPair(services []ServiceKey) []pair {
 
 // ServiceIDsFromEntity returns a list of services the entity is a part of.
 func ServiceIDsFromEntity(entity *Entity) ([]services.ServiceID, error) {
+	if entity == nil {
+		return make([]services.ServiceID, 0), nil
+	}
+
 	if len(entity.Services) == 0 {
 		return nil, errors.New("missing services")
 	}

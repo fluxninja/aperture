@@ -21,21 +21,23 @@ type multiMatcher = multimatcher.MultiMatcher[string, iface.MultiMatchResult]
 
 // ProvideEngineAPI Main fx app.
 func ProvideEngineAPI() iface.EngineAPI {
-	e := &Engine{}
-	e.multiMatchers = make(map[selectors.ControlPointID]*multiMatcher)
-	e.fluxMeterHists = make(map[string]prometheus.Histogram)
+	e := &Engine{
+		multiMatchers:         make(map[selectors.ControlPointID]*multiMatcher),
+		catchAllMultiMatchers: make(map[selectors.ControlPoint]*multiMatcher),
+		fluxMeterHists:        make(map[string]prometheus.Histogram),
+	}
 	return e
 }
 
 // Engine APIs to
 // (1) Get schedulers given a service, control point and set of labels
-// (2) Get flux meter histogram given a metric id
-// TODO: Will implement 3 APIs described in policy-config-api.go.
+// (2) Get flux meter histogram given a metric id.
 type Engine struct {
-	fluxMeterHistMutex sync.RWMutex
-	multiMatchMutex    sync.RWMutex
-	fluxMeterHists     map[string]prometheus.Histogram
-	multiMatchers      map[selectors.ControlPointID]*multiMatcher
+	fluxMeterHistMutex    sync.RWMutex
+	fluxMeterHists        map[string]prometheus.Histogram
+	multiMatchersMutex    sync.RWMutex
+	multiMatchers         map[selectors.ControlPointID]*multiMatcher
+	catchAllMultiMatchers map[selectors.ControlPoint]*multiMatcher
 }
 
 // ProcessRequest .
@@ -143,12 +145,7 @@ func (e *Engine) RegisterConcurrencyLimiter(cl iface.Limiter) error {
 		)
 		return mmr
 	}
-
-	return e.register(
-		"ConcurrencyLimiter:"+cl.GetPolicyName(),
-		cl.GetSelector(),
-		concurrencyLimiterMatchedCB,
-	)
+	return e.register("ConcurrencyLimiter:"+cl.GetPolicyName(), cl.GetSelector(), concurrencyLimiterMatchedCB)
 }
 
 // UnregisterConcurrencyLimiter removes concurrency limiter from multimatcher.
@@ -211,11 +208,7 @@ func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
 		return mmr
 	}
 
-	return e.register(
-		"RateLimiter:"+rl.GetPolicyName(),
-		rl.GetSelector(),
-		limiterActuatorMatchedCB,
-	)
+	return e.register("RateLimiter:"+rl.GetPolicyName(), rl.GetSelector(), limiterActuatorMatchedCB)
 }
 
 // UnregisterRateLimiter removes limiter actuator from multimatcher.
@@ -226,72 +219,114 @@ func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 
 // GetMatches returns schedulers and fluxmeters for given labels.
 func (e *Engine) getMatches(controlPoint selectors.ControlPoint, svcs []services.ServiceID, labels selectors.Labels) iface.MultiMatchResult {
-	e.multiMatchMutex.RLock()
-	defer e.multiMatchMutex.RUnlock()
+	e.multiMatchersMutex.RLock()
+	defer e.multiMatchersMutex.RUnlock()
 
-	retMMRslt := iface.MultiMatchResult{}
+	mmResult := iface.MultiMatchResult{}
+
+	// Lookup catchall multi matchers for controlPoint
+	camm, ok := e.catchAllMultiMatchers[controlPoint]
+	if ok {
+		resultCollection := camm.Match(multimatcher.Labels(labels.ToPlainMap()))
+		mmResult.ConcurrencyLimiters = append(mmResult.ConcurrencyLimiters, resultCollection.ConcurrencyLimiters...)
+		mmResult.FluxMeters = append(mmResult.FluxMeters, resultCollection.FluxMeters...)
+		mmResult.RateLimiters = append(mmResult.RateLimiters, resultCollection.RateLimiters...)
+	}
+
 	for _, service := range svcs {
 		controlPointID := selectors.ControlPointID{
 			ControlPoint: controlPoint,
 			Service:      service,
 		}
-
-		// Lookup multi matcher for this control point id
+		// Lookup multi matcher for controlPointID
 		mm, ok := e.multiMatchers[controlPointID]
 		if ok {
-			// Run match
 			resultCollection := mm.Match(multimatcher.Labels(labels.ToPlainMap()))
-			// Append the matching Schedulers
-			retMMRslt.ConcurrencyLimiters = append(retMMRslt.ConcurrencyLimiters, resultCollection.ConcurrencyLimiters...)
-			// Append the matching FluxMeters
-			retMMRslt.FluxMeters = append(retMMRslt.FluxMeters, resultCollection.FluxMeters...)
-			// Append the matching Limiters
-			retMMRslt.RateLimiters = append(retMMRslt.RateLimiters, resultCollection.RateLimiters...)
+			mmResult.ConcurrencyLimiters = append(mmResult.ConcurrencyLimiters, resultCollection.ConcurrencyLimiters...)
+			mmResult.FluxMeters = append(mmResult.FluxMeters, resultCollection.FluxMeters...)
+			mmResult.RateLimiters = append(mmResult.RateLimiters, resultCollection.RateLimiters...)
 		}
 	}
-	return retMMRslt
+
+	return mmResult
 }
 
-func (e *Engine) register(
-	key string,
-	selectorProto *policylangv1.Selector,
-	matchedCB multimatcher.MatchCallback[iface.MultiMatchResult],
-) error {
-	e.multiMatchMutex.Lock()
-	defer e.multiMatchMutex.Unlock()
+func (e *Engine) register(key string, selectorProto *policylangv1.Selector, matchedCB multimatcher.MatchCallback[iface.MultiMatchResult]) error {
+	e.multiMatchersMutex.Lock()
+	defer e.multiMatchersMutex.Unlock()
+
 	selector, err := selectors.FromProto(selectorProto)
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed to parse selector")
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
-	// check if multi matcher exists for this control point id
-	mm, ok := e.multiMatchers[selector.ControlPointID]
-	if !ok {
-		mm = multimatcher.New[string, iface.MultiMatchResult]()
-		e.multiMatchers[selector.ControlPointID] = mm
+
+	if selector.Service.Service == "" {
+		camm, ok := e.catchAllMultiMatchers[selector.ControlPoint]
+		if !ok {
+			camm = multimatcher.New[string, iface.MultiMatchResult]()
+			e.catchAllMultiMatchers[selector.ControlPoint] = camm
+		}
+		err = camm.AddEntry(key, selector.LabelMatcher, matchedCB)
+		if err != nil {
+			return err
+		}
+	} else {
+		// check if multi matcher exists for this control point id
+		mm, ok := e.multiMatchers[selector.ControlPointID]
+		if !ok {
+			mm = multimatcher.New[string, iface.MultiMatchResult]()
+			e.multiMatchers[selector.ControlPointID] = mm
+		}
+		err = mm.AddEntry(key, selector.LabelMatcher, matchedCB)
+		if err != nil {
+			return err
+		}
 	}
 
-	return mm.AddEntry(key, selector.LabelMatcher, matchedCB)
+	return nil
 }
 
 func (e *Engine) unregister(key string, selectorProto *policylangv1.Selector) error {
-	e.multiMatchMutex.Lock()
-	defer e.multiMatchMutex.Unlock()
+	e.multiMatchersMutex.Lock()
+	defer e.multiMatchersMutex.Unlock()
+
 	selector, err := selectors.FromProto(selectorProto)
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed to parse selector")
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
-	// check if multi matcher exists for this control point id
-	mm, ok := e.multiMatchers[selector.ControlPointID]
-	if !ok {
-		log.Warn().Msgf("Unable to unregister, multi matcher not found for control point id")
-		return nil
+
+	if selector.Service.Service == "" {
+		camm, ok := e.catchAllMultiMatchers[selector.ControlPoint]
+		if !ok {
+			log.Warn().Msg("Unable to unregister, catch-all multi matcher not found for control point")
+			return nil
+		}
+		err = camm.RemoveEntry(key)
+		if err != nil {
+			return err
+		}
+		// remove this multi matcher if this was the last entry
+		if camm.Length() == 0 {
+			delete(e.catchAllMultiMatchers, selector.ControlPoint)
+		}
+	} else {
+		// check if multi matcher exists for this control point id
+		mm, ok := e.multiMatchers[selector.ControlPointID]
+		if !ok {
+			log.Warn().Msg("Unable to unregister, multi matcher not found for control point id")
+			return nil
+		}
+		err = mm.RemoveEntry(key)
+		if err != nil {
+			return err
+		}
+		// remove this multi matcher if this was the last entry
+		if mm.Length() == 0 {
+			delete(e.multiMatchers, selector.ControlPointID)
+		}
 	}
-	retval := mm.RemoveEntry(key)
-	// remove this multi matcher if this was the last entry
-	if mm.Length() == 0 {
-		delete(e.multiMatchers, selector.ControlPointID)
-	}
-	return retval
+
+	return nil
 }

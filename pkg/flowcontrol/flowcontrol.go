@@ -85,18 +85,18 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	_ = grpc.SetHeader(ctx, metadata.Pairs("client-ip", clientIP))
 
 	entity := h.entityCache.GetByIP(clientIP)
-	if entity == nil {
-		log.Warn().Err(errors.New("no entity in cache")).Msg("failed to get services and labels from entities")
-		reason := &flowcontrolv1.Reason{
-			Reason: &flowcontrolv1.Reason_ErrorReason_{
-				ErrorReason: flowcontrolv1.Reason_ERROR_REASON_ENTITY_LOOKUP_FAILED,
-			},
-		}
-		return &flowcontrolv1.CheckResponse{
-			DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_UNSPECIFIED,
-			Reason:       reason,
-		}, nil
-	}
+	// if entity == nil {
+	// 	log.Warn().Err(errors.New("no entity in cache")).Msg("failed to get services and labels from entities")
+	// 	reason := &flowcontrolv1.Reason{
+	// 		Reason: &flowcontrolv1.Reason_ErrorReason_{
+	// 			ErrorReason: flowcontrolv1.Reason_ERROR_REASON_ENTITY_LOOKUP_FAILED,
+	// 		},
+	// 	}
+	// 	return &flowcontrolv1.CheckResponse{
+	// 		DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_UNSPECIFIED,
+	// 		Reason:       reason,
+	// 	}, nil
+	// }
 
 	svcs, err := entitycache.ServiceIDsFromEntity(entity)
 	if err != nil {
