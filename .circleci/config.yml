@@ -55,64 +55,35 @@ commands:
           paths:
             - ~/.asdf
 jobs:
-  nightly:
-    working_directory: ~/RM
-    executor: base-cimg-executor
-    steps:
-      - checkout
-      - asdf_install: &nightly_tools
-          cache_name: nightly
-          tools: |-
-            python
-            gcloud
-            terraform
-            kubectl
-            helmfile
-      - run:
-          name: Prepare for nightly
-          command: .circleci/scripts/nightly_bootstrap.sh
-      - asdf_save_cache:
-          cache_name: nightly
-      - run:
-          name: Run nightly
-          working_directory: ops/apps/opsninja
-          command: inv nightly
-  demo:
-    executor: base-cimg-executor
-    steps:
-      - checkout
-      - asdf_install: *nightly_tools
-      - run:
-          name: Prepare for demo
-          command: .circleci/scripts/demo_bootstrap.sh
-      - asdf_save_cache:
-          cache_name: nightly
-      - run:
-          name: Run demo
-          working_directory: ops/apps/opsninja
-          command: inv demo
   release-components:
     executor: base-cimg-executor
     steps:
       - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
       - asdf_install:
           cache_name: release
           tools: |-
             python
             gcloud
-            terraform
-            kubectl
-            helmfile
       - run:
-          name: Install opsninja dependencies
-          working_directory: ops/apps/opsninja
+          name: Install opsninja and its dependencies
           command: |
-            pip install .
+            # We need R/O access to cloud repository to be able to fetch opsninja library
+            # FIXME: make "releases" of opsninja library somehow, even as a separate repository
+            # to limit exposure.
+            export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
+            export SSH_AUTH_SOCK=""
+            # Bust asdf cache as our opsninja version is always 0.0.0
+            pip uninstall -y opsninja
+            pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
             asdf reshim
       - run:
           name: Schedule release jobs
           working_directory: ops/apps/opsninja
-          command: inv release.circleci-release --tag << pipeline.git.tag >>
+          command: fn circleci trigger-release --tag << pipeline.git.tag >>
       - asdf_save_cache:
           cache_name: release
 

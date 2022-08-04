@@ -6,7 +6,7 @@ golangci-lint 1.47.3
 grpcurl 1.8.6
 mockery 2.14.0
 buf 1.7.0
-nodejs 18.7.0
+nodejs 16.14.1
 python 3.10.5
 shellcheck 0.8.0
 yq 4.27.2
