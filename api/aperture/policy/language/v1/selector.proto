@@ -19,13 +19,7 @@ message Selector {
 
   string service = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     description: "The service (name) of the entities.\nIn k8s, this is the FQDN of the Service object.\n\nNote: Entity may belong to multiple services."
-    extensions: {
-      key: "x-go-validate";
-      value {
-        string_value: "required"
-      }
-    }
-  }]; // @gotags: validate:"required"
+  }];
 
   ControlPoint control_point = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     description: "Describes control point Within the entity where the policy should apply to."

@@ -1512,7 +1512,6 @@ definitions:
           In k8s, this is the FQDN of the Service object.
 
           Note: Entity may belong to multiple services.
-        x-go-validate: required
     description: Describes where a rule or actuation component should apply to.
   v1Sqrt:
     type: object
