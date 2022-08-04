@@ -25,6 +25,9 @@ go.work
 /vendor/
 /Godeps/
 
+## IDEA ##
+.idea/
+
 ## VSCode ###
 .vscode/
 

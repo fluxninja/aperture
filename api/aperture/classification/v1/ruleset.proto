@@ -37,7 +37,7 @@ message Classifier {
     json_schema: {
       description: "Set of classification rules sharing a common selector."
     }
-    example: "{\"'yaml\":{\"selector\":{\"namespace\":\"default\",\"service\":\"service1\",\"control_point\":{\"traffic\":\"ingress\"}},\"rules\":{\"user\":{\"extractor\":{\"from\":\"request.http.headers.user\"}}}}}"
+    example: "{\"'yaml\":{\"selector\":{\"service\":\"service1.default.svc.cluster.local\",\"control_point\":{\"traffic\":\"ingress\"}},\"rules\":{\"user\":{\"extractor\":{\"from\":\"request.http.headers.user\"}}}}}"
   };
 
   policy.language.v1.Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
