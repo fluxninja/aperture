@@ -39,11 +39,6 @@ require (
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.20.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.56.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.56.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.56.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.56.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.56.0
 	github.com/open-policy-agent/opa v0.43.0
 	github.com/open-policy-agent/opa-envoy-plugin v0.43.0-envoy
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.57.2
