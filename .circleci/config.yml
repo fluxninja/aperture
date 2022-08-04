@@ -35,11 +35,8 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
-              parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
-              checksum "go.mod" }}
-            - aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
-              parameters.cache_name >>-
+            - aperture-asdf-cache-v1-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
+            - aperture-asdf-cache-v1-{{ checksum "~/month" }}-<< parameters.cache_name >>-
       - run:
           name: Install ASDF tools
           environment:
@@ -54,10 +51,7 @@ commands:
     steps:
       - save_cache:
           name: Save ASDF cache
-          key:
-            aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
-            parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
-            "go.mod" }}
+          key: aperture-asdf-cache-v1-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
           paths:
             - ~/.asdf
 jobs:

@@ -614,8 +614,7 @@ definitions:
         selector:
           control_point:
             traffic: ingress
-          namespace: default
-          service: service1
+          service: service1.default.svc.cluster.local
     properties:
       rules:
         type: object
@@ -1479,8 +1478,7 @@ definitions:
                 regex: ^(?!.*Chrome).*Safari
             match_labels:
               user_tier: gold
-          namespace: default
-          service: service1
+          service: service1.default.svc.cluster.local
     properties:
       agent_group:
         type: string
@@ -1492,7 +1490,7 @@ definitions:
       label_matcher:
         $ref: '#/definitions/v1LabelMatcher'
         description: |-
-          Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).
+          Allows to add _additional_ condition on labels that must also be satisfied (in addition to service+control point matching).
           The label matcher allows to match on infra labels, flow labels and request labels.
           Arbitrary label matcher can be used to match infra labels.
           For flowcontrol policies, the matcher can be used to match flow labels.
@@ -1507,17 +1505,11 @@ definitions:
           Also, (non-pseudo) headers are available as `request_header_<headername>`.
 
           Note: Request headers are only available for "traffic" control points.
-      namespace:
-        type: string
-        description: |-
-          The namespace of the entities to select.
-          In k8s, this is the k8s' namespace.
-        x-go-validate: required
       service:
         type: string
         description: |-
           The service (name) of the entities.
-          In k8s, this is a name of the Service object.
+          In k8s, this is the FQDN of the Service object.
 
           Note: Entity may belong to multiple services.
         x-go-validate: required

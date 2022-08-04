@@ -5,7 +5,9 @@
 //go:generate swagger generate spec --include="github.com/fluxninja*" --include-tag=classification-configuration -o ../../docs/gen/classification/config-swagger.yaml
 
 // Aperture Controller
-//   BasePath: /aperture-controller
+//
+//	BasePath: /aperture-controller
+//
 // swagger:meta
 package main
 

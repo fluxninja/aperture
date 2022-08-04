@@ -8,8 +8,7 @@ metadata:
 data:
   default.productpage.yaml: |
     selector:
-      namespace: bookinfo
-      service: productpage
+      service: productpage.bookinfo.svc.cluster.local
       control_point: { traffic: ingress }
     rules:
       ua:
@@ -30,8 +29,7 @@ data:
 
   default.reviewsv2.yaml: |
     selector:
-      namespace: bookinfo
-      service: reviews
+      service: reviews.bookinfo.svc.cluster.local
       label_matcher:
         match_labels:
           kube_version: v2
@@ -44,8 +42,7 @@ data:
 
   default.reviewsv3.yaml: |
     selector:
-      namespace: bookinfo
-      service: reviews
+      service: reviews.bookinfo.svc.cluster.local
       label_matcher:
         match_labels:
           kube_version: v3

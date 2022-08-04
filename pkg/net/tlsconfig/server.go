@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
-	"io/ioutil"
+	"os"
 	"path"
 
 	"go.uber.org/fx"
@@ -98,7 +98,7 @@ func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller
 		var clientCertPool *x509.CertPool
 		if config.ClientCA != "" {
 
-			caCert, err := ioutil.ReadFile(path.Join(certPath, config.ClientCA))
+			caCert, err := os.ReadFile(path.Join(certPath, config.ClientCA))
 			if err != nil {
 				log.Error().Err(err).Msg("failed to load client CA")
 				return nil, err
