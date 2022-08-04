@@ -18,8 +18,8 @@ func NewFactory() component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
 		createDefaultConfig,
-		component.WithLogsProcessor(CreateLogsProcessor),
-		component.WithTracesProcessor(CreateTracesProcessor))
+		component.WithLogsProcessor(CreateLogsProcessor, component.StabilityLevelInDevelopment),
+		component.WithTracesProcessor(CreateTracesProcessor, component.StabilityLevelInDevelopment))
 }
 
 func createDefaultConfig() config.Processor {
