@@ -82,6 +82,8 @@ jobs:
             export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
+            # Bust asdf cache as our opsninja version is always 0.0.0
+            pip uninstall -y opsninja
             pip install 'git+ssh://git@github.com/fluxninja/cloud@kklimonda/aperture-docs-publish-fixes#egg=opsninja&subdirectory=ops/apps/opsninja/'
       - run:
           name: Schedule release jobs
