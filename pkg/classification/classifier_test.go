@@ -36,8 +36,7 @@ var _ = Describe("Classifier", func() {
 		// Classifier with a simple extractor-based rule
 		rs1 := &classificationv1.Classifier{
 			Selector: &policylangv1.Selector{
-				Namespace: "default",
-				Service:   "my-service",
+				Service: "my-service.default.svc.cluster.local",
 				ControlPoint: &policylangv1.ControlPoint{
 					Controlpoint: &policylangv1.ControlPoint_Traffic{
 						Traffic: "ingress",
@@ -54,8 +53,7 @@ var _ = Describe("Classifier", func() {
 		// Classifier with Raw-rego rule, additionally gated for just "version one"
 		rs2 := &classificationv1.Classifier{
 			Selector: &policylangv1.Selector{
-				Namespace: "default",
-				Service:   "my-service",
+				Service: "my-service.default.svc.cluster.local",
 				LabelMatcher: &policylangv1.LabelMatcher{
 					MatchLabels: map[string]string{"version": "one"},
 				},
@@ -110,8 +108,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				map[string]string{"version": "one", "other": "tag"},
 				selectors.Ingress,
@@ -131,8 +128,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				map[string]string{"version": "one"},
 				selectors.Egress,
@@ -149,8 +145,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				map[string]string{"version": "two"},
 				selectors.Ingress,
@@ -172,8 +167,7 @@ var _ = Describe("Classifier", func() {
 				labels, err := classifier.Classify(
 					context.TODO(),
 					[]services.ServiceID{{
-						Namespace: "default",
-						Service:   "my-service",
+						Service: "my-service.default.svc.cluster.local",
 					}},
 					map[string]string{"version": "one"},
 					selectors.Ingress,
@@ -205,8 +199,7 @@ var _ = Describe("Classifier", func() {
 	setRulesForMyService := func(labelRules map[string]*classificationv1.Rule) error {
 		_, err := classifier.AddRules(context.TODO(), "test", &classificationv1.Classifier{
 			Selector: &policylangv1.Selector{
-				Namespace: "default",
-				Service:   "my-service",
+				Service: "my-service.default.svc.cluster.local",
 				ControlPoint: &policylangv1.ControlPoint{
 					Controlpoint: &policylangv1.ControlPoint_Traffic{
 						Traffic: "ingress",
@@ -246,8 +239,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				nil,
 				selectors.Ingress,
@@ -291,8 +283,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				nil,
 				selectors.Ingress,
@@ -349,8 +340,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				nil,
 				selectors.Ingress,
@@ -414,8 +404,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				nil,
 				selectors.Ingress,

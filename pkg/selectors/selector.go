@@ -132,14 +132,13 @@ func ControlPointIDFromProto(selector *policylangv1.Selector) ControlPointID {
 	return ControlPointID{
 		Service: services.ServiceID{
 			AgentGroup: selector.AgentGroup,
-			Namespace:  selector.Namespace,
 			Service:    selector.Service,
 		},
 		ControlPoint: ControlPointFromProto(selector.ControlPoint),
 	}
 }
 
-// MMExprFromLabelMatcher translate's proto definition of label matcher into
+// MMExprFromLabelMatcher translates proto definition of label matcher into
 // a // single multimatcher expression
 //
 // LabelMatcher can be nil or a validated LabelMatcher.

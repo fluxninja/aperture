@@ -42,7 +42,7 @@ repos:
       - id: go-generate
       - id: go-mod-tidy-repo
         args:
-          - -compat=1.19
+          - -compat=1.18
   - repo: meta
     hooks:
       - id: check-hooks-apply

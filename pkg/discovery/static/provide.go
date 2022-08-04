@@ -16,7 +16,6 @@ const configKey = common.DiscoveryConfigKey + ".static"
 // EntityConfig describes a single entity.
 type EntityConfig struct {
 	IPAddress string `json:"ip_address"`
-	Namespace string `json:"namespace"`
 	Prefix    string `json:"prefix"`
 	UID       string `json:"uid"`
 }
