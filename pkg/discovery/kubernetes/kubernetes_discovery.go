@@ -307,7 +307,6 @@ func (kc *KubernetesDiscovery) updatePodInTracker(podInfo podInfo) error {
 	entity.Services = services
 	entity.IPAddress = podInfo.IPAddress
 	entity.UID = podInfo.UID
-	entity.Namespace = podInfo.Namespace
 	entity.Prefix = "kubernetes_pod_id"
 
 	value, err := json.Marshal(entity)
@@ -389,7 +388,6 @@ func getFQDN(e *v1.Endpoints) string {
 
 	// we assume that FQDN of all kubernetes services is the default one
 	defaultFQDN := fmt.Sprintf("%v.%v.svc.cluster.local", name, namespace)
-
 	return defaultFQDN
 }
 

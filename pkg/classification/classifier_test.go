@@ -108,8 +108,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service.default.svc.cluster.local",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				map[string]string{"version": "one", "other": "tag"},
 				selectors.Ingress,
@@ -129,8 +128,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service.default.svc.cluster.local",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				map[string]string{"version": "one"},
 				selectors.Egress,
@@ -147,8 +145,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service.default.svc.cluster.local",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				map[string]string{"version": "two"},
 				selectors.Ingress,
@@ -170,8 +167,7 @@ var _ = Describe("Classifier", func() {
 				labels, err := classifier.Classify(
 					context.TODO(),
 					[]services.ServiceID{{
-						Namespace: "default",
-						Service:   "my-service.default.svc.cluster.local",
+						Service: "my-service.default.svc.cluster.local",
 					}},
 					map[string]string{"version": "one"},
 					selectors.Ingress,
@@ -243,8 +239,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service.default.svc.cluster.local",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				nil,
 				selectors.Ingress,
@@ -288,8 +283,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service.default.svc.cluster.local",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				nil,
 				selectors.Ingress,
@@ -346,8 +340,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service.default.svc.cluster.local",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				nil,
 				selectors.Ingress,
@@ -411,8 +404,7 @@ var _ = Describe("Classifier", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
-					Namespace: "default",
-					Service:   "my-service.default.svc.cluster.local",
+					Service: "my-service.default.svc.cluster.local",
 				}},
 				nil,
 				selectors.Ingress,

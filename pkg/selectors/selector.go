@@ -129,22 +129,16 @@ func (p ControlPointID) String() string {
 //
 // Selector is assumed to be validated and non-nil.
 func ControlPointIDFromProto(selector *policylangv1.Selector) ControlPointID {
-	serviceNameParts := strings.Split(selector.Service, ".")
-	namespace := ""
-	if len(serviceNameParts) >= 4 {
-		namespace = serviceNameParts[len(serviceNameParts)-4]
-	}
 	return ControlPointID{
 		Service: services.ServiceID{
 			AgentGroup: selector.AgentGroup,
-			Namespace:  namespace,
 			Service:    selector.Service,
 		},
 		ControlPoint: ControlPointFromProto(selector.ControlPoint),
 	}
 }
 
-// MMExprFromLabelMatcher translate's proto definition of label matcher into
+// MMExprFromLabelMatcher translates proto definition of label matcher into
 // a // single multimatcher expression
 //
 // LabelMatcher can be nil or a validated LabelMatcher.
