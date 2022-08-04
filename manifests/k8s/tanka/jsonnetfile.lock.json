@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "dependencies": [
+    {
+      "source": {
+        "git": {
+          "remote": "ssh://git@github.com/fluxninja/aperture-mixin.git",
+          "subdir": ""
+        }
+      },
+      "version": "746b7607e37cd2d59929557a3f3cac7f7431067d",
+      "sum": "GIuwMfSyIXgC6ZEFuRzgB3xLMyF13WRR0JLL/ray3WA="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grafonnet-lib.git",
+          "subdir": "grafonnet"
+        }
+      },
+      "version": "6db00c292d3a1c71661fc875f90e0ec7caa538c2",
+      "sum": "gF8foHByYcB25jcUOBqP6jxk0OPifQMjPvKY0HaCk6w="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "grafana-builder"
+        }
+      },
+      "version": "37f8f9d015efac5f83c3f490a52de1d686c2cdc9",
+      "sum": "0KkygBQd/AFzUvVzezE4qF/uDYgrwUXVpZfINBti0oc="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "ksonnet-util"
+        }
+      },
+      "version": "37f8f9d015efac5f83c3f490a52de1d686c2cdc9",
+      "sum": "xo1A7iYvJ7OZ64q2dOZY0G8FGHHt+t/+vEJW3bnXHyk="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "tanka-util"
+        }
+      },
+      "version": "37f8f9d015efac5f83c3f490a52de1d686c2cdc9",
+      "sum": "AGgjH6IJe/1qwNtxFIiG8V1uyOJZascEydQsNrfPQ4c="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/jsonnet-libs/docsonnet.git",
+          "subdir": "doc-util"
+        }
+      },
+      "version": "fc3f9bca2dff836b0e924a993bdf11bc51af78d4",
+      "sum": "JUBWG9ybm0TlY3uCWrNoQS00BcfPlCvuK9jPFU0NIj8="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/jsonnet-libs/grafana-operator-libsonnet.git",
+          "subdir": ""
+        }
+      },
+      "version": "956b95bbf0d9696bc0e8b9812f9259aff72cbf85",
+      "sum": "D3iHOST+T5u1pA7DTp6b/Qkn8To1snchTIpCmGgW5+U="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/jsonnet-libs/k8s-libsonnet.git",
+          "subdir": "1.22"
+        }
+      },
+      "version": "1942ec15993b5a273569bb9a59d522b01522d0db",
+      "sum": "1dv7m/ZBM6LvAlq2AghD3x/y2wG2bHUE4+jDKySIewI="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/kubernetes-monitoring/kubernetes-mixin.git",
+          "subdir": ""
+        }
+      },
+      "version": "b8f44bb7be728423836bef0e904ec7166895a34b",
+      "sum": "LCgSosxceeYuoau5fYSPtE5eXOFe46DxexfkrctUv7c="
+    }
+  ],
+  "legacyImports": false
+}
