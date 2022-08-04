@@ -12,7 +12,6 @@ package fluxmeter_test
 var _ = Describe("Fluxmeter", func() {
 	Context("With proto", func() {
 		selector := &policylangv1.Selector{
-			Namespace: "testnamespace",
 			Service:   "testservice",
 			ControlPoint: &policylangv1.ControlPoint{
 				Controlpoint: &policylangv1.ControlPoint_Feature{

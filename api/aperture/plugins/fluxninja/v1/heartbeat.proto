@@ -50,9 +50,8 @@ message Services {
 // particular agent
 message Service {
   string agent_group = 1;
-  string namespace = 2;
-  string name = 3;
-  int32 entities_count = 4;
+  string name = 2;
+  int32 entities_count = 3;
 }
 
 message OverlappingServices {
@@ -68,8 +67,7 @@ message OverlappingService {
 
 message ServiceKey {
   string agent_group = 1;
-  string namespace = 2;
-  string name = 3;
+  string name = 2;
 }
 
 message ControllerInfo {

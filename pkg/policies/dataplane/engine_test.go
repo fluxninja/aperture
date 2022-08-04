@@ -35,8 +35,7 @@ var _ = Describe("Dataplane Engine", func() {
 		engine = ProvideEngineAPI()
 		selector = &policylangv1.Selector{
 			AgentGroup: "default",
-			Namespace:  "testNamespace",
-			Service:    "testService",
+			Service:    "testService.testNamespace.svc.cluster.local",
 			ControlPoint: &policylangv1.ControlPoint{
 				Controlpoint: &policylangv1.ControlPoint_Traffic{Traffic: "ingress"},
 			},
@@ -141,8 +140,7 @@ var _ = Describe("Dataplane Engine", func() {
 			}
 			svcs := []services.ServiceID{{
 				AgentGroup: "default",
-				Namespace:  "testNamespace2",
-				Service:    "testService2",
+				Service:    "testService2.testNamespace2.svc.cluster.local",
 			}}
 			labels := selectors.NewLabels(selectors.LabelSources{
 				Flow: map[string]string{"service": "whatever"},
@@ -162,11 +160,10 @@ var _ = Describe("Dataplane Engine", func() {
 			}
 			svcs := []services.ServiceID{{
 				AgentGroup: "default",
-				Namespace:  "testNamespace",
-				Service:    "testService",
+				Service:    "testService.testNamespace.svc.cluster.local",
 			}}
 			labels := selectors.NewLabels(selectors.LabelSources{
-				Flow: map[string]string{"service": "testService"},
+				Flow: map[string]string{"service": "testService.testNamespace.svc.cluster.local"},
 			})
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)

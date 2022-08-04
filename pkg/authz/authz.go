@@ -227,15 +227,9 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {
 	host := req.GetAttributes().GetRequest().GetHttp().GetHost()
 	host = strings.Split(host, ":")[0]
-	hostParts := strings.Split(host, ".")
-	ns := "default"
-	if len(hostParts) >= 2 {
-		ns = hostParts[1]
-	}
 	return services.ServiceID{
 		AgentGroup: "default",
-		Namespace:  ns,
-		Service:    hostParts[0],
+		Service:    host,
 	}
 }
 

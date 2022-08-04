@@ -12,7 +12,6 @@ import (
 
 const (
 	testPrefix = "test"
-	testNS     = "testNamespace"
 )
 
 var _ = Describe("Cache", func() {
@@ -25,7 +24,7 @@ var _ = Describe("Cache", func() {
 	Context("by IP", func() {
 		It("reads entity properly", func() {
 			ip := "1.2.3.4"
-			entity := testEntity("foo", "foo", testNS, ip, nil)
+			entity := testEntity("foo", "foo", ip, nil)
 			ec.Put(entity)
 			actual := ec.GetByIP(ip)
 			Expect(actual).To(Equal(entity))
@@ -39,7 +38,7 @@ var _ = Describe("Cache", func() {
 
 		It("removes an entity properly", func() {
 			ip := "1.2.3.4"
-			entity := testEntity("foo", "foo", testNS, ip, nil)
+			entity := testEntity("foo", "foo", ip, nil)
 			ec.Put(entity)
 
 			removed := ec.Remove(entity)
@@ -52,10 +51,10 @@ var _ = Describe("Cache", func() {
 		It("returns false if trying to remove a nonexistent entity", func() {
 			ip := "1.2.3.4"
 			otherIP := "192.168.0.1"
-			entity := testEntity("foo", "foo", testNS, ip, nil)
+			entity := testEntity("foo", "foo", ip, nil)
 			ec.Put(entity)
 
-			otherEntity := testEntity("foo2", "foo", testNS, otherIP, nil)
+			otherEntity := testEntity("foo2", "foo", otherIP, nil)
 			removed := ec.Remove(otherEntity)
 			Expect(removed).To(BeFalse())
 
@@ -68,7 +67,7 @@ var _ = Describe("Cache", func() {
 		It("reads entity properly", func() {
 			uid := "foo"
 			name := nameFromUid(testPrefix, uid)
-			entity := testEntity(uid, "foo", "", testNS, nil)
+			entity := testEntity(uid, "foo", "", nil)
 			ec.Put(entity)
 			actual := ec.GetByName(name)
 			Expect(actual).To(Equal(entity))
@@ -84,7 +83,7 @@ var _ = Describe("Cache", func() {
 		It("removes an entity properly", func() {
 			uid := "bar"
 			name := nameFromUid(testPrefix, uid)
-			entity := testEntity(uid, "foo", "", testNS, nil)
+			entity := testEntity(uid, "foo", "", nil)
 			ec.Put(entity)
 
 			removed := ec.Remove(entity)
@@ -98,10 +97,10 @@ var _ = Describe("Cache", func() {
 			uid := "bar"
 			name := nameFromUid(testPrefix, uid)
 			otherUid := "baz"
-			entity := testEntity(uid, "foo", testNS, "1.1.1.1", nil)
+			entity := testEntity(uid, "foo", "1.1.1.1", nil)
 			ec.Put(entity)
 
-			otherEntity := testEntity(otherUid, "foo", testNS, "1.1.1.2", nil)
+			otherEntity := testEntity(otherUid, "foo", "1.1.1.2", nil)
 			removed := ec.Remove(otherEntity)
 			Expect(removed).To(BeFalse())
 
@@ -112,7 +111,7 @@ var _ = Describe("Cache", func() {
 
 	It("clears all entities from the map", func() {
 		ip := "1.2.3.4"
-		entity := testEntity("foo", "foo", ip, testNS, nil)
+		entity := testEntity("foo", "foo", "", nil)
 		ec.Put(entity)
 		ec.Clear()
 		found := ec.GetByIP(ip)
@@ -121,13 +120,12 @@ var _ = Describe("Cache", func() {
 
 	Context("Services", func() {
 		It("reads same service from two entities", func() {
-			ec.Put(testEntity("1", "foo", testNS, "1.1.1.1", []string{"baz"}))
-			ec.Put(testEntity("2", "foo", testNS, "1.1.1.2", []string{"baz"}))
+			ec.Put(testEntity("1", "foo", "1.1.1.1", []string{"baz"}))
+			ec.Put(testEntity("2", "foo", "1.1.1.2", []string{"baz"}))
 			services, _ := ec.Services()
 			Expect(services).To(HaveLen(1))
 			Expect(services).To(ContainElement(&heartbeatv1.Service{
 				AgentGroup:    "foo",
-				Namespace:     testNS,
 				Name:          "baz",
 				EntitiesCount: 2,
 			}))
@@ -136,18 +134,16 @@ var _ = Describe("Cache", func() {
 		It("reads two services from one entity", func() {
 			ip := "1.1.1.1"
 			serviceNames := []string{"baz1", "baz2"}
-			ec.Put(testEntity("1", "foo", testNS, ip, serviceNames))
+			ec.Put(testEntity("1", "foo", ip, serviceNames))
 			services, _ := ec.Services()
 			Expect(services).To(HaveLen(2))
 			Expect(services).To(ContainElement(&heartbeatv1.Service{
 				AgentGroup:    "foo",
-				Namespace:     testNS,
 				Name:          "baz1",
 				EntitiesCount: 1,
 			}))
 			Expect(services).To(ContainElement(&heartbeatv1.Service{
 				AgentGroup:    "foo",
-				Namespace:     testNS,
 				Name:          "baz2",
 				EntitiesCount: 1,
 			}))
@@ -156,7 +152,7 @@ var _ = Describe("Cache", func() {
 		It("returns no service after being cleared", func() {
 			ip := "1.1.1.1"
 			serviceNames := []string{"baz"}
-			ec.Put(testEntity("1", "foo", testNS, ip, serviceNames))
+			ec.Put(testEntity("1", "foo", ip, serviceNames))
 			ec.Clear()
 			services, _ := ec.Services()
 			Expect(services).To(HaveLen(0))
@@ -164,11 +160,11 @@ var _ = Describe("Cache", func() {
 	})
 })
 
-func testEntity(uid, agentGroup, namespace, ipAddress string, services []string) *entitycache.Entity {
+func testEntity(uid, agentGroup, ipAddress string, services []string) *entitycache.Entity {
 	entity := entitycache.NewEntity(entitycache.EntityID{
 		Prefix: "test",
 		UID:    uid,
-	}, namespace, ipAddress, services)
+	}, ipAddress, services)
 	entity.SetAgentGroup(agentGroup)
 	return entity
 }
