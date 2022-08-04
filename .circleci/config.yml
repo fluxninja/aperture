@@ -85,6 +85,7 @@ jobs:
             # Bust asdf cache as our opsninja version is always 0.0.0
             pip uninstall -y opsninja
             pip install 'git+ssh://git@github.com/fluxninja/cloud@kklimonda/aperture-docs-publish-fixes#egg=opsninja&subdirectory=ops/apps/opsninja/'
+            asdf reshim
       - run:
           name: Schedule release jobs
           working_directory: ops/apps/opsninja
