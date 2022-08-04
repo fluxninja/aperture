@@ -86,7 +86,7 @@ jobs:
       - run:
           name: Schedule release jobs
           working_directory: ops/apps/opsninja
-          command: inv release.circleci-release --tag << pipeline.git.tag >>
+          command: fn circleci trigger-release --tag << pipeline.git.tag >>
       - asdf_save_cache:
           cache_name: release
 
