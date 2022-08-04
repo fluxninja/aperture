@@ -227,6 +227,10 @@ jobs:
           keys:
             - aperture-v1-go-cache-{{ checksum "~/day" }}
       - run:
+          name: Workaround till https://github.com/golangci/golangci-lint/pull/3037 is released
+          command: |
+            go install github.com/golangci/golangci-lint/cmd/golangci-lint@2d8fea819e651d384cf47784a5fb9c789cf5bd59
+      - run:
           name: Cache golangci-lint run
           command: |
             golangci-lint run || true
