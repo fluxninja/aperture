@@ -29,44 +29,6 @@ var (
 	jws        jobs.JobWatchers
 )
 
-// func main() {
-// 	app := platform.New(
-// 		platform.Config{}.Module(),
-// 		http.ClientConstructor{Name: "k8s-http-client", Key: "kubernetes.http_client"}.Annotate(),
-// 		notifiers.TrackersConstructor{Name: "entity_trackers"}.Annotate(),
-// 		prometheus.Module(),
-// 		otel.ProvideAnnotatedAgentConfig(),
-// 		fx.Provide(
-// 			agentinfo.ProvideAgentInfo,
-// 			k8s.Providek8sClient,
-// 			clockwork.NewRealClock,
-// 			entitycache.ProvideEntityCache,
-// 			otel.AgentOTELComponents,
-// 			agent.ProvidePeersPrefix,
-// 		),
-// 		flowcontrol.Module,
-// 		classification.Module,
-// 		authz.Module,
-// 		otelcollector.Module(),
-// 		distcache.Module(),
-// 		dataplane.PolicyModule(),
-// 		discovery.Module(),
-// 		fx.Invoke(
-// 			authz.Register,
-// 			flowcontrol.Register,
-// 		),
-// 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),
-// 	)
-
-// 	if err := app.Err(); err != nil {
-// 		visualize, _ := fx.VisualizeError(err)
-// 		log.Panic().Err(err).Msg("fx.New failed: " + visualize)
-// 	}
-
-// 	log.Info().Msg("aperture-agent app created")
-// 	platform.Run(app)
-// }
-
 func init() {
 	if l := os.Getenv(EnvTestMemLimit); l != "" {
 		l, err := strconv.Atoi(l)
@@ -100,7 +62,7 @@ func createUnmarshaller() (config.Unmarshaller, error) {
 }
 
 func TestIsolatedControlWatermarkPolicy(t *testing.T) {
-	key := "test-isolated-control-watermark-policy"
+	key := "cgroup"
 	reg := status.NewRegistry(".")
 	// skipIfNotIsolated(t)
 
@@ -113,7 +75,7 @@ func TestIsolatedControlWatermarkPolicy(t *testing.T) {
 		DefaultConfig: WatchdogConfig{
 			CGroup: WatchdogPolicyType{
 				WatermarksPolicy: WatermarksPolicy{
-					Watermarks: []float64{0.50, 0.75, 0.80, 0.85, 0.90, 0.95, 0.99},
+					// Watermarks: []float64{0.50, 0.75, 0.80, 0.85, 0.90, 0.95, 0.99},
 					PolicyCommon: PolicyCommon{
 						Enabled: true,
 					},
@@ -134,6 +96,44 @@ func TestIsolatedControlWatermarkPolicy(t *testing.T) {
 
 	fmt.Printf("watchdog Content: %v\n", watchDog)
 
+	runTestCGroup(t)
+}
+
+func TestIsolatedControlAdaptivePolicy(t *testing.T) {
+	key := "cgroup"
+	reg := status.NewRegistry(".")
+	// skipIfNotIsolated(t)
+
+	jobGroup, multiJob := createJobGroupAndMultiJob(key, reg)
+	unmarshaller, err := createUnmarshaller()
+	require.NoError(t, err)
+
+	constructor := &Constructor{
+		Key: key,
+		DefaultConfig: WatchdogConfig{
+			CGroup: WatchdogPolicyType{
+				AdaptivePolicy: AdaptivePolicy{
+					PolicyCommon: PolicyCommon{
+						Enabled: true,
+					},
+				},
+			},
+		},
+	}
+
+	watchDog := WatchdogIn{
+		StatusRegistry: status.NewRegistry("."),
+		JobGroup:       jobGroup,
+		WatchdogJob:    multiJob,
+		Unmarshaller:   unmarshaller,
+	}
+
+	err = constructor.setupWatchdog(watchDog)
+	require.NoError(t, err)
+	runTestCGroup(t)
+}
+
+func runTestCGroup(t *testing.T) {
 	rounds := 100
 	if memLimit != 0 {
 		rounds /= int(float64(memLimit)*0.8) / 1024 / 1024
