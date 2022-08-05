@@ -23,10 +23,11 @@ message CheckResponse {
   Reason reason = 2;
   // limiter_decisions contains information about decision made by each limiter.
   repeated LimiterDecision limiter_decisions = 3;
-  // flux meter ids that were matched for this request
-  repeated string flux_meter_ids = 4;
+  // flux meters that were matched for this request.
+  repeated FluxMeter flux_meters = 4;
 }
 
+// Reason contains fields that give futher information about error or rejection.
 message Reason {
   enum ErrorReason {
     ERROR_REASON_UNSPECIFIED = 0;
@@ -55,17 +56,14 @@ enum DecisionType {
 
 // LimiterDecision describes details for each limiter.
 message LimiterDecision {
-  message RateLimiterDecision {
-    string policy_name = 1;
-    string policy_hash = 2;
-    int64 component_index = 3;
+  message RateLimiter {
+    int64 remaining = 1;
+    int64 current = 2;
+    string label = 3;
   }
 
-  message ConurrencyLimiterDecision {
-    string policy_name = 1;
-    string policy_hash = 2;
-    int64 component_index = 3;
-    string workload = 4;
+  message ConcurrencyLimiter {
+    string workload = 1;
   }
 
   enum LimiterReason {
@@ -73,10 +71,21 @@ message LimiterDecision {
     LIMITER_REASON_KEY_NOT_FOUND = 1;
   }
 
-  oneof decision {
-    RateLimiterDecision rate_limiter_decision = 1;
-    ConurrencyLimiterDecision concurrency_limiter_decision = 2;
+  string policy_name = 1;
+  string policy_hash = 2;
+  int64 component_index = 3;
+  bool dropped = 4;
+  LimiterReason reason = 5;
+  oneof details {
+    RateLimiter rate_limiter = 6;
+    ConcurrencyLimiter concurrency_limiter = 7;
   }
-  bool dropped = 3;
-  LimiterReason reason = 4;
+}
+
+// FluxMeter describes deteail for each FluxMeter.
+message FluxMeter {
+  string agent_group_name = 1;
+  string policy_name = 2;
+  string policy_hash = 3;
+  string flux_meter_name = 4;
 }

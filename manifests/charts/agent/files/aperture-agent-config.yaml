@@ -1,0 +1,44 @@
+server:
+  addr: ":{{ .Values.agent.serverPort }}"
+
+dist_cache:
+  bind_addr: ":{{ .Values.agent.distributedCachePort }}"
+  memberlist_config_bind_addr: ":{{ .Values.agent.memberListPort }}"
+
+otel:
+  addr: ":{{ .Values.agent.serverPort }}"
+
+log:
+  pretty_console: {{ .Values.agent.log.prettyConsole }}
+  non_blocking: {{ .Values.agent.log.nonBlocking }}
+  level: "{{ .Values.agent.log.level }}"
+  file: "{{ .Values.agent.log.file }}"
+
+etcd:
+  endpoints: {{ include "aperture.etcd.endpoints" (dict "etcd" .Values.etcd "context" . $) }}
+  lease_ttl: {{ .Values.etcd.leaseTtl }}
+
+prometheus:
+  address: {{ include "aperture.prometheus.address" (dict "prometheus" .Values.prometheus "context" . $) | quote }}
+
+plugins:
+  disable_plugins: false
+  {{- if not .Values.fluxninjaPlugin.enabled }}
+  disabled_plugins:
+    - aperture-plugin-fluxninja
+  {{- end }}
+
+{{- if .Values.fluxninjaPlugin.enabled }}
+fluxninja_plugin:
+  fluxninja_endpoint: "{{ .Values.fluxninjaPlugin.endpoint }}"
+  heartbeat_interval: "{{ .Values.fluxninjaPlugin.heartbeatsInterval }}"
+  client_grpc:
+    insecure: {{ .Values.fluxninjaPlugin.tls.insecure | default false }}
+    tls:
+      insecure_skip_verify: {{ .Values.fluxninjaPlugin.tls.insecureSkipVerify | default false }}
+      ca_file: {{ .Values.fluxninjaPlugin.tls.caFile | default "" }}
+  client_http:
+    tls:
+      insecure_skip_verify: {{ .Values.fluxninjaPlugin.tls.insecureSkipVerify | default false }}
+      ca_file: {{ .Values.fluxninjaPlugin.tls.caFile | default "" }}
+{{- end }}

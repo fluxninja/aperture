@@ -84,7 +84,7 @@ install_plugins() {
 		printf 'Installing Go tools\n'
 		go env
 		# install go tools
-		cd "${git_root}" && make install-go-tools
+		cd "${git_root}" && make go-mod-tidy && make install-go-tools
 		asdf reshim golang
 	fi
 }

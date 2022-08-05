@@ -61,6 +61,11 @@ func initSpanLinkAttributes(dest pcommon.Map) {
 	spanLinkAttributes.CopyTo(dest)
 }
 
+func initMetricExemplarAttributes(dest pcommon.Map) {
+	dest.Clear()
+	dest.InsertString("exemplar-attachment", "exemplar-attachment-value")
+}
+
 func initMetricAttachment(dest pcommon.Map) {
 	dest.Clear()
 	metricAttachment.CopyTo(dest)

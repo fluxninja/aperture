@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -151,4 +152,17 @@ func UnmarshalStringVal(value pcommon.Value, labelName string, output interface{
 	}
 
 	return true
+}
+
+// GetCheckResponse unmarshalls limiter decisions from string label.
+func GetCheckResponse(attributes pcommon.Map) (checkResponse *flowcontrolv1.CheckResponse) {
+	rawLimiterDecisions, exists := attributes.Get(MarshalledCheckResponseLabel)
+	if !exists {
+		log.Debug().Str("label", MarshalledCheckResponseLabel).Msg("Label does not exist")
+		return
+	}
+	if !UnmarshalStringVal(rawLimiterDecisions, MarshalledCheckResponseLabel, &checkResponse) {
+		log.Debug().Str("label", MarshalledCheckResponseLabel).Msg("Label is not a string")
+	}
+	return
 }

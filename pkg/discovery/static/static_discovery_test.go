@@ -40,7 +40,6 @@ var _ = Describe("Static service discovery", func() {
 
 		It("Correctly reads a config entity", func() {
 			someIPAddress := "1.2.3.4"
-			someNamespace := "nspc"
 			somePrefix := "vm_id"
 			someUID := "foo"
 			someService := "svc1"
@@ -52,7 +51,6 @@ var _ = Describe("Static service discovery", func() {
 						Entities: []*EntityConfig{
 							{
 								IPAddress: someIPAddress,
-								Namespace: someNamespace,
 								Prefix:    somePrefix,
 								UID:       someUID,
 							},
@@ -63,7 +61,6 @@ var _ = Describe("Static service discovery", func() {
 
 			expectedEntity := &common.Entity{
 				IPAddress: someIPAddress,
-				Namespace: someNamespace,
 				Prefix:    somePrefix,
 				UID:       someUID,
 				Services:  []string{someService},
@@ -89,13 +86,11 @@ var _ = Describe("Static service discovery", func() {
 						Entities: []*EntityConfig{
 							{
 								IPAddress: "1.2.3.4",
-								Namespace: "nspc",
 								Prefix:    "vm_id",
 								UID:       "foo",
 							},
 							{
 								IPAddress: "1.2.3.5",
-								Namespace: "nspc",
 								Prefix:    "vm_id",
 								UID:       "bar",
 							},
@@ -114,7 +109,6 @@ var _ = Describe("Static service discovery", func() {
 
 		It("Writes one entity if it's defined for multiple services", func() {
 			someIPAddress := "1.2.3.4"
-			someNamespace := "nspc"
 			somePrefix := "vm_id"
 			someUID := "foo"
 			someService := "svc1"
@@ -127,7 +121,6 @@ var _ = Describe("Static service discovery", func() {
 						Entities: []*EntityConfig{
 							{
 								IPAddress: someIPAddress,
-								Namespace: someNamespace,
 								Prefix:    somePrefix,
 								UID:       someUID,
 							},
@@ -138,7 +131,6 @@ var _ = Describe("Static service discovery", func() {
 						Entities: []*EntityConfig{
 							{
 								IPAddress: someIPAddress,
-								Namespace: someNamespace,
 								Prefix:    somePrefix,
 								UID:       someUID,
 							},
@@ -149,7 +141,6 @@ var _ = Describe("Static service discovery", func() {
 
 			expectedEntity := &common.Entity{
 				IPAddress: someIPAddress,
-				Namespace: someNamespace,
 				Prefix:    somePrefix,
 				UID:       someUID,
 				Services:  []string{someService, someOtherService},

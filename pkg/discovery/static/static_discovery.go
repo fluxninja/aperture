@@ -55,7 +55,6 @@ func (sd *StaticDiscovery) entitiesFromConfig() map[string]*common.Entity {
 			if entity, ok = entities[key]; !ok {
 				entity = &common.Entity{
 					IPAddress: e.IPAddress,
-					Namespace: e.Namespace,
 					Prefix:    e.Prefix,
 					UID:       e.UID,
 					Services:  nil,

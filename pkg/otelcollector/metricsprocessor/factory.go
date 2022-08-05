@@ -22,8 +22,8 @@ func NewFactory(promRegistry *prometheus.Registry, engine iface.EngineAPI) compo
 	return component.NewProcessorFactory(
 		typeStr,
 		createDefaultConfig(promRegistry, engine),
-		component.WithLogsProcessor(createLogsProcessor),
-		component.WithTracesProcessor(createTracesProcessor),
+		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
+		component.WithTracesProcessor(createTracesProcessor, component.StabilityLevelInDevelopment),
 	)
 }
 

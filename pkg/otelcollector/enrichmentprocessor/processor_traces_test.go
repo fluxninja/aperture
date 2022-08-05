@@ -17,7 +17,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			ID:         entitycache.EntityID{},
 			IPAddress:  "192.0.2.0",
 			AgentGroup: "defaultAG",
-			Namespace:  "nspc1",
 			Services:   []string{"svc1", "svc2"},
 		})
 		processor := newProcessor(entityCache)
@@ -35,7 +34,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			"control_point": "egress",
 			"labeled":       "false",
 			"agent_group":   "defaultAG",
-			"namespace":     "nspc1",
 			"services":      "svc1,svc2",
 		}))
 	})
@@ -71,7 +69,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			ID:         entitycache.EntityID{},
 			IPAddress:  "192.0.2.0",
 			AgentGroup: "defaultAG",
-			Namespace:  "nspc1",
 			Services:   []string{"svc1", "svc2"},
 		})
 		processor := newProcessor(entityCache)
@@ -89,7 +86,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			"control_point": "ingress",
 			"labeled":       "false",
 			"agent_group":   "defaultAG",
-			"namespace":     "nspc1",
 			"services":      "svc1,svc2",
 		}))
 	})
@@ -113,34 +109,34 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		}))
 	})
 
-	It("Unpacks fn.flow properly", func() {
+	It("Unpacks aperture.labels properly", func() {
 		entityCache := entitycache.NewEntityCache()
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]string{
-			"control_point": "egress",
-			"fn.flow":       `{"foo": "bar", "fizz": "buzz"}`,
+			"control_point":   "egress",
+			"aperture.labels": `{"foo": "bar", "fizz": "buzz"}`,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
 
 		assertTracesEqual(td, tracesFromLabels(map[string]string{
 			"control_point": "egress",
-			"fn.flow.foo":   "bar",
-			"fn.flow.fizz":  "buzz",
+			"foo":           "bar",
+			"fizz":          "buzz",
 			"labeled":       "true",
 		}))
 	})
 
-	It("Ignores empty fn.flow", func() {
+	It("Ignores empty aperture.labels", func() {
 		entityCache := entitycache.NewEntityCache()
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]string{
-			"control_point": "egress",
-			"fn.flow":       ``,
+			"control_point":   "egress",
+			"aperture.labels": ``,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
@@ -151,14 +147,14 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		}))
 	})
 
-	It("Ignores minus as fn.flow", func() {
+	It("Ignores minus as aperture.labels", func() {
 		entityCache := entitycache.NewEntityCache()
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]string{
-			"control_point": "feature",
-			"fn.flow":       `-`,
+			"control_point":   "feature",
+			"aperture.labels": `-`,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())

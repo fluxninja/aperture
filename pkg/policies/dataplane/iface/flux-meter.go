@@ -4,12 +4,15 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 )
 
 //go:generate mockgen -source=flux-meter.go -destination=../../mocks/mock_flux_meter.go -package=mocks
 
 // FluxMeter in an interface for interacting with fluxmeters.
 type FluxMeter interface {
+	component.ComponentAPI
+
 	// GetSelector returns the selector
 	GetSelector() *policylangv1.Selector
 

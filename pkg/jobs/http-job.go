@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -54,7 +53,7 @@ func NewHTTPJob(config HTTPJobConfig) *HTTPJob {
 		}
 
 		if config.ExpectedBody != "" {
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return nil, errors.Errorf("failed to read response body: %v", err)
 			}

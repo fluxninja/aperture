@@ -1,0 +1,781 @@
+# vim: ft=bzl sw=4
+v1alpha1.extension_repo(name='default', url='https://github.com/tilt-dev/tilt-extensions', ref='HEAD')
+load("ext://namespace", "namespace_create", "namespace_inject")
+load('ext://uibutton', 'cmd_button')
+
+#################
+### CONSTANTS ###
+#################
+GCP_PROJECT = "devel-309501"
+IMG_REPO = "gcr.io/{project}/cf-fn".format(project=GCP_PROJECT)
+GIT_ROOT = str(local("git rev-parse --show-toplevel")).strip()
+TILT_OBJECTS = []
+APERTURE_SYSTEM_NS = "aperture-system"
+TANKA = "tk"
+SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
+# Mutable global state, since global values are not mutable
+GLOBAL_STATE = {}
+GLOBAL_RAN_TANKA_DEPS_KEY = "RAN_TANKA_DEPS"
+
+# Dependency tree and service configuration.
+# Top level maps NAMESPACE to services
+# Services are a mapping of service name to their config, which consists of:
+# "needs": list of services (from any namespace) which need to be brought up for the service to work
+# "images": list of dicts, defining arguments passed to build_docker_img
+# "port_forwards": any value accepted by k8s_resource's port_forwards argument.
+#                  In addition to that, it can be a dict describing multiple port_forwards (mapping name to port_forwards, as above)
+DEP_TREE = {
+    APERTURE_SYSTEM_NS: {
+        "aperture-grafana": {
+            "labels": ["Aperture"],
+            "tkenv": "tanka/environments/tilt/apps/aperture-grafana",
+            "child_resources": [
+                {
+                    "new_name": "aperture-grafana-operator-bootstrap",
+                    "extra_objects": [
+                        ("integreatly.org$", "CustomResourceDefinition", None),
+                    ]
+                },
+                {
+                    "workload": "aperture-grafana-operator",
+                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "extra_objects": [
+                        ("^aperture-grafana-operator", None, APERTURE_SYSTEM_NS)
+                    ],
+                    "ignored_objects": [
+                        ("^aperture-grafana-operator", "Deployment", APERTURE_SYSTEM_NS)
+                    ]
+                },
+                {
+                    "new_name": "aperture-grafana",
+                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "extra_objects": [
+                        "aperture-grafana:grafana",
+                        "agent-prometheus:grafanadatasource"
+                    ]
+                },
+                {
+                    "new_name": "aperture-dashboards",
+                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "extra_objects": [
+                        (None, "GrafanaDashboard", APERTURE_SYSTEM_NS)
+                    ]
+                }
+            ]
+        },
+        "agent": {
+            "labels": ["Aperture"],
+            "tkenv": "tanka/environments/tilt/apps/agent",
+            "resource_deps": ["ingestion-service", "kafka", "agent-service"],
+            "images": [
+                {
+                    "ref": "aperture-agent",
+                    "context": "./",
+                    "dockerfile": "cmd/aperture-agent/Dockerfile",
+                    "ssh": "default",
+                },
+                {
+                    "ref": "aperture-controller",
+                    "context": "./",
+                    "dockerfile": "cmd/aperture-controller/Dockerfile",
+                    "ssh": "default",
+                }
+            ],
+            "port_forwards": {
+                "agent-aperture-agent": "8089:80",
+                "agent-aperture-controller": "8087:80",
+                "agent-prometheus-server": "9090:9090",
+                "agent-etcd": "2379:2379",
+            },
+            "pvc_selectors": ["app.kubernetes.io/name=etcd"],
+            "child_resources": [
+                {
+                    "workload": "agent-aperture-agent",
+                    "new_name": "aperture-agent",
+                    "resource_deps": ["cluster-bootstrap", "agent-etcd", "agent-bootstrap"],
+                    "extra_objects": [
+                        "agent-cm-validator:validatingwebhookconfiguration",
+                        ("^agent-aperture-agent", None),
+                    ],
+                    "ignored_objects": [
+                        ("^agent-aperture-agent$", "Service|DaemonSet|Secret")
+                    ]
+                },
+                {
+                    "workload": "agent-aperture-controller",
+                    "new_name": "aperture-controller",
+                    "resource_deps": ["cluster-bootstrap", "agent-etcd", "agent-bootstrap"],
+                    "extra_objects": [
+                        ("^agent-aperture-controller", None),
+
+                    ],
+                    "ignored_objects": [
+                        ("^agent-aperture-controller$", "Service|Deployment|Secret")
+                    ]
+                },
+                {
+                    "workload": "agent-etcd",
+                    "resource_deps": ["cluster-bootstrap"],
+                    "extra_objects": [
+                        ("^agent-etcd", None),
+                    ],
+                    "ignored_objects": [
+                        ("^agent-etcd", "Service|StatefulSet"),
+                    ]
+                },
+                {
+                    "workload": "agent-prometheus-server",
+                    "new_name": "agent-prometheus",
+                    "resource_deps": ["cluster-bootstrap"],
+                    "extra_objects": [
+                        ("^agent-prometheus", None),
+                    ],
+                    "ignored_objects": [
+                        ("^agent-prometheus", "Service|Deployment"),
+                        "agent-prometheus:grafanadatasource"
+                    ]
+                },
+                {
+                    "workload": "agent-kube-state-metrics",
+                    "resource_deps": ["cluster-bootstrap"],
+                    "extra_objects": [
+                        ("^agent-kube-state-metrics", None),
+                    ],
+                    "ignored_objects": [
+                        ("^agent-kube-state-metrics$", "Service|Deployment", APERTURE_SYSTEM_NS),
+                    ]
+                },
+                {
+                    "new_name": "agent-bootstrap",
+                    "resource_deps": ["cluster-bootstrap"],
+                    "extra_objects": [
+                        ("^agent-aperture$", "ClusterRole|ClusterRoleBinding")
+                    ]
+                },
+                {
+                    "new_name": "istio-bootstrap",
+                    "extra_objects": [
+                        "istio:configmap",
+                        "aperture-envoy-filter:envoyfilter",
+                        "istio-validator-aperture-system:validatingwebhookconfiguration",
+                        ("istio.io$", "customresourcedefinition"),
+                        (None, "EnvoyFilter", "aperture-system"),
+                        ("^istio-reader", None),
+                        ("^istio-sidecar", None),
+                    ]
+                },
+                {
+                    "workload": "istiod",
+                    "resource_deps": ["istio-bootstrap"],
+                    "extra_objects": [
+                        ("^istiod", None),
+                    ],
+                    "ignored_objects": [
+                        ("^istiod", "Service|Deployment")
+                    ]
+                },
+                {
+                    "workload": "istio-egressgateway",
+                    "resource_deps": ["istio-bootstrap"],
+                    "extra_objects": [
+                        ("^istio-egressgateway", None)
+                    ],
+                    "ignored_objects": [
+                        ("^istio-egressgateway", "Service|Deployment")
+                    ]
+                },
+                {
+                    "workload": "istio-ingressgateway",
+                    "resource_deps": ["istio-bootstrap"],
+                    "extra_objects": [
+                        ("^istio-ingressgateway", None)
+                    ],
+                    "ignored_objects": [
+                        ("^istio-ingressgateway", "Service|Deployment")
+                    ]
+                }
+            ]
+        }
+    }
+}
+
+NS_CONFIG = {}
+
+###############
+### HELPERS ###
+###############
+
+def verbose(*msg):
+    if VERBOSE:
+        print("VERBOSE:", *msg)
+
+def trace(*msg):
+    if TRACE:
+        print("TRACE:", *msg)
+
+def build_docker_img(ref, context, dockerfile="Dockerfile", **kwargs):
+    # Wrapper around docker_build to not repeat image repo,
+    # have context relative to git root
+    # as well as have dockerfile relative to context
+    print(
+        "Will build",
+        ref,
+        "with context of",
+        context,
+        "using",
+        dockerfile,
+        "and",
+        kwargs,
+    )
+    ref = IMG_REPO.rstrip("/") + "/" + ref
+    context = GIT_ROOT + "/" + context
+    dockerfile = context + "/" + dockerfile
+    docker_build(ref, context, dockerfile=dockerfile, **kwargs)
+
+
+def pull_docker_img(ref, tag):
+    print("Will pull", ref, "with version", tag)
+    ref = IMG_REPO.rstrip("/") + "/" + ref
+    custom_build(
+      ref=ref,
+      command=["docker", "pull", ref + ":" + tag],
+      deps=[],
+      tag=tag,
+    )
+
+
+def _convert_yaml_into_objects(yaml):
+    if type(yaml) == "string":
+        return read_yaml_stream(yaml)
+    elif type(yaml) == "blob":
+        return decode_yaml_stream(yaml)
+    else:
+        fail('only takes string or blob, got: %s' % type(yaml))
+
+
+def update_tilt_objects(objects):
+    for obj in objects:
+        object_name = obj["metadata"]["name"].lower()
+        object_name = object_name.replace(":", "\\:")
+
+        object_kind = obj["kind"].lower()
+        object_namespace = obj["metadata"].get("namespace")
+
+        object_selector = ":".join([object_name, object_kind])
+        if object_namespace:
+            object_selector += ":%s" % object_namespace
+
+        TILT_OBJECTS.append(object_selector)
+
+
+def wrapped_k8s_yaml(yaml, allow_duplicates=False):
+    objects = _convert_yaml_into_objects(yaml)
+    update_tilt_objects(objects)
+
+    k8s_yaml(yaml, allow_duplicates)
+
+
+def render_tanka(environment, env_vars):
+    print(
+        "Rendering tanka environment",
+        environment,
+    )
+    base_dir = environment.split("environments/")[0] or "./"
+
+    if SKIP_LOCAL_CMDS:
+        return
+
+    if not GLOBAL_STATE.get(GLOBAL_RAN_TANKA_DEPS_KEY):
+        # Get base directory for Jsonnet Bundler execution
+        # tanka/environments/default -> tanka/
+        # environments/default -> ./
+        # Make sure jb dependencies are up to date
+        local(command=["jb", "install"], dir=base_dir)
+
+        # Refreshing the dependencies for the Agent chart
+        local(command=["helm", "dependency", "update", "--skip-refresh"], dir=base_dir + "charts/agent")
+
+        # Fetch any vendored charts that are not included in our repository
+        local(command=[TANKA, "tool", "charts", "vendor"], dir=base_dir)
+
+        # Skip refreshing deps the second time
+        GLOBAL_STATE[GLOBAL_RAN_TANKA_DEPS_KEY] = True
+
+    trace("Rendering tanka with env: %s" % env_vars)
+    # Generate manifests with tanka
+    wrapped_k8s_yaml(
+        local(
+            quiet=True,
+            command=[
+                TANKA,
+                "--ext-str=projectRoot=" + base_dir,
+                "show",
+                # Allow dumping the templates to stdout,
+                # instead of using tk export to generate files
+                # and then have to manage deleting them etc.
+                "--dangerous-allow-redirect",
+                environment
+            ],
+            env=env_vars
+        )
+    )
+
+
+def print_available_resources(dep_tree):
+    print("Following resources are available:")
+    for ns, resources in dep_tree.items():
+        print(ns)
+        for resource in resources.keys():
+            print("   ", resource)
+
+
+def schedule_pvc_deletion(namespace, selector):
+    # Cleanup DB
+    # Marks PVC for deletion, but doesn't wait since finalizers need to run first
+    # and they will be ran later when tilt deletes created resources
+    local(
+        command=[
+            "kubectl",
+            "--namespace",
+            namespace,
+            "delete",
+            "pvc",
+            "--selector",
+            selector,
+            "--wait=false",
+        ]
+    )
+
+#####################
+### OPTION PARSER ###
+#####################
+
+
+def invert_dep_tree(dep_tree):
+    """Returns dict of resources, with injected namespace into resource dict"""
+    inverted = {}
+    for ns, resources in dep_tree.items():
+        for resource, resource_info in resources.items():
+            info_copy = dict(resource_info)
+            info_copy["namespace"] = ns
+            inverted[resource] = info_copy
+    return inverted
+
+
+def get_resource_list_to_deploy(names, run_only_listed, dep_tree, inv_dep_tree):
+    """
+    Resursively convert list of NS and service names to set of required services
+    If a given name is both a name of resource and namespace, it is assumed to be resource
+    """
+    if "all" in names:
+        names = inv_dep_tree.keys()
+    resources = (
+        []
+    )  # It'd be faster and better to use set here, but Starlark set only has .union method
+    for name in names:
+        if name in inv_dep_tree:  # It's resource name
+            resources.append(name)
+            if not run_only_listed:
+                # We could recursively resolve dependencies, but then we risk getting in a dependency loop
+                resource_info = inv_dep_tree[name]
+                dependencies = resource_info.get("needs", [])
+                while len(dependencies) > 0:
+                    dep = dependencies.pop()
+                    if dep not in resources:
+                        resources.append(dep)
+                        dependencies.extend(inv_dep_tree[dep].get("needs", []))
+        elif name in dep_tree:  # It's a namespace
+            resource_names = dep_tree[name].keys()
+            resources.extend(
+                get_resource_list_to_deploy(resource_names, run_only_listed, dep_tree, inv_dep_tree)
+            )
+        else:
+            fail("Unable to find " + name + " as neither resource nor namespace name")
+    return set(resources)
+
+
+def parse_kubernetes_object_selector(selector):
+    """Parse string representing kubernetes object selector into its parts
+
+    Tilt defines kubernetes object selectors as name[:kind[:namespace]], and kubernetes
+    names can contain colons. This function parses given selector into its parts, while
+    making sure that name with colons is properly handled.
+    """
+    parts = selector.split(":")
+
+    name, kind, namespace = "", None, None
+    # First, get name from parts - names in kubernetes may contain : so we must
+    # rebuild it here, probably from multiple parts.
+    while True:
+        name += parts.pop(0).lower()
+        if not name.endswith("\\"):
+            break
+        name = name[:-1] + ":"
+        if not parts:
+            fail("Unable to parse selector '%s'" % selector)
+
+    if parts:
+        kind = parts.pop(0).lower()
+
+    if parts:
+        namespace = parts.pop(0).lower()
+
+    if parts:
+        fail("Unable to parse selector '%s'" % selector)
+
+    return (name, kind, namespace)
+
+
+MATCHER_MATCH_START = 1
+MATCHER_MATCH_END = 2
+MATCHER_MATCH_FULL = 3
+MATCHER_MATCH_EMPTY = 4
+def match_kubernetes_object_selector_with_glob(selector_glob):
+    """Returns all kubernetes objects known by tilt that match given matcher and string
+
+    Starlark has no regex engine, so to get all matching objects we must cheat a bit. This
+    function requires matcher and kind arguments, both strings: kind is lowercase kubernetes
+    kind, and matcher is a string starting with ^ or ending with $, converting them into
+    startswith() and endwith() respectively.
+    """
+    matcher_name = selector_glob[0]
+    matcher_kind = selector_glob[1]
+    if len(selector_glob) == 3:
+        matcher_namespace = selector_glob[2]
+    else:
+        matcher_namespace = None
+
+    if not matcher_name:
+        matcher_type = MATCHER_MATCH_EMPTY
+    elif matcher_name[0] == "^" and matcher_name[-1] == "$":
+        matcher_name = matcher_name[1:-1]
+        matcher_type = MATCHER_MATCH_FULL
+    elif matcher_name[0] == "^":
+        matcher_name = matcher_name[1:]
+        matcher_type = MATCHER_MATCH_START
+    elif matcher_name[-1] == "$":
+        matcher_name = matcher_name[:-1]
+        matcher_type = MATCHER_MATCH_END
+    else:
+        fail("Need to specify starting or ending matcher token for '%s'" % (matcher_name))
+    trace("Running glob object selector with name=%s, kind=%s and namespace=%s" % (matcher_name, matcher_kind, matcher_namespace))
+
+    matched_objs = []
+    for obj in TILT_OBJECTS:
+        name, kind, namespace = parse_kubernetes_object_selector(obj)
+
+        if matcher_namespace and matcher_namespace != namespace:
+            continue
+
+        if matcher_kind:
+            kinds = [k.lower() for k in matcher_kind.split("|")]
+            if kind not in kinds:
+                continue
+
+        if matcher_type == MATCHER_MATCH_START and name.startswith(matcher_name):
+            matched_objs.append(obj)
+        elif matcher_type == MATCHER_MATCH_END and name.endswith(matcher_name):
+            matched_objs.append(obj)
+        elif matcher_type == MATCHER_MATCH_FULL and name == matcher_name:
+            matched_objs.append(obj)
+        elif matcher_type == MATCHER_MATCH_EMPTY:
+            matched_objs.append(obj)
+
+    return matched_objs
+
+
+def match_kubernetes_object_selector(selector):
+    """Find tilt object matching given kubernetes object selector
+
+    Given a valid selector, find a matching object in a list of objects known
+    to tilt. Fail if more than one object matches the given selector.
+    """
+    matched_obj = None
+    parsed_selector = parse_kubernetes_object_selector(selector)
+
+    for tilt_obj in TILT_OBJECTS:
+        parsed_object = parse_kubernetes_object_selector(tilt_obj)
+        parsed_object_without_ns = (parsed_object[0], parsed_object[1], None)
+        # If selector matches given object (check both with and without namespace as selectors may be partial),
+        # keep matched object reference and continue iterating the list to see if selector matches multiple
+        # objects, which is an error.
+        if parsed_selector == parsed_object or parsed_selector == parsed_object_without_ns:
+            if matched_obj:
+                fail("Multiple tilt objects matched selector '%s'" % (selector))
+            matched_obj = tilt_obj
+
+    return matched_obj
+
+
+def _resolve_objects_match_objects(matchers, fail_on_missing=False):
+    """Helper used for creating a list of all tilt objects matching matchers"""
+    matched_objs = []
+    for matcher in matchers:
+        if type(matcher) == "string":
+            matched = match_kubernetes_object_selector(matcher)
+            if not matched and fail_on_missing:
+                fail("Found no match for selector '%s'" % matcher)
+            elif matched and matched not in matched_objs:
+                matched_objs += [matched]
+        else:
+            matched = match_kubernetes_object_selector_with_glob(matcher)
+            matched_not_present = [match for match in matched if match not in matched_objs]
+            matched_objs.extend(matched_not_present)
+    return matched_objs
+
+
+def resolve_objects(included_matchers, ignored_matchers):
+    """Resolve all objects from included_matchers into tilt objects
+
+    For the included_matches list, get all objects from TILT_OBJECTS that are
+    matching items of this list, and filter out objects that match items of the
+    ignored_matchers list. This is useful when you want to use wide includes, and
+    then exclude some subset of the matched items.
+    """
+    matched_objs = _resolve_objects_match_objects(included_matchers, fail_on_missing=True)
+    verbose("Include matchers found", matched_objs)
+    ignored_objs = _resolve_objects_match_objects(ignored_matchers)
+    verbose("Ignore matchers found", ignored_objs)
+
+    for obj in ignored_objs:
+        if obj in matched_objs:
+            matched_objs.remove(obj)
+
+    for obj in matched_objs:
+        TILT_OBJECTS.remove(obj)
+
+    return matched_objs
+
+
+#################################
+### MAIN RESOURCE DECLARATION ###
+#################################
+
+
+def forward_port_delayed(workload, labels, resource_deps, namespace, service, local_port, remote_port):
+    cmd = "kubectl port-forward -n %s svc/%s %s:%s" % (namespace, service, local_port, remote_port)
+    remote_port = ":%s" % remote_port
+    local_resource(
+        name=workload,
+        labels=labels,
+        resource_deps=resource_deps,
+        serve_cmd='while sleep 3; do %s; done' % cmd,
+        readiness_probe=probe(exec=exec_action(['lsof', '-i', remote_port])), # Treat as success if some process listens on this port
+    )
+
+
+def declare_resources(resources, dep_tree, inv_dep_tree):
+    """
+    Declares resource-specific actions (images, ports, etc)
+    Generating manifests with tanka is done separately, in order to speed up builds
+    """
+    for resource in resources:
+        resource_info = inv_dep_tree[resource]
+        labels = resource_info.get("labels", [])
+        for image in resource_info.get("images", []):
+            if 'tag' in image.keys():
+                # We will be pulling existing image
+                if not set(image.keys()) == set(['tag', 'ref']):
+                    fail("Invalid image configuration: {img}".format(img=image))
+                pull_docker_img(**image)
+            else:
+                # We build images depending on what we want to deploy, and so live_update
+                # steps have to be a lambda, so that they are only created when we realize
+                # the image.
+                live_update_callable = image.get("live_update")
+                if live_update_callable:
+                    image["live_update"] = live_update_callable()
+                build_docker_img(**image)
+
+        pf = resource_info.get("port_forwards", None)
+
+        if pf:
+            if type(pf) == "dict":
+                # We have multiple pf resources to define
+                for pf_name, pf_value in pf.items():
+                    k8s_resource(pf_name, labels=labels, port_forwards=pf_value)
+            else:
+                k8s_resource(resource, labels=labels, port_forwards=pf)
+
+    # Create mapping of namespace to list of resources within the namespace
+    ns_resource_list = {}
+    for resource in resources:
+        resource_info = inv_dep_tree[resource]
+        ns = resource_info["namespace"]
+        # setdefault is a bit misleading:
+        # it gets value for given key, if it exists
+        # if it doesn't, it puts the default value under that key
+        # and returns the selected value
+        ns_resource_list.setdefault(ns, []).append(resource)
+
+    verbose("Resource list items:", ns_resource_list.items())
+
+    # A list of namespaces that should be managed by tilt. Those namespaces will be managed under
+    # a separate "cluster-bootstrap" resource/workload so that they are moved out of uncategorized.
+    managed_namespaces = []
+    # First, go over all applications and see if they can be rendered with tanka,
+    # storing a list of all applications that were missing tanka environment.
+    for namespace, apps in ns_resource_list.items():
+        # Tilt doesn't create namespace automatically
+        ns_config = NS_CONFIG.get(namespace, {})
+        ns_labels = ns_config.get("labels", [])
+        if ns_config.get("create_namespace", True):
+            namespace_create(namespace, labels=ns_labels)
+            managed_namespaces += [namespace + ":namespace"]
+
+        ns_apps = DEP_TREE.get(namespace, {})
+        for app in apps:
+            app_config = ns_apps.get(app, {})
+            tkenv = app_config.get("tkenv")
+            if not tkenv:
+                fail("Tanka app is not found for %s." % app)
+            env_vars = app_config.get("env_vars", {})
+            render_tanka(tkenv, env_vars)
+
+    # Some resources are cluster-wide so we group them into a single workload "cluster-bootstrap",
+    # to drop them from uncategorized resource list.
+    cluster_bootstrap_resources = []
+
+    # All namespaces created by tilt are kept in cluster-bootstrap
+    if managed_namespaces:
+        cluster_bootstrap_resources += managed_namespaces
+
+    if cluster_bootstrap_resources:
+        k8s_resource(objects=cluster_bootstrap_resources, new_name="cluster-bootstrap")
+
+    for resource in resources:
+        verbose("Registering resource", resource)
+        resource_info = inv_dep_tree[resource]
+        resource_name = resource_info.get("resource_name", resource)
+        resource_labels = resource_info.get("labels", [])
+
+        extra_objects = resource_info.get("extra_objects", [])
+        ignored_objects = resource_info.get("ignored_objects", [])
+        resource_deps = resource_info.get("resource_deps", [])
+        if extra_objects:
+            resolved_objects = resolve_objects(extra_objects, ignored_objects)
+            k8s_resource(resource_name, objects=resolved_objects, labels=resource_labels, resource_deps=resource_deps)
+
+        child_resources = resource_info.get("child_resources", [])
+        for child in child_resources:
+            extra_objects = []
+            ignored_objects = []
+
+            if "extra_objects" in child:
+                extra_objects = child.pop("extra_objects")
+            if "ignored_objects" in child:
+                ignored_objects = child.pop("ignored_objects")
+            if extra_objects:
+                child["objects"] = resolve_objects(extra_objects, ignored_objects)
+
+            child["labels"] = resource_labels
+            verbose("Registering child", child)
+            k8s_resource(**child)
+
+    if "aperture-grafana" in resources:
+        forward_port_delayed(workload="aperture-grafana-forward", namespace="aperture-system", labels=["Aperture"],
+                          resource_deps=["aperture-grafana"], service="aperture-grafana", local_port=3000, remote_port=3000)
+
+
+    if config.tilt_subcommand == "down":
+        for resource_name in resources:
+            resource = inv_dep_tree[resource_name]
+            pvc_selectors = resource.get("pvc_selectors", [])
+            for selector in pvc_selectors:
+                schedule_pvc_deletion(resource["namespace"], selector)
+
+    if SKIP_LOCAL_CMDS:
+        fail("SKIP_LOCAL_CMDS mode enabled")
+
+
+############
+### MAIN ###
+############
+
+# Parse config: https://docs.tilt.dev/tiltfile_config.html
+config.define_string_list("to-run", args=True)
+config.define_bool("list-resources", usage="Only list available resources and exit")
+config.define_bool("manual", usage="Set trigger mode to manual")
+config.define_bool("only", usage="Only deploy explicitly resources, without handling dependencies")
+config.define_bool("verbose", usage="Enable verbose logging")
+config.define_bool("trace", usage="Enable trace logging")
+cfg = config.parse()
+# Enable all resources, as calling `config.parse()` by default disables all
+config.set_enabled_resources([])
+
+if cfg.get("list-resources", False):
+    print_available_resources(DEP_TREE)
+    exit()
+
+if cfg.get("manual", False):
+    trigger_mode(TRIGGER_MODE_MANUAL)
+
+
+cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false")).lower()
+TRACE = cfg_trace == "true"
+
+cfg_verbose = cfg.get("verbose", os.getenv("NINJA_TILT_VERBOSE", cfg_trace)).lower()
+VERBOSE = cfg_verbose == "true"
+
+run_only_listed = cfg.get("only", False)
+# We almost never want all resources - deploy only cloud by default
+to_run = cfg.get("to-run", ["agent"])
+
+inverted_dep_tree = invert_dep_tree(DEP_TREE)
+resources = get_resource_list_to_deploy(to_run, run_only_listed, DEP_TREE, inverted_dep_tree)
+
+print("Will deploy resources:", ", ".join(resources))
+
+# Watch charts and secrets
+watch_file("./")
+watch_file("../charts/")
+
+cmd_button(
+    'classification-1-demoapp',
+    resource='aperture-agent',
+    icon_name='content_paste_go',
+    text='Apply Example Classification For Demo App',
+    argv=['kubectl', 'apply', '-f', '../../example-classification-cm-demoapp.yaml']
+)
+
+cmd_button(
+    'classification-2-bookinfo',
+    resource='aperture-agent',
+    icon_name='content_paste_go',
+    text='Apply Example Classification For Bookinfo',
+    argv=['kubectl', 'apply', '-f', '../../example-classification-cm-bookinfo.yaml']
+)
+
+cmd_button(
+    'classification-3-delete',
+    resource='aperture-agent',
+    icon_name='content_paste_off',
+    text='Delete Classification configmap',
+    argv=['kubectl', '-n', APERTURE_SYSTEM_NS, 'delete', 'cm', 'classification']
+)
+
+cmd_button(
+    'flowcontrol-1-latency',
+    resource='aperture-controller',
+    icon_name='content_paste_go',
+    text='Apply Example Latency Gradient Policy For Demo App',
+    argv=['kubectl', 'apply', '-f', '../../latency-gradient-policy.yaml']
+)
+
+cmd_button(
+    'flowcontrol-2-rate-limit',
+    resource='aperture-controller',
+    icon_name='content_paste_go',
+    text='Apply Example Rate Limit Policy For Demo App',
+    argv=['kubectl', 'apply', '-f', '../../rate-limit-policy.yaml']
+)
+
+cmd_button(
+    'flowcontrol-3-delete',
+    resource='aperture-controller',
+    icon_name='content_paste_off',
+    text='Delete Flowcontrol configmap',
+    argv=['kubectl', '-n', APERTURE_SYSTEM_NS, 'delete', 'cm', 'flowcontrol']
+)
+
+declare_resources(resources, DEP_TREE, inverted_dep_tree)

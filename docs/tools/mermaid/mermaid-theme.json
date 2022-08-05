@@ -1,8 +1,19 @@
 {
   "logLevel": "debug",
-  "theme": "forest",
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#8EC4AD",
+    "primaryTextColor": "#20242C",
+    "primaryBorderColor": "#20242C",
+    "secondaryColor": "#ECEDF0",
+    "secondaryTextColor": "#20242C",
+    "tertiaryColor": "#c2c6cf50",
+    "tertiaryBorderColor": "#00000080",
+    "tertiaryTextColor": "#3D4554",
+    "lineColor": "#20242C"
+  },
   "background": "transparent",
-  "themeCSS": ".node rect, .er.entityBox { fill: rgb(102, 178, 255); stroke-width: 1; stroke: black; } .node .label { color: white; }; .cluster rect { fill: #f0f0f0; stroke-width: 1px; stroke: #333}; .edgeLabel { background-color: #f0f0f0; }; .er.entityBox + .er.entityLabel { fill: white }; .er.attributeBoxEven, .er.attributeBoxOdd { fill: #fff; stroke: #777 }",
+  "themeCSS": ".node rect { fill: #FC9A69; } span.edgeLabel { padding: 0.1em }",
   "startOnLoad": true,
   "flowchart": {
     "useMaxWidth": false,

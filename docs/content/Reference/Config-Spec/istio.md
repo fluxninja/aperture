@@ -11,24 +11,24 @@ keywords:
 
 The Aperture Agent collects the below data using the Envoy Filter:
 
-| Key                          | Value                                                          | Description                                                                            | Type              |
-| ---------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ----------------- |
-| http.method                  | "%REQ(:METHOD)%"                                               | The HTTP method used for the request                                                   | Inbound, Outbound |
-| http.target                  | "%REQ(:PATH)%"                                                 | The HTTP path requested by the client                                                  | Inbound, Outbound |
-| http.host                    | "%REQ(HOST)%"                                                  | The value of the Host (HTTP/1.1)                                                       | Inbound, Outbound |
-| http.user_agent              | "%REQ(USER-AGENT)%"                                            | The user agent string to identify the specific type of software request agent          | Inbound, Outbound |
-| http.duration_millis         | "%DURATION%"                                                   | Total duration in milliseconds of the request from the start time to the last byte out | Inbound, Outbound |
-| http.request_content_length  | "%BYTES_RECEIVED%"                                             | Body bytes received                                                                    | Inbound, Outbound |
-| http.response_content_length | "%BYTES_SENT%"                                                 | Body bytes sent. For WebSocket connection it will also include response header bytes   | Inbound, Outbound |
-| http.status_code             | "%RESPONSE_CODE%"                                              | HTTP response code                                                                     | Inbound, Outbound |
-| fn.flow                      | "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.flow)%"     | FluxNinja Flow Labels                                                                  | Inbound, Outbound |
-| fn.policies                  | "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.policies)%" | FluxNinja Policy details                                                               | Inbound, Outbound |
-| control_point                | ingress/egress                                                 | Request Type                                                                           | Inbound, Outbound |
-| net.peer.address             | "%UPSTREAM_HOST%"                                              | Upstream host URL                                                                      | Outbound          |
-| net.host.address             | "%UPSTREAM_LOCAL_ADDRESS%"                                     | Local address of the upstream connection                                               | Outbound          |
-| net.peer.ip                  | "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"                     | Remote address of the downstream connection, without any port component                | Inbound           |
-| net.host.ip                  | "%DOWNSTREAM_LOCAL_ADDRESS_WITHOUT_PORT%"                      | Local address of the downstream connection, without any port component                 | Inbound           |
-| net.host.port                | "%DOWNSTREAM_LOCAL_PORT%"                                      | Local port of the downstream connection                                                | Inbound           |
+| Key                          | Value                                                                      | Description                                                                            | Type              |
+| ---------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ----------------- |
+| http.method                  | "%REQ(:METHOD)%"                                                           | The HTTP method used for the request                                                   | Inbound, Outbound |
+| http.target                  | "%REQ(:PATH)%"                                                             | The HTTP path requested by the client                                                  | Inbound, Outbound |
+| http.host                    | "%REQ(HOST)%"                                                              | The value of the Host (HTTP/1.1)                                                       | Inbound, Outbound |
+| http.user_agent              | "%REQ(USER-AGENT)%"                                                        | The user agent string to identify the specific type of software request agent          | Inbound, Outbound |
+| http.duration_millis         | "%DURATION%"                                                               | Total duration in milliseconds of the request from the start time to the last byte out | Inbound, Outbound |
+| http.request_content_length  | "%BYTES_RECEIVED%"                                                         | Body bytes received                                                                    | Inbound, Outbound |
+| http.response_content_length | "%BYTES_SENT%"                                                             | Body bytes sent. For WebSocket connection it will also include response header bytes   | Inbound, Outbound |
+| http.status_code             | "%RESPONSE_CODE%"                                                          | HTTP response code                                                                     | Inbound, Outbound |
+| aperture.flow                | "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.flow)%"           | Aperture Flow Labels                                                                   | Inbound, Outbound |
+| aperture.check_response      | "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%" | Aperture Check Response details                                                        | Inbound, Outbound |
+| control_point                | ingress/egress                                                             | Request Type                                                                           | Inbound, Outbound |
+| net.peer.address             | "%UPSTREAM_HOST%"                                                          | Upstream host URL                                                                      | Outbound          |
+| net.host.address             | "%UPSTREAM_LOCAL_ADDRESS%"                                                 | Local address of the upstream connection                                               | Outbound          |
+| net.peer.ip                  | "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"                                 | Remote address of the downstream connection, without any port component                | Inbound           |
+| net.host.ip                  | "%DOWNSTREAM_LOCAL_ADDRESS_WITHOUT_PORT%"                                  | Local address of the downstream connection, without any port component                 | Inbound           |
+| net.host.port                | "%DOWNSTREAM_LOCAL_PORT%"                                                  | Local port of the downstream connection                                                | Inbound           |
 
 More information about the extracted values can be found on
 [this site](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log).
@@ -116,15 +116,12 @@ installed with `agent` as the helm release name and is installed in the
                    - key: http.status_code
                      value:
                        string_value: "%RESPONSE_CODE%"
-                   - key: fn.flow
+                   - key: aperture.labels
                      value:
-                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.flow)%"
-                   - key: fn.overwiev
+                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.labels)%"
+                   - key: aperture.check_response
                      value:
-                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.overwiev)%"
-                   - key: fn.fluxmeters
-                     value:
-                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.fluxmeters)%"
+                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
                    - key: control_point
                      value:
                        string_value: "egress"
@@ -206,15 +203,12 @@ installed with `agent` as the helm release name and is installed in the
                    - key: http.status_code
                      value:
                        string_value: "%RESPONSE_CODE%"
-                   - key: fn.flow
+                   - key: aperture.labels
                      value:
-                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.flow)%"
-                   - key: fn.overwiev
+                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.labels)%"
+                   - key: aperture.check_response
                      value:
-                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.overwiev)%"
-                   - key: fn.fluxmeters
-                     value:
-                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.fluxmeters)%"
+                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
                    - key: control_point
                      value:
                        string_value: "ingress"
