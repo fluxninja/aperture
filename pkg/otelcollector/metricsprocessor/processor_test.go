@@ -252,7 +252,7 @@ var _ = Describe("Metrics Processor", func() {
 			map[string]interface{}{
 				"authz_error":            "ERROR_NO_ERROR",
 				"decision_type":          "DECISION_TYPE_ACCEPTED",
-				"decision_reason":        "error_reason:ERROR_REASON_ENTITY_LOOKUP_FAILED",
+				"decision_reason":        "error_reason:ERROR_REASON_UNSPECIFIED",
 				"rate_limiters":          []interface{}{},
 				"dropping_rate_limiters": []interface{}{},
 				"concurrency_limiters": []interface{}{
@@ -466,7 +466,7 @@ var _ = Describe("Metrics Processor", func() {
 			`,
 			map[string]interface{}{
 				"decision_type":   "DECISION_TYPE_ACCEPTED",
-				"decision_reason": "error_reason:ERROR_REASON_ENTITY_LOOKUP_FAILED",
+				"decision_reason": "error_reason:ERROR_REASON_UNSPECIFIED",
 				"rate_limiters": []interface{}{
 					"policy_name:foo,component_index:1,policy_hash:foo-hash",
 				},
