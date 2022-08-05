@@ -78,12 +78,30 @@ var _ = Describe("Classifier", func() {
 			},
 		}
 
-		var ars1, ars2 ActiveRuleset
+		// Classifier with a no service populated
+		rs3 := &classificationv1.Classifier{
+			Selector: &policylangv1.Selector{
+				ControlPoint: &policylangv1.ControlPoint{
+					Controlpoint: &policylangv1.ControlPoint_Traffic{
+						Traffic: "ingress",
+					},
+				},
+			},
+			Rules: map[string]*classificationv1.Rule{
+				"fuu": {
+					Source: headerExtractor("fuu"),
+				},
+			},
+		}
+
+		var ars1, ars2, ars3 ActiveRuleset
 		BeforeEach(func() {
 			var err error
 			ars1, err = classifier.AddRules(context.TODO(), "one", rs1)
 			Expect(err).NotTo(HaveOccurred())
 			ars2, err = classifier.AddRules(context.TODO(), "two", rs2)
+			Expect(err).NotTo(HaveOccurred())
+			ars3, err = classifier.AddRules(context.TODO(), "three", rs3)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -100,6 +118,12 @@ var _ = Describe("Classifier", func() {
 					LabelName:   "bar-twice",
 					Rule:        rs2.Rules["bar-twice"],
 					Selector:    rs2.Selector,
+				},
+				ReportedRule{
+					RulesetName: "three",
+					LabelName:   "fuu",
+					Rule:        rs3.Rules["fuu"],
+					Selector:    rs3.Selector,
 				},
 			))
 		})
@@ -187,6 +211,7 @@ var _ = Describe("Classifier", func() {
 			BeforeEach(func() {
 				ars1.Drop()
 				ars2.Drop()
+				ars3.Drop()
 			})
 
 			It("removes all the rules", func() {
