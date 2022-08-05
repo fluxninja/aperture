@@ -20,10 +20,13 @@ import (
 	"github.com/fluxninja/aperture/pkg/services"
 )
 
-// activeRules is a helper struct to keep both compiled and uncompiled sets of
-// rules in sync.
-type activeRules struct {
-	// rules compiled to map from ControlPointIDs to list of labelers.
+// rules is a helper struct to keep both compiled and uncompiled sets of rules in sync.
+type rules struct {
+	// rules compiled to map from ControlPointIDs to list of labelers
+	// this map combines labelers from all the active rulesets
+	LabelersByControlPointID labelersByControlPointID
+
+	// rules compiled to map from ControlPoint to list of labelers
 	// this map combines labelers from all the active rulesets
 	LabelersByControlPoint labelersByControlPoint
 
@@ -33,14 +36,22 @@ type activeRules struct {
 
 // compiledRuleset is compiled form of Classifier proto.
 type compiledRuleset struct {
-	ControlPoint  selectors.ControlPointID
+	ControlPointID selectors.ControlPointID
+	Labelers       []labelerWithSelector
+	ReportedRules  []ReportedRule
+}
+
+type catchAllCompiledRuleset struct {
+	ControlPoint  selectors.ControlPoint
 	Labelers      []labelerWithSelector
 	ReportedRules []ReportedRule
 }
 
-// labelersByControlPoint maps control point identifiers to list of labelers
-// applicable to that control point.
-type labelersByControlPoint map[selectors.ControlPointID]*multimatcher.MultiMatcher[int, []*labeler]
+// labelersByControlPointID maps ControlPointID to list of labelers applicable.
+type labelersByControlPointID map[selectors.ControlPointID]*multimatcher.MultiMatcher[int, []*labeler]
+
+// labelersByControlPoint maps ControlPoint to list of labelers applicable.
+type labelersByControlPoint map[selectors.ControlPoint]*multimatcher.MultiMatcher[int, []*labeler]
 
 type labelerWithSelector struct {
 	Labeler       *labeler
@@ -67,10 +78,11 @@ type labeler struct {
 // Classifier receives classification policies and provides Classify method.
 type Classifier struct {
 	// storing activeRules underneath
-	activeRules      atomic.Value
-	activeRulesets   map[rulesetID]compiledRuleset // protected by activeRulesetsMu
-	nextRulesetID    rulesetID                     // protected by activeRulesetsMu
-	activeRulesetsMu sync.Mutex
+	activeRules            atomic.Value
+	activeRulesets         map[rulesetID]compiledRuleset         // protected by activeRulesetsMu
+	catchAllActiveRulesets map[rulesetID]catchAllCompiledRuleset // protected by activeRulesetsMu
+	nextRulesetID          rulesetID                             // protected by activeRulesetsMu
+	activeRulesetsMu       sync.Mutex
 }
 
 type rulesetID = uint64
@@ -134,12 +146,64 @@ func boolValueOrTrue(bv *wrapperspb.BoolValue) bool { return bv == nil || bv.Val
 // New creates a new Flow Classifier.
 func New() *Classifier {
 	return &Classifier{
-		activeRulesets: make(map[rulesetID]compiledRuleset),
+		activeRulesets:         make(map[rulesetID]compiledRuleset),
+		catchAllActiveRulesets: make(map[rulesetID]catchAllCompiledRuleset),
+	}
+}
+
+func populateFlowLabels(
+	ctx context.Context,
+	flowLabels FlowLabels,
+	mm *multimatcher.MultiMatcher[int, []*labeler],
+	labelsForMatching selectors.Labels,
+	input ast.Value,
+) {
+	for _, query := range mm.Match(labelsForMatching.ToPlainMap()) {
+		resultSet, err := query.Query.Eval(ctx, rego.EvalParsedInput(input))
+		if err != nil {
+			log.Warn().Msg("Rego: Evaluation failed")
+			continue
+		}
+
+		if len(resultSet) == 0 {
+			log.Warn().Msg("Rego: Empty resultSet")
+			continue
+		}
+
+		if len(resultSet) > 1 {
+			log.Warn().Msg("Rego: Ambiguous resultSet")
+		}
+
+		if len(resultSet[0].Expressions) != 1 {
+			log.Warn().Msg("Rego: Expected exactly one expression")
+			continue
+		}
+
+		if query.LabelName != "" {
+			// single-label-query
+			flowLabels[query.LabelName] = FlowLabelValue{
+				Value: resultSet[0].Expressions[0].String(),
+				Flags: query.LabelFlags,
+			}
+		} else {
+			// multi-label-query
+			variables, isMap := resultSet[0].Expressions[0].Value.(map[string]interface{})
+			if !isMap {
+				log.Error().Msg("Rego: Expression's not a map (bug)")
+				continue
+			}
+
+			for key, value := range variables {
+				flowLabels[key] = FlowLabelValue{
+					Value: fmt.Sprint(value),
+					Flags: query.LabelsFlags[key],
+				}
+			}
+		}
 	}
 }
 
 // Classify takes rego input, performs classification, and returns a map of flow labels.
-//
 // LabelsForMatching are additional labels to use for selector matching.
 func (c *Classifier) Classify(
 	ctx context.Context,
@@ -149,79 +213,51 @@ func (c *Classifier) Classify(
 	input ast.Value,
 ) (FlowLabels, error) {
 	labelers := c.getLabelers()
+	catchAllLabelers := c.getCatchAllLabelers()
 
 	flowLabels := make(FlowLabels)
 
+	// TODO (hasit): add equivalent catchall mm here as well.
+
+	controlPoint := selectors.ControlPoint{Traffic: direction}
+	camm, exists := catchAllLabelers[controlPoint]
+	if exists {
+		populateFlowLabels(ctx, flowLabels, camm, labelsForMatching, input)
+	}
+
+	// TODO (krdln): update prometheus metrics upon classification errors.
+
 	for _, service := range services {
-		controlPoint := selectors.ControlPointID{
-			Service: service,
+		controlPointID := selectors.ControlPointID{
+			ServiceID: service,
 			ControlPoint: selectors.ControlPoint{
 				Traffic: direction,
 			},
 		}
-
-		mm, exists := labelers[controlPoint]
+		mm, exists := labelers[controlPointID]
 		if !exists {
-			log.Trace().Str("controlPoint", controlPoint.String()).Msg("No labelers for controlPoint")
+			log.Trace().Str("controlPoint", controlPointID.String()).Msg("No labelers for controlPoint")
 			continue
 		}
-
-		for _, query := range mm.Match(labelsForMatching.ToPlainMap()) {
-			resultSet, err := query.Query.Eval(ctx, rego.EvalParsedInput(input))
-			if err != nil {
-				log.Warn().Msg("Rego: Evaluation failed")
-				continue
-			}
-
-			if len(resultSet) == 0 {
-				log.Warn().Msg("Rego: Empty resultSet")
-				continue
-			}
-
-			if len(resultSet) > 1 {
-				log.Warn().Msg("Rego: Ambiguous resultSet")
-			}
-
-			if len(resultSet[0].Expressions) != 1 {
-				log.Warn().Msg("Rego: Expected exactly one expression")
-				continue
-			}
-
-			if query.LabelName != "" {
-				// single-label-query
-				flowLabels[query.LabelName] = FlowLabelValue{
-					Value: resultSet[0].Expressions[0].String(),
-					Flags: query.LabelFlags,
-				}
-			} else {
-				// multi-label-query
-				variables, isMap := resultSet[0].Expressions[0].Value.(map[string]interface{})
-				if !isMap {
-					log.Error().Msg("Rego: Expression's not a map (bug)")
-					continue
-				}
-
-				for key, value := range variables {
-					flowLabels[key] = FlowLabelValue{
-						Value: fmt.Sprint(value),
-						Flags: query.LabelsFlags[key],
-					}
-				}
-			}
-		}
+		populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)
 	}
 
 	return flowLabels, nil
 }
 
-func (c *Classifier) getLabelers() labelersByControlPoint {
-	ac, _ := c.activeRules.Load().(activeRules)
-	return ac.LabelersByControlPoint
+func (c *Classifier) getLabelers() labelersByControlPointID {
+	r, _ := c.activeRules.Load().(rules)
+	return r.LabelersByControlPointID
+}
+
+func (c *Classifier) getCatchAllLabelers() labelersByControlPoint {
+	r, _ := c.activeRules.Load().(rules)
+	return r.LabelersByControlPoint
 }
 
 // ActiveRules returns a slice of uncompiled Rules which are currently active.
 func (c *Classifier) ActiveRules() []ReportedRule {
-	ac, _ := c.activeRules.Load().(activeRules)
+	ac, _ := c.activeRules.Load().(rules)
 	return ac.ReportedRules
 }
 
@@ -240,6 +276,11 @@ func (c *Classifier) AddRules(
 		return ActiveRuleset{}, err
 	}
 
+	catchAllCompiled, err := compileCatchAllRuleset(ctx, name, rules)
+	if err != nil {
+		return ActiveRuleset{}, err
+	}
+
 	c.activeRulesetsMu.Lock()
 	defer c.activeRulesetsMu.Unlock()
 	id := c.nextRulesetID
@@ -250,6 +291,7 @@ func (c *Classifier) AddRules(
 	//   and load a new one – in this case duplicated name is kinda expected.
 	// So the name is used only for reporting.
 	c.activeRulesets[id] = compiled
+	c.catchAllActiveRulesets[id] = catchAllCompiled
 	c.activateRulesets()
 	return ActiveRuleset{id: id, classifier: c}, nil
 }
@@ -319,7 +361,36 @@ func compileRuleset(
 		)
 	}
 	return compiledRuleset{
-		ControlPoint:  selector.ControlPointID,
+		ControlPointID: selector.ControlPointID,
+		Labelers:       labelers,
+		ReportedRules:  rulesetToReportedRules(classifier, name),
+	}, nil
+}
+
+func compileCatchAllRuleset(
+	ctx context.Context,
+	name string,
+	classifier *classificationv1.Classifier,
+) (catchAllCompiledRuleset, error) {
+	if classifier.Selector == nil {
+		return catchAllCompiledRuleset{}, fmt.Errorf("%w: missing selector", BadSelector)
+	}
+
+	selector, err := selectors.FromProto(classifier.Selector)
+	if err != nil {
+		return catchAllCompiledRuleset{}, fmt.Errorf("%w: %v", BadSelector, err)
+	}
+
+	labelers, err := compileRules(ctx, selector.LabelMatcher, classifier.Rules)
+	if err != nil {
+		return catchAllCompiledRuleset{}, fmt.Errorf(
+			"failed to compile %q rules for %v: %w",
+			name, selector.ControlPointID, err,
+		)
+	}
+
+	return catchAllCompiledRuleset{
+		ControlPoint:  selector.ControlPoint,
 		Labelers:      labelers,
 		ReportedRules: rulesetToReportedRules(classifier, name),
 	}, nil
@@ -427,9 +498,10 @@ func (c *Classifier) activateRulesets() {
 	log.Info().Int("rulesets", len(c.activeRulesets)).Msg("Rules updated")
 }
 
-func combineRulesets(rulesets map[rulesetID]compiledRuleset) activeRules {
-	combined := activeRules{
-		LabelersByControlPoint: make(labelersByControlPoint),
+func combineRulesets(rulesets map[rulesetID]compiledRuleset) rules {
+	combined := rules{
+		LabelersByControlPointID: make(labelersByControlPointID),
+		LabelersByControlPoint:   make(labelersByControlPoint),
 	}
 
 	// to have unique keys to AddEntry
@@ -439,14 +511,14 @@ func combineRulesets(rulesets map[rulesetID]compiledRuleset) activeRules {
 		combined.ReportedRules = append(combined.ReportedRules, ruleset.ReportedRules...)
 
 		for _, labelerWithSelector := range ruleset.Labelers {
-			mm := combined.LabelersByControlPoint[ruleset.ControlPoint]
+			mm := combined.LabelersByControlPointID[ruleset.ControlPointID]
 			if mm == nil {
 				mm = multimatcher.New[int, []*labeler]()
-				combined.LabelersByControlPoint[ruleset.ControlPoint] = mm
+				combined.LabelersByControlPointID[ruleset.ControlPointID] = mm
 			}
 
-			matcherID := controlPointKeys[ruleset.ControlPoint]
-			controlPointKeys[ruleset.ControlPoint]++
+			matcherID := controlPointKeys[ruleset.ControlPointID]
+			controlPointKeys[ruleset.ControlPointID]++
 
 			err := mm.AddEntry(
 				matcherID,
@@ -455,7 +527,7 @@ func combineRulesets(rulesets map[rulesetID]compiledRuleset) activeRules {
 			)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to add entry to multimatcher")
-				return activeRules{}
+				return rules{}
 			}
 		}
 	}

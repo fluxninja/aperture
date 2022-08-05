@@ -175,7 +175,7 @@ var _ = Describe("Metrics Processor", func() {
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
 				Reason: &flowcontrolv1.Reason{
 					Reason: &flowcontrolv1.Reason_ErrorReason_{
-						ErrorReason: flowcontrolv1.Reason_ERROR_REASON_ENTITY_LOOKUP_FAILED,
+						ErrorReason: flowcontrolv1.Reason_ERROR_REASON_UNSPECIFIED,
 					},
 				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
@@ -387,7 +387,7 @@ var _ = Describe("Metrics Processor", func() {
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
 				Reason: &flowcontrolv1.Reason{
 					Reason: &flowcontrolv1.Reason_ErrorReason_{
-						ErrorReason: flowcontrolv1.Reason_ERROR_REASON_ENTITY_LOOKUP_FAILED,
+						ErrorReason: flowcontrolv1.Reason_ERROR_REASON_UNSPECIFIED,
 					},
 				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{

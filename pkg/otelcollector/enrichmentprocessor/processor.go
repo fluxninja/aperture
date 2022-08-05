@@ -160,6 +160,7 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map) {
 		log.Warn().Str(otelcollector.ControlPointLabel, controlPoint.AsString()).Msg("Unknown control point")
 		return
 	}
+
 	hostEntity := ep.cache.GetByIP(hostIP)
 	if hostEntity == nil {
 		log.Trace().Str("ip", hostIP).Msg("Skipping because entity not found in cache")

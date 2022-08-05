@@ -31,9 +31,6 @@ message CheckResponse {
 message Reason {
   enum ErrorReason {
     ERROR_REASON_UNSPECIFIED = 0;
-    ERROR_REASON_ENTITY_LOOKUP_FAILED = 1;
-    ERROR_REASON_SERVICE_LOOKUP_FAILED = 2;
-    ERROR_REASON_BAD_CLIENT_IP = 3;
   }
 
   enum RejectReason {

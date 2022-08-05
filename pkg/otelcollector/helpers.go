@@ -126,9 +126,6 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 	return nil
 }
 
-// TODO (hasit): The following unmarshaling function
-// 1. should be renamed and moved to a common package along with the corresponding marshal method
-
 // UnmarshalStringVal is a helper for cases we're sending more complex
 // structure json-encoded in a string label
 //
@@ -154,15 +151,28 @@ func UnmarshalStringVal(value pcommon.Value, labelName string, output interface{
 	return true
 }
 
-// GetCheckResponse unmarshalls limiter decisions from string label.
+// GetCheckResponse unmarshalls flowcontrol CheckResponse from string label.
 func GetCheckResponse(attributes pcommon.Map) (checkResponse *flowcontrolv1.CheckResponse) {
-	rawLimiterDecisions, exists := attributes.Get(MarshalledCheckResponseLabel)
+	checkResponseRaw, exists := attributes.Get(MarshalledCheckResponseLabel)
 	if !exists {
 		log.Debug().Str("label", MarshalledCheckResponseLabel).Msg("Label does not exist")
 		return
 	}
-	if !UnmarshalStringVal(rawLimiterDecisions, MarshalledCheckResponseLabel, &checkResponse) {
+	if !UnmarshalStringVal(checkResponseRaw, MarshalledCheckResponseLabel, &checkResponse) {
 		log.Debug().Str("label", MarshalledCheckResponseLabel).Msg("Label is not a string")
+	}
+	return
+}
+
+// GetAuthzResponse unmarshalls authz response from string label.
+func GetAuthzResponse(attributes pcommon.Map) (authzResponse *flowcontrolv1.AuthzResponse) {
+	authzResponseRaw, exists := attributes.Get(MarshalledAuthzResponseLabel)
+	if !exists {
+		log.Debug().Str("label", MarshalledAuthzResponseLabel).Msg("Label does not exist")
+		return
+	}
+	if !UnmarshalStringVal(authzResponseRaw, MarshalledAuthzResponseLabel, &authzResponse) {
+		log.Debug().Str("label", MarshalledAuthzResponseLabel).Msg("Label is not a string")
 	}
 	return
 }

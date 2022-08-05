@@ -217,8 +217,8 @@ func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 	return e.unregister("RateLimiter:"+rl.GetPolicyName(), selectorProto)
 }
 
-// GetMatches returns schedulers and fluxmeters for given labels.
-func (e *Engine) getMatches(controlPoint selectors.ControlPoint, svcs []services.ServiceID, labels selectors.Labels) iface.MultiMatchResult {
+// getMatches returns schedulers and fluxmeters for given labels.
+func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) iface.MultiMatchResult {
 	e.multiMatchersMutex.RLock()
 	defer e.multiMatchersMutex.RUnlock()
 
@@ -233,10 +233,10 @@ func (e *Engine) getMatches(controlPoint selectors.ControlPoint, svcs []services
 		mmResult.RateLimiters = append(mmResult.RateLimiters, resultCollection.RateLimiters...)
 	}
 
-	for _, service := range svcs {
+	for _, serviceID := range serviceIDs {
 		controlPointID := selectors.ControlPointID{
 			ControlPoint: controlPoint,
-			Service:      service,
+			ServiceID:    serviceID,
 		}
 		// Lookup multi matcher for controlPointID
 		mm, ok := e.multiMatchers[controlPointID]
@@ -261,7 +261,7 @@ func (e *Engine) register(key string, selectorProto *policylangv1.Selector, matc
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
 
-	if selector.Service.Service == "" {
+	if selector.ServiceID.Service == "" {
 		camm, ok := e.catchAllMultiMatchers[selector.ControlPoint]
 		if !ok {
 			camm = multimatcher.New[string, iface.MultiMatchResult]()
@@ -297,7 +297,7 @@ func (e *Engine) unregister(key string, selectorProto *policylangv1.Selector) er
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
 
-	if selector.Service.Service == "" {
+	if selector.ServiceID.Service == "" {
 		camm, ok := e.catchAllMultiMatchers[selector.ControlPoint]
 		if !ok {
 			log.Warn().Msg("Unable to unregister, catch-all multi matcher not found for control point")

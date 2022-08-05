@@ -150,10 +150,6 @@ func NewFluxMeterOptions(
 		nil
 }
 
-// TODO (hasit): rename fluxmeter metric name to a static one 'flux_meter'
-// with user-provided name as label 'flux_meter_name' with other labels 'policy_name', 'policy_hash'.
-// metricID goes away
-
 func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheus.Registry) {
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

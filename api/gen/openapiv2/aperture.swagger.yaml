@@ -203,9 +203,6 @@ definitions:
     type: string
     enum:
       - ERROR_REASON_UNSPECIFIED
-      - ERROR_REASON_ENTITY_LOOKUP_FAILED
-      - ERROR_REASON_SERVICE_LOOKUP_FAILED
-      - ERROR_REASON_BAD_CLIENT_IP
     default: ERROR_REASON_UNSPECIFIED
   ReasonRejectReason:
     type: string

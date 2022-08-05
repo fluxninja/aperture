@@ -101,6 +101,10 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			return errors.New("failed getting check response from attributes")
 		}
 		p.addCheckResponseBasedLabels(logRecord.Attributes(), checkResponse)
+
+		authzResponse := otelcollector.GetAuthzResponse(logRecord.Attributes())
+		p.addAuthzResponseBasedLabels(logRecord.Attributes(), authzResponse)
+
 		return p.updateMetrics(logRecord.Attributes(), checkResponse)
 	})
 	return ld, err
@@ -119,6 +123,17 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 	return td, err
 }
 
+func (p *metricsProcessor) addAuthzResponseBasedLabels(attributes pcommon.Map, authzResponse *flowcontrolv1.AuthzResponse) {
+	labels := map[string]pcommon.Value{
+		otelcollector.AuthzErrorLabel: pcommon.NewValueSlice(),
+	}
+	labels[otelcollector.AuthzErrorLabel] = pcommon.NewValueString(authzResponse.Error.String())
+	for key, value := range labels {
+		attributes.Insert(key, value)
+	}
+	attributes.Remove(otelcollector.MarshalledAuthzResponseLabel)
+}
+
 // addCheckResponseBasedLabels adds the following labels:
 // * `decision_type`
 // * `decision_reason`
@@ -127,10 +142,7 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 // * `concurrency_limiters`
 // * `dropping_concurrency_limiters`
 // * `flux_meters`.
-func (p *metricsProcessor) addCheckResponseBasedLabels(
-	attributes pcommon.Map,
-	checkResponse *flowcontrolv1.CheckResponse,
-) {
+func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse) {
 	labels := map[string]pcommon.Value{
 		otelcollector.RateLimitersLabel:                pcommon.NewValueSlice(),
 		otelcollector.DroppingRateLimitersLabel:        pcommon.NewValueSlice(),

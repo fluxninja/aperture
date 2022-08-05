@@ -353,23 +353,18 @@ func eachPair(services []ServiceKey) []pair {
 }
 
 // ServiceIDsFromEntity returns a list of services the entity is a part of.
-func ServiceIDsFromEntity(entity *Entity) ([]services.ServiceID, error) {
-	if entity == nil {
-		return make([]services.ServiceID, 0), nil
+func ServiceIDsFromEntity(entity *Entity) []services.ServiceID {
+	var svcs []services.ServiceID
+	if entity != nil {
+		svcs = make([]services.ServiceID, 0, len(entity.Services))
+		for _, service := range entity.Services {
+			svcs = append(svcs, services.ServiceID{
+				AgentGroup: entity.AgentGroup,
+				Service:    service,
+			})
+		}
 	}
-
-	if len(entity.Services) == 0 {
-		return nil, errors.New("missing services")
-	}
-
-	svcs := make([]services.ServiceID, 0, len(entity.Services))
-	for _, service := range entity.Services {
-		svcs = append(svcs, services.ServiceID{
-			AgentGroup: entity.AgentGroup,
-			Service:    service,
-		})
-	}
-	return svcs, nil
+	return svcs
 }
 
 func servicesFromEntity(entity *Entity) ([]*heartbeatv1.Service, error) {
@@ -377,11 +372,7 @@ func servicesFromEntity(entity *Entity) ([]*heartbeatv1.Service, error) {
 		return nil, errors.New("missing agent group")
 	}
 
-	svcIDs, err := ServiceIDsFromEntity(entity)
-	if err != nil {
-		return nil, err
-	}
-
+	svcIDs := ServiceIDsFromEntity(entity)
 	svcs := make([]*heartbeatv1.Service, 0, len(svcIDs))
 	for _, svc := range svcIDs {
 		svcs = append(svcs, &heartbeatv1.Service{
