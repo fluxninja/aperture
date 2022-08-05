@@ -47,6 +47,7 @@ var _ = Describe("Metrics Processor", func() {
 		func(
 			controlPoint string,
 			checkResponse *flowcontrolv1.CheckResponse,
+			authzResponse *flowcontrolv1.AuthzResponse,
 			expectedErr error,
 			expectedMetrics string,
 			expectedLabels map[string]interface{},
@@ -55,7 +56,7 @@ var _ = Describe("Metrics Processor", func() {
 
 			expectEngineCalls(engine, checkResponse)
 
-			logs := someLogs(checkResponse, controlPoint)
+			logs := someLogs(checkResponse, authzResponse, controlPoint)
 			modifiedLogs, err := processor.ConsumeLogs(ctx, logs)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -104,6 +105,9 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 			},
+			&flowcontrolv1.AuthzResponse{
+				Error: flowcontrolv1.AuthzResponse_ERROR_NO_ERROR,
+			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -148,6 +152,9 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 				FluxMeters: []*flowcontrolv1.FluxMeter{},
+			},
+			&flowcontrolv1.AuthzResponse{
+				Error: flowcontrolv1.AuthzResponse_ERROR_NO_ERROR,
 			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
@@ -214,6 +221,9 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 				FluxMeters: []*flowcontrolv1.FluxMeter{},
+			},
+			&flowcontrolv1.AuthzResponse{
+				Error: flowcontrolv1.AuthzResponse_ERROR_NO_ERROR,
 			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
@@ -476,6 +486,7 @@ var _ = Describe("Metrics Processor", func() {
 // someLogs will return a plog.Logs instance with single LogRecord
 func someLogs(
 	checkResponse *flowcontrolv1.CheckResponse,
+	authzResponse *flowcontrolv1.AuthzResponse,
 	controlPoint string,
 ) plog.Logs {
 	logs := plog.NewLogs()
@@ -490,7 +501,10 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
+			marshalledAuthzResponse, err := json.Marshal(authzResponse)
+			Expect(err).NotTo(HaveOccurred())
 			logRecord.Attributes().InsertString(otelcollector.MarshalledCheckResponseLabel, string(marshalledCheckResponse))
+			logRecord.Attributes().InsertString(otelcollector.MarshalledAuthzResponseLabel, string(marshalledAuthzResponse))
 			logRecord.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
 			logRecord.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
 			switch controlPoint {
