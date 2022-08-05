@@ -119,6 +119,7 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
+				"authz_error":                   "ERROR_NO_ERROR",
 				"decision_type":                 "DECISION_TYPE_ACCEPTED",
 				"decision_reason":               "",
 				"flux_meters":                   []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
@@ -167,6 +168,7 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
+				"authz_error":                   "ERROR_NO_ERROR",
 				"decision_type":                 "DECISION_TYPE_REJECTED",
 				"decision_reason":               "reject_reason:REJECT_REASON_RATE_LIMITED",
 				"rate_limiters":                 []interface{}{},
@@ -248,6 +250,7 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
 			map[string]interface{}{
+				"authz_error":            "ERROR_NO_ERROR",
 				"decision_type":          "DECISION_TYPE_ACCEPTED",
 				"decision_reason":        "error_reason:ERROR_REASON_ENTITY_LOOKUP_FAILED",
 				"rate_limiters":          []interface{}{},
