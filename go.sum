@@ -1074,11 +1074,10 @@ github.com/onsi/gomega v1.15.0/go.mod h1:cIuvLEne0aoVhAgh/O6ac0Op8WWw9H6eYCriF+t
 github.com/onsi/gomega v1.17.0/go.mod h1:HnhC7FXeEQY45zxNK3PPoIUhzk/80Xly9PcubAlGdZY=
 github.com/onsi/gomega v1.20.0 h1:8W0cWlwFkflGPLltQvLRB7ZVD5HuP6ng320w2IS245Q=
 github.com/onsi/gomega v1.20.0/go.mod h1:DtrZpjmvpn2mPm4YWQa0/ALMDj9v4YxLgojwPeREyVo=
-github.com/open-policy-agent/opa v0.42.1/go.mod h1:MrmoTi/BsKWT58kXlVayBb+rYVeaMwuBm3nYAN3923s=
-github.com/open-policy-agent/opa v0.42.2 h1:qocVAKyjrqMjCqsU02S/gHyLr4AQQ9xMtuV1kKnnyhM=
-github.com/open-policy-agent/opa v0.42.2/go.mod h1:MrmoTi/BsKWT58kXlVayBb+rYVeaMwuBm3nYAN3923s=
-github.com/open-policy-agent/opa-envoy-plugin v0.42.1-envoy h1:v9AsxoDyztfRWz/OC8SrThKQRODvCWsFczLV+c3G1Tw=
-github.com/open-policy-agent/opa-envoy-plugin v0.42.1-envoy/go.mod h1:uzCptmfbDb/9tPFjnVqMZXW6VfUYQm2/cyoyjRV95D8=
+github.com/open-policy-agent/opa v0.43.0 h1:UKTpyFUPMs4wYYL1qsXpYQQurBCPoEjFbxaD/4V46gY=
+github.com/open-policy-agent/opa v0.43.0/go.mod h1:xfTsKQEMvy7CxxgsCFoYuzT9jA/8C4JWLignCkN4Dzw=
+github.com/open-policy-agent/opa-envoy-plugin v0.43.0-envoy h1:V/dTzrniCEgZ5htlOE8E/7U3tjIPi9logafm6aJi5+Q=
+github.com/open-policy-agent/opa-envoy-plugin v0.43.0-envoy/go.mod h1:l+yzG5QFNvXIA3spfFeZxga/YaHYp6EzhduqbyVM1WI=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.56.0 h1:aQ3oYp0CEdOgohKpK4Ty/qo1eq0f4IBWz/EajwgmRWc=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.56.0/go.mod h1:5YUJGLP2HH2yfObQ0mW1ie/pV3WF1NbeVJZWTr20QUU=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.56.0 h1:3DstXxJV6jSTNoxCvNBGEcBnZekbX2yldfbDdyx38hU=
@@ -1376,7 +1375,7 @@ github.com/urfave/cli v0.0.0-20171014202726-7bc6a0acffa5/go.mod h1:70zkFmudgCuE/
 github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijbERA=
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/urfave/cli v1.22.2/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
-github.com/vektah/gqlparser/v2 v2.4.5/go.mod h1:flJWIR04IMQPGz+BXLrORkrARBxv/rtyIAFvd/MceW0=
+github.com/vektah/gqlparser/v2 v2.4.6/go.mod h1:flJWIR04IMQPGz+BXLrORkrARBxv/rtyIAFvd/MceW0=
 github.com/vektah/gqlparser/v2 v2.4.7 h1:yub2WLoSIr+chP1zMv6bjrsgTasfubxGZJeC8ISEpgE=
 github.com/vektah/gqlparser/v2 v2.4.7/go.mod h1:flJWIR04IMQPGz+BXLrORkrARBxv/rtyIAFvd/MceW0=
 github.com/vishvananda/netlink v0.0.0-20181108222139-023a6dafdcdf/go.mod h1:+SR5DhBJrl6ZM7CoCKvpw5BKroDKQ+PJqOg65H/2ktk=
