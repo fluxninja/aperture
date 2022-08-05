@@ -88,7 +88,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 		return err
 	}
 
-	var gcs *gcSentinel
+	gcs := newSentinel()
 	// Heap memory check
 	var hp *heapPolicy
 
@@ -163,7 +163,7 @@ func setupWatchdogOnStart(ctx context.Context, w watchdog, gcs *gcSentinel, hp *
 		}
 	}
 
-	gcs = newSentinel()
+	// gcs = newSentinel()
 	// start a go routine to track GC
 	panichandler.Go(func() {
 		for {
