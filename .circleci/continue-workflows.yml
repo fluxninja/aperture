@@ -431,6 +431,34 @@ workflows:
     jobs:
       - publish-aperture-docs
 
+  push-deployment-changes:
+    when:
+      and:
+        - or: &updated_deployment_code
+            - << pipeline.parameters.updated-aperture-chart >>
+        - or: &main_or_stable_branch
+            - equal: [main, << pipeline.git.branch >>]
+            - matches:
+                { pattern: "^stable/.+", value: << pipeline.git.branch>> }
+    jobs:
+      - publish-deployment-code: &push_deployment_code_job
+          name: push-deployment-changes
+          task-name: Push deployment code changes to fluxninja/deployment.git
+
+  preview-deployment-changes:
+    when:
+      and:
+        - not:
+            or: *main_or_stable_branch
+        - or: *updated_deployment_code
+    jobs:
+      - publish-deployment-code:
+          <<: *push_deployment_code_job
+          name: preview-deployment-changes
+          dry-run: true
+          task-name:
+            "Preview changes between aperture.git and deployment repository"
+
 commands:
   asdf_install:
     description: "Install tools using ASDF"
@@ -631,31 +659,3 @@ commands:
             PARAM_DEST_IMAGE: <<parameters.dest-image>>
             PARAM_DEST_TAG: <<parameters.dest-tag>>
           name: <<parameters.step-name>>
-
-  push-deployment-changes:
-    when:
-      and:
-        - or: &updated_deployment_code
-            - << pipeline.parameters.updated-aperture-chart >>
-        - or: &main_or_stable_branch
-            - equal: [main, << pipeline.git.branch >>]
-            - matches:
-                { pattern: "^stable/.+", value: << pipeline.git.branch>> }
-    jobs:
-      - publish-deployment-code: &push_deployment_code_job
-          name: push-deployment-changes
-          task-name: Push deployment code changes to fluxninja/deployment.git
-
-  preview-deployment-changes:
-    when:
-      and:
-        - not:
-            or: *main_or_stable_branch
-        - or: *updated_deployment_code
-    jobs:
-      - publish-deployment-code:
-          <<: *push_deployment_code_job
-          name: preview-deployment-changes
-          dry-run: true
-          task-name:
-            "Preview changes between aperture.git and deployment repository"
