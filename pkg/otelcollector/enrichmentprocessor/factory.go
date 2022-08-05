@@ -21,9 +21,9 @@ func NewFactory(cache *entitycache.EntityCache) component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
 		createDefaultConfig(cache),
-		component.WithLogsProcessor(createLogsProcessor),
-		component.WithTracesProcessor(createTracesProcessor),
-		component.WithMetricsProcessor(createMetricsProcessor),
+		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
+		component.WithTracesProcessor(createTracesProcessor, component.StabilityLevelInDevelopment),
+		component.WithMetricsProcessor(createMetricsProcessor, component.StabilityLevelInDevelopment),
 	)
 }
 
