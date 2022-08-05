@@ -2,19 +2,15 @@
 
 # check whether ggrep exists or not
 if ! [ -x "$(command -v ggrep)" ]; then
-	echo "picking grep"
 	GREP="grep"
 else
-	echo "picking ggrep"
 	GREP="ggrep"
 fi
 
 # check whether gdirname exists or not
 if ! [ -x "$(command -v gdirname)" ]; then
-	echo "picking dirname"
 	DIRNAME="dirname"
 else
-	echo "picking gdirname"
 	DIRNAME="gdirname"
 fi
 
