@@ -1,13 +1,14 @@
 package watchdog
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"runtime"
+	"runtime/debug"
 	"strconv"
 	"testing"
 
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/stretchr/testify/require"
@@ -56,84 +57,8 @@ func createJobGroupAndMultiJob(key string, reg *status.Registry) (*jobs.JobGroup
 	return group, multiJob
 }
 
-func createUnmarshaller() (config.Unmarshaller, error) {
-	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte(""))
-	return unmarshaller, err
-}
-
-func TestIsolatedControlWatermarkPolicy(t *testing.T) {
-	key := "cgroup"
-	reg := status.NewRegistry(".")
-	// skipIfNotIsolated(t)
-
-	jobGroup, multiJob := createJobGroupAndMultiJob(key, reg)
-	unmarshaller, err := createUnmarshaller()
-	require.NoError(t, err)
-
-	constructor := &Constructor{
-		Key: key,
-		DefaultConfig: WatchdogConfig{
-			CGroup: WatchdogPolicyType{
-				WatermarksPolicy: WatermarksPolicy{
-					// Watermarks: []float64{0.50, 0.75, 0.80, 0.85, 0.90, 0.95, 0.99},
-					PolicyCommon: PolicyCommon{
-						Enabled: true,
-					},
-				},
-			},
-		},
-	}
-
-	watchDog := WatchdogIn{
-		StatusRegistry: status.NewRegistry("."),
-		JobGroup:       jobGroup,
-		WatchdogJob:    multiJob,
-		Unmarshaller:   unmarshaller,
-	}
-
-	err = constructor.setupWatchdog(watchDog)
-	require.NoError(t, err)
-
-	fmt.Printf("watchdog Content: %v\n", watchDog)
-
-	runTestCGroup(t)
-}
-
-func TestIsolatedControlAdaptivePolicy(t *testing.T) {
-	key := "cgroup"
-	reg := status.NewRegistry(".")
-	// skipIfNotIsolated(t)
-
-	jobGroup, multiJob := createJobGroupAndMultiJob(key, reg)
-	unmarshaller, err := createUnmarshaller()
-	require.NoError(t, err)
-
-	constructor := &Constructor{
-		Key: key,
-		DefaultConfig: WatchdogConfig{
-			CGroup: WatchdogPolicyType{
-				AdaptivePolicy: AdaptivePolicy{
-					PolicyCommon: PolicyCommon{
-						Enabled: true,
-					},
-				},
-			},
-		},
-	}
-
-	watchDog := WatchdogIn{
-		StatusRegistry: status.NewRegistry("."),
-		JobGroup:       jobGroup,
-		WatchdogJob:    multiJob,
-		Unmarshaller:   unmarshaller,
-	}
-
-	err = constructor.setupWatchdog(watchDog)
-	require.NoError(t, err)
-	runTestCGroup(t)
-}
-
-func runTestCGroup(t *testing.T) {
+func runTest(t *testing.T) {
+	debug.SetGCPercent(100)
 	rounds := 100
 	if memLimit != 0 {
 		rounds /= int(float64(memLimit)*0.8) / 1024 / 1024
@@ -159,4 +84,90 @@ func runTestCGroup(t *testing.T) {
 	runtime.ReadMemStats(&ms)
 	require.NotZero(t, ms.NumGC)    // GCs have taken place, but...
 	require.Zero(t, ms.NumForcedGC) // ... no forced GCs beyond our initial one.
+}
+
+func TestIsolatedControlCGroupAndSystem(t *testing.T) {
+	sentinel := newSentinel()
+	var heapPolicy *heapPolicy
+	key := "TestCGroupPolicy"
+	reg := status.NewRegistry(".")
+	// skipIfNotIsolated(t)
+
+	jobGroup, multiJob := createJobGroupAndMultiJob(key, reg)
+	config := WatchdogConfig{
+		CGroup: WatchdogPolicyType{
+			WatermarksPolicy: WatermarksPolicy{
+				PolicyCommon: PolicyCommon{
+					Enabled: true,
+				},
+			},
+		},
+		System: WatchdogPolicyType{
+			WatermarksPolicy: WatermarksPolicy{
+				PolicyCommon: PolicyCommon{
+					Enabled: true,
+				},
+			},
+		},
+	}
+	watchDog := watchdog{
+		statusRegistry: reg,
+		jobGroup:       jobGroup,
+		watchdogJob:    multiJob,
+		config:         config,
+	}
+	err := setupWatchdogOnStart(context.Background(), watchDog, sentinel, heapPolicy)
+	require.NoError(t, err)
+	runTest(t)
+
+	err = setupWatchdogOnStop(context.Background(), watchDog, sentinel)
+	require.NoError(t, err)
+
+	config.CGroup.WatermarksPolicy.PolicyCommon.Enabled = false
+	config.CGroup.AdaptivePolicy.PolicyCommon.Enabled = true
+	config.System.WatermarksPolicy.PolicyCommon.Enabled = false
+	config.System.AdaptivePolicy.PolicyCommon.Enabled = true
+
+	err = setupWatchdogOnStart(context.Background(), watchDog, sentinel, heapPolicy)
+	require.NoError(t, err)
+	runTest(t)
+
+	err = setupWatchdogOnStop(context.Background(), watchDog, sentinel)
+	require.NoError(t, err)
+}
+
+func TestHeapDriven(t *testing.T) {
+	sentinel := newSentinel()
+	var heapPolicy *heapPolicy
+	key := "TestHeapPolicy"
+	reg := status.NewRegistry(".")
+	jobGroup, multiJob := createJobGroupAndMultiJob(key, reg)
+
+	config := WatchdogConfig{
+		Heap: HeapConfig{
+			WatchdogPolicyType: WatchdogPolicyType{
+				WatermarksPolicy: WatermarksPolicy{
+					PolicyCommon: PolicyCommon{
+						Enabled: true,
+					},
+				},
+			},
+			HeapLimit: HeapLimit{
+				MinGoGC: 25,
+				Limit:   268435456,
+			},
+		},
+	}
+	watchDog := watchdog{
+		statusRegistry: reg,
+		jobGroup:       jobGroup,
+		watchdogJob:    multiJob,
+		config:         config,
+	}
+	err := setupWatchdogOnStart(context.Background(), watchDog, sentinel, heapPolicy)
+	require.NoError(t, err)
+	runTest(t)
+
+	err = setupWatchdogOnStop(context.Background(), watchDog, sentinel)
+	require.NoError(t, err)
 }
