@@ -20,6 +20,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/services"
 )
 
+const defaultPackageName = "fluxninja.classification.extractors"
+
 // rules is a helper struct to keep both compiled and uncompiled sets of rules in sync.
 type rules struct {
 	// rules compiled to map from ControlPointIDs to list of labelers
@@ -269,16 +271,22 @@ func (c *Classifier) ActiveRules() []ReportedRule {
 func (c *Classifier) AddRules(
 	ctx context.Context,
 	name string,
-	rules *classificationv1.Classifier,
+	classifier *classificationv1.Classifier,
 ) (ActiveRuleset, error) {
-	compiled, err := compileRuleset(ctx, name, rules)
-	if err != nil {
-		return ActiveRuleset{}, err
-	}
+	var compiled compiledRuleset
+	var catchAllCompiled catchAllCompiledRuleset
+	var err error
 
-	catchAllCompiled, err := compileCatchAllRuleset(ctx, name, rules)
-	if err != nil {
-		return ActiveRuleset{}, err
+	if classifier.Selector.Service == "" {
+		catchAllCompiled, err = compileCatchAllRuleset(ctx, name, classifier)
+		if err != nil {
+			return ActiveRuleset{}, err
+		}
+	} else {
+		compiled, err = compileRuleset(ctx, name, classifier)
+		if err != nil {
+			return ActiveRuleset{}, err
+		}
 	}
 
 	c.activeRulesetsMu.Lock()
@@ -311,6 +319,7 @@ func (rs ActiveRuleset) Drop() {
 	c.activeRulesetsMu.Lock()
 	defer c.activeRulesetsMu.Unlock()
 	delete(c.activeRulesets, rs.id)
+	delete(c.catchAllActiveRulesets, rs.id)
 	c.activateRulesets()
 }
 
@@ -494,20 +503,42 @@ func compileRules(
 
 // needs to be called with activeRulesets mutex held.
 func (c *Classifier) activateRulesets() {
-	c.activeRules.Store(combineRulesets(c.activeRulesets))
+	c.activeRules.Store(c.combineRulesets())
 	log.Info().Int("rulesets", len(c.activeRulesets)).Msg("Rules updated")
 }
 
-func combineRulesets(rulesets map[rulesetID]compiledRuleset) rules {
+func (c *Classifier) combineRulesets() rules {
 	combined := rules{
 		LabelersByControlPointID: make(labelersByControlPointID),
 		LabelersByControlPoint:   make(labelersByControlPoint),
 	}
 
 	// to have unique keys to AddEntry
-	controlPointKeys := make(map[selectors.ControlPointID]int)
+	controlPointIDKeys := make(map[selectors.ControlPointID]int)
+	controlPointKeys := make(map[selectors.ControlPoint]int)
 
-	for _, ruleset := range rulesets {
+	for _, ruleset := range c.catchAllActiveRulesets {
+		combined.ReportedRules = append(combined.ReportedRules, ruleset.ReportedRules...)
+
+		for _, labelerWithSelector := range ruleset.Labelers {
+			mm := combined.LabelersByControlPoint[ruleset.ControlPoint]
+			if mm == nil {
+				mm = multimatcher.New[int, []*labeler]()
+				combined.LabelersByControlPoint[ruleset.ControlPoint] = mm
+			}
+
+			matcherID := controlPointKeys[ruleset.ControlPoint]
+			controlPointKeys[ruleset.ControlPoint]++
+
+			err := mm.AddEntry(matcherID, labelerWithSelector.LabelSelector, multimatcher.Appender(labelerWithSelector.Labeler))
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to add entry to catchall multimatcher")
+				return rules{}
+			}
+		}
+	}
+
+	for _, ruleset := range c.activeRulesets {
 		combined.ReportedRules = append(combined.ReportedRules, ruleset.ReportedRules...)
 
 		for _, labelerWithSelector := range ruleset.Labelers {
@@ -517,8 +548,8 @@ func combineRulesets(rulesets map[rulesetID]compiledRuleset) rules {
 				combined.LabelersByControlPointID[ruleset.ControlPointID] = mm
 			}
 
-			matcherID := controlPointKeys[ruleset.ControlPointID]
-			controlPointKeys[ruleset.ControlPointID]++
+			matcherID := controlPointIDKeys[ruleset.ControlPointID]
+			controlPointIDKeys[ruleset.ControlPointID]++
 
 			err := mm.AddEntry(
 				matcherID,
@@ -531,7 +562,6 @@ func combineRulesets(rulesets map[rulesetID]compiledRuleset) rules {
 			}
 		}
 	}
+
 	return combined
 }
-
-const defaultPackageName = "fluxninja.classification.extractors"
