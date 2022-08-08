@@ -5,6 +5,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/component"
@@ -58,6 +59,7 @@ func AgentOTELComponents(cache *entitycache.EntityCache, promRegistry *prometheu
 		enrichmentprocessor.NewFactory(cache),
 		rollupprocessor.NewFactory(),
 		metricsprocessor.NewFactory(promRegistry, engine),
+		attributesprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
 
@@ -95,7 +97,9 @@ func ControllerOTELComponents() (component.Factories, error) {
 	)
 	errs = multierr.Append(errs, err)
 
-	processors, err := component.MakeProcessorFactoryMap()
+	processors, err := component.MakeProcessorFactoryMap(
+		attributesprocessor.NewFactory(),
+	)
 	errs = multierr.Append(errs, err)
 
 	factories := component.Factories{

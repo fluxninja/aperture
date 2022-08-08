@@ -35,6 +35,6 @@ func (fn *FluxNinjaPlugin) Module() fx.Option {
 	log.Info().Msg("Loading FluxNinjaPlugin")
 	return fx.Options(
 		heartbeats.Module(),
-		otel.ProvideAnnotatedPluginConfig(),
+		otel.Module(),
 	)
 }

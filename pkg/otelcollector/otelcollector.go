@@ -43,42 +43,44 @@ func Invoke(in ConstructorIn) (*service.Collector, error) {
 	mapProviders := map[string]confmap.Provider{
 		"file": NewOTELConfigUnmarshaler(in.BaseConfig.AsMap()),
 	}
-	for i, pluginConfig := range in.PluginConfigs {
-		scheme := fmt.Sprintf("plugin-%v", i)
-		locations = append(locations, fmt.Sprintf("%v:%v", scheme, scheme))
-		mapProviders[scheme] = NewOTELConfigUnmarshaler(pluginConfig.AsMap())
-	}
 
-	configProvider, err := service.NewConfigProvider(service.ConfigProviderSettings{
-		Locations:    locations,
-		MapProviders: mapProviders,
-		MapConverters: []confmap.Converter{
-			overwritepropertiesconverter.New([]string{}),
-			expandconverter.New(),
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("creating OTEL config provider: %w", err)
-	}
-	otelService, err := service.New(
-		service.CollectorSettings{
-			BuildInfo:               component.NewDefaultBuildInfo(),
-			Factories:               in.Factories,
-			ConfigProvider:          configProvider,
-			DisableGracefulShutdown: true,
-			LoggingOptions: []zap.Option{zap.WrapCore(func(zapcore.Core) zapcore.Core {
-				return log.NewZerologAdapter(log.GetGlobalLogger())
-			})},
-			// NOTE: do not remove this becauase it causes a data-race condition.
-			SkipSettingGRPCLogger: true,
-		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("constructing OTEL Service: %v", err)
-	}
-
+	var otelService *service.Collector
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
+			for i, pluginConfig := range in.PluginConfigs {
+				scheme := fmt.Sprintf("plugin-%v", i)
+				locations = append(locations, fmt.Sprintf("%v:%v", scheme, scheme))
+				mapProviders[scheme] = NewOTELConfigUnmarshaler(pluginConfig.AsMap())
+			}
+
+			configProvider, err := service.NewConfigProvider(service.ConfigProviderSettings{
+				Locations:    locations,
+				MapProviders: mapProviders,
+				MapConverters: []confmap.Converter{
+					overwritepropertiesconverter.New([]string{}),
+					expandconverter.New(),
+				},
+			})
+			if err != nil {
+				return fmt.Errorf("creating OTEL config provider: %w", err)
+			}
+			otelService, err = service.New(
+				service.CollectorSettings{
+					BuildInfo:               component.NewDefaultBuildInfo(),
+					Factories:               in.Factories,
+					ConfigProvider:          configProvider,
+					DisableGracefulShutdown: true,
+					LoggingOptions: []zap.Option{zap.WrapCore(func(zapcore.Core) zapcore.Core {
+						return log.NewZerologAdapter(log.GetGlobalLogger())
+					})},
+					// NOTE: do not remove this becauase it causes a data-race condition.
+					SkipSettingGRPCLogger: true,
+				},
+			)
+			if err != nil {
+				return fmt.Errorf("constructing OTEL Service: %v", err)
+			}
+
 			log.Info().Msg("Starting OTEL Collector")
 			panichandler.Go(func() {
 				err := otelService.Run(context.Background())
