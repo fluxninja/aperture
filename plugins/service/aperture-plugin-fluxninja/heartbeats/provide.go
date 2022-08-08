@@ -49,7 +49,7 @@ type ConstructorIn struct {
 }
 
 // Provide provides a new instance of Heartbeats.
-func Provide(in ConstructorIn) (*heartbeats, error) {
+func Provide(in ConstructorIn) (*Heartbeats, error) {
 	var config pluginconfig.FluxNinjaPluginConfig
 	if err := in.Unmarshaller.UnmarshalKey(pluginconfig.PluginConfigKey, &config); err != nil {
 		return nil, err
@@ -84,4 +84,4 @@ func Provide(in ConstructorIn) (*heartbeats, error) {
 }
 
 // Invoke enables heartbeats in FX.
-func Invoke(*heartbeats) {}
+func Invoke(*Heartbeats) {}
