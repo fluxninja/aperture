@@ -47,7 +47,7 @@ const (
 	heartbeatsHTTPPath = "/plugins/fluxninja/v1/report"
 )
 
-type heartbeats struct {
+type Heartbeats struct {
 	heartbeatsClient heartbeatv1.FluxNinjaServiceClient
 	peersWatcher     *peers.PeerDiscovery
 	clientHTTP       *http.Client
@@ -63,6 +63,10 @@ type heartbeats struct {
 	jobName          string
 }
 
+func (h *Heartbeats) GetControllerInfo() *heartbeatv1.ControllerInfo {
+	return h.controllerInfo
+}
+
 func newHeartbeats(
 	jobGroup *jobs.JobGroup,
 	p pluginconfig.FluxNinjaPluginConfig,
@@ -70,8 +74,8 @@ func newHeartbeats(
 	entityCache *entitycache.EntityCache,
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
-) *heartbeats {
-	return &heartbeats{
+) *Heartbeats {
+	return &Heartbeats{
 		heartbeatsAddr: p.FluxNinjaEndpoint,
 		interval:       p.HeartbeatInterval,
 		APIKey:         p.APIKey,
@@ -83,7 +87,7 @@ func newHeartbeats(
 	}
 }
 
-func (h *heartbeats) start(ctx context.Context, in *ConstructorIn) error {
+func (h *Heartbeats) start(ctx context.Context, in *ConstructorIn) error {
 	var job jobs.Job
 	var err error
 
@@ -103,7 +107,7 @@ func (h *heartbeats) start(ctx context.Context, in *ConstructorIn) error {
 	return nil
 }
 
-func (h *heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdclient.Client) error {
+func (h *Heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdclient.Client) error {
 	etcdPath := "/fluxninja/controllerid"
 	controllerID := guuid.NewString()
 
@@ -131,7 +135,7 @@ func (h *heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdcl
 	return nil
 }
 
-func (h *heartbeats) createGRPCJob(ctx context.Context, grpcClientConnBuilder grpcclient.ClientConnectionBuilder) (jobs.Job, error) {
+func (h *Heartbeats) createGRPCJob(ctx context.Context, grpcClientConnBuilder grpcclient.ClientConnectionBuilder) (jobs.Job, error) {
 	log.Debug().Str("heartbeatsAddr", h.heartbeatsAddr).Msg("Heartbeats service address")
 	connWrapper := grpcClientConnBuilder.Build()
 	conn, err := connWrapper.Dial(ctx, h.heartbeatsAddr)
@@ -151,7 +155,7 @@ func (h *heartbeats) createGRPCJob(ctx context.Context, grpcClientConnBuilder gr
 	return &job, nil
 }
 
-func (h *heartbeats) createHTTPJob(ctx context.Context, restapiClientConnection *http.Client) (jobs.Job, error) {
+func (h *Heartbeats) createHTTPJob(ctx context.Context, restapiClientConnection *http.Client) (jobs.Job, error) {
 	h.heartbeatsAddr += heartbeatsHTTPPath
 
 	h.clientHTTP = restapiClientConnection
@@ -162,7 +166,7 @@ func (h *heartbeats) createHTTPJob(ctx context.Context, restapiClientConnection 
 	return &job, nil
 }
 
-func (h *heartbeats) registerHearbeatsJob(job jobs.Job) {
+func (h *Heartbeats) registerHearbeatsJob(job jobs.Job) {
 	executionTimeout := config.Duration{Duration: durationpb.New(jobTimeoutDuration)}
 	jobConfig := jobs.JobConfig{
 		InitiallyHealthy: true,
@@ -176,7 +180,7 @@ func (h *heartbeats) registerHearbeatsJob(job jobs.Job) {
 	}
 }
 
-func (h *heartbeats) stop() {
+func (h *Heartbeats) stop() {
 	log.Info().Msg("Stopping gRPC heartbeats")
 
 	if h.clientConn != nil {
@@ -186,7 +190,7 @@ func (h *heartbeats) stop() {
 	_ = h.jobGroup.DeregisterJob(h.jobName)
 }
 
-func (h *heartbeats) newHeartbeat(
+func (h *Heartbeats) newHeartbeat(
 	jobCtxt context.Context,
 	health,
 	healthDetails string,
@@ -245,7 +249,7 @@ func (h *heartbeats) newHeartbeat(
 	}
 }
 
-func (h *heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message, error) {
+func (h *Heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message, error) {
 	report := h.newHeartbeat(jobCtxt, healthyStatus, "")
 
 	// Add api key value to metadata
@@ -258,7 +262,7 @@ func (h *heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message
 	return &emptypb.Empty{}, nil
 }
 
-func (h *heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.Message, error) {
+func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.Message, error) {
 	report := h.newHeartbeat(jobCtxt, healthyStatus, "")
 	reqBody, err := protojson.MarshalOptions{
 		UseProtoNames: true,
