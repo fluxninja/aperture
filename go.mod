@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture
 
-go 1.18
+go 1.19
 
 require (
 	github.com/Henry-Sarabia/sliceconv v1.0.2

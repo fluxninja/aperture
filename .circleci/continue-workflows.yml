@@ -13,7 +13,7 @@ executors:
       - image: cimg/base:2021.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.18
+      - image: cimg/go:1.19
         user: root
   python-cimg-executor:
     docker:
