@@ -1,8 +1,8 @@
 pre-commit 2.20.0
 bats 1.7.0
 gcloud 395.0.0
-golang 1.18.5
-golangci-lint 1.47.3
+golang 1.19
+golangci-lint 1.48.0
 grpcurl 1.8.6
 mockery 2.14.0
 buf 1.7.0
