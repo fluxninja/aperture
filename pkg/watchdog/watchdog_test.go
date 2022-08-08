@@ -57,6 +57,7 @@ func createJobGroupAndMultiJob(key string, reg *status.Registry) (*jobs.JobGroup
 	return group, multiJob
 }
 
+// runTest sets a GCPercent needed to trigger the enables policy and then overloads the memory, and ends up checking the memory stats to confirm that the test has run correctly.
 func runTest(t *testing.T) {
 	debug.SetGCPercent(100)
 	rounds := 100
@@ -80,29 +81,25 @@ func runTest(t *testing.T) {
 		}
 	}
 
+	// Results are checked in a generic way.
 	var ms runtime.MemStats
 	runtime.ReadMemStats(&ms)
-	require.NotZero(t, ms.NumGC)    // GCs have taken place, but...
-	require.Zero(t, ms.NumForcedGC) // ... no forced GCs beyond our initial one.
+	require.NotZero(t, ms.NumGC)
+	require.Zero(t, ms.NumForcedGC)
 }
 
-func TestIsolatedControlCGroupAndSystem(t *testing.T) {
+// TestIsolatedControlCGroup tests that the watchdog watermark and adaptive policy are enabled and working when the watchdog is run in an isolated process.
+func TestIsolatedControlCGroup(t *testing.T) {
+	skipIfNotIsolated(t)
+
 	sentinel := newSentinel()
 	var heapPolicy *heapPolicy
 	key := "TestCGroupPolicy"
 	reg := status.NewRegistry(".")
-	// skipIfNotIsolated(t)
 
 	jobGroup, multiJob := createJobGroupAndMultiJob(key, reg)
 	config := WatchdogConfig{
 		CGroup: WatchdogPolicyType{
-			WatermarksPolicy: WatermarksPolicy{
-				PolicyCommon: PolicyCommon{
-					Enabled: true,
-				},
-			},
-		},
-		System: WatchdogPolicyType{
 			WatermarksPolicy: WatermarksPolicy{
 				PolicyCommon: PolicyCommon{
 					Enabled: true,
@@ -136,7 +133,52 @@ func TestIsolatedControlCGroupAndSystem(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestHeapDriven(t *testing.T) {
+// TestIsolatedSystemDriven tests that the watchdog watermark and adaptive policy are enabled and working when the watchdog is run in an isolated process.
+func TestIsolatedSystemDriven(t *testing.T) {
+	skipIfNotIsolated(t)
+
+	sentinel := newSentinel()
+	var heapPolicy *heapPolicy
+	key := "TestSystemDriven"
+	reg := status.NewRegistry(".")
+	jobGroup, multiJob := createJobGroupAndMultiJob(key, reg)
+
+	config := WatchdogConfig{
+		System: WatchdogPolicyType{
+			AdaptivePolicy: AdaptivePolicy{
+				PolicyCommon: PolicyCommon{
+					Enabled: true,
+				},
+			},
+		},
+	}
+
+	watchDog := watchdog{
+		statusRegistry: reg,
+		jobGroup:       jobGroup,
+		watchdogJob:    multiJob,
+		config:         config,
+	}
+
+	err := setupWatchdogOnStart(context.Background(), watchDog, sentinel, heapPolicy)
+	require.NoError(t, err)
+	runTest(t)
+
+	err = setupWatchdogOnStop(context.Background(), watchDog, sentinel)
+	require.NoError(t, err)
+
+	config.System.AdaptivePolicy.PolicyCommon.Enabled = false
+	config.System.WatermarksPolicy.PolicyCommon.Enabled = true
+
+	err = setupWatchdogOnStart(context.Background(), watchDog, sentinel, heapPolicy)
+	require.NoError(t, err)
+	runTest(t)
+}
+
+// TestHeapDriven tests that the watchdog watermark and adaptive policy are enabled and working when the watchdog is run in an isolated process.
+func TestIsolatedHeapDriven(t *testing.T) {
+	skipIfNotIsolated(t)
+
 	sentinel := newSentinel()
 	var heapPolicy *heapPolicy
 	key := "TestHeapPolicy"
