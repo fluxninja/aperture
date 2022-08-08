@@ -22,29 +22,28 @@ import (
 const (
 	processorBatchMetricsSlow = "batch/metrics-slow"
 	processorRollup           = "rollup"
-	processorAttributes       = "attributes"
+	processorAttributes       = "attributes/insert"
 
 	exporterFluxninja = "otlp/fluxninja"
 )
 
-func ProvideAnnotatedPluginConfig() fx.Option {
-	return fx.Option(
-		fx.Invoke(
+func Module() fx.Option {
+	return fx.Options(
+		fx.Provide(
 			fx.Annotate(
-				InvokePluginOTELConfig,
+				Provide,
 				fx.ParamTags(config.NameTag("base"), config.NameTag("heartbeats-grpc-client-config"), config.NameTag("heartbeats-http-client-config")),
 				fx.ResultTags(config.GroupTag("plugin")),
 			),
 		),
+		fx.Invoke(Invoke),
 	)
 }
 
-func InvokePluginOTELConfig(baseConfig *otelcollector.OTELConfig,
+func Provide(baseConfig *otelcollector.OTELConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 	unmarshaller config.Unmarshaller,
-	lifecycle fx.Lifecycle,
-	heartbeats *heartbeats.Heartbeats,
 ) (*otelcollector.OTELConfig, error) {
 	var pluginConfig pluginconfig.FluxNinjaPluginConfig
 	if err := unmarshaller.UnmarshalKey(pluginconfig.PluginConfigKey, &pluginConfig); err != nil {
@@ -53,25 +52,37 @@ func InvokePluginOTELConfig(baseConfig *otelcollector.OTELConfig,
 	config := otelcollector.NewOTELConfig()
 	addFluxninjaExporter(config, &pluginConfig, grpcClientConfig, httpClientConfig)
 
-	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			controllerID := heartbeats.GetControllerInfo().Id
-			addAttributesProcessor(config, controllerID)
+	return config, nil
+}
 
-			if logsPipeline, exists := baseConfig.Service.Pipeline("logs"); exists {
-				addPipelineWithFNExporter("logs", config, logsPipeline)
-				addPipelineWithAttributesProcessor("logs", config, logsPipeline)
-			}
-			if tracesPipeline, exists := baseConfig.Service.Pipeline("traces"); exists {
-				addPipelineWithFNExporter("traces", config, tracesPipeline)
-				addPipelineWithAttributesProcessor("traces", config, tracesPipeline)
-			}
-			if _, exists := baseConfig.Service.Pipeline("metrics/fast"); exists {
-				addMetricsSlowPipeline(config)
-			}
-			if metricsPipeline, exists := baseConfig.Service.Pipeline("metrics/controller"); exists {
-				addPipelineWithFNExporter("metrics/fluxninja", config, metricsPipeline)
-				addPipelineWithAttributesProcessor("metrics/fluxninja", config, metricsPipeline)
+type ConstructorIn struct {
+	fx.In
+	Lifecycle     fx.Lifecycle
+	BaseConfig    *otelcollector.OTELConfig   `name:"base"`
+	PluginConfigs []*otelcollector.OTELConfig `group:"plugin"`
+	Heartbeats    *heartbeats.Heartbeats
+}
+
+func Invoke(in ConstructorIn) {
+	in.Lifecycle.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			controllerID := in.Heartbeats.GetControllerInfo().Id
+
+			for _, config := range in.PluginConfigs {
+				addAttributesProcessor(config, controllerID)
+
+				if logsPipeline, exists := in.BaseConfig.Service.Pipeline("logs"); exists {
+					addFNToPipeline("logs", config, logsPipeline)
+				}
+				if tracesPipeline, exists := in.BaseConfig.Service.Pipeline("traces"); exists {
+					addFNToPipeline("traces", config, tracesPipeline)
+				}
+				if _, exists := in.BaseConfig.Service.Pipeline("metrics/fast"); exists {
+					addMetricsSlowPipeline(config)
+				}
+				if metricsPipeline, exists := in.BaseConfig.Service.Pipeline("metrics/controller"); exists {
+					addFNToPipeline("metrics/fluxninja", config, metricsPipeline)
+				}
 			}
 			return nil
 		},
@@ -79,15 +90,13 @@ func InvokePluginOTELConfig(baseConfig *otelcollector.OTELConfig,
 			return nil
 		},
 	})
-
-	return config, nil
 }
 
 func addAttributesProcessor(config *otelcollector.OTELConfig, controllerID string) {
 	config.AddProcessor(processorAttributes, map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{
-				"key":    "controller_id",
+				"key":    "controllerid",
 				"action": "insert",
 				"value":  controllerID,
 			},
@@ -95,20 +104,14 @@ func addAttributesProcessor(config *otelcollector.OTELConfig, controllerID strin
 	})
 }
 
-func addPipelineWithAttributesProcessor(
+func addFNToPipeline(
 	name string,
 	config *otelcollector.OTELConfig,
 	pipeline otelcollector.Pipeline,
 ) {
 	pipeline.Processors = append(pipeline.Processors, processorAttributes)
 	config.Service.AddPipeline(name, pipeline)
-}
 
-func addPipelineWithFNExporter(
-	name string,
-	config *otelcollector.OTELConfig,
-	pipeline otelcollector.Pipeline,
-) {
 	pipeline.Exporters = append(pipeline.Exporters, exporterFluxninja)
 	config.Service.AddPipeline(name, pipeline)
 }
@@ -120,6 +123,7 @@ func addMetricsSlowPipeline(config *otelcollector.OTELConfig) {
 		Processors: []string{
 			otel.ProcessorEnrichment,
 			processorBatchMetricsSlow,
+			processorAttributes,
 		},
 		Exporters: []string{exporterFluxninja},
 	})
