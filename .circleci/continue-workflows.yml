@@ -213,6 +213,7 @@ jobs:
             pre-commit
             bats
             golang
+            golangci-lint
             buf
             mockery
             nodejs
