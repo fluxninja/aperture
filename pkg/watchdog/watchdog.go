@@ -163,7 +163,6 @@ func setupWatchdogOnStart(ctx context.Context, w watchdog, gcs *gcSentinel, hp *
 		}
 	}
 
-	// gcs = newSentinel()
 	// start a go routine to track GC
 	panichandler.Go(func() {
 		for {
@@ -286,6 +285,9 @@ func newHeapPolicy(config HeapConfig) *heapPolicy {
 	hp.originalGoGC = debug.SetGCPercent(100)
 	debug.SetGCPercent(hp.originalGoGC)
 	hp.currGoGC = hp.originalGoGC
+	// Setting go's memory limit to the configured value, changes was needed after go 1.19, limit will be respected even if gc is disabled.
+	debug.SetMemoryLimit(int64(config.Limit))
+
 	return &hp
 }
 
