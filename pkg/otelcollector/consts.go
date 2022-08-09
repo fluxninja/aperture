@@ -73,8 +73,6 @@ const (
 	TimestampLabel = "timestamp"
 	// AgentGroupLabel describes cluster to which metrics refer.
 	AgentGroupLabel = "agent_group"
-	// NamespaceLabel describes namespace to which metrics refer.
-	NamespaceLabel = "namespace"
 	// ServicesLabel describes services to which metrics refer. This is comma-separated
 	// list.
 	ServicesLabel = "services"

@@ -19,8 +19,7 @@ data:
             limit:
               signal_name: "RATE_LIMIT"
           selector:
-            namespace: "demoapp"
-            service: "demo1-demo-app"
+            service: "demo1-demo-app.demoapp.svc.cluster.local"
             control_point:
               traffic: "ingress"
           label_key: "request_header_user"

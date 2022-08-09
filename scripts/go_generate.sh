@@ -22,4 +22,4 @@ fi
 dirs=$("${GREP}" --include="*.go" --exclude-dir="vendor" -r "go:generate" -l | xargs "${DIRNAME}" | sort -u)
 
 # use parallel to execute "cd {} && go generate" in for each directory in $dirs
-parallel -j4 "cd {} && go generate" ::: "$dirs"
+parallel -j4 --no-notice "cd {} && go generate" ::: "$dirs"

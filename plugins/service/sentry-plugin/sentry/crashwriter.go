@@ -68,7 +68,7 @@ func (w *CrashWriter) GetCrashLog() []byte {
 	for {
 		if w.buffer.Length() > 0 {
 			log := w.buffer.Remove()
-      data = append(data, log.([]byte)...)
+			data = append(data, log.([]byte)...)
 		} else {
 			break
 		}

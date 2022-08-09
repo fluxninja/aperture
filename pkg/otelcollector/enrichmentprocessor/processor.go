@@ -167,7 +167,6 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map) {
 	}
 
 	attributes.UpsertString(otelcollector.AgentGroupLabel, hostEntity.AgentGroup)
-	attributes.UpsertString(otelcollector.NamespaceLabel, hostEntity.Namespace)
 	attributes.UpsertString(otelcollector.ServicesLabel, strings.Join(hostEntity.Services, ","))
 }
 
@@ -184,7 +183,6 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 		return
 	}
 	attributes.UpsertString(otelcollector.AgentGroupLabel, hostEntity.AgentGroup)
-	attributes.UpsertString(otelcollector.NamespaceLabel, hostEntity.Namespace)
 	attributes.UpsertString(otelcollector.ServicesLabel, strings.Join(hostEntity.Services, ","))
 }
 

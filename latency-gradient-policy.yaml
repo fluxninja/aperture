@@ -11,8 +11,7 @@ data:
     flux_meters:
       - name: "demo1_latency"
         selector:
-          namespace: "demoapp"
-          service: "demo1-demo-app"
+          service: "demo1-demo-app.demoapp.svc.cluster.local"
           control_point:
             traffic: "ingress"
     circuit:
@@ -90,8 +89,7 @@ data:
       - concurrency_limiter:
           scheduler:
             selector:
-              namespace: "demoapp"
-              service: "demo1-demo-app"
+              service: "demo1-demo-app.demoapp.svc.cluster.local"
               control_point:
                 traffic: "ingress"
             workload_config:

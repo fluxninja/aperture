@@ -129,9 +129,6 @@ definitions:
       ip_address:
         type: string
         x-go-name: IPAddress
-      namespace:
-        type: string
-        x-go-name: Namespace
       prefix:
         type: string
         x-go-name: Prefix

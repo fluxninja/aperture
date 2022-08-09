@@ -182,7 +182,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	}
 
 	flowLabels := mergeFlowLabels(oldFlowLabels, newFlowLabels)
-	log.Warn().Msgf("Creating check response. Flow labels: %v, LimiterDecisions; %v, fluxmeters: %v", flowLabels, fcResponse.LimiterDecisions, fcResponse.FluxMeters)
+	log.Trace().Msgf("Creating check response. Flow labels: %v, LimiterDecisions; %v, fluxmeters: %v", flowLabels, fcResponse.LimiterDecisions, fcResponse.FluxMeters)
 	marshalledCheckResponse, err := protoMessageAsPbValue(fcResponse)
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed marshaling check response")
@@ -227,15 +227,9 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {
 	host := req.GetAttributes().GetRequest().GetHttp().GetHost()
 	host = strings.Split(host, ":")[0]
-	hostParts := strings.Split(host, ".")
-	ns := "default"
-	if len(hostParts) >= 2 {
-		ns = hostParts[1]
-	}
 	return services.ServiceID{
 		AgentGroup: "default",
-		Namespace:  ns,
-		Service:    hostParts[0],
+		Service:    host,
 	}
 }
 
