@@ -138,13 +138,13 @@ func UnmarshalStringVal(value pcommon.Value, labelName string, output interface{
 	stringVal := value.StringVal()
 
 	if stringVal == MissingAttributeSourceValue {
-		log.Trace().Str("label", labelName).Msg("Missing attribute source")
+		log.Debug().Str("label", labelName).Msg("Missing attribute source")
 		return true
 	}
 
 	err := json.Unmarshal([]byte(stringVal), output)
 	if err != nil {
-		log.Debug().Err(err).Str("label", labelName).Msg("Unmarshalling")
+		log.Error().Err(err).Str("label", labelName).Msg("Failed to unmarshal")
 		// This is almost impossible to happen (eg. broken sdk), so ignoring error is ok
 	}
 
@@ -152,27 +152,35 @@ func UnmarshalStringVal(value pcommon.Value, labelName string, output interface{
 }
 
 // GetCheckResponse unmarshalls flowcontrol CheckResponse from string label.
-func GetCheckResponse(attributes pcommon.Map) (checkResponse *flowcontrolv1.CheckResponse) {
-	checkResponseRaw, exists := attributes.Get(MarshalledCheckResponseLabel)
-	if !exists {
-		log.Debug().Str("label", MarshalledCheckResponseLabel).Msg("Label does not exist")
-		return
+func GetCheckResponse(attributes pcommon.Map) *flowcontrolv1.CheckResponse {
+	checkResponse := &flowcontrolv1.CheckResponse{}
+	ok := unmarshalAttributesMap(attributes, MarshalledCheckResponseLabel, &checkResponse)
+	if !ok {
+		log.Debug().Str("label", MarshalledCheckResponseLabel).Msg("Failed to unmarshal attributes into AuthzResponse")
 	}
-	if !UnmarshalStringVal(checkResponseRaw, MarshalledCheckResponseLabel, &checkResponse) {
-		log.Debug().Str("label", MarshalledCheckResponseLabel).Msg("Label is not a string")
-	}
-	return
+	return checkResponse
 }
 
 // GetAuthzResponse unmarshalls authz response from string label.
-func GetAuthzResponse(attributes pcommon.Map) (authzResponse *flowcontrolv1.AuthzResponse) {
-	authzResponseRaw, exists := attributes.Get(MarshalledAuthzResponseLabel)
-	if !exists {
-		log.Debug().Str("label", MarshalledAuthzResponseLabel).Msg("Label does not exist")
-		return
+func GetAuthzResponse(attributes pcommon.Map) *flowcontrolv1.AuthzResponse {
+	authzResponse := &flowcontrolv1.AuthzResponse{}
+	ok := unmarshalAttributesMap(attributes, MarshalledAuthzResponseLabel, &authzResponse)
+	if !ok {
+		log.Debug().Str("label", MarshalledAuthzResponseLabel).Msg("Failed to unmarshal attributes into AuthzResponse")
 	}
-	if !UnmarshalStringVal(authzResponseRaw, MarshalledAuthzResponseLabel, &authzResponse) {
-		log.Debug().Str("label", MarshalledAuthzResponseLabel).Msg("Label is not a string")
+	return authzResponse
+}
+
+func unmarshalAttributesMap(attributes pcommon.Map, label string, output interface{}) bool {
+	value, ok := attributes.Get(label)
+	if !ok {
+		log.Error().Str("label", label).Msg("Label does not exist in attributes map")
+		return false
 	}
-	return
+	ok = UnmarshalStringVal(value, label, &output)
+	if !ok {
+		log.Debug().Str("label", label).Msg("Label is not a string")
+		return false
+	}
+	return true
 }

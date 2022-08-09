@@ -82,7 +82,7 @@ func sanitizeBaggageHeaderValue(value string) string {
 func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_authz.CheckResponse, error) {
 	log.Trace().Msg("Classifier.Check()")
 
-	returnCheckResponse := func(fcResponse *flowcontrolv1.CheckResponse, authzResponse *flowcontrolv1.AuthzResponse, flowLabels classification.FlowLabels) *ext_authz.CheckResponse {
+	createExtAuthzResponse := func(fcResponse *flowcontrolv1.CheckResponse, authzResponse *flowcontrolv1.AuthzResponse, flowLabels classification.FlowLabels) *ext_authz.CheckResponse {
 		if fcResponse == nil {
 			fcResponse = &flowcontrolv1.CheckResponse{
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_UNSPECIFIED,
@@ -116,6 +116,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		}
 		marshalledFlowLabels := flowLabelsAsPbValueForTelemetry(flowLabels)
 
+		log.Trace().Interface("fcResponse", marshalledCheckResponse).Interface("authzResponse", marshalledAuthzResponse).Interface("flowLabels", marshalledFlowLabels).Msg("Created ext_authz.CheckResponse")
 		return &ext_authz.CheckResponse{
 			DynamicMetadata: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
@@ -140,7 +141,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 			authzResponse := &flowcontrolv1.AuthzResponse{
 				Status: flowcontrolv1.AuthzResponse_STATUS_INVALID_TRAFFIC_DIRECTION,
 			}
-			resp := returnCheckResponse(nil, authzResponse, nil)
+			resp := createExtAuthzResponse(nil, authzResponse, nil)
 			return resp, errors.New("invalid traffic-direction")
 		}
 	} else {
@@ -171,7 +172,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		authzResponse := &flowcontrolv1.AuthzResponse{
 			Status: flowcontrolv1.AuthzResponse_STATUS_CONVERT_TO_MAP_STRUCT,
 		}
-		resp := returnCheckResponse(nil, authzResponse, nil)
+		resp := createExtAuthzResponse(nil, authzResponse, nil)
 		return resp, fmt.Errorf("converting raw input into rego input failed: %v", err)
 	}
 
@@ -180,7 +181,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		authzResponse := &flowcontrolv1.AuthzResponse{
 			Status: flowcontrolv1.AuthzResponse_STATUS_CONVERT_TO_REGO_AST,
 		}
-		resp := returnCheckResponse(nil, authzResponse, nil)
+		resp := createExtAuthzResponse(nil, authzResponse, nil)
 		return resp, fmt.Errorf("converting rego input to value failed: %v", err)
 	}
 
@@ -200,7 +201,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		authzResponse := &flowcontrolv1.AuthzResponse{
 			Status: flowcontrolv1.AuthzResponse_STATUS_CLASSIFY_FLOW_LABELS,
 		}
-		resp := returnCheckResponse(nil, authzResponse, nil)
+		resp := createExtAuthzResponse(nil, authzResponse, nil)
 		return resp, fmt.Errorf("failed to classify: %v", err)
 	}
 
@@ -225,7 +226,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 	flowLabels := mergeFlowLabels(oldFlowLabels, newFlowLabels)
 
-	resp := returnCheckResponse(fcResponse, nil, flowLabels)
+	resp := createExtAuthzResponse(fcResponse, nil, flowLabels)
 
 	// Check if fcResponse error is set
 	if fcResponse.DecisionType != flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {

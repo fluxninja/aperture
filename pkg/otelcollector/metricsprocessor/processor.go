@@ -96,11 +96,9 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		log.Debug().Msgf("ConsumeLogs attributes: %+v", logRecord.Attributes())
-
 		checkResponse := otelcollector.GetCheckResponse(logRecord.Attributes())
 		if checkResponse == nil {
-			return errors.New("failed getting check response from attributes")
+			return errors.New("failed to get check_response from attributes")
 		}
 		p.addCheckResponseBasedLabels(logRecord.Attributes(), checkResponse)
 
