@@ -119,14 +119,15 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
-				"authz_error":                   "ERROR_NO_ERROR",
-				"decision_type":                 "DECISION_TYPE_ACCEPTED",
-				"decision_reason":               "",
-				"flux_meters":                   []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
-				"rate_limiters":                 []interface{}{},
-				"dropping_rate_limiters":        []interface{}{},
-				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
+				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionErrorReasonLabel:         "",
+				otelcollector.DecisionRejectReasonLabel:        "",
+				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
+				otelcollector.RateLimitersLabel:                []interface{}{},
+				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -166,13 +167,13 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
-				"authz_error":                   "ERROR_NO_ERROR",
-				"decision_type":                 "DECISION_TYPE_REJECTED",
-				"decision_reason":               "reject_reason:REJECT_REASON_RATE_LIMITED",
-				"rate_limiters":                 []interface{}{},
-				"dropping_rate_limiters":        []interface{}{},
-				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
+				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
+				otelcollector.DecisionRejectReasonLabel:        "REJECT_REASON_RATE_LIMITED",
+				otelcollector.RateLimitersLabel:                []interface{}{},
+				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -246,17 +247,17 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
 			map[string]interface{}{
-				"authz_error":            "ERROR_NO_ERROR",
-				"decision_type":          "DECISION_TYPE_ACCEPTED",
-				"decision_reason":        "error_reason:ERROR_REASON_UNSPECIFIED",
-				"rate_limiters":          []interface{}{},
-				"dropping_rate_limiters": []interface{}{},
-				"concurrency_limiters": []interface{}{
+				otelcollector.AuthzStatusLabel:          "STATUS_NO_ERROR",
+				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionErrorReasonLabel:  "ERROR_REASON_UNSPECIFIED",
+				otelcollector.RateLimitersLabel:         []interface{}{},
+				otelcollector.DroppingRateLimitersLabel: []interface{}{},
+				otelcollector.ConcurrencyLimitersLabel: []interface{}{
 					"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash",
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
 					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
 				},
-				"dropping_concurrency_limiters": []interface{}{
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
 					"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash",
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
 				},
@@ -336,13 +337,14 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
-				"decision_type":                 "DECISION_TYPE_ACCEPTED",
-				"decision_reason":               "",
-				"flux_meters":                   []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
-				"rate_limiters":                 []interface{}{},
-				"dropping_rate_limiters":        []interface{}{},
-				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionErrorReasonLabel:         "",
+				otelcollector.DecisionRejectReasonLabel:        "",
+				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
+				otelcollector.RateLimitersLabel:                []interface{}{},
+				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -379,12 +381,12 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
-				"decision_type":                 "DECISION_TYPE_REJECTED",
-				"decision_reason":               "reject_reason:REJECT_REASON_RATE_LIMITED",
-				"rate_limiters":                 []interface{}{},
-				"dropping_rate_limiters":        []interface{}{},
-				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
+				otelcollector.DecisionRejectReasonLabel:        "REJECT_REASON_RATE_LIMITED",
+				otelcollector.RateLimitersLabel:                []interface{}{},
+				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -457,19 +459,19 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
 			map[string]interface{}{
-				"decision_type":   "DECISION_TYPE_ACCEPTED",
-				"decision_reason": "error_reason:ERROR_REASON_UNSPECIFIED",
-				"rate_limiters": []interface{}{
+				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionRejectReasonLabel: "REJECT_REASON_UNSPECIFIED",
+				otelcollector.RateLimitersLabel: []interface{}{
 					"policy_name:foo,component_index:1,policy_hash:foo-hash",
 				},
-				"dropping_rate_limiters": []interface{}{
+				otelcollector.DroppingRateLimitersLabel: []interface{}{
 					"policy_name:foo,component_index:1,policy_hash:foo-hash",
 				},
-				"concurrency_limiters": []interface{}{
+				otelcollector.ConcurrencyLimitersLabel: []interface{}{
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
 					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
 				},
-				"dropping_concurrency_limiters": []interface{}{
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
 					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
 				},
