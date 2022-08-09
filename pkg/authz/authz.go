@@ -85,8 +85,11 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	returnCheckResponse := func(fcResponse *flowcontrolv1.CheckResponse, authzResponse *flowcontrolv1.AuthzResponse, flowLabels classification.FlowLabels) *ext_authz.CheckResponse {
 		if fcResponse == nil {
 			fcResponse = &flowcontrolv1.CheckResponse{
-				DecisionType:     flowcontrolv1.DecisionType_DECISION_TYPE_UNSPECIFIED,
-				Reason:           nil,
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_UNSPECIFIED,
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					ErrorReason:  flowcontrolv1.DecisionReason_ERROR_REASON_UNSPECIFIED,
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
+				},
 				LimiterDecisions: nil,
 				FluxMeters:       nil,
 			}
@@ -99,7 +102,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 		if authzResponse == nil {
 			authzResponse = &flowcontrolv1.AuthzResponse{
-				Error: flowcontrolv1.AuthzResponse_ERROR_NO_ERROR,
+				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
 			}
 		}
 		marshalledAuthzResponse, err := protoMessageAsPbValue(authzResponse)
@@ -135,7 +138,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		default:
 			log.Warn().Str("traffic-direction", dirHeader[0]).Msg("invalid traffic-direction header")
 			authzResponse := &flowcontrolv1.AuthzResponse{
-				Error: flowcontrolv1.AuthzResponse_ERROR_INVALID_TRAFFIC_DIRECTION,
+				Status: flowcontrolv1.AuthzResponse_STATUS_INVALID_TRAFFIC_DIRECTION,
 			}
 			resp := returnCheckResponse(nil, authzResponse, nil)
 			return resp, errors.New("invalid traffic-direction")
@@ -166,7 +169,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	input, err := envoyauth.RequestToInput(req, logger, nil)
 	if err != nil {
 		authzResponse := &flowcontrolv1.AuthzResponse{
-			Error: flowcontrolv1.AuthzResponse_ERROR_CONVERT_TO_GO_MAP,
+			Status: flowcontrolv1.AuthzResponse_STATUS_CONVERT_TO_MAP_STRUCT,
 		}
 		resp := returnCheckResponse(nil, authzResponse, nil)
 		return resp, fmt.Errorf("converting raw input into rego input failed: %v", err)
@@ -175,7 +178,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	inputValue, err := ast.InterfaceToValue(input)
 	if err != nil {
 		authzResponse := &flowcontrolv1.AuthzResponse{
-			Error: flowcontrolv1.AuthzResponse_ERROR_CONVERT_TO_REGO_AST,
+			Status: flowcontrolv1.AuthzResponse_STATUS_CONVERT_TO_REGO_AST,
 		}
 		resp := returnCheckResponse(nil, authzResponse, nil)
 		return resp, fmt.Errorf("converting rego input to value failed: %v", err)
@@ -195,7 +198,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	newFlowLabels, err := h.classifier.Classify(ctx, svcs, labelsForMatching, direction, inputValue)
 	if err != nil {
 		authzResponse := &flowcontrolv1.AuthzResponse{
-			Error: flowcontrolv1.AuthzResponse_ERROR_CLASSIFY_FLOW_LABELS,
+			Status: flowcontrolv1.AuthzResponse_STATUS_CLASSIFY_FLOW_LABELS,
 		}
 		resp := returnCheckResponse(nil, authzResponse, nil)
 		return resp, fmt.Errorf("failed to classify: %v", err)
@@ -221,7 +224,6 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	fcResponse := h.fcHandler.CheckWithValues(ctx, selectors.ControlPoint{Traffic: direction}, svcs, labelsForMatching)
 
 	flowLabels := mergeFlowLabels(oldFlowLabels, newFlowLabels)
-	log.Warn().Msgf("Creating check response. Flow labels: %v, LimiterDecisions; %v, fluxmeters: %v", flowLabels, fcResponse.LimiterDecisions, fcResponse.FluxMeters)
 
 	resp := returnCheckResponse(fcResponse, nil, flowLabels)
 

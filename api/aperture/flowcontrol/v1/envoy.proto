@@ -3,13 +3,13 @@ syntax = "proto3";
 package aperture.flowcontrol.v1;
 
 message AuthzResponse {
-  enum Error {
-    ERROR_NO_ERROR = 0;
-    ERROR_INVALID_TRAFFIC_DIRECTION = 1;
-    ERROR_CONVERT_TO_GO_MAP = 2;
-    ERROR_CONVERT_TO_REGO_AST = 3;
-    ERROR_CLASSIFY_FLOW_LABELS = 4;
+  enum Status {
+    STATUS_NO_ERROR = 0;
+    STATUS_INVALID_TRAFFIC_DIRECTION = 1;
+    STATUS_CONVERT_TO_MAP_STRUCT = 2;
+    STATUS_CONVERT_TO_REGO_AST = 3;
+    STATUS_CLASSIFY_FLOW_LABELS = 4;
   }
 
-  Error error = 1;
+  Status status = 1;
 }

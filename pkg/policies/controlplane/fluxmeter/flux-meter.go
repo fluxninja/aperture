@@ -108,6 +108,8 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 	return nil
 }
 
+// TODO (hasit): rename fluxmeter metric name to a static one 'flux_meter'
+
 // registerFluxMeter registers histograms for fluxmeter in controller.
 func registerFluxMeter(fluxMeterProto *policylangv1.FluxMeter, componentAPI component.ComponentAPI, metricSubRegistry policyapi.MetricSubRegistry) error {
 	// Original metric name

@@ -106,7 +106,7 @@ var _ = Describe("Metrics Processor", func() {
 				},
 			},
 			&flowcontrolv1.AuthzResponse{
-				Error: flowcontrolv1.AuthzResponse_ERROR_NO_ERROR,
+				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
 			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
@@ -134,10 +134,8 @@ var _ = Describe("Metrics Processor", func() {
 			otelcollector.ControlPointFeature,
 			&flowcontrolv1.CheckResponse{
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
-				Reason: &flowcontrolv1.Reason{
-					Reason: &flowcontrolv1.Reason_RejectReason_{
-						RejectReason: flowcontrolv1.Reason_REJECT_REASON_RATE_LIMITED,
-					},
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_RATE_LIMITED,
 				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
@@ -155,7 +153,7 @@ var _ = Describe("Metrics Processor", func() {
 				FluxMeters: []*flowcontrolv1.FluxMeter{},
 			},
 			&flowcontrolv1.AuthzResponse{
-				Error: flowcontrolv1.AuthzResponse_ERROR_NO_ERROR,
+				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
 			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
@@ -182,10 +180,8 @@ var _ = Describe("Metrics Processor", func() {
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
-				Reason: &flowcontrolv1.Reason{
-					Reason: &flowcontrolv1.Reason_ErrorReason_{
-						ErrorReason: flowcontrolv1.Reason_ERROR_REASON_UNSPECIFIED,
-					},
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
 				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
@@ -225,7 +221,7 @@ var _ = Describe("Metrics Processor", func() {
 				FluxMeters: []*flowcontrolv1.FluxMeter{},
 			},
 			&flowcontrolv1.AuthzResponse{
-				Error: flowcontrolv1.AuthzResponse_ERROR_NO_ERROR,
+				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
 			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
@@ -354,10 +350,8 @@ var _ = Describe("Metrics Processor", func() {
 			otelcollector.ControlPointFeature,
 			&flowcontrolv1.CheckResponse{
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
-				Reason: &flowcontrolv1.Reason{
-					Reason: &flowcontrolv1.Reason_RejectReason_{
-						RejectReason: flowcontrolv1.Reason_REJECT_REASON_RATE_LIMITED,
-					},
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_RATE_LIMITED,
 				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
@@ -398,10 +392,8 @@ var _ = Describe("Metrics Processor", func() {
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
-				Reason: &flowcontrolv1.Reason{
-					Reason: &flowcontrolv1.Reason_ErrorReason_{
-						ErrorReason: flowcontrolv1.Reason_ERROR_REASON_UNSPECIFIED,
-					},
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
 				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{

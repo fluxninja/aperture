@@ -77,10 +77,8 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	// Do not execute concurrency limiters.
 	if rateLimitersDecisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
 		response.DecisionType = rateLimitersDecisionType
-		response.Reason = &flowcontrolv1.Reason{
-			Reason: &flowcontrolv1.Reason_RejectReason_{
-				RejectReason: flowcontrolv1.Reason_REJECT_REASON_RATE_LIMITED,
-			},
+		response.DecisionReason = &flowcontrolv1.DecisionReason{
+			RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_RATE_LIMITED,
 		}
 		return
 	}
@@ -94,10 +92,8 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 
 	if concurrencyLimitersDecisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
 		response.DecisionType = flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED
-		response.Reason = &flowcontrolv1.Reason{
-			Reason: &flowcontrolv1.Reason_RejectReason_{
-				RejectReason: flowcontrolv1.Reason_REJECT_REASON_CONCURRENCY_LIMITED,
-			},
+		response.DecisionReason = &flowcontrolv1.DecisionReason{
+			RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_CONCURRENCY_LIMITED,
 		}
 		return
 	}

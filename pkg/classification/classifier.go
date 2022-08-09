@@ -219,8 +219,6 @@ func (c *Classifier) Classify(
 
 	flowLabels := make(FlowLabels)
 
-	// TODO (hasit): add equivalent catchall mm here as well.
-
 	controlPoint := selectors.ControlPoint{Traffic: direction}
 	camm, exists := catchAllLabelers[controlPoint]
 	if exists {
@@ -277,29 +275,30 @@ func (c *Classifier) AddRules(
 	var catchAllCompiled catchAllCompiledRuleset
 	var err error
 
-	if classifier.Selector.Service == "" {
-		catchAllCompiled, err = compileCatchAllRuleset(ctx, name, classifier)
-		if err != nil {
-			return ActiveRuleset{}, err
-		}
-	} else {
-		compiled, err = compileRuleset(ctx, name, classifier)
-		if err != nil {
-			return ActiveRuleset{}, err
-		}
-	}
-
 	c.activeRulesetsMu.Lock()
 	defer c.activeRulesetsMu.Unlock()
-	id := c.nextRulesetID
-	c.nextRulesetID++
 	// Why index activeRulesets via ID instead of provided name?
 	// * more robust if caller provides non-unique names
 	// * when modifying file, one approach would be to first unload old ruleset
 	//   and load a new one – in this case duplicated name is kinda expected.
 	// So the name is used only for reporting.
-	c.activeRulesets[id] = compiled
-	c.catchAllActiveRulesets[id] = catchAllCompiled
+	id := c.nextRulesetID
+	c.nextRulesetID++
+
+	if classifier.Selector.Service == "" {
+		catchAllCompiled, err = compileCatchAllRuleset(ctx, name, classifier)
+		if err != nil {
+			return ActiveRuleset{}, err
+		}
+		c.catchAllActiveRulesets[id] = catchAllCompiled
+	} else {
+		compiled, err = compileRuleset(ctx, name, classifier)
+		if err != nil {
+			return ActiveRuleset{}, err
+		}
+		c.activeRulesets[id] = compiled
+	}
+
 	c.activateRulesets()
 	return ActiveRuleset{id: id, classifier: c}, nil
 }
@@ -504,7 +503,7 @@ func compileRules(
 // needs to be called with activeRulesets mutex held.
 func (c *Classifier) activateRulesets() {
 	c.activeRules.Store(c.combineRulesets())
-	log.Info().Int("rulesets", len(c.activeRulesets)).Msg("Rules updated")
+	log.Info().Int("rulesets", len(c.activeRulesets)+len(c.catchAllActiveRulesets)).Msg("Rules updated")
 }
 
 func (c *Classifier) combineRulesets() rules {

@@ -1,6 +1,6 @@
 package otelcollector
 
-// TODO: organize the contants by their usage.
+// TODO: organize the constants by their usage.
 // example:
 // aperture.* are used in ext_authz.CheckResponse.DynamicMetadata
 // others are being used to get attributes from traces and logs
@@ -19,8 +19,8 @@ const (
 	// MarshalledAuthzResponseLabel contains JSON encoded response from authz.
 	MarshalledAuthzResponseLabel = "aperture.authz_response"
 
-	// AuthzErrorLabel describes the error occurred during authz processing.
-	AuthzErrorLabel = "authz_error"
+	// AuthzStatusLabel describes the status reported from authz processing.
+	AuthzStatusLabel = "authz_status"
 
 	// MarshalledCheckResponseLabel contains JSON encoded check response struct.
 	MarshalledCheckResponseLabel = "aperture.check_response"
@@ -53,8 +53,10 @@ const (
 	FeatureDurationLabel = "feature.duration_millis"
 	// DecisionTypeLabel descibes the decision type taken by policy.
 	DecisionTypeLabel = "decision_type"
-	// DecisionReasonLabel descibes the reason of the decision taken by policy.
-	DecisionReasonLabel = "decision_reason"
+	// DecisionErrorReasonLabel descibes the error reason of the decision taken by policy.
+	DecisionErrorReasonLabel = "decision_error_reason"
+	// DecisionRejectReasonLabel descibes the reject reason of the decision taken by policy.
+	DecisionRejectReasonLabel = "decision_reject_reason"
 	// RateLimitersLabel describes rate limiters matched to the traffic.
 	RateLimitersLabel = "rate_limiters"
 	// DroppingRateLimitersLabel describes rate limiters dropping the traffic.
@@ -84,6 +86,5 @@ const (
 	// AgentGroupLabel describes cluster to which metrics refer.
 	AgentGroupLabel = "agent_group"
 	// ServicesLabel describes services to which metrics refer.
-	// This is comma-separated list.
 	ServicesLabel = "services"
 )

@@ -96,6 +96,8 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
+		log.Debug().Msgf("ConsumeLogs attributes: %+v", logRecord.Attributes())
+
 		checkResponse := otelcollector.GetCheckResponse(logRecord.Attributes())
 		if checkResponse == nil {
 			return errors.New("failed getting check response from attributes")
@@ -125,9 +127,8 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 
 func (p *metricsProcessor) addAuthzResponseBasedLabels(attributes pcommon.Map, authzResponse *flowcontrolv1.AuthzResponse) {
 	labels := map[string]pcommon.Value{
-		otelcollector.AuthzErrorLabel: pcommon.NewValueSlice(),
+		otelcollector.AuthzStatusLabel: pcommon.NewValueString(authzResponse.GetStatus().String()),
 	}
-	labels[otelcollector.AuthzErrorLabel] = pcommon.NewValueString(authzResponse.Error.String())
 	for key, value := range labels {
 		attributes.Insert(key, value)
 	}
@@ -150,10 +151,12 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 		otelcollector.DroppingConcurrencyLimitersLabel: pcommon.NewValueSlice(),
 		otelcollector.FluxMetersLabel:                  pcommon.NewValueSlice(),
 		otelcollector.DecisionTypeLabel:                pcommon.NewValueString(checkResponse.DecisionType.String()),
-		otelcollector.DecisionReasonLabel:              pcommon.NewValueString(""),
+		otelcollector.DecisionRejectReasonLabel:        pcommon.NewValueString(""),
+		otelcollector.DecisionErrorReasonLabel:         pcommon.NewValueString(""),
 	}
-	if checkResponse.Reason != nil && checkResponse.Reason.Reason != nil {
-		labels[otelcollector.DecisionReasonLabel] = pcommon.NewValueString(checkResponse.Reason.String())
+	if checkResponse.DecisionReason != nil {
+		labels[otelcollector.DecisionErrorReasonLabel] = pcommon.NewValueString(checkResponse.DecisionReason.GetErrorReason().String())
+		labels[otelcollector.DecisionRejectReasonLabel] = pcommon.NewValueString(checkResponse.DecisionReason.GetRejectReason().String())
 	}
 	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiter() != nil {

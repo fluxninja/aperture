@@ -40,7 +40,7 @@ func (msg *CheckResponse) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Reason) MarshalJSON() ([]byte, error) {
+func (msg *DecisionReason) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -49,7 +49,7 @@ func (msg *Reason) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Reason) UnmarshalJSON(b []byte) error {
+func (msg *DecisionReason) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
