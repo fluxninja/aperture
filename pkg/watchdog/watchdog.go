@@ -283,7 +283,8 @@ func newHeapPolicy(config HeapConfig) *heapPolicy {
 	// get the initial effective GoGC; guess it's 100 (default), and restore
 	// it to whatever it actually was. This works because SetGCPercent
 	// returns the previous value.
-	hp.originalGoGC = debug.SetGCPercent(debug.SetGCPercent(100))
+	hp.originalGoGC = debug.SetGCPercent(100)
+	debug.SetGCPercent(hp.originalGoGC)
 	hp.currGoGC = hp.originalGoGC
 	return &hp
 }
