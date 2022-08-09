@@ -14,3 +14,4 @@ coverage:
         target: 0%
 ignore:
   - "**/generated/**"
+  - "**/gen/**"
