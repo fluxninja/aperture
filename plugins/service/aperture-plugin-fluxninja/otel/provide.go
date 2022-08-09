@@ -1,6 +1,7 @@
 package otel
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"time"
@@ -14,29 +15,32 @@ import (
 	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/heartbeats"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
 )
 
 const (
 	processorBatchMetricsSlow = "batch/metrics-slow"
 	processorRollup           = "rollup"
+	processorAttributes       = "attributes/insert"
 
 	exporterFluxninja = "otlp/fluxninja"
 )
 
-func ProvideAnnotatedPluginConfig() fx.Option {
-	return fx.Option(
+func Module() fx.Option {
+	return fx.Options(
 		fx.Provide(
 			fx.Annotate(
-				ProvidePluginOTELConfig,
+				Provide,
 				fx.ParamTags(config.NameTag("base"), config.NameTag("heartbeats-grpc-client-config"), config.NameTag("heartbeats-http-client-config")),
 				fx.ResultTags(config.GroupTag("plugin")),
 			),
 		),
+		fx.Invoke(Invoke),
 	)
 }
 
-func ProvidePluginOTELConfig(baseConfig *otelcollector.OTELConfig,
+func Provide(baseConfig *otelcollector.OTELConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 	unmarshaller config.Unmarshaller,
@@ -47,27 +51,65 @@ func ProvidePluginOTELConfig(baseConfig *otelcollector.OTELConfig,
 	}
 	config := otelcollector.NewOTELConfig()
 	addFluxninjaExporter(config, &pluginConfig, grpcClientConfig, httpClientConfig)
-	if logsPipeline, exists := baseConfig.Service.Pipeline("logs"); exists {
-		addPipelineWithFNExporter("logs", config, &pluginConfig, logsPipeline)
-	}
-	if tracesPipeline, exists := baseConfig.Service.Pipeline("traces"); exists {
-		addPipelineWithFNExporter("traces", config, &pluginConfig, tracesPipeline)
-	}
-	if _, exists := baseConfig.Service.Pipeline("metrics/fast"); exists {
-		addMetricsSlowPipeline(config)
-	}
-	if metricsPipeline, exists := baseConfig.Service.Pipeline("metrics/controller"); exists {
-		addPipelineWithFNExporter("metrics/fluxninja", config, &pluginConfig, metricsPipeline)
-	}
+
 	return config, nil
 }
 
-func addPipelineWithFNExporter(
+type ConstructorIn struct {
+	fx.In
+	Lifecycle     fx.Lifecycle
+	BaseConfig    *otelcollector.OTELConfig   `name:"base"`
+	PluginConfigs []*otelcollector.OTELConfig `group:"plugin"`
+	Heartbeats    *heartbeats.Heartbeats
+}
+
+func Invoke(in ConstructorIn) {
+	in.Lifecycle.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			controllerID := in.Heartbeats.GetControllerInfo().Id
+
+			for _, config := range in.PluginConfigs {
+				addAttributesProcessor(config, controllerID)
+
+				if logsPipeline, exists := in.BaseConfig.Service.Pipeline("logs"); exists {
+					addFNToPipeline("logs", config, logsPipeline)
+				}
+				if tracesPipeline, exists := in.BaseConfig.Service.Pipeline("traces"); exists {
+					addFNToPipeline("traces", config, tracesPipeline)
+				}
+				if _, exists := in.BaseConfig.Service.Pipeline("metrics/fast"); exists {
+					addMetricsSlowPipeline(config)
+				}
+				if metricsPipeline, exists := in.BaseConfig.Service.Pipeline("metrics/controller"); exists {
+					addFNToPipeline("metrics/fluxninja", config, metricsPipeline)
+				}
+			}
+			return nil
+		},
+		OnStop: func(context.Context) error {
+			return nil
+		},
+	})
+}
+
+func addAttributesProcessor(config *otelcollector.OTELConfig, controllerID string) {
+	config.AddProcessor(processorAttributes, map[string]interface{}{
+		"actions": []map[string]interface{}{
+			{
+				"key":    "controller_id",
+				"action": "insert",
+				"value":  controllerID,
+			},
+		},
+	})
+}
+
+func addFNToPipeline(
 	name string,
 	config *otelcollector.OTELConfig,
-	pluginConfig *pluginconfig.FluxNinjaPluginConfig,
 	pipeline otelcollector.Pipeline,
 ) {
+	pipeline.Processors = append(pipeline.Processors, processorAttributes)
 	pipeline.Exporters = append(pipeline.Exporters, exporterFluxninja)
 	config.Service.AddPipeline(name, pipeline)
 }
@@ -79,6 +121,7 @@ func addMetricsSlowPipeline(config *otelcollector.OTELConfig) {
 		Processors: []string{
 			otel.ProcessorEnrichment,
 			processorBatchMetricsSlow,
+			processorAttributes,
 		},
 		Exporters: []string{exporterFluxninja},
 	})

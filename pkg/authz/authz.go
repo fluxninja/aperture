@@ -182,7 +182,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	}
 
 	flowLabels := mergeFlowLabels(oldFlowLabels, newFlowLabels)
-	log.Warn().Msgf("Creating check response. Flow labels: %v, LimiterDecisions; %v, fluxmeters: %v", flowLabels, fcResponse.LimiterDecisions, fcResponse.FluxMeters)
+	log.Trace().Msgf("Creating check response. Flow labels: %v, LimiterDecisions; %v, fluxmeters: %v", flowLabels, fcResponse.LimiterDecisions, fcResponse.FluxMeters)
 	marshalledCheckResponse, err := protoMessageAsPbValue(fcResponse)
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed marshaling check response")
