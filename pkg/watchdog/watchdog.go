@@ -73,6 +73,13 @@ type WatchdogIn struct {
 	Lifecycle      fx.Lifecycle
 }
 
+type watchdog struct {
+	statusRegistry *status.Registry
+	jobGroup       *jobs.JobGroup
+	watchdogJob    *jobs.MultiJob
+	config         WatchdogConfig
+}
+
 func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 	config := constructor.DefaultConfig
 
@@ -81,96 +88,110 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 		return err
 	}
 
-	var gcs *gcSentinel
+	gcs := newSentinel()
 	// Heap memory check
 	var hp *heapPolicy
 
+	w := watchdog{
+		statusRegistry: in.StatusRegistry,
+		jobGroup:       in.JobGroup,
+		watchdogJob:    in.WatchdogJob,
+		config:         config,
+	}
+
 	in.Lifecycle.Append(fx.Hook{
-		OnStart: func(context.Context) error {
-			var err error
-
-			// CGroup memory check
-			if runtime.GOOS == "linux" {
-				job := &jobs.BasicJob{
-					JobBase: jobs.JobBase{
-						JobName: "cgroup",
-					},
-				}
-				if config.CGroup.WatermarksPolicy.Enabled {
-					cgw := &cgroupWatermarks{WatermarksPolicy: config.CGroup.WatermarksPolicy}
-					job.JobFunc = cgw.Check
-				} else if config.CGroup.AdaptivePolicy.Enabled {
-					cga := &cgroupAdaptive{AdaptivePolicy: config.CGroup.AdaptivePolicy}
-					job.JobFunc = cga.Check
-				}
-				err = in.WatchdogJob.RegisterJob(job)
-				if err != nil {
-					return err
-				}
-			}
-
-			if config.System.WatermarksPolicy.Enabled || config.System.AdaptivePolicy.Enabled {
-				job := &jobs.BasicJob{
-					JobBase: jobs.JobBase{
-						JobName: "system",
-					},
-				}
-				// System memory check
-				if config.System.WatermarksPolicy.Enabled {
-					sw := &systemWatermarks{WatermarksPolicy: config.System.WatermarksPolicy}
-					job.JobFunc = sw.Check
-				} else if config.System.AdaptivePolicy.Enabled {
-					sa := &systemAdaptive{AdaptivePolicy: config.System.AdaptivePolicy}
-					job.JobFunc = sa.Check
-				}
-				err = in.WatchdogJob.RegisterJob(job)
-				if err != nil {
-					return err
-				}
-			}
-
-			if config.Heap.WatermarksPolicy.Enabled || config.Heap.AdaptivePolicy.Enabled {
-				hp = newHeapPolicy(config.Heap)
-				s := status.NewStatus(nil, nil)
-				err := in.StatusRegistry.Push(heapStatusKey, s)
-				if err != nil {
-					return err
-				}
-			}
-
-			gcs = newSentinel()
-			// start a go routine to track GC
-			panichandler.Go(func() {
-				for {
-					select {
-					case <-gcs.gcTriggered:
-						log.Trace().Msg("GC detected, triggering watchdog checks")
-						in.JobGroup.TriggerJob(watchdogMultiJobName)
-						if hp != nil {
-							details, e := hp.checkHeap()
-							s := status.NewStatus(details, e)
-							err := in.StatusRegistry.Push(heapStatusKey, s)
-							if err != nil {
-								log.Error().Err(err).Msg("Unable to push heap check results to status registry")
-							}
-						}
-					case <-gcs.ctx.Done():
-						return
-					}
-				}
-			})
-
-			return nil
+		OnStart: func(ctx context.Context) error {
+			return setupWatchdogOnStart(ctx, w, gcs, hp)
 		},
-		OnStop: func(context.Context) error {
-			gcs.stop()
-			_ = in.WatchdogJob.DeregisterJob("cgroup")
-			_ = in.WatchdogJob.DeregisterJob("system")
-			in.StatusRegistry.Delete(heapStatusKey)
-			return nil
+		OnStop: func(ctx context.Context) error {
+			return setupWatchdogOnStop(ctx, w, gcs)
 		},
 	})
 
+	return nil
+}
+
+func setupWatchdogOnStart(ctx context.Context, w watchdog, gcs *gcSentinel, hp *heapPolicy) error {
+	var err error
+
+	// CGroup memory check
+	if runtime.GOOS == "linux" {
+		job := &jobs.BasicJob{
+			JobBase: jobs.JobBase{
+				JobName: "cgroup",
+			},
+		}
+		if w.config.CGroup.WatermarksPolicy.Enabled {
+			cgw := &cgroupWatermarks{WatermarksPolicy: w.config.CGroup.WatermarksPolicy}
+			job.JobFunc = cgw.Check
+		} else if w.config.CGroup.AdaptivePolicy.Enabled {
+			cga := &cgroupAdaptive{AdaptivePolicy: w.config.CGroup.AdaptivePolicy}
+			job.JobFunc = cga.Check
+		}
+		err = w.watchdogJob.RegisterJob(job)
+		if err != nil {
+			return err
+		}
+	}
+
+	if w.config.System.WatermarksPolicy.Enabled || w.config.System.AdaptivePolicy.Enabled {
+		job := &jobs.BasicJob{
+			JobBase: jobs.JobBase{
+				JobName: "system",
+			},
+		}
+		// System memory check
+		if w.config.System.WatermarksPolicy.Enabled {
+			sw := &systemWatermarks{WatermarksPolicy: w.config.System.WatermarksPolicy}
+			job.JobFunc = sw.Check
+		} else if w.config.System.AdaptivePolicy.Enabled {
+			sa := &systemAdaptive{AdaptivePolicy: w.config.System.AdaptivePolicy}
+			job.JobFunc = sa.Check
+		}
+		err = w.watchdogJob.RegisterJob(job)
+		if err != nil {
+			return err
+		}
+	}
+
+	if w.config.Heap.WatermarksPolicy.Enabled || w.config.Heap.AdaptivePolicy.Enabled {
+		hp = newHeapPolicy(w.config.Heap)
+		s := status.NewStatus(nil, nil)
+		err := w.statusRegistry.Push(heapStatusKey, s)
+		if err != nil {
+			return err
+		}
+	}
+
+	// start a go routine to track GC
+	panichandler.Go(func() {
+		for {
+			select {
+			case <-gcs.gcTriggered:
+				log.Trace().Msg("GC detected, triggering watchdog checks")
+				w.jobGroup.TriggerJob(watchdogMultiJobName)
+				if hp != nil {
+					details, e := hp.checkHeap()
+					s := status.NewStatus(details, e)
+					err := w.statusRegistry.Push(heapStatusKey, s)
+					if err != nil {
+						log.Error().Err(err).Msg("Unable to push heap check results to status registry")
+					}
+				}
+			case <-gcs.ctx.Done():
+				return
+			}
+		}
+	})
+
+	return nil
+}
+
+func setupWatchdogOnStop(ctx context.Context, w watchdog, gcs *gcSentinel) error {
+	gcs.stop()
+	_ = w.watchdogJob.DeregisterJob("cgroup")
+	_ = w.watchdogJob.DeregisterJob("system")
+	w.statusRegistry.Delete(heapStatusKey)
 	return nil
 }
 
@@ -261,8 +282,12 @@ func newHeapPolicy(config HeapConfig) *heapPolicy {
 	// get the initial effective GoGC; guess it's 100 (default), and restore
 	// it to whatever it actually was. This works because SetGCPercent
 	// returns the previous value.
-	hp.originalGoGC = debug.SetGCPercent(debug.SetGCPercent(100))
+	hp.originalGoGC = debug.SetGCPercent(100)
+	debug.SetGCPercent(hp.originalGoGC)
 	hp.currGoGC = hp.originalGoGC
+	// Setting go's memory limit to the configured value, changes was needed after go 1.19, limit will be respected even if gc is disabled.
+	debug.SetMemoryLimit(int64(config.Limit))
+
 	return &hp
 }
 
