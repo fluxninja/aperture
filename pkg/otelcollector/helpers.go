@@ -138,7 +138,7 @@ func UnmarshalStringVal(value pcommon.Value, labelName string, output interface{
 	stringVal := value.StringVal()
 
 	if stringVal == MissingAttributeSourceValue {
-		log.Debug().Str("label", labelName).Msg("Missing attribute source")
+		log.Trace().Str("label", labelName).Msg("Missing attribute source")
 		return true
 	}
 

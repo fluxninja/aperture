@@ -190,9 +190,12 @@ func (c *Classifier) Classify(
 	direction selectors.TrafficDirection,
 	input ast.Value,
 ) (FlowLabels, error) {
-	r := c.activeRules.Load().(rules)
-
 	flowLabels := make(FlowLabels)
+
+	r, ok := c.activeRules.Load().(rules)
+	if !ok {
+		return flowLabels, nil
+	}
 
 	cp := selectors.ControlPoint{
 		Traffic: direction,

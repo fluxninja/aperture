@@ -57,7 +57,7 @@ func (tbls *TokenBucketLoadShed) SetLoadShedFactor(now time.Time, lsf float64) {
 		if !tbls.counter.IsBootstrapping() {
 			// set fillRate based on latest sched.tokenRate
 			tbls.tbb.setFillRate(now, tbls.counter.CalculateTokenRate()*(1-tbls.lsf))
-			log.Debug().
+			log.Trace().
 				Float64("loadShedFactor", lsf).
 				Float64("calculated fillRate", tbls.tbb.getFillRate()).
 				Float64("calculated token rate", tbls.counter.CalculateTokenRate()).

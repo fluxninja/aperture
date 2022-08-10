@@ -4,6 +4,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/services"
 )
@@ -12,7 +13,7 @@ import (
 
 // EngineAPI is an interface for registering fluxmeters and schedulers.
 type EngineAPI interface {
-	ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse
+	ProcessRequest(agentGroup string, controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse
 
 	RegisterConcurrencyLimiter(sa Limiter) error
 	UnregisterConcurrencyLimiter(sa Limiter) error
@@ -30,4 +31,12 @@ type MultiMatchResult struct {
 	ConcurrencyLimiters []Limiter
 	FluxMeters          []FluxMeter
 	RateLimiters        []RateLimiter
+}
+
+// PopulateFromMultiMatcher populates result object with results from MultiMatcher.
+func (result *MultiMatchResult) PopulateFromMultiMatcher(mm *multimatcher.MultiMatcher[string, MultiMatchResult], labels selectors.Labels) {
+	resultCollection := mm.Match(multimatcher.Labels(labels.ToPlainMap()))
+	result.ConcurrencyLimiters = append(result.ConcurrencyLimiters, resultCollection.ConcurrencyLimiters...)
+	result.FluxMeters = append(result.FluxMeters, resultCollection.FluxMeters...)
+	result.RateLimiters = append(result.RateLimiters, resultCollection.RateLimiters...)
 }
