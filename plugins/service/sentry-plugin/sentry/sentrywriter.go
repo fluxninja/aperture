@@ -19,6 +19,7 @@ import (
 var _ = io.WriteCloser(new(SentryWriter))
 
 const (
+	// SentryFlushWait is the duration to wait for the sentry client to flush its queue.
 	SentryFlushWait = "5000ms"
 )
 
@@ -31,6 +32,7 @@ var zerologToSentryLevel = map[zerolog.Level]sentry.Level{
 	log.PanicLevel: sentry.LevelFatal,
 }
 
+// SentryWriter is a writer that forwards the data to the sentry client and the CrashWriter.
 type SentryWriter struct {
 	Client         *sentry.Client
 	Levels         map[zerolog.Level]struct{}
@@ -38,6 +40,7 @@ type SentryWriter struct {
 	StatusRegistry *status.Registry
 }
 
+// Write implements io.Writer and forwards the data to CrashWriter buffer.
 func (s *SentryWriter) Write(data []byte) (int, error) {
 	event, ok := s.parseLogEvent(data)
 
@@ -100,6 +103,7 @@ func (s *SentryWriter) parseLogEvent(data []byte) (*sentry.Event, bool) {
 	return &event, true
 }
 
+// Close implements io.Closer and wait for the sentry client to flush its queue.
 func (s *SentryWriter) Close() error {
 	duration, _ := time.ParseDuration(SentryFlushWait)
 	s.Client.Flush(duration)
@@ -110,55 +114,86 @@ func bytesToStrUnsafe(data []byte) string {
 	return *(*string)(unsafe.Pointer(&data))
 }
 
-// func RegisterSentryPanicHandler() {}
-
+// SentryPanicHandler is a panic handler that sends the fatal level event to Sentry with diagnostic information.
 func (s *SentryWriter) SentryPanicHandler(e interface{}, _ panichandler.Callstack) {
 	duration, _ := time.ParseDuration(SentryFlushWait)
 
 	// Crash Log
-	var crashLogData map[string]interface{}
-	crashLog := s.CrashWriter.GetCrashLog()
-	err := json.Unmarshal(crashLog, &crashLogData)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to unmarshal crash log")
-	}
-
-	sentry.AddBreadcrumb(&sentry.Breadcrumb{
-		Category: "Crash report",
-		Level:    sentry.LevelInfo,
-		Data:     crashLogData,
-	})
-
-	// Dump Status Registry
-	var statusData map[string]interface{}
-	status := s.StatusRegistry.Get("")
-	if status != nil {
-		groupStatus, err := json.MarshalIndent(status, "", " ")
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to marshal status registry")
+	crashLogs := s.CrashWriter.GetCrashLogs()
+	for _, crashLog := range crashLogs {
+		levelStr, ok := crashLog["level"].(string)
+		if !ok {
+			levelStr = "info"
 		}
-
-		err = json.Unmarshal(groupStatus, &statusData)
+		level, err := zerolog.ParseLevel(levelStr)
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to unmarshal status registry")
+			level = zerolog.InfoLevel
 		}
+		sentryLevel := zerologToSentryLevel[level]
+		delete(crashLog, "level")
+
+		msg, ok := crashLog["message"].(string)
+		if !ok {
+			msg = ""
+		}
+		delete(crashLog, "message")
+
+		timestamp, ok := crashLog["timestamp"].(time.Time)
+		if !ok {
+			timestamp = time.Now()
+		}
+		delete(crashLog, "timestamp")
 
 		sentry.AddBreadcrumb(&sentry.Breadcrumb{
-			Category: "Status Registry",
-			Level:    sentry.LevelInfo,
-			Data:     statusData,
+			Type:      "debug",
+			Category:  "Log",
+			Level:     sentryLevel,
+			Data:      crashLog,
+			Message:   msg,
+			Timestamp: timestamp,
 		})
 	}
 
+	// Dump Status Registry
+	status, err := s.StatusRegistry.GetAllFlat()
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to dump status registry")
+	} else {
+		if status != nil {
+			groupStatus, err := json.Marshal(status)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to marshal status registry")
+			}
+
+			statusData := make(map[string]interface{})
+			err = json.Unmarshal(groupStatus, &statusData)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to unmarshal status registry")
+			}
+
+			sentry.AddBreadcrumb(&sentry.Breadcrumb{
+				Category: "Status Registry",
+				Level:    sentry.LevelInfo,
+				Data:     statusData,
+			})
+		} else {
+			sentry.AddBreadcrumb(&sentry.Breadcrumb{
+				Category: "Status Registry",
+				Level:    sentry.LevelInfo,
+				Message:  "No Status Registry found",
+			})
+		}
+	}
+
 	// Service Version Information
-	var versionData map[string]interface{}
 	versionInfo := info.GetVersionInfo()
 	if versionInfo != nil {
-		vInfo, err := json.MarshalIndent(versionInfo, "", " ")
+		vInfo, err := json.Marshal(versionInfo)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to marshal version information")
 		}
 
+		versionData := make(map[string]interface{})
 		err = json.Unmarshal(vInfo, &versionData)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to unmarshal version information")
@@ -168,6 +203,12 @@ func (s *SentryWriter) SentryPanicHandler(e interface{}, _ panichandler.Callstac
 			Category: "Version Information",
 			Level:    sentry.LevelInfo,
 			Data:     versionData,
+		})
+	} else {
+		sentry.AddBreadcrumb(&sentry.Breadcrumb{
+			Category: "Version Information",
+			Level:    sentry.LevelInfo,
+			Message:  "No Version Information found",
 		})
 	}
 

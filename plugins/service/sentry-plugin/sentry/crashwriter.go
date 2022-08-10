@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"encoding/json"
 	"io"
 	"os"
 	"sync"
@@ -9,7 +10,7 @@ import (
 	"github.com/fluxninja/lumberjack"
 )
 
-const logCountLimit = 100
+const logCountLimit = 20
 
 // CrashWriter defines a crash writer with buffer to store the logs when the app crashes.
 type CrashWriter struct {
@@ -39,13 +40,19 @@ func (w *CrashWriter) Write(data []byte) (n int, err error) {
 		_ = w.buffer.Remove()
 	}
 
+	var log map[string]interface{}
+	err = json.Unmarshal(data, &log)
+	if err != nil {
+		return 0, err
+	}
+
 	// Puts data on the end of the queue buffer.
-	w.buffer.Add(data)
+	w.buffer.Add(log)
 
 	return len(data), nil
 }
 
-// Flush writes last 100 lines of logs up until crash to the disk.
+// Flush writes last 20 lines of logs up until crash to the disk.
 func (w *CrashWriter) Flush(lg io.Writer) {
 	w.crashLock.Lock()
 	defer w.crashLock.Unlock()
@@ -60,21 +67,18 @@ func (w *CrashWriter) Flush(lg io.Writer) {
 	}
 }
 
-func (w *CrashWriter) GetCrashLog() []byte {
+// GetCrashLogs returns the logs buffered in the crash writer until the crash.
+func (w *CrashWriter) GetCrashLogs() []map[string]interface{} {
 	w.crashLock.Lock()
 	defer w.crashLock.Unlock()
-	var data []byte
 
-	for {
-		if w.buffer.Length() > 0 {
-			log := w.buffer.Remove()
-			data = append(data, log.([]byte)...)
-		} else {
-			break
-		}
+	logs := []map[string]interface{}{}
+	for w.buffer.Length() > 0 {
+		log := w.buffer.Remove().(map[string]interface{})
+		logs = append(logs, log)
 	}
 
-	return data
+	return logs
 }
 
 // NewCrashFileWriter returns a lumberjack rolling logger which is used to write crash logs to the output file.

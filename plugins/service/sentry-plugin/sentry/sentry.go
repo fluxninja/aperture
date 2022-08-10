@@ -38,7 +38,7 @@ type SentryConfig struct {
 	Disabled bool `json:"disabled" default:"false"`
 }
 
-// SentryWriterConstructor.
+// SentryWriterConstructor holds fields to create an annotated instance of Sentry Writer.
 type SentryWriterConstructor struct {
 	// Name of sentry instance
 	Name string
@@ -48,7 +48,7 @@ type SentryWriterConstructor struct {
 	DefaultConfig SentryConfig
 }
 
-// Annotate Fx provide.
+// Annotate creates an annotated instance of SentryWriter.
 func (constructor SentryWriterConstructor) Annotate() fx.Option {
 	var group string
 	if constructor.Name == "" {
@@ -66,7 +66,7 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusReg *status.Registry, lifecycle fx.Lifecycle) (io.Writer, error) {
+func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusRegistry *status.Registry, lifecycle fx.Lifecycle) (io.Writer, error) {
 	config := constructor.DefaultConfig
 
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
@@ -79,6 +79,8 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 	}
 
 	sentryWriter, _ := NewSentryWriter(config)
+	sentryWriter.StatusRegistry = statusRegistry
+
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			err := sentry.Init(sentryWriter.Client.Options())
@@ -96,6 +98,7 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 	return sentryWriter, nil
 }
 
+// NewSentryWriter creates a new SentryWriter instance with Sentry Client and registers panic handler.
 func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 	client, err := sentry.NewClient(sentry.ClientOptions{
 		Dsn:              config.Dsn,
@@ -131,12 +134,11 @@ func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 		levels[level] = struct{}{}
 	}
 
-	CrashWriter := NewCrashWriter(logCountLimit)
+	crashWriter := NewCrashWriter(logCountLimit)
 	sentryWriter := &SentryWriter{
-		Client:         client,
-		Levels:         levels,
-		CrashWriter:    CrashWriter,
-		StatusRegistry: status.NewRegistry(""),
+		Client:      client,
+		Levels:      levels,
+		CrashWriter: crashWriter,
 	}
 
 	panichandler.RegisterPanicHandler(sentryWriter.SentryPanicHandler)
