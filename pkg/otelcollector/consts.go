@@ -1,5 +1,10 @@
 package otelcollector
 
+// TODO: organize the constants by their usage.
+// example:
+// aperture.* are used in ext_authz.CheckResponse.DynamicMetadata
+// others are being used to get attributes from traces and logs
+
 const (
 	// ControlPointLabel describes control point which reported traffic.
 	// May be 'ingress', 'egress' or 'feature'.
@@ -10,6 +15,12 @@ const (
 	ControlPointEgress = "egress"
 	// ControlPointFeature const for feature control point.
 	ControlPointFeature = "feature"
+
+	// MarshalledAuthzResponseLabel contains JSON encoded response from authz.
+	MarshalledAuthzResponseLabel = "aperture.authz_response"
+
+	// AuthzStatusLabel describes the status reported from authz processing.
+	AuthzStatusLabel = "authz_status"
 
 	// MarshalledCheckResponseLabel contains JSON encoded check response struct.
 	MarshalledCheckResponseLabel = "aperture.check_response"
@@ -27,7 +38,6 @@ const (
 	//   "foo": "bar",
 	//   "fizz": "buzz"
 	// }.
-	//
 	MarshalledLabelsLabel = "aperture.labels"
 	// LabeledLabel describes if there are any labels matched to traffic.
 	LabeledLabel = "labeled"
@@ -43,8 +53,10 @@ const (
 	FeatureDurationLabel = "feature.duration_millis"
 	// DecisionTypeLabel descibes the decision type taken by policy.
 	DecisionTypeLabel = "decision_type"
-	// DecisionReasonLabel descibes the reason of the decision taken by policy.
-	DecisionReasonLabel = "decision_reason"
+	// DecisionErrorReasonLabel descibes the error reason of the decision taken by policy.
+	DecisionErrorReasonLabel = "decision_error_reason"
+	// DecisionRejectReasonLabel descibes the reject reason of the decision taken by policy.
+	DecisionRejectReasonLabel = "decision_reject_reason"
 	// RateLimitersLabel describes rate limiters matched to the traffic.
 	RateLimitersLabel = "rate_limiters"
 	// DroppingRateLimitersLabel describes rate limiters dropping the traffic.
@@ -73,7 +85,6 @@ const (
 	TimestampLabel = "timestamp"
 	// AgentGroupLabel describes cluster to which metrics refer.
 	AgentGroupLabel = "agent_group"
-	// ServicesLabel describes services to which metrics refer. This is comma-separated
-	// list.
+	// ServicesLabel describes services to which metrics refer.
 	ServicesLabel = "services"
 )

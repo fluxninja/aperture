@@ -165,6 +165,18 @@ paths:
       tags:
         - StatusService
 definitions:
+  DecisionReasonErrorReason:
+    type: string
+    enum:
+      - ERROR_REASON_UNSPECIFIED
+    default: ERROR_REASON_UNSPECIFIED
+  DecisionReasonRejectReason:
+    type: string
+    enum:
+      - REJECT_REASON_UNSPECIFIED
+      - REJECT_REASON_RATE_LIMITED
+      - REJECT_REASON_CONCURRENCY_LIMITED
+    default: REJECT_REASON_UNSPECIFIED
   LimiterDecisionLimiterReason:
     type: string
     enum:
@@ -199,21 +211,6 @@ definitions:
       limit_scale_factor:
         type: number
         format: double
-  ReasonErrorReason:
-    type: string
-    enum:
-      - ERROR_REASON_UNSPECIFIED
-      - ERROR_REASON_ENTITY_LOOKUP_FAILED
-      - ERROR_REASON_SERVICE_LOOKUP_FAILED
-      - ERROR_REASON_BAD_CLIENT_IP
-    default: ERROR_REASON_UNSPECIFIED
-  ReasonRejectReason:
-    type: string
-    enum:
-      - REJECT_REASON_UNSPECIFIED
-      - REJECT_REASON_RATE_LIMITED
-      - REJECT_REASON_CONCURRENCY_LIMITED
-    default: REJECT_REASON_UNSPECIFIED
   RuleRego:
     type: object
     properties:
@@ -586,6 +583,9 @@ definitions:
   v1CheckResponse:
     type: object
     properties:
+      decision_reason:
+        $ref: '#/definitions/v1DecisionReason'
+        description: reason contains information in the case of an error or rejection.
       decision_type:
         $ref: '#/definitions/v1DecisionType'
         description: decision_type contains what the decision was.
@@ -599,9 +599,6 @@ definitions:
         items:
           $ref: '#/definitions/v1LimiterDecision'
         description: limiter_decisions contains information about decision made by each limiter.
-      reason:
-        $ref: '#/definitions/v1Reason'
-        description: reason contains information in the case of an error or rejection.
     description: CheckResponse contains fields that represent decision made by Check call.
   v1Classifier:
     type: object
@@ -770,6 +767,14 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Selected signal (on_true or on_false).
     description: Outputs for the Decider component.
+  v1DecisionReason:
+    type: object
+    properties:
+      error_reason:
+        $ref: '#/definitions/DecisionReasonErrorReason'
+      reject_reason:
+        $ref: '#/definitions/DecisionReasonRejectReason'
+    description: Reason contains fields that give futher information about error or rejection.
   v1DecisionType:
     type: string
     enum:
@@ -1351,14 +1356,6 @@ definitions:
       limit:
         $ref: '#/definitions/v1Port'
         title: negative limit means no limit is applied
-  v1Reason:
-    type: object
-    properties:
-      error_reason:
-        $ref: '#/definitions/ReasonErrorReason'
-      reject_reason:
-        $ref: '#/definitions/ReasonRejectReason'
-    description: Reason contains fields that give futher information about error or rejection.
   v1ReportRequest:
     type: object
     properties:
@@ -1512,7 +1509,6 @@ definitions:
           In k8s, this is the FQDN of the Service object.
 
           Note: Entity may belong to multiple services.
-        x-go-validate: required
     description: Describes where a rule or actuation component should apply to.
   v1Sqrt:
     type: object

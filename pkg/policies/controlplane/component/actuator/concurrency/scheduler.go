@@ -107,8 +107,7 @@ func NewSchedulerAndOptions(
 	scheduler.incomingQuery = incomingQuery
 
 	tokensQuery, tokensQueryOptions, tokensQueryErr := component.NewTaggedQueryAndOptions(
-		// TODO (hasit): change the metric name to token_latency with labels policy_name, policy_hash, component_index.
-		fmt.Sprintf("sum by (%s, %s) (increase(request_latency_ms_sum{metric_id=\"%s\"}[30m])) / sum by (%s, %s) (increase(request_latency_ms_count{metric_id=\"%s\"}[30m]))",
+		fmt.Sprintf("sum by (%s, %s) (increase(workload_latency_ms_sum{metric_id=\"%s\"}[30m])) / sum by (%s, %s) (increase(workload_latency_ms_count{metric_id=\"%s\"}[30m]))",
 			workloadKeyNameMetricsLabel, workloadKeyValueMetricsLabel, metricID,
 			workloadKeyNameMetricsLabel, workloadKeyValueMetricsLabel, metricID),
 		tokensQueryInterval,

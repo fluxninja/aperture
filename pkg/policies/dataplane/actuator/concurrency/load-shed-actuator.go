@@ -292,7 +292,6 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		return
 	}
 
-	log.Info().Float64("loadShedFactor", loadShedDecision.LoadShedFactor).
-		Msg("Setting load shed factor")
+	log.Trace().Float64("loadShedFactor", loadShedDecision.LoadShedFactor).Msg("Setting load shed factor")
 	lsa.tokenBucketLoadShed.SetLoadShedFactor(lsa.clock.Now(), loadShedDecision.LoadShedFactor)
 }

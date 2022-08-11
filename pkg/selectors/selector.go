@@ -115,13 +115,13 @@ func ControlPointFromProto(controlPoint *policylangv1.ControlPoint) ControlPoint
 //
 // Control Point.
 type ControlPointID struct {
-	Service      services.ServiceID
+	ServiceID    services.ServiceID
 	ControlPoint ControlPoint
 }
 
 // String returns a string representation of control point and service.
 func (p ControlPointID) String() string {
-	return fmt.Sprintf("%v@%v", p.ControlPoint, p.Service)
+	return fmt.Sprintf("%v@%v", p.ControlPoint, p.ServiceID)
 }
 
 // ControlPointIDFromProto extracts a ControlPointID from proto-based selector
@@ -130,7 +130,7 @@ func (p ControlPointID) String() string {
 // Selector is assumed to be validated and non-nil.
 func ControlPointIDFromProto(selector *policylangv1.Selector) ControlPointID {
 	return ControlPointID{
-		Service: services.ServiceID{
+		ServiceID: services.ServiceID{
 			AgentGroup: selector.AgentGroup,
 			Service:    selector.Service,
 		},

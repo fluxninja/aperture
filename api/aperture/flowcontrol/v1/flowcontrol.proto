@@ -20,7 +20,7 @@ message CheckResponse {
   // decision_type contains what the decision was.
   DecisionType decision_type = 1;
   // reason contains information in the case of an error or rejection.
-  Reason reason = 2;
+  DecisionReason decision_reason = 2;
   // limiter_decisions contains information about decision made by each limiter.
   repeated LimiterDecision limiter_decisions = 3;
   // flux meters that were matched for this request.
@@ -28,12 +28,9 @@ message CheckResponse {
 }
 
 // Reason contains fields that give futher information about error or rejection.
-message Reason {
+message DecisionReason {
   enum ErrorReason {
     ERROR_REASON_UNSPECIFIED = 0;
-    ERROR_REASON_ENTITY_LOOKUP_FAILED = 1;
-    ERROR_REASON_SERVICE_LOOKUP_FAILED = 2;
-    ERROR_REASON_BAD_CLIENT_IP = 3;
   }
 
   enum RejectReason {
@@ -42,10 +39,8 @@ message Reason {
     REJECT_REASON_CONCURRENCY_LIMITED = 2;
   }
 
-  oneof reason {
-    ErrorReason error_reason = 1;
-    RejectReason reject_reason = 2;
-  }
+  ErrorReason error_reason = 1;
+  RejectReason reject_reason = 2;
 }
 
 enum DecisionType {

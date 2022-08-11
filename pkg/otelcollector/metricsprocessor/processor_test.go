@@ -47,6 +47,7 @@ var _ = Describe("Metrics Processor", func() {
 		func(
 			controlPoint string,
 			checkResponse *flowcontrolv1.CheckResponse,
+			authzResponse *flowcontrolv1.AuthzResponse,
 			expectedErr error,
 			expectedMetrics string,
 			expectedLabels map[string]interface{},
@@ -55,7 +56,7 @@ var _ = Describe("Metrics Processor", func() {
 
 			expectEngineCalls(engine, checkResponse)
 
-			logs := someLogs(checkResponse, controlPoint)
+			logs := someLogs(checkResponse, authzResponse, controlPoint)
 			modifiedLogs, err := processor.ConsumeLogs(ctx, logs)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -104,6 +105,9 @@ var _ = Describe("Metrics Processor", func() {
 					},
 				},
 			},
+			&flowcontrolv1.AuthzResponse{
+				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
+			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -115,13 +119,15 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
-				"decision_type":                 "DECISION_TYPE_ACCEPTED",
-				"decision_reason":               "",
-				"flux_meters":                   []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
-				"rate_limiters":                 []interface{}{},
-				"dropping_rate_limiters":        []interface{}{},
-				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
+				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionErrorReasonLabel:         "",
+				otelcollector.DecisionRejectReasonLabel:        "",
+				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
+				otelcollector.RateLimitersLabel:                []interface{}{},
+				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -129,10 +135,8 @@ var _ = Describe("Metrics Processor", func() {
 			otelcollector.ControlPointFeature,
 			&flowcontrolv1.CheckResponse{
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
-				Reason: &flowcontrolv1.Reason{
-					Reason: &flowcontrolv1.Reason_RejectReason_{
-						RejectReason: flowcontrolv1.Reason_REJECT_REASON_RATE_LIMITED,
-					},
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_RATE_LIMITED,
 				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
@@ -149,6 +153,9 @@ var _ = Describe("Metrics Processor", func() {
 				},
 				FluxMeters: []*flowcontrolv1.FluxMeter{},
 			},
+			&flowcontrolv1.AuthzResponse{
+				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
+			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -160,12 +167,13 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
-				"decision_type":                 "DECISION_TYPE_REJECTED",
-				"decision_reason":               "reject_reason:REJECT_REASON_RATE_LIMITED",
-				"rate_limiters":                 []interface{}{},
-				"dropping_rate_limiters":        []interface{}{},
-				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
+				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
+				otelcollector.DecisionRejectReasonLabel:        "REJECT_REASON_RATE_LIMITED",
+				otelcollector.RateLimitersLabel:                []interface{}{},
+				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -173,10 +181,8 @@ var _ = Describe("Metrics Processor", func() {
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
-				Reason: &flowcontrolv1.Reason{
-					Reason: &flowcontrolv1.Reason_ErrorReason_{
-						ErrorReason: flowcontrolv1.Reason_ERROR_REASON_ENTITY_LOOKUP_FAILED,
-					},
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
 				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
@@ -215,6 +221,9 @@ var _ = Describe("Metrics Processor", func() {
 				},
 				FluxMeters: []*flowcontrolv1.FluxMeter{},
 			},
+			&flowcontrolv1.AuthzResponse{
+				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
+			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
@@ -238,16 +247,17 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
 			map[string]interface{}{
-				"decision_type":          "DECISION_TYPE_ACCEPTED",
-				"decision_reason":        "error_reason:ERROR_REASON_ENTITY_LOOKUP_FAILED",
-				"rate_limiters":          []interface{}{},
-				"dropping_rate_limiters": []interface{}{},
-				"concurrency_limiters": []interface{}{
+				otelcollector.AuthzStatusLabel:          "STATUS_NO_ERROR",
+				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionErrorReasonLabel:  "ERROR_REASON_UNSPECIFIED",
+				otelcollector.RateLimitersLabel:         []interface{}{},
+				otelcollector.DroppingRateLimitersLabel: []interface{}{},
+				otelcollector.ConcurrencyLimitersLabel: []interface{}{
 					"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash",
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
 					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
 				},
-				"dropping_concurrency_limiters": []interface{}{
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
 					"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash",
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
 				},
@@ -327,13 +337,14 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
-				"decision_type":                 "DECISION_TYPE_ACCEPTED",
-				"decision_reason":               "",
-				"flux_meters":                   []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
-				"rate_limiters":                 []interface{}{},
-				"dropping_rate_limiters":        []interface{}{},
-				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionErrorReasonLabel:         "",
+				otelcollector.DecisionRejectReasonLabel:        "",
+				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
+				otelcollector.RateLimitersLabel:                []interface{}{},
+				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -341,10 +352,8 @@ var _ = Describe("Metrics Processor", func() {
 			otelcollector.ControlPointFeature,
 			&flowcontrolv1.CheckResponse{
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
-				Reason: &flowcontrolv1.Reason{
-					Reason: &flowcontrolv1.Reason_RejectReason_{
-						RejectReason: flowcontrolv1.Reason_REJECT_REASON_RATE_LIMITED,
-					},
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_RATE_LIMITED,
 				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
@@ -372,12 +381,12 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
 			`,
 			map[string]interface{}{
-				"decision_type":                 "DECISION_TYPE_REJECTED",
-				"decision_reason":               "reject_reason:REJECT_REASON_RATE_LIMITED",
-				"rate_limiters":                 []interface{}{},
-				"dropping_rate_limiters":        []interface{}{},
-				"concurrency_limiters":          []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				"dropping_concurrency_limiters": []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
+				otelcollector.DecisionRejectReasonLabel:        "REJECT_REASON_RATE_LIMITED",
+				otelcollector.RateLimitersLabel:                []interface{}{},
+				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
 			},
 		),
 
@@ -385,10 +394,8 @@ var _ = Describe("Metrics Processor", func() {
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
 				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
-				Reason: &flowcontrolv1.Reason{
-					Reason: &flowcontrolv1.Reason_ErrorReason_{
-						ErrorReason: flowcontrolv1.Reason_ERROR_REASON_ENTITY_LOOKUP_FAILED,
-					},
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
 				},
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
@@ -452,19 +459,19 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
 			`,
 			map[string]interface{}{
-				"decision_type":   "DECISION_TYPE_ACCEPTED",
-				"decision_reason": "error_reason:ERROR_REASON_ENTITY_LOOKUP_FAILED",
-				"rate_limiters": []interface{}{
+				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionRejectReasonLabel: "REJECT_REASON_UNSPECIFIED",
+				otelcollector.RateLimitersLabel: []interface{}{
 					"policy_name:foo,component_index:1,policy_hash:foo-hash",
 				},
-				"dropping_rate_limiters": []interface{}{
+				otelcollector.DroppingRateLimitersLabel: []interface{}{
 					"policy_name:foo,component_index:1,policy_hash:foo-hash",
 				},
-				"concurrency_limiters": []interface{}{
+				otelcollector.ConcurrencyLimitersLabel: []interface{}{
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
 					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
 				},
-				"dropping_concurrency_limiters": []interface{}{
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
 					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
 					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
 				},
@@ -476,6 +483,7 @@ var _ = Describe("Metrics Processor", func() {
 // someLogs will return a plog.Logs instance with single LogRecord
 func someLogs(
 	checkResponse *flowcontrolv1.CheckResponse,
+	authzResponse *flowcontrolv1.AuthzResponse,
 	controlPoint string,
 ) plog.Logs {
 	logs := plog.NewLogs()
@@ -490,7 +498,10 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
+			marshalledAuthzResponse, err := json.Marshal(authzResponse)
+			Expect(err).NotTo(HaveOccurred())
 			logRecord.Attributes().InsertString(otelcollector.MarshalledCheckResponseLabel, string(marshalledCheckResponse))
+			logRecord.Attributes().InsertString(otelcollector.MarshalledAuthzResponseLabel, string(marshalledAuthzResponse))
 			logRecord.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
 			logRecord.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
 			switch controlPoint {
