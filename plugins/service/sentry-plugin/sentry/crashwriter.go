@@ -56,12 +56,8 @@ func (w *CrashWriter) Flush() {
 	w.crashLock.Lock()
 	defer w.crashLock.Unlock()
 
-	for {
-		if w.buffer.Length() > 0 {
-			_ = w.buffer.Remove()
-		} else {
-			break
-		}
+	for w.buffer.Length() > 0 {
+		_ = w.buffer.Remove()
 	}
 }
 
