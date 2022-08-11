@@ -98,10 +98,10 @@ var _ = Describe("Metrics Processor", func() {
 				},
 				FluxMeters: []*flowcontrolv1.FluxMeter{
 					{
-						AgentGroupName: "ag",
-						PolicyName:     "foo",
-						PolicyHash:     "foo-hash",
-						FluxMeterName:  "bar",
+						AgentGroup:    "ag",
+						PolicyName:    "foo",
+						PolicyHash:    "foo-hash",
+						FluxMeterName: "bar",
 					},
 				},
 			},
@@ -319,10 +319,10 @@ var _ = Describe("Metrics Processor", func() {
 				},
 				FluxMeters: []*flowcontrolv1.FluxMeter{
 					{
-						AgentGroupName: "ag",
-						PolicyName:     "foo",
-						PolicyHash:     "foo-hash",
-						FluxMeterName:  "bar",
+						AgentGroup:    "ag",
+						PolicyName:    "foo",
+						PolicyHash:    "foo-hash",
+						FluxMeterName: "bar",
 					},
 				},
 			},
@@ -592,7 +592,7 @@ func expectEngineCalls(engine *mocks.MockEngineAPI, checkResponse *flowcontrolv1
 		// TODO actually return some Histogram
 		fmID := fmt.Sprintf(
 			"agent_group-%v-policy-%v-flux_meter-%v-policy_hash-%v",
-			fm.GetAgentGroupName(),
+			fm.GetAgentGroup(),
 			fm.GetPolicyName(),
 			fm.GetFluxMeterName(),
 			fm.GetPolicyHash(),

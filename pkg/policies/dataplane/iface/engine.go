@@ -13,7 +13,7 @@ import (
 
 // EngineAPI is an interface for registering fluxmeters and schedulers.
 type EngineAPI interface {
-	ProcessRequest(agentGroup string, controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse
+	ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse
 
 	RegisterConcurrencyLimiter(sa Limiter) error
 	UnregisterConcurrencyLimiter(sa Limiter) error

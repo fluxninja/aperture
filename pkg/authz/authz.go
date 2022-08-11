@@ -259,8 +259,7 @@ func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {
 	host := req.GetAttributes().GetRequest().GetHttp().GetHost()
 	host = strings.Split(host, ":")[0]
 	return services.ServiceID{
-		AgentGroup: "default",
-		Service:    host,
+		Service: host,
 	}
 }
 
