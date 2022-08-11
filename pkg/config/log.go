@@ -180,9 +180,6 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 		writers = append(writers, zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})
 	}
 
-	// append ring buffer crash log writer
-	writers = append(writers, panichandler.GetCrashWriter())
-
 	multi := zerolog.MultiLevelWriter(writers...)
 
 	logger := log.NewLogger(multi, config.NonBlocking, strings.ToLower(config.LogLevel))

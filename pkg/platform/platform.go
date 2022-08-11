@@ -2,10 +2,7 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 	"os"
-	"path"
-	"path/filepath"
 	"time"
 
 	"github.com/spf13/pflag"
@@ -17,7 +14,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	fswatcher "github.com/fluxninja/aperture/pkg/filesystem/watcher"
-	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
@@ -212,42 +208,7 @@ func stop(app *fx.App) {
 	os.Exit(0)
 }
 
-var defaultDiagnosticDir = path.Join(config.DefaultAssetsDirectory, "diagnostic")
-
 // OnCrash is the panic handler.
-func OnCrash(e interface{}, s panichandler.Callstack) {
-	log.Debug().Msg("Crash Reporter Registered")
-	_ = os.MkdirAll(defaultDiagnosticDir, os.ModePerm)
-	diagnosticDir := path.Join(defaultDiagnosticDir, time.Now().Format(time.RFC3339))
-
-	// Crash Log writer
-	fName := "/crash.log"
-	crashlogger := panichandler.NewCrashFileWriter(filepath.Join(diagnosticDir, fName))
-	crashLogWriter := panichandler.GetCrashWriter()
-	crashLogWriter.Flush(crashlogger)
-	panichandler.CloseCrashFileWriter(crashlogger)
-
-	// Dump Status Registry
-	groupStatus := platform.statusRegistry.Get("")
-	if groupStatus != nil {
-		gs, err := json.MarshalIndent(groupStatus, "", " ")
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to marshal group status")
-		}
-		fName = "/status.json"
-		_ = os.WriteFile(filepath.Join(diagnosticDir, fName), gs, 0o600)
-	} else {
-		log.Info().Msg("No status information collected yet")
-	}
-
-	// Service version information
-	versionInfo := info.GetVersionInfo()
-	if versionInfo != nil {
-		vInfo, err := json.MarshalIndent(versionInfo, "", " ")
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to marshal version information")
-		}
-		fName = "/version-info.json"
-		_ = os.WriteFile(filepath.Join(diagnosticDir, fName), vInfo, 0o600)
-	}
-}
+// TODO: Crash Report will be handled by Sentry plugin.
+// Need to implement Panic Handler for the platform.
+func OnCrash(interface{}, panichandler.Callstack) {}
