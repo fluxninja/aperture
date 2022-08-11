@@ -97,7 +97,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 }
 
 func newWatchdog(jobGroup *jobs.JobGroup, registry *status.Registry, config WatchdogConfig) *watchdog {
-	job := jobs.NewMultiJob(watchdogJobName, jobGroup.GroupName(), false, registry, nil, nil)
+	job := jobs.NewMultiJob(watchdogJobName, jobGroup.GroupName(), true, registry, nil, nil)
 
 	w := &watchdog{
 		statusRegistry: registry,
