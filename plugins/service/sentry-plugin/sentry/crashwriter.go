@@ -2,11 +2,9 @@ package sentry
 
 import (
 	"encoding/json"
-	"os"
 	"sync"
 
 	"github.com/eapache/queue"
-	"github.com/fluxninja/lumberjack"
 )
 
 const logCountLimit = 20
@@ -73,22 +71,4 @@ func (w *CrashWriter) GetCrashLogs() []map[string]interface{} {
 	}
 
 	return logs
-}
-
-// NewCrashFileWriter returns a lumberjack rolling logger which is used to write crash logs to the output file.
-func NewCrashFileWriter(filename string) *lumberjack.Logger {
-	writer := &lumberjack.Logger{
-		Filename:   filename,
-		MaxBackups: 10,
-		MaxAge:     7,
-	}
-	return writer
-}
-
-// CloseCrashFileWriter closes the crash file writer.
-func CloseCrashFileWriter(lg *lumberjack.Logger) {
-	filename := lg.Filename
-	_ = lg.Rotate()
-	_ = lg.Close()
-	_ = os.Remove(filename)
 }
