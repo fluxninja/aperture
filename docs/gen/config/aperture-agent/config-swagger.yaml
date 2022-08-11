@@ -873,6 +873,8 @@ definitions:
         $ref: '#/definitions/WatchdogPolicyType'
       heap:
         $ref: '#/definitions/HeapConfig'
+      job:
+        $ref: '#/definitions/JobConfig'
       system:
         $ref: '#/definitions/WatchdogPolicyType'
     title: WatchdogConfig holds configuration for Watchdog Policy. For each policy,
@@ -1114,10 +1116,6 @@ paths:
         name: memory
         schema:
           $ref: '#/definitions/WatchdogConfig'
-      - in: body
-        name: scheduler
-        schema:
-          $ref: '#/definitions/JobGroupConfig'
       tags:
       - common-configuration
       x-fn-config-env: true

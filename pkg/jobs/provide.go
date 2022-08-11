@@ -117,12 +117,12 @@ func registerSelfChecks(sc SelfChecksIn) {
 	}
 }
 
-func checkSelfLiveness(ctx context.Context) (proto.Message, error) {
+func checkSelfLiveness(context.Context) (proto.Message, error) {
 	message := wrapperspb.String("Liveness job module is alive")
 	return message, nil
 }
 
-func checkSelfReadiness(ctx context.Context) (proto.Message, error) {
+func checkSelfReadiness(context.Context) (proto.Message, error) {
 	message := wrapperspb.String("Readiness job module is alive")
 	return message, nil
 }
