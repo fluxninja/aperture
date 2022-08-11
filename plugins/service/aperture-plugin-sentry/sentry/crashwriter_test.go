@@ -3,7 +3,7 @@ package sentry_test
 import (
 	"encoding/json"
 
-	"github.com/fluxninja/aperture/plugins/service/sentry-plugin/sentry"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/sentry"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

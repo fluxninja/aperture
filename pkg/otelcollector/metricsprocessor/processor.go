@@ -98,9 +98,13 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
 		checkResponse := otelcollector.GetCheckResponse(logRecord.Attributes())
 		if checkResponse == nil {
-			return errors.New("failed getting check response from attributes")
+			return errors.New("failed to get check_response from attributes")
 		}
 		p.addCheckResponseBasedLabels(logRecord.Attributes(), checkResponse)
+
+		authzResponse := otelcollector.GetAuthzResponse(logRecord.Attributes())
+		p.addAuthzResponseBasedLabels(logRecord.Attributes(), authzResponse)
+
 		return p.updateMetrics(logRecord.Attributes(), checkResponse)
 	})
 	return ld, err
@@ -119,6 +123,16 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 	return td, err
 }
 
+func (p *metricsProcessor) addAuthzResponseBasedLabels(attributes pcommon.Map, authzResponse *flowcontrolv1.AuthzResponse) {
+	labels := map[string]pcommon.Value{
+		otelcollector.AuthzStatusLabel: pcommon.NewValueString(authzResponse.GetStatus().String()),
+	}
+	for key, value := range labels {
+		attributes.Insert(key, value)
+	}
+	attributes.Remove(otelcollector.MarshalledAuthzResponseLabel)
+}
+
 // addCheckResponseBasedLabels adds the following labels:
 // * `decision_type`
 // * `decision_reason`
@@ -127,10 +141,7 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 // * `concurrency_limiters`
 // * `dropping_concurrency_limiters`
 // * `flux_meters`.
-func (p *metricsProcessor) addCheckResponseBasedLabels(
-	attributes pcommon.Map,
-	checkResponse *flowcontrolv1.CheckResponse,
-) {
+func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse) {
 	labels := map[string]pcommon.Value{
 		otelcollector.RateLimitersLabel:                pcommon.NewValueSlice(),
 		otelcollector.DroppingRateLimitersLabel:        pcommon.NewValueSlice(),
@@ -138,10 +149,12 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(
 		otelcollector.DroppingConcurrencyLimitersLabel: pcommon.NewValueSlice(),
 		otelcollector.FluxMetersLabel:                  pcommon.NewValueSlice(),
 		otelcollector.DecisionTypeLabel:                pcommon.NewValueString(checkResponse.DecisionType.String()),
-		otelcollector.DecisionReasonLabel:              pcommon.NewValueString(""),
+		otelcollector.DecisionRejectReasonLabel:        pcommon.NewValueString(""),
+		otelcollector.DecisionErrorReasonLabel:         pcommon.NewValueString(""),
 	}
-	if checkResponse.Reason != nil && checkResponse.Reason.Reason != nil {
-		labels[otelcollector.DecisionReasonLabel] = pcommon.NewValueString(checkResponse.Reason.String())
+	if checkResponse.DecisionReason != nil {
+		labels[otelcollector.DecisionErrorReasonLabel] = pcommon.NewValueString(checkResponse.DecisionReason.GetErrorReason().String())
+		labels[otelcollector.DecisionRejectReasonLabel] = pcommon.NewValueString(checkResponse.DecisionReason.GetRejectReason().String())
 	}
 	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiter() != nil {

@@ -26,6 +26,8 @@ var _ = Describe("Dataplane Engine", func() {
 		histogram goprom.Histogram
 	)
 
+	agentGroup := ""
+
 	BeforeEach(func() {
 		t = GinkgoTestReporter{}
 		mockCtrl = gomock.NewController(t)
@@ -146,7 +148,7 @@ var _ = Describe("Dataplane Engine", func() {
 				Flow: map[string]string{"service": "whatever"},
 			})
 
-			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
+			mmr := engine.(*Engine).getMatches(agentGroup, controlPoint, svcs, labels)
 			Expect(mmr.FluxMeters).To(BeEmpty())
 			Expect(mmr.ConcurrencyLimiters).To(BeEmpty())
 		})
@@ -166,7 +168,7 @@ var _ = Describe("Dataplane Engine", func() {
 				Flow: map[string]string{"service": "testService.testNamespace.svc.cluster.local"},
 			})
 
-			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
+			mmr := engine.(*Engine).getMatches(agentGroup, controlPoint, svcs, labels)
 			Expect(mmr.FluxMeters).NotTo(BeEmpty())
 			Expect(mmr.ConcurrencyLimiters).NotTo(BeEmpty())
 		})

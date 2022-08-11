@@ -599,7 +599,7 @@ Note: Request headers are only available for "traffic" control points.
 <dt>service</dt>
 <dd>
 
-(string, `required`) The service (name) of the entities.
+(string) The service (name) of the entities.
 In k8s, this is the FQDN of the Service object.
 
 Note: Entity may belong to multiple services.

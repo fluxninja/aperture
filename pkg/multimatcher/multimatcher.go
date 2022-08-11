@@ -114,11 +114,7 @@ func (mm *MultiMatcher[_, _]) Length() int {
 // Key is an arbitrary key to map this entry – should be unique, can be used to remove the entry.
 // MatchCallback is a callback used by Match in case of successful match.
 // The entry is considered matching if matchExpr.Evaluate(labels) returns true.
-func (mm *MultiMatcher[Key, ResultCollection]) AddEntry(
-	key Key,
-	matchExpr Expr,
-	mc MatchCallback[ResultCollection],
-) error {
+func (mm *MultiMatcher[Key, ResultCollection]) AddEntry(key Key, matchExpr Expr, mc MatchCallback[ResultCollection]) error {
 	mm.mutex.Lock()
 	defer mm.mutex.Unlock()
 

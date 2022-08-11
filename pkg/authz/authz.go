@@ -48,19 +48,19 @@ func NewHandler(
 		log.Warn().Msg("Authz: No entity cache, will guess services based on Host header")
 	}
 	return &Handler{
-		classifier: classifier,
-		entities:   entityCache,
-		propagator: authz_baggage.W3Baggage{},
-		fcHandler:  fcHandler,
+		classifier:  classifier,
+		entityCache: entityCache,
+		propagator:  authz_baggage.W3Baggage{},
+		fcHandler:   fcHandler,
 	}
 }
 
 // Handler implements envoy.service.auth.v3.Authorization and handles Check call.
 type Handler struct {
-	entities   *entitycache.EntityCache
-	classifier *classification.Classifier
-	propagator authz_baggage.Propagator
-	fcHandler  flowcontrol.HandlerWithValues
+	entityCache *entitycache.EntityCache
+	classifier  *classification.Classifier
+	propagator  authz_baggage.Propagator
+	fcHandler   flowcontrol.HandlerWithValues
 }
 
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)
@@ -82,6 +82,52 @@ func sanitizeBaggageHeaderValue(value string) string {
 func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_authz.CheckResponse, error) {
 	log.Trace().Msg("Classifier.Check()")
 
+	createExtAuthzResponse := func(fcResponse *flowcontrolv1.CheckResponse, authzResponse *flowcontrolv1.AuthzResponse, flowLabels classification.FlowLabels) *ext_authz.CheckResponse {
+		if fcResponse == nil {
+			fcResponse = &flowcontrolv1.CheckResponse{
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_UNSPECIFIED,
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					ErrorReason:  flowcontrolv1.DecisionReason_ERROR_REASON_UNSPECIFIED,
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
+				},
+				LimiterDecisions: nil,
+				FluxMeters:       nil,
+			}
+		}
+		marshalledCheckResponse, err := protoMessageAsPbValue(fcResponse)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to marshal check response")
+			return nil
+		}
+
+		if authzResponse == nil {
+			authzResponse = &flowcontrolv1.AuthzResponse{
+				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
+			}
+		}
+		marshalledAuthzResponse, err := protoMessageAsPbValue(authzResponse)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to marshal authz response")
+			return nil
+		}
+
+		if flowLabels == nil {
+			flowLabels = make(classification.FlowLabels)
+		}
+		marshalledFlowLabels := flowLabelsAsPbValueForTelemetry(flowLabels)
+
+		log.Trace().Interface("fcResponse", marshalledCheckResponse).Interface("authzResponse", marshalledAuthzResponse).Interface("flowLabels", marshalledFlowLabels).Msg("Created ext_authz.CheckResponse")
+		return &ext_authz.CheckResponse{
+			DynamicMetadata: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					otelcollector.MarshalledLabelsLabel:        marshalledFlowLabels,
+					otelcollector.MarshalledCheckResponseLabel: marshalledCheckResponse,
+					otelcollector.MarshalledAuthzResponseLabel: marshalledAuthzResponse,
+				},
+			},
+		}
+	}
+
 	var direction selectors.TrafficDirection
 	headers, _ := metadata.FromIncomingContext(ctx)
 	if dirHeader, exists := headers["traffic-direction"]; exists && len(dirHeader) > 0 {
@@ -91,51 +137,52 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		case "OUTBOUND":
 			direction = selectors.Egress
 		default:
-			log.Warn().Str("traffic-direction", dirHeader[0]).Msg(
-				"invalid traffic-direction header",
-			)
-			return nil, errors.New("invalid traffic-direction")
+			log.Warn().Str("traffic-direction", dirHeader[0]).Msg("invalid traffic-direction header")
+			authzResponse := &flowcontrolv1.AuthzResponse{
+				Status: flowcontrolv1.AuthzResponse_STATUS_INVALID_TRAFFIC_DIRECTION,
+			}
+			resp := createExtAuthzResponse(nil, authzResponse, nil)
+			return resp, errors.New("invalid traffic-direction")
 		}
 	} else {
 		log.Warn().Msg("traffic-direction not set, assuming inbound")
 		direction = selectors.Ingress
 	}
 
-	rpcPeer, peerExists := peer.FromContext(ctx)
-	if !peerExists {
-		log.Warn().Msg("Cannot get client address")
-		return nil, errors.New("failed to get client address")
-	}
-	clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
-
 	var svcs []services.ServiceID
 	var err error
-	if h.entities != nil {
-		entity := h.entities.GetByIP(clientIP)
-		if entity == nil {
-			log.Warn().Str("IP", clientIP).Msg("No entity in cache")
-			return nil, fmt.Errorf("missing entity for %s", clientIP)
+
+	rpcPeer, peerExists := peer.FromContext(ctx)
+	if peerExists {
+		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
+		if h.entityCache != nil {
+			entity := h.entityCache.GetByIP(clientIP)
+			svcs = entitycache.ServiceIDsFromEntity(entity)
+		} else {
+			// TODO: should not have a fallback, always expect entity for consistent experience
+			log.Warn().Msg("No entity cache, guessing ServiceID based on Host header")
+			svcs = []services.ServiceID{guessDstService(req)}
 		}
-		svcs, err = entitycache.ServiceIDsFromEntity(entity)
-		if err != nil {
-			log.Warn().Err(err).Msg("Cannot get services from entity")
-			return nil, fmt.Errorf("failed to get services from entity: %v", err)
-		}
-	} else {
-		// TODO: should not have a fallback, always expect entity for consistent experience
-		log.Warn().Msg("No entity cache, guessing service id based on Host header")
-		svcs = []services.ServiceID{guessDstService(req)}
 	}
 
 	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
+
 	input, err := envoyauth.RequestToInput(req, logger, nil)
 	if err != nil {
-		return nil, fmt.Errorf("converting raw input into rego input failed: %v", err)
+		authzResponse := &flowcontrolv1.AuthzResponse{
+			Status: flowcontrolv1.AuthzResponse_STATUS_CONVERT_TO_MAP_STRUCT,
+		}
+		resp := createExtAuthzResponse(nil, authzResponse, nil)
+		return resp, fmt.Errorf("converting raw input into rego input failed: %v", err)
 	}
 
 	inputValue, err := ast.InterfaceToValue(input)
 	if err != nil {
-		return nil, fmt.Errorf("converting rego input to value failed: %v", err)
+		authzResponse := &flowcontrolv1.AuthzResponse{
+			Status: flowcontrolv1.AuthzResponse_STATUS_CONVERT_TO_REGO_AST,
+		}
+		resp := createExtAuthzResponse(nil, authzResponse, nil)
+		return resp, fmt.Errorf("converting rego input to value failed: %v", err)
 	}
 
 	// Extract previous flow labels from headers
@@ -151,7 +198,11 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 	newFlowLabels, err := h.classifier.Classify(ctx, svcs, labelsForMatching, direction, inputValue)
 	if err != nil {
-		return nil, fmt.Errorf("failed to classify: %v", err)
+		authzResponse := &flowcontrolv1.AuthzResponse{
+			Status: flowcontrolv1.AuthzResponse_STATUS_CLASSIFY_FLOW_LABELS,
+		}
+		resp := createExtAuthzResponse(nil, authzResponse, nil)
+		return resp, fmt.Errorf("failed to classify: %v", err)
 	}
 
 	for key, fl := range newFlowLabels {
@@ -171,31 +222,11 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		Flow: newFlowLabels.ToPlainMap(),
 	})
 	// Ask flow control service for Ok/Deny
-	fcResponse := h.fcHandler.CheckWithValues(
-		ctx,
-		selectors.ControlPoint{Traffic: direction},
-		svcs,
-		labelsForMatching,
-	)
-	if err != nil {
-		log.Warn().Err(err).Msg("Flow control Check had an error")
-	}
+	fcResponse := h.fcHandler.CheckWithValues(ctx, selectors.ControlPoint{Traffic: direction}, svcs, labelsForMatching)
 
 	flowLabels := mergeFlowLabels(oldFlowLabels, newFlowLabels)
-	log.Trace().Msgf("Creating check response. Flow labels: %v, LimiterDecisions; %v, fluxmeters: %v", flowLabels, fcResponse.LimiterDecisions, fcResponse.FluxMeters)
-	marshalledCheckResponse, err := protoMessageAsPbValue(fcResponse)
-	if err != nil {
-		log.Warn().Err(err).Msg("Failed marshaling check response")
-	}
-	resp := ext_authz.CheckResponse{
-		// Put all non-hidden flow labels and policy details as dynamic metadata
-		DynamicMetadata: &structpb.Struct{
-			Fields: map[string]*structpb.Value{
-				otelcollector.MarshalledLabelsLabel:        flowLabelsAsPbValueForTelemetry(flowLabels),
-				otelcollector.MarshalledCheckResponseLabel: marshalledCheckResponse,
-			},
-		},
-	}
+
+	resp := createExtAuthzResponse(fcResponse, nil, flowLabels)
 
 	// Check if fcResponse error is set
 	if fcResponse.DecisionType != flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
@@ -221,7 +252,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		}
 	}
 
-	return &resp, nil
+	return resp, nil
 }
 
 func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {

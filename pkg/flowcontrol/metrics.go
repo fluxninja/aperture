@@ -10,14 +10,14 @@ import (
 // Metrics is used for collecting metrics about Aperture flowcontrol.
 type Metrics interface {
 	// CheckResponse collects metrics about Aperture Check call with DecisionType and Reason.
-	CheckResponse(flowcontrolv1.DecisionType, *flowcontrolv1.Reason)
+	CheckResponse(flowcontrolv1.DecisionType, *flowcontrolv1.DecisionReason)
 }
 
 // NopMetrics is a no-op implementation of Metrics.
 type NopMetrics struct{}
 
 // CheckResponse is no-op method for NopMetrics.
-func (NopMetrics) CheckResponse(flowcontrolv1.DecisionType, *flowcontrolv1.Reason) {
+func (NopMetrics) CheckResponse(flowcontrolv1.DecisionType, *flowcontrolv1.DecisionReason) {
 }
 
 // PrometheusMetrics stores collected metrics.
@@ -83,14 +83,14 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 }
 
 // CheckResponse collects metrics about Aperture Check call with DecisionType, Reason.
-func (pm *PrometheusMetrics) CheckResponse(decision flowcontrolv1.DecisionType, reason *flowcontrolv1.Reason) {
+func (pm *PrometheusMetrics) CheckResponse(decision flowcontrolv1.DecisionType, reason *flowcontrolv1.DecisionReason) {
 	pm.checkReceivedTotal.Inc()
 	pm.checkDecision.With(prometheus.Labels{"flowcontrol_check_decision_type": decision.Enum().String()}).Inc()
 	if reason != nil {
-		if reason.GetErrorReason() != flowcontrolv1.Reason_ERROR_REASON_UNSPECIFIED {
+		if reason.GetErrorReason() != flowcontrolv1.DecisionReason_ERROR_REASON_UNSPECIFIED {
 			pm.errorReason.With(prometheus.Labels{"flowcontrol_check_error_reason": reason.GetErrorReason().Enum().String()}).Inc()
 		}
-		if reason.GetRejectReason() != flowcontrolv1.Reason_REJECT_REASON_UNSPECIFIED {
+		if reason.GetRejectReason() != flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED {
 			pm.rejectReason.With(prometheus.Labels{"flowcontrol_check_reject_reason": reason.GetRejectReason().Enum().String()}).Inc()
 		}
 	}
