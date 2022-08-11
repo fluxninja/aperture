@@ -21,7 +21,7 @@ executors:
   base-machine-executor:
     machine:
       image: ubuntu-2004:202107-02
-      docker_layer_caching: true
+      docker_layer_caching: false
 
 parameters:
   updated-aperture:
