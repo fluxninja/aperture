@@ -146,7 +146,7 @@ func (s *SentryWriter) SentryPanicHandler(e interface{}, _ panichandler.Callstac
 
 		sentry.AddBreadcrumb(&sentry.Breadcrumb{
 			Type:      "debug",
-			Category:  "Log",
+			Category:  "log",
 			Level:     sentryLevel,
 			Data:      crashLog,
 			Message:   msg,

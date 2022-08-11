@@ -83,14 +83,12 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			err := sentry.Init(sentryWriter.Client.Options())
-			if err != nil {
-				log.Panic().Err(err).Msg("Failed initiating Sentry")
-			}
+			sentry.CurrentHub().BindClient(sentryWriter.Client)
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
-			sentry.Flush(5 * time.Second)
+			duration, _ := time.ParseDuration(SentryFlushWait)
+			sentry.Flush(duration)
 			return nil
 		},
 	})

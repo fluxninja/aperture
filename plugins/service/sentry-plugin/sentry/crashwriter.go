@@ -30,7 +30,7 @@ func NewCrashWriter(limit int) *CrashWriter {
 	return crashWriter
 }
 
-// Write writes the crash logs to the buffer and updates CrashWriter's buffer status.
+// Write writes the crash logs to the buffer in map[string]interface{} format for Sentry Breadcrumb data field.
 func (w *CrashWriter) Write(data []byte) (n int, err error) {
 	w.crashLock.Lock()
 	defer w.crashLock.Unlock()
