@@ -12,6 +12,7 @@ import (
 
 	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/watchdog/v1"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -21,6 +22,7 @@ type WatchdogConfig struct {
 	CGroup WatchdogPolicyType `json:"cgroup"`
 	System WatchdogPolicyType `json:"system"`
 	Heap   HeapConfig         `json:"heap"`
+	Job    jobs.JobConfig     `json:"job"`
 }
 
 // WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
