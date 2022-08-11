@@ -1,7 +1,7 @@
 package sentry_test
 
 import (
-	"bytes"
+	"encoding/json"
 
 	"github.com/fluxninja/aperture/plugins/service/sentry-plugin/sentry"
 	. "github.com/onsi/ginkgo/v2"
@@ -9,54 +9,68 @@ import (
 )
 
 var _ = Describe("Crash-Writer", func() {
-	It("flushes logs within limit, writes all the logs", func() {
+	It("gets all the buffered logs", func() {
 		crashWriter := sentry.NewCrashWriter(5)
-		data := [][]byte{[]byte("log 0 "), []byte("log 1 "), []byte("log 2 "), []byte("log 3 ")}
+		data := [][]byte{[]byte("{\"log1\": \"test1\"}"), []byte("{\"log2\": \"test2\"}"), []byte("{\"log3\": \"test3\"}"), []byte("{\"log4\": \"test4\"}")}
+
 		for _, d := range data {
 			_, err := crashWriter.Write(d)
 			Expect(err).NotTo(HaveOccurred())
 		}
 
-		file := bytes.Buffer{}
-		crashWriter.Flush(&file)
-		Expect(file.String()).To(Equal(convertToString(data)))
+		logs := crashWriter.GetCrashLogs()
+		Expect(logs).To(Equal(convertToCrashLogs(data)))
 	})
 
-	It("flushes logs over limit, writes last 5 logs", func() {
+	It("gets last 5 buffered logs over limit", func() {
 		crashWriter := sentry.NewCrashWriter(5)
-		data := [][]byte{[]byte("log 0 "), []byte("log 1 "), []byte("log 2 "), []byte("log 3 "), []byte("log 4 "), []byte("log 5 ")}
+		data := [][]byte{[]byte("{\"log1\": \"test1\"}"), []byte("{\"log2\": \"test2\"}"), []byte("{\"log3\": \"test3\"}"), []byte("{\"log4\": \"test4\"}"), []byte("{\"log5\": \"test5\"}"), []byte("{\"log6\": \"test6\"}")}
+
 		for _, d := range data {
 			_, err := crashWriter.Write(d)
 			Expect(err).NotTo(HaveOccurred())
 		}
 
-		file := bytes.Buffer{}
-		crashWriter.Flush(&file)
-		Expect(file.String()).To(Equal(convertToString(data[1:])))
+		logs := crashWriter.GetCrashLogs()
+		Expect(logs).To(Equal(convertToCrashLogs(data[1:])))
 	})
 
-	It("flushes logs over small limit, writes only the last log", func() {
+	It("gets last buffered log over limit size 1", func() {
 		crashWriter := sentry.NewCrashWriter(1)
-		data := [][]byte{[]byte("log 0 "), []byte("log 1 "), []byte("log 2 "), []byte("log 3 "), []byte("log 4 "), []byte("log 5 ")}
+		data := [][]byte{[]byte("{\"log1\": \"test1\"}"), []byte("{\"log2\": \"test2\"}"), []byte("{\"log3\": \"test3\"}"), []byte("{\"log4\": \"test4\"}"), []byte("{\"log5\": \"test5\"}"), []byte("{\"log6\": \"test6\"}")}
+
 		for _, d := range data {
 			_, err := crashWriter.Write(d)
 			Expect(err).NotTo(HaveOccurred())
 		}
 
-		file := bytes.Buffer{}
-		crashWriter.Flush(&file)
-		Expect(file.String()).To(Equal(convertToString(data[len(data)-1:])))
+		logs := crashWriter.GetCrashLogs()
+		Expect(logs).To(Equal(convertToCrashLogs(data[len(data)-1:])))
+	})
+
+	It("flushes and drains the crash writer buffer", func() {
+		crashWriter := sentry.NewCrashWriter(5)
+		data := [][]byte{[]byte("{\"log1\": \"test1\"}"), []byte("{\"log2\": \"test2\"}"), []byte("{\"log3\": \"test3\"}"), []byte("{\"log4\": \"test4\"}")}
+
+		for _, d := range data {
+			_, err := crashWriter.Write(d)
+			Expect(err).NotTo(HaveOccurred())
+		}
+
+		crashWriter.Flush()
+		logs := crashWriter.GetCrashLogs()
+		Expect(logs).To(BeEmpty())
 	})
 })
 
-func convertToString(data [][]byte) string {
-	if data == nil {
-		return ""
+func convertToCrashLogs(data [][]byte) []map[string]interface{} {
+	var logs []map[string]interface{}
+
+	for _, d := range data {
+		log := make(map[string]interface{})
+		_ = json.Unmarshal(d, &log)
+		logs = append(logs, log)
 	}
 
-	var str string
-	for _, d := range data {
-		str += string(d)
-	}
-	return str
+	return logs
 }

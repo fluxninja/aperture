@@ -2,7 +2,6 @@ package sentry
 
 import (
 	"encoding/json"
-	"io"
 	"os"
 	"sync"
 
@@ -52,15 +51,14 @@ func (w *CrashWriter) Write(data []byte) (n int, err error) {
 	return len(data), nil
 }
 
-// Flush writes last 20 lines of logs up until crash to the disk.
-func (w *CrashWriter) Flush(lg io.Writer) {
+// Flush drains the crash writer buffer.
+func (w *CrashWriter) Flush() {
 	w.crashLock.Lock()
 	defer w.crashLock.Unlock()
 
 	for {
 		if w.buffer.Length() > 0 {
-			log := w.buffer.Remove()
-			_, _ = lg.Write(log.([]byte))
+			_ = w.buffer.Remove()
 		} else {
 			break
 		}
