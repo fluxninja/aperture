@@ -32,7 +32,7 @@ func providePlatformReadinessStatus(in platformReadinessStatusIn) error {
 	}
 
 	in.Lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
 			s := status.NewStatus(nil, errors.New("platform starting"))
 			err := in.StatusRegistry.Push(platformReadinessStatusName, s)
 			if err != nil {
@@ -40,7 +40,7 @@ func providePlatformReadinessStatus(in platformReadinessStatusIn) error {
 			}
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(context.Context) error {
 			s := status.NewStatus(nil, errors.New("platform stopping"))
 			err := in.StatusRegistry.Push(platformReadinessStatusName, s)
 			if err != nil {
