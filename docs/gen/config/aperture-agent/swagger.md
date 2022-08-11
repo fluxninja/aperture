@@ -452,14 +452,6 @@ Env-Var Prefix: `APERTURE_AGENT_WATCHDOG_MEMORY_`
 Type: [WatchdogConfig](#watchdog-config)
 
 </dd>
-
-<dt>scheduler</dt>
-<dd>
-
-Env-Var Prefix: `APERTURE_AGENT_WATCHDOG_SCHEDULER_`
-Type: [JobGroupConfig](#job-group-config)
-
-</dd>
 </dl>
 
 ## Objects
@@ -1589,6 +1581,14 @@ WatchdogConfig holds configuration for Watchdog Policy. For each policy, either 
 <dd>
 
 ([HeapConfig](#heap-config))
+
+</dd>
+</dl>
+<dl>
+<dt>job</dt>
+<dd>
+
+([JobConfig](#job-config))
 
 </dd>
 </dl>

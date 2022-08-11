@@ -92,7 +92,7 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 	time.Sleep(groupConfig.jobRunConfig.sleepTime)
 
 	for _, job := range groupConfig.jobs {
-		regKey := strings.Join([]string{"liveness", jobGroup.GroupName(), job.Name()}, registry.Delim())
+		regKey := strings.Join([]string{"liveness", "job_groups", jobGroup.GroupName(), job.Name()}, registry.Delim())
 		gotStatusMsg := registry.Get(regKey).Status.GetMessage()
 		expectedStatusMsg, _ := anypb.New(wrapperspb.String(groupConfig.jobRunConfig.expectedStatusMsg))
 		if !proto.Equal(gotStatusMsg, expectedStatusMsg) {

@@ -16,8 +16,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-const jobLivenessStatusName = "liveness"
-
 // JobCallback is the callback function that is called after a job is executed.
 type JobCallback func(context.Context) (proto.Message, error)
 
@@ -118,8 +116,8 @@ func (executor *jobExecutor) setPanicHandler(handler panicHandlerFunc) {
 }
 
 func (executor *jobExecutor) getLivenessStatusPath() string {
-	// "liveness.<jobGroupName>.<jobName>"
-	return strings.Join([]string{jobLivenessStatusName, executor.jg.GroupName(), executor.Name()}, executor.jg.gt.registry.Delim())
+	// "liveness.job_groups.<jobGroupName>.<jobName>"
+	return strings.Join([]string{"liveness", "job_groups", executor.jg.GroupName(), executor.Name()}, executor.jg.gt.registry.Delim())
 }
 
 func (executor *jobExecutor) doJob() {
