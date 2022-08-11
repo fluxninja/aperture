@@ -1,4 +1,4 @@
-//go:generate swagger generate spec --scan-models --include="github.com/fluxninja/aperture/plugins/service/sentry-plugin/*" --include-tag=plugin-configuration -o ../../../docs/gen/config/sentry-plugin/plugin-swagger.yaml
+//go:generate swagger generate spec --scan-models --include="github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/*" --include-tag=plugin-configuration -o ../../../docs/gen/config/aperture-plugin-sentry/plugin-swagger.yaml
 
 // Sentry Plugin
 //   BasePath: /aperture-controller
@@ -11,11 +11,11 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/plugins"
-	"github.com/fluxninja/aperture/plugins/service/sentry-plugin/sentry"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/sentry"
 )
 
 const (
-	Plugin        = "sentry-plugin"
+	Plugin        = "aperture-plugin-sentry"
 	BuildHost     = "unknown"
 	BuildOS       = "unknown"
 	BuildTime     = "unknown"

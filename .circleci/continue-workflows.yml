@@ -366,7 +366,7 @@ workflows:
           gcr-image: cf-fn/aperture-agent
           docker-context: .
           dockerfile: cmd/aperture-agent/Dockerfile
-          use-docker-layer-caching: yes
+          use-docker-layer-caching: true
       - build-push-add-tag:
           name: image-build-aperture-controller
           dockerhub-image: aperturecontrol/aperture-controller
@@ -374,7 +374,7 @@ workflows:
           gcr-image: cf-fn/aperture-controller
           docker-context: .
           dockerfile: cmd/aperture-controller/Dockerfile
-          use-docker-layer-caching: yes
+          use-docker-layer-caching: true
       - go-test-coverage:
           name: go-test-coverage-aperture
           work_dir: .

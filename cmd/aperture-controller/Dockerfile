@@ -26,21 +26,19 @@ RUN --mount=type=cache,target=/go/pkg/ \
 FROM base AS plugins-builder
 RUN --mount=type=cache,target=/go/pkg/ \
     --mount=type=cache,target=/root/.cache/go-build/ \
-    /bin/bash <<-"EOF"
-    shopt -s nullglob
-    set -eux
-    for plugin in ./plugins/{service,controller}/aperture-plugin-*; do
-      echo "building plugin $plugin"
-      CGO_ENABLED=1 GOOS=linux GOARCH=amd64 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w" ./pkg/plugins/build.sh
-    done
-EOF
+    /bin/bash -c 'shopt -s nullglob; for plugin in ./plugins/{service,controller}/aperture-plugin-*; do\
+    echo "building plugin $plugin";\
+    CGO_ENABLED=1 GOOS=linux GOARCH=amd64 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w" \
+    ./pkg/plugins/build.sh;\
+    done\
+    '
 
 # Final image
 FROM alpine:3.15.0
 # Needed for linker to be compatible
 RUN apk add --no-cache libc6-compat
 RUN mkdir -p /etc/aperture/aperture-controller/classifiers /etc/aperture/aperture-controller/policies /etc/aperture/aperture-controller/plugins
-COPY --link certs /etc/aperture/aperture-agent/certs
+COPY --link certs /etc/aperture/aperture-controller/certs
 COPY --link --from=builder /aperture-controller /aperture-controller
 COPY --link --from=plugins-builder /plugins /var/lib/aperture/aperture-controller/plugins
 CMD ["/aperture-controller"]
