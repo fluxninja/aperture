@@ -6,7 +6,7 @@ import (
 
 // ComponentAPI is the interface that wraps the GetPolicyName, GetPolicyID, and GetComponentIndex methods.
 type ComponentAPI interface {
-	GetAgentGroupName() string
+	GetAgentGroup() string
 	GetPolicyName() string
 	GetPolicyHash() string
 	GetComponentIndex() int64

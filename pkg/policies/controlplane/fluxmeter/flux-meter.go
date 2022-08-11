@@ -38,12 +38,12 @@ func NewFluxMeterOptions(
 	if selectorProto == nil {
 		return nil, errors.New("FluxMeter.Selector is nil")
 	}
-	agentGroupName := selectorProto.GetAgentGroup()
+	agentGroup := selectorProto.GetAgentGroup()
 
 	wrapperProto := &configv1.ConfigPropertiesWrapper{
-		AgentGroupName: agentGroupName,
-		PolicyName:     policyBaseAPI.GetPolicyName(),
-		PolicyHash:     policyBaseAPI.GetPolicyHash(),
+		AgentGroup: agentGroup,
+		PolicyName: policyBaseAPI.GetPolicyName(),
+		PolicyHash: policyBaseAPI.GetPolicyHash(),
 	}
 
 	// Register FluxMeter
@@ -53,11 +53,11 @@ func NewFluxMeterOptions(
 	}
 
 	etcdPath := path.Join(paths.FluxMeterConfigPath,
-		paths.IdentifierForFluxMeter(agentGroupName, policyBaseAPI.GetPolicyName(), fluxMeterProto.GetName()))
+		paths.IdentifierForFluxMeter(agentGroup, policyBaseAPI.GetPolicyName(), fluxMeterProto.GetName()))
 	configSync := &fluxMeterConfigSync{
 		fluxMeterProto: fluxMeterProto,
 		policyBaseAPI:  policyBaseAPI,
-		agentGroupName: agentGroupName,
+		agentGroupName: agentGroup,
 		etcdPath:       etcdPath,
 	}
 

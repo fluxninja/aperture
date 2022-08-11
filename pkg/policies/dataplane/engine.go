@@ -53,7 +53,7 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	fluxMeters := make([]*flowcontrolv1.FluxMeter, len(rawFluxMeters))
 	for i, rawFluxMeter := range rawFluxMeters {
 		fluxMeters[i] = &flowcontrolv1.FluxMeter{
-			AgentGroup:    rawFluxMeter.GetAgentGroupName(),
+			AgentGroup:    rawFluxMeter.GetAgentGroup(),
 			PolicyName:    rawFluxMeter.GetPolicyName(),
 			PolicyHash:    rawFluxMeter.GetPolicyHash(),
 			FluxMeterName: rawFluxMeter.GetMetricName(),
