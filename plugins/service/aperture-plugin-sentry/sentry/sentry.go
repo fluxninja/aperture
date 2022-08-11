@@ -1,7 +1,9 @@
 package sentry
 
 import (
+	"context"
 	"io"
+	"time"
 
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
@@ -11,6 +13,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 // SentryConfig holds configuration for Sentry.
@@ -18,8 +22,8 @@ import (
 type SentryConfig struct {
 	// If DSN is not set, the client is effectively disabled
 	// You can set test project's dsn to send log events.
-	// i.e. oss-aperture: <https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877>
-	Dsn string `json:"dsn" default:""`
+	// oss-aperture project dsn is set as default.
+	Dsn string `json:"dsn" default:"https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877"`
 	// Environment
 	Environment string `json:"environment" default:"production"`
 	// Sample rate for sampling traces i.e. 0.0 to 1.0
@@ -34,7 +38,7 @@ type SentryConfig struct {
 	Disabled bool `json:"disabled" default:"false"`
 }
 
-// SentryWriterConstructor.
+// SentryWriterConstructor holds fields to create an annotated instance of Sentry Writer.
 type SentryWriterConstructor struct {
 	// Name of sentry instance
 	Name string
@@ -44,7 +48,7 @@ type SentryWriterConstructor struct {
 	DefaultConfig SentryConfig
 }
 
-// Annotate Fx provide.
+// Annotate creates an annotated instance of SentryWriter.
 func (constructor SentryWriterConstructor) Annotate() fx.Option {
 	var group string
 	if constructor.Name == "" {
@@ -52,15 +56,17 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 	} else {
 		group = config.GroupTag(constructor.Name)
 	}
-	return fx.Provide(
-		fx.Annotate(
-			constructor.provideSentryWriter,
-			fx.ResultTags(group),
+	return fx.Options(
+		fx.Provide(
+			fx.Annotate(
+				constructor.provideSentryWriter,
+				fx.ResultTags(group),
+			),
 		),
 	)
 }
 
-func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller) (io.Writer, error) {
+func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusRegistry *status.Registry, lifecycle fx.Lifecycle) (io.Writer, error) {
 	config := constructor.DefaultConfig
 
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
@@ -73,10 +79,24 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 	}
 
 	sentryWriter, _ := NewSentryWriter(config)
+	sentryWriter.StatusRegistry = statusRegistry
+
+	lifecycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			sentry.CurrentHub().BindClient(sentryWriter.Client)
+			return nil
+		},
+		OnStop: func(_ context.Context) error {
+			duration, _ := time.ParseDuration(SentryFlushWait)
+			sentry.Flush(duration)
+			return nil
+		},
+	})
 
 	return sentryWriter, nil
 }
 
+// NewSentryWriter creates a new SentryWriter instance with Sentry Client and registers panic handler.
 func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 	client, err := sentry.NewClient(sentry.ClientOptions{
 		Dsn:              config.Dsn,
@@ -99,6 +119,10 @@ func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 	}
 
 	reportLevels := []zerolog.Level{
+		zerolog.DebugLevel,
+		zerolog.InfoLevel,
+		zerolog.WarnLevel,
+		zerolog.ErrorLevel,
 		zerolog.FatalLevel,
 		zerolog.PanicLevel,
 	}
@@ -108,10 +132,13 @@ func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 		levels[level] = struct{}{}
 	}
 
+	crashWriter := NewCrashWriter(logCountLimit)
 	sentryWriter := &SentryWriter{
-		Client: client,
-		Levels: levels,
+		Client:      client,
+		Levels:      levels,
+		CrashWriter: crashWriter,
 	}
 
+	panichandler.RegisterPanicHandler(sentryWriter.SentryPanicHandler)
 	return sentryWriter, nil
 }

@@ -1,4 +1,4 @@
-package panichandler_test
+package sentry_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestPanic(t *testing.T) {
+func TestSentry(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Panic Suite")
+	RunSpecs(t, "Sentry Suite")
 }

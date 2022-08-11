@@ -10,6 +10,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cenkalti/backoff/v4 v4.1.3
 	github.com/containerd/cgroups v1.0.4
+	github.com/eapache/queue v1.1.0
 	github.com/elastic/gmux v0.2.0
 	github.com/elastic/gosigar v0.14.2
 	github.com/envoyproxy/go-control-plane v0.10.3
