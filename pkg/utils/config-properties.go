@@ -30,7 +30,7 @@ func HashAndWrapWithConfProps(message proto.Message, policyName string) (*config
 }
 
 // WrapWithConfProps wraps a proto message with a config properties wrapper.
-func WrapWithConfProps(message proto.Message, agentGroupName, policyName, policyHash string, componentIndex int) (*configv1.ConfigPropertiesWrapper, error) {
+func WrapWithConfProps(message proto.Message, agentGroup, policyName, policyHash string, componentIndex int) (*configv1.ConfigPropertiesWrapper, error) {
 	anyPb, anyErr := anypb.New(message)
 	if anyErr != nil {
 		log.Warn().Err(anyErr).Msgf("Failed to create anypb from proto message %+v", message)
@@ -39,7 +39,7 @@ func WrapWithConfProps(message proto.Message, agentGroupName, policyName, policy
 
 	wrapper := configv1.ConfigPropertiesWrapper{
 		Config:         anyPb,
-		AgentGroupName: agentGroupName,
+		AgentGroup:     agentGroup,
 		PolicyName:     policyName,
 		PolicyHash:     policyHash,
 		ComponentIndex: int64(componentIndex),

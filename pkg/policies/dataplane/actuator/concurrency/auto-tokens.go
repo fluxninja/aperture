@@ -128,7 +128,7 @@ func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller co
 		return
 	}
 
-	if wrapperMessage.AgentGroupName != at.agentGroup {
+	if wrapperMessage.AgentGroup != at.agentGroup {
 		log.Trace().Msg("Tokens not updated - agent group mismatch")
 		return
 	}

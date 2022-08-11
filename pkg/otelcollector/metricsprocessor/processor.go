@@ -258,7 +258,7 @@ func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, la
 
 func (p *metricsProcessor) updateMetricsForFluxMeters(fluxMeter *flowcontrolv1.FluxMeter, latency float64) {
 	fluxMeterID := paths.MetricIDForFluxMeterExpanded(
-		fluxMeter.GetAgentGroupName(),
+		fluxMeter.GetAgentGroup(),
 		fluxMeter.GetPolicyName(),
 		fluxMeter.GetFluxMeterName(),
 		fluxMeter.GetPolicyHash(),

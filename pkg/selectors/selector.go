@@ -131,8 +131,7 @@ func (p ControlPointID) String() string {
 func ControlPointIDFromProto(selector *policylangv1.Selector) ControlPointID {
 	return ControlPointID{
 		ServiceID: services.ServiceID{
-			AgentGroup: selector.AgentGroup,
-			Service:    selector.Service,
+			Service: selector.Service,
 		},
 		ControlPoint: ControlPointFromProto(selector.ControlPoint),
 	}

@@ -39,12 +39,12 @@ type Engine struct {
 }
 
 // ProcessRequest .
-func (e *Engine) ProcessRequest(agentGroup string, controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
+func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
 		DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
 	}
 
-	multiMatchResult := e.getMatches(agentGroup, controlPoint, serviceIDs, labels)
+	multiMatchResult := e.getMatches(controlPoint, serviceIDs, labels)
 	if multiMatchResult == nil {
 		return
 	}
@@ -53,10 +53,10 @@ func (e *Engine) ProcessRequest(agentGroup string, controlPoint selectors.Contro
 	fluxMeters := make([]*flowcontrolv1.FluxMeter, len(rawFluxMeters))
 	for i, rawFluxMeter := range rawFluxMeters {
 		fluxMeters[i] = &flowcontrolv1.FluxMeter{
-			AgentGroupName: rawFluxMeter.GetAgentGroupName(),
-			PolicyName:     rawFluxMeter.GetPolicyName(),
-			PolicyHash:     rawFluxMeter.GetPolicyHash(),
-			FluxMeterName:  rawFluxMeter.GetMetricName(),
+			AgentGroup:    rawFluxMeter.GetAgentGroup(),
+			PolicyName:    rawFluxMeter.GetPolicyName(),
+			PolicyHash:    rawFluxMeter.GetPolicyHash(),
+			FluxMeterName: rawFluxMeter.GetMetricName(),
 		}
 	}
 	response.FluxMeters = fluxMeters
@@ -216,7 +216,7 @@ func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.
-func (e *Engine) getMatches(agentGroup string, controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *iface.MultiMatchResult {
+func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *iface.MultiMatchResult {
 	e.multiMatchersMutex.RLock()
 	defer e.multiMatchersMutex.RUnlock()
 
@@ -226,8 +226,7 @@ func (e *Engine) getMatches(agentGroup string, controlPoint selectors.ControlPoi
 	controlPointID := selectors.ControlPointID{
 		ControlPoint: controlPoint,
 		ServiceID: services.ServiceID{
-			Service:    "",
-			AgentGroup: agentGroup,
+			Service: "",
 		},
 	}
 	camm, ok := e.multiMatchers[controlPointID]

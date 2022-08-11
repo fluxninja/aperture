@@ -26,8 +26,6 @@ var _ = Describe("Dataplane Engine", func() {
 		histogram goprom.Histogram
 	)
 
-	agentGroup := ""
-
 	BeforeEach(func() {
 		t = GinkgoTestReporter{}
 		mockCtrl = gomock.NewController(t)
@@ -141,14 +139,13 @@ var _ = Describe("Dataplane Engine", func() {
 				Traffic: selectors.Ingress,
 			}
 			svcs := []services.ServiceID{{
-				AgentGroup: "default",
-				Service:    "testService2.testNamespace2.svc.cluster.local",
+				Service: "testService2.testNamespace2.svc.cluster.local",
 			}}
 			labels := selectors.NewLabels(selectors.LabelSources{
 				Flow: map[string]string{"service": "whatever"},
 			})
 
-			mmr := engine.(*Engine).getMatches(agentGroup, controlPoint, svcs, labels)
+			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.FluxMeters).To(BeEmpty())
 			Expect(mmr.ConcurrencyLimiters).To(BeEmpty())
 		})
@@ -161,14 +158,13 @@ var _ = Describe("Dataplane Engine", func() {
 				Traffic: selectors.Ingress,
 			}
 			svcs := []services.ServiceID{{
-				AgentGroup: "default",
-				Service:    "testService.testNamespace.svc.cluster.local",
+				Service: "testService.testNamespace.svc.cluster.local",
 			}}
 			labels := selectors.NewLabels(selectors.LabelSources{
 				Flow: map[string]string{"service": "testService.testNamespace.svc.cluster.local"},
 			})
 
-			mmr := engine.(*Engine).getMatches(agentGroup, controlPoint, svcs, labels)
+			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.FluxMeters).NotTo(BeEmpty())
 			Expect(mmr.ConcurrencyLimiters).NotTo(BeEmpty())
 		})

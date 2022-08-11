@@ -290,7 +290,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegist
 		return err
 	}
 	autoTokens, err := autoTokensFactory.newAutoTokens(
-		conLimiter.GetAgentGroupName(), conLimiter.GetPolicyName(),
+		conLimiter.GetAgentGroup(), conLimiter.GetPolicyName(),
 		conLimiter.GetPolicyHash(), lifecycle, conLimiter.GetComponentIndex())
 	if err != nil {
 		return err

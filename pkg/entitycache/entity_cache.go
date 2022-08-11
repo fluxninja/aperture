@@ -359,8 +359,7 @@ func ServiceIDsFromEntity(entity *Entity) []services.ServiceID {
 		svcs = make([]services.ServiceID, 0, len(entity.Services))
 		for _, service := range entity.Services {
 			svcs = append(svcs, services.ServiceID{
-				AgentGroup: entity.AgentGroup,
-				Service:    service,
+				Service: service,
 			})
 		}
 	}

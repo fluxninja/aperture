@@ -203,8 +203,7 @@ func (c *Classifier) Classify(
 
 	cpID := selectors.ControlPointID{
 		ServiceID: services.ServiceID{
-			AgentGroup: agentGroup,
-			Service:    "",
+			Service: "",
 		},
 		ControlPoint: cp,
 	}

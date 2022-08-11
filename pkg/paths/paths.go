@@ -47,7 +47,7 @@ func IdentifierForComponent(agentGroupName, policyName string, componentIndex in
 
 // MetricIDForComponent returns the metric ID for a component.
 func MetricIDForComponent(componentAPI component.ComponentAPI) string {
-	return MetricIDForComponentExpanded(componentAPI.GetAgentGroupName(), componentAPI.GetPolicyName(), componentAPI.GetComponentIndex(), componentAPI.GetPolicyHash())
+	return MetricIDForComponentExpanded(componentAPI.GetAgentGroup(), componentAPI.GetPolicyName(), componentAPI.GetComponentIndex(), componentAPI.GetPolicyHash())
 }
 
 // MetricIDForComponentExpanded returns the metric ID for a component.
@@ -62,7 +62,7 @@ func IdentifierForFluxMeter(agentGroupName, policyName, fluxMeterName string) st
 
 // MetricIDForFluxMeter returns the metric ID for a flux meter.
 func MetricIDForFluxMeter(componentAPI component.ComponentAPI, fluxMeterName string) string {
-	return MetricIDForFluxMeterExpanded(componentAPI.GetAgentGroupName(), componentAPI.GetPolicyName(), fluxMeterName, componentAPI.GetPolicyHash())
+	return MetricIDForFluxMeterExpanded(componentAPI.GetAgentGroup(), componentAPI.GetPolicyName(), fluxMeterName, componentAPI.GetPolicyHash())
 }
 
 // MetricIDForFluxMeterExpanded returns the metric ID for a flux meter.

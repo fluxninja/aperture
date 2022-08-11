@@ -297,7 +297,7 @@ definitions:
   apertureflowcontrolv1FluxMeter:
     type: object
     properties:
-      agent_group_name:
+      agent_group:
         type: string
       flux_meter_name:
         type: string
@@ -305,7 +305,7 @@ definitions:
         type: string
       policy_name:
         type: string
-    description: FluxMeter describes deteail for each FluxMeter.
+    description: FluxMeter describes detail for each FluxMeter.
   googlerpcStatus:
     type: object
     properties:

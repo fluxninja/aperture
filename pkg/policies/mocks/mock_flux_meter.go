@@ -35,18 +35,18 @@ func (m *MockFluxMeter) EXPECT() *MockFluxMeterMockRecorder {
 	return m.recorder
 }
 
-// GetAgentGroupName mocks base method.
-func (m *MockFluxMeter) GetAgentGroupName() string {
+// GetAgentGroup mocks base method.
+func (m *MockFluxMeter) GetAgentGroup() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAgentGroupName")
+	ret := m.ctrl.Call(m, "GetAgentGroup")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetAgentGroupName indicates an expected call of GetAgentGroupName.
-func (mr *MockFluxMeterMockRecorder) GetAgentGroupName() *gomock.Call {
+// GetAgentGroup indicates an expected call of GetAgentGroup.
+func (mr *MockFluxMeterMockRecorder) GetAgentGroup() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAgentGroupName", reflect.TypeOf((*MockFluxMeter)(nil).GetAgentGroupName))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAgentGroup", reflect.TypeOf((*MockFluxMeter)(nil).GetAgentGroup))
 }
 
 // GetBuckets mocks base method.
