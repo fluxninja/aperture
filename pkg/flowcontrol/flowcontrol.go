@@ -9,12 +9,10 @@ import (
 	"google.golang.org/grpc/peer"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 // Handler implements the flowcontrol.v1 Service
@@ -25,41 +23,34 @@ type Handler struct {
 	entityCache *entitycache.EntityCache
 	metrics     Metrics
 	engine      iface.EngineAPI
-	agentInfo   *agentinfo.AgentInfo
 }
 
 // NewHandler creates an empty flowcontrol Handler
 //
 // It also accepts a pointer to an EntityCache for Infra Labels lookup.
-func NewHandler(entityCache *entitycache.EntityCache, metrics Metrics, engine iface.EngineAPI, agentInfo *agentinfo.AgentInfo) *Handler {
+func NewHandler(entityCache *entitycache.EntityCache, metrics Metrics, engine iface.EngineAPI) *Handler {
 	return &Handler{
 		entityCache: entityCache,
 		metrics:     metrics,
 		engine:      engine,
-		agentInfo:   agentInfo,
 	}
 }
 
 // HandlerWithValues implements the flowcontrol.v1 service using collected inferred values.
 type HandlerWithValues interface {
-	CheckWithValues(
-		context.Context,
-		selectors.ControlPoint,
-		[]services.ServiceID,
-		selectors.Labels,
-	) *flowcontrolv1.CheckResponse
+	CheckWithValues(context.Context, selectors.ControlPoint, []string, selectors.Labels) *flowcontrolv1.CheckResponse
 }
 
 // CheckWithValues makes decision using collected inferred fields from authz or Handler.
 func (h *Handler) CheckWithValues(
 	ctx context.Context,
 	controlPoint selectors.ControlPoint,
-	serviceIDs []services.ServiceID,
+	svcs []string,
 	labels selectors.Labels,
 ) *flowcontrolv1.CheckResponse {
 	log.Trace().Msg("FlowControl.CheckWithValues()")
 
-	checkResponse := h.engine.ProcessRequest(h.agentInfo.GetAgentGroup(), controlPoint, serviceIDs, labels)
+	checkResponse := h.engine.ProcessRequest(controlPoint, svcs, labels)
 	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetDecisionReason())
 	return checkResponse
 }
@@ -78,13 +69,13 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 		entity = h.entityCache.GetByIP(clientIP)
 	}
 
-	serviceIDs := entitycache.ServiceIDsFromEntity(entity)
+	services := entity.Services
 
 	// CheckWithValues already pushes result to metrics
 	resp := h.CheckWithValues(
 		ctx,
 		selectors.ControlPoint{Feature: req.Feature},
-		serviceIDs,
+		services,
 		selectors.NewLabels(selectors.LabelSources{
 			Flow: req.Labels,
 		}),

@@ -10,7 +10,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 var _ = Describe("Dataplane Engine", func() {
@@ -25,8 +24,6 @@ var _ = Describe("Dataplane Engine", func() {
 		selector  *policylangv1.Selector
 		histogram goprom.Histogram
 	)
-
-	agentGroup := ""
 
 	BeforeEach(func() {
 		t = GinkgoTestReporter{}
@@ -140,15 +137,14 @@ var _ = Describe("Dataplane Engine", func() {
 			controlPoint := selectors.ControlPoint{
 				Traffic: selectors.Ingress,
 			}
-			svcs := []services.ServiceID{{
-				AgentGroup: "default",
-				Service:    "testService2.testNamespace2.svc.cluster.local",
-			}}
+			svcs := []string{
+				"testService2.testNamespace2.svc.cluster.local",
+			}
 			labels := selectors.NewLabels(selectors.LabelSources{
 				Flow: map[string]string{"service": "whatever"},
 			})
 
-			mmr := engine.(*Engine).getMatches(agentGroup, controlPoint, svcs, labels)
+			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.FluxMeters).To(BeEmpty())
 			Expect(mmr.ConcurrencyLimiters).To(BeEmpty())
 		})
@@ -160,15 +156,14 @@ var _ = Describe("Dataplane Engine", func() {
 			controlPoint := selectors.ControlPoint{
 				Traffic: selectors.Ingress,
 			}
-			svcs := []services.ServiceID{{
-				AgentGroup: "default",
-				Service:    "testService.testNamespace.svc.cluster.local",
-			}}
+			svcs := []string{
+				"testService.testNamespace.svc.cluster.local",
+			}
 			labels := selectors.NewLabels(selectors.LabelSources{
 				Flow: map[string]string{"service": "testService.testNamespace.svc.cluster.local"},
 			})
 
-			mmr := engine.(*Engine).getMatches(agentGroup, controlPoint, svcs, labels)
+			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.FluxMeters).NotTo(BeEmpty())
 			Expect(mmr.ConcurrencyLimiters).NotTo(BeEmpty())
 		})

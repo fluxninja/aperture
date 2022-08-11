@@ -13,7 +13,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -39,12 +38,12 @@ type Engine struct {
 }
 
 // ProcessRequest .
-func (e *Engine) ProcessRequest(agentGroup string, controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
+func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, svcs []string, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
 		DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
 	}
 
-	multiMatchResult := e.getMatches(agentGroup, controlPoint, serviceIDs, labels)
+	multiMatchResult := e.getMatches(controlPoint, svcs, labels)
 	if multiMatchResult == nil {
 		return
 	}
@@ -216,7 +215,7 @@ func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.
-func (e *Engine) getMatches(agentGroup string, controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *iface.MultiMatchResult {
+func (e *Engine) getMatches(controlPoint selectors.ControlPoint, svcs []string, labels selectors.Labels) *iface.MultiMatchResult {
 	e.multiMatchersMutex.RLock()
 	defer e.multiMatchersMutex.RUnlock()
 
@@ -225,20 +224,17 @@ func (e *Engine) getMatches(agentGroup string, controlPoint selectors.ControlPoi
 	// Lookup catchall multi matchers for controlPoint
 	controlPointID := selectors.ControlPointID{
 		ControlPoint: controlPoint,
-		ServiceID: services.ServiceID{
-			Service:    "",
-			AgentGroup: agentGroup,
-		},
+		Service:      "",
 	}
 	camm, ok := e.multiMatchers[controlPointID]
 	if ok {
 		mmResult.PopulateFromMultiMatcher(camm, labels)
 	}
 
-	for _, serviceID := range serviceIDs {
+	for _, svc := range svcs {
 		controlPointID := selectors.ControlPointID{
 			ControlPoint: controlPoint,
-			ServiceID:    serviceID,
+			Service:      svc,
 		}
 		// Lookup multi matcher for controlPointID
 		mm, ok := e.multiMatchers[controlPointID]

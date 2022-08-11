@@ -14,7 +14,6 @@ import (
 
 	. "github.com/fluxninja/aperture/pkg/classification"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 type object = map[string]interface{}
@@ -131,9 +130,9 @@ var _ = Describe("Classifier", func() {
 		It("classifies input by returning flow labels", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
-				[]services.ServiceID{{
-					Service: "my-service.default.svc.cluster.local",
-				}},
+				[]string{
+					"my-service.default.svc.cluster.local",
+				},
 				map[string]string{"version": "one", "other": "tag"},
 				selectors.Ingress,
 				attributesWithHeaders(object{
@@ -151,9 +150,9 @@ var _ = Describe("Classifier", func() {
 		It("doesn't classify if direction doesn't match", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
-				[]services.ServiceID{{
-					Service: "my-service.default.svc.cluster.local",
-				}},
+				[]string{
+					"my-service.default.svc.cluster.local",
+				},
 				map[string]string{"version": "one"},
 				selectors.Egress,
 				attributesWithHeaders(object{
@@ -168,9 +167,9 @@ var _ = Describe("Classifier", func() {
 		It("skips rules with non-matching labels", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
-				[]services.ServiceID{{
-					Service: "my-service.default.svc.cluster.local",
-				}},
+				[]string{
+					"my-service.default.svc.cluster.local",
+				},
 				map[string]string{"version": "two"},
 				selectors.Ingress,
 				attributesWithHeaders(object{
@@ -190,9 +189,9 @@ var _ = Describe("Classifier", func() {
 			It("removes removes subset of rules", func() {
 				labels, err := classifier.Classify(
 					context.TODO(),
-					[]services.ServiceID{{
-						Service: "my-service.default.svc.cluster.local",
-					}},
+					[]string{
+						"my-service.default.svc.cluster.local",
+					},
 					map[string]string{"version": "one"},
 					selectors.Ingress,
 					attributesWithHeaders(object{
@@ -263,9 +262,9 @@ var _ = Describe("Classifier", func() {
 		It("marks the returned flow labels with those flags", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
-				[]services.ServiceID{{
-					Service: "my-service.default.svc.cluster.local",
-				}},
+				[]string{
+					"my-service.default.svc.cluster.local",
+				},
 				nil,
 				selectors.Ingress,
 				attributesWithHeaders(object{
@@ -307,9 +306,9 @@ var _ = Describe("Classifier", func() {
 			// them names from filenames)
 			labels, err := classifier.Classify(
 				context.TODO(),
-				[]services.ServiceID{{
-					Service: "my-service.default.svc.cluster.local",
-				}},
+				[]string{
+					"my-service.default.svc.cluster.local",
+				},
 				nil,
 				selectors.Ingress,
 				attributesWithHeaders(object{
@@ -364,9 +363,9 @@ var _ = Describe("Classifier", func() {
 			// them names from filenames)
 			labels, err := classifier.Classify(
 				context.TODO(),
-				[]services.ServiceID{{
-					Service: "my-service.default.svc.cluster.local",
-				}},
+				[]string{
+					"my-service.default.svc.cluster.local",
+				},
 				nil,
 				selectors.Ingress,
 				attributesWithHeaders(object{
@@ -428,9 +427,9 @@ var _ = Describe("Classifier", func() {
 		It("classifies and returns empty flow labels - could not decide which rego to use", func() {
 			labels, err := classifier.Classify(
 				context.TODO(),
-				[]services.ServiceID{{
-					Service: "my-service.default.svc.cluster.local",
-				}},
+				[]string{
+					"my-service.default.svc.cluster.local",
+				},
 				nil,
 				selectors.Ingress,
 				attributesWithHeaders(object{

@@ -7,14 +7,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/fluxninja/aperture/pkg/log"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	mm "github.com/fluxninja/aperture/pkg/multimatcher"
-	"github.com/fluxninja/aperture/pkg/services"
-
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/log"
+	mm "github.com/fluxninja/aperture/pkg/multimatcher"
 )
 
 // Selector is a parsed/preprocessed version of policylangv1.Selector
@@ -24,7 +21,6 @@ type Selector struct {
 	// Additionally, arbitrary label matcher can be used to match labels.
 	// For flowcontrol policies this matcher can _also_ match flow labels.
 	LabelMatcher mm.Expr
-	// ServiceID and control point are required
 	ControlPointID
 }
 
@@ -110,18 +106,16 @@ func ControlPointFromProto(controlPoint *policylangv1.ControlPoint) ControlPoint
 	}
 }
 
-// ControlPointID uniquely identifies the control point within a cluster – so
-// it's a ServiceID and ControlPoint combined
-//
-// Control Point.
+// ControlPointID uniquely identifies the control point within a cluster
+// It is a combination of Service and ControlPoint.
 type ControlPointID struct {
-	ServiceID    services.ServiceID
+	Service      string
 	ControlPoint ControlPoint
 }
 
 // String returns a string representation of control point and service.
 func (p ControlPointID) String() string {
-	return fmt.Sprintf("%v@%v", p.ControlPoint, p.ServiceID)
+	return fmt.Sprintf("%v@%v", p.ControlPoint, p.Service)
 }
 
 // ControlPointIDFromProto extracts a ControlPointID from proto-based selector
@@ -130,10 +124,7 @@ func (p ControlPointID) String() string {
 // Selector is assumed to be validated and non-nil.
 func ControlPointIDFromProto(selector *policylangv1.Selector) ControlPointID {
 	return ControlPointID{
-		ServiceID: services.ServiceID{
-			AgentGroup: selector.AgentGroup,
-			Service:    selector.Service,
-		},
+		Service:      selector.Service,
 		ControlPoint: ControlPointFromProto(selector.ControlPoint),
 	}
 }

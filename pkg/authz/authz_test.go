@@ -17,7 +17,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 var (
@@ -43,12 +42,7 @@ type AcceptingHandler struct {
 	flowcontrol.HandlerWithValues
 }
 
-func (s *AcceptingHandler) CheckWithValues(
-	context.Context,
-	selectors.ControlPoint,
-	[]services.ServiceID,
-	selectors.Labels,
-) *flowcontrolv1.CheckResponse {
+func (s *AcceptingHandler) CheckWithValues(context.Context, selectors.ControlPoint, []string, selectors.Labels) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
 		DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
 	}

@@ -17,7 +17,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/discovery/common"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 const (
@@ -63,8 +62,7 @@ type Entity struct {
 	AgentGroup string `json:"agent_group"`
 	// Services is a List of names of services this entity is a part of.
 	// We store "well-known-labels" (identifying a service) in a separate
-	// fields for easier access. Note: we could store `[]agent_core/services/ServiceID`
-	// here directly, but right now it'd cause cyclic dependency.
+	// fields for easier access.
 	Services []string `json:"services"`
 }
 
@@ -352,34 +350,18 @@ func eachPair(services []ServiceKey) []pair {
 	return pairs
 }
 
-// ServiceIDsFromEntity returns a list of services the entity is a part of.
-func ServiceIDsFromEntity(entity *Entity) []services.ServiceID {
-	var svcs []services.ServiceID
-	if entity != nil {
-		svcs = make([]services.ServiceID, 0, len(entity.Services))
-		for _, service := range entity.Services {
-			svcs = append(svcs, services.ServiceID{
-				AgentGroup: entity.AgentGroup,
-				Service:    service,
-			})
-		}
-	}
-	return svcs
-}
-
 func servicesFromEntity(entity *Entity) ([]*heartbeatv1.Service, error) {
 	if entity.AgentGroup == "" {
 		return nil, errors.New("missing agent group")
 	}
 
-	svcIDs := ServiceIDsFromEntity(entity)
-	svcs := make([]*heartbeatv1.Service, 0, len(svcIDs))
-	for _, svc := range svcIDs {
-		svcs = append(svcs, &heartbeatv1.Service{
+	services := make([]*heartbeatv1.Service, 0, len(entity.Services))
+	for _, svc := range entity.Services {
+		services = append(services, &heartbeatv1.Service{
 			AgentGroup:    entity.AgentGroup,
-			Name:          svc.Service,
+			Name:          svc,
 			EntitiesCount: 1,
 		})
 	}
-	return svcs, nil
+	return services, nil
 }

@@ -17,7 +17,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 const defaultPackageName = "fluxninja.classification.extractors"
@@ -185,7 +184,7 @@ func populateFlowLabels(ctx context.Context, flowLabels FlowLabels, mm *multimat
 // LabelsForMatching are additional labels to use for selector matching.
 func (c *Classifier) Classify(
 	ctx context.Context,
-	svcs []services.ServiceID,
+	svcs []string,
 	labelsForMatching selectors.Labels,
 	direction selectors.TrafficDirection,
 	input ast.Value,
@@ -202,11 +201,8 @@ func (c *Classifier) Classify(
 	}
 
 	cpID := selectors.ControlPointID{
-		ServiceID: services.ServiceID{
-			AgentGroup: agentGroup,
-			Service:    "",
-		},
 		ControlPoint: cp,
+		Service:      "",
 	}
 	camm, ok := r.MultiMatcherByControlPointID[cpID]
 	if ok {
@@ -217,7 +213,7 @@ func (c *Classifier) Classify(
 
 	for _, svc := range svcs {
 		cpID := selectors.ControlPointID{
-			ServiceID:    svc,
+			Service:      svc,
 			ControlPoint: cp,
 		}
 		mm, ok := r.MultiMatcherByControlPointID[cpID]
