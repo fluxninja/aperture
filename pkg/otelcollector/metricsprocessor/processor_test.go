@@ -249,7 +249,7 @@ var _ = Describe("Metrics Processor", func() {
 			map[string]interface{}{
 				otelcollector.AuthzStatusLabel:          "STATUS_NO_ERROR",
 				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_ACCEPTED",
-				otelcollector.DecisionRejectReasonLabel: "error_reason:ERROR_REASON_ENTITY_LOOKUP_FAILED",
+				otelcollector.DecisionErrorReasonLabel:  "ERROR_REASON_UNSPECIFIED",
 				otelcollector.RateLimitersLabel:         []interface{}{},
 				otelcollector.DroppingRateLimitersLabel: []interface{}{},
 				otelcollector.ConcurrencyLimitersLabel: []interface{}{
