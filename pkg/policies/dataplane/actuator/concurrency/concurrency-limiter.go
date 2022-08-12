@@ -303,10 +303,10 @@ type concurrencyLimiter struct {
 	concurrencyLimiterProto    *policylangv1.ConcurrencyLimiter
 	concurrencyLimiterFactory  *concurrencyLimiterFactory
 	autoTokens                 *autoTokens
-	registryPath               string
 	workloadMultiMatcher       *multiMatcher
 	defaultWorkloadProto       *policylangv1.Scheduler_Workload
 	schedulerProto             *policylangv1.Scheduler
+	registryPath               string
 }
 
 // Make sure ConcurrencyLimiter implements the iface.ConcurrencyLimiter.

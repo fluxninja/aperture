@@ -38,6 +38,8 @@ const (
 // Scheduler is part of the concurrency control component stack.
 type Scheduler struct {
 	policyReadAPI policyapi.PolicyReadAPI
+	// saves promValue result from tokens query to check if anything changed
+	tokensPromValue prometheusmodel.Value
 	// Prometheus query for accepted concurrency
 	acceptedQuery *component.ScalarQuery
 	// Prometheus query for incoming concurrency
@@ -47,13 +49,10 @@ type Scheduler struct {
 
 	// saves tokens value per workload read from prometheus
 	tokensByWorkload *policydecisionsv1.TokensDecision
-	agentGroupName   string
-	componentIndex   int
-	etcdPath         string
 	writer           *etcdwriter.Writer
-
-	// saves promValue result from tokens query to check if anything changed
-	tokensPromValue prometheusmodel.Value
+	agentGroupName   string
+	etcdPath         string
+	componentIndex   int
 }
 
 // NewSchedulerAndOptions creates scheduler and its fx options.
@@ -65,7 +64,6 @@ func NewSchedulerAndOptions(
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.AutoTokenResultsPath,
 		paths.IdentifierForComponent(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
-	metricID := paths.MetricIDForComponentExpanded(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex), policyReadAPI.GetPolicyHash())
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,
@@ -104,10 +102,9 @@ func NewSchedulerAndOptions(
 
 	if schedulerProto.AutoTokens {
 		tokensQuery, tokensQueryOptions, tokensQueryErr := component.NewTaggedQueryAndOptions(
-			// TODO (hasit): change the metric name to token_latency with labels policy_name, policy_hash, component_index.
-			fmt.Sprintf("sum by %s (increase(workload_latency_ms_sum{metric_id=\"%s\"}[30m])) / sum by %s (increase(workload_latency_ms_count{metric_id=\"%s\"}[30m]))",
-				workloadIndexLabel, metricID,
-				workloadIndexLabel, metricID),
+			fmt.Sprintf("sum by %s (increase(workload_latency_ms_sum{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[30m])) / sum by %s (increase(workload_latency_ms_count{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[30m]))",
+				workloadIndexLabel, policyReadAPI.GetPolicyName(), policyReadAPI.GetPolicyHash(), componentIndex,
+				workloadIndexLabel, policyReadAPI.GetPolicyName(), policyReadAPI.GetPolicyHash(), componentIndex),
 			tokensQueryInterval,
 			componentIndex,
 			policyReadAPI,
