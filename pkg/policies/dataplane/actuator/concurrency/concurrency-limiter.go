@@ -3,7 +3,6 @@ package concurrency
 import (
 	"context"
 	"fmt"
-	"math"
 	"path"
 	"strconv"
 	"time"
@@ -16,6 +15,7 @@ import (
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -23,7 +23,6 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/flowcontrol/scheduler"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
@@ -42,13 +41,11 @@ const (
 	componentIndexLabelKey = "component_index"
 )
 
-var (
-	// FxNameTag is Concurrency Limiter Watcher's Fx Tag.
-	fxNameTag = config.NameTag("concurrency_limiter")
+// fxNameTag is Concurrency Limiter Watcher's Fx Tag.
+var fxNameTag = config.NameTag("concurrency_limiter")
 
-	// Array of Label Keys for WFQ and Token Bucket Metrics.
-	metricLabelKeys = []string{policyNameLabelKey, policyHashLabelKey, componentIndexLabelKey}
-)
+// Array of Label Keys for WFQ and Token Bucket Metrics.
+var metricLabelKeys = []string{policyNameLabelKey, policyHashLabelKey, componentIndexLabelKey}
 
 // concurrencyLimiterModule returns the fx options for dataplane side pieces of concurrency limiter in the main fx app.
 func concurrencyLimiterModule() fx.Option {
@@ -220,14 +217,6 @@ func setupConcurrencyLimiterFactory(
 	return nil
 }
 
-// multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
-type multiMatchResult struct {
-	matchedWorkloads map[int]*policylangv1.Scheduler_Workload
-}
-
-// multiMatcher is MultiMatcher instantiation used in this package.
-type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
-
 // newConcurrencyLimiterOptions returns fx options for the concurrency limiter fx app.
 func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions(
 	key notifiers.Key,
@@ -252,40 +241,14 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 		return fx.Options(), err
 	}
 
-	// Loop through the workloads
-	schedulerProto := concurrencyLimiterProto.Scheduler
-	if schedulerProto == nil {
-		err = fmt.Errorf("no scheduler specified")
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(registryPath, s)
-		log.Warn().Err(err).Msg("Failed to unmarshal scheduler")
-		return fx.Options(), err
-	}
-	mm := multimatcher.New[int, multiMatchResult]()
-	for workloadIndex, workloadProto := range schedulerProto.Workloads {
-		workloadMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-			mmr.matchedWorkloads[workloadIndex] = workloadProto.GetWorkload()
-			return mmr
-		}
-		labelMatcher, err := selectors.MMExprFromLabelMatcher(workloadProto.GetLabelMatcher())
-		if err != nil {
-			return fx.Options(), err
-		}
-		err = mm.AddEntry(workloadIndex, labelMatcher, workloadMatchedCB)
-		if err != nil {
-			return fx.Options(), err
-		}
-	}
-
 	conLimiter := &concurrencyLimiter{
 		ComponentAPI:              component.NewComponent(wrapperMessage),
 		concurrencyLimiterProto:   concurrencyLimiterProto,
 		registryPath:              registryPath,
 		concurrencyLimiterFactory: conLimiterFactory,
-		workloadMultiMatcher:      mm,
-		defaultWorkloadProto:      schedulerProto.DefaultWorkload,
-		schedulerProto:            schedulerProto,
 	}
+	// MetricID for the metrics associated with this concurrency limiter
+	conLimiter.metricID = paths.MetricIDForComponent(conLimiter)
 
 	return fx.Options(
 		fx.Invoke(
@@ -303,10 +266,8 @@ type concurrencyLimiter struct {
 	concurrencyLimiterProto    *policylangv1.ConcurrencyLimiter
 	concurrencyLimiterFactory  *concurrencyLimiterFactory
 	autoTokens                 *autoTokens
-	workloadMultiMatcher       *multiMatcher
-	defaultWorkloadProto       *policylangv1.Scheduler_Workload
-	schedulerProto             *policylangv1.Scheduler
 	registryPath               string
+	metricID                   string
 }
 
 // Make sure ConcurrencyLimiter implements the iface.ConcurrencyLimiter.
@@ -328,15 +289,13 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegist
 	if err != nil {
 		return err
 	}
-	if conLimiter.schedulerProto.AutoTokens {
-		autoTokens, err := autoTokensFactory.newAutoTokens(
-			conLimiter.GetAgentGroup(), conLimiter.GetPolicyName(),
-			conLimiter.GetPolicyHash(), lifecycle, conLimiter.GetComponentIndex())
-		if err != nil {
-			return err
-		}
-		conLimiter.autoTokens = autoTokens
+	autoTokens, err := autoTokensFactory.newAutoTokens(
+		conLimiter.GetAgentGroup(), conLimiter.GetPolicyName(),
+		conLimiter.GetPolicyHash(), lifecycle, conLimiter.GetComponentIndex())
+	if err != nil {
+		return err
 	}
+	conLimiter.autoTokens = autoTokens
 
 	engineAPI := conLimiterFactory.engineAPI
 	wfqFlowsGaugeVec := conLimiterFactory.wfqFlowsGaugeVec
@@ -432,59 +391,77 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegist
 	return nil
 }
 
+func (conLimiter *concurrencyLimiter) getWorkload(labels selectors.Labels) *policydecisionsv1.WorkloadDesc {
+	workload := &policydecisionsv1.WorkloadDesc{
+		WorkloadKey:   "default_workload_key",
+		WorkloadValue: "default_workload_value",
+	}
+	workloadConfig := conLimiter.concurrencyLimiterProto.GetScheduler().GetWorkloadConfig()
+	labelKey := workloadConfig.LabelKey
+	// Check if workload flow label is present in labels
+	labelValue, ok := labels[labelKey]
+	if ok {
+		for _, value := range workloadConfig.Workloads {
+			if value.LabelValue == labelValue {
+				// Stop at match
+				workload = &policydecisionsv1.WorkloadDesc{
+					WorkloadKey:   labelKey,
+					WorkloadValue: labelValue,
+				}
+				break
+			}
+		}
+	}
+	return workload
+}
+
 // GetSelector returns selector.
 func (conLimiter *concurrencyLimiter) GetSelector() *policylangv1.Selector {
-	return conLimiter.schedulerProto.GetSelector()
+	return conLimiter.concurrencyLimiterProto.GetScheduler().GetSelector()
 }
 
 // RunLimiter .
 func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
-	var matchedWorkloadProto *policylangv1.Scheduler_Workload
-	var matchedWorkloadIndex string
-	// match labels against conLimiter.workloadMultiMatcher
-	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labels.ToPlainMap()))
-	// if at least one match, return workload with lowest index
-	if len(mmr.matchedWorkloads) > 0 {
-		// select the smallest workloadIndex
-		smallestWorkloadIndex := math.MaxInt32
-		for workloadIndex := range mmr.matchedWorkloads {
-			if workloadIndex < smallestWorkloadIndex {
-				smallestWorkloadIndex = workloadIndex
+	fairnessKey := conLimiter.concurrencyLimiterProto.GetScheduler().GetFairnessKey()
+	workloadConfig := conLimiter.concurrencyLimiterProto.GetScheduler().GetWorkloadConfig()
+	workload := conLimiter.getWorkload(labels)
+
+	priority := workloadConfig.DefaultWorkload.Priority
+	tokens := workloadConfig.DefaultWorkload.Tokens
+	fairnessLabel := "stub"
+	timeout := workloadConfig.DefaultWorkload.Timeout
+
+	if val, ok := labels[fairnessKey]; ok {
+		// TODO: revist with the right format.
+		fairnessLabel = fairnessKey + ":" + val
+	}
+
+	matched := false
+	for _, val := range workloadConfig.Workloads {
+		if workload.WorkloadValue == val.LabelValue {
+			priority = val.Priority
+			timeout = val.Timeout
+
+			if workloadConfig.AutoTokens {
+				tokens = conLimiter.autoTokens.GetTokensForWorkload(workload)
+				matched = true
+			} else {
+				tokens = val.Tokens
+				matched = true
 			}
+			break
 		}
-		matchedWorkloadProto = mmr.matchedWorkloads[smallestWorkloadIndex]
-		matchedWorkloadIndex = strconv.Itoa(smallestWorkloadIndex)
-	} else {
-		// no match, return default workload
-		matchedWorkloadProto = conLimiter.defaultWorkloadProto
-		// TODO: get default workload's workload_index value from common file
-		matchedWorkloadIndex = "default"
 	}
 
-	fairnessLabel := "workload:" + matchedWorkloadIndex
-
-	if val, ok := labels[matchedWorkloadProto.FairnessKey]; ok {
-		fairnessLabel = fairnessLabel + "," + val
-	}
-	// Lookup tokens for the workload
-	var tokens uint64
-	if conLimiter.schedulerProto.AutoTokens {
-		tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex)
-		if !ok {
-			// default to 1 if auto tokens not found
-			tokens = 1
-		} else {
-			tokens = tokensAuto
-		}
-	} else {
-		tokens = matchedWorkloadProto.Tokens
+	if !matched {
+		tokens = conLimiter.autoTokens.GetTokensForDefaultWorkload()
 	}
 
 	reqContext := scheduler.RequestContext{
 		FairnessLabel: fairnessLabel,
-		Priority:      uint8(matchedWorkloadProto.Priority),
-		Timeout:       matchedWorkloadProto.Timeout.AsDuration(),
 		Tokens:        tokens,
+		Priority:      uint8(priority),
+		Timeout:       timeout.AsDuration(),
 	}
 
 	accepted := conLimiter.scheduler.Schedule(reqContext)
@@ -503,7 +480,7 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowc
 		Dropped:        !accepted,
 		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
 			ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-				WorkloadIndex: matchedWorkloadIndex,
+				Workload: workload.String(),
 			},
 		},
 	}

@@ -14,8 +14,9 @@
   eg. {any: {of: [expr…
 - [RateLimiterLazySyncConfig](#rate-limiter-lazy-sync-config)
 - [RateLimiterOverrideConfig](#rate-limiter-override-config)
-- [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
-- [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
+- [SchedulerWorkloadConfig](#scheduler-workload-config) – Configuration that provides scheduling parameters such as priority for the given…
+- [WorkloadConfigDefaultWorkload](#workload-config-default-workload) – Workload defines a class of requests that preferably have similar properties suc…
+- [WorkloadConfigWorkload](#workload-config-workload) – Workload defines a class of requests that preferably have similar properties suc…
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to pr…
 - [languagev1RateLimiter](#languagev1-rate-limiter)
 - [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
@@ -144,20 +145,52 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
-### <span id="scheduler-workload"></span> SchedulerWorkload
+### <span id="scheduler-workload-config"></span> SchedulerWorkloadConfig
+
+Configuration that provides scheduling parameters such as priority for the given workloads.
+
+#### Properties
+
+<dl>
+<dt>auto_tokens</dt>
+<dd>
+
+(bool)
+
+</dd>
+</dl>
+<dl>
+<dt>default_workload</dt>
+<dd>
+
+([WorkloadConfigDefaultWorkload](#workload-config-default-workload))
+
+</dd>
+</dl>
+<dl>
+<dt>label_key</dt>
+<dd>
+
+(string) TODO: this entire section is being reworked by @TanveerGill
+
+</dd>
+</dl>
+<dl>
+<dt>workloads</dt>
+<dd>
+
+([[]WorkloadConfigWorkload](#workload-config-workload)) list of workloads
+workload can describe priority, tokens (if auto_tokens are set to false) and timeout
+
+</dd>
+</dl>
+
+### <span id="workload-config-default-workload"></span> WorkloadConfigDefaultWorkload
 
 Workload defines a class of requests that preferably have similar properties such as response latency.
 
 #### Properties
 
-<dl>
-<dt>fairness_key</dt>
-<dd>
-
-(string)
-
-</dd>
-</dl>
 <dl>
 <dt>priority</dt>
 <dd>
@@ -185,23 +218,43 @@ Higher numbers means higher priority level.
 </dd>
 </dl>
 
-### <span id="scheduler-workload-and-label-matcher"></span> SchedulerWorkloadAndLabelMatcher
+### <span id="workload-config-workload"></span> WorkloadConfigWorkload
+
+Workload defines a class of requests that preferably have similar properties such as response latency.
 
 #### Properties
 
 <dl>
-<dt>label_matcher</dt>
+<dt>label_value</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload.
+(string) Value of label for specified workload label key.
 
 </dd>
 </dl>
 <dl>
-<dt>workload</dt>
+<dt>priority</dt>
 <dd>
 
-([SchedulerWorkload](#scheduler-workload)) Workload associated with requests matching the label matcher.
+(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
+Priority level ranges from 0 to 255.
+Higher numbers means higher priority level.
+
+</dd>
+</dl>
+<dl>
+<dt>timeout</dt>
+<dd>
+
+(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
+
+</dd>
+</dl>
+<dl>
+<dt>tokens</dt>
+<dd>
+
+(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.
 
 </dd>
 </dl>
@@ -1395,18 +1448,10 @@ Weighted Fair Queuing based workload scheduler.
 #### Properties
 
 <dl>
-<dt>auto_tokens</dt>
+<dt>fairness_key</dt>
 <dd>
 
-(bool)
-
-</dd>
-</dl>
-<dl>
-<dt>default_workload</dt>
-<dd>
-
-([SchedulerWorkload](#scheduler-workload))
+(string) TODO: this is getting reworked.
 
 </dd>
 </dl>
@@ -1427,11 +1472,10 @@ Weighted Fair Queuing based workload scheduler.
 </dd>
 </dl>
 <dl>
-<dt>workloads</dt>
+<dt>workload_config</dt>
 <dd>
 
-([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) list of workloads
-workload can describe priority, tokens (if auto_tokens are set to false) and timeout
+([SchedulerWorkloadConfig](#scheduler-workload-config))
 
 </dd>
 </dl>

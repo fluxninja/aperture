@@ -173,7 +173,7 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 			rawValue := []string{
 				fmt.Sprintf("policy_name:%v", decision.GetPolicyName()),
 				fmt.Sprintf("component_index:%v", decision.GetComponentIndex()),
-				fmt.Sprintf("workload_index:%v", cl.GetWorkloadIndex()),
+				fmt.Sprintf("workload_index:%v", cl.GetWorkload()),
 				fmt.Sprintf("policy_hash:%v", decision.GetPolicyHash()),
 			}
 			value := strings.Join(rawValue, ",")
@@ -229,7 +229,7 @@ func (p *metricsProcessor) updateMetrics(
 
 		workload := ""
 		if cl := decision.GetConcurrencyLimiter(); cl != nil {
-			workload = cl.GetWorkloadIndex()
+			workload = cl.GetWorkload()
 		}
 		err = p.updateMetricsForWorkload(labels, latency, workload)
 		if err != nil {
