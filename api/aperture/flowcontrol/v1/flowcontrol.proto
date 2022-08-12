@@ -58,7 +58,7 @@ message LimiterDecision {
   }
 
   message ConcurrencyLimiter {
-    string workload = 1;
+    string workload_index = 1;
   }
 
   enum LimiterReason {

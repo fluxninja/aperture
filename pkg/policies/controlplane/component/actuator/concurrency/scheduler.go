@@ -32,15 +32,14 @@ var (
 )
 
 const (
-	workloadKeyNameMetricsLabel  = "workload_key_name"
-	workloadKeyValueMetricsLabel = "workload_key_value"
-	defaultWorkloadKey           = "default_workload_key"
-	defaultWorkloadValue         = "default_workload_value"
+	workloadIndexLabel = "workload_index"
 )
 
 // Scheduler is part of the concurrency control component stack.
 type Scheduler struct {
 	policyReadAPI policyapi.PolicyReadAPI
+	// saves promValue result from tokens query to check if anything changed
+	tokensPromValue prometheusmodel.Value
 	// Prometheus query for accepted concurrency
 	acceptedQuery *component.ScalarQuery
 	// Prometheus query for incoming concurrency
@@ -50,31 +49,26 @@ type Scheduler struct {
 
 	// saves tokens value per workload read from prometheus
 	tokensByWorkload *policydecisionsv1.TokensDecision
-	agentGroupName   string
-	componentIndex   int
-	etcdPath         string
 	writer           *etcdwriter.Writer
-
-	// saves promValue result from tokens query to check if anything changed
-	tokensPromValue prometheusmodel.Value
+	agentGroupName   string
+	etcdPath         string
+	componentIndex   int
 }
 
 // NewSchedulerAndOptions creates scheduler and its fx options.
 func NewSchedulerAndOptions(
-	_ *policylangv1.Scheduler,
+	schedulerProto *policylangv1.Scheduler,
 	componentIndex int,
 	policyReadAPI policyapi.PolicyReadAPI,
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.AutoTokenResultsPath,
 		paths.IdentifierForComponent(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
-	metricID := paths.MetricIDForComponentExpanded(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex), policyReadAPI.GetPolicyHash())
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,
 		tokensByWorkload: &policydecisionsv1.TokensDecision{
-			DefaultWorkloadTokens: 1,
-			TokensByWorkload:      make(map[string]uint64),
+			TokensByWorkloadIndex: make(map[string]uint64),
 		},
 		agentGroupName:  agentGroupName,
 		componentIndex:  componentIndex,
@@ -106,28 +100,37 @@ func NewSchedulerAndOptions(
 	}
 	scheduler.incomingQuery = incomingQuery
 
-	tokensQuery, tokensQueryOptions, tokensQueryErr := component.NewTaggedQueryAndOptions(
-		fmt.Sprintf("sum by (%s, %s) (increase(workload_latency_ms_sum{metric_id=\"%s\"}[30m])) / sum by (%s, %s) (increase(workload_latency_ms_count{metric_id=\"%s\"}[30m]))",
-			workloadKeyNameMetricsLabel, workloadKeyValueMetricsLabel, metricID,
-			workloadKeyNameMetricsLabel, workloadKeyValueMetricsLabel, metricID),
-		tokensQueryInterval,
-		componentIndex,
-		policyReadAPI,
-		"Tokens",
-	)
-	if tokensQueryErr != nil {
-		return nil, nil, tokensQueryErr
+	if schedulerProto.AutoTokens {
+		tokensQuery, tokensQueryOptions, tokensQueryErr := component.NewTaggedQueryAndOptions(
+			fmt.Sprintf("sum by %s (increase(workload_latency_ms_sum{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[30m])) / sum by %s (increase(workload_latency_ms_count{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[30m]))",
+				workloadIndexLabel, policyReadAPI.GetPolicyName(), policyReadAPI.GetPolicyHash(), componentIndex,
+				workloadIndexLabel, policyReadAPI.GetPolicyName(), policyReadAPI.GetPolicyHash(), componentIndex),
+			tokensQueryInterval,
+			componentIndex,
+			policyReadAPI,
+			"Tokens",
+		)
+		if tokensQueryErr != nil {
+			return nil, nil, tokensQueryErr
+		}
+		scheduler.tokensQuery = tokensQuery
+		return scheduler,
+			fx.Options(
+				acceptedQueryOptions,
+				incomingQueryOptions,
+				tokensQueryOptions,
+				fx.Invoke(scheduler.setupWriter),
+			),
+			nil
+	} else {
+		return scheduler,
+			fx.Options(
+				acceptedQueryOptions,
+				incomingQueryOptions,
+				fx.Invoke(scheduler.setupWriter),
+			),
+			nil
 	}
-	scheduler.tokensQuery = tokensQuery
-
-	return scheduler,
-		fx.Options(
-			acceptedQueryOptions,
-			incomingQueryOptions,
-			tokensQueryOptions,
-			fx.Invoke(scheduler.setupWriter),
-		),
-		nil
 }
 
 func (s *Scheduler) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
@@ -153,51 +156,37 @@ func (s *Scheduler) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Life
 func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	var errMulti error
 
-	promValue, err := s.tokensQuery.ExecutePromQuery(tickInfo)
-	if err != nil {
-		log.Error().Err(err).Msg("could not read tokens query from prometheus")
-		errMulti = multierr.Append(errMulti, err)
-	} else if promValue != nil && !reflect.DeepEqual(promValue, s.tokensPromValue) {
-		// update only if something changed
-		s.tokensPromValue = promValue
+	if s.tokensQuery != nil {
+		promValue, err := s.tokensQuery.ExecutePromQuery(tickInfo)
+		if err != nil {
+			log.Error().Err(err).Msg("could not read tokens query from prometheus")
+			errMulti = multierr.Append(errMulti, err)
+		} else if promValue != nil && !reflect.DeepEqual(promValue, s.tokensPromValue) {
+			// update only if something changed
+			s.tokensPromValue = promValue
 
-		if vector, ok := promValue.(prometheusmodel.Vector); ok {
-			tokensDecision := &policydecisionsv1.TokensDecision{
-				DefaultWorkloadTokens: 1,
-				TokensByWorkload:      make(map[string]uint64),
-			}
-			defaultWorkload := &policydecisionsv1.WorkloadDesc{
-				WorkloadKey:   "default_workload_key",
-				WorkloadValue: "default_workload_value",
-			}
-			for _, sample := range vector {
-				var workloadKey, workloadValue string
-				for k, v := range sample.Metric {
-					if k == workloadKeyNameMetricsLabel {
-						workloadKey = string(v)
-					}
-					if k == workloadKeyValueMetricsLabel {
-						workloadValue = string(v)
+			if vector, ok := promValue.(prometheusmodel.Vector); ok {
+				tokensDecision := &policydecisionsv1.TokensDecision{
+					TokensByWorkloadIndex: make(map[string]uint64),
+				}
+				for _, sample := range vector {
+					for k, v := range sample.Metric {
+						if k == workloadIndexLabel {
+							workloadIndex := string(v)
+							sampleValue := uint64(sample.Value)
+							tokensDecision.TokensByWorkloadIndex[workloadIndex] = sampleValue
+							break
+						}
 					}
 				}
-				sampleValue := uint64(sample.Value)
-				workload := &policydecisionsv1.WorkloadDesc{WorkloadKey: workloadKey, WorkloadValue: workloadValue}
-
-				// Check if it's a default workload
-				if reflect.DeepEqual(workload, defaultWorkload) {
-					tokensDecision.DefaultWorkloadTokens = sampleValue
-				} else {
-					tokensDecision.TokensByWorkload[workload.String()] = sampleValue
+				err = s.publishQueryTokens(tokensDecision)
+				if err != nil {
+					log.Error().Err(err).Msg("failed to publish tokens")
 				}
-
+			} else {
+				err = fmt.Errorf("tokens query returned a non-vector value")
+				log.Error().Err(err).Msg("Failed to parse tokens")
 			}
-			err = s.publishQueryTokens(tokensDecision)
-			if err != nil {
-				log.Error().Err(err).Msg("failed to publish tokens")
-			}
-		} else {
-			err = fmt.Errorf("tokens query returned a non-vector value")
-			log.Error().Err(err).Msg("Failed to parse tokens")
 		}
 	}
 

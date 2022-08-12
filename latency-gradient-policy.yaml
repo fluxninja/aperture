@@ -92,19 +92,23 @@ data:
               service: "demo1-demo-app.demoapp.svc.cluster.local"
               control_point:
                 traffic: "ingress"
-            workload_config:
-              label_key: "flow_user"
-              auto_tokens: true
-              default_workload:
-                priority: 20
-                timeout: "0.005s"
-              workloads:
-                - label_value: "A"
+            auto_tokens: true
+            default_workload:
+              priority: 20
+              timeout: "0.005s"
+            workloads:
+              - workload:
                   priority: 50
                   timeout: "0.005s"
-                - label_value: "B"
+                label_matcher:
+                  match_labels:
+                    flow_user: "A"
+              - workload:
                   priority: 200
                   timeout: "0.005s"
+                label_matcher:
+                  match_labels:
+                    flow_user: "B"
             out_ports:
               accepted_concurrency:
                 signal_name: "ACCEPTED_CONCURRENCY"
