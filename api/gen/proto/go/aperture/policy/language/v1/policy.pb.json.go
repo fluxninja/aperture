@@ -392,7 +392,7 @@ func (msg *Scheduler) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Scheduler_Workload) MarshalJSON() ([]byte, error) {
+func (msg *Scheduler_WorkloadConfig) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -401,14 +401,14 @@ func (msg *Scheduler_Workload) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Scheduler_Workload) UnmarshalJSON(b []byte) error {
+func (msg *Scheduler_WorkloadConfig) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Scheduler_WorkloadAndLabelMatcher) MarshalJSON() ([]byte, error) {
+func (msg *Scheduler_WorkloadConfig_Workload) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -417,7 +417,23 @@ func (msg *Scheduler_WorkloadAndLabelMatcher) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Scheduler_WorkloadAndLabelMatcher) UnmarshalJSON(b []byte) error {
+func (msg *Scheduler_WorkloadConfig_Workload) UnmarshalJSON(b []byte) error {
+	return protojson.UnmarshalOptions{
+		DiscardUnknown: false,
+	}.Unmarshal(b, msg)
+}
+
+// MarshalJSON implements json.Marshaler
+func (msg *Scheduler_WorkloadConfig_DefaultWorkload) MarshalJSON() ([]byte, error) {
+	return protojson.MarshalOptions{
+		UseEnumNumbers:  false,
+		EmitUnpopulated: true,
+		UseProtoNames:   true,
+	}.Marshal(msg)
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (msg *Scheduler_WorkloadConfig_DefaultWorkload) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

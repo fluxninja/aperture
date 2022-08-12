@@ -177,7 +177,7 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 		registryPath:       registryPath,
 		rateLimiterFactory: rateLimiterFactory,
 	}
-	rateLimiter.name = paths.MetricIDForComponent(rateLimiter)
+	rateLimiter.metricID = paths.MetricIDForComponent(rateLimiter)
 
 	return fx.Options(
 		fx.Invoke(
@@ -194,7 +194,7 @@ type rateLimiter struct {
 	limitCheck         *ratelimiter.BasicRateLimitCheck
 	registryPath       string
 	rateLimiterProto   *policylangv1.RateLimiter
-	name               string
+	metricID           string
 }
 
 // Make sure rateLimiter implements iface.Limiter.
@@ -225,7 +225,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 			}
 			rateLimiter.limiter, err = ratelimiter.NewOlricRateLimiter(rateLimiter.limitCheck,
 				rateLimiter.rateLimiterFactory.distCache,
-				rateLimiter.name,
+				rateLimiter.metricID,
 				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to create limiter")

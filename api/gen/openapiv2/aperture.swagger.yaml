@@ -229,11 +229,27 @@ definitions:
     description: |-
       Raw rego rules are compiled 1:1 to rego queries.
       High-level extractor-based rules are compiled into a single rego query.
-  SchedulerWorkload:
+  SchedulerWorkloadConfig:
     type: object
     properties:
-      fairness_key:
+      auto_tokens:
+        type: boolean
+      default_workload:
+        $ref: '#/definitions/WorkloadConfigDefaultWorkload'
+      label_key:
         type: string
+        title: 'TODO: this entire section is being reworked by @TanveerGill'
+      workloads:
+        type: array
+        items:
+          $ref: '#/definitions/WorkloadConfigWorkload'
+        title: |-
+          list of workloads
+          workload can describe priority, tokens (if auto_tokens are set to false) and timeout
+    description: Configuration that provides scheduling parameters such as priority for the given workloads.
+  WorkloadConfigDefaultWorkload:
+    type: object
+    properties:
       priority:
         type: integer
         format: int64
@@ -253,15 +269,31 @@ definitions:
           Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.
         x-go-default: 1
     description: Workload defines a class of requests that preferably have similar properties such as response latency.
-  SchedulerWorkloadAndLabelMatcher:
+  WorkloadConfigWorkload:
     type: object
     properties:
-      label_matcher:
-        $ref: '#/definitions/v1LabelMatcher'
-        description: Label Matcher to select a Workload.
-      workload:
-        $ref: '#/definitions/SchedulerWorkload'
-        description: Workload associated with requests matching the label matcher.
+      label_value:
+        type: string
+        description: Value of label for specified workload label key.
+      priority:
+        type: integer
+        format: int64
+        description: |-
+          Describes priority level of the requests within the workload.
+          Priority level ranges from 0 to 255.
+          Higher numbers means higher priority level.
+        x-go-validate: gte=0,lte=255
+      timeout:
+        type: string
+        description: Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
+        x-go-default: 0.005s
+      tokens:
+        type: string
+        format: uint64
+        description: |
+          Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.
+        x-go-default: 1
+    description: Workload defines a class of requests that preferably have similar properties such as response latency.
   apertureflowcontrolv1FluxMeter:
     type: object
     properties:
@@ -1092,7 +1124,7 @@ definitions:
   v1LimiterDecisionConcurrencyLimiter:
     type: object
     properties:
-      workload_index:
+      workload:
         type: string
   v1LimiterDecisionRateLimiter:
     type: object
@@ -1403,23 +1435,17 @@ definitions:
   v1Scheduler:
     type: object
     properties:
-      auto_tokens:
-        type: boolean
-      default_workload:
-        $ref: '#/definitions/SchedulerWorkload'
+      fairness_key:
+        type: string
+        description: 'TODO: this is getting reworked.'
       out_ports:
         $ref: '#/definitions/v1SchedulerOuts'
         description: Output ports for the Scheduler component.
       selector:
         $ref: '#/definitions/v1Selector'
         description: Selector decides for which service or flows the scheduler will be applied.
-      workloads:
-        type: array
-        items:
-          $ref: '#/definitions/SchedulerWorkloadAndLabelMatcher'
-        title: |-
-          list of workloads
-          workload can describe priority, tokens (if auto_tokens are set to false) and timeout
+      workload_config:
+        $ref: '#/definitions/SchedulerWorkloadConfig'
     description: Weighted Fair Queuing based workload scheduler.
   v1SchedulerOuts:
     type: object
