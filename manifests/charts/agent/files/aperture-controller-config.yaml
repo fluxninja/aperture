@@ -8,7 +8,7 @@ webhooks:
   addr: ":8086"
   tls:
     enable: true
-    certs_path: "/etc/aperture/aperture-agent/certs"
+    certs_path: "/etc/aperture/aperture-controller/certs"
     server_cert: "crt.pem"
     server_key: "key.pem"
 
