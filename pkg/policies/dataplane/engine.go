@@ -19,9 +19,8 @@ import (
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
 	ConcurrencyLimiters []iface.Limiter
-	// TODO: Can be FluxMeterIDs
-	FluxMeters   []iface.FluxMeter
-	RateLimiters []iface.RateLimiter
+	FluxMeters          []iface.FluxMeter
+	RateLimiters        []iface.RateLimiter
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.

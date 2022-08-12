@@ -440,7 +440,6 @@ func (conLimiter *concurrencyLimiter) GetSelector() *policylangv1.Selector {
 // RunLimiter .
 func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadProto *policylangv1.Scheduler_Workload
-	// TODO: put workload index in a workload wrapper struct
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
 	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labels.ToPlainMap()))
@@ -458,6 +457,7 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowc
 	} else {
 		// no match, return default workload
 		matchedWorkloadProto = conLimiter.defaultWorkloadProto
+		// TODO: get default workload's workload_index value from common file
 		matchedWorkloadIndex = "default"
 	}
 
