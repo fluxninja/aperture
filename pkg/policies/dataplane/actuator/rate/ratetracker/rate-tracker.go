@@ -1,16 +1,16 @@
-package ratelimiter
+package ratetracker
 
-// RateLimiter is a generic limiter interface.
-type RateLimiter interface {
+// RateTracker is a generic limiter interface.
+type RateTracker interface {
 	Name() string
 	Take(label string) (ok bool, remaining int, current int)
 	TakeN(label string, count int) (ok bool, remaining int, current int)
-	GetRateLimitCheck() RateLimitCheck
+	GetRateLimitChecker() RateLimitChecker
 	Close() error
 }
 
-// RateLimitCheck is a generic limit checker interface.
-type RateLimitCheck interface {
+// RateLimitChecker is a generic limit checker interface.
+type RateLimitChecker interface {
 	CheckRateLimit(label string, count int) (ok bool, remaining int)
 	SetRateLimit(limit int)
 	GetRateLimit() int

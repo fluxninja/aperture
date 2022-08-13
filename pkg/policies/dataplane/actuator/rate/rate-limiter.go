@@ -18,11 +18,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/distcache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/flowcontrol/ratelimiter"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/rate/ratetracker"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/selectors"
@@ -190,8 +190,8 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 type rateLimiter struct {
 	component.ComponentAPI
 	rateLimiterFactory *rateLimiterFactory
-	limiter            ratelimiter.RateLimiter
-	limitCheck         *ratelimiter.BasicRateLimitCheck
+	rateTracker        ratetracker.RateTracker
+	rateLimitChecker   *ratetracker.BasicRateLimitChecker
 	registryPath       string
 	rateLimiterProto   *policylangv1.RateLimiter
 	name               string
@@ -217,13 +217,13 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var err error
-			rateLimiter.limitCheck = ratelimiter.NewBasicRateLimitCheck()
+			rateLimiter.rateLimitChecker = ratetracker.NewBasicRateLimitChecker()
 			// loop through overrides
 			for _, override := range rateLimiter.rateLimiterProto.GetOverrides() {
 				label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
-				rateLimiter.limitCheck.AddOverride(label, override.GetLimitScaleFactor())
+				rateLimiter.rateLimitChecker.AddOverride(label, override.GetLimitScaleFactor())
 			}
-			rateLimiter.limiter, err = ratelimiter.NewOlricRateLimiter(rateLimiter.limitCheck,
+			rateLimiter.rateTracker, err = ratetracker.NewOlricRateTracker(rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
 				rateLimiter.name,
 				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())
@@ -235,7 +235,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 			if lazySyncConfig := rateLimiter.rateLimiterProto.GetLazySyncConfig(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
 					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
-					rateLimiter.limiter, err = ratelimiter.NewLazySyncRateLimiter(rateLimiter.limiter,
+					rateLimiter.rateTracker, err = ratetracker.NewLazySyncRateTracker(rateLimiter.rateTracker,
 						lazySyncInterval,
 						rateLimiter.rateLimiterFactory.lazySyncJobGroup)
 					if err != nil {
@@ -274,7 +274,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 				log.Error().Err(err).Msg("Failed to remove decision notifier")
 				merr = multierr.Append(merr, err)
 			}
-			rateLimiter.limiter.Close()
+			rateLimiter.rateTracker.Close()
 			s := status.NewStatus(nil, merr)
 			err = statusRegistry.Push(rateLimiter.registryPath, s)
 			if err != nil {
@@ -331,7 +331,7 @@ func (rateLimiter *rateLimiter) TakeN(labels selectors.Labels, n int) (label str
 
 	label = labelKey + ":" + labelValue
 
-	ok, remaining, current = rateLimiter.limiter.TakeN(label, n)
+	ok, remaining, current = rateLimiter.rateTracker.TakeN(label, n)
 
 	return
 }
@@ -339,7 +339,7 @@ func (rateLimiter *rateLimiter) TakeN(labels selectors.Labels, n int) (label str
 func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	if event.Type == notifiers.Remove {
 		log.Debug().Msg("Decision removed")
-		rateLimiter.limitCheck.SetRateLimit(-1)
+		rateLimiter.rateLimitChecker.SetRateLimit(-1)
 		return
 	}
 
@@ -356,5 +356,5 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 	if err != nil {
 		return
 	}
-	rateLimiter.limitCheck.SetRateLimit(int(limitDecision.GetLimit()))
+	rateLimiter.rateLimitChecker.SetRateLimit(int(limitDecision.GetLimit()))
 }
