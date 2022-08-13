@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"math/rand"
 	"path"
 	"strconv"
 	"time"
@@ -263,15 +264,15 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	}
 	mm := multimatcher.New[int, multiMatchResult]()
 	for workloadIndex, workloadProto := range schedulerProto.Workloads {
-		workloadMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-			mmr.matchedWorkloads[workloadIndex] = workloadProto.GetWorkload()
-			return mmr
-		}
 		labelMatcher, err := selectors.MMExprFromLabelMatcher(workloadProto.GetLabelMatcher())
 		if err != nil {
 			return fx.Options(), err
 		}
-		err = mm.AddEntry(workloadIndex, labelMatcher, workloadMatchedCB)
+		wm := &workloadMatcher{
+			workloadIndex: workloadIndex,
+			workloadProto: workloadProto,
+		}
+		err = mm.AddEntry(workloadIndex, labelMatcher, wm.matchCallback)
 		if err != nil {
 			return fx.Options(), err
 		}
@@ -292,6 +293,20 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 			conLimiter.setup,
 		),
 	), nil
+}
+
+type workloadMatcher struct {
+	workloadProto *policylangv1.Scheduler_WorkloadAndLabelMatcher
+	workloadIndex int
+}
+
+func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult {
+	// mmr.matchedWorkloads is nil on first match.
+	if mmr.matchedWorkloads == nil {
+		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload)
+	}
+	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetWorkload()
+	return mmr
 }
 
 // concurrencyLimiter implements concurrency limiter on the dataplane side.
@@ -442,12 +457,24 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowc
 	var matchedWorkloadProto *policylangv1.Scheduler_Workload
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
-	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labels.ToPlainMap()))
+	labelMap := labels.ToPlainMap()
+	trafficLogDice := rand.Intn(100) //#nosec
+	trafficLogEnabled := trafficLogDice < 5
+	if trafficLogEnabled {
+		log.Debug().Msgf("concurrencyLimiter.RunLimiter on labels: %v", labelMap)
+	}
+	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labelMap))
+	if trafficLogEnabled {
+		log.Debug().Msgf("Multi match result: %v", mmr)
+	}
 	// if at least one match, return workload with lowest index
 	if len(mmr.matchedWorkloads) > 0 {
 		// select the smallest workloadIndex
 		smallestWorkloadIndex := math.MaxInt32
 		for workloadIndex := range mmr.matchedWorkloads {
+			if trafficLogEnabled {
+				log.Debug().Msgf("Matched workload index: %d", workloadIndex)
+			}
 			if workloadIndex < smallestWorkloadIndex {
 				smallestWorkloadIndex = workloadIndex
 			}

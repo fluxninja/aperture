@@ -828,8 +828,6 @@ definitions:
   v1ErrorDetails:
     type: object
     properties:
-      cause:
-        $ref: '#/definitions/v1ErrorDetails'
       message:
         type: string
     description: ErrorDetails holds raw error message and its cause in a nested field.

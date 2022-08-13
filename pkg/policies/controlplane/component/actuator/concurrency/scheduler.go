@@ -102,7 +102,7 @@ func NewSchedulerAndOptions(
 
 	if schedulerProto.AutoTokens {
 		tokensQuery, tokensQueryOptions, tokensQueryErr := component.NewTaggedQueryAndOptions(
-			fmt.Sprintf("sum by %s (increase(workload_latency_ms_sum{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[30m])) / sum by %s (increase(workload_latency_ms_count{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[30m]))",
+			fmt.Sprintf("sum by (%s) (increase(workload_latency_ms_sum{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[30m])) / sum by (%s) (increase(workload_latency_ms_count{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[30m]))",
 				workloadIndexLabel, policyReadAPI.GetPolicyName(), policyReadAPI.GetPolicyHash(), componentIndex,
 				workloadIndexLabel, policyReadAPI.GetPolicyName(), policyReadAPI.GetPolicyHash(), componentIndex),
 			tokensQueryInterval,

@@ -61,5 +61,4 @@ message Status {
 // ErrorDetails holds raw error message and its cause in a nested field.
 message ErrorDetails {
   string message = 1;
-  ErrorDetails cause = 2;
 }
