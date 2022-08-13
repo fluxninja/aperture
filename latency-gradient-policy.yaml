@@ -102,13 +102,13 @@ data:
                   timeout: "0.005s"
                 label_matcher:
                   match_labels:
-                    request_header_user: "A"
+                    request_header_user-type: "guest"
               - workload:
                   priority: 200
                   timeout: "0.005s"
                 label_matcher:
                   match_labels:
-                    request_header_user: "B"
+                    request_header_user-type: "subscriber"
             out_ports:
               accepted_concurrency:
                 signal_name: "ACCEPTED_CONCURRENCY"
