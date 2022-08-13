@@ -54,7 +54,7 @@ func newAutoTokensFactory(lifecycle fx.Lifecycle, client *etcdclient.Client) (*a
 	return autoTokensFactory, nil
 }
 
-// newAutoTokens provides creates new autoTokens.
+// newAutoTokens creates new autoTokens.
 func (atFactory *autoTokensFactory) newAutoTokens(
 	agentGroupName,
 	policyName,
@@ -63,10 +63,8 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 	componentIdx int64,
 ) (*autoTokens, error) {
 	at := &autoTokens{
-		avgTokensForPolicy: 1,
 		tokensDecision: &policydecisionsv1.TokensDecision{
-			DefaultWorkloadTokens: 1,
-			TokensByWorkload:      make(map[string]uint64),
+			TokensByWorkloadIndex: make(map[string]uint64),
 		},
 		agentGroup:            agentGroupName,
 		policyName:            policyName,
@@ -109,7 +107,6 @@ type autoTokens struct {
 	agentGroup            string
 	policyName            string
 	policyHash            string
-	avgTokensForPolicy    uint64
 	componentIdx          int64
 }
 
@@ -145,27 +142,16 @@ func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller co
 	tokensDecision := &policydecisionsv1.TokensDecision{}
 	err = wrapperMessage.Config.UnmarshalTo(tokensDecision)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to unmarshal avg tokens value")
+		log.Error().Err(err).Msg("Failed to unmarshal tokens decision")
 		return
 	}
 	at.tokensDecision = tokensDecision
 }
 
-// GetTokensForDefaultWorkload returns average tokens for default workload.
-func (at *autoTokens) GetTokensForDefaultWorkload() uint64 {
-	at.mutex.RLock()
-	defer at.mutex.RUnlock()
-
-	return at.avgTokensForPolicy
-}
-
 // GetTokensForWorkload returns tokens per workflow.
-func (at *autoTokens) GetTokensForWorkload(workload *policydecisionsv1.WorkloadDesc) uint64 {
+func (at *autoTokens) GetTokensForWorkload(workloadIndex string) (uint64, bool) {
 	at.mutex.RLock()
 	defer at.mutex.RUnlock()
-
-	if val, ok := at.tokensDecision.TokensByWorkload[workload.String()]; ok {
-		return val
-	}
-	return at.tokensDecision.DefaultWorkloadTokens
+	val, ok := at.tokensDecision.TokensByWorkloadIndex[workloadIndex]
+	return val, ok
 }

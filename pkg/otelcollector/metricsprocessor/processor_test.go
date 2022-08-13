@@ -91,7 +91,7 @@ var _ = Describe("Metrics Processor", func() {
 						Dropped:        true,
 						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
 							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-								Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+								WorkloadIndex: "0",
 							},
 						},
 					},
@@ -111,12 +111,12 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
@@ -126,8 +126,8 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
-				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
 			},
 		),
 
@@ -146,7 +146,7 @@ var _ = Describe("Metrics Processor", func() {
 						Dropped:        true,
 						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
 							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-								Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+								WorkloadIndex: "0",
 							},
 						},
 					},
@@ -159,12 +159,12 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
@@ -172,8 +172,8 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.DecisionRejectReasonLabel:        "REJECT_REASON_RATE_LIMITED",
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
-				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
 			},
 		),
 
@@ -192,7 +192,7 @@ var _ = Describe("Metrics Processor", func() {
 						Dropped:        true,
 						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
 							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-								Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+								WorkloadIndex: "0",
 							},
 						},
 					},
@@ -203,7 +203,7 @@ var _ = Describe("Metrics Processor", func() {
 						Dropped:        true,
 						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
 							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-								Workload: "workload_key:\"fizz\", workload_value:\"buzz\"",
+								WorkloadIndex: "1",
 							},
 						},
 					},
@@ -214,7 +214,7 @@ var _ = Describe("Metrics Processor", func() {
 						Dropped:        false,
 						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
 							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-								Workload: "workload_key:\"fizz\", workload_value:\"hoge\"",
+								WorkloadIndex: "2",
 							},
 						},
 					},
@@ -227,24 +227,24 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\""} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\""} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
-			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="0"} 0
-			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="10"} 1
-			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="20"} 1
-			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 5
-			workload_latency_ms_count{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="0"} 0
+			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="10"} 1
+			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="20"} 1
+			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
+			workload_latency_ms_count{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.AuthzStatusLabel:          "STATUS_NO_ERROR",
@@ -253,13 +253,9 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.RateLimitersLabel:         []interface{}{},
 				otelcollector.DroppingRateLimitersLabel: []interface{}{},
 				otelcollector.ConcurrencyLimitersLabel: []interface{}{
-					"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash",
-					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
-					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
-				},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
-					"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash",
-					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
+					"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash",
+					"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
+					"policy_name:fizz,component_index:2,workload_index:2,policy_hash:fizz-hash",
 				},
 			},
 		),
@@ -312,7 +308,7 @@ var _ = Describe("Metrics Processor", func() {
 						Dropped:        true,
 						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
 							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-								Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+								WorkloadIndex: "0",
 							},
 						},
 					},
@@ -329,12 +325,12 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_ACCEPTED",
@@ -343,8 +339,8 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
-				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
 			},
 		),
 
@@ -363,7 +359,7 @@ var _ = Describe("Metrics Processor", func() {
 						Dropped:        true,
 						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
 							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-								Workload: "workload_key:\"foo\", workload_value:\"bar\"",
+								WorkloadIndex: "0",
 							},
 						},
 					},
@@ -373,20 +369,20 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\"",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="workload_key:\"foo\", workload_value:\"bar\""} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionRejectReasonLabel:        "REJECT_REASON_RATE_LIMITED",
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
-				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:workload_key:\"foo\", workload_value:\"bar\",policy_hash:foo-hash"},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
 			},
 		),
 
@@ -418,7 +414,7 @@ var _ = Describe("Metrics Processor", func() {
 						Dropped:        true,
 						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
 							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-								Workload: "workload_key:\"fizz\", workload_value:\"buzz\"",
+								WorkloadIndex: "1",
 							},
 						},
 					},
@@ -429,7 +425,7 @@ var _ = Describe("Metrics Processor", func() {
 						Dropped:        true,
 						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
 							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-								Workload: "workload_key:\"fizz\", workload_value:\"hoge\"",
+								WorkloadIndex: "2",
 							},
 						},
 					},
@@ -439,24 +435,24 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\"",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\""} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"buzz\""} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
+			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
 			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="",le="0"} 0
 			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="",le="10"} 1
 			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="",le="20"} 1
 			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="",le="+Inf"} 1
 			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index=""} 5
 			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index=""} 1
-			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="0"} 0
-			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="10"} 1
-			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="20"} 1
-			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\"",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 5
-			workload_latency_ms_count{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="workload_key:\"fizz\", workload_value:\"hoge\""} 1
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="0"} 0
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="10"} 1
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="20"} 1
+			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
+			workload_latency_ms_count{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_ACCEPTED",
@@ -468,12 +464,12 @@ var _ = Describe("Metrics Processor", func() {
 					"policy_name:foo,component_index:1,policy_hash:foo-hash",
 				},
 				otelcollector.ConcurrencyLimitersLabel: []interface{}{
-					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
-					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
+					"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
+					"policy_name:fizz,component_index:2,workload_index:2,policy_hash:fizz-hash",
 				},
 				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
-					"policy_name:fizz,component_index:1,workload_index:workload_key:\"fizz\", workload_value:\"buzz\",policy_hash:fizz-hash",
-					"policy_name:fizz,component_index:2,workload_index:workload_key:\"fizz\", workload_value:\"hoge\",policy_hash:fizz-hash",
+					"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
+					"policy_name:fizz,component_index:2,workload_index:2,policy_hash:fizz-hash",
 				},
 			},
 		),

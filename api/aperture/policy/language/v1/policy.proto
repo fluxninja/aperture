@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package aperture.policy.language.v1;
 
+import "aperture/policy/language/v1/labelmatcher.proto";
 import "aperture/policy/language/v1/selector.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
@@ -524,102 +525,54 @@ message Scheduler {
     }
   };
 
-  message WorkloadConfig {
+  message Workload {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
       json_schema: {
-        description: "Configuration that provides scheduling parameters such as priority for the given workloads."
+        description: "Workload defines a class of requests that preferably have similar properties such as response latency."
       }
     };
 
-    message Workload {
-      option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-        json_schema: {
-          description: "Workload defines a class of requests that preferably have similar properties such as response latency."
+    uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level."
+      extensions: {
+        key: "x-go-validate";
+        value {
+          string_value: "gte=0,lte=255"
         }
-      };
+      }
+    }]; // @gotags: validate:"gte=0,lte=255"
 
-      uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level."
-        extensions: {
-          key: "x-go-validate";
-          value {
-            string_value: "gte=0,lte=255"
-          }
+    uint64 tokens = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.\n"
+      extensions: {
+        key: "x-go-default";
+        value {
+          number_value: 1
         }
-      }]; // @gotags: validate:"gte=0,lte=255"
+      }
+    }]; // @gotags: default:"1"
 
-      uint64 tokens = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.\n"
-        extensions: {
-          key: "x-go-default";
-          value {
-            number_value: 1
-          }
+    google.protobuf.Duration timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled."
+      extensions: {
+        key: "x-go-default";
+        value {
+          string_value: "0.005s"
         }
-      }]; // @gotags: default:"1"
+      }
+    }]; // @gotags: default:"0.005s"
 
-      google.protobuf.Duration timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled."
-        extensions: {
-          key: "x-go-default";
-          value {
-            string_value: "0.005s"
-          }
-        }
-      }]; // @gotags: default:"0.005s"
+    string fairness_key = 4;
+  }
 
-      string label_value = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Value of label for specified workload label key."
-      }];
-    }
+  message WorkloadAndLabelMatcher {
+    Workload workload = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Workload associated with requests matching the label matcher."
+    }];
 
-    message DefaultWorkload {
-      option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-        json_schema: {
-          description: "Workload defines a class of requests that preferably have similar properties such as response latency."
-        }
-      };
-
-      uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level."
-        extensions: {
-          key: "x-go-validate";
-          value {
-            string_value: "gte=0,lte=255"
-          }
-        }
-      }]; // @gotags: validate:"gte=0,lte=255"
-
-      uint64 tokens = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.\n"
-        extensions: {
-          key: "x-go-default";
-          value {
-            number_value: 1
-          }
-        }
-      }]; // @gotags: default:"1"
-
-      google.protobuf.Duration timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled."
-        extensions: {
-          key: "x-go-default";
-          value {
-            string_value: "0.005s"
-          }
-        }
-      }]; // @gotags: default:"0.005s"
-    }
-
-    // TODO: this entire section is being reworked by @TanveerGill
-    string label_key = 1;
-
-    bool auto_tokens = 2; // @gotags: default:"true"
-
-    DefaultWorkload default_workload = 3;
-    // list of workloads
-    // workload can describe priority, tokens (if auto_tokens are set to false) and timeout
-    repeated Workload workloads = 4;
+    LabelMatcher label_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Label Matcher to select a Workload."
+    }];
   }
 
   message Outs {
@@ -646,10 +599,12 @@ message Scheduler {
     description: "Selector decides for which service or flows the scheduler will be applied."
   }];
 
-  // TODO: this is getting reworked.
-  string fairness_key = 3;
+  bool auto_tokens = 3; // @gotags: default:"true"
 
-  WorkloadConfig workload_config = 4;
+  Workload default_workload = 4;
+  // list of workloads
+  // workload can describe priority, tokens (if auto_tokens are set to false) and timeout
+  repeated WorkloadAndLabelMatcher workloads = 5;
 }
 
 message LoadShedActuator {

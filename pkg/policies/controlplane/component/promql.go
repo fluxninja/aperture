@@ -450,11 +450,14 @@ func NewScalarQueryAndOptions(
 	}
 	// Create promQL
 	promQL, options, err := NewPromQLAndOptions(promQLProto, componentIndex, policyReadAPI)
+	if err != nil {
+		return nil, fx.Options(), err
+	}
 	promQL.jobName = fmt.Sprintf("Component-%d.%s", promQL.componentIndex, jobPostFix)
 	scalarQuery := &ScalarQuery{
 		promQL: promQL,
 	}
-	return scalarQuery, options, err
+	return scalarQuery, options, nil
 }
 
 // ExecuteScalarQuery runs a ScalarQueryJob and returns the current results: value and err. This function is supposed to be run under Circuit Execution Lock (Execution of Circuit Components is protected by this lock).
@@ -484,6 +487,9 @@ func NewTaggedQueryAndOptions(
 	jobPostFix string,
 ) (*TaggedQuery, fx.Option, error) {
 	scalarQuery, options, err := NewScalarQueryAndOptions(queryString, evaluationInterval, componentIndex, policyReadAPI, jobPostFix)
+	if err != nil {
+		return nil, fx.Options(), err
+	}
 	taggedQuery := &TaggedQuery{
 		scalarQuery: scalarQuery,
 		// Set err to make sure the initial runs of ExecutePromQuery return error.
@@ -491,7 +497,7 @@ func NewTaggedQueryAndOptions(
 	}
 	// taggedQuery implements jobRegisterer
 	scalarQuery.promQL.jobRegisterer = taggedQuery
-	return taggedQuery, options, err
+	return taggedQuery, options, nil
 }
 
 func (taggedQuery *TaggedQuery) registerJob(endTimestamp time.Time) {
