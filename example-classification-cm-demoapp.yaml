@@ -30,6 +30,6 @@ data:
             ua = http.headers["user-agent"]
           query: data.my.rego.pkg.ua
 
-      user:
+      user-type:
         extractor:
-          from: request.http.headers.user
+          from: request.http.headers.user-type
