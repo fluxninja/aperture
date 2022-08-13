@@ -1,4 +1,4 @@
-package ratelimiter
+package ratetracker
 
 import (
 	"context"
@@ -21,7 +21,7 @@ type counter struct {
 // LazySyncRateLimiter is a limiter that syncs its state lazily with another limiter.
 type LazySyncRateLimiter struct {
 	counters      sync.Map
-	limiter       RateLimiter
+	limiter       RateTracker
 	jobGroup      *jobs.JobGroup
 	name          string
 	syncDuration  time.Duration
@@ -29,10 +29,10 @@ type LazySyncRateLimiter struct {
 }
 
 // NewLazySyncRateLimiter creates a new LazySyncLimiter.
-func NewLazySyncRateLimiter(limiter RateLimiter,
+func NewLazySyncRateLimiter(limiter RateTracker,
 	syncDuration time.Duration,
 	jobGroup *jobs.JobGroup,
-) (RateLimiter, error) {
+) (RateTracker, error) {
 	lsl := &LazySyncRateLimiter{
 		limiter:      limiter,
 		jobGroup:     jobGroup,
@@ -133,7 +133,7 @@ func (lsl *LazySyncRateLimiter) TakeN(label string, n int) (bool, int, int) {
 		local := atomic.AddInt32(&c.local, int32(n))
 		total := int(local) + int(atomic.LoadInt64(&c.global))
 		// check limit
-		ok, remaining := lsl.limiter.GetRateLimitCheck().CheckRateLimit(label, total)
+		ok, remaining := lsl.limiter.GetRateLimitChecker().CheckRateLimit(label, total)
 		return ok, remaining, total
 	}
 
@@ -164,7 +164,7 @@ func (lsl *LazySyncRateLimiter) Take(label string) (bool, int, int) {
 	return lsl.TakeN(label, 1)
 }
 
-// GetRateLimitCheck returns the limit checker of the limiter.
-func (lsl *LazySyncRateLimiter) GetRateLimitCheck() RateLimitCheck {
-	return lsl.limiter.GetRateLimitCheck()
+// GetRateLimitChecker returns the limit checker of the limiter.
+func (lsl *LazySyncRateLimiter) GetRateLimitChecker() RateLimitChecker {
+	return lsl.limiter.GetRateLimitChecker()
 }

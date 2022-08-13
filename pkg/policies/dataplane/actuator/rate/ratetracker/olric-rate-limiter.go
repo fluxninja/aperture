@@ -1,4 +1,4 @@
-package ratelimiter
+package ratetracker
 
 import (
 	"sync"
@@ -13,13 +13,13 @@ import (
 // OlricRateLimiter implements Limiter.
 type OlricRateLimiter struct {
 	mu         sync.RWMutex
-	limitCheck RateLimitCheck
+	limitCheck RateLimitChecker
 	dMap       *olric.DMap
 	name       string
 }
 
 // NewOlricRateLimiter creates a new instance of OlricRateLimiter.
-func NewOlricRateLimiter(limitCheck RateLimitCheck, dc *distcache.DistCache, name string, ttl time.Duration) (RateLimiter, error) {
+func NewOlricRateLimiter(limitCheck RateLimitChecker, dc *distcache.DistCache, name string, ttl time.Duration) (RateTracker, error) {
 	dmapConfig := config.DMap{
 		TTLDuration: ttl,
 	}
@@ -76,10 +76,10 @@ func (ol *OlricRateLimiter) TakeN(label string, n int) (bool, int, int) {
 	return ok, remaining, newN
 }
 
-// GetRateLimitCheck returns the RateLimitCheck of the OlricRateLimiter.
-func (ol *OlricRateLimiter) GetRateLimitCheck() RateLimitCheck {
+// GetRateLimitChecker returns the RateLimitCheck of the OlricRateLimiter.
+func (ol *OlricRateLimiter) GetRateLimitChecker() RateLimitChecker {
 	return ol.limitCheck
 }
 
 // Make sure OlricRateLimiter implements Limiter interface.
-var _ RateLimiter = (*OlricRateLimiter)(nil)
+var _ RateTracker = (*OlricRateLimiter)(nil)
