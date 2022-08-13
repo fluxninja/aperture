@@ -27,7 +27,7 @@ func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit int, ttl
 	for label, limit := range overrides {
 		limitCheck.AddOverride(label, limit)
 	}
-	limiter, err := NewOlricRateLimiter(limitCheck, distCache, "Limiter", ttl)
+	limiter, err := NewOlricRateTracker(limitCheck, distCache, "Limiter", ttl)
 	if err != nil {
 		t.Logf("Failed to create OlricLimiter: %v", err)
 		return nil, err
@@ -275,7 +275,7 @@ func createLazySyncLimiters(t *testing.T, limiters []RateTracker, syncDuration t
 	var lazySyncLimiters []RateTracker
 	for _, limiter := range limiters {
 		jobGroup := createJobGroup(limiter)
-		lazySyncLimiter, err := NewLazySyncRateLimiter(limiter, syncDuration, jobGroup)
+		lazySyncLimiter, err := NewLazySyncRateTracker(limiter, syncDuration, jobGroup)
 		if err != nil {
 			t.Logf("Error creating lazy sync limiter: %v", err)
 			t.FailNow()

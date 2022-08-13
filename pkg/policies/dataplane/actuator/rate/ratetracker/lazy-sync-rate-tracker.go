@@ -18,8 +18,8 @@ type counter struct {
 	global int64
 }
 
-// LazySyncRateLimiter is a limiter that syncs its state lazily with another limiter.
-type LazySyncRateLimiter struct {
+// LazySyncRateTracker is a limiter that syncs its state lazily with another limiter.
+type LazySyncRateTracker struct {
 	counters      sync.Map
 	limiter       RateTracker
 	jobGroup      *jobs.JobGroup
@@ -28,12 +28,12 @@ type LazySyncRateLimiter struct {
 	totalCounters int64
 }
 
-// NewLazySyncRateLimiter creates a new LazySyncLimiter.
-func NewLazySyncRateLimiter(limiter RateTracker,
+// NewLazySyncRateTracker creates a new LazySyncLimiter.
+func NewLazySyncRateTracker(limiter RateTracker,
 	syncDuration time.Duration,
 	jobGroup *jobs.JobGroup,
 ) (RateTracker, error) {
-	lsl := &LazySyncRateLimiter{
+	lsl := &LazySyncRateTracker{
 		limiter:      limiter,
 		jobGroup:     jobGroup,
 		name:         limiter.Name() + "-lazy-sync",
@@ -64,7 +64,7 @@ func NewLazySyncRateLimiter(limiter RateTracker,
 }
 
 // Close closes the limiter.
-func (lsl *LazySyncRateLimiter) Close() error {
+func (lsl *LazySyncRateTracker) Close() error {
 	err := lsl.jobGroup.DeregisterJob(lsl.name)
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func (lsl *LazySyncRateLimiter) Close() error {
 	return nil
 }
 
-func (lsl *LazySyncRateLimiter) sync(ctx context.Context) (proto.Message, error) {
+func (lsl *LazySyncRateTracker) sync(ctx context.Context) (proto.Message, error) {
 	requestDelay := time.Duration(0)
 
 	totalCount := atomic.LoadInt64(&lsl.totalCounters)
@@ -122,12 +122,12 @@ func (lsl *LazySyncRateLimiter) sync(ctx context.Context) (proto.Message, error)
 }
 
 // Name returns the name of the limiter.
-func (lsl *LazySyncRateLimiter) Name() string {
+func (lsl *LazySyncRateTracker) Name() string {
 	return lsl.name
 }
 
 // TakeN takes n tokens from the limiter.
-func (lsl *LazySyncRateLimiter) TakeN(label string, n int) (bool, int, int) {
+func (lsl *LazySyncRateTracker) TakeN(label string, n int) (bool, int, int) {
 	checkLimit := func(c *counter) (bool, int, int) {
 		// atomic increment local counter
 		local := atomic.AddInt32(&c.local, int32(n))
@@ -160,11 +160,11 @@ func (lsl *LazySyncRateLimiter) TakeN(label string, n int) (bool, int, int) {
 }
 
 // Take is a wrapper for TakeN(label, 1).
-func (lsl *LazySyncRateLimiter) Take(label string) (bool, int, int) {
+func (lsl *LazySyncRateTracker) Take(label string) (bool, int, int) {
 	return lsl.TakeN(label, 1)
 }
 
 // GetRateLimitChecker returns the limit checker of the limiter.
-func (lsl *LazySyncRateLimiter) GetRateLimitChecker() RateLimitChecker {
+func (lsl *LazySyncRateTracker) GetRateLimitChecker() RateLimitChecker {
 	return lsl.limiter.GetRateLimitChecker()
 }

@@ -223,7 +223,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 				label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
 				rateLimiter.rateLimitChecker.AddOverride(label, override.GetLimitScaleFactor())
 			}
-			rateLimiter.rateTracker, err = ratetracker.NewOlricRateLimiter(rateLimiter.rateLimitChecker,
+			rateLimiter.rateTracker, err = ratetracker.NewOlricRateTracker(rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
 				rateLimiter.name,
 				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())
@@ -235,7 +235,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 			if lazySyncConfig := rateLimiter.rateLimiterProto.GetLazySyncConfig(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
 					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
-					rateLimiter.rateTracker, err = ratetracker.NewLazySyncRateLimiter(rateLimiter.rateTracker,
+					rateLimiter.rateTracker, err = ratetracker.NewLazySyncRateTracker(rateLimiter.rateTracker,
 						lazySyncInterval,
 						rateLimiter.rateLimiterFactory.lazySyncJobGroup)
 					if err != nil {
