@@ -358,3 +358,12 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 	}
 	rateLimiter.rateLimitChecker.SetRateLimit(int(limitDecision.GetLimit()))
 }
+
+// GetLimiterID returns the limiter ID.
+func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
+	return iface.LimiterID{
+		PolicyName:     rateLimiter.GetPolicyName(),
+		ComponentIndex: rateLimiter.GetComponentIndex(),
+		PolicyHash:     rateLimiter.GetPolicyHash(),
+	}
+}

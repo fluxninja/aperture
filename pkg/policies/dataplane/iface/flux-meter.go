@@ -3,11 +3,24 @@ package iface
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 )
 
 //go:generate mockgen -source=flux-meter.go -destination=../../mocks/mock_flux_meter.go -package=mocks
+
+// FluxMeterID is the ID of the FluxMeter.
+type FluxMeterID struct {
+	PolicyName    string
+	FluxMeterName string
+	PolicyHash    string
+}
+
+// String function returns the FluxMeterID as a string.
+func (fmID FluxMeterID) String() string {
+	return "policy_name-" + fmID.PolicyName + "-flux_meter_name-" + fmID.FluxMeterName + "-policy_hash-" + fmID.PolicyHash
+}
 
 // FluxMeter in an interface for interacting with fluxmeters.
 type FluxMeter interface {
@@ -19,15 +32,15 @@ type FluxMeter interface {
 	// GetFluxMeterProto returns the flux meter proto
 	GetFluxMeterProto() *policylangv1.FluxMeter
 
-	// GetMetricName returns the metric name
-	GetMetricName() string
+	// GetFluxMeterName returns the metric name
+	GetFluxMeterName() string
 
-	// GetMetricID returns the metric ID
-	GetMetricID() string
-
-	// GetHistogram returns the histogram
-	GetHistogram() prometheus.Histogram
+	// GetFluxMeterID returns the flux meter ID
+	GetFluxMeterID() FluxMeterID
 
 	// GetBuckets returns the buckets
 	GetBuckets() []float64
+
+	// GetHistogram returns the histogram for the flowcontrolv1.DecisionType
+	GetHistogram(flowcontrolv1.DecisionType) prometheus.Histogram
 }

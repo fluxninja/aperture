@@ -17,7 +17,6 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/paths"
 )
 
 const (
@@ -26,7 +25,7 @@ const (
 	policyNameLabel     = "policy_name"
 	policyHashLabel     = "policy_hash"
 	componentIndexLabel = "component_index"
-	droppedMetricsLabel = "dropped"
+	decisionTypeLabel   = "decision_type"
 	workloadIndexLabel  = "workload_index"
 )
 
@@ -60,7 +59,7 @@ func (p *metricsProcessor) registerRequestLatencyHistogram() error {
 		policyNameLabel,
 		policyHashLabel,
 		componentIndexLabel,
-		droppedMetricsLabel,
+		decisionTypeLabel,
 		workloadIndexLabel,
 	})
 	err := p.cfg.promRegistry.Register(p.workloadLatencyHistogram)
@@ -224,7 +223,7 @@ func (p *metricsProcessor) updateMetrics(
 			policyNameLabel:     decision.PolicyName,
 			policyHashLabel:     decision.PolicyHash,
 			componentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
-			droppedMetricsLabel: fmt.Sprintf("%t", decision.Dropped),
+			decisionTypeLabel:   checkResponse.DecisionType.String(),
 		}
 
 		workload := ""
@@ -238,7 +237,7 @@ func (p *metricsProcessor) updateMetrics(
 	}
 
 	for _, fluxMeter := range checkResponse.FluxMeters {
-		p.updateMetricsForFluxMeters(fluxMeter, latency)
+		p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, latency)
 	}
 
 	return nil
@@ -256,16 +255,10 @@ func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, la
 	return nil
 }
 
-func (p *metricsProcessor) updateMetricsForFluxMeters(fluxMeter *flowcontrolv1.FluxMeter, latency float64) {
-	fluxMeterID := paths.MetricIDForFluxMeterExpanded(
-		fluxMeter.GetAgentGroup(),
-		fluxMeter.GetPolicyName(),
-		fluxMeter.GetFluxMeterName(),
-		fluxMeter.GetPolicyHash(),
-	)
-	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxMeterID)
+func (p *metricsProcessor) updateMetricsForFluxMeters(fluxMeter *flowcontrolv1.FluxMeter, decisionType flowcontrolv1.DecisionType, latency float64) {
+	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxMeter.GetPolicyName(), fluxMeter.GetFluxMeterName(), fluxMeter.GetPolicyHash(), decisionType)
 	if fluxmeterHistogram == nil {
-		log.Debug().Str("fluxMeterID", fluxMeterID).Msg("Fluxmeter not found")
+		log.Debug().Str("policy_name", fluxMeter.GetPolicyName()).Str("flux_meter_name", fluxMeter.GetFluxMeterName()).Str("policy_hash", fluxMeter.GetPolicyHash()).Str("decision_type", decisionType.String()).Msg("Fluxmeter not found")
 		return
 	}
 	fluxmeterHistogram.Observe(latency)

@@ -18,9 +18,9 @@ import (
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	ConcurrencyLimiters []iface.Limiter
-	FluxMeters          []iface.FluxMeter
-	RateLimiters        []iface.RateLimiter
+	concurrencyLimiters []iface.Limiter
+	fluxMeters          []iface.FluxMeter
+	rateLimiters        []iface.RateLimiter
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -29,16 +29,16 @@ type multiMatcher = multimatcher.MultiMatcher[string, multiMatchResult]
 // PopulateFromMultiMatcher populates result object with results from MultiMatcher.
 func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiMatcher[string, multiMatchResult], labels selectors.Labels) {
 	resultCollection := mm.Match(multimatcher.Labels(labels.ToPlainMap()))
-	result.ConcurrencyLimiters = append(result.ConcurrencyLimiters, resultCollection.ConcurrencyLimiters...)
-	result.FluxMeters = append(result.FluxMeters, resultCollection.FluxMeters...)
-	result.RateLimiters = append(result.RateLimiters, resultCollection.RateLimiters...)
+	result.concurrencyLimiters = append(result.concurrencyLimiters, resultCollection.concurrencyLimiters...)
+	result.fluxMeters = append(result.fluxMeters, resultCollection.fluxMeters...)
+	result.rateLimiters = append(result.rateLimiters, resultCollection.rateLimiters...)
 }
 
 // ProvideEngineAPI Main fx app.
 func ProvideEngineAPI() iface.EngineAPI {
 	e := &Engine{
-		multiMatchers:  make(map[selectors.ControlPointID]*multiMatcher),
-		fluxMeterHists: make(map[string]prometheus.Histogram),
+		multiMatchers: make(map[selectors.ControlPointID]*multiMatcher),
+		fluxMetersMap: make(map[iface.FluxMeterID]iface.FluxMeter),
 	}
 	return e
 }
@@ -47,8 +47,8 @@ func ProvideEngineAPI() iface.EngineAPI {
 // (1) Get schedulers given a service, control point and set of labels
 // (2) Get flux meter histogram given a metric id.
 type Engine struct {
-	fluxMeterHistMutex sync.RWMutex
-	fluxMeterHists     map[string]prometheus.Histogram
+	fluxMeterMapMutex  sync.RWMutex
+	fluxMetersMap      map[iface.FluxMeterID]iface.FluxMeter
 	multiMatchersMutex sync.RWMutex
 	multiMatchers      map[selectors.ControlPointID]*multiMatcher
 }
@@ -64,21 +64,21 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 		return
 	}
 
-	rawFluxMeters := mmr.FluxMeters
-	fluxMeters := make([]*flowcontrolv1.FluxMeter, len(rawFluxMeters))
-	for i, rawFluxMeter := range rawFluxMeters {
-		fluxMeters[i] = &flowcontrolv1.FluxMeter{
-			AgentGroup:    rawFluxMeter.GetAgentGroup(),
-			PolicyName:    rawFluxMeter.GetPolicyName(),
-			PolicyHash:    rawFluxMeter.GetPolicyHash(),
-			FluxMeterName: rawFluxMeter.GetMetricName(),
+	fluxMeters := mmr.fluxMeters
+	fluxMeterProtos := make([]*flowcontrolv1.FluxMeter, len(fluxMeters))
+	for i, fluxMeter := range fluxMeters {
+		fluxMeterProtos[i] = &flowcontrolv1.FluxMeter{
+			AgentGroup:    fluxMeter.GetAgentGroup(),
+			PolicyName:    fluxMeter.GetPolicyName(),
+			PolicyHash:    fluxMeter.GetPolicyHash(),
+			FluxMeterName: fluxMeter.GetFluxMeterName(),
 		}
 	}
-	response.FluxMeters = fluxMeters
+	response.FluxMeters = fluxMeterProtos
 
 	// execute rate limiters first
-	rateLimiters := make([]iface.Limiter, len(mmr.RateLimiters))
-	for i, rl := range mmr.RateLimiters {
+	rateLimiters := make([]iface.Limiter, len(mmr.rateLimiters))
+	for i, rl := range mmr.rateLimiters {
 		rateLimiters[i] = rl
 	}
 	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(rateLimiters, labels)
@@ -86,7 +86,7 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 
 	defer func() {
 		if response.DecisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
-			returnExtraTokens(mmr.RateLimiters, rateLimiterDecisions, labels)
+			returnExtraTokens(mmr.rateLimiters, rateLimiterDecisions, labels)
 		}
 	}()
 
@@ -101,8 +101,8 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	}
 
 	// execute rate limiters first
-	concurrencyLimiters := make([]iface.Limiter, len(mmr.ConcurrencyLimiters))
-	copy(concurrencyLimiters, mmr.ConcurrencyLimiters)
+	concurrencyLimiters := make([]iface.Limiter, len(mmr.concurrencyLimiters))
+	copy(concurrencyLimiters, mmr.concurrencyLimiters)
 
 	concurrencyLimiterDecisions, concurrencyLimitersDecisionType := runLimiters(concurrencyLimiters, labels)
 	response.LimiterDecisions = append(response.LimiterDecisions, concurrencyLimiterDecisions...)
@@ -152,82 +152,86 @@ func returnExtraTokens(
 // RegisterConcurrencyLimiter adds concurrency limiter to multimatcher.
 func (e *Engine) RegisterConcurrencyLimiter(cl iface.Limiter) error {
 	concurrencyLimiterMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.ConcurrencyLimiters = append(
-			mmr.ConcurrencyLimiters,
+		mmr.concurrencyLimiters = append(
+			mmr.concurrencyLimiters,
 			cl,
 		)
 		return mmr
 	}
-	return e.register("ConcurrencyLimiter:"+cl.GetPolicyName(), cl.GetSelector(), concurrencyLimiterMatchedCB)
+	return e.register("ConcurrencyLimiter:"+cl.GetLimiterID().String(), cl.GetSelector(), concurrencyLimiterMatchedCB)
 }
 
 // UnregisterConcurrencyLimiter removes concurrency limiter from multimatcher.
 func (e *Engine) UnregisterConcurrencyLimiter(cl iface.Limiter) error {
 	selectorProto := cl.GetSelector()
-	return e.unregister("ConcurrencyLimiter:"+cl.GetPolicyName(), selectorProto)
+	return e.unregister("ConcurrencyLimiter:"+cl.GetLimiterID().String(), selectorProto)
 }
 
 // RegisterFluxMeter adds fluxmeter to histogram map.
 func (e *Engine) RegisterFluxMeter(fm iface.FluxMeter) error {
 	// Save the histogram in fluxMeterHists indexed by metric id
-	e.fluxMeterHistMutex.Lock()
-	defer e.fluxMeterHistMutex.Unlock()
-	if _, ok := e.fluxMeterHists[fm.GetMetricID()]; !ok {
-		e.fluxMeterHists[fm.GetMetricID()] = fm.GetHistogram()
+	e.fluxMeterMapMutex.Lock()
+	defer e.fluxMeterMapMutex.Unlock()
+	if _, ok := e.fluxMetersMap[fm.GetFluxMeterID()]; !ok {
+		e.fluxMetersMap[fm.GetFluxMeterID()] = fm
 	} else {
 		return fmt.Errorf("metric id already registered")
 	}
 
 	// Save the fluxMeterAPI in multiMatchers
 	fluxMeterMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.FluxMeters = append(
-			mmr.FluxMeters,
+		mmr.fluxMeters = append(
+			mmr.fluxMeters,
 			fm,
 		)
 		return mmr
 	}
 
 	selectorProto := fm.GetSelector()
-	return e.register("FluxMeter:"+fm.GetMetricID(), selectorProto, fluxMeterMatchedCB)
+	return e.register("FluxMeter:"+fm.GetFluxMeterID().String(), selectorProto, fluxMeterMatchedCB)
 }
 
 // UnregisterFluxMeter removes fluxmeter from histogram map.
 func (e *Engine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 	// Remove the histogram from fluxMeterHists indexed by metric id
-	e.fluxMeterHistMutex.Lock()
-	defer e.fluxMeterHistMutex.Unlock()
-	delete(e.fluxMeterHists, fm.GetMetricID())
+	e.fluxMeterMapMutex.Lock()
+	defer e.fluxMeterMapMutex.Unlock()
+	delete(e.fluxMetersMap, fm.GetFluxMeterID())
 
 	// Remove the fluxMeterAPI from multiMatchers
 	selectorProto := fm.GetSelector()
-	return e.unregister("FluxMeter:"+fm.GetMetricID(), selectorProto)
+	return e.unregister("FluxMeter:"+fm.GetFluxMeterID().String(), selectorProto)
 }
 
-// GetFluxMeterHist Lookup function for getting histogram by metric id.
-// TODO: this method should move under policies/dataplane/fluxmeter.
-func (e *Engine) GetFluxMeterHist(metricID string) prometheus.Histogram {
-	e.fluxMeterHistMutex.RLock()
-	defer e.fluxMeterHistMutex.RUnlock()
-	return e.fluxMeterHists[metricID]
+// GetFluxMeterHist Lookup function for getting histogram.
+func (e *Engine) GetFluxMeterHist(policyName, fluxMeterName, policyHash string, decisionType flowcontrolv1.DecisionType) prometheus.Histogram {
+	e.fluxMeterMapMutex.RLock()
+	defer e.fluxMeterMapMutex.RUnlock()
+	fmID := iface.FluxMeterID{
+		PolicyName:    policyName,
+		FluxMeterName: fluxMeterName,
+		PolicyHash:    policyHash,
+	}
+	return e.fluxMetersMap[fmID].GetHistogram(decisionType)
 }
 
 // RegisterRateLimiter adds limiter actuator to multimatcher.
 func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
 	limiterActuatorMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.RateLimiters = append(
-			mmr.RateLimiters,
+		mmr.rateLimiters = append(
+			mmr.rateLimiters,
 			rl,
 		)
 		return mmr
 	}
 
-	return e.register("RateLimiter:"+rl.GetPolicyName(), rl.GetSelector(), limiterActuatorMatchedCB)
+	return e.register("RateLimiter:"+rl.GetLimiterID().String(), rl.GetSelector(), limiterActuatorMatchedCB)
 }
 
 // UnregisterRateLimiter removes limiter actuator from multimatcher.
 func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 	selectorProto := rl.GetSelector()
-	return e.unregister("RateLimiter:"+rl.GetPolicyName(), selectorProto)
+	return e.unregister("RateLimiter:"+rl.GetLimiterID().String(), selectorProto)
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.

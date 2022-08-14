@@ -369,6 +369,7 @@ func NewPromQLAndOptions(
 		log.Error().Err(err).Str("job", promQL.jobName).Msgf("Error resolving metric names in query template: %s" + queryTemplate)
 		return nil, fx.Options(), err
 	}
+	log.Info().Str("job", promQL.jobName).Msgf("queryTemplate: %s, \n queryString: %s", queryTemplate, queryString)
 	promQL.queryString = queryString
 
 	// Invoke setup in the Policy app startup via fx.Options
