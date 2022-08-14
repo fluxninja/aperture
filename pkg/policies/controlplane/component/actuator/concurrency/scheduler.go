@@ -28,7 +28,7 @@ import (
 
 var (
 	concurrencyQueryInterval = time.Second * 1
-	tokensQueryInterval      = time.Minute * 5
+	tokensQueryInterval      = time.Second * 10
 )
 
 const (

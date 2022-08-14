@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 	goprom "github.com/prometheus/client_golang/prometheus"
 
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
@@ -41,8 +42,13 @@ var _ = Describe("Dataplane Engine", func() {
 			},
 		}
 		histogram = goprom.NewHistogram(goprom.HistogramOpts{
-			Name:        "test",
-			ConstLabels: goprom.Labels{"metric_id": "test"},
+			Name: "flux_meter",
+			ConstLabels: goprom.Labels{
+				"policy_name":     "test",
+				"flux_meter_name": "test",
+				"policy_hash":     "test",
+				"decision_type":   flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED.String(),
+			},
 		})
 	})
 
@@ -79,9 +85,11 @@ var _ = Describe("Dataplane Engine", func() {
 
 	Context("Flux meter", func() {
 		BeforeEach(func() {
-			mockFluxmeter.EXPECT().GetMetricID().Return("test").AnyTimes()
+			mockFluxmeter.EXPECT().GetPolicyName().Return("test").AnyTimes()
+			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
+			mockFluxmeter.EXPECT().GetPolicyHash().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockFluxmeter.EXPECT().GetHistogram().Return(histogram).AnyTimes()
+			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(histogram).AnyTimes()
 		})
 
 		It("Registers Flux meter", func() {
@@ -109,13 +117,13 @@ var _ = Describe("Dataplane Engine", func() {
 		})
 
 		It("Tries to get unregistered fluxmeter hist", func() {
-			hist := engine.GetFluxMeterHist("test")
+			hist := engine.GetFluxMeterHist("test", "test", "test", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED)
 			Expect(hist).To(BeNil())
 		})
 
 		It("Returns registered fluxmeter hist", func() {
 			err := engine.RegisterFluxMeter(mockFluxmeter)
-			hist := engine.GetFluxMeterHist("test")
+			hist := engine.GetFluxMeterHist("test", "test", "test", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(hist).To(Equal(histogram))
 		})
@@ -126,9 +134,11 @@ var _ = Describe("Dataplane Engine", func() {
 			mockLimiter.EXPECT().GetPolicyName().AnyTimes()
 			mockLimiter.EXPECT().GetSelector().Return(selector).AnyTimes()
 
-			mockFluxmeter.EXPECT().GetMetricID().Return("test").AnyTimes()
+			mockFluxmeter.EXPECT().GetPolicyName().Return("test").AnyTimes()
+			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
+			mockFluxmeter.EXPECT().GetPolicyHash().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockFluxmeter.EXPECT().GetHistogram().Return(histogram).AnyTimes()
+			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(histogram).AnyTimes()
 		})
 
 		It("Return nothing for not compatible service", func() {
@@ -146,8 +156,8 @@ var _ = Describe("Dataplane Engine", func() {
 			})
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
-			Expect(mmr.FluxMeters).To(BeEmpty())
-			Expect(mmr.ConcurrencyLimiters).To(BeEmpty())
+			Expect(mmr.fluxMeters).To(BeEmpty())
+			Expect(mmr.concurrencyLimiters).To(BeEmpty())
 		})
 
 		It("Return matched schedulers and fluxmeters", func() {
@@ -165,8 +175,8 @@ var _ = Describe("Dataplane Engine", func() {
 			})
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
-			Expect(mmr.FluxMeters).NotTo(BeEmpty())
-			Expect(mmr.ConcurrencyLimiters).NotTo(BeEmpty())
+			Expect(mmr.fluxMeters).NotTo(BeEmpty())
+			Expect(mmr.concurrencyLimiters).NotTo(BeEmpty())
 		})
 	})
 })

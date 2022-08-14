@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"math/rand"
 	"path"
 	"strconv"
 	"time"
@@ -458,23 +457,12 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowc
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
 	labelMap := labels.ToPlainMap()
-	trafficLogDice := rand.Intn(100) //#nosec
-	trafficLogEnabled := trafficLogDice < 5
-	if trafficLogEnabled {
-		log.Debug().Msgf("concurrencyLimiter.RunLimiter on labels: %v", labelMap)
-	}
 	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labelMap))
-	if trafficLogEnabled {
-		log.Debug().Msgf("Multi match result: %v", mmr)
-	}
 	// if at least one match, return workload with lowest index
 	if len(mmr.matchedWorkloads) > 0 {
 		// select the smallest workloadIndex
 		smallestWorkloadIndex := math.MaxInt32
 		for workloadIndex := range mmr.matchedWorkloads {
-			if trafficLogEnabled {
-				log.Debug().Msgf("Matched workload index: %d", workloadIndex)
-			}
 			if workloadIndex < smallestWorkloadIndex {
 				smallestWorkloadIndex = workloadIndex
 			}
@@ -533,5 +521,15 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowc
 				WorkloadIndex: matchedWorkloadIndex,
 			},
 		},
+	}
+}
+
+// GetLimiterID returns the limiter ID.
+func (conLimiter *concurrencyLimiter) GetLimiterID() iface.LimiterID {
+	// TODO: move this to limiter base.
+	return iface.LimiterID{
+		PolicyName:     conLimiter.GetPolicyName(),
+		ComponentIndex: conLimiter.GetComponentIndex(),
+		PolicyHash:     conLimiter.GetPolicyHash(),
 	}
 }

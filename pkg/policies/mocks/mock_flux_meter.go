@@ -7,7 +7,9 @@ package mocks
 import (
 	reflect "reflect"
 
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	gomock "github.com/golang/mock/gomock"
 	prometheus "github.com/prometheus/client_golang/prometheus"
 )
@@ -77,6 +79,34 @@ func (mr *MockFluxMeterMockRecorder) GetComponentIndex() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetComponentIndex", reflect.TypeOf((*MockFluxMeter)(nil).GetComponentIndex))
 }
 
+// GetFluxMeterID mocks base method.
+func (m *MockFluxMeter) GetFluxMeterID() iface.FluxMeterID {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFluxMeterID")
+	ret0, _ := ret[0].(iface.FluxMeterID)
+	return ret0
+}
+
+// GetFluxMeterID indicates an expected call of GetFluxMeterID.
+func (mr *MockFluxMeterMockRecorder) GetFluxMeterID() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeterID", reflect.TypeOf((*MockFluxMeter)(nil).GetFluxMeterID))
+}
+
+// GetFluxMeterName mocks base method.
+func (m *MockFluxMeter) GetFluxMeterName() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFluxMeterName")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetFluxMeterName indicates an expected call of GetFluxMeterName.
+func (mr *MockFluxMeterMockRecorder) GetFluxMeterName() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeterName", reflect.TypeOf((*MockFluxMeter)(nil).GetFluxMeterName))
+}
+
 // GetFluxMeterProto mocks base method.
 func (m *MockFluxMeter) GetFluxMeterProto() *languagev1.FluxMeter {
 	m.ctrl.T.Helper()
@@ -92,45 +122,17 @@ func (mr *MockFluxMeterMockRecorder) GetFluxMeterProto() *gomock.Call {
 }
 
 // GetHistogram mocks base method.
-func (m *MockFluxMeter) GetHistogram() prometheus.Histogram {
+func (m *MockFluxMeter) GetHistogram(arg0 flowcontrolv1.DecisionType) prometheus.Histogram {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetHistogram")
+	ret := m.ctrl.Call(m, "GetHistogram", arg0)
 	ret0, _ := ret[0].(prometheus.Histogram)
 	return ret0
 }
 
 // GetHistogram indicates an expected call of GetHistogram.
-func (mr *MockFluxMeterMockRecorder) GetHistogram() *gomock.Call {
+func (mr *MockFluxMeterMockRecorder) GetHistogram(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram))
-}
-
-// GetMetricID mocks base method.
-func (m *MockFluxMeter) GetMetricID() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMetricID")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// GetMetricID indicates an expected call of GetMetricID.
-func (mr *MockFluxMeterMockRecorder) GetMetricID() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetricID", reflect.TypeOf((*MockFluxMeter)(nil).GetMetricID))
-}
-
-// GetMetricName mocks base method.
-func (m *MockFluxMeter) GetMetricName() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMetricName")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// GetMetricName indicates an expected call of GetMetricName.
-func (mr *MockFluxMeterMockRecorder) GetMetricName() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetricName", reflect.TypeOf((*MockFluxMeter)(nil).GetMetricName))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram), arg0)
 }
 
 // GetPolicyHash mocks base method.

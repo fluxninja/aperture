@@ -16,7 +16,7 @@ data:
             traffic: "ingress"
     circuit:
       - promql:
-          query_string: "sum(increase(demo1_latency_sum[5s]))/sum(increase(demo1_latency_count[5s]))"
+          query_string: "sum(increase(demo1_latency_sum{decision_type!=\"DECISION_TYPE_REJECTED\"}[5s]))/sum(increase(demo1_latency_count{decision_type!=\"DECISION_TYPE_REJECTED\"}[5s]))"
           evaluation_interval: "1s"
           out_ports:
             output:
