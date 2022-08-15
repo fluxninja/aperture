@@ -212,7 +212,11 @@ func (e *Engine) GetFluxMeterHist(policyName, fluxMeterName, policyHash string, 
 		FluxMeterName: fluxMeterName,
 		PolicyHash:    policyHash,
 	}
-	return e.fluxMetersMap[fmID].GetHistogram(decisionType)
+	fluxMeter := e.fluxMetersMap[fmID]
+	if fluxMeter != nil {
+		return fluxMeter.GetHistogram(decisionType)
+	}
+	return nil
 }
 
 // RegisterRateLimiter adds limiter actuator to multimatcher.

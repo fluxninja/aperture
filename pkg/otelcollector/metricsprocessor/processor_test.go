@@ -1,7 +1,6 @@
 package metricsprocessor
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/golang/mock/gomock"
@@ -82,7 +81,7 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with single policy - ingress",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
-				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -111,16 +110,16 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
-				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionErrorReasonLabel:         "",
 				otelcollector.DecisionRejectReasonLabel:        "",
 				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
@@ -159,12 +158,12 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
@@ -180,7 +179,7 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with two policies",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
-				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
 				DecisionReason: &flowcontrolv1.DecisionReason{
 					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
 				},
@@ -227,28 +226,28 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
-			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="0"} 0
-			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="10"} 1
-			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="20"} 1
-			workload_latency_ms_bucket{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
-			workload_latency_ms_count{component_index="2",dropped="false",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
+			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			workload_latency_ms_bucket{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="0"} 0
+			workload_latency_ms_bucket{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="10"} 1
+			workload_latency_ms_bucket{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="20"} 1
+			workload_latency_ms_bucket{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
+			workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.AuthzStatusLabel:          "STATUS_NO_ERROR",
-				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionErrorReasonLabel:  "ERROR_REASON_UNSPECIFIED",
 				otelcollector.RateLimitersLabel:         []interface{}{},
 				otelcollector.DroppingRateLimitersLabel: []interface{}{},
@@ -256,6 +255,10 @@ var _ = Describe("Metrics Processor", func() {
 					"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash",
 					"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
 					"policy_name:fizz,component_index:2,workload_index:2,policy_hash:fizz-hash",
+				},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
+					"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash",
+					"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
 				},
 			},
 		),
@@ -299,7 +302,7 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with single policy - ingress",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
-				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -325,15 +328,15 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
-				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionErrorReasonLabel:         "",
 				otelcollector.DecisionRejectReasonLabel:        "",
 				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
@@ -369,12 +372,12 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
@@ -389,7 +392,7 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with two policies",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
-				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
 				DecisionReason: &flowcontrolv1.DecisionReason{
 					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
 				},
@@ -435,27 +438,27 @@ var _ = Describe("Metrics Processor", func() {
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
 			# TYPE workload_latency_ms histogram
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="",le="0"} 0
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="",le="10"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="",le="20"} 1
-			workload_latency_ms_bucket{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index="",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index=""} 5
-			workload_latency_ms_count{component_index="1",dropped="true",policy_hash="foo-hash",policy_name="foo",workload_index=""} 1
-			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="0"} 0
-			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="10"} 1
-			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="20"} 1
-			workload_latency_ms_bucket{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="+Inf"} 1
-			workload_latency_ms_sum{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
-			workload_latency_ms_count{component_index="2",dropped="true",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
+			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="",le="0"} 0
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="",le="10"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="",le="20"} 1
+			workload_latency_ms_bucket{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index=""} 5
+			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index=""} 1
+			workload_latency_ms_bucket{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="0"} 0
+			workload_latency_ms_bucket{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="10"} 1
+			workload_latency_ms_bucket{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="20"} 1
+			workload_latency_ms_bucket{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2",le="+Inf"} 1
+			workload_latency_ms_sum{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
+			workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 			`,
 			map[string]interface{}{
-				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_ACCEPTED",
+				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionRejectReasonLabel: "REJECT_REASON_UNSPECIFIED",
 				otelcollector.RateLimitersLabel: []interface{}{
 					"policy_name:foo,component_index:1,policy_hash:foo-hash",
@@ -586,14 +589,7 @@ func expectEngineCalls(engine *mocks.MockEngineAPI, checkResponse *flowcontrolv1
 	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
 	for i, fm := range checkResponse.FluxMeters {
 		// TODO actually return some Histogram
-		fmID := fmt.Sprintf(
-			"agent_group-%v-policy-%v-flux_meter-%v-policy_hash-%v",
-			fm.GetAgentGroup(),
-			fm.GetPolicyName(),
-			fm.GetFluxMeterName(),
-			fm.GetPolicyHash(),
-		)
-		expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fmID).Return(nil)
+		expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetPolicyName(), fm.GetFluxMeterName(), fm.GetPolicyHash(), flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
 	}
 	gomock.InOrder(expectedCalls...)
 }
