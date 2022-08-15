@@ -107,7 +107,7 @@ func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 		SampleRate:       config.SampleRate,
 		TracesSampleRate: config.TracesSampleRate,
 		// TODO: Customize sampler if needed
-		// TracesSampler enables to customize the sampleing of traces, overrides TracesSampleRate
+		// TracesSampler enables to customize the sampling of traces, overrides TracesSampleRate
 		//
 		// TracesSampler: sentry.TracesSamplerFunc(func(ctx sentry.SamplingContext) sentry.Sampled {
 		// 	return sentry.SampledTrue
