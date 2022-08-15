@@ -127,20 +127,16 @@ func (executor *jobExecutor) doJob() {
 
 	jobCh := make(chan bool, 1)
 
-	execFunc := func(ctx context.Context) func() {
-		return func() {
-			defer func() {
-				jobCh <- true
-			}()
-			_, err := executor.jg.gt.execute(ctx, executor)
-			if err != nil {
-				log.Error().Err(err).Str("job", executor.Name()).Msg("job execution failed")
-				return
-			}
+	panichandler.Go(func() {
+		defer func() {
+			jobCh <- true
+		}()
+		_, err := executor.jg.gt.execute(ctx, executor)
+		if err != nil {
+			log.Error().Err(err).Str("job", executor.Name()).Msg("job execution failed")
+			return
 		}
-	}
-
-	panichandler.Go(execFunc(ctx))
+	})
 
 	timerCh := make(chan bool, 1)
 	timer := time.AfterFunc(newDuration, func() {
