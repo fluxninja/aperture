@@ -13,6 +13,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -66,11 +67,13 @@ type JobConfig struct {
 }
 
 type jobExecutor struct {
+	execLock sync.Mutex
 	Job
-	jg     *JobGroup
-	job    *gocron.Job
-	config JobConfig
-	jobTag string
+	jg      *JobGroup
+	job     *gocron.Job
+	config  JobConfig
+	jobTag  string
+	stopped bool
 }
 
 // Make sure jobExecutor complies with Job interface.
@@ -102,25 +105,19 @@ func (executor *jobExecutor) Execute(ctx context.Context) (proto.Message, error)
 	return executor.Job.Execute(ctx)
 }
 
-type panicHandlerFunc func(jobName string, recoverData interface{})
-
-var (
-	panicHandler      panicHandlerFunc
-	panicHandlerMutex = sync.RWMutex{}
-)
-
-func (executor *jobExecutor) setPanicHandler(handler panicHandlerFunc) {
-	panicHandlerMutex.Lock()
-	defer panicHandlerMutex.Unlock()
-	panicHandler = handler
-}
-
 func (executor *jobExecutor) getLivenessStatusPath() string {
 	// "liveness.job_groups.<jobGroupName>.<jobName>"
 	return strings.Join([]string{"liveness", "job_groups", executor.jg.GroupName(), executor.Name()}, executor.jg.gt.registry.Delim())
 }
 
 func (executor *jobExecutor) doJob() {
+	executor.execLock.Lock()
+	defer executor.execLock.Unlock()
+
+	if executor.stopped {
+		return
+	}
+
 	executionTimeout := executor.config.ExecutionTimeout.Duration.AsDuration()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -134,25 +131,17 @@ func (executor *jobExecutor) doJob() {
 	newDuration := newTime.Sub(now)
 
 	jobCh := make(chan bool, 1)
-	go func(ctx context.Context) {
+
+	panichandler.Go(func() {
 		defer func() {
 			jobCh <- true
 		}()
-		panicHandlerMutex.RLock()
-		defer panicHandlerMutex.RUnlock()
-		if panicHandler != nil {
-			defer func() {
-				if r := recover(); r != nil {
-					panicHandler(executor.Name(), r)
-				}
-			}()
-		}
 		_, err := executor.jg.gt.execute(ctx, executor)
 		if err != nil {
 			log.Error().Err(err).Str("job", executor.Name()).Msg("job execution failed")
 			return
 		}
-	}(ctx)
+	})
 
 	timerCh := make(chan bool, 1)
 	timer := time.AfterFunc(newDuration, func() {
@@ -175,12 +164,16 @@ func (executor *jobExecutor) doJob() {
 			if err != nil {
 				log.Error().Err(err).Str("job", executor.Name()).Msg("Unable to push status to registry")
 			}
+			timer.Stop()
 			return
 		}
 	}
 }
 
 func (executor *jobExecutor) start() {
+	executor.execLock.Lock()
+	defer executor.execLock.Unlock()
+
 	var scheduler *gocron.Scheduler
 	if executor.config.ExecutionPeriod.Duration.AsDuration() > 0 {
 		scheduler = executor.jg.scheduler.
@@ -214,6 +207,9 @@ func (executor *jobExecutor) start() {
 }
 
 func (executor *jobExecutor) stop() {
+	executor.execLock.Lock()
+	defer executor.execLock.Unlock()
+
 	regPath := executor.getLivenessStatusPath()
 	executor.jg.gt.registry.Delete(regPath)
 	err := executor.jg.scheduler.RemoveByTag(executor.jobTag)
@@ -221,6 +217,7 @@ func (executor *jobExecutor) stop() {
 		log.Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job")
 		return
 	}
+	executor.stopped = true
 }
 
 func (executor *jobExecutor) trigger() {
@@ -232,9 +229,6 @@ func (executor *jobExecutor) trigger() {
 }
 
 func (executor *jobExecutor) jobInfo() *JobInfo {
-	if executor.job == nil {
-		return nil
-	}
 	return &JobInfo{
 		LastRunTime: executor.job.LastRun(),
 		NextRunTime: executor.job.NextRun(),

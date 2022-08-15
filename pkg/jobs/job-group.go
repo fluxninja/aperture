@@ -210,10 +210,6 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 	}
 
 	executor := newJobExecutor(job, jg, config)
-	// setPanicHandler sets the global panicHandler to the given executor.
-	executor.setPanicHandler(panicHandlerFunc(func(jobName string, recoverData interface{}) {
-		log.Panic().Str("job", jobName).Interface("recoverData", recoverData).Msg("Panic recovered during job execution")
-	}))
 	// add to the tracker
 	err := jg.gt.registerJob(executor)
 	if err != nil {
