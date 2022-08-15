@@ -69,10 +69,11 @@ type JobConfig struct {
 type jobExecutor struct {
 	execLock sync.Mutex
 	Job
-	jg     *JobGroup
-	job    *gocron.Job
-	config JobConfig
-	jobTag string
+	jg      *JobGroup
+	job     *gocron.Job
+	config  JobConfig
+	jobTag  string
+	stopped bool
 }
 
 // Make sure jobExecutor complies with Job interface.
@@ -112,6 +113,10 @@ func (executor *jobExecutor) getLivenessStatusPath() string {
 func (executor *jobExecutor) doJob() {
 	executor.execLock.Lock()
 	defer executor.execLock.Unlock()
+
+	if executor.stopped {
+		return
+	}
 
 	executionTimeout := executor.config.ExecutionTimeout.Duration.AsDuration()
 
@@ -212,6 +217,7 @@ func (executor *jobExecutor) stop() {
 		log.Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job")
 		return
 	}
+	executor.stopped = true
 }
 
 func (executor *jobExecutor) trigger() {
