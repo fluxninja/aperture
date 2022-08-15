@@ -89,8 +89,8 @@ func (c Callstack) Entries() []Entry {
 	return out
 }
 
-// GetEntriesForSentry returns stacktrace of Callstack in map[string]interface{} format.
-func (c Callstack) GetEntriesForSentry() map[string]interface{} {
+// GetEntries returns stacktrace of Callstack in map[string]interface{} format.
+func (c Callstack) GetEntries() map[string]interface{} {
 	entries := c.Entries()
 	lines := make(map[string]interface{})
 	for i, e := range entries {
