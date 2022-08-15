@@ -217,7 +217,7 @@ func (s *SentryWriter) SentryPanicHandler(e interface{}, stacktrace panichandler
 		Type:     "debug",
 		Category: "Stacktrace",
 		Level:    sentry.LevelInfo,
-		Message:  stacktrace.String(),
+		Data:     stacktrace.GetEntriesForSentry(),
 	})
 
 	sentry.CurrentHub().Recover(e)

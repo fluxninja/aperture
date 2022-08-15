@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -88,22 +89,23 @@ func (c Callstack) Entries() []Entry {
 	return out
 }
 
-// String returns stacktrace of Callstack in string format.
-func (c Callstack) String() string {
+// GetEntriesForSentry returns stacktrace of Callstack in map[string]interface{} format.
+func (c Callstack) GetEntriesForSentry() map[string]interface{} {
 	entries := c.Entries()
-	lines := make([]string, len(entries))
+	lines := make(map[string]interface{})
 	for i, e := range entries {
-		lines[i] = e.String()
+		lines["#"+strconv.Itoa(i+1)] = e.String()
 	}
-	return strings.Join(lines, "\n")
+
+	return lines
 }
 
-// String returns stacktrace of Entry in string format.
+// String returns stacktrace of Entry.
 func (e Entry) String() string {
-	return fmt.Sprint("- ", e.Location, ":", e.Function)
+	return fmt.Sprint(e.Location, ":", e.Function)
 }
 
-// String returns stacktrace of Location in Entry in string format.
+// String returns Location of stack entry.
 func (l Location) String() string {
 	const strip = "fluxninja/"
 	dir := l.Directory
@@ -113,7 +115,7 @@ func (l Location) String() string {
 	return fmt.Sprint(dir, l.File, "@", l.Line)
 }
 
-// String returns stacktrace of Function in Entry in string format.
+// String returns name of Function.
 func (f Function) String() string {
 	return f.Name
 }
