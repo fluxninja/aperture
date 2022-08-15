@@ -1,6 +1,6 @@
 kind: ConfigMap
 metadata:
-  name: flowcontrol
+  name: policies
   namespace: aperture-system
   labels:
     aperture.tech/validate: "true"

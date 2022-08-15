@@ -133,7 +133,7 @@ spec:
           volumeMounts:
             - name: aperture-controller-config
               mountPath: /etc/aperture/aperture-controller/config
-            - name: etc-aperture-flowcontrol
+            - name: etc-aperture-policies
               mountPath: /etc/aperture/aperture-controller/policies
               readOnly: true
             - name: etc-aperture-classification
@@ -149,9 +149,9 @@ spec:
         - name: aperture-controller-config
           configMap:
             name: {{ template "common.names.fullname" . }}-controller
-        - name: etc-aperture-flowcontrol
+        - name: etc-aperture-policies
           configMap:
-            name: flowcontrol
+            name: policies
             optional: true
         - name: etc-aperture-classification
           configMap:
