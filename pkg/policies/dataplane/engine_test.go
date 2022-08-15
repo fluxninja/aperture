@@ -23,8 +23,10 @@ var _ = Describe("Dataplane Engine", func() {
 		mockLimiter   *mocks.MockLimiter
 		mockFluxmeter *mocks.MockFluxMeter
 
-		selector  *policylangv1.Selector
-		histogram goprom.Histogram
+		selector    *policylangv1.Selector
+		histogram   goprom.Histogram
+		fluxMeterID iface.FluxMeterID
+		limiterID   iface.LimiterID
 	)
 
 	BeforeEach(func() {
@@ -50,12 +52,23 @@ var _ = Describe("Dataplane Engine", func() {
 				"decision_type":   flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED.String(),
 			},
 		})
+		fluxMeterID = iface.FluxMeterID{
+			PolicyName:    "test",
+			FluxMeterName: "test",
+			PolicyHash:    "test",
+		}
+		limiterID = iface.LimiterID{
+			PolicyName:     "test",
+			ComponentIndex: 0,
+			PolicyHash:     "test",
+		}
 	})
 
 	Context("Scheduler actuator", func() {
 		BeforeEach(func() {
 			mockLimiter.EXPECT().GetPolicyName().AnyTimes()
 			mockLimiter.EXPECT().GetSelector().Return(selector).AnyTimes()
+			mockLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 		})
 
 		It("Registers scheduler actuator", func() {
@@ -90,6 +103,7 @@ var _ = Describe("Dataplane Engine", func() {
 			mockFluxmeter.EXPECT().GetPolicyHash().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
 			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(histogram).AnyTimes()
+			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 
 		It("Registers Flux meter", func() {
@@ -133,12 +147,14 @@ var _ = Describe("Dataplane Engine", func() {
 		BeforeEach(func() {
 			mockLimiter.EXPECT().GetPolicyName().AnyTimes()
 			mockLimiter.EXPECT().GetSelector().Return(selector).AnyTimes()
+			mockLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 
 			mockFluxmeter.EXPECT().GetPolicyName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetPolicyHash().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
 			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(histogram).AnyTimes()
+			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 
 		It("Return nothing for not compatible service", func() {
