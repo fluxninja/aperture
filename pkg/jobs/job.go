@@ -232,6 +232,9 @@ func (executor *jobExecutor) trigger() {
 }
 
 func (executor *jobExecutor) jobInfo() *JobInfo {
+	if executor.job == nil {
+		return nil
+	}
 	return &JobInfo{
 		LastRunTime: executor.job.LastRun(),
 		NextRunTime: executor.job.NextRun(),
