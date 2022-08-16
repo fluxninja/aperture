@@ -27,37 +27,25 @@ const (
 // ServiceKey holds key for service.
 type ServiceKey struct {
 	AgentGroup string `json:"agent_group"`
-	Namespace  string `json:"namespace"`
 	Name       string `json:"name"`
 }
 
 func (sk ServiceKey) lessThan(sk2 ServiceKey) bool {
-	if sk.AgentGroup < sk2.AgentGroup {
-		return true
-	} else if sk.AgentGroup > sk2.AgentGroup {
-		return false
+	if sk.AgentGroup == sk2.AgentGroup {
+		return sk.Name < sk2.Name
 	}
-	if sk.Namespace < sk2.Namespace {
-		return true
-	} else if sk.Namespace > sk2.Namespace {
-		return false
-	}
-	if sk.Name < sk2.Name {
-		return true
-	}
-	return false
+	return sk.AgentGroup < sk2.AgentGroup
 }
 
 // KeyFromService returns a service key for given service.
 func KeyFromService(service *heartbeatv1.Service) *ServiceKey {
 	return &ServiceKey{
 		AgentGroup: service.AgentGroup,
-		Namespace:  service.Namespace,
 		Name:       service.Name,
 	}
 }
 
-// Merge merges `mergedService` into `originalService`. This sums `EnititesCount`.
+// Merge merges `mergedService` into `originalService`. This sums `EntitiesCount`.
 func Merge(originalService, mergedService *heartbeatv1.Service) {
 	originalService.EntitiesCount += mergedService.EntitiesCount
 }
@@ -71,8 +59,6 @@ type Entity struct {
 
 	// IP Address of this entity
 	IPAddress string `json:"ip_address"`
-	// Namespace in which this entity belongs
-	Namespace string `json:"namespace"`
 	// AgentGroup needs to be explicitly set using SetAgentGroup.
 	AgentGroup string `json:"agent_group"`
 	// Services is a List of names of services this entity is a part of.
@@ -104,10 +90,9 @@ type EntityID struct {
 }
 
 // NewEntity creates a new entity from ID and IP address from the tagger.
-func NewEntity(id EntityID, namespace, ipAddress string, services []string) *Entity {
+func NewEntity(id EntityID, ipAddress string, services []string) *Entity {
 	return &Entity{
 		ID:        id,
-		Namespace: namespace,
 		IPAddress: ipAddress,
 		Services:  services,
 	}
@@ -144,25 +129,24 @@ func ProvideEntityCache(in FxIn) (*EntityCache, error) {
 		UnmarshalNotifyFunc: entityCache.processUpdate,
 	}
 
-	in.Lifecycle.Append(
-		fx.Hook{
-			OnStart: func(context.Context) error {
-				err := in.EntityTrackers.AddPrefixNotifier(configPrefixNotifier)
-				if err != nil {
-					log.Error().Err(err).Msg("failed to add config prefix notifier")
-					return err
-				}
-				return nil
-			},
-			OnStop: func(context.Context) error {
-				err := in.EntityTrackers.RemovePrefixNotifier(configPrefixNotifier)
-				if err != nil {
-					log.Error().Err(err).Msg("failed to remove prefix notifier")
-					return err
-				}
-				return nil
-			},
-		})
+	in.Lifecycle.Append(fx.Hook{
+		OnStart: func(context.Context) error {
+			err := in.EntityTrackers.AddPrefixNotifier(configPrefixNotifier)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to add config prefix notifier")
+				return err
+			}
+			return nil
+		},
+		OnStop: func(context.Context) error {
+			err := in.EntityTrackers.RemovePrefixNotifier(configPrefixNotifier)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to remove prefix notifier")
+				return err
+			}
+			return nil
+		},
+	})
 
 	return entityCache, nil
 }
@@ -193,7 +177,7 @@ func discoveryEntityToCacheEntity(entity *common.Entity) *Entity {
 	return NewEntity(EntityID{
 		Prefix: entity.Prefix,
 		UID:    entity.UID,
-	}, entity.Namespace, entity.IPAddress, entity.Services)
+	}, entity.IPAddress, entity.Services)
 }
 
 // NewEntityCache creates a new, empty EntityCache.
@@ -274,13 +258,12 @@ func (c *EntityCache) Remove(entity *Entity) bool {
 
 // Services returns a list of services based on entities in cache.
 //
-// Each service is identified by 3 values:
+// Each service is identified by 2 values:
 // - agent group
-// - namespace
 // - service name
 //
 // This shouldn't happen in real world, but entities which have multiple values
-// either for agent group or namespace are ignored.
+// for an agent group is ignored.
 // Entities which have multiple values for service name will create one service
 // for each of them.
 func (c *EntityCache) Services() ([]*heartbeatv1.Service, []*heartbeatv1.OverlappingService) {
@@ -320,12 +303,10 @@ func (c *EntityCache) Services() ([]*heartbeatv1.Service, []*heartbeatv1.Overlap
 		retOverlapping = append(retOverlapping, &heartbeatv1.OverlappingService{
 			Service1: &heartbeatv1.ServiceKey{
 				AgentGroup: k.x.AgentGroup,
-				Namespace:  k.x.Namespace,
 				Name:       k.x.Name,
 			},
 			Service2: &heartbeatv1.ServiceKey{
 				AgentGroup: k.y.AgentGroup,
-				Namespace:  k.y.Namespace,
 				Name:       k.y.Name,
 			},
 			EntitiesCount: int32(v),
@@ -372,24 +353,17 @@ func eachPair(services []ServiceKey) []pair {
 }
 
 // ServiceIDsFromEntity returns a list of services the entity is a part of.
-func ServiceIDsFromEntity(entity *Entity) ([]services.ServiceID, error) {
-	if entity.Namespace == "" {
-		return nil, errors.New("missing namespace")
+func ServiceIDsFromEntity(entity *Entity) []services.ServiceID {
+	var svcs []services.ServiceID
+	if entity != nil {
+		svcs = make([]services.ServiceID, 0, len(entity.Services))
+		for _, service := range entity.Services {
+			svcs = append(svcs, services.ServiceID{
+				Service: service,
+			})
+		}
 	}
-
-	if len(entity.Services) == 0 {
-		return nil, errors.New("missing services")
-	}
-
-	svcs := make([]services.ServiceID, 0, len(entity.Services))
-	for _, service := range entity.Services {
-		svcs = append(svcs, services.ServiceID{
-			AgentGroup: entity.AgentGroup,
-			Namespace:  entity.Namespace,
-			Service:    service,
-		})
-	}
-	return svcs, nil
+	return svcs
 }
 
 func servicesFromEntity(entity *Entity) ([]*heartbeatv1.Service, error) {
@@ -397,16 +371,11 @@ func servicesFromEntity(entity *Entity) ([]*heartbeatv1.Service, error) {
 		return nil, errors.New("missing agent group")
 	}
 
-	svcIDs, err := ServiceIDsFromEntity(entity)
-	if err != nil {
-		return nil, err
-	}
-
+	svcIDs := ServiceIDsFromEntity(entity)
 	svcs := make([]*heartbeatv1.Service, 0, len(svcIDs))
 	for _, svc := range svcIDs {
 		svcs = append(svcs, &heartbeatv1.Service{
 			AgentGroup:    entity.AgentGroup,
-			Namespace:     svc.Namespace,
 			Name:          svc.Service,
 			EntitiesCount: 1,
 		})

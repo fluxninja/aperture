@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -125,9 +126,6 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 	return nil
 }
 
-// TODO (hasit): The following unmarshaling function
-// 1. should be renamed and moved to a common package along with the corresponding marshal method
-
 // UnmarshalStringVal is a helper for cases we're sending more complex
 // structure json-encoded in a string label
 //
@@ -146,9 +144,43 @@ func UnmarshalStringVal(value pcommon.Value, labelName string, output interface{
 
 	err := json.Unmarshal([]byte(stringVal), output)
 	if err != nil {
-		log.Debug().Err(err).Str("label", labelName).Msg("Unmarshalling")
+		log.Error().Err(err).Str("label", labelName).Msg("Failed to unmarshal")
 		// This is almost impossible to happen (eg. broken sdk), so ignoring error is ok
 	}
 
+	return true
+}
+
+// GetCheckResponse unmarshalls flowcontrol CheckResponse from string label.
+func GetCheckResponse(attributes pcommon.Map) *flowcontrolv1.CheckResponse {
+	checkResponse := &flowcontrolv1.CheckResponse{}
+	ok := unmarshalAttributesMap(attributes, MarshalledCheckResponseLabel, &checkResponse)
+	if !ok {
+		log.Debug().Str("label", MarshalledCheckResponseLabel).Msg("Failed to unmarshal attributes into AuthzResponse")
+	}
+	return checkResponse
+}
+
+// GetAuthzResponse unmarshalls authz response from string label.
+func GetAuthzResponse(attributes pcommon.Map) *flowcontrolv1.AuthzResponse {
+	authzResponse := &flowcontrolv1.AuthzResponse{}
+	ok := unmarshalAttributesMap(attributes, MarshalledAuthzResponseLabel, &authzResponse)
+	if !ok {
+		log.Debug().Str("label", MarshalledAuthzResponseLabel).Msg("Failed to unmarshal attributes into AuthzResponse")
+	}
+	return authzResponse
+}
+
+func unmarshalAttributesMap(attributes pcommon.Map, label string, output interface{}) bool {
+	value, ok := attributes.Get(label)
+	if !ok {
+		log.Error().Str("label", label).Msg("Label does not exist in attributes map")
+		return false
+	}
+	ok = UnmarshalStringVal(value, label, &output)
+	if !ok {
+		log.Debug().Str("label", label).Msg("Label is not a string")
+		return false
+	}
 	return true
 }

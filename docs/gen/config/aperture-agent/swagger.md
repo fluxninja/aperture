@@ -452,14 +452,6 @@ Env-Var Prefix: `APERTURE_AGENT_WATCHDOG_MEMORY_`
 Type: [WatchdogConfig](#watchdog-config)
 
 </dd>
-
-<dt>scheduler</dt>
-<dd>
-
-Env-Var Prefix: `APERTURE_AGENT_WATCHDOG_SCHEDULER_`
-Type: [JobGroupConfig](#job-group-config)
-
-</dd>
 </dl>
 
 ## Objects
@@ -1484,9 +1476,9 @@ SentryConfig holds configuration for Sentry.
 <dt>dsn</dt>
 <dd>
 
-(string) If DSN is not set, the client is effectively disabled
+(string, default: `https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877`) If DSN is not set, the client is effectively disabled
 You can set test project's dsn to send log events.
-i.e. oss-aperture: <https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877>
+oss-aperture project dsn is set as default.
 
 </dd>
 </dl>
@@ -1589,6 +1581,14 @@ WatchdogConfig holds configuration for Watchdog Policy. For each policy, either 
 <dd>
 
 ([HeapConfig](#heap-config))
+
+</dd>
+</dl>
+<dl>
+<dt>job</dt>
+<dd>
+
+([JobConfig](#job-config))
 
 </dd>
 </dl>

@@ -1,6 +1,6 @@
 kind: ConfigMap
 metadata:
-  name: flowcontrol
+  name: policies
   namespace: aperture-system
   labels:
     aperture.tech/validate: "true"
@@ -11,13 +11,12 @@ data:
     flux_meters:
       - name: "demo1_latency"
         selector:
-          namespace: "demoapp"
-          service: "demo1-demo-app"
+          service: "demo1-demo-app.demoapp.svc.cluster.local"
           control_point:
             traffic: "ingress"
     circuit:
       - promql:
-          query_string: "sum(increase(demo1_latency_sum[5s]))/sum(increase(demo1_latency_count[5s]))"
+          query_string: "sum(increase(demo1_latency_sum{decision_type!=\"DECISION_TYPE_REJECTED\"}[5s]))/sum(increase(demo1_latency_count{decision_type!=\"DECISION_TYPE_REJECTED\"}[5s]))"
           evaluation_interval: "1s"
           out_ports:
             output:
@@ -90,23 +89,26 @@ data:
       - concurrency_limiter:
           scheduler:
             selector:
-              namespace: "demoapp"
-              service: "demo1-demo-app"
+              service: "demo1-demo-app.demoapp.svc.cluster.local"
               control_point:
                 traffic: "ingress"
-            workload_config:
-              label_key: "flow_user"
-              auto_tokens: true
-              default_workload:
-                priority: 20
-                timeout: "0.005s"
-              workloads:
-                - label_value: "A"
+            auto_tokens: true
+            default_workload:
+              priority: 20
+              timeout: "0.005s"
+            workloads:
+              - workload:
                   priority: 50
                   timeout: "0.005s"
-                - label_value: "B"
+                label_matcher:
+                  match_labels:
+                    request_header_user-type: "guest"
+              - workload:
                   priority: 200
                   timeout: "0.005s"
+                label_matcher:
+                  match_labels:
+                    request_header_user-type: "subscriber"
             out_ports:
               accepted_concurrency:
                 signal_name: "ACCEPTED_CONCURRENCY"

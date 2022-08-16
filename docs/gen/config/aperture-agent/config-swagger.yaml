@@ -129,9 +129,6 @@ definitions:
       ip_address:
         type: string
         x-go-name: IPAddress
-      namespace:
-        type: string
-        x-go-name: Namespace
       prefix:
         type: string
         x-go-name: Prefix
@@ -876,6 +873,8 @@ definitions:
         $ref: '#/definitions/WatchdogPolicyType'
       heap:
         $ref: '#/definitions/HeapConfig'
+      job:
+        $ref: '#/definitions/JobConfig'
       system:
         $ref: '#/definitions/WatchdogPolicyType'
     title: WatchdogConfig holds configuration for Watchdog Policy. For each policy,
@@ -1117,10 +1116,6 @@ paths:
         name: memory
         schema:
           $ref: '#/definitions/WatchdogConfig'
-      - in: body
-        name: scheduler
-        schema:
-          $ref: '#/definitions/JobGroupConfig'
       tags:
       - common-configuration
       x-fn-config-env: true

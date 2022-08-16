@@ -28,7 +28,7 @@ type CMFileValidator interface {
 	) (bool, string, error)
 }
 
-// CMValidator validates the flowcontrol configmap.
+// CMValidator validates the policies configmap.
 type CMValidator struct {
 	tokens         chan concurrencyToken
 	fileValidators []CMFileValidator
@@ -95,7 +95,6 @@ func (v *CMValidator) ValidateObject(
 // * false, message, nil when config is invalid
 // and
 // * false, "", err on other errors.
-//
 func (v *CMValidator) ValidateConfigMap(ctx context.Context, cm corev1.ConfigMap) (bool, string, error) {
 	files := make(map[string][]byte, len(cm.Data)+len(cm.BinaryData))
 

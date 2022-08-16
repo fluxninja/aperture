@@ -16,301 +16,309 @@ import (
 	"github.com/fluxninja/aperture/pkg/services"
 )
 
+// multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
+type multiMatchResult struct {
+	concurrencyLimiters []iface.Limiter
+	fluxMeters          []iface.FluxMeter
+	rateLimiters        []iface.RateLimiter
+}
+
 // multiMatcher is MultiMatcher instantiation used in this package.
-type multiMatcher = multimatcher.MultiMatcher[string, iface.MultiMatchResult]
+type multiMatcher = multimatcher.MultiMatcher[string, multiMatchResult]
+
+// PopulateFromMultiMatcher populates result object with results from MultiMatcher.
+func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiMatcher[string, multiMatchResult], labels selectors.Labels) {
+	resultCollection := mm.Match(multimatcher.Labels(labels.ToPlainMap()))
+	result.concurrencyLimiters = append(result.concurrencyLimiters, resultCollection.concurrencyLimiters...)
+	result.fluxMeters = append(result.fluxMeters, resultCollection.fluxMeters...)
+	result.rateLimiters = append(result.rateLimiters, resultCollection.rateLimiters...)
+}
 
 // ProvideEngineAPI Main fx app.
 func ProvideEngineAPI() iface.EngineAPI {
-	e := &Engine{}
-	e.multiMatchers = make(map[selectors.ControlPointID]*multiMatcher)
-	e.fluxMeterHists = make(map[string]prometheus.Histogram)
+	e := &Engine{
+		multiMatchers: make(map[selectors.ControlPointID]*multiMatcher),
+		fluxMetersMap: make(map[iface.FluxMeterID]iface.FluxMeter),
+	}
 	return e
 }
 
 // Engine APIs to
 // (1) Get schedulers given a service, control point and set of labels
-// (2) Get flux meter histogram given a metric id
-// TODO: Will implement 3 APIs described in policy-config-api.go.
+// (2) Get flux meter histogram given a metric id.
 type Engine struct {
-	fluxMeterHistMutex sync.RWMutex
-	multiMatchMutex    sync.RWMutex
-	fluxMeterHists     map[string]prometheus.Histogram
+	fluxMeterMapMutex  sync.RWMutex
+	fluxMetersMap      map[iface.FluxMeterID]iface.FluxMeter
+	multiMatchersMutex sync.RWMutex
 	multiMatchers      map[selectors.ControlPointID]*multiMatcher
 }
 
 // ProcessRequest .
-func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse {
-	resp := &flowcontrolv1.CheckResponse{}
-
-	decisionType := flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED
-	var decisionReason *flowcontrolv1.Reason
-
-	setDecisionRejected := func() {
-		decisionType = flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED
+func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
+	response = &flowcontrolv1.CheckResponse{
+		DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
 	}
 
-	// Run applicable service protection policies (schedulers) in parallel and reject request if any policy decides to reject
-	multiMatchResult := e.getMatches(controlPoint, serviceIDs, labels)
-
-	// append fluxmeter IDs
-	fluxMeters := multiMatchResult.FluxMeters
-	// TODO: change the return signature of GetMatches to return only FluxMeterIDs.
-	fluxMeterIDs := make([]string, 0, len(fluxMeters))
-	for _, fluxMeter := range fluxMeters {
-		fluxMeterIDs = append(fluxMeterIDs, fluxMeter.GetMetricID())
+	mmr := e.getMatches(controlPoint, serviceIDs, labels)
+	if mmr == nil {
+		return
 	}
 
-	limiterDecisions := []*flowcontrolv1.LimiterDecision{}
-
-	var wg sync.WaitGroup
-	var once sync.Once
-
-	execLimiter := func(limiter iface.Limiter, decision *flowcontrolv1.LimiterDecision) func() {
-		return func() {
-			defer wg.Done()
-			decision = limiter.RunLimiter(labels)
-			if decision.Dropped {
-				once.Do(setDecisionRejected)
-			}
+	fluxMeters := mmr.fluxMeters
+	fluxMeterProtos := make([]*flowcontrolv1.FluxMeter, len(fluxMeters))
+	for i, fluxMeter := range fluxMeters {
+		fluxMeterProtos[i] = &flowcontrolv1.FluxMeter{
+			AgentGroup:    fluxMeter.GetAgentGroup(),
+			PolicyName:    fluxMeter.GetPolicyName(),
+			PolicyHash:    fluxMeter.GetPolicyHash(),
+			FluxMeterName: fluxMeter.GetFluxMeterName(),
 		}
 	}
-
-	execLimiters := func(limiters []iface.Limiter) []*flowcontrolv1.LimiterDecision {
-		decisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))
-		// execute limiters
-		for i, limiter := range limiters {
-			wg.Add(1)
-			decision := &flowcontrolv1.LimiterDecision{}
-			decisions[i] = decision
-			if i == len(limiters)-1 {
-				execLimiter(limiter, decision)()
-			} else {
-				panichandler.Go(execLimiter(limiter, decision))
-			}
-		}
-		wg.Wait()
-		return decisions
-	}
-
-	returnResponse := func() *flowcontrolv1.CheckResponse {
-		resp = &flowcontrolv1.CheckResponse{
-			DecisionType:     decisionType,
-			LimiterDecisions: limiterDecisions,
-			FluxMeterIds:     fluxMeterIDs,
-			Reason:           decisionReason,
-		}
-		return resp
-	}
-
-	///////////// Execute rate limiters and concurrency limiters //////////////
+	response.FluxMeters = fluxMeterProtos
 
 	// execute rate limiters first
-	rateLimiters := multiMatchResult.RateLimiters
-	rateLimiterDecisions := make([]*flowcontrolv1.LimiterDecision, 0, len(rateLimiters))
-	// return extra tokens back to rate limiters in case some rate limiters or concurrent limiters decides to reject request
+	rateLimiters := make([]iface.Limiter, len(mmr.rateLimiters))
+	for i, rl := range mmr.rateLimiters {
+		rateLimiters[i] = rl
+	}
+	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(rateLimiters, labels)
+	response.LimiterDecisions = rateLimiterDecisions
+
 	defer func() {
-		if resp.DecisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
-			for i, l := range rateLimiterDecisions {
-				if !l.Dropped && l.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
-					go rateLimiters[i].TakeN(labels, -1)
-				}
-			}
+		if response.DecisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
+			returnExtraTokens(mmr.rateLimiters, rateLimiterDecisions, labels)
 		}
 	}()
 
-	rLimiters := []iface.Limiter{}
-	for _, limiter := range rateLimiters {
-		rLimiters = append(rLimiters, limiter)
-	}
-
-	limiterDecisions = append(limiterDecisions, execLimiters(rLimiters)...)
-	// save rate limiter decisions separately in case we need to return back the tokens
-	rateLimiterDecisions = limiterDecisions
-
-	if decisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
-		decisionReason = &flowcontrolv1.Reason{
-			Reason: &flowcontrolv1.Reason_RejectReason_{
-				RejectReason: flowcontrolv1.Reason_REJECT_REASON_RATE_LIMITED,
-			},
+	// If any rate limiter dropped, then mark this as a decision reason and return.
+	// Do not execute concurrency limiters.
+	if rateLimitersDecisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
+		response.DecisionType = rateLimitersDecisionType
+		response.DecisionReason = &flowcontrolv1.DecisionReason{
+			RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_RATE_LIMITED,
 		}
-		return returnResponse()
+		return
 	}
 
-	// execute concurrency limiters
-	concurrencyLimiters := multiMatchResult.ConcurrencyLimiters
+	// execute rate limiters first
+	concurrencyLimiters := make([]iface.Limiter, len(mmr.concurrencyLimiters))
+	copy(concurrencyLimiters, mmr.concurrencyLimiters)
 
-	limiterDecisions = append(limiterDecisions, execLimiters(concurrencyLimiters)...)
+	concurrencyLimiterDecisions, concurrencyLimitersDecisionType := runLimiters(concurrencyLimiters, labels)
+	response.LimiterDecisions = append(response.LimiterDecisions, concurrencyLimiterDecisions...)
 
-	if decisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
-		decisionReason = &flowcontrolv1.Reason{
-			Reason: &flowcontrolv1.Reason_RejectReason_{
-				RejectReason: flowcontrolv1.Reason_REJECT_REASON_CONCURRENCY_LIMITED,
-			},
+	if concurrencyLimitersDecisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
+		response.DecisionType = flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED
+		response.DecisionReason = &flowcontrolv1.DecisionReason{
+			RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_CONCURRENCY_LIMITED,
 		}
-		return returnResponse()
+		return
 	}
 
-	return returnResponse()
+	return
+}
+
+func runLimiters(limiters []iface.Limiter, labels selectors.Labels) ([]*flowcontrolv1.LimiterDecision, flowcontrolv1.DecisionType) {
+	decisionType := flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED
+	var wg sync.WaitGroup
+	limiterDecisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))
+	for i, limiter := range limiters {
+		wg.Add(1)
+		panichandler.Go(func() {
+			defer wg.Done()
+			decision := limiter.RunLimiter(labels)
+			if decision.Dropped {
+				decisionType = flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED
+			}
+			limiterDecisions[i] = decision
+		})
+	}
+	wg.Wait()
+	return limiterDecisions, decisionType
+}
+
+func returnExtraTokens(
+	rateLimiters []iface.RateLimiter,
+	rateLimiterDecisions []*flowcontrolv1.LimiterDecision,
+	labels selectors.Labels,
+) {
+	for i, l := range rateLimiterDecisions {
+		if !l.Dropped && l.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
+			go rateLimiters[i].TakeN(labels, -1)
+		}
+	}
 }
 
 // RegisterConcurrencyLimiter adds concurrency limiter to multimatcher.
 func (e *Engine) RegisterConcurrencyLimiter(cl iface.Limiter) error {
-	concurrencyLimiterMatchedCB := func(mmr iface.MultiMatchResult) iface.MultiMatchResult {
-		mmr.ConcurrencyLimiters = append(
-			mmr.ConcurrencyLimiters,
+	concurrencyLimiterMatchedCB := func(mmr multiMatchResult) multiMatchResult {
+		mmr.concurrencyLimiters = append(
+			mmr.concurrencyLimiters,
 			cl,
 		)
 		return mmr
 	}
-
-	return e.register(
-		"ConcurrencyLimiter:"+cl.GetPolicyName(),
-		cl.GetSelector(),
-		concurrencyLimiterMatchedCB,
-	)
+	return e.register("ConcurrencyLimiter:"+cl.GetLimiterID().String(), cl.GetSelector(), concurrencyLimiterMatchedCB)
 }
 
 // UnregisterConcurrencyLimiter removes concurrency limiter from multimatcher.
 func (e *Engine) UnregisterConcurrencyLimiter(cl iface.Limiter) error {
 	selectorProto := cl.GetSelector()
-	return e.unregister("ConcurrencyLimiter:"+cl.GetPolicyName(), selectorProto)
+	return e.unregister("ConcurrencyLimiter:"+cl.GetLimiterID().String(), selectorProto)
 }
 
 // RegisterFluxMeter adds fluxmeter to histogram map.
 func (e *Engine) RegisterFluxMeter(fm iface.FluxMeter) error {
 	// Save the histogram in fluxMeterHists indexed by metric id
-	e.fluxMeterHistMutex.Lock()
-	defer e.fluxMeterHistMutex.Unlock()
-	if _, ok := e.fluxMeterHists[fm.GetMetricID()]; !ok {
-		e.fluxMeterHists[fm.GetMetricID()] = fm.GetHistogram()
+	e.fluxMeterMapMutex.Lock()
+	defer e.fluxMeterMapMutex.Unlock()
+	if _, ok := e.fluxMetersMap[fm.GetFluxMeterID()]; !ok {
+		e.fluxMetersMap[fm.GetFluxMeterID()] = fm
 	} else {
 		return fmt.Errorf("metric id already registered")
 	}
 
 	// Save the fluxMeterAPI in multiMatchers
-	fluxMeterMatchedCB := func(mmr iface.MultiMatchResult) iface.MultiMatchResult {
-		mmr.FluxMeters = append(
-			mmr.FluxMeters,
+	fluxMeterMatchedCB := func(mmr multiMatchResult) multiMatchResult {
+		mmr.fluxMeters = append(
+			mmr.fluxMeters,
 			fm,
 		)
 		return mmr
 	}
 
 	selectorProto := fm.GetSelector()
-	return e.register("FluxMeter:"+fm.GetMetricID(), selectorProto, fluxMeterMatchedCB)
+	return e.register("FluxMeter:"+fm.GetFluxMeterID().String(), selectorProto, fluxMeterMatchedCB)
 }
 
 // UnregisterFluxMeter removes fluxmeter from histogram map.
 func (e *Engine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 	// Remove the histogram from fluxMeterHists indexed by metric id
-	e.fluxMeterHistMutex.Lock()
-	defer e.fluxMeterHistMutex.Unlock()
-	delete(e.fluxMeterHists, fm.GetMetricID())
+	e.fluxMeterMapMutex.Lock()
+	defer e.fluxMeterMapMutex.Unlock()
+	delete(e.fluxMetersMap, fm.GetFluxMeterID())
 
 	// Remove the fluxMeterAPI from multiMatchers
 	selectorProto := fm.GetSelector()
-	return e.unregister("FluxMeter:"+fm.GetMetricID(), selectorProto)
+	return e.unregister("FluxMeter:"+fm.GetFluxMeterID().String(), selectorProto)
 }
 
-// GetFluxMeterHist Lookup function for getting histogram by metric id.
-// TODO: this method should move under policies/dataplane/fluxmeter.
-func (e *Engine) GetFluxMeterHist(metricID string) prometheus.Histogram {
-	e.fluxMeterHistMutex.RLock()
-	defer e.fluxMeterHistMutex.RUnlock()
-	return e.fluxMeterHists[metricID]
+// GetFluxMeterHist Lookup function for getting histogram.
+func (e *Engine) GetFluxMeterHist(policyName, fluxMeterName, policyHash string, decisionType flowcontrolv1.DecisionType) prometheus.Histogram {
+	e.fluxMeterMapMutex.RLock()
+	defer e.fluxMeterMapMutex.RUnlock()
+	fmID := iface.FluxMeterID{
+		PolicyName:    policyName,
+		FluxMeterName: fluxMeterName,
+		PolicyHash:    policyHash,
+	}
+	fluxMeter := e.fluxMetersMap[fmID]
+	if fluxMeter != nil {
+		return fluxMeter.GetHistogram(decisionType)
+	}
+	return nil
 }
 
 // RegisterRateLimiter adds limiter actuator to multimatcher.
 func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
-	limiterActuatorMatchedCB := func(mmr iface.MultiMatchResult) iface.MultiMatchResult {
-		mmr.RateLimiters = append(
-			mmr.RateLimiters,
+	limiterActuatorMatchedCB := func(mmr multiMatchResult) multiMatchResult {
+		mmr.rateLimiters = append(
+			mmr.rateLimiters,
 			rl,
 		)
 		return mmr
 	}
 
-	return e.register(
-		"RateLimiter:"+rl.GetPolicyName(),
-		rl.GetSelector(),
-		limiterActuatorMatchedCB,
-	)
+	return e.register("RateLimiter:"+rl.GetLimiterID().String(), rl.GetSelector(), limiterActuatorMatchedCB)
 }
 
 // UnregisterRateLimiter removes limiter actuator from multimatcher.
 func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 	selectorProto := rl.GetSelector()
-	return e.unregister("RateLimiter:"+rl.GetPolicyName(), selectorProto)
+	return e.unregister("RateLimiter:"+rl.GetLimiterID().String(), selectorProto)
 }
 
-// GetMatches returns schedulers and fluxmeters for given labels.
-func (e *Engine) getMatches(controlPoint selectors.ControlPoint, svcs []services.ServiceID, labels selectors.Labels) iface.MultiMatchResult {
-	e.multiMatchMutex.RLock()
-	defer e.multiMatchMutex.RUnlock()
+// getMatches returns schedulers and fluxmeters for given labels.
+func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *multiMatchResult {
+	e.multiMatchersMutex.RLock()
+	defer e.multiMatchersMutex.RUnlock()
 
-	retMMRslt := iface.MultiMatchResult{}
-	for _, service := range svcs {
+	mmResult := &multiMatchResult{}
+
+	// Lookup catchall multi matchers for controlPoint
+	controlPointID := selectors.ControlPointID{
+		ControlPoint: controlPoint,
+		ServiceID: services.ServiceID{
+			Service: "",
+		},
+	}
+	camm, ok := e.multiMatchers[controlPointID]
+	if ok {
+		mmResult.populateFromMultiMatcher(camm, labels)
+	}
+
+	for _, serviceID := range serviceIDs {
 		controlPointID := selectors.ControlPointID{
 			ControlPoint: controlPoint,
-			Service:      service,
+			ServiceID:    serviceID,
 		}
-
-		// Lookup multi matcher for this control point id
+		// Lookup multi matcher for controlPointID
 		mm, ok := e.multiMatchers[controlPointID]
 		if ok {
-			// Run match
-			resultCollection := mm.Match(multimatcher.Labels(labels.ToPlainMap()))
-			// Append the matching Schedulers
-			retMMRslt.ConcurrencyLimiters = append(retMMRslt.ConcurrencyLimiters, resultCollection.ConcurrencyLimiters...)
-			// Append the matching FluxMeters
-			retMMRslt.FluxMeters = append(retMMRslt.FluxMeters, resultCollection.FluxMeters...)
-			// Append the matching Limiters
-			retMMRslt.RateLimiters = append(retMMRslt.RateLimiters, resultCollection.RateLimiters...)
+			mmResult.populateFromMultiMatcher(mm, labels)
 		}
 	}
-	return retMMRslt
+
+	return mmResult
 }
 
-func (e *Engine) register(
-	key string,
-	selectorProto *policylangv1.Selector,
-	matchedCB multimatcher.MatchCallback[iface.MultiMatchResult],
-) error {
-	e.multiMatchMutex.Lock()
-	defer e.multiMatchMutex.Unlock()
+func (e *Engine) register(key string, selectorProto *policylangv1.Selector, matchedCB multimatcher.MatchCallback[multiMatchResult]) error {
+	e.multiMatchersMutex.Lock()
+	defer e.multiMatchersMutex.Unlock()
+
 	selector, err := selectors.FromProto(selectorProto)
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed to parse selector")
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
-	// check if multi matcher exists for this control point id
+
 	mm, ok := e.multiMatchers[selector.ControlPointID]
 	if !ok {
-		mm = multimatcher.New[string, iface.MultiMatchResult]()
+		mm = multimatcher.New[string, multiMatchResult]()
 		e.multiMatchers[selector.ControlPointID] = mm
 	}
+	err = mm.AddEntry(key, selector.LabelMatcher, matchedCB)
+	if err != nil {
+		return err
+	}
 
-	return mm.AddEntry(key, selector.LabelMatcher, matchedCB)
+	return nil
 }
 
 func (e *Engine) unregister(key string, selectorProto *policylangv1.Selector) error {
-	e.multiMatchMutex.Lock()
-	defer e.multiMatchMutex.Unlock()
+	e.multiMatchersMutex.Lock()
+	defer e.multiMatchersMutex.Unlock()
+
 	selector, err := selectors.FromProto(selectorProto)
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed to parse selector")
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
+
 	// check if multi matcher exists for this control point id
 	mm, ok := e.multiMatchers[selector.ControlPointID]
 	if !ok {
-		log.Warn().Msgf("Unable to unregister, multi matcher not found for control point id")
+		log.Warn().Msg("Unable to unregister, multi matcher not found for control point id")
 		return nil
 	}
-	retval := mm.RemoveEntry(key)
+	err = mm.RemoveEntry(key)
+	if err != nil {
+		return err
+	}
 	// remove this multi matcher if this was the last entry
 	if mm.Length() == 0 {
 		delete(e.multiMatchers, selector.ControlPointID)
 	}
-	return retval
+
+	return nil
 }

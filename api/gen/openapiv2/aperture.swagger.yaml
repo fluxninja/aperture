@@ -165,18 +165,18 @@ paths:
       tags:
         - StatusService
 definitions:
-  LimiterDecisionConurrencyLimiterDecision:
-    type: object
-    properties:
-      component_index:
-        type: string
-        format: int64
-      policy_hash:
-        type: string
-      policy_name:
-        type: string
-      workload:
-        type: string
+  DecisionReasonErrorReason:
+    type: string
+    enum:
+      - ERROR_REASON_UNSPECIFIED
+    default: ERROR_REASON_UNSPECIFIED
+  DecisionReasonRejectReason:
+    type: string
+    enum:
+      - REJECT_REASON_UNSPECIFIED
+      - REJECT_REASON_RATE_LIMITED
+      - REJECT_REASON_CONCURRENCY_LIMITED
+    default: REJECT_REASON_UNSPECIFIED
   LimiterDecisionLimiterReason:
     type: string
     enum:
@@ -216,21 +216,6 @@ definitions:
         type: number
         format: double
         x-go-default: 1
-  ReasonErrorReason:
-    type: string
-    enum:
-      - ERROR_REASON_UNSPECIFIED
-      - ERROR_REASON_ENTITY_LOOKUP_FAILED
-      - ERROR_REASON_SERVICE_LOOKUP_FAILED
-      - ERROR_REASON_BAD_CLIENT_IP
-    default: ERROR_REASON_UNSPECIFIED
-  ReasonRejectReason:
-    type: string
-    enum:
-      - REJECT_REASON_UNSPECIFIED
-      - REJECT_REASON_RATE_LIMITED
-      - REJECT_REASON_CONCURRENCY_LIMITED
-    default: REJECT_REASON_UNSPECIFIED
   RuleRego:
     type: object
     properties:
@@ -249,33 +234,17 @@ definitions:
     description: |-
       Raw rego rules are compiled 1:1 to rego queries.
       High-level extractor-based rules are compiled into a single rego query.
-  SchedulerWorkloadConfig:
+  SchedulerWorkload:
     type: object
     properties:
-      auto_tokens:
-        type: boolean
-        x-go-default: true
-      default_workload:
-        $ref: '#/definitions/WorkloadConfigDefaultWorkload'
-      label_key:
+      fairness_key:
         type: string
-        title: 'TODO: this entire section is being reworked by @TanveerGill'
-      workloads:
-        type: array
-        items:
-          $ref: '#/definitions/WorkloadConfigWorkload'
-        description: |-
-          List of workloads.
-          Workload can describe priority, tokens (if auto_tokens are set to false) and timeout.
-    description: Configuration that provides scheduling parameters such as priority for the given workloads.
-  WorkloadConfigDefaultWorkload:
-    type: object
-    properties:
       priority:
         type: integer
         format: int64
         description: |-
-          Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.
+          Describes priority level of the requests within the workload.
+          Priority level ranges from 0 to 255.
           Higher numbers means higher priority level.
         x-go-validate: gte=0,lte=255
       timeout:
@@ -292,33 +261,27 @@ definitions:
           This override is applicable only if auto_tokens is set to false.
         x-go-default: 1
     description: Workload defines a class of requests that preferably have similar properties such as response latency.
-  WorkloadConfigWorkload:
+  SchedulerWorkloadAndLabelMatcher:
     type: object
     properties:
-      label_value:
+      label_matcher:
+        $ref: '#/definitions/v1LabelMatcher'
+        description: Label Matcher to select a Workload.
+      workload:
+        $ref: '#/definitions/SchedulerWorkload'
+        description: Workload associated with requests matching the label matcher.
+  apertureflowcontrolv1FluxMeter:
+    type: object
+    properties:
+      agent_group:
         type: string
-        description: Value of label for specified workload label key.
-      priority:
-        type: integer
-        format: int64
-        description: |-
-          Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.
-          Higher numbers means higher priority level.
-        x-go-validate: gte=0,lte=255
-      timeout:
+      flux_meter_name:
         type: string
-        description: |-
-          Timeout override decides how long a request in the workload can wait for tokens.
-          This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
-        x-go-default: 0.005s
-      tokens:
+      policy_hash:
         type: string
-        format: uint64
-        description: |-
-          Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-          This override is applicable only if auto_tokens is set to false.
-        x-go-default: 1
-    description: Workload defines a class of requests that preferably have similar properties such as response latency.
+      policy_name:
+        type: string
+    description: FluxMeter describes detail for each FluxMeter.
   googlerpcStatus:
     type: object
     properties:
@@ -331,6 +294,58 @@ definitions:
           $ref: '#/definitions/protobufAny'
       message:
         type: string
+  languagev1ConcurrencyLimiter:
+    type: object
+    properties:
+      load_shed_actuator:
+        $ref: '#/definitions/v1LoadShedActuator'
+        description: Actuator based on load shedding a portion of requests.
+      scheduler:
+        $ref: '#/definitions/v1Scheduler'
+        description: Weighted Fair Queuing based workfload scheduler.
+        x-go-validate: required
+    description: |-
+      Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
+      It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+      Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
+  languagev1RateLimiter:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1RateLimiterIns'
+        x-go-validate: required
+      label_key:
+        type: string
+        x-go-validate: required
+      lazy_sync_config:
+        $ref: '#/definitions/RateLimiterLazySyncConfig'
+      limit_reset_interval:
+        type: string
+        x-go-default: 60s
+      overrides:
+        type: array
+        items:
+          $ref: '#/definitions/RateLimiterOverrideConfig'
+      selector:
+        $ref: '#/definitions/v1Selector'
+        x-go-validate: required
+  policylanguagev1FluxMeter:
+    type: object
+    properties:
+      histogram_buckets:
+        type: array
+        items:
+          type: number
+          format: double
+        description: Latency histogram buckets (in ms) for this FluxMeter.
+        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+      name:
+        type: string
+        description: Name of the flux meter.
+      selector:
+        $ref: '#/definitions/v1Selector'
+        description: Policies are only applied to flows that are matched based on the fields in the selector.
+    description: FluxMeter gathers metrics for the traffic that matches its selector.
   protobufAny:
     type: object
     properties:
@@ -553,22 +568,22 @@ definitions:
   v1CheckResponse:
     type: object
     properties:
+      decision_reason:
+        $ref: '#/definitions/v1DecisionReason'
+        description: reason contains information in the case of an error or rejection.
       decision_type:
         $ref: '#/definitions/v1DecisionType'
         description: decision_type contains what the decision was.
-      flux_meter_ids:
+      flux_meters:
         type: array
         items:
-          type: string
-        description: flux meter ids that were matched for this request.
+          $ref: '#/definitions/apertureflowcontrolv1FluxMeter'
+        description: flux meters that were matched for this request.
       limiter_decisions:
         type: array
         items:
           $ref: '#/definitions/v1LimiterDecision'
         description: limiter_decisions contains information about decision made by each limiter.
-      reason:
-        $ref: '#/definitions/v1Reason'
-        description: reason contains information in the case of an error or rejection.
     description: CheckResponse contains fields that represent decision made by Check call.
   v1Classifier:
     type: object
@@ -603,7 +618,7 @@ definitions:
         $ref: '#/definitions/v1ArithmeticCombinator'
         description: Applies the given operator on input operands (signals) and emits the result.
       concurrency_limiter:
-        $ref: '#/definitions/v1ConcurrencyLimiter'
+        $ref: '#/definitions/languagev1ConcurrencyLimiter'
         description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
       constant:
         $ref: '#/definitions/v1Constant'
@@ -632,7 +647,7 @@ definitions:
         $ref: '#/definitions/v1PromQL'
         description: Periodically runs a Prometheus query in the background and emits the result.
       rate_limiter:
-        $ref: '#/definitions/v1RateLimiter'
+        $ref: '#/definitions/languagev1RateLimiter'
         description: Rate Limiter provides service protection by applying rate limiter.
       sqrt:
         $ref: '#/definitions/v1Sqrt'
@@ -643,20 +658,6 @@ definitions:
       Components are wired to each other based on signal names forming an execution graph of the circuit.
       Loops are broken by the runtime at the earliest component index that is part of the loop.
       The looped signals are saved in the tick they are generated and served in the subsequent tick.
-  v1ConcurrencyLimiter:
-    type: object
-    properties:
-      load_shed_actuator:
-        $ref: '#/definitions/v1LoadShedActuator'
-        description: Actuator based on load shedding a portion of requests.
-      scheduler:
-        $ref: '#/definitions/v1Scheduler'
-        description: Weighted Fair Queuing based workfload scheduler.
-        x-go-validate: required
-    description: |-
-      Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
-      It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-      Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
   v1Constant:
     type: object
     properties:
@@ -699,6 +700,11 @@ definitions:
     description: |-
       Identifies control point within a service that the rule or policy should apply to.
       Controlpoint is either a library feature name or one of ingress/egress traffic control point.
+  v1ControllerInfo:
+    type: object
+    properties:
+      id:
+        type: string
   v1Decider:
     type: object
     properties:
@@ -752,6 +758,14 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Selected signal (on_true or on_false).
     description: Outputs for the Decider component.
+  v1DecisionReason:
+    type: object
+    properties:
+      error_reason:
+        $ref: '#/definitions/DecisionReasonErrorReason'
+      reject_reason:
+        $ref: '#/definitions/DecisionReasonRejectReason'
+    description: Reason contains fields that give futher information about error or rejection.
   v1DecisionType:
     type: string
     enum:
@@ -835,8 +849,6 @@ definitions:
   v1ErrorDetails:
     type: object
     properties:
-      cause:
-        $ref: '#/definitions/v1ErrorDetails'
       message:
         type: string
     description: ErrorDetails holds raw error message and its cause in a nested field.
@@ -910,23 +922,6 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Extrapolated signal.
     description: Outputs for the Extrapolator component.
-  v1FluxMeter:
-    type: object
-    properties:
-      histogram_buckets:
-        type: array
-        items:
-          type: number
-          format: double
-        description: Latency histogram buckets (in ms) for this FluxMeter.
-        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
-      name:
-        type: string
-        description: Name of the flux meter.
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Policies are only applied to flows that are matched based on the fields in the selector.
-    description: FluxMeter gathers metrics for the traffic that matches its selector.
   v1GradientController:
     type: object
     properties:
@@ -1113,25 +1108,38 @@ definitions:
   v1LimiterDecision:
     type: object
     properties:
-      concurrency_limiter_decision:
-        $ref: '#/definitions/LimiterDecisionConurrencyLimiterDecision'
-      dropped:
-        type: boolean
-      rate_limiter_decision:
-        $ref: '#/definitions/v1LimiterDecisionRateLimiterDecision'
-      reason:
-        $ref: '#/definitions/LimiterDecisionLimiterReason'
-    description: LimiterDecision describes details for each limiter.
-  v1LimiterDecisionRateLimiterDecision:
-    type: object
-    properties:
       component_index:
         type: string
         format: int64
+      concurrency_limiter:
+        $ref: '#/definitions/v1LimiterDecisionConcurrencyLimiter'
+      dropped:
+        type: boolean
       policy_hash:
         type: string
       policy_name:
         type: string
+      rate_limiter:
+        $ref: '#/definitions/v1LimiterDecisionRateLimiter'
+      reason:
+        $ref: '#/definitions/LimiterDecisionLimiterReason'
+    description: LimiterDecision describes details for each limiter.
+  v1LimiterDecisionConcurrencyLimiter:
+    type: object
+    properties:
+      workload_index:
+        type: string
+  v1LimiterDecisionRateLimiter:
+    type: object
+    properties:
+      current:
+        type: string
+        format: int64
+      label:
+        type: string
+      remaining:
+        type: string
+        format: int64
   v1LoadShedActuator:
     type: object
     properties:
@@ -1311,7 +1319,7 @@ definitions:
       flux_meters:
         type: array
         items:
-          $ref: '#/definitions/v1FluxMeter'
+          $ref: '#/definitions/policylanguagev1FluxMeter'
         description: FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
     description: |-
       Policy is defined as a dataflow graph (circuit) of inter-connected components.
@@ -1354,27 +1362,6 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: The result of the Prometheus query as an output signal.
     description: Output for the PromQL component.
-  v1RateLimiter:
-    type: object
-    properties:
-      in_ports:
-        $ref: '#/definitions/v1RateLimiterIns'
-        x-go-validate: required
-      label_key:
-        type: string
-        x-go-validate: required
-      lazy_sync_config:
-        $ref: '#/definitions/RateLimiterLazySyncConfig'
-      limit_reset_interval:
-        type: string
-        x-go-default: 60s
-      overrides:
-        type: array
-        items:
-          $ref: '#/definitions/RateLimiterOverrideConfig'
-      selector:
-        $ref: '#/definitions/v1Selector'
-        x-go-validate: required
   v1RateLimiterIns:
     type: object
     properties:
@@ -1383,13 +1370,6 @@ definitions:
         description: negative limit means no limit is applied.
         x-go-default: -1
         x-go-validate: required
-  v1Reason:
-    type: object
-    properties:
-      error_reason:
-        $ref: '#/definitions/ReasonErrorReason'
-      reject_reason:
-        $ref: '#/definitions/ReasonRejectReason'
   v1ReportRequest:
     type: object
     properties:
@@ -1399,6 +1379,8 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/protobufAny'
+      controller_info:
+        $ref: '#/definitions/v1ControllerInfo'
       host_info:
         $ref: '#/definitions/v1HostInfo'
       peer_infos:
@@ -1470,17 +1452,23 @@ definitions:
   v1Scheduler:
     type: object
     properties:
-      fairness_key:
-        type: string
-        description: 'TODO: this is getting reworked.'
+      auto_tokens:
+        type: boolean
+      default_workload:
+        $ref: '#/definitions/SchedulerWorkload'
       out_ports:
         $ref: '#/definitions/v1SchedulerOuts'
         description: Output ports for the Scheduler component.
       selector:
         $ref: '#/definitions/v1Selector'
         description: Selector decides for which service or flows the scheduler will be applied.
-      workload_config:
-        $ref: '#/definitions/SchedulerWorkloadConfig'
+      workloads:
+        type: array
+        items:
+          $ref: '#/definitions/SchedulerWorkloadAndLabelMatcher'
+        title: |-
+          list of workloads
+          workload can describe priority, tokens (if auto_tokens are set to false) and timeout
     description: Weighted Fair Queuing based workload scheduler.
   v1SchedulerOuts:
     type: object
@@ -1521,20 +1509,13 @@ definitions:
           Also, (non-pseudo) headers are available as `request_header_<headername>`.
 
           Note: Request headers are only available for "traffic" control points.
-      namespace:
-        type: string
-        description: |-
-          The namespace of the entities to select.
-          In k8s, this is the k8s' namespace.
-        x-go-validate: required
       service:
         type: string
         description: |-
           The service (name) of the entities.
-          In k8s, this is a name of the Service object.
+          In k8s, this is the FQDN of the Service object.
 
           Note: Entity may belong to multiple services.
-        x-go-validate: required
     description: |-
       Describes where a rule or actuation component should apply to.
 

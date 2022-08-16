@@ -736,20 +736,11 @@ Note: Request headers are only available for "traffic" control points.
 </dd>
 </dl>
 <dl>
-<dt>namespace</dt>
-<dd>
-
-(string, `required`) The namespace of the entities to select.
-In k8s, this is the k8s' namespace.
-
-</dd>
-</dl>
-<dl>
 <dt>service</dt>
 <dd>
 
-(string, `required`) The service (name) of the entities.
-In k8s, this is a name of the Service object.
+(string) The service (name) of the entities.
+In k8s, this is the FQDN of the Service object.
 
 Note: Entity may belong to multiple services.
 

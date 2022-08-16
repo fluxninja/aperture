@@ -16,6 +16,8 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
@@ -24,6 +26,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/services"
 )
@@ -45,19 +48,19 @@ func NewHandler(
 		log.Warn().Msg("Authz: No entity cache, will guess services based on Host header")
 	}
 	return &Handler{
-		classifier: classifier,
-		entities:   entityCache,
-		propagator: authz_baggage.W3Baggage{},
-		fcHandler:  fcHandler,
+		classifier:  classifier,
+		entityCache: entityCache,
+		propagator:  authz_baggage.W3Baggage{},
+		fcHandler:   fcHandler,
 	}
 }
 
 // Handler implements envoy.service.auth.v3.Authorization and handles Check call.
 type Handler struct {
-	entities   *entitycache.EntityCache
-	classifier *classification.Classifier
-	propagator authz_baggage.Propagator
-	fcHandler  flowcontrol.HandlerWithValues
+	entityCache *entitycache.EntityCache
+	classifier  *classification.Classifier
+	propagator  authz_baggage.Propagator
+	fcHandler   flowcontrol.HandlerWithValues
 }
 
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)
@@ -79,6 +82,52 @@ func sanitizeBaggageHeaderValue(value string) string {
 func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_authz.CheckResponse, error) {
 	log.Trace().Msg("Classifier.Check()")
 
+	createExtAuthzResponse := func(fcResponse *flowcontrolv1.CheckResponse, authzResponse *flowcontrolv1.AuthzResponse, flowLabels classification.FlowLabels) *ext_authz.CheckResponse {
+		if fcResponse == nil {
+			fcResponse = &flowcontrolv1.CheckResponse{
+				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_UNSPECIFIED,
+				DecisionReason: &flowcontrolv1.DecisionReason{
+					ErrorReason:  flowcontrolv1.DecisionReason_ERROR_REASON_UNSPECIFIED,
+					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
+				},
+				LimiterDecisions: nil,
+				FluxMeters:       nil,
+			}
+		}
+		marshalledCheckResponse, err := protoMessageAsPbValue(fcResponse)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to marshal check response")
+			return nil
+		}
+
+		if authzResponse == nil {
+			authzResponse = &flowcontrolv1.AuthzResponse{
+				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
+			}
+		}
+		marshalledAuthzResponse, err := protoMessageAsPbValue(authzResponse)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to marshal authz response")
+			return nil
+		}
+
+		if flowLabels == nil {
+			flowLabels = make(classification.FlowLabels)
+		}
+		marshalledFlowLabels := flowLabelsAsPbValueForTelemetry(flowLabels)
+
+		log.Trace().Interface("fcResponse", marshalledCheckResponse).Interface("authzResponse", marshalledAuthzResponse).Interface("flowLabels", marshalledFlowLabels).Msg("Created ext_authz.CheckResponse")
+		return &ext_authz.CheckResponse{
+			DynamicMetadata: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					otelcollector.MarshalledLabelsLabel:        marshalledFlowLabels,
+					otelcollector.MarshalledCheckResponseLabel: marshalledCheckResponse,
+					otelcollector.MarshalledAuthzResponseLabel: marshalledAuthzResponse,
+				},
+			},
+		}
+	}
+
 	var direction selectors.TrafficDirection
 	headers, _ := metadata.FromIncomingContext(ctx)
 	if dirHeader, exists := headers["traffic-direction"]; exists && len(dirHeader) > 0 {
@@ -88,51 +137,52 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		case "OUTBOUND":
 			direction = selectors.Egress
 		default:
-			log.Warn().Str("traffic-direction", dirHeader[0]).Msg(
-				"invalid traffic-direction header",
-			)
-			return nil, errors.New("invalid traffic-direction")
+			log.Warn().Str("traffic-direction", dirHeader[0]).Msg("invalid traffic-direction header")
+			authzResponse := &flowcontrolv1.AuthzResponse{
+				Status: flowcontrolv1.AuthzResponse_STATUS_INVALID_TRAFFIC_DIRECTION,
+			}
+			resp := createExtAuthzResponse(nil, authzResponse, nil)
+			return resp, errors.New("invalid traffic-direction")
 		}
 	} else {
 		log.Warn().Msg("traffic-direction not set, assuming inbound")
 		direction = selectors.Ingress
 	}
 
-	rpcPeer, peerExists := peer.FromContext(ctx)
-	if !peerExists {
-		log.Warn().Msg("Cannot get client address")
-		return nil, errors.New("failed to get client address")
-	}
-	clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
-
 	var svcs []services.ServiceID
 	var err error
-	if h.entities != nil {
-		entity := h.entities.GetByIP(clientIP)
-		if entity == nil {
-			log.Warn().Str("IP", clientIP).Msg("No entity in cache")
-			return nil, fmt.Errorf("missing entity for %s", clientIP)
+
+	rpcPeer, peerExists := peer.FromContext(ctx)
+	if peerExists {
+		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
+		if h.entityCache != nil {
+			entity := h.entityCache.GetByIP(clientIP)
+			svcs = entitycache.ServiceIDsFromEntity(entity)
+		} else {
+			// TODO: should not have a fallback, always expect entity for consistent experience
+			log.Warn().Msg("No entity cache, guessing ServiceID based on Host header")
+			svcs = []services.ServiceID{guessDstService(req)}
 		}
-		svcs, err = entitycache.ServiceIDsFromEntity(entity)
-		if err != nil {
-			log.Warn().Err(err).Msg("Cannot get services from entity")
-			return nil, fmt.Errorf("failed to get services from entity: %v", err)
-		}
-	} else {
-		// TODO: should not have a fallback, always expect entity for consistent experience
-		log.Warn().Msg("No entity cache, guessing service id based on Host header")
-		svcs = []services.ServiceID{guessDstService(req)}
 	}
 
 	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
+
 	input, err := envoyauth.RequestToInput(req, logger, nil)
 	if err != nil {
-		return nil, fmt.Errorf("converting raw input into rego input failed: %v", err)
+		authzResponse := &flowcontrolv1.AuthzResponse{
+			Status: flowcontrolv1.AuthzResponse_STATUS_CONVERT_TO_MAP_STRUCT,
+		}
+		resp := createExtAuthzResponse(nil, authzResponse, nil)
+		return resp, fmt.Errorf("converting raw input into rego input failed: %v", err)
 	}
 
 	inputValue, err := ast.InterfaceToValue(input)
 	if err != nil {
-		return nil, fmt.Errorf("converting rego input to value failed: %v", err)
+		authzResponse := &flowcontrolv1.AuthzResponse{
+			Status: flowcontrolv1.AuthzResponse_STATUS_CONVERT_TO_REGO_AST,
+		}
+		resp := createExtAuthzResponse(nil, authzResponse, nil)
+		return resp, fmt.Errorf("converting rego input to value failed: %v", err)
 	}
 
 	// Extract previous flow labels from headers
@@ -148,7 +198,11 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 	newFlowLabels, err := h.classifier.Classify(ctx, svcs, labelsForMatching, direction, inputValue)
 	if err != nil {
-		return nil, fmt.Errorf("failed to classify: %v", err)
+		authzResponse := &flowcontrolv1.AuthzResponse{
+			Status: flowcontrolv1.AuthzResponse_STATUS_CLASSIFY_FLOW_LABELS,
+		}
+		resp := createExtAuthzResponse(nil, authzResponse, nil)
+		return resp, fmt.Errorf("failed to classify: %v", err)
 	}
 
 	for key, fl := range newFlowLabels {
@@ -168,27 +222,11 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		Flow: newFlowLabels.ToPlainMap(),
 	})
 	// Ask flow control service for Ok/Deny
-	fcResponse := h.fcHandler.CheckWithValues(
-		ctx,
-		selectors.ControlPoint{Traffic: direction},
-		svcs,
-		labelsForMatching,
-	)
-	if err != nil {
-		log.Warn().Err(err).Msg("Flow control Check had an error")
-	}
+	fcResponse := h.fcHandler.CheckWithValues(ctx, selectors.ControlPoint{Traffic: direction}, svcs, labelsForMatching)
 
 	flowLabels := mergeFlowLabels(oldFlowLabels, newFlowLabels)
-	resp := ext_authz.CheckResponse{
-		// Put all non-hidden flow labels and policy details as dynamic metadata
-		DynamicMetadata: &structpb.Struct{
-			Fields: map[string]*structpb.Value{
-				"fn.flow":              flowLabelsAsPbValueForTelemetry(flowLabels),
-				"fn.limiter_decisions": limiterDecisionsAsPbValueForTelemetry(fcResponse.LimiterDecisions),
-				"fn.fluxmeters":        fluxmeterIDsAsPbValueForTelemetry(fcResponse.FluxMeterIds),
-			},
-		},
-	}
+
+	resp := createExtAuthzResponse(fcResponse, nil, flowLabels)
 
 	// Check if fcResponse error is set
 	if fcResponse.DecisionType != flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
@@ -214,21 +252,14 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		}
 	}
 
-	return &resp, nil
+	return resp, nil
 }
 
 func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {
 	host := req.GetAttributes().GetRequest().GetHttp().GetHost()
 	host = strings.Split(host, ":")[0]
-	hostParts := strings.Split(host, ".")
-	ns := "default"
-	if len(hostParts) >= 2 {
-		ns = hostParts[1]
-	}
 	return services.ServiceID{
-		AgentGroup: "default",
-		Namespace:  ns,
-		Service:    hostParts[0],
+		Service: host,
 	}
 }
 
@@ -237,59 +268,32 @@ func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {
 // "The External Authorization filter supports emitting dynamic metadata as an opaque google.protobuf.Struct."
 // from envoy documentation
 
-// TODO (hasit): The following marshaling functions
-// 1. should be 1 and generic
-// 2. should be moved to a common package along with the corresponding unmarshal method
-
-func flowLabelsAsPbValueForTelemetry(m classification.FlowLabels) *structpb.Value {
-	fields := make(map[string]*structpb.Value, len(m))
-	for k, fl := range m {
-		if fl.Flags.Hidden {
+func flowLabelsAsPbValueForTelemetry(labels classification.FlowLabels) *structpb.Value {
+	fields := make(map[string]*structpb.Value, len(labels))
+	for k, v := range labels {
+		if v.Flags.Hidden {
 			continue
 		}
-		fields[k] = structpb.NewStringValue(fl.Value)
+		fields[k] = structpb.NewStringValue(v.Value)
 	}
 	return structpb.NewStructValue(&structpb.Struct{Fields: fields})
 }
 
-func fluxmeterIDsAsPbValueForTelemetry(fluxmeters []string) *structpb.Value {
-	values := make([]*structpb.Value, 0, len(fluxmeters))
-	for _, fluxmeter := range fluxmeters {
-		values = append(values, structpb.NewStringValue(fluxmeter))
+func protoMessageAsPbValue(message protoreflect.ProtoMessage) (*structpb.Value, error) {
+	mBytes, err := protojson.Marshal(message)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to marshal proto message into JSON")
+		return nil, err
+
 	}
-	return structpb.NewListValue(&structpb.ListValue{Values: values})
-}
-
-func limiterDecisionsAsPbValueForTelemetry(limiterDecisions []*flowcontrolv1.LimiterDecision) *structpb.Value {
-	policies := make([]*structpb.Value, len(limiterDecisions))
-	for i, ld := range limiterDecisions {
-		var structVal *structpb.Value
-
-		switch decision := ld.Decision.(type) {
-		case *flowcontrolv1.LimiterDecision_RateLimiterDecision_:
-			structVal = structpb.NewStructValue(&structpb.Struct{
-				Fields: map[string]*structpb.Value{
-					"policy_name":     structpb.NewStringValue(decision.RateLimiterDecision.PolicyName),
-					"component_index": structpb.NewNumberValue(float64(decision.RateLimiterDecision.ComponentIndex)),
-					"dropped":         structpb.NewBoolValue(ld.Dropped),
-					"reason":          structpb.NewStringValue(ld.Reason.Enum().String()),
-				},
-			})
-		case *flowcontrolv1.LimiterDecision_ConcurrencyLimiterDecision:
-			structVal = structpb.NewStructValue(&structpb.Struct{
-				Fields: map[string]*structpb.Value{
-					"policy_name":     structpb.NewStringValue(decision.ConcurrencyLimiterDecision.PolicyName),
-					"component_index": structpb.NewNumberValue(float64(decision.ConcurrencyLimiterDecision.ComponentIndex)),
-					"workload":        structpb.NewStringValue(decision.ConcurrencyLimiterDecision.Workload),
-					"dropped":         structpb.NewBoolValue(ld.Dropped),
-					"reason":          structpb.NewStringValue(ld.Reason.Enum().String()),
-				},
-			})
-		}
-
-		policies[i] = structVal
+	mStruct := new(structpb.Struct)
+	err = protojson.Unmarshal(mBytes, mStruct)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal JSON bytes into structpb.Struct")
+		return nil, err
 	}
-	return structpb.NewListValue(&structpb.ListValue{Values: policies})
+
+	return structpb.NewStructValue(mStruct), nil
 }
 
 // merges two flow labels maps.

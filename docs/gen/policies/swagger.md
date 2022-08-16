@@ -14,15 +14,16 @@
   eg. {any: {of: [expr…
 - [RateLimiterLazySyncConfig](#rate-limiter-lazy-sync-config)
 - [RateLimiterOverrideConfig](#rate-limiter-override-config)
-- [SchedulerWorkloadConfig](#scheduler-workload-config) – Configuration that provides scheduling parameters such as priority for the given…
-- [WorkloadConfigDefaultWorkload](#workload-config-default-workload) – Workload defines a class of requests that preferably have similar properties suc…
-- [WorkloadConfigWorkload](#workload-config-workload) – Workload defines a class of requests that preferably have similar properties suc…
+- [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
+- [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
+- [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to pr…
+- [languagev1RateLimiter](#languagev1-rate-limiter)
+- [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 - [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals…
 - [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
 - [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the Arithmetic Combinator component.
 - [v1Component](#v1-component) – Computational blocks that form the circuit.
   Signals flow into the components via…
-- [v1ConcurrencyLimiter](#v1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to pr…
 - [v1Constant](#v1-constant) – Component that emits a constant value as an output signal.
 - [v1ConstantOuts](#v1-constant-outs) – Outputs for the Constant component.
 - [v1ControlPoint](#v1-control-point) – Identifies control point within a service that the rule or policy should apply t…
@@ -36,7 +37,6 @@
 - [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the perio…
 - [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator component.
 - [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator component.
-- [v1FluxMeter](#v1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 - [v1GradientController](#v1-gradient-controller) – Describes the gradient values which is computed as follows: gradient = (setpoint…
 - [v1GradientControllerIns](#v1-gradient-controller-ins) – Inputs for the Gradient Controller component.
 - [v1GradientControllerOuts](#v1-gradient-controller-outs) – Outputs for the Gradient Controller component.
@@ -66,7 +66,6 @@
 - [v1Port](#v1-port) – Components are interconnected with each other via Ports.
 - [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an…
 - [v1PromQLOuts](#v1-prom-q-l-outs) – Output for the PromQL component.
-- [v1RateLimiter](#v1-rate-limiter)
 - [v1RateLimiterIns](#v1-rate-limiter-ins)
 - [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing based workload scheduler.
 - [v1SchedulerOuts](#v1-scheduler-outs) – Output for the Scheduler component.
@@ -172,27 +171,116 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
-### <span id="scheduler-workload-config"></span> SchedulerWorkloadConfig
+### <span id="scheduler-workload"></span> SchedulerWorkload
 
 
-Configuration that provides scheduling parameters such as priority for the given workloads.
+Workload defines a class of requests that preferably have similar properties such as response latency.
 
 
 
 #### Properties
 <dl>
-<dt>auto_tokens</dt>
+<dt>fairness_key</dt>
 <dd>
 
-(bool, default: `true`)
+(string)
 
 </dd>
 </dl>
 <dl>
-<dt>default_workload</dt>
+<dt>priority</dt>
 <dd>
 
-([WorkloadConfigDefaultWorkload](#workload-config-default-workload))
+(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
+Priority level ranges from 0 to 255.
+Higher numbers means higher priority level.
+
+</dd>
+</dl>
+<dl>
+<dt>timeout</dt>
+<dd>
+
+(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens.
+This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
+
+</dd>
+</dl>
+<dl>
+<dt>tokens</dt>
+<dd>
+
+(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+This override is applicable only if auto_tokens is set to false.
+
+</dd>
+</dl>
+
+### <span id="scheduler-workload-and-label-matcher"></span> SchedulerWorkloadAndLabelMatcher
+
+
+
+
+
+
+#### Properties
+<dl>
+<dt>label_matcher</dt>
+<dd>
+
+([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload.
+
+</dd>
+</dl>
+<dl>
+<dt>workload</dt>
+<dd>
+
+([SchedulerWorkload](#scheduler-workload)) Workload associated with requests matching the label matcher.
+
+</dd>
+</dl>
+
+### <span id="languagev1-concurrency-limiter"></span> languagev1ConcurrencyLimiter
+
+
+Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
+It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
+
+
+
+#### Properties
+<dl>
+<dt>load_shed_actuator</dt>
+<dd>
+
+([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a portion of requests.
+
+</dd>
+</dl>
+<dl>
+<dt>scheduler</dt>
+<dd>
+
+([V1Scheduler](#v1-scheduler), `required`) Weighted Fair Queuing based workfload scheduler.
+
+</dd>
+</dl>
+
+### <span id="languagev1-rate-limiter"></span> languagev1RateLimiter
+
+
+
+
+
+
+#### Properties
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1RateLimiterIns](#v1-rate-limiter-ins), `required`)
 
 </dd>
 </dl>
@@ -200,96 +288,72 @@ Configuration that provides scheduling parameters such as priority for the given
 <dt>label_key</dt>
 <dd>
 
-(string) TODO: this entire section is being reworked by @TanveerGill
+(string, `required`)
 
 </dd>
 </dl>
 <dl>
-<dt>workloads</dt>
+<dt>lazy_sync_config</dt>
 <dd>
 
-([[]WorkloadConfigWorkload](#workload-config-workload)) List of workloads.
-Workload can describe priority, tokens (if auto_tokens are set to false) and timeout.
+([RateLimiterLazySyncConfig](#rate-limiter-lazy-sync-config))
+
+</dd>
+</dl>
+<dl>
+<dt>limit_reset_interval</dt>
+<dd>
+
+(string, default: `60s`)
+
+</dd>
+</dl>
+<dl>
+<dt>overrides</dt>
+<dd>
+
+([[]RateLimiterOverrideConfig](#rate-limiter-override-config))
+
+</dd>
+</dl>
+<dl>
+<dt>selector</dt>
+<dd>
+
+([V1Selector](#v1-selector), `required`)
 
 </dd>
 </dl>
 
-### <span id="workload-config-default-workload"></span> WorkloadConfigDefaultWorkload
+### <span id="policylanguagev1-flux-meter"></span> policylanguagev1FluxMeter
 
 
-Workload defines a class of requests that preferably have similar properties such as response latency.
+FluxMeter gathers metrics for the traffic that matches its selector.
 
 
 
 #### Properties
 <dl>
-<dt>priority</dt>
+<dt>histogram_buckets</dt>
 <dd>
 
-(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.
-Higher numbers means higher priority level.
+([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) Latency histogram buckets (in ms) for this FluxMeter.
 
 </dd>
 </dl>
 <dl>
-<dt>timeout</dt>
+<dt>name</dt>
 <dd>
 
-(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens.
-This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
+(string) Name of the flux meter.
 
 </dd>
 </dl>
 <dl>
-<dt>tokens</dt>
+<dt>selector</dt>
 <dd>
 
-(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-This override is applicable only if auto_tokens is set to false.
-
-</dd>
-</dl>
-
-### <span id="workload-config-workload"></span> WorkloadConfigWorkload
-
-
-Workload defines a class of requests that preferably have similar properties such as response latency.
-
-
-
-#### Properties
-<dl>
-<dt>label_value</dt>
-<dd>
-
-(string) Value of label for specified workload label key.
-
-</dd>
-</dl>
-<dl>
-<dt>priority</dt>
-<dd>
-
-(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.
-Higher numbers means higher priority level.
-
-</dd>
-</dl>
-<dl>
-<dt>timeout</dt>
-<dd>
-
-(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens.
-This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
-
-</dd>
-</dl>
-<dl>
-<dt>tokens</dt>
-<dd>
-
-(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-This override is applicable only if auto_tokens is set to false.
+([V1Selector](#v1-selector)) Policies are only applied to flows that are matched based on the fields in the selector.
 
 </dd>
 </dl>
@@ -394,7 +458,7 @@ The looped signals are saved in the tick they are generated and served in the su
 <dt>concurrency_limiter</dt>
 <dd>
 
-([V1ConcurrencyLimiter](#v1-concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+([Languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
 
 </dd>
 </dl>
@@ -467,7 +531,7 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 <dt>rate_limiter</dt>
 <dd>
 
-([V1RateLimiter](#v1-rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
+([Languagev1RateLimiter](#languagev1-rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
 
 </dd>
 </dl>
@@ -476,33 +540,6 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 <dd>
 
 ([V1Sqrt](#v1-sqrt)) Takes an input signal and emits the square root of the input signal.
-
-</dd>
-</dl>
-
-### <span id="v1-concurrency-limiter"></span> v1ConcurrencyLimiter
-
-
-Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
-It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
-
-
-
-#### Properties
-<dl>
-<dt>load_shed_actuator</dt>
-<dd>
-
-([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a portion of requests.
-
-</dd>
-</dl>
-<dl>
-<dt>scheduler</dt>
-<dd>
-
-([V1Scheduler](#v1-scheduler), `required`) Weighted Fair Queuing based workfload scheduler.
 
 </dd>
 </dl>
@@ -902,39 +939,6 @@ Outputs for the Extrapolator component.
 <dd>
 
 ([V1Port](#v1-port)) Extrapolated signal.
-
-</dd>
-</dl>
-
-### <span id="v1-flux-meter"></span> v1FluxMeter
-
-
-FluxMeter gathers metrics for the traffic that matches its selector.
-
-
-
-#### Properties
-<dl>
-<dt>histogram_buckets</dt>
-<dd>
-
-([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) Latency histogram buckets (in ms) for this FluxMeter.
-
-</dd>
-</dl>
-<dl>
-<dt>name</dt>
-<dd>
-
-(string) Name of the flux meter.
-
-</dd>
-</dl>
-<dl>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector)) Policies are only applied to flows that are matched based on the fields in the selector.
 
 </dd>
 </dl>
@@ -1404,7 +1408,7 @@ This interval is typically aligned with how often the corrective action (actuati
 <dt>flux_meters</dt>
 <dd>
 
-([[]V1FluxMeter](#v1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+([[]Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
 
 </dd>
 </dl>
@@ -1470,59 +1474,6 @@ Output for the PromQL component.
 </dd>
 </dl>
 
-### <span id="v1-rate-limiter"></span> v1RateLimiter
-
-#### Properties
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([V1RateLimiterIns](#v1-rate-limiter-ins), `required`)
-
-</dd>
-</dl>
-<dl>
-<dt>label_key</dt>
-<dd>
-
-(string, `required`)
-
-</dd>
-</dl>
-<dl>
-<dt>lazy_sync_config</dt>
-<dd>
-
-([RateLimiterLazySyncConfig](#rate-limiter-lazy-sync-config))
-
-</dd>
-</dl>
-<dl>
-<dt>limit_reset_interval</dt>
-<dd>
-
-(string, default: `60s`)
-
-</dd>
-</dl>
-<dl>
-<dt>overrides</dt>
-<dd>
-
-([[]RateLimiterOverrideConfig](#rate-limiter-override-config))
-
-</dd>
-</dl>
-<dl>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector), `required`)
-
-</dd>
-</dl>
-
 ### <span id="v1-rate-limiter-ins"></span> v1RateLimiterIns
 
 #### Properties
@@ -1543,10 +1494,18 @@ Weighted Fair Queuing based workload scheduler.
 #### Properties
 
 <dl>
-<dt>fairness_key</dt>
+<dt>auto_tokens</dt>
 <dd>
 
-(string) TODO: this is getting reworked.
+(bool)
+
+</dd>
+</dl>
+<dl>
+<dt>default_workload</dt>
+<dd>
+
+([SchedulerWorkload](#scheduler-workload))
 
 </dd>
 </dl>
@@ -1567,10 +1526,11 @@ Weighted Fair Queuing based workload scheduler.
 </dd>
 </dl>
 <dl>
-<dt>workload_config</dt>
+<dt>workloads</dt>
 <dd>
 
-([SchedulerWorkloadConfig](#scheduler-workload-config))
+([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) list of workloads
+workload can describe priority, tokens (if auto_tokens are set to false) and timeout
 
 </dd>
 </dl>
@@ -1664,20 +1624,11 @@ Note: Request headers are only available for "traffic" control points.
 </dd>
 </dl>
 <dl>
-<dt>namespace</dt>
-<dd>
-
-(string, `required`) The namespace of the entities to select.
-In k8s, this is the k8s' namespace.
-
-</dd>
-</dl>
-<dl>
 <dt>service</dt>
 <dd>
 
-(string, `required`) The service (name) of the entities.
-In k8s, this is a name of the Service object.
+(string) The service (name) of the entities.
+In k8s, this is the FQDN of the Service object.
 
 Note: Entity may belong to multiple services.
 

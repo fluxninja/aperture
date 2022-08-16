@@ -1,6 +1,9 @@
 package otelcollector
 
-// TODO (hasit): These are commong envoy keys that need to be moved to a common package
+// TODO: organize the constants by their usage.
+// example:
+// aperture.* are used in ext_authz.CheckResponse.DynamicMetadata
+// others are being used to get attributes from traces and logs
 
 const (
 	// ControlPointLabel describes control point which reported traffic.
@@ -13,20 +16,14 @@ const (
 	// ControlPointFeature const for feature control point.
 	ControlPointFeature = "feature"
 
-	// PoliciesLabel describes policies relevant to this traffic.
-	// This is JSON encoded field:
-	// [
-	//   {
-	//     "id": "<id of the policy>",
-	//     "dropped": true,
-	//     "workload": "foo:bar",
-	//   },
-	//   ...
-	// ].
-	//
-	PoliciesLabel = "fn.policies"
-	// FluxMeterIDsLabel describes the flux meter IDs matched to this traffic.
-	FluxMeterIDsLabel = "fn.fluxmeters"
+	// MarshalledAuthzResponseLabel contains JSON encoded response from authz.
+	MarshalledAuthzResponseLabel = "aperture.authz_response"
+
+	// AuthzStatusLabel describes the status reported from authz processing.
+	AuthzStatusLabel = "authz_status"
+
+	// MarshalledCheckResponseLabel contains JSON encoded check response struct.
+	MarshalledCheckResponseLabel = "aperture.check_response"
 
 	// MissingAttributeSourceValue is a special attribute value, which can
 	// happen when (eg. Envoy's) logger tries to send attribute value, but its
@@ -35,15 +32,14 @@ const (
 	// from "just empty", eg. "", "[]" or "{}".
 	MissingAttributeSourceValue = "-"
 
-	// FlowLabel describes flow labels relevant to this traffic.
+	// MarshalledLabelsLabel describes labels relevant to this traffic.
 	// This is JSON encoded field:
 	// {
 	//   "foo": "bar",
 	//   "fizz": "buzz"
 	// }.
-	//
-	FlowLabel = "fn.flow"
-	// LabeledLabel describes if there are any flow labels matched to traffic.
+	MarshalledLabelsLabel = "aperture.labels"
+	// LabeledLabel describes if there are any labels matched to traffic.
 	LabeledLabel = "labeled"
 	// StatusCodeLabel describes HTTP status code of the response.
 	StatusCodeLabel = "http.status_code"
@@ -55,10 +51,22 @@ const (
 	HTTPResponseContentLength = "http.response_content_length"
 	// FeatureDurationLabel describes duration of the feature in milliseconds.
 	FeatureDurationLabel = "feature.duration_millis"
-	// PoliciesMatchedLabel describes if there are any policies matched to traffic.
-	PoliciesMatchedLabel = "policy_ids_matched"
-	// PoliciesDroppedLabel describes if there are any policies dropped to traffic.
-	PoliciesDroppedLabel = "policy_ids_dropped"
+	// DecisionTypeLabel descibes the decision type taken by policy.
+	DecisionTypeLabel = "decision_type"
+	// DecisionErrorReasonLabel descibes the error reason of the decision taken by policy.
+	DecisionErrorReasonLabel = "decision_error_reason"
+	// DecisionRejectReasonLabel descibes the reject reason of the decision taken by policy.
+	DecisionRejectReasonLabel = "decision_reject_reason"
+	// RateLimitersLabel describes rate limiters matched to the traffic.
+	RateLimitersLabel = "rate_limiters"
+	// DroppingRateLimitersLabel describes rate limiters dropping the traffic.
+	DroppingRateLimitersLabel = "dropping_rate_limiters"
+	// ConcurrencyLimitersLabel describes rate limiters matched to the traffic.
+	ConcurrencyLimitersLabel = "concurrency_limiters"
+	// DroppingConcurrencyLimitersLabel describes rate limiters dropping the traffic.
+	DroppingConcurrencyLimitersLabel = "dropping_concurrency_limiters"
+	// FluxMetersLabel describes flux meters metched to the traffic.
+	FluxMetersLabel = "flux_meters"
 	// HostAddressLabel describes host address of the request.
 	HostAddressLabel = "net.host.address"
 	// PeerAddressLabel describes peer address of the request.
@@ -69,15 +77,14 @@ const (
 	PeerIPLabel = "net.peer.ip"
 	// FeatureAddressLabel describes feature address of the request.
 	FeatureAddressLabel = "feature.ip"
+	// FeatureIDLabel describes the ID of the feature.
+	FeatureIDLabel = "feature.id"
 	// EntityNameLabel describes entity name e.g. pod name.
 	EntityNameLabel = "entity_name"
 	// TimestampLabel describes timestamp of the request.
 	TimestampLabel = "timestamp"
 	// AgentGroupLabel describes cluster to which metrics refer.
 	AgentGroupLabel = "agent_group"
-	// NamespaceLabel describes namespace to which metrics refer.
-	NamespaceLabel = "namespace"
-	// ServicesLabel describes services to which metrics refer. This is comma-separated
-	// list.
+	// ServicesLabel describes services to which metrics refer.
 	ServicesLabel = "services"
 )

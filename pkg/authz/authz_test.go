@@ -83,8 +83,7 @@ var _ = Describe("Authorization handler", func() {
 })
 
 var demo1Selector = policylangv1.Selector{
-	Namespace: "demoapp",
-	Service:   "demo1-demo-app",
+	Service: "demo1-demo-app.demoapp.svc.cluster.local",
 	ControlPoint: &policylangv1.ControlPoint{
 		Controlpoint: &policylangv1.ControlPoint_Traffic{
 			Traffic: "ingress",

@@ -7,8 +7,8 @@ import "google/protobuf/any.proto";
 message ConfigPropertiesWrapper {
   // An arbitrary config message.
   google.protobuf.Any config = 1;
-  // Name of the Agent Group associated with this config.
-  string agent_group_name = 2;
+  // Name of the AgentGroup associated with this config.
+  string agent_group = 2;
   // Name of the Policy.
   string policy_name = 3;
   // Hash of the entire Policy spec.

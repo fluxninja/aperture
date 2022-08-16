@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/peer"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
@@ -28,7 +29,6 @@ var _ = BeforeEach(func() {
 	entities.Put(&entitycache.Entity{
 		ID:         entitycache.EntityID{},
 		Services:   hardCodedServices,
-		Namespace:  hardCodedNameSpace,
 		AgentGroup: hardCodedAgentGroup,
 		IPAddress:  hardCodedIPAddress,
 	})
@@ -44,6 +44,7 @@ var _ = BeforeEach(func() {
 				},
 			},
 		}.Module(),
+		fx.Provide(agentinfo.ProvideAgentInfo),
 		fx.Supply(entities),
 		fx.Provide(flowcontrol.ProvideNopMetrics),
 		fx.Provide(flowcontrol.ProvideHandler),
@@ -76,7 +77,6 @@ var _ = Describe("FlowControl Check", func() {
 
 var (
 	hardCodedServices   = []string{"service1", "service2"}
-	hardCodedNameSpace  = "aperture-system"
 	hardCodedAgentGroup = "nondefault"
 	hardCodedIPAddress  = "1.2.3.4"
 )

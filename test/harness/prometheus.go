@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"time"
@@ -47,7 +46,7 @@ func NewPrometheusHarness(prometheusWriter io.Writer) (*PrometheusHarness, error
 		return nil, err
 	}
 
-	p.prometheusDir, err = ioutil.TempDir("/tmp", "prometheus_testserver")
+	p.prometheusDir, err = os.MkdirTemp("/tmp", "prometheus_testserver")
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +64,7 @@ func NewPrometheusHarness(prometheusWriter io.Writer) (*PrometheusHarness, error
 		"--storage.tsdb.path="+p.prometheusDir,
 	)
 	p.prometheusServer.Stderr = p.errWriter
-	p.prometheusServer.Stdout = ioutil.Discard
+	p.prometheusServer.Stdout = io.Discard
 	p.Endpoint = endpoint
 
 	err = p.prometheusServer.Start()

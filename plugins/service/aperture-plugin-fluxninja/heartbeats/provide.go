@@ -9,6 +9,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/entitycache"
+	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
@@ -44,10 +45,11 @@ type ConstructorIn struct {
 	EntityCache                *entitycache.EntityCache `optional:"true"`
 	AgentInfo                  *agentinfo.AgentInfo     `optional:"true"`
 	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
+	EtcdClient                 *etcdclient.Client
 }
 
 // Provide provides a new instance of Heartbeats.
-func Provide(in ConstructorIn) (*heartbeats, error) {
+func Provide(in ConstructorIn) (*Heartbeats, error) {
 	var config pluginconfig.FluxNinjaPluginConfig
 	if err := in.Unmarshaller.UnmarshalKey(pluginconfig.PluginConfigKey, &config); err != nil {
 		return nil, err
@@ -58,7 +60,13 @@ func Provide(in ConstructorIn) (*heartbeats, error) {
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			err := heartbeats.start(runCtx, &in)
+			err := heartbeats.setupControllerInfo(runCtx, in.EtcdClient)
+			if err != nil {
+				log.Error().Err(err).Msg("Could not read/create controller id in heartbeats")
+				return err
+			}
+
+			err = heartbeats.start(runCtx, &in)
 			if err != nil {
 				log.Error().Err(err).Msg("Heartbeats start had an error")
 				return err
@@ -76,4 +84,4 @@ func Provide(in ConstructorIn) (*heartbeats, error) {
 }
 
 // Invoke enables heartbeats in FX.
-func Invoke(*heartbeats) {}
+func Invoke(*Heartbeats) {}

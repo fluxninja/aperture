@@ -2,3 +2,4 @@
 /.circleci/                                  @FluxNinja/devops
 /.github/                                    @FluxNinja/devops
 /docs/                                       @FluxNinja/documentation
+/manifests/                                  @FluxNinja/devops

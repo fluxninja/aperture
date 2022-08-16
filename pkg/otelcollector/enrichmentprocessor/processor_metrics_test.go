@@ -19,7 +19,6 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 				UID:    "1",
 			},
 			AgentGroup: "fooGroup",
-			Namespace:  "fooNS",
 			Services:   []string{"fooSvc1", "fooSvc2"},
 		})
 		processor := newProcessor(entityCache)
@@ -35,7 +34,6 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 		assertMetricsEqual(md, metricsFromLabels(map[string]string{
 			"preserve":    "this",
 			"agent_group": "fooGroup",
-			"namespace":   "fooNS",
 			"services":    "fooSvc1,fooSvc2",
 		}))
 	})

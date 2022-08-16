@@ -4,4 +4,4 @@
 dirs=$(grep --include="*.go" --exclude-dir="vendor" -r "package main" -l plugins | xargs dirname | sort -u)
 
 # use parallel to execute "cd {} && go build" in for each directory in $dirs
-parallel --no-notice --bar --eta "cd {} && go build --buildmode=plugin" ::: "$dirs"
+parallel -j4 --no-notice --bar --eta "cd {} && go build --buildmode=plugin" ::: "$dirs"

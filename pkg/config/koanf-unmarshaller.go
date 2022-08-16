@@ -346,7 +346,9 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 				continue
 			}
 			if v != nil {
-				log.Info().Str("env", env).Str("key", key).Interface("v", v).Msg("reading env var")
+				if tv, ok := t.Tag.Lookup("public"); ok && tv == "true" {
+					log.Info().Str("env", env).Str("key", key).Interface("v", v).Msg("reading env var")
+				}
 				keyVals[key] = v
 			}
 		}

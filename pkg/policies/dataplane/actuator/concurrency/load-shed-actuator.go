@@ -16,10 +16,10 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/flowcontrol/scheduler"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/concurrency/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -292,7 +292,6 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		return
 	}
 
-	log.Info().Float64("loadShedFactor", loadShedDecision.LoadShedFactor).
-		Msg("Setting load shed factor")
+	log.Trace().Float64("loadShedFactor", loadShedDecision.LoadShedFactor).Msg("Setting load shed factor")
 	lsa.tokenBucketLoadShed.SetLoadShedFactor(lsa.clock.Now(), loadShedDecision.LoadShedFactor)
 }

@@ -115,13 +115,13 @@ func ControlPointFromProto(controlPoint *policylangv1.ControlPoint) ControlPoint
 //
 // Control Point.
 type ControlPointID struct {
-	Service      services.ServiceID
+	ServiceID    services.ServiceID
 	ControlPoint ControlPoint
 }
 
 // String returns a string representation of control point and service.
 func (p ControlPointID) String() string {
-	return fmt.Sprintf("%v@%v", p.ControlPoint, p.Service)
+	return fmt.Sprintf("%v@%v", p.ControlPoint, p.ServiceID)
 }
 
 // ControlPointIDFromProto extracts a ControlPointID from proto-based selector
@@ -130,16 +130,14 @@ func (p ControlPointID) String() string {
 // Selector is assumed to be validated and non-nil.
 func ControlPointIDFromProto(selector *policylangv1.Selector) ControlPointID {
 	return ControlPointID{
-		Service: services.ServiceID{
-			AgentGroup: selector.AgentGroup,
-			Namespace:  selector.Namespace,
-			Service:    selector.Service,
+		ServiceID: services.ServiceID{
+			Service: selector.Service,
 		},
 		ControlPoint: ControlPointFromProto(selector.ControlPoint),
 	}
 }
 
-// MMExprFromLabelMatcher translate's proto definition of label matcher into
+// MMExprFromLabelMatcher translates proto definition of label matcher into
 // a // single multimatcher expression
 //
 // LabelMatcher can be nil or a validated LabelMatcher.

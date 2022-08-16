@@ -18,11 +18,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/distcache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/flowcontrol/ratelimiter"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/rate/ratetracker"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/selectors"
@@ -177,7 +177,7 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 		registryPath:       registryPath,
 		rateLimiterFactory: rateLimiterFactory,
 	}
-	rateLimiter.metricID = paths.MetricIDForComponent(rateLimiter)
+	rateLimiter.name = paths.MetricIDForComponent(rateLimiter)
 
 	return fx.Options(
 		fx.Invoke(
@@ -190,11 +190,11 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 type rateLimiter struct {
 	component.ComponentAPI
 	rateLimiterFactory *rateLimiterFactory
-	limiter            ratelimiter.RateLimiter
-	limitCheck         *ratelimiter.BasicRateLimitCheck
+	rateTracker        ratetracker.RateTracker
+	rateLimitChecker   *ratetracker.BasicRateLimitChecker
 	registryPath       string
 	rateLimiterProto   *policylangv1.RateLimiter
-	metricID           string
+	name               string
 }
 
 // Make sure rateLimiter implements iface.Limiter.
@@ -217,15 +217,15 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var err error
-			rateLimiter.limitCheck = ratelimiter.NewBasicRateLimitCheck()
+			rateLimiter.rateLimitChecker = ratetracker.NewBasicRateLimitChecker()
 			// loop through overrides
 			for _, override := range rateLimiter.rateLimiterProto.GetOverrides() {
 				label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
-				rateLimiter.limitCheck.AddOverride(label, override.GetLimitScaleFactor())
+				rateLimiter.rateLimitChecker.AddOverride(label, override.GetLimitScaleFactor())
 			}
-			rateLimiter.limiter, err = ratelimiter.NewOlricRateLimiter(rateLimiter.limitCheck,
+			rateLimiter.rateTracker, err = ratetracker.NewOlricRateTracker(rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
-				rateLimiter.metricID,
+				rateLimiter.name,
 				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to create limiter")
@@ -235,7 +235,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 			if lazySyncConfig := rateLimiter.rateLimiterProto.GetLazySyncConfig(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
 					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
-					rateLimiter.limiter, err = ratelimiter.NewLazySyncRateLimiter(rateLimiter.limiter,
+					rateLimiter.rateTracker, err = ratetracker.NewLazySyncRateTracker(rateLimiter.rateTracker,
 						lazySyncInterval,
 						rateLimiter.rateLimiterFactory.lazySyncJobGroup)
 					if err != nil {
@@ -274,7 +274,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 				log.Error().Err(err).Msg("Failed to remove decision notifier")
 				merr = multierr.Append(merr, err)
 			}
-			rateLimiter.limiter.Close()
+			rateLimiter.rateTracker.Close()
 			s := status.NewStatus(nil, merr)
 			err = statusRegistry.Push(rateLimiter.registryPath, s)
 			if err != nil {
@@ -297,22 +297,25 @@ func (rateLimiter *rateLimiter) GetSelector() *policylangv1.Selector {
 func (rateLimiter *rateLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
-	label, ok, _, _ := rateLimiter.TakeN(labels, 1)
+	label, ok, remaining, current := rateLimiter.TakeN(labels, 1)
 
 	if label == "" {
 		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND
 	}
 
 	return &flowcontrolv1.LimiterDecision{
-		Decision: &flowcontrolv1.LimiterDecision_RateLimiterDecision_{
-			RateLimiterDecision: &flowcontrolv1.LimiterDecision_RateLimiterDecision{
-				PolicyName:     rateLimiter.GetPolicyName(),
-				PolicyHash:     rateLimiter.GetPolicyHash(),
-				ComponentIndex: rateLimiter.GetComponentIndex(),
+		PolicyName:     rateLimiter.GetPolicyName(),
+		PolicyHash:     rateLimiter.GetPolicyHash(),
+		ComponentIndex: rateLimiter.GetComponentIndex(),
+		Dropped:        !ok,
+		Reason:         reason,
+		Details: &flowcontrolv1.LimiterDecision_RateLimiter_{
+			RateLimiter: &flowcontrolv1.LimiterDecision_RateLimiter{
+				Label:     label,
+				Remaining: int64(remaining),
+				Current:   int64(current),
 			},
 		},
-		Dropped: !ok,
-		Reason:  reason,
 	}
 }
 
@@ -328,7 +331,7 @@ func (rateLimiter *rateLimiter) TakeN(labels selectors.Labels, n int) (label str
 
 	label = labelKey + ":" + labelValue
 
-	ok, remaining, current = rateLimiter.limiter.TakeN(label, n)
+	ok, remaining, current = rateLimiter.rateTracker.TakeN(label, n)
 
 	return
 }
@@ -336,7 +339,7 @@ func (rateLimiter *rateLimiter) TakeN(labels selectors.Labels, n int) (label str
 func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	if event.Type == notifiers.Remove {
 		log.Debug().Msg("Decision removed")
-		rateLimiter.limitCheck.SetRateLimit(-1)
+		rateLimiter.rateLimitChecker.SetRateLimit(-1)
 		return
 	}
 
@@ -353,5 +356,14 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 	if err != nil {
 		return
 	}
-	rateLimiter.limitCheck.SetRateLimit(int(limitDecision.GetLimit()))
+	rateLimiter.rateLimitChecker.SetRateLimit(int(limitDecision.GetLimit()))
+}
+
+// GetLimiterID returns the limiter ID.
+func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
+	return iface.LimiterID{
+		PolicyName:     rateLimiter.GetPolicyName(),
+		ComponentIndex: rateLimiter.GetComponentIndex(),
+		PolicyHash:     rateLimiter.GetPolicyHash(),
+	}
 }

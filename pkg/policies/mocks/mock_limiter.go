@@ -9,6 +9,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	selectors "github.com/fluxninja/aperture/pkg/selectors"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -34,6 +35,20 @@ func NewMockLimiter(ctrl *gomock.Controller) *MockLimiter {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockLimiter) EXPECT() *MockLimiterMockRecorder {
 	return m.recorder
+}
+
+// GetLimiterID mocks base method.
+func (m *MockLimiter) GetLimiterID() iface.LimiterID {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLimiterID")
+	ret0, _ := ret[0].(iface.LimiterID)
+	return ret0
+}
+
+// GetLimiterID indicates an expected call of GetLimiterID.
+func (mr *MockLimiterMockRecorder) GetLimiterID() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLimiterID", reflect.TypeOf((*MockLimiter)(nil).GetLimiterID))
 }
 
 // GetPolicyName mocks base method.

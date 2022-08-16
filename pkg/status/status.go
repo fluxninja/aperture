@@ -1,7 +1,6 @@
 package status
 
 import (
-	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -45,13 +44,6 @@ func NewErrorDetails(e error) *statusv1.ErrorDetails {
 	}
 
 	errorDetails.Message = e.Error()
-
-	cause := errors.Cause(e)
-	if cause != nil {
-		if cause != e {
-			errorDetails.Cause = NewErrorDetails(cause)
-		}
-	}
 
 	return errorDetails
 }

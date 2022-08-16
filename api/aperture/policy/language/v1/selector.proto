@@ -39,33 +39,11 @@ message Selector {
     }
   ]; // @gotags: default:"default"
 
-  // The namespace of the entities to select.
-  // In k8s, this is the k8s' namespace.
-  string namespace = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {
-          string_value: "required"
-        }
-      }
-    }
-  ]; // @gotags: validate:"required"
-
-  // The service (name) of the entities.
-  // In k8s, this is a name of the Service object.
-  //
-  // Note: Entity may belong to multiple services.
   string service = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {
-          string_value: "required"
-        }
-      }
+      description: "The service (name) of the entities.\nIn k8s, this is the FQDN of the Service object.\n\nNote: Entity may belong to multiple services."
     }
-  ]; // @gotags: validate:"required"
+  ];
 
   // Describes control point within the entity where the policy should apply to.
   ControlPoint control_point = 4 [
