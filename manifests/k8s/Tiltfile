@@ -293,7 +293,7 @@ def render_tanka(environment, env_vars):
         local(command=["jb", "install"], dir=base_dir)
 
         # Refreshing the dependencies for the Agent chart
-        local(command=["helm", "dependency", "update", "--skip-refresh"], dir=base_dir + "charts/agent")
+        local(command=["helm", "dependency", "update"], dir=base_dir + "charts/agent")
 
         # Fetch any vendored charts that are not included in our repository
         local(command=[TANKA, "tool", "charts", "vendor"], dir=base_dir)
