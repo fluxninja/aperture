@@ -755,7 +755,7 @@ cmd_button(
 )
 
 cmd_button(
-    'flowcontrol-1-latency',
+    'policies-1-latency',
     resource='aperture-controller',
     icon_name='content_paste_go',
     text='Apply Example Latency Gradient Policy For Demo App',
@@ -763,7 +763,7 @@ cmd_button(
 )
 
 cmd_button(
-    'flowcontrol-2-rate-limit',
+    'policies-2-rate-limit',
     resource='aperture-controller',
     icon_name='content_paste_go',
     text='Apply Example Rate Limit Policy For Demo App',
@@ -771,11 +771,11 @@ cmd_button(
 )
 
 cmd_button(
-    'flowcontrol-3-delete',
+    'policies-3-delete',
     resource='aperture-controller',
     icon_name='content_paste_off',
-    text='Delete Flowcontrol configmap',
-    argv=['kubectl', '-n', APERTURE_SYSTEM_NS, 'delete', 'cm', 'flowcontrol']
+    text='Delete Policy configmap',
+    argv=['kubectl', '-n', APERTURE_SYSTEM_NS, 'delete', 'cm', 'policies']
 )
 
 declare_resources(resources, DEP_TREE, inverted_dep_tree)
