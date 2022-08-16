@@ -28,7 +28,7 @@ type CMFileValidator interface {
 	) (bool, string, error)
 }
 
-// CMValidator validates the flowcontrol configmap.
+// CMValidator validates the policies configmap.
 type CMValidator struct {
 	tokens         chan concurrencyToken
 	fileValidators []CMFileValidator

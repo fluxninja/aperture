@@ -1,5 +1,6 @@
 {
   "logLevel": "debug",
+  "deterministicIds": true,
   "theme": "base",
   "themeVariables": {
     "primaryColor": "#8EC4AD",

@@ -69,13 +69,13 @@ $(POLICY_MARKDOWNS): %/swagger.md: %/config-swagger.yaml
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid:
 	@echo generating mermaid diagrams
-	@find . -name '*.mmd.png' -exec $(MAKE) -B {} \;
+	@find . -name '*.mmd' -exec $(MAKE) -B {}.svg \;
 
-%.mmd.png: %.mmd ./tools/mermaid/mermaid-theme.json
+%.mmd.svg: %.mmd ./tools/mermaid/mermaid-theme.json
 	@echo MMDC $@
-	@for fmt in png; \
+	@for fmt in svg; \
 		do npx -p @mermaid-js/mermaid-cli mmdc \
-			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --output $<.$$fmt; \
+			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --output $<.$$fmt --backgroundColor transparent; \
 	done
 
 .PHONY: generate-config-markdown generate-mermaid
