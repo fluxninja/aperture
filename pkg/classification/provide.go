@@ -22,7 +22,7 @@ import (
 // Module is a default set of components to enable flow classification
 //
 // Note: this module provides just a Classifier datastructure, with no API endpoint.
-// Example API endpoint to the classifier is pkg/apis/authz.
+// Example API endpoint to the classifier is pkg/envoy.
 var Module fx.Option = fx.Options(
 	fx.Provide(
 		fx.Annotated{
