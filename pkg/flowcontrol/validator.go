@@ -8,23 +8,23 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// CMFileValidator Flowcontrol implementation of CMFileValidator interface.
+// CMFileValidator policies implementation of CMFileValidator interface.
 type CMFileValidator struct{}
 
-// CheckCMName checks configmap name is equals to "flowcontrol"
+// CheckCMName checks configmap name is equals to "policies"
 //
 // returns:
-// * true when config is flowcontrol
-// * false when config is not flowcontrol.
+// * true when config is policies
+// * false when config is not policies.
 func (v *CMFileValidator) CheckCMName(name string) bool {
-	if name == "flowcontrol" {
+	if name == "policies" {
 		return true
 	}
-	log.Trace().Str("name", name).Msg("Not a flowcontrol cm, skipping")
+	log.Trace().Str("name", name).Msg("Not a policies cm, skipping")
 	return false
 }
 
-// ValidateFile checks the validity of a single Flowcontrol Policy as yaml file
+// ValidateFile checks the validity of a single policies Policy as yaml file
 //
 // returns:
 // * true, "", nil when config is valid
@@ -38,9 +38,9 @@ func (v *CMFileValidator) ValidateFile(
 	name string,
 	yamlSrc []byte,
 ) (bool, string, error) {
-	log.Trace().Str("name", name).Msg("Validating CM flowcontrol yaml")
+	log.Trace().Str("name", name).Msg("Validating CM policies yaml")
 	if len(yamlSrc) == 0 {
-		log.Warn().Msg("Validation: Empty flowcontrol configmap file")
+		log.Warn().Msg("Validation: Empty policies configmap file")
 		return false, "", nil
 	}
 	var policy languagev1.Policy
