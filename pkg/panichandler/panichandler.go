@@ -1,7 +1,6 @@
 package panichandler
 
 import (
-	"runtime"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -65,19 +64,6 @@ func RegisterPanicHandler(ph PanicHandler) {
 
 // crashOnce prevents multiple panics to interfere each other, process single panic.
 var crashOnce = sync.Once{}
-
-// Callstack is a full stacktrace.
-type Callstack []uintptr
-
-const stackLimit = 50
-
-// Capture returns a full stacktrace.
-func Capture() Callstack {
-	callers := make([]uintptr, stackLimit)
-	count := runtime.Callers(2, callers)
-	stack := callers[:count]
-	return Callstack(stack)
-}
 
 // RegisterPanicHandler appends panic handler to list of global registry's panic handler.
 func (r *PanicHandlerRegistry) RegisterPanicHandler(ph PanicHandler) {
