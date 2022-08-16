@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"github.com/fluxninja/aperture/pkg/authz/baggage"
 	class "github.com/fluxninja/aperture/pkg/classification"
+	"github.com/fluxninja/aperture/pkg/envoy/baggage"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 

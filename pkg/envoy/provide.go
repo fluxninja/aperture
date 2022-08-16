@@ -1,4 +1,4 @@
-package authz
+package envoy
 
 import (
 	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
