@@ -552,22 +552,13 @@ message ConcurrencyLimiter {
 
 // Weighted Fair Queuing based workload scheduler.
 message Scheduler {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Weighted Fair Queuing based workload scheduler."
-    }
-  };
-
+  // Workload defines a class of requests that preferably have similar properties such as response latency.
   message Workload {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-      json_schema: {
-        description: "Workload defines a class of requests that preferably have similar properties such as response latency."
-      }
-    };
-
+    // Describes priority level of the requests within the workload.
+    // Priority level ranges from 0 to 255.
+    // Higher numbers means higher priority level.
     uint32 priority = 1 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level."
         extensions: {
           key: "x-go-validate";
           value {
@@ -607,17 +598,11 @@ message Scheduler {
   }
 
   message WorkloadAndLabelMatcher {
-    Workload workload = 1 [
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Workload associated with requests matching the label matcher."
-      }
-    ];
+    // Workload associated with requests matching the label matcher.
+    Workload workload = 1;
 
-    LabelMatcher label_matcher = 2 [
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Label Matcher to select a Workload."
-      }
-    ];
+    // Label Matcher to select a Workload.
+    LabelMatcher label_matcher = 2;
   }
 
   // Output for the Scheduler component.

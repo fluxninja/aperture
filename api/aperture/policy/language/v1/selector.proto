@@ -39,11 +39,11 @@ message Selector {
     }
   ]; // @gotags: default:"default"
 
-  string service = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The service (name) of the entities.\nIn k8s, this is the FQDN of the Service object.\n\nNote: Entity may belong to multiple services."
-    }
-  ];
+  // The service (name) of the entities.
+  // In k8s, this is the FQDN of the Service object.
+  //
+  // Note: Entity may belong to multiple services.
+  string service = 2;
 
   // Describes control point within the entity where the policy should apply to.
   ControlPoint control_point = 3 [
