@@ -14,9 +14,9 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/authz"
 	"github.com/fluxninja/aperture/pkg/classification"
 	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/envoy"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
@@ -143,10 +143,10 @@ var _ = BeforeSuite(func() {
 		),
 		flowcontrol.Module,
 		classification.Module,
-		authz.Module,
+		envoy.Module,
 		otelcollector.Module(),
 		fx.Invoke(
-			authz.Register,
+			envoy.Register,
 			flowcontrol.Register,
 		),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),

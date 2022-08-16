@@ -1,4 +1,4 @@
-package authz
+package envoy
 
 import (
 	"context"
@@ -21,9 +21,9 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	authz_baggage "github.com/fluxninja/aperture/pkg/authz/baggage"
 	"github.com/fluxninja/aperture/pkg/classification"
 	"github.com/fluxninja/aperture/pkg/entitycache"
+	authz_baggage "github.com/fluxninja/aperture/pkg/envoy/baggage"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"

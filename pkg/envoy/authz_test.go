@@ -1,4 +1,4 @@
-package authz_test
+package envoy_test
 
 import (
 	"context"
@@ -12,8 +12,8 @@ import (
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/authz"
 	"github.com/fluxninja/aperture/pkg/classification"
+	"github.com/fluxninja/aperture/pkg/envoy"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/selectors"
@@ -24,7 +24,7 @@ var (
 	ctx        context.Context
 	cancel     context.CancelFunc
 	classifier *classification.Classifier
-	handler    *authz.Handler
+	handler    *envoy.Handler
 )
 
 var _ = BeforeEach(func() {
@@ -61,7 +61,7 @@ var _ = Describe("Authorization handler", func() {
 			classifier = classification.New()
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
 			Expect(err).NotTo(HaveOccurred())
-			handler = authz.NewHandler(classifier, nil, &AcceptingHandler{})
+			handler = envoy.NewHandler(classifier, nil, &AcceptingHandler{})
 		})
 		It("returns ok response", func() {
 			Eventually(func(g Gomega) {

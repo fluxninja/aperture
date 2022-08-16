@@ -1,4 +1,4 @@
-package authz_test
+package envoy_test
 
 import (
 	"testing"

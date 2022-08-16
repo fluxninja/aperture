@@ -51,11 +51,11 @@ const (
 	HTTPResponseContentLength = "http.response_content_length"
 	// FeatureDurationLabel describes duration of the feature in milliseconds.
 	FeatureDurationLabel = "feature.duration_millis"
-	// DecisionTypeLabel descibes the decision type taken by policy.
+	// DecisionTypeLabel describes the decision type taken by policy.
 	DecisionTypeLabel = "decision_type"
-	// DecisionErrorReasonLabel descibes the error reason of the decision taken by policy.
+	// DecisionErrorReasonLabel describes the error reason of the decision taken by policy.
 	DecisionErrorReasonLabel = "decision_error_reason"
-	// DecisionRejectReasonLabel descibes the reject reason of the decision taken by policy.
+	// DecisionRejectReasonLabel describes the reject reason of the decision taken by policy.
 	DecisionRejectReasonLabel = "decision_reject_reason"
 	// RateLimitersLabel describes rate limiters matched to the traffic.
 	RateLimitersLabel = "rate_limiters"
@@ -65,7 +65,7 @@ const (
 	ConcurrencyLimitersLabel = "concurrency_limiters"
 	// DroppingConcurrencyLimitersLabel describes rate limiters dropping the traffic.
 	DroppingConcurrencyLimitersLabel = "dropping_concurrency_limiters"
-	// FluxMetersLabel describes flux meters metched to the traffic.
+	// FluxMetersLabel describes flux meters matched to the traffic.
 	FluxMetersLabel = "flux_meters"
 	// HostAddressLabel describes host address of the request.
 	HostAddressLabel = "net.host.address"
