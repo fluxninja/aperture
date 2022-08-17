@@ -33,6 +33,9 @@ parameters:
   updated-circleci-config:
     type: boolean
     default: false
+  updated-aperture-chart:
+    type: boolean
+    default: false
 
 jobs:
   build-push-add-tag:
@@ -317,7 +320,7 @@ jobs:
           fingerprints:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
             - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff" # fluxninja/aperture-tech-docs R/W
-      - run:
+      - run: &install_opsninja
           name: Install opsninja and its dependencies
           command: |
             # We need R/O access to cloud repository to be able to fetch opsninja library
@@ -350,6 +353,43 @@ jobs:
             fn release update-aperture-docs "${args[@]}"
       - asdf_save_cache:
           cache_name: publish-docs
+
+  publish-deployment-code:
+    parameters:
+      task-name:
+        type: string
+        description: How to name the step that executes invoke task
+      dry-run:
+        type: boolean
+        default: false
+        description: Whether to push changes to the deployment repository
+      deployment-repo:
+        type: string
+        default: git@github.com:fluxninja/deployment.git
+        description: Deployment repository to push deployment changes to
+    executor: python-cimg-executor
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "50:32:f0:16:fd:12:4c:fd:1c:b4:2d:8c:7a:00:fd:45"
+      - checkout
+      - run: *install_opsninja
+      - run:
+          name: Checkout git submodules
+          command: git submodule update --init --recursive
+      - run:
+          name: << parameters.task-name >>
+          command: |
+            echo "parameters.dry-run: '<< parameters.dry-run >>'"
+            args=(
+              --color=always
+              --dest-repo-url "<< parameters.deployment-repo >>"
+              --target-branch "main"
+            )
+            if [[ "<< parameters.dry-run >>" == "true" ]]; then
+              args+=( --dry-run )
+            fi
+            fn release sync-deployment-repo "${args[@]}"
 
 workflows:
   version: 2
@@ -390,6 +430,34 @@ workflows:
         - << pipeline.parameters.updated-aperture-docs >>
     jobs:
       - publish-aperture-docs
+
+  push-deployment-changes:
+    when:
+      and:
+        - or: &updated_deployment_code
+            - << pipeline.parameters.updated-aperture-chart >>
+        - or: &main_or_stable_branch
+            - equal: [main, << pipeline.git.branch >>]
+            - matches:
+                { pattern: "^stable/.+", value: << pipeline.git.branch>> }
+    jobs:
+      - publish-deployment-code: &push_deployment_code_job
+          name: push-deployment-changes
+          task-name: Push deployment code changes to fluxninja/deployment.git
+
+  preview-deployment-changes:
+    when:
+      and:
+        - not:
+            or: *main_or_stable_branch
+        - or: *updated_deployment_code
+    jobs:
+      - publish-deployment-code:
+          <<: *push_deployment_code_job
+          name: preview-deployment-changes
+          dry-run: true
+          task-name:
+            "Preview changes between aperture.git and deployment repository"
 
 commands:
   asdf_install:
