@@ -7,7 +7,6 @@ import "aperture/policy/language/v1/selector.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
 
 service RulesService {
   rpc AllRules(google.protobuf.Empty) returns (AllRulesResponse) {
@@ -21,73 +20,98 @@ message AllRulesResponse {
   AllRules all_rules = 1;
 }
 
+// All the ruleset name to ruleset mapping.
 message AllRules {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "All the ruleset name to ruleset mapping."
-    }
-  };
-  map<string, Classifier> all_rules = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "A map of {key, value} pairs mapping from the name of the classifier to the values of the classifier."
-  }];
+  // A map of {key, value} pairs mapping from the name of the classifier to the values of the classifier.
+  map<string, Classifier> all_rules = 1;
 }
 
+// Set of classification rules sharing a common selector.
+//
+// Example:
+// ```yaml
+// selector:
+//   namespace: default
+//   service: service1
+//   control_point:
+//     traffic: ingress
+// rules:
+//   user:
+//     extractor:
+//       from: request.http.headers.user
+// ```
 message Classifier {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Set of classification rules sharing a common selector."
-    }
-    example: "{\"'yaml\":{\"selector\":{\"service\":\"service1.default.svc.cluster.local\",\"control_point\":{\"traffic\":\"ingress\"}},\"rules\":{\"user\":{\"extractor\":{\"from\":\"request.http.headers.user\"}}}}}"
-  };
+  // Defines where to apply the flow classification rule.
+  policy.language.v1.Selector selector = 1;
 
-  policy.language.v1.Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Defines where to apply the flow classification rule."
-  }];
-
-  map<string, Rule> rules = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "A map of {key, value} pairs mapping from flow label names to rules that define how to extract and propagate them."
-  }];
+  // A map of {key, value} pairs mapping from flow label names to rules that define how to extract and propagate them.
+  map<string, Rule> rules = 2;
 }
 
+// Rule describes a single Flow Classification Rule.
+// Flow classification rule extracts a value from request metadata.
+// More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
+// See <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.
+// There are two ways to define a flow classification rule:
+// * Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.
+// * Rego expression.
+//
+// Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
+// [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
+//
+// Example:
+// ```yaml
+// Example of Declarative JSON extractor:
+//   yaml:
+//     extractor:
+//       json:
+//         from: request.http.body
+//         pointer: /user/name
+//     propagate: true
+//     hidden: false
+// Example of Rego module:
+//   yaml:
+//     rego:
+//       query: data.user_from_cookie.user
+//       source:
+//         package: user_from_cookie
+//         cookies: "split(input.attributes.request.http.headers.cookie, ';')"
+//         cookie: "cookies[_]"
+//         cookie.startswith: "('session=')"
+//         session: "substring(cookie, count('session='), -1)"
+//         parts: "split(session, '.')"
+//         object: "json.unmarshal(base64url.decode(parts[0]))"
+//         user: object.user
+//     propagate: false
+//     hidden: true
+// ```
 message Rule {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Rule describes a single Flow Classification Rule.\nFlow classification rule extracts a value from request metadata.\nMore specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].\nSee <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.\nThere are two ways to define a flow classification rule:\n* Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.\n* Rego expression.\n\nPerformance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.\n[attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)"
-    }
-    example: "{\"Example of Declarative JSON extractor\":{\"'yaml\":{\"extractor\":{\"json\":{\"from\":\"request.http.body\",\"pointer\":\"/user/name\"}},\"propagate\":true,\"hidden\":false}}, \"Example of Rego module\":{\"'yaml\":{\"rego\":{\"query\":\"data.user_from_cookie.user\",\"source\":{\"package\": \"user_from_cookie\", \"cookies\":\"split(input.attributes.request.http.headers.cookie, ';')\", \"cookie\":\"cookies[_]\", \"cookie.startswith\":\"('session=')\", \"session\":\"substring(cookie, count('session='), -1)\", \"parts\":\"split(session, '.')\", \"object\":\"json.unmarshal(base64url.decode(parts[0]))\", \"user\":\"object.user\"}}, \"propagate\":false, \"hidden\":true}}}"
-  };
-
+  // Raw rego rules are compiled 1:1 to rego queries.
+  // High-level extractor-based rules are compiled into a single rego query.
   message Rego {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-      json_schema: {
-        description: "Raw rego rules are compiled 1:1 to rego queries.\nHigh-level extractor-based rules are compiled into a single rego query."
-      }
-    };
+    // Source code of the rego module.
+    //
+    // Note: Must include a "package" declaration.
+    string source = 1;
 
-    string source = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Source code of the rego module.\n\nNote: Must include a \"package\" declaration."
-    }];
-
-    string query = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Query string to extract a value (eg. `data.<mymodulename>.<variablename>`)\n\nNote: The module name must match the package name from the \"source\"."
-    }];
+    // Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+    //
+    // Note: The module name must match the package name from the "source".
+    string query = 2;
   }
 
   oneof source {
-    Extractor extractor = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "High-level flow label declarative extractor.\nRego extractor extracts a value from the rego module."
-    }];
+    // High-level flow label declarative extractor.
+    // Rego extractor extracts a value from the rego module.
+    Extractor extractor = 1;
 
-    Rego rego = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Rego module to extract a value from the rego module."
-    }];
+    // Rego module to extract a value from the rego module.
+    Rego rego = 2;
   }
 
-  google.protobuf.BoolValue propagate = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true)."
-  }];
+  // Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true).
+  google.protobuf.BoolValue propagate = 3;
 
-  bool hidden = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Decides if the created flow label should be hidden from the telemetry."
-  }];
+  // Decides if the created flow label should be hidden from the telemetry.
+  bool hidden = 4;
 }

@@ -17,26 +17,53 @@
 - [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`.
   I…
 - [v1Classifier](#v1-classifier) – Set of classification rules sharing a common selector.
-- [v1ControlPoint](#v1-control-point) – Identifies control point within a service that the rule or policy should apply t…
-- [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
-- [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label given http reque…
-- [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of the fields.
-- [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload.
-  Specify a field to be extracted…
-- [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
-- [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or n…
-- [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels.
-  …
-- [v1MatchesMatchExpression](#v1-matches-match-expression) – Label selector expression of the matches form "label matches regex".
-- [v1PathTemplateMatcher](#v1-path-template-matcher) – Matches HTTP Path to given path templates.
-  HTTP path will be matched against giv…
-- [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule.
-  Flow classification rule extra…
-- [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to.
+
+Example:
+
+````yaml
+selecto…
+* [v1ControlPoint](#v1-control-point) – Identifies control point within a service that the rule or policy should apply t…
+* [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
+* [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write regod code.
+There are multiple variants of extractor, specify exactly one:
+- JSON Extractor
+- Address Extractor
+- JWT Extractor
+* [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of the fields.
+
+Example:
+```yaml
+from: reque…
+* [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload.
+Specify a field to be extracted…
+* [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
+* [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not.
+It provides three ways to define requirements:
+- matchLabels
+- matchExpressions
+- arbitrary expression
+* [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels.
+…
+* [v1MatchesMatchExpression](#v1-matches-match-expression) – Label selector expression of the matches form "label matches regex".
+* [v1PathTemplateMatcher](#v1-path-template-matcher) – Matches HTTP Path to given path templates.
+HTTP path will be matched against giv…
+* [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule.
+Flow classification rule extra…
+* [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to.
+
+Example:
+```yaml…
+
 
 ## Reference
 
-### <span id="classification-rule"></span> _ClassificationRule_
+### <span id="classification-rule"></span> *ClassificationRule*
+
+
+
+
+
+
 
 #### Members
 
@@ -45,8 +72,8 @@
 <dt></dt>
 <dd>
 
-Type: [V1Classifier](#v1-classifier)
 
+Type: [V1Classifier](#v1-classifier)
 </dd>
 </dl>
 
@@ -54,11 +81,13 @@ Type: [V1Classifier](#v1-classifier)
 
 ### <span id="match-expression-list"></span> MatchExpressionList
 
+
 List of MatchExpressions that is used for all/any matching.
 eg. {any: {of: [expr1, expr2]}}.
 
-#### Properties
 
+
+#### Properties
 <dl>
 <dt>of</dt>
 <dd>
@@ -70,16 +99,18 @@ eg. {any: {of: [expr1, expr2]}}.
 
 ### <span id="rule-rego"></span> RuleRego
 
+
 Raw rego rules are compiled 1:1 to rego queries.
 High-level extractor-based rules are compiled into a single rego query.
 
-#### Properties
 
+
+#### Properties
 <dl>
 <dt>query</dt>
 <dd>
 
-(string) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`)
+(string) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
 Note: The module name must match the package name from the "source".
 
@@ -98,6 +129,7 @@ Note: Must include a "package" declaration.
 
 ### <span id="v1-address-extractor"></span> v1AddressExtractor
 
+
 Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`.
 IP addresses in attribute context are defined as objects with separate ip and port fields.
 This is a helper to display an address as a single string.
@@ -106,13 +138,18 @@ Note: Use with care, as it might accidentally introduce a high-cardinality flow 
 
 [ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
 
+Example:
+```yaml
+from: "source.address # or dstination.address"
+````
+
 #### Properties
 
 <dl>
 <dt>from</dt>
 <dd>
 
-(string, `required`) Attribute path pointing to some string. eg. "source.address".
+(string, `required`) Attribute path pointing to some string - eg. "source.address".
 
 </dd>
 </dl>
@@ -120,6 +157,20 @@ Note: Use with care, as it might accidentally introduce a high-cardinality flow 
 ### <span id="v1-classifier"></span> v1Classifier
 
 Set of classification rules sharing a common selector.
+
+Example:
+
+```yaml
+selector:
+  namespace: default
+  service: service1
+  control_point:
+    traffic: ingress
+rules:
+  user:
+    extractor:
+      from: request.http.headers.user
+```
 
 #### Properties
 
@@ -143,7 +194,7 @@ Set of classification rules sharing a common selector.
 ### <span id="v1-control-point"></span> v1ControlPoint
 
 Identifies control point within a service that the rule or policy should apply to.
-Controlpoint is either a library feature name or one of "ingress/egress" traffic control point.
+Controlpoint is either a library feature name or one of ingress/egress traffic control point.
 
 #### Properties
 
@@ -210,7 +261,7 @@ There are multiple variants of extractor, specify exactly one:
 <dt>address</dt>
 <dd>
 
-([V1AddressExtractor](#v1-address-extractor)) Display an address as a single string. eg. `<ip>:<port>`.
+([V1AddressExtractor](#v1-address-extractor)) Display an address as a single string - `<ip>:<port>`.
 
 </dd>
 </dl>
@@ -219,15 +270,24 @@ There are multiple variants of extractor, specify exactly one:
 <dd>
 
 (string) Use an attribute with no convertion.
-Attribute path is a dot-separated path to attribute. Should be either:
+Attribute path is a dot-separated path to attribute.
+
+Should be either:
 
 - one of the fields of [Attribute Context][attribute-context], or
 - a special "request.http.bearer" pseudo-attribute.
   Eg. "request.http.method" or "request.http.header.user-agent"
 
-Note: The same attribute path syntax is shared by other extractor variants, wherever attribute path is needed in their "from" syntax.
+Note: The same attribute path syntax is shared by other extractor variants,
+wherever attribute path is needed in their "from" syntax.
 
-[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
+Example:
+
+```yaml
+from: request.http.headers.user-agent
+```
+
+[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto"
 
 </dd>
 </dl>
@@ -260,13 +320,20 @@ Note: The same attribute path syntax is shared by other extractor variants, wher
 
 Deserialize a json, and extract one of the fields.
 
+Example:
+
+```yaml
+from: request.http.body
+pointer: /user/name
+```
+
 #### Properties
 
 <dl>
 <dt>from</dt>
 <dd>
 
-(string, `required`) Attribute path pointing to some strings. eg. "request.http.body".
+(string, `required`) Attribute path pointing to some strings - eg. "request.http.body".
 
 </dd>
 </dl>
@@ -276,8 +343,8 @@ Deserialize a json, and extract one of the fields.
 
 (string) Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
 
-Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax, eg. `/foo/bar`.
-If the pointer points into an object, it'd be stringified.
+Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
 
 </dd>
 </dl>
@@ -289,6 +356,13 @@ Specify a field to be extracted from payload using "json_pointer".
 
 Note: The signature is not verified against the secret (we're assuming there's some
 other parts of the system that handles such verification).
+
+Example:
+
+```yaml
+from: request.http.bearer
+json_pointer: /user/email
+```
 
 #### Properties
 
@@ -306,8 +380,8 @@ other parts of the system that handles such verification).
 
 (string) Json pointer allowing to select a specified field from the json payload.
 
-Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax, eg. `/foo/bar`.
-If the pointer points into an object, it'd be stringified.
+Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
 
 </dd>
 </dl>
@@ -394,6 +468,15 @@ Note: The requirements are ANDed.
 
 Defines a [map<string, string> → bool] expression to be evaluated on labels.
 MatchExpression has multiple variants, exactly one should be set.
+
+Example:
+
+```yaml
+all:
+  of:
+    - label_exists: foo
+    - label_equals: { label = app, value = frobnicator }
+```
 
 #### Properties
 
@@ -485,7 +568,15 @@ In case of multiple path templates matching, the most specific one will be chose
 
 (map of string) Template value keys are OpenAPI-inspired path templates.
 
-- Static path segment `/foo` matches a path segment exactly
+Examples:
+
+```
+/register
+/users/{user_id}
+/static/*
+```
+
+- Static path segment `/foo` matches a path segment exactly.
 - `/{param}` matches arbitrary path segment.
   (The param name is ignored and can be omitted (`{}`))
 - The parameter must cover whole segment.
@@ -494,9 +585,9 @@ In case of multiple path templates matching, the most specific one will be chose
 - Multiple consecutive `/` are ignored, as well as trailing `/`.
 - Parametrized path segments must come after static segments.
 - `*`, if present, must come last.
-- Most specific template "wins" (`/foo` over `/{}` and `/{}` over `/*`).
+- Most specific template \"wins\" (`/foo` over `/{}` and `/{}` over `/*`).
 
-See also <https://swagger.io/specification/#path-templating-matching>
+See also <https://swagger.io/specification/#path-templating-matching>"
 
 </dd>
 </dl>
@@ -514,6 +605,34 @@ There are two ways to define a flow classification rule:
 
 Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
 [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
+
+Example:
+
+```yaml
+Example of Declarative JSON extractor:
+  yaml:
+    extractor:
+      json:
+        from: request.http.body
+        pointer: /user/name
+    propagate: true
+    hidden: false
+Example of Rego module:
+  yaml:
+    rego:
+      query: data.user_from_cookie.user
+      source:
+        package: user_from_cookie
+        cookies: "split(input.attributes.request.http.headers.cookie, ';')"
+        cookie: "cookies[_]"
+        cookie.startswith: "('session=')"
+        session: "substring(cookie, count('session='), -1)"
+        parts: "split(session, '.')"
+        object: "json.unmarshal(base64url.decode(parts[0]))"
+        user: object.user
+    propagate: false
+    hidden: true
+```
 
 #### Properties
 
@@ -555,13 +674,34 @@ Rego extractor extracts a value from the rego module.
 
 Describes where a rule or actuation component should apply to.
 
+Example:
+
+```yaml
+selector:
+  namespace: default
+  service: service1
+  control_point:
+    traffic: ingress # Allowed values are `ingress` and `egress`.
+  label_matcher:
+    match_labels:
+      user_tier: gold
+    match_expressions:
+      - key: query
+        operator: In
+        values:
+          - insert
+          - delete
+      - label: user_agent
+        regex: ^(?!.*Chrome).*Safari
+```
+
 #### Properties
 
 <dl>
 <dt>agent_group</dt>
 <dd>
 
-(string) Describes where this selector applies to.
+(string, default: `default`) Describes where this selector applies to.
 
 </dd>
 </dl>
@@ -569,7 +709,7 @@ Describes where a rule or actuation component should apply to.
 <dt>control_point</dt>
 <dd>
 
-([V1ControlPoint](#v1-control-point), `required`) Describes control point Within the entity where the policy should apply to.
+([V1ControlPoint](#v1-control-point), `required`) Describes control point within the entity where the policy should apply to.
 
 </dd>
 </dl>
@@ -577,7 +717,7 @@ Describes where a rule or actuation component should apply to.
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Allows to add _additional_ condition on labels that must also be satisfied (in addition to service+control point matching).
+([V1LabelMatcher](#v1-label-matcher)) Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).
 The label matcher allows to match on infra labels, flow labels and request labels.
 Arbitrary label matcher can be used to match infra labels.
 For flowcontrol policies, the matcher can be used to match flow labels.
@@ -585,9 +725,9 @@ For flowcontrol policies, the matcher can be used to match flow labels.
 Note: For classification we can only match flow labels that were created at some **previous** control point.
 
 In case of k8s, infra labels are labels on entities (note: there might exist some additional labels).
-Flow label names are always prefixed with `flow_`
+Flow label names are always prefixed with `flow_`.
 Request labels are always prefixed with `request_`.
-Available request labels are `id` (available as `request_id`), `method`, `path`, `host`, `scheme`, `size`, `protocol`
+Available request labels are `id` (available as `request_id`), `method`, `path`, `host`, `scheme`, `size`, `protocol`.
 (mapped from fields of [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
 Also, (non-pseudo) headers are available as `request_header_<headername>`.
 

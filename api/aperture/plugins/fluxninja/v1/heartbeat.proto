@@ -7,10 +7,10 @@ import "aperture/common/peers/v1/peers.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
 
-// FluxNinjaService is used to receive health and status info from agents
+// FluxNinjaService is used to receive health and status info from agents.
 service FluxNinjaService {
   // Report accepts information about agents' health and applied
-  // configurations/policies
+  // configurations/policies.
   rpc Report(ReportRequest) returns (ReportResponse) {
     option (google.api.http) = {
       post: "/plugins/fluxninja/v1/report"
@@ -29,25 +29,25 @@ message ReportRequest {
   map<string, google.protobuf.Any> all_statuses = 7;
 }
 
-// ReportResponse is empty for now
+// ReportResponse is empty for now.
 message ReportResponse {}
 
-// Policies type is packing an array of FlowControlPolicy to be used as one message and sent using type Any
+// Policies type is packing an array of FlowControlPolicy to be used as one message and sent using type Any.
 message Policies {
   repeated FlowControlPolicy policies = 1;
 }
 
 // FlowControlPolicy is a policy used for directing traffic.
-// TODO fill it
+// TODO: fill it.
 message FlowControlPolicy {}
 
-// Services type is packing an array of Service to be used as one message and sent using type Any
+// Services type is packing an array of Service to be used as one message and sent using type Any.
 message Services {
   repeated Service services = 1;
 }
 
 // Service contains information about single service discovered in agent group by a
-// particular agent
+// particular agent.
 message Service {
   string agent_group = 1;
   string name = 2;
