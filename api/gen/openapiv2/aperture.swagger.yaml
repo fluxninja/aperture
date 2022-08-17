@@ -800,7 +800,9 @@ definitions:
         description: Output ports for the EMA component.
       warm_up_window:
         type: string
-        description: Duration of EMA warming up window.\nThe initial value of the EMA is the average of signal readings received during the warm up window.
+        description: |-
+          Duration of EMA warming up window.
+          The initial value of the EMA is the average of signal readings received during the warm up window.
         x-go-default: 0s
     description: |-
       Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings.

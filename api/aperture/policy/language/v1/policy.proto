@@ -235,7 +235,8 @@ message EMA {
     }
   }]; // @gotags: default:"5s"
 
-  // Duration of EMA warming up window.\nThe initial value of the EMA is the average of signal readings received during the warm up window.
+  // Duration of EMA warming up window.
+  // The initial value of the EMA is the average of signal readings received during the warm up window.
   google.protobuf.Duration warm_up_window = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"

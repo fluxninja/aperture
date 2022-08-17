@@ -653,7 +653,8 @@ type EMA struct {
 	OutPorts *EMA_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Duration of EMA sampling window.
 	EmaWindow *durationpb.Duration `protobuf:"bytes,3,opt,name=ema_window,json=emaWindow,proto3" json:"ema_window,omitempty" default:"5s"` // @gotags: default:"5s"
-	// Duration of EMA warming up window.\nThe initial value of the EMA is the average of signal readings received during the warm up window.
+	// Duration of EMA warming up window.
+	// The initial value of the EMA is the average of signal readings received during the warm up window.
 	WarmUpWindow *durationpb.Duration `protobuf:"bytes,4,opt,name=warm_up_window,json=warmUpWindow,proto3" json:"warm_up_window,omitempty" default:"0s"` // @gotags: default:"0s"
 	// Correction factor to apply on the output value if its in violation of the min envelope.
 	CorrectionFactorOnMinEnvelopeViolation float64 `protobuf:"fixed64,5,opt,name=correction_factor_on_min_envelope_violation,json=correctionFactorOnMinEnvelopeViolation,proto3" json:"correction_factor_on_min_envelope_violation,omitempty" validate:"gte=1.0" default:"1.0"` // @gotags: validate:"gte=1.0" default:"1.0"
