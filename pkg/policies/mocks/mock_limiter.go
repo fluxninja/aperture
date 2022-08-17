@@ -7,8 +7,8 @@ package mocks
 import (
 	reflect "reflect"
 
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	selectors "github.com/fluxninja/aperture/pkg/selectors"
 	gomock "github.com/golang/mock/gomock"
@@ -66,10 +66,10 @@ func (mr *MockLimiterMockRecorder) GetPolicyName() *gomock.Call {
 }
 
 // GetSelector mocks base method.
-func (m *MockLimiter) GetSelector() *languagev1.Selector {
+func (m *MockLimiter) GetSelector() *selectorv1.Selector {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSelector")
-	ret0, _ := ret[0].(*languagev1.Selector)
+	ret0, _ := ret[0].(*selectorv1.Selector)
 	return ret0
 }
 

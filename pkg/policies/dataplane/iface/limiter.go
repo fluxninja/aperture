@@ -3,8 +3,8 @@ package iface
 import (
 	"strconv"
 
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/selectors"
 )
 
@@ -26,7 +26,7 @@ func (limiterID LimiterID) String() string {
 // Lifetime of this interface is per policy/component.
 type Limiter interface {
 	GetPolicyName() string
-	GetSelector() *policylangv1.Selector
+	GetSelector() *selectorv1.Selector
 	RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
 }

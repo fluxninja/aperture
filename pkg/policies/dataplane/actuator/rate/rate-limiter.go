@@ -10,6 +10,7 @@ import (
 	"go.uber.org/multierr"
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -289,7 +290,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 }
 
 // GetSelector returns the selector for the rate limiter.
-func (rateLimiter *rateLimiter) GetSelector() *policylangv1.Selector {
+func (rateLimiter *rateLimiter) GetSelector() *selectorv1.Selector {
 	return rateLimiter.rateLimiterProto.GetSelector()
 }
 

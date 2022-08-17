@@ -3,6 +3,7 @@ package iface
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
@@ -27,7 +28,7 @@ type FluxMeter interface {
 	component.ComponentAPI
 
 	// GetSelector returns the selector
-	GetSelector() *policylangv1.Selector
+	GetSelector() *selectorv1.Selector
 
 	// GetFluxMeterProto returns the flux meter proto
 	GetFluxMeterProto() *policylangv1.FluxMeter
