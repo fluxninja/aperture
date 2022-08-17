@@ -795,7 +795,8 @@ The alpha is computed using ema_window: alpha = 2 / (N + 1). Where, N = ema_wind
 <dt>warm_up_window</dt>
 <dd>
 
-(string, default: `0s`) Duration of EMA warming up window.\nThe initial value of the EMA is the average of signal readings received during the warm up window.
+(string, default: `0s`) Duration of EMA warming up window.
+The initial value of the EMA is the average of signal readings received during the warm up window.
 
 </dd>
 </dl>
