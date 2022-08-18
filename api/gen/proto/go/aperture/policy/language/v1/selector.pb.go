@@ -55,21 +55,24 @@ type Selector struct {
 	Service string `protobuf:"bytes,2,opt,name=service,proto3" json:"service,omitempty"`
 	// Describes control point within the entity where the policy should apply to.
 	ControlPoint *ControlPoint `protobuf:"bytes,3,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Allows to add _additional_ condition on labels that must also be satisfied (in addition to service+control point matching).
-	// The label matcher allows to match on infra labels, flow labels and request labels.
-	// Arbitrary label matcher can be used to match infra labels.
-	// For policies, the matcher can be used to match flow labels.
+	// Label matcher allows to add _additional_ condition on labels that must
+	// also be satisfied (in addition to service+control point matching)
 	//
-	// Note: For classification we can only match flow labels that were created at some **previous** control point.
+	// This matcher allows to match on flow labels and request labels.
+	// (Note: For classification we can only match flow labels that were created at
+	// some **previous** control point).
 	//
-	// In case of k8s, infra labels are labels on entities (note: there might exist some additional labels).
-	// Flow label names are always prefixed with `flow_`.
-	// Request labels are always prefixed with `request_`.
-	// Available request labels are `id` (available as `request_id`), `method`, `path`, `host`, `scheme`, `size`, `protocol`.
-	// (mapped from fields of [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
-	// Also, (non-pseudo) headers are available as `request_header_<headername>`.
+	// Flow labels are available with the same label key as defined in
+	// classification rule.
 	//
-	// Note: Request headers are only available for "traffic" control points.
+	// Request labels are always prefixed with `request_`. Available request
+	// labels are `id` (available as `request_id`), `method`, `path`, `host`,
+	// `scheme`, `size`, `protocol` (mapped from fields of
+	// [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
+	// Also, (non-pseudo) headers are available as `request_header_<headername>`, where
+	// `<headername>` is a headername normalised to lowercase, eg. `request_header_user-agent`.
+	//
+	// Note: Request headers are only available for `traffic` control points.
 	LabelMatcher *LabelMatcher `protobuf:"bytes,4,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty"`
 }
 
