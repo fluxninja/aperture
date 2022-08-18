@@ -125,7 +125,6 @@ var _ = Describe("Cache", func() {
 			services, _ := ec.Services()
 			Expect(services).To(HaveLen(1))
 			Expect(services).To(ContainElement(&heartbeatv1.Service{
-				AgentGroup:    "foo",
 				Name:          "baz",
 				EntitiesCount: 2,
 			}))
@@ -138,12 +137,10 @@ var _ = Describe("Cache", func() {
 			services, _ := ec.Services()
 			Expect(services).To(HaveLen(2))
 			Expect(services).To(ContainElement(&heartbeatv1.Service{
-				AgentGroup:    "foo",
 				Name:          "baz1",
 				EntitiesCount: 1,
 			}))
 			Expect(services).To(ContainElement(&heartbeatv1.Service{
-				AgentGroup:    "foo",
 				Name:          "baz2",
 				EntitiesCount: 1,
 			}))
