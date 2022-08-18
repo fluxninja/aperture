@@ -545,7 +545,9 @@ func (x *Port) GetSignalName() string {
 	return ""
 }
 
-// Describes the gradient values which is computed as follows: gradient = (setpoint)/(signal) \* tolerance.
+// Gradient controller
+//
+// Describes the gradient values which is computed as follows $\text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}$.
 // Limits gradient to range [min_gradient, max_gradient].
 // Output: (gradient \* control_variable) + optimize.
 type GradientController struct {
@@ -632,18 +634,31 @@ func (x *GradientController) GetMaxGradient() float64 {
 	return 0
 }
 
-// Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings.
+// Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
+//
 // At any time EMA component operates in one of the following states:
 // 1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
 // If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
 // 2. Normal state: The EMA is computed using following formula.
+//
 // If an invalid reading is received continuously for ema_window during the EMA stage, the last good EMA is emitted and the state gets reset back to Warm up state.
-// The EMA for a series Y is calculated recursively as:
-// EMAt = Y0 , t = 0
-// EMAt = alpha \* Yt + (1 - alpha) \* EMAt-1 , t > 0
-// The coefficient alpha represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.
-// A higher alpha discounts older observations faster.
-// The alpha is computed using ema_window: alpha = 2 / (N + 1). Where, N = ema_window / evalutation_period.
+// The EMA for a series $Y$ is calculated recursively as:
+//
+// $$
+// \text{EMA} _t =
+// \begin{cases}
+//   Y_0, &\text{for } t = 0 \\
+//   \alpha Y_t + (1 - \alpha) \text{EMA} _{t-1}, &\text{for }t > 0
+// \end{cases}
+// $$
+//
+// The coefficient $\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.
+// A higher $\alpha$ discounts older observations faster.
+// The $\alpha$ is computed using ema\_window:
+//
+// $$
+// \alpha = \frac{2}{N + 1} \quad\text{where } N = \text{ema\_window} \over \text{evalutation\_period}
+// $$
 type EMA struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -985,7 +1000,7 @@ func (x *RateLimiter) GetLazySyncConfig() *RateLimiter_LazySyncConfig {
 
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
 // It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-// Concurrency is calculated in terms of total tokens which translate to (avg. latency * inflight requests), i.e. Little's Law.
+// Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
 type ConcurrencyLimiter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1321,7 +1336,8 @@ func (x *Constant) GetValue() float64 {
 }
 
 // Takes an input signal and emits the square root of it multiplied by scale as an output.
-// Sqrt: output = sqrt(input) * scale.
+//
+// $$\text{output} = \text{scale} \sqrt{\text{input}}$$
 type Sqrt struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2424,7 +2440,7 @@ type LoadShedActuator_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Load shedding factor is a fraction of incoming concurrency (tokens * requests) that needs to be dropped.
+	// Load shedding factor is a fraction of incoming concurrency (tokens \* requests) that needs to be dropped.
 	LoadShedFactor *Port `protobuf:"bytes,1,opt,name=load_shed_factor,json=loadShedFactor,proto3" json:"load_shed_factor,omitempty"`
 }
 

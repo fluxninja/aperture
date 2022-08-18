@@ -21,7 +21,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Allows to define rules whether a map of labels should be considered a match or not.
+// Allows to define rules whether a map of labels should be considered a match or not
+//
 // It provides three ways to define requirements:
 // - matchLabels
 // - matchExpressions
