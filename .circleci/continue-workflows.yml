@@ -194,7 +194,7 @@ jobs:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
           command: |
-            gotestsum --format=testname --junitfile unit-tests.xml --rerun-fails=2 --packages="./..." -- -race -coverprofile=coverage.out -coverpkg=./... ./...
+            gotestsum --format=pkgname --junitfile=unit-tests.xml --rerun-fails=2 --packages=$(go list ./... | grep -v gen) -- -coverprofile=coverage.out
             mkdir -p /tmp/test-results
             mv unit-tests.xml /tmp/test-results
       - codecov/upload:
@@ -507,9 +507,7 @@ commands:
     steps:
       - save_cache:
           name: Save ASDF cache
-          key: aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
-            parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
-            "go.mod" }}
+          key: aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
           paths:
             - ~/.asdf
 
