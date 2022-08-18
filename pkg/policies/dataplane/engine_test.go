@@ -6,8 +6,8 @@ import (
 	. "github.com/onsi/gomega"
 	goprom "github.com/prometheus/client_golang/prometheus"
 
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
 	"github.com/fluxninja/aperture/pkg/selectors"
@@ -23,7 +23,7 @@ var _ = Describe("Dataplane Engine", func() {
 		mockLimiter   *mocks.MockLimiter
 		mockFluxmeter *mocks.MockFluxMeter
 
-		selector    *policylangv1.Selector
+		selector    *selectorv1.Selector
 		histogram   goprom.Histogram
 		fluxMeterID iface.FluxMeterID
 		limiterID   iface.LimiterID
@@ -36,11 +36,11 @@ var _ = Describe("Dataplane Engine", func() {
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
 
 		engine = ProvideEngineAPI()
-		selector = &policylangv1.Selector{
+		selector = &selectorv1.Selector{
 			AgentGroup: "default",
 			Service:    "testService.testNamespace.svc.cluster.local",
-			ControlPoint: &policylangv1.ControlPoint{
-				Controlpoint: &policylangv1.ControlPoint_Traffic{Traffic: "ingress"},
+			ControlPoint: &selectorv1.ControlPoint{
+				Controlpoint: &selectorv1.ControlPoint_Traffic{Traffic: "ingress"},
 			},
 		}
 		histogram = goprom.NewHistogram(goprom.HistogramOpts{

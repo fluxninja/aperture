@@ -9,7 +9,8 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	labelmatcherv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/labelmatcher/v1"
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 
 	. "github.com/fluxninja/aperture/pkg/classification"
@@ -35,10 +36,10 @@ var _ = Describe("Classifier", func() {
 	Context("configured with some classification rules", func() {
 		// Classifier with a simple extractor-based rule
 		rs1 := &classificationv1.Classifier{
-			Selector: &policylangv1.Selector{
+			Selector: &selectorv1.Selector{
 				Service: "my-service.default.svc.cluster.local",
-				ControlPoint: &policylangv1.ControlPoint{
-					Controlpoint: &policylangv1.ControlPoint_Traffic{
+				ControlPoint: &selectorv1.ControlPoint{
+					Controlpoint: &selectorv1.ControlPoint_Traffic{
 						Traffic: "ingress",
 					},
 				},
@@ -52,13 +53,13 @@ var _ = Describe("Classifier", func() {
 
 		// Classifier with Raw-rego rule, additionally gated for just "version one"
 		rs2 := &classificationv1.Classifier{
-			Selector: &policylangv1.Selector{
+			Selector: &selectorv1.Selector{
 				Service: "my-service.default.svc.cluster.local",
-				LabelMatcher: &policylangv1.LabelMatcher{
+				LabelMatcher: &labelmatcherv1.LabelMatcher{
 					MatchLabels: map[string]string{"version": "one"},
 				},
-				ControlPoint: &policylangv1.ControlPoint{
-					Controlpoint: &policylangv1.ControlPoint_Traffic{
+				ControlPoint: &selectorv1.ControlPoint{
+					Controlpoint: &selectorv1.ControlPoint_Traffic{
 						Traffic: "ingress",
 					},
 				},
@@ -80,9 +81,9 @@ var _ = Describe("Classifier", func() {
 
 		// Classifier with a no service populated
 		rs3 := &classificationv1.Classifier{
-			Selector: &policylangv1.Selector{
-				ControlPoint: &policylangv1.ControlPoint{
-					Controlpoint: &policylangv1.ControlPoint_Traffic{
+			Selector: &selectorv1.Selector{
+				ControlPoint: &selectorv1.ControlPoint{
+					Controlpoint: &selectorv1.ControlPoint_Traffic{
 						Traffic: "ingress",
 					},
 				},
@@ -223,10 +224,10 @@ var _ = Describe("Classifier", func() {
 	// helper for setting rules with a "default" selector
 	setRulesForMyService := func(labelRules map[string]*classificationv1.Rule) error {
 		_, err := classifier.AddRules(context.TODO(), "test", &classificationv1.Classifier{
-			Selector: &policylangv1.Selector{
+			Selector: &selectorv1.Selector{
 				Service: "my-service.default.svc.cluster.local",
-				ControlPoint: &policylangv1.ControlPoint{
-					Controlpoint: &policylangv1.ControlPoint_Traffic{
+				ControlPoint: &selectorv1.ControlPoint{
+					Controlpoint: &selectorv1.ControlPoint_Traffic{
 						Traffic: "ingress",
 					},
 				},

@@ -6,8 +6,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/panichandler"
@@ -272,7 +272,7 @@ func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []se
 	return mmResult
 }
 
-func (e *Engine) register(key string, selectorProto *policylangv1.Selector, matchedCB multimatcher.MatchCallback[multiMatchResult]) error {
+func (e *Engine) register(key string, selectorProto *selectorv1.Selector, matchedCB multimatcher.MatchCallback[multiMatchResult]) error {
 	e.multiMatchersMutex.Lock()
 	defer e.multiMatchersMutex.Unlock()
 
@@ -295,7 +295,7 @@ func (e *Engine) register(key string, selectorProto *policylangv1.Selector, matc
 	return nil
 }
 
-func (e *Engine) unregister(key string, selectorProto *policylangv1.Selector) error {
+func (e *Engine) unregister(key string, selectorProto *selectorv1.Selector) error {
 	e.multiMatchersMutex.Lock()
 	defer e.multiMatchersMutex.Unlock()
 
