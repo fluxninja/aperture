@@ -45,12 +45,26 @@ definitions:
     title: SentryConfig holds configuration for Sentry.
     type: object
     x-go-package: github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/sentry
+  SentryPluginConfig:
+    properties:
+      sentry_agent_key:
+        description: |-
+          API Key for this agent.
+          Send Agent Key as label to sentry events.
+        type: string
+        x-go-name: SentryAgentKey
+    title: SentryPluginConfig is the configuration for Sentry cloud integration plugin.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/pluginconfig
 info: {}
 paths:
   /sentry_plugin:
     post:
       operationId: SentryPlugin
       parameters:
+      - in: body
+        schema:
+          $ref: '#/definitions/SentryPluginConfig'
       - in: body
         name: sentry
         schema:

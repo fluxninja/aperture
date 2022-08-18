@@ -15,6 +15,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/pluginconfig"
 )
 
 // SentryConfig holds configuration for Sentry.
@@ -66,7 +67,7 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusRegistry *status.Registry, lifecycle fx.Lifecycle) (io.Writer, error) {
+func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusRegistry *status.Registry, p pluginconfig.SentryPluginConfig, lifecycle fx.Lifecycle) (io.Writer, error) {
 	config := constructor.DefaultConfig
 
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
@@ -80,6 +81,7 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 
 	sentryWriter, _ := NewSentryWriter(config)
 	sentryWriter.StatusRegistry = statusRegistry
+	sentryWriter.AgentKey = p.SentryAgentKey
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

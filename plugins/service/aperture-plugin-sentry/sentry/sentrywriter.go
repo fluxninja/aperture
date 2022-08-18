@@ -38,6 +38,7 @@ type SentryWriter struct {
 	Levels         map[zerolog.Level]struct{}
 	CrashWriter    *CrashWriter
 	StatusRegistry *status.Registry
+	AgentKey       string
 }
 
 // Write implements io.Writer and forwards the data to CrashWriter buffer.
@@ -117,6 +118,12 @@ func bytesToStrUnsafe(data []byte) string {
 // SentryPanicHandler is a panic handler that sends the fatal level event to Sentry with diagnostic information.
 func (s *SentryWriter) SentryPanicHandler(e interface{}, stacktrace panichandler.Callstack) {
 	duration, _ := time.ParseDuration(SentryFlushWait)
+
+	// Binds agnet key to the current scope of the sentry and ensures all future
+	// events within the scope will contain the same tag.
+	sentry.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetTag("sentry.agent.key", s.AgentKey)
+	})
 
 	// Crash Log
 	crashLogs := s.CrashWriter.GetCrashLogs()

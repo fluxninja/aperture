@@ -58,6 +58,7 @@
 - [PrometheusConfig](#prometheus-config) – PrometheusConfig holds configuration for Prometheus Server.
 - [ProxyConfig](#proxy-config) – ProxyConfig holds proxy configuration.
 - [SentryConfig](#sentry-config) – SentryConfig holds configuration for Sentry.
+- [SentryPluginConfig](#sentry-plugin-config) – SentryPluginConfig is the configuration for Sentry cloud integration plugin.
 - [ServerTLSConfig](#server-tls-config) – ServerTLSConfig holds configuration for setting up server TLS support.
 - [WatchdogConfig](#watchdog-config) – WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
 - [WatchdogPolicyType](#watchdog-policy-type) – WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
@@ -355,6 +356,14 @@ Env-Var Prefix: `APERTURE_AGENT_SENTRY_PLUGIN_`
 #### Members
 
 <dl>
+
+<dt></dt>
+<dd>
+
+Env-Var Prefix: `APERTURE_AGENT_SENTRY_PLUGIN_`
+Type: [SentryPluginConfig](#sentry-plugin-config)
+
+</dd>
 
 <dt>sentry</dt>
 <dd>
@@ -1503,6 +1512,22 @@ oss-aperture project dsn is set as default.
 <dd>
 
 (float64, default: `0.2`) Sample rate for sampling traces i.e. 0.0 to 1.0
+
+</dd>
+</dl>
+
+### <span id="sentry-plugin-config"></span> SentryPluginConfig
+
+SentryPluginConfig is the configuration for Sentry cloud integration plugin.
+
+#### Properties
+
+<dl>
+<dt>sentry_agent_key</dt>
+<dd>
+
+(string) API Key for this agent.
+Send Agent Key as label to sentry events.
 
 </dd>
 </dl>
