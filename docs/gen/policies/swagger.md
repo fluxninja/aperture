@@ -1498,7 +1498,7 @@ Weighted Fair Queuing based workload scheduler.
 <dt>auto_tokens</dt>
 <dd>
 
-(bool)
+(bool, default: `true`)
 
 </dd>
 </dl>
@@ -1567,8 +1567,7 @@ Example:
 
 ```yaml
 selector:
-  namespace: default
-  service: service1
+  service: service1.default.svc.cluster.local
   control_point:
     traffic: ingress # Allowed values are `ingress` and `egress`.
   label_matcher:
@@ -1606,7 +1605,7 @@ selector:
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).
+([V1LabelMatcher](#v1-label-matcher)) Allows to add _additional_ condition on labels that must also be satisfied (in addition to service+control point matching).
 The label matcher allows to match on infra labels, flow labels and request labels.
 Arbitrary label matcher can be used to match infra labels.
 For flowcontrol policies, the matcher can be used to match flow labels.

@@ -377,25 +377,25 @@ type PathTemplateMatcher struct {
 
 	// Template value keys are OpenAPI-inspired path templates.
 	//
-	// Examples:
-	// ```
-	// /register
-	// /users/{user_id}
-	// /static/*
-	// ```
-	//
-	// * Static path segment `/foo` matches a path segment exactly.
+	// * Static path segment `/foo` matches a path segment exactly
 	// * `/{param}` matches arbitrary path segment.
-	// (The param name is ignored and can be omitted (`{}`))
+	//   (The param name is ignored and can be omitted (`{}`))
 	// * The parameter must cover whole segment.
 	// * Additionally, path template can end with `/*` wildcard to match
-	// arbitrary number of trailing segments (0 or more).
+	//   arbitrary number of trailing segments (0 or more).
 	// * Multiple consecutive `/` are ignored, as well as trailing `/`.
 	// * Parametrized path segments must come after static segments.
 	// * `*`, if present, must come last.
-	// * Most specific template \"wins\" (`/foo` over `/{}` and `/{}` over `/*`).
+	// * Most specific template "wins" (`/foo` over `/{}` and `/{}` over `/*`).
 	//
-	// See also <https://swagger.io/specification/#path-templating-matching>"
+	// See also <https://swagger.io/specification/#path-templating-matching>
+	//
+	// Example:
+	// ```yaml
+	// /register: register
+	// "/user/{userId}": user
+	// /static/*: other
+	// ```
 	TemplateValues map[string]string `protobuf:"bytes,1,rep,name=template_values,json=templateValues,proto3" json:"template_values,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 

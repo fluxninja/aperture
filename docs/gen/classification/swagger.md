@@ -162,8 +162,7 @@ Example:
 
 ```yaml
 selector:
-  namespace: default
-  service: service1
+  service: service1.default.svc.cluster.local
   control_point:
     traffic: ingress
 rules:
@@ -568,15 +567,7 @@ In case of multiple path templates matching, the most specific one will be chose
 
 (map of string) Template value keys are OpenAPI-inspired path templates.
 
-Examples:
-
-```
-/register
-/users/{user_id}
-/static/*
-```
-
-- Static path segment `/foo` matches a path segment exactly.
+- Static path segment `/foo` matches a path segment exactly
 - `/{param}` matches arbitrary path segment.
   (The param name is ignored and can be omitted (`{}`))
 - The parameter must cover whole segment.
@@ -585,9 +576,17 @@ Examples:
 - Multiple consecutive `/` are ignored, as well as trailing `/`.
 - Parametrized path segments must come after static segments.
 - `*`, if present, must come last.
-- Most specific template \"wins\" (`/foo` over `/{}` and `/{}` over `/*`).
+- Most specific template "wins" (`/foo` over `/{}` and `/{}` over `/*`).
 
-See also <https://swagger.io/specification/#path-templating-matching>"
+See also <https://swagger.io/specification/#path-templating-matching>
+
+Example:
+
+```yaml
+/register: register
+"/user/{userId}": user
+/static/*: other
+```
 
 </dd>
 </dl>
@@ -678,8 +677,7 @@ Example:
 
 ```yaml
 selector:
-  namespace: default
-  service: service1
+  service: service1.default.svc.cluster.local
   control_point:
     traffic: ingress # Allowed values are `ingress` and `egress`.
   label_matcher:
@@ -717,7 +715,7 @@ selector:
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).
+([V1LabelMatcher](#v1-label-matcher)) Allows to add _additional_ condition on labels that must also be satisfied (in addition to service+control point matching).
 The label matcher allows to match on infra labels, flow labels and request labels.
 Arbitrary label matcher can be used to match infra labels.
 For flowcontrol policies, the matcher can be used to match flow labels.

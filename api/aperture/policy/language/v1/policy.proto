@@ -514,8 +514,8 @@ message Scheduler {
     // Higher numbers means higher priority level.
     uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
-        key: "x-go-validate";
-        value {
+        key: "x-go-validate"
+        value: {
           string_value: "gte=0,lte=255"
         }
       }
@@ -569,7 +569,14 @@ message Scheduler {
   // Selector decides for which service or flows the scheduler will be applied.
   Selector selector = 2;
 
-  bool auto_tokens = 3; // @gotags: default:"true"
+  bool auto_tokens = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {
+        string_value: "true"
+      }
+    }
+  }]; // @gotags: default:"true"
 
   Workload default_workload = 4;
   // list of workloads

@@ -26,8 +26,7 @@ const (
 // Example:
 // ```yaml
 // selector:
-//   namespace: default
-//   service: service1
+//   service: service1.default.svc.cluster.local
 //   control_point:
 //     traffic: ingress # Allowed values are `ingress` and `egress`.
 //   label_matcher:
@@ -56,7 +55,7 @@ type Selector struct {
 	Service string `protobuf:"bytes,2,opt,name=service,proto3" json:"service,omitempty"`
 	// Describes control point within the entity where the policy should apply to.
 	ControlPoint *ControlPoint `protobuf:"bytes,3,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).
+	// Allows to add _additional_ condition on labels that must also be satisfied (in addition to service+control point matching).
 	// The label matcher allows to match on infra labels, flow labels and request labels.
 	// Arbitrary label matcher can be used to match infra labels.
 	// For policies, the matcher can be used to match flow labels.

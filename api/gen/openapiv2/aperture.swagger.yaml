@@ -602,8 +602,7 @@ definitions:
       Example:
       ```yaml
       selector:
-        namespace: default
-        service: service1
+        service: service1.default.svc.cluster.local
         control_point:
           traffic: ingress
       rules:
@@ -1269,25 +1268,25 @@ definitions:
         description: |-
           Template value keys are OpenAPI-inspired path templates.
 
-          Examples:
-          ```
-          /register
-          /users/{user_id}
-          /static/*
-          ```
-
-          * Static path segment `/foo` matches a path segment exactly.
+          * Static path segment `/foo` matches a path segment exactly
           * `/{param}` matches arbitrary path segment.
-          (The param name is ignored and can be omitted (`{}`))
+            (The param name is ignored and can be omitted (`{}`))
           * The parameter must cover whole segment.
           * Additionally, path template can end with `/*` wildcard to match
-          arbitrary number of trailing segments (0 or more).
+            arbitrary number of trailing segments (0 or more).
           * Multiple consecutive `/` are ignored, as well as trailing `/`.
           * Parametrized path segments must come after static segments.
           * `*`, if present, must come last.
-          * Most specific template \"wins\" (`/foo` over `/{}` and `/{}` over `/*`).
+          * Most specific template "wins" (`/foo` over `/{}` and `/{}` over `/*`).
 
-          See also <https://swagger.io/specification/#path-templating-matching>"
+          See also <https://swagger.io/specification/#path-templating-matching>
+
+          Example:
+          ```yaml
+          /register: register
+          "/user/{userId}": user
+          /static/*: other
+          ```
     description: |-
       Matches HTTP Path to given path templates.
       HTTP path will be matched against given path templates.
@@ -1456,6 +1455,7 @@ definitions:
     properties:
       auto_tokens:
         type: boolean
+        x-go-default: "true"
       default_workload:
         $ref: '#/definitions/SchedulerWorkload'
       out_ports:
@@ -1496,7 +1496,7 @@ definitions:
       label_matcher:
         $ref: '#/definitions/v1LabelMatcher'
         description: |-
-          Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).
+          Allows to add _additional_ condition on labels that must also be satisfied (in addition to service+control point matching).
           The label matcher allows to match on infra labels, flow labels and request labels.
           Arbitrary label matcher can be used to match infra labels.
           For policies, the matcher can be used to match flow labels.
@@ -1524,8 +1524,7 @@ definitions:
       Example:
       ```yaml
       selector:
-        namespace: default
-        service: service1
+        service: service1.default.svc.cluster.local
         control_point:
           traffic: ingress # Allowed values are `ingress` and `egress`.
         label_matcher:
