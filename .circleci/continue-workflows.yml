@@ -194,7 +194,7 @@ jobs:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
           command: |
-            gotestsum --format=pkgname --junitfile=unit-tests.xml --rerun-fails=2 --packages=$(go list ./... | grep -v gen) -- -race -coverprofile=coverage.out -coverpkg=./...
+            gotestsum --format=pkgname --junitfile=unit-tests.xml --rerun-fails=2 --packages=$(go list ./... | grep -v gen) -- -coverprofile=coverage.out
             mkdir -p /tmp/test-results
             mv unit-tests.xml /tmp/test-results
       - codecov/upload:
