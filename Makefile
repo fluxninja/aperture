@@ -15,7 +15,7 @@ go-mod-tidy:
 
 go-test:
 	@echo Running go tests
-	gotestsum --format=testname
+	gotestsum --format=pkgname
 	@cd ./pkg/watchdog && go test -v ./...
 
 go-lint:

@@ -42,13 +42,11 @@ jobs:
     parameters:
       attach-workspace:
         type: boolean
-        description:
-          Boolean for whether or not to attach to an existing workspace
+        description: Boolean for whether or not to attach to an existing workspace
         default: false
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to .
+        description: Path to the directory containing your build context, defaults to .
         default: .
       dockerfile:
         type: string
@@ -77,8 +75,7 @@ jobs:
         description: A name for the image pushed to GCR
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to .
+        description: Path to the directory containing your Dockerfile, defaults to .
         default: .
       remote-docker-version:
         type: string
@@ -197,10 +194,11 @@ jobs:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
           command: |
-            gotestsum --format=testname --junitfile unit-tests.xml --rerun-fails=2 --packages="./..." -- -race -coverprofile=coverage.out -coverpkg=./... ./...
+            gotestsum --format=pkgname --junitfile=unit-tests.xml --rerun-fails=2 --packages=$(go list ./... | grep -v gen) -- -coverprofile=coverage.out
             mkdir -p /tmp/test-results
             mv unit-tests.xml /tmp/test-results
-      - codecov/upload
+      - codecov/upload:
+          file: coverage.out
       - store_test_results:
           path: /tmp/test-results
       - run:
@@ -296,15 +294,13 @@ jobs:
           when: on_success
       - save_cache:
           name: Save pre-commit cache
-          key:
-            aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
+          key: aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
             - ~/.cache/pre-commit
       - asdf_save_cache:
           cache_name: pre-commit
       - run:
-          name:
-            Show diff and assert pre-commit didn't create any non-ignored files
+          name: Show diff and assert pre-commit didn't create any non-ignored files
           command: |
             git status
             git add .
@@ -464,8 +460,7 @@ workflows:
           <<: *push_deployment_code_job
           name: preview-deployment-changes
           dry-run: true
-          task-name:
-            "Preview changes between aperture.git and deployment repository"
+          task-name: "Preview changes between aperture.git and deployment repository"
 
 commands:
   asdf_install:
@@ -512,10 +507,7 @@ commands:
     steps:
       - save_cache:
           name: Save ASDF cache
-          key:
-            aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
-            parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
-            "go.mod" }}
+          key: aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
           paths:
             - ~/.asdf
 
