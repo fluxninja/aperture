@@ -37,10 +37,10 @@ func (sk ServiceKey) lessThan(sk2 ServiceKey) bool {
 	return sk.AgentGroup < sk2.AgentGroup
 }
 
-// KeyFromService returns a service key for given service.
-func KeyFromService(service *heartbeatv1.Service) *ServiceKey {
+// keyFromService returns a service key for given service.
+func (c *EntityCache) keyFromService(service *heartbeatv1.Service) *ServiceKey {
 	return &ServiceKey{
-		AgentGroup: service.AgentGroup,
+		AgentGroup: c.agentGroup,
 		Name:       service.Name,
 	}
 }
@@ -280,7 +280,7 @@ func (c *EntityCache) Services() ([]*heartbeatv1.Service, []*heartbeatv1.Overlap
 		}
 		var serviceKeys []ServiceKey
 		for _, es := range entityServices {
-			key := *KeyFromService(es)
+			key := *c.keyFromService(es)
 			serviceKeys = append(serviceKeys, key)
 			if _, ok := services[key]; !ok {
 				services[key] = es
@@ -301,14 +301,8 @@ func (c *EntityCache) Services() ([]*heartbeatv1.Service, []*heartbeatv1.Overlap
 	retOverlapping := make([]*heartbeatv1.OverlappingService, 0, len(overlapping))
 	for k, v := range overlapping {
 		retOverlapping = append(retOverlapping, &heartbeatv1.OverlappingService{
-			Service1: &heartbeatv1.ServiceKey{
-				AgentGroup: k.x.AgentGroup,
-				Name:       k.x.Name,
-			},
-			Service2: &heartbeatv1.ServiceKey{
-				AgentGroup: k.y.AgentGroup,
-				Name:       k.y.Name,
-			},
+			Service1:      k.x.Name,
+			Service2:      k.y.Name,
 			EntitiesCount: int32(v),
 		})
 	}
@@ -375,7 +369,6 @@ func servicesFromEntity(entity *Entity) ([]*heartbeatv1.Service, error) {
 	svcs := make([]*heartbeatv1.Service, 0, len(svcIDs))
 	for _, svc := range svcIDs {
 		svcs = append(svcs, &heartbeatv1.Service{
-			AgentGroup:    entity.AgentGroup,
 			Name:          svc.Service,
 			EntitiesCount: 1,
 		})

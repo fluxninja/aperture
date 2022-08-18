@@ -40,9 +40,8 @@ message Services {
 // Service contains information about single service discovered in agent group by a
 // particular agent.
 message Service {
-  string agent_group = 1;
-  string name = 2;
-  int32 entities_count = 3;
+  string name = 1;
+  int32 entities_count = 2;
 }
 
 message OverlappingServices {
@@ -51,14 +50,9 @@ message OverlappingServices {
 
 // OverlappingService contains info about a service that overlaps with another one.
 message OverlappingService {
-  ServiceKey service1 = 1;
-  ServiceKey service2 = 2;
+  string service1 = 1;
+  string service2 = 2;
   int32 entities_count = 3;
-}
-
-message ServiceKey {
-  string agent_group = 1;
-  string name = 2;
 }
 
 message ControllerInfo {
