@@ -1105,6 +1105,14 @@ KubernetesDiscoveryConfig for Kubernetes service discovery.
 #### Properties
 
 <dl>
+<dt>discovery_enabled</dt>
+<dd>
+
+(bool)
+
+</dd>
+</dl>
+<dl>
 <dt>node_name</dt>
 <dd>
 
@@ -1117,14 +1125,6 @@ KubernetesDiscoveryConfig for Kubernetes service discovery.
 <dd>
 
 (string)
-
-</dd>
-</dl>
-<dl>
-<dt>sidecar_mode</dt>
-<dd>
-
-(bool)
 
 </dd>
 </dl>

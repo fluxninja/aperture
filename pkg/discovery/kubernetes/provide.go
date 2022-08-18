@@ -19,9 +19,9 @@ var configKey = common.DiscoveryConfigKey + ".kubernetes"
 // swagger:model
 type KubernetesDiscoveryConfig struct {
 	// NodeName is the name of the k8s node the agent should be monitoring
-	NodeName    string `json:"node_name"`
-	PodName     string `json:"pod_name"`
-	SidecarMode bool   `json:"sidecar_mode"`
+	NodeName         string `json:"node_name"`
+	PodName          string `json:"pod_name"`
+	DiscoveryEnabled bool   `json:"discovery_enabled"`
 }
 
 // FxIn describes parameters passed to k8s discovery constructor.
@@ -42,7 +42,7 @@ func InvokeKubernetesServiceDiscovery(in FxIn) error {
 		return err
 	}
 
-	if !cfg.SidecarMode {
+	if cfg.DiscoveryEnabled {
 		kd, err := newKubernetesServiceDiscovery(in.EntityTrackers, cfg.NodeName, in.KubernetesClient)
 		if err != nil {
 			log.Info().Err(err).Msg("Failed to create Kubernetes discovery service")
@@ -60,7 +60,7 @@ func InvokeKubernetesServiceDiscovery(in FxIn) error {
 			},
 		})
 	} else {
-		log.Info().Msg("Operating in sidecar mode. Skipping Kubernetes discovery service creation")
+		log.Info().Msg("Skipping Kubernetes discovery service creation")
 	}
 
 	return nil
