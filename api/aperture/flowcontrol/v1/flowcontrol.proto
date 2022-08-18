@@ -5,7 +5,7 @@ package aperture.flowcontrol.v1;
 // FlowControlService is used to perform Flow Control operations.
 service FlowControlService {
   // Check wraps the given arbitrary resource and matches the given labels
-  // against Flow Control Limiters to makes a decision whether to allow/deny
+  // against Flow Control Limiters to makes a decision whether to allow/deny.
   rpc Check(CheckRequest) returns (CheckResponse) {}
 }
 

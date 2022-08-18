@@ -4,156 +4,140 @@ package aperture.policy.language.v1;
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 
+// Allows to define rules whether a map of labels should be considered a match or not.
+// It provides three ways to define requirements:
+// - matchLabels
+// - matchExpressions
+// - arbitrary expression
+//
+// If multiple requirements are set, they are all ANDed.
+// An empty label matcher always matches.
 message LabelMatcher {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Allows to define rules whether a map of labels should be considered a match or not.\nIt provides three ways to define requirements:\n- matchLabels\n- matchExpressions\n- arbitrary expression\n\nIf multiple requirements are set, they are all ANDed.\nAn empty label matcher always matches."
-    }
-  };
+  // A map of {key,value} pairs representing labels to be matched.
+  // A single {key,value} in the matchLabels requires that the label "key" is present and equal to "value".
+  //
+  // Note: The requirements are ANDed.
+  map<string, string> match_labels = 1;
 
-  map<string, string> match_labels = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "A map of {key,value} pairs representing labels to be matched.\nA single {key,value} in the matchLabels requires that the label \"key\" is present and equal to \"value\".\n\nNote: The requirements are ANDed."
-  }];
+  // List of k8s-style label matcher requirements.
+  //
+  // Note: The requirements are ANDed.
+  repeated K8sLabelMatcherRequirement match_expressions = 2;
 
-  repeated K8sLabelMatcherRequirement match_expressions = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "List of k8s-style label matcher requirements.\n\nNote: The requirements are ANDed."
-  }];
-
-  MatchExpression expression = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "An arbitrary expression to be evaluated on the labels."
-  }];
+  // An arbitrary expression to be evaluated on the labels.
+  MatchExpression expression = 3;
 }
 
+// Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
 message K8sLabelMatcherRequirement {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values."
-    }
-  };
-
+  // Label key that the selector applies to.
   string key = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Label key that the selector applies to."
     extensions: {
-      key: "x-go-validate";
-      value {
+      key: "x-go-validate"
+      value: {
         string_value: "required"
       }
     }
   }]; // @gotags: validate:"required"
 
+  // Logical operator which represents a key's relationship to a set of values.
+  // Valid operators are In, NotIn, Exists and DoesNotExist.
   string operator = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist."
     extensions: {
-      key: "x-go-validate";
-      value {
+      key: "x-go-validate"
+      value: {
         string_value: "oneof=In NotIn Exists DoesNotExists"
       }
     }
   }]; // @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
 
-  repeated string values = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "An array of string values that relates to the key by an operator.\nIf the operator is In or NotIn, the values array must be non-empty.\nIf the operator is Exists or DoesNotExist, the values array must be empty."
-  }];
+  // An array of string values that relates to the key by an operator.
+  // If the operator is In or NotIn, the values array must be non-empty.
+  // If the operator is Exists or DoesNotExist, the values array must be empty.
+  repeated string values = 3;
 }
 
+// Defines a [map<string, string> → bool] expression to be evaluated on labels.
+// MatchExpression has multiple variants, exactly one should be set.
+//
+// Example:
+// ```yaml
+// all:
+//   of:
+//     - label_exists: foo
+//     - label_equals: { label = app, value = frobnicator }
+// ```
 message MatchExpression {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Defines a [map<string, string> →\u00a0bool] expression to be evaluated on labels.\nMatchExpression has multiple variants, exactly one should be set."
-    }
-    example: "{\"'yaml\":{\"all\": {\"of\": [\"label_exists: foo\", \"label_equals: { label = app, value = frobnicator }\"]}}}"
-  };
-
+  // List of MatchExpressions that is used for all/any matching.
+  // eg. {any: {of: [expr1, expr2]}}.
   message List {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-      json_schema: {
-        description: "List of MatchExpressions that is used for all/any matching.\neg. {any: {of: [expr1, expr2]}}."
-      }
-    };
-
-    repeated MatchExpression of = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "List of subexpressions of the match expression."
-    }];
+    // List of subexpressions of the match expression.
+    repeated MatchExpression of = 1;
   }
 
   // @gotags: validate:"required"
   oneof variant {
-    MatchExpression not = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression negates the result of subexpression."
-    }];
+    // The expression negates the result of subexpression.
+    MatchExpression not = 1;
 
-    List all = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression is true when all subexpressions are true."
-    }];
+    // The expression is true when all subexpressions are true.
+    List all = 2;
 
-    List any = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression is true when any subexpression is true."
-    }];
+    // The expression is true when any subexpression is true.
+    List any = 3;
 
+    // The expression is true when label with given name exists.
     string label_exists = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression is true when label with given name exists."
       extensions: {
-        key: "x-go-validate";
-        value {
+        key: "x-go-validate"
+        value: {
           string_value: "required"
         }
       }
     }]; // @gotags: validate:"required"
 
-    EqualsMatchExpression label_equals = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression is true when label value equals given value."
-    }];
+    // The expression is true when label value equals given value.
+    EqualsMatchExpression label_equals = 5;
 
-    MatchesMatchExpression label_matches = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The expression is true when label matches given regex."
-    }];
+    // The expression is true when label matches given regex.
+    MatchesMatchExpression label_matches = 6;
   }
 }
 
+// Label selector expression of the equal form "label == value".
 message EqualsMatchExpression {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Label selector expression of the equal form \"label == value\"."
-    }
-  };
-
+  // Name of the label to equal match the value.
   string label = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Name of the label to equal match the value."
     extensions: {
-      key: "x-go-validate";
-      value {
+      key: "x-go-validate"
+      value: {
         string_value: "required"
       }
     }
   }]; // @gotags: validate:"required"
 
-  string value = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Exact value that the label should be equal to."
-  }];
+  // Exact value that the label should be equal to.
+  string value = 2;
 }
 
+// Label selector expression of the matches form "label matches regex".
 message MatchesMatchExpression {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Label selector expression of the matches form \"label matches regex\"."
-    }
-  };
-
+  // Name of the label to match the regular expression.
   string label = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Name of the label to match the regular expression."
     extensions: {
-      key: "x-go-validate";
-      value {
+      key: "x-go-validate"
+      value: {
         string_value: "required"
       }
     }
   }]; // @gotags: validate:"required"
 
+  // Regular expression that should match the label value.
+  // It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
   string regex = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    description: "Regular expression that should match the label value.\nIt uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax)."
     extensions: {
-      key: "x-go-validate";
-      value {
+      key: "x-go-validate"
+      value: {
         string_value: "required"
       }
     }

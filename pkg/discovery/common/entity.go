@@ -6,4 +6,5 @@ type Entity struct {
 	Services  []string `json:"service"`
 	Prefix    string   `json:"prefix"`
 	UID       string   `json:"uid"`
+	Name      string   `json:"name"`
 }

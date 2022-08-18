@@ -58,6 +58,7 @@ func (sd *StaticDiscovery) entitiesFromConfig() map[string]*common.Entity {
 					Prefix:    e.Prefix,
 					UID:       e.UID,
 					Services:  nil,
+					Name:      e.Name,
 				}
 				entities[key] = entity
 			}
