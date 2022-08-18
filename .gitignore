@@ -51,3 +51,6 @@ Sessionx.vim
 tags
 # Persistent undo
 [._]*.un~
+
+### Symlinks
+manifests/aperture-operator

@@ -17,6 +17,20 @@ SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands
 GLOBAL_STATE = {}
 GLOBAL_RAN_TANKA_DEPS_KEY = "RAN_TANKA_DEPS"
 
+def check_external_repos_config():
+    """
+    Checks if environment is properly configured to work with external Aperture-Operator
+    repositories, by:
+    1. checking repo links:
+        * manifests/aperture-operator -> github.com/fluxninja/aperture-operator repo location
+    """
+    path = ("../aperture-operator", "github.com/fluxninja/aperture-operator")
+    if not os.path.exists(path[0]):
+        fail('path %s does not exist. It should be a symlink to %s repo' % path)
+
+# We need to do this check before DEP_TREE is created
+check_external_repos_config()
+
 # Dependency tree and service configuration.
 # Top level maps NAMESPACE to services
 # Services are a mapping of service name to their config, which consists of:
@@ -65,8 +79,7 @@ DEP_TREE = {
         },
         "agent": {
             "labels": ["Aperture"],
-            "tkenv": "tanka/environments/tilt/apps/agent",
-            "resource_deps": ["ingestion-service", "kafka", "agent-service"],
+            "tkenv": "tanka/environments/tilt/apps/aperture-operator",
             "images": [
                 {
                     "ref": "aperture-agent",
@@ -79,77 +92,76 @@ DEP_TREE = {
                     "context": "./",
                     "dockerfile": "cmd/aperture-controller/Dockerfile",
                     "ssh": "default",
+                },
+                {
+                    "ref": "aperture-operator",
+                    "context": "manifests/aperture-operator/",
+                    "dockerfile": "./Dockerfile",
+                    "ssh": "default",
                 }
             ],
             "port_forwards": {
-                "agent-aperture-agent": "8089:80",
-                "agent-aperture-controller": "8087:80",
-                "agent-prometheus-server": "9090:9090",
-                "agent-etcd": "2379:2379",
+                "aperture-prometheus-server": "9090:9090",
+                "aperture-etcd": "2379:2379",
             },
             "pvc_selectors": ["app.kubernetes.io/name=etcd"],
             "child_resources": [
                 {
-                    "workload": "agent-aperture-agent",
-                    "new_name": "aperture-agent",
-                    "resource_deps": ["cluster-bootstrap", "agent-etcd", "agent-bootstrap"],
-                    "extra_objects": [
-                        "agent-cm-validator:validatingwebhookconfiguration",
-                        ("^agent-aperture-agent", None),
-                    ],
-                    "ignored_objects": [
-                        ("^agent-aperture-agent$", "Service|DaemonSet|Secret")
-                    ]
-                },
-                {
-                    "workload": "agent-aperture-controller",
-                    "new_name": "aperture-controller",
-                    "resource_deps": ["cluster-bootstrap", "agent-etcd", "agent-bootstrap"],
-                    "extra_objects": [
-                        ("^agent-aperture-controller", None),
-
-                    ],
-                    "ignored_objects": [
-                        ("^agent-aperture-controller$", "Service|Deployment|Secret")
-                    ]
-                },
-                {
-                    "workload": "agent-etcd",
+                    "new_name": "aperture-operator-bootstrap",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
-                        ("^agent-etcd", None),
-                    ],
-                    "ignored_objects": [
-                        ("^agent-etcd", "Service|StatefulSet"),
+                        "apertures.aperture.tech:customresourcedefinition"
                     ]
                 },
                 {
-                    "workload": "agent-prometheus-server",
-                    "new_name": "agent-prometheus",
-                    "resource_deps": ["cluster-bootstrap"],
-                    "extra_objects": [
-                        ("^agent-prometheus", None),
-                    ],
-                    "ignored_objects": [
-                        ("^agent-prometheus", "Service|Deployment"),
-                        "agent-prometheus:grafanadatasource"
+                    "workload": "aperture",
+                    "resource_deps": ["aperture-etcd", "aperture-aperture-operator"],
+                    "extra_pod_selectors": [
+                        {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
+                        {'app.kubernetes.io/component':  'controller', 'app.kubernetes.io/managed-by': 'aperture-operator'}
                     ]
                 },
                 {
-                    "workload": "agent-kube-state-metrics",
-                    "resource_deps": ["cluster-bootstrap"],
+                    "workload": "aperture-aperture-operator",
+                    "resource_deps": ["aperture-operator-bootstrap"],
                     "extra_objects": [
-                        ("^agent-kube-state-metrics", None),
+                        ("^aperture-aperture-operator", "Role|RoleBinding|ServiceAccount", APERTURE_SYSTEM_NS),
+                        ("^aperture-aperture-operator", "ClusterRole|ClusterRoleBinding"),
                     ],
                     "ignored_objects": [
-                        ("^agent-kube-state-metrics$", "Service|Deployment", APERTURE_SYSTEM_NS),
+                        ("^aperture-aperture-operator", "Service|Deployment", APERTURE_SYSTEM_NS),
                     ]
                 },
                 {
-                    "new_name": "agent-bootstrap",
+                    "workload": "aperture-etcd",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
-                        ("^agent-aperture$", "ClusterRole|ClusterRoleBinding")
+                        ("^aperture-etcd", None),
+                    ],
+                    "ignored_objects": [
+                        ("^aperture-etcd", "Service|StatefulSet")
+                    ]
+                },
+                {
+                    "workload": "aperture-prometheus-server",
+                    "new_name": "aperture-prometheus",
+                    "resource_deps": ["cluster-bootstrap"],
+                    "extra_objects": [
+                        ("^aperture-prometheus", None),
+                    ],
+                    "ignored_objects": [
+                        ("^aperture-prometheus", "Service|Deployment"),
+                        "aperture-prometheus:grafanadatasource"
+                    ]
+                },
+                {
+                    "workload": "aperture-kube-state-metrics",
+                    "resource_deps": ["cluster-bootstrap"],
+                    "extra_objects": [
+                        ("^aperture-kube-state-metrics", None),
+                    ],
+                    "ignored_objects": [
+                        ("^aperture-kube-state-metrics", "Service|Deployment", APERTURE_SYSTEM_NS),
                     ]
                 },
                 {
@@ -157,9 +169,9 @@ DEP_TREE = {
                     "extra_objects": [
                         "istio:configmap",
                         "aperture-envoy-filter:envoyfilter",
-                        "istio-validator-aperture-system:validatingwebhookconfiguration",
+                        "istio-validator-%s:validatingwebhookconfiguration" % APERTURE_SYSTEM_NS,
                         ("istio.io$", "customresourcedefinition"),
-                        (None, "EnvoyFilter", "aperture-system"),
+                        (None, "EnvoyFilter", APERTURE_SYSTEM_NS),
                         ("^istio-reader", None),
                         ("^istio-sidecar", None),
                     ]
@@ -193,7 +205,7 @@ DEP_TREE = {
                     "ignored_objects": [
                         ("^istio-ingressgateway", "Service|Deployment")
                     ]
-                }
+                },
             ]
         }
     }
@@ -274,6 +286,12 @@ def wrapped_k8s_yaml(yaml, allow_duplicates=False):
 
     k8s_yaml(yaml, allow_duplicates)
 
+    for i in range(0, len(objects)):
+        if objects[i]["kind"] == "Aperture":
+            k8s_kind("Aperture", image_object={'json_path': '{.spec.agent.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait')
+            k8s_kind("Aperture", image_object={'json_path': '{.spec.controller.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait')
+
+
 
 def render_tanka(environment, env_vars):
     print(
@@ -293,7 +311,7 @@ def render_tanka(environment, env_vars):
         local(command=["jb", "install"], dir=base_dir)
 
         # Refreshing the dependencies for the Agent chart
-        local(command=["helm", "dependency", "update"], dir=base_dir + "charts/agent")
+        local(command=["helm", "dependency", "update"], dir=base_dir + "charts/aperture-operator")
 
         # Fetch any vendored charts that are not included in our repository
         local(command=[TANKA, "tool", "charts", "vendor"], dir=base_dir)
@@ -554,13 +572,12 @@ def resolve_objects(included_matchers, ignored_matchers):
 
 def forward_port_delayed(workload, labels, resource_deps, namespace, service, local_port, remote_port):
     cmd = "kubectl port-forward -n %s svc/%s %s:%s" % (namespace, service, local_port, remote_port)
-    remote_port = ":%s" % remote_port
     local_resource(
         name=workload,
         labels=labels,
         resource_deps=resource_deps,
         serve_cmd='while sleep 3; do %s; done' % cmd,
-        readiness_probe=probe(exec=exec_action(['lsof', '-i', remote_port])), # Treat as success if some process listens on this port
+        readiness_probe=probe(exec=exec_action(['lsof', '-i', ":%s" % local_port])), # Treat as success if some process listens on this port
     )
 
 
@@ -673,11 +690,18 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
             k8s_resource(**child)
 
     if "aperture-grafana" in resources:
-        forward_port_delayed(workload="aperture-grafana-forward", namespace="aperture-system", labels=["Aperture"],
+        forward_port_delayed(workload="aperture-grafana-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
                           resource_deps=["aperture-grafana"], service="aperture-grafana", local_port=3000, remote_port=3000)
 
+    if "agent" in resources:
+        forward_port_delayed(workload="aperture-agent-port-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
+                        resource_deps=["aperture"], service="aperture-agent", local_port=8089, remote_port=80)
+        forward_port_delayed(workload="aperture-controller-port-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
+                        resource_deps=["aperture"], service="aperture-controller", local_port=8087, remote_port=80)
 
     if config.tilt_subcommand == "down":
+        if "agent" in resources:
+            local('if (kubectl get aperture aperture -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete aperture aperture -n {0};  fi'.format(APERTURE_SYSTEM_NS))
         for resource_name in resources:
             resource = inv_dep_tree[resource_name]
             pvc_selectors = resource.get("pvc_selectors", [])
@@ -726,9 +750,15 @@ resources = get_resource_list_to_deploy(to_run, run_only_listed, DEP_TREE, inver
 
 print("Will deploy resources:", ", ".join(resources))
 
-# Watch charts and secrets
-watch_file("./")
-watch_file("../charts/")
+# Watch charts and code
+watch_file("Tiltfile")
+watch_file("./tanka/environments/")
+watch_file("./tanka/lib/")
+watch_file("../tanka/charts/")
+watch_file("../../api/")
+watch_file("../../cmd/")
+watch_file("../../pkg/")
+watch_file("../../plugins/")
 
 cmd_button(
     'classification-1-demoapp',
