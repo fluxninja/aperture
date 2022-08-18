@@ -125,8 +125,7 @@ func (x *AllRules) GetAllRules() map[string]*Classifier {
 // Example:
 // ```yaml
 // selector:
-//   namespace: default
-//   service: service1
+//   service: service1.default.svc.cluster.local
 //   control_point:
 //     traffic: ingress
 // rules:

@@ -20,13 +20,14 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 			},
 			AgentGroup: "fooGroup",
 			Services:   []string{"fooSvc1", "fooSvc2"},
+			EntityName: "someName",
 		})
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		md := metricsFromLabels(map[string]string{
 			"preserve":    "this",
-			"entity_name": "testPrefix-1",
+			"entity_name": "someName",
 		})
 		md, err := processor.ConsumeMetrics(context.TODO(), md)
 		Expect(err).NotTo(HaveOccurred())

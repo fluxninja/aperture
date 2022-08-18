@@ -226,6 +226,14 @@ jobs:
             shellcheck
             yq
       - run:
+          name: Install additional system dependencies for pre-commit
+          command: |
+            sudo apt-get update
+            sudo apt-get install \
+              libgtk-3-0 \
+              libgbm1 \
+              libasound2
+      - run:
           name: set GOMAXPROCS to 4
           command: |
             echo 'export GOMAXPROCS=4' >> $BASH_ENV
