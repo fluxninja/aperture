@@ -67,9 +67,13 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusRegistry *status.Registry, p pluginconfig.SentryPluginConfig, lifecycle fx.Lifecycle) (io.Writer, error) {
-	config := constructor.DefaultConfig
+func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusRegistry *status.Registry, lifecycle fx.Lifecycle) (io.Writer, error) {
+	var pluginConfig pluginconfig.SentryPluginConfig
+	if err := unmarshaller.UnmarshalKey(pluginconfig.PluginConfigKey, &pluginConfig); err != nil {
+		log.Panic().Err(err).Msg("Unable to unmarshal sentry plugin config")
+	}
 
+	config := constructor.DefaultConfig
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
 		log.Panic().Err(err).Msg("Unable to deserialize sentry config")
 	}
@@ -81,7 +85,7 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 
 	sentryWriter, _ := NewSentryWriter(config)
 	sentryWriter.StatusRegistry = statusRegistry
-	sentryWriter.AgentKey = p.SentryAgentKey
+	sentryWriter.AgentKey = pluginConfig.SentryAgentKey
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
