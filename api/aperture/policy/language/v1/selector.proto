@@ -10,8 +10,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // Example:
 // ```yaml
 // selector:
-//   namespace: default
-//   service: service1
+//   service: service1.default.svc.cluster.local
 //   control_point:
 //     traffic: ingress # Allowed values are `ingress` and `egress`.
 //   label_matcher:
@@ -53,7 +52,7 @@ message Selector {
     }
   }]; // @gotags: validate:"required"
 
-  // Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).
+  // Allows to add _additional_ condition on labels that must also be satisfied (in addition to service+control point matching).
   // The label matcher allows to match on infra labels, flow labels and request labels.
   // Arbitrary label matcher can be used to match infra labels.
   // For policies, the matcher can be used to match flow labels.
