@@ -308,6 +308,7 @@ func (kc *KubernetesDiscovery) updatePodInTracker(podInfo podInfo) error {
 	entity.IPAddress = podInfo.IPAddress
 	entity.UID = podInfo.UID
 	entity.Prefix = "kubernetes_pod_id"
+	entity.Name = podInfo.Name
 
 	value, err := json.Marshal(entity)
 	if err != nil {

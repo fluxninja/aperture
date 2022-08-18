@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"sync"
 
@@ -66,6 +65,8 @@ type Entity struct {
 	// fields for easier access. Note: we could store `[]agent_core/services/ServiceID`
 	// here directly, but right now it'd cause cyclic dependency.
 	Services []string `json:"services"`
+	// EntityName is the name of this entity
+	EntityName string `json:"name"`
 }
 
 // IP returns IP of this entity.
@@ -73,9 +74,9 @@ func (e *Entity) IP() string {
 	return e.IPAddress
 }
 
-// Name returns Name of this entity. Currently this is based on ID.
+// Name returns Name of this entity.
 func (e *Entity) Name() string {
-	return fmt.Sprintf("%v-%v", e.ID.Prefix, e.ID.UID)
+	return e.EntityName
 }
 
 // SetAgentGroup sets agentGroup.
@@ -90,11 +91,12 @@ type EntityID struct {
 }
 
 // NewEntity creates a new entity from ID and IP address from the tagger.
-func NewEntity(id EntityID, ipAddress string, services []string) *Entity {
+func NewEntity(id EntityID, ipAddress, name string, services []string) *Entity {
 	return &Entity{
-		ID:        id,
-		IPAddress: ipAddress,
-		Services:  services,
+		ID:         id,
+		IPAddress:  ipAddress,
+		Services:   services,
+		EntityName: name,
 	}
 }
 
@@ -177,7 +179,7 @@ func discoveryEntityToCacheEntity(entity *common.Entity) *Entity {
 	return NewEntity(EntityID{
 		Prefix: entity.Prefix,
 		UID:    entity.UID,
-	}, entity.IPAddress, entity.Services)
+	}, entity.IPAddress, entity.Name, entity.Services)
 }
 
 // NewEntityCache creates a new, empty EntityCache.
