@@ -14,7 +14,8 @@ import (
 	mm "github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/services"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	labelmatcherv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/labelmatcher/v1"
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 )
 
 // Selector is a parsed/preprocessed version of policylangv1.Selector
@@ -31,7 +32,7 @@ type Selector struct {
 // FromProto creates a Selector from a "raw" proto-based Selector
 //
 // The selector is assumed to be already validated and non-nil.
-func FromProto(selector *policylangv1.Selector) (Selector, error) {
+func FromProto(selector *selectorv1.Selector) (Selector, error) {
 	labelMatcher, err := MMExprFromLabelMatcher(selector.GetLabelMatcher())
 	if err != nil {
 		return Selector{}, fmt.Errorf("invalid label matcher: %w", err)
@@ -90,11 +91,11 @@ func (p *ControlPoint) String() string {
 // ControlPointFromProto creates a ControlPoint from "raw" proto-based ControlPoint
 //
 // The controlPoint is assumed to be already validated and nonnil.
-func ControlPointFromProto(controlPoint *policylangv1.ControlPoint) ControlPoint {
+func ControlPointFromProto(controlPoint *selectorv1.ControlPoint) ControlPoint {
 	switch cp := controlPoint.Controlpoint.(type) {
-	case *policylangv1.ControlPoint_Feature:
+	case *selectorv1.ControlPoint_Feature:
 		return ControlPoint{Feature: cp.Feature}
-	case *policylangv1.ControlPoint_Traffic:
+	case *selectorv1.ControlPoint_Traffic:
 		switch cp.Traffic {
 		case "ingress":
 			return ControlPoint{Traffic: Ingress}
@@ -128,7 +129,7 @@ func (p ControlPointID) String() string {
 // (ignoring LabelMatcher)
 //
 // Selector is assumed to be validated and non-nil.
-func ControlPointIDFromProto(selector *policylangv1.Selector) ControlPointID {
+func ControlPointIDFromProto(selector *selectorv1.Selector) ControlPointID {
 	return ControlPointID{
 		ServiceID: services.ServiceID{
 			Service: selector.Service,
@@ -141,7 +142,7 @@ func ControlPointIDFromProto(selector *policylangv1.Selector) ControlPointID {
 // a // single multimatcher expression
 //
 // LabelMatcher can be nil or a validated LabelMatcher.
-func MMExprFromLabelMatcher(lm *policylangv1.LabelMatcher) (mm.Expr, error) {
+func MMExprFromLabelMatcher(lm *labelmatcherv1.LabelMatcher) (mm.Expr, error) {
 	var reqExprs []mm.Expr
 
 	for k, v := range lm.GetMatchLabels() {
@@ -187,31 +188,31 @@ func MMExprFromLabelMatcher(lm *policylangv1.LabelMatcher) (mm.Expr, error) {
 // MMExprFromProto converts proto definition of expression into multimatcher Expression
 //
 // The expr is assumed to be validated and nonnil.
-func MMExprFromProto(expr *policylangv1.MatchExpression) (mm.Expr, error) {
+func MMExprFromProto(expr *labelmatcherv1.MatchExpression) (mm.Expr, error) {
 	switch e := expr.Variant.(type) {
-	case *policylangv1.MatchExpression_Not:
+	case *labelmatcherv1.MatchExpression_Not:
 		expr, err := MMExprFromProto(e.Not)
 		if err != nil {
 			return nil, err
 		}
 		return mm.Not(expr), nil
-	case *policylangv1.MatchExpression_All:
+	case *labelmatcherv1.MatchExpression_All:
 		exprs, err := mmExprsFromProtoList(e.All)
 		if err != nil {
 			return nil, err
 		}
 		return mm.All(exprs), nil
-	case *policylangv1.MatchExpression_Any:
+	case *labelmatcherv1.MatchExpression_Any:
 		exprs, err := mmExprsFromProtoList(e.Any)
 		if err != nil {
 			return nil, err
 		}
 		return mm.Any(exprs), nil
-	case *policylangv1.MatchExpression_LabelExists:
+	case *labelmatcherv1.MatchExpression_LabelExists:
 		return mm.LabelExists(e.LabelExists), nil
-	case *policylangv1.MatchExpression_LabelEquals:
+	case *labelmatcherv1.MatchExpression_LabelEquals:
 		return mm.LabelEquals(e.LabelEquals.Label, e.LabelEquals.Value), nil
-	case *policylangv1.MatchExpression_LabelMatches:
+	case *labelmatcherv1.MatchExpression_LabelMatches:
 		return mm.LabelMatchesRegex(e.LabelMatches.Label, e.LabelMatches.Regex)
 	default:
 		log.Error().Msg("unknown/unset expression variant")
@@ -219,7 +220,7 @@ func MMExprFromProto(expr *policylangv1.MatchExpression) (mm.Expr, error) {
 	}
 }
 
-func mmExprsFromProtoList(list *policylangv1.MatchExpression_List) ([]mm.Expr, error) {
+func mmExprsFromProtoList(list *labelmatcherv1.MatchExpression_List) ([]mm.Expr, error) {
 	exprs := make([]mm.Expr, 0, len(list.Of))
 	for _, protoExpr := range list.Of {
 		expr, err := MMExprFromProto(protoExpr)

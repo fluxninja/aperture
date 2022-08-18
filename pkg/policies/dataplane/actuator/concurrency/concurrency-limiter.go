@@ -15,6 +15,7 @@ import (
 	"go.uber.org/multierr"
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -447,7 +448,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegist
 }
 
 // GetSelector returns selector.
-func (conLimiter *concurrencyLimiter) GetSelector() *policylangv1.Selector {
+func (conLimiter *concurrencyLimiter) GetSelector() *selectorv1.Selector {
 	return conLimiter.schedulerProto.GetSelector()
 }
 

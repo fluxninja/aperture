@@ -8,6 +8,7 @@ import (
 	"go.uber.org/fx"
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -97,7 +98,7 @@ func setupFluxMeterModule(
 type FluxMeter struct {
 	component.ComponentAPI
 	histMetrics    map[flowcontrolv1.DecisionType]prometheus.Histogram
-	selector       *policylangv1.Selector
+	selector       *selectorv1.Selector
 	fluxMeterProto *policylangv1.FluxMeter
 	fluxMeterName  string
 	buckets        []float64
@@ -205,7 +206,7 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 }
 
 // GetSelector returns the selector.
-func (fluxMeter *FluxMeter) GetSelector() *policylangv1.Selector {
+func (fluxMeter *FluxMeter) GetSelector() *selectorv1.Selector {
 	return fluxMeter.selector
 }
 

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package aperture.policy.language.v1;
+package aperture.common.selector.v1;
 
-import "aperture/policy/language/v1/labelmatcher.proto";
+import "aperture/common/labelmatcher/v1/labelmatcher.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 // Describes where a rule or actuation component should apply to.
@@ -70,7 +70,7 @@ message Selector {
   // `<headername>` is a headername normalised to lowercase, eg. `request_header_user-agent`.
   //
   // Note: Request headers are only available for `traffic` control points.
-  LabelMatcher label_matcher = 4;
+  common.labelmatcher.v1.LabelMatcher label_matcher = 4;
 }
 
 // Identifies control point within a service that the rule or policy should apply to.
