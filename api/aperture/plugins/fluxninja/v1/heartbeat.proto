@@ -32,15 +32,6 @@ message ReportRequest {
 // ReportResponse is empty for now.
 message ReportResponse {}
 
-// Policies type is packing an array of FlowControlPolicy to be used as one message and sent using type Any.
-message Policies {
-  repeated FlowControlPolicy policies = 1;
-}
-
-// FlowControlPolicy is a policy used for directing traffic.
-// TODO: fill it.
-message FlowControlPolicy {}
-
 // Services type is packing an array of Service to be used as one message and sent using type Any.
 message Services {
   repeated Service services = 1;

@@ -1499,7 +1499,7 @@ definitions:
           Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).
           The label matcher allows to match on infra labels, flow labels and request labels.
           Arbitrary label matcher can be used to match infra labels.
-          For flowcontrol policies, the matcher can be used to match flow labels.
+          For policies, the matcher can be used to match flow labels.
 
           Note: For classification we can only match flow labels that were created at some **previous** control point.
 
