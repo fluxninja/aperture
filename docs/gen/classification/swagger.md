@@ -162,8 +162,7 @@ Example:
 
 ```yaml
 selector:
-  namespace: default
-  service: service1
+  service: service1.default.svc.cluster.local
   control_point:
     traffic: ingress
 rules:
@@ -568,15 +567,7 @@ In case of multiple path templates matching, the most specific one will be chose
 
 (map of string) Template value keys are OpenAPI-inspired path templates.
 
-Examples:
-
-```
-/register
-/users/{user_id}
-/static/*
-```
-
-- Static path segment `/foo` matches a path segment exactly.
+- Static path segment `/foo` matches a path segment exactly
 - `/{param}` matches arbitrary path segment.
   (The param name is ignored and can be omitted (`{}`))
 - The parameter must cover whole segment.
@@ -585,9 +576,17 @@ Examples:
 - Multiple consecutive `/` are ignored, as well as trailing `/`.
 - Parametrized path segments must come after static segments.
 - `*`, if present, must come last.
-- Most specific template \"wins\" (`/foo` over `/{}` and `/{}` over `/*`).
+- Most specific template "wins" (`/foo` over `/{}` and `/{}` over `/*`).
 
-See also <https://swagger.io/specification/#path-templating-matching>"
+See also <https://swagger.io/specification/#path-templating-matching>
+
+Example:
+
+```yaml
+/register: register
+"/user/{userId}": user
+/static/*: other
+```
 
 </dd>
 </dl>
@@ -678,8 +677,7 @@ Example:
 
 ```yaml
 selector:
-  namespace: default
-  service: service1
+  service: service1.default.svc.cluster.local
   control_point:
     traffic: ingress # Allowed values are `ingress` and `egress`.
   label_matcher:
@@ -717,21 +715,24 @@ selector:
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Allows to add _additional_ condition on labels that must also be satisfied (in addition to namespace+service+control point matching).
-The label matcher allows to match on infra labels, flow labels and request labels.
-Arbitrary label matcher can be used to match infra labels.
-For flowcontrol policies, the matcher can be used to match flow labels.
+([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on labels that must
+also be satisfied (in addition to service+control point matching)
 
-Note: For classification we can only match flow labels that were created at some **previous** control point.
+This matcher allows to match on flow labels and request labels.
+(Note: For classification we can only match flow labels that were created at
+some **previous** control point).
 
-In case of k8s, infra labels are labels on entities (note: there might exist some additional labels).
-Flow label names are always prefixed with `flow_`.
-Request labels are always prefixed with `request_`.
-Available request labels are `id` (available as `request_id`), `method`, `path`, `host`, `scheme`, `size`, `protocol`.
-(mapped from fields of [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
-Also, (non-pseudo) headers are available as `request_header_<headername>`.
+Flow labels are available with the same label key as defined in
+classification rule.
 
-Note: Request headers are only available for "traffic" control points.
+Request labels are always prefixed with `request_`. Available request
+labels are `id` (available as `request_id`), `method`, `path`, `host`,
+`scheme`, `size`, `protocol` (mapped from fields of
+[HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
+Also, (non-pseudo) headers are available as `request_header_<headername>`, where
+`<headername>` is a headername normalised to lowercase, eg. `request_header_user-agent`.
+
+Note: Request headers are only available for `traffic` control points.
 
 </dd>
 </dl>

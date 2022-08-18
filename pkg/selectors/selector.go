@@ -22,7 +22,7 @@ import (
 // refer to proto definition for docs.
 type Selector struct {
 	// Additionally, arbitrary label matcher can be used to match labels.
-	// For flowcontrol policies this matcher can _also_ match flow labels.
+	// For policies this matcher can _also_ match flow labels.
 	LabelMatcher mm.Expr
 	// ServiceID and control point are required
 	ControlPointID

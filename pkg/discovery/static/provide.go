@@ -18,6 +18,7 @@ type EntityConfig struct {
 	IPAddress string `json:"ip_address"`
 	Prefix    string `json:"prefix"`
 	UID       string `json:"uid"`
+	Name      string `json:"name"`
 }
 
 // ServiceConfig describes a service and its entities.

@@ -42,6 +42,7 @@ var _ = Describe("Static service discovery", func() {
 			someIPAddress := "1.2.3.4"
 			somePrefix := "vm_id"
 			someUID := "foo"
+			someName := "some_entity"
 			someService := "svc1"
 
 			config := StaticDiscoveryConfig{
@@ -53,6 +54,7 @@ var _ = Describe("Static service discovery", func() {
 								IPAddress: someIPAddress,
 								Prefix:    somePrefix,
 								UID:       someUID,
+								Name:      someName,
 							},
 						},
 					},
@@ -64,6 +66,7 @@ var _ = Describe("Static service discovery", func() {
 				Prefix:    somePrefix,
 				UID:       someUID,
 				Services:  []string{someService},
+				Name:      someName,
 			}
 
 			expectedEntityKey := notifiers.Key(fmt.Sprintf("%v.%v", somePrefix, someUID))
@@ -88,11 +91,13 @@ var _ = Describe("Static service discovery", func() {
 								IPAddress: "1.2.3.4",
 								Prefix:    "vm_id",
 								UID:       "foo",
+								Name:      "someName",
 							},
 							{
 								IPAddress: "1.2.3.5",
 								Prefix:    "vm_id",
 								UID:       "bar",
+								Name:      "someName",
 							},
 						},
 					},
@@ -111,6 +116,7 @@ var _ = Describe("Static service discovery", func() {
 			someIPAddress := "1.2.3.4"
 			somePrefix := "vm_id"
 			someUID := "foo"
+			someName := "some_entity"
 			someService := "svc1"
 			someOtherService := "svc2"
 
@@ -123,6 +129,7 @@ var _ = Describe("Static service discovery", func() {
 								IPAddress: someIPAddress,
 								Prefix:    somePrefix,
 								UID:       someUID,
+								Name:      someName,
 							},
 						},
 					},
@@ -133,6 +140,7 @@ var _ = Describe("Static service discovery", func() {
 								IPAddress: someIPAddress,
 								Prefix:    somePrefix,
 								UID:       someUID,
+								Name:      someName,
 							},
 						},
 					},
@@ -144,6 +152,7 @@ var _ = Describe("Static service discovery", func() {
 				Prefix:    somePrefix,
 				UID:       someUID,
 				Services:  []string{someService, someOtherService},
+				Name:      someName,
 			}
 
 			expectedEntityKey := notifiers.Key(fmt.Sprintf("%v.%v", somePrefix, someUID))
