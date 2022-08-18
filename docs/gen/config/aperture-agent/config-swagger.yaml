@@ -507,6 +507,9 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
   KubernetesDiscoveryConfig:
     properties:
+      discovery_enabled:
+        type: boolean
+        x-go-name: DiscoveryEnabled
       node_name:
         description: NodeName is the name of the k8s node the agent should be monitoring
         type: string
@@ -514,9 +517,6 @@ definitions:
       pod_name:
         type: string
         x-go-name: PodName
-      sidecar_mode:
-        type: boolean
-        x-go-name: SidecarMode
     title: KubernetesDiscoveryConfig for Kubernetes service discovery.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes
