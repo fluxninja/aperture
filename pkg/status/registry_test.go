@@ -12,7 +12,7 @@ import (
 )
 
 var _ = Describe("Status Registry", func() {
-	var reg *Registry
+	var reg, j1, sj1, sj2 Registry
 	delim := ""
 
 	BeforeEach(func() {
@@ -22,75 +22,113 @@ var _ = Describe("Status Registry", func() {
 		key1_status := NewStatus(nil, errors.New("key1"))
 		Expect(key1_status.GetError().Message).To(Equal("key1"))
 
-		err := reg.At("key1").Push(key1_status)
+		err := reg.Push("key1", key1_status)
 		Expect(err).NotTo(HaveOccurred())
-		err = reg.At("key2").Push(NewStatus(nil, errors.New("key2")))
+		err = reg.Push("key2", NewStatus(nil, errors.New("key2")))
 		Expect(err).NotTo(HaveOccurred())
-		err = reg.At("job1", "key1").Push(NewStatus(nil, errors.New("job1.key1")))
+
+		j1 = NewRegistryPrefix(reg, "job1")
+
+		err = j1.Push("key1", NewStatus(nil, errors.New("job1.key1")))
 		Expect(err).NotTo(HaveOccurred())
-		err = reg.At("job1", "key2").Push(NewStatus(nil, errors.New("job1.key2")))
+		err = j1.Push("key2", NewStatus(nil, errors.New("job1.key2")))
 		Expect(err).NotTo(HaveOccurred())
-		err = reg.At("job1", "subjob1", "key1").Push(NewStatus(nil, errors.New("job1.subjob1.key1")))
+
+		sj1 = NewRegistryPrefix(j1, "subjob1")
+		err = sj1.Push("key1", NewStatus(nil, errors.New("job1.subjob1.key1")))
 		Expect(err).NotTo(HaveOccurred())
-		err = reg.At("job1", "subjob1", "key2").Push(NewStatus(nil, errors.New("job1.subjob1.key2")))
+		err = sj1.Push("key2", NewStatus(nil, errors.New("job1.subjob1.key2")))
 		Expect(err).NotTo(HaveOccurred())
-		err = reg.At("job1", "subjob2", "key1").Push(NewStatus(nil, errors.New("job1.subjob2.key1")))
+
+		sj2 = NewRegistryPrefix(j1, "subjob2")
+		err = sj2.Push("key1", NewStatus(nil, errors.New("job1.subjob2.key1")))
 		Expect(err).NotTo(HaveOccurred())
-		err = reg.At("job1", "subjob2", "key2").Push(NewStatus(nil, errors.New("job1.subjob2.key2")))
+		err = sj2.Push("key2", NewStatus(nil, errors.New("job1.subjob2.key2")))
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("should return correct delimiter", func() {
+	It("should return correct delimiters for root and sub registries", func() {
 		Expect(reg.Delim()).To(Equal(defaultDelim))
+		Expect(j1.Delim()).To(Equal(defaultDelim))
+		Expect(sj1.Delim()).To(Equal(defaultDelim))
+		Expect(sj2.Delim()).To(Equal(defaultDelim))
+	})
+
+	It("should return correct prefixes for root and sub registries", func() {
+		Expect(reg.Prefix()).To(Equal(""))
+		Expect(j1.Prefix()).To(Equal("job1"))
+		Expect(sj1.Prefix()).To(Equal("job1.subjob1"))
+		Expect(sj2.Prefix()).To(Equal("job1.subjob2"))
 	})
 
 	It("should return all the keys pushed to the result map", func() {
-		expected := []string{"job1", "job1.key1", "job1.key2", "job1.subjob1", "job1.subjob1.key1", "job1.subjob1.key2", "job1.subjob2", "job1.subjob2.key1", "job1.subjob2.key2", "key1", "key2"}
-		Expect(reg.Keys()).To(Equal(expected))
-		Expect(reg.Keys()).To(HaveLen(11))
+		regKeys := reg.Keys()
+		regExpected := []string{"job1", "job1.key1", "job1.key2", "job1.subjob1", "job1.subjob1.key1", "job1.subjob1.key2", "job1.subjob2", "job1.subjob2.key1", "job1.subjob2.key2", "key1", "key2"}
+		Expect(regKeys).To(Equal(regExpected))
+		Expect(regKeys).To(HaveLen(11))
+
+		j1regKeys := j1.Keys()
+		j1regExpected := []string{"job1", "job1.key1", "job1.key2", "job1.subjob1", "job1.subjob1.key1", "job1.subjob1.key2", "job1.subjob2", "job1.subjob2.key1", "job1.subjob2.key2"}
+		Expect(j1regKeys).To(Equal(j1regExpected))
+		Expect(j1regKeys).To(HaveLen(9))
+
+		sj1regKeys := sj1.Keys()
+		sj1regExpected := []string{"job1.subjob1", "job1.subjob1.key1", "job1.subjob1.key2"}
+		Expect(sj1regKeys).To(Equal(sj1regExpected))
+		Expect(sj1regKeys).To(HaveLen(3))
+
+		sj2regKeys := sj2.Keys()
+		sj2regExpected := []string{"job1.subjob2", "job1.subjob2.key1", "job1.subjob2.key2"}
+		Expect(sj2regKeys).To(Equal(sj2regExpected))
+		Expect(sj2regKeys).To(HaveLen(3))
 	})
 
 	It("should have paths that were pushed", func() {
-		Expect(reg.At("key1").Exists()).To(BeTrue())
-		Expect(reg.At("job1", "key2").Exists()).To(BeTrue())
-		Expect(reg.At("job1", "subjob2", "key2").Exists()).To(BeTrue())
+		Expect(reg.Exists("key1")).To(BeTrue())
+		Expect(reg.Exists("key2")).To(BeTrue())
+		Expect(sj2.Exists("key2")).To(BeTrue())
 
-		Expect(reg.At("key3").Exists()).To(BeFalse())
-		Expect(reg.At("job1", "key3").Exists()).To(BeFalse())
-		Expect(reg.At("job1", "subjob2", "key3").Exists()).To(BeFalse())
+		Expect(reg.Exists("key3")).To(BeFalse())
+		Expect(sj2.Exists("key3")).To(BeFalse())
 	})
 
 	It("should error when status is pushed without path", func() {
-		err := reg.At("").Push(NewStatus(nil, errors.New("key1")))
+		err := reg.Push("", NewStatus(nil, errors.New("key1")))
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(Equal("path doesn't exist"))
+
+		err = j1.Push("", NewStatus(nil, errors.New("job1")))
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	It("should overwrite the status when pushed to an existing path", func() {
-		err := reg.At("job1", "subjob1").Push(NewStatus(nil, errors.New("job1.subjob1")))
+		err := sj1.Push("key1", NewStatus(nil, errors.New("new")))
 		Expect(err).ToNot(HaveOccurred())
-
-		statusDetail := reg.At("job1", "subjob1").Get().GetStatus().GetDetails()
-		Expect(statusDetail).To(Equal(testGroupStatus("job1.subjob1").Status.Details))
+		statusDetail := sj1.Get("key1").GetStatus().GetDetails()
+		Expect(statusDetail).To(Equal(testGroupStatus("new").Status.Details))
 	})
 
 	It("should delete the status", func() {
-		Expect(reg.At("job1", "subjob1").Exists()).To(BeTrue())
-		reg.At("job1", "subjob1").Delete()
-		Expect(reg.At("job1", "subjob1").Exists()).To(BeFalse())
+		Expect(sj1.Exists("key1")).To(BeTrue())
+		sj1.Delete("key1")
+		Expect(sj1.Exists("key1")).To(BeFalse())
+
+		Expect(sj1.Exists("")).To(BeTrue())
+		sj1.Delete("")
+		Expect(sj1.Exists("")).To(BeFalse())
 	})
 
 	It("should have no keys when root path is deleted", func() {
-		reg.At("").Delete()
+		reg.Delete("")
 		Expect(reg.Keys()).To(HaveLen(0))
 	})
 
 	It("should get the status details for the given key", func() {
-		statusDetail := reg.At("key1").Get().GetStatus().GetDetails()
-		Expect(statusDetail).To(Equal(testGroupStatus("key1").Status.Details))
+		s := reg.Get("key1").GetStatus().GetDetails()
+		Expect(s).To(Equal(testGroupStatus("key1").Status.Details))
 
-		statusDetail = reg.At("job1", "subjob2", "key1").Get().GetStatus().GetDetails()
-		Expect(statusDetail).To(Equal(testGroupStatus("job1.subjob2.key1").Status.Details))
+		s = sj2.Get("key1").GetStatus().GetDetails()
+		Expect(s).To(Equal(testGroupStatus("job1.subjob2.key1").Status.Details))
 	})
 
 	It("should return correct flattened group status map", func() {
@@ -104,32 +142,36 @@ var _ = Describe("Status Registry", func() {
 		experiment := gmeasure.NewExperiment("status registry operations performance")
 		AddReportEntry(experiment.Name, experiment)
 
+		r1 := NewRegistryPrefix(reg, "one")
+		r2 := NewRegistryPrefix(r1, "two")
+
 		experiment.Sample(func(i int) {
-			path := fmt.Sprintf("one.two.measure%d", i)
+			path := fmt.Sprintf("measure%d", i)
 			pathStatus := NewStatus(nil, errors.New(path))
 			Expect(pathStatus.GetError().Message).To(Equal(path))
 			experiment.MeasureDuration("Push", func() {
-				err := reg.At(path).Push(pathStatus)
+				err := r2.Push(path, pathStatus)
 				Expect(err).ToNot(HaveOccurred())
 			})
 		}, gmeasure.SamplingConfig{N: 1000})
 
 		experiment.Sample(func(i int) {
-			path := fmt.Sprintf("one.two.measure%d", i)
+			path := fmt.Sprintf("measure%d", i)
 			experiment.MeasureDuration("Get", func() {
-				statusDetail := reg.At(path).Get().GetStatus().GetDetails()
+				statusDetail := r2.Get(path).GetStatus().GetDetails()
 				Expect(statusDetail).To(Equal(testGroupStatus(path).Status.Details))
 			})
 		}, gmeasure.SamplingConfig{N: 1000})
 
 		experiment.Sample(func(i int) {
-			path := fmt.Sprintf("one.two.measure%d", i)
+			path := fmt.Sprintf("measure%d", i)
 			pathStatus := NewStatus(nil, errors.New(path))
 			Expect(pathStatus.GetError().Message).To(Equal(path))
 			experiment.MeasureDuration("Delete", func() {
-				reg.At(path).Delete()
-				ok := reg.At(path).Exists()
-				Expect(ok).ToNot(BeTrue())
+				err := r2.Delete(path)
+				Expect(err).ToNot(HaveOccurred())
+				ok := r2.Exists(path)
+				Expect(ok).To(BeFalse())
 			})
 		}, gmeasure.SamplingConfig{N: 1000})
 	})
