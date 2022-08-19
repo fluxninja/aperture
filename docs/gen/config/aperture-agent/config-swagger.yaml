@@ -509,6 +509,7 @@ definitions:
     properties:
       discovery_enabled:
         type: boolean
+        x-go-default: "true"
         x-go-name: DiscoveryEnabled
       node_name:
         description: NodeName is the name of the k8s node the agent should be monitoring
