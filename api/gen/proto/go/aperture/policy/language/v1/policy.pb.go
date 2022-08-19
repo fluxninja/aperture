@@ -657,7 +657,7 @@ func (x *GradientController) GetMaxGradient() float64 {
 // The $\alpha$ is computed using ema\_window:
 //
 // $$
-// \alpha = \frac{2}{N + 1} \quad\text{where } N = \text{ema\_window} \over \text{evalutation\_period}
+// \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
 // $$
 type EMA struct {
 	state         protoimpl.MessageState
@@ -1337,7 +1337,9 @@ func (x *Constant) GetValue() float64 {
 
 // Takes an input signal and emits the square root of it multiplied by scale as an output.
 //
-// $$\text{output} = \text{scale} \sqrt{\text{input}}$$
+// $$
+// \text{output} = \text{scale} \sqrt{\text{input}}
+// $$
 type Sqrt struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
