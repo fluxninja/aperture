@@ -22,7 +22,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Describes where a rule or actuation component should apply to.
+// Describes where a rule or actuation component should apply to
 //
 // Example:
 // ```yaml

@@ -37,11 +37,7 @@ from: reque…
 * [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload.
 Specify a field to be extracted…
 * [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
-* [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not.
-It provides three ways to define requirements:
-- matchLabels
-- matchExpressions
-- arbitrary expression
+* [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not
 * [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels.
 …
 * [v1MatchesMatchExpression](#v1-matches-match-expression) – Label selector expression of the matches form "label matches regex".
@@ -49,10 +45,7 @@ It provides three ways to define requirements:
 HTTP path will be matched against giv…
 * [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule.
 Flow classification rule extra…
-* [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to.
-
-Example:
-```yaml…
+* [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to
 
 
 ## Reference
@@ -421,7 +414,8 @@ If the operator is Exists or DoesNotExist, the values array must be empty.
 
 ### <span id="v1-label-matcher"></span> v1LabelMatcher
 
-Allows to define rules whether a map of labels should be considered a match or not.
+Allows to define rules whether a map of labels should be considered a match or not
+
 It provides three ways to define requirements:
 
 - matchLabels
@@ -671,7 +665,7 @@ Rego extractor extracts a value from the rego module.
 
 ### <span id="v1-selector"></span> v1Selector
 
-Describes where a rule or actuation component should apply to.
+Describes where a rule or actuation component should apply to
 
 Example:
 
