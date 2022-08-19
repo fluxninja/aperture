@@ -825,7 +825,7 @@ definitions:
       The $\alpha$ is computed using ema\_window:
 
       $$
-      \alpha = \frac{2}{N + 1} \quad\text{where } N = \text{ema\_window} \over \text{evalutation\_period}
+      \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
       $$
     title: Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
   v1EMAIns:
@@ -1571,7 +1571,9 @@ definitions:
     description: |-
       Takes an input signal and emits the square root of it multiplied by scale as an output.
 
-      $$\text{output} = \text{scale} \sqrt{\text{input}}$$
+      $$
+      \text{output} = \text{scale} \sqrt{\text{input}}
+      $$
   v1SqrtIns:
     type: object
     properties:
