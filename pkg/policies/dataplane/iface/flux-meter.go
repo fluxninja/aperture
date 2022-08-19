@@ -44,5 +44,5 @@ type FluxMeter interface {
 	GetBuckets() []float64
 
 	// GetHistogram returns the histogram for the flowcontrolv1.DecisionType
-	GetHistogram(flowcontrolv1.DecisionType) prometheus.Histogram
+	GetHistogram(flowcontrolv1.DecisionType, string) prometheus.Histogram
 }

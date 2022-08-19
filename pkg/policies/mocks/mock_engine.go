@@ -39,17 +39,17 @@ func (m *MockEngine) EXPECT() *MockEngineMockRecorder {
 }
 
 // GetFluxMeterHist mocks base method.
-func (m *MockEngine) GetFluxMeterHist(policyName, fluxMeterName, policyHash string, decisionType flowcontrolv1.DecisionType) prometheus.Histogram {
+func (m *MockEngine) GetFluxMeterHist(policyName, fluxMeterName, policyHash, statusCode string, decisionType flowcontrolv1.DecisionType) prometheus.Histogram {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFluxMeterHist", policyName, fluxMeterName, policyHash, decisionType)
+	ret := m.ctrl.Call(m, "GetFluxMeterHist", policyName, fluxMeterName, policyHash, statusCode, decisionType)
 	ret0, _ := ret[0].(prometheus.Histogram)
 	return ret0
 }
 
 // GetFluxMeterHist indicates an expected call of GetFluxMeterHist.
-func (mr *MockEngineMockRecorder) GetFluxMeterHist(policyName, fluxMeterName, policyHash, decisionType interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) GetFluxMeterHist(policyName, fluxMeterName, policyHash, statusCode, decisionType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeterHist", reflect.TypeOf((*MockEngine)(nil).GetFluxMeterHist), policyName, fluxMeterName, policyHash, decisionType)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeterHist", reflect.TypeOf((*MockEngine)(nil).GetFluxMeterHist), policyName, fluxMeterName, policyHash, statusCode, decisionType)
 }
 
 // ProcessRequest mocks base method.
