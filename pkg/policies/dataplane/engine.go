@@ -203,7 +203,7 @@ func (e *Engine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 }
 
 // GetFluxMeterHist Lookup function for getting histogram.
-func (e *Engine) GetFluxMeterHist(policyName, fluxMeterName, policyHash string, decisionType flowcontrolv1.DecisionType) prometheus.Histogram {
+func (e *Engine) GetFluxMeterHist(policyName, fluxMeterName, policyHash, statusCode string, decisionType flowcontrolv1.DecisionType) prometheus.Histogram {
 	e.fluxMeterMapMutex.RLock()
 	defer e.fluxMeterMapMutex.RUnlock()
 	fmID := iface.FluxMeterID{
@@ -213,7 +213,7 @@ func (e *Engine) GetFluxMeterHist(policyName, fluxMeterName, policyHash string, 
 	}
 	fluxMeter := e.fluxMetersMap[fmID]
 	if fluxMeter != nil {
-		return fluxMeter.GetHistogram(decisionType)
+		return fluxMeter.GetHistogram(decisionType, statusCode)
 	}
 	return nil
 }

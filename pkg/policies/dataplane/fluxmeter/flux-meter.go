@@ -219,7 +219,7 @@ func (fluxMeter *FluxMeter) GetFluxMeterID() iface.FluxMeterID {
 }
 
 // GetHistogram returns the histogram.
-func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType) prometheus.Histogram {
+func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode string) prometheus.Histogram {
 	return fluxMeter.histMetrics[decisionType]
 }
 
