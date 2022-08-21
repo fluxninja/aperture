@@ -16,6 +16,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
@@ -146,14 +147,14 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 			for _, decisionType := range decisionTypes {
 				// Initialize a prometheus histogram metric
 				histMetric := prometheus.NewHistogram(prometheus.HistogramOpts{
-					Name:    "flux_meter",
+					Name:    metrics.FluxMeterMetricName,
 					Buckets: fluxMeter.buckets,
 					// TODO flux-meter-refactor: remove metricID, instead use policyName, fluxMeterName, policyHash
 					ConstLabels: prometheus.Labels{
-						"policy_name":     fluxMeter.GetPolicyName(),
-						"flux_meter_name": fluxMeter.GetFluxMeterName(),
-						"policy_hash":     fluxMeter.GetPolicyHash(),
-						"decision_type":   decisionType.String(),
+						metrics.PolicyNameLabel:    fluxMeter.GetPolicyName(),
+						metrics.FluxMeterNameLabel: fluxMeter.GetFluxMeterName(),
+						metrics.PolicyHashLabel:    fluxMeter.GetPolicyHash(),
+						metrics.DecisionTypeLabel:  decisionType.String(),
 					},
 				})
 				fluxMeter.histMetrics[decisionType] = histMetric

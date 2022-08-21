@@ -13,6 +13,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 )
@@ -96,12 +97,6 @@ type Server struct {
 	Latencies       *prometheus.HistogramVec
 }
 
-const (
-	requestCounterMetricName   = "http_server_request_counter"
-	errorCountMetricName       = "http_server_error_counter"
-	latencyHistogramMetricName = "http_server_request_latency_seconds"
-)
-
 func (constructor ServerConstructor) provideServer(
 	listener *listener.Listener,
 	tlsConfig *tls.Config,
@@ -117,18 +112,18 @@ func (constructor ServerConstructor) provideServer(
 	}
 
 	// Register metrics
-	defaultLabels := []string{"method", "response_status_code"}
+	defaultLabels := []string{metrics.MethodLabel, metrics.ResponseStatusCodeLabel}
 	errorCounters := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: errorCountMetricName,
+		Name: metrics.ErrorCountMetricName,
 		Help: "The total number of errors that occurred",
 	}, defaultLabels)
 	requestCounters := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: requestCounterMetricName,
+		Name: metrics.RequestCounterMetricName,
 		Help: "The total number of requests that occurred",
 	}, defaultLabels)
 	// We record latency milliseconds
 	latencyHistograms := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    latencyHistogramMetricName,
+		Name:    metrics.LatencyHistogramMetricName,
 		Help:    "Latency of the requests processed by the server",
 		Buckets: prometheus.LinearBuckets(config.LatencyBucketStartMS, config.LatencyBucketWidthMS, config.LatencyBucketCount),
 	}, defaultLabels)
@@ -209,8 +204,8 @@ func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 		duration := time.Since(startTime)
 
 		labels := map[string]string{
-			"method":               r.Method,
-			"response_status_code": fmt.Sprintf("%d", rec.status),
+			metrics.MethodLabel:             r.Method,
+			metrics.ResponseStatusCodeLabel: fmt.Sprintf("%d", rec.status),
 		}
 
 		requestCounter, err := s.RequestCounters.GetMetricWith(labels)

@@ -23,6 +23,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
@@ -35,11 +36,6 @@ import (
 const (
 	// The path in status registry for concurrency limiter status.
 	concurrencyLimiterStatusRoot = "concurrency_limiter"
-
-	// Label Keys for WFQ and Token Bucket Metrics.
-	policyNameLabelKey     = "policy_name"
-	policyHashLabelKey     = "policy_hash"
-	componentIndexLabelKey = "component_index"
 )
 
 var (
@@ -47,7 +43,7 @@ var (
 	fxNameTag = config.NameTag("concurrency_limiter")
 
 	// Array of Label Keys for WFQ and Token Bucket Metrics.
-	metricLabelKeys = []string{policyNameLabelKey, policyHashLabelKey, componentIndexLabelKey}
+	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel}
 )
 
 // concurrencyLimiterModule returns the fx options for dataplane side pieces of concurrency limiter in the main fx app.
@@ -326,9 +322,9 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegist
 	autoTokensFactory := conLimiterFactory.autoTokensFactory
 	// Form metric labels
 	metricLabels := make(prometheus.Labels)
-	metricLabels[policyNameLabelKey] = conLimiter.GetPolicyName()
-	metricLabels[policyHashLabelKey] = conLimiter.GetPolicyHash()
-	metricLabels[componentIndexLabelKey] = strconv.FormatInt(conLimiter.GetComponentIndex(), 10)
+	metricLabels[metrics.PolicyNameLabel] = conLimiter.GetPolicyName()
+	metricLabels[metrics.PolicyHashLabel] = conLimiter.GetPolicyHash()
+	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(conLimiter.GetComponentIndex(), 10)
 	// Create sub components.
 	clock := clockwork.NewRealClock()
 	loadShedActuator, err := loadShedActuatorFactory.newLoadShedActuator(conLimiter.registryPath, conLimiter, statusRegistry, clock, lifecycle, metricLabels)
@@ -465,8 +461,7 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowc
 	} else {
 		// no match, return default workload
 		matchedWorkloadProto = conLimiter.defaultWorkloadProto
-		// TODO: get default workload's workload_index value from common file
-		matchedWorkloadIndex = "default"
+		matchedWorkloadIndex = metrics.DefaultWorkloadIndex
 	}
 
 	fairnessLabel := "workload:" + matchedWorkloadIndex

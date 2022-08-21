@@ -14,6 +14,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 )
@@ -109,19 +110,19 @@ func registerFluxMeter(
 	fluxMeterWrapper *configv1.FluxMeterWrapper,
 	metricSubRegistry iface.MetricSubRegistry,
 ) error {
-	policyNameMatcher, err := labels.NewMatcher(labels.MatchEqual, "policy_name", fluxMeterWrapper.GetPolicyName())
+	policyNameMatcher, err := labels.NewMatcher(labels.MatchEqual, metrics.PolicyNameLabel, fluxMeterWrapper.GetPolicyName())
 	if err != nil {
 		return err
 	}
-	fluxMeterNameMatcher, err := labels.NewMatcher(labels.MatchEqual, "flux_meter_name", fluxMeterWrapper.GetFluxmeterName())
+	fluxMeterNameMatcher, err := labels.NewMatcher(labels.MatchEqual, metrics.FluxMeterNameLabel, fluxMeterWrapper.GetFluxmeterName())
 	if err != nil {
 		return err
 	}
-	policyHashMatcher, err := labels.NewMatcher(labels.MatchEqual, "policy_hash", fluxMeterWrapper.GetPolicyHash())
+	policyHashMatcher, err := labels.NewMatcher(labels.MatchEqual, metrics.PolicyHashLabel, fluxMeterWrapper.GetPolicyHash())
 	if err != nil {
 		return err
 	}
 	metricLabels := []*labels.Matcher{policyNameMatcher, fluxMeterNameMatcher, policyHashMatcher}
-	metricSubRegistry.RegisterHistogramSub(fluxMeterWrapper.GetFluxmeterName(), "flux_meter", metricLabels)
+	metricSubRegistry.RegisterHistogramSub(fluxMeterWrapper.GetFluxmeterName(), metrics.FluxMeterMetricName, metricLabels)
 	return nil
 }

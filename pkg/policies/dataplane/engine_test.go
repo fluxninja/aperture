@@ -8,6 +8,7 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
 	"github.com/fluxninja/aperture/pkg/selectors"
@@ -37,19 +38,19 @@ var _ = Describe("Dataplane Engine", func() {
 
 		engine = ProvideEngineAPI()
 		selector = &selectorv1.Selector{
-			AgentGroup: "default",
+			AgentGroup: metrics.DefaultAgentGroup,
 			Service:    "testService.testNamespace.svc.cluster.local",
 			ControlPoint: &selectorv1.ControlPoint{
 				Controlpoint: &selectorv1.ControlPoint_Traffic{Traffic: "ingress"},
 			},
 		}
 		histogram = goprom.NewHistogram(goprom.HistogramOpts{
-			Name: "flux_meter",
+			Name: metrics.FluxMeterMetricName,
 			ConstLabels: goprom.Labels{
-				"policy_name":     "test",
-				"flux_meter_name": "test",
-				"policy_hash":     "test",
-				"decision_type":   flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED.String(),
+				metrics.PolicyNameLabel:    "test",
+				metrics.FluxMeterNameLabel: "test",
+				metrics.PolicyHashLabel:    "test",
+				metrics.DecisionTypeLabel:  flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED.String(),
 			},
 		})
 		fluxMeterID = iface.FluxMeterID{
