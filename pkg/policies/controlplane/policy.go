@@ -75,8 +75,8 @@ func NewPolicyOptions(
 
 	var fluxMeterOptions []fx.Option
 	// Initialize flux meters
-	for _, fluxMeterProto := range policyProto.FluxMeters {
-		fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(fluxMeterProto, policy, policy)
+	for name, fluxMeterProto := range policyProto.FluxMeters {
+		fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(name, fluxMeterProto, policy, policy)
 		if err != nil {
 			return nil, err
 		}

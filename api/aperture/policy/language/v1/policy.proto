@@ -46,19 +46,16 @@ message Policy {
   }]; // @gotags: default:"0.5s"
 
   // FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
-  repeated FluxMeter flux_meters = 3;
+  map<string, FluxMeter> flux_meters = 3;
 }
 
 // FluxMeter gathers metrics for the traffic that matches its selector.
 message FluxMeter {
-  // Name of the flux meter.
-  string name = 1;
-
   // Policies are only applied to flows that are matched based on the fields in the selector.
-  common.selector.v1.Selector selector = 2;
+  common.selector.v1.Selector selector = 1;
 
   // Latency histogram buckets (in ms) for this FluxMeter.
-  repeated double histogram_buckets = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  repeated double histogram_buckets = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {

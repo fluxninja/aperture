@@ -71,14 +71,14 @@ func NewCircuitAndOptions(
 			})
 		}
 	}
-	log.Debug().Msgf("Comp list: %+v", compList)
+	log.Trace().Msgf("Comp list: %+v", compList)
 
 	// Second pass to initialize port maps for each component
 	compWithPortsList := make([]runtime.ComponentWithPorts, len(compList))
 	for graphNodeIndex, componentWithMapStruct := range compList {
 		comp := componentWithMapStruct.component
 		mapStruct := componentWithMapStruct.mapStruct
-		log.Debug().Msgf("mapStruct: %+v", mapStruct)
+		log.Trace().Msgf("mapStruct: %+v", mapStruct)
 
 		compWithPorts := runtime.ComponentWithPorts{
 			Component:           comp,
@@ -89,7 +89,7 @@ func NewCircuitAndOptions(
 
 		// Read in_ports in mapStruct
 		inPorts, ok := mapStruct["in_ports"]
-		log.Debug().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", componentWithMapStruct.compName).Msg("mapStruct[in_ports]")
+		log.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", componentWithMapStruct.compName).Msg("mapStruct[in_ports]")
 		if ok {
 			// Convert in_ports to map[string]interface{}
 			inPortsMap, castOk := inPorts.(map[string]interface{})
@@ -98,13 +98,13 @@ func NewCircuitAndOptions(
 				if err != nil {
 					return nil, nil, err
 				}
-				log.Debug().Msgf("inPortToSignalsMap: %+v", inPortToSignalsMap)
+				log.Trace().Msgf("inPortToSignalsMap: %+v", inPortToSignalsMap)
 				compWithPorts.InPortToSignalsMap = inPortToSignalsMap
 			}
 		}
 		// Read out_ports in mapStruct
 		outPorts, ok := mapStruct["out_ports"]
-		log.Debug().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", componentWithMapStruct.compName).Msg("mapStruct[out_ports]")
+		log.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", componentWithMapStruct.compName).Msg("mapStruct[out_ports]")
 		if ok {
 			// Convert out_ports to map[string]interface{}
 			outPortsMap, castOk := outPorts.(map[string]interface{})
@@ -113,7 +113,7 @@ func NewCircuitAndOptions(
 				if err != nil {
 					return nil, nil, err
 				}
-				log.Debug().Msgf("inPortToSignalsMap: %+v", outPortToSignalsMap)
+				log.Trace().Msgf("inPortToSignalsMap: %+v", outPortToSignalsMap)
 				compWithPorts.OutPortToSignalsMap = outPortToSignalsMap
 			}
 		}
@@ -159,7 +159,7 @@ func NewCircuitAndOptions(
 	// Run Tarjan's algorithm for detecting loops
 	loops := tarjan.Connections(graph)
 	// Log loops and graph
-	log.Debug().Msgf("Tarjan Loops: %+v \nTarjan Graph: %+v", loops, graph)
+	log.Trace().Msgf("Tarjan Loops: %+v \nTarjan Graph: %+v", loops, graph)
 
 	// Iterate over loops
 	for _, loop := range loops {
@@ -224,11 +224,11 @@ func NewCircuitAndOptions(
 		}
 	}
 
-	log.Debug().Msgf("comp with ports list: %+v", compWithPortsList)
+	log.Trace().Msgf("comp with ports list: %+v", compWithPortsList)
 
 	// Log compWithPortsList
 	for _, compWithPorts := range compWithPortsList {
-		log.Debug().Msgf("comp with ports: %+v", compWithPorts)
+		log.Trace().Msgf("comp with ports: %+v", compWithPorts)
 	}
 
 	// Create circuit
@@ -297,13 +297,13 @@ func getPortSignals(portMapping map[string]interface{}, inSignals map[string][]i
 
 	portToSignalMapping := make(runtime.PortToSignal)
 
-	log.Debug().Msgf("portMapping: %+v", portMapping)
+	log.Trace().Msgf("portMapping: %+v", portMapping)
 
 	// Iterate each port
 	for port, portMap := range portMapping {
 		// Convert portMap to map[string][]interface{}
 		portList, isList := portMap.([]interface{})
-		log.Debug().Bool("isList", isList).Msgf("portMap: %+v", portMap)
+		log.Trace().Bool("isList", isList).Msgf("portMap: %+v", portMap)
 		// Convert portMap to map[string]interface{}
 		portSpec, isSpec := portMap.(map[string]interface{})
 		if isList {

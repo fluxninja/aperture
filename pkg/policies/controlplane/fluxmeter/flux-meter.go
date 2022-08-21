@@ -29,6 +29,7 @@ type fluxMeterConfigSync struct {
 
 // NewFluxMeterOptions creates fx options for FluxMeter.
 func NewFluxMeterOptions(
+	name string,
 	fluxMeterProto *policylangv1.FluxMeter,
 	policyBaseAPI policyapi.PolicyBaseAPI,
 	metricSubRegistry policyapi.MetricSubRegistry,
@@ -39,6 +40,9 @@ func NewFluxMeterOptions(
 		return nil, errors.New("FluxMeter.Selector is nil")
 	}
 	agentGroup := selectorProto.GetAgentGroup()
+	if agentGroup == "" {
+		agentGroup = "default"
+	}
 
 	wrapperProto := &configv1.ConfigPropertiesWrapper{
 		AgentGroup: agentGroup,
@@ -47,13 +51,13 @@ func NewFluxMeterOptions(
 	}
 
 	// Register FluxMeter
-	err := registerFluxMeter(fluxMeterProto, wrapperProto, metricSubRegistry)
+	err := registerFluxMeter(name, fluxMeterProto, wrapperProto, metricSubRegistry)
 	if err != nil {
 		return nil, err
 	}
 
 	etcdPath := path.Join(paths.FluxMeterConfigPath,
-		paths.IdentifierForFluxMeter(agentGroup, policyBaseAPI.GetPolicyName(), fluxMeterProto.GetName()))
+		paths.IdentifierForFluxMeter(agentGroup, policyBaseAPI.GetPolicyName(), name))
 	configSync := &fluxMeterConfigSync{
 		fluxMeterProto: fluxMeterProto,
 		policyBaseAPI:  policyBaseAPI,
@@ -109,15 +113,17 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 }
 
 // registerFluxMeter registers histograms for fluxmeter in controller.
-func registerFluxMeter(fluxMeterProto *policylangv1.FluxMeter, componentAPI component.ComponentAPI, metricSubRegistry policyapi.MetricSubRegistry) error {
-	// Original metric name
-	fluxMeterName := fluxMeterProto.Name
-
+func registerFluxMeter(
+	name string,
+	fluxMeterProto *policylangv1.FluxMeter,
+	componentAPI component.ComponentAPI,
+	metricSubRegistry policyapi.MetricSubRegistry,
+) error {
 	policyNameMatcher, err := labels.NewMatcher(labels.MatchEqual, "policy_name", componentAPI.GetPolicyName())
 	if err != nil {
 		return err
 	}
-	fluxMeterNameMatcher, err := labels.NewMatcher(labels.MatchEqual, "flux_meter_name", fluxMeterName)
+	fluxMeterNameMatcher, err := labels.NewMatcher(labels.MatchEqual, "flux_meter_name", name)
 	if err != nil {
 		return err
 	}
@@ -126,6 +132,6 @@ func registerFluxMeter(fluxMeterProto *policylangv1.FluxMeter, componentAPI comp
 		return err
 	}
 	metricLabels := []*labels.Matcher{policyNameMatcher, fluxMeterNameMatcher, policyHashMatcher}
-	metricSubRegistry.RegisterHistogramSub(fluxMeterName, "flux_meter", metricLabels)
+	metricSubRegistry.RegisterHistogramSub(name, "flux_meter", metricLabels)
 	return nil
 }
