@@ -9,7 +9,7 @@ data:
   latency-gradient.yaml: |
     evaluation_interval: "0.5s"
     flux_meters:
-      - name: "demo1_latency"
+      "demo1_latency":
         selector:
           service: "demo1-demo-app.demoapp.svc.cluster.local"
           control_point:

@@ -3,6 +3,7 @@ package fluxmeter
 import (
 	"context"
 	"path"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
@@ -111,6 +112,11 @@ func NewFluxMeterOptions(
 	registry *status.Registry,
 ) (fx.Option, error) {
 	registryPath := path.Join(fluxMeterStatusRoot, key.String())
+	fluxmeterName := "default"
+	if nameSplit := strings.Split(key.String(), "-flux_meter-"); len(nameSplit) == 2 {
+		fluxmeterName = nameSplit[1]
+	}
+
 	wrapperMessage := &configv1.ConfigPropertiesWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.Config == nil {
@@ -132,14 +138,10 @@ func NewFluxMeterOptions(
 		fluxMeterProto: fluxMeterProto,
 		ComponentAPI:   wrapperMessage,
 		histMetrics:    make(map[flowcontrolv1.DecisionType]prometheus.Histogram),
+		fluxMeterName:  fluxmeterName,
+		selector:       fluxMeterProto.GetSelector(),
+		buckets:        fluxMeterProto.GetHistogramBuckets(),
 	}
-
-	// Original metric name
-	fluxMeter.fluxMeterName = fluxMeterProto.Name
-	// Selector
-	fluxMeter.selector = fluxMeterProto.GetSelector()
-	// Buckets
-	fluxMeter.buckets = fluxMeterProto.GetHistogramBuckets()
 
 	return fx.Options(
 			fx.Invoke(fluxMeter.setup),
