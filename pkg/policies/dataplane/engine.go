@@ -35,7 +35,7 @@ func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiM
 }
 
 // ProvideEngineAPI Main fx app.
-func ProvideEngineAPI() iface.EngineAPI {
+func ProvideEngineAPI() iface.Engine {
 	e := &Engine{
 		multiMatchers: make(map[selectors.ControlPointID]*multiMatcher),
 		fluxMetersMap: make(map[iface.FluxMeterID]iface.FluxMeter),
@@ -68,7 +68,6 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	fluxMeterProtos := make([]*flowcontrolv1.FluxMeter, len(fluxMeters))
 	for i, fluxMeter := range fluxMeters {
 		fluxMeterProtos[i] = &flowcontrolv1.FluxMeter{
-			AgentGroup:    fluxMeter.GetAgentGroup(),
 			PolicyName:    fluxMeter.GetPolicyName(),
 			PolicyHash:    fluxMeter.GetPolicyHash(),
 			FluxMeterName: fluxMeter.GetFluxMeterName(),

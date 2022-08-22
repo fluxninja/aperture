@@ -6,7 +6,6 @@ import (
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 )
 
 //go:generate mockgen -source=flux-meter.go -destination=../../mocks/mock_flux_meter.go -package=mocks
@@ -25,7 +24,9 @@ func (fmID FluxMeterID) String() string {
 
 // FluxMeter in an interface for interacting with fluxmeters.
 type FluxMeter interface {
-	component.ComponentAPI
+	// Policy
+	GetPolicyName() string
+	GetPolicyHash() string
 
 	// GetSelector returns the selector
 	GetSelector() *selectorv1.Selector

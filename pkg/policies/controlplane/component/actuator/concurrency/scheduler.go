@@ -13,6 +13,7 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
+	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -23,7 +24,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/component"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
-	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 var (
@@ -63,7 +63,7 @@ func NewSchedulerAndOptions(
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.AutoTokenResultsPath,
-		paths.IdentifierForComponent(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
+		paths.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,
@@ -216,14 +216,16 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 }
 
 func (s *Scheduler) publishQueryTokens(tokens *policydecisionsv1.TokensDecision) error {
+	// TODO: publish only on change
 	s.tokensByWorkload = tokens
 	policyName := s.policyReadAPI.GetPolicyName()
 	policyHash := s.policyReadAPI.GetPolicyHash()
 
-	wrapper, err := utils.WrapWithConfProps(tokens, s.agentGroupName, policyName, policyHash, s.componentIndex)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to wrap tokens in config properties")
-		return err
+	wrapper := &configv1.TokensDecisionWrapper{
+		TokensDecision: tokens,
+		ComponentIndex: int64(s.componentIndex),
+		PolicyName:     policyName,
+		PolicyHash:     policyHash,
 	}
 	dat, err := proto.Marshal(wrapper)
 	if err != nil {

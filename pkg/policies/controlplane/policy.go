@@ -60,7 +60,7 @@ type metricSub struct {
 func NewPolicyOptions(
 	circuitJobGroup *jobs.JobGroup,
 	etcdClient *etcdclient.Client,
-	wrapperMessage *configv1.ConfigPropertiesWrapper,
+	wrapperMessage *configv1.PolicyWrapper,
 	policyProto *policylangv1.Policy,
 ) (fx.Option, error) {
 	policy := &Policy{

@@ -3,8 +3,6 @@ package paths
 import (
 	"path"
 	"strconv"
-
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 )
 
 var (
@@ -40,32 +38,17 @@ func PolicyPrefix(agentGroupName, policyName string) string {
 	return AgentGroupPrefix(agentGroupName) + "-policy-" + policyName
 }
 
-// IdentifierForComponent returns the identifier for a component.
-func IdentifierForComponent(agentGroupName, policyName string, componentIndex int64) string {
+// DataplaneComponentKey returns the identifier for a Component in etcd.
+func DataplaneComponentKey(agentGroupName, policyName string, componentIndex int64) string {
 	return PolicyPrefix(agentGroupName, policyName) + "-component_index-" + strconv.FormatInt(componentIndex, 10)
 }
 
-// MetricIDForComponent returns the metric ID for a component.
-func MetricIDForComponent(componentAPI component.ComponentAPI) string {
-	return MetricIDForComponentExpanded(componentAPI.GetAgentGroup(), componentAPI.GetPolicyName(), componentAPI.GetComponentIndex(), componentAPI.GetPolicyHash())
-}
-
-// MetricIDForComponentExpanded returns the metric ID for a component.
-func MetricIDForComponentExpanded(agentGroupName, policyName string, componentIndex int64, policyHash string) string {
-	return IdentifierForComponent(agentGroupName, policyName, componentIndex) + "-policy_hash-" + policyHash
-}
-
-// IdentifierForFluxMeter returns the identifier for FluxMeter.
-func IdentifierForFluxMeter(agentGroupName, policyName, fluxMeterName string) string {
+// FluxMeterKey returns the identifier for FluxMeter in etcd.
+func FluxMeterKey(agentGroupName, policyName, fluxMeterName string) string {
 	return PolicyPrefix(agentGroupName, policyName) + "-flux_meter-" + fluxMeterName
 }
 
-// MetricIDForFluxMeter returns the metric ID for a flux meter.
-func MetricIDForFluxMeter(componentAPI component.ComponentAPI, fluxMeterName string) string {
-	return MetricIDForFluxMeterExpanded(componentAPI.GetAgentGroup(), componentAPI.GetPolicyName(), fluxMeterName, componentAPI.GetPolicyHash())
-}
-
-// MetricIDForFluxMeterExpanded returns the metric ID for a flux meter.
-func MetricIDForFluxMeterExpanded(agentGroupName, policyName, fluxMeterName, policyHash string) string {
-	return IdentifierForFluxMeter(agentGroupName, policyName, fluxMeterName) + "-policy_hash-" + policyHash
+// ClassifierKey returns the identifier for a Classifier in etcd.
+func ClassifierKey(agentGroupName, classifierName string) string {
+	return AgentGroupPrefix(agentGroupName) + "-classifier-" + classifierName
 }

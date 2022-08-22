@@ -48,13 +48,13 @@ func notifierFunc(event Event) {
 }
 
 // transformFunc is a mock func that reverses the content of any bytes given to it if the action is valid.
-func transformFunc(key Key, bytes []byte, eventType EventType) ([]byte, error) {
+func transformFunc(key Key, bytes []byte, eventType EventType) (Key, []byte, error) {
 	if eventType.IsAEventType() {
 		for i, j := 0, len(bytes)-1; i < j; i, j = i+1, j-1 {
 			bytes[i], bytes[j] = bytes[j], bytes[i]
 		}
 	}
-	return bytes, nil
+	return key, bytes, nil
 }
 
 func runTests(t *testing.T, config testConfig) {

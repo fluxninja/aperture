@@ -8,12 +8,12 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
+	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
-	"github.com/fluxninja/aperture/pkg/utils"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -41,7 +41,7 @@ func NewConcurrencyLimiterOptions(
 		return fx.Options(), "", errors.New("concurrencyLimiter.Scheduler.Selector is nil")
 	}
 	agentGroupName := selectorProto.GetAgentGroup()
-	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath, paths.IdentifierForComponent(agentGroupName, policyBaseAPI.GetPolicyName(), int64(componentStackIndex)))
+	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath, paths.DataplaneComponentKey(agentGroupName, policyBaseAPI.GetPolicyName(), int64(componentStackIndex)))
 	configSync := &concurrencyLimiterConfigSync{
 		concurrencyLimiterProto: concurrencyLimiterProto,
 		policyBaseAPI:           policyBaseAPI,
@@ -61,16 +61,11 @@ func (configSync *concurrencyLimiterConfigSync) doSync(etcdClient *etcdclient.Cl
 	// Add/remove file in lifecycle hooks in order to sync with etcd.
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper, err := utils.WrapWithConfProps(
-				configSync.concurrencyLimiterProto,
-				configSync.agentGroupName,
-				configSync.policyBaseAPI.GetPolicyName(),
-				configSync.policyBaseAPI.GetPolicyHash(),
-				configSync.componentIndex,
-			)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to wrap concurrency control config in config properties")
-				return err
+			wrapper := &configv1.ConcurrencyLimiterWrapper{
+				ConcurrencyLimiter: configSync.concurrencyLimiterProto,
+				ComponentIndex:     int64(configSync.componentIndex),
+				PolicyName:         configSync.policyBaseAPI.GetPolicyName(),
+				PolicyHash:         configSync.policyBaseAPI.GetPolicyHash(),
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {

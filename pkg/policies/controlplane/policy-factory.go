@@ -7,7 +7,6 @@ import (
 	"go.uber.org/fx"
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -113,27 +112,19 @@ func (factory *policyFactory) ProvideControllerPolicyFxOptions(
 	unmarshaller config.Unmarshaller,
 	registry *status.Registry,
 ) (fx.Option, error) {
-	var wrapperMessage configv1.ConfigPropertiesWrapper
+	var wrapperMessage configv1.PolicyWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.Config == nil {
+	if err != nil || wrapperMessage.Policy == nil {
 		s := status.NewStatus(nil, err)
 		_ = registry.Push(factory.registryPath, s)
 		log.Warn().Err(err).Msg("Failed to unmarshal policy config wrapper")
-		return fx.Options(), err
-	}
-	var policyMessage policylangv1.Policy
-	err = wrapperMessage.Config.UnmarshalTo(&policyMessage)
-	if err != nil {
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(factory.registryPath, s)
-		log.Warn().Err(err).Msg("Failed to unmarshal policy")
 		return fx.Options(), err
 	}
 	policyFxOptions, err := NewPolicyOptions(
 		factory.circuitJobGroup,
 		factory.etcdClient,
 		&wrapperMessage,
-		&policyMessage,
+		wrapperMessage.Policy,
 	)
 	if err != nil {
 		s := status.NewStatus(nil, err)

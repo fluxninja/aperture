@@ -38,20 +38,6 @@ func (m *MockFluxMeter) EXPECT() *MockFluxMeterMockRecorder {
 	return m.recorder
 }
 
-// GetAgentGroup mocks base method.
-func (m *MockFluxMeter) GetAgentGroup() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAgentGroup")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// GetAgentGroup indicates an expected call of GetAgentGroup.
-func (mr *MockFluxMeterMockRecorder) GetAgentGroup() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAgentGroup", reflect.TypeOf((*MockFluxMeter)(nil).GetAgentGroup))
-}
-
 // GetBuckets mocks base method.
 func (m *MockFluxMeter) GetBuckets() []float64 {
 	m.ctrl.T.Helper()
@@ -64,20 +50,6 @@ func (m *MockFluxMeter) GetBuckets() []float64 {
 func (mr *MockFluxMeterMockRecorder) GetBuckets() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBuckets", reflect.TypeOf((*MockFluxMeter)(nil).GetBuckets))
-}
-
-// GetComponentIndex mocks base method.
-func (m *MockFluxMeter) GetComponentIndex() int64 {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetComponentIndex")
-	ret0, _ := ret[0].(int64)
-	return ret0
-}
-
-// GetComponentIndex indicates an expected call of GetComponentIndex.
-func (mr *MockFluxMeterMockRecorder) GetComponentIndex() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetComponentIndex", reflect.TypeOf((*MockFluxMeter)(nil).GetComponentIndex))
 }
 
 // GetFluxMeterID mocks base method.

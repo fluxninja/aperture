@@ -16,8 +16,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
-	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 type fluxMeterConfigSync struct {
@@ -40,8 +38,7 @@ func NewFluxMeterOptions(
 	}
 	agentGroup := selectorProto.GetAgentGroup()
 
-	wrapperProto := &configv1.ConfigPropertiesWrapper{
-		AgentGroup: agentGroup,
+	wrapperProto := &configv1.FluxMeterWrapper{
 		PolicyName: policyBaseAPI.GetPolicyName(),
 		PolicyHash: policyBaseAPI.GetPolicyHash(),
 	}
@@ -53,7 +50,7 @@ func NewFluxMeterOptions(
 	}
 
 	etcdPath := path.Join(paths.FluxMeterConfigPath,
-		paths.IdentifierForFluxMeter(agentGroup, policyBaseAPI.GetPolicyName(), fluxMeterProto.GetName()))
+		paths.FluxMeterKey(agentGroup, policyBaseAPI.GetPolicyName(), fluxMeterProto.GetName()))
 	configSync := &fluxMeterConfigSync{
 		fluxMeterProto: fluxMeterProto,
 		policyBaseAPI:  policyBaseAPI,
@@ -71,16 +68,9 @@ func NewFluxMeterOptions(
 func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper, err := utils.WrapWithConfProps(
-				configSync.fluxMeterProto,
-				configSync.agentGroupName,
-				configSync.policyBaseAPI.GetPolicyName(),
-				configSync.policyBaseAPI.GetPolicyHash(),
-				0,
-			)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to wrap flux meter config in config properties")
-				return err
+			wrapper := &configv1.FluxMeterWrapper{
+				PolicyName: configSync.policyBaseAPI.GetPolicyName(),
+				PolicyHash: configSync.policyBaseAPI.GetPolicyHash(),
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {
@@ -109,11 +99,11 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 }
 
 // registerFluxMeter registers histograms for fluxmeter in controller.
-func registerFluxMeter(fluxMeterProto *policylangv1.FluxMeter, componentAPI component.ComponentAPI, metricSubRegistry policyapi.MetricSubRegistry) error {
+func registerFluxMeter(fluxMeterProto *policylangv1.FluxMeter, fluxMeterWrapper *configv1.FluxMeterWrapper, metricSubRegistry policyapi.MetricSubRegistry) error {
 	// Original metric name
 	fluxMeterName := fluxMeterProto.Name
 
-	policyNameMatcher, err := labels.NewMatcher(labels.MatchEqual, "policy_name", componentAPI.GetPolicyName())
+	policyNameMatcher, err := labels.NewMatcher(labels.MatchEqual, "policy_name", fluxMeterWrapper.GetPolicyName())
 	if err != nil {
 		return err
 	}
@@ -121,7 +111,7 @@ func registerFluxMeter(fluxMeterProto *policylangv1.FluxMeter, componentAPI comp
 	if err != nil {
 		return err
 	}
-	policyHashMatcher, err := labels.NewMatcher(labels.MatchEqual, "policy_hash", componentAPI.GetPolicyHash())
+	policyHashMatcher, err := labels.NewMatcher(labels.MatchEqual, "policy_hash", fluxMeterWrapper.GetPolicyHash())
 	if err != nil {
 		return err
 	}

@@ -16,7 +16,7 @@ import (
 
 var _ = Describe("Dataplane Engine", func() {
 	var (
-		engine iface.EngineAPI
+		engine iface.Engine
 
 		t             GinkgoTestReporter
 		mockCtrl      *gomock.Controller

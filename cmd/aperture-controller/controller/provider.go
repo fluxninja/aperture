@@ -2,14 +2,18 @@ package controller
 
 import (
 	"context"
+	"encoding/base64"
+	"errors"
 	"path"
 
+	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"github.com/ghodss/yaml"
 	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
+	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -20,7 +24,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/status"
-	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 var (
@@ -89,42 +92,48 @@ func setClassifiersPathFlag(fs *pflag.FlagSet) error {
 
 // Sync classifiers config directory with etcd.
 func setupClassifiersNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry *status.Registry) {
-	wrapClassifier := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) ([]byte, error) {
-		unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
+	transformKey := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (retKey notifiers.Key, retBytes []byte, retErr error) {
+		statusPath := rulesetKey + "." + key.String()
 		classifierMsg := &classificationv1.Classifier{}
+
+		updateStatus := func() {
+			if etype == notifiers.Remove {
+				statusRegistry.Delete(statusPath)
+			} else if etype == notifiers.Write {
+				if retErr != nil {
+					s := status.NewStatus(nil, retErr)
+					pushErr := statusRegistry.Push(statusPath, s)
+					if pushErr != nil {
+						log.Error().Err(pushErr).Msg("could not push error to status registry")
+					}
+				} else {
+					s := status.NewStatus(classifierMsg, nil)
+					pushErr := statusRegistry.Push(statusPath, s)
+					if pushErr != nil {
+						log.Error().Err(pushErr).Msg("could not push classifier to status registry")
+					}
+				}
+			}
+		}
+
+		defer updateStatus()
+
+		unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
 		unmarshalErr := unmarshaller.Unmarshal(classifierMsg)
 		if unmarshalErr != nil {
-			log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal classification")
-			return nil, unmarshalErr
+			log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal classifier")
+
+			return key, bytes, unmarshalErr
 		}
 
-		statusPath := rulesetKey + "." + key.String()
-
-		if etype == notifiers.Write {
-			s := status.NewStatus(classifierMsg, nil)
-			pushErr := statusRegistry.Push(statusPath, s)
-			if pushErr != nil {
-				log.Error().Err(pushErr).Msg("could not push classification rules to status registry")
-			}
-
-			wrapper, wrapErr := utils.HashAndWrapWithConfProps(classifierMsg, string(key))
-			if wrapErr != nil {
-				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
-				return nil, wrapErr
-			}
-			dat, marshalWrapErr := yaml.Marshal(wrapper)
-			if marshalWrapErr != nil {
-				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
-				return nil, marshalWrapErr
-			}
-			return dat, nil
+		selectorProto := classifierMsg.GetSelector()
+		if selectorProto == nil {
+			return key, bytes, errors.New("Classifier.Selector is nil")
 		}
+		agentGroup := selectorProto.GetAgentGroup()
+		etcdPath := path.Join(paths.Classifiers, paths.ClassifierKey(agentGroup, string(key)))
 
-		if etype == notifiers.Remove {
-			statusRegistry.Delete(statusPath)
-		}
-
-		return nil, nil
+		return notifiers.Key(etcdPath), bytes, nil
 	}
 
 	notifier := etcdnotifier.NewPrefixToEtcdNotifier(
@@ -134,10 +143,10 @@ func setupClassifiersNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client
 	)
 
 	// content transform callback to wrap policy in config properties wrapper
-	notifier.SetTransformFunc(wrapClassifier)
+	notifier.SetTransformFunc(transformKey)
 
 	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(_ context.Context) error {
 			err := notifier.Start()
 			if err != nil {
 				return err
@@ -148,7 +157,7 @@ func setupClassifiersNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client
 			}
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(_ context.Context) error {
 			var merr, err error
 			err = w.RemovePrefixNotifier(notifier)
 			if err != nil {
@@ -174,9 +183,30 @@ func setPoliciesPathFlag(fs *pflag.FlagSet) error {
 	return nil
 }
 
+// HashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
+func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*configv1.PolicyWrapper, error) {
+	dat, marshalErr := yaml.Marshal(policyMessage)
+	if marshalErr != nil {
+		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
+		return nil, marshalErr
+	}
+	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
+	if hashErr != nil {
+		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))
+		return nil, hashErr
+	}
+	hash := base64.StdEncoding.EncodeToString(hashBytes[:])
+
+	return &configv1.PolicyWrapper{
+		Policy:     policyMessage,
+		PolicyName: policyName,
+		PolicyHash: hash,
+	}, nil
+}
+
 // Sync policies config directory with etcd.
 func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry *status.Registry) {
-	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) ([]byte, error) {
+	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
 		statusPath := policyKey + "." + key.String()
 
 		var dat []byte
@@ -188,19 +218,19 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 			unmarshalErr := unmarshaller.Unmarshal(policyMessage)
 			if unmarshalErr != nil {
 				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
-				return nil, unmarshalErr
+				return key, nil, unmarshalErr
 			}
 
-			wrapper, wrapErr := utils.HashAndWrapWithConfProps(policyMessage, string(key))
+			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
-				return nil, wrapErr
+				return key, nil, wrapErr
 			}
 			var marshalWrapErr error
 			dat, marshalWrapErr = yaml.Marshal(wrapper)
 			if marshalWrapErr != nil {
 				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
-				return nil, marshalWrapErr
+				return key, nil, marshalWrapErr
 			}
 
 			s := status.NewStatus(wrapper, nil)
@@ -212,7 +242,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 		case notifiers.Remove:
 			statusRegistry.Delete(statusPath)
 		}
-		return dat, nil
+		return key, dat, nil
 	}
 
 	notifier := etcdnotifier.NewPrefixToEtcdNotifier(
@@ -223,7 +253,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 	notifier.SetTransformFunc(wrapPolicy)
 
 	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(_ context.Context) error {
 			err := notifier.Start()
 			if err != nil {
 				return err
@@ -234,7 +264,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 			}
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(_ context.Context) error {
 			var merr, err error
 			err = w.RemovePrefixNotifier(notifier)
 			if err != nil {

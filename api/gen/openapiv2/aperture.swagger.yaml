@@ -4,11 +4,11 @@ info:
   version: "1.0"
 tags:
   - name: RulesService
+  - name: PolicyService
   - name: InfoService
   - name: StatusService
   - name: FlowControlService
   - name: FluxNinjaService
-  - name: PolicyService
 consumes:
   - application/json
 produces:
@@ -273,8 +273,6 @@ definitions:
   apertureflowcontrolv1FluxMeter:
     type: object
     properties:
-      agent_group:
-        type: string
       flux_meter_name:
         type: string
       policy_hash:

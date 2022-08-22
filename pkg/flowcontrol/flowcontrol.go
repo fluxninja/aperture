@@ -23,13 +23,13 @@ type Handler struct {
 	flowcontrolv1.UnimplementedFlowControlServiceServer
 	entityCache *entitycache.EntityCache
 	metrics     Metrics
-	engine      iface.EngineAPI
+	engine      iface.Engine
 }
 
 // NewHandler creates an empty flowcontrol Handler
 //
 // It also accepts a pointer to an EntityCache for Infra Labels lookup.
-func NewHandler(entityCache *entitycache.EntityCache, metrics Metrics, engine iface.EngineAPI) *Handler {
+func NewHandler(entityCache *entitycache.EntityCache, metrics Metrics, engine iface.Engine) *Handler {
 	return &Handler{
 		entityCache: entityCache,
 		metrics:     metrics,
