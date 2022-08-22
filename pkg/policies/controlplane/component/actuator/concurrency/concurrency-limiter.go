@@ -13,12 +13,12 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 type concurrencyLimiterConfigSync struct {
-	policyBaseAPI           policyapi.PolicyBaseAPI
+	policyBaseAPI           iface.PolicyBase
 	concurrencyLimiterProto *policylangv1.ConcurrencyLimiter
 	etcdPath                string
 	agentGroupName          string
@@ -29,7 +29,7 @@ type concurrencyLimiterConfigSync struct {
 func NewConcurrencyLimiterOptions(
 	concurrencyLimiterProto *policylangv1.ConcurrencyLimiter,
 	componentStackIndex int,
-	policyBaseAPI policyapi.PolicyBaseAPI,
+	policyBaseAPI iface.PolicyBase,
 ) (fx.Option, string, error) {
 	// Get Agent Group Name from ConcurrencyLimiter.Scheduler.Selector.AgentGroup
 	schedulerProto := concurrencyLimiterProto.GetScheduler()

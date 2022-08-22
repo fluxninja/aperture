@@ -15,13 +15,13 @@ import (
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
 // LoadShedActuator struct.
 type LoadShedActuator struct {
-	policyReadAPI  policyapi.PolicyReadAPI
+	policyReadAPI  iface.PolicyRead
 	decision       *policydecisionsv1.LoadShedDecision
 	etcdPath       string
 	writer         *etcdwriter.Writer
@@ -33,7 +33,7 @@ type LoadShedActuator struct {
 func NewLoadShedActuatorAndOptions(
 	_ *policylangv1.LoadShedActuator,
 	componentIndex int,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.LoadShedDecisionsPath,

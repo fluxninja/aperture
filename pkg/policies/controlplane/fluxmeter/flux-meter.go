@@ -15,11 +15,11 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 )
 
 type fluxMeterConfigSync struct {
-	policyBaseAPI  policyapi.PolicyBaseAPI
+	policyBaseAPI  iface.PolicyBase
 	fluxMeterProto *policylangv1.FluxMeter
 	etcdPath       string
 	agentGroupName string
@@ -28,8 +28,8 @@ type fluxMeterConfigSync struct {
 // NewFluxMeterOptions creates fx options for FluxMeter.
 func NewFluxMeterOptions(
 	fluxMeterProto *policylangv1.FluxMeter,
-	policyBaseAPI policyapi.PolicyBaseAPI,
-	metricSubRegistry policyapi.MetricSubRegistry,
+	policyBaseAPI iface.PolicyBase,
+	metricSubRegistry iface.MetricSubRegistry,
 ) (fx.Option, error) {
 	// Get Agent Group Name from FluxMeter.Selector.AgentGroup
 	selectorProto := fluxMeterProto.GetSelector()
@@ -99,7 +99,7 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 }
 
 // registerFluxMeter registers histograms for fluxmeter in controller.
-func registerFluxMeter(fluxMeterProto *policylangv1.FluxMeter, fluxMeterWrapper *configv1.FluxMeterWrapper, metricSubRegistry policyapi.MetricSubRegistry) error {
+func registerFluxMeter(fluxMeterProto *policylangv1.FluxMeter, fluxMeterWrapper *configv1.FluxMeterWrapper, metricSubRegistry iface.MetricSubRegistry) error {
 	// Original metric name
 	fluxMeterName := fluxMeterProto.Name
 

@@ -1,4 +1,4 @@
-package policyapi
+package iface
 
 import (
 	"time"
@@ -20,15 +20,15 @@ const (
 	PoliciesRoot = "policies"
 )
 
-// PolicyBaseAPI is for read only access to base policy info.
-type PolicyBaseAPI interface {
+// PolicyBase is for read only access to base policy info.
+type PolicyBase interface {
 	GetPolicyName() string
 	GetPolicyHash() string
 }
 
-// PolicyReadAPI is for read only access to full policy state.
-type PolicyReadAPI interface {
-	PolicyBaseAPI
+// PolicyRead is for read only access to full policy state.
+type PolicyRead interface {
+	PolicyBase
 	ResolveMetricNames(query string) (string, error)
 	GetEvaluationInterval() time.Duration
 }
@@ -39,8 +39,8 @@ type MetricSubRegistry interface {
 	RegisterMetricSub(metricsNameOrig, metricNameSub string, labelMatchers []*labels.Matcher)
 }
 
-// PolicyAPI is the global interface composed of all of the above APIs.
-type PolicyAPI interface {
-	PolicyReadAPI
+// Policy is the global interface composed of all of the above APIs.
+type Policy interface {
+	PolicyRead
 	MetricSubRegistry
 }

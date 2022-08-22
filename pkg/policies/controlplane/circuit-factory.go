@@ -9,7 +9,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -23,7 +23,7 @@ func CircuitFactoryModule() fx.Option {
 // NewCircuitAndOptions creates Circuit and its fx options.
 func NewCircuitAndOptions(
 	circuitProto []*policylangv1.Component,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 ) (*runtime.Circuit, fx.Option, error) {
 	inSignals := make(map[string][]int)
 	outSignals := make(map[string]int)

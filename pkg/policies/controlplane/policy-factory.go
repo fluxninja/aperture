@@ -14,8 +14,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/common"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -59,7 +59,7 @@ func setupPolicyFxDriver(
 	lifecycle fx.Lifecycle,
 	registry *status.Registry,
 ) error {
-	circuitJobGroup, err := jobs.NewJobGroup(policyapi.PoliciesRoot+".circuit_jobs", registry, 0, jobs.RescheduleMode, nil)
+	circuitJobGroup, err := jobs.NewJobGroup(iface.PoliciesRoot+".circuit_jobs", registry, 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create job group")
 		return err

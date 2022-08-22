@@ -20,8 +20,8 @@ import (
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/component"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -37,7 +37,7 @@ const (
 
 // Scheduler is part of the concurrency control component stack.
 type Scheduler struct {
-	policyReadAPI policyapi.PolicyReadAPI
+	policyReadAPI iface.PolicyRead
 	// saves promValue result from tokens query to check if anything changed
 	tokensPromValue prometheusmodel.Value
 	// Prometheus query for accepted concurrency
@@ -59,7 +59,7 @@ type Scheduler struct {
 func NewSchedulerAndOptions(
 	schedulerProto *policylangv1.Scheduler,
 	componentIndex int,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.AutoTokenResultsPath,

@@ -12,7 +12,7 @@ import (
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
@@ -21,7 +21,7 @@ import (
 )
 
 type rateLimiterSync struct {
-	policyReadAPI     policyapi.PolicyReadAPI
+	policyReadAPI     iface.PolicyRead
 	rateLimiterProto  *policylangv1.RateLimiter
 	decision          *policydecisionsv1.RateLimiterDecision
 	configEtcdPath    string
@@ -35,7 +35,7 @@ type rateLimiterSync struct {
 func NewRateLimiterAndOptions(
 	rateLimiterProto *policylangv1.RateLimiter,
 	componentIndex int,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 ) (runtime.Component, fx.Option, error) {
 	// Get the agent group name.
 	selectorProto := rateLimiterProto.GetSelector()

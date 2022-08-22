@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -19,11 +19,11 @@ type ControllerComponent struct {
 	// Controller output's last reading
 	output         reading.Reading
 	componentIndex int
-	policyReadAPI  policyapi.PolicyReadAPI
+	policyReadAPI  iface.PolicyRead
 }
 
 // NewControllerComponent creates a new ControllerComponent.
-func NewControllerComponent(controller Controller, componentIndex int, policyReadAPI policyapi.PolicyReadAPI) *ControllerComponent {
+func NewControllerComponent(controller Controller, componentIndex int, policyReadAPI iface.PolicyRead) *ControllerComponent {
 	return &ControllerComponent{
 		signal:          reading.NewInvalid(),
 		setpoint:        reading.NewInvalid(),
