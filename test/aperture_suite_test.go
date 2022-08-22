@@ -55,7 +55,7 @@ var (
 type JobGroupIn struct {
 	fx.In
 	JobGroup *jobs.JobGroup `name:"job-group"`
-	Registry *status.Registry
+	Registry status.Registry
 }
 
 func TestCore(t *testing.T) {

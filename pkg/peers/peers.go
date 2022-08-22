@@ -73,7 +73,7 @@ type PeerDiscoveryIn struct {
 	Unmarshaller   config.Unmarshaller
 	Client         *etcdclient.Client
 	Listener       *listener.Listener
-	StatusRegistry *status.Registry
+	StatusRegistry status.Registry
 	Prefix         PeerDiscoveryPrefix
 	Watchers       PeerWatchers `group:"peer-watchers"`
 }

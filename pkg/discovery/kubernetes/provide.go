@@ -29,7 +29,7 @@ type FxIn struct {
 	fx.In
 	Unmarshaller     config.Unmarshaller
 	Lifecycle        fx.Lifecycle
-	StatusRegistry   *status.Registry
+	StatusRegistry   status.Registry
 	KubernetesClient k8s.K8sClient
 	EntityTrackers   notifiers.Trackers `name:"entity_trackers"`
 }
