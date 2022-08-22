@@ -301,14 +301,6 @@ FluxMeter gathers metrics for the traffic that matches its selector.
 </dd>
 </dl>
 <dl>
-<dt>name</dt>
-<dd>
-
-(string) Name of the flux meter.
-
-</dd>
-</dl>
-<dl>
 <dt>selector</dt>
 <dd>
 
@@ -1340,7 +1332,7 @@ This interval is typically aligned with how often the corrective action (actuati
 <dt>flux_meters</dt>
 <dd>
 
-([[]Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+(map of [Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
 
 </dd>
 </dl>
