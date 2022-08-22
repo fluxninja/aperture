@@ -69,6 +69,7 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			wrapper := &configv1.FluxMeterWrapper{
+				FluxMeter:  configSync.fluxMeterProto,
 				PolicyName: configSync.policyBaseAPI.GetPolicyName(),
 				PolicyHash: configSync.policyBaseAPI.GetPolicyHash(),
 			}
