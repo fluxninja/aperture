@@ -169,6 +169,12 @@ func getTypeHash(t reflect.Type) typeHash {
 //	 foo := &ExampleBasic{}
 //	 SetDefaults(foo)
 func SetDefaults(variable interface{}) {
+	kind := reflect.ValueOf(variable).Elem().Kind()
+	if kind != reflect.Struct {
+		// Panic early with clear message to avoid cryptic errors from inner functions.
+		// Note: Perhaps we can lift this limitation.
+		panic(fmt.Sprintf("SetDefaults can be used only on structs, got %v", kind))
+	}
 	getDefaultFiller().fill(variable)
 }
 
@@ -366,6 +372,8 @@ func newDefaultFiller() *filler {
 				val := field.Value.Index(i)
 				setPtrDefaults(val)
 			}
+			// FIXME: also descend into slice of slices
+			// FIXME: also descend into slice of maps
 		default:
 			reg := regexp.MustCompile(`^\[(.*)\]$`)
 			matchs := reg.FindStringSubmatch(field.TagValue)
@@ -390,6 +398,32 @@ func newDefaultFiller() *filler {
 				field.Value.Set(result)
 			}
 		}
+	}
+	funcs[reflect.Map] = func(field *fieldData) {
+		switch field.Field.Type.Elem().Kind() {
+		case reflect.Struct:
+			keys := field.Value.MapKeys()
+			for _, key := range keys {
+				// We need to pull the value from map, copy to a settable
+				// location, fill in defaults, and then put it back into map.
+				value := field.Value.MapIndex(key)
+				tmp := reflect.New(value.Type()).Elem()
+				tmp.Set(value)
+				fields := filler.getFieldsFromValue(tmp, nil)
+				filler.setDefaultValues(fields)
+				field.Value.SetMapIndex(key, tmp)
+			}
+		case reflect.Ptr, reflect.Interface:
+			iter := field.Value.MapRange()
+			for iter.Next() {
+				setPtrDefaults(iter.Value())
+			}
+		case reflect.Slice:
+			// FIXME: also descend into map of slices
+		case reflect.Map:
+			// FIXME: also descend into map of maps
+		}
+		// FIXME: handle actual default Tags on maps?
 	}
 	filler.FuncByKind = funcs
 	filler.FuncByType = types
