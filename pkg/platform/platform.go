@@ -48,7 +48,7 @@ var platform = initPlatform()
 
 // Platform holds the state of the platform.
 type Platform struct {
-	statusRegistry *status.Registry
+	statusRegistry status.Registry
 	unmarshaller   config.Unmarshaller
 	dotgraph       fx.DotGraph
 }

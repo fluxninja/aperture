@@ -73,7 +73,7 @@ func setupFluxMeterModule(
 	watcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
 	e iface.EngineAPI,
-	sr *status.Registry,
+	sr status.Registry,
 	pr *prometheus.Registry,
 ) error {
 	// save policy config api
@@ -108,7 +108,7 @@ type FluxMeter struct {
 func NewFluxMeterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry *status.Registry,
+	registry status.Registry,
 ) (fx.Option, error) {
 	registryPath := path.Join(fluxMeterStatusRoot, key.String())
 	wrapperMessage := &configv1.ConfigPropertiesWrapper{}

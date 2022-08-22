@@ -55,7 +55,7 @@ type Heartbeats struct {
 	interval         config.Duration
 	jobGroup         *jobs.JobGroup
 	clientConn       *grpc.ClientConn
-	statusRegistry   *status.Registry
+	statusRegistry   status.Registry
 	entityCache      *entitycache.EntityCache
 	controllerInfo   *heartbeatv1.ControllerInfo
 	heartbeatsAddr   string
@@ -70,7 +70,7 @@ func (h *Heartbeats) GetControllerInfo() *heartbeatv1.ControllerInfo {
 func newHeartbeats(
 	jobGroup *jobs.JobGroup,
 	p pluginconfig.FluxNinjaPluginConfig,
-	statusRegistry *status.Registry,
+	statusRegistry status.Registry,
 	entityCache *entitycache.EntityCache,
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,

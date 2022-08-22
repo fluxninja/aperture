@@ -15,13 +15,13 @@ import (
 )
 
 // FxOptionsFunc is a function that returns fx.Option.
-type FxOptionsFunc func(Key, config.Unmarshaller, *status.Registry) (fx.Option, error)
+type FxOptionsFunc func(Key, config.Unmarshaller, status.Registry) (fx.Option, error)
 
 type fxRunner struct {
 	UnmarshalKeyNotifier
 	app                *fx.App
 	fxOptionsFuncs     []FxOptionsFunc
-	statusRegistry     *status.Registry
+	statusRegistry     status.Registry
 	prometheusRegistry *prometheus.Registry
 	registryPath       string
 }
@@ -58,7 +58,10 @@ func (fr *fxRunner) processEvent(event Event) {
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to deinit app")
 		}
-		fr.statusRegistry.Delete(fr.registryPath)
+		err = fr.statusRegistry.Delete(fr.registryPath)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to delete app status")
+		}
 	}
 }
 
@@ -157,7 +160,7 @@ type FxDriver struct {
 	// Note that when key's contents change the previous App will be stopped
 	// and a fresh one will be created.
 	FxOptionsFuncs     []FxOptionsFunc
-	StatusRegistry     *status.Registry
+	StatusRegistry     status.Registry
 	PrometheusRegistry *prometheus.Registry
 	// Registry path prefix to push status updates to
 	StatusPath string

@@ -88,7 +88,7 @@ func setClassifiersPathFlag(fs *pflag.FlagSet) error {
 }
 
 // Sync classifiers config directory with etcd.
-func setupClassifiersNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry *status.Registry) {
+func setupClassifiersNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry status.Registry) {
 	wrapClassifier := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) ([]byte, error) {
 		unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
 		classifierMsg := &classificationv1.Classifier{}
@@ -121,7 +121,7 @@ func setupClassifiersNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client
 		}
 
 		if etype == notifiers.Remove {
-			statusRegistry.Delete(statusPath)
+			_ = statusRegistry.Delete(statusPath)
 		}
 
 		return nil, nil
@@ -175,7 +175,7 @@ func setPoliciesPathFlag(fs *pflag.FlagSet) error {
 }
 
 // Sync policies config directory with etcd.
-func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry *status.Registry) {
+func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry status.Registry) {
 	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) ([]byte, error) {
 		statusPath := policyKey + "." + key.String()
 
@@ -210,7 +210,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 			}
 
 		case notifiers.Remove:
-			statusRegistry.Delete(statusPath)
+			_ = statusRegistry.Delete(statusPath)
 		}
 		return dat, nil
 	}

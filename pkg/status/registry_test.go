@@ -108,6 +108,13 @@ var _ = Describe("Status Registry", func() {
 		Expect(statusDetail).To(Equal(testGroupStatus("new").Status.Details))
 	})
 
+	It("should write to a sub group when pushed from root registry", func() {
+		err := reg.Push("job1.subjob1.key1", NewStatus(nil, errors.New("new")))
+		Expect(err).ToNot(HaveOccurred())
+		statusDetail := reg.Get("job1.subjob1.key1").GetStatus().GetDetails()
+		Expect(statusDetail).To(Equal(testGroupStatus("new").Status.Details))
+	})
+
 	It("should delete the status", func() {
 		Expect(sj1.Exists("key1")).To(BeTrue())
 		sj1.Delete("key1")

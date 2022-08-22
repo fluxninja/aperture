@@ -76,7 +76,7 @@ type ProvideClassifierIn struct {
 	Classifier *Classifier       `name:"empty"`
 	Watcher    notifiers.Watcher `name:"classifier"`
 	Lifecycle  fx.Lifecycle
-	Registry   *status.Registry
+	Registry   status.Registry
 }
 
 // ProvideClassifier provides a classifier that loads the rules from config file.
@@ -119,7 +119,7 @@ func RegisterCMFileValidator(validator *CMFileValidator, configMapValidator *val
 func (c *Classifier) provideClassifierFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry *status.Registry,
+	registry status.Registry,
 ) (fx.Option, error) {
 	return fx.Options(
 		fx.Supply(c),

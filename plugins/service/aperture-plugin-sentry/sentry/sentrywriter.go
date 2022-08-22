@@ -37,7 +37,7 @@ type SentryWriter struct {
 	Client         *sentry.Client
 	Levels         map[zerolog.Level]struct{}
 	CrashWriter    *CrashWriter
-	StatusRegistry *status.Registry
+	StatusRegistry status.Registry
 }
 
 // Write implements io.Writer and forwards the data to CrashWriter buffer.

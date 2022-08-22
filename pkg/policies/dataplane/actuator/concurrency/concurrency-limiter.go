@@ -106,7 +106,7 @@ func setupConcurrencyLimiterFactory(
 	watcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
 	e iface.EngineAPI,
-	statusRegistry *status.Registry,
+	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
@@ -233,7 +233,7 @@ type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
 func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry *status.Registry,
+	registry status.Registry,
 ) (fx.Option, error) {
 	registryPath := path.Join(concurrencyLimiterStatusRoot, key.String())
 	wrapperMessage := &configv1.ConfigPropertiesWrapper{}
@@ -327,7 +327,7 @@ type concurrencyLimiter struct {
 // Make sure ConcurrencyLimiter implements the iface.ConcurrencyLimiter.
 var _ iface.Limiter = &concurrencyLimiter{}
 
-func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *status.Registry) error {
+func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegistry status.Registry) error {
 	// Factories
 	conLimiterFactory := conLimiter.concurrencyLimiterFactory
 	loadShedActuatorFactory := conLimiterFactory.loadShedActuatorFactory

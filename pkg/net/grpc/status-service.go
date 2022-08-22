@@ -14,11 +14,11 @@ import (
 // StatusService is the implementation of the statusv1.StatusServiceServer interface.
 type StatusService struct {
 	statusv1.UnimplementedStatusServiceServer
-	registry *status.Registry
+	registry status.Registry
 }
 
 // RegisterStatusService registers the StatusService implementation with the provided grpc server.
-func RegisterStatusService(server *grpc.Server, reg *status.Registry) {
+func RegisterStatusService(server *grpc.Server, reg status.Registry) {
 	svc := &StatusService{
 		registry: reg,
 	}
@@ -29,7 +29,7 @@ func RegisterStatusService(server *grpc.Server, reg *status.Registry) {
 func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.GroupStatusRequest) (*statusv1.GroupStatus, error) {
 	log.Trace().Str("group", req.Group).Msg("Received request on GetGroupStatus handler")
 
-	status := svc.registry.At(req.Group).Get()
+	status := svc.registry.Get(req.Group)
 
 	return status, nil
 }

@@ -211,8 +211,11 @@ func (executor *jobExecutor) stop() {
 	defer executor.execLock.Unlock()
 
 	regPath := executor.getLivenessStatusPath()
-	executor.jg.gt.registry.Delete(regPath)
-	err := executor.jg.scheduler.RemoveByTag(executor.jobTag)
+	err := executor.jg.registry.Delete(regPath)
+	if err != nil {
+		log.Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job status")
+	}
+	err = executor.jg.scheduler.RemoveByTag(executor.jobTag)
 	if err != nil {
 		log.Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job")
 		return

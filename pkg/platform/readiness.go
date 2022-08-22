@@ -21,7 +21,7 @@ type platformReadinessStatusIn struct {
 	fx.In
 
 	Lifecycle      fx.Lifecycle
-	StatusRegistry *status.Registry
+	StatusRegistry status.Registry
 }
 
 func providePlatformReadinessStatus(in platformReadinessStatusIn) error {

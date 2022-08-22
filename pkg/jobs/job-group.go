@@ -84,7 +84,7 @@ func (jgc JobGroupConstructor) Annotate() fx.Option {
 
 func (jgc JobGroupConstructor) provideJobGroup(
 	gw GroupWatchers,
-	registry *status.Registry,
+	registry status.Registry,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (*JobGroup, error) {
@@ -144,7 +144,7 @@ var errInitialResult = errors.New("job hasn't been scheduled yet")
 // JobGroup tracks a group of jobs.
 // It is responsible for scheduling jobs and keeping track of their statuses.
 type JobGroup struct {
-	registry  *status.Registry
+	registry  status.Registry
 	scheduler *gocron.Scheduler
 	gt        *groupTracker
 	name      string
@@ -152,7 +152,7 @@ type JobGroup struct {
 
 // NewJobGroup creates a new JobGroup.
 func NewJobGroup(name string,
-	registry *status.Registry,
+	registry status.Registry,
 	maxConcurrentJobs int,
 	schedulerMode SchedulerMode,
 	gws GroupWatchers,

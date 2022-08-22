@@ -136,7 +136,7 @@ func newLoadShedActuatorFactory(
 }
 
 // newLoadShedActuator creates a new load shed actuator based on proto spec.
-func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath string, componentAPI component.ComponentAPI, registry *status.Registry, clock clockwork.Clock, lifecycle fx.Lifecycle, metricLabels prometheus.Labels) (*loadShedActuator, error) {
+func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath string, componentAPI component.ComponentAPI, registry status.Registry, clock clockwork.Clock, lifecycle fx.Lifecycle, metricLabels prometheus.Labels) (*loadShedActuator, error) {
 	lsa := &loadShedActuator{
 		componentAPI:   componentAPI,
 		clock:          clock,
@@ -245,7 +245,7 @@ type loadShedActuator struct {
 	componentAPI        component.ComponentAPI
 	clock               clockwork.Clock
 	tokenBucketLoadShed *scheduler.TokenBucketLoadShed
-	statusRegistry      *status.Registry
+	statusRegistry      status.Registry
 	registryPath        string
 }
 

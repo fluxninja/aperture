@@ -80,7 +80,7 @@ func setupRateLimiterFactory(
 	lifecycle fx.Lifecycle,
 	e iface.EngineAPI,
 	distCache *distcache.DistCache,
-	statusRegistry *status.Registry,
+	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
@@ -150,7 +150,7 @@ func setupRateLimiterFactory(
 func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry *status.Registry,
+	registry status.Registry,
 ) (fx.Option, error) {
 	registryPath := path.Join(rateLimiterStatusRoot, key.String())
 
@@ -201,7 +201,7 @@ type rateLimiter struct {
 // Make sure rateLimiter implements iface.Limiter.
 var _ iface.RateLimiter = (*rateLimiter)(nil)
 
-func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *status.Registry) error {
+func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry status.Registry) error {
 	// decision notifier
 	unmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {

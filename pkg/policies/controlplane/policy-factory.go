@@ -58,7 +58,7 @@ func setupPolicyFxDriver(
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
-	registry *status.Registry,
+	registry status.Registry,
 ) error {
 	circuitJobGroup, err := jobs.NewJobGroup(policyapi.PoliciesRoot+".circuit_jobs", registry, 0, jobs.RescheduleMode, nil)
 	if err != nil {
@@ -111,7 +111,7 @@ func setupPolicyFxDriver(
 func (factory *policyFactory) ProvideControllerPolicyFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry *status.Registry,
+	registry status.Registry,
 ) (fx.Option, error) {
 	var wrapperMessage configv1.ConfigPropertiesWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)

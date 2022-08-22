@@ -50,7 +50,7 @@ func PromQLModule() fx.Option {
 }
 
 func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.API) notifiers.FxOptionsFunc {
-	return func(key notifiers.Key, unmarshaller config.Unmarshaller, registry *status.Registry) (fx.Option, error) {
+	return func(key notifiers.Key, unmarshaller config.Unmarshaller, registry status.Registry) (fx.Option, error) {
 		return fx.Supply(fx.Annotated{Name: promQLJobGroupTag, Target: promQLJobGroup},
 			fx.Annotate(promAPI, fx.As(new(prometheusv1.API))),
 		), nil
@@ -59,7 +59,7 @@ func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.AP
 
 // PromQLModuleForPolicyApp returns fx options for PromQL in the policy app. Invoked only once per policy.
 func PromQLModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
-	providePromJobsExecutor := func(promQLJobGroup *jobs.JobGroup, registry *status.Registry, lifecycle fx.Lifecycle) (*promJobsExecutor, error) {
+	providePromJobsExecutor := func(promQLJobGroup *jobs.JobGroup, registry status.Registry, lifecycle fx.Lifecycle) (*promJobsExecutor, error) {
 		// Create this watcher as a singleton at the policy/circuit level
 		pje := &promJobsExecutor{
 			circuitAPI:     circuitAPI,

@@ -50,7 +50,7 @@ func (mjc MultiJobConstructor) provideMultiJob(
 	gws GroupWatchers,
 	jws JobWatchers,
 	jg *JobGroup,
-	registry *status.Registry,
+	registry status.Registry,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (*MultiJob, error) {
@@ -108,7 +108,7 @@ type MultiJob struct {
 var _ Job = (*MultiJob)(nil)
 
 // NewMultiJob creates a new instance of MultiJob.
-func NewMultiJob(name string, group string, alwaysHealthy bool, registry *status.Registry, jws JobWatchers, gws GroupWatchers) *MultiJob {
+func NewMultiJob(name string, group string, alwaysHealthy bool, registry status.Registry, jws JobWatchers, gws GroupWatchers) *MultiJob {
 	gtName := strings.Join([]string{group, name}, registry.Delim())
 	return &MultiJob{
 		JobBase: JobBase{

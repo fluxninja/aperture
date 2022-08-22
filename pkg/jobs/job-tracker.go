@@ -3,7 +3,6 @@ package jobs
 import (
 	"context"
 	"errors"
-	"strings"
 	"sync"
 	"time"
 
@@ -33,16 +32,17 @@ func newJobTracker(job Job) *jobTracker {
 type groupTracker struct {
 	mu            sync.Mutex
 	trackers      map[string]*jobTracker
-	registry      *status.Registry
+	registry      status.Registry
 	name          string
 	groupWatchers GroupWatchers
 }
 
-func newGroupTracker(gws GroupWatchers, registry *status.Registry, name string) *groupTracker {
+func newGroupTracker(gws GroupWatchers, registry status.Registry, name string) *groupTracker {
+	r := status.NewRegistryPrefix(registry, name)
 	return &groupTracker{
 		name:          name,
 		trackers:      make(map[string]*jobTracker),
-		registry:      registry,
+		registry:      r,
 		groupWatchers: gws,
 	}
 }
@@ -61,8 +61,8 @@ func (gt *groupTracker) updateStatus(job Job, s *statusv1.Status) error {
 		return errExistingJob
 	}
 
-	regPath := gt.getStatusRegPath(job.Name())
-	err := gt.registry.Push(regPath, s)
+	// regPath := gt.getStatusRegPath(job.Name())
+	err := gt.registry.Push(job.Name(), s)
 	if err != nil {
 		return err
 	}
@@ -70,9 +70,9 @@ func (gt *groupTracker) updateStatus(job Job, s *statusv1.Status) error {
 	return nil
 }
 
-func (gt *groupTracker) getStatusRegPath(jobName string) string {
-	return strings.Join([]string{gt.name, jobName}, gt.registry.Delim())
-}
+// func (gt *groupTracker) getStatusRegPath(jobName string) string {
+// 	return strings.Join([]string{gt.name, jobName}, gt.registry.Delim())
+// }
 
 func (gt *groupTracker) registerJob(job Job) error {
 	if job.Name() == "" {
@@ -93,8 +93,8 @@ func (gt *groupTracker) registerJob(job Job) error {
 	tracker := newJobTracker(job)
 	gt.trackers[job.Name()] = tracker
 
-	regPath := gt.getStatusRegPath(job.Name())
-	err := gt.registry.Push(regPath, s)
+	// regPath := gt.getStatusRegPath(job.Name())
+	err := gt.registry.Push(job.Name(), s)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to push job status to registry")
 		return err
@@ -119,8 +119,11 @@ func (gt *groupTracker) deregisterJob(name string) (Job, error) {
 	delete(gt.trackers, name)
 	gt.groupWatchers.OnJobDeregistered(name)
 
-	regPath := gt.getStatusRegPath(name)
-	gt.registry.Delete(regPath)
+	// regPath := gt.getStatusRegPath(name)
+	err := gt.registry.Delete(name)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to delete job status")
+	}
 
 	return tracker.job, nil
 }
@@ -136,8 +139,11 @@ func (gt *groupTracker) reset() []Job {
 		jobs = append(jobs, job)
 		gt.groupWatchers.OnJobDeregistered(job.Name())
 
-		regPath := gt.getStatusRegPath(job.Name())
-		gt.registry.Delete(regPath)
+		// regPath := gt.getStatusRegPath(job.Name())
+		err := gt.registry.Delete(job.Name())
+		if err != nil {
+			log.Error().Err(err).Msg("failed to delete job status")
+		}
 	}
 
 	gt.trackers = make(map[string]*jobTracker)
@@ -150,8 +156,8 @@ func (gt *groupTracker) isHealthy() bool {
 	defer gt.mu.Unlock()
 
 	for _, tracker := range gt.trackers {
-		regPath := gt.getStatusRegPath(tracker.job.Name())
-		gs := gt.registry.Get(regPath)
+		// regPath := gt.getStatusRegPath(tracker.job.Name())
+		gs := gt.registry.Get(tracker.job.Name())
 		if gs.Status.GetError().GetMessage() != "" {
 			return false
 		}
@@ -170,8 +176,8 @@ func (gt *groupTracker) results() (*statusv1.GroupStatus, bool) {
 	healthy := true
 
 	for name, tracker := range gt.trackers {
-		regPath := gt.getStatusRegPath(tracker.job.Name())
-		tgs := gt.registry.Get(regPath)
+		// regPath := gt.getStatusRegPath(tracker.job.Name())
+		tgs := gt.registry.Get(tracker.job.Name())
 		gs.Groups[name] = tgs
 		if tgs.Status.GetError().GetMessage() != "" {
 			healthy = false

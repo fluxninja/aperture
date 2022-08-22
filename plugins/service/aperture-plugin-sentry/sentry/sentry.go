@@ -66,7 +66,7 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusRegistry *status.Registry, lifecycle fx.Lifecycle) (io.Writer, error) {
+func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusRegistry status.Registry, lifecycle fx.Lifecycle) (io.Writer, error) {
 	config := constructor.DefaultConfig
 
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
