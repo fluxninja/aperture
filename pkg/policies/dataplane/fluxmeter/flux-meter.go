@@ -18,7 +18,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -31,7 +30,7 @@ const (
 	FxNameTag = "name:\"flux_meter\""
 )
 
-var engineAPI iface.EngineAPI
+var engineAPI iface.Engine
 
 // fluxMeterModule returns the fx options for dataplane side pieces of concurrency control in the main fx app.
 func fluxMeterModule() fx.Option {
@@ -72,7 +71,7 @@ func provideWatcher(
 func setupFluxMeterModule(
 	watcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
-	e iface.EngineAPI,
+	e iface.Engine,
 	sr *status.Registry,
 	pr *prometheus.Registry,
 ) error {
@@ -96,7 +95,7 @@ func setupFluxMeterModule(
 
 // FluxMeter describes single fluxmeter from policy.
 type FluxMeter struct {
-	component.ComponentAPI
+	iface.Policy
 	histMetrics    map[flowcontrolv1.DecisionType]prometheus.Histogram
 	selector       *selectorv1.Selector
 	fluxMeterProto *policylangv1.FluxMeter
@@ -111,26 +110,19 @@ func NewFluxMeterOptions(
 	registry *status.Registry,
 ) (fx.Option, error) {
 	registryPath := path.Join(fluxMeterStatusRoot, key.String())
-	wrapperMessage := &configv1.ConfigPropertiesWrapper{}
+	wrapperMessage := &configv1.FluxMeterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
-	if err != nil || wrapperMessage.Config == nil {
+	if err != nil || wrapperMessage.FluxMeter == nil {
 		s := status.NewStatus(nil, err)
 		_ = registry.Push(registryPath, s)
 		log.Warn().Err(err).Msg("Failed to unmarshal flux meter config wrapper")
 		return fx.Options(), err
 	}
-	fluxMeterProto := &policylangv1.FluxMeter{}
-	err = wrapperMessage.Config.UnmarshalTo(fluxMeterProto)
-	if err != nil {
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(registryPath, s)
-		log.Warn().Err(err).Msg("Failed to unmarshal flux meter")
-		return fx.Options(), err
-	}
+	fluxMeterProto := wrapperMessage.FluxMeter
 
 	fluxMeter := &FluxMeter{
 		fluxMeterProto: fluxMeterProto,
-		ComponentAPI:   wrapperMessage,
+		Policy:         wrapperMessage,
 		histMetrics:    make(map[flowcontrolv1.DecisionType]prometheus.Histogram),
 	}
 

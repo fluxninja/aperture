@@ -8,20 +8,20 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
+	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
-	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // LoadShedActuator struct.
 type LoadShedActuator struct {
-	policyReadAPI  policyapi.PolicyReadAPI
+	policyReadAPI  iface.PolicyRead
 	decision       *policydecisionsv1.LoadShedDecision
 	etcdPath       string
 	writer         *etcdwriter.Writer
@@ -33,11 +33,11 @@ type LoadShedActuator struct {
 func NewLoadShedActuatorAndOptions(
 	_ *policylangv1.LoadShedActuator,
 	componentIndex int,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.LoadShedDecisionsPath,
-		paths.IdentifierForComponent(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
+		paths.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
 	lsa := &LoadShedActuator{
 		policyReadAPI:  policyReadAPI,
 		agentGroupName: agentGroupName,
@@ -101,16 +101,11 @@ func (lsa *LoadShedActuator) publishLoadShedFactor(loadShedFactor float64) error
 		lsa.decision.LoadShedFactor = loadShedFactor
 		// Publish decision
 		log.Debug().Float64("loadShedFactor", loadShedFactor).Msg("Publish load shed decision")
-		wrapper, err := utils.WrapWithConfProps(
-			lsa.decision,
-			lsa.agentGroupName,
-			lsa.policyReadAPI.GetPolicyName(),
-			lsa.policyReadAPI.GetPolicyHash(),
-			lsa.componentIndex,
-		)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to wrap policy decision in config properties")
-			return err
+		wrapper := &configv1.LoadShedDecsisionWrapper{
+			LoadShedDecision: lsa.decision,
+			ComponentIndex:   int64(lsa.componentIndex),
+			PolicyName:       lsa.policyReadAPI.GetPolicyName(),
+			PolicyHash:       lsa.policyReadAPI.GetPolicyHash(),
 		}
 		dat, err := proto.Marshal(wrapper)
 		if err != nil {

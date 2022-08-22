@@ -20,8 +20,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/common"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/prometheus"
@@ -34,13 +34,12 @@ const (
 	promTimeout = time.Second * 5
 )
 
-var promQLJobGroupTag = policyapi.PoliciesRoot + "promql_jobs"
+var promQLJobGroupTag = iface.PoliciesRoot + "promql_jobs"
 
 // PromQLModule returns fx options for PromQL in the main app.
 func PromQLModule() fx.Option {
-	// TODO: Generate documentation for concurrency parameter in job group config.
 	return fx.Options(
-		jobs.JobGroupConstructor{Name: promQLJobGroupTag, Key: policyapi.PoliciesRoot + ".promql_jobs_scheduler"}.Annotate(),
+		jobs.JobGroupConstructor{Name: promQLJobGroupTag, Key: iface.PoliciesRoot + ".promql_jobs_scheduler"}.Annotate(),
 		fx.Provide(fx.Annotate(
 			provideFxOptionsFunc,
 			fx.ParamTags(config.NameTag(promQLJobGroupTag)),
@@ -319,7 +318,7 @@ type PromQL struct {
 	// Prometheus API
 	promAPI prometheusv1.API
 	// Policy read API
-	policyReadAPI policyapi.PolicyReadAPI
+	policyReadAPI iface.PolicyRead
 	// Current error
 	err error
 	// Job Registerer used to register Prometheus query jobs. Determines the type of job to register.
@@ -345,7 +344,7 @@ var _ jobRegistererIfc = (*PromQL)(nil)
 func NewPromQLAndOptions(
 	promQLProto *policylangv1.PromQL,
 	componentIndex int,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 ) (*PromQL, fx.Option, error) {
 	promQL := &PromQL{
 		evaluationInterval: promQLProto.EvaluationInterval.AsDuration(),
@@ -441,7 +440,7 @@ func NewScalarQueryAndOptions(
 	queryString string,
 	evaluationInterval time.Duration,
 	componentIndex int,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 	jobPostFix string,
 ) (*ScalarQuery, fx.Option, error) {
 	// Create promQLProto
@@ -484,7 +483,7 @@ func NewTaggedQueryAndOptions(
 	queryString string,
 	evaluationInterval time.Duration,
 	componentIndex int,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 	jobPostFix string,
 ) (*TaggedQuery, fx.Option, error) {
 	scalarQuery, options, err := NewScalarQueryAndOptions(queryString, evaluationInterval, componentIndex, policyReadAPI, jobPostFix)

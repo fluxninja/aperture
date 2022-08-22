@@ -12,7 +12,6 @@ import (
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -24,7 +23,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/rate/ratetracker"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -67,7 +65,7 @@ func provideWatchers(
 }
 
 type rateLimiterFactory struct {
-	engineAPI                 iface.EngineAPI
+	engineAPI                 iface.Engine
 	distCache                 *distcache.DistCache
 	lazySyncJobGroup          *jobs.JobGroup
 	rateLimitDecisionsWatcher notifiers.Watcher
@@ -78,7 +76,7 @@ type rateLimiterFactory struct {
 func setupRateLimiterFactory(
 	watcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
-	e iface.EngineAPI,
+	e iface.Engine,
 	distCache *distcache.DistCache,
 	statusRegistry *status.Registry,
 	prometheusRegistry *prometheus.Registry,
@@ -154,31 +152,24 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 ) (fx.Option, error) {
 	registryPath := path.Join(rateLimiterStatusRoot, key.String())
 
-	wrapperMessage := &configv1.ConfigPropertiesWrapper{}
+	wrapperMessage := &configv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
-	if err != nil || wrapperMessage.Config == nil {
+	if err != nil || wrapperMessage.RateLimiter == nil {
 		s := status.NewStatus(nil, err)
 		_ = registry.Push(registryPath, s)
 		log.Warn().Err(err).Msg("Failed to unmarshal rate limiter config")
 		return fx.Options(), err
 	}
 
-	rateLimiterProto := &policylangv1.RateLimiter{}
-	err = wrapperMessage.Config.UnmarshalTo(rateLimiterProto)
-	if err != nil {
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(registryPath, s)
-		log.Warn().Err(err).Msg("Failed to unmarshal rate limiter config")
-		return fx.Options(), err
-	}
+	rateLimiterMessage := wrapperMessage.RateLimiter
 
 	rateLimiter := &rateLimiter{
-		ComponentAPI:       component.NewComponent(wrapperMessage),
-		rateLimiterProto:   rateLimiterProto,
+		Component:          wrapperMessage,
+		rateLimiterProto:   rateLimiterMessage,
 		registryPath:       registryPath,
 		rateLimiterFactory: rateLimiterFactory,
 	}
-	rateLimiter.name = paths.MetricIDForComponent(rateLimiter)
+	rateLimiter.name = iface.ComponentID(rateLimiter)
 
 	return fx.Options(
 		fx.Invoke(
@@ -189,7 +180,7 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 
 // rateLimiter implements rate limiter on the data plane side.
 type rateLimiter struct {
-	component.ComponentAPI
+	iface.Component
 	rateLimiterFactory *rateLimiterFactory
 	rateTracker        ratetracker.RateTracker
 	rateLimitChecker   *ratetracker.BasicRateLimitChecker
@@ -208,9 +199,9 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 		return err
 	}
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.IdentifierForComponent(rateLimiter.rateLimiterFactory.agentGroupName,
-			rateLimiter.ComponentAPI.GetPolicyName(),
-			rateLimiter.ComponentAPI.GetComponentIndex())),
+		notifiers.Key(paths.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
+			rateLimiter.GetPolicyName(),
+			rateLimiter.GetComponentIndex())),
 		unmarshaller,
 		rateLimiter.decisionUpdateCallback,
 	)
@@ -344,19 +335,15 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 		return
 	}
 
-	var wrapperMessage configv1.ConfigPropertiesWrapper
+	var wrapperMessage configv1.RateLimiterDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.Config == nil {
+	if err != nil || wrapperMessage.RateLimiterDecision == nil {
 		return
 	}
-	if wrapperMessage.PolicyHash != rateLimiter.ComponentAPI.GetPolicyHash() {
+	if wrapperMessage.PolicyHash != rateLimiter.GetPolicyHash() {
 		return
 	}
-	limitDecision := &policydecisionsv1.RateLimiterDecision{}
-	err = wrapperMessage.Config.UnmarshalTo(limitDecision)
-	if err != nil {
-		return
-	}
+	limitDecision := wrapperMessage.RateLimiterDecision
 	rateLimiter.rateLimitChecker.SetRateLimit(int(limitDecision.GetLimit()))
 }
 

@@ -12,7 +12,6 @@ import (
 	"go.uber.org/multierr"
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
-	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -20,7 +19,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/concurrency/scheduler"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -37,18 +35,18 @@ type loadShedActuatorFactory struct {
 func newLoadShedActuatorFactory(
 	lc fx.Lifecycle,
 	etcdClient *etcdclient.Client,
-	agentGroupName string,
+	agentGroup string,
 	prometheusRegistry *prometheus.Registry,
 ) (*loadShedActuatorFactory, error) {
 	// Scope the sync to the agent group.
-	etcdPath := path.Join(paths.LoadShedDecisionsPath, paths.AgentGroupPrefix(agentGroupName))
+	etcdPath := path.Join(paths.LoadShedDecisionsPath, paths.AgentGroupPrefix(agentGroup))
 	loadShedDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
 	}
 	f := &loadShedActuatorFactory{
 		loadShedDecisionWatcher: loadShedDecisionWatcher,
-		agentGroupName:          agentGroupName,
+		agentGroupName:          agentGroup,
 	}
 	// Initialize and register the WFQ and Token Bucket Metric Vectors
 	f.tokenBucketLSFGaugeVec = prometheus.NewGaugeVec(
@@ -136,9 +134,9 @@ func newLoadShedActuatorFactory(
 }
 
 // newLoadShedActuator creates a new load shed actuator based on proto spec.
-func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath string, componentAPI component.ComponentAPI, registry *status.Registry, clock clockwork.Clock, lifecycle fx.Lifecycle, metricLabels prometheus.Labels) (*loadShedActuator, error) {
+func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath string, conLimiter *concurrencyLimiter, registry *status.Registry, clock clockwork.Clock, lifecycle fx.Lifecycle, metricLabels prometheus.Labels) (*loadShedActuator, error) {
 	lsa := &loadShedActuator{
-		componentAPI:   componentAPI,
+		conLimiter:     conLimiter,
 		clock:          clock,
 		statusRegistry: registry,
 		registryPath:   fmt.Sprintf("%s.load_shed", registryPath),
@@ -150,7 +148,7 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath stri
 	}
 	// decision notifier
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.IdentifierForComponent(lsaFactory.agentGroupName, lsa.componentAPI.GetPolicyName(), lsa.componentAPI.GetComponentIndex())),
+		notifiers.Key(paths.DataplaneComponentKey(lsaFactory.agentGroupName, lsa.conLimiter.GetPolicyName(), lsa.conLimiter.GetComponentIndex())),
 		unmarshaller,
 		lsa.decisionUpdateCallback,
 	)
@@ -242,7 +240,7 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath stri
 
 // loadShedActuator saves load shed decisions received from controller.
 type loadShedActuator struct {
-	componentAPI        component.ComponentAPI
+	conLimiter          *concurrencyLimiter
 	clock               clockwork.Clock
 	tokenBucketLoadShed *scheduler.TokenBucketLoadShed
 	statusRegistry      *status.Registry
@@ -255,9 +253,10 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		return
 	}
 
-	var wrapperMessage configv1.ConfigPropertiesWrapper
+	var wrapperMessage configv1.LoadShedDecsisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.Config == nil {
+	loadShedDecision := wrapperMessage.LoadShedDecision
+	if err != nil || loadShedDecision == nil {
 		statusMsg := "Failed to unmarshal config wrapper"
 		log.Warn().Err(err).Msg(statusMsg)
 		s := status.NewStatus(nil, err)
@@ -268,21 +267,9 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		return
 	}
 	// check if this decision is for the same policy id as what we have
-	if wrapperMessage.PolicyHash != lsa.componentAPI.GetPolicyHash() {
+	if wrapperMessage.PolicyHash != lsa.conLimiter.GetPolicyHash() {
 		err = errors.New("policy id mismatch")
-		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", lsa.componentAPI.GetPolicyHash(), wrapperMessage.PolicyHash)
-		log.Warn().Err(err).Msg(statusMsg)
-		s := status.NewStatus(nil, err)
-		rPErr := lsa.statusRegistry.Push(lsa.registryPath, s)
-		if rPErr != nil {
-			log.Error().Err(rPErr).Msg("Failed to push status")
-		}
-		return
-	}
-	var loadShedDecision policydecisionsv1.LoadShedDecision
-	err = wrapperMessage.Config.UnmarshalTo(&loadShedDecision)
-	if err != nil {
-		statusMsg := "Failed to unmarshal policy decision"
+		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", lsa.conLimiter.GetPolicyHash(), wrapperMessage.PolicyHash)
 		log.Warn().Err(err).Msg(statusMsg)
 		s := status.NewStatus(nil, err)
 		rPErr := lsa.statusRegistry.Push(lsa.registryPath, s)

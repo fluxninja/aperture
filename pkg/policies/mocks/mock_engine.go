@@ -15,31 +15,31 @@ import (
 	prometheus "github.com/prometheus/client_golang/prometheus"
 )
 
-// MockEngineAPI is a mock of EngineAPI interface.
-type MockEngineAPI struct {
+// MockEngine is a mock of Engine interface.
+type MockEngine struct {
 	ctrl     *gomock.Controller
-	recorder *MockEngineAPIMockRecorder
+	recorder *MockEngineMockRecorder
 }
 
-// MockEngineAPIMockRecorder is the mock recorder for MockEngineAPI.
-type MockEngineAPIMockRecorder struct {
-	mock *MockEngineAPI
+// MockEngineMockRecorder is the mock recorder for MockEngine.
+type MockEngineMockRecorder struct {
+	mock *MockEngine
 }
 
-// NewMockEngineAPI creates a new mock instance.
-func NewMockEngineAPI(ctrl *gomock.Controller) *MockEngineAPI {
-	mock := &MockEngineAPI{ctrl: ctrl}
-	mock.recorder = &MockEngineAPIMockRecorder{mock}
+// NewMockEngine creates a new mock instance.
+func NewMockEngine(ctrl *gomock.Controller) *MockEngine {
+	mock := &MockEngine{ctrl: ctrl}
+	mock.recorder = &MockEngineMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockEngineAPI) EXPECT() *MockEngineAPIMockRecorder {
+func (m *MockEngine) EXPECT() *MockEngineMockRecorder {
 	return m.recorder
 }
 
 // GetFluxMeterHist mocks base method.
-func (m *MockEngineAPI) GetFluxMeterHist(policyName, fluxMeterName, policyHash string, decisionType flowcontrolv1.DecisionType) prometheus.Histogram {
+func (m *MockEngine) GetFluxMeterHist(policyName, fluxMeterName, policyHash string, decisionType flowcontrolv1.DecisionType) prometheus.Histogram {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFluxMeterHist", policyName, fluxMeterName, policyHash, decisionType)
 	ret0, _ := ret[0].(prometheus.Histogram)
@@ -47,13 +47,13 @@ func (m *MockEngineAPI) GetFluxMeterHist(policyName, fluxMeterName, policyHash s
 }
 
 // GetFluxMeterHist indicates an expected call of GetFluxMeterHist.
-func (mr *MockEngineAPIMockRecorder) GetFluxMeterHist(policyName, fluxMeterName, policyHash, decisionType interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) GetFluxMeterHist(policyName, fluxMeterName, policyHash, decisionType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeterHist", reflect.TypeOf((*MockEngineAPI)(nil).GetFluxMeterHist), policyName, fluxMeterName, policyHash, decisionType)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeterHist", reflect.TypeOf((*MockEngine)(nil).GetFluxMeterHist), policyName, fluxMeterName, policyHash, decisionType)
 }
 
 // ProcessRequest mocks base method.
-func (m *MockEngineAPI) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse {
+func (m *MockEngine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessRequest", controlPoint, serviceIDs, labels)
 	ret0, _ := ret[0].(*flowcontrolv1.CheckResponse)
@@ -61,13 +61,13 @@ func (m *MockEngineAPI) ProcessRequest(controlPoint selectors.ControlPoint, serv
 }
 
 // ProcessRequest indicates an expected call of ProcessRequest.
-func (mr *MockEngineAPIMockRecorder) ProcessRequest(controlPoint, serviceIDs, labels interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) ProcessRequest(controlPoint, serviceIDs, labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessRequest", reflect.TypeOf((*MockEngineAPI)(nil).ProcessRequest), controlPoint, serviceIDs, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessRequest", reflect.TypeOf((*MockEngine)(nil).ProcessRequest), controlPoint, serviceIDs, labels)
 }
 
 // RegisterConcurrencyLimiter mocks base method.
-func (m *MockEngineAPI) RegisterConcurrencyLimiter(sa iface.Limiter) error {
+func (m *MockEngine) RegisterConcurrencyLimiter(sa iface.Limiter) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RegisterConcurrencyLimiter", sa)
 	ret0, _ := ret[0].(error)
@@ -75,13 +75,13 @@ func (m *MockEngineAPI) RegisterConcurrencyLimiter(sa iface.Limiter) error {
 }
 
 // RegisterConcurrencyLimiter indicates an expected call of RegisterConcurrencyLimiter.
-func (mr *MockEngineAPIMockRecorder) RegisterConcurrencyLimiter(sa interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) RegisterConcurrencyLimiter(sa interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterConcurrencyLimiter", reflect.TypeOf((*MockEngineAPI)(nil).RegisterConcurrencyLimiter), sa)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterConcurrencyLimiter", reflect.TypeOf((*MockEngine)(nil).RegisterConcurrencyLimiter), sa)
 }
 
 // RegisterFluxMeter mocks base method.
-func (m *MockEngineAPI) RegisterFluxMeter(fm iface.FluxMeter) error {
+func (m *MockEngine) RegisterFluxMeter(fm iface.FluxMeter) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RegisterFluxMeter", fm)
 	ret0, _ := ret[0].(error)
@@ -89,13 +89,13 @@ func (m *MockEngineAPI) RegisterFluxMeter(fm iface.FluxMeter) error {
 }
 
 // RegisterFluxMeter indicates an expected call of RegisterFluxMeter.
-func (mr *MockEngineAPIMockRecorder) RegisterFluxMeter(fm interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) RegisterFluxMeter(fm interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterFluxMeter", reflect.TypeOf((*MockEngineAPI)(nil).RegisterFluxMeter), fm)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterFluxMeter", reflect.TypeOf((*MockEngine)(nil).RegisterFluxMeter), fm)
 }
 
 // RegisterRateLimiter mocks base method.
-func (m *MockEngineAPI) RegisterRateLimiter(l iface.RateLimiter) error {
+func (m *MockEngine) RegisterRateLimiter(l iface.RateLimiter) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RegisterRateLimiter", l)
 	ret0, _ := ret[0].(error)
@@ -103,13 +103,13 @@ func (m *MockEngineAPI) RegisterRateLimiter(l iface.RateLimiter) error {
 }
 
 // RegisterRateLimiter indicates an expected call of RegisterRateLimiter.
-func (mr *MockEngineAPIMockRecorder) RegisterRateLimiter(l interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) RegisterRateLimiter(l interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterRateLimiter", reflect.TypeOf((*MockEngineAPI)(nil).RegisterRateLimiter), l)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterRateLimiter", reflect.TypeOf((*MockEngine)(nil).RegisterRateLimiter), l)
 }
 
 // UnregisterConcurrencyLimiter mocks base method.
-func (m *MockEngineAPI) UnregisterConcurrencyLimiter(sa iface.Limiter) error {
+func (m *MockEngine) UnregisterConcurrencyLimiter(sa iface.Limiter) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UnregisterConcurrencyLimiter", sa)
 	ret0, _ := ret[0].(error)
@@ -117,13 +117,13 @@ func (m *MockEngineAPI) UnregisterConcurrencyLimiter(sa iface.Limiter) error {
 }
 
 // UnregisterConcurrencyLimiter indicates an expected call of UnregisterConcurrencyLimiter.
-func (mr *MockEngineAPIMockRecorder) UnregisterConcurrencyLimiter(sa interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) UnregisterConcurrencyLimiter(sa interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterConcurrencyLimiter", reflect.TypeOf((*MockEngineAPI)(nil).UnregisterConcurrencyLimiter), sa)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterConcurrencyLimiter", reflect.TypeOf((*MockEngine)(nil).UnregisterConcurrencyLimiter), sa)
 }
 
 // UnregisterFluxMeter mocks base method.
-func (m *MockEngineAPI) UnregisterFluxMeter(fm iface.FluxMeter) error {
+func (m *MockEngine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UnregisterFluxMeter", fm)
 	ret0, _ := ret[0].(error)
@@ -131,13 +131,13 @@ func (m *MockEngineAPI) UnregisterFluxMeter(fm iface.FluxMeter) error {
 }
 
 // UnregisterFluxMeter indicates an expected call of UnregisterFluxMeter.
-func (mr *MockEngineAPIMockRecorder) UnregisterFluxMeter(fm interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) UnregisterFluxMeter(fm interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterFluxMeter", reflect.TypeOf((*MockEngineAPI)(nil).UnregisterFluxMeter), fm)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterFluxMeter", reflect.TypeOf((*MockEngine)(nil).UnregisterFluxMeter), fm)
 }
 
 // UnregisterRateLimiter mocks base method.
-func (m *MockEngineAPI) UnregisterRateLimiter(l iface.RateLimiter) error {
+func (m *MockEngine) UnregisterRateLimiter(l iface.RateLimiter) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UnregisterRateLimiter", l)
 	ret0, _ := ret[0].(error)
@@ -145,7 +145,7 @@ func (m *MockEngineAPI) UnregisterRateLimiter(l iface.RateLimiter) error {
 }
 
 // UnregisterRateLimiter indicates an expected call of UnregisterRateLimiter.
-func (mr *MockEngineAPIMockRecorder) UnregisterRateLimiter(l interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) UnregisterRateLimiter(l interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterRateLimiter", reflect.TypeOf((*MockEngineAPI)(nil).UnregisterRateLimiter), l)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterRateLimiter", reflect.TypeOf((*MockEngine)(nil).UnregisterRateLimiter), l)
 }

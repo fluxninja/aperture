@@ -11,7 +11,7 @@ import (
 	"go.uber.org/multierr"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 )
 
@@ -87,7 +87,7 @@ type ComponentWithPorts struct {
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
 type Circuit struct {
 	// Policy Read API
-	policyapi.PolicyReadAPI
+	iface.PolicyRead
 	// Execution lock is taken when circuit needs to execute
 	executionLock sync.Mutex
 	// Looped signals persistence across ticks
@@ -102,9 +102,9 @@ type Circuit struct {
 var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
-func NewCircuitAndOptions(policyReadAPI policyapi.PolicyReadAPI, compWithPortsList []ComponentWithPorts) (*Circuit, fx.Option) {
+func NewCircuitAndOptions(policyReadAPI iface.PolicyRead, compWithPortsList []ComponentWithPorts) (*Circuit, fx.Option) {
 	circuit := &Circuit{
-		PolicyReadAPI: policyReadAPI,
+		PolicyRead:    policyReadAPI,
 		loopedSignals: make(signalToReading),
 		components:    make([]ComponentWithPorts, 0),
 	}
@@ -196,7 +196,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 		for signal, reading := range circuitSignalReadings {
 			circuitMetricsLabels := prometheus.Labels{
 				SignalNameMetricLabel: signal.Name,
-				PolicyNameMetricLabel: circuit.PolicyReadAPI.GetPolicyName(),
+				PolicyNameMetricLabel: circuit.PolicyRead.GetPolicyName(),
 			}
 			signalSummaryVecMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
 			if err != nil {

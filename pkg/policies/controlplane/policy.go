@@ -17,8 +17,8 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/fluxmeter"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -35,7 +35,7 @@ func PolicyModule() fx.Option {
 
 // Policy invokes the Circuit runtime at tick frequency.
 type Policy struct {
-	policyapi.PolicyBaseAPI
+	iface.PolicyBase
 	// Metric substitution map
 	metricSubMap map[string]*metricSub
 	// Circuit
@@ -49,7 +49,7 @@ type Policy struct {
 }
 
 // Make sure Policy complies with PolicyAPI interface.
-var _ policyapi.PolicyAPI = (*Policy)(nil)
+var _ iface.Policy = (*Policy)(nil)
 
 type metricSub struct {
 	metricName    string
@@ -60,11 +60,11 @@ type metricSub struct {
 func NewPolicyOptions(
 	circuitJobGroup *jobs.JobGroup,
 	etcdClient *etcdclient.Client,
-	wrapperMessage *configv1.ConfigPropertiesWrapper,
+	wrapperMessage *configv1.PolicyWrapper,
 	policyProto *policylangv1.Policy,
 ) (fx.Option, error) {
 	policy := &Policy{
-		PolicyBaseAPI:   wrapperMessage,
+		PolicyBase:      wrapperMessage,
 		circuitJobGroup: circuitJobGroup,
 	}
 
@@ -92,7 +92,7 @@ func NewPolicyOptions(
 
 	return fx.Options(
 		fx.Supply(
-			fx.Annotate(policy, fx.As(new(policyapi.PolicyReadAPI))),
+			fx.Annotate(policy, fx.As(new(iface.PolicyRead))),
 			etcdClient,
 		),
 		circuitOptions,

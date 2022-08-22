@@ -27,7 +27,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/concurrency/scheduler"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -87,7 +86,7 @@ func provideWatcher(
 }
 
 type concurrencyLimiterFactory struct {
-	engineAPI iface.EngineAPI
+	engineAPI iface.Engine
 
 	autoTokensFactory       *autoTokensFactory
 	loadShedActuatorFactory *loadShedActuatorFactory
@@ -105,21 +104,21 @@ type concurrencyLimiterFactory struct {
 func setupConcurrencyLimiterFactory(
 	watcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
-	e iface.EngineAPI,
+	e iface.Engine,
 	statusRegistry *status.Registry,
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
 ) error {
-	agentGroupName := ai.GetAgentGroup()
+	agentGroup := ai.GetAgentGroup()
 
 	// Create factories
-	loadShedActuatorFactory, err := newLoadShedActuatorFactory(lifecycle, etcdClient, agentGroupName, prometheusRegistry)
+	loadShedActuatorFactory, err := newLoadShedActuatorFactory(lifecycle, etcdClient, agentGroup, prometheusRegistry)
 	if err != nil {
 		return err
 	}
 
-	autoTokensFactory, err := newAutoTokensFactory(lifecycle, etcdClient)
+	autoTokensFactory, err := newAutoTokensFactory(lifecycle, etcdClient, agentGroup)
 	if err != nil {
 		return err
 	}
@@ -236,25 +235,18 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	registry *status.Registry,
 ) (fx.Option, error) {
 	registryPath := path.Join(concurrencyLimiterStatusRoot, key.String())
-	wrapperMessage := &configv1.ConfigPropertiesWrapper{}
+	wrapperMessage := &configv1.ConcurrencyLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
-	if err != nil || wrapperMessage.Config == nil {
+	concurrencyLimiterMessage := wrapperMessage.ConcurrencyLimiter
+	if err != nil || concurrencyLimiterMessage == nil {
 		s := status.NewStatus(nil, err)
 		_ = registry.Push(registryPath, s)
 		log.Warn().Err(err).Msg("Failed to unmarshal concurrency limiter config wrapper")
 		return fx.Options(), err
 	}
-	concurrencyLimiterProto := &policylangv1.ConcurrencyLimiter{}
-	err = wrapperMessage.Config.UnmarshalTo(concurrencyLimiterProto)
-	if err != nil {
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(registryPath, s)
-		log.Warn().Err(err).Msg("Failed to unmarshal concurrency limiter")
-		return fx.Options(), err
-	}
 
 	// Loop through the workloads
-	schedulerProto := concurrencyLimiterProto.Scheduler
+	schedulerProto := concurrencyLimiterMessage.Scheduler
 	if schedulerProto == nil {
 		err = fmt.Errorf("no scheduler specified")
 		s := status.NewStatus(nil, err)
@@ -279,8 +271,8 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	}
 
 	conLimiter := &concurrencyLimiter{
-		ComponentAPI:              component.NewComponent(wrapperMessage),
-		concurrencyLimiterProto:   concurrencyLimiterProto,
+		Component:                 wrapperMessage,
+		concurrencyLimiterProto:   concurrencyLimiterMessage,
 		registryPath:              registryPath,
 		concurrencyLimiterFactory: conLimiterFactory,
 		workloadMultiMatcher:      mm,
@@ -311,7 +303,7 @@ func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult 
 
 // concurrencyLimiter implements concurrency limiter on the dataplane side.
 type concurrencyLimiter struct {
-	component.ComponentAPI
+	iface.Component
 	scheduler                  scheduler.Scheduler
 	incomingConcurrencyCounter prometheus.Counter
 	acceptedConcurrencyCounter prometheus.Counter
@@ -345,8 +337,8 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegist
 	}
 	if conLimiter.schedulerProto.AutoTokens {
 		autoTokens, err := autoTokensFactory.newAutoTokens(
-			conLimiter.GetAgentGroup(), conLimiter.GetPolicyName(),
-			conLimiter.GetPolicyHash(), lifecycle, conLimiter.GetComponentIndex())
+			conLimiter.GetPolicyName(), conLimiter.GetPolicyHash(),
+			lifecycle, conLimiter.GetComponentIndex())
 		if err != nil {
 			return err
 		}
