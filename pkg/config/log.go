@@ -145,17 +145,16 @@ func (constructor LoggerConstructor) provideLogger(writers []io.Writer,
 func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	var writers []io.Writer
 
-	if config.File != emptyFile {
-		switch config.File {
-		case stdErrFile:
+	if !config.PrettyConsole {
+		if config.File == stdErrFile {
 			writers = append(writers, os.Stderr)
-		case stdOutFile:
+		} else if config.File == stdOutFile {
 			writers = append(writers, os.Stdout)
-		default:
-			config.Writers = append(config.Writers, config.LogWriterConfig)
 		}
 	}
-
+	if config.File == "default" {
+		config.Writers = append(config.Writers, config.LogWriterConfig)
+	}
 	// append file writers
 	for _, writerConfig := range config.Writers {
 		lj := &lumberjack.Logger{

@@ -6,7 +6,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -20,7 +20,7 @@ type Sqrt struct {
 var _ runtime.Component = (*Sqrt)(nil)
 
 // NewSqrtAndOptions creates a new Sqrt Component.
-func NewSqrtAndOptions(sqrtProto *policylangv1.Sqrt, componentIndex int, policyReadAPI policyapi.PolicyReadAPI) (runtime.Component, fx.Option, error) {
+func NewSqrtAndOptions(sqrtProto *policylangv1.Sqrt, componentIndex int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
 	sqrt := Sqrt{
 		scale: sqrtProto.Scale,
 	}

@@ -16,17 +16,8 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
-)
-
-const (
-	workloadLatencyMetricName = "workload_latency_ms"
-
-	policyNameLabel     = "policy_name"
-	policyHashLabel     = "policy_hash"
-	componentIndexLabel = "component_index"
-	decisionTypeLabel   = "decision_type"
-	workloadIndexLabel  = "workload_index"
 )
 
 type metricsProcessor struct {
@@ -48,7 +39,7 @@ func newProcessor(cfg *Config) (*metricsProcessor, error) {
 
 func (p *metricsProcessor) registerRequestLatencyHistogram() error {
 	p.workloadLatencyHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name: workloadLatencyMetricName,
+		Name: metrics.WorkloadLatencyMetricName,
 		Help: "Latency histogram of workload",
 		Buckets: prometheus.LinearBuckets(
 			p.cfg.LatencyBucketStartMS,
@@ -56,11 +47,11 @@ func (p *metricsProcessor) registerRequestLatencyHistogram() error {
 			p.cfg.LatencyBucketCount,
 		),
 	}, []string{
-		policyNameLabel,
-		policyHashLabel,
-		componentIndexLabel,
-		decisionTypeLabel,
-		workloadIndexLabel,
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIndexLabel,
+		metrics.DecisionTypeLabel,
+		metrics.WorkloadIndexLabel,
 	})
 	err := p.cfg.promRegistry.Register(p.workloadLatencyHistogram)
 	if err != nil {
@@ -159,9 +150,9 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiter() != nil {
 			rawValue := []string{
-				fmt.Sprintf("policy_name:%v", decision.GetPolicyName()),
-				fmt.Sprintf("component_index:%v", decision.GetComponentIndex()),
-				fmt.Sprintf("policy_hash:%v", decision.GetPolicyHash()),
+				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
+				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
+				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
 			}
 			value := strings.Join(rawValue, ",")
 			labels[otelcollector.RateLimitersLabel].SliceVal().AppendEmpty().SetStringVal(value)
@@ -171,10 +162,10 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 		}
 		if cl := decision.GetConcurrencyLimiter(); cl != nil {
 			rawValue := []string{
-				fmt.Sprintf("policy_name:%v", decision.GetPolicyName()),
-				fmt.Sprintf("component_index:%v", decision.GetComponentIndex()),
-				fmt.Sprintf("workload_index:%v", cl.GetWorkloadIndex()),
-				fmt.Sprintf("policy_hash:%v", decision.GetPolicyHash()),
+				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
+				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
+				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.GetWorkloadIndex()),
+				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
 			}
 			value := strings.Join(rawValue, ",")
 			labels[otelcollector.ConcurrencyLimitersLabel].SliceVal().AppendEmpty().SetStringVal(value)
@@ -185,9 +176,9 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 	}
 	for _, fluxMeter := range checkResponse.FluxMeters {
 		rawValue := []string{
-			fmt.Sprintf("policy_name:%v", fluxMeter.GetPolicyName()),
-			fmt.Sprintf("flux_meter_name:%v", fluxMeter.GetFluxMeterName()),
-			fmt.Sprintf("policy_hash:%v", fluxMeter.GetPolicyHash()),
+			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, fluxMeter.GetPolicyName()),
+			fmt.Sprintf("%s:%v", metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()),
+			fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, fluxMeter.GetPolicyHash()),
 		}
 		value := strings.Join(rawValue, ",")
 		labels[otelcollector.FluxMetersLabel].SliceVal().AppendEmpty().SetStringVal(value)
@@ -221,10 +212,10 @@ func (p *metricsProcessor) updateMetrics(
 
 	for _, decision := range checkResponse.LimiterDecisions {
 		labels := map[string]string{
-			policyNameLabel:     decision.PolicyName,
-			policyHashLabel:     decision.PolicyHash,
-			componentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
-			decisionTypeLabel:   checkResponse.DecisionType.String(),
+			metrics.PolicyNameLabel:     decision.PolicyName,
+			metrics.PolicyHashLabel:     decision.PolicyHash,
+			metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
+			metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
 		}
 		log.Error().Msgf("labels: %v", labels)
 
@@ -246,7 +237,7 @@ func (p *metricsProcessor) updateMetrics(
 }
 
 func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64, workload string) error {
-	labels[workloadIndexLabel] = workload
+	labels[metrics.WorkloadIndexLabel] = workload
 	latencyHistogram, err := p.workloadLatencyHistogram.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Getting latency histogram")
@@ -260,7 +251,11 @@ func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, la
 func (p *metricsProcessor) updateMetricsForFluxMeters(fluxMeter *flowcontrolv1.FluxMeter, decisionType flowcontrolv1.DecisionType, latency float64) {
 	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxMeter.GetPolicyName(), fluxMeter.GetFluxMeterName(), fluxMeter.GetPolicyHash(), decisionType)
 	if fluxmeterHistogram == nil {
-		log.Debug().Str("policy_name", fluxMeter.GetPolicyName()).Str("flux_meter_name", fluxMeter.GetFluxMeterName()).Str("policy_hash", fluxMeter.GetPolicyHash()).Str("decision_type", decisionType.String()).Msg("Fluxmeter not found")
+		log.Debug().Str(metrics.PolicyNameLabel, fluxMeter.GetPolicyName()).
+			Str(metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()).
+			Str(metrics.PolicyHashLabel, fluxMeter.GetPolicyHash()).
+			Str(metrics.DecisionTypeLabel, decisionType.String()).
+			Msg("Fluxmeter not found")
 		return
 	}
 	fluxmeterHistogram.Observe(latency)

@@ -83,7 +83,7 @@ func (w *watcher) Start() error {
 				}
 				for _, ev := range resp.Events {
 					key := getNotifierKey(ev.Kv.Key)
-					// parse events and update files on local filesystem
+					// Track only the children, skip etcdPath itself
 					if path.Clean(string(ev.Kv.Key)) == path.Clean(w.etcdPath) {
 						continue
 					}

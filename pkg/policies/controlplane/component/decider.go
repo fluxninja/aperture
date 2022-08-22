@@ -7,7 +7,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -54,7 +54,7 @@ type Decider struct {
 var _ runtime.Component = (*Decider)(nil)
 
 // NewDeciderAndOptions creates timed controller and its fx options.
-func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI policyapi.PolicyReadAPI) (runtime.Component, fx.Option, error) {
+func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
 	operator, err := comparisonOperatorString(timedProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err

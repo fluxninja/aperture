@@ -6,8 +6,9 @@ import (
 	. "github.com/onsi/gomega"
 	goprom "github.com/prometheus/client_golang/prometheus"
 
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
 	"github.com/fluxninja/aperture/pkg/selectors"
@@ -16,14 +17,14 @@ import (
 
 var _ = Describe("Dataplane Engine", func() {
 	var (
-		engine iface.EngineAPI
+		engine iface.Engine
 
 		t             GinkgoTestReporter
 		mockCtrl      *gomock.Controller
 		mockLimiter   *mocks.MockLimiter
 		mockFluxmeter *mocks.MockFluxMeter
 
-		selector    *policylangv1.Selector
+		selector    *selectorv1.Selector
 		histogram   goprom.Histogram
 		fluxMeterID iface.FluxMeterID
 		limiterID   iface.LimiterID
@@ -36,20 +37,20 @@ var _ = Describe("Dataplane Engine", func() {
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
 
 		engine = ProvideEngineAPI()
-		selector = &policylangv1.Selector{
-			AgentGroup: "default",
+		selector = &selectorv1.Selector{
+			AgentGroup: metrics.DefaultAgentGroup,
 			Service:    "testService.testNamespace.svc.cluster.local",
-			ControlPoint: &policylangv1.ControlPoint{
-				Controlpoint: &policylangv1.ControlPoint_Traffic{Traffic: "ingress"},
+			ControlPoint: &selectorv1.ControlPoint{
+				Controlpoint: &selectorv1.ControlPoint_Traffic{Traffic: "ingress"},
 			},
 		}
 		histogram = goprom.NewHistogram(goprom.HistogramOpts{
-			Name: "flux_meter",
+			Name: metrics.FluxMeterMetricName,
 			ConstLabels: goprom.Labels{
-				"policy_name":     "test",
-				"flux_meter_name": "test",
-				"policy_hash":     "test",
-				"decision_type":   flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED.String(),
+				metrics.PolicyNameLabel:    "test",
+				metrics.FluxMeterNameLabel: "test",
+				metrics.PolicyHashLabel:    "test",
+				metrics.DecisionTypeLabel:  flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED.String(),
 			},
 		})
 		fluxMeterID = iface.FluxMeterID{

@@ -7,7 +7,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 )
 
-// Module is a fx module that provides a status registry and registers status service handlers as grpcgateway handlers.
+// Module is a fx module that provides a status Registry and registers status service handlers as grpc-gateway handlers.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(provideRegistry),

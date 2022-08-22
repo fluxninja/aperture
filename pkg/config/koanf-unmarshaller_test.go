@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 )
 
 type simpleTestConfig struct {
@@ -458,11 +458,11 @@ var _ = Describe("Duration", func() {
 
 var _ = Describe("ProtobufUnmarshaller", func() {
 	Context("when unmarshalling a protobuf", func() {
-		selector := &languagev1.Selector{
+		selector := &selectorv1.Selector{
 			AgentGroup: "ag",
 			Service:    "s.n.svc.cluster.local",
-			ControlPoint: &languagev1.ControlPoint{
-				Controlpoint: &languagev1.ControlPoint_Traffic{
+			ControlPoint: &selectorv1.ControlPoint{
+				Controlpoint: &selectorv1.ControlPoint_Traffic{
 					Traffic: "egress",
 				},
 			},
@@ -474,7 +474,7 @@ var _ = Describe("ProtobufUnmarshaller", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		It("parses selectorBytes content into newSel and matches both contents", func() {
-			var newSel languagev1.Selector
+			var newSel selectorv1.Selector
 			err := unmarshaller.Unmarshal(&newSel)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(newSel.String()).To(Equal(selector.String()))

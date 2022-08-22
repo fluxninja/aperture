@@ -18,7 +18,7 @@ const (
 )
 
 // NewFactory returns a new factory for the metrics processor.
-func NewFactory(promRegistry *prometheus.Registry, engine iface.EngineAPI) component.ProcessorFactory {
+func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine) component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
 		createDefaultConfig(promRegistry, engine),
@@ -27,7 +27,7 @@ func NewFactory(promRegistry *prometheus.Registry, engine iface.EngineAPI) compo
 	)
 }
 
-func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.EngineAPI) component.ProcessorCreateDefaultConfigFunc {
+func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.Engine) component.ProcessorCreateDefaultConfigFunc {
 	return func() config.Processor {
 		return &Config{
 			ProcessorSettings: config.NewProcessorSettings(config.NewComponentID(typeStr)),

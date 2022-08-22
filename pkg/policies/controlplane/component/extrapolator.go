@@ -6,7 +6,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -25,7 +25,7 @@ type Extrapolator struct {
 var _ runtime.Component = (*Extrapolator)(nil)
 
 // NewExtrapolatorAndOptions creates a new Extrapolator Component.
-func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, componentIndex int, policyReadAPI policyapi.PolicyReadAPI) (runtime.Component, fx.Option, error) {
+func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, componentIndex int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
 	exp := Extrapolator{
 		maxExtrapolationInterval: extrapolatorProto.MaxExtrapolationInterval.AsDuration(),
 		lastOutput:               reading.NewInvalid(),

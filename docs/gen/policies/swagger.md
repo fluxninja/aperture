@@ -30,18 +30,18 @@
 - [v1Decider](#v1-decider) – Type of combinator that computes the comparison operation on lhs and rhs signals…
 - [v1DeciderIns](#v1-decider-ins) – Inputs for the Decider component.
 - [v1DeciderOuts](#v1-decider-outs) – Outputs for the Decider component.
-- [v1EMA](#v1-e-m-a) – Exponential Moving Average (EMA) is a type of moving average that applies expone…
+- [v1EMA](#v1-e-m-a) – Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
 - [v1EMAIns](#v1-e-m-a-ins) – Inputs for the EMA component.
 - [v1EMAOuts](#v1-e-m-a-outs) – Outputs for the EMA component.
 - [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
 - [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the perio…
 - [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator component.
 - [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator component.
-- [v1GradientController](#v1-gradient-controller) – Describes the gradient values which is computed as follows: gradient = (setpoint…
+- [v1GradientController](#v1-gradient-controller) – Gradient controller
 - [v1GradientControllerIns](#v1-gradient-controller-ins) – Inputs for the Gradient Controller component.
 - [v1GradientControllerOuts](#v1-gradient-controller-outs) – Outputs for the Gradient Controller component.
 - [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
-- [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or n…
+- [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not
 - [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in th…
 - [v1LoadShedActuatorIns](#v1-load-shed-actuator-ins) – Input for the Load Shed Actuator component.
 - [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels.
@@ -63,7 +63,7 @@
 - [v1RateLimiterIns](#v1-rate-limiter-ins)
 - [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing based workload scheduler.
 - [v1SchedulerOuts](#v1-scheduler-outs) – Output for the Scheduler component.
-- [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to.
+- [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to
 - [v1Sqrt](#v1-sqrt) – Takes an input signal and emits the square root of it multiplied by scale as an …
 - [v1SqrtIns](#v1-sqrt-ins) – Inputs for the Sqrt component.
 - [v1SqrtOuts](#v1-sqrt-outs) – Outputs for the Sqrt component.
@@ -110,7 +110,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>enabled</dt>
 <dd>
 
-(bool)
+(bool, default: `true`)
 
 </dd>
 </dl>
@@ -118,7 +118,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>num_sync</dt>
 <dd>
 
-(int64) Number of times to lazy sync within the limit_reset_interval
+(int64, `gt=0`, default: `5`) Number of times to lazy sync within the limit_reset_interval.
 
 </dd>
 </dl>
@@ -131,7 +131,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>label_value</dt>
 <dd>
 
-(string)
+(string, `required`)
 
 </dd>
 </dl>
@@ -139,7 +139,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>limit_scale_factor</dt>
 <dd>
 
-(float64)
+(float64, default: `1`)
 
 </dd>
 </dl>
@@ -172,7 +172,8 @@ Higher numbers means higher priority level.
 <dt>timeout</dt>
 <dd>
 
-(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens. This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
+(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens.
+This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
 
 </dd>
 </dl>
@@ -180,7 +181,8 @@ Higher numbers means higher priority level.
 <dt>tokens</dt>
 <dd>
 
-(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency. This override is applicable only if auto_tokens is set to false.
+(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+This override is applicable only if auto_tokens is set to false.
 
 </dd>
 </dl>
@@ -208,7 +210,9 @@ Higher numbers means higher priority level.
 
 ### <span id="languagev1-concurrency-limiter"></span> languagev1ConcurrencyLimiter
 
-Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection. It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles. Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
+It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
 
 #### Properties
 
@@ -237,7 +241,7 @@ Concurrency Limiter is an actuator component that regulates flows in order to pr
 <dt>in_ports</dt>
 <dd>
 
-([V1RateLimiterIns](#v1-rate-limiter-ins))
+([V1RateLimiterIns](#v1-rate-limiter-ins), `required`)
 
 </dd>
 </dl>
@@ -245,7 +249,7 @@ Concurrency Limiter is an actuator component that regulates flows in order to pr
 <dt>label_key</dt>
 <dd>
 
-(string)
+(string, `required`)
 
 </dd>
 </dl>
@@ -261,7 +265,7 @@ Concurrency Limiter is an actuator component that regulates flows in order to pr
 <dt>limit_reset_interval</dt>
 <dd>
 
-(string)
+(string, default: `60s`)
 
 </dd>
 </dl>
@@ -277,7 +281,7 @@ Concurrency Limiter is an actuator component that regulates flows in order to pr
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector))
+([V1Selector](#v1-selector), `required`)
 
 </dd>
 </dl>
@@ -293,14 +297,6 @@ FluxMeter gathers metrics for the traffic that matches its selector.
 <dd>
 
 ([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) Latency histogram buckets (in ms) for this FluxMeter.
-
-</dd>
-</dl>
-<dl>
-<dt>name</dt>
-<dd>
-
-(string) Name of the flux meter.
 
 </dd>
 </dl>
@@ -445,7 +441,8 @@ The looped signals are saved in the tick they are generated and served in the su
 <dt>gradient_controller</dt>
 <dd>
 
-([V1GradientController](#v1-gradient-controller)) Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied. This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
+([V1GradientController](#v1-gradient-controller)) Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 
 </dd>
 </dl>
@@ -531,7 +528,7 @@ Outputs for the Constant component.
 ### <span id="v1-control-point"></span> v1ControlPoint
 
 Identifies control point within a service that the rule or policy should apply to.
-Controlpoint is either a library feature name or one of "ingress/egress" traffic control point.
+Controlpoint is either a library feature name or one of ingress/egress traffic control point.
 
 #### Properties
 
@@ -668,19 +665,32 @@ Outputs for the Decider component.
 
 ### <span id="v1-e-m-a"></span> v1EMA
 
-Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings.
+Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
+
 At any time EMA component operates in one of the following states:
 
 1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
    If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
 2. Normal state: The EMA is computed using following formula.
-   If an invalid reading is received continuously for ema_window during the EMA stage, the last good EMA is emitted and the state gets reset back to Warm up state.
-   The EMA for a series Y is calculated recursively as:
-   EMAt = Y0 , t = 0
-   EMAt = alpha \* Yt + (1 - alpha) \* EMAt-1 , t > 0
-   The coefficient alpha represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.
-   A higher alpha discounts older observations faster.
-   The alpha is computed using ema_window: alpha = 2 / (N + 1). Where, N = ema_window / evalutation_period.
+
+If an invalid reading is received continuously for ema_window during the EMA stage, the last good EMA is emitted and the state gets reset back to Warm up state.
+The EMA for a series $Y$ is calculated recursively as:
+
+$$
+\text{EMA} _t =
+\begin{cases}
+  Y_0, &\text{for } t = 0 \\
+  \alpha Y_t + (1 - \alpha) \text{EMA} _{t-1}, &\text{for }t > 0
+\end{cases}
+$$
+
+The coefficient $\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.
+A higher $\alpha$ discounts older observations faster.
+The $\alpha$ is computed using ema_window:
+
+$$
+\alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
+$$
 
 #### Properties
 
@@ -805,7 +815,8 @@ Label selector expression of the equal form "label == value".
 
 ### <span id="v1-extrapolator"></span> v1Extrapolator
 
-Extrapolates the input signal by repeating the last valid value during the period in which it is invalid. It does so until maximum_extrapolation_interval is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
+It does so until maximum_extrapolation_interval is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 
 #### Properties
 
@@ -866,7 +877,9 @@ Outputs for the Extrapolator component.
 
 ### <span id="v1-gradient-controller"></span> v1GradientController
 
-Describes the gradient values which is computed as follows: gradient = (setpoint)/(signal) \* tolerance.
+Gradient controller
+
+Describes the gradient values which is computed as follows $\text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}$.
 Limits gradient to range [min_gradient, max_gradient].
 Output: (gradient \* control_variable) + optimize.
 
@@ -1019,7 +1032,8 @@ If the operator is Exists or DoesNotExist, the values array must be empty.
 
 ### <span id="v1-label-matcher"></span> v1LabelMatcher
 
-Allows to define rules whether a map of labels should be considered a match or not.
+Allows to define rules whether a map of labels should be considered a match or not
+
 It provides three ways to define requirements:
 
 - matchLabels
@@ -1095,6 +1109,15 @@ Input for the Load Shed Actuator component.
 
 Defines a [map<string, string> → bool] expression to be evaluated on labels.
 MatchExpression has multiple variants, exactly one should be set.
+
+Example:
+
+```yaml
+all:
+  of:
+    - label_exists: foo
+    - label_equals: { label = app, value = frobnicator }
+```
 
 #### Properties
 
@@ -1309,7 +1332,7 @@ This interval is typically aligned with how often the corrective action (actuati
 <dt>flux_meters</dt>
 <dd>
 
-([[]Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+(map of [Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
 
 </dd>
 </dl>
@@ -1383,7 +1406,7 @@ Output for the PromQL component.
 <dt>limit</dt>
 <dd>
 
-([V1Port](#v1-port)) negative limit means no limit is applied
+([V1Port](#v1-port), `required`, default: `-1`) negative limit means no limit is applied.
 
 </dd>
 </dl>
@@ -1398,7 +1421,7 @@ Weighted Fair Queuing based workload scheduler.
 <dt>auto_tokens</dt>
 <dd>
 
-(bool)
+(bool, default: `true`)
 
 </dd>
 </dl>
@@ -1461,7 +1484,27 @@ Output for the Scheduler component.
 
 ### <span id="v1-selector"></span> v1Selector
 
-Describes where a rule or actuation component should apply to.
+Describes where a rule or actuation component should apply to
+
+Example:
+
+```yaml
+selector:
+  service: service1.default.svc.cluster.local
+  control_point:
+    traffic: ingress # Allowed values are `ingress` and `egress`.
+  label_matcher:
+    match_labels:
+      user_tier: gold
+    match_expressions:
+      - key: query
+        operator: In
+        values:
+          - insert
+          - delete
+      - label: user_agent
+        regex: ^(?!.*Chrome).*Safari
+```
 
 #### Properties
 
@@ -1469,7 +1512,7 @@ Describes where a rule or actuation component should apply to.
 <dt>agent_group</dt>
 <dd>
 
-(string) Describes where this selector applies to.
+(string, default: `default`) Describes where this selector applies to.
 
 </dd>
 </dl>
@@ -1477,7 +1520,7 @@ Describes where a rule or actuation component should apply to.
 <dt>control_point</dt>
 <dd>
 
-([V1ControlPoint](#v1-control-point), `required`) Describes control point Within the entity where the policy should apply to.
+([V1ControlPoint](#v1-control-point), `required`) Describes control point within the entity where the policy should apply to.
 
 </dd>
 </dl>
@@ -1485,21 +1528,24 @@ Describes where a rule or actuation component should apply to.
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Allows to add _additional_ condition on labels that must also be satisfied (in addition to service+control point matching).
-The label matcher allows to match on infra labels, flow labels and request labels.
-Arbitrary label matcher can be used to match infra labels.
-For flowcontrol policies, the matcher can be used to match flow labels.
+([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on labels that must
+also be satisfied (in addition to service+control point matching)
 
-Note: For classification we can only match flow labels that were created at some **previous** control point.
+This matcher allows to match on flow labels and request labels.
+(Note: For classification we can only match flow labels that were created at
+some **previous** control point).
 
-In case of k8s, infra labels are labels on entities (note: there might exist some additional labels).
-Flow label names are always prefixed with `flow_`
-Request labels are always prefixed with `request_`.
-Available request labels are `id` (available as `request_id`), `method`, `path`, `host`, `scheme`, `size`, `protocol`
-(mapped from fields of [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
-Also, (non-pseudo) headers are available as `request_header_<headername>`.
+Flow labels are available with the same label key as defined in
+classification rule.
 
-Note: Request headers are only available for "traffic" control points.
+Request labels are always prefixed with `request_`. Available request
+labels are `id` (available as `request_id`), `method`, `path`, `host`,
+`scheme`, `size`, `protocol` (mapped from fields of
+[HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
+Also, (non-pseudo) headers are available as `request_header_<headername>`, where
+`<headername>` is a headername normalised to lowercase, eg. `request_header_user-agent`.
+
+Note: Request headers are only available for `traffic` control points.
 
 </dd>
 </dl>
@@ -1518,7 +1564,10 @@ Note: Entity may belong to multiple services.
 ### <span id="v1-sqrt"></span> v1Sqrt
 
 Takes an input signal and emits the square root of it multiplied by scale as an output.
-Sqrt: output = sqrt(input) \* scale.
+
+$$
+\text{output} = \text{scale} \sqrt{\text{input}}
+$$
 
 #### Properties
 

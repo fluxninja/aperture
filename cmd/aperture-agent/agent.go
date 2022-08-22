@@ -13,11 +13,11 @@ import (
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/authz"
 	"github.com/fluxninja/aperture/pkg/classification"
 	"github.com/fluxninja/aperture/pkg/discovery"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/envoy"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -48,13 +48,13 @@ func main() {
 		),
 		flowcontrol.Module,
 		classification.Module,
-		authz.Module,
+		envoy.Module,
 		otelcollector.Module(),
 		distcache.Module(),
 		dataplane.PolicyModule(),
 		discovery.Module(),
 		fx.Invoke(
-			authz.Register,
+			envoy.Register,
 			flowcontrol.Register,
 		),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),

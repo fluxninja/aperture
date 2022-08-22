@@ -11,8 +11,8 @@ import (
 
 //go:generate mockgen -source=engine.go -destination=../../mocks/mock_engine.go -package=mocks
 
-// EngineAPI is an interface for registering fluxmeters and schedulers.
-type EngineAPI interface {
+// Engine is an interface for registering fluxmeters and schedulers.
+type Engine interface {
 	ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse
 
 	RegisterConcurrencyLimiter(sa Limiter) error

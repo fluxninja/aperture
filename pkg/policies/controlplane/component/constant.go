@@ -4,7 +4,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -16,7 +16,7 @@ type Constant struct {
 }
 
 // NewConstantAndOptions creates constant setpoint and its fx options.
-func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, policyReadAPI policyapi.PolicyReadAPI) (runtime.Component, fx.Option, error) {
+func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
 	con := Constant{
 		value: constant.Value,
 	}

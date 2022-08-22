@@ -5,7 +5,7 @@ package aperture.flowcontrol.v1;
 // FlowControlService is used to perform Flow Control operations.
 service FlowControlService {
   // Check wraps the given arbitrary resource and matches the given labels
-  // against Flow Control Limiters to makes a decision whether to allow/deny
+  // against Flow Control Limiters to makes a decision whether to allow/deny.
   rpc Check(CheckRequest) returns (CheckResponse) {}
 }
 
@@ -79,8 +79,7 @@ message LimiterDecision {
 
 // FluxMeter describes detail for each FluxMeter.
 message FluxMeter {
-  string agent_group = 1;
-  string policy_name = 2;
-  string policy_hash = 3;
-  string flux_meter_name = 4;
+  string policy_name = 1;
+  string policy_hash = 2;
+  string flux_meter_name = 3;
 }

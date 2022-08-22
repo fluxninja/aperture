@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	"github.com/fluxninja/aperture/pkg/classification/extractors"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
@@ -74,7 +74,7 @@ type rulesetID = uint64
 
 // ReportedRule is a rule along with its selector and label name.
 type ReportedRule struct {
-	Selector    *policylangv1.Selector
+	Selector    *selectorv1.Selector
 	Rule        *classificationv1.Rule
 	RulesetName string
 	LabelName   string

@@ -31,7 +31,7 @@ type ConstructorIn struct {
 
 	EntityCache *entitycache.EntityCache
 	Metrics     Metrics
-	EngineAPI   iface.EngineAPI
+	EngineAPI   iface.Engine
 }
 
 // ProvideHandler provides a Flow Control Handler.

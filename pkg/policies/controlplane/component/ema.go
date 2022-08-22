@@ -9,8 +9,8 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -47,7 +47,7 @@ var _ runtime.Component = (*EMA)(nil)
 // NewEMAAndOptions returns a new EMA filter and its Fx options.
 func NewEMAAndOptions(emaProto *policylangv1.EMA,
 	_ int,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 ) (*EMA, fx.Option, error) {
 	// period of tick
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()

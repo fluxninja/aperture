@@ -6,10 +6,10 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/component"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/component/actuator/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/component/controller"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -32,7 +32,7 @@ func ComponentFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option
 func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentIndex int,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 ) (string, map[string]any, map[string]runtime.Component, runtime.Component, fx.Option, error) {
 	// Factory parser to determine what kind of component to create
 	if gradientController := componentProto.GetGradientController(); gradientController != nil {

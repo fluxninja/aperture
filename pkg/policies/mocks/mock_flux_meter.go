@@ -7,6 +7,7 @@ package mocks
 import (
 	reflect "reflect"
 
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
@@ -37,20 +38,6 @@ func (m *MockFluxMeter) EXPECT() *MockFluxMeterMockRecorder {
 	return m.recorder
 }
 
-// GetAgentGroup mocks base method.
-func (m *MockFluxMeter) GetAgentGroup() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAgentGroup")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// GetAgentGroup indicates an expected call of GetAgentGroup.
-func (mr *MockFluxMeterMockRecorder) GetAgentGroup() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAgentGroup", reflect.TypeOf((*MockFluxMeter)(nil).GetAgentGroup))
-}
-
 // GetBuckets mocks base method.
 func (m *MockFluxMeter) GetBuckets() []float64 {
 	m.ctrl.T.Helper()
@@ -63,20 +50,6 @@ func (m *MockFluxMeter) GetBuckets() []float64 {
 func (mr *MockFluxMeterMockRecorder) GetBuckets() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBuckets", reflect.TypeOf((*MockFluxMeter)(nil).GetBuckets))
-}
-
-// GetComponentIndex mocks base method.
-func (m *MockFluxMeter) GetComponentIndex() int64 {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetComponentIndex")
-	ret0, _ := ret[0].(int64)
-	return ret0
-}
-
-// GetComponentIndex indicates an expected call of GetComponentIndex.
-func (mr *MockFluxMeterMockRecorder) GetComponentIndex() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetComponentIndex", reflect.TypeOf((*MockFluxMeter)(nil).GetComponentIndex))
 }
 
 // GetFluxMeterID mocks base method.
@@ -164,10 +137,10 @@ func (mr *MockFluxMeterMockRecorder) GetPolicyName() *gomock.Call {
 }
 
 // GetSelector mocks base method.
-func (m *MockFluxMeter) GetSelector() *languagev1.Selector {
+func (m *MockFluxMeter) GetSelector() *selectorv1.Selector {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSelector")
-	ret0, _ := ret[0].(*languagev1.Selector)
+	ret0, _ := ret[0].(*selectorv1.Selector)
 	return ret0
 }
 

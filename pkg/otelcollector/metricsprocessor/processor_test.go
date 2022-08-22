@@ -23,13 +23,13 @@ var _ = Describe("Metrics Processor", func() {
 		pr        *prometheus.Registry
 		cfg       *Config
 		processor *metricsProcessor
-		engine    *mocks.MockEngineAPI
+		engine    *mocks.MockEngine
 	)
 
 	BeforeEach(func() {
 		pr = prometheus.NewRegistry()
 		ctrl := gomock.NewController(GinkgoT())
-		engine = mocks.NewMockEngineAPI(ctrl)
+		engine = mocks.NewMockEngine(ctrl)
 		cfg = &Config{
 			engine:               engine,
 			promRegistry:         pr,
@@ -97,7 +97,6 @@ var _ = Describe("Metrics Processor", func() {
 				},
 				FluxMeters: []*flowcontrolv1.FluxMeter{
 					{
-						AgentGroup:    "ag",
 						PolicyName:    "foo",
 						PolicyHash:    "foo-hash",
 						FluxMeterName: "bar",
@@ -318,7 +317,6 @@ var _ = Describe("Metrics Processor", func() {
 				},
 				FluxMeters: []*flowcontrolv1.FluxMeter{
 					{
-						AgentGroup:    "ag",
 						PolicyName:    "foo",
 						PolicyHash:    "foo-hash",
 						FluxMeterName: "bar",
@@ -585,7 +583,7 @@ func allTraceRecords(traces ptrace.Traces) []ptrace.Span {
 	return spanRecords
 }
 
-func expectEngineCalls(engine *mocks.MockEngineAPI, checkResponse *flowcontrolv1.CheckResponse) {
+func expectEngineCalls(engine *mocks.MockEngine, checkResponse *flowcontrolv1.CheckResponse) {
 	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
 	for i, fm := range checkResponse.FluxMeters {
 		// TODO actually return some Histogram

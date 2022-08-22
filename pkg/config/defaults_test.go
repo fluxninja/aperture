@@ -63,6 +63,11 @@ type ExampleNested struct {
 	Struct ExampleBasic
 }
 
+type ExampleMap struct {
+	Values map[string]ExampleBasic
+	Ptrs   map[string]*ExampleBasic
+}
+
 type FixtureTypeInt int
 
 type ExampleStruct struct {
@@ -135,16 +140,32 @@ var _ = Describe("DefaultTest", func() {
 		})
 	})
 
-	var exampleNested *ExampleNested
 	Context("set defaults with nested structs", func() {
-		BeforeEach(func() {
-			exampleNested = &ExampleNested{}
+		It("should set defaults for nested structs", func() {
+			exampleNested := &ExampleNested{}
 			exampleNested.Struct.ExamplePtr = &ExamplePtr{}
 			SetDefaults(exampleNested)
+			testDefaultTypes(&exampleNested.Struct)
 		})
 
-		It("should set defaults for nested structs", func() {
-			testDefaultTypes(&exampleNested.Struct)
+		It("should set defaults for structs in maps", func() {
+			m := ExampleMap{
+				Values: map[string]ExampleBasic{
+					"foo": {},
+				},
+			}
+			SetDefaults(&m)
+			Expect(m.Values["foo"].Bool).To(BeTrue())
+		})
+
+		It("should set defaults for pointers to structs in maps", func() {
+			m := ExampleMap{
+				Ptrs: map[string]*ExampleBasic{
+					"foo": {},
+				},
+			}
+			SetDefaults(&m)
+			Expect(m.Ptrs["foo"].Bool).To(BeTrue())
 		})
 	})
 
@@ -274,6 +295,7 @@ func testDefaultTypes(foo *ExampleBasic) {
 	Expect(foo.StringSliceSlice).To(Equal([][]string{{"1"}, {}}))
 	Expect(foo.ConfigDuration.Duration.AsDuration()).To(Equal(time.Second * 10))
 	Expect(foo.PBDuration.AsDuration()).To(Equal(time.Second * 3))
+	Expect(foo.ExamplePtr).NotTo(BeNil())
 	Expect(foo.ExamplePtr.Integer).To(Equal(33))
 	Expect(foo.ExamplePtr.FloatSlice).To(Equal([]float64{1.1, 2.2, 3.3, 4.4}))
 }

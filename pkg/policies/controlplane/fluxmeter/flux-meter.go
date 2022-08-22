@@ -14,24 +14,25 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/component"
-	"github.com/fluxninja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 )
 
 type fluxMeterConfigSync struct {
-	policyBaseAPI  policyapi.PolicyBaseAPI
+	policyBaseAPI  iface.PolicyBase
 	fluxMeterProto *policylangv1.FluxMeter
 	etcdPath       string
 	agentGroupName string
+	fluxmeterName  string
 }
 
 // NewFluxMeterOptions creates fx options for FluxMeter.
 func NewFluxMeterOptions(
+	name string,
 	fluxMeterProto *policylangv1.FluxMeter,
-	policyBaseAPI policyapi.PolicyBaseAPI,
-	metricSubRegistry policyapi.MetricSubRegistry,
+	policyBaseAPI iface.PolicyBase,
+	metricSubRegistry iface.MetricSubRegistry,
 ) (fx.Option, error) {
 	// Get Agent Group Name from FluxMeter.Selector.AgentGroup
 	selectorProto := fluxMeterProto.GetSelector()
@@ -39,11 +40,10 @@ func NewFluxMeterOptions(
 		return nil, errors.New("FluxMeter.Selector is nil")
 	}
 	agentGroup := selectorProto.GetAgentGroup()
-
-	wrapperProto := &configv1.ConfigPropertiesWrapper{
-		AgentGroup: agentGroup,
-		PolicyName: policyBaseAPI.GetPolicyName(),
-		PolicyHash: policyBaseAPI.GetPolicyHash(),
+	wrapperProto := &configv1.FluxMeterWrapper{
+		FluxmeterName: name,
+		PolicyName:    policyBaseAPI.GetPolicyName(),
+		PolicyHash:    policyBaseAPI.GetPolicyHash(),
 	}
 
 	// Register FluxMeter
@@ -53,12 +53,13 @@ func NewFluxMeterOptions(
 	}
 
 	etcdPath := path.Join(paths.FluxMeterConfigPath,
-		paths.IdentifierForFluxMeter(agentGroup, policyBaseAPI.GetPolicyName(), fluxMeterProto.GetName()))
+		paths.FluxMeterKey(agentGroup, policyBaseAPI.GetPolicyName(), name))
 	configSync := &fluxMeterConfigSync{
 		fluxMeterProto: fluxMeterProto,
 		policyBaseAPI:  policyBaseAPI,
 		agentGroupName: agentGroup,
 		etcdPath:       etcdPath,
+		fluxmeterName:  name,
 	}
 
 	return fx.Options(
@@ -71,16 +72,11 @@ func NewFluxMeterOptions(
 func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper, err := utils.WrapWithConfProps(
-				configSync.fluxMeterProto,
-				configSync.agentGroupName,
-				configSync.policyBaseAPI.GetPolicyName(),
-				configSync.policyBaseAPI.GetPolicyHash(),
-				0,
-			)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to wrap flux meter config in config properties")
-				return err
+			wrapper := &configv1.FluxMeterWrapper{
+				FluxmeterName: configSync.fluxmeterName,
+				FluxMeter:     configSync.fluxMeterProto,
+				PolicyName:    configSync.policyBaseAPI.GetPolicyName(),
+				PolicyHash:    configSync.policyBaseAPI.GetPolicyHash(),
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {
@@ -109,23 +105,24 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 }
 
 // registerFluxMeter registers histograms for fluxmeter in controller.
-func registerFluxMeter(fluxMeterProto *policylangv1.FluxMeter, componentAPI component.ComponentAPI, metricSubRegistry policyapi.MetricSubRegistry) error {
-	// Original metric name
-	fluxMeterName := fluxMeterProto.Name
-
-	policyNameMatcher, err := labels.NewMatcher(labels.MatchEqual, "policy_name", componentAPI.GetPolicyName())
+func registerFluxMeter(
+	fluxMeterProto *policylangv1.FluxMeter,
+	fluxMeterWrapper *configv1.FluxMeterWrapper,
+	metricSubRegistry iface.MetricSubRegistry,
+) error {
+	policyNameMatcher, err := labels.NewMatcher(labels.MatchEqual, metrics.PolicyNameLabel, fluxMeterWrapper.GetPolicyName())
 	if err != nil {
 		return err
 	}
-	fluxMeterNameMatcher, err := labels.NewMatcher(labels.MatchEqual, "flux_meter_name", fluxMeterName)
+	fluxMeterNameMatcher, err := labels.NewMatcher(labels.MatchEqual, metrics.FluxMeterNameLabel, fluxMeterWrapper.GetFluxmeterName())
 	if err != nil {
 		return err
 	}
-	policyHashMatcher, err := labels.NewMatcher(labels.MatchEqual, "policy_hash", componentAPI.GetPolicyHash())
+	policyHashMatcher, err := labels.NewMatcher(labels.MatchEqual, metrics.PolicyHashLabel, fluxMeterWrapper.GetPolicyHash())
 	if err != nil {
 		return err
 	}
 	metricLabels := []*labels.Matcher{policyNameMatcher, fluxMeterNameMatcher, policyHashMatcher}
-	metricSubRegistry.RegisterHistogramSub(fluxMeterName, "flux_meter", metricLabels)
+	metricSubRegistry.RegisterHistogramSub(fluxMeterWrapper.GetFluxmeterName(), metrics.FluxMeterMetricName, metricLabels)
 	return nil
 }
