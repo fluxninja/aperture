@@ -107,7 +107,7 @@ func (executor *jobExecutor) Execute(ctx context.Context) (proto.Message, error)
 
 func (executor *jobExecutor) getLivenessStatusPath() string {
 	// "liveness.job_groups.<jobGroupName>.<jobName>"
-	return strings.Join([]string{"liveness", "job_groups", executor.jg.GroupName(), executor.Name()}, executor.jg.gt.registry.Delim())
+	return strings.Join([]string{"liveness", "job_groups", executor.jg.GroupName(), executor.Name()}, executor.jg.registry.Delim())
 }
 
 func (executor *jobExecutor) doJob() {
@@ -153,14 +153,14 @@ func (executor *jobExecutor) doJob() {
 		select {
 		case <-timerCh:
 			s := status.NewStatus(wrapperspb.String("Timeout"), nil)
-			err := executor.jg.gt.registry.Push(regPath, s)
+			err := executor.jg.registry.Push(regPath, s)
 			if err != nil {
 				log.Error().Err(err).Str("job", executor.Name()).Msg("Unable to push status to registry")
 			}
 			timer.Reset(time.Second * 1)
 		case <-jobCh:
 			s := status.NewStatus(wrapperspb.String("OK"), nil)
-			err := executor.jg.gt.registry.Push(regPath, s)
+			err := executor.jg.registry.Push(regPath, s)
 			if err != nil {
 				log.Error().Err(err).Str("job", executor.Name()).Msg("Unable to push status to registry")
 			}
