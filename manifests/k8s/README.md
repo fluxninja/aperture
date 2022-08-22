@@ -88,6 +88,18 @@ Create a K8s cluster using Kind:
 kind create cluster
 ```
 
+### Prerequisites - fluxninja/aperture-operator access
+
+For tilt to be able to access fluxninja/aperture-operator repository and build images,
+`aperture-operator` symlink to the repository must be created under `manifests/`.
+
+For example:
+
+```sh
+cd ~/src/fluxninja/aperture/
+ln -s ~/src/fluxninja/aperture-operator manifests/aperture-operator
+```
+
 ### Services deployment
 
 Simply run `tilt up` - it'll automatically start building and deploying!
