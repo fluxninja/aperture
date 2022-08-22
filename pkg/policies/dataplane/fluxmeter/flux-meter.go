@@ -124,14 +124,10 @@ func NewFluxMeterOptions(
 		fluxMeterProto: fluxMeterProto,
 		Policy:         wrapperMessage,
 		histMetrics:    make(map[flowcontrolv1.DecisionType]prometheus.Histogram),
+		fluxMeterName:  wrapperMessage.FluxmeterName,
+		selector:       fluxMeterProto.GetSelector(),
+		buckets:        fluxMeterProto.GetHistogramBuckets(),
 	}
-
-	// Original metric name
-	fluxMeter.fluxMeterName = fluxMeterProto.Name
-	// Selector
-	fluxMeter.selector = fluxMeterProto.GetSelector()
-	// Buckets
-	fluxMeter.buckets = fluxMeterProto.GetHistogramBuckets()
 
 	return fx.Options(
 			fx.Invoke(fluxMeter.setup),

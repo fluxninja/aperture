@@ -337,9 +337,6 @@ definitions:
           format: double
         description: Latency histogram buckets (in ms) for this FluxMeter.
         x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
-      name:
-        type: string
-        description: Name of the flux meter.
       selector:
         $ref: '#/definitions/v1Selector'
         description: Policies are only applied to flows that are matched based on the fields in the selector.
@@ -1329,8 +1326,8 @@ definitions:
           This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
         x-go-default: 0.5s
       flux_meters:
-        type: array
-        items:
+        type: object
+        additionalProperties:
           $ref: '#/definitions/policylanguagev1FluxMeter'
         description: FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
     description: |-

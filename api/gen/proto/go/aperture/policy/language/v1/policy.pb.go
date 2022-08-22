@@ -135,7 +135,7 @@ type Policy struct {
 	// This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 	EvaluationInterval *durationpb.Duration `protobuf:"bytes,2,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"0.5s"` // @gotags: default:"0.5s"
 	// FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
-	FluxMeters []*FluxMeter `protobuf:"bytes,3,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty"`
+	FluxMeters map[string]*FluxMeter `protobuf:"bytes,3,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *Policy) Reset() {
@@ -184,7 +184,7 @@ func (x *Policy) GetEvaluationInterval() *durationpb.Duration {
 	return nil
 }
 
-func (x *Policy) GetFluxMeters() []*FluxMeter {
+func (x *Policy) GetFluxMeters() map[string]*FluxMeter {
 	if x != nil {
 		return x.FluxMeters
 	}
@@ -197,12 +197,10 @@ type FluxMeter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Name of the flux meter.
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Policies are only applied to flows that are matched based on the fields in the selector.
-	Selector *v1.Selector `protobuf:"bytes,2,opt,name=selector,proto3" json:"selector,omitempty"`
+	Selector *v1.Selector `protobuf:"bytes,1,opt,name=selector,proto3" json:"selector,omitempty"`
 	// Latency histogram buckets (in ms) for this FluxMeter.
-	HistogramBuckets []float64 `protobuf:"fixed64,3,rep,packed,name=histogram_buckets,json=histogramBuckets,proto3" json:"histogram_buckets,omitempty" default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"` // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+	HistogramBuckets []float64 `protobuf:"fixed64,2,rep,packed,name=histogram_buckets,json=histogramBuckets,proto3" json:"histogram_buckets,omitempty" default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"` // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
 }
 
 func (x *FluxMeter) Reset() {
@@ -235,13 +233,6 @@ func (x *FluxMeter) ProtoReflect() protoreflect.Message {
 // Deprecated: Use FluxMeter.ProtoReflect.Descriptor instead.
 func (*FluxMeter) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *FluxMeter) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
 }
 
 func (x *FluxMeter) GetSelector() *v1.Selector {
@@ -1615,7 +1606,7 @@ type GradientController_Ins struct {
 func (x *GradientController_Ins) Reset() {
 	*x = GradientController_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[21]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1628,7 +1619,7 @@ func (x *GradientController_Ins) String() string {
 func (*GradientController_Ins) ProtoMessage() {}
 
 func (x *GradientController_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[21]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1699,7 +1690,7 @@ type GradientController_Outs struct {
 func (x *GradientController_Outs) Reset() {
 	*x = GradientController_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[22]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1712,7 +1703,7 @@ func (x *GradientController_Outs) String() string {
 func (*GradientController_Outs) ProtoMessage() {}
 
 func (x *GradientController_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[22]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1752,7 +1743,7 @@ type EMA_Ins struct {
 func (x *EMA_Ins) Reset() {
 	*x = EMA_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[23]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1765,7 +1756,7 @@ func (x *EMA_Ins) String() string {
 func (*EMA_Ins) ProtoMessage() {}
 
 func (x *EMA_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[23]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1815,7 +1806,7 @@ type EMA_Outs struct {
 func (x *EMA_Outs) Reset() {
 	*x = EMA_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[24]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1828,7 +1819,7 @@ func (x *EMA_Outs) String() string {
 func (*EMA_Outs) ProtoMessage() {}
 
 func (x *EMA_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[24]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1866,7 +1857,7 @@ type ArithmeticCombinator_Ins struct {
 func (x *ArithmeticCombinator_Ins) Reset() {
 	*x = ArithmeticCombinator_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[25]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1879,7 +1870,7 @@ func (x *ArithmeticCombinator_Ins) String() string {
 func (*ArithmeticCombinator_Ins) ProtoMessage() {}
 
 func (x *ArithmeticCombinator_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[25]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1922,7 +1913,7 @@ type ArithmeticCombinator_Outs struct {
 func (x *ArithmeticCombinator_Outs) Reset() {
 	*x = ArithmeticCombinator_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[26]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1935,7 +1926,7 @@ func (x *ArithmeticCombinator_Outs) String() string {
 func (*ArithmeticCombinator_Outs) ProtoMessage() {}
 
 func (x *ArithmeticCombinator_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[26]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1977,7 +1968,7 @@ type Decider_Ins struct {
 func (x *Decider_Ins) Reset() {
 	*x = Decider_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[27]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1990,7 +1981,7 @@ func (x *Decider_Ins) String() string {
 func (*Decider_Ins) ProtoMessage() {}
 
 func (x *Decider_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[27]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2047,7 +2038,7 @@ type Decider_Outs struct {
 func (x *Decider_Outs) Reset() {
 	*x = Decider_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[28]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2060,7 +2051,7 @@ func (x *Decider_Outs) String() string {
 func (*Decider_Outs) ProtoMessage() {}
 
 func (x *Decider_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[28]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2096,7 +2087,7 @@ type RateLimiter_LazySyncConfig struct {
 func (x *RateLimiter_LazySyncConfig) Reset() {
 	*x = RateLimiter_LazySyncConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[29]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2109,7 +2100,7 @@ func (x *RateLimiter_LazySyncConfig) String() string {
 func (*RateLimiter_LazySyncConfig) ProtoMessage() {}
 
 func (x *RateLimiter_LazySyncConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[29]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2151,7 +2142,7 @@ type RateLimiter_OverrideConfig struct {
 func (x *RateLimiter_OverrideConfig) Reset() {
 	*x = RateLimiter_OverrideConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[30]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2164,7 +2155,7 @@ func (x *RateLimiter_OverrideConfig) String() string {
 func (*RateLimiter_OverrideConfig) ProtoMessage() {}
 
 func (x *RateLimiter_OverrideConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[30]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2206,7 +2197,7 @@ type RateLimiter_Ins struct {
 func (x *RateLimiter_Ins) Reset() {
 	*x = RateLimiter_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[31]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2219,7 +2210,7 @@ func (x *RateLimiter_Ins) String() string {
 func (*RateLimiter_Ins) ProtoMessage() {}
 
 func (x *RateLimiter_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[31]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2264,7 +2255,7 @@ type Scheduler_Workload struct {
 func (x *Scheduler_Workload) Reset() {
 	*x = Scheduler_Workload{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[32]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2277,7 +2268,7 @@ func (x *Scheduler_Workload) String() string {
 func (*Scheduler_Workload) ProtoMessage() {}
 
 func (x *Scheduler_Workload) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[32]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2335,7 +2326,7 @@ type Scheduler_WorkloadAndLabelMatcher struct {
 func (x *Scheduler_WorkloadAndLabelMatcher) Reset() {
 	*x = Scheduler_WorkloadAndLabelMatcher{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[33]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2348,7 +2339,7 @@ func (x *Scheduler_WorkloadAndLabelMatcher) String() string {
 func (*Scheduler_WorkloadAndLabelMatcher) ProtoMessage() {}
 
 func (x *Scheduler_WorkloadAndLabelMatcher) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[33]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2393,7 +2384,7 @@ type Scheduler_Outs struct {
 func (x *Scheduler_Outs) Reset() {
 	*x = Scheduler_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[34]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2406,7 +2397,7 @@ func (x *Scheduler_Outs) String() string {
 func (*Scheduler_Outs) ProtoMessage() {}
 
 func (x *Scheduler_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[34]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2449,7 +2440,7 @@ type LoadShedActuator_Ins struct {
 func (x *LoadShedActuator_Ins) Reset() {
 	*x = LoadShedActuator_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[35]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2462,7 +2453,7 @@ func (x *LoadShedActuator_Ins) String() string {
 func (*LoadShedActuator_Ins) ProtoMessage() {}
 
 func (x *LoadShedActuator_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[35]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2498,7 +2489,7 @@ type PromQL_Outs struct {
 func (x *PromQL_Outs) Reset() {
 	*x = PromQL_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[36]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2511,7 +2502,7 @@ func (x *PromQL_Outs) String() string {
 func (*PromQL_Outs) ProtoMessage() {}
 
 func (x *PromQL_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[36]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2547,7 +2538,7 @@ type Constant_Outs struct {
 func (x *Constant_Outs) Reset() {
 	*x = Constant_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[37]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2560,7 +2551,7 @@ func (x *Constant_Outs) String() string {
 func (*Constant_Outs) ProtoMessage() {}
 
 func (x *Constant_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[37]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2596,7 +2587,7 @@ type Sqrt_Ins struct {
 func (x *Sqrt_Ins) Reset() {
 	*x = Sqrt_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[38]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2609,7 +2600,7 @@ func (x *Sqrt_Ins) String() string {
 func (*Sqrt_Ins) ProtoMessage() {}
 
 func (x *Sqrt_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[38]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2645,7 +2636,7 @@ type Sqrt_Outs struct {
 func (x *Sqrt_Outs) Reset() {
 	*x = Sqrt_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[39]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2658,7 +2649,7 @@ func (x *Sqrt_Outs) String() string {
 func (*Sqrt_Outs) ProtoMessage() {}
 
 func (x *Sqrt_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[39]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2694,7 +2685,7 @@ type Extrapolator_Ins struct {
 func (x *Extrapolator_Ins) Reset() {
 	*x = Extrapolator_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[40]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2707,7 +2698,7 @@ func (x *Extrapolator_Ins) String() string {
 func (*Extrapolator_Ins) ProtoMessage() {}
 
 func (x *Extrapolator_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[40]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2743,7 +2734,7 @@ type Extrapolator_Outs struct {
 func (x *Extrapolator_Outs) Reset() {
 	*x = Extrapolator_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[41]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2756,7 +2747,7 @@ func (x *Extrapolator_Outs) String() string {
 func (*Extrapolator_Outs) ProtoMessage() {}
 
 func (x *Extrapolator_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[41]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2792,7 +2783,7 @@ type Max_Ins struct {
 func (x *Max_Ins) Reset() {
 	*x = Max_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[42]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2805,7 +2796,7 @@ func (x *Max_Ins) String() string {
 func (*Max_Ins) ProtoMessage() {}
 
 func (x *Max_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[42]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2841,7 +2832,7 @@ type Max_Outs struct {
 func (x *Max_Outs) Reset() {
 	*x = Max_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[43]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2854,7 +2845,7 @@ func (x *Max_Outs) String() string {
 func (*Max_Outs) ProtoMessage() {}
 
 func (x *Max_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[43]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2890,7 +2881,7 @@ type Min_Ins struct {
 func (x *Min_Ins) Reset() {
 	*x = Min_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[44]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[45]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2903,7 +2894,7 @@ func (x *Min_Ins) String() string {
 func (*Min_Ins) ProtoMessage() {}
 
 func (x *Min_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[44]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[45]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2939,7 +2930,7 @@ type Min_Outs struct {
 func (x *Min_Outs) Reset() {
 	*x = Min_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[45]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[46]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2952,7 +2943,7 @@ func (x *Min_Outs) String() string {
 func (*Min_Outs) ProtoMessage() {}
 
 func (x *Min_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[45]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[46]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3016,7 +3007,7 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72,
 	0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67,
 	0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x52, 0x05,
-	0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0xfd, 0x01, 0x0a, 0x06, 0x50, 0x6f,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0xf1, 0x02, 0x0a, 0x06, 0x50, 0x6f,
 	0x6c, 0x69, 0x63, 0x79, 0x12, 0x40, 0x0a, 0x07, 0x63, 0x69, 0x72, 0x63, 0x75, 0x69, 0x74, 0x18,
 	0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x26, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65,
 	0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65,
@@ -3028,19 +3019,25 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x92, 0x41, 0x19, 0x82, 0x03, 0x16, 0x0a, 0x0c, 0x78, 0x2d, 0x67, 0x6f, 0x2d, 0x64, 0x65, 0x66,
 	0x61, 0x75, 0x6c, 0x74, 0x12, 0x06, 0x1a, 0x04, 0x30, 0x2e, 0x35, 0x73, 0x52, 0x12, 0x65, 0x76,
 	0x61, 0x6c, 0x75, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c,
-	0x12, 0x47, 0x0a, 0x0b, 0x66, 0x6c, 0x75, 0x78, 0x5f, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x18,
-	0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x26, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65,
+	0x12, 0x54, 0x0a, 0x0b, 0x66, 0x6c, 0x75, 0x78, 0x5f, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x18,
+	0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x33, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65,
 	0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65,
-	0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6c, 0x75, 0x78, 0x4d, 0x65, 0x74, 0x65, 0x72, 0x52, 0x0a, 0x66,
-	0x6c, 0x75, 0x78, 0x4d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x22, 0xed, 0x01, 0x0a, 0x09, 0x46, 0x6c,
-	0x75, 0x78, 0x4d, 0x65, 0x74, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x41, 0x0a, 0x08, 0x73,
-	0x65, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x25, 0x2e,
+	0x2e, 0x76, 0x31, 0x2e, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x46, 0x6c, 0x75, 0x78, 0x4d,
+	0x65, 0x74, 0x65, 0x72, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0a, 0x66, 0x6c, 0x75, 0x78,
+	0x4d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x1a, 0x65, 0x0a, 0x0f, 0x46, 0x6c, 0x75, 0x78, 0x4d, 0x65,
+	0x74, 0x65, 0x72, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x3c, 0x0a, 0x05, 0x76,
+	0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x26, 0x2e, 0x61, 0x70, 0x65,
+	0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e,
+	0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6c, 0x75, 0x78, 0x4d, 0x65, 0x74,
+	0x65, 0x72, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0xd9, 0x01,
+	0x0a, 0x09, 0x46, 0x6c, 0x75, 0x78, 0x4d, 0x65, 0x74, 0x65, 0x72, 0x12, 0x41, 0x0a, 0x08, 0x73,
+	0x65, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x25, 0x2e,
 	0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e,
 	0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65, 0x6c, 0x65,
 	0x63, 0x74, 0x6f, 0x72, 0x52, 0x08, 0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x12, 0x88,
 	0x01, 0x0a, 0x11, 0x68, 0x69, 0x73, 0x74, 0x6f, 0x67, 0x72, 0x61, 0x6d, 0x5f, 0x62, 0x75, 0x63,
-	0x6b, 0x65, 0x74, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x01, 0x42, 0x5b, 0x92, 0x41, 0x58, 0x82,
+	0x6b, 0x65, 0x74, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x01, 0x42, 0x5b, 0x92, 0x41, 0x58, 0x82,
 	0x03, 0x55, 0x0a, 0x0c, 0x78, 0x2d, 0x67, 0x6f, 0x2d, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74,
 	0x12, 0x45, 0x1a, 0x43, 0x5b, 0x35, 0x2e, 0x30, 0x2c, 0x31, 0x30, 0x2e, 0x30, 0x2c, 0x32, 0x35,
 	0x2e, 0x30, 0x2c, 0x35, 0x30, 0x2e, 0x30, 0x2c, 0x31, 0x30, 0x30, 0x2e, 0x30, 0x2c, 0x32, 0x35,
@@ -3595,7 +3592,7 @@ func file_aperture_policy_language_v1_policy_proto_rawDescGZIP() []byte {
 	return file_aperture_policy_language_v1_policy_proto_rawDescData
 }
 
-var file_aperture_policy_language_v1_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 46)
+var file_aperture_policy_language_v1_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
 var file_aperture_policy_language_v1_policy_proto_goTypes = []interface{}{
 	(*AllPoliciesResponse)(nil),               // 0: aperture.policy.language.v1.AllPoliciesResponse
 	(*AllPolicies)(nil),                       // 1: aperture.policy.language.v1.AllPolicies
@@ -3618,43 +3615,44 @@ var file_aperture_policy_language_v1_policy_proto_goTypes = []interface{}{
 	(*Max)(nil),                               // 18: aperture.policy.language.v1.Max
 	(*Min)(nil),                               // 19: aperture.policy.language.v1.Min
 	nil,                                       // 20: aperture.policy.language.v1.AllPolicies.AllPoliciesEntry
-	(*GradientController_Ins)(nil),            // 21: aperture.policy.language.v1.GradientController.Ins
-	(*GradientController_Outs)(nil),           // 22: aperture.policy.language.v1.GradientController.Outs
-	(*EMA_Ins)(nil),                           // 23: aperture.policy.language.v1.EMA.Ins
-	(*EMA_Outs)(nil),                          // 24: aperture.policy.language.v1.EMA.Outs
-	(*ArithmeticCombinator_Ins)(nil),          // 25: aperture.policy.language.v1.ArithmeticCombinator.Ins
-	(*ArithmeticCombinator_Outs)(nil),         // 26: aperture.policy.language.v1.ArithmeticCombinator.Outs
-	(*Decider_Ins)(nil),                       // 27: aperture.policy.language.v1.Decider.Ins
-	(*Decider_Outs)(nil),                      // 28: aperture.policy.language.v1.Decider.Outs
-	(*RateLimiter_LazySyncConfig)(nil),        // 29: aperture.policy.language.v1.RateLimiter.LazySyncConfig
-	(*RateLimiter_OverrideConfig)(nil),        // 30: aperture.policy.language.v1.RateLimiter.OverrideConfig
-	(*RateLimiter_Ins)(nil),                   // 31: aperture.policy.language.v1.RateLimiter.Ins
-	(*Scheduler_Workload)(nil),                // 32: aperture.policy.language.v1.Scheduler.Workload
-	(*Scheduler_WorkloadAndLabelMatcher)(nil), // 33: aperture.policy.language.v1.Scheduler.WorkloadAndLabelMatcher
-	(*Scheduler_Outs)(nil),                    // 34: aperture.policy.language.v1.Scheduler.Outs
-	(*LoadShedActuator_Ins)(nil),              // 35: aperture.policy.language.v1.LoadShedActuator.Ins
-	(*PromQL_Outs)(nil),                       // 36: aperture.policy.language.v1.PromQL.Outs
-	(*Constant_Outs)(nil),                     // 37: aperture.policy.language.v1.Constant.Outs
-	(*Sqrt_Ins)(nil),                          // 38: aperture.policy.language.v1.Sqrt.Ins
-	(*Sqrt_Outs)(nil),                         // 39: aperture.policy.language.v1.Sqrt.Outs
-	(*Extrapolator_Ins)(nil),                  // 40: aperture.policy.language.v1.Extrapolator.Ins
-	(*Extrapolator_Outs)(nil),                 // 41: aperture.policy.language.v1.Extrapolator.Outs
-	(*Max_Ins)(nil),                           // 42: aperture.policy.language.v1.Max.Ins
-	(*Max_Outs)(nil),                          // 43: aperture.policy.language.v1.Max.Outs
-	(*Min_Ins)(nil),                           // 44: aperture.policy.language.v1.Min.Ins
-	(*Min_Outs)(nil),                          // 45: aperture.policy.language.v1.Min.Outs
-	(*durationpb.Duration)(nil),               // 46: google.protobuf.Duration
-	(*v1.Selector)(nil),                       // 47: aperture.common.selector.v1.Selector
-	(*v11.LabelMatcher)(nil),                  // 48: aperture.common.labelmatcher.v1.LabelMatcher
-	(*emptypb.Empty)(nil),                     // 49: google.protobuf.Empty
+	nil,                                       // 21: aperture.policy.language.v1.Policy.FluxMetersEntry
+	(*GradientController_Ins)(nil),            // 22: aperture.policy.language.v1.GradientController.Ins
+	(*GradientController_Outs)(nil),           // 23: aperture.policy.language.v1.GradientController.Outs
+	(*EMA_Ins)(nil),                           // 24: aperture.policy.language.v1.EMA.Ins
+	(*EMA_Outs)(nil),                          // 25: aperture.policy.language.v1.EMA.Outs
+	(*ArithmeticCombinator_Ins)(nil),          // 26: aperture.policy.language.v1.ArithmeticCombinator.Ins
+	(*ArithmeticCombinator_Outs)(nil),         // 27: aperture.policy.language.v1.ArithmeticCombinator.Outs
+	(*Decider_Ins)(nil),                       // 28: aperture.policy.language.v1.Decider.Ins
+	(*Decider_Outs)(nil),                      // 29: aperture.policy.language.v1.Decider.Outs
+	(*RateLimiter_LazySyncConfig)(nil),        // 30: aperture.policy.language.v1.RateLimiter.LazySyncConfig
+	(*RateLimiter_OverrideConfig)(nil),        // 31: aperture.policy.language.v1.RateLimiter.OverrideConfig
+	(*RateLimiter_Ins)(nil),                   // 32: aperture.policy.language.v1.RateLimiter.Ins
+	(*Scheduler_Workload)(nil),                // 33: aperture.policy.language.v1.Scheduler.Workload
+	(*Scheduler_WorkloadAndLabelMatcher)(nil), // 34: aperture.policy.language.v1.Scheduler.WorkloadAndLabelMatcher
+	(*Scheduler_Outs)(nil),                    // 35: aperture.policy.language.v1.Scheduler.Outs
+	(*LoadShedActuator_Ins)(nil),              // 36: aperture.policy.language.v1.LoadShedActuator.Ins
+	(*PromQL_Outs)(nil),                       // 37: aperture.policy.language.v1.PromQL.Outs
+	(*Constant_Outs)(nil),                     // 38: aperture.policy.language.v1.Constant.Outs
+	(*Sqrt_Ins)(nil),                          // 39: aperture.policy.language.v1.Sqrt.Ins
+	(*Sqrt_Outs)(nil),                         // 40: aperture.policy.language.v1.Sqrt.Outs
+	(*Extrapolator_Ins)(nil),                  // 41: aperture.policy.language.v1.Extrapolator.Ins
+	(*Extrapolator_Outs)(nil),                 // 42: aperture.policy.language.v1.Extrapolator.Outs
+	(*Max_Ins)(nil),                           // 43: aperture.policy.language.v1.Max.Ins
+	(*Max_Outs)(nil),                          // 44: aperture.policy.language.v1.Max.Outs
+	(*Min_Ins)(nil),                           // 45: aperture.policy.language.v1.Min.Ins
+	(*Min_Outs)(nil),                          // 46: aperture.policy.language.v1.Min.Outs
+	(*durationpb.Duration)(nil),               // 47: google.protobuf.Duration
+	(*v1.Selector)(nil),                       // 48: aperture.common.selector.v1.Selector
+	(*v11.LabelMatcher)(nil),                  // 49: aperture.common.labelmatcher.v1.LabelMatcher
+	(*emptypb.Empty)(nil),                     // 50: google.protobuf.Empty
 }
 var file_aperture_policy_language_v1_policy_proto_depIdxs = []int32{
 	1,  // 0: aperture.policy.language.v1.AllPoliciesResponse.all_policies:type_name -> aperture.policy.language.v1.AllPolicies
 	20, // 1: aperture.policy.language.v1.AllPolicies.all_policies:type_name -> aperture.policy.language.v1.AllPolicies.AllPoliciesEntry
 	4,  // 2: aperture.policy.language.v1.Policy.circuit:type_name -> aperture.policy.language.v1.Component
-	46, // 3: aperture.policy.language.v1.Policy.evaluation_interval:type_name -> google.protobuf.Duration
-	3,  // 4: aperture.policy.language.v1.Policy.flux_meters:type_name -> aperture.policy.language.v1.FluxMeter
-	47, // 5: aperture.policy.language.v1.FluxMeter.selector:type_name -> aperture.common.selector.v1.Selector
+	47, // 3: aperture.policy.language.v1.Policy.evaluation_interval:type_name -> google.protobuf.Duration
+	21, // 4: aperture.policy.language.v1.Policy.flux_meters:type_name -> aperture.policy.language.v1.Policy.FluxMetersEntry
+	48, // 5: aperture.policy.language.v1.FluxMeter.selector:type_name -> aperture.common.selector.v1.Selector
 	6,  // 6: aperture.policy.language.v1.Component.gradient_controller:type_name -> aperture.policy.language.v1.GradientController
 	7,  // 7: aperture.policy.language.v1.Component.ema:type_name -> aperture.policy.language.v1.EMA
 	8,  // 8: aperture.policy.language.v1.Component.arithmetic_combinator:type_name -> aperture.policy.language.v1.ArithmeticCombinator
@@ -3667,86 +3665,87 @@ var file_aperture_policy_language_v1_policy_proto_depIdxs = []int32{
 	17, // 15: aperture.policy.language.v1.Component.extrapolator:type_name -> aperture.policy.language.v1.Extrapolator
 	18, // 16: aperture.policy.language.v1.Component.max:type_name -> aperture.policy.language.v1.Max
 	19, // 17: aperture.policy.language.v1.Component.min:type_name -> aperture.policy.language.v1.Min
-	21, // 18: aperture.policy.language.v1.GradientController.in_ports:type_name -> aperture.policy.language.v1.GradientController.Ins
-	22, // 19: aperture.policy.language.v1.GradientController.out_ports:type_name -> aperture.policy.language.v1.GradientController.Outs
-	23, // 20: aperture.policy.language.v1.EMA.in_ports:type_name -> aperture.policy.language.v1.EMA.Ins
-	24, // 21: aperture.policy.language.v1.EMA.out_ports:type_name -> aperture.policy.language.v1.EMA.Outs
-	46, // 22: aperture.policy.language.v1.EMA.ema_window:type_name -> google.protobuf.Duration
-	46, // 23: aperture.policy.language.v1.EMA.warm_up_window:type_name -> google.protobuf.Duration
-	25, // 24: aperture.policy.language.v1.ArithmeticCombinator.in_ports:type_name -> aperture.policy.language.v1.ArithmeticCombinator.Ins
-	26, // 25: aperture.policy.language.v1.ArithmeticCombinator.out_ports:type_name -> aperture.policy.language.v1.ArithmeticCombinator.Outs
-	27, // 26: aperture.policy.language.v1.Decider.in_ports:type_name -> aperture.policy.language.v1.Decider.Ins
-	28, // 27: aperture.policy.language.v1.Decider.out_ports:type_name -> aperture.policy.language.v1.Decider.Outs
-	46, // 28: aperture.policy.language.v1.Decider.true_for:type_name -> google.protobuf.Duration
-	46, // 29: aperture.policy.language.v1.Decider.false_for:type_name -> google.protobuf.Duration
-	31, // 30: aperture.policy.language.v1.RateLimiter.in_ports:type_name -> aperture.policy.language.v1.RateLimiter.Ins
-	47, // 31: aperture.policy.language.v1.RateLimiter.selector:type_name -> aperture.common.selector.v1.Selector
-	46, // 32: aperture.policy.language.v1.RateLimiter.limit_reset_interval:type_name -> google.protobuf.Duration
-	30, // 33: aperture.policy.language.v1.RateLimiter.overrides:type_name -> aperture.policy.language.v1.RateLimiter.OverrideConfig
-	29, // 34: aperture.policy.language.v1.RateLimiter.lazy_sync_config:type_name -> aperture.policy.language.v1.RateLimiter.LazySyncConfig
+	22, // 18: aperture.policy.language.v1.GradientController.in_ports:type_name -> aperture.policy.language.v1.GradientController.Ins
+	23, // 19: aperture.policy.language.v1.GradientController.out_ports:type_name -> aperture.policy.language.v1.GradientController.Outs
+	24, // 20: aperture.policy.language.v1.EMA.in_ports:type_name -> aperture.policy.language.v1.EMA.Ins
+	25, // 21: aperture.policy.language.v1.EMA.out_ports:type_name -> aperture.policy.language.v1.EMA.Outs
+	47, // 22: aperture.policy.language.v1.EMA.ema_window:type_name -> google.protobuf.Duration
+	47, // 23: aperture.policy.language.v1.EMA.warm_up_window:type_name -> google.protobuf.Duration
+	26, // 24: aperture.policy.language.v1.ArithmeticCombinator.in_ports:type_name -> aperture.policy.language.v1.ArithmeticCombinator.Ins
+	27, // 25: aperture.policy.language.v1.ArithmeticCombinator.out_ports:type_name -> aperture.policy.language.v1.ArithmeticCombinator.Outs
+	28, // 26: aperture.policy.language.v1.Decider.in_ports:type_name -> aperture.policy.language.v1.Decider.Ins
+	29, // 27: aperture.policy.language.v1.Decider.out_ports:type_name -> aperture.policy.language.v1.Decider.Outs
+	47, // 28: aperture.policy.language.v1.Decider.true_for:type_name -> google.protobuf.Duration
+	47, // 29: aperture.policy.language.v1.Decider.false_for:type_name -> google.protobuf.Duration
+	32, // 30: aperture.policy.language.v1.RateLimiter.in_ports:type_name -> aperture.policy.language.v1.RateLimiter.Ins
+	48, // 31: aperture.policy.language.v1.RateLimiter.selector:type_name -> aperture.common.selector.v1.Selector
+	47, // 32: aperture.policy.language.v1.RateLimiter.limit_reset_interval:type_name -> google.protobuf.Duration
+	31, // 33: aperture.policy.language.v1.RateLimiter.overrides:type_name -> aperture.policy.language.v1.RateLimiter.OverrideConfig
+	30, // 34: aperture.policy.language.v1.RateLimiter.lazy_sync_config:type_name -> aperture.policy.language.v1.RateLimiter.LazySyncConfig
 	12, // 35: aperture.policy.language.v1.ConcurrencyLimiter.scheduler:type_name -> aperture.policy.language.v1.Scheduler
 	13, // 36: aperture.policy.language.v1.ConcurrencyLimiter.load_shed_actuator:type_name -> aperture.policy.language.v1.LoadShedActuator
-	34, // 37: aperture.policy.language.v1.Scheduler.out_ports:type_name -> aperture.policy.language.v1.Scheduler.Outs
-	47, // 38: aperture.policy.language.v1.Scheduler.selector:type_name -> aperture.common.selector.v1.Selector
-	32, // 39: aperture.policy.language.v1.Scheduler.default_workload:type_name -> aperture.policy.language.v1.Scheduler.Workload
-	33, // 40: aperture.policy.language.v1.Scheduler.workloads:type_name -> aperture.policy.language.v1.Scheduler.WorkloadAndLabelMatcher
-	35, // 41: aperture.policy.language.v1.LoadShedActuator.in_ports:type_name -> aperture.policy.language.v1.LoadShedActuator.Ins
-	36, // 42: aperture.policy.language.v1.PromQL.out_ports:type_name -> aperture.policy.language.v1.PromQL.Outs
-	46, // 43: aperture.policy.language.v1.PromQL.evaluation_interval:type_name -> google.protobuf.Duration
-	37, // 44: aperture.policy.language.v1.Constant.out_ports:type_name -> aperture.policy.language.v1.Constant.Outs
-	38, // 45: aperture.policy.language.v1.Sqrt.in_ports:type_name -> aperture.policy.language.v1.Sqrt.Ins
-	39, // 46: aperture.policy.language.v1.Sqrt.out_ports:type_name -> aperture.policy.language.v1.Sqrt.Outs
-	40, // 47: aperture.policy.language.v1.Extrapolator.in_ports:type_name -> aperture.policy.language.v1.Extrapolator.Ins
-	41, // 48: aperture.policy.language.v1.Extrapolator.out_ports:type_name -> aperture.policy.language.v1.Extrapolator.Outs
-	46, // 49: aperture.policy.language.v1.Extrapolator.max_extrapolation_interval:type_name -> google.protobuf.Duration
-	42, // 50: aperture.policy.language.v1.Max.in_ports:type_name -> aperture.policy.language.v1.Max.Ins
-	43, // 51: aperture.policy.language.v1.Max.out_ports:type_name -> aperture.policy.language.v1.Max.Outs
-	44, // 52: aperture.policy.language.v1.Min.in_ports:type_name -> aperture.policy.language.v1.Min.Ins
-	45, // 53: aperture.policy.language.v1.Min.out_ports:type_name -> aperture.policy.language.v1.Min.Outs
+	35, // 37: aperture.policy.language.v1.Scheduler.out_ports:type_name -> aperture.policy.language.v1.Scheduler.Outs
+	48, // 38: aperture.policy.language.v1.Scheduler.selector:type_name -> aperture.common.selector.v1.Selector
+	33, // 39: aperture.policy.language.v1.Scheduler.default_workload:type_name -> aperture.policy.language.v1.Scheduler.Workload
+	34, // 40: aperture.policy.language.v1.Scheduler.workloads:type_name -> aperture.policy.language.v1.Scheduler.WorkloadAndLabelMatcher
+	36, // 41: aperture.policy.language.v1.LoadShedActuator.in_ports:type_name -> aperture.policy.language.v1.LoadShedActuator.Ins
+	37, // 42: aperture.policy.language.v1.PromQL.out_ports:type_name -> aperture.policy.language.v1.PromQL.Outs
+	47, // 43: aperture.policy.language.v1.PromQL.evaluation_interval:type_name -> google.protobuf.Duration
+	38, // 44: aperture.policy.language.v1.Constant.out_ports:type_name -> aperture.policy.language.v1.Constant.Outs
+	39, // 45: aperture.policy.language.v1.Sqrt.in_ports:type_name -> aperture.policy.language.v1.Sqrt.Ins
+	40, // 46: aperture.policy.language.v1.Sqrt.out_ports:type_name -> aperture.policy.language.v1.Sqrt.Outs
+	41, // 47: aperture.policy.language.v1.Extrapolator.in_ports:type_name -> aperture.policy.language.v1.Extrapolator.Ins
+	42, // 48: aperture.policy.language.v1.Extrapolator.out_ports:type_name -> aperture.policy.language.v1.Extrapolator.Outs
+	47, // 49: aperture.policy.language.v1.Extrapolator.max_extrapolation_interval:type_name -> google.protobuf.Duration
+	43, // 50: aperture.policy.language.v1.Max.in_ports:type_name -> aperture.policy.language.v1.Max.Ins
+	44, // 51: aperture.policy.language.v1.Max.out_ports:type_name -> aperture.policy.language.v1.Max.Outs
+	45, // 52: aperture.policy.language.v1.Min.in_ports:type_name -> aperture.policy.language.v1.Min.Ins
+	46, // 53: aperture.policy.language.v1.Min.out_ports:type_name -> aperture.policy.language.v1.Min.Outs
 	2,  // 54: aperture.policy.language.v1.AllPolicies.AllPoliciesEntry.value:type_name -> aperture.policy.language.v1.Policy
-	5,  // 55: aperture.policy.language.v1.GradientController.Ins.signal:type_name -> aperture.policy.language.v1.Port
-	5,  // 56: aperture.policy.language.v1.GradientController.Ins.setpoint:type_name -> aperture.policy.language.v1.Port
-	5,  // 57: aperture.policy.language.v1.GradientController.Ins.optimize:type_name -> aperture.policy.language.v1.Port
-	5,  // 58: aperture.policy.language.v1.GradientController.Ins.max:type_name -> aperture.policy.language.v1.Port
-	5,  // 59: aperture.policy.language.v1.GradientController.Ins.min:type_name -> aperture.policy.language.v1.Port
-	5,  // 60: aperture.policy.language.v1.GradientController.Ins.control_variable:type_name -> aperture.policy.language.v1.Port
-	5,  // 61: aperture.policy.language.v1.GradientController.Outs.output:type_name -> aperture.policy.language.v1.Port
-	5,  // 62: aperture.policy.language.v1.EMA.Ins.input:type_name -> aperture.policy.language.v1.Port
-	5,  // 63: aperture.policy.language.v1.EMA.Ins.max_envelope:type_name -> aperture.policy.language.v1.Port
-	5,  // 64: aperture.policy.language.v1.EMA.Ins.min_envelope:type_name -> aperture.policy.language.v1.Port
-	5,  // 65: aperture.policy.language.v1.EMA.Outs.output:type_name -> aperture.policy.language.v1.Port
-	5,  // 66: aperture.policy.language.v1.ArithmeticCombinator.Ins.lhs:type_name -> aperture.policy.language.v1.Port
-	5,  // 67: aperture.policy.language.v1.ArithmeticCombinator.Ins.rhs:type_name -> aperture.policy.language.v1.Port
-	5,  // 68: aperture.policy.language.v1.ArithmeticCombinator.Outs.output:type_name -> aperture.policy.language.v1.Port
-	5,  // 69: aperture.policy.language.v1.Decider.Ins.lhs:type_name -> aperture.policy.language.v1.Port
-	5,  // 70: aperture.policy.language.v1.Decider.Ins.rhs:type_name -> aperture.policy.language.v1.Port
-	5,  // 71: aperture.policy.language.v1.Decider.Ins.on_true:type_name -> aperture.policy.language.v1.Port
-	5,  // 72: aperture.policy.language.v1.Decider.Ins.on_false:type_name -> aperture.policy.language.v1.Port
-	5,  // 73: aperture.policy.language.v1.Decider.Outs.output:type_name -> aperture.policy.language.v1.Port
-	5,  // 74: aperture.policy.language.v1.RateLimiter.Ins.limit:type_name -> aperture.policy.language.v1.Port
-	46, // 75: aperture.policy.language.v1.Scheduler.Workload.timeout:type_name -> google.protobuf.Duration
-	32, // 76: aperture.policy.language.v1.Scheduler.WorkloadAndLabelMatcher.workload:type_name -> aperture.policy.language.v1.Scheduler.Workload
-	48, // 77: aperture.policy.language.v1.Scheduler.WorkloadAndLabelMatcher.label_matcher:type_name -> aperture.common.labelmatcher.v1.LabelMatcher
-	5,  // 78: aperture.policy.language.v1.Scheduler.Outs.accepted_concurrency:type_name -> aperture.policy.language.v1.Port
-	5,  // 79: aperture.policy.language.v1.Scheduler.Outs.incoming_concurrency:type_name -> aperture.policy.language.v1.Port
-	5,  // 80: aperture.policy.language.v1.LoadShedActuator.Ins.load_shed_factor:type_name -> aperture.policy.language.v1.Port
-	5,  // 81: aperture.policy.language.v1.PromQL.Outs.output:type_name -> aperture.policy.language.v1.Port
-	5,  // 82: aperture.policy.language.v1.Constant.Outs.output:type_name -> aperture.policy.language.v1.Port
-	5,  // 83: aperture.policy.language.v1.Sqrt.Ins.input:type_name -> aperture.policy.language.v1.Port
-	5,  // 84: aperture.policy.language.v1.Sqrt.Outs.output:type_name -> aperture.policy.language.v1.Port
-	5,  // 85: aperture.policy.language.v1.Extrapolator.Ins.input:type_name -> aperture.policy.language.v1.Port
-	5,  // 86: aperture.policy.language.v1.Extrapolator.Outs.output:type_name -> aperture.policy.language.v1.Port
-	5,  // 87: aperture.policy.language.v1.Max.Ins.inputs:type_name -> aperture.policy.language.v1.Port
-	5,  // 88: aperture.policy.language.v1.Max.Outs.output:type_name -> aperture.policy.language.v1.Port
-	5,  // 89: aperture.policy.language.v1.Min.Ins.inputs:type_name -> aperture.policy.language.v1.Port
-	5,  // 90: aperture.policy.language.v1.Min.Outs.output:type_name -> aperture.policy.language.v1.Port
-	49, // 91: aperture.policy.language.v1.PolicyService.AllPolicies:input_type -> google.protobuf.Empty
-	0,  // 92: aperture.policy.language.v1.PolicyService.AllPolicies:output_type -> aperture.policy.language.v1.AllPoliciesResponse
-	92, // [92:93] is the sub-list for method output_type
-	91, // [91:92] is the sub-list for method input_type
-	91, // [91:91] is the sub-list for extension type_name
-	91, // [91:91] is the sub-list for extension extendee
-	0,  // [0:91] is the sub-list for field type_name
+	3,  // 55: aperture.policy.language.v1.Policy.FluxMetersEntry.value:type_name -> aperture.policy.language.v1.FluxMeter
+	5,  // 56: aperture.policy.language.v1.GradientController.Ins.signal:type_name -> aperture.policy.language.v1.Port
+	5,  // 57: aperture.policy.language.v1.GradientController.Ins.setpoint:type_name -> aperture.policy.language.v1.Port
+	5,  // 58: aperture.policy.language.v1.GradientController.Ins.optimize:type_name -> aperture.policy.language.v1.Port
+	5,  // 59: aperture.policy.language.v1.GradientController.Ins.max:type_name -> aperture.policy.language.v1.Port
+	5,  // 60: aperture.policy.language.v1.GradientController.Ins.min:type_name -> aperture.policy.language.v1.Port
+	5,  // 61: aperture.policy.language.v1.GradientController.Ins.control_variable:type_name -> aperture.policy.language.v1.Port
+	5,  // 62: aperture.policy.language.v1.GradientController.Outs.output:type_name -> aperture.policy.language.v1.Port
+	5,  // 63: aperture.policy.language.v1.EMA.Ins.input:type_name -> aperture.policy.language.v1.Port
+	5,  // 64: aperture.policy.language.v1.EMA.Ins.max_envelope:type_name -> aperture.policy.language.v1.Port
+	5,  // 65: aperture.policy.language.v1.EMA.Ins.min_envelope:type_name -> aperture.policy.language.v1.Port
+	5,  // 66: aperture.policy.language.v1.EMA.Outs.output:type_name -> aperture.policy.language.v1.Port
+	5,  // 67: aperture.policy.language.v1.ArithmeticCombinator.Ins.lhs:type_name -> aperture.policy.language.v1.Port
+	5,  // 68: aperture.policy.language.v1.ArithmeticCombinator.Ins.rhs:type_name -> aperture.policy.language.v1.Port
+	5,  // 69: aperture.policy.language.v1.ArithmeticCombinator.Outs.output:type_name -> aperture.policy.language.v1.Port
+	5,  // 70: aperture.policy.language.v1.Decider.Ins.lhs:type_name -> aperture.policy.language.v1.Port
+	5,  // 71: aperture.policy.language.v1.Decider.Ins.rhs:type_name -> aperture.policy.language.v1.Port
+	5,  // 72: aperture.policy.language.v1.Decider.Ins.on_true:type_name -> aperture.policy.language.v1.Port
+	5,  // 73: aperture.policy.language.v1.Decider.Ins.on_false:type_name -> aperture.policy.language.v1.Port
+	5,  // 74: aperture.policy.language.v1.Decider.Outs.output:type_name -> aperture.policy.language.v1.Port
+	5,  // 75: aperture.policy.language.v1.RateLimiter.Ins.limit:type_name -> aperture.policy.language.v1.Port
+	47, // 76: aperture.policy.language.v1.Scheduler.Workload.timeout:type_name -> google.protobuf.Duration
+	33, // 77: aperture.policy.language.v1.Scheduler.WorkloadAndLabelMatcher.workload:type_name -> aperture.policy.language.v1.Scheduler.Workload
+	49, // 78: aperture.policy.language.v1.Scheduler.WorkloadAndLabelMatcher.label_matcher:type_name -> aperture.common.labelmatcher.v1.LabelMatcher
+	5,  // 79: aperture.policy.language.v1.Scheduler.Outs.accepted_concurrency:type_name -> aperture.policy.language.v1.Port
+	5,  // 80: aperture.policy.language.v1.Scheduler.Outs.incoming_concurrency:type_name -> aperture.policy.language.v1.Port
+	5,  // 81: aperture.policy.language.v1.LoadShedActuator.Ins.load_shed_factor:type_name -> aperture.policy.language.v1.Port
+	5,  // 82: aperture.policy.language.v1.PromQL.Outs.output:type_name -> aperture.policy.language.v1.Port
+	5,  // 83: aperture.policy.language.v1.Constant.Outs.output:type_name -> aperture.policy.language.v1.Port
+	5,  // 84: aperture.policy.language.v1.Sqrt.Ins.input:type_name -> aperture.policy.language.v1.Port
+	5,  // 85: aperture.policy.language.v1.Sqrt.Outs.output:type_name -> aperture.policy.language.v1.Port
+	5,  // 86: aperture.policy.language.v1.Extrapolator.Ins.input:type_name -> aperture.policy.language.v1.Port
+	5,  // 87: aperture.policy.language.v1.Extrapolator.Outs.output:type_name -> aperture.policy.language.v1.Port
+	5,  // 88: aperture.policy.language.v1.Max.Ins.inputs:type_name -> aperture.policy.language.v1.Port
+	5,  // 89: aperture.policy.language.v1.Max.Outs.output:type_name -> aperture.policy.language.v1.Port
+	5,  // 90: aperture.policy.language.v1.Min.Ins.inputs:type_name -> aperture.policy.language.v1.Port
+	5,  // 91: aperture.policy.language.v1.Min.Outs.output:type_name -> aperture.policy.language.v1.Port
+	50, // 92: aperture.policy.language.v1.PolicyService.AllPolicies:input_type -> google.protobuf.Empty
+	0,  // 93: aperture.policy.language.v1.PolicyService.AllPolicies:output_type -> aperture.policy.language.v1.AllPoliciesResponse
+	93, // [93:94] is the sub-list for method output_type
+	92, // [92:93] is the sub-list for method input_type
+	92, // [92:92] is the sub-list for extension type_name
+	92, // [92:92] is the sub-list for extension extendee
+	0,  // [0:92] is the sub-list for field type_name
 }
 
 func init() { file_aperture_policy_language_v1_policy_proto_init() }
@@ -3995,7 +3994,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GradientController_Ins); i {
 			case 0:
 				return &v.state
@@ -4007,7 +4006,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GradientController_Outs); i {
 			case 0:
 				return &v.state
@@ -4019,7 +4018,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*EMA_Ins); i {
 			case 0:
 				return &v.state
@@ -4031,7 +4030,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*EMA_Outs); i {
 			case 0:
 				return &v.state
@@ -4043,7 +4042,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ArithmeticCombinator_Ins); i {
 			case 0:
 				return &v.state
@@ -4055,7 +4054,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ArithmeticCombinator_Outs); i {
 			case 0:
 				return &v.state
@@ -4067,7 +4066,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Decider_Ins); i {
 			case 0:
 				return &v.state
@@ -4079,7 +4078,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Decider_Outs); i {
 			case 0:
 				return &v.state
@@ -4091,7 +4090,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RateLimiter_LazySyncConfig); i {
 			case 0:
 				return &v.state
@@ -4103,7 +4102,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RateLimiter_OverrideConfig); i {
 			case 0:
 				return &v.state
@@ -4115,7 +4114,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RateLimiter_Ins); i {
 			case 0:
 				return &v.state
@@ -4127,7 +4126,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Scheduler_Workload); i {
 			case 0:
 				return &v.state
@@ -4139,7 +4138,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Scheduler_WorkloadAndLabelMatcher); i {
 			case 0:
 				return &v.state
@@ -4151,7 +4150,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Scheduler_Outs); i {
 			case 0:
 				return &v.state
@@ -4163,7 +4162,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*LoadShedActuator_Ins); i {
 			case 0:
 				return &v.state
@@ -4175,7 +4174,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PromQL_Outs); i {
 			case 0:
 				return &v.state
@@ -4187,7 +4186,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Constant_Outs); i {
 			case 0:
 				return &v.state
@@ -4199,7 +4198,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Sqrt_Ins); i {
 			case 0:
 				return &v.state
@@ -4211,7 +4210,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Sqrt_Outs); i {
 			case 0:
 				return &v.state
@@ -4223,7 +4222,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Extrapolator_Ins); i {
 			case 0:
 				return &v.state
@@ -4235,7 +4234,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Extrapolator_Outs); i {
 			case 0:
 				return &v.state
@@ -4247,7 +4246,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Max_Ins); i {
 			case 0:
 				return &v.state
@@ -4259,7 +4258,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Max_Outs); i {
 			case 0:
 				return &v.state
@@ -4271,7 +4270,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Min_Ins); i {
 			case 0:
 				return &v.state
@@ -4283,7 +4282,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_policy_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_policy_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Min_Outs); i {
 			case 0:
 				return &v.state
@@ -4319,7 +4318,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_aperture_policy_language_v1_policy_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   46,
+			NumMessages:   47,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

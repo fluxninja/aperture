@@ -21,6 +21,8 @@ message FluxMeterWrapper {
   string policy_name = 2;
   // Hash of the entire Policy spec.
   string policy_hash = 3;
+  // Name of fluxmeter metric.
+  string fluxmeter_name = 4;
 }
 
 message ConcurrencyLimiterWrapper {
