@@ -1108,7 +1108,7 @@ KubernetesDiscoveryConfig for Kubernetes service discovery.
 <dt>discovery_enabled</dt>
 <dd>
 
-(bool)
+(bool, default: `true`)
 
 </dd>
 </dl>

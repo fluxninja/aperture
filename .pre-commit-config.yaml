@@ -84,7 +84,7 @@ repos:
         name: "Docs"
         entry: "./tools/githooks/generate_docs.sh"
         language: script
-        files: '\.go$|\.md$|\.mmd$'
+        files: '\.proto$|\.go$|\.md$|\.mmd$'
         exclude: ^ops/.*
         pass_filenames: false
         description: "Generate docs"

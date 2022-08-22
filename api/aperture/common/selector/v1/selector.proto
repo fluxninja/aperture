@@ -5,7 +5,7 @@ package aperture.common.selector.v1;
 import "aperture/common/labelmatcher/v1/labelmatcher.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-// Describes where a rule or actuation component should apply to.
+// Describes where a rule or actuation component should apply to
 //
 // Example:
 // ```yaml
