@@ -280,6 +280,27 @@ agent:
     annotations: {}
     automountServiceAccountToken: true
 
+  ## @param agent.batchPrerollup.timeout Timeout for batch prerollup processor.
+  ## @param agent.batchPrerollup.sendBatchSize Size of a batch in prerollup processor which after hit, will trigger it to be sent.
+  ##
+  batchPrerollup:
+    timeout: 1s
+    sendBatchSize: 10000
+
+  ## @param agent.batchPostrollup.timeout Timeout for batch postrollup processor.
+  ## @param agent.batchPostrollup.sendBatchSize Size of a batch in postrollup processor which after hit, will trigger it to be sent.
+  ##
+  batchPostrollup:
+    timeout: 1s
+    sendBatchSize: 10000
+
+  ## @param agent.batchMetricsFast.timeout Timeout for batch metrics/fast processor.
+  ## @param agent.batchMetricsFast.sendBatchSize Size of a batch in metrics/fast processor which after hit, will trigger it to be sent.
+  ##
+  batchMetricsFast:
+    timeout: 1s
+    sendBatchSize: 1000
+
 ## @section Controller Parameters
 
 ## Agent Controller container
