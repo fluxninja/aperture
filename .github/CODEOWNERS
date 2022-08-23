@@ -1,5 +1,6 @@
 *                                            @FluxNinja/backend
 /.circleci/                                  @FluxNinja/devops
 /.github/                                    @FluxNinja/devops
-/docs/                                       @FluxNinja/documentation
+/docs/content                                @FluxNinja/documentation
+/docs/diagrams                               @FluxNinja/documentation
 /manifests/                                  @FluxNinja/devops

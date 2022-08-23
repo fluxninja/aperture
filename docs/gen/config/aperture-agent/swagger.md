@@ -36,6 +36,7 @@
 - [BackoffConfig](#backoff-config) – BackoffConfig holds configuration for GRPC Client Backoff.
 - [ClientTLSConfig](#client-tls-config) – ClientTLSConfig is the config for client TLS.
 - [DistCacheConfig](#dist-cache-config) – DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
+- [EntityConfig](#entity-config) – EntityConfig describes a single entity.
 - [EtcdConfig](#etcd-config) – EtcdConfig holds configuration for etcd client.
 - [FluxNinjaPluginConfig](#flux-ninja-plugin-config) – FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugin.
 - [GRPCClientConfig](#g-rpc-client-config) – GRPCClientConfig holds configuration for GRPC Client.
@@ -59,6 +60,8 @@
 - [ProxyConfig](#proxy-config) – ProxyConfig holds proxy configuration.
 - [SentryConfig](#sentry-config) – SentryConfig holds configuration for Sentry.
 - [ServerTLSConfig](#server-tls-config) – ServerTLSConfig holds configuration for setting up server TLS support.
+- [ServiceConfig](#service-config) – ServiceConfig describes a service and its entities.
+- [StaticDiscoveryConfig](#static-discovery-config) – StaticDiscoveryConfig for pre-determined list of services.
 - [WatchdogConfig](#watchdog-config) – WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
 - [WatchdogPolicyType](#watchdog-policy-type) – WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
 - [WatermarksPolicy](#watermarks-policy) – WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
@@ -433,6 +436,14 @@ Env-Var Prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
 Type: [KubernetesDiscoveryConfig](#kubernetes-discovery-config)
 
 </dd>
+
+<dt>static</dt>
+<dd>
+
+Env-Var Prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
+Type: [StaticDiscoveryConfig](#static-discovery-config)
+
+</dd>
 </dl>
 
 ### <span id="watchdog"></span> _Watchdog_
@@ -615,6 +626,37 @@ DistCacheConfig configures distributed cache that holds per-label counters in di
 <dd>
 
 (int64, default: `1`) ReplicaCount is 1 by default.
+
+</dd>
+</dl>
+
+### <span id="entity-config"></span> EntityConfig
+
+EntityConfig describes a single entity.
+
+#### Properties
+
+<dl>
+<dt>ip_address</dt>
+<dd>
+
+(string, `required,ip`) IP address of the entity.
+
+</dd>
+</dl>
+<dl>
+<dt>name</dt>
+<dd>
+
+(string) Name of the entity.
+
+</dd>
+</dl>
+<dl>
+<dt>uid</dt>
+<dd>
+
+(string) UID of the entity.
 
 </dd>
 </dl>
@@ -1558,6 +1600,44 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dd>
 
 (string, default: `ca.key`) Server Key file
+
+</dd>
+</dl>
+
+### <span id="service-config"></span> ServiceConfig
+
+ServiceConfig describes a service and its entities.
+
+#### Properties
+
+<dl>
+<dt>entities</dt>
+<dd>
+
+([[]EntityConfig](#entity-config)) Entities of the service.
+
+</dd>
+</dl>
+<dl>
+<dt>name</dt>
+<dd>
+
+(string, `required`) Name of the service.
+
+</dd>
+</dl>
+
+### <span id="static-discovery-config"></span> StaticDiscoveryConfig
+
+StaticDiscoveryConfig for pre-determined list of services.
+
+#### Properties
+
+<dl>
+<dt>services</dt>
+<dd>
+
+([[]ServiceConfig](#service-config)) Services list.
 
 </dd>
 </dl>

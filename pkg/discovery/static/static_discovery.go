@@ -39,6 +39,11 @@ func (sd *StaticDiscovery) start() error {
 	return nil
 }
 
+func (sd *StaticDiscovery) stop() error {
+	sd.trackers.Purge(staticEntityTrackerPrefix)
+	return nil
+}
+
 func (sd *StaticDiscovery) entitiesFromConfig() map[string]*common.Entity {
 	// entities maps entity tracker key to the entity.
 	// We assume that configured entities are consistent, i.e. same Prefix+UID implies equality of other fields
@@ -47,7 +52,7 @@ func (sd *StaticDiscovery) entitiesFromConfig() map[string]*common.Entity {
 	for _, service := range sd.services {
 		serviceName := service.Name
 		for _, e := range service.Entities {
-			key := getEntityIDKey(e.Prefix, e.UID)
+			key := fmt.Sprintf("%s.%s", staticEntityTrackerPrefix, e.UID)
 
 			var entity *common.Entity
 			var ok bool
@@ -55,7 +60,7 @@ func (sd *StaticDiscovery) entitiesFromConfig() map[string]*common.Entity {
 			if entity, ok = entities[key]; !ok {
 				entity = &common.Entity{
 					IPAddress: e.IPAddress,
-					Prefix:    e.Prefix,
+					Prefix:    staticEntityTrackerPrefix,
 					UID:       e.UID,
 					Services:  nil,
 					Name:      e.Name,
@@ -68,8 +73,4 @@ func (sd *StaticDiscovery) entitiesFromConfig() map[string]*common.Entity {
 	}
 
 	return entities
-}
-
-func getEntityIDKey(trackerPrefix, uid string) string {
-	return fmt.Sprintf("%s.%s", trackerPrefix, uid)
 }
