@@ -97,7 +97,7 @@ func setupFluxMeterModule(
 // FluxMeter describes single fluxmeter from policy.
 type FluxMeter struct {
 	iface.Policy
-	histMetrics    map[flowcontrolv1.DecisionType]prometheus.Histogram
+	histMetrics    *prometheus.HistogramVec
 	selector       *selectorv1.Selector
 	fluxMeterProto *policylangv1.FluxMeter
 	fluxMeterName  string
@@ -124,7 +124,6 @@ func NewFluxMeterOptions(
 	fluxMeter := &FluxMeter{
 		fluxMeterProto: fluxMeterProto,
 		Policy:         wrapperMessage,
-		histMetrics:    make(map[flowcontrolv1.DecisionType]prometheus.Histogram),
 		fluxMeterName:  wrapperMessage.FluxmeterName,
 		selector:       fluxMeterProto.GetSelector(),
 		buckets:        fluxMeterProto.GetHistogramBuckets(),
@@ -139,35 +138,29 @@ func NewFluxMeterOptions(
 func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheus.Registry) {
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			decisionTypes := []flowcontrolv1.DecisionType{
-				flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
-				flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
-				flowcontrolv1.DecisionType_DECISION_TYPE_UNSPECIFIED,
-			}
-			for _, decisionType := range decisionTypes {
-				// Initialize a prometheus histogram metric
-				histMetric := prometheus.NewHistogram(prometheus.HistogramOpts{
-					Name:    metrics.FluxMeterMetricName,
-					Buckets: fluxMeter.buckets,
-					// TODO flux-meter-refactor: remove metricID, instead use policyName, fluxMeterName, policyHash
-					ConstLabels: prometheus.Labels{
-						metrics.PolicyNameLabel:    fluxMeter.GetPolicyName(),
-						metrics.FluxMeterNameLabel: fluxMeter.GetFluxMeterName(),
-						metrics.PolicyHashLabel:    fluxMeter.GetPolicyHash(),
-						metrics.DecisionTypeLabel:  decisionType.String(),
-					},
-				})
-				fluxMeter.histMetrics[decisionType] = histMetric
-				// Register metric with Prometheus
-				err := prometheusRegistry.Register(histMetric)
-				if err != nil {
-					log.Error().Err(err).Msgf("Failed to register metric with Prometheus registry for FluxMeter %s", fluxMeter.fluxMeterName)
-					return err
-				}
+			// Initialize a prometheus histogram vector metric
+			histMetric := prometheus.NewHistogramVec(prometheus.HistogramOpts{
+				Name:    metrics.FluxMeterMetricName,
+				Buckets: fluxMeter.buckets,
+				ConstLabels: prometheus.Labels{
+					metrics.PolicyNameLabel:    fluxMeter.GetPolicyName(),
+					metrics.FluxMeterNameLabel: fluxMeter.GetFluxMeterName(),
+					metrics.PolicyHashLabel:    fluxMeter.GetPolicyHash(),
+				},
+			}, []string{
+				metrics.DecisionTypeLabel,
+				metrics.StatusCodeLabel,
+			})
+			fluxMeter.histMetrics = histMetric
+			// Register metric with Prometheus
+			err := prometheusRegistry.Register(histMetric)
+			if err != nil {
+				log.Error().Err(err).Msgf("Failed to register metric with Prometheus registry for FluxMeter %s", fluxMeter.fluxMeterName)
+				return err
 			}
 
 			// Register metric with PCA
-			err := engineAPI.RegisterFluxMeter(fluxMeter)
+			err = engineAPI.RegisterFluxMeter(fluxMeter)
 			if err != nil {
 				log.Error().Err(err).Msgf("Failed to register FluxMeter %s with PolicyConfigAPI", fluxMeter.fluxMeterName)
 				return err
@@ -181,12 +174,10 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 			if err != nil {
 				log.Error().Err(err).Msgf("Failed to unregister FluxMeter %s with PolicyConfigAPI", fluxMeter.fluxMeterName)
 			}
-			for _, histMetric := range fluxMeter.histMetrics {
-				// Unregister metrics with Prometheus
-				unregistered := prometheusRegistry.Unregister(histMetric)
-				if !unregistered {
-					log.Error().Err(err).Msgf("Failed to unregister metric %s with Prometheus registry", fluxMeter.fluxMeterName)
-				}
+			// Unregister metrics with Prometheus
+			unregistered := prometheusRegistry.Unregister(fluxMeter.histMetrics)
+			if !unregistered {
+				log.Error().Err(err).Msgf("Failed to unregister metric %s with Prometheus registry", fluxMeter.fluxMeterName)
 			}
 
 			return err
@@ -219,8 +210,18 @@ func (fluxMeter *FluxMeter) GetFluxMeterID() iface.FluxMeterID {
 }
 
 // GetHistogram returns the histogram.
-func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode string) prometheus.Histogram {
-	return fluxMeter.histMetrics[decisionType]
+func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode string) prometheus.Observer {
+	labels := make(map[string]string)
+	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	labels[metrics.StatusCodeLabel] = statusCode
+
+	fluxMeterHistogram, err := fluxMeter.histMetrics.GetMetricWith(labels)
+	if err != nil {
+		log.Warn().Err(err).Msg("Getting latency histogram")
+		return nil
+	}
+
+	return fluxMeterHistogram
 }
 
 // GetBuckets returns the buckets.
