@@ -39,10 +39,10 @@ func (m *MockEngine) EXPECT() *MockEngineMockRecorder {
 }
 
 // GetFluxMeterHist mocks base method.
-func (m *MockEngine) GetFluxMeterHist(policyName, fluxMeterName, policyHash, statusCode string, decisionType flowcontrolv1.DecisionType) prometheus.Histogram {
+func (m *MockEngine) GetFluxMeterHist(policyName, fluxMeterName, policyHash, statusCode string, decisionType flowcontrolv1.DecisionType) prometheus.Observer {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFluxMeterHist", policyName, fluxMeterName, policyHash, statusCode, decisionType)
-	ret0, _ := ret[0].(prometheus.Histogram)
+	ret0, _ := ret[0].(prometheus.Observer)
 	return ret0
 }
 

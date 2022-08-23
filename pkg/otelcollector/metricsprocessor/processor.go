@@ -278,6 +278,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 			Str(metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()).
 			Str(metrics.PolicyHashLabel, fluxMeter.GetPolicyHash()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
+			Str(metrics.StatusCodeLabel, statusCode).
 			Msg("Fluxmeter not found")
 		return
 	}
