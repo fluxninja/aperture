@@ -40,7 +40,7 @@ func (sd *StaticDiscovery) start() error {
 }
 
 func (sd *StaticDiscovery) stop() error {
-	sd.trackers.Purge(staticIDTrackerPrefix)
+	sd.trackers.Purge(staticEntityTrackerPrefix)
 	return nil
 }
 
@@ -52,7 +52,7 @@ func (sd *StaticDiscovery) entitiesFromConfig() map[string]*common.Entity {
 	for _, service := range sd.services {
 		serviceName := service.Name
 		for _, e := range service.Entities {
-			key := fmt.Sprintf("%s.%s", staticIDTrackerPrefix, e.UID)
+			key := fmt.Sprintf("%s.%s", staticEntityTrackerPrefix, e.UID)
 
 			var entity *common.Entity
 			var ok bool
@@ -60,7 +60,7 @@ func (sd *StaticDiscovery) entitiesFromConfig() map[string]*common.Entity {
 			if entity, ok = entities[key]; !ok {
 				entity = &common.Entity{
 					IPAddress: e.IPAddress,
-					Prefix:    staticIDTrackerPrefix,
+					Prefix:    staticEntityTrackerPrefix,
 					UID:       e.UID,
 					Services:  nil,
 					Name:      e.Name,

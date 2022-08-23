@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	configKey             = common.DiscoveryConfigKey + ".static"
-	staticIDTrackerPrefix = "static_entity"
+	configKey                 = common.DiscoveryConfigKey + ".static"
+	staticEntityTrackerPrefix = "static_entity"
 )
 
 // EntityConfig describes a single entity.
