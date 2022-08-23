@@ -127,15 +127,16 @@ definitions:
   EntityConfig:
     properties:
       ip_address:
+        description: IP address of the entity.
         type: string
         x-go-name: IPAddress
+        x-go-validate: required,ip
       name:
+        description: Name of the entity.
         type: string
         x-go-name: Name
-      prefix:
-        type: string
-        x-go-name: Prefix
       uid:
+        description: UID of the entity.
         type: string
         x-go-name: UID
     title: EntityConfig describes a single entity.
@@ -851,19 +852,23 @@ definitions:
   ServiceConfig:
     properties:
       entities:
+        description: Entities of the service.
         items:
           $ref: '#/definitions/EntityConfig'
         type: array
         x-go-name: Entities
       name:
+        description: Name of the service.
         type: string
         x-go-name: Name
+        x-go-validate: required
     title: ServiceConfig describes a service and its entities.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
   StaticDiscoveryConfig:
     properties:
       services:
+        description: Services list.
         items:
           $ref: '#/definitions/ServiceConfig'
         type: array
@@ -1105,6 +1110,10 @@ paths:
     post:
       operationId: ServiceDiscovery
       parameters:
+      - in: body
+        name: static
+        schema:
+          $ref: '#/definitions/StaticDiscoveryConfig'
       - in: body
         name: kubernetes
         schema:
