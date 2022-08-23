@@ -30,66 +30,44 @@ func NewCircuitAndOptions(
 
 	circuitOptions := []fx.Option{}
 
-	type componentAndMapStruct struct {
-		component runtime.Component
-		mapStruct map[string]interface{}
-		compName  string
-	}
-	var compList []componentAndMapStruct
+	var compList []compiledComponent
 	for compIndex, componentProto := range circuitProto {
 		// Create component
-		componentName, mapStruct, subComponents, comp, compOption, compErr := NewComponentAndOptions(componentProto, compIndex, policyReadAPI)
+		compiledComp, compiledSubComps, compOption, compErr := NewComponentAndOptions(componentProto, compIndex, policyReadAPI)
 		if compErr != nil {
 			return nil, fx.Options(), compErr
 		}
 		circuitOptions = append(circuitOptions, compOption)
 
 		// Add Component to compList
-		if comp != nil {
-			compList = append(compList, componentAndMapStruct{
-				component: comp,
-				mapStruct: mapStruct,
-				compName:  componentName,
-			})
+		if compiledComp.component != nil {
+			compList = append(compList, compiledComp)
 		}
 
-		// Add Subcomponents to compList
-		for key, subComp := range subComponents {
-			// retrieve the map struct for this subcomponent
-			subCompStruct, ok := mapStruct[key]
-			if !ok {
-				return nil, fx.Options(), fmt.Errorf("subcomponent at key %s, not found in map struct", key)
-			}
-			subCompMapStruct, ok := subCompStruct.(map[string]interface{})
-			if !ok {
-				return nil, fx.Options(), fmt.Errorf("subcomponent at key %s, not a map struct", key)
-			}
-			compList = append(compList, componentAndMapStruct{
-				component: subComp,
-				mapStruct: subCompMapStruct,
-				compName:  componentName,
-			})
+		// Add SubComponents to compList
+		if len(compiledSubComps) > 0 {
+			compList = append(compList, compiledSubComps...)
 		}
 	}
 	log.Trace().Msgf("Comp list: %+v", compList)
 
 	// Second pass to initialize port maps for each component
 	compWithPortsList := make([]runtime.ComponentWithPorts, len(compList))
-	for graphNodeIndex, componentWithMapStruct := range compList {
-		comp := componentWithMapStruct.component
-		mapStruct := componentWithMapStruct.mapStruct
+	for graphNodeIndex, compiledComp := range compList {
+		comp := compiledComp.component
+		mapStruct := compiledComp.mapStruct
 		log.Trace().Msgf("mapStruct: %+v", mapStruct)
 
 		compWithPorts := runtime.ComponentWithPorts{
 			Component:           comp,
 			InPortToSignalsMap:  make(runtime.PortToSignal),
 			OutPortToSignalsMap: make(runtime.PortToSignal),
-			ComponentName:       componentWithMapStruct.compName,
+			ComponentName:       compiledComp.name,
 		}
 
 		// Read in_ports in mapStruct
 		inPorts, ok := mapStruct["in_ports"]
-		log.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", componentWithMapStruct.compName).Msg("mapStruct[in_ports]")
+		log.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", compiledComp.name).Msg("mapStruct[in_ports]")
 		if ok {
 			// Convert in_ports to map[string]interface{}
 			inPortsMap, castOk := inPorts.(map[string]interface{})
@@ -104,7 +82,7 @@ func NewCircuitAndOptions(
 		}
 		// Read out_ports in mapStruct
 		outPorts, ok := mapStruct["out_ports"]
-		log.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", componentWithMapStruct.compName).Msg("mapStruct[out_ports]")
+		log.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", compiledComp.name).Msg("mapStruct[out_ports]")
 		if ok {
 			// Convert out_ports to map[string]interface{}
 			outPortsMap, castOk := outPorts.(map[string]interface{})

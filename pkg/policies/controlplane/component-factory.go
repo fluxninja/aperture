@@ -28,71 +28,124 @@ func ComponentFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option
 	)
 }
 
+type compiledComponent struct {
+	component runtime.Component
+	mapStruct map[string]any
+	name      string
+}
+
 // NewComponentAndOptions creates component and its fx options.
 func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentIndex int,
 	policyReadAPI iface.PolicyRead,
-) (string, map[string]any, map[string]runtime.Component, runtime.Component, fx.Option, error) {
+) (compiledComponent, []compiledComponent, fx.Option, error) {
 	// Factory parser to determine what kind of component to create
 	if gradientController := componentProto.GetGradientController(); gradientController != nil {
 		component, option, err := controller.NewGradientControllerAndOptions(gradientController, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(gradientController, err)
-		return "Gradient", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(gradientController, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "Gradient",
+		}, nil, option, err
 	} else if limiter := componentProto.GetRateLimiter(); limiter != nil {
 		component, option, err := rate.NewRateLimiterAndOptions(limiter, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(limiter, err)
-		return "RateLimiter", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(limiter, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "RateLimiter",
+		}, nil, option, err
 	} else if ema := componentProto.GetEma(); ema != nil {
 		component, option, err := component.NewEMAAndOptions(ema, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(ema, err)
-		return "EMA", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(ema, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "EMA",
+		}, nil, option, err
 	} else if arithmeticCombinator := componentProto.GetArithmeticCombinator(); arithmeticCombinator != nil {
 		component, option, err := component.NewArithmeticCombinatorAndOptions(arithmeticCombinator, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(arithmeticCombinator, err)
-		return "ArithmeticCombinator", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(arithmeticCombinator, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "ArithmeticCombinator",
+		}, nil, option, err
 	} else if promQL := componentProto.GetPromql(); promQL != nil {
 		component, option, err := component.NewPromQLAndOptions(promQL, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(promQL, err)
-		return "PromQL", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(promQL, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "PromQL",
+		}, nil, option, err
 	} else if constant := componentProto.GetConstant(); constant != nil {
 		component, option, err := component.NewConstantAndOptions(constant, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(constant, err)
-		return "Constant", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(constant, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "Constant",
+		}, nil, option, err
 	} else if decider := componentProto.GetDecider(); decider != nil {
 		component, option, err := component.NewDeciderAndOptions(decider, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(decider, err)
-		return "Decider", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(decider, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "Decider",
+		}, nil, option, err
 	} else if sqrt := componentProto.GetSqrt(); sqrt != nil {
 		component, option, err := component.NewSqrtAndOptions(sqrt, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(sqrt, err)
-		return "Sqrt", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(sqrt, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "Sqrt",
+		}, nil, option, err
 	} else if max := componentProto.GetMax(); max != nil {
 		component, option, err := component.NewMaxAndOptions(max, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(max, err)
-		return "Max", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(max, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "Max",
+		}, nil, option, err
 	} else if min := componentProto.GetMin(); min != nil {
 		component, option, err := component.NewMinAndOptions(min, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(min, err)
-		return "Min", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(min, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "Min",
+		}, nil, option, err
 	} else if extrapolator := componentProto.GetExtrapolator(); extrapolator != nil {
 		component, option, err := component.NewExtrapolatorAndOptions(extrapolator, componentIndex, policyReadAPI)
-		mapStruct, err := getComponentMapStruct(extrapolator, err)
-		return "Extrapolator", mapStruct, nil, component, option, err
+		mapStruct, err := encodeMapStructOnNilErr(extrapolator, err)
+		return compiledComponent{
+			component: component,
+			mapStruct: mapStruct,
+			name:      "Extrapolator",
+		}, nil, option, err
 	} else {
 		// Try Component Stack Factory
-		componentName, mapStruct, subComponents, option, err := NewComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
-		return componentName, mapStruct, subComponents, nil, option, err
+		return NewComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
 	}
 }
 
-func getComponentMapStruct(comp any, err error) (map[string]any, error) {
+func encodeMapStructOnNilErr(comp any, err error) (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
+	return encodeMapStruct(comp)
+}
+
+func encodeMapStruct(obj any) (map[string]any, error) {
 	// TODO: mapstruct functionality needs to be moved to a common package
 	var mapStruct map[string]interface{}
-	b, err := json.Marshal(comp)
+	b, err := json.Marshal(obj)
 	if err != nil {
 		return nil, err
 	}
