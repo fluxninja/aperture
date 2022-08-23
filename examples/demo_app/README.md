@@ -1,7 +1,5 @@
 # Demo App
 
-See [Simple Service — Ninjato Phase 1 Architecture](https://docs.google.com/document/d/1-ZEUJ2aX1amaNt_dC9VleBaxt0zk38OZYluRObKugOc/edit#heading=h.78db76xosv55).
-
 Simple service is a test service that can be composed to create a whole mesh of micro services in order to create a test cluster and mimic real world scenarios in a fully controlled test environment.
 
 The service has one endpoint and depending on the incoming payload, it will either forward the request onwards to one of more upstream services or just respond to the request.
