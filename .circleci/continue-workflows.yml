@@ -27,13 +27,19 @@ parameters:
   updated-aperture:
     type: boolean
     default: false
+  updated-aperture-operator:
+    type: boolean
+    default: false
   updated-aperture-docs:
     type: boolean
     default: false
   updated-circleci-config:
     type: boolean
     default: false
-  updated-aperture-chart:
+  updated-aperture-charts:
+    type: boolean
+    default: false
+  updated-demo-app:
     type: boolean
     default: false
 
@@ -203,6 +209,37 @@ jobs:
       - codecov/upload
       - store_test_results:
           path: /tmp/test-results
+      - run:
+          name: Show peak memory usage in bytes
+          command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
+          when: always
+
+  go-test-coverage-operator:
+    parameters:
+      work_dir:
+        type: string
+        description: working directory
+    executor: go-cimg-executor
+    resource_class: large
+    steps:
+      - checkout
+      - when:
+          condition:
+            or:
+              - << pipeline.parameters.updated-aperture-operator >>
+          steps:
+            - run:
+                name: set GOMAXPROCS to 4
+                command: |
+                  echo 'export GOMAXPROCS=4' >> $BASH_ENV
+      - run:
+          name: Run tests and coverage
+          working_directory: << parameters.work_dir >>
+          command: |
+            envtest_path=$(make setup_envtest -s)
+            KUBEBUILDER_ASSETS="${envtest_path}" gotestsum --format=testname --junitfile unit-tests.xml -- -race -coverprofile=coverage.out -coverpkg=./... $(go list ./... | grep -v api)
+            mkdir -p /tmp/test-results
+            mv unit-tests.xml /tmp/test-results
       - run:
           name: Show peak memory usage in bytes
           command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
@@ -427,6 +464,31 @@ workflows:
           name: go-test-coverage-aperture
           work_dir: .
 
+  aperture-operator:
+    when: << pipeline.parameters.updated-aperture-operator >>
+    jobs:
+      - build-push-add-tag:
+          name: image-build-aperture-operator
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/aperture-operator
+          docker-context: ./operator
+          dockerfile: ./operator/Dockerfile
+          use-docker-layer-caching: true
+      - go-test-coverage:
+          name: go-test-coverage-aperture-operator
+          work_dir: ./operator
+
+  demo-app:
+    when: << pipeline.parameters.updated-demo-app >>
+    jobs:
+      - build-push-add-tag:
+          name: image-demo-app
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/demo-app
+          docker-context: .
+          dockerfile: examples/demo_app/Dockerfile
+          use-docker-layer-caching: true
+
   pre-commit:
     jobs:
       - pre-commit
@@ -443,7 +505,7 @@ workflows:
     when:
       and:
         - or: &updated_deployment_code
-            - << pipeline.parameters.updated-aperture-chart >>
+            - << pipeline.parameters.updated-aperture-charts >>
         - or: &main_or_stable_branch
             - equal: [main, << pipeline.git.branch >>]
             - matches:

@@ -1,0 +1,15 @@
+dependencies:
+- name: common
+  repository: https://charts.bitnami.com/bitnami
+  version: 1.14.1
+- name: etcd
+  repository: https://charts.bitnami.com/bitnami
+  version: 6.13.5
+- name: prometheus
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 15.5.3
+- name: istio
+  repository: https://getindata.github.io/helm-charts
+  version: 1.11.1
+digest: sha256:d7767f52034f7979921b2a6555faed43d5f0075efec00a5465e14764c61286e9
+generated: "2022-08-16T14:23:25.660222164+05:30"

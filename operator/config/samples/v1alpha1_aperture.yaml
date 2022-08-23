@@ -1,0 +1,4 @@
+apiVersion: aperture.tech/v1alpha1
+kind: Aperture
+metadata:
+  name: aperture
