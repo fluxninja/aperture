@@ -19,6 +19,8 @@ export NINJA_KUBE_API_SERVER="localhost"
 
 cd "${TOP_LEVEL}"/manifests/k8s/tanka/
 jb install
+helm dependency update "${TOP_LEVEL}"/manifests/charts/aperture-operator
+tk tool charts vendor
 
 exit_code=0
 while read -r environment; do
