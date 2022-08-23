@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 
+	"golang.org/x/exp/maps"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -56,7 +58,8 @@ type Engine struct {
 // ProcessRequest .
 func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
-		DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+		DecisionType:  flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+		FlowLabelKeys: maps.Keys(labels),
 	}
 
 	mmr := e.getMatches(controlPoint, serviceIDs, labels)
