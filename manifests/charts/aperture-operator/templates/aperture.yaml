@@ -1,0 +1,302 @@
+{{- if .Values.aperture.create }}
+apiVersion: aperture.tech/v1alpha1
+kind: Aperture
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-operator
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.global.imageRegistry }}
+  imageRegistry: {{ .Values.global.imageRegistry }}
+  {{- end }}
+  {{- if .Values.global.imagePullSecrets }}
+  imagePullSecrets: {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.commonLabels }}
+  labels: {{ .Values.commonLabels | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{ .Values.commonAnnotations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.aperture.fluxninjaPlugin.enabled }}
+  fluxninjaPlugin:
+    enabled: {{ .Values.aperture.fluxninjaPlugin.enabled }}
+    endpoint: {{ include "aperture.fluxninjaPlugin.endpoint" ( dict "aperture" .Values.aperture $) }}
+    {{- if .Values.aperture.fluxninjaPlugin.heartbeatsInterval }}
+    heartbeatsInterval: {{ .Values.aperture.fluxninjaPlugin.heartbeatsInterval }}
+    {{- end }}
+    tls:
+      insecure: {{ .Values.aperture.fluxninjaPlugin.tls.insecure }}
+      insecureSkipVerify: {{ .Values.aperture.fluxninjaPlugin.tls.insecureSkipVerify }}
+      caFile: {{ .Values.aperture.fluxninjaPlugin.tls.caFile }}
+    apiKeySecret:
+      agent:
+        create: {{ .Values.aperture.fluxninjaPlugin.apiKeySecret.agent.create }}
+        secretKeyRef:
+          name: {{ .Values.aperture.fluxninjaPlugin.apiKeySecret.agent.secretKeyRef.name }}
+          key: {{ .Values.aperture.fluxninjaPlugin.apiKeySecret.agent.secretKeyRef.key }}
+        value: {{ .Values.aperture.fluxninjaPlugin.apiKeySecret.agent.value }}
+      controller:
+        create: {{ .Values.aperture.fluxninjaPlugin.apiKeySecret.controller.create }}
+        secretKeyRef:
+          name: {{ .Values.aperture.fluxninjaPlugin.apiKeySecret.controller.secretKeyRef.name }}
+          key: {{ .Values.aperture.fluxninjaPlugin.apiKeySecret.controller.secretKeyRef.key }}
+        value: {{ .Values.aperture.fluxninjaPlugin.apiKeySecret.controller.value }}
+  {{- end }}
+  agent:
+    {{- if or .Values.aperture.agent.image.registry .Values.aperture.agent.image.repository .Values.aperture.agent.image.tag .Values.aperture.agent.image.pullPolicy .Values.aperture.agent.image.pullSecrets }}
+    image: {{ .Values.aperture.agent.image | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.serverPort }}
+    serverPort: {{ .Values.aperture.agent.serverPort }}
+    {{- end }}
+    {{- if or .Values.aperture.agent.log.prettyConsole .Values.aperture.agent.log.nonBlocking .Values.aperture.agent.log.level .Values.aperture.agent.log.file }}
+    log: {{ .Values.aperture.agent.log | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.agentGroup }}
+    agentGroup: {{ .Values.aperture.agent.agentGroup }}
+    {{- end }}
+    serviceAccount:
+      create: {{ .Values.aperture.agent.serviceAccount.create }}
+      {{- if .Values.aperture.agent.serviceAccount.annotations }}
+      annotations: {{ .Values.aperture.agent.serviceAccount.annotations }}
+      {{- end }}
+      {{- if .Values.aperture.agent.serviceAccount.automountServiceAccountToken }}
+      automountServiceAccountToken: {{ .Values.aperture.agent.serviceAccount.automountServiceAccountToken }}
+      {{- end }}
+    livenessProbe:
+      enabled: {{ .Values.aperture.agent.livenessProbe.enabled }}
+      {{- if  .Values.aperture.agent.livenessProbe.initialDelaySeconds }}
+      initialDelaySeconds: {{ .Values.aperture.agent.livenessProbe.initialDelaySeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.agent.livenessProbe.periodSeconds }}
+      periodSeconds: {{ .Values.aperture.agent.livenessProbe.periodSeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.agent.livenessProbe.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.aperture.agent.livenessProbe.timeoutSeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.agent.livenessProbe.failureThreshold }}
+      failureThreshold: {{ .Values.aperture.agent.livenessProbe.failureThreshold }}
+      {{- end }}
+      {{- if  .Values.aperture.agent.livenessProbe.successThreshold }}
+      successThreshold: {{ .Values.aperture.agent.livenessProbe.successThreshold }}
+      {{- end }}
+    readinessProbe:
+      enabled: {{ .Values.aperture.agent.readinessProbe.enabled }}
+      {{- if  .Values.aperture.agent.livenessProbe.initialDelaySeconds }}
+      initialDelaySeconds: {{ .Values.aperture.agent.readinessProbe.initialDelaySeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.agent.livenessProbe.periodSeconds }}
+      periodSeconds: {{ .Values.aperture.agent.readinessProbe.periodSeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.agent.livenessProbe.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.aperture.agent.readinessProbe.timeoutSeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.agent.livenessProbe.failureThreshold }}
+      failureThreshold: {{ .Values.aperture.agent.readinessProbe.failureThreshold }}
+      {{- end }}
+      {{- if  .Values.aperture.agent.livenessProbe.successThreshold }}
+      successThreshold: {{ .Values.aperture.agent.readinessProbe.successThreshold }}
+      {{- end }}
+    {{- if .Values.aperture.agent.customLivenessProbe }}
+    customLivenessProbe: {{ .Values.aperture.agent.customLivenessProbe | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.customReadinessProbe }}
+    customReadinessProbe: {{ .Values.aperture.agent.customReadinessProbe | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if or .Values.aperture.agent.resources.limits .Values.aperture.agent.resources.requests }}
+    resources: {{ .Values.aperture.agent.resources | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.podSecurityContext.enabled }}
+    podSecurityContext: {{- .Values.aperture.agent.podSecurityContext | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.podSecurityContext.enabled }}
+    containerSecurityContext: {{- .Values.aperture.agent.containerSecurityContext | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.command }}
+    command: {{ .Values.aperture.agent.command | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.args }}
+    args: {{ .Values.aperture.agent.args | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.podLabels }}
+    podLabels: {{ .Values.aperture.agent.podLabels | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.podAnnotations }}
+    podAnnotations: {{ .Values.aperture.agent.podAnnotations | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.affinity }}
+    affinity: {{ .Values.aperture.agent.affinity | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.nodeSelector }}
+    nodeSelector: {{ .Values.aperture.agent.nodeSelector | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.tolerations }}
+    tolerations: {{ .Values.aperture.agent.tolerations | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.terminationGracePeriodSeconds }}
+    terminationGracePeriodSeconds: {{ .Values.aperture.agent.terminationGracePeriodSeconds | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.lifecycleHooks }}
+    lifecycleHooks: {{ .Values.aperture.agent.lifecycleHooks | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.extraEnvVars }}
+    extraEnvVars: {{ .Values.aperture.agent.extraEnvVars | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.extraVolumes }}
+    extraVolumes: {{ .Values.aperture.agent.extraVolumes | toYaml | nindent 6}}
+    {{- end }}
+    {{- if .Values.aperture.agent.extraVolumeMounts }}
+    extraVolumeMounts: {{ .Values.aperture.agent.extraVolumeMounts | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.sidecars }}
+    sidecars: {{ .Values.aperture.agent.sidecars | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.agent.initContainers }}
+    initContainers: {{ .Values.aperture.agent.initContainers | toYaml | nindent 6 }}
+    {{- end }}
+  controller:
+    {{- if or .Values.aperture.controller.image.registry .Values.aperture.controller.image.repository .Values.aperture.controller.image.tag .Values.aperture.controller.image.pullPolicy .Values.aperture.controller.image.pullSecrets }}
+    image: {{ .Values.aperture.controller.image | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.serverPort }}
+    serverPort: {{ .Values.aperture.controller.serverPort }}
+    {{- end }}
+    {{- if or .Values.aperture.controller.log.prettyConsole .Values.aperture.controller.log.nonBlocking .Values.aperture.controller.log.level .Values.aperture.controller.log.file }}
+    log: {{ .Values.aperture.controller.log | toYaml | nindent 6 }}
+    {{- end }}
+    serviceAccount:
+      create: {{ .Values.aperture.controller.serviceAccount.create }}
+      {{- if .Values.aperture.controller.serviceAccount.annotations }}
+      annotations: {{ .Values.aperture.controller.serviceAccount.annotations }}
+      {{- end }}
+      {{- if .Values.aperture.controller.serviceAccount.automountServiceAccountToken }}
+      automountServiceAccountToken: {{ .Values.aperture.controller.serviceAccount.automountServiceAccountToken }}
+      {{- end }}
+    livenessProbe:
+      enabled: {{ .Values.aperture.controller.livenessProbe.enabled }}
+      {{- if  .Values.aperture.controller.livenessProbe.initialDelaySeconds }}
+      initialDelaySeconds: {{ .Values.aperture.controller.livenessProbe.initialDelaySeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.controller.livenessProbe.periodSeconds }}
+      periodSeconds: {{ .Values.aperture.controller.livenessProbe.periodSeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.controller.livenessProbe.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.aperture.controller.livenessProbe.timeoutSeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.controller.livenessProbe.failureThreshold }}
+      failureThreshold: {{ .Values.aperture.controller.livenessProbe.failureThreshold }}
+      {{- end }}
+      {{- if  .Values.aperture.controller.livenessProbe.successThreshold }}
+      successThreshold: {{ .Values.aperture.controller.livenessProbe.successThreshold }}
+      {{- end }}
+    readinessProbe:
+      enabled: {{ .Values.aperture.controller.readinessProbe.enabled }}
+      {{- if  .Values.aperture.controller.livenessProbe.initialDelaySeconds }}
+      initialDelaySeconds: {{ .Values.aperture.controller.readinessProbe.initialDelaySeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.controller.livenessProbe.periodSeconds }}
+      periodSeconds: {{ .Values.aperture.controller.readinessProbe.periodSeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.controller.livenessProbe.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.aperture.controller.readinessProbe.timeoutSeconds }}
+      {{- end }}
+      {{- if  .Values.aperture.controller.livenessProbe.failureThreshold }}
+      failureThreshold: {{ .Values.aperture.controller.readinessProbe.failureThreshold }}
+      {{- end }}
+      {{- if  .Values.aperture.controller.livenessProbe.successThreshold }}
+      successThreshold: {{ .Values.aperture.controller.readinessProbe.successThreshold }}
+      {{- end }}
+    {{- if .Values.aperture.controller.customLivenessProbe }}
+    customLivenessProbe: {{ .Values.aperture.controller.customLivenessProbe }}
+    {{- end }}
+    {{- if .Values.aperture.controller.customReadinessProbe }}
+    customReadinessProbe: {{ .Values.aperture.controller.customReadinessProbe }}
+    {{- end }}
+    {{- if or .Values.aperture.controller.resources.limits .Values.aperture.controller.resources.requests }}
+    resources: {{ .Values.aperture.controller.resources | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.podSecurityContext.enabled }}
+    podSecurityContext: {{- .Values.aperture.controller.podSecurityContext | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.podSecurityContext.enabled }}
+    containerSecurityContext: {{- .Values.aperture.controller.containerSecurityContext | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.command }}
+    command: {{ .Values.aperture.controller.command | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.args }}
+    args: {{ .Values.aperture.controller.args | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.hostAliases }}
+    hostAliases: {{ .Values.aperture.controller.hostAliases | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.podLabels }}
+    podLabels: {{ .Values.aperture.controller.podLabels | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.podAnnotations }}
+    podAnnotations: {{ .Values.aperture.controller.podAnnotations | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.affinity }}
+    affinity: {{ .Values.aperture.controller.affinity | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.nodeSelector }}
+    nodeSelector: {{ .Values.aperture.controller.nodeSelector | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.tolerations }}
+    tolerations: {{ .Values.aperture.controller.tolerations | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.terminationGracePeriodSeconds }}
+    terminationGracePeriodSeconds: {{ .Values.aperture.controller.terminationGracePeriodSeconds | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.lifecycleHooks }}
+    lifecycleHooks: {{ .Values.aperture.controller.lifecycleHooks | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.extraEnvVars }}
+    extraEnvVars: {{ .Values.aperture.controller.extraEnvVars | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.extraVolumes }}
+    extraVolumes: {{ .Values.aperture.controller.extraVolumes | toYaml | nindent 6}}
+    {{- end }}
+    {{- if .Values.aperture.controller.extraVolumeMounts }}
+    extraVolumeMounts: {{ .Values.aperture.controller.extraVolumeMounts | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.sidecars }}
+    sidecars: {{ .Values.aperture.controller.sidecars | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if .Values.aperture.controller.initContainers }}
+    initContainers: {{ .Values.aperture.controller.initContainers | toYaml | nindent 6 }}
+    {{- end }}
+  {{- if or .Values.aperture.service.agent.annotations .Values.aperture.service.controller.annotations }}
+  service:
+    {{- if .Values.aperture.service.agent.annotations }}
+    agent:
+      annotations: {{ .Values.aperture.service.agent.annotations }}
+    {{- end }}
+    {{- if .Values.aperture.service.controller.annotations }}
+    controller:
+      annotations: {{ .Values.aperture.service.controller.annotations }}
+    {{- end }}
+  {{- end }}
+  {{- if .Values.aperture.sidecar.enabled }}
+  sidecar:
+    enabled: {{ .Values.aperture.sidecar.enabled }}
+    enableNamespacesByDefault: {{ .Values.aperture.sidecar.enableNamespacesByDefault }}
+  {{- end }}
+  {{- if or (not .Values.etcd.enabled) .Values.aperture.etcd.endpoints }}
+  etcd:  {{- omit .Values.aperture.etcd "endpoints" | toYaml | nindent 4 }}
+    endpoints: {{ include "aperture.etcd.endpoints" (dict "etcd" .Values.aperture.etcd "context" . $) }}
+  {{- end }}
+  {{- if or (not .Values.prometheus.enabled) .Values.aperture.prometheus.endpoints }}
+  prometheus: {{- omit .Values.aperture.prometheus "address" | toYaml | nindent 4 }}
+    address: {{ include "aperture.prometheus.address" (dict "prometheus" .Values.aperture.prometheus "context" . $) }}
+  {{- end }}
+{{- end }}

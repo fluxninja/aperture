@@ -1,0 +1,61 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin
+testbin/*
+controllers/certs/
+
+# Test binary, build with `go test -c`
+*.test
+unit-test*
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Kubernetes Generated files - skip generated files, except for vendored files
+
+!vendor/**/zz_generated.*
+
+# editor and IDE paraphernalia
+.idea
+*.swp
+*.swo
+*~
+
+### macOS
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### SublimeText
+# Cache files for Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+
+# Workspace files are user-specific
+*.sublime-workspace
+
+### VisualStudioCode
+.vscode/
+
+### IntelliJ IDEA
+.idea
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+### Tags
+TAGS
+.TAGS
+!TAGS/
+tags
+.tags
+!tags/

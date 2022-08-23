@@ -1,0 +1,166 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-operator
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.operator.replicaCount | default 1 }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: aperture-operator
+  {{- if .Values.operator.updateStrategy }}
+  strategy: {{ toYaml .Values.operator.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        sidecar.aperture.tech/injection: "false"
+        {{- if .Values.operator.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.operator.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: aperture-operator
+        {{- if .Values.operator.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.operator.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "common.images.pullSecrets" (dict "images" (list .Values.operator.image) "global" .Values.global) | nindent 6 }}
+      {{- if .Values.operator.priorityClassName }}
+      priorityClassName: {{ .Values.operator.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.operator.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.operator.topologySpreadConstraints "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.operator.schedulerName }}
+      schedulerName: {{ .Values.operator.schedulerName | quote }}
+      {{- end }}
+      {{- if .Values.operator.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.operator.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.operator.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.operator.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.operator.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.operator.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        {{- if not (empty .Values.operator.podAffinityPreset) }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.operator.podAffinityPreset "component" "aperture-operator" "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if not (empty .Values.operator.podAntiAffinityPreset) }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.operator.podAntiAffinityPreset "component" "aperture-operator" "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if not (empty .Values.operator.nodeAffinityPreset.type) }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.operator.nodeAffinityPreset.type "key" .Values.operator.nodeAffinityPreset.key "values" .Values.operator.nodeAffinityPreset.values) | nindent 10 }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.operator.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.operator.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "aperture-operator.serviceAccountName" . }}
+      {{- if .Values.operator.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.operator.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.operator.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.operator.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- if .Values.operator.initContainers }}
+      initContainers: {{- include "common.tplvalues.render" (dict "value" .Values.operator.initContainers "context" $) | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: aperture-operator
+          image: {{ include "common.images.image" (dict "imageRoot" .Values.operator.image "global" .Values.global) }}
+          imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
+          {{- if .Values.operator.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.operator.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.operator.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.operator.command "context" $) | nindent 12 }}
+          {{- else }}
+          command:
+            - /aperture-operator
+          {{- end }}
+          {{- if .Values.operator.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.operator.args "context" $) | nindent 12 }}
+          {{- else }}
+          args:
+            - --leader-elect=True
+          {{- end }}
+          {{- if .Values.operator.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.operator.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            - name: APERTURE_OPERATOR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: APERTURE_OPERATOR_SERVICE_NAME
+              value: {{ template "common.names.fullname" . }}
+            {{- if .Values.operator.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.operator.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.operator.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.operator.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.operator.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.operator.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          {{- if .Values.operator.resources }}
+          resources: {{- toYaml .Values.operator.resources | nindent 12 }}
+          {{- end }}
+          ports:
+            - containerPort: 9443
+              name: webhook-server
+              protocol: TCP
+            - containerPort: 8080
+              name: metrics
+              protocol: TCP
+          {{- if .Values.operator.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.operator.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /healthz
+              port: 8081
+          {{- else if .Values.operator.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.operator.customLivenessProbe "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.operator.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.operator.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /readyz
+              port: 8081
+          {{- else if .Values.operator.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.operator.customReadinessProbe "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.operator.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.operator.startupProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /metrics
+              port: metrics
+          {{- else if .Values.operator.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.operator.customStartupProbe "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: cert
+            {{- if .Values.operator.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.operator.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+      volumes:
+        - emptyDir: {}
+          name: cert
+        {{- if .Values.operator.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.operator.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
