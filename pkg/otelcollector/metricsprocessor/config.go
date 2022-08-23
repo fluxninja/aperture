@@ -10,7 +10,7 @@ import (
 // Config holds configuration for the metrics processor.
 type Config struct {
 	promRegistry             *prometheus.Registry
-	engine                   iface.EngineAPI
+	engine                   iface.Engine
 	config.ProcessorSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct
 	// The lowest bucket in latency histogram
 	LatencyBucketStartMS float64 `mapstructure:"latency_bucket_start_ms" validate:"gte=0" default:"20"`

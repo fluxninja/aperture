@@ -21,17 +21,23 @@ import (
 
 type autoTokensFactory struct {
 	tokensDecisionWatcher notifiers.Watcher
+	agentGroup            string
 }
 
-func newAutoTokensFactory(lifecycle fx.Lifecycle, client *etcdclient.Client) (*autoTokensFactory, error) {
+func newAutoTokensFactory(
+	lifecycle fx.Lifecycle,
+	client *etcdclient.Client,
+	agentGroup string,
+) (*autoTokensFactory, error) {
 	var err error
-	etcdPath := path.Join(paths.AutoTokenResultsPath)
+	etcdPath := path.Join(paths.AutoTokenResultsPath, paths.AgentGroupPrefix(agentGroup))
 	tokensDecisionWatcher, err := etcdwatcher.NewWatcher(client, etcdPath)
 	if err != nil {
 		return nil, err
 	}
 	autoTokensFactory := &autoTokensFactory{
 		tokensDecisionWatcher: tokensDecisionWatcher,
+		agentGroup:            agentGroup,
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -56,7 +62,6 @@ func newAutoTokensFactory(lifecycle fx.Lifecycle, client *etcdclient.Client) (*a
 
 // newAutoTokens creates new autoTokens.
 func (atFactory *autoTokensFactory) newAutoTokens(
-	agentGroupName,
 	policyName,
 	policyHash string,
 	lc fx.Lifecycle,
@@ -66,7 +71,6 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 		tokensDecision: &policydecisionsv1.TokensDecision{
 			TokensByWorkloadIndex: make(map[string]uint64),
 		},
-		agentGroup:            agentGroupName,
 		policyName:            policyName,
 		policyHash:            policyHash,
 		tokensDecisionWatcher: atFactory.tokensDecisionWatcher,
@@ -80,7 +84,7 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 	}
 
 	tokensNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.IdentifierForComponent(at.agentGroup, at.policyName, at.componentIdx)),
+		notifiers.Key(paths.DataplaneComponentKey(atFactory.agentGroup, at.policyName, at.componentIdx)),
 		unmarshaller,
 		at.tokenUpdateCallback,
 	)
@@ -104,7 +108,6 @@ type autoTokens struct {
 	mutex                 sync.RWMutex
 	tokensDecision        *policydecisionsv1.TokensDecision
 	tokensDecisionWatcher notifiers.Watcher
-	agentGroup            string
 	policyName            string
 	policyHash            string
 	componentIdx          int64
@@ -118,15 +121,10 @@ func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller co
 		return
 	}
 
-	var wrapperMessage configv1.ConfigPropertiesWrapper
+	var wrapperMessage configv1.TokensDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.Config == nil {
+	if err != nil || wrapperMessage.TokensDecision == nil {
 		log.Error().Err(err).Msg("Failed to unmarshal config wrapper")
-		return
-	}
-
-	if wrapperMessage.AgentGroup != at.agentGroup {
-		log.Trace().Msg("Tokens not updated - agent group mismatch")
 		return
 	}
 
@@ -139,13 +137,7 @@ func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller co
 		return
 	}
 
-	tokensDecision := &policydecisionsv1.TokensDecision{}
-	err = wrapperMessage.Config.UnmarshalTo(tokensDecision)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to unmarshal tokens decision")
-		return
-	}
-	at.tokensDecision = tokensDecision
+	at.tokensDecision = wrapperMessage.TokensDecision
 }
 
 // GetTokensForWorkload returns tokens per workflow.

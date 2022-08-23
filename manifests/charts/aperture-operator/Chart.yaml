@@ -1,0 +1,20 @@
+apiVersion: v2
+name: aperture-operator
+description: A Helm chart to deploy Aperture operator
+version: 0.1.0
+dependencies:
+  - name: common
+    repository: https://charts.bitnami.com/bitnami
+    version: "=1.14.1"
+  - name: etcd
+    version: "=6.13.5"
+    repository: https://charts.bitnami.com/bitnami
+    condition: etcd.enabled
+  - name: prometheus
+    version: "=15.5.3"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: prometheus.enabled
+  - name: istio
+    version: "=1.11.1"
+    repository: https://getindata.github.io/helm-charts
+    condition: istio.enabled

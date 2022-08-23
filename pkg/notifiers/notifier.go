@@ -20,8 +20,8 @@ type notifier interface {
 }
 
 // TransformFunc is the callback signature that other notifiers (like NewPrefixToEtcdNotifier and NewKeyToEtcdNotifier) can use to receive notification before contents are processed.
-// This function can transform the contents before processing them further.
-type TransformFunc func(key Key, bytes []byte, etype EventType) ([]byte, error)
+// This function can transform the key and contents before processing them further.
+type TransformFunc func(key Key, bytes []byte, etype EventType) (Key, []byte, error)
 
 // NotifierBase is the base type for all notifiers.
 type NotifierBase struct {
@@ -64,16 +64,17 @@ type KeyNotifier interface {
 }
 
 func transformNotify(kn KeyNotifier, event Event) {
+	transKey := event.Key
 	transVal := event.Value
 	var err error
 	if tf := kn.GetTransformFunc(); tf != nil {
-		transVal, err = tf(event.Key, event.Value, event.Type)
+		transKey, transVal, err = tf(event.Key, event.Value, event.Type)
 		if err != nil {
 			return
 		}
 	}
 	ev := Event{
-		Key:   event.Key,
+		Key:   transKey,
 		Value: transVal,
 		Type:  event.Type,
 	}

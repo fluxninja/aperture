@@ -7,7 +7,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -23,7 +23,7 @@ type GradientController struct {
 var _ Controller = (*GradientController)(nil)
 
 // NewGradientControllerAndOptions creates a Gradient Controller Component and its fx options.
-func NewGradientControllerAndOptions(gradientControllerProto *policylangv1.GradientController, componentIndex int, policyReadAPI policyapi.PolicyReadAPI) (runtime.Component, fx.Option, error) {
+func NewGradientControllerAndOptions(gradientControllerProto *policylangv1.GradientController, componentIndex int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
 	// Make sure max is greater than min
 	if gradientControllerProto.MaxGradient < gradientControllerProto.MinGradient {
 		return nil, nil, fmt.Errorf("max_gradient must be greater than min_gradient")

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 
+	"golang.org/x/exp/maps"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -35,7 +37,7 @@ func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiM
 }
 
 // ProvideEngineAPI Main fx app.
-func ProvideEngineAPI() iface.EngineAPI {
+func ProvideEngineAPI() iface.Engine {
 	e := &Engine{
 		multiMatchers: make(map[selectors.ControlPointID]*multiMatcher),
 		fluxMetersMap: make(map[iface.FluxMeterID]iface.FluxMeter),
@@ -56,7 +58,8 @@ type Engine struct {
 // ProcessRequest .
 func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
-		DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+		DecisionType:  flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+		FlowLabelKeys: maps.Keys(labels),
 	}
 
 	mmr := e.getMatches(controlPoint, serviceIDs, labels)
@@ -68,7 +71,6 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	fluxMeterProtos := make([]*flowcontrolv1.FluxMeter, len(fluxMeters))
 	for i, fluxMeter := range fluxMeters {
 		fluxMeterProtos[i] = &flowcontrolv1.FluxMeter{
-			AgentGroup:    fluxMeter.GetAgentGroup(),
 			PolicyName:    fluxMeter.GetPolicyName(),
 			PolicyHash:    fluxMeter.GetPolicyHash(),
 			FluxMeterName: fluxMeter.GetFluxMeterName(),

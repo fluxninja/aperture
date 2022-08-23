@@ -25,9 +25,11 @@ message CheckResponse {
   repeated LimiterDecision limiter_decisions = 3;
   // flux meters that were matched for this request.
   repeated FluxMeter flux_meters = 4;
+  // flow label keys that were matched for this request.
+  repeated string flow_label_keys = 5;
 }
 
-// Reason contains fields that give futher information about error or rejection.
+// Reason contains fields that give further information about error or rejection.
 message DecisionReason {
   enum ErrorReason {
     ERROR_REASON_UNSPECIFIED = 0;
@@ -79,8 +81,7 @@ message LimiterDecision {
 
 // FluxMeter describes detail for each FluxMeter.
 message FluxMeter {
-  string agent_group = 1;
-  string policy_name = 2;
-  string policy_hash = 3;
-  string flux_meter_name = 4;
+  string policy_name = 1;
+  string policy_hash = 2;
+  string flux_meter_name = 3;
 }

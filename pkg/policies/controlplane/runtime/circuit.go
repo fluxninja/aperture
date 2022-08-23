@@ -11,7 +11,8 @@ import (
 	"go.uber.org/multierr"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/metrics"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 )
 
@@ -27,21 +28,12 @@ type CircuitMetrics struct {
 	SignalSummaryVec *prometheus.SummaryVec
 }
 
-const (
-	// SignalNameMetricLabel metric label.
-	SignalNameMetricLabel = "signal_name"
-	// PolicyNameMetricLabel metric label.
-	PolicyNameMetricLabel = "policy_name"
-)
-
 var circuitMetrics = &CircuitMetrics{}
 
 func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.Lifecycle) {
-	const signalReadingMetricName string = "signal_reading"
-
-	circuitMetricsLabels := []string{SignalNameMetricLabel, PolicyNameMetricLabel}
+	circuitMetricsLabels := []string{metrics.SignalNameLabel, metrics.PolicyNameLabel}
 	circuitMetrics.SignalSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Name:       signalReadingMetricName,
+		Name:       metrics.SignalReadingMetricName,
 		Help:       "The reading from a signal",
 		Objectives: map[float64]float64{0: 0, 0.01: 0.001, 0.05: 0.01, 0.5: 0.05, 0.9: 0.01, 0.99: 0.001, 1: 0},
 	}, circuitMetricsLabels)
@@ -57,7 +49,7 @@ func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.L
 		OnStop: func(context.Context) error {
 			unregistered := prometheusRegistry.Unregister(circuitMetrics.SignalSummaryVec)
 			if !unregistered {
-				err := fmt.Errorf("failed to unregister metric %s", signalReadingMetricName)
+				err := fmt.Errorf("failed to unregister metric %s", metrics.SignalReadingMetricName)
 				return err
 			}
 			return nil
@@ -87,7 +79,7 @@ type ComponentWithPorts struct {
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
 type Circuit struct {
 	// Policy Read API
-	policyapi.PolicyReadAPI
+	iface.PolicyRead
 	// Execution lock is taken when circuit needs to execute
 	executionLock sync.Mutex
 	// Looped signals persistence across ticks
@@ -102,9 +94,9 @@ type Circuit struct {
 var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
-func NewCircuitAndOptions(policyReadAPI policyapi.PolicyReadAPI, compWithPortsList []ComponentWithPorts) (*Circuit, fx.Option) {
+func NewCircuitAndOptions(policyReadAPI iface.PolicyRead, compWithPortsList []ComponentWithPorts) (*Circuit, fx.Option) {
 	circuit := &Circuit{
-		PolicyReadAPI: policyReadAPI,
+		PolicyRead:    policyReadAPI,
 		loopedSignals: make(signalToReading),
 		components:    make([]ComponentWithPorts, 0),
 	}
@@ -147,8 +139,8 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 		for _, outPort := range component.OutPortToSignalsMap {
 			for _, signal := range outPort {
 				l := prometheus.Labels{
-					SignalNameMetricLabel: signal.Name,
-					PolicyNameMetricLabel: circuit.GetPolicyName(),
+					metrics.SignalNameLabel: signal.Name,
+					metrics.PolicyNameLabel: circuit.GetPolicyName(),
 				}
 				circuitMetricsLabels[signal.Name] = l
 			}
@@ -195,8 +187,8 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 		// log all circuitSignalReadings
 		for signal, reading := range circuitSignalReadings {
 			circuitMetricsLabels := prometheus.Labels{
-				SignalNameMetricLabel: signal.Name,
-				PolicyNameMetricLabel: circuit.PolicyReadAPI.GetPolicyName(),
+				metrics.SignalNameLabel: signal.Name,
+				metrics.PolicyNameLabel: circuit.PolicyRead.GetPolicyName(),
 			}
 			signalSummaryVecMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
 			if err != nil {

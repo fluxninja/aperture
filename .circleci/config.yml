@@ -110,9 +110,11 @@ workflows:
           config-path: .circleci/continue-workflows.yml
           mapping: |
             (cmd|pkg|plugins|tools|api)/.* updated-aperture true
+            operator/(api|config|controllers|hack)/.*|operator/main.go updated-aperture-operator true
             (go.mod|go.sum) updated-aperture true
             docs/.* updated-aperture-docs true
-            manifests/charts/agent/.* updated-aperture-chart true
+            manifests/charts/.* updated-aperture-charts true
+            examples/demo_app/.* updated-demo-app true
   filter-paths-pr:
     when:
       and:

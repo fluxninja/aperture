@@ -1,0 +1,16 @@
+{{- range .Values.service.names }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ . }}
+  labels:
+    app: {{ . }}
+    service: {{ . }}
+spec:
+  ports:
+    - port: 9080
+      name: http
+  selector:
+    app: {{ . }}
+{{- end }}

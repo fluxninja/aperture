@@ -1,0 +1,24 @@
+# permissions for end users to edit apertures.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: aperture-editor-role
+rules:
+- apiGroups:
+  - aperture.tech
+  resources:
+  - apertures
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - aperture.tech
+  resources:
+  - apertures/status
+  verbs:
+  - get

@@ -7,12 +7,10 @@ import (
 	"go.uber.org/fx"
 
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -37,8 +35,6 @@ var Module fx.Option = fx.Options(
 	),
 )
 
-var agentGroup string
-
 const (
 	configKey              = "classification"
 	classificationJobGroup = "classification"
@@ -46,8 +42,8 @@ const (
 )
 
 func setupEtcdClassifierWatcher(etcdClient *etcdclient.Client, lc fx.Lifecycle, ai *agentinfo.AgentInfo) (notifiers.Watcher, error) {
-	agentGroup = ai.GetAgentGroup()
-	etcdPath := path.Join(paths.Classifiers)
+	agentGroup := ai.GetAgentGroup()
+	etcdPath := path.Join(paths.Classifiers, paths.AgentGroupPrefix(agentGroup))
 	etcdWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
@@ -133,22 +129,9 @@ func invokeMiniApp(
 	unmarshaller config.Unmarshaller,
 	classifier *Classifier,
 ) error {
-	var wrapperMessage configv1.ConfigPropertiesWrapper
-	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.Config == nil {
-		if err != nil {
-			return err
-		}
-	}
-
 	var rs classificationv1.Classifier
-	if err := wrapperMessage.Config.UnmarshalTo(&rs); err != nil {
+	if err := unmarshaller.Unmarshal(&rs); err != nil {
 		return err
-	}
-
-	if rs.Selector.AgentGroup != agentGroup {
-		log.Trace().Msg("Could not create classifier - agent group mismatch")
-		return nil
 	}
 
 	var activeRuleset ActiveRuleset

@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "demo-app.fullname" . }}
+  labels:
+    {{- include "demo-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "demo-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "demo-app.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "demo-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: simplesrv
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.simplesrv.image.repository }}:{{ .Values.simplesrv.image.tag }}"
+          imagePullPolicy: {{ .Values.simplesrv.image.pullPolicy }}
+          ports:
+            - name: srvhttp
+              containerPort: 8099
+              protocol: TCP
+          env:
+            # These values are "hardcoded" in envoy proxy config
+            - name: SIMPLE_SERVICE_PORT
+              value: "8099"
+            # Use when running envoy as a proxy (separate from istio deploy)
+            #- name: ENVOY_EGRESS_PORT
+            #  value: "9001"
+            - name: HOSTNAME
+              # TODO: Don't hardcode domain
+              value: "{{ include "demo-app.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

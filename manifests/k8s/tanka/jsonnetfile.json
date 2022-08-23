@@ -8,7 +8,16 @@
           "subdir": ""
         }
       },
-      "version": "master"
+      "version": "f3e43072c6b32b6831469fdd46f3480d60d8ba9d"
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "ssh://git@github.com/fluxninja/aperture-mixin.git",
+          "subdir": "aperture/1.0"
+        }
+      },
+      "version": "f3e43072c6b32b6831469fdd46f3480d60d8ba9d"
     },
     {
       "source": {

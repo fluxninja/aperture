@@ -5,15 +5,15 @@ import (
 	"errors"
 	"path"
 
+	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/apis/policyapi"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
-	"github.com/fluxninja/aperture/pkg/utils"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -21,7 +21,7 @@ import (
 )
 
 type rateLimiterSync struct {
-	policyReadAPI     policyapi.PolicyReadAPI
+	policyReadAPI     iface.PolicyRead
 	rateLimiterProto  *policylangv1.RateLimiter
 	decision          *policydecisionsv1.RateLimiterDecision
 	configEtcdPath    string
@@ -35,7 +35,7 @@ type rateLimiterSync struct {
 func NewRateLimiterAndOptions(
 	rateLimiterProto *policylangv1.RateLimiter,
 	componentIndex int,
-	policyReadAPI policyapi.PolicyReadAPI,
+	policyReadAPI iface.PolicyRead,
 ) (runtime.Component, fx.Option, error) {
 	// Get the agent group name.
 	selectorProto := rateLimiterProto.GetSelector()
@@ -43,7 +43,7 @@ func NewRateLimiterAndOptions(
 		return nil, fx.Options(), errors.New("selector is nil")
 	}
 	agentGroupName := selectorProto.GetAgentGroup()
-	componentID := paths.IdentifierForComponent(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
+	componentID := paths.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
 	configEtcdPath := path.Join(paths.RateLimiterConfigPath, componentID)
 	decisionsEtcdPath := path.Join(paths.RateLimiterDecisionsPath, componentID)
 
@@ -66,16 +66,11 @@ func NewRateLimiterAndOptions(
 func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper, err := utils.WrapWithConfProps(
-				limiterSync.rateLimiterProto,
-				limiterSync.agentGroupName,
-				limiterSync.policyReadAPI.GetPolicyName(),
-				limiterSync.policyReadAPI.GetPolicyHash(),
-				limiterSync.componentIndex,
-			)
-			if err != nil {
-				log.Error().Err(err).Msg("failed to wrap rate limiter config")
-				return err
+			wrapper := &configv1.RateLimiterWrapper{
+				RateLimiter:    limiterSync.rateLimiterProto,
+				ComponentIndex: int64(limiterSync.componentIndex),
+				PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
+				PolicyHash:     limiterSync.policyReadAPI.GetPolicyHash(),
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {
@@ -138,16 +133,11 @@ func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
 		limiterSync.decision.Limit = limitValue
 		// Publish decision
 		log.Debug().Float64("limit", limitValue).Msg("publishing rate limiter decision")
-		wrapper, err := utils.WrapWithConfProps(
-			limiterSync.decision,
-			limiterSync.agentGroupName,
-			limiterSync.policyReadAPI.GetPolicyName(),
-			limiterSync.policyReadAPI.GetPolicyHash(),
-			limiterSync.componentIndex,
-		)
-		if err != nil {
-			log.Error().Err(err).Msg("failed to wrap rate limiter decision")
-			return err
+		wrapper := &configv1.RateLimiterWrapper{
+			RateLimiter:    limiterSync.rateLimiterProto,
+			ComponentIndex: int64(limiterSync.componentIndex),
+			PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
+			PolicyHash:     limiterSync.policyReadAPI.GetPolicyHash(),
 		}
 		dat, err := proto.Marshal(wrapper)
 		if err != nil {
