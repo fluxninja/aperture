@@ -67,6 +67,8 @@ const (
 	DroppingConcurrencyLimitersLabel = "dropping_concurrency_limiters"
 	// FluxMetersLabel describes flux meters matched to the traffic.
 	FluxMetersLabel = "flux_meters"
+	// FlowLabelKeysLabel describes keys of flow labels matched to the traffic.
+	FlowLabelKeysLabel = "flow_label_keys"
 	// HostAddressLabel describes host address of the request.
 	HostAddressLabel = "net.host.address"
 	// PeerAddressLabel describes peer address of the request.
