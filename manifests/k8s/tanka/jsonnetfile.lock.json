@@ -8,8 +8,18 @@
           "subdir": ""
         }
       },
-      "version": "746b7607e37cd2d59929557a3f3cac7f7431067d",
-      "sum": "GIuwMfSyIXgC6ZEFuRzgB3xLMyF13WRR0JLL/ray3WA="
+      "version": "f3e43072c6b32b6831469fdd46f3480d60d8ba9d",
+      "sum": "9eAMEsHAddOozVOpLlPKbi3k9pJ1nv0n9qY021JZ1T4="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "ssh://git@github.com/fluxninja/aperture-mixin.git",
+          "subdir": "aperture/1.0"
+        }
+      },
+      "version": "f3e43072c6b32b6831469fdd46f3480d60d8ba9d",
+      "sum": "FZm2n4fzjKZnHHsjJjEHi1EkUa+JKxTL1/Y6QsNtdqs="
     },
     {
       "source": {
@@ -18,8 +28,8 @@
           "subdir": "grafonnet"
         }
       },
-      "version": "6db00c292d3a1c71661fc875f90e0ec7caa538c2",
-      "sum": "gF8foHByYcB25jcUOBqP6jxk0OPifQMjPvKY0HaCk6w="
+      "version": "30280196507e0fe6fa978a3e0eaca3a62844f817",
+      "sum": "342u++/7rViR/zj2jeJOjshzglkZ1SY+hFNuyCBFMdc="
     },
     {
       "source": {
@@ -28,8 +38,8 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "37f8f9d015efac5f83c3f490a52de1d686c2cdc9",
-      "sum": "0KkygBQd/AFzUvVzezE4qF/uDYgrwUXVpZfINBti0oc="
+      "version": "a2ba95acc8b7653d33bd57075678d8de2a64e5b3",
+      "sum": "1Ge62JmmPDq7fWyDAt3uCTobGEj4sJdbkqxRGWK22p0="
     },
     {
       "source": {
@@ -38,8 +48,8 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "37f8f9d015efac5f83c3f490a52de1d686c2cdc9",
-      "sum": "xo1A7iYvJ7OZ64q2dOZY0G8FGHHt+t/+vEJW3bnXHyk="
+      "version": "a2ba95acc8b7653d33bd57075678d8de2a64e5b3",
+      "sum": "2++XoPslyz02LRgsxREWxjLgYgiCIqhAtXCyVSvYcoE="
     },
     {
       "source": {
@@ -48,8 +58,8 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "37f8f9d015efac5f83c3f490a52de1d686c2cdc9",
-      "sum": "AGgjH6IJe/1qwNtxFIiG8V1uyOJZascEydQsNrfPQ4c="
+      "version": "a2ba95acc8b7653d33bd57075678d8de2a64e5b3",
+      "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {
       "source": {
@@ -58,8 +68,8 @@
           "subdir": "doc-util"
         }
       },
-      "version": "fc3f9bca2dff836b0e924a993bdf11bc51af78d4",
-      "sum": "JUBWG9ybm0TlY3uCWrNoQS00BcfPlCvuK9jPFU0NIj8="
+      "version": "be066653f33fcaa8467231f6334f6878b92fd8f9",
+      "sum": "fzESn29CRKzLap9jTpcUNSNBy7MzvzOxZo1LYWyIrGs="
     },
     {
       "source": {
@@ -68,8 +78,8 @@
           "subdir": ""
         }
       },
-      "version": "956b95bbf0d9696bc0e8b9812f9259aff72cbf85",
-      "sum": "D3iHOST+T5u1pA7DTp6b/Qkn8To1snchTIpCmGgW5+U="
+      "version": "90f2a60a37433d12cd913793b65479b5830b532f",
+      "sum": "53cZqeDhE5Oik8pxXUNT3tjMzUoRKf3uHJjk4F37gAI="
     },
     {
       "source": {
@@ -78,8 +88,8 @@
           "subdir": "1.22"
         }
       },
-      "version": "1942ec15993b5a273569bb9a59d522b01522d0db",
-      "sum": "1dv7m/ZBM6LvAlq2AghD3x/y2wG2bHUE4+jDKySIewI="
+      "version": "e22027656445547ff5e757c10a3cb7d8c933a441",
+      "sum": "QKsc62wl5Wc+uxxP4NJCF1NidiPi9zjngbzIszFvesc="
     },
     {
       "source": {

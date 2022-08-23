@@ -1,0 +1,4 @@
+namespace: aperture-system
+
+bases:
+  - default/

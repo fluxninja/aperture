@@ -17,13 +17,15 @@ repos:
     rev: v4.2.0
     hooks:
       - id: trailing-whitespace
+        exclude: ^(manifests/charts/.*/README*)
       - id: end-of-file-fixer
-        exclude: ^(docs/|manifests/charts/agent/README*)|\.*svg$
+        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$
       - id: check-yaml
         exclude: ^(manifests/charts/.*/(templates|files)/.*)
         args:
           - "--allow-multiple-documents"
       - id: check-added-large-files
+        exclude: ^operator/config/crd/
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
       - id: check-json
@@ -50,7 +52,7 @@ repos:
     rev: "v2.7.1"
     hooks:
       - id: prettier
-        exclude: ^(docs/gen/.*.yaml|manifests/charts/agent/README*)
+        exclude: ^(docs/gen/.*.yaml|manifests/charts/.*/README*)
         types_or:
           [
             sh,
@@ -88,3 +90,13 @@ repos:
         exclude: ^ops/.*
         pass_filenames: false
         description: "Generate docs"
+      - id: tanka-show
+        name: "Check tanka parses jsonnet"
+        language: script
+        entry: ./tools/githooks/check_tanka_show.sh
+        pass_filenames: false
+        files: ^manifests/k8s/tanka/
+        types_or:
+          - jsonnet
+          - json
+          - yaml

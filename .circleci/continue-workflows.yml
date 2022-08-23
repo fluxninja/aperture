@@ -27,13 +27,19 @@ parameters:
   updated-aperture:
     type: boolean
     default: false
+  updated-aperture-operator:
+    type: boolean
+    default: false
   updated-aperture-docs:
     type: boolean
     default: false
   updated-circleci-config:
     type: boolean
     default: false
-  updated-aperture-chart:
+  updated-aperture-charts:
+    type: boolean
+    default: false
+  updated-demo-app:
     type: boolean
     default: false
 
@@ -208,10 +214,45 @@ jobs:
           command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
           when: always
 
+  go-test-coverage-operator:
+    parameters:
+      work_dir:
+        type: string
+        description: working directory
+    executor: go-cimg-executor
+    resource_class: large
+    steps:
+      - checkout
+      - when:
+          condition:
+            or:
+              - << pipeline.parameters.updated-aperture-operator >>
+          steps:
+            - run:
+                name: set GOMAXPROCS to 4
+                command: |
+                  echo 'export GOMAXPROCS=4' >> $BASH_ENV
+      - run:
+          name: Run tests and coverage
+          working_directory: << parameters.work_dir >>
+          command: |
+            envtest_path=$(make setup_envtest -s)
+            KUBEBUILDER_ASSETS="${envtest_path}" gotestsum --format=testname --junitfile unit-tests.xml -- -race -coverprofile=coverage.out -coverpkg=./... $(go list ./... | grep -v api)
+            mkdir -p /tmp/test-results
+            mv unit-tests.xml /tmp/test-results
+      - run:
+          name: Show peak memory usage in bytes
+          command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
+          when: always
+
   pre-commit:
     executor: python-cimg-executor
     resource_class: xlarge
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
+            - "75:2f:7a:fe:d3:a1:5e:81:a8:d2:cc:3a:21:59:b7:2c"  # fluxninja/aperture-mixin R/O
       - checkout
       - asdf_install:
           cache_name: pre-commit
@@ -225,6 +266,10 @@ jobs:
             nodejs
             shellcheck
             yq
+            jb
+            tanka
+            helm
+            kustomize
       - run:
           name: Install additional system dependencies for pre-commit
           command: |
@@ -233,6 +278,16 @@ jobs:
               libgtk-3-0 \
               libgbm1 \
               libasound2
+      - run: &install_opsninja
+          name: Install opsninja and its dependencies
+          command: |
+            # We need R/O access to cloud repository to be able to fetch opsninja library
+            # FIXME: make "releases" of opsninja library somehow, even as a separate repository
+            # to limit exposure.
+            export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
+            export SSH_AUTH_SOCK=""
+            pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
       - run:
           name: set GOMAXPROCS to 4
           command: |
@@ -274,6 +329,8 @@ jobs:
           command: |
             set -euo pipefail
             set -x
+            export LOGURU_LEVEL=TRACE
+            export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes -o IdentityAgent=none"
             if [ "$CIRCLE_BRANCH" = "main" ]; then
               pre-commit run --all-files
             else
@@ -328,16 +385,7 @@ jobs:
           fingerprints:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
             - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff" # fluxninja/aperture-tech-docs R/W
-      - run: &install_opsninja
-          name: Install opsninja and its dependencies
-          command: |
-            # We need R/O access to cloud repository to be able to fetch opsninja library
-            # FIXME: make "releases" of opsninja library somehow, even as a separate repository
-            # to limit exposure.
-            export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
-            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
-            export SSH_AUTH_SOCK=""
-            pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
+      - run: *install_opsninja
       - asdf_install:
           cache_name: publish-docs
           tools: |-
@@ -379,7 +427,8 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "50:32:f0:16:fd:12:4c:fd:1c:b4:2d:8c:7a:00:fd:45"
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
+            - "2d:5d:fd:00:b3:67:c4:32:2d:9f:80:60:58:b0:d6:b2" # fluxninja/deployment R/W
       - checkout
       - run: *install_opsninja
       - run:
@@ -393,6 +442,7 @@ jobs:
               --color=always
               --dest-repo-url "<< parameters.deployment-repo >>"
               --target-branch "main"
+              --ssh-identity "~/.ssh/id_rsa_$(echo "2d:5d:fd:00:b3:67:c4:32:2d:9f:80:60:58:b0:d6:b2" | tr -d ':')"
             )
             if [[ "<< parameters.dry-run >>" == "true" ]]; then
               args+=( --dry-run )
@@ -409,7 +459,7 @@ workflows:
     jobs:
       - build-push-add-tag:
           name: image-build-aperture-agent
-          dockerhub-image: aperturecontrol/aperture-agent
+          dockerhub-image: fluxninja/aperture-agent
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-agent
           docker-context: .
@@ -417,7 +467,7 @@ workflows:
           use-docker-layer-caching: true
       - build-push-add-tag:
           name: image-build-aperture-controller
-          dockerhub-image: aperturecontrol/aperture-controller
+          dockerhub-image: fluxninja/aperture-controller
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-controller
           docker-context: .
@@ -426,6 +476,33 @@ workflows:
       - go-test-coverage:
           name: go-test-coverage-aperture
           work_dir: .
+
+  aperture-operator:
+    when: << pipeline.parameters.updated-aperture-operator >>
+    jobs:
+      - build-push-add-tag:
+          name: image-build-aperture-operator
+          dockerhub-image: fluxninja/aperture-operator
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/aperture-operator
+          docker-context: ./operator
+          dockerfile: ./operator/Dockerfile
+          use-docker-layer-caching: true
+      - go-test-coverage-operator:
+          name: go-test-coverage-aperture-operator
+          work_dir: ./operator
+
+  demo-app:
+    when: << pipeline.parameters.updated-demo-app >>
+    jobs:
+      - build-push-add-tag:
+          name: image-demo-app
+          dockerhub-image: fluxninja/demo-app
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/demo-app
+          docker-context: .
+          dockerfile: examples/demo_app/Dockerfile
+          use-docker-layer-caching: true
 
   pre-commit:
     jobs:
@@ -443,7 +520,7 @@ workflows:
     when:
       and:
         - or: &updated_deployment_code
-            - << pipeline.parameters.updated-aperture-chart >>
+            - << pipeline.parameters.updated-aperture-charts >>
         - or: &main_or_stable_branch
             - equal: [main, << pipeline.git.branch >>]
             - matches:

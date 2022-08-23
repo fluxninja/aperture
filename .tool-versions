@@ -11,3 +11,8 @@ python 3.10.5
 shellcheck 0.8.0
 yq 4.27.2
 helm 3.9.2
+kubectl 1.24.3
+kustomize 4.5.5
+kind 0.14.0
+jb 0.5.1
+tanka 0.22.1

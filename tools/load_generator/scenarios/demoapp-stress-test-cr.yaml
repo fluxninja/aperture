@@ -1,0 +1,10 @@
+apiVersion: k6.io/v1alpha1
+kind: K6
+metadata:
+  name: demoapp-stress-test-cr
+spec:
+  parallelism: 4
+  script:
+    configMap:
+      name: stress-test
+      file: stress_test.js

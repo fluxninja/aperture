@@ -1,0 +1,103 @@
+# Default values for bookinfo.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  accounts:
+  - name: details
+  - name: ratings
+  - name: reviews
+  - name: productpage
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+deployments:
+  simple:
+  - name: details
+    version: v1
+    image: docker.io/istio/examples-bookinfo-details-v1:1.16.2
+  - name: ratings
+    version: v1
+    image: docker.io/istio/examples-bookinfo-ratings-v1:1.16.2
+  - name: productpage
+    version: v1
+    image: docker.io/istio/examples-bookinfo-productpage-v1:1.16.2
+    volumes: true
+  reviews:
+  - version: v1
+    image: docker.io/istio/examples-bookinfo-reviews-v1:1.16.2
+  - version: v2
+    image: docker.io/istio/examples-bookinfo-reviews-v2:1.16.2
+  - version: v3
+    image: docker.io/istio/examples-bookinfo-reviews-v3:1.16.2
+
+
+
+service:
+  type: ClusterIP
+  port: 80
+  names:
+  - details
+  - ratings
+  - reviews
+  - productpage
+
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+  hosts: {}
+  tls: []
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -1,7 +1,7 @@
 local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonnet/4.3/main.libsonnet';
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
-local apertureDashboards = import 'github.com/fluxninja/aperture-mixin/lib/dashboards.libsonnet';
+local policy = import 'github.com/fluxninja/aperture-mixin/policies/latency-gradient/main.libsonnet';
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;
@@ -40,7 +40,7 @@ local dashboards =
   [
     dashboard.new('example-dashboard') +
     dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
-    dashboard.spec.withJson(std.manifestJsonEx(apertureDashboards['example-dashboard.json'], indent='  ')) +
+    dashboard.spec.withJson(std.manifestJsonEx(policy.dashboard, indent='  ')) +
     dashboard.spec.withDatasources({
       inputName: 'DS_AGENT-PROMETHEUS',
       datasourceName: 'agent-prometheus',

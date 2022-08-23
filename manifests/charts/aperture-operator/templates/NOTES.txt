@@ -1,0 +1,8 @@
+CHART NAME: {{ .Chart.Name  }}
+CHART VERSION: {{ .Chart.Version  }}
+APP VERSION: {{ .Chart.AppVersion  }}
+
+** Please be patient while the chart is being deployed **
+
+{{- include "common.warnings.rollingTag" .Values.operator.image }}
+{{- include "aperture-operator.validateValues" . }}

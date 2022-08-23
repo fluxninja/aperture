@@ -1,0 +1,39 @@
+# Deleting the Aperture Custom Resource creating with the chart in the 'pre-delete' hook.
+# The CR required the operator to gracefully delete all the resources and if the chart is
+# deleted before deleting the CR, it won't get cleaned up properly.
+{{- if .Values.aperture.createUninstallHook }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "common.names.fullname" . }}-hook
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-operator
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+  {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.aperture.tech/injection: "false"
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: aperture-operator
+    spec:
+      serviceAccountName: {{ include "aperture-operator.serviceAccountName" . }}
+      restartPolicy: Never
+      containers:
+      - name: pre-delete-job
+        image: "bitnami/kubectl"
+        command:
+          - "/bin/bash"
+          - "-xc"
+          - "kubectl delete aperture {{ .Release.Name }} -n {{ template "common.names.namespace" . }}; while (kubectl get aperture aperture -n {{ template "common.names.namespace" . }}); ret=$?; [ $ret -eq 0 ]; do echo \"deleting\"; sleep 2; done"
+{{- end }}
