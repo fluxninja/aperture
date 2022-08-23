@@ -7,6 +7,17 @@ dist_cache:
 
 otel:
   addr: ":{{ .Values.agent.serverPort }}"
+  {{- if .Values.fluxninjaPlugin.enabled }}
+  batch_prerollup:
+    timeout: {{ .Values.agent.batchPrerollup.timeout }}
+    send_batch_size: {{ .Values.agent.batchPrerollup.sendBatchSize }}
+  batch_postrollup:
+    timeout: {{ .Values.agent.batchPostrollup.timeout }}
+    send_batch_size: {{ .Values.agent.batchPostrollup.sendBatchSize }}
+  batch_metrics_fast:
+    timeout: {{ .Values.agent.batchMetricsFast.timeout }}
+    send_batch_size: {{ .Values.agent.batchMetricsFast.sendBatchSize }}
+  {{- end }}
 
 log:
   pretty_console: {{ .Values.agent.log.prettyConsole }}
