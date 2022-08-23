@@ -446,7 +446,7 @@ workflows:
     jobs:
       - build-push-add-tag:
           name: image-build-aperture-agent
-          dockerhub-image: aperturecontrol/aperture-agent
+          dockerhub-image: fluxninja/aperture-agent
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-agent
           docker-context: .
@@ -454,7 +454,7 @@ workflows:
           use-docker-layer-caching: true
       - build-push-add-tag:
           name: image-build-aperture-controller
-          dockerhub-image: aperturecontrol/aperture-controller
+          dockerhub-image: fluxninja/aperture-controller
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-controller
           docker-context: .
@@ -469,6 +469,7 @@ workflows:
     jobs:
       - build-push-add-tag:
           name: image-build-aperture-operator
+          dockerhub-image: fluxninja/aperture-operator
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-operator
           docker-context: ./operator
@@ -483,6 +484,7 @@ workflows:
     jobs:
       - build-push-add-tag:
           name: image-demo-app
+          dockerhub-image: fluxninja/demo-app
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/demo-app
           docker-context: .
