@@ -25,9 +25,11 @@ message CheckResponse {
   repeated LimiterDecision limiter_decisions = 3;
   // flux meters that were matched for this request.
   repeated FluxMeter flux_meters = 4;
+  // flow label keys that were matched for this request.
+  repeated string flow_label_keys = 5;
 }
 
-// Reason contains fields that give futher information about error or rejection.
+// Reason contains fields that give further information about error or rejection.
 message DecisionReason {
   enum ErrorReason {
     ERROR_REASON_UNSPECIFIED = 0;

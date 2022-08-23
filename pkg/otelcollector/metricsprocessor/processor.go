@@ -139,6 +139,7 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 		otelcollector.ConcurrencyLimitersLabel:         pcommon.NewValueSlice(),
 		otelcollector.DroppingConcurrencyLimitersLabel: pcommon.NewValueSlice(),
 		otelcollector.FluxMetersLabel:                  pcommon.NewValueSlice(),
+		otelcollector.FlowLabelKeysLabel:               pcommon.NewValueSlice(),
 		otelcollector.DecisionTypeLabel:                pcommon.NewValueString(checkResponse.DecisionType.String()),
 		otelcollector.DecisionRejectReasonLabel:        pcommon.NewValueString(""),
 		otelcollector.DecisionErrorReasonLabel:         pcommon.NewValueString(""),
@@ -183,6 +184,11 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 		value := strings.Join(rawValue, ",")
 		labels[otelcollector.FluxMetersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 	}
+
+	for _, flowLabelKey := range checkResponse.GetFlowLabelKeys() {
+		labels[otelcollector.FlowLabelKeysLabel].SliceVal().AppendEmpty().SetStringVal(flowLabelKey)
+	}
+
 	for key, value := range labels {
 		attributes.Insert(key, value)
 	}

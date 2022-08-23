@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 
+	"golang.org/x/exp/maps"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -113,6 +115,8 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 		}
 		return
 	}
+
+	response.FlowLabelKeys = maps.Keys(labels)
 
 	return
 }

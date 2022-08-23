@@ -569,6 +569,11 @@ definitions:
       decision_type:
         $ref: '#/definitions/v1DecisionType'
         description: decision_type contains what the decision was.
+      flow_label_keys:
+        type: array
+        items:
+          type: string
+        description: flow label keys that were matched for this request.
       flux_meters:
         type: array
         items:
@@ -759,7 +764,7 @@ definitions:
         $ref: '#/definitions/DecisionReasonErrorReason'
       reject_reason:
         $ref: '#/definitions/DecisionReasonRejectReason'
-    description: Reason contains fields that give futher information about error or rejection.
+    description: Reason contains fields that give further information about error or rejection.
   v1DecisionType:
     type: string
     enum:
