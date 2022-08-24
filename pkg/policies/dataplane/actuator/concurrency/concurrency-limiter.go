@@ -127,28 +127,28 @@ func setupConcurrencyLimiterFactory(
 
 	conLimiterFactory.wfqFlowsGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "wfq_flows",
+			Name: metrics.WFQFlowsMetricName,
 			Help: "A gauge that tracks the number of flows in the WFQScheduler",
 		},
 		metricLabelKeys,
 	)
 	conLimiterFactory.wfqRequestsGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "wfq_requests",
+			Name: metrics.WFQRequestsMetricName,
 			Help: "A gauge that tracks the number of queued requests in the WFQScheduler",
 		},
 		metricLabelKeys,
 	)
 	conLimiterFactory.incomingConcurrencyCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "incoming_concurrency",
+			Name: metrics.IncomingConcurrencyMetricName,
 			Help: "A counter measuring incoming concurrency into Scheduler",
 		},
 		metricLabelKeys,
 	)
 	conLimiterFactory.acceptedConcurrencyCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "accepted_concurrency",
+			Name: metrics.AcceptedConcurrencyMetricName,
 			Help: "A counter measuring the concurrency admitted by Scheduler",
 		},
 		metricLabelKeys,
