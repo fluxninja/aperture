@@ -403,14 +403,8 @@
           ]
         },
         {
-          "type": "category",
-          "label": "Glossary",
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/glossary/tokens"
-            }
-          ]
+          "type": "doc",
+          "id": "reference/glossary"
         }
       ]
     },
