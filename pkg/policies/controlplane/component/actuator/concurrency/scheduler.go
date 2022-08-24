@@ -19,6 +19,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/component"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -29,10 +30,6 @@ import (
 var (
 	concurrencyQueryInterval = time.Second * 1
 	tokensQueryInterval      = time.Second * 10
-)
-
-const (
-	workloadIndexLabel = "workload_index"
 )
 
 // Scheduler is part of the concurrency control component stack.
@@ -76,8 +73,20 @@ func NewSchedulerAndOptions(
 		etcdPath:        etcdPath,
 	}
 
+	// Prepare parameters for prometheus queries
+	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%d\"",
+		metrics.PolicyNameLabel,
+		policyReadAPI.GetPolicyName(),
+		metrics.PolicyHashLabel,
+		policyReadAPI.GetPolicyHash(),
+		metrics.ComponentIndexLabel,
+		componentIndex,
+	)
+
 	acceptedQuery, acceptedQueryOptions, acceptedQueryErr := component.NewScalarQueryAndOptions(
-		fmt.Sprintf("sum(rate(accepted_concurrency{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[10s]))", policyReadAPI.GetPolicyName(), policyReadAPI.GetPolicyHash(), componentIndex),
+		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
+			metrics.AcceptedConcurrencyMetricName,
+			policyParams),
 		concurrencyQueryInterval,
 		componentIndex,
 		policyReadAPI,
@@ -89,7 +98,9 @@ func NewSchedulerAndOptions(
 	scheduler.acceptedQuery = acceptedQuery
 
 	incomingQuery, incomingQueryOptions, incomingQueryErr := component.NewScalarQueryAndOptions(
-		fmt.Sprintf("sum(rate(incoming_concurrency{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[10s]))", policyReadAPI.GetPolicyName(), policyReadAPI.GetPolicyHash(), componentIndex),
+		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
+			metrics.IncomingConcurrencyMetricName,
+			policyParams),
 		concurrencyQueryInterval,
 		componentIndex,
 		policyReadAPI,
@@ -102,9 +113,13 @@ func NewSchedulerAndOptions(
 
 	if schedulerProto.AutoTokens {
 		tokensQuery, tokensQueryOptions, tokensQueryErr := component.NewTaggedQueryAndOptions(
-			fmt.Sprintf("sum by (%s) (increase(workload_latency_ms_sum{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[30m])) / sum by (%s) (increase(workload_latency_ms_count{policy_name=\"%s\",policy_hash=\"%s\",component_index=\"%d\"}[30m]))",
-				workloadIndexLabel, policyReadAPI.GetPolicyName(), policyReadAPI.GetPolicyHash(), componentIndex,
-				workloadIndexLabel, policyReadAPI.GetPolicyName(), policyReadAPI.GetPolicyHash(), componentIndex),
+			fmt.Sprintf("sum by (%s) (increase(%s{%s}[30m])) / sum by (%s) (increase(%s{%s}[30m]))",
+				metrics.WorkloadIndexLabel,
+				metrics.WorkloadLatencySumMetricName,
+				policyParams,
+				metrics.WorkloadIndexLabel,
+				metrics.WorkloadLatencyCountMetricName,
+				policyParams),
 			tokensQueryInterval,
 			componentIndex,
 			policyReadAPI,
@@ -171,7 +186,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 				}
 				for _, sample := range vector {
 					for k, v := range sample.Metric {
-						if k == workloadIndexLabel {
+						if k == metrics.WorkloadIndexLabel {
 							workloadIndex := string(v)
 							sampleValue := uint64(sample.Value)
 							tokensDecision.TokensByWorkloadIndex[workloadIndex] = sampleValue
@@ -201,7 +216,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	} else {
 		acceptedReading = reading.New(acceptedValue)
 	}
-	outPortReadings["accepted_concurrency"] = []reading.Reading{acceptedReading}
+	outPortReadings[metrics.AcceptedConcurrencyMetricName] = []reading.Reading{acceptedReading}
 
 	incomingValue, err := s.incomingQuery.ExecuteScalarQuery(tickInfo)
 	if err != nil {
@@ -210,7 +225,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	} else {
 		incomingReading = reading.New(incomingValue)
 	}
-	outPortReadings["incoming_concurrency"] = []reading.Reading{incomingReading}
+	outPortReadings[metrics.IncomingConcurrencyMetricName] = []reading.Reading{incomingReading}
 
 	return outPortReadings, errMulti
 }
