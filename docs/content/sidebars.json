@@ -6,7 +6,7 @@
       "items": [
         {
           "type": "doc",
-          "id": "Introduction/aperture"
+          "id": "introduction/aperture"
         }
       ]
     },
@@ -16,21 +16,21 @@
       "items": [
         {
           "type": "category",
-          "label": "Controller",
+          "label": "Installing Controller",
           "items": [
             {
               "type": "doc",
-              "id": "Setup/Controller/kubernetes-operator"
+              "id": "setup/controller/kubernetes-operator"
             }
           ]
         },
         {
           "type": "category",
-          "label": "Agent",
+          "label": "Installing Agent",
           "items": [
             {
               "type": "category",
-              "label": "SupportPlatforms",
+              "label": "Support Platforms",
               "items": [
                 {
                   "type": "category",
@@ -38,25 +38,25 @@
                   "items": [
                     {
                       "type": "category",
-                      "label": "InstallwithApertureOperator",
+                      "label": "Service Discovery",
                       "items": [
                         {
                           "type": "doc",
-                          "id": "Setup/Agent/Supported Platforms/Kubernetes/Install with Aperture Operator/daemonset"
-                        },
-                        {
-                          "type": "doc",
-                          "id": "Setup/Agent/Supported Platforms/Kubernetes/Install with Aperture Operator/sidecar"
+                          "id": "setup/agent/supported-platforms/kubernetes/service-discovery/certs"
                         }
                       ]
                     },
                     {
                       "type": "category",
-                      "label": "Servicediscovery",
+                      "label": "Install with Aperture Operator",
                       "items": [
                         {
                           "type": "doc",
-                          "id": "Setup/Agent/Supported Platforms/Kubernetes/Service Discovery/certs"
+                          "id": "setup/agent/supported-platforms/kubernetes/install-with-aperture-operator/daemonset"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "setup/agent/supported-platforms/kubernetes/install-with-aperture-operator/sidecar"
                         }
                       ]
                     }
@@ -68,11 +68,11 @@
         },
         {
           "type": "category",
-          "label": "Deployment",
+          "label": "Deploying in your application",
           "items": [
             {
               "type": "category",
-              "label": "ServiceMesh",
+              "label": "Service Mesh",
               "items": [
                 {
                   "type": "category",
@@ -84,21 +84,11 @@
                       "items": [
                         {
                           "type": "doc",
-                          "id": "Setup/Deployment/Service Mesh/Envoy/Requirements/accesslogs"
+                          "id": "setup/deploying-in-your-application/service-mesh/envoy/requirements/accesslogs"
                         },
                         {
                           "type": "doc",
-                          "id": "Setup/Deployment/Service Mesh/Envoy/Requirements/authzapi"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "category",
-                      "label": "ConsulMesh",
-                      "items": [
-                        {
-                          "type": "doc",
-                          "id": "Setup/Deployment/Service Mesh/Envoy/Consul Mesh/consulmesh"
+                          "id": "setup/deploying-in-your-application/service-mesh/envoy/requirements/authzapi"
                         }
                       ]
                     },
@@ -108,33 +98,43 @@
                       "items": [
                         {
                           "type": "doc",
-                          "id": "Setup/Deployment/Service Mesh/Envoy/Istio/istio"
+                          "id": "setup/deploying-in-your-application/service-mesh/envoy/istio/istio"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "category",
+                      "label": "Consul Mesh",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "setup/deploying-in-your-application/service-mesh/envoy/consulmesh/consulmesh"
                         }
                       ]
                     }
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "SDK",
-          "items": [
-            {
-              "type": "doc",
-              "id": "Setup/SDK/go"
             },
             {
-              "type": "doc",
-              "id": "Setup/SDK/java"
+              "type": "category",
+              "label": "SDK",
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "setup/deploying-in-your-application/sdk/go"
+                },
+                {
+                  "type": "doc",
+                  "id": "setup/deploying-in-your-application/sdk/java"
+                }
+              ]
             }
           ]
         },
         {
           "type": "doc",
-          "id": "Setup/linktodemovideo"
+          "id": "setup/link-to-demo-video"
         }
       ]
     },
@@ -144,67 +144,77 @@
       "items": [
         {
           "type": "category",
-          "label": "CreatePolicies",
+          "label": "Creating Policies",
           "items": [
             {
               "type": "doc",
-              "id": "Get Started/Create Policies/Ratelimiterrestrictscripttraffic"
+              "id": "get-started/creating-policies/rate-limiter-to-restrict-script-traffic"
             },
             {
               "type": "doc",
-              "id": "Get Started/Create Policies/LatencyGradientControllerEMA"
+              "id": "get-started/creating-policies/latency-gradient-controller-with-ema"
             },
             {
               "type": "doc",
-              "id": "Get Started/Create Policies/ReplacingPromQLquerywithEMA"
+              "id": "get-started/creating-policies/replacing-promql-query-with-ema-on-long-term-data"
             },
             {
               "type": "doc",
-              "id": "Get Started/Create Policies/Escalation"
+              "id": "get-started/creating-policies/escalation"
+            },
+            {
+              "type": "category",
+              "label": "Local playground",
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "get-started/creating-policies/local-playground/tilt-based-demo-app-setup"
+                },
+                {
+                  "type": "doc",
+                  "id": "get-started/creating-policies/local-playground/screenshots-of-grafana-dashboard"
+                }
+              ]
             },
             {
               "type": "doc",
-              "id": "Get Started/Create Policies/localplayground"
-            },
-            {
-              "type": "doc",
-              "id": "Get Started/Create Policies/linktodemovideo"
+              "id": "get-started/creating-policies/link-to-demo-video"
             }
           ]
         },
         {
           "type": "category",
-          "label": "GeneratePolicyWithBlueprints",
+          "label": "Generating Policies with Blueprints",
           "items": [
             {
               "type": "doc",
-              "id": "Get Started/Generate Policy With Blueprints/ratelimiter"
+              "id": "get-started/generating-policies-with-blueprints/rate-limiter"
             },
             {
               "type": "doc",
-              "id": "Get Started/Generate Policy With Blueprints/latencygradient"
+              "id": "get-started/generating-policies-with-blueprints/latency-gradient"
             },
             {
               "type": "doc",
-              "id": "Get Started/Generate Policy With Blueprints/linktodemovideo"
+              "id": "get-started/generating-policies-with-blueprints/link-to-demo-video"
             }
           ]
         },
         {
           "type": "category",
-          "label": "Classifyingflows",
+          "label": "Classifying flows",
           "items": [
             {
               "type": "doc",
-              "id": "Get Started/Classifying Flows/rego"
+              "id": "get-started/classifying-flows/rego"
             },
             {
               "type": "doc",
-              "id": "Get Started/Classifying Flows/extractor"
+              "id": "get-started/classifying-flows/extractors"
             },
             {
               "type": "doc",
-              "id": "Get Started/Classifying Flows/linktodemovideo"
+              "id": "get-started/classifying-flows/link-to-demo-video"
             }
           ]
         }
@@ -220,15 +230,15 @@
           "items": [
             {
               "type": "category",
-              "label": "circuits",
+              "label": "Circuits",
               "items": [
                 {
                   "type": "doc",
-                  "id": "Concepts/Controller/Circuits/runtime"
+                  "id": "concepts/controller/circuits/runtime"
                 },
                 {
                   "type": "doc",
-                  "id": "Concepts/Controller/Circuits/promqlruntime"
+                  "id": "concepts/controller/circuits/promql-runtime"
                 }
               ]
             }
@@ -244,15 +254,15 @@
               "items": [
                 {
                   "type": "doc",
-                  "id": "Concepts/Agent/Agent/Selectors/service"
+                  "id": "concepts/agent/selectors/service"
                 },
                 {
                   "type": "doc",
-                  "id": "Concepts/Agent/Agent/Selectors/agentgroup"
+                  "id": "concepts/agent/selectors/agent-group"
                 },
                 {
                   "type": "doc",
-                  "id": "Concepts/Agent/Agent/Selectors/labelmatcher"
+                  "id": "concepts/agent/selectors/label-matcher"
                 }
               ]
             },
@@ -262,7 +272,7 @@
               "items": [
                 {
                   "type": "doc",
-                  "id": "Concepts/Agent/Agent/Flux Meters/histograms"
+                  "id": "concepts/agent/flux-meters/histograms"
                 }
               ]
             },
@@ -272,37 +282,37 @@
               "items": [
                 {
                   "type": "category",
-                  "label": "scheduler",
+                  "label": "Scheduler - WFQ",
                   "items": [
                     {
                       "type": "doc",
-                      "id": "Concepts/Agent/Acutators/scheduler/priorities"
+                      "id": "concepts/agent/actuators/scheduler/priorities"
                     },
                     {
                       "type": "doc",
-                      "id": "Concepts/Agent/Acutators/scheduler/autotokens"
+                      "id": "concepts/agent/actuators/scheduler/autotokens"
                     },
                     {
                       "type": "doc",
-                      "id": "Concepts/Agent/Acutators/scheduler/timeouts"
+                      "id": "concepts/agent/actuators/scheduler/timeouts"
                     }
                   ]
                 },
                 {
                   "type": "category",
-                  "label": "ratelimiter",
+                  "label": "Rate limiter",
                   "items": [
                     {
                       "type": "doc",
-                      "id": "Concepts/Agent/Acutators/ratelimiter/distributedcounters"
+                      "id": "concepts/agent/actuators/rate-limiter/distributed-counters"
                     },
                     {
                       "type": "doc",
-                      "id": "Concepts/Agent/Acutators/ratelimiter/overrides"
+                      "id": "concepts/agent/actuators/rate-limiter/overrides"
                     },
                     {
                       "type": "doc",
-                      "id": "Concepts/Agent/Acutators/ratelimiter/lazysyncing"
+                      "id": "concepts/agent/actuators/rate-limiter/lazy-syncing"
                     }
                   ]
                 }
@@ -310,15 +320,15 @@
             },
             {
               "type": "category",
-              "label": "FlowClassifiers",
+              "label": "Flow classifier",
               "items": [
                 {
                   "type": "doc",
-                  "id": "Concepts/Agent/Flowclassifiers/rego"
+                  "id": "concepts/agent/flow-classifiers/rego"
                 },
                 {
                   "type": "doc",
-                  "id": "Concepts/Agent/Flowclassifiers/extractors"
+                  "id": "concepts/agent/flow-classifiers/extractors"
                 }
               ]
             }
@@ -328,11 +338,11 @@
     },
     {
       "type": "category",
-      "label": "FluxNinjaCloud",
+      "label": "FluxNinja Cloud",
       "items": [
         {
           "type": "doc",
-          "id": "FluxNinjaCloud/CloudPlugin"
+          "id": "fluxninja-cloud/cloud-plugin"
         }
       ]
     },
@@ -346,23 +356,23 @@
           "items": [
             {
               "type": "doc",
-              "id": "Reference/Configuration/policies"
+              "id": "reference/configuration/policies"
             },
             {
               "type": "doc",
-              "id": "Reference/configuration/flowclassification"
+              "id": "reference/configuration/flow-classification"
             },
             {
               "type": "category",
-              "label": "ProcessConfiguration",
+              "label": "Process Configuration",
               "items": [
                 {
                   "type": "doc",
-                  "id": "Reference/Configuration/ProcessConfiguration/aperturecontroller"
+                  "id": "reference/configuration/process-configuration/aperture-controller"
                 },
                 {
                   "type": "doc",
-                  "id": "Reference/configuration/ProcessConfiguration/apertureagent"
+                  "id": "reference/configuration/process-configuration/aperture-agent"
                 }
               ]
             }
@@ -370,15 +380,15 @@
         },
         {
           "type": "category",
-          "label": "APISpec",
+          "label": "API Spec",
           "items": [
             {
               "type": "doc",
-              "id": "Reference/APISpec/flowcontrolproto"
+              "id": "reference/api-spec/flowcontrol-proto"
             },
             {
               "type": "doc",
-              "id": "Reference/APISpec/fluxninjacloudgraphql"
+              "id": "reference/api-spec/fluxninja-cloud-graphql"
             }
           ]
         },
@@ -388,7 +398,7 @@
           "items": [
             {
               "type": "doc",
-              "id": "Reference/Metrics/metrics"
+              "id": "reference/metrics/metrics"
             }
           ]
         },
@@ -398,7 +408,7 @@
           "items": [
             {
               "type": "doc",
-              "id": "Reference/Glossary/tokens"
+              "id": "reference/glossary/tokens"
             }
           ]
         }
@@ -406,11 +416,11 @@
     },
     {
       "type": "category",
-      "label": "ReleaseNotes",
+      "label": "Release Notes",
       "items": [
         {
           "type": "doc",
-          "id": "ReleaseNotes/ReleaseNotes"
+          "id": "release-notes/release-notes"
         }
       ]
     },
@@ -420,7 +430,7 @@
       "items": [
         {
           "type": "doc",
-          "id": "Developers/cla"
+          "id": "developers/cla"
         }
       ]
     },
@@ -430,7 +440,7 @@
       "items": [
         {
           "type": "doc",
-          "id": "FAQ/faq"
+          "id": "faq/faq"
         }
       ]
     },
@@ -440,7 +450,7 @@
       "items": [
         {
           "type": "doc",
-          "id": "Feedback/feedback"
+          "id": "feedback/feedback"
         }
       ]
     }
