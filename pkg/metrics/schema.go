@@ -15,6 +15,18 @@ const (
 	ErrorCountMetricName = "http_server_error_counter"
 	// LatencyHistogramMetricName - metric from http server.
 	LatencyHistogramMetricName = "http_server_request_latency_seconds"
+	// AcceptedConcurrencyMetricName - metric for measuring latencies of accepted requests.
+	AcceptedConcurrencyMetricName = "accepted_concurrency"
+	// IncomingConcurrencyMetricName - metric for measuring latencies of all incoming requests.
+	IncomingConcurrencyMetricName = "incoming_concurrency"
+	// WorkloadLatencySumMetricName - metric from workload histogram.
+	WorkloadLatencySumMetricName = "workload_latency_ms_sum"
+	// WorkloadLatencyCountMetricName - metric from workload histogram.
+	WorkloadLatencyCountMetricName = "workload_latency_ms_count"
+	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
+	WFQFlowsMetricName = "wfq_flows"
+	// WFQRequestsMetricName - weighted fair queuing number of requests gauge.
+	WFQRequestsMetricName = "wfq_requests"
 
 	// PROMETHEUS LABELS.
 
