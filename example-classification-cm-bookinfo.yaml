@@ -4,7 +4,7 @@ metadata:
   name: classification
   namespace: aperture-system
   labels:
-    aperture.tech/validate: "true"
+    fluxninja.com/validate: "true"
 data:
   default.productpage.yaml: |
     selector:

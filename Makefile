@@ -15,7 +15,8 @@ go-mod-tidy:
 
 go-test:
 	@echo Running go tests
-	gotestsum --format=pkgname
+	envtest_path=$(make operator-setup_envtest -s)
+	KUBEBUILDER_ASSETS="${envtest_path}" gotestsum --format=pkgname
 	@cd ./pkg/watchdog && go test -v ./...
 
 go-lint:
@@ -58,3 +59,155 @@ all: install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-b
 	@echo "Done"
 
 .PHONY: install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser
+
+#####################################
+###### OPERATOR section starts ######
+#####################################
+
+# IMAGE_TAG_BASE defines the docker.io namespace and part of the image name for remote images.
+IMAGE_TAG_BASE ?= fluxninja/aperture-operator
+
+# USE_IMAGE_DIGESTS defines if images are resolved via tags or digests
+# You can enable this value if you would like to use SHA Based Digests
+# To enable set flag to true
+USE_IMAGE_DIGESTS ?= false
+ifeq ($(USE_IMAGE_DIGESTS), true)
+	BUNDLE_GEN_FLAGS += --use-image-digests
+endif
+
+# Image URL to use all building/pushing image targets
+IMG ?= aperture-operator:latest
+# ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
+ENVTEST_K8S_VERSION = 1.23
+
+# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
+ifeq (,$(shell go env GOBIN))
+GOBIN=$(shell go env GOPATH)/bin
+else
+GOBIN=$(shell go env GOBIN)
+endif
+
+# Setting SHELL to bash allows bash commands to be executed by recipes.
+# This is a requirement for 'setup-envtest.sh' in the test target.
+# Options are set to exit when a recipe line exits non-zero or a piped command fails.
+SHELL = /usr/bin/env bash -o pipefail
+.SHELLFLAGS = -ec
+
+.PHONY: operator-all
+operator-all: operator-build
+
+##@ General
+
+# The help target prints out all targets with their descriptions organized
+# beneath their categories. The categories are represented by '##@' and the
+# target descriptions by '##'. The awk commands is responsible for reading the
+# entire set of makefiles included in this invocation, looking for lines of the
+# file as xyz: ## something, and then pretty-format the target and help. Then,
+# if there's a line with ##@ something, that gets pretty-printed as a category.
+# More info on the usage of ANSI control characters for terminal formatting:
+# https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
+# More info on the awk command:
+# http://linuxcommand.org/lc3_adv_awk.php
+
+.PHONY: operator-help
+operator-help: ## Display this help.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
+##@ Development
+
+.PHONY: operator-manifests
+operator-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./operator/..." output:crd:artifacts:config=operator/config/crd/bases output:rbac:artifacts:config=operator/config/rbac
+
+.PHONY: operator-generate
+operator-generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./operator/..."
+
+.PHONY: operator-fmt
+operator-fmt: ## Run go fmt against code.
+	go fmt ./operator/...
+
+.PHONY: operator-vet
+operator-vet: ## Run go vet against code.
+	go vet ./operator/...
+
+.PHONY: operator-test
+operator-test: operator-manifests operator-generate operator-fmt operator-vet envtest ## Run tests.
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./operator/... -coverprofile operator/cover.out
+
+.PHONY: operator-setup_envtest
+operator-setup_envtest: envtest ## Run tests.
+	echo "$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)"
+
+##@ Build
+
+.PHONY: operator-build
+operator-build: operator-generate operator-fmt operator-vet ## Build manager binary.
+	go build -o bin/manager operator/main.go
+
+.PHONY: operator-run
+operator-run: operator-manifests operator-generate operator-fmt operator-vet ## Run a controller from your host.
+	go run ./operator/main.go
+
+.PHONY: operator-docker-build
+operator-docker-build: operator-test ## Build docker image with the manager.
+	docker build -t ${IMG} ./ -f operator/Dockerfile
+
+##@ Deployment
+
+ifndef ignore-not-found
+  ignore-not-found = false
+endif
+
+.PHONY: operator-install
+operator-install: operator-manifests kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/config.
+	$(KUSTOMIZE) build operator/config/crd | kubectl apply -f -
+
+.PHONY: operator-uninstall
+operator-uninstall: operator-manifests kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
+	$(KUSTOMIZE) build operator/config/crd | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
+
+.PHONY: operator-deploy
+operator-deploy: operator-manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
+	cd operator/config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build operator/config/default | kubectl create -f -
+
+.PHONY: operator-undeploy
+operator-undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
+	$(KUSTOMIZE) build operator/config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
+
+##@ Build Dependencies
+
+## Location to install dependencies to
+LOCALBIN ?= $(shell pwd)/bin
+$(LOCALBIN):
+	mkdir -p $(LOCALBIN)
+
+## Tool Binaries
+KUSTOMIZE ?= $(LOCALBIN)/kustomize
+CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
+ENVTEST ?= $(LOCALBIN)/setup-envtest
+
+## Tool Versions
+KUSTOMIZE_VERSION ?= v3.8.7
+CONTROLLER_TOOLS_VERSION ?= v0.8.0
+
+KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
+.PHONY: kustomize
+kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary.
+$(KUSTOMIZE): $(LOCALBIN)
+	curl -s $(KUSTOMIZE_INSTALL_SCRIPT) | bash -s -- $(subst v,,$(KUSTOMIZE_VERSION)) $(LOCALBIN)
+
+.PHONY: controller-gen
+controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary.
+$(CONTROLLER_GEN): $(LOCALBIN)
+	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
+
+.PHONY: envtest
+envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
+$(ENVTEST): $(LOCALBIN)
+	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+
+#####################################
+###### OPERATOR section ends ########
+#####################################

@@ -32,8 +32,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
-	"aperture.tech/operators/aperture-operator/controllers"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -72,7 +72,7 @@ func main() {
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "a4362587.aperture.tech",
+		LeaderElectionID:       "a4362587.fluxninja.com",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

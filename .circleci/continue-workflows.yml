@@ -203,7 +203,8 @@ jobs:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
           command: |
-            PKGS=$(go list ./... | grep -v gen) && gotestsum --format=testname --junitfile=unit-tests.xml --rerun-fails=2 --packages="$PKGS" -- -race -coverprofile=coverage.out -coverpkg=./... $PKGS
+            envtest_path=$(make operator-setup_envtest -s)
+            KUBEBUILDER_ASSETS="${envtest_path}" PKGS=$(go list ./... | grep -v gen | grep -v operator/api) && gotestsum --format=testname --junitfile=unit-tests.xml --rerun-fails=2 --packages="$PKGS" -- -race -coverprofile=coverage.out -coverpkg=./... $PKGS
             mkdir -p /tmp/test-results
             mv unit-tests.xml /tmp/test-results
       - codecov/upload
@@ -501,7 +502,7 @@ workflows:
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/demo-app
           docker-context: .
-          dockerfile: examples/demo_app/Dockerfile
+          dockerfile: tools/demo_app/Dockerfile
           use-docker-layer-caching: true
 
   pre-commit:

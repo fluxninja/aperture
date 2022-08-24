@@ -29,7 +29,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 //go:embed agent_config_without_fluxninja_plugin_test.tpl
@@ -113,7 +113,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 					Annotations: nil,
 					OwnerReferences: []metav1.OwnerReference{
 						{
-							APIVersion:         "aperture.tech/v1alpha1",
+							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Aperture",
 							Controller:         pointer.BoolPtr(true),
@@ -188,7 +188,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 					Annotations: nil,
 					OwnerReferences: []metav1.OwnerReference{
 						{
-							APIVersion:         "aperture.tech/v1alpha1",
+							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Aperture",
 							Controller:         pointer.BoolPtr(true),
@@ -263,7 +263,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 					Annotations: nil,
 					OwnerReferences: []metav1.OwnerReference{
 						{
-							APIVersion:         "aperture.tech/v1alpha1",
+							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Aperture",
 							Controller:         pointer.BoolPtr(true),
@@ -347,7 +347,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 					Annotations: nil,
 					OwnerReferences: []metav1.OwnerReference{
 						{
-							APIVersion:         "aperture.tech/v1alpha1",
+							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Aperture",
 							Controller:         pointer.BoolPtr(true),
