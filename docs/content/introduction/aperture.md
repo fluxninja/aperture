@@ -29,7 +29,7 @@ overload scenarios and user abuse.
 Policies configured in Aperture are always-on "Observe, Analyze, Actuate"
 control-loops:
 
-![Aperture Control Loop](../assets/img/FN--Aperture--FluxNinja--Control-Loop.svg) "Aperture Control Loop")
+![Aperture Control Loop](../assets/img/FN--Aperture--FluxNinja--Control-Loop.svg) ("Aperture Control Loop")
 
 - Observe: Aperture has a built-in, on-demand, telemetry collection system that is
   tuned towards control purposes. The telemetry collected by Aperture is very
