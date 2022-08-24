@@ -1,7 +1,7 @@
 ---
 id: aperture
 title: Aperture Open Source
-slug: /Introduction/aperture
+slug: /introduction/aperture
 description: Aperture Introduction page
 keywords:
   - observe
