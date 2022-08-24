@@ -40,7 +40,6 @@ var _ = Describe("Static service discovery", func() {
 
 		It("Correctly reads a config entity", func() {
 			someIPAddress := "1.2.3.4"
-			somePrefix := "vm_id"
 			someUID := "foo"
 			someName := "some_entity"
 			someService := "svc1"
@@ -52,7 +51,6 @@ var _ = Describe("Static service discovery", func() {
 						Entities: []*EntityConfig{
 							{
 								IPAddress: someIPAddress,
-								Prefix:    somePrefix,
 								UID:       someUID,
 								Name:      someName,
 							},
@@ -63,13 +61,13 @@ var _ = Describe("Static service discovery", func() {
 
 			expectedEntity := &common.Entity{
 				IPAddress: someIPAddress,
-				Prefix:    somePrefix,
+				Prefix:    staticEntityTrackerPrefix,
 				UID:       someUID,
 				Services:  []string{someService},
 				Name:      someName,
 			}
 
-			expectedEntityKey := notifiers.Key(fmt.Sprintf("%v.%v", somePrefix, someUID))
+			expectedEntityKey := notifiers.Key(fmt.Sprintf("%v.%v", staticEntityTrackerPrefix, someUID))
 			serializedExpectedEntity, err := json.Marshal(expectedEntity)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -89,13 +87,11 @@ var _ = Describe("Static service discovery", func() {
 						Entities: []*EntityConfig{
 							{
 								IPAddress: "1.2.3.4",
-								Prefix:    "vm_id",
 								UID:       "foo",
 								Name:      "someName",
 							},
 							{
 								IPAddress: "1.2.3.5",
-								Prefix:    "vm_id",
 								UID:       "bar",
 								Name:      "someName",
 							},
@@ -114,7 +110,6 @@ var _ = Describe("Static service discovery", func() {
 
 		It("Writes one entity if it's defined for multiple services", func() {
 			someIPAddress := "1.2.3.4"
-			somePrefix := "vm_id"
 			someUID := "foo"
 			someName := "some_entity"
 			someService := "svc1"
@@ -127,7 +122,6 @@ var _ = Describe("Static service discovery", func() {
 						Entities: []*EntityConfig{
 							{
 								IPAddress: someIPAddress,
-								Prefix:    somePrefix,
 								UID:       someUID,
 								Name:      someName,
 							},
@@ -138,7 +132,6 @@ var _ = Describe("Static service discovery", func() {
 						Entities: []*EntityConfig{
 							{
 								IPAddress: someIPAddress,
-								Prefix:    somePrefix,
 								UID:       someUID,
 								Name:      someName,
 							},
@@ -149,13 +142,13 @@ var _ = Describe("Static service discovery", func() {
 
 			expectedEntity := &common.Entity{
 				IPAddress: someIPAddress,
-				Prefix:    somePrefix,
+				Prefix:    staticEntityTrackerPrefix,
 				UID:       someUID,
 				Services:  []string{someService, someOtherService},
 				Name:      someName,
 			}
 
-			expectedEntityKey := notifiers.Key(fmt.Sprintf("%v.%v", somePrefix, someUID))
+			expectedEntityKey := notifiers.Key(fmt.Sprintf("%v.%v", staticEntityTrackerPrefix, someUID))
 			serializedExpectedEntity, err := json.Marshal(expectedEntity)
 			Expect(err).NotTo(HaveOccurred())
 

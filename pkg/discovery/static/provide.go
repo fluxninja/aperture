@@ -11,25 +11,35 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
-const configKey = common.DiscoveryConfigKey + ".static"
+const (
+	configKey                 = common.DiscoveryConfigKey + ".static"
+	staticEntityTrackerPrefix = "static_entity"
+)
 
 // EntityConfig describes a single entity.
+// swagger:model
 type EntityConfig struct {
-	IPAddress string `json:"ip_address"`
-	Prefix    string `json:"prefix"`
-	UID       string `json:"uid"`
-	Name      string `json:"name"`
+	// IP address of the entity.
+	IPAddress string `json:"ip_address" validate:"required,ip"`
+	// UID of the entity.
+	UID string `json:"uid"`
+	// Name of the entity.
+	Name string `json:"name"`
 }
 
 // ServiceConfig describes a service and its entities.
+// swagger:model
 type ServiceConfig struct {
-	Name     string          `json:"name"`
+	// Name of the service.
+	Name string `json:"name" validate:"required"`
+	// Entities of the service.
 	Entities []*EntityConfig `json:"entities"`
 }
 
 // StaticDiscoveryConfig for pre-determined list of services.
 // swagger:model
 type StaticDiscoveryConfig struct {
+	// Services list.
 	Services []*ServiceConfig `json:"services"`
 }
 
@@ -60,7 +70,7 @@ func InvokeStaticServiceDiscovery(in FxIn) error {
 			return sd.start()
 		},
 		OnStop: func(_ context.Context) error {
-			return nil
+			return sd.stop()
 		},
 	})
 

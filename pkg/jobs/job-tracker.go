@@ -178,6 +178,11 @@ func (gt *groupTracker) results() (*statusv1.GroupStatus, bool) {
 	for name, tracker := range gt.trackers {
 		// regPath := gt.getStatusRegPath(tracker.job.Name())
 		tgs := gt.registry.Get(tracker.job.Name())
+		if tgs == nil {
+			log.Debug().Str("path", tracker.job.Name()).Msg("returned nil status")
+			continue
+		}
+
 		gs.Groups[name] = tgs
 		if tgs.Status.GetError().GetMessage() != "" {
 			healthy = false

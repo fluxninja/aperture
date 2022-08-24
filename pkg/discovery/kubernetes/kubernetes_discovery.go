@@ -24,7 +24,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 
-const podIDTrackerPrefix = "kubernetes_pod_id"
+const podTrackerPrefix = "kubernetes_pod"
 
 type serviceCacheOperation int
 
@@ -203,7 +203,7 @@ func (kc *KubernetesDiscovery) start() {
 
 		operation := func() error {
 			// purge notifiers
-			kc.trackers.Purge(podIDTrackerPrefix)
+			kc.trackers.Purge(podTrackerPrefix)
 
 			// bootstrap mapping
 			endpoints, err := kc.cli.CoreV1().Endpoints(metav1.NamespaceAll).List(kc.ctx, metav1.ListOptions{})
@@ -284,6 +284,7 @@ func (kc *KubernetesDiscovery) start() {
 func (kc *KubernetesDiscovery) stop() {
 	kc.cancel()
 	kc.waitGroup.Wait()
+	kc.trackers.Purge(podTrackerPrefix)
 }
 
 // updatePodInTracker retrieves stored pod data from tracker, enriches it with new info and send the updated version.
@@ -307,7 +308,7 @@ func (kc *KubernetesDiscovery) updatePodInTracker(podInfo podInfo) error {
 	entity.Services = services
 	entity.IPAddress = podInfo.IPAddress
 	entity.UID = podInfo.UID
-	entity.Prefix = "kubernetes_pod_id"
+	entity.Prefix = podTrackerPrefix
 	entity.Name = podInfo.Name
 
 	value, err := json.Marshal(entity)
@@ -452,5 +453,5 @@ func (kc *KubernetesDiscovery) addRemoveFromEndpoints(e *v1.Endpoints, operation
 }
 
 func getPodIDKey(key string) string {
-	return fmt.Sprintf("%s.%s", podIDTrackerPrefix, key)
+	return fmt.Sprintf("%s.%s", podTrackerPrefix, key)
 }
