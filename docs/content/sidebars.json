@@ -12,43 +12,129 @@
     },
     {
       "type": "category",
-      "label": "Overview",
-      "items": [
-        {
-          "type": "doc",
-          "id": "Overview/motivation"
-        }
-      ]
-    },
-    {
-      "type": "category",
       "label": "Setup",
       "items": [
         {
-          "type": "doc",
-          "id": "Setup/supported-platforms"
-        },
-        {
-          "type": "doc",
-          "id": "Setup/requirements"
-        },
-        {
-          "type": "doc",
-          "id": "Setup/aperture-setup"
-        },
-        {
           "type": "category",
-          "label": "Component",
+          "label": "Controller",
           "items": [
             {
               "type": "doc",
-              "id": "Setup/Components/aperture-controller"
+              "id": "Setup/Controller/kubernetes-operator"
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Agent",
+          "items": [
+            {
+              "type": "category",
+              "label": "SupportPlatforms",
+              "items": [
+                {
+                  "type": "category",
+                  "label": "Kubernetes",
+                  "items": [
+                    {
+                      "type": "category",
+                      "label": "InstallwithApertureOperator",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "Setup/Agent/Supported Platforms/Kubernetes/Install with Aperture Operator/daemonset"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "Setup/Agent/Supported Platforms/Kubernetes/Install with Aperture Operator/sidecar"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "category",
+                      "label": "Servicediscovery",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "Setup/Agent/Supported Platforms/Kubernetes/Service Discovery/certs"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Deployment",
+          "items": [
+            {
+              "type": "category",
+              "label": "ServiceMesh",
+              "items": [
+                {
+                  "type": "category",
+                  "label": "Envoy",
+                  "items": [
+                    {
+                      "type": "category",
+                      "label": "Requirements",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "Setup/Deployment/Service Mesh/Envoy/Requirements/accesslogs"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "Setup/Deployment/Service Mesh/Envoy/Requirements/authzapi"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "category",
+                      "label": "ConsulMesh",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "Setup/Deployment/Service Mesh/Envoy/Consul Mesh/consulmesh"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "category",
+                      "label": "Istio",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "Setup/Deployment/Service Mesh/Envoy/Istio/istio"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "SDK",
+          "items": [
+            {
+              "type": "doc",
+              "id": "Setup/SDK/go"
             },
             {
               "type": "doc",
-              "id": "Setup/Components/aperture-agent"
+              "id": "Setup/SDK/java"
             }
           ]
+        },
+        {
+          "type": "doc",
+          "id": "Setup/linktodemovideo"
         }
       ]
     },
@@ -57,50 +143,196 @@
       "label": "Get Started",
       "items": [
         {
-          "type": "doc",
-          "id": "Get Started/grafana-prometheus"
-        }
-      ]
-    },
-    {
-      "type": "category",
-      "label": "Architecture",
-      "items": [
-        {
           "type": "category",
-          "label": "Concepts",
+          "label": "CreatePolicies",
           "items": [
             {
               "type": "doc",
-              "id": "Architecture/Concepts/fluxmeter"
+              "id": "Get Started/Create Policies/Ratelimiterrestrictscripttraffic"
             },
             {
               "type": "doc",
-              "id": "Architecture/Concepts/actuator"
+              "id": "Get Started/Create Policies/LatencyGradientControllerEMA"
             },
             {
               "type": "doc",
-              "id": "Architecture/Concepts/selector"
+              "id": "Get Started/Create Policies/ReplacingPromQLquerywithEMA"
             },
             {
               "type": "doc",
-              "id": "Architecture/Concepts/circuit"
+              "id": "Get Started/Create Policies/Escalation"
+            },
+            {
+              "type": "doc",
+              "id": "Get Started/Create Policies/localplayground"
+            },
+            {
+              "type": "doc",
+              "id": "Get Started/Create Policies/linktodemovideo"
             }
           ]
         },
         {
           "type": "category",
-          "label": "Workflows",
+          "label": "GeneratePolicyWithBlueprints",
           "items": [
             {
               "type": "doc",
-              "id": "Architecture/Workflows/flowcontrol-loop"
+              "id": "Get Started/Generate Policy With Blueprints/ratelimiter"
             },
             {
               "type": "doc",
-              "id": "Architecture/Workflows/telemetry"
+              "id": "Get Started/Generate Policy With Blueprints/latencygradient"
+            },
+            {
+              "type": "doc",
+              "id": "Get Started/Generate Policy With Blueprints/linktodemovideo"
             }
           ]
+        },
+        {
+          "type": "category",
+          "label": "Classifyingflows",
+          "items": [
+            {
+              "type": "doc",
+              "id": "Get Started/Classifying Flows/rego"
+            },
+            {
+              "type": "doc",
+              "id": "Get Started/Classifying Flows/extractor"
+            },
+            {
+              "type": "doc",
+              "id": "Get Started/Classifying Flows/linktodemovideo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Concepts",
+      "items": [
+        {
+          "type": "category",
+          "label": "Controller",
+          "items": [
+            {
+              "type": "category",
+              "label": "circuits",
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "Concepts/Controller/Circuits/runtime"
+                },
+                {
+                  "type": "doc",
+                  "id": "Concepts/Controller/Circuits/promqlruntime"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Agent",
+          "items": [
+            {
+              "type": "category",
+              "label": "Selectors",
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "Concepts/Agent/Agent/Selectors/service"
+                },
+                {
+                  "type": "doc",
+                  "id": "Concepts/Agent/Agent/Selectors/agentgroup"
+                },
+                {
+                  "type": "doc",
+                  "id": "Concepts/Agent/Agent/Selectors/labelmatcher"
+                }
+              ]
+            },
+            {
+              "type": "category",
+              "label": "FluxMeters",
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "Concepts/Agent/Agent/Flux Meters/histograms"
+                }
+              ]
+            },
+            {
+              "type": "category",
+              "label": "Actuators",
+              "items": [
+                {
+                  "type": "category",
+                  "label": "scheduler",
+                  "items": [
+                    {
+                      "type": "doc",
+                      "id": "Concepts/Agent/Acutators/scheduler/priorities"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "Concepts/Agent/Acutators/scheduler/autotokens"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "Concepts/Agent/Acutators/scheduler/timeouts"
+                    }
+                  ]
+                },
+                {
+                  "type": "category",
+                  "label": "ratelimiter",
+                  "items": [
+                    {
+                      "type": "doc",
+                      "id": "Concepts/Agent/Acutators/ratelimiter/distributedcounters"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "Concepts/Agent/Acutators/ratelimiter/overrides"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "Concepts/Agent/Acutators/ratelimiter/lazysyncing"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "category",
+              "label": "FlowClassifiers",
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "Concepts/Agent/Flowclassifiers/rego"
+                },
+                {
+                  "type": "doc",
+                  "id": "Concepts/Agent/Flowclassifiers/extractors"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "FluxNinjaCloud",
+      "items": [
+        {
+          "type": "doc",
+          "id": "FluxNinjaCloud/CloudPlugin"
         }
       ]
     },
@@ -110,29 +342,75 @@
       "items": [
         {
           "type": "category",
-          "label": "Config Spec",
+          "label": "Configuration",
           "items": [
             {
               "type": "doc",
-              "id": "Reference/Config-Spec/aperture-agent"
+              "id": "Reference/Configuration/policies"
             },
             {
               "type": "doc",
-              "id": "Reference/Config-Spec/aperture-controller"
+              "id": "Reference/configuration/flowclassification"
             },
             {
-              "type": "doc",
-              "id": "Reference/Config-Spec/classification"
-            },
-            {
-              "type": "doc",
-              "id": "Reference/Config-Spec/policies"
-            },
-            {
-              "type": "doc",
-              "id": "Reference/Config-Spec/istio"
+              "type": "category",
+              "label": "ProcessConfiguration",
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "Reference/Configuration/ProcessConfiguration/aperturecontroller"
+                },
+                {
+                  "type": "doc",
+                  "id": "Reference/configuration/ProcessConfiguration/apertureagent"
+                }
+              ]
             }
           ]
+        },
+        {
+          "type": "category",
+          "label": "APISpec",
+          "items": [
+            {
+              "type": "doc",
+              "id": "Reference/APISpec/flowcontrolproto"
+            },
+            {
+              "type": "doc",
+              "id": "Reference/APISpec/fluxninjacloudgraphql"
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Metrics",
+          "items": [
+            {
+              "type": "doc",
+              "id": "Reference/Metrics/metrics"
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Glossary",
+          "items": [
+            {
+              "type": "doc",
+              "id": "Reference/Glossary/tokens"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "ReleaseNotes",
+      "items": [
+        {
+          "type": "doc",
+          "id": "ReleaseNotes/ReleaseNotes"
         }
       ]
     },
@@ -143,6 +421,26 @@
         {
           "type": "doc",
           "id": "Developers/cla"
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "FAQ",
+      "items": [
+        {
+          "type": "doc",
+          "id": "FAQ/faq"
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Feedback",
+      "items": [
+        {
+          "type": "doc",
+          "id": "Feedback/feedback"
         }
       ]
     }
