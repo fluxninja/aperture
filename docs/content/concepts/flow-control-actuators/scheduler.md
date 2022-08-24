@@ -1,39 +1,28 @@
 ---
-title: Glossary
-slug: reference/glossary
-description: Glossary
+title: Scheduler
+slug: concepts/flow-control-actuators/scheduler
+description: Scheduler
 keywords:
-  - Glossary
+  - Scheduler
+  - WFQ
+  - Tokens
+  - Priority
+  - Fairness
+  - Queuing
+  - Timeouts
 ---
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Glossary](#glossary)
-  - [Flow](#flow)
-  - [Workload](#workload)
+- [Scheduler](#scheduler)
   - [Tokens](#tokens)
   - [Token bucket](#token-bucket)
 
 <!-- /code_chunk_output -->
 
-# Glossary
-
-A glossary of common terms used in the Aperture system.
-
-## Flow
-
-A flow is the fundamental unit of work from the perspective of an Aperture
-Agent. It could be an API call, a feature, or even a database query. A flow in
-Aperture is similar to
-[OpenTelemetry Span](https://opentelemetry.io/docs/reference/specification/trace/api/#span).
-
-## Workload
-
-Workloads are a group of flows based on common attributes. Workloads are
-expressed by label matcher rules in Aperture. Aperture Agents schedule workloads
-based on their priorities and by estimating their [tokens](#tokens).
+# Scheduler
 
 ## Tokens
 
