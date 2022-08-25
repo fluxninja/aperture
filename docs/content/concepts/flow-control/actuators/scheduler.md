@@ -1,6 +1,6 @@
 ---
 title: Scheduler
-slug: concepts/flow-control-actuators/scheduler
+slug: concepts/flow-control/actuators/scheduler
 description: Scheduler
 keywords:
   - Scheduler
