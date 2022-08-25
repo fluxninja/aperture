@@ -95,7 +95,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		authzResponse := otelcollector.GetAuthzResponse(logRecord.Attributes())
 		p.addAuthzResponseBasedLabels(logRecord.Attributes(), authzResponse)
 
-		log.Error().Msgf("CheckResponse: %v", checkResponse)
+		log.Trace().Msgf("CheckResponse: %v", checkResponse)
 		return p.updateMetrics(logRecord.Attributes(), checkResponse)
 	})
 	return ld, err
@@ -215,6 +215,12 @@ func (p *metricsProcessor) updateMetrics(
 		log.Debug().Str("rawLatency", rawLatency.AsString()).Msg("Could not parse raw latency to float")
 		return nil
 	}
+	statusCode, exists := attributes.Get(otelcollector.StatusCodeLabel)
+	if !exists {
+		log.Debug().Str("label", otelcollector.StatusCodeLabel).Msg("Label does not exist")
+		return nil
+	}
+	statusCodeStr := statusCode.StringVal()
 
 	for _, decision := range checkResponse.LimiterDecisions {
 		labels := map[string]string{
@@ -223,7 +229,7 @@ func (p *metricsProcessor) updateMetrics(
 			metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
 			metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
 		}
-		log.Error().Msgf("labels: %v", labels)
+		log.Trace().Msgf("labels: %v", labels)
 
 		workload := ""
 		if cl := decision.GetConcurrencyLimiter(); cl != nil {
@@ -236,7 +242,7 @@ func (p *metricsProcessor) updateMetrics(
 	}
 
 	for _, fluxMeter := range checkResponse.FluxMeters {
-		p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, latency)
+		p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, latency)
 	}
 
 	return nil
@@ -254,13 +260,25 @@ func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, la
 	return nil
 }
 
-func (p *metricsProcessor) updateMetricsForFluxMeters(fluxMeter *flowcontrolv1.FluxMeter, decisionType flowcontrolv1.DecisionType, latency float64) {
-	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(fluxMeter.GetPolicyName(), fluxMeter.GetFluxMeterName(), fluxMeter.GetPolicyHash(), decisionType)
+func (p *metricsProcessor) updateMetricsForFluxMeters(
+	fluxMeter *flowcontrolv1.FluxMeter,
+	decisionType flowcontrolv1.DecisionType,
+	statusCode string,
+	latency float64,
+) {
+	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(
+		fluxMeter.GetPolicyName(),
+		fluxMeter.GetFluxMeterName(),
+		fluxMeter.GetPolicyHash(),
+		statusCode,
+		decisionType,
+	)
 	if fluxmeterHistogram == nil {
 		log.Debug().Str(metrics.PolicyNameLabel, fluxMeter.GetPolicyName()).
 			Str(metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()).
 			Str(metrics.PolicyHashLabel, fluxMeter.GetPolicyHash()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
+			Str(metrics.StatusCodeLabel, statusCode).
 			Msg("Fluxmeter not found")
 		return
 	}
