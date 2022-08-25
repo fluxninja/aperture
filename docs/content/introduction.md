@@ -9,6 +9,7 @@ keywords:
   - fluxninja
   - microservices
   - cloud
+sidebar_position: 1
 ---
 
 # Introduction

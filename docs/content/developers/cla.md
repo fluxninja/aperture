@@ -3,6 +3,7 @@ title: Contributor License Agreement
 description: Aperture Contributor License Agreement
 keywords:
   - cla
+sidebar_position: 1
 ---
 
 [Contributor License Agreement]{.smallcaps}
