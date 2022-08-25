@@ -63,8 +63,6 @@ type Signal struct {
 	Looped bool
 }
 
-type signalToReading map[Signal]reading.Reading
-
 // PortToSignal is a map from port name to a slice of Signals.
 type PortToSignal map[string][]Signal
 
@@ -81,6 +79,8 @@ type CompiledComponentAndPorts struct {
 	OutPortToSignalsMap PortToSignal
 	CompiledComponent   CompiledComponent
 }
+
+type signalToReading map[Signal]reading.Reading
 
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
 type Circuit struct {
