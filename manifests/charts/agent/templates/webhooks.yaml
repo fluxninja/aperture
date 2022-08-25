@@ -4,7 +4,7 @@ metadata:
   name: agent-cm-validator
   namespace: {{ template "common.names.namespace" . }}
 webhooks:
-  - name: cm-validator.aperture.tech
+  - name: cm-validator.fluxninja.com
     clientConfig:
       service:
         name: agent-webhooks
@@ -17,7 +17,7 @@ webhooks:
         "kubernetes.io/metadata.name": {{ template "common.names.namespace" . }}
     objectSelector:
       matchLabels:
-        "aperture.tech/validate": "true"
+        "fluxninja.com/validate": "true"
     rules:
       - operations: ["CREATE", "UPDATE"]
         apiGroups: [""]

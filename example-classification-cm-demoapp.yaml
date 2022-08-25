@@ -4,7 +4,7 @@ metadata:
   name: classification
   namespace: aperture-system
   labels:
-    aperture.tech/validate: "true"
+    fluxninja.com/validate: "true"
 data:
   default.classification.yaml: |
     # Example of Flow Classification rules file, showcasing using "extractors" and raw rego.

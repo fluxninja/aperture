@@ -116,6 +116,11 @@ jobs:
           Workspace root path that is either an absolute path or a path relative
           to the working directory. Defaults to '.' (the working directory)
         default: .
+      push-to-dockerhub:
+        type: boolean
+        description:
+          Boolean for whether or not to push images to DockerHub
+        default: true
     executor: <<parameters.executor>>
     environment:
       DOCKER_BUILDKIT: 1
@@ -154,6 +159,14 @@ jobs:
           image: <<parameters.gcr-image>>
           tag: <<parameters.tag>>
       - when:
+          condition: <<parameters.push-to-dockerhub>>
+          steps:
+            - run:
+                name: Push images to DockerHub
+                command: |
+                  docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+                  docker push <<parameters.dockerhub-image>>:<<parameters.tag>>
+      - when:
           condition:
             equal: [main, << pipeline.git.branch >>]
           steps:
@@ -161,6 +174,14 @@ jobs:
                 image: <<parameters.gcr-image>>
                 source-tag: <<parameters.tag>>
                 target-tag: <<parameters.target-tag>>
+            - when:
+                condition: <<parameters.push-to-dockerhub>>
+                steps:
+                  - run:
+                      name: Push images to DockerHub
+                      command: |
+                        docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+                        docker push <<parameters.dockerhub-image>>:<<parameters.target-tag>>
 
   go-test-coverage:
     parameters:
@@ -203,43 +224,14 @@ jobs:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
           command: |
-            PKGS=$(go list ./... | grep -v gen) && gotestsum --format=testname --junitfile=unit-tests.xml --rerun-fails=2 --packages="$PKGS" -- -race -coverprofile=coverage.out -coverpkg=./... $PKGS
+            envtest_path=$(make operator-setup_envtest -s)
+            export KUBEBUILDER_ASSETS="${envtest_path}"
+            PKGS=$(go list ./... | grep -v gen | grep -v operator/api) && gotestsum --format=testname --junitfile=unit-tests.xml --rerun-fails=2 --packages="$PKGS" -- -race -coverprofile=coverage.out -coverpkg=./... $PKGS
             mkdir -p /tmp/test-results
             mv unit-tests.xml /tmp/test-results
       - codecov/upload
       - store_test_results:
           path: /tmp/test-results
-      - run:
-          name: Show peak memory usage in bytes
-          command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
-          when: always
-
-  go-test-coverage-operator:
-    parameters:
-      work_dir:
-        type: string
-        description: working directory
-    executor: go-cimg-executor
-    resource_class: large
-    steps:
-      - checkout
-      - when:
-          condition:
-            or:
-              - << pipeline.parameters.updated-aperture-operator >>
-          steps:
-            - run:
-                name: set GOMAXPROCS to 4
-                command: |
-                  echo 'export GOMAXPROCS=4' >> $BASH_ENV
-      - run:
-          name: Run tests and coverage
-          working_directory: << parameters.work_dir >>
-          command: |
-            envtest_path=$(make setup_envtest -s)
-            KUBEBUILDER_ASSETS="${envtest_path}" gotestsum --format=testname --junitfile unit-tests.xml -- -race -coverprofile=coverage.out -coverpkg=./... $(go list ./... | grep -v api)
-            mkdir -p /tmp/test-results
-            mv unit-tests.xml /tmp/test-results
       - run:
           name: Show peak memory usage in bytes
           command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
@@ -252,7 +244,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-            - "75:2f:7a:fe:d3:a1:5e:81:a8:d2:cc:3a:21:59:b7:2c"  # fluxninja/aperture-mixin R/O
+            - "75:2f:7a:fe:d3:a1:5e:81:a8:d2:cc:3a:21:59:b7:2c"  # fluxninja/aperture-libsonnet R/O
       - checkout
       - asdf_install:
           cache_name: pre-commit
@@ -485,12 +477,9 @@ workflows:
           dockerhub-image: fluxninja/aperture-operator
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-operator
-          docker-context: ./operator
+          docker-context: .
           dockerfile: ./operator/Dockerfile
           use-docker-layer-caching: true
-      - go-test-coverage-operator:
-          name: go-test-coverage-aperture-operator
-          work_dir: ./operator
 
   demo-app:
     when: << pipeline.parameters.updated-demo-app >>
@@ -501,8 +490,9 @@ workflows:
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/demo-app
           docker-context: .
-          dockerfile: examples/demo_app/Dockerfile
+          dockerfile: tools/demo_app/Dockerfile
           use-docker-layer-caching: true
+          push-to-dockerhub: false
 
   pre-commit:
     jobs:

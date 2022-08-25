@@ -36,7 +36,7 @@ import (
 
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 

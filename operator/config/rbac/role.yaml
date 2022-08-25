@@ -36,32 +36,6 @@ rules:
   - update
   - watch
 - apiGroups:
-  - aperture.tech
-  resources:
-  - apertures
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - aperture.tech
-  resources:
-  - apertures/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - aperture.tech
-  resources:
-  - apertures/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
   - apps
   resources:
   - daemonsets
@@ -237,6 +211,32 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - fluxninja.com
+  resources:
+  - apertures
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - fluxninja.com
+  resources:
+  - apertures/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - fluxninja.com
+  resources:
+  - apertures/status
+  verbs:
+  - get
+  - patch
+  - update
 - apiGroups:
   - policy
   resources:

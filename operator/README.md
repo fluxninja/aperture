@@ -12,7 +12,7 @@ The operator has below custome resources:
 
 - Aperture
 
-all custom resources use the api group `aperture.tech` and version `v1alpha1`.
+all custom resources use the api group `fluxninja.com` and version `v1alpha1`.
 
 ## Deploying the operator using `make`
 
