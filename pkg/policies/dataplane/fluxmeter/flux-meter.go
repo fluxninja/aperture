@@ -2,7 +2,6 @@ package fluxmeter
 
 import (
 	"context"
-	"fmt"
 	"path"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -202,11 +201,9 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 				errMulti = multierr.Append(errMulti, err)
 			}
 			// Delete this specific fluxmeter from prometheus
-			deleted := histogramVec.Delete(metricLabels)
-			if !deleted {
-				err = fmt.Errorf("failed to delete %s fluxmeter from its metric vector", fluxMeter.GetFluxMeterName())
-				errMulti = multierr.Append(errMulti, err)
-			}
+			deleted := histogramVec.DeletePartialMatch(metricLabels)
+			log.Info().Msgf("Deleted %d metrics for fluxmeter: %+v in policy %s", deleted, fluxMeter.GetFluxMeterName(), fluxMeter.GetPolicyName())
+
 			return errMulti
 		},
 	})
