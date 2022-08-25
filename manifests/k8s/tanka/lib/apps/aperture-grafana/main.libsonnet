@@ -10,10 +10,10 @@ local dataSource = grafanaOperator.integreatly.v1alpha1.grafanaDataSource;
 local dataSources =
   {
     cloudPrometheus:
-      dataSource.new('agent-prometheus') +
-      dataSource.spec.withName('agent-prometheus') +
+      dataSource.new('aperture-prometheus') +
+      dataSource.spec.withName('aperture-prometheus') +
       dataSource.spec.withDatasources({
-        name: 'agent-prometheus',
+        name: 'aperture-prometheus',
         type: 'prometheus',
         access: 'proxy',
         url: 'http://aperture-prometheus-server',
@@ -45,7 +45,7 @@ local dashboards =
     }).dashboard, indent='  ')) +
     dashboard.spec.withDatasources({
       inputName: 'DS_AGENT-PROMETHEUS',
-      datasourceName: 'agent-prometheus',
+      datasourceName: 'aperture-prometheus',
     }),
     dashboard.new('k8s-resources') +
     dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +

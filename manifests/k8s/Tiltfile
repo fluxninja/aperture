@@ -53,7 +53,7 @@ DEP_TREE = {
                     "resource_deps": ["aperture-grafana-operator-bootstrap"],
                     "extra_objects": [
                         "aperture-grafana:grafana",
-                        "agent-prometheus:grafanadatasource"
+                        "aperture-prometheus:grafanadatasource"
                     ]
                 },
                 {
