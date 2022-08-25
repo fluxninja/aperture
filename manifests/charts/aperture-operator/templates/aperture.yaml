@@ -163,6 +163,21 @@ spec:
     {{- if .Values.aperture.agent.initContainers }}
     initContainers: {{ .Values.aperture.agent.initContainers | toYaml | nindent 6 }}
     {{- end }}
+    {{- if .Values.aperture.agent.batchPrerollup }}
+    batch_prerollup:
+      timeout: {{ .Values.aperture.agent.batchPrerollup.timeout }}
+      send_batch_size: {{ .Values.aperture.agent.batchPrerollup.sendBatchSize }}
+    {{- end }}
+    {{- if .Values.aperture.agent.batchPostrollup }}
+    batch_postrollup:
+      timeout: {{ .Values.aperture.agent.batchPostrollup.timeout }}
+      send_batch_size: {{ .Values.aperture.agent.batchPostrollup.sendBatchSize }}
+    {{- end }}
+    {{- if .Values.aperture.agent.batchMetricsFast }}
+    batch_metrics_size:
+      timeout: {{ .Values.aperture.agent.batchMetricsFast.timeout }}
+      send_batch_size: {{ .Values.aperture.agent.batchMetricsFast.sendBatchSize }}
+    {{- end }}
   controller:
     {{- if or .Values.aperture.controller.image.registry .Values.aperture.controller.image.repository .Values.aperture.controller.image.tag .Values.aperture.controller.image.pullPolicy .Values.aperture.controller.image.pullSecrets }}
     image: {{ .Values.aperture.controller.image | toYaml | nindent 6 }}

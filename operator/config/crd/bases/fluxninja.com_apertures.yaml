@@ -918,6 +918,63 @@ spec:
                     items:
                       type: string
                     type: array
+                  batchMetricsFast:
+                    default:
+                      sendBatchSize: 1000
+                      timeout: 1000000000
+                    description: Batch metrics/fast processor configuration.
+                    properties:
+                      sendBatchSize:
+                        default: 10000
+                        description: SendBatchSize is the size of a batch which after
+                          hit, will trigger it to be sent.
+                        format: int32
+                        type: integer
+                      timeout:
+                        default: 1000000000
+                        description: Timeout sets the time after which a batch will
+                          be sent regardless of size.
+                        format: int64
+                        type: integer
+                    type: object
+                  batchPostrollup:
+                    default:
+                      sendBatchSize: 10000
+                      timeout: 1000000000
+                    description: Batch postrollup processor configuration.
+                    properties:
+                      sendBatchSize:
+                        default: 10000
+                        description: SendBatchSize is the size of a batch which after
+                          hit, will trigger it to be sent.
+                        format: int32
+                        type: integer
+                      timeout:
+                        default: 1000000000
+                        description: Timeout sets the time after which a batch will
+                          be sent regardless of size.
+                        format: int64
+                        type: integer
+                    type: object
+                  batchPrerollup:
+                    default:
+                      sendBatchSize: 10000
+                      timeout: 1000000000
+                    description: Batch prerollup processor configuration.
+                    properties:
+                      sendBatchSize:
+                        default: 10000
+                        description: SendBatchSize is the size of a batch which after
+                          hit, will trigger it to be sent.
+                        format: int32
+                        type: integer
+                      timeout:
+                        default: 1000000000
+                        description: Timeout sets the time after which a batch will
+                          be sent regardless of size.
+                        format: int64
+                        type: integer
+                    type: object
                   command:
                     description: Override default container command
                     items:

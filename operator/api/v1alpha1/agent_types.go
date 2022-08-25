@@ -16,6 +16,8 @@ limitations under the License.
 
 package v1alpha1
 
+import "time"
+
 // AgentSpec defines the desired state for the Agent.
 type AgentSpec struct {
 	// CommonSpec defines the common state between Agent and Controller
@@ -43,4 +45,31 @@ type AgentSpec struct {
 	// AgentGroup name for the Agent
 	//+kubebuilder:validation:Optional
 	AgentGroup string `json:"agentGroup"`
+
+	// Batch prerollup processor configuration.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={timeout:1000000000,sendBatchSize:10000}
+	BatchPrerollup Batch `json:"batchPrerollup"`
+
+	// Batch postrollup processor configuration.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={timeout:1000000000,sendBatchSize:10000}
+	BatchPostrollup Batch `json:"batchPostrollup"`
+
+	// Batch metrics/fast processor configuration.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={timeout:1000000000,sendBatchSize:1000}
+	BatchMetricsFast Batch `json:"batchMetricsFast"`
+}
+
+// Batch defines configuration for OTEL batch processor.
+type Batch struct {
+	// Timeout sets the time after which a batch will be sent regardless of size.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=1000000000
+	Timeout time.Duration `json:"timeout"`
+	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=10000
+	SendBatchSize uint32 `json:"sendBatchSize"`
 }

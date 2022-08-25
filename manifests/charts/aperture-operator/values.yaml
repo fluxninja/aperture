@@ -546,6 +546,24 @@ aperture:
     ##    command: ['sh', '-c', 'echo "hello world"']
     ##
     initContainers: []
+    ## @param aperture.agent.batchPrerollup.timeout Timeout for batch prerollup processor.
+    ## @param aperture.agent.batchPrerollup.sendBatchSize Size of a batch in prerollup processor which after hit, will trigger it to be sent.
+    ##
+    batchPrerollup:
+      timeout: 1s
+      sendBatchSize: 10000
+    ## @param aperture.agent.batchPostrollup.timeout Timeout for batch postrollup processor.
+    ## @param aperture.agent.batchPostrollup.sendBatchSize Size of a batch in postrollup processor which after hit, will trigger it to be sent.
+    ##
+    batchPostrollup:
+      timeout: 1s
+      sendBatchSize: 10000
+    ## @param aperture.agent.batchMetricsFast.timeout Timeout for batch metrics/fast processor.
+    ## @param aperture.agent.batchMetricsFast.sendBatchSize Size of a batch in metrics/fast processor which after hit, will trigger it to be sent.
+    ##
+    batchMetricsFast:
+      timeout: 1s
+      sendBatchSize: 1000
   ## Controller Related Parameters
   ##
   controller:
