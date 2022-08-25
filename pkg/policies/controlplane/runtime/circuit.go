@@ -75,8 +75,8 @@ type CompiledComponent struct {
 	Name      string
 }
 
-// ComponentWithPorts consists of a CompiledComponent and its In and Out ports.
-type ComponentWithPorts struct {
+// CompiledComponentAndPorts consists of a CompiledComponent and its In and Out ports.
+type CompiledComponentAndPorts struct {
 	InPortToSignalsMap  PortToSignal
 	OutPortToSignalsMap PortToSignal
 	CompiledComponent   CompiledComponent
@@ -91,7 +91,7 @@ type Circuit struct {
 	// Looped signals persistence across ticks
 	loopedSignals signalToReading
 	// Components
-	components []ComponentWithPorts
+	components []CompiledComponentAndPorts
 	// Tick end callbacks
 	tickEndCallbacks []TickEndCallback
 }
@@ -100,15 +100,15 @@ type Circuit struct {
 var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
-func NewCircuitAndOptions(policyReadAPI iface.PolicyRead, compWithPortsList []ComponentWithPorts) (*Circuit, fx.Option) {
+func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts, policyReadAPI iface.PolicyRead) (*Circuit, fx.Option) {
 	circuit := &Circuit{
 		PolicyRead:    policyReadAPI,
 		loopedSignals: make(signalToReading),
-		components:    make([]ComponentWithPorts, 0),
+		components:    make([]CompiledComponentAndPorts, 0),
 	}
 
 	// setComponents sets the Components for a Circuit
-	setComponents := func(components []ComponentWithPorts) error {
+	setComponents := func(components []CompiledComponentAndPorts) error {
 		if len(circuit.components) > 0 {
 			return errors.New("circuit already has components")
 		}

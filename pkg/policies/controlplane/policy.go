@@ -58,11 +58,35 @@ type metricSub struct {
 func NewPolicyOptions(
 	wrapperMessage *configv1.PolicyWrapper,
 ) (fx.Option, error) {
+	// List of options for the policy.
+	policyOptions := []fx.Option{}
+	policy, compWithPortsList, partialPolicyOption, err := CompilePolicy(wrapperMessage)
+	if err != nil {
+		return nil, err
+	}
+	policyOptions = append(policyOptions, partialPolicyOption)
+	policyOptions = append(policyOptions, fx.Supply(
+		fx.Annotate(policy, fx.As(new(iface.PolicyRead))),
+	))
+
+	// Create circuit
+	circuit, circuitOption := runtime.NewCircuitAndOptions(compWithPortsList, policy)
+	policyOptions = append(policyOptions, circuitOption)
+
+	policyOptions = append(policyOptions, ComponentFactoryModuleForPolicyApp(circuit))
+
+	policyOptions = append(policyOptions, fx.Supply(fx.Annotate(circuit, fx.As(new(runtime.CircuitAPI)))))
+	policy.circuit = circuit
+
+	return fx.Options(policyOptions...), nil
+}
+
+// CompilePolicy takes policyProto and returns a compiled policy.
+func CompilePolicy(wrapperMessage *configv1.PolicyWrapper) (*Policy, []runtime.CompiledComponentAndPorts, fx.Option, error) {
 	if wrapperMessage == nil {
-		return nil, fmt.Errorf("nil policy wrapper message")
+		return nil, nil, nil, fmt.Errorf("nil policy wrapper message")
 	}
 
-	// TODO compiler: The code below up till the next marker moves into the compiler.
 	policy := &Policy{
 		PolicyBase: wrapperMessage,
 	}
@@ -71,7 +95,7 @@ func NewPolicyOptions(
 	// Get Policy Proto
 	policyProto := wrapperMessage.GetPolicy()
 	if policyProto == nil {
-		return nil, fmt.Errorf("nil policy proto")
+		return nil, nil, nil, fmt.Errorf("nil policy proto")
 	}
 	// Read evaluation interval
 	policy.evaluationInterval = policyProto.EvaluationInterval.AsDuration()
@@ -81,35 +105,22 @@ func NewPolicyOptions(
 	for name, fluxMeterProto := range policyProto.FluxMeters {
 		fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(name, fluxMeterProto, policy, policy)
 		if err != nil {
-			return nil, err
+			return nil, nil, nil, err
 		}
 		fluxMeterOptions = append(fluxMeterOptions, fluxMeterOption)
 	}
-	// TODO compiler: code end marker.
 
-	// TODO compiler: Split NewCircuitAndOptions into two functions:
-	// CompileCircuit(circuitProto *policylangv1.Circuit) (*compiler.Circuit, fx.Option, error)
-	// runtime.NewCircuitAndOptions(*compiler.Circuit, iface.PolicyReadAPI) (runtime.Circuit, fx.Option, error)
-	// Initialize circuit
-	circuit, circuitOptions, err := NewCircuitAndOptions(policyProto.Circuit, policy)
+	compWithPortsList, partialCircuitOption, err := CompileCircuit(policyProto.Circuit, policy)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
-	policy.circuit = circuit
 
-	return fx.Options(
-		fx.Supply(
-			fx.Annotate(policy, fx.As(new(iface.PolicyRead))),
-		),
-		circuitOptions,
+	return policy, compWithPortsList, fx.Options(
 		fx.Options(fluxMeterOptions...),
+		partialCircuitOption,
 		fx.Invoke(policy.setup),
 	), nil
 }
-
-// TODO compiler: CompilePolicy takes policyProto and returns a compiled policy.
-/*func CompilePolicy(wrapperMessage *configv1.PolicyWrapper) (*Policy, CompiledCircuit, fx.Option, error) {
-}*/
 
 // GetEvaluationInterval returns the ID of the policy.
 func (policy *Policy) GetEvaluationInterval() time.Duration {
