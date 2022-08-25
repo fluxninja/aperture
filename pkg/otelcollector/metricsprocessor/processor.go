@@ -95,7 +95,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		authzResponse := otelcollector.GetAuthzResponse(logRecord.Attributes())
 		p.addAuthzResponseBasedLabels(logRecord.Attributes(), authzResponse)
 
-		log.Error().Msgf("CheckResponse: %v", checkResponse)
+		log.Trace().Msgf("CheckResponse: %v", checkResponse)
 		return p.updateMetrics(logRecord.Attributes(), checkResponse)
 	})
 	return ld, err
@@ -229,7 +229,7 @@ func (p *metricsProcessor) updateMetrics(
 			metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
 			metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
 		}
-		log.Error().Msgf("labels: %v", labels)
+		log.Trace().Msgf("labels: %v", labels)
 
 		workload := ""
 		if cl := decision.GetConcurrencyLimiter(); cl != nil {
