@@ -68,12 +68,18 @@ type signalToReading map[Signal]reading.Reading
 // PortToSignal is a map from port name to a slice of Signals.
 type PortToSignal map[string][]Signal
 
-// ComponentWithPorts is a Component along with In and Out ports.
+// CompiledComponent consists of a Component, its MapStruct and Name.
+type CompiledComponent struct {
+	Component Component
+	MapStruct map[string]any
+	Name      string
+}
+
+// ComponentWithPorts consists of a CompiledComponent and its In and Out ports.
 type ComponentWithPorts struct {
-	Component           Component
 	InPortToSignalsMap  PortToSignal
 	OutPortToSignalsMap PortToSignal
-	ComponentName       string
+	CompiledComponent   CompiledComponent
 }
 
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
@@ -240,9 +246,9 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				componentInPortReadings[port] = readingList
 			}
 			// log the component being executed
-			log.Trace().Str("component", cmp.ComponentName).Int("tick", tickInfo.Tick).Interface("in_ports", componentInPortReadings).Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).Msg("Executing component")
+			log.Trace().Str("component", cmp.CompiledComponent.Name).Int("tick", tickInfo.Tick).Interface("in_ports", componentInPortReadings).Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).Msg("Executing component")
 			// If control reaches this point, the component is ready to execute
-			componentOutPortReadings, err := cmp.Component.Execute(
+			componentOutPortReadings, err := cmp.CompiledComponent.Component.Execute(
 				/* pass signal */
 				componentInPortReadings,
 				/* pass tick info */

@@ -25,12 +25,16 @@ func NewCircuitAndOptions(
 	circuitProto []*policylangv1.Component,
 	policyReadAPI iface.PolicyRead,
 ) (*runtime.Circuit, fx.Option, error) {
+	// List of runtime.CompiledComponent. The index of runtime.CompiledComponents in compList is referred as graphNodeIndex.
+	var compList []runtime.CompiledComponent
+	// Map from signal name to a list of graphNodeIndex(es) which accept the signal as input.
 	inSignals := make(map[string][]int)
+	// Map from signal name to the graphNodeIndex which emits the signal as output.
 	outSignals := make(map[string]int)
 
+	// List of Fx options for the circuit.
 	circuitOptions := []fx.Option{}
 
-	var compList []compiledComponent
 	for compIndex, componentProto := range circuitProto {
 		// Create component
 		compiledComp, compiledSubComps, compOption, compErr := NewComponentAndOptions(componentProto, compIndex, policyReadAPI)
@@ -40,7 +44,7 @@ func NewCircuitAndOptions(
 		circuitOptions = append(circuitOptions, compOption)
 
 		// Add Component to compList
-		if compiledComp.component != nil {
+		if compiledComp.Component != nil {
 			compList = append(compList, compiledComp)
 		}
 
@@ -54,20 +58,18 @@ func NewCircuitAndOptions(
 	// Second pass to initialize port maps for each component
 	compWithPortsList := make([]runtime.ComponentWithPorts, len(compList))
 	for graphNodeIndex, compiledComp := range compList {
-		comp := compiledComp.component
-		mapStruct := compiledComp.mapStruct
+		mapStruct := compiledComp.MapStruct
 		log.Trace().Msgf("mapStruct: %+v", mapStruct)
 
 		compWithPorts := runtime.ComponentWithPorts{
-			Component:           comp,
 			InPortToSignalsMap:  make(runtime.PortToSignal),
 			OutPortToSignalsMap: make(runtime.PortToSignal),
-			ComponentName:       compiledComp.name,
+			CompiledComponent:   compiledComp,
 		}
 
 		// Read in_ports in mapStruct
 		inPorts, ok := mapStruct["in_ports"]
-		log.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", compiledComp.name).Msg("mapStruct[in_ports]")
+		log.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", compiledComp.Name).Msg("mapStruct[in_ports]")
 		if ok {
 			// Convert in_ports to map[string]interface{}
 			inPortsMap, castOk := inPorts.(map[string]interface{})
@@ -82,7 +84,7 @@ func NewCircuitAndOptions(
 		}
 		// Read out_ports in mapStruct
 		outPorts, ok := mapStruct["out_ports"]
-		log.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", compiledComp.name).Msg("mapStruct[out_ports]")
+		log.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", compiledComp.Name).Msg("mapStruct[out_ports]")
 		if ok {
 			// Convert out_ports to map[string]interface{}
 			outPortsMap, castOk := outPorts.(map[string]interface{})

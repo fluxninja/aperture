@@ -121,10 +121,7 @@ func (factory *policyFactory) ProvideControllerPolicyFxOptions(
 		return fx.Options(), err
 	}
 	policyFxOptions, err := NewPolicyOptions(
-		factory.circuitJobGroup,
-		factory.etcdClient,
 		&wrapperMessage,
-		wrapperMessage.Policy,
 	)
 	if err != nil {
 		s := status.NewStatus(nil, err)
@@ -136,5 +133,11 @@ func (factory *policyFactory) ProvideControllerPolicyFxOptions(
 		log.Warn().Err(err).Msg("Failed to create policy options")
 		return fx.Options(), err
 	}
-	return policyFxOptions, nil
+	return fx.Options(
+		policyFxOptions,
+		fx.Supply(
+			factory.circuitJobGroup,
+			factory.etcdClient,
+		),
+	), nil
 }

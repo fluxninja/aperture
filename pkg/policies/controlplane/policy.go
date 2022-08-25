@@ -12,9 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/fluxmeter"
@@ -58,18 +56,23 @@ type metricSub struct {
 
 // NewPolicyOptions creates a new Policy object and returns its Fx options for the per Policy App.
 func NewPolicyOptions(
-	circuitJobGroup *jobs.JobGroup,
-	etcdClient *etcdclient.Client,
 	wrapperMessage *configv1.PolicyWrapper,
-	policyProto *policylangv1.Policy,
 ) (fx.Option, error) {
-	policy := &Policy{
-		PolicyBase:      wrapperMessage,
-		circuitJobGroup: circuitJobGroup,
+	if wrapperMessage == nil {
+		return nil, fmt.Errorf("nil policy wrapper message")
 	}
 
+	// TODO compiler: The code below up till the next marker moves into the compiler.
+	policy := &Policy{
+		PolicyBase: wrapperMessage,
+	}
 	policy.metricSubMap = make(map[string]*metricSub)
 
+	// Get Policy Proto
+	policyProto := wrapperMessage.GetPolicy()
+	if policyProto == nil {
+		return nil, fmt.Errorf("nil policy proto")
+	}
 	// Read evaluation interval
 	policy.evaluationInterval = policyProto.EvaluationInterval.AsDuration()
 
@@ -82,7 +85,11 @@ func NewPolicyOptions(
 		}
 		fluxMeterOptions = append(fluxMeterOptions, fluxMeterOption)
 	}
+	// TODO compiler: code end marker.
 
+	// TODO compiler: Split NewCircuitAndOptions into two functions:
+	// CompileCircuit(circuitProto *policylangv1.Circuit) (*compiler.Circuit, fx.Option, error)
+	// runtime.NewCircuitAndOptions(*compiler.Circuit, iface.PolicyReadAPI) (runtime.Circuit, fx.Option, error)
 	// Initialize circuit
 	circuit, circuitOptions, err := NewCircuitAndOptions(policyProto.Circuit, policy)
 	if err != nil {
@@ -93,7 +100,6 @@ func NewPolicyOptions(
 	return fx.Options(
 		fx.Supply(
 			fx.Annotate(policy, fx.As(new(iface.PolicyRead))),
-			etcdClient,
 		),
 		circuitOptions,
 		fx.Options(fluxMeterOptions...),
@@ -101,14 +107,23 @@ func NewPolicyOptions(
 	), nil
 }
 
+// TODO compiler: CompilePolicy takes policyProto and returns a compiled policy.
+/*func CompilePolicy(wrapperMessage *configv1.PolicyWrapper) (*Policy, CompiledCircuit, fx.Option, error) {
+}*/
+
 // GetEvaluationInterval returns the ID of the policy.
 func (policy *Policy) GetEvaluationInterval() time.Duration {
 	return policy.evaluationInterval
 }
 
-func (policy *Policy) setup(lifecycle fx.Lifecycle) error {
+func (policy *Policy) setup(
+	lifecycle fx.Lifecycle,
+	circuitJobGroup *jobs.JobGroup,
+) error {
 	// Job name
 	policy.jobName = fmt.Sprintf("Policy-%s", policy.GetPolicyName())
+	// Job group
+	policy.circuitJobGroup = circuitJobGroup
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
