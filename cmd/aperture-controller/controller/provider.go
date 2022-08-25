@@ -2,18 +2,15 @@ package controller
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"path"
 
-	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"github.com/ghodss/yaml"
 	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -183,27 +180,6 @@ func setPoliciesPathFlag(fs *pflag.FlagSet) error {
 	return nil
 }
 
-// HashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
-func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*configv1.PolicyWrapper, error) {
-	dat, marshalErr := yaml.Marshal(policyMessage)
-	if marshalErr != nil {
-		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
-		return nil, marshalErr
-	}
-	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
-	if hashErr != nil {
-		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))
-		return nil, hashErr
-	}
-	hash := base64.StdEncoding.EncodeToString(hashBytes[:])
-
-	return &configv1.PolicyWrapper{
-		Policy:     policyMessage,
-		PolicyName: policyName,
-		PolicyHash: hash,
-	}, nil
-}
-
 // Sync policies config directory with etcd.
 func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry *status.Registry) {
 	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
@@ -221,7 +197,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 				return key, nil, unmarshalErr
 			}
 
-			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
+			wrapper, wrapErr := controlplane.HashAndPolicyWrap(policyMessage, string(key))
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
 				return key, nil, wrapErr

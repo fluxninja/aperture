@@ -2,16 +2,20 @@ package controlplane
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"time"
 
+	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/promql/parser"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"gopkg.in/yaml.v2"
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -20,13 +24,13 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// PolicyModule returns Fx options of Policy for the Main App.
-func PolicyModule() fx.Option {
+// policyModule returns Fx options of Policy for the Main App.
+func policyModule() fx.Option {
 	// Circuit module options
-	componentFactoryOptions := ComponentFactoryModule()
+	componentFactoryOptions := componentFactoryModule()
 
 	return fx.Options(
-		CircuitFactoryModule(),
+		circuitFactoryModule(),
 		componentFactoryOptions,
 	)
 }
@@ -54,13 +58,13 @@ type metricSub struct {
 	labelMatchers []*labels.Matcher
 }
 
-// NewPolicyOptions creates a new Policy object and returns its Fx options for the per Policy App.
-func NewPolicyOptions(
+// newPolicyOptions creates a new Policy object and returns its Fx options for the per Policy App.
+func newPolicyOptions(
 	wrapperMessage *configv1.PolicyWrapper,
 ) (fx.Option, error) {
 	// List of options for the policy.
 	policyOptions := []fx.Option{}
-	policy, compWithPortsList, partialPolicyOption, err := CompilePolicy(wrapperMessage)
+	policy, compWithPortsList, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +77,7 @@ func NewPolicyOptions(
 	circuit, circuitOption := runtime.NewCircuitAndOptions(compWithPortsList, policy)
 	policyOptions = append(policyOptions, circuitOption)
 
-	policyOptions = append(policyOptions, ComponentFactoryModuleForPolicyApp(circuit))
+	policyOptions = append(policyOptions, componentFactoryModuleForPolicyApp(circuit))
 
 	policyOptions = append(policyOptions, fx.Supply(fx.Annotate(circuit, fx.As(new(runtime.CircuitAPI)))))
 	policy.circuit = circuit
@@ -81,8 +85,21 @@ func NewPolicyOptions(
 	return fx.Options(policyOptions...), nil
 }
 
-// CompilePolicy takes policyProto and returns a compiled policy.
-func CompilePolicy(wrapperMessage *configv1.PolicyWrapper) (*Policy, []runtime.CompiledComponentAndPorts, fx.Option, error) {
+// CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
+func CompilePolicy(policyMessage *policylangv1.Policy) ([]runtime.CompiledComponentAndPorts, error) {
+	wrapperMessage, err := HashAndPolicyWrap(policyMessage, "DoesNotMatter")
+	if err != nil {
+		return nil, err
+	}
+	_, compWithPortsList, _, err := compilePolicyWrapper(wrapperMessage)
+	if err != nil {
+		return nil, err
+	}
+	return compWithPortsList, nil
+}
+
+// compilePolicyWrapper takes policyProto and returns a compiled policy.
+func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []runtime.CompiledComponentAndPorts, fx.Option, error) {
 	if wrapperMessage == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy wrapper message")
 	}
@@ -110,7 +127,7 @@ func CompilePolicy(wrapperMessage *configv1.PolicyWrapper) (*Policy, []runtime.C
 		fluxMeterOptions = append(fluxMeterOptions, fluxMeterOption)
 	}
 
-	compWithPortsList, partialCircuitOption, err := CompileCircuit(policyProto.Circuit, policy)
+	compWithPortsList, partialCircuitOption, err := compileCircuit(policyProto.Circuit, policy)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -269,4 +286,25 @@ func (msv *metricSubVisitor) Visit(node parser.Node, path []parser.Node) (parser
 		log.Warn().Msgf("Unknown type %T", n)
 	}
 	return msv, nil
+}
+
+// HashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
+func HashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*configv1.PolicyWrapper, error) {
+	dat, marshalErr := yaml.Marshal(policyMessage)
+	if marshalErr != nil {
+		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
+		return nil, marshalErr
+	}
+	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
+	if hashErr != nil {
+		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))
+		return nil, hashErr
+	}
+	hash := base64.StdEncoding.EncodeToString(hashBytes[:])
+
+	return &configv1.PolicyWrapper{
+		Policy:     policyMessage,
+		PolicyName: policyName,
+		PolicyHash: hash,
+	}, nil
 }

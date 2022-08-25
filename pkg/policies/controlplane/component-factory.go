@@ -13,15 +13,15 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// ComponentFactoryModule for component factory run via the main app.
-func ComponentFactoryModule() fx.Option {
+// componentFactoryModule for component factory run via the main app.
+func componentFactoryModule() fx.Option {
 	return fx.Options(
 		component.PromQLModule(),
 	)
 }
 
-// ComponentFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
-func ComponentFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
+// componentFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
+func componentFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	return fx.Options(
 		ComponentStackFactoryModuleForPolicyApp(circuitAPI),
 		component.PromQLModuleForPolicyApp(circuitAPI),

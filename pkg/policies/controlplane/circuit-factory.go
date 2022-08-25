@@ -13,15 +13,15 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// CircuitFactoryModule for circuit factory run via the main app.
-func CircuitFactoryModule() fx.Option {
+// circuitFactoryModule for circuit factory run via the main app.
+func circuitFactoryModule() fx.Option {
 	return fx.Options(
 		runtime.CircuitModule(),
 	)
 }
 
-// CompileCircuit takes a circuitProto and returns list of CompiledComponentAndPorts.
-func CompileCircuit(
+// compileCircuit takes a circuitProto and returns list of CompiledComponentAndPorts.
+func compileCircuit(
 	circuitProto []*policylangv1.Component,
 	policyReadAPI iface.PolicyRead,
 ) ([]runtime.CompiledComponentAndPorts, fx.Option, error) {
