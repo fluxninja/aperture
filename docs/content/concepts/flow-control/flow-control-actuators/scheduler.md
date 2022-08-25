@@ -17,12 +17,19 @@ keywords:
 <!-- code_chunk_output -->
 
 - [Scheduler](#scheduler)
+  - [Workload](#workload)
   - [Tokens](#tokens)
   - [Token bucket](#token-bucket)
 
 <!-- /code_chunk_output -->
 
 # Scheduler
+
+## Workload
+
+Workloads are a group of flows based on common attributes. Workloads are
+expressed by label matcher rules in Aperture. Aperture Agents schedule workloads
+based on their priorities and by estimating their [tokens](#tokens).
 
 ## Tokens
 
