@@ -46,14 +46,14 @@ func createDefaultConfig() config.Exporter {
 	}
 }
 
-func createTracesExporter(_ context.Context, set component.ExporterCreateSettings, config config.Exporter) (component.TracesExporter, error) {
-	return newTracesExporter(config, set)
+func createTracesExporter(ctx context.Context, set component.ExporterCreateSettings, config config.Exporter) (component.TracesExporter, error) {
+	return newTracesExporter(ctx, set, config)
 }
 
-func createMetricsExporter(_ context.Context, set component.ExporterCreateSettings, config config.Exporter) (component.MetricsExporter, error) {
-	return newMetricsExporter(config, set)
+func createMetricsExporter(ctx context.Context, set component.ExporterCreateSettings, config config.Exporter) (component.MetricsExporter, error) {
+	return newMetricsExporter(ctx, set, config)
 }
 
-func createLogsExporter(_ context.Context, set component.ExporterCreateSettings, config config.Exporter) (component.LogsExporter, error) {
-	return newLogsExporter(config, set)
+func createLogsExporter(ctx context.Context, set component.ExporterCreateSettings, config config.Exporter) (component.LogsExporter, error) {
+	return newLogsExporter(ctx, set, config)
 }
