@@ -8,4 +8,4 @@ webhook:
   port: 9443
 leaderElection:
   leaderElect: true
-  resourceName: a4362587.aperture.tech
+  resourceName: a4362587.fluxninja.com

@@ -28,7 +28,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 var _ = Describe("MutatingWebhookConfiguration for Controller", func() {
@@ -37,7 +37,7 @@ var _ = Describe("MutatingWebhookConfiguration for Controller", func() {
 			instance := &v1alpha1.Aperture{
 				TypeMeta: v1.TypeMeta{
 					Kind:       "Aperture",
-					APIVersion: "aperture.tech/v1alpha1",
+					APIVersion: "fluxninja.com/v1alpha1",
 				},
 				ObjectMeta: v1.ObjectMeta{
 					Name:      appName,
@@ -73,8 +73,8 @@ var _ = Describe("MutatingWebhookConfiguration for Controller", func() {
 						test:                           test,
 					},
 					Annotations: map[string]string{
-						"aperture.tech/primary-resource-type": "Aperture.aperture.tech",
-						"aperture.tech/primary-resource":      fmt.Sprintf("%s/%s", appName, appName),
+						"fluxninja.com/primary-resource-type": "Aperture.fluxninja.com",
+						"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", appName, appName),
 						test:                                  test,
 						testTwo:                               testTwo,
 					},
@@ -133,7 +133,7 @@ var _ = Describe("Test MutatingWebhookConfiguration Mutate", func() {
 			ObjectMeta: v1.ObjectMeta{},
 			Webhooks: []admissionregistrationv1.MutatingWebhook{
 				{
-					Name:                    "cm-validator.aperture.tech",
+					Name:                    "cm-validator.fluxninja.com",
 					AdmissionReviewVersions: testArray,
 					ClientConfig: admissionregistrationv1.WebhookClientConfig{
 						URL: &test,
@@ -158,7 +158,7 @@ var _ = Describe("Test MutatingWebhookConfiguration Mutate", func() {
 		mwc := &admissionregistrationv1.MutatingWebhookConfiguration{
 			Webhooks: []admissionregistrationv1.MutatingWebhook{
 				{
-					Name: "cm-validator.aperture.tech",
+					Name: "cm-validator.fluxninja.com",
 				},
 			},
 		}

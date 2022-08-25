@@ -25,7 +25,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 var _ = Describe("ClusterRole", func() {
@@ -34,7 +34,7 @@ var _ = Describe("ClusterRole", func() {
 			instance := &v1alpha1.Aperture{
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Aperture",
-					APIVersion: "aperture.tech/v1alpha1",
+					APIVersion: "fluxninja.com/v1alpha1",
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
@@ -53,8 +53,8 @@ var _ = Describe("ClusterRole", func() {
 						"app.kubernetes.io/component":  agentServiceName,
 					},
 					Annotations: map[string]string{
-						"aperture.tech/primary-resource-type": "Aperture.aperture.tech",
-						"aperture.tech/primary-resource":      fmt.Sprintf("%s/%s", appName, appName),
+						"fluxninja.com/primary-resource-type": "Aperture.fluxninja.com",
+						"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", appName, appName),
 					},
 				},
 				Rules: []rbacv1.PolicyRule{
@@ -111,7 +111,7 @@ var _ = Describe("ClusterRole", func() {
 			instance := &v1alpha1.Aperture{
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Aperture",
-					APIVersion: "aperture.tech/v1alpha1",
+					APIVersion: "fluxninja.com/v1alpha1",
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
@@ -134,8 +134,8 @@ var _ = Describe("ClusterRole", func() {
 						test:                           test,
 					},
 					Annotations: map[string]string{
-						"aperture.tech/primary-resource-type": "Aperture.aperture.tech",
-						"aperture.tech/primary-resource":      fmt.Sprintf("%s/%s", appName, appName),
+						"fluxninja.com/primary-resource-type": "Aperture.fluxninja.com",
+						"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", appName, appName),
 						test:                                  test,
 					},
 				},
@@ -194,7 +194,7 @@ var _ = Describe("ClusterRoleBinding", func() {
 		instance := &v1alpha1.Aperture{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Aperture",
-				APIVersion: "aperture.tech/v1alpha1",
+				APIVersion: "fluxninja.com/v1alpha1",
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      appName,
@@ -217,8 +217,8 @@ var _ = Describe("ClusterRoleBinding", func() {
 					test:                           test,
 				},
 				Annotations: map[string]string{
-					"aperture.tech/primary-resource-type": "Aperture.aperture.tech",
-					"aperture.tech/primary-resource":      fmt.Sprintf("%s/%s", appName, appName),
+					"fluxninja.com/primary-resource-type": "Aperture.fluxninja.com",
+					"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", appName, appName),
 					test:                                  test,
 				},
 			},

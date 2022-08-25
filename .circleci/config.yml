@@ -114,7 +114,7 @@ workflows:
             (go.mod|go.sum) updated-aperture true
             docs/.* updated-aperture-docs true
             manifests/charts/.* updated-aperture-charts true
-            examples/demo_app/.* updated-demo-app true
+            tools/demo_app/.* updated-demo-app true
   filter-paths-pr:
     when:
       and:

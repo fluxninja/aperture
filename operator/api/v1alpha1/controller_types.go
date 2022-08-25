@@ -27,7 +27,7 @@ type ControllerSpec struct {
 
 	// Image configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={tag:"latest",pullPolicy:"IfNotPresent",registry:"docker.io/aperturecontrol",repository:"aperture-controller"}
+	//+kubebuilder:default:={tag:"latest",pullPolicy:"IfNotPresent",registry:"docker.io/fluxninja",repository:"aperture-controller"}
 	Image Image `json:"image"`
 
 	// Pod's host aliases

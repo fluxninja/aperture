@@ -23,7 +23,7 @@ spec:
   template:
     metadata:
       annotations:
-        sidecar.aperture.tech/injection: "false"
+        sidecar.fluxninja.com/injection: "false"
       labels: {{- include "common.labels.standard" . | nindent 8 }}
         app.kubernetes.io/component: aperture-operator
     spec:

@@ -83,8 +83,8 @@ DEP_TREE = {
                 },
                 {
                     "ref": "aperture-operator",
-                    "context": "operator/",
-                    "dockerfile": "./Dockerfile",
+                    "context": "./",
+                    "dockerfile": "./operator/Dockerfile",
                     "ssh": "default",
                 }
             ],
@@ -98,7 +98,7 @@ DEP_TREE = {
                     "new_name": "aperture-operator-bootstrap",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
-                        "apertures.aperture.tech:customresourcedefinition"
+                        "apertures.fluxninja.com:customresourcedefinition"
                     ]
                 },
                 {
@@ -223,7 +223,7 @@ DEP_TREE = {
                 {
                     "ref": "demo-app",
                     "context": "./",
-                    "dockerfile": "examples/demo_app/Dockerfile",
+                    "dockerfile": "tools/demo_app/Dockerfile",
                     "ssh": "default",
                 }
             ],

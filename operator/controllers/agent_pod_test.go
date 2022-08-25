@@ -25,7 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 var _ = Describe("Sidecar container for Agent", func() {

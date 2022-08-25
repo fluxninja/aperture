@@ -37,7 +37,7 @@ type AgentSpec struct {
 
 	// Image configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={tag:"latest",pullPolicy:"IfNotPresent",registry:"docker.io/aperturecontrol",repository:"aperture-agent"}
+	//+kubebuilder:default:={tag:"latest",pullPolicy:"IfNotPresent",registry:"docker.io/fluxninja",repository:"aperture-agent"}
 	Image Image `json:"image"`
 
 	// AgentGroup name for the Agent

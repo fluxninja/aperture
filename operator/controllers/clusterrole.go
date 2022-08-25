@@ -27,7 +27,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 // clusterRoleForAgent prepares the ClusterRole object for the Agent based on the provided parameter.

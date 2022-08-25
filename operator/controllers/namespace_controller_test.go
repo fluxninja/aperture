@@ -33,7 +33,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 var _ = Describe("Namespace controller", func() {

@@ -24,7 +24,7 @@ import (
 type Image struct {
 	// The registry of the image
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="docker.io/aperturecontrol"
+	//+kubebuilder:default:="docker.io/fluxninja"
 	Registry string `json:"registry"`
 
 	// The repository of the image

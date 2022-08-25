@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.8.0
   creationTimestamp: null
-  name: apertures.aperture.tech
+  name: apertures.fluxninja.com
 spec:
-  group: aperture.tech
+  group: fluxninja.com
   names:
     kind: Aperture
     listKind: ApertureList
@@ -2967,7 +2967,7 @@ spec:
                   image:
                     default:
                       pullPolicy: IfNotPresent
-                      registry: docker.io/aperturecontrol
+                      registry: docker.io/fluxninja
                       repository: aperture-agent
                       tag: latest
                     description: Image configuration
@@ -2986,7 +2986,7 @@ spec:
                           type: string
                         type: array
                       registry:
-                        default: docker.io/aperturecontrol
+                        default: docker.io/fluxninja
                         description: The registry of the image
                         type: string
                       repository:
@@ -8870,7 +8870,7 @@ spec:
                   image:
                     default:
                       pullPolicy: IfNotPresent
-                      registry: docker.io/aperturecontrol
+                      registry: docker.io/fluxninja
                       repository: aperture-controller
                       tag: latest
                     description: Image configuration
@@ -8889,7 +8889,7 @@ spec:
                           type: string
                         type: array
                       registry:
-                        default: docker.io/aperturecontrol
+                        default: docker.io/fluxninja
                         description: The registry of the image
                         type: string
                       repository:
