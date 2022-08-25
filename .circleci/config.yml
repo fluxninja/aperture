@@ -78,7 +78,7 @@ jobs:
             export SSH_AUTH_SOCK=""
             # Bust asdf cache as our opsninja version is always 0.0.0
             pip uninstall -y opsninja
-            pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
+            pip install 'git+ssh://git@github.com/fluxninja/cloud@kklimonda/opsninja-release-push-to-dockerhub#egg=opsninja&subdirectory=ops/apps/opsninja/'
             asdf reshim
       - run:
           name: Schedule release jobs
