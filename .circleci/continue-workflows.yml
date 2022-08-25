@@ -116,6 +116,11 @@ jobs:
           Workspace root path that is either an absolute path or a path relative
           to the working directory. Defaults to '.' (the working directory)
         default: .
+      push-to-dockerhub:
+        type: boolean
+        description:
+          Boolean for whether or not to push images to DockerHub
+        default: true
     executor: <<parameters.executor>>
     environment:
       DOCKER_BUILDKIT: 1
@@ -154,6 +159,14 @@ jobs:
           image: <<parameters.gcr-image>>
           tag: <<parameters.tag>>
       - when:
+          condition: <<parameters.push-to-dockerhub>>
+          steps:
+            - run:
+                name: Push images to DockerHub
+                command: |
+                  docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+                  docker push <<parameters.dockerhub-image>>:<<parameters.tag>>
+      - when:
           condition:
             equal: [main, << pipeline.git.branch >>]
           steps:
@@ -161,6 +174,14 @@ jobs:
                 image: <<parameters.gcr-image>>
                 source-tag: <<parameters.tag>>
                 target-tag: <<parameters.target-tag>>
+            - when:
+                condition: <<parameters.push-to-dockerhub>>
+                steps:
+                  - run:
+                      name: Push images to DockerHub
+                      command: |
+                        docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+                        docker push <<parameters.dockerhub-image>>:<<parameters.target-tag>>
 
   go-test-coverage:
     parameters:
@@ -471,6 +492,7 @@ workflows:
           docker-context: .
           dockerfile: tools/demo_app/Dockerfile
           use-docker-layer-caching: true
+          push-to-dockerhub: false
 
   pre-commit:
     jobs:
