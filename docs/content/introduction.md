@@ -1,5 +1,5 @@
 ---
-title: Aperture Open Source
+title: Introduction
 description: Aperture Introduction
 keywords:
   - reliability
