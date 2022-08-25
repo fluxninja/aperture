@@ -1,9 +1,11 @@
 ---
 title: Flows
-slug: concepts/flow-control/flows
 description: Concept of flows.
 keywords:
-  - Flows
+  - flows
+  - tracing
+  - opentracing
+  - opentelemetry
 ---
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->

@@ -1,23 +1,25 @@
 ---
-id: aperture
 title: Aperture Open Source
-slug: /introduction/aperture
-description: Aperture Introduction page
+description: Aperture Introduction
 keywords:
-  - observe
-  - analyze
-  - actuate
-  - how-it-works
+  - reliability
+  - overload
+  - concurrency
+  - aperture
+  - fluxninja
+  - microservices
+  - cloud
 ---
 
 # Introduction
 
-Welcome to the official guide for Aperture!
+Welcome to the official documentation for
+[Aperture](https://github.com/fluxninja/aperture)!
 
 Aperture is an open-source flow control and reliability management platform for
-modern web application.
+modern web applications.
 
-## Why flow control is needed?
+## Why is flow control needed?
 
 Modern web-scale apps are a complex network of inter-connected microservices
 that implement features such as account management, search, payments & more.
@@ -28,7 +30,7 @@ service, kick-starting a positive feedback loop and causing
 The application stops serving responses in a timely manner and critical end-user
 transactions are interrupted.
 
-![Absence of flow control](../assets/img/no-flow-control.jpg)
+![Absence of flow control](./assets/img/no-flow-control.jpg)
 
 Applications are governed by
 [Little’s Law](https://en.wikipedia.org/wiki/Little%27s_law), which describes
@@ -41,7 +43,7 @@ users are insufficient in protecting services. Autoscaling is slow to respond
 and can be cost-prohibitive. As the number of services scales, these techniques
 get harder to deploy.
 
-![Reliability with flow control](../assets/img/active-flow-control.jpg)
+![Reliability with flow control](./assets/img/active-flow-control.jpg)
 
 This is where flow control comes in. Applications can degrade gracefully in
 real-time when using flow control techniques with Aperture, by prioritizing
@@ -52,7 +54,7 @@ high-importance features over others.
 At the fundamental level, Aperture enables flow control through observing,
 analyzing, and actuating, facilitated by agents and a controller.
 
-![Aperture Control Loop](../assets/img/control-loop.svg)
+![Aperture Control Loop](./assets/img/control-loop.svg)
 
 ### Aperture Agents
 
