@@ -23,7 +23,7 @@ etcd:
   lease_ttl: 60s
 
 prometheus:
-  address: "http://agent-prometheus-server:80"
+  address: "http://aperture-prometheus-server:80"
 
 plugins:
   disable_plugins: false
