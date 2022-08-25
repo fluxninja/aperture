@@ -22,7 +22,7 @@ import (
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 // validatingWebhookConfiguration prepares the ValidatingWebhookConfiguration object for the Controller, based on the provided parameter.
@@ -35,7 +35,7 @@ func validatingWebhookConfiguration(instance *v1alpha1.Aperture, cert []byte) *a
 		},
 		Webhooks: []admissionregistrationv1.ValidatingWebhook{
 			{
-				Name: "cm-validator.aperture.tech",
+				Name: "cm-validator.fluxninja.com",
 				ClientConfig: admissionregistrationv1.WebhookClientConfig{
 					Service: &admissionregistrationv1.ServiceReference{
 						Name:      "agent-webhooks",
@@ -52,7 +52,7 @@ func validatingWebhookConfiguration(instance *v1alpha1.Aperture, cert []byte) *a
 				},
 				ObjectSelector: &v1.LabelSelector{
 					MatchLabels: map[string]string{
-						"aperture.tech/validate": "true",
+						"fluxninja.com/validate": "true",
 					},
 				},
 				Rules: []admissionregistrationv1.RuleWithOperations{

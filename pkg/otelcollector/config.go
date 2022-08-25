@@ -22,7 +22,7 @@ func NewOTELConfigUnmarshaler(config map[string]interface{}) *OTELConfigUnmarsha
 // Implements MapProvider interface
 
 // Retrieve returns the value to be injected in the configuration and the corresponding watcher.
-func (u *OTELConfigUnmarshaller) Retrieve(_ context.Context, _ string, _ confmap.WatcherFunc) (confmap.Retrieved, error) {
+func (u *OTELConfigUnmarshaller) Retrieve(_ context.Context, _ string, _ confmap.WatcherFunc) (*confmap.Retrieved, error) {
 	return confmap.NewRetrieved(u.config)
 }
 

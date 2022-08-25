@@ -19,7 +19,7 @@ package controllers
 import (
 	corev1 "k8s.io/api/core/v1"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 // agentContainer prepares Sidecar container for the Agent based on the received parameters.

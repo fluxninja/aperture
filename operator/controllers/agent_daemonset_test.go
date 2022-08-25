@@ -28,7 +28,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 var _ = Describe("Agent Daemonset", func() {
@@ -121,7 +121,7 @@ var _ = Describe("Agent Daemonset", func() {
 					},
 					OwnerReferences: []metav1.OwnerReference{
 						{
-							APIVersion:         "aperture.tech/v1alpha1",
+							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Aperture",
 							Controller:         pointer.BoolPtr(true),
@@ -348,7 +348,7 @@ var _ = Describe("Agent Daemonset", func() {
 					},
 					OwnerReferences: []metav1.OwnerReference{
 						{
-							APIVersion:         "aperture.tech/v1alpha1",
+							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Aperture",
 							Controller:         pointer.BoolPtr(true),

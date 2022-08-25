@@ -3,7 +3,7 @@ metadata:
   name: policies
   namespace: aperture-system
   labels:
-    aperture.tech/validate: "true"
+    fluxninja.com/validate: "true"
 apiVersion: v1
 data:
   latency-gradient.yaml: |

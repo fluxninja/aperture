@@ -5,7 +5,7 @@ metadata:
   name: aperture-viewer-role
 rules:
 - apiGroups:
-  - aperture.tech
+  - fluxninja.com
   resources:
   - apertures
   verbs:
@@ -13,7 +13,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - aperture.tech
+  - fluxninja.com
   resources:
   - apertures/status
   verbs:

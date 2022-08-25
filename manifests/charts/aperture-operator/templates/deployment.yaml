@@ -24,7 +24,7 @@ spec:
   template:
     metadata:
       annotations:
-        sidecar.aperture.tech/injection: "false"
+        sidecar.fluxninja.com/injection: "false"
         {{- if .Values.operator.podAnnotations }}
         {{- include "common.tplvalues.render" (dict "value" .Values.operator.podAnnotations "context" $) | nindent 8 }}
         {{- end }}

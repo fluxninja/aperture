@@ -19,6 +19,7 @@ var ignoreFuncs = []string{
 	"google.golang.org/grpc.(*ccBalancerWrapper).watcher",
 	"google.golang.org/grpc.(*addrConn).resetTransport",
 	"go.opentelemetry.io/collector/service/internal/telemetry.(*ProcessMetricsViews).StartCollection.func1",
+	"time.Sleep",
 }
 
 // GoLeakDetector holds options for the goleak detector.

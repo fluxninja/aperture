@@ -25,7 +25,7 @@ import (
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 // MutatingWebhookConfiguration prepares the MutatingWebhookConfiguration object for the Operator, based on the provided parameter.

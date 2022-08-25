@@ -4,7 +4,7 @@
     {
       "source": {
         "git": {
-          "remote": "ssh://git@github.com/fluxninja/aperture-mixin.git",
+          "remote": "ssh://git@github.com/fluxninja/aperture-libsonnet.git",
           "subdir": ""
         }
       },
@@ -13,7 +13,7 @@
     {
       "source": {
         "git": {
-          "remote": "ssh://git@github.com/fluxninja/aperture-mixin.git",
+          "remote": "ssh://git@github.com/fluxninja/aperture-libsonnet.git",
           "subdir": "aperture/1.0"
         }
       },
