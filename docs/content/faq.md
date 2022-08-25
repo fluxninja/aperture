@@ -1,7 +1,6 @@
 ---
 title: FAQ
-slug: faq/faq
-description: FAQ
+description: Frequently Asked Questions
 keywords:
-  - FAQ
+  - faq
 ---

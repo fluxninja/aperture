@@ -1,15 +1,12 @@
 ---
 title: Scheduler
-slug: concepts/flow-control/actuators/scheduler
 description: Scheduler
 keywords:
-  - Scheduler
-  - WFQ
-  - Tokens
-  - Priority
-  - Fairness
-  - Queuing
-  - Timeouts
+  - scheduler
+  - tokens
+  - priority
+  - fairness
+  - queuing
 ---
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
