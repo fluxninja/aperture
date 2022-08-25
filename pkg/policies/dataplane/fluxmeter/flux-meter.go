@@ -2,10 +2,12 @@ package fluxmeter
 
 import (
 	"context"
+	"fmt"
 	"path"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
+	"go.uber.org/multierr"
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -176,6 +178,11 @@ func NewFluxMeterOptions(
 }
 
 func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheus.Registry) {
+	metricLabels := make(map[string]string)
+	metricLabels[metrics.PolicyNameLabel] = fluxMeter.GetPolicyName()
+	metricLabels[metrics.PolicyHashLabel] = fluxMeter.GetPolicyHash()
+	metricLabels[metrics.FluxMeterNameLabel] = fluxMeter.GetFluxMeterName()
+
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			// Register metric with PCA
@@ -187,12 +194,20 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
+			var errMulti error
 			// Unregister metric with PCA
 			err := engineAPI.UnregisterFluxMeter(fluxMeter)
 			if err != nil {
 				log.Error().Err(err).Msgf("Failed to unregister FluxMeter %s with PolicyConfigAPI", fluxMeter.fluxMeterName)
+				errMulti = multierr.Append(errMulti, err)
 			}
-			return err
+			// Delete this specific fluxmeter from prometheus
+			deleted := histogramVec.Delete(metricLabels)
+			if !deleted {
+				err = fmt.Errorf("failed to delete %s fluxmeter from its metric vector", fluxMeter.GetFluxMeterName())
+				errMulti = multierr.Append(errMulti, err)
+			}
+			return errMulti
 		},
 	})
 }
