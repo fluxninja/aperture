@@ -78,11 +78,16 @@ func newLoggingExporter() *loggingExporter {
 
 // newTracesExporter creates an exporter.TracesExporter that just drops the
 // received data and logs debugging messages.
-func newTracesExporter(config config.Exporter, set component.ExporterCreateSettings) (component.TracesExporter, error) {
+func newTracesExporter(
+	ctx context.Context,
+	set component.ExporterCreateSettings,
+	config config.Exporter,
+) (component.TracesExporter, error) {
 	s := newLoggingExporter()
-	return exporterhelper.NewTracesExporter(
-		config,
+	return exporterhelper.NewTracesExporterWithContext(
+		ctx,
 		set,
+		config,
 		s.pushTraces,
 		exporterhelper.WithCapabilities(consumer.Capabilities{MutatesData: false}),
 		// Disable Timeout/RetryOnFailure and SendingQueue
@@ -94,11 +99,16 @@ func newTracesExporter(config config.Exporter, set component.ExporterCreateSetti
 
 // newMetricsExporter creates an exporter.MetricsExporter that just drops the
 // received data and logs debugging messages.
-func newMetricsExporter(config config.Exporter, set component.ExporterCreateSettings) (component.MetricsExporter, error) {
+func newMetricsExporter(
+	ctx context.Context,
+	set component.ExporterCreateSettings,
+	config config.Exporter,
+) (component.MetricsExporter, error) {
 	s := newLoggingExporter()
-	return exporterhelper.NewMetricsExporter(
-		config,
+	return exporterhelper.NewMetricsExporterWithContext(
+		ctx,
 		set,
+		config,
 		s.pushMetrics,
 		exporterhelper.WithCapabilities(consumer.Capabilities{MutatesData: false}),
 		// Disable Timeout/RetryOnFailure and SendingQueue
@@ -110,11 +120,16 @@ func newMetricsExporter(config config.Exporter, set component.ExporterCreateSett
 
 // newLogsExporter creates an exporter.LogsExporter that just drops the
 // received data and logs debugging messages.
-func newLogsExporter(config config.Exporter, set component.ExporterCreateSettings) (component.LogsExporter, error) {
+func newLogsExporter(
+	ctx context.Context,
+	set component.ExporterCreateSettings,
+	config config.Exporter,
+) (component.LogsExporter, error) {
 	s := newLoggingExporter()
-	return exporterhelper.NewLogsExporter(
-		config,
+	return exporterhelper.NewLogsExporterWithContext(
+		ctx,
 		set,
+		config,
 		s.pushLogs,
 		exporterhelper.WithCapabilities(consumer.Capabilities{MutatesData: false}),
 		// Disable Timeout/RetryOnFailure and SendingQueue
