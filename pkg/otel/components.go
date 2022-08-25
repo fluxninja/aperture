@@ -16,6 +16,7 @@ import (
 	"go.opentelemetry.io/collector/processor/batchprocessor"
 	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
+	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
 	"github.com/fluxninja/aperture/pkg/entitycache"
@@ -27,7 +28,12 @@ import (
 )
 
 // AgentOTELComponents constructs OTEL Collector Factories for Agent.
-func AgentOTELComponents(cache *entitycache.EntityCache, promRegistry *prometheus.Registry, engine iface.Engine) (component.Factories, error) {
+func AgentOTELComponents(
+	cache *entitycache.EntityCache,
+	promRegistry *prometheus.Registry,
+	engine iface.Engine,
+	lifecycle fx.Lifecycle,
+) (component.Factories, error) {
 	var errs error
 
 	extensions, err := component.MakeExtensionFactoryMap(
@@ -58,7 +64,7 @@ func AgentOTELComponents(cache *entitycache.EntityCache, promRegistry *prometheu
 		memorylimiterprocessor.NewFactory(),
 		enrichmentprocessor.NewFactory(cache),
 		rollupprocessor.NewFactory(),
-		metricsprocessor.NewFactory(promRegistry, engine),
+		metricsprocessor.NewFactory(promRegistry, engine, lifecycle),
 		attributesprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)

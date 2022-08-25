@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/collector/config"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/processor/processorhelper"
+	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
@@ -18,21 +19,26 @@ const (
 )
 
 // NewFactory returns a new factory for the metrics processor.
-func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine) component.ProcessorFactory {
+func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine, lc fx.Lifecycle) component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
-		createDefaultConfig(promRegistry, engine),
+		createDefaultConfig(promRegistry, engine, lc),
 		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
 		component.WithTracesProcessor(createTracesProcessor, component.StabilityLevelInDevelopment),
 	)
 }
 
-func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.Engine) component.ProcessorCreateDefaultConfigFunc {
+func createDefaultConfig(
+	promRegistry *prometheus.Registry,
+	engine iface.Engine,
+	lc fx.Lifecycle,
+) component.ProcessorCreateDefaultConfigFunc {
 	return func() config.Processor {
 		return &Config{
 			ProcessorSettings: config.NewProcessorSettings(config.NewComponentID(typeStr)),
 			promRegistry:      promRegistry,
 			engine:            engine,
+			lifecycle:         lc,
 		}
 	}
 }

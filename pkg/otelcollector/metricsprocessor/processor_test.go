@@ -2,6 +2,7 @@ package metricsprocessor
 
 import (
 	"strings"
+	"testing"
 
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -10,6 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/testutil"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/ptrace"
+	"go.uber.org/fx/fxtest"
 	"golang.org/x/net/context"
 	"k8s.io/apimachinery/pkg/util/json"
 
@@ -36,6 +38,7 @@ var _ = Describe("Metrics Processor", func() {
 			LatencyBucketStartMS: 0,
 			LatencyBucketWidthMS: 10,
 			LatencyBucketCount:   3,
+			lifecycle:            fxtest.NewLifecycle(&testing.B{}),
 		}
 		var err error
 		processor, err = newProcessor(cfg)

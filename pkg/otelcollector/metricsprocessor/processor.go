@@ -13,6 +13,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/ptrace"
+	"go.uber.org/fx"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -53,15 +54,29 @@ func (p *metricsProcessor) registerRequestLatencyHistogram() error {
 		metrics.DecisionTypeLabel,
 		metrics.WorkloadIndexLabel,
 	})
-	err := p.cfg.promRegistry.Register(p.workloadLatencyHistogram)
-	if err != nil {
-		if are, ok := err.(prometheus.AlreadyRegisteredError); ok {
-			// A histogram for that metric has been registered before. Use the old histogram from now on.
-			p.workloadLatencyHistogram = are.ExistingCollector.(*prometheus.HistogramVec)
+
+	p.cfg.lifecycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			err := p.cfg.promRegistry.Register(p.workloadLatencyHistogram)
+			if err != nil {
+				if are, ok := err.(prometheus.AlreadyRegisteredError); ok {
+					// A histogram for that metric has been registered before. Use the old histogram from now on.
+					p.workloadLatencyHistogram = are.ExistingCollector.(*prometheus.HistogramVec)
+					return nil
+				}
+			}
+			return err
+		},
+		OnStop: func(_ context.Context) error {
+			unregistered := p.cfg.promRegistry.Unregister(p.workloadLatencyHistogram)
+			if !unregistered {
+				log.Error().Msgf("Failed to unregister workloadLatencyHistogram metric with Prometheus registry")
+			}
 			return nil
-		}
-	}
-	return err
+		},
+	})
+
+	return nil
 }
 
 // Start indicates and logs the start of the metrics processor.

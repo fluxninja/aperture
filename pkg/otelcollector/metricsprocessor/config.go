@@ -3,6 +3,7 @@ package metricsprocessor
 import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/config"
+	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
@@ -11,6 +12,7 @@ import (
 type Config struct {
 	promRegistry             *prometheus.Registry
 	engine                   iface.Engine
+	lifecycle                fx.Lifecycle
 	config.ProcessorSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct
 	// The lowest bucket in latency histogram
 	LatencyBucketStartMS float64 `mapstructure:"latency_bucket_start_ms" validate:"gte=0" default:"20"`
