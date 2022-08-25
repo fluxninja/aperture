@@ -41,7 +41,7 @@ local dashboards =
     dashboard.new('example-dashboard') +
     dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
     dashboard.spec.withJson(std.manifestJsonEx(decisionDashboard({
-      fluxmeterName: "demoapp",
+      fluxmeterName: "flux_meter",
     }).dashboard, indent='  ')) +
     dashboard.spec.withDatasources({
       inputName: 'DS_AGENT-PROMETHEUS',
