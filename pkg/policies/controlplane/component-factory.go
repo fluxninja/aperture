@@ -23,7 +23,7 @@ func componentFactoryModule() fx.Option {
 // componentFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
 func componentFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	return fx.Options(
-		ComponentStackFactoryModuleForPolicyApp(circuitAPI),
+		componentStackFactoryModuleForPolicyApp(circuitAPI),
 		component.PromQLModuleForPolicyApp(circuitAPI),
 	)
 }
@@ -125,7 +125,7 @@ func NewComponentAndOptions(
 		}, nil, option, err
 	} else {
 		// Try Component Stack Factory
-		return NewComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
+		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
 	}
 }
 

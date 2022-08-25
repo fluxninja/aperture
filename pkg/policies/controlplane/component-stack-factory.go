@@ -11,13 +11,13 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// ComponentStackFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
-func ComponentStackFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
+// componentStackFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
+func componentStackFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	return fx.Options()
 }
 
-// NewComponentStackAndOptions creates components for component stack, sub components and their fx options.
-func NewComponentStackAndOptions(
+// newComponentStackAndOptions creates components for component stack, sub components and their fx options.
+func newComponentStackAndOptions(
 	componentStackProto *policylangv1.Component,
 	componentStackIndex int,
 	policyReadAPI iface.PolicyRead,
