@@ -27,14 +27,31 @@ message AllPolicies {
 }
 
 // Policy is defined as a dataflow graph (circuit) of inter-connected components.
+//
 // Signals flow between components via ports.
 // As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
 // Policies are evaluated periodically in order to respond to changes in signal readings.
+//
+// :::info
+// **Signal**
+//
+// Signals are floating-point values.
+//
+// A signal also have a special **Invalid** value. It's usually used to
+// communicate that signal doesn't have a meaningful value at the moment, eg.
+// [PromQL](#-v1promql) emits such a value if it cannot execute a query.
+// Components know when their input signals are invalid and can act
+// accordingly. They can either propagate the invalidness, by making their
+// output itself invalid (like eg.
+// [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
+// logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+// docs on how exactly it handles invalid inputs.
+// :::
 message Policy {
   // Defines a signal processing graph as a list of components.
   repeated Component circuit = 1;
 
-  // Evaluation interval (ticks) is the time period between consecutive runs of the policy circuit.
+  // Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
   // This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
   google.protobuf.Duration evaluation_interval = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
@@ -46,12 +63,30 @@ message Policy {
   }]; // @gotags: default:"0.5s"
 
   // FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+  //
+  // FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
   map<string, FluxMeter> flux_meters = 3;
 }
 
 // FluxMeter gathers metrics for the traffic that matches its selector.
+//
+// Example of a selector that creates a histogram metric for all HTTP requests
+// to particular service:
+// ```yaml
+// selector:
+//   service: myservice.mynamespace.svc.cluster.local
+//   control_point:
+//     traffic: ingress
+// ```
 message FluxMeter {
-  // Policies are only applied to flows that are matched based on the fields in the selector.
+  // What latency should we measure in the histogram created by this FluxMeter.
+  //
+  // * For traffic control points, fluxmeter will measure the duration of the
+  //   whole http transaction (including sending request and receiving
+  //   response).
+  // * For feature control points, fluxmeter will measure execution of the span
+  //   associated with particular feature. What contributes to the span's
+  //   duration is entirely up to the user code that uses Aperture library.
   common.selector.v1.Selector selector = 1;
 
   // Latency histogram buckets (in ms) for this FluxMeter.
@@ -65,11 +100,38 @@ message FluxMeter {
   }]; // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
 }
 
-// Computational blocks that form the circuit.
+// Computational block that form the circuit
+//
 // Signals flow into the components via input ports and results are emitted on output ports.
 // Components are wired to each other based on signal names forming an execution graph of the circuit.
+//
+// :::note
 // Loops are broken by the runtime at the earliest component index that is part of the loop.
 // The looped signals are saved in the tick they are generated and served in the subsequent tick.
+// :::
+//
+// There are three categories of components:
+// * "source" components – they take some sort of input from "the real world" and output
+//   a signal based on this input. Example: [PromQL](#-v1promql). In the UI
+//   they're represented by green color.
+// * internal components – "pure" components that don't interact with the "real world".
+//   Examples: [GradientController](#-v1gradientcontroller), [Max](#-v1max).
+//   :::note
+//   Internal components's output can depend on their internal state, in addition to the inputs.
+//   Eg. see the [Exponential Moving Average filter](#-v1ema).
+//   :::
+// * "sink" components – they affect the real world.
+//   [Scheduler](#-v1scheduler) and [RateLimiter](#-languagev1ratelimiter).
+//   Also sometimes called _actuators_. In the UI, represented by orange color.
+//   Sink components are usually also "sources" too, they usually emit a
+//   feedback signal, like `accepted_concurrency` in case of ConcurrencyLimiter.
+//
+// :::tip
+// Sometimes you may want to use a constant value as one of component's inputs.
+// You can use the [Constant](#-constant) component for this.
+// :::
+//
+// See also [Policy](#-v1policy) for a higher-level explanation of circuits.
 message Component {
   oneof component {
     // Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
@@ -117,11 +179,34 @@ message Port {
   string signal_name = 1;
 }
 
-// Gradient controller
+// Gradient controller is a type of controller which tries to adjust the
+// control variable proportionally to the relative difference between setpoint
+// and actual value of the signal.
 //
-// Describes the gradient values which is computed as follows $\text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}$.
-// Limits gradient to range [min_gradient, max_gradient].
-// Output: (gradient \* control_variable) + optimize.
+// The `gradient` describes a corrective factor that should be applied to the
+// control variable to get the signal closer to the setpoint. It is computed as follows:
+//
+// $$
+// \text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}
+// $$
+//
+// `gradient` is then clamped to [min_gradient, max_gradient] range.
+//
+// The output of gradient controller is computed as follows:
+// $$
+// \text{output} = \text{gradient}_{\text{clamped}} \cdot \text{control\_variable} + \text{optimize}.
+// $$
+//
+// Note the additional `optimize` signal, that can be used to "nudge" the
+// controller into desired idle state.
+//
+// The output can be _optionally_ clamped to desired range using `max` and
+// `min` input.
+//
+// :::caution
+// Some changes are expected in the near future:
+// [#182](https://github.com/fluxninja/aperture/issues/182)
+// :::
 message GradientController {
   // Inputs for the Gradient Controller component.
   message Ins {
@@ -134,13 +219,15 @@ message GradientController {
     // Optimize signal is added to the output of the gradient calculation.
     Port optimize = 3;
 
-    // Maximum value to limit the gradient.
+    // Maximum value to limit the output signal.
     Port max = 4;
 
-    // Minimum value to limit the gradient.
+    // Minimum value to limit the output signal.
     Port min = 5;
 
-    // Control variable is multiplied by the gradient to produce the output.
+    // Actual current value of the control variable.
+    //
+    // This signal is multiplied by the gradient to produce the output.
     Port control_variable = 6;
   }
 
@@ -156,7 +243,13 @@ message GradientController {
   // Output ports of the Gradient Controller.
   Outs out_ports = 2;
 
-  // Tolerance of the gradient controller beyond which the correction is made.
+  // Tolerance is a way to pre-multiply a setpoint by given value.
+  //
+  // Value of tolerance should be close or equal to 1, eg. 1.1.
+  //
+  // :::caution
+  // [This is going to be deprecated](https://github.com/fluxninja/aperture/issues/182).
+  // :::
   double tolerance = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
@@ -191,10 +284,9 @@ message GradientController {
 //
 // At any time EMA component operates in one of the following states:
 // 1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
-// If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+//    If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
 // 2. Normal state: The EMA is computed using following formula.
 //
-// If an invalid reading is received continuously for ema_window during the EMA stage, the last good EMA is emitted and the state gets reset back to Warm up state.
 // The EMA for a series $Y$ is calculated recursively as:
 //
 // $$
@@ -212,6 +304,8 @@ message GradientController {
 // $$
 // \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
 // $$
+//
+// The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#-v1emains).
 message EMA {
   // Inputs for the EMA component.
   message Ins {
@@ -219,9 +313,23 @@ message EMA {
     Port input = 1;
 
     // Upper bound of the moving average.
+    //
+    // Used during the warm-up stage: if the signal would exceed `max_envelope`
+    // it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+    //
+    // :::note
+    // If the signal deviates from `max_envelope` faster than the correction
+    // faster, it might end up exceeding the envelope.
+    // :::
+    //
+    // :::note
+    // The envelope logic is **not** used outside the warm-up stage!
+    // :::
     Port max_envelope = 2;
 
     // Lower bound of the moving average.
+    //
+    // Used during the warm-up stage analoguously to `max_envelope`.
     Port min_envelope = 3;
   }
 
@@ -248,6 +356,7 @@ message EMA {
   }]; // @gotags: default:"5s"
 
   // Duration of EMA warming up window.
+  //
   // The initial value of the EMA is the average of signal readings received during the warm up window.
   google.protobuf.Duration warm_up_window = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
@@ -292,7 +401,6 @@ message EMA {
 }
 
 // Type of combinator that computes the arithmetic operation on the operand signals.
-// The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
 message ArithmeticCombinator {
   // Inputs for the Arithmetic Combinator component.
   message Ins {
@@ -316,6 +424,9 @@ message ArithmeticCombinator {
   Outs out_ports = 2;
 
   // Operator of the arithmetic operation.
+  //
+  // The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
+  // In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
   string operator = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
@@ -326,10 +437,15 @@ message ArithmeticCombinator {
   }]; // @gotags: validate:"oneof=add sub mul div xor lshift rshift"
 }
 
-// Type of combinator that computes the comparison operation on lhs and rhs signals and switches between on_true and on_false signals based on the result of the comparison.
+// Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison.
+//
 // The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
-// This component also supports time-based response, i.e. the output transitions between on_true or on_false signal if the decider condition is true or false for at least "positive_for" or "negative_for" duration.
-// If true_for and false_for durations are zero then the transitions are instantaneous.
+//
+// This component also supports time-based response, i.e. the output
+// transitions between on_true or on_false signal if the decider condition is
+// true or false for at least "positive_for" or "negative_for" duration. If
+// `true_for` and `false_for` durations are zero then the transitions are
+// instantaneous.
 message Decider {
   // Inputs for the Decider component.
   message Ins {
@@ -620,6 +736,11 @@ message PromQL {
   Outs out_ports = 1;
 
   // Describes the Prometheus query to be run.
+  //
+  // :::caution
+  // TODO we should describe how to construct the query, eg. how to employ the
+  // fluxmeters here or link to appropriate place in docs.
+  // :::
   string query_string = 2;
 
   // Describes the interval between successive evaluations of the Prometheus query.
@@ -684,7 +805,7 @@ message Sqrt {
 }
 
 // Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
-// It does so until maximum_extrapolation_interval is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+// It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 message Extrapolator {
   // Inputs for the Extrapolator component.
   message Ins {
