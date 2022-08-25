@@ -16,7 +16,7 @@ local dataSources =
         name: 'agent-prometheus',
         type: 'prometheus',
         access: 'proxy',
-        url: 'http://agent-prometheus-server',
+        url: 'http://aperture-prometheus-server',
       }),
     operationsPrometheus:
       dataSource.new('operations-prometheus') +
