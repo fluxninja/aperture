@@ -63,18 +63,24 @@ type Signal struct {
 	Looped bool
 }
 
-type signalToReading map[Signal]reading.Reading
-
 // PortToSignal is a map from port name to a slice of Signals.
 type PortToSignal map[string][]Signal
 
-// ComponentWithPorts is a Component along with In and Out ports.
-type ComponentWithPorts struct {
-	Component           Component
+// CompiledComponent consists of a Component, its MapStruct and Name.
+type CompiledComponent struct {
+	Component Component
+	MapStruct map[string]any
+	Name      string
+}
+
+// CompiledComponentAndPorts consists of a CompiledComponent and its In and Out ports.
+type CompiledComponentAndPorts struct {
 	InPortToSignalsMap  PortToSignal
 	OutPortToSignalsMap PortToSignal
-	ComponentName       string
+	CompiledComponent   CompiledComponent
 }
+
+type signalToReading map[Signal]reading.Reading
 
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
 type Circuit struct {
@@ -85,7 +91,7 @@ type Circuit struct {
 	// Looped signals persistence across ticks
 	loopedSignals signalToReading
 	// Components
-	components []ComponentWithPorts
+	components []CompiledComponentAndPorts
 	// Tick end callbacks
 	tickEndCallbacks []TickEndCallback
 }
@@ -94,15 +100,15 @@ type Circuit struct {
 var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
-func NewCircuitAndOptions(policyReadAPI iface.PolicyRead, compWithPortsList []ComponentWithPorts) (*Circuit, fx.Option) {
+func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts, policyReadAPI iface.PolicyRead) (*Circuit, fx.Option) {
 	circuit := &Circuit{
 		PolicyRead:    policyReadAPI,
 		loopedSignals: make(signalToReading),
-		components:    make([]ComponentWithPorts, 0),
+		components:    make([]CompiledComponentAndPorts, 0),
 	}
 
 	// setComponents sets the Components for a Circuit
-	setComponents := func(components []ComponentWithPorts) error {
+	setComponents := func(components []CompiledComponentAndPorts) error {
 		if len(circuit.components) > 0 {
 			return errors.New("circuit already has components")
 		}
@@ -240,9 +246,9 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				componentInPortReadings[port] = readingList
 			}
 			// log the component being executed
-			log.Trace().Str("component", cmp.ComponentName).Int("tick", tickInfo.Tick).Interface("in_ports", componentInPortReadings).Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).Msg("Executing component")
+			log.Trace().Str("component", cmp.CompiledComponent.Name).Int("tick", tickInfo.Tick).Interface("in_ports", componentInPortReadings).Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).Msg("Executing component")
 			// If control reaches this point, the component is ready to execute
-			componentOutPortReadings, err := cmp.Component.Execute(
+			componentOutPortReadings, err := cmp.CompiledComponent.Component.Execute(
 				/* pass signal */
 				componentInPortReadings,
 				/* pass tick info */

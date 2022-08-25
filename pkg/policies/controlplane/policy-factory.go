@@ -41,7 +41,7 @@ func PolicyFactoryModule() fx.Option {
 			),
 		),
 		prometheus.Module(),
-		PolicyModule(),
+		policyModule(),
 	)
 }
 
@@ -71,7 +71,7 @@ func setupPolicyFxDriver(
 		etcdClient:      etcdClient,
 	}
 
-	optionsFunc := []notifiers.FxOptionsFunc{factory.ProvideControllerPolicyFxOptions}
+	optionsFunc := []notifiers.FxOptionsFunc{factory.provideControllerPolicyFxOptions}
 	if len(fxOptionsFuncs) > 0 {
 		optionsFunc = append(optionsFunc, fxOptionsFuncs...)
 	}
@@ -106,8 +106,8 @@ func setupPolicyFxDriver(
 	return nil
 }
 
-// ProvideControllerPolicyFxOptions Per policy fx app in controller.
-func (factory *policyFactory) ProvideControllerPolicyFxOptions(
+// provideControllerPolicyFxOptions Per policy fx app in controller.
+func (factory *policyFactory) provideControllerPolicyFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	registry *status.Registry,
@@ -120,11 +120,8 @@ func (factory *policyFactory) ProvideControllerPolicyFxOptions(
 		log.Warn().Err(err).Msg("Failed to unmarshal policy config wrapper")
 		return fx.Options(), err
 	}
-	policyFxOptions, err := NewPolicyOptions(
-		factory.circuitJobGroup,
-		factory.etcdClient,
+	policyFxOptions, err := newPolicyOptions(
 		&wrapperMessage,
-		wrapperMessage.Policy,
 	)
 	if err != nil {
 		s := status.NewStatus(nil, err)
@@ -136,5 +133,11 @@ func (factory *policyFactory) ProvideControllerPolicyFxOptions(
 		log.Warn().Err(err).Msg("Failed to create policy options")
 		return fx.Options(), err
 	}
-	return policyFxOptions, nil
+	return fx.Options(
+		policyFxOptions,
+		fx.Supply(
+			factory.circuitJobGroup,
+			factory.etcdClient,
+		),
+	), nil
 }
