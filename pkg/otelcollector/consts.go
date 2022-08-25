@@ -44,7 +44,7 @@ const (
 	// StatusCodeLabel describes HTTP status code of the response.
 	StatusCodeLabel = "http.status_code"
 	// HTTPDurationLabel describes duration of the HTTP request in milliseconds.
-	HTTPDurationLabel = "http.duration_millis"
+	HTTPDurationLabel = "duration_millis"
 	// HTTPRequestContentLength describes length of the HTTP request content in bytes.
 	HTTPRequestContentLength = "http.request_content_length"
 	// HTTPResponseContentLength describes length of the HTTP response content in bytes.
@@ -89,6 +89,4 @@ const (
 	AgentGroupLabel = "agent_group"
 	// ServicesLabel describes services to which metrics refer.
 	ServicesLabel = "services"
-	// SpanDurationLabel describes duration of the span in milliseconds from the moment the FCS check call is started till the end of the Span.
-	SpanDurationLabel = "span.duration_millis"
 )
