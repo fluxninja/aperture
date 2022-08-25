@@ -89,4 +89,6 @@ const (
 	AgentGroupLabel = "agent_group"
 	// ServicesLabel describes services to which metrics refer.
 	ServicesLabel = "services"
+	// SpanDurationLabel describes duration of the span in milliseconds from the moment the FCS check call is started till the end of the Span.
+	SpanDurationLabel = "span.duration_millis"
 )
