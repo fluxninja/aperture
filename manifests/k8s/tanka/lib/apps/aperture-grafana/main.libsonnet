@@ -1,7 +1,7 @@
 local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonnet/4.3/main.libsonnet';
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
-local policy = import 'github.com/fluxninja/aperture-libsonnet/policies/latency-gradient/main.libsonnet';
+local decisionDashboard = import 'github.com/fluxninja/aperture-blueprints/lib/1.0/dashboards/decision.libsonnet';
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;
@@ -16,7 +16,7 @@ local dataSources =
         name: 'agent-prometheus',
         type: 'prometheus',
         access: 'proxy',
-        url: 'http://agent-prometheus-server',
+        url: 'http://aperture-prometheus-server',
       }),
     operationsPrometheus:
       dataSource.new('operations-prometheus') +
@@ -40,7 +40,9 @@ local dashboards =
   [
     dashboard.new('example-dashboard') +
     dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
-    dashboard.spec.withJson(std.manifestJsonEx(policy.dashboard, indent='  ')) +
+    dashboard.spec.withJson(std.manifestJsonEx(decisionDashboard({
+      fluxmeterName: "flux_meter",
+    }).dashboard, indent='  ')) +
     dashboard.spec.withDatasources({
       inputName: 'DS_AGENT-PROMETHEUS',
       datasourceName: 'agent-prometheus',
