@@ -38,8 +38,8 @@ func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.Engine)
 }
 
 func createLogsProcessor(
-	_ context.Context,
-	_ component.ProcessorCreateSettings,
+	ctx context.Context,
+	params component.ProcessorCreateSettings,
 	cfg config.Processor,
 	nextLogsConsumer consumer.Logs,
 ) (component.LogsProcessor, error) {
@@ -48,7 +48,9 @@ func createLogsProcessor(
 	if err != nil {
 		return nil, err
 	}
-	return processorhelper.NewLogsProcessor(
+	return processorhelper.NewLogsProcessorWithCreateSettings(
+		ctx,
+		params,
 		cfg,
 		nextLogsConsumer,
 		proc.ConsumeLogs,
@@ -59,8 +61,8 @@ func createLogsProcessor(
 }
 
 func createTracesProcessor(
-	_ context.Context,
-	_ component.ProcessorCreateSettings,
+	ctx context.Context,
+	params component.ProcessorCreateSettings,
 	cfg config.Processor,
 	nextTracesConsumer consumer.Traces,
 ) (component.TracesProcessor, error) {
@@ -69,7 +71,9 @@ func createTracesProcessor(
 	if err != nil {
 		return nil, err
 	}
-	return processorhelper.NewTracesProcessor(
+	return processorhelper.NewTracesProcessorWithCreateSettings(
+		ctx,
+		params,
 		cfg,
 		nextTracesConsumer,
 		proc.ConsumeTraces,
