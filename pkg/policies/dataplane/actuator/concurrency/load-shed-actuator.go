@@ -134,12 +134,13 @@ func newLoadShedActuatorFactory(
 }
 
 // newLoadShedActuator creates a new load shed actuator based on proto spec.
-func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath string, conLimiter *concurrencyLimiter, registry status.Registry, clock clockwork.Clock, lifecycle fx.Lifecycle, metricLabels prometheus.Labels) (*loadShedActuator, error) {
+func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concurrencyLimiter, registry status.Registry, clock clockwork.Clock, lifecycle fx.Lifecycle, metricLabels prometheus.Labels) (*loadShedActuator, error) {
+	reg := status.NewRegistry(registry, "load_shed")
+
 	lsa := &loadShedActuator{
 		conLimiter:     conLimiter,
 		clock:          clock,
-		statusRegistry: registry,
-		registryPath:   fmt.Sprintf("%s.load_shed", registryPath),
+		statusRegistry: reg,
 	}
 
 	unmarshaller, err := config.NewProtobufUnmarshaller(nil)
@@ -157,7 +158,7 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath stri
 		OnStart: func(context.Context) error {
 			retErr := func(err error) error {
 				s := status.NewStatus(nil, err)
-				errStatus := lsa.statusRegistry.Push(lsa.registryPath, s)
+				errStatus := lsa.statusRegistry.Push(s)
 				if errStatus != nil {
 					errStatus = errors.Wrap(errStatus, "failed to push status")
 					return multierr.Append(err, errStatus)
@@ -228,7 +229,7 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath stri
 			}
 
 			s := status.NewStatus(nil, errMulti)
-			err = lsa.statusRegistry.Push(lsa.registryPath, s)
+			err = lsa.statusRegistry.Push(s)
 			if err != nil {
 				errMulti = multierr.Append(errMulti, err)
 			}
@@ -244,7 +245,6 @@ type loadShedActuator struct {
 	clock               clockwork.Clock
 	tokenBucketLoadShed *scheduler.TokenBucketLoadShed
 	statusRegistry      status.Registry
-	registryPath        string
 }
 
 func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
@@ -260,7 +260,7 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		statusMsg := "Failed to unmarshal config wrapper"
 		log.Warn().Err(err).Msg(statusMsg)
 		s := status.NewStatus(nil, err)
-		rPErr := lsa.statusRegistry.Push(lsa.registryPath, s)
+		rPErr := lsa.statusRegistry.Push(s)
 		if rPErr != nil {
 			log.Error().Err(rPErr).Msg("Failed to push status")
 		}
@@ -272,7 +272,7 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", lsa.conLimiter.GetPolicyHash(), wrapperMessage.PolicyHash)
 		log.Warn().Err(err).Msg(statusMsg)
 		s := status.NewStatus(nil, err)
-		rPErr := lsa.statusRegistry.Push(lsa.registryPath, s)
+		rPErr := lsa.statusRegistry.Push(s)
 		if rPErr != nil {
 			log.Error().Err(rPErr).Msg("Failed to push status")
 		}

@@ -29,8 +29,8 @@ func RegisterStatusService(server *grpc.Server, reg status.Registry) {
 func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.GroupStatusRequest) (*statusv1.GroupStatus, error) {
 	log.Trace().Str("group", req.Group).Msg("Received request on GetGroupStatus handler")
 
-	status := svc.registry.Get(req.Group)
-
+	groupStatusRegistry := status.NewRegistry(svc.registry, req.Group)
+	status := groupStatusRegistry.Get()
 	return status, nil
 }
 
@@ -41,6 +41,5 @@ func (svc *StatusService) GetGroups(ctx context.Context, req *emptypb.Empty) (*s
 	response := &statusv1.Groups{
 		Groups: svc.registry.Keys(),
 	}
-
 	return response, nil
 }

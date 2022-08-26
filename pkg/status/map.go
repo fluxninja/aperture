@@ -47,7 +47,12 @@ func mergeMaps(a, b map[string]*statusv1.GroupStatus) {
 			continue
 		}
 
-		bv.Status = av.Status
+		if av.Status.Details != nil {
+			bv.Status.Details = av.Status.GetDetails()
+		}
+		if av.Status.Timestamp != nil {
+			bv.Status.Timestamp = av.Status.GetTimestamp()
+		}
 
 		// If key exists in b, merge the two
 		if bv.Groups != nil {

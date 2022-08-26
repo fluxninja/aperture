@@ -67,11 +67,11 @@ type WatchdogIn struct {
 }
 
 type watchdog struct {
-	sentinel               *gcSentinel
-	watchdogStatusRegistry status.Registry
-	jobGroup               *jobs.JobGroup
-	watchdogJob            *jobs.MultiJob
-	config                 WatchdogConfig
+	sentinel           *gcSentinel
+	heapStatusRegistry status.Registry
+	jobGroup           *jobs.JobGroup
+	watchdogJob        *jobs.MultiJob
+	config             WatchdogConfig
 }
 
 func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
@@ -82,9 +82,9 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 		return err
 	}
 
-	r := status.NewRegistryPrefix(in.StatusRegistry, watchdogJobName)
+	watchdogRegistry := status.NewRegistry(in.StatusRegistry, watchdogJobName)
 
-	w := newWatchdog(in.JobGroup, r, config)
+	w := newWatchdog(in.JobGroup, watchdogRegistry, config)
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -99,14 +99,17 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 }
 
 func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config WatchdogConfig) *watchdog {
-	job := jobs.NewMultiJob(watchdogJobName, jobGroup.GroupName(), true, registry, nil, nil)
+	livenessReg := status.NewRegistry(registry, jobGroup.GroupName())
+	job := jobs.NewMultiJob(watchdogJobName, true, livenessReg, nil, nil)
+
+	heapStatusRegistry := status.NewRegistry(registry, heapStatusKey)
 
 	w := &watchdog{
-		watchdogStatusRegistry: registry,
-		jobGroup:               jobGroup,
-		watchdogJob:            job,
-		config:                 config,
-		sentinel:               newSentinel(),
+		heapStatusRegistry: heapStatusRegistry,
+		jobGroup:           jobGroup,
+		watchdogJob:        job,
+		config:             config,
+		sentinel:           newSentinel(),
 	}
 
 	return w
@@ -160,7 +163,7 @@ func (w *watchdog) start() error {
 	if w.config.Heap.WatermarksPolicy.Enabled || w.config.Heap.AdaptivePolicy.Enabled {
 		hp = newHeapPolicy(w.config.Heap)
 		s := status.NewStatus(nil, nil)
-		err = w.watchdogStatusRegistry.Push(heapStatusKey, s)
+		err = w.heapStatusRegistry.Push(s)
 		if err != nil {
 			return err
 		}
@@ -182,7 +185,7 @@ func (w *watchdog) start() error {
 				if hp != nil {
 					details, e := hp.checkHeap()
 					s := status.NewStatus(details, e)
-					err := w.watchdogStatusRegistry.Push(heapStatusKey, s)
+					err := w.heapStatusRegistry.Push(s)
 					if err != nil {
 						log.Error().Err(err).Msg("Unable to push heap check results to status registry")
 					}
@@ -205,7 +208,7 @@ func (w *watchdog) stop() error {
 	}
 	_ = w.watchdogJob.DeregisterJob("cgroup")
 	_ = w.watchdogJob.DeregisterJob("system")
-	err = w.watchdogStatusRegistry.Delete(heapStatusKey)
+	err = w.heapStatusRegistry.Delete()
 	if err != nil {
 		merr = multierr.Append(merr, err)
 	}

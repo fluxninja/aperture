@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -99,24 +100,7 @@ func (jgc JobGroupConstructor) provideJobGroup(
 		log.Panic().Err(err).Msg("Unable to deserialize JobGroup configuration!")
 	}
 
-	scheduler := gocron.NewScheduler(time.Local)
-
-	scheduler.TagsUnique()
-
-	if config.MaxConcurrentJobs > 0 {
-		switch jgc.SchedulerMode {
-		case RescheduleMode:
-			scheduler.SetMaxConcurrentJobs(config.MaxConcurrentJobs, gocron.RescheduleMode)
-		case WaitMode:
-			scheduler.SetMaxConcurrentJobs(config.MaxConcurrentJobs, gocron.WaitMode)
-		}
-	}
-
-	// always singleton
-	scheduler.SingletonModeAll()
-
 	gwAll := GroupWatchers{}
-
 	if len(jgc.GW) > 0 || len(gw) > 0 {
 		gwAll = append(gwAll, jgc.GW...)
 		gwAll = append(gwAll, gw...)
@@ -144,23 +128,21 @@ var errInitialResult = errors.New("job hasn't been scheduled yet")
 // JobGroup tracks a group of jobs.
 // It is responsible for scheduling jobs and keeping track of their statuses.
 type JobGroup struct {
-	registry  status.Registry
 	scheduler *gocron.Scheduler
 	gt        *groupTracker
 	name      string
 }
 
 // NewJobGroup creates a new JobGroup.
-func NewJobGroup(name string,
-	registry status.Registry,
+func NewJobGroup(
+	name string,
+	statusRegistry status.Registry,
 	maxConcurrentJobs int,
 	schedulerMode SchedulerMode,
 	gws GroupWatchers,
 ) (*JobGroup, error) {
 	scheduler := gocron.NewScheduler(time.UTC)
-
 	scheduler.TagsUnique()
-
 	if maxConcurrentJobs > 0 {
 		switch schedulerMode {
 		case RescheduleMode:
@@ -169,14 +151,13 @@ func NewJobGroup(name string,
 			scheduler.SetMaxConcurrentJobs(maxConcurrentJobs, gocron.WaitMode)
 		}
 	}
-
 	// always singleton
 	scheduler.SingletonModeAll()
+
 	jg := &JobGroup{
 		name:      name,
-		registry:  registry,
 		scheduler: scheduler,
-		gt:        newGroupTracker(gws, registry, name),
+		gt:        newGroupTracker(gws, statusRegistry, name),
 	}
 
 	return jg, nil
@@ -208,6 +189,8 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 	if !config.InitiallyHealthy {
 		initialErr = errInitialResult
 	}
+
+	fmt.Printf("\n\n registering job: %+v\n", job)
 
 	executor := newJobExecutor(job, jg, config)
 	// add to the tracker
@@ -280,10 +263,13 @@ func (jg *JobGroup) JobInfo(name string) *JobInfo {
 	return nil
 }
 
-// IsHealthy returns true if the job is healthy.
-func (jg *JobGroup) IsHealthy() bool {
-	return jg.gt.isHealthy()
-}
+// // IsHealthy returns true if the job is healthy.
+// func (jg *JobGroup) IsHealthy() bool {
+// 	flatMap, _ := jg.gt.statusRegistry.GetAllFlat()
+// 	b, _ := json.MarshalIndent(flatMap, "", " ")
+// 	fmt.Printf("\n\n b: %+v\n", string(b))
+// 	return jg.gt.isHealthy()
+// }
 
 // Results returns the results of all jobs in the JobGroup.
 func (jg *JobGroup) Results() (*statusv1.GroupStatus, bool) {

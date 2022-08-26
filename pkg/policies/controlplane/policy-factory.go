@@ -48,7 +48,7 @@ func PolicyFactoryModule() fx.Option {
 type policyFactory struct {
 	circuitJobGroup *jobs.JobGroup
 	etcdClient      *etcdclient.Client
-	registryPath    string
+	registry        status.Registry
 }
 
 // Main fx app.
@@ -65,8 +65,10 @@ func setupPolicyFxDriver(
 		return err
 	}
 
+	policiesStatusRegistry := status.NewRegistry(registry, policiesStatusRoot)
+
 	factory := &policyFactory{
-		registryPath:    policiesStatusRoot,
+		registry:        policiesStatusRegistry,
 		circuitJobGroup: circuitJobGroup,
 		etcdClient:      etcdClient,
 	}
@@ -81,8 +83,7 @@ func setupPolicyFxDriver(
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
 		},
-		StatusRegistry: registry,
-		StatusPath:     policiesStatusRoot,
+		StatusRegistry: policiesStatusRegistry,
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -110,13 +111,12 @@ func setupPolicyFxDriver(
 func (factory *policyFactory) ProvideControllerPolicyFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry status.Registry,
 ) (fx.Option, error) {
 	var wrapperMessage configv1.PolicyWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.Policy == nil {
 		s := status.NewStatus(nil, err)
-		_ = registry.Push(factory.registryPath, s)
+		_ = factory.registry.Push(s)
 		log.Warn().Err(err).Msg("Failed to unmarshal policy config wrapper")
 		return fx.Options(), err
 	}
@@ -128,7 +128,7 @@ func (factory *policyFactory) ProvideControllerPolicyFxOptions(
 	)
 	if err != nil {
 		s := status.NewStatus(nil, err)
-		rPErr := registry.Push(factory.registryPath, s)
+		rPErr := factory.registry.Push(s)
 		if rPErr != nil {
 			// Wrap errors
 			err = errors.Wrap(err, rPErr.Error())

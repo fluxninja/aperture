@@ -79,13 +79,18 @@ func setupFluxMeterModule(
 	// save policy config api
 	engineAPI = e
 
+	reg := status.NewRegistry(sr, fluxMeterStatusRoot)
+
+	fmf := &fluxMeterFactory{
+		statusRegistry: reg,
+	}
+
 	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{NewFluxMeterOptions},
+		FxOptionsFuncs: []notifiers.FxOptionsFunc{fmf.newFluxMeterOptions},
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
 		},
-		StatusPath:         fluxMeterStatusRoot,
-		StatusRegistry:     sr,
+		StatusRegistry:     reg,
 		PrometheusRegistry: pr,
 	}
 
@@ -104,18 +109,22 @@ type FluxMeter struct {
 	buckets        []float64
 }
 
+type fluxMeterFactory struct {
+	statusRegistry status.Registry
+}
+
 // NewFluxMeterOptions creates fluxmeter for usage in dataplane and also returns its fx options.
-func NewFluxMeterOptions(
+func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry status.Registry,
 ) (fx.Option, error) {
-	registryPath := path.Join(fluxMeterStatusRoot, key.String())
+	reg := status.NewRegistry(fluxMeterFactory.statusRegistry, key.String())
+
 	wrapperMessage := &configv1.FluxMeterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.FluxMeter == nil {
 		s := status.NewStatus(nil, err)
-		_ = registry.Push(registryPath, s)
+		_ = reg.Push(s)
 		log.Warn().Err(err).Msg("Failed to unmarshal flux meter config wrapper")
 		return fx.Options(), err
 	}

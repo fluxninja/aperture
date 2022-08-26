@@ -9,11 +9,14 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-const platformReadinessStatusName = "readiness.platform"
+const (
+	readinessStatusPath = "readiness"
+	platformStatusPath  = "platform"
+)
 
 func platformStatusModule() fx.Option {
 	return fx.Options(
-		fx.Invoke(providePlatformReadinessStatus),
+		fx.Invoke(platformReadinessStatus),
 	)
 }
 
@@ -24,9 +27,12 @@ type platformReadinessStatusIn struct {
 	StatusRegistry status.Registry
 }
 
-func providePlatformReadinessStatus(in platformReadinessStatusIn) error {
+func platformReadinessStatus(in platformReadinessStatusIn) error {
+	readinessStatusRegistry := status.NewRegistry(in.StatusRegistry, readinessStatusPath)
+	platformStatusRegistry := status.NewRegistry(readinessStatusRegistry, platformStatusPath)
+
 	s := status.NewStatus(nil, nil)
-	err := in.StatusRegistry.Push(platformReadinessStatusName, s)
+	err := platformStatusRegistry.Push(s)
 	if err != nil {
 		return err
 	}
@@ -34,7 +40,7 @@ func providePlatformReadinessStatus(in platformReadinessStatusIn) error {
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			s := status.NewStatus(nil, errors.New("platform starting"))
-			err := in.StatusRegistry.Push(platformReadinessStatusName, s)
+			err := platformStatusRegistry.Push(s)
 			if err != nil {
 				return err
 			}
@@ -42,7 +48,7 @@ func providePlatformReadinessStatus(in platformReadinessStatusIn) error {
 		},
 		OnStop: func(context.Context) error {
 			s := status.NewStatus(nil, errors.New("platform stopping"))
-			err := in.StatusRegistry.Push(platformReadinessStatusName, s)
+			err := platformStatusRegistry.Push(s)
 			if err != nil {
 				return err
 			}

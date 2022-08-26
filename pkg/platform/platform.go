@@ -184,8 +184,11 @@ func Run(app *fx.App) {
 
 	defer stop(app)
 
+	readinessStatusRegistry := status.NewRegistry(platform.statusRegistry, readinessStatusPath)
+	platformStatusRegistry := status.NewRegistry(readinessStatusRegistry, platformStatusPath)
+
 	s := status.NewStatus(wrapperspb.String("platform running"), nil)
-	err := platform.statusRegistry.Push(platformReadinessStatusName, s)
+	err := platformStatusRegistry.Push(s)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to push platform readiness status")
 		return

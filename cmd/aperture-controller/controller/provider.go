@@ -45,7 +45,7 @@ var (
 	classifiersDefaultPath = path.Join(config.DefaultAssetsDirectory, "classifiers")
 	classifiersPathKey     = "controller.classifiers_path"
 	classifiersFxTag       = "Classifiers"
-	rulesetKey             = "classification.ruleset"
+	rulesetKey             = "ruleset"
 
 	policiesDefaultPath = path.Join(config.DefaultAssetsDirectory, "policies")
 	policiesPathKey     = "controller.policies_path"
@@ -93,25 +93,27 @@ func setClassifiersPathFlag(fs *pflag.FlagSet) error {
 // Sync classifiers config directory with etcd.
 func setupClassifiersNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry status.Registry) {
 	transformKey := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (retKey notifiers.Key, retBytes []byte, retErr error) {
-		statusPath := rulesetKey + "." + key.String()
+		rulesetReg := status.NewRegistry(statusRegistry, rulesetKey)
+		reg := status.NewRegistry(rulesetReg, key.String())
+
 		classifierMsg := &classificationv1.Classifier{}
 
 		updateStatus := func() {
 			if etype == notifiers.Remove {
-				err := statusRegistry.Delete(statusPath)
+				err := reg.Delete()
 				if err != nil {
 					log.Error().Err(err).Msg("failed to delete status")
 				}
 			} else if etype == notifiers.Write {
 				if retErr != nil {
 					s := status.NewStatus(nil, retErr)
-					pushErr := statusRegistry.Push(statusPath, s)
+					pushErr := reg.Push(s)
 					if pushErr != nil {
 						log.Error().Err(pushErr).Msg("could not push error to status registry")
 					}
 				} else {
 					s := status.NewStatus(classifierMsg, nil)
-					pushErr := statusRegistry.Push(statusPath, s)
+					pushErr := reg.Push(s)
 					if pushErr != nil {
 						log.Error().Err(pushErr).Msg("could not push classifier to status registry")
 					}
@@ -210,7 +212,8 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 // Sync policies config directory with etcd.
 func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry status.Registry) {
 	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
-		statusPath := policyKey + "." + key.String()
+		policyReg := status.NewRegistry(statusRegistry, policyKey)
+		reg := status.NewRegistry(policyReg, key.String())
 
 		var dat []byte
 
@@ -237,13 +240,13 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 			}
 
 			s := status.NewStatus(wrapper, nil)
-			pushErr := statusRegistry.Push(statusPath, s)
+			pushErr := reg.Push(s)
 			if pushErr != nil {
 				log.Error().Err(pushErr).Msg("could not push classification rules to status registry")
 			}
 
 		case notifiers.Remove:
-			_ = statusRegistry.Delete(statusPath)
+			_ = reg.Delete()
 		}
 		return key, dat, nil
 	}

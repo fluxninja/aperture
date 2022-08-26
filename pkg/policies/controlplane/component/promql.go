@@ -49,7 +49,7 @@ func PromQLModule() fx.Option {
 }
 
 func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.API) notifiers.FxOptionsFunc {
-	return func(key notifiers.Key, unmarshaller config.Unmarshaller, registry status.Registry) (fx.Option, error) {
+	return func(key notifiers.Key, unmarshaller config.Unmarshaller) (fx.Option, error) {
 		return fx.Supply(fx.Annotated{Name: promQLJobGroupTag, Target: promQLJobGroup},
 			fx.Annotate(promAPI, fx.As(new(prometheusv1.API))),
 		), nil
@@ -71,8 +71,10 @@ func PromQLModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 		var jws []jobs.JobWatcher
 		jws = append(jws, pje)
 
+		reg := status.NewRegistry(registry, promQLJobGroupTag)
+
 		// Create promMultiJob for this circuit
-		promMultiJob := jobs.NewMultiJob(circuitAPI.GetPolicyName(), promQLJobGroupTag, false, registry, jws, nil)
+		promMultiJob := jobs.NewMultiJob(circuitAPI.GetPolicyName(), false, reg, jws, nil)
 		pje.promMultiJob = promMultiJob
 
 		initialDelay := config.Duration{Duration: durationpb.New(time.Duration(-1))}

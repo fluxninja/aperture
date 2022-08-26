@@ -246,7 +246,7 @@ func TestLimitSetGetAndOverrides(t *testing.T) {
 func createJobGroup(limiter RateTracker) *jobs.JobGroup {
 	var gws jobs.GroupWatchers
 
-	reg := status.NewRegistry(".")
+	reg := status.NewRegistry(nil, "")
 
 	group, err := jobs.NewJobGroup("Sync", reg, 0, jobs.RescheduleMode, gws)
 	if err != nil {

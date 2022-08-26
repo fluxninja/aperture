@@ -19,31 +19,34 @@ var (
 )
 
 type jobTracker struct {
-	job Job
+	job            Job
+	statusRegistry status.Registry
 }
 
-func newJobTracker(job Job) *jobTracker {
+func newJobTracker(job Job, statusRegistry status.Registry) *jobTracker {
+	reg := status.NewRegistry(statusRegistry, job.Name())
 	return &jobTracker{
-		job: job,
+		job:            job,
+		statusRegistry: reg,
 	}
 }
 
 // Common groupTracker.
 type groupTracker struct {
-	mu            sync.Mutex
-	trackers      map[string]*jobTracker
-	registry      status.Registry
-	name          string
-	groupWatchers GroupWatchers
+	mu             sync.Mutex
+	trackers       map[string]*jobTracker
+	statusRegistry status.Registry
+	name           string
+	groupWatchers  GroupWatchers
 }
 
-func newGroupTracker(gws GroupWatchers, registry status.Registry, name string) *groupTracker {
-	r := status.NewRegistryPrefix(registry, name)
+func newGroupTracker(gws GroupWatchers, statusRegistry status.Registry, name string) *groupTracker {
+	reg := status.NewRegistry(statusRegistry, name)
 	return &groupTracker{
-		name:          name,
-		trackers:      make(map[string]*jobTracker),
-		registry:      r,
-		groupWatchers: gws,
+		name:           name,
+		trackers:       make(map[string]*jobTracker),
+		statusRegistry: reg,
+		groupWatchers:  gws,
 	}
 }
 
@@ -61,18 +64,13 @@ func (gt *groupTracker) updateStatus(job Job, s *statusv1.Status) error {
 		return errExistingJob
 	}
 
-	// regPath := gt.getStatusRegPath(job.Name())
-	err := gt.registry.Push(job.Name(), s)
+	err := gt.statusRegistry.Push(s)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
-// func (gt *groupTracker) getStatusRegPath(jobName string) string {
-// 	return strings.Join([]string{gt.name, jobName}, gt.registry.Delim())
-// }
 
 func (gt *groupTracker) registerJob(job Job) error {
 	if job.Name() == "" {
@@ -90,11 +88,10 @@ func (gt *groupTracker) registerJob(job Job) error {
 		return errExistingJob
 	}
 
-	tracker := newJobTracker(job)
+	tracker := newJobTracker(job, gt.statusRegistry)
 	gt.trackers[job.Name()] = tracker
 
-	// regPath := gt.getStatusRegPath(job.Name())
-	err := gt.registry.Push(job.Name(), s)
+	err := gt.statusRegistry.Push(s)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to push job status to registry")
 		return err
@@ -119,8 +116,7 @@ func (gt *groupTracker) deregisterJob(name string) (Job, error) {
 	delete(gt.trackers, name)
 	gt.groupWatchers.OnJobDeregistered(name)
 
-	// regPath := gt.getStatusRegPath(name)
-	err := gt.registry.Delete(name)
+	err := gt.statusRegistry.Delete()
 	if err != nil {
 		log.Error().Err(err).Msg("failed to delete job status")
 	}
@@ -139,8 +135,7 @@ func (gt *groupTracker) reset() []Job {
 		jobs = append(jobs, job)
 		gt.groupWatchers.OnJobDeregistered(job.Name())
 
-		// regPath := gt.getStatusRegPath(job.Name())
-		err := gt.registry.Delete(job.Name())
+		err := gt.statusRegistry.Delete()
 		if err != nil {
 			log.Error().Err(err).Msg("failed to delete job status")
 		}
@@ -151,19 +146,18 @@ func (gt *groupTracker) reset() []Job {
 	return jobs
 }
 
-func (gt *groupTracker) isHealthy() bool {
-	gt.mu.Lock()
-	defer gt.mu.Unlock()
+// func (gt *groupTracker) isHealthy() bool {
+// 	gt.mu.Lock()
+// 	defer gt.mu.Unlock()
 
-	for _, tracker := range gt.trackers {
-		// regPath := gt.getStatusRegPath(tracker.job.Name())
-		gs := gt.registry.Get(tracker.job.Name())
-		if gs.Status.GetError().GetMessage() != "" {
-			return false
-		}
-	}
-	return true
-}
+// 	for _, tracker := range gt.trackers {
+// 		gs := tracker.statusRegistry.Get()
+// 		if gs.Status.GetError().GetMessage() != "" {
+// 			return false
+// 		}
+// 	}
+// 	return true
+// }
 
 func (gt *groupTracker) results() (*statusv1.GroupStatus, bool) {
 	gt.mu.Lock()
@@ -176,8 +170,7 @@ func (gt *groupTracker) results() (*statusv1.GroupStatus, bool) {
 	healthy := true
 
 	for name, tracker := range gt.trackers {
-		// regPath := gt.getStatusRegPath(tracker.job.Name())
-		tgs := gt.registry.Get(tracker.job.Name())
+		tgs := tracker.statusRegistry.Get()
 		if tgs == nil {
 			log.Debug().Str("path", tracker.job.Name()).Msg("returned nil status")
 			continue

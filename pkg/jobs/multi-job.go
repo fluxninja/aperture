@@ -3,7 +3,6 @@ package jobs
 import (
 	"context"
 	"errors"
-	"strings"
 	"sync"
 
 	"go.uber.org/fx"
@@ -50,7 +49,7 @@ func (mjc MultiJobConstructor) provideMultiJob(
 	gws GroupWatchers,
 	jws JobWatchers,
 	jg *JobGroup,
-	registry status.Registry,
+	statusRegistry status.Registry,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (*MultiJob, error) {
@@ -74,8 +73,9 @@ func (mjc MultiJobConstructor) provideMultiJob(
 		jwAll = append(jwAll, jws...)
 	}
 
+	reg := status.NewRegistry(statusRegistry, mjc.JobGroupName)
 	// Create a new MultiJob instance
-	mj := NewMultiJob(mjc.Name, mjc.JobGroupName, config.AlwaysHealthy, registry, jwAll, gwAll)
+	mj := NewMultiJob(mjc.Name, config.AlwaysHealthy, reg, jwAll, gwAll)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -101,22 +101,21 @@ func (mjc MultiJobConstructor) provideMultiJob(
 type MultiJob struct {
 	gt *groupTracker
 	JobBase
-	alwaysHealthy bool // Always makes the jobs as healthy even when Jobs fail.
+	alwaysHealthy bool // Always marks the jobs as healthy even when Jobs fail.
 }
 
 // Make sure MultiJob complies with Job interface.
 var _ Job = (*MultiJob)(nil)
 
 // NewMultiJob creates a new instance of MultiJob.
-func NewMultiJob(name string, group string, alwaysHealthy bool, registry status.Registry, jws JobWatchers, gws GroupWatchers) *MultiJob {
-	gtName := strings.Join([]string{group, name}, registry.Delim())
+func NewMultiJob(name string, alwaysHealthy bool, statusRegistry status.Registry, jws JobWatchers, gws GroupWatchers) *MultiJob {
 	return &MultiJob{
 		JobBase: JobBase{
 			JobName: name,
 			JWS:     jws,
 		},
 		alwaysHealthy: alwaysHealthy,
-		gt:            newGroupTracker(gws, registry, gtName),
+		gt:            newGroupTracker(gws, statusRegistry, name),
 	}
 }
 

@@ -75,15 +75,18 @@ type ProvideClassifierIn struct {
 	Registry   status.Registry
 }
 
+const classifierDriverRegistryPath = "classifier-driver"
+
 // ProvideClassifier provides a classifier that loads the rules from config file.
 func ProvideClassifier(in ProvideClassifierIn) *Classifier {
+	reg := status.NewRegistry(in.Registry, classifierDriverRegistryPath)
+
 	fxDriver := &notifiers.FxDriver{
 		FxOptionsFuncs: []notifiers.FxOptionsFunc{in.Classifier.provideClassifierFxOptions},
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
 		},
-		StatusRegistry: in.Registry,
-		StatusPath:     "classifier-driver",
+		StatusRegistry: reg,
 	}
 
 	in.Lifecycle.Append(fx.Hook{
@@ -115,7 +118,6 @@ func RegisterCMFileValidator(validator *CMFileValidator, configMapValidator *val
 func (c *Classifier) provideClassifierFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry status.Registry,
 ) (fx.Option, error) {
 	return fx.Options(
 		fx.Supply(c),
