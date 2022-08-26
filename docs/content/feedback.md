@@ -9,7 +9,6 @@ keywords:
   - fluxninja
   - microservices
   - cloud
-  sidebar_position: 10
 ---
 
 Aperture Feedback URL: https://github.com/fluxninja/aperture/issues/new/choose
