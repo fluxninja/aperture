@@ -294,9 +294,7 @@ func getLatencyLabel(attributes pcommon.Map) string {
 	}
 	switch controlPoint.AsString() {
 	case otelcollector.ControlPointFeature:
-		return otelcollector.FeatureDurationLabel
-	case otelcollector.ControlPointIngress, otelcollector.ControlPointEgress:
-		return otelcollector.HTTPDurationLabel
+		return otelcollector.DurationLabel
 	}
 	return ""
 }

@@ -43,14 +43,12 @@ const (
 	LabeledLabel = "labeled"
 	// StatusCodeLabel describes HTTP status code of the response.
 	StatusCodeLabel = "http.status_code"
-	// HTTPDurationLabel describes duration of the HTTP request in milliseconds.
-	HTTPDurationLabel = "duration_millis"
+	// DurationLabel describes duration of the request which can be a feature request duration, fcs latency duration or http latency duration.
+	DurationLabel = "duration_millis"
 	// HTTPRequestContentLength describes length of the HTTP request content in bytes.
 	HTTPRequestContentLength = "http.request_content_length"
 	// HTTPResponseContentLength describes length of the HTTP response content in bytes.
 	HTTPResponseContentLength = "http.response_content_length"
-	// FeatureDurationLabel describes duration of the feature in milliseconds.
-	FeatureDurationLabel = "feature.duration_millis"
 	// DecisionTypeLabel describes the decision type taken by policy.
 	DecisionTypeLabel = "decision_type"
 	// DecisionErrorReasonLabel describes the error reason of the decision taken by policy.

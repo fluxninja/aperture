@@ -185,7 +185,7 @@ func addMetricsProcessor(config *otelcollector.OTELConfig) {
 
 func addRollupProcessor(config *otelcollector.OTELConfig) {
 	rollupFields := []string{
-		otelcollector.HTTPDurationLabel,
+		otelcollector.DurationLabel,
 		otelcollector.HTTPRequestContentLength,
 		otelcollector.HTTPResponseContentLength,
 	}
