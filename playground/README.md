@@ -1,42 +1,27 @@
-# Playground
+# Deployment for k8s
 
-Playground is a Kubernetes based environment for exploring the capabilities of
-Aperture. Additionally it is used as a development environment for Aperture.
-Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in
-Kubernetes. Tilt watches for changes to local files and auto-deploys any
-resources that change. This is very convenient for getting quick feedback during
-development of Aperture.
-
-Playground deploys resources to the Kubernetes cluster that `kubectl` on your
-machine points at. For convience, this README includes instructions for
-deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
+This directory contains definitions used for local k8s deployments.
 
 ## Tools
 
-Described hereafter deployment methods assume usage of specific deployment and
-configuration/management tools (which must be installed beforehand).
+Described hereafter deployment methods assume usage of specific deployment and configuration/management tools (which must be installed beforehand).
 
-To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install
-manually (check [Tools used for k8s deployment](#tools-used-for-k8s-deployment)
-).
+To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install manually (check [Tools used for k8s deployment](#tools-used-for-k8s-deployment) ).
 
 When using `asdf`:
 
-- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
-  and [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
-  `asdf`
-- Add intended plugins (tools/applications which will be managed by `asdf`) e.g.
-  `asdf plugin-add terraform`
+- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf) `asdf`
+- Add intended plugins (tools/applications which will be managed by `asdf`) e.g. `asdf plugin-add terraform`
 - Install tools: `asdf install`
 
-> Note: Last command will install tools which have been added as plugins and
-> which are defined/versioned in `.tool-versions` file
+> Note:
+> Last command will install tools which has been added as plugins and which are defined/versioned in `.tool-versions` file
 
-### Tools required for k8s deployment
+## Tools used for k8s deployment
 
 Tools which are required for local k8s deployment:
 
-#### helm
+### helm
 
 Helm is a package manager for k8s.
 
@@ -93,22 +78,7 @@ Tilt can be installed with `asdf install` or manually
 Create a K8s cluster using Kind with configuration file:
 
 ```sh
-kind create cluster --config kind-config.yaml
-```
-
-This will start a cluster with the name `aperture-playground`.
-
-Once done, you can delete the cluster with following command:
-
-```sh
-kind delete cluster --name aperture-playground
-```
-
-Alternatively, you can use [`ctlptl`](https://github.com/tilt-dev/ctlptl) to
-start a cluster with built-in local registry for Docker images:
-
-```sh
-ctlptl apply -f ctlptl-kind-config.yaml
+kind create cluster --name aperture-playground --config kind-config.yaml
 ```
 
 ### Services deployment
