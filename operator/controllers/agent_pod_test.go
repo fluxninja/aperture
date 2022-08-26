@@ -57,25 +57,23 @@ var _ = Describe("Sidecar container for Agent", func() {
 
 	Context("Pod without agent container and default Aperture instance", func() {
 		It("returns correct Sidecar container", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
+				Spec: v1alpha1.AgentSpec{
 					Sidecar: v1alpha1.SidecarSpec{
 						Enabled: true,
 					},
-					Agent: v1alpha1.AgentSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort: 80,
-						},
-						Image: v1alpha1.Image{
-							Registry:   "gcr.io/devel-309501/cf-fn",
-							Repository: "aperture-agent",
-							Tag:        "latest",
-							PullPolicy: "IfNotPresent",
-						},
+					CommonSpec: v1alpha1.CommonSpec{
+						ServerPort: 80,
+					},
+					Image: v1alpha1.Image{
+						Registry:   "gcr.io/devel-309501/cf-fn",
+						Repository: "aperture-agent",
+						Tag:        "latest",
+						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -143,25 +141,23 @@ var _ = Describe("Sidecar container for Agent", func() {
 
 	Context("Pod with agent container and default Aperture instance", func() {
 		It("returns correct Sidecar container", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
+				Spec: v1alpha1.AgentSpec{
 					Sidecar: v1alpha1.SidecarSpec{
 						Enabled: true,
 					},
-					Agent: v1alpha1.AgentSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort: 80,
-						},
-						Image: v1alpha1.Image{
-							Registry:   "gcr.io/devel-309501/cf-fn",
-							Repository: "aperture-agent",
-							Tag:        "latest",
-							PullPolicy: "IfNotPresent",
-						},
+					CommonSpec: v1alpha1.CommonSpec{
+						ServerPort: 80,
+					},
+					Image: v1alpha1.Image{
+						Registry:   "gcr.io/devel-309501/cf-fn",
+						Repository: "aperture-agent",
+						Tag:        "latest",
+						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -271,53 +267,51 @@ var _ = Describe("Sidecar container for Agent", func() {
 
 	Context("Pod without agent container and all Aperture instance variables", func() {
 		It("returns correct Sidecar container", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
+				Spec: v1alpha1.AgentSpec{
 					Sidecar: v1alpha1.SidecarSpec{
 						Enabled: true,
 					},
-					Agent: v1alpha1.AgentSpec{
-						AgentGroup: test,
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort:     8000,
-							LivenessProbe:  probe,
-							ReadinessProbe: probe,
-							Resources:      resourceRequirement,
-							ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
-								Enabled:                true,
-								RunAsUser:              pointer.Int64Ptr(0),
-								RunAsNonRootUser:       pointer.BoolPtr(false),
-								ReadOnlyRootFilesystem: pointer.BoolPtr(false),
-							},
-							Command:        testArray,
-							Args:           testArray,
-							LifecycleHooks: lifecycle,
-							ExtraEnvVars: []corev1.EnvVar{
-								{
-									Name:  test,
-									Value: test,
-								},
-							},
-							ExtraEnvVarsCM:     test,
-							ExtraEnvVarsSecret: test,
-							ExtraVolumeMounts: []corev1.VolumeMount{
-								{
-									Name:      test,
-									MountPath: test,
-								},
+					AgentGroup: test,
+					CommonSpec: v1alpha1.CommonSpec{
+						ServerPort:     8000,
+						LivenessProbe:  probe,
+						ReadinessProbe: probe,
+						Resources:      resourceRequirement,
+						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
+							Enabled:                true,
+							RunAsUser:              pointer.Int64Ptr(0),
+							RunAsNonRootUser:       pointer.BoolPtr(false),
+							ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+						},
+						Command:        testArray,
+						Args:           testArray,
+						LifecycleHooks: lifecycle,
+						ExtraEnvVars: []corev1.EnvVar{
+							{
+								Name:  test,
+								Value: test,
 							},
 						},
-						Image: v1alpha1.Image{
-							Registry:    "gcr.io/devel-309501/cf-fn",
-							Repository:  "aperture-agent",
-							Tag:         "latest",
-							PullPolicy:  "IfNotPresent",
-							PullSecrets: testArray,
+						ExtraEnvVarsCM:     test,
+						ExtraEnvVarsSecret: test,
+						ExtraVolumeMounts: []corev1.VolumeMount{
+							{
+								Name:      test,
+								MountPath: test,
+							},
 						},
+					},
+					Image: v1alpha1.Image{
+						Registry:    "gcr.io/devel-309501/cf-fn",
+						Repository:  "aperture-agent",
+						Tag:         "latest",
+						PullPolicy:  "IfNotPresent",
+						PullSecrets: testArray,
 					},
 				},
 			}
@@ -475,25 +469,23 @@ var _ = Describe("Sidecar container for Agent", func() {
 var _ = Describe("Pod modification for Agent", func() {
 	Context("Pod without agent container and default Aperture Instance", func() {
 		It("returns correct Pod", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
+				Spec: v1alpha1.AgentSpec{
 					Sidecar: v1alpha1.SidecarSpec{
 						Enabled: true,
 					},
-					Agent: v1alpha1.AgentSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort: 80,
-						},
-						Image: v1alpha1.Image{
-							Registry:   "gcr.io/devel-309501/cf-fn",
-							Repository: "aperture-agent",
-							Tag:        "latest",
-							PullPolicy: "IfNotPresent",
-						},
+					CommonSpec: v1alpha1.CommonSpec{
+						ServerPort: 80,
+					},
+					Image: v1alpha1.Image{
+						Registry:   "gcr.io/devel-309501/cf-fn",
+						Repository: "aperture-agent",
+						Tag:        "latest",
+						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -581,40 +573,37 @@ var _ = Describe("Pod modification for Agent", func() {
 
 	Context("Pod with agent container and all Aperture Instance", func() {
 		It("returns correct Pod", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					ImagePullSecrets: testArray,
+				Spec: v1alpha1.AgentSpec{
 					Sidecar: v1alpha1.SidecarSpec{
 						Enabled: true,
 					},
-					Agent: v1alpha1.AgentSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort: 80,
-							InitContainers: []corev1.Container{
-								{
-									Name: test,
-								},
+					CommonSpec: v1alpha1.CommonSpec{
+						ServerPort: 80,
+						InitContainers: []corev1.Container{
+							{
+								Name: test,
 							},
-							ExtraVolumes: []corev1.Volume{
-								{
-									Name: test,
-									VolumeSource: corev1.VolumeSource{
-										EmptyDir: &corev1.EmptyDirVolumeSource{},
-									},
+						},
+						ExtraVolumes: []corev1.Volume{
+							{
+								Name: test,
+								VolumeSource: corev1.VolumeSource{
+									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},
 							},
 						},
-						Image: v1alpha1.Image{
-							Registry:    "gcr.io/devel-309501/cf-fn",
-							Repository:  "aperture-agent",
-							Tag:         "latest",
-							PullPolicy:  "IfNotPresent",
-							PullSecrets: testArrayTwo,
-						},
+					},
+					Image: v1alpha1.Image{
+						Registry:    "gcr.io/devel-309501/cf-fn",
+						Repository:  "aperture-agent",
+						Tag:         "latest",
+						PullPolicy:  "IfNotPresent",
+						PullSecrets: testArrayTwo,
 					},
 				},
 			}

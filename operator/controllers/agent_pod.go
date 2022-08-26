@@ -23,44 +23,44 @@ import (
 )
 
 // agentContainer prepares Sidecar container for the Agent based on the received parameters.
-func agentContainer(instance *v1alpha1.Aperture, container *corev1.Container, agentGroup string) {
-	agentSpec := instance.Spec.Agent
-	livenessProbe, readinessProbe := containerProbes(instance.Spec.Agent.CommonSpec)
+func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agentGroup string) {
+	spec := instance.Spec
+	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec)
 	container.Name = agentServiceName
 
 	if container.Image == "" || container.Image == "auto" {
-		container.Image = imageString(instance.Spec.ImageRegistry, agentSpec.Image)
+		container.Image = imageString(spec.Image)
 	}
 
 	if container.ImagePullPolicy == "" {
-		container.ImagePullPolicy = corev1.PullPolicy(agentSpec.Image.PullPolicy)
+		container.ImagePullPolicy = corev1.PullPolicy(spec.Image.PullPolicy)
 	}
 
 	if container.SecurityContext == nil {
-		container.SecurityContext = containerSecurityContext(agentSpec.ContainerSecurityContext)
+		container.SecurityContext = containerSecurityContext(spec.ContainerSecurityContext)
 	}
 
 	if container.Command == nil {
-		container.Command = agentSpec.Command
+		container.Command = spec.Command
 	}
 
 	if container.Args == nil {
-		container.Args = agentSpec.Args
+		container.Args = spec.Args
 	}
 
 	if container.Resources.Limits == nil {
-		container.Resources.Limits = agentSpec.Resources.Limits
+		container.Resources.Limits = spec.Resources.Limits
 	}
 
 	if container.Resources.Requests == nil {
-		container.Resources.Requests = agentSpec.Resources.Requests
+		container.Resources.Requests = spec.Resources.Requests
 	}
 
 	// Not allowing Port override until it is supported by Agent
 	container.Ports = []corev1.ContainerPort{
 		{
 			Name:          "grpc",
-			ContainerPort: int32(agentSpec.ServerPort),
+			ContainerPort: int32(spec.ServerPort),
 		},
 		{
 			Name:          "grpc-otel",
@@ -77,17 +77,17 @@ func agentContainer(instance *v1alpha1.Aperture, container *corev1.Container, ag
 	}
 
 	if container.Lifecycle == nil {
-		container.Lifecycle = agentSpec.LifecycleHooks
+		container.Lifecycle = spec.LifecycleHooks
 	}
 
 	container.Env = mergeEnvVars(agentEnv(instance, agentGroup), container.Env)
-	container.EnvFrom = mergeEnvFromSources(containerEnvFrom(agentSpec.CommonSpec), container.EnvFrom)
-	container.VolumeMounts = mergeVolumeMounts(agentVolumeMounts(agentSpec), container.VolumeMounts)
+	container.EnvFrom = mergeEnvFromSources(containerEnvFrom(spec.CommonSpec), container.EnvFrom)
+	container.VolumeMounts = mergeVolumeMounts(agentVolumeMounts(spec), container.VolumeMounts)
 }
 
 // agentPod updates the received Pod spec to add Sidecar for the Agent.
-func agentPod(instance *v1alpha1.Aperture, pod *corev1.Pod) {
-	agentSpec := instance.Spec.Agent
+func agentPod(instance *v1alpha1.Agent, pod *corev1.Pod) {
+	apec := instance.Spec
 	agentGroup := ""
 	if pod.Annotations != nil {
 		agentGroup = pod.Annotations[agentGroupKey]
@@ -111,7 +111,7 @@ func agentPod(instance *v1alpha1.Aperture, pod *corev1.Pod) {
 		pod.Spec.Containers[containerIndex] = container
 	}
 
-	pod.Spec.ImagePullSecrets = mergeImagePullSecrets(imagePullSecrets(instance.Spec.ImagePullSecrets, agentSpec.Image), pod.Spec.ImagePullSecrets)
-	pod.Spec.InitContainers = mergeContainers(agentSpec.InitContainers, pod.Spec.InitContainers)
-	pod.Spec.Volumes = mergeVolumes(agentVolumes(agentSpec), pod.Spec.Volumes)
+	pod.Spec.ImagePullSecrets = mergeImagePullSecrets(imagePullSecrets(apec.Image), pod.Spec.ImagePullSecrets)
+	pod.Spec.InitContainers = mergeContainers(apec.InitContainers, pod.Spec.InitContainers)
+	pod.Spec.Volumes = mergeVolumes(agentVolumes(apec), pod.Spec.Volumes)
 }

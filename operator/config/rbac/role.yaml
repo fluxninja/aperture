@@ -214,7 +214,7 @@ rules:
 - apiGroups:
   - fluxninja.com
   resources:
-  - apertures
+  - agents
   verbs:
   - create
   - delete
@@ -226,13 +226,39 @@ rules:
 - apiGroups:
   - fluxninja.com
   resources:
-  - apertures/finalizers
+  - agents/finalizers
   verbs:
   - update
 - apiGroups:
   - fluxninja.com
   resources:
-  - apertures/status
+  - agents/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - fluxninja.com
+  resources:
+  - controllers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - fluxninja.com
+  resources:
+  - controllers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - fluxninja.com
+  resources:
+  - controllers/status
   verbs:
   - get
   - patch

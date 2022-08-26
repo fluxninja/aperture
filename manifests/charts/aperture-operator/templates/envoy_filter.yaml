@@ -63,7 +63,7 @@ spec:
                   log_name: ingress
                   grpc_service:
                     google_grpc:
-                      {{- if .Values.aperture.sidecar.enabled }}
+                      {{- if .Values.agent.sidecar.enabled }}
                       target_uri: localhost:4317
                       {{- else }}
                       target_uri: {{ .Release.Name }}-agent.{{ template "common.names.namespace" . }}.svc.cluster.local:4317
@@ -111,7 +111,7 @@ spec:
                   log_name: egress
                   grpc_service:
                     google_grpc:
-                      {{- if .Values.aperture.sidecar.enabled }}
+                      {{- if .Values.agent.sidecar.enabled }}
                       target_uri: localhost:4317
                       {{- else }}
                       target_uri: {{ .Release.Name }}-agent.{{ template "common.names.namespace" . }}.svc.cluster.local:4317
@@ -159,8 +159,8 @@ spec:
           failure_mode_allow: true
           grpc_service:
             google_grpc:
-              {{- if .Values.aperture.sidecar.enabled }}
-              target_uri: localhost:{{ .Values.aperture.agent.serverPort | default 80 }}
+              {{- if .Values.agent.sidecar.enabled }}
+              target_uri: localhost:{{ .Values.agent.serverPort | default 80 }}
               {{- else }}
               target_uri: {{ .Release.Name }}-agent.{{ template "common.names.namespace" . }}.svc.cluster.local:80
               {{- end }}
@@ -196,8 +196,8 @@ spec:
           failure_mode_allow: true
           grpc_service:
             google_grpc:
-              {{- if .Values.aperture.sidecar.enabled }}
-              target_uri: localhost:{{ .Values.aperture.agent.serverPort | default 80 }}
+              {{- if .Values.agent.sidecar.enabled }}
+              target_uri: localhost:{{ .Values.agent.serverPort | default 80 }}
               {{- else }}
               target_uri: {{ .Release.Name }}-agent.{{ template "common.names.namespace" . }}.svc.cluster.local:4317
               {{- end }}

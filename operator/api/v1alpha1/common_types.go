@@ -180,14 +180,44 @@ type FluxNinjaPluginSpec struct {
 	//+kubebuilder:default:={insecure:false,insecureSkipVerify:false}
 	TLS TLSSpec `json:"tls"`
 
-	// API Key secret references for Agent and Controller
+	// API Key secret references for Agent or Controller
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={agent:{create:true},controller:{create:true}}
-	APIKeySecret APIKeySecretSpec `json:"apiKeySecret"`
+	//+kubebuilder:default:={create:true}
+	APIKeySecret APIKeySecret `json:"apiKeySecret"`
 }
 
 // CommonSpec defines the desired the common state of Agent and Controller.
 type CommonSpec struct {
+	// Labels to add to all deployed objects
+	//+mapType=atomic
+	//+kubebuilder:validation:Optional
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
+	Labels map[string]string `json:"labels,omitempty"`
+
+	// Annotations to add to all deployed objects
+	//+kubebuilder:validation:Optional
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
+	Annotations map[string]string `json:"annotations,omitempty"`
+
+	// FluxNinjaPlugin defines the parameters for FluxNinja plugin with Agent or Controller
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={enabled:false,heartbeatsInterval:"30s"}
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
+	FluxNinjaPlugin FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
+
+	// Configuration for Agent or Controller service
+	//+kubebuilder:validation:Optional
+	Service Service `json:"service"`
+
+	// Etcd parameters for Agent or Controller
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={leaseTtl:"60s"}
+	Etcd EtcdSpec `json:"etcd"`
+
+	// Prometheus parameters for Agent or Controller
+	//+kubebuilder:validation:Optional
+	Prometheus PrometheusSpec `json:"prometheus"`
+
 	// Server port for the Agent
 	//+kubebuilder:default:=80
 	//+kubebuilder:validation:Optional
@@ -200,7 +230,7 @@ type CommonSpec struct {
 	//+kubebuilder:default:={prettyConsole:false,nonBlocking:true,level:"info",file:"stderr"}
 	Log Log `json:"log"`
 
-	// ServiceAccountSpec defines the the configuration pf Service account for Agent and Controller
+	// ServiceAccountSpec defines the the configuration pf Service account for Agent or Controller
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:={create:true,automountServiceAccountToken:true}
 	ServiceAccountSpec ServiceAccountSpec `json:"serviceAccount"`
