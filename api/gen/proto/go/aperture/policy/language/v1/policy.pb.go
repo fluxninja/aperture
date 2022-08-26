@@ -121,9 +121,26 @@ func (x *AllPolicies) GetAllPolicies() map[string]*Policy {
 }
 
 // Policy is defined as a dataflow graph (circuit) of inter-connected components.
+//
 // Signals flow between components via ports.
 // As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
 // Policies are evaluated periodically in order to respond to changes in signal readings.
+//
+// :::info
+// **Signal**
+//
+// Signals are floating-point values.
+//
+// A signal also have a special **Invalid** value. It's usually used to
+// communicate that signal doesn't have a meaningful value at the moment, eg.
+// [PromQL](#-v1promql) emits such a value if it cannot execute a query.
+// Components know when their input signals are invalid and can act
+// accordingly. They can either propagate the invalidness, by making their
+// output itself invalid (like eg.
+// [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
+// logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+// docs on how exactly it handles invalid inputs.
+// :::
 type Policy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -131,10 +148,12 @@ type Policy struct {
 
 	// Defines a signal processing graph as a list of components.
 	Circuit []*Component `protobuf:"bytes,1,rep,name=circuit,proto3" json:"circuit,omitempty"`
-	// Evaluation interval (ticks) is the time period between consecutive runs of the policy circuit.
+	// Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
 	// This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 	EvaluationInterval *durationpb.Duration `protobuf:"bytes,2,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"0.5s"` // @gotags: default:"0.5s"
 	// FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+	//
+	// FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
 	FluxMeters map[string]*FluxMeter `protobuf:"bytes,3,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -192,12 +211,28 @@ func (x *Policy) GetFluxMeters() map[string]*FluxMeter {
 }
 
 // FluxMeter gathers metrics for the traffic that matches its selector.
+//
+// Example of a selector that creates a histogram metric for all HTTP requests
+// to particular service:
+// ```yaml
+// selector:
+//   service: myservice.mynamespace.svc.cluster.local
+//   control_point:
+//     traffic: ingress
+// ```
 type FluxMeter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Policies are only applied to flows that are matched based on the fields in the selector.
+	// What latency should we measure in the histogram created by this FluxMeter.
+	//
+	// * For traffic control points, fluxmeter will measure the duration of the
+	//   whole http transaction (including sending request and receiving
+	//   response).
+	// * For feature control points, fluxmeter will measure execution of the span
+	//   associated with particular feature. What contributes to the span's
+	//   duration is entirely up to the user code that uses Aperture library.
 	Selector *v1.Selector `protobuf:"bytes,1,opt,name=selector,proto3" json:"selector,omitempty"`
 	// Latency histogram buckets (in ms) for this FluxMeter.
 	HistogramBuckets []float64 `protobuf:"fixed64,2,rep,packed,name=histogram_buckets,json=histogramBuckets,proto3" json:"histogram_buckets,omitempty" default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"` // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
@@ -249,11 +284,38 @@ func (x *FluxMeter) GetHistogramBuckets() []float64 {
 	return nil
 }
 
-// Computational blocks that form the circuit.
+// Computational block that form the circuit
+//
 // Signals flow into the components via input ports and results are emitted on output ports.
 // Components are wired to each other based on signal names forming an execution graph of the circuit.
+//
+// :::note
 // Loops are broken by the runtime at the earliest component index that is part of the loop.
 // The looped signals are saved in the tick they are generated and served in the subsequent tick.
+// :::
+//
+// There are three categories of components:
+// * "source" components – they take some sort of input from "the real world" and output
+//   a signal based on this input. Example: [PromQL](#-v1promql). In the UI
+//   they're represented by green color.
+// * internal components – "pure" components that don't interact with the "real world".
+//   Examples: [GradientController](#-v1gradientcontroller), [Max](#-v1max).
+//   :::note
+//   Internal components's output can depend on their internal state, in addition to the inputs.
+//   Eg. see the [Exponential Moving Average filter](#-v1ema).
+//   :::
+// * "sink" components – they affect the real world.
+//   [Scheduler](#-v1scheduler) and [RateLimiter](#-languagev1ratelimiter).
+//   Also sometimes called _actuators_. In the UI, represented by orange color.
+//   Sink components are usually also "sources" too, they usually emit a
+//   feedback signal, like `accepted_concurrency` in case of ConcurrencyLimiter.
+//
+// :::tip
+// Sometimes you may want to use a constant value as one of component's inputs.
+// You can use the [Constant](#-constant) component for this.
+// :::
+//
+// See also [Policy](#-v1policy) for a higher-level explanation of circuits.
 type Component struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -536,11 +598,34 @@ func (x *Port) GetSignalName() string {
 	return ""
 }
 
-// Gradient controller
+// Gradient controller is a type of controller which tries to adjust the
+// control variable proportionally to the relative difference between setpoint
+// and actual value of the signal.
 //
-// Describes the gradient values which is computed as follows $\text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}$.
-// Limits gradient to range [min_gradient, max_gradient].
-// Output: (gradient \* control_variable) + optimize.
+// The `gradient` describes a corrective factor that should be applied to the
+// control variable to get the signal closer to the setpoint. It is computed as follows:
+//
+// $$
+// \text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}
+// $$
+//
+// `gradient` is then clamped to [min_gradient, max_gradient] range.
+//
+// The output of gradient controller is computed as follows:
+// $$
+// \text{output} = \text{gradient}_{\text{clamped}} \cdot \text{control\_variable} + \text{optimize}.
+// $$
+//
+// Note the additional `optimize` signal, that can be used to "nudge" the
+// controller into desired idle state.
+//
+// The output can be _optionally_ clamped to desired range using `max` and
+// `min` input.
+//
+// :::caution
+// Some changes are expected in the near future:
+// [#182](https://github.com/fluxninja/aperture/issues/182)
+// :::
 type GradientController struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -550,7 +635,13 @@ type GradientController struct {
 	InPorts *GradientController_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
 	// Output ports of the Gradient Controller.
 	OutPorts *GradientController_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
-	// Tolerance of the gradient controller beyond which the correction is made.
+	// Tolerance is a way to pre-multiply a setpoint by given value.
+	//
+	// Value of tolerance should be close or equal to 1, eg. 1.1.
+	//
+	// :::caution
+	// [This is going to be deprecated](https://github.com/fluxninja/aperture/issues/182).
+	// :::
 	Tolerance float64 `protobuf:"fixed64,3,opt,name=tolerance,proto3" json:"tolerance,omitempty" validate:"gte=0.0"` // @gotags: validate:"gte=0.0"
 	// Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 	MinGradient float64 `protobuf:"fixed64,4,opt,name=min_gradient,json=minGradient,proto3" json:"min_gradient,omitempty" default:"-1.79769313486231570814527423731704356798070e+308"` // @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
@@ -629,10 +720,9 @@ func (x *GradientController) GetMaxGradient() float64 {
 //
 // At any time EMA component operates in one of the following states:
 // 1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
-// If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+//    If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
 // 2. Normal state: The EMA is computed using following formula.
 //
-// If an invalid reading is received continuously for ema_window during the EMA stage, the last good EMA is emitted and the state gets reset back to Warm up state.
 // The EMA for a series $Y$ is calculated recursively as:
 //
 // $$
@@ -650,6 +740,8 @@ func (x *GradientController) GetMaxGradient() float64 {
 // $$
 // \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
 // $$
+//
+// The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#-v1emains).
 type EMA struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -662,6 +754,7 @@ type EMA struct {
 	// Duration of EMA sampling window.
 	EmaWindow *durationpb.Duration `protobuf:"bytes,3,opt,name=ema_window,json=emaWindow,proto3" json:"ema_window,omitempty" default:"5s"` // @gotags: default:"5s"
 	// Duration of EMA warming up window.
+	//
 	// The initial value of the EMA is the average of signal readings received during the warm up window.
 	WarmUpWindow *durationpb.Duration `protobuf:"bytes,4,opt,name=warm_up_window,json=warmUpWindow,proto3" json:"warm_up_window,omitempty" default:"0s"` // @gotags: default:"0s"
 	// Correction factor to apply on the output value if its in violation of the min envelope.
@@ -745,7 +838,6 @@ func (x *EMA) GetCorrectionFactorOnMaxEnvelopeViolation() float64 {
 }
 
 // Type of combinator that computes the arithmetic operation on the operand signals.
-// The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
 type ArithmeticCombinator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -756,6 +848,9 @@ type ArithmeticCombinator struct {
 	// Output ports for the Arithmetic Combinator component.
 	OutPorts *ArithmeticCombinator_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Operator of the arithmetic operation.
+	//
+	// The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
+	// In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
 	Operator string `protobuf:"bytes,3,opt,name=operator,proto3" json:"operator,omitempty" validate:"oneof=add sub mul div xor lshift rshift"` // @gotags: validate:"oneof=add sub mul div xor lshift rshift"
 }
 
@@ -812,10 +907,15 @@ func (x *ArithmeticCombinator) GetOperator() string {
 	return ""
 }
 
-// Type of combinator that computes the comparison operation on lhs and rhs signals and switches between on_true and on_false signals based on the result of the comparison.
+// Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison.
+//
 // The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
-// This component also supports time-based response, i.e. the output transitions between on_true or on_false signal if the decider condition is true or false for at least "positive_for" or "negative_for" duration.
-// If true_for and false_for durations are zero then the transitions are instantaneous.
+//
+// This component also supports time-based response, i.e. the output
+// transitions between on_true or on_false signal if the decider condition is
+// true or false for at least "positive_for" or "negative_for" duration. If
+// `true_for` and `false_for` durations are zero then the transitions are
+// instantaneous.
 type Decider struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1210,6 +1310,11 @@ type PromQL struct {
 	// Output ports for the PromQL component.
 	OutPorts *PromQL_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Describes the Prometheus query to be run.
+	//
+	// :::caution
+	// TODO we should describe how to construct the query, eg. how to employ the
+	// fluxmeters here or link to appropriate place in docs.
+	// :::
 	QueryString string `protobuf:"bytes,2,opt,name=query_string,json=queryString,proto3" json:"query_string,omitempty"`
 	// Describes the interval between successive evaluations of the Prometheus query.
 	EvaluationInterval *durationpb.Duration `protobuf:"bytes,3,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"10s"` // @gotags: default:"10s"
@@ -1398,7 +1503,7 @@ func (x *Sqrt) GetScale() float64 {
 }
 
 // Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
-// It does so until maximum_extrapolation_interval is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+// It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 type Extrapolator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1595,11 +1700,13 @@ type GradientController_Ins struct {
 	Setpoint *Port `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty"`
 	// Optimize signal is added to the output of the gradient calculation.
 	Optimize *Port `protobuf:"bytes,3,opt,name=optimize,proto3" json:"optimize,omitempty"`
-	// Maximum value to limit the gradient.
+	// Maximum value to limit the output signal.
 	Max *Port `protobuf:"bytes,4,opt,name=max,proto3" json:"max,omitempty"`
-	// Minimum value to limit the gradient.
+	// Minimum value to limit the output signal.
 	Min *Port `protobuf:"bytes,5,opt,name=min,proto3" json:"min,omitempty"`
-	// Control variable is multiplied by the gradient to produce the output.
+	// Actual current value of the control variable.
+	//
+	// This signal is multiplied by the gradient to produce the output.
 	ControlVariable *Port `protobuf:"bytes,6,opt,name=control_variable,json=controlVariable,proto3" json:"control_variable,omitempty"`
 }
 
@@ -1735,8 +1842,22 @@ type EMA_Ins struct {
 	// Input signal to be used for the EMA computation.
 	Input *Port `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
 	// Upper bound of the moving average.
+	//
+	// Used during the warm-up stage: if the signal would exceed `max_envelope`
+	// it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+	//
+	// :::note
+	// If the signal deviates from `max_envelope` faster than the correction
+	// faster, it might end up exceeding the envelope.
+	// :::
+	//
+	// :::note
+	// The envelope logic is **not** used outside the warm-up stage!
+	// :::
 	MaxEnvelope *Port `protobuf:"bytes,2,opt,name=max_envelope,json=maxEnvelope,proto3" json:"max_envelope,omitempty"`
 	// Lower bound of the moving average.
+	//
+	// Used during the warm-up stage analoguously to `max_envelope`.
 	MinEnvelope *Port `protobuf:"bytes,3,opt,name=min_envelope,json=minEnvelope,proto3" json:"min_envelope,omitempty"`
 }
 

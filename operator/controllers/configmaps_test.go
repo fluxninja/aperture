@@ -232,7 +232,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 						LeaseTTL:  "60s",
 					},
 					Prometheus: v1alpha1.PrometheusSpec{
-						Address: "http://agent-prometheus-server:80",
+						Address: "http://aperture-prometheus-server:80",
 					},
 					FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
 						Endpoint:           test,
@@ -305,7 +305,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 						LeaseTTL:  "60s",
 					},
 					Prometheus: v1alpha1.PrometheusSpec{
-						Address: "http://agent-prometheus-server:80",
+						Address: "http://aperture-prometheus-server:80",
 					},
 					FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
 						Enabled:            true,

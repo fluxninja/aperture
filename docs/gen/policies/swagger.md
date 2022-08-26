@@ -19,11 +19,13 @@
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to pr…
 - [languagev1RateLimiter](#languagev1-rate-limiter)
 - [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
+
+Example of…
+
 - [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals…
 - [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
 - [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the Arithmetic Combinator component.
-- [v1Component](#v1-component) – Computational blocks that form the circuit.
-  Signals flow into the components via…
+- [v1Component](#v1-component) – Computational block that form the circuit
 - [v1Constant](#v1-constant) – Component that emits a constant value as an output signal.
 - [v1ConstantOuts](#v1-constant-outs) – Outputs for the Constant component.
 - [v1ControlPoint](#v1-control-point) – Identifies control point within a service that the rule or policy should apply t…
@@ -37,7 +39,8 @@
 - [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the perio…
 - [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator component.
 - [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator component.
-- [v1GradientController](#v1-gradient-controller) – Gradient controller
+- [v1GradientController](#v1-gradient-controller) – Gradient controller is a type of controller which tries to adjust the
+  control va…
 - [v1GradientControllerIns](#v1-gradient-controller-ins) – Inputs for the Gradient Controller component.
 - [v1GradientControllerOuts](#v1-gradient-controller-outs) – Outputs for the Gradient Controller component.
 - [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
@@ -56,7 +59,9 @@
 - [v1MinIns](#v1-min-ins) – Inputs for the Min component.
 - [v1MinOuts](#v1-min-outs) – Output ports for the Min component.
 - [v1Policy](#v1-policy) – Policy is defined as a dataflow graph (circuit) of inter-connected components.
-  S…
+
+…
+
 - [v1Port](#v1-port) – Components are interconnected with each other via Ports.
 - [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an…
 - [v1PromQLOuts](#v1-prom-q-l-outs) – Output for the PromQL component.
@@ -290,6 +295,16 @@ Concurrency is calculated in terms of total tokens which translate to (avg. late
 
 FluxMeter gathers metrics for the traffic that matches its selector.
 
+Example of a selector that creates a histogram metric for all HTTP requests
+to particular service:
+
+```yaml
+selector:
+  service: myservice.mynamespace.svc.cluster.local
+  control_point:
+    traffic: ingress
+```
+
 #### Properties
 
 <dl>
@@ -304,7 +319,14 @@ FluxMeter gathers metrics for the traffic that matches its selector.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector)) Policies are only applied to flows that are matched based on the fields in the selector.
+([V1Selector](#v1-selector)) What latency should we measure in the histogram created by this FluxMeter.
+
+- For traffic control points, fluxmeter will measure the duration of the
+  whole http transaction (including sending request and receiving
+  response).
+- For feature control points, fluxmeter will measure execution of the span
+  associated with particular feature. What contributes to the span's
+  duration is entirely up to the user code that uses Aperture library.
 
 </dd>
 </dl>
@@ -312,7 +334,6 @@ FluxMeter gathers metrics for the traffic that matches its selector.
 ### <span id="v1-arithmetic-combinator"></span> v1ArithmeticCombinator
 
 Type of combinator that computes the arithmetic operation on the operand signals.
-The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
 
 #### Properties
 
@@ -329,6 +350,9 @@ The arithmetic operation can be addition, subtraction, multiplication, division,
 <dd>
 
 (string, `oneof=add sub mul div xor lshift rshift`) Operator of the arithmetic operation.
+
+The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
+In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
 
 </dd>
 </dl>
@@ -381,11 +405,39 @@ Outputs for the Arithmetic Combinator component.
 
 ### <span id="v1-component"></span> v1Component
 
-Computational blocks that form the circuit.
+Computational block that form the circuit
+
 Signals flow into the components via input ports and results are emitted on output ports.
 Components are wired to each other based on signal names forming an execution graph of the circuit.
+
+:::note
 Loops are broken by the runtime at the earliest component index that is part of the loop.
 The looped signals are saved in the tick they are generated and served in the subsequent tick.
+:::
+
+There are three categories of components:
+
+- "source" components – they take some sort of input from "the real world" and output
+  a signal based on this input. Example: [PromQL](#-v1promql). In the UI
+  they're represented by green color.
+- internal components – "pure" components that don't interact with the "real world".
+  Examples: [GradientController](#-v1gradientcontroller), [Max](#-v1max).
+  :::note
+  Internal components's output can depend on their internal state, in addition to the inputs.
+  Eg. see the [Exponential Moving Average filter](#-v1ema).
+  :::
+- "sink" components – they affect the real world.
+  [Scheduler](#-v1scheduler) and [RateLimiter](#-languagev1ratelimiter).
+  Also sometimes called _actuators_. In the UI, represented by orange color.
+  Sink components are usually also "sources" too, they usually emit a
+  feedback signal, like `accepted_concurrency` in case of ConcurrencyLimiter.
+
+:::tip
+Sometimes you may want to use a constant value as one of component's inputs.
+You can use the [Constant](#-constant) component for this.
+:::
+
+See also [Policy](#-v1policy) for a higher-level explanation of circuits.
 
 #### Properties
 
@@ -559,10 +611,15 @@ Usually powered by integration with a proxy (like envoy) or a web framework.
 
 ### <span id="v1-decider"></span> v1Decider
 
-Type of combinator that computes the comparison operation on lhs and rhs signals and switches between on_true and on_false signals based on the result of the comparison.
+Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison.
+
 The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
-This component also supports time-based response, i.e. the output transitions between on_true or on_false signal if the decider condition is true or false for at least "positive_for" or "negative_for" duration.
-If true_for and false_for durations are zero then the transitions are instantaneous.
+
+This component also supports time-based response, i.e. the output
+transitions between on_true or on_false signal if the decider condition is
+true or false for at least "positive_for" or "negative_for" duration. If
+`true_for` and `false_for` durations are zero then the transitions are
+instantaneous.
 
 #### Properties
 
@@ -673,7 +730,6 @@ At any time EMA component operates in one of the following states:
    If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
 2. Normal state: The EMA is computed using following formula.
 
-If an invalid reading is received continuously for ema_window during the EMA stage, the last good EMA is emitted and the state gets reset back to Warm up state.
 The EMA for a series $Y$ is calculated recursively as:
 
 $$
@@ -691,6 +747,8 @@ The $\alpha$ is computed using ema_window:
 $$
 \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
 $$
+
+The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#-v1emains).
 
 #### Properties
 
@@ -739,6 +797,7 @@ $$
 <dd>
 
 (string, default: `0s`) Duration of EMA warming up window.
+
 The initial value of the EMA is the average of signal readings received during the warm up window.
 
 </dd>
@@ -764,6 +823,18 @@ Inputs for the EMA component.
 
 ([V1Port](#v1-port)) Upper bound of the moving average.
 
+Used during the warm-up stage: if the signal would exceed `max_envelope`
+it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+
+:::note
+If the signal deviates from `max_envelope` faster than the correction
+faster, it might end up exceeding the envelope.
+:::
+
+:::note
+The envelope logic is **not** used outside the warm-up stage!
+:::
+
 </dd>
 </dl>
 <dl>
@@ -771,6 +842,8 @@ Inputs for the EMA component.
 <dd>
 
 ([V1Port](#v1-port)) Lower bound of the moving average.
+
+Used during the warm-up stage analoguously to `max_envelope`.
 
 </dd>
 </dl>
@@ -816,7 +889,7 @@ Label selector expression of the equal form "label == value".
 ### <span id="v1-extrapolator"></span> v1Extrapolator
 
 Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
-It does so until maximum_extrapolation_interval is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 
 #### Properties
 
@@ -877,11 +950,35 @@ Outputs for the Extrapolator component.
 
 ### <span id="v1-gradient-controller"></span> v1GradientController
 
-Gradient controller
+Gradient controller is a type of controller which tries to adjust the
+control variable proportionally to the relative difference between setpoint
+and actual value of the signal.
 
-Describes the gradient values which is computed as follows $\text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}$.
-Limits gradient to range [min_gradient, max_gradient].
-Output: (gradient \* control_variable) + optimize.
+The `gradient` describes a corrective factor that should be applied to the
+control variable to get the signal closer to the setpoint. It is computed as follows:
+
+$$
+\text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}
+$$
+
+`gradient` is then clamped to [min_gradient, max_gradient] range.
+
+The output of gradient controller is computed as follows:
+
+$$
+\text{output} = \text{gradient}_{\text{clamped}} \cdot \text{control\_variable} + \text{optimize}.
+$$
+
+Note the additional `optimize` signal, that can be used to "nudge" the
+controller into desired idle state.
+
+The output can be _optionally_ clamped to desired range using `max` and
+`min` input.
+
+:::caution
+Some changes are expected in the near future:
+[#182](https://github.com/fluxninja/aperture/issues/182)
+:::
 
 #### Properties
 
@@ -921,7 +1018,13 @@ Output: (gradient \* control_variable) + optimize.
 <dt>tolerance</dt>
 <dd>
 
-(float64, `gte=0.0`) Tolerance of the gradient controller beyond which the correction is made.
+(float64, `gte=0.0`) Tolerance is a way to pre-multiply a setpoint by given value.
+
+Value of tolerance should be close or equal to 1, eg. 1.1.
+
+:::caution
+[This is going to be deprecated](https://github.com/fluxninja/aperture/issues/182).
+:::
 
 </dd>
 </dl>
@@ -936,7 +1039,9 @@ Inputs for the Gradient Controller component.
 <dt>control_variable</dt>
 <dd>
 
-([V1Port](#v1-port)) Control variable is multiplied by the gradient to produce the output.
+([V1Port](#v1-port)) Actual current value of the control variable.
+
+This signal is multiplied by the gradient to produce the output.
 
 </dd>
 </dl>
@@ -944,7 +1049,7 @@ Inputs for the Gradient Controller component.
 <dt>max</dt>
 <dd>
 
-([V1Port](#v1-port)) Maximum value to limit the gradient.
+([V1Port](#v1-port)) Maximum value to limit the output signal.
 
 </dd>
 </dl>
@@ -952,7 +1057,7 @@ Inputs for the Gradient Controller component.
 <dt>min</dt>
 <dd>
 
-([V1Port](#v1-port)) Minimum value to limit the gradient.
+([V1Port](#v1-port)) Minimum value to limit the output signal.
 
 </dd>
 </dl>
@@ -1305,9 +1410,26 @@ Output ports for the Min component.
 ### <span id="v1-policy"></span> v1Policy
 
 Policy is defined as a dataflow graph (circuit) of inter-connected components.
+
 Signals flow between components via ports.
 As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
 Policies are evaluated periodically in order to respond to changes in signal readings.
+
+:::info
+**Signal**
+
+Signals are floating-point values.
+
+A signal also have a special **Invalid** value. It's usually used to
+communicate that signal doesn't have a meaningful value at the moment, eg.
+[PromQL](#-v1promql) emits such a value if it cannot execute a query.
+Components know when their input signals are invalid and can act
+accordingly. They can either propagate the invalidness, by making their
+output itself invalid (like eg.
+[ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
+logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+docs on how exactly it handles invalid inputs.
+:::
 
 #### Properties
 
@@ -1323,7 +1445,7 @@ Policies are evaluated periodically in order to respond to changes in signal rea
 <dt>evaluation_interval</dt>
 <dd>
 
-(string, default: `0.5s`) Evaluation interval (ticks) is the time period between consecutive runs of the policy circuit.
+(string, default: `0.5s`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
 This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 
 </dd>
@@ -1333,6 +1455,8 @@ This interval is typically aligned with how often the corrective action (actuati
 <dd>
 
 (map of [Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+
+FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
 
 </dd>
 </dl>
@@ -1379,6 +1503,11 @@ Component that runs a Prometheus query periodically and returns the result as an
 <dd>
 
 (string) Describes the Prometheus query to be run.
+
+:::caution
+TODO we should describe how to construct the query, eg. how to employ the
+fluxmeters here or link to appropriate place in docs.
+:::
 
 </dd>
 </dl>
