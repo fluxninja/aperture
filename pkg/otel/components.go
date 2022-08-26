@@ -98,6 +98,7 @@ func ControllerOTELComponents() (component.Factories, error) {
 	errs = multierr.Append(errs, err)
 
 	processors, err := component.MakeProcessorFactoryMap(
+		batchprocessor.NewFactory(),
 		attributesprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
