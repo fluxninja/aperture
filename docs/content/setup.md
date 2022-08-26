@@ -7,7 +7,6 @@ keywords:
   - overload
   - concurrency
   - aperture
-  - aperture
   - FAQ
   - setup
 ---
