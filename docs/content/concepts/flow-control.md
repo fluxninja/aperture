@@ -1,5 +1,5 @@
 ---
-title: Flows
+title: Flow Control
 description: Concept of flows.
 keywords:
   - flows
@@ -7,14 +7,6 @@ keywords:
   - opentracing
   - opentelemetry
 ---
-
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
-<!-- code_chunk_output -->
-
-- [Flows](#flows)
-
-<!-- /code_chunk_output -->
 
 # Flows
 
