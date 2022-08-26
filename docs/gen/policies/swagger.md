@@ -10,8 +10,7 @@
 
 ### Object Index
 
-- [MatchExpressionList](#match-expression-list) – List of MatchExpressions that is used for all/any matching.
-  eg. {any: {of: [expr…
+- [MatchExpressionList](#match-expression-list) – List of MatchExpressions that is used for all/any matching
 - [RateLimiterLazySyncConfig](#rate-limiter-lazy-sync-config)
 - [RateLimiterOverrideConfig](#rate-limiter-override-config)
 - [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
@@ -47,8 +46,7 @@ Example of…
 - [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not
 - [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in th…
 - [v1LoadShedActuatorIns](#v1-load-shed-actuator-ins) – Input for the Load Shed Actuator component.
-- [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels.
-  …
+- [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels
 - [v1MatchesMatchExpression](#v1-matches-match-expression) – Label selector expression of the matches form "label matches regex".
 - [v1Max](#v1-max) – Takes a list of input signals and emits the signal with the maximum value.
   Max: …
@@ -93,7 +91,8 @@ Type: [V1Policy](#v1-policy)
 
 ### <span id="match-expression-list"></span> MatchExpressionList
 
-List of MatchExpressions that is used for all/any matching.
+List of MatchExpressions that is used for all/any matching
+
 eg. {any: {of: [expr1, expr2]}}.
 
 #### Properties
@@ -1212,7 +1211,8 @@ Input for the Load Shed Actuator component.
 
 ### <span id="v1-match-expression"></span> v1MatchExpression
 
-Defines a [map<string, string> → bool] expression to be evaluated on labels.
+Defines a [map<string, string> → bool] expression to be evaluated on labels
+
 MatchExpression has multiple variants, exactly one should be set.
 
 Example:
