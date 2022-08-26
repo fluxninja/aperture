@@ -4,6 +4,8 @@ This directory contains definitions used for local k8s deployments.
 
 ## Tools
 
+- Check if you are already in the root directory of the project.
+
 Described hereafter deployment methods assume usage of specific deployment and configuration/management tools (which must be installed beforehand).
 
 To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install manually (check [Tools used for k8s deployment](#tools-used-for-k8s-deployment) ).
@@ -11,7 +13,12 @@ To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install ma
 When using `asdf`:
 
 - [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf) `asdf`
-- Add intended plugins (tools/applications which will be managed by `asdf`) e.g. `asdf plugin-add terraform`
+- Run the below command to add all the required plugins.
+
+```
+cat .tool-versions | cut -d' ' -f1 | grep "^[^\#]" | xargs -i asdf plugin add  {}
+```
+
 - Install tools: `asdf install`
 
 > Note:
@@ -21,7 +28,7 @@ When using `asdf`:
 
 Tools which are required for local k8s deployment:
 
-### helm
+### Helm
 
 Helm is a package manager for k8s.
 
@@ -76,9 +83,7 @@ Tilt can be installed with `asdf install` or manually <https://docs.tilt.dev/ins
 
 Create a K8s cluster using Kind with configuration file:
 
-```sh
-kind create cluster --name aperture-playground --config kind-config.yaml
-```
+- Run a script available in `aperture/scripts` directory `./aperture_dev_cluster.sh`. [this will create 3 node kind cluster]
 
 ### Services deployment
 
