@@ -34,20 +34,20 @@ func (textMetricsMarshaler) MarshalMetrics(md pmetric.Metrics) ([]byte, error) {
 		rm := rms.At(i)
 		buf.logEntry("Resource SchemaURL: %s", rm.SchemaUrl())
 		buf.logMap("Resource labels", rm.Resource().Attributes())
-		ilms := rm.ScopeMetrics()
-		for j := 0; j < ilms.Len(); j++ {
-			buf.logEntry("ScopeMetrics #%d", j)
-			ilm := ilms.At(j)
-			buf.logEntry("ScopeMetrics SchemaURL: %s", ilm.SchemaUrl())
-			buf.logScope(ilm.Scope())
-			metrics := ilm.Metrics()
-			for k := 0; k < metrics.Len(); k++ {
-				buf.logEntry("Metric #%d", k)
-				metric := metrics.At(k)
-				buf.logMetricDescriptor(metric)
-				buf.logMetricDataPoints(metric)
-			}
-		}
+		// ilms := rm.ScopeMetrics()
+		// for j := 0; j < ilms.Len(); j++ {
+		// buf.logEntry("ScopeMetrics #%d", j)
+		// ilm := ilms.At(j)
+		// buf.logEntry("ScopeMetrics SchemaURL: %s", ilm.SchemaUrl())
+		// buf.logScope(ilm.Scope())
+		// metrics := ilm.Metrics()
+		// for k := 0; k < metrics.Len(); k++ {
+		// buf.logEntry("Metric #%d", k)
+		// metric := metrics.At(k)
+		// buf.logMetricDescriptor(metric)
+		// buf.logMetricDataPoints(metric)
+		// }
+		// }
 	}
 
 	return buf.buf.Bytes(), nil

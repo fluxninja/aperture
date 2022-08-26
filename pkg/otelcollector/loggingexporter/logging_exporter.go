@@ -53,7 +53,7 @@ func (s *loggingExporter) pushMetrics(_ context.Context, md pmetric.Metrics) err
 	if err != nil {
 		return err
 	}
-	log.Trace().Msg(string(buf))
+	log.Info().Msg(string(buf))
 	return nil
 }
 
