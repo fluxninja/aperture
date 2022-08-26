@@ -191,9 +191,8 @@ definitions:
         items:
           $ref: '#/definitions/v1MatchExpression'
         description: List of subexpressions of the match expression.
-    description: |-
-      List of MatchExpressions that is used for all/any matching.
-      eg. {any: {of: [expr1, expr2]}}.
+    description: 'eg. {any: {of: [expr1, expr2]}}.'
+    title: List of MatchExpressions that is used for all/any matching
   RateLimiterLazySyncConfig:
     type: object
     properties:
@@ -231,9 +230,8 @@ definitions:
           Source code of the rego module.
 
           Note: Must include a "package" declaration.
-    description: |-
-      Raw rego rules are compiled 1:1 to rego queries.
-      High-level extractor-based rules are compiled into a single rego query.
+    description: High-level extractor-based rules are compiled into a single rego query.
+    title: Raw rego rules are compiled 1:1 to rego queries
   SchedulerWorkload:
     type: object
     properties:
@@ -497,7 +495,6 @@ definitions:
         description: Attribute path pointing to some string - eg. "source.address".
         x-go-validate: required
     description: |-
-      Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`.
       IP addresses in attribute context are defined as objects with separate ip and port fields.
       This is a helper to display an address as a single string.
 
@@ -509,6 +506,7 @@ definitions:
       ```yaml
       from: "source.address # or dstination.address"
       ```
+    title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
   v1AllPolicies:
     type: object
     properties:
@@ -617,8 +615,6 @@ definitions:
         $ref: '#/definitions/v1Selector'
         description: Defines where to apply the flow classification rule.
     description: |-
-      Set of classification rules sharing a common selector.
-
       Example:
       ```yaml
       selector:
@@ -630,6 +626,7 @@ definitions:
           extractor:
             from: request.http.headers.user
       ```
+    title: Set of classification rules sharing a common selector
   v1Component:
     type: object
     properties:
@@ -943,7 +940,6 @@ definitions:
       from:
         type: string
         description: |-
-          Use an attribute with no convertion.
           Attribute path is a dot-separated path to attribute.
 
           Should be either:
@@ -959,6 +955,7 @@ definitions:
           from: request.http.headers.user-agent
           ```
           [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto"
+        title: Use an attribute with no convertion
       json:
         $ref: '#/definitions/v1JSONExtractor'
         description: Deserialize a json, and extract one of the fields.
@@ -968,12 +965,12 @@ definitions:
       path_templates:
         $ref: '#/definitions/v1PathTemplateMatcher'
         description: Match HTTP Path to given path templates.
-    title: |-
-      Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write regod code.
+    description: |-
       There are multiple variants of extractor, specify exactly one:
       - JSON Extractor
       - Address Extractor
       - JWT Extractor
+    title: Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
   v1Extrapolator:
     type: object
     properties:
@@ -1135,13 +1132,12 @@ definitions:
           Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
           eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
     description: |-
-      Deserialize a json, and extract one of the fields.
-
       Example:
       ```yaml
       from: request.http.body
       pointer: /user/name
       ```
+    title: Deserialize a json, and extract one of the fields
   v1JWTExtractor:
     type: object
     properties:
@@ -1157,7 +1153,6 @@ definitions:
           Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
           eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
     description: |-
-      Parse the attribute as JWT and read the payload.
       Specify a field to be extracted from payload using "json_pointer".
 
       Note: The signature is not verified against the secret (we're assuming there's some
@@ -1168,6 +1163,7 @@ definitions:
       from: request.http.bearer
       json_pointer: /user/email
       ```
+    title: Parse the attribute as JWT and read the payload
   v1K8sLabelMatcherRequirement:
     type: object
     properties:
@@ -1294,7 +1290,6 @@ definitions:
         $ref: '#/definitions/v1MatchExpression'
         description: The expression negates the result of subexpression.
     description: |-
-      Defines a [map<string, string> → bool] expression to be evaluated on labels.
       MatchExpression has multiple variants, exactly one should be set.
 
       Example:
@@ -1304,6 +1299,7 @@ definitions:
           - label_exists: foo
           - label_equals: { label = app, value = frobnicator }
       ```
+    title: Defines a [map<string, string> → bool] expression to be evaluated on labels
   v1MatchesMatchExpression:
     type: object
     properties:
@@ -1404,10 +1400,10 @@ definitions:
           /static/*: other
           ```
     description: |-
-      Matches HTTP Path to given path templates.
       HTTP path will be matched against given path templates.
       If a match occurs, the value associated with the path template will be treated as a result.
       In case of multiple path templates matching, the most specific one will be chosen.
+    title: Matches HTTP Path to given path templates
   v1PeerInfo:
     type: object
     properties:
@@ -1555,7 +1551,6 @@ definitions:
         $ref: '#/definitions/RuleRego'
         description: Rego module to extract a value from the rego module.
     description: |-
-      Rule describes a single Flow Classification Rule.
       Flow classification rule extracts a value from request metadata.
       More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
       See <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.
@@ -1592,6 +1587,7 @@ definitions:
           propagate: false
           hidden: true
       ```
+    title: Rule describes a single Flow Classification Rule
   v1Scheduler:
     type: object
     properties:

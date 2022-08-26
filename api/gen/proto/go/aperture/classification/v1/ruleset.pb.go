@@ -120,7 +120,7 @@ func (x *AllRules) GetAllRules() map[string]*Classifier {
 	return nil
 }
 
-// Set of classification rules sharing a common selector.
+// Set of classification rules sharing a common selector
 //
 // Example:
 // ```yaml
@@ -190,7 +190,8 @@ func (x *Classifier) GetRules() map[string]*Rule {
 	return nil
 }
 
-// Rule describes a single Flow Classification Rule.
+// Rule describes a single Flow Classification Rule
+//
 // Flow classification rule extracts a value from request metadata.
 // More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
 // See <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.
@@ -328,7 +329,8 @@ func (*Rule_Extractor) isRule_Source() {}
 
 func (*Rule_Rego_) isRule_Source() {}
 
-// Raw rego rules are compiled 1:1 to rego queries.
+// Raw rego rules are compiled 1:1 to rego queries
+//
 // High-level extractor-based rules are compiled into a single rego query.
 type Rule_Rego struct {
 	state         protoimpl.MessageState
