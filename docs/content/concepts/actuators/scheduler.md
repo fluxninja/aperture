@@ -9,16 +9,9 @@ keywords:
   - queuing
 ---
 
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
-<!-- code_chunk_output -->
-
-- [Scheduler](#scheduler)
-  - [Workload](#workload)
-  - [Tokens](#tokens)
-  - [Token bucket](#token-bucket)
-
-<!-- /code_chunk_output -->
+:::info
+See also what are [actuators](actuators.md) in general.
+:::
 
 # Scheduler
 

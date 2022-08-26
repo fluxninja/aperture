@@ -4,22 +4,22 @@
     {
       "source": {
         "git": {
-          "remote": "ssh://git@github.com/fluxninja/aperture-libsonnet.git",
+          "remote": "https://github.com/fluxninja/aperture-blueprints.git",
           "subdir": ""
         }
       },
-      "version": "f3e43072c6b32b6831469fdd46f3480d60d8ba9d",
-      "sum": "9eAMEsHAddOozVOpLlPKbi3k9pJ1nv0n9qY021JZ1T4="
+      "version": "c2eb96f4cf309a37d63d6782976d34a02f1833ad",
+      "sum": "YwDomUQb/x5OW/96ZJa/kSg6KcH4Kw32DAPHAI2DL4g="
     },
     {
       "source": {
         "git": {
-          "remote": "ssh://git@github.com/fluxninja/aperture-libsonnet.git",
-          "subdir": "aperture/1.0"
+          "remote": "https://github.com/fluxninja/aperture-libsonnet.git",
+          "subdir": "1.0"
         }
       },
-      "version": "f3e43072c6b32b6831469fdd46f3480d60d8ba9d",
-      "sum": "FZm2n4fzjKZnHHsjJjEHi1EkUa+JKxTL1/Y6QsNtdqs="
+      "version": "a980995cd4168d5182be94111d84342b82fc05b3",
+      "sum": "10xiyM+eJiA0iwyawvtaAC4YvLb9oH3F5JCCJhED8ak="
     },
     {
       "source": {

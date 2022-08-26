@@ -58,7 +58,8 @@ message K8sLabelMatcherRequirement {
   repeated string values = 3;
 }
 
-// Defines a [map<string, string> → bool] expression to be evaluated on labels.
+// Defines a [map<string, string> → bool] expression to be evaluated on labels
+//
 // MatchExpression has multiple variants, exactly one should be set.
 //
 // Example:
@@ -69,7 +70,8 @@ message K8sLabelMatcherRequirement {
 //     - label_equals: { label = app, value = frobnicator }
 // ```
 message MatchExpression {
-  // List of MatchExpressions that is used for all/any matching.
+  // List of MatchExpressions that is used for all/any matching
+  //
   // eg. {any: {of: [expr1, expr2]}}.
   message List {
     // List of subexpressions of the match expression.
