@@ -141,7 +141,7 @@ jobs:
           docker-context: <<parameters.docker-context>>
           dockerfile: <<parameters.dockerfile>>
           extra_build_args: <<parameters.extra_build_args>>
-          registry: <<parameters.registry>>``
+          registry: <<parameters.registry>>
           image: <<parameters.dockerhub-image>>
           path: <<parameters.path>>
           tag: <<parameters.tag>>
@@ -177,6 +177,13 @@ jobs:
             - when:
                 condition: <<parameters.push-to-dockerhub>>
                 steps:
+                  - aperture_docker_tag:
+                      source-registry: <<parameters.registry>>
+                      source-image: <<parameters.dockerhub-image>>
+                      source-tag: <<parameters.tag>>
+                      dest-registry: <<parameters.registry>>
+                      dest-image: <<parameters.dockerhub-image>>
+                      dest-tag: <<parameters.target-tag>>
                   - run:
                       name: Push images to DockerHub
                       command: |
