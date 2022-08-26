@@ -1,5 +1,5 @@
 ---
-title: Flow Control
+title: Flow
 description: Concept of flows.
 keywords:
   - flows
@@ -8,7 +8,7 @@ keywords:
   - opentelemetry
 ---
 
-# Flows
+# Flow
 
 A flow is the fundamental unit of work from the perspective of an Aperture
 Agent. It could be an API call, a feature, or even a database query. A flow in
