@@ -42,7 +42,7 @@ JSON policy and dashboard files.
 To generate JSON files, `scripts/aperture-generate.py` can be used:
 
 ```sh
-$ ./scripts/aperture-generate.py --
+$ ./scripts/aperture-generate.py --help
 usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG] BLUEPRINT
 
 Aperture policies & dashboards generator utility.
@@ -84,6 +84,7 @@ aperture-blueprints $ jb install
 GET https://github.com/grafana/jsonnet-libs/archive/a2ba95acc8b7653d33bd57075678d8de2a64e5b3.tar.gz 200
 GET https://github.com/fluxninja/aperture-libsonnet/archive/a980995cd4168d5182be94111d84342b82fc05b3.tar.gz 200
 GET https://github.com/grafana/grafonnet-lib/archive/30280196507e0fe6fa978a3e0eaca3a62844f817.tar.gz 200
+
 aperture-blueprints $ ./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet blueprints/latency-gradient
 Creating /sources/aperture-blueprints/_gen/dashboards/demo1-decision-dashboard.json
 Creating /sources/aperture-blueprints/_gen/policies/demo1-latency-gradient.json
@@ -139,4 +140,5 @@ jsonnet --yaml-stream -J vendor [example file].jsonnet
 
 This can be also integrated with other kubernetes deployment tools like [tanka][tk]
 
+[jsonnet]: https://github.com/google/go-jsonnet
 [tk]: https://grafana.com/oss/tanka/
