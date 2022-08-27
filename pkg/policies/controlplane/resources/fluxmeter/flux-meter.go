@@ -21,11 +21,11 @@ import (
 
 type fluxMeterConfigSync struct {
 	policyBaseAPI     iface.PolicyBase
+	metricSubRegistry iface.MetricSubRegistry
 	fluxMeterProto    *policylangv1.FluxMeter
 	etcdPath          string
 	agentGroupName    string
 	fluxmeterName     string
-	metricSubRegistry iface.MetricSubRegistry
 }
 
 // NewFluxMeterOptions creates fx options for FluxMeter.
