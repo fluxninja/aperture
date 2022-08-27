@@ -1,7 +1,5 @@
 ---
-title: Introduction
-sidebar_position: 1
-description: Aperture Introduction
+description: Introduction
 sidebar_position: 1
 keywords:
   - reliability
