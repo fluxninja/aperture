@@ -104,6 +104,8 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 // ConsumeTraces receives ptrace.Traces for consumption then returns updated traces with policy labels and metrics.
 func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) (ptrace.Traces, error) {
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
+		spanStatus := span.Status()
+		p.addFeatureStatusLabels(span.Attributes(), spanStatus)
 		checkResponse := otelcollector.GetCheckResponse(span.Attributes())
 		if checkResponse == nil {
 			return errors.New("failed getting check response from attributes")
@@ -112,6 +114,11 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 		return p.updateMetrics(span.Attributes(), checkResponse)
 	})
 	return td, err
+}
+
+func (p *metricsProcessor) addFeatureStatusLabels(attributes pcommon.Map, status ptrace.SpanStatus) {
+	attributes.Insert(otelcollector.FeatureStatusCodeLabel, pcommon.NewValueInt(int64(status.Code())))
+	attributes.Insert(otelcollector.FeatureStatusMessageLabel, pcommon.NewValueString(status.Message()))
 }
 
 func (p *metricsProcessor) addAuthzResponseBasedLabels(attributes pcommon.Map, authzResponse *flowcontrolv1.AuthzResponse) {

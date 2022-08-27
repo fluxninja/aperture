@@ -43,6 +43,10 @@ const (
 	LabeledLabel = "labeled"
 	// StatusCodeLabel describes HTTP status code of the response.
 	StatusCodeLabel = "http.status_code"
+	// FeatureStatusCodeLabel describes Feature status code of the response.
+	FeatureStatusCodeLabel = "feature.status_code"
+	// FeatureStatusMessageLabel describes Feature status message of the response.
+	FeatureStatusMessageLabel = "feature.status_message"
 	// HTTPDurationLabel describes duration of the HTTP request in milliseconds.
 	HTTPDurationLabel = "http.duration_millis"
 	// HTTPRequestContentLength describes length of the HTTP request content in bytes.
