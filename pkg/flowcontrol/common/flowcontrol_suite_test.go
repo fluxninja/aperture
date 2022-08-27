@@ -1,4 +1,4 @@
-package flowcontrol_test
+package common_test
 
 import (
 	"testing"

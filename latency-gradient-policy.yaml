@@ -18,15 +18,12 @@ data:
         - selector:
             service: demo1-demo-app.demoapp.svc.cluster.local
             control_point: { traffic: ingress }
-
           rules:
             # An example rule using extractor.
             # See following RFC for list of available extractors and their syntax.
-            # https://www.notion.so/YAML-classification-policies-extractors-a7f36469fdf14c1bbc79c6ba963680a5#9ae103e0c9034c4aba30228d05d91391
             ua:
               extractor:
                 from: request.http.headers.user-agent
-
             # The same rule using raw rego. Requires specifying rego source code and a query
             also-ua:
               rego:
@@ -35,7 +32,6 @@ data:
                   import input.attributes.request.http
                   ua = http.headers["user-agent"]
                 query: data.my.rego.pkg.ua
-
             user-type:
               extractor:
                 from: request.http.headers.user-type
@@ -43,7 +39,7 @@ data:
       evaluation_interval: "0.5s"
       components:
         - promql:
-    query_string: "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))/sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))"
+            query_string: "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))/sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))"
             evaluation_interval: "1s"
             out_ports:
               output:

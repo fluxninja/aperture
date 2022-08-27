@@ -22,7 +22,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
-	"github.com/fluxninja/aperture/pkg/flowcontrol"
+	"github.com/fluxninja/aperture/pkg/flowcontrol/common"
 	authz_baggage "github.com/fluxninja/aperture/pkg/flowcontrol/envoy/baggage"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
@@ -42,7 +42,7 @@ import (
 func NewHandler(
 	classifier *classification.Classifier,
 	entityCache *entitycache.EntityCache,
-	fcHandler flowcontrol.HandlerWithValues,
+	fcHandler common.HandlerWithValues,
 ) *Handler {
 	if entityCache == nil {
 		log.Warn().Msg("Authz: No entity cache, will guess services based on Host header")
@@ -60,7 +60,7 @@ type Handler struct {
 	entityCache *entitycache.EntityCache
 	classifier  *classification.Classifier
 	propagator  authz_baggage.Propagator
-	fcHandler   flowcontrol.HandlerWithValues
+	fcHandler   common.HandlerWithValues
 }
 
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)

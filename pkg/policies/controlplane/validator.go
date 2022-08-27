@@ -56,7 +56,7 @@ func (v *CMFileValidator) ValidateFile(
 	name string,
 	yamlSrc []byte,
 ) (bool, string, error) {
-	log.Trace().Str("name", name).Msg("Validating CM policy yaml")
+	log.Info().Str("name", name).Msg("Validating CM policy yaml")
 	if len(yamlSrc) == 0 {
 		return false, "empty yaml", nil
 	}

@@ -18,7 +18,10 @@ import (
 //
 // Note: Register function is not bundled inside this module and should be
 // invoked explicitly.
-var Module = fx.Provide(ProvideHandler)
+var Module = fx.Options(
+	fx.Provide(ProvideHandler),
+	fx.Invoke(Register),
+)
 
 // ProvideHandler provides an authz handler
 //

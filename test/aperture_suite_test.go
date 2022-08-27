@@ -18,7 +18,6 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
-	"github.com/fluxninja/aperture/pkg/flowcontrol/envoy"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
@@ -143,12 +142,7 @@ var _ = BeforeSuite(func() {
 		),
 		flowcontrol.Module,
 		classifier.Module,
-		envoy.Module,
 		otelcollector.Module(),
-		fx.Invoke(
-			envoy.Register,
-			flowcontrol.Register,
-		),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),
 		jobs.JobGroupConstructor{Name: jobGroupName}.Annotate(),
 		fx.Populate(jgIn),

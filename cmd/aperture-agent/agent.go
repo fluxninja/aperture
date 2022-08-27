@@ -17,7 +17,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
-	"github.com/fluxninja/aperture/pkg/flowcontrol/envoy"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
@@ -46,15 +45,10 @@ func main() {
 			agent.ProvidePeersPrefix,
 		),
 		flowcontrol.Module,
-		envoy.Module,
 		otelcollector.Module(),
 		distcache.Module(),
 		dataplane.PolicyModule(),
 		discovery.Module(),
-		fx.Invoke(
-			envoy.Register,
-			flowcontrol.Register,
-		),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),
 	)
 

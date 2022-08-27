@@ -12,7 +12,7 @@ import (
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/flowcontrol"
+	"github.com/fluxninja/aperture/pkg/flowcontrol/common"
 	"github.com/fluxninja/aperture/pkg/flowcontrol/envoy"
 	"github.com/fluxninja/aperture/pkg/log"
 	classification "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
@@ -40,7 +40,7 @@ var _ = AfterEach(func() {
 })
 
 type AcceptingHandler struct {
-	flowcontrol.HandlerWithValues
+	common.HandlerWithValues
 }
 
 func (s *AcceptingHandler) CheckWithValues(

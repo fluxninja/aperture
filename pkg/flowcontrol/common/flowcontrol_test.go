@@ -1,4 +1,4 @@
-package flowcontrol_test
+package common_test
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/entitycache"
-	"github.com/fluxninja/aperture/pkg/flowcontrol"
+	"github.com/fluxninja/aperture/pkg/flowcontrol/common"
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane"
@@ -46,8 +46,8 @@ var _ = BeforeEach(func() {
 		}.Module(),
 		fx.Provide(agentinfo.ProvideAgentInfo),
 		fx.Supply(entities),
-		fx.Provide(flowcontrol.ProvideNopMetrics),
-		fx.Provide(flowcontrol.ProvideHandler),
+		fx.Provide(common.ProvideNopMetrics),
+		fx.Provide(common.ProvideHandler),
 		fx.Provide(dataplane.ProvideEngineAPI),
 		grpcclient.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),
 		fx.Populate(&svc),
