@@ -9,16 +9,41 @@ data:
   latency-gradient.yaml: |
     resources:
       flux_meters:
-        "demo1_latency":
+        "service_latency":
           selector:
             service: "demo1-demo-app.demoapp.svc.cluster.local"
             control_point:
               traffic: "ingress"
+      classifiers:
+        - selector:
+            service: demo1-demo-app.demoapp.svc.cluster.local
+            control_point: { traffic: ingress }
+
+          rules:
+            # An example rule using extractor.
+            # See following RFC for list of available extractors and their syntax.
+            # https://www.notion.so/YAML-classification-policies-extractors-a7f36469fdf14c1bbc79c6ba963680a5#9ae103e0c9034c4aba30228d05d91391
+            ua:
+              extractor:
+                from: request.http.headers.user-agent
+
+            # The same rule using raw rego. Requires specifying rego source code and a query
+            also-ua:
+              rego:
+                source: |
+                  package my.rego.pkg
+                  import input.attributes.request.http
+                  ua = http.headers["user-agent"]
+                query: data.my.rego.pkg.ua
+
+            user-type:
+              extractor:
+                from: request.http.headers.user-type
     circuit:
       evaluation_interval: "0.5s"
       components:
         - promql:
-            query_string: "sum(increase(demo1_latency_sum{decision_type!=\"DECISION_TYPE_REJECTED\"}[5s]))/sum(increase(demo1_latency_count{decision_type!=\"DECISION_TYPE_REJECTED\"}[5s]))"
+            query_string: "sum(increase(service_latency_sum{decision_type!=\"DECISION_TYPE_REJECTED\"}[5s]))/sum(increase(service_latency_count{decision_type!=\"DECISION_TYPE_REJECTED\"}[5s]))"
             evaluation_interval: "1s"
             out_ports:
               output:
