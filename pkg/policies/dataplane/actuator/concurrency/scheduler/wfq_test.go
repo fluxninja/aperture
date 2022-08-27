@@ -13,6 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 )
 
 const (
@@ -35,34 +36,34 @@ func getMetrics() *TokenBucketLoadShedMetrics {
 	constLabels := make(prometheus.Labels)
 
 	wfqFlowsGauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name:        "wfq_flows",
+		Name:        metrics.WFQFlowsMetricName,
 		Help:        "A gauge that tracks the number of flows in the WFQScheduler",
 		ConstLabels: constLabels,
 	})
 	_ = prometheusRegistry.Register(wfqFlowsGauge)
 	wfqHeapRequestsGauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name:        "wfq_requests",
+		Name:        metrics.WFQRequestsMetricName,
 		Help:        "A gauge that tracks the number of queued requests in the WFQScheduler",
 		ConstLabels: constLabels,
 	})
 	_ = prometheusRegistry.Register(wfqHeapRequestsGauge)
 	tokenBucketLSFGauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "token_bucket_lsf",
+		Name: metrics.TokenBucketMetricName,
 		Help: "A gauge that tracks the load shed factor",
 	})
 	_ = prometheusRegistry.Register(tokenBucketLSFGauge)
 	tokenBucketFillRateGauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "token_bucket_bucket_fill_rate",
+		Name: metrics.TokenBucketFillRateMetricName,
 		Help: "A gauge that tracks the fill rate of token bucket",
 	})
 	_ = prometheusRegistry.Register(tokenBucketFillRateGauge)
 	tokenBucketBucketCapacityGauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "token_bucket_bucket_capacity",
+		Name: metrics.TokenBucketCapacityMetricName,
 		Help: "A gauge that tracks the capacity of token bucket",
 	})
 	_ = prometheusRegistry.Register(tokenBucketBucketCapacityGauge)
 	tokenBucketAvailableTokensGauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "token_bucket_available_tokens",
+		Name: metrics.TokenBucketAvailableMetricName,
 		Help: "A gauge that tracks the number of tokens available in token bucket",
 	})
 	_ = prometheusRegistry.Register(tokenBucketAvailableTokensGauge)
