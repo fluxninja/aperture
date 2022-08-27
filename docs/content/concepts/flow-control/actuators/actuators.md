@@ -1,5 +1,6 @@
 ---
 title: Actuators
+sidebar_position: 4
 ---
 
 TODO What are actuators in general?
