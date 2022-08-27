@@ -1,4 +1,4 @@
-package classification_test
+package classifier_test
 
 import (
 	"testing"

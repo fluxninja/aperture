@@ -14,12 +14,11 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/classification"
 	"github.com/fluxninja/aperture/pkg/entitycache"
-	"github.com/fluxninja/aperture/pkg/envoy"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
+	"github.com/fluxninja/aperture/pkg/flowcontrol/envoy"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
@@ -28,6 +27,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/test/harness"
@@ -142,7 +142,7 @@ var _ = BeforeSuite(func() {
 			agentinfo.ProvideAgentInfo,
 		),
 		flowcontrol.Module,
-		classification.Module,
+		classifier.Module,
 		envoy.Module,
 		otelcollector.Module(),
 		fx.Invoke(

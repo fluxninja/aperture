@@ -1,4 +1,4 @@
-package classification_test
+package classifier_test
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 
-	. "github.com/fluxninja/aperture/pkg/classification"
+	. "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/services"
 )

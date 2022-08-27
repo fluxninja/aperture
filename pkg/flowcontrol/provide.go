@@ -13,7 +13,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
-	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
 
 // Module is a set of default providers for flowcontrol components
@@ -65,16 +64,4 @@ func Register(server *grpc.Server, handler flowcontrolv1.FlowControlServiceServe
 
 	healthsrv.SetServingStatus("aperture.flowcontrol.v1.FlowControlService", grpc_health_v1.HealthCheckResponse_SERVING)
 	log.Info().Msg("flowcontrol handler registered")
-}
-
-// ProvideCMFileValidator provides flowcontrol config map file validator
-//
-// Note: This validator must be registered to be accessible.
-func ProvideCMFileValidator() *CMFileValidator {
-	return &CMFileValidator{}
-}
-
-// RegisterCMFileValidator registers flowcontrol configmap validator as configmap file validator.
-func RegisterCMFileValidator(validator *CMFileValidator, configMapValidator *validation.CMValidator) {
-	configMapValidator.RegisterCMFileValidator(validator)
 }

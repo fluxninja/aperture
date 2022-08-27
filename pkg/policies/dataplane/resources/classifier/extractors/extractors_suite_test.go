@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/classification/extractors"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/extractors"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 

@@ -1,4 +1,4 @@
-package classification
+package classifier
 
 import (
 	"context"
@@ -13,9 +13,9 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/classification/extractors"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/extractors"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/services"
 )
@@ -32,8 +32,8 @@ type rules struct {
 	ReportedRules []ReportedRule
 }
 
-// compiledRuleset is compiled form of Classifier proto.
-type compiledRuleset struct {
+// CompiledRuleset is compiled form of Classifier proto.
+type CompiledRuleset struct {
 	ControlPointID selectors.ControlPointID
 	Labelers       []labelerWithSelector
 	ReportedRules  []ReportedRule
@@ -66,7 +66,7 @@ type Classifier struct {
 	// storing activeRules underneath
 	mu             sync.Mutex
 	activeRules    atomic.Value
-	activeRulesets map[rulesetID]compiledRuleset // protected by mu
+	activeRulesets map[rulesetID]CompiledRuleset // protected by mu
 	nextRulesetID  rulesetID                     // protected by mu
 }
 
@@ -131,7 +131,7 @@ func boolValueOrTrue(bv *wrapperspb.BoolValue) bool { return bv == nil || bv.Val
 // New creates a new Flow Classifier.
 func New() *Classifier {
 	return &Classifier{
-		activeRulesets: make(map[rulesetID]compiledRuleset),
+		activeRulesets: make(map[rulesetID]CompiledRuleset),
 	}
 }
 
@@ -246,7 +246,7 @@ func (c *Classifier) AddRules(
 	name string,
 	classifier *classificationv1.Classifier,
 ) (ActiveRuleset, error) {
-	compiled, err := compileRuleset(ctx, name, classifier)
+	compiled, err := CompileRuleset(ctx, name, classifier)
 	if err != nil {
 		return ActiveRuleset{}, err
 	}
@@ -308,23 +308,23 @@ type badLabelName struct{}
 
 func (b badLabelName) Error() string { return "invalid label name" }
 
-// compileRuleset parses ruleset's selector and compiles its rules.
-func compileRuleset(ctx context.Context, name string, classifier *classificationv1.Classifier) (compiledRuleset, error) {
+// CompileRuleset parses ruleset's selector and compiles its rules.
+func CompileRuleset(ctx context.Context, name string, classifier *classificationv1.Classifier) (CompiledRuleset, error) {
 	if classifier.Selector == nil {
-		return compiledRuleset{}, fmt.Errorf("%w: missing selector", BadSelector)
+		return CompiledRuleset{}, fmt.Errorf("%w: missing selector", BadSelector)
 	}
 
 	selector, err := selectors.FromProto(classifier.Selector)
 	if err != nil {
-		return compiledRuleset{}, fmt.Errorf("%w: %v", BadSelector, err)
+		return CompiledRuleset{}, fmt.Errorf("%w: %v", BadSelector, err)
 	}
 
 	labelers, err := compileRules(ctx, selector.LabelMatcher, classifier.Rules)
 	if err != nil {
-		return compiledRuleset{}, fmt.Errorf("failed to compile %q rules for %v: %w", name, selector, err)
+		return CompiledRuleset{}, fmt.Errorf("failed to compile %q rules for %v: %w", name, selector, err)
 	}
 
-	cr := compiledRuleset{
+	cr := CompiledRuleset{
 		ControlPointID: selector.ControlPointID,
 		Labelers:       labelers,
 		ReportedRules:  rulesetToReportedRules(classifier, name),

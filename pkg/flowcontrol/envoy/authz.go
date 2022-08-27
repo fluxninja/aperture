@@ -21,12 +21,12 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"github.com/fluxninja/aperture/pkg/classification"
 	"github.com/fluxninja/aperture/pkg/entitycache"
-	authz_baggage "github.com/fluxninja/aperture/pkg/envoy/baggage"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
+	authz_baggage "github.com/fluxninja/aperture/pkg/flowcontrol/envoy/baggage"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	classification "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/services"
 )

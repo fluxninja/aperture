@@ -1,4 +1,4 @@
-package classification
+package classifier
 
 import (
 	"context"
@@ -14,7 +14,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/status"
-	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
 
 // Module is a default set of components to enable flow classification
@@ -25,7 +24,7 @@ var Module fx.Option = fx.Options(
 	fx.Provide(
 		fx.Annotated{
 			Target: setupEtcdClassifierWatcher,
-			Name:   fxTag,
+			Name:   "classifier",
 		},
 		fx.Annotated{
 			Target: ProvideEmptyClassifier,
@@ -33,12 +32,6 @@ var Module fx.Option = fx.Options(
 		},
 		ProvideClassifier,
 	),
-)
-
-const (
-	configKey              = "classification"
-	classificationJobGroup = "classification"
-	fxTag                  = "classifier"
 )
 
 func setupEtcdClassifierWatcher(etcdClient *etcdclient.Client, lc fx.Lifecycle, ai *agentinfo.AgentInfo) (notifiers.Watcher, error) {
@@ -95,20 +88,6 @@ func ProvideClassifier(in ProvideClassifierIn) *Classifier {
 		},
 	})
 	return in.Classifier
-}
-
-// ProvideCMFileValidator provides classification config map file validator
-//
-// Note: This validator must be registered to be accessible.
-func ProvideCMFileValidator() *CMFileValidator {
-	return &CMFileValidator{}
-}
-
-// RegisterCMFileValidator registers classification configmap validator as configmap file validator.
-func RegisterCMFileValidator(validator *CMFileValidator, configMapValidator *validation.CMValidator) {
-	// The path is not configurable – if one doesn't want default path, one
-	// could just write their own Register function
-	configMapValidator.RegisterCMFileValidator(validator)
 }
 
 // Per classifier fx app.

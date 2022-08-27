@@ -14,12 +14,11 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
-	"github.com/fluxninja/aperture/pkg/classification"
-	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/webhooks"
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
@@ -30,8 +29,7 @@ func main() {
 		otel.ProvideAnnotatedControllerConfig(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			classification.ProvideCMFileValidator,
-			flowcontrol.ProvideCMFileValidator,
+			controlplane.ProvideCMFileValidator,
 			validation.ProvideCMValidator,
 			otel.ControllerOTELComponents,
 		),
@@ -39,8 +37,7 @@ func main() {
 		controller.Module(),
 		webhooks.Module(),
 		fx.Invoke(
-			classification.RegisterCMFileValidator,
-			flowcontrol.RegisterCMFileValidator,
+			controlplane.RegisterCMFileValidator,
 			validation.RegisterCMValidator,
 		),
 	)

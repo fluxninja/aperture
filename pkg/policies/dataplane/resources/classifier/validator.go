@@ -1,4 +1,4 @@
-package classification
+package classifier
 
 import (
 	"context"
@@ -46,7 +46,7 @@ func (v *CMFileValidator) ValidateFile(
 	if err != nil {
 		return false, err.Error(), nil
 	}
-	_, err = compileRuleset(ctx, name, &classifier)
+	_, err = CompileRuleset(ctx, name, &classifier)
 	if err != nil {
 		if errors.Is(err, BadExtractor) || errors.Is(err, BadSelector) ||
 			errors.Is(err, BadRego) || errors.Is(err, BadLabelName) {

@@ -1,4 +1,4 @@
-package flowcontrol_test
+package controlplane_test
 
 import (
 	"context"
@@ -11,13 +11,13 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/fluxninja/aperture/pkg/flowcontrol"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
 
 var _ = Describe("Validator", func() {
-	cmFileValidator := &flowcontrol.CMFileValidator{}
-	It("rejects non-flowcontrol configmap name", func() {
+	cmFileValidator := &controlplane.CMFileValidator{}
+	It("rejects non-policy configmap name", func() {
 		ok := cmFileValidator.CheckCMName("foo")
 		Expect(ok).To(BeFalse())
 	})
@@ -33,6 +33,7 @@ var _ = Describe("Validator", func() {
 
 	validateExample := func(name string) {
 		contents, err := os.ReadFile(filepath.Join(
+			"..", // policies
 			"..", // pkg
 			"..", // aperture
 			fmt.Sprintf("%s.yaml", name),
