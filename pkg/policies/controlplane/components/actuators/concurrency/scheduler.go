@@ -34,7 +34,7 @@ var (
 
 // Scheduler is part of the concurrency control component stack.
 type Scheduler struct {
-	policyReadAPI iface.PolicyRead
+	policyReadAPI iface.Policy
 	// saves promValue result from tokens query to check if anything changed
 	tokensPromValue prometheusmodel.Value
 	// Prometheus query for accepted concurrency
@@ -56,7 +56,7 @@ type Scheduler struct {
 func NewSchedulerAndOptions(
 	schedulerProto *policylangv1.Scheduler,
 	componentIndex int,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.AutoTokenResultsPath,

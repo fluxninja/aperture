@@ -16,7 +16,7 @@ type Constant struct {
 }
 
 // NewConstantAndOptions creates constant setpoint and its fx options.
-func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
+func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	con := Constant{
 		value: constant.Value,
 	}

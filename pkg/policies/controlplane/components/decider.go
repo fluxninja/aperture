@@ -54,7 +54,7 @@ type Decider struct {
 var _ runtime.Component = (*Decider)(nil)
 
 // NewDeciderAndOptions creates timed controller and its fx options.
-func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
+func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	operator, err := comparisonOperatorString(timedProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err

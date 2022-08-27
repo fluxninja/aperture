@@ -23,7 +23,7 @@ func circuitFactoryModule() fx.Option {
 // compileCircuit takes a circuitProto and returns list of CompiledComponentAndPorts.
 func compileCircuit(
 	circuitProto []*policylangv1.Component,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 ) ([]runtime.CompiledComponentAndPorts, fx.Option, error) {
 	// List of runtime.CompiledComponent. The index of runtime.CompiledComponents in compList is referred as graphNodeIndex.
 	var compList []runtime.CompiledComponent

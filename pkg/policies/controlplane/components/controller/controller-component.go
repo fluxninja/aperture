@@ -19,11 +19,11 @@ type ControllerComponent struct {
 	// Controller output's last reading
 	output         reading.Reading
 	componentIndex int
-	policyReadAPI  iface.PolicyRead
+	policyReadAPI  iface.Policy
 }
 
 // NewControllerComponent creates a new ControllerComponent.
-func NewControllerComponent(controller Controller, componentIndex int, policyReadAPI iface.PolicyRead) *ControllerComponent {
+func NewControllerComponent(controller Controller, componentIndex int, policyReadAPI iface.Policy) *ControllerComponent {
 	return &ControllerComponent{
 		signal:          reading.NewInvalid(),
 		setpoint:        reading.NewInvalid(),

@@ -318,7 +318,7 @@ type PromQL struct {
 	// Prometheus API
 	promAPI prometheusv1.API
 	// Policy read API
-	policyReadAPI iface.PolicyRead
+	policyReadAPI iface.Policy
 	// Current error
 	err error
 	// Job Registerer used to register Prometheus query jobs. Determines the type of job to register.
@@ -344,7 +344,7 @@ var _ jobRegistererIfc = (*PromQL)(nil)
 func NewPromQLAndOptions(
 	promQLProto *policylangv1.PromQL,
 	componentIndex int,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 ) (*PromQL, fx.Option, error) {
 	promQL := &PromQL{
 		evaluationInterval: promQLProto.EvaluationInterval.AsDuration(),
@@ -362,14 +362,7 @@ func NewPromQLAndOptions(
 	promQL.jobName = fmt.Sprintf("Component-%d", promQL.componentIndex)
 
 	// Resolve metric names in PromQL to get the query string
-	queryTemplate := promQLProto.GetQueryString()
-	queryString, err := promQL.policyReadAPI.ResolveMetricNames(queryTemplate)
-	if err != nil {
-		log.Error().Err(err).Str("job", promQL.jobName).Msgf("Error resolving metric names in query template: %s" + queryTemplate)
-		return nil, fx.Options(), err
-	}
-	log.Info().Str("job", promQL.jobName).Msgf("queryTemplate: %s, \n queryString: %s", queryTemplate, queryString)
-	promQL.queryString = queryString
+	promQL.queryString = promQLProto.GetQueryString()
 
 	// Invoke setup in the Policy app startup via fx.Options
 	options := fx.Options(
@@ -440,7 +433,7 @@ func NewScalarQueryAndOptions(
 	queryString string,
 	evaluationInterval time.Duration,
 	componentIndex int,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 	jobPostFix string,
 ) (*ScalarQuery, fx.Option, error) {
 	// Create promQLProto
@@ -483,7 +476,7 @@ func NewTaggedQueryAndOptions(
 	queryString string,
 	evaluationInterval time.Duration,
 	componentIndex int,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 	jobPostFix string,
 ) (*TaggedQuery, fx.Option, error) {
 	scalarQuery, options, err := NewScalarQueryAndOptions(queryString, evaluationInterval, componentIndex, policyReadAPI, jobPostFix)

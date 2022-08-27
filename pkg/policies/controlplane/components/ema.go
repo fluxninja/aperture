@@ -47,7 +47,7 @@ var _ runtime.Component = (*EMA)(nil)
 // NewEMAAndOptions returns a new EMA filter and its Fx options.
 func NewEMAAndOptions(emaProto *policylangv1.EMA,
 	_ int,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 ) (*EMA, fx.Option, error) {
 	// period of tick
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()

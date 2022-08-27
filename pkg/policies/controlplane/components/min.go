@@ -18,7 +18,7 @@ type Min struct{}
 var _ runtime.Component = (*Min)(nil)
 
 // NewMinAndOptions creates a new Min Component.
-func NewMinAndOptions(minProto *policylangv1.Min, componentIndex int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
+func NewMinAndOptions(minProto *policylangv1.Min, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	min := Min{}
 	return &min, fx.Options(), nil
 }

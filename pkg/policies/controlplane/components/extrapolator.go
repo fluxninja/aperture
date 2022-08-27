@@ -25,7 +25,7 @@ type Extrapolator struct {
 var _ runtime.Component = (*Extrapolator)(nil)
 
 // NewExtrapolatorAndOptions creates a new Extrapolator Component.
-func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, componentIndex int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
+func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	exp := Extrapolator{
 		maxExtrapolationInterval: extrapolatorProto.MaxExtrapolationInterval.AsDuration(),
 		lastOutput:               reading.NewInvalid(),

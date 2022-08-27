@@ -18,7 +18,7 @@ type Max struct{}
 var _ runtime.Component = (*Max)(nil)
 
 // NewMaxAndOptions creates a new Max Component.
-func NewMaxAndOptions(maxProto *policylangv1.Max, componentIndex int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
+func NewMaxAndOptions(maxProto *policylangv1.Max, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	max := Max{}
 	return &max, fx.Options(), nil
 }

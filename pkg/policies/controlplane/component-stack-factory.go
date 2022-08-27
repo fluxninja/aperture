@@ -20,7 +20,7 @@ func componentStackFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.O
 func newComponentStackAndOptions(
 	componentStackProto *policylangv1.Component,
 	componentStackIndex int,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 ) (runtime.CompiledComponent, []runtime.CompiledComponent, fx.Option, error) {
 	// Factory parser to determine what kind of component stack to create
 	if concurrencyLimiter := componentStackProto.GetConcurrencyLimiter(); concurrencyLimiter != nil {

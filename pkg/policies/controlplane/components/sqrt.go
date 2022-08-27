@@ -20,7 +20,7 @@ type Sqrt struct {
 var _ runtime.Component = (*Sqrt)(nil)
 
 // NewSqrtAndOptions creates a new Sqrt Component.
-func NewSqrtAndOptions(sqrtProto *policylangv1.Sqrt, componentIndex int, policyReadAPI iface.PolicyRead) (runtime.Component, fx.Option, error) {
+func NewSqrtAndOptions(sqrtProto *policylangv1.Sqrt, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	sqrt := Sqrt{
 		scale: sqrtProto.Scale,
 	}

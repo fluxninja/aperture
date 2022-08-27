@@ -91,7 +91,6 @@ func setupFluxMeterModule(
 			}, []string{
 				metrics.PolicyNameLabel,
 				metrics.FluxMeterNameLabel,
-				metrics.PolicyHashLabel,
 				metrics.DecisionTypeLabel,
 				metrics.StatusCodeLabel,
 			})
@@ -179,7 +178,6 @@ func NewFluxMeterOptions(
 func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheus.Registry) {
 	metricLabels := make(map[string]string)
 	metricLabels[metrics.PolicyNameLabel] = fluxMeter.GetPolicyName()
-	metricLabels[metrics.PolicyHashLabel] = fluxMeter.GetPolicyHash()
 	metricLabels[metrics.FluxMeterNameLabel] = fluxMeter.GetFluxMeterName()
 
 	lc.Append(fx.Hook{
@@ -229,7 +227,6 @@ func (fluxMeter *FluxMeter) GetFluxMeterID() iface.FluxMeterID {
 	return iface.FluxMeterID{
 		PolicyName:    fluxMeter.GetPolicyName(),
 		FluxMeterName: fluxMeter.GetFluxMeterName(),
-		PolicyHash:    fluxMeter.GetPolicyHash(),
 	}
 }
 
@@ -238,7 +235,6 @@ func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType
 	labels := make(map[string]string)
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
 	labels[metrics.StatusCodeLabel] = statusCode
-	labels[metrics.PolicyHashLabel] = fluxMeter.GetPolicyHash()
 	labels[metrics.PolicyNameLabel] = fluxMeter.GetPolicyName()
 	labels[metrics.FluxMeterNameLabel] = fluxMeter.GetFluxMeterName()
 

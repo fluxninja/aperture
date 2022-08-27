@@ -5,7 +5,6 @@ import (
 	"errors"
 	"path"
 
-	"github.com/prometheus/prometheus/model/labels"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
@@ -14,18 +13,16 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 )
 
 type fluxMeterConfigSync struct {
-	policyBaseAPI     iface.PolicyBase
-	metricSubRegistry iface.MetricSubRegistry
-	fluxMeterProto    *policylangv1.FluxMeter
-	etcdPath          string
-	agentGroupName    string
-	fluxmeterName     string
+	policyBaseAPI  iface.PolicyBase
+	fluxMeterProto *policylangv1.FluxMeter
+	etcdPath       string
+	agentGroupName string
+	fluxmeterName  string
 }
 
 // NewFluxMeterOptions creates fx options for FluxMeter.
@@ -33,7 +30,6 @@ func NewFluxMeterOptions(
 	name string,
 	fluxMeterProto *policylangv1.FluxMeter,
 	policyBaseAPI iface.PolicyBase,
-	metricSubRegistry iface.MetricSubRegistry,
 ) (fx.Option, error) {
 	// Get Agent Group Name from FluxMeter.Selector.AgentGroup
 	selectorProto := fluxMeterProto.GetSelector()
@@ -45,18 +41,11 @@ func NewFluxMeterOptions(
 	etcdPath := path.Join(paths.FluxMeterConfigPath,
 		paths.FluxMeterKey(agentGroup, policyBaseAPI.GetPolicyName(), name))
 	configSync := &fluxMeterConfigSync{
-		fluxMeterProto:    fluxMeterProto,
-		policyBaseAPI:     policyBaseAPI,
-		metricSubRegistry: metricSubRegistry,
-		agentGroupName:    agentGroup,
-		etcdPath:          etcdPath,
-		fluxmeterName:     name,
-	}
-
-	// Register FluxMeter
-	err := configSync.registerFluxMeter()
-	if err != nil {
-		return nil, err
+		fluxMeterProto: fluxMeterProto,
+		policyBaseAPI:  policyBaseAPI,
+		agentGroupName: agentGroup,
+		etcdPath:       etcdPath,
+		fluxmeterName:  name,
 	}
 
 	return fx.Options(
@@ -98,24 +87,5 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 		},
 	})
 
-	return nil
-}
-
-// registerFluxMeter registers histograms for fluxmeter in controller.
-func (configSync *fluxMeterConfigSync) registerFluxMeter() error {
-	policyNameMatcher, err := labels.NewMatcher(labels.MatchEqual, metrics.PolicyNameLabel, configSync.policyBaseAPI.GetPolicyName())
-	if err != nil {
-		return err
-	}
-	fluxMeterNameMatcher, err := labels.NewMatcher(labels.MatchEqual, metrics.FluxMeterNameLabel, configSync.fluxmeterName)
-	if err != nil {
-		return err
-	}
-	policyHashMatcher, err := labels.NewMatcher(labels.MatchEqual, metrics.PolicyHashLabel, configSync.policyBaseAPI.GetPolicyHash())
-	if err != nil {
-		return err
-	}
-	metricLabels := []*labels.Matcher{policyNameMatcher, fluxMeterNameMatcher, policyHashMatcher}
-	configSync.metricSubRegistry.RegisterHistogramSub(configSync.fluxmeterName, metrics.FluxMeterMetricName, metricLabels)
 	return nil
 }

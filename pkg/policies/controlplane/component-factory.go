@@ -32,7 +32,7 @@ func componentFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option
 func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentIndex int,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 ) (runtime.CompiledComponent, []runtime.CompiledComponent, fx.Option, error) {
 	// Factory parser to determine what kind of component to create
 	if gradientController := componentProto.GetGradientController(); gradientController != nil {

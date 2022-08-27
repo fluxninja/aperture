@@ -21,7 +21,7 @@ import (
 
 // LoadShedActuator struct.
 type LoadShedActuator struct {
-	policyReadAPI  iface.PolicyRead
+	policyReadAPI  iface.Policy
 	decision       *policydecisionsv1.LoadShedDecision
 	etcdPath       string
 	writer         *etcdwriter.Writer
@@ -33,7 +33,7 @@ type LoadShedActuator struct {
 func NewLoadShedActuatorAndOptions(
 	_ *policylangv1.LoadShedActuator,
 	componentIndex int,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.LoadShedDecisionsPath,

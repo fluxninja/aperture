@@ -43,7 +43,7 @@ data:
       evaluation_interval: "0.5s"
       components:
         - promql:
-            query_string: "sum(increase(service_latency_sum{decision_type!=\"DECISION_TYPE_REJECTED\"}[5s]))/sum(increase(service_latency_count{decision_type!=\"DECISION_TYPE_REJECTED\"}[5s]))"
+    query_string: "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))/sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))"
             evaluation_interval: "1s"
             out_ports:
               output:

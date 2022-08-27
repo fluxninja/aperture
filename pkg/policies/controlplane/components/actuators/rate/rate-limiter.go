@@ -21,7 +21,7 @@ import (
 )
 
 type rateLimiterSync struct {
-	policyReadAPI     iface.PolicyRead
+	policyReadAPI     iface.Policy
 	rateLimiterProto  *policylangv1.RateLimiter
 	decision          *policydecisionsv1.RateLimiterDecision
 	configEtcdPath    string
@@ -35,7 +35,7 @@ type rateLimiterSync struct {
 func NewRateLimiterAndOptions(
 	rateLimiterProto *policylangv1.RateLimiter,
 	componentIndex int,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	// Get the agent group name.
 	selectorProto := rateLimiterProto.GetSelector()
