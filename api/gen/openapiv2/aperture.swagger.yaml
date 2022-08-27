@@ -1512,8 +1512,10 @@ definitions:
   v1Resources:
     type: object
     properties:
-      classifier:
-        $ref: '#/definitions/v1Classifier'
+      classifiers:
+        type: array
+        items:
+          $ref: '#/definitions/v1Classifier'
         description: |-
           Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 

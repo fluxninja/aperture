@@ -30,7 +30,7 @@ var (
 // PolicyFactoryModule module for policy factory.
 func PolicyFactoryModule() fx.Option {
 	return fx.Options(
-		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: paths.Policies}.Annotate(),
+		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: paths.PoliciesConfigPath}.Annotate(),
 		fx.Invoke(
 			fx.Annotate(
 				setupPolicyFxDriver,

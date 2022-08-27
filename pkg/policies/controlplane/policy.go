@@ -19,8 +19,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/fluxmeter"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/fluxmeter"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -115,7 +116,7 @@ func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []ru
 		return nil, nil, nil, fmt.Errorf("nil policy proto")
 	}
 
-	var fluxMeterOptions []fx.Option
+	var resourceOptions []fx.Option
 	if policyProto.GetResources() != nil {
 		// Initialize flux meters
 		for name, fluxMeterProto := range policyProto.GetResources().FluxMeters {
@@ -123,7 +124,15 @@ func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []ru
 			if err != nil {
 				return nil, nil, nil, err
 			}
-			fluxMeterOptions = append(fluxMeterOptions, fluxMeterOption)
+			resourceOptions = append(resourceOptions, fluxMeterOption)
+		}
+		// Initialize classifiers
+		for index, classifierProto := range policyProto.GetResources().Classifiers {
+			classifierOption, err := classifier.NewClassifierOptions(int64(index), classifierProto, policy)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+			resourceOptions = append(resourceOptions, classifierOption)
 		}
 	}
 	var compWithPortsList []runtime.CompiledComponentAndPorts
@@ -141,7 +150,7 @@ func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []ru
 	}
 
 	return policy, compWithPortsList, fx.Options(
-		fx.Options(fluxMeterOptions...),
+		fx.Options(resourceOptions...),
 		partialCircuitOption,
 		fx.Invoke(policy.setupCircuitJob),
 	), nil

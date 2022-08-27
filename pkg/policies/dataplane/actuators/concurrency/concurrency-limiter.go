@@ -27,7 +27,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/concurrency/scheduler"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/concurrency/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/status"

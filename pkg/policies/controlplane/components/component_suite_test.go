@@ -1,4 +1,4 @@
-package component_test
+package components_test
 
 import (
 	"testing"

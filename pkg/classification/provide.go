@@ -43,7 +43,7 @@ const (
 
 func setupEtcdClassifierWatcher(etcdClient *etcdclient.Client, lc fx.Lifecycle, ai *agentinfo.AgentInfo) (notifiers.Watcher, error) {
 	agentGroup := ai.GetAgentGroup()
-	etcdPath := path.Join(paths.Classifiers, paths.AgentGroupPrefix(agentGroup))
+	etcdPath := path.Join(paths.ClassifiersConfigPath, paths.AgentGroupPrefix(agentGroup))
 	etcdWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err

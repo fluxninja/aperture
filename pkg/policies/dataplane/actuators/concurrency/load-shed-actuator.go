@@ -18,7 +18,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/concurrency/scheduler"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/concurrency/scheduler"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 

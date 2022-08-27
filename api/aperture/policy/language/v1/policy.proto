@@ -86,7 +86,7 @@ message Resources {
   // Classifiers are installed in the data-plane and are used to label the requests based on payload content.
   //
   // The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
-  Classifier classifier = 2;
+  repeated Classifier classifiers = 2;
 }
 
 // Computational block that form the circuit

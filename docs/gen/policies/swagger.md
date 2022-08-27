@@ -1853,10 +1853,10 @@ Resources are typically FluxMeters, Classifiers, etc. that can be used to create
 #### Properties
 
 <dl>
-<dt>classifier</dt>
+<dt>classifiers</dt>
 <dd>
 
-([V1Classifier](#v1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+([[]V1Classifier](#v1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
 

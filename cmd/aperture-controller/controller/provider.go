@@ -108,7 +108,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 	}
 
 	notifier := etcdnotifier.NewPrefixToEtcdNotifier(
-		paths.Policies,
+		paths.PoliciesConfigPath,
 		etcdClient,
 		true)
 	// content transform callback to wrap policy in config properties wrapper

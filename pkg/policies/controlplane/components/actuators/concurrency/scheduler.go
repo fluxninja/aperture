@@ -21,7 +21,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/component"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -38,11 +38,11 @@ type Scheduler struct {
 	// saves promValue result from tokens query to check if anything changed
 	tokensPromValue prometheusmodel.Value
 	// Prometheus query for accepted concurrency
-	acceptedQuery *component.ScalarQuery
+	acceptedQuery *components.ScalarQuery
 	// Prometheus query for incoming concurrency
-	incomingQuery *component.ScalarQuery
+	incomingQuery *components.ScalarQuery
 	// Prometheus query for tokens based on ms latency
-	tokensQuery *component.TaggedQuery
+	tokensQuery *components.TaggedQuery
 
 	// saves tokens value per workload read from prometheus
 	tokensByWorkload *policydecisionsv1.TokensDecision
@@ -83,7 +83,7 @@ func NewSchedulerAndOptions(
 		componentIndex,
 	)
 
-	acceptedQuery, acceptedQueryOptions, acceptedQueryErr := component.NewScalarQueryAndOptions(
+	acceptedQuery, acceptedQueryOptions, acceptedQueryErr := components.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
 			metrics.AcceptedConcurrencyMetricName,
 			policyParams),
@@ -97,7 +97,7 @@ func NewSchedulerAndOptions(
 	}
 	scheduler.acceptedQuery = acceptedQuery
 
-	incomingQuery, incomingQueryOptions, incomingQueryErr := component.NewScalarQueryAndOptions(
+	incomingQuery, incomingQueryOptions, incomingQueryErr := components.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
 			metrics.IncomingConcurrencyMetricName,
 			policyParams),
@@ -112,7 +112,7 @@ func NewSchedulerAndOptions(
 	scheduler.incomingQuery = incomingQuery
 
 	if schedulerProto.AutoTokens {
-		tokensQuery, tokensQueryOptions, tokensQueryErr := component.NewTaggedQueryAndOptions(
+		tokensQuery, tokensQueryOptions, tokensQueryErr := components.NewTaggedQueryAndOptions(
 			fmt.Sprintf("sum by (%s) (increase(%s{%s}[30m])) / sum by (%s) (increase(%s{%s}[30m]))",
 				metrics.WorkloadIndexLabel,
 				metrics.WorkloadLatencySumMetricName,
