@@ -73,7 +73,7 @@ func ProvideClassifier(in ProvideClassifierIn) *Classifier {
 	fxDriver := &notifiers.FxDriver{
 		FxOptionsFuncs: []notifiers.FxOptionsFunc{in.Classifier.provideClassifierFxOptions},
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
+			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
 		},
 		StatusRegistry: in.Registry,
 		StatusPath:     "classifier-driver",
