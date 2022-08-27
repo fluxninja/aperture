@@ -7,20 +7,21 @@ metadata:
 apiVersion: v1
 data:
   rate-limit-policy.yaml: |
-    evaluation_interval: "0.5s"
     circuit:
-      - constant:
-          value: "250.0"
-          out_ports:
-            output:
-              signal_name: "RATE_LIMIT"
-      - rate_limiter:
-          in_ports:
-            limit:
-              signal_name: "RATE_LIMIT"
-          selector:
-            service: "demo1-demo-app.demoapp.svc.cluster.local"
-            control_point:
-              traffic: "ingress"
-          label_key: "request_header_user-type"
-          limit_reset_interval: "1s"
+      evaluation_interval: "0.5s"
+      components:
+        - constant:
+            value: "250.0"
+            out_ports:
+              output:
+                signal_name: "RATE_LIMIT"
+        - rate_limiter:
+            in_ports:
+              limit:
+                signal_name: "RATE_LIMIT"
+            selector:
+              service: "demo1-demo-app.demoapp.svc.cluster.local"
+              control_point:
+                traffic: "ingress"
+            label_key: "request_header_user-type"
+            limit_reset_interval: "1s"

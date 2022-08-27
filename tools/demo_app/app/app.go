@@ -68,10 +68,11 @@ func (simpleService SimpleService) Run() error {
 	}
 
 	http.Handle("/request", limitClients(handler, 10))
-	// http.Handle("/request", handler)
 	address := fmt.Sprintf(":%d", simpleService.port)
 
-	return http.ListenAndServe(address, nil)
+	server := &http.Server{Addr: address}
+
+	return server.ListenAndServe()
 }
 
 func limitClients(h *RequestHandler, n int) http.Handler {

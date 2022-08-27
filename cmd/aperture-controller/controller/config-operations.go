@@ -8,10 +8,3 @@ package controller
 // - in: body
 //   schema:
 //     "$ref": "#/definitions/v1Policy"
-
-// swagger:operation POST / classification-configuration ClassificationRule
-// ---
-// parameters:
-// - in: body
-//   schema:
-//     "$ref": "#/definitions/v1Classifier"

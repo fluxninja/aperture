@@ -107,12 +107,6 @@ Env-Var Prefix: `APERTURE_CONTROLLER_CONTROLLER_`
 #### Members
 
 <dl>
-<dt>classifiers_path</dt>
-<dd>
-
-(string, default: `/etc/aperture/aperture-controller/classifiers`, env-var: `APERTURE_CONTROLLER_CONTROLLER_CLASSIFIERS_PATH`) Directory containing classification rules
-
-</dd>
 <dt>policies_path</dt>
 <dd>
 

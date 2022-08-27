@@ -9,9 +9,9 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/grpc/peer"
 
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/classification"
 	"github.com/fluxninja/aperture/pkg/envoy"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"

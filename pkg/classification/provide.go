@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/fx"
 
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
+	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"

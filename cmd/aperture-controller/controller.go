@@ -2,8 +2,6 @@
 
 //go:generate swagger generate spec --include="github.com/fluxninja*" --include-tag=policies-configuration -o ../../docs/gen/policies/config-swagger.yaml
 
-//go:generate swagger generate spec --include="github.com/fluxninja*" --include-tag=classification-configuration -o ../../docs/gen/classification/config-swagger.yaml
-
 // Aperture Controller
 //
 //	BasePath: /aperture-controller

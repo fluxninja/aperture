@@ -8,9 +8,9 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
 	labelmatcherv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/labelmatcher/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 
 	. "github.com/fluxninja/aperture/pkg/classification"

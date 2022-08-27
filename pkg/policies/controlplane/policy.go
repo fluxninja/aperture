@@ -114,28 +114,36 @@ func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []ru
 	if policyProto == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy proto")
 	}
-	// Read evaluation interval
-	policy.evaluationInterval = policyProto.EvaluationInterval.AsDuration()
 
 	var fluxMeterOptions []fx.Option
-	// Initialize flux meters
-	for name, fluxMeterProto := range policyProto.FluxMeters {
-		fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(name, fluxMeterProto, policy, policy)
+	if policyProto.GetResources() != nil {
+		// Initialize flux meters
+		for name, fluxMeterProto := range policyProto.GetResources().FluxMeters {
+			fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(name, fluxMeterProto, policy, policy)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+			fluxMeterOptions = append(fluxMeterOptions, fluxMeterOption)
+		}
+	}
+	var compWithPortsList []runtime.CompiledComponentAndPorts
+	partialCircuitOption := fx.Options()
+	var err error
+
+	if policyProto.GetCircuit() != nil {
+		// Read evaluation interval
+		policy.evaluationInterval = policyProto.GetCircuit().GetEvaluationInterval().AsDuration()
+
+		compWithPortsList, partialCircuitOption, err = compileCircuit(policyProto.GetCircuit().Components, policy)
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		fluxMeterOptions = append(fluxMeterOptions, fluxMeterOption)
-	}
-
-	compWithPortsList, partialCircuitOption, err := compileCircuit(policyProto.Circuit, policy)
-	if err != nil {
-		return nil, nil, nil, err
 	}
 
 	return policy, compWithPortsList, fx.Options(
 		fx.Options(fluxMeterOptions...),
 		partialCircuitOption,
-		fx.Invoke(policy.setup),
+		fx.Invoke(policy.setupCircuitJob),
 	), nil
 }
 
@@ -144,45 +152,47 @@ func (policy *Policy) GetEvaluationInterval() time.Duration {
 	return policy.evaluationInterval
 }
 
-func (policy *Policy) setup(
+func (policy *Policy) setupCircuitJob(
 	lifecycle fx.Lifecycle,
 	circuitJobGroup *jobs.JobGroup,
 ) error {
-	// Job name
-	policy.jobName = fmt.Sprintf("Policy-%s", policy.GetPolicyName())
-	// Job group
-	policy.circuitJobGroup = circuitJobGroup
+	if policy.evaluationInterval > 0 {
+		// Job name
+		policy.jobName = fmt.Sprintf("Policy-%s", policy.GetPolicyName())
+		// Job group
+		policy.circuitJobGroup = circuitJobGroup
 
-	lifecycle.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
-			// Create a job that runs every tick i.e. evaluation_interval. Set timeout duration to half of evaluation_interval
-			job := jobs.BasicJob{
-				JobFunc: policy.executeTick,
-			}
-			job.JobName = policy.jobName
-			initialDelay := config.Duration{Duration: durationpb.New(time.Duration(0))}
-			executionPeriod := config.Duration{Duration: durationpb.New(policy.evaluationInterval)}
-			executionTimeout := config.Duration{Duration: durationpb.New(time.Millisecond * 100)}
-			jobConfig := jobs.JobConfig{
-				InitiallyHealthy: true,
-				InitialDelay:     initialDelay,
-				ExecutionPeriod:  executionPeriod,
-				ExecutionTimeout: executionTimeout,
-			}
-			// Register job with registry
-			err := policy.circuitJobGroup.RegisterJob(&job, jobConfig)
-			if err != nil {
-				log.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
-				return err
-			}
-			return nil
-		},
-		OnStop: func(_ context.Context) error {
-			// Deregister job from registry
-			_ = policy.circuitJobGroup.DeregisterJob(policy.jobName)
-			return nil
-		},
-	})
+		lifecycle.Append(fx.Hook{
+			OnStart: func(_ context.Context) error {
+				// Create a job that runs every tick i.e. evaluation_interval. Set timeout duration to half of evaluation_interval
+				job := jobs.BasicJob{
+					JobFunc: policy.executeTick,
+				}
+				job.JobName = policy.jobName
+				initialDelay := config.Duration{Duration: durationpb.New(time.Duration(0))}
+				executionPeriod := config.Duration{Duration: durationpb.New(policy.evaluationInterval)}
+				executionTimeout := config.Duration{Duration: durationpb.New(time.Millisecond * 100)}
+				jobConfig := jobs.JobConfig{
+					InitiallyHealthy: true,
+					InitialDelay:     initialDelay,
+					ExecutionPeriod:  executionPeriod,
+					ExecutionTimeout: executionTimeout,
+				}
+				// Register job with registry
+				err := policy.circuitJobGroup.RegisterJob(&job, jobConfig)
+				if err != nil {
+					log.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
+					return err
+				}
+				return nil
+			},
+			OnStop: func(_ context.Context) error {
+				// Deregister job from registry
+				_ = policy.circuitJobGroup.DeregisterJob(policy.jobName)
+				return nil
+			},
+		})
+	}
 
 	return nil
 }
