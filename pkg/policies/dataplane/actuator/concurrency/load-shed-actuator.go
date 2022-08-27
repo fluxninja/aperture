@@ -16,6 +16,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuator/concurrency/scheduler"
@@ -51,28 +52,28 @@ func newLoadShedActuatorFactory(
 	// Initialize and register the WFQ and Token Bucket Metric Vectors
 	f.tokenBucketLSFGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "token_bucket_lsf",
+			Name: metrics.TokenBucketMetricName,
 			Help: "A gauge that tracks the load shed factor",
 		},
 		metricLabelKeys,
 	)
 	f.tokenBucketFillRateGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "token_bucket_bucket_fill_rate",
+			Name: metrics.TokenBucketFillRateMetricName,
 			Help: "A gauge that tracks the fill rate of token bucket",
 		},
 		metricLabelKeys,
 	)
 	f.tokenBucketBucketCapacityGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "token_bucket_bucket_capacity",
+			Name: metrics.TokenBucketCapacityMetricName,
 			Help: "A gauge that tracks the capacity of token bucket",
 		},
 		metricLabelKeys,
 	)
 	f.tokenBucketAvailableTokensGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "token_bucket_available_tokens",
+			Name: metrics.TokenBucketAvailableMetricName,
 			Help: "A gauge that tracks the number of tokens available in token bucket",
 		},
 		metricLabelKeys,

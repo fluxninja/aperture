@@ -5,6 +5,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 )
 
 // Metrics is used for collecting metrics about Aperture flowcontrol.
@@ -47,27 +48,27 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 		registry: registry,
 		checkReceivedTotal: prometheus.NewCounter(
 			prometheus.CounterOpts{
-				Name: "flowcontrol_check_requests_total",
+				Name: metrics.FlowControlCheckRequestsMetricName,
 				Help: "Total number of aperture check requests handled",
 			},
 		),
 		checkDecision: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: "flowcontrol_check_decisions_total",
+				Name: metrics.FlowControlCheckDecisionsMetricName,
 				Help: "Number of aperture check decisions",
-			}, []string{"flowcontrol_check_decision_type"},
+			}, []string{metrics.FlowControlCheckDecisionTypeLabel},
 		),
 		errorReason: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: "flowcontrol_check_error_reason_total",
+				Name: metrics.FlowControlCheckErrorReasonMetricName,
 				Help: "Number of error reasons other than unspecified",
-			}, []string{"flowcontrol_check_error_reason"},
+			}, []string{metrics.FlowControlCheckErrorReasonLabel},
 		),
 		rejectReason: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: "flowcontrol_check_reject_reason_total",
+				Name: metrics.FlowControlCheckRejectReasonMetricName,
 				Help: "Number of reject reasons other than unspecified",
-			}, []string{"flowcontrol_check_reject_reason"},
+			}, []string{metrics.FlowControlCheckRejectReasonLabel},
 		),
 	}
 
@@ -85,13 +86,13 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 // CheckResponse collects metrics about Aperture Check call with DecisionType, Reason.
 func (pm *PrometheusMetrics) CheckResponse(decision flowcontrolv1.DecisionType, reason *flowcontrolv1.DecisionReason) {
 	pm.checkReceivedTotal.Inc()
-	pm.checkDecision.With(prometheus.Labels{"flowcontrol_check_decision_type": decision.Enum().String()}).Inc()
+	pm.checkDecision.With(prometheus.Labels{metrics.FlowControlCheckDecisionTypeLabel: decision.Enum().String()}).Inc()
 	if reason != nil {
 		if reason.GetErrorReason() != flowcontrolv1.DecisionReason_ERROR_REASON_UNSPECIFIED {
-			pm.errorReason.With(prometheus.Labels{"flowcontrol_check_error_reason": reason.GetErrorReason().Enum().String()}).Inc()
+			pm.errorReason.With(prometheus.Labels{metrics.FlowControlCheckErrorReasonLabel: reason.GetErrorReason().Enum().String()}).Inc()
 		}
 		if reason.GetRejectReason() != flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED {
-			pm.rejectReason.With(prometheus.Labels{"flowcontrol_check_reject_reason": reason.GetRejectReason().Enum().String()}).Inc()
+			pm.rejectReason.With(prometheus.Labels{metrics.FlowControlCheckRejectReasonLabel: reason.GetRejectReason().Enum().String()}).Inc()
 		}
 	}
 	// TODO: update fluxmeter metrics
