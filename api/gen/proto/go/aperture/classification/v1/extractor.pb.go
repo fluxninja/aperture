@@ -21,7 +21,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write regod code.
+// Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
+//
 // There are multiple variants of extractor, specify exactly one:
 // - JSON Extractor
 // - Address Extractor
@@ -119,7 +120,8 @@ type isExtractor_Variant interface {
 }
 
 type Extractor_From struct {
-	// Use an attribute with no convertion.
+	// Use an attribute with no convertion
+	//
 	// Attribute path is a dot-separated path to attribute.
 	//
 	// Should be either:
@@ -168,7 +170,7 @@ func (*Extractor_Jwt) isExtractor_Variant() {}
 
 func (*Extractor_PathTemplates) isExtractor_Variant() {}
 
-// Deserialize a json, and extract one of the fields.
+// Deserialize a json, and extract one of the fields
 //
 // Example:
 // ```yaml
@@ -235,7 +237,8 @@ func (x *JSONExtractor) GetPointer() string {
 	return ""
 }
 
-// Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`.
+// Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
+//
 // IP addresses in attribute context are defined as objects with separate ip and port fields.
 // This is a helper to display an address as a single string.
 //
@@ -295,7 +298,8 @@ func (x *AddressExtractor) GetFrom() string {
 	return ""
 }
 
-// Parse the attribute as JWT and read the payload.
+// Parse the attribute as JWT and read the payload
+//
 // Specify a field to be extracted from payload using "json_pointer".
 //
 // Note: The signature is not verified against the secret (we're assuming there's some
@@ -366,7 +370,8 @@ func (x *JWTExtractor) GetJsonPointer() string {
 	return ""
 }
 
-// Matches HTTP Path to given path templates.
+// Matches HTTP Path to given path templates
+//
 // HTTP path will be matched against given path templates.
 // If a match occurs, the value associated with the path template will be treated as a result.
 // In case of multiple path templates matching, the most specific one will be chosen.

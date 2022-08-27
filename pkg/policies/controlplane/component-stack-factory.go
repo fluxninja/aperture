@@ -11,26 +11,26 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// ComponentStackFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
-func ComponentStackFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
+// componentStackFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
+func componentStackFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	return fx.Options()
 }
 
-// NewComponentStackAndOptions creates components for component stack, sub components and their fx options.
-func NewComponentStackAndOptions(
+// newComponentStackAndOptions creates components for component stack, sub components and their fx options.
+func newComponentStackAndOptions(
 	componentStackProto *policylangv1.Component,
 	componentStackIndex int,
 	policyReadAPI iface.PolicyRead,
-) (compiledComponent, []compiledComponent, fx.Option, error) {
+) (runtime.CompiledComponent, []runtime.CompiledComponent, fx.Option, error) {
 	// Factory parser to determine what kind of component stack to create
 	if concurrencyLimiter := componentStackProto.GetConcurrencyLimiter(); concurrencyLimiter != nil {
 		var (
-			compiledComponents []compiledComponent
+			compiledComponents []runtime.CompiledComponent
 			options            []fx.Option
 		)
 		concurrencyLimiterOptions, agentGroupName, concurrencyLimiterErr := concurrency.NewConcurrencyLimiterOptions(concurrencyLimiter, componentStackIndex, policyReadAPI)
 		if concurrencyLimiterErr != nil {
-			return compiledComponent{}, nil, nil, concurrencyLimiterErr
+			return runtime.CompiledComponent{}, nil, nil, concurrencyLimiterErr
 		}
 		// Append concurrencyLimiter options
 		options = append(options, concurrencyLimiterOptions)
@@ -39,17 +39,17 @@ func NewComponentStackAndOptions(
 		if schedulerProto := concurrencyLimiter.GetScheduler(); schedulerProto != nil {
 			scheduler, schedulerOptions, schedulerErr := concurrency.NewSchedulerAndOptions(schedulerProto, componentStackIndex, policyReadAPI, agentGroupName)
 			if schedulerErr != nil {
-				return compiledComponent{}, nil, nil, schedulerErr
+				return runtime.CompiledComponent{}, nil, nil, schedulerErr
 			}
 			schedulerMapStruct, err := encodeMapStruct(schedulerProto)
 			if err != nil {
-				return compiledComponent{}, nil, nil, err
+				return runtime.CompiledComponent{}, nil, nil, err
 			}
-			// Append scheduler as a compiledComponent
-			compiledComponents = append(compiledComponents, compiledComponent{
-				component: scheduler,
-				mapStruct: schedulerMapStruct,
-				name:      "Scheduler",
+			// Append scheduler as a runtime.CompiledComponent
+			compiledComponents = append(compiledComponents, runtime.CompiledComponent{
+				Component: scheduler,
+				MapStruct: schedulerMapStruct,
+				Name:      "Scheduler",
 			})
 
 			// Append scheduler options
@@ -60,24 +60,24 @@ func NewComponentStackAndOptions(
 		if loadShedActuatorProto := concurrencyLimiter.GetLoadShedActuator(); loadShedActuatorProto != nil {
 			loadShedActuator, loadShedActuatorOptions, loadShedActuatorErr := concurrency.NewLoadShedActuatorAndOptions(loadShedActuatorProto, componentStackIndex, policyReadAPI, agentGroupName)
 			if loadShedActuatorErr != nil {
-				return compiledComponent{}, nil, nil, loadShedActuatorErr
+				return runtime.CompiledComponent{}, nil, nil, loadShedActuatorErr
 			}
 			loadShedActuatorMapStruct, err := encodeMapStruct(loadShedActuatorProto)
 			if err != nil {
-				return compiledComponent{}, nil, nil, err
+				return runtime.CompiledComponent{}, nil, nil, err
 			}
-			// Append loadShedActuator as a compiledComponent
-			compiledComponents = append(compiledComponents, compiledComponent{
-				component: loadShedActuator,
-				mapStruct: loadShedActuatorMapStruct,
-				name:      "LoadShedActuator",
+			// Append loadShedActuator as a runtime.CompiledComponent
+			compiledComponents = append(compiledComponents, runtime.CompiledComponent{
+				Component: loadShedActuator,
+				MapStruct: loadShedActuatorMapStruct,
+				Name:      "LoadShedActuator",
 			})
 
 			// Append loadShedActuator options
 			options = append(options, loadShedActuatorOptions)
 		}
 
-		return compiledComponent{}, compiledComponents, fx.Options(options...), nil
+		return runtime.CompiledComponent{}, compiledComponents, fx.Options(options...), nil
 	}
-	return compiledComponent{}, nil, nil, fmt.Errorf("unsupported/missing component type")
+	return runtime.CompiledComponent{}, nil, nil, fmt.Errorf("unsupported/missing component type")
 }

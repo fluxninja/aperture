@@ -13,34 +13,38 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// CircuitFactoryModule for circuit factory run via the main app.
-func CircuitFactoryModule() fx.Option {
+// circuitFactoryModule for circuit factory run via the main app.
+func circuitFactoryModule() fx.Option {
 	return fx.Options(
 		runtime.CircuitModule(),
 	)
 }
 
-// NewCircuitAndOptions creates Circuit and its fx options.
-func NewCircuitAndOptions(
+// compileCircuit takes a circuitProto and returns list of CompiledComponentAndPorts.
+func compileCircuit(
 	circuitProto []*policylangv1.Component,
 	policyReadAPI iface.PolicyRead,
-) (*runtime.Circuit, fx.Option, error) {
+) ([]runtime.CompiledComponentAndPorts, fx.Option, error) {
+	// List of runtime.CompiledComponent. The index of runtime.CompiledComponents in compList is referred as graphNodeIndex.
+	var compList []runtime.CompiledComponent
+	// Map from signal name to a list of graphNodeIndex(es) which accept the signal as input.
 	inSignals := make(map[string][]int)
+	// Map from signal name to the graphNodeIndex which emits the signal as output.
 	outSignals := make(map[string]int)
 
-	circuitOptions := []fx.Option{}
+	// List of Fx options for components.
+	componentOptions := []fx.Option{}
 
-	var compList []compiledComponent
 	for compIndex, componentProto := range circuitProto {
 		// Create component
 		compiledComp, compiledSubComps, compOption, compErr := NewComponentAndOptions(componentProto, compIndex, policyReadAPI)
 		if compErr != nil {
 			return nil, fx.Options(), compErr
 		}
-		circuitOptions = append(circuitOptions, compOption)
+		componentOptions = append(componentOptions, compOption)
 
 		// Add Component to compList
-		if compiledComp.component != nil {
+		if compiledComp.Component != nil {
 			compList = append(compList, compiledComp)
 		}
 
@@ -52,22 +56,20 @@ func NewCircuitAndOptions(
 	log.Trace().Msgf("Comp list: %+v", compList)
 
 	// Second pass to initialize port maps for each component
-	compWithPortsList := make([]runtime.ComponentWithPorts, len(compList))
+	compWithPortsList := make([]runtime.CompiledComponentAndPorts, len(compList))
 	for graphNodeIndex, compiledComp := range compList {
-		comp := compiledComp.component
-		mapStruct := compiledComp.mapStruct
+		mapStruct := compiledComp.MapStruct
 		log.Trace().Msgf("mapStruct: %+v", mapStruct)
 
-		compWithPorts := runtime.ComponentWithPorts{
-			Component:           comp,
+		compWithPorts := runtime.CompiledComponentAndPorts{
 			InPortToSignalsMap:  make(runtime.PortToSignal),
 			OutPortToSignalsMap: make(runtime.PortToSignal),
-			ComponentName:       compiledComp.name,
+			CompiledComponent:   compiledComp,
 		}
 
 		// Read in_ports in mapStruct
 		inPorts, ok := mapStruct["in_ports"]
-		log.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", compiledComp.name).Msg("mapStruct[in_ports]")
+		log.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", compiledComp.Name).Msg("mapStruct[in_ports]")
 		if ok {
 			// Convert in_ports to map[string]interface{}
 			inPortsMap, castOk := inPorts.(map[string]interface{})
@@ -82,7 +84,7 @@ func NewCircuitAndOptions(
 		}
 		// Read out_ports in mapStruct
 		outPorts, ok := mapStruct["out_ports"]
-		log.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", compiledComp.name).Msg("mapStruct[out_ports]")
+		log.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", compiledComp.Name).Msg("mapStruct[out_ports]")
 		if ok {
 			// Convert out_ports to map[string]interface{}
 			outPortsMap, castOk := outPorts.(map[string]interface{})
@@ -209,15 +211,7 @@ func NewCircuitAndOptions(
 		log.Trace().Msgf("comp with ports: %+v", compWithPorts)
 	}
 
-	// Create circuit
-	circuit, circuitOption := runtime.NewCircuitAndOptions(policyReadAPI, compWithPortsList)
-	circuitOptions = append(circuitOptions, circuitOption)
-
-	circuitOptions = append(circuitOptions, ComponentFactoryModuleForPolicyApp(circuit))
-
-	circuitOptions = append(circuitOptions, fx.Supply(fx.Annotate(circuit, fx.As(new(runtime.CircuitAPI)))))
-
-	return circuit, fx.Options(circuitOptions...), nil
+	return compWithPortsList, fx.Options(componentOptions...), nil
 }
 
 type signalType int

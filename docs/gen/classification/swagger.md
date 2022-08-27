@@ -10,53 +10,26 @@
 
 ### Object Index
 
-- [MatchExpressionList](#match-expression-list) – List of MatchExpressions that is used for all/any matching.
-  eg. {any: {of: [expr…
-- [RuleRego](#rule-rego) – Raw rego rules are compiled 1:1 to rego queries.
-  High-level extractor-based rule…
-- [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`.
-  I…
-- [v1Classifier](#v1-classifier) – Set of classification rules sharing a common selector.
-
-Example:
-
-````yaml
-selecto…
-* [v1ControlPoint](#v1-control-point) – Identifies control point within a service that the rule or policy should apply t…
-* [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
-* [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write regod code.
-There are multiple variants of extractor, specify exactly one:
-- JSON Extractor
-- Address Extractor
-- JWT Extractor
-* [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of the fields.
-
-Example:
-```yaml
-from: reque…
-* [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload.
-Specify a field to be extracted…
-* [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
-* [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not
-* [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels.
-…
-* [v1MatchesMatchExpression](#v1-matches-match-expression) – Label selector expression of the matches form "label matches regex".
-* [v1PathTemplateMatcher](#v1-path-template-matcher) – Matches HTTP Path to given path templates.
-HTTP path will be matched against giv…
-* [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule.
-Flow classification rule extra…
-* [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to
-
+- [MatchExpressionList](#match-expression-list) – List of MatchExpressions that is used for all/any matching
+- [RuleRego](#rule-rego) – Raw rego rules are compiled 1:1 to rego queries
+- [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
+- [v1Classifier](#v1-classifier) – Set of classification rules sharing a common selector
+- [v1ControlPoint](#v1-control-point) – Identifies control point within a service that the rule or policy should apply t…
+- [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
+- [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
+- [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of the fields
+- [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload
+- [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
+- [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not
+- [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels
+- [v1MatchesMatchExpression](#v1-matches-match-expression) – Label selector expression of the matches form "label matches regex".
+- [v1PathTemplateMatcher](#v1-path-template-matcher) – Matches HTTP Path to given path templates
+- [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule
+- [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to
 
 ## Reference
 
-### <span id="classification-rule"></span> *ClassificationRule*
-
-
-
-
-
-
+### <span id="classification-rule"></span> _ClassificationRule_
 
 #### Members
 
@@ -65,8 +38,8 @@ Flow classification rule extra…
 <dt></dt>
 <dd>
 
-
 Type: [V1Classifier](#v1-classifier)
+
 </dd>
 </dl>
 
@@ -74,13 +47,12 @@ Type: [V1Classifier](#v1-classifier)
 
 ### <span id="match-expression-list"></span> MatchExpressionList
 
+List of MatchExpressions that is used for all/any matching
 
-List of MatchExpressions that is used for all/any matching.
 eg. {any: {of: [expr1, expr2]}}.
 
-
-
 #### Properties
+
 <dl>
 <dt>of</dt>
 <dd>
@@ -92,13 +64,12 @@ eg. {any: {of: [expr1, expr2]}}.
 
 ### <span id="rule-rego"></span> RuleRego
 
+Raw rego rules are compiled 1:1 to rego queries
 
-Raw rego rules are compiled 1:1 to rego queries.
 High-level extractor-based rules are compiled into a single rego query.
 
-
-
 #### Properties
+
 <dl>
 <dt>query</dt>
 <dd>
@@ -122,8 +93,8 @@ Note: Must include a "package" declaration.
 
 ### <span id="v1-address-extractor"></span> v1AddressExtractor
 
+Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
 
-Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`.
 IP addresses in attribute context are defined as objects with separate ip and port fields.
 This is a helper to display an address as a single string.
 
@@ -132,9 +103,10 @@ Note: Use with care, as it might accidentally introduce a high-cardinality flow 
 [ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
 
 Example:
+
 ```yaml
 from: "source.address # or dstination.address"
-````
+```
 
 #### Properties
 
@@ -149,7 +121,7 @@ from: "source.address # or dstination.address"
 
 ### <span id="v1-classifier"></span> v1Classifier
 
-Set of classification rules sharing a common selector.
+Set of classification rules sharing a common selector
 
 Example:
 
@@ -240,7 +212,8 @@ Label selector expression of the equal form "label == value".
 
 ### <span id="v1-extractor"></span> v1Extractor
 
-Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write regod code.
+Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
+
 There are multiple variants of extractor, specify exactly one:
 
 - JSON Extractor
@@ -261,7 +234,8 @@ There are multiple variants of extractor, specify exactly one:
 <dt>from</dt>
 <dd>
 
-(string) Use an attribute with no convertion.
+(string) Use an attribute with no convertion
+
 Attribute path is a dot-separated path to attribute.
 
 Should be either:
@@ -310,7 +284,7 @@ from: request.http.headers.user-agent
 
 ### <span id="v1-json-extractor"></span> v1JSONExtractor
 
-Deserialize a json, and extract one of the fields.
+Deserialize a json, and extract one of the fields
 
 Example:
 
@@ -343,7 +317,8 @@ eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
 
 ### <span id="v1-j-w-t-extractor"></span> v1JWTExtractor
 
-Parse the attribute as JWT and read the payload.
+Parse the attribute as JWT and read the payload
+
 Specify a field to be extracted from payload using "json_pointer".
 
 Note: The signature is not verified against the secret (we're assuming there's some
@@ -459,7 +434,8 @@ Note: The requirements are ANDed.
 
 ### <span id="v1-match-expression"></span> v1MatchExpression
 
-Defines a [map<string, string> → bool] expression to be evaluated on labels.
+Defines a [map<string, string> → bool] expression to be evaluated on labels
+
 MatchExpression has multiple variants, exactly one should be set.
 
 Example:
@@ -548,7 +524,8 @@ It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/
 
 ### <span id="v1-path-template-matcher"></span> v1PathTemplateMatcher
 
-Matches HTTP Path to given path templates.
+Matches HTTP Path to given path templates
+
 HTTP path will be matched against given path templates.
 If a match occurs, the value associated with the path template will be treated as a result.
 In case of multiple path templates matching, the most specific one will be chosen.
@@ -587,7 +564,8 @@ Example:
 
 ### <span id="v1-rule"></span> v1Rule
 
-Rule describes a single Flow Classification Rule.
+Rule describes a single Flow Classification Rule
+
 Flow classification rule extracts a value from request metadata.
 More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
 See <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.

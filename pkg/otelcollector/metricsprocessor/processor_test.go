@@ -587,7 +587,7 @@ func expectEngineCalls(engine *mocks.MockEngine, checkResponse *flowcontrolv1.Ch
 	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
 	for i, fm := range checkResponse.FluxMeters {
 		// TODO actually return some Histogram
-		expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetPolicyName(), fm.GetFluxMeterName(), fm.GetPolicyHash(), flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
+		expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetPolicyName(), fm.GetFluxMeterName(), fm.GetPolicyHash(), "201", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
 	}
 	gomock.InOrder(expectedCalls...)
 }

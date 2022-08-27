@@ -50,6 +50,7 @@ func Provide(baseConfig *otelcollector.OTELConfig,
 		return nil, err
 	}
 	config := otelcollector.NewOTELConfig()
+	config.AddDebugExtensions()
 	addFluxninjaExporter(config, &pluginConfig, grpcClientConfig, httpClientConfig)
 
 	return config, nil
@@ -80,8 +81,8 @@ func Invoke(in ConstructorIn) {
 				if _, exists := in.BaseConfig.Service.Pipeline("metrics/fast"); exists {
 					addMetricsSlowPipeline(config)
 				}
-				if metricsPipeline, exists := in.BaseConfig.Service.Pipeline("metrics/controller"); exists {
-					addFNToPipeline("metrics/fluxninja", config, metricsPipeline)
+				if _, exists := in.BaseConfig.Service.Pipeline("metrics/controller-fast"); exists {
+					addMetricsControllerSlowPipeline(config)
 				}
 			}
 			return nil
@@ -120,6 +121,18 @@ func addMetricsSlowPipeline(config *otelcollector.OTELConfig) {
 		Receivers: []string{otel.ReceiverPrometheus},
 		Processors: []string{
 			otel.ProcessorEnrichment,
+			processorBatchMetricsSlow,
+			processorAttributes,
+		},
+		Exporters: []string{exporterFluxninja},
+	})
+}
+
+func addMetricsControllerSlowPipeline(config *otelcollector.OTELConfig) {
+	config.AddBatchProcessor(processorBatchMetricsSlow, 10*time.Second, 10000)
+	config.Service.AddPipeline("metrics/controller-slow", otelcollector.Pipeline{
+		Receivers: []string{otel.ReceiverPrometheus},
+		Processors: []string{
 			processorBatchMetricsSlow,
 			processorAttributes,
 		},

@@ -1,5 +1,6 @@
 ---
 title: Introduction
+sidebar_position: 1
 description: Aperture Introduction
 sidebar_position: 1
 keywords:
