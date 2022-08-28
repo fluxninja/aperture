@@ -8,7 +8,7 @@ repos:
     hooks:
       - id: proto
         name: "Proto"
-        entry: "./tools/githooks/generate_api.sh"
+        entry: "./scripts/precommit/generate_api.sh"
         language: script
         files: '\.proto$'
         pass_filenames: false
@@ -84,7 +84,7 @@ repos:
           - --fix
       - id: generate-docs
         name: "Docs"
-        entry: "./tools/githooks/generate_docs.sh"
+        entry: "./scripts/precommit/generate_docs.sh"
         language: script
         files: '\.proto$|\.go$|\.md$|\.mmd$'
         exclude: ^ops/.*
@@ -93,7 +93,7 @@ repos:
       - id: tanka-show
         name: "Check tanka parses jsonnet"
         language: script
-        entry: ./tools/githooks/check_tanka_show.sh
+        entry: ./scripts/precommit/check_tanka_show.sh
         pass_filenames: false
         files: ^manifests/k8s/tanka/
         types_or:

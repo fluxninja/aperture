@@ -118,8 +118,7 @@ jobs:
         default: .
       push-to-dockerhub:
         type: boolean
-        description:
-          Boolean for whether or not to push images to DockerHub
+        description: Boolean for whether or not to push images to DockerHub
         default: true
     executor: <<parameters.executor>>
     environment:
@@ -244,7 +243,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-            - "75:2f:7a:fe:d3:a1:5e:81:a8:d2:cc:3a:21:59:b7:2c"  # fluxninja/aperture-libsonnet R/O
+            - "75:2f:7a:fe:d3:a1:5e:81:a8:d2:cc:3a:21:59:b7:2c" # fluxninja/aperture-libsonnet R/O
       - checkout
       - asdf_install:
           cache_name: pre-commit
@@ -328,13 +327,6 @@ jobs:
             else
               base_ref="$(git merge-base main $CIRCLE_SHA1)"
               pre-commit run --from-ref "${base_ref}" --to-ref "$CIRCLE_SHA1"
-              # TODO: Re-enable this on PR level at some point
-              ## pre-commit won't run commit-msg stage checks above, so we run it manually
-              #commits="$(git log "${base_ref}..${CIRCLE_SHA1}" --format=%H)"
-              #readarray -t commit_list \<<<"${commits}"
-              #for commit in "${commit_list[@]}"; do
-              #  ./tools/githooks/commit_check.py <(git log -n1 "${commit}" --format=%B)
-              #done
             fi
       - save_cache:
           name: Save go cache

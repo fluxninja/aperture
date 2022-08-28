@@ -33,6 +33,10 @@ go-build-plugins:
 	@echo Building go plugins
 	@./scripts/go_build_plugins.sh
 
+install-asdf-tools:
+	@echo Installing Asdf tools
+	@./scripts/manage_tools.sh setup
+
 install-go-tools:
 	@echo Installing tools from tools.go
 	@./scripts/install_go_tools.sh
@@ -57,10 +61,10 @@ coverage_profile:
 show_coverage_in_browser: profile.coverprofile
 	go tool cover -html profile.coverprofile
 
-all: install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs
+all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs
 	@echo "Done"
 
-.PHONY: install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser
+.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser
 
 #####################################
 ###### OPERATOR section starts ######
