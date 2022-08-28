@@ -4,7 +4,6 @@ import (
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	goprom "github.com/prometheus/client_golang/prometheus"
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
@@ -24,7 +23,6 @@ var _ = Describe("Dataplane Engine", func() {
 		mockFluxmeter *mocks.MockFluxMeter
 
 		selector    *selectorv1.Selector
-		histogram   goprom.Histogram
 		fluxMeterID iface.FluxMeterID
 		limiterID   iface.LimiterID
 	)
@@ -43,15 +41,6 @@ var _ = Describe("Dataplane Engine", func() {
 				Controlpoint: &selectorv1.ControlPoint_Traffic{Traffic: "ingress"},
 			},
 		}
-		histogram = goprom.NewHistogram(goprom.HistogramOpts{
-			Name: metrics.FluxMeterMetricName,
-			ConstLabels: goprom.Labels{
-				metrics.PolicyNameLabel:    "test",
-				metrics.FluxMeterNameLabel: "test",
-				metrics.PolicyHashLabel:    "test",
-				metrics.DecisionTypeLabel:  flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
-			},
-		})
 		fluxMeterID = iface.FluxMeterID{
 			FluxMeterName: "test",
 		}
@@ -98,7 +87,7 @@ var _ = Describe("Dataplane Engine", func() {
 		BeforeEach(func() {
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "200", "").Return(histogram).AnyTimes()
+
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 
@@ -130,14 +119,6 @@ var _ = Describe("Dataplane Engine", func() {
 			fluxMeter := engine.GetFluxMeter("test")
 			Expect(fluxMeter).To(BeNil())
 		})
-
-		It("Returns registered fluxmeter histogram", func() {
-			err := engine.RegisterFluxMeter(mockFluxmeter)
-			Expect(err).NotTo(HaveOccurred())
-			fluxMeter := engine.GetFluxMeter("test")
-			h := fluxMeter.GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "200", "")
-			Expect(h).To(Equal(histogram))
-		})
 	})
 
 	Context("Multimatch", func() {
@@ -148,7 +129,6 @@ var _ = Describe("Dataplane Engine", func() {
 
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "503", "").Return(histogram).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 

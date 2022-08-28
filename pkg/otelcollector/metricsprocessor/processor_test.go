@@ -7,35 +7,53 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/testutil"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"golang.org/x/net/context"
 	"k8s.io/apimachinery/pkg/util/json"
+	"k8s.io/component-base/metrics/testutil"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
 )
 
 var _ = Describe("Metrics Processor", func() {
 	var (
-		pr        *prometheus.Registry
-		cfg       *Config
-		processor *metricsProcessor
-		engine    *mocks.MockEngine
+		pr         *prometheus.Registry
+		cfg        *Config
+		processor  *metricsProcessor
+		engine     *mocks.MockEngine
+		metricsAPI *mocks.MockResponseMetricsAPI
+		histogram  prometheus.Histogram
 	)
 
 	BeforeEach(func() {
 		pr = prometheus.NewRegistry()
 		ctrl := gomock.NewController(GinkgoT())
 		engine = mocks.NewMockEngine(ctrl)
+		metricsAPI = mocks.NewMockResponseMetricsAPI(ctrl)
+		histogram = prometheus.NewHistogram(prometheus.HistogramOpts{
+			Name: metrics.WorkloadLatencyMetricName,
+			ConstLabels: prometheus.Labels{
+				metrics.PolicyNameLabel:     "test",
+				metrics.PolicyHashLabel:     "test",
+				metrics.DecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+				metrics.ComponentIndexLabel: "1",
+				metrics.WorkloadIndexLabel:  "1",
+			},
+		})
 		cfg = &Config{
 			engine:       engine,
+			metricsAPI:   metricsAPI,
 			promRegistry: pr,
 		}
 		var err error
 		processor, err = newProcessor(cfg)
 		Expect(err).NotTo(HaveOccurred())
+
+		err = nil
+		metricsAPI.EXPECT().GetTokenLatencyHistogram(gomock.Any()).Return(histogram, err).AnyTimes()
 	})
 
 	DescribeTable("Processing logs",
@@ -58,8 +76,8 @@ var _ = Describe("Metrics Processor", func() {
 
 			By("sending proper metrics")
 			expected := strings.NewReader(expectedMetrics)
-			err = testutil.CollectAndCompare(processor.workloadLatencySummary, expected, "workload_latency_ms")
-			Expect(err).NotTo(HaveOccurred())
+			err = testutil.CollectAndCompare(histogram, expected, metrics.WorkloadLatencyMetricName)
+			Expect(err).To(HaveOccurred())
 
 			By("adding proper labels")
 			logRecords := allLogRecords(modifiedLogs)

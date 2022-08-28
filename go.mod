@@ -83,6 +83,7 @@ require (
 
 require (
 	github.com/antonmedv/expr v1.9.0 // indirect
+	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/dnephin/pflag v1.0.7 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect

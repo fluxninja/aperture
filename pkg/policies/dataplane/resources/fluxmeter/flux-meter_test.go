@@ -43,7 +43,6 @@ var _ = Describe("Fluxmeter", func() {
 			Expect(newFluxmeter.GetFluxMeterProto()).To(Equal(fluxMeterProto))
 			Expect(newFluxmeter.GetSelector()).To(Equal(selector))
 			Expect(newFluxmeter.GetBuckets()).To(BeNil())
-			Expect(newFluxmeter.GetHistogram()).To(BeNil())
 			Expect(newFluxmeter.GetMetricID()).To(BeEmpty())
 		})
 	})
