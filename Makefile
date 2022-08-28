@@ -49,8 +49,11 @@ go-generate-swagger:
 generate-docs: generate-config-markdown generate-mermaid
 	@echo Generating docs
 
-generate-config-markdown: go-generate-swagger
+generate-config-markdown: go-generate-swagger generate-api
 	@cd ./docs && $(MAKE) generate-config-markdown
+
+generate-libsonnet: generate-config-markdown
+	@cd ./libsonnet && $(MAKE) gen-lib
 
 generate-mermaid:
 	@cd ./docs && $(MAKE) generate-mermaid
