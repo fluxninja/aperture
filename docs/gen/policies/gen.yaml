@@ -4,7 +4,8 @@ produces:
 - application/json
 swagger: "2.0"
 info:
-  description: Aperture Controller
+  description: Policy
+  title: Policy
 basePath: /aperture-controller
 paths:
   /:
@@ -13,9 +14,14 @@ paths:
       - policies-configuration
       operationId: Policy
       parameters:
-      - in: body
+      - name: body
+        in: body
+        required: true
         schema:
           $ref: '#/definitions/v1Policy'
+      responses:
+        "200":
+          description: A successful response.
 definitions:
   MatchExpressionList:
     description: 'eg. {any: {of: [expr1, expr2]}}.'
