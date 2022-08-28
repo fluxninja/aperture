@@ -84,8 +84,18 @@ install_plugins() {
 		printf 'Installing Go tools\n'
 		go env
 		# install go tools
-		cd "${git_root}" && make go-mod-tidy && make install-go-tools
+		pushd "${git_root}" >/dev/null
+		make go-mod-tidy && make install-go-tools
+		popd >/dev/null
 		asdf reshim golang
+	fi
+	# install libsonnet requirements regardless of asdf python
+	pip3 install -r "${git_root}"/libsonnet/requirements.txt
+	if asdf where python &>/dev/null; then
+		printf 'Installing Python tools\n'
+		pip3 install --quiet loguru
+		pip3 install --quiet requests
+		asdf reshim python
 	fi
 }
 
