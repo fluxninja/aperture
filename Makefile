@@ -15,9 +15,11 @@ go-mod-tidy:
 
 go-test:
 	@echo Running go tests
-	envtest_path=$(make operator-setup_envtest -s)
-	KUBEBUILDER_ASSETS="${envtest_path}" gotestsum --format=pkgname
-	@cd ./pkg/watchdog && go test -v ./...
+	@{ \
+		envtest_path=$(make operator-setup_envtest -s); \
+		KUBEBUILDER_ASSETS="${envtest_path}"; \
+		gotestsum --format=pkgname; \
+	}
 
 go-lint:
 	@echo Linting go code

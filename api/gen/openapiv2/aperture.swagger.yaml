@@ -3,7 +3,6 @@ info:
   title: Aperture API
   version: "1.0"
 tags:
-  - name: RulesService
   - name: PolicyService
   - name: InfoService
   - name: StatusService
@@ -117,20 +116,6 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - PolicyService
-  /v1/rules:
-    get:
-      operationId: RulesService_AllRules
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1AllRulesResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      tags:
-        - RulesService
   /v1/status/{group}:
     get:
       operationId: StatusService_GetGroupStatus
@@ -519,20 +504,6 @@ definitions:
     properties:
       all_policies:
         $ref: '#/definitions/v1AllPolicies'
-  v1AllRules:
-    type: object
-    properties:
-      all_rules:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Classifier'
-        description: A map of {key, value} pairs mapping from the name of the classifier to the values of the classifier.
-    description: All the ruleset name to ruleset mapping.
-  v1AllRulesResponse:
-    type: object
-    properties:
-      all_rules:
-        $ref: '#/definitions/v1AllRules'
   v1ArithmeticCombinator:
     type: object
     properties:
@@ -603,6 +574,42 @@ definitions:
           $ref: '#/definitions/v1LimiterDecision'
         description: limiter_decisions contains information about decision made by each limiter.
     description: CheckResponse contains fields that represent decision made by Check call.
+  v1Circuit:
+    type: object
+    properties:
+      components:
+        type: array
+        items:
+          $ref: '#/definitions/v1Component'
+        description: Defines a signal processing graph as a list of components.
+      evaluation_interval:
+        type: string
+        description: |-
+          Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+          This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
+        x-go-default: 0.5s
+    description: |-
+      Circuit is defined as a dataflow graph of inter-connected components.
+
+      Signals flow between components via ports.
+      As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
+      Circuit evaluated periodically in order to respond to changes in signal readings.
+
+      :::info
+      **Signal**
+
+      Signals are floating-point values.
+
+      A signal also have a special **Invalid** value. It's usually used to
+      communicate that signal doesn't have a meaningful value at the moment, eg.
+      [PromQL](#-v1promql) emits such a value if it cannot execute a query.
+      Components know when their input signals are invalid and can act
+      accordingly. They can either propagate the invalidness, by making their
+      output itself invalid (like eg.
+      [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
+      logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+      docs on how exactly it handles invalid inputs.
+      :::
   v1Classifier:
     type: object
     properties:
@@ -1419,46 +1426,15 @@ definitions:
     type: object
     properties:
       circuit:
-        type: array
-        items:
-          $ref: '#/definitions/v1Component'
-        description: Defines a signal processing graph as a list of components.
-      evaluation_interval:
-        type: string
-        description: |-
-          Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
-          This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-        x-go-default: 0.5s
-      flux_meters:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/policylanguagev1FluxMeter'
-        description: |-
-          FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
-
-          FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+        $ref: '#/definitions/v1Circuit'
+        description: Defines the control-loop logic of the policy.
+      resources:
+        $ref: '#/definitions/v1Resources'
+        description: Resources (FluxMeters, Classifiers etc.) to setup.
     description: |-
-      Policy is defined as a dataflow graph (circuit) of inter-connected components.
+      Policy expresses reliability automation workflow that automatically protects services.
 
-      Signals flow between components via ports.
-      As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
-      Policies are evaluated periodically in order to respond to changes in signal readings.
-
-      :::info
-      **Signal**
-
-      Signals are floating-point values.
-
-      A signal also have a special **Invalid** value. It's usually used to
-      communicate that signal doesn't have a meaningful value at the moment, eg.
-      [PromQL](#-v1promql) emits such a value if it cannot execute a query.
-      Components know when their input signals are invalid and can act
-      accordingly. They can either propagate the invalidness, by making their
-      output itself invalid (like eg.
-      [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
-      logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
-      docs on how exactly it handles invalid inputs.
-      :::
+      Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
   v1Port:
     type: object
     properties:
@@ -1533,6 +1509,29 @@ definitions:
   v1ReportResponse:
     type: object
     description: ReportResponse is empty for now.
+  v1Resources:
+    type: object
+    properties:
+      classifiers:
+        type: array
+        items:
+          $ref: '#/definitions/v1Classifier'
+        description: |-
+          Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+
+          The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
+      flux_meters:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/policylanguagev1FluxMeter'
+        description: |-
+          FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+
+          FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+    description: |-
+      Resources that need to be setup for the policy to function.
+
+      Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
   v1Rule:
     type: object
     properties:

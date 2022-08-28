@@ -179,7 +179,6 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 		rawValue := []string{
 			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, fluxMeter.GetPolicyName()),
 			fmt.Sprintf("%s:%v", metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()),
-			fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, fluxMeter.GetPolicyHash()),
 		}
 		value := strings.Join(rawValue, ",")
 		labels[otelcollector.FluxMetersLabel].SliceVal().AppendEmpty().SetStringVal(value)
@@ -269,14 +268,12 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(
 		fluxMeter.GetPolicyName(),
 		fluxMeter.GetFluxMeterName(),
-		fluxMeter.GetPolicyHash(),
 		statusCode,
 		decisionType,
 	)
 	if fluxmeterHistogram == nil {
 		log.Debug().Str(metrics.PolicyNameLabel, fluxMeter.GetPolicyName()).
 			Str(metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()).
-			Str(metrics.PolicyHashLabel, fluxMeter.GetPolicyHash()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
 			Msg("Fluxmeter not found")

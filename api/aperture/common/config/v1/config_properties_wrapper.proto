@@ -3,6 +3,7 @@ syntax = "proto3";
 package aperture.common.config.v1;
 
 import "aperture/policy/decisions/v1/decisions.proto";
+import "aperture/policy/language/v1/fluxmeter.proto";
 import "aperture/policy/language/v1/policy.proto";
 
 message PolicyWrapper {

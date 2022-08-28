@@ -13,6 +13,7 @@
 - [MatchExpressionList](#match-expression-list) – List of MatchExpressions that is used for all/any matching
 - [RateLimiterLazySyncConfig](#rate-limiter-lazy-sync-config)
 - [RateLimiterOverrideConfig](#rate-limiter-override-config)
+- [RuleRego](#rule-rego) – Raw rego rules are compiled 1:1 to rego queries
 - [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
 - [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to pr…
@@ -21,9 +22,15 @@
 
 Example of…
 
+- [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
 - [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals…
 - [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
 - [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the Arithmetic Combinator component.
+- [v1Circuit](#v1-circuit) – Circuit is defined as a dataflow graph of inter-connected components.
+
+Signals f…
+
+- [v1Classifier](#v1-classifier) – Set of classification rules sharing a common selector
 - [v1Component](#v1-component) – Computational block that form the circuit
 - [v1Constant](#v1-constant) – Component that emits a constant value as an output signal.
 - [v1ConstantOuts](#v1-constant-outs) – Outputs for the Constant component.
@@ -35,6 +42,7 @@ Example of…
 - [v1EMAIns](#v1-e-m-a-ins) – Inputs for the EMA component.
 - [v1EMAOuts](#v1-e-m-a-outs) – Outputs for the EMA component.
 - [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
+- [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
 - [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the perio…
 - [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator component.
 - [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator component.
@@ -42,6 +50,8 @@ Example of…
   control va…
 - [v1GradientControllerIns](#v1-gradient-controller-ins) – Inputs for the Gradient Controller component.
 - [v1GradientControllerOuts](#v1-gradient-controller-outs) – Outputs for the Gradient Controller component.
+- [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of the fields
+- [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload
 - [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
 - [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not
 - [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in th…
@@ -56,14 +66,17 @@ Example of…
   Min…
 - [v1MinIns](#v1-min-ins) – Inputs for the Min component.
 - [v1MinOuts](#v1-min-outs) – Output ports for the Min component.
-- [v1Policy](#v1-policy) – Policy is defined as a dataflow graph (circuit) of inter-connected components.
-
-…
-
+- [v1PathTemplateMatcher](#v1-path-template-matcher) – Matches HTTP Path to given path templates
+- [v1Policy](#v1-policy) – Policy expresses reliability automation workflow that automatically protects ser…
 - [v1Port](#v1-port) – Components are interconnected with each other via Ports.
 - [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an…
 - [v1PromQLOuts](#v1-prom-q-l-outs) – Output for the PromQL component.
 - [v1RateLimiterIns](#v1-rate-limiter-ins)
+- [v1Resources](#v1-resources) – Resources that need to be setup for the policy to function.
+
+Resources are typic…
+
+- [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule
 - [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing based workload scheduler.
 - [v1SchedulerOuts](#v1-scheduler-outs) – Output for the Scheduler component.
 - [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to
@@ -144,6 +157,35 @@ eg. {any: {of: [expr1, expr2]}}.
 <dd>
 
 (float64, default: `1`)
+
+</dd>
+</dl>
+
+### <span id="rule-rego"></span> RuleRego
+
+Raw rego rules are compiled 1:1 to rego queries
+
+High-level extractor-based rules are compiled into a single rego query.
+
+#### Properties
+
+<dl>
+<dt>query</dt>
+<dd>
+
+(string) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+
+Note: The module name must match the package name from the "source".
+
+</dd>
+</dl>
+<dl>
+<dt>source</dt>
+<dd>
+
+(string) Source code of the rego module.
+
+Note: Must include a "package" declaration.
 
 </dd>
 </dl>
@@ -330,6 +372,34 @@ selector:
 </dd>
 </dl>
 
+### <span id="v1-address-extractor"></span> v1AddressExtractor
+
+Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
+
+IP addresses in attribute context are defined as objects with separate ip and port fields.
+This is a helper to display an address as a single string.
+
+Note: Use with care, as it might accidentally introduce a high-cardinality flow label values.
+
+[ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
+
+Example:
+
+```yaml
+from: "source.address # or dstination.address"
+```
+
+#### Properties
+
+<dl>
+<dt>from</dt>
+<dd>
+
+(string, `required`) Attribute path pointing to some string - eg. "source.address".
+
+</dd>
+</dl>
+
 ### <span id="v1-arithmetic-combinator"></span> v1ArithmeticCombinator
 
 Type of combinator that computes the arithmetic operation on the operand signals.
@@ -398,6 +468,86 @@ Outputs for the Arithmetic Combinator component.
 <dd>
 
 ([V1Port](#v1-port)) Result of arithmetic operation.
+
+</dd>
+</dl>
+
+### <span id="v1-circuit"></span> v1Circuit
+
+Circuit is defined as a dataflow graph of inter-connected components.
+
+Signals flow between components via ports.
+As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
+Circuit evaluated periodically in order to respond to changes in signal readings.
+
+:::info
+**Signal**
+
+Signals are floating-point values.
+
+A signal also have a special **Invalid** value. It's usually used to
+communicate that signal doesn't have a meaningful value at the moment, eg.
+[PromQL](#-v1promql) emits such a value if it cannot execute a query.
+Components know when their input signals are invalid and can act
+accordingly. They can either propagate the invalidness, by making their
+output itself invalid (like eg.
+[ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
+logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+docs on how exactly it handles invalid inputs.
+:::
+
+#### Properties
+
+<dl>
+<dt>components</dt>
+<dd>
+
+([[]V1Component](#v1-component)) Defines a signal processing graph as a list of components.
+
+</dd>
+</dl>
+<dl>
+<dt>evaluation_interval</dt>
+<dd>
+
+(string, default: `0.5s`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
+
+</dd>
+</dl>
+
+### <span id="v1-classifier"></span> v1Classifier
+
+Set of classification rules sharing a common selector
+
+Example:
+
+```yaml
+selector:
+  service: service1.default.svc.cluster.local
+  control_point:
+    traffic: ingress
+rules:
+  user:
+    extractor:
+      from: request.http.headers.user
+```
+
+#### Properties
+
+<dl>
+<dt>rules</dt>
+<dd>
+
+(map of [V1Rule](#v1-rule)) A map of {key, value} pairs mapping from flow label names to rules that define how to extract and propagate them.
+
+</dd>
+</dl>
+<dl>
+<dt>selector</dt>
+<dd>
+
+([V1Selector](#v1-selector)) Defines where to apply the flow classification rule.
 
 </dd>
 </dl>
@@ -885,6 +1035,78 @@ Label selector expression of the equal form "label == value".
 </dd>
 </dl>
 
+### <span id="v1-extractor"></span> v1Extractor
+
+Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
+
+There are multiple variants of extractor, specify exactly one:
+
+- JSON Extractor
+- Address Extractor
+- JWT Extractor
+
+#### Properties
+
+<dl>
+<dt>address</dt>
+<dd>
+
+([V1AddressExtractor](#v1-address-extractor)) Display an address as a single string - `<ip>:<port>`.
+
+</dd>
+</dl>
+<dl>
+<dt>from</dt>
+<dd>
+
+(string) Use an attribute with no convertion
+
+Attribute path is a dot-separated path to attribute.
+
+Should be either:
+
+- one of the fields of [Attribute Context][attribute-context], or
+- a special "request.http.bearer" pseudo-attribute.
+  Eg. "request.http.method" or "request.http.header.user-agent"
+
+Note: The same attribute path syntax is shared by other extractor variants,
+wherever attribute path is needed in their "from" syntax.
+
+Example:
+
+```yaml
+from: request.http.headers.user-agent
+```
+
+[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto"
+
+</dd>
+</dl>
+<dl>
+<dt>json</dt>
+<dd>
+
+([V1JSONExtractor](#v1-json-extractor)) Deserialize a json, and extract one of the fields.
+
+</dd>
+</dl>
+<dl>
+<dt>jwt</dt>
+<dd>
+
+([V1JWTExtractor](#v1-j-w-t-extractor)) Parse the attribute as JWT and read the payload.
+
+</dd>
+</dl>
+<dl>
+<dt>path_templates</dt>
+<dd>
+
+([V1PathTemplateMatcher](#v1-path-template-matcher)) Match HTTP Path to given path templates.
+
+</dd>
+</dl>
+
 ### <span id="v1-extrapolator"></span> v1Extrapolator
 
 Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
@@ -1096,6 +1318,77 @@ Outputs for the Gradient Controller component.
 <dd>
 
 ([V1Port](#v1-port)) Computed desired value of the control variable.
+
+</dd>
+</dl>
+
+### <span id="v1-json-extractor"></span> v1JSONExtractor
+
+Deserialize a json, and extract one of the fields
+
+Example:
+
+```yaml
+from: request.http.body
+pointer: /user/name
+```
+
+#### Properties
+
+<dl>
+<dt>from</dt>
+<dd>
+
+(string, `required`) Attribute path pointing to some strings - eg. "request.http.body".
+
+</dd>
+</dl>
+<dl>
+<dt>pointer</dt>
+<dd>
+
+(string) Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
+
+Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+
+</dd>
+</dl>
+
+### <span id="v1-j-w-t-extractor"></span> v1JWTExtractor
+
+Parse the attribute as JWT and read the payload
+
+Specify a field to be extracted from payload using "json_pointer".
+
+Note: The signature is not verified against the secret (we're assuming there's some
+other parts of the system that handles such verification).
+
+Example:
+
+```yaml
+from: request.http.bearer
+json_pointer: /user/email
+```
+
+#### Properties
+
+<dl>
+<dt>from</dt>
+<dd>
+
+(string, `required`) Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
+
+</dd>
+</dl>
+<dl>
+<dt>json_pointer</dt>
+<dd>
+
+(string) Json pointer allowing to select a specified field from the json payload.
+
+Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
 
 </dd>
 </dl>
@@ -1407,29 +1700,51 @@ Output ports for the Min component.
 </dd>
 </dl>
 
+### <span id="v1-path-template-matcher"></span> v1PathTemplateMatcher
+
+Matches HTTP Path to given path templates
+
+HTTP path will be matched against given path templates.
+If a match occurs, the value associated with the path template will be treated as a result.
+In case of multiple path templates matching, the most specific one will be chosen.
+
+#### Properties
+
+<dl>
+<dt>template_values</dt>
+<dd>
+
+(map of string) Template value keys are OpenAPI-inspired path templates.
+
+- Static path segment `/foo` matches a path segment exactly
+- `/{param}` matches arbitrary path segment.
+  (The param name is ignored and can be omitted (`{}`))
+- The parameter must cover whole segment.
+- Additionally, path template can end with `/*` wildcard to match
+  arbitrary number of trailing segments (0 or more).
+- Multiple consecutive `/` are ignored, as well as trailing `/`.
+- Parametrized path segments must come after static segments.
+- `*`, if present, must come last.
+- Most specific template "wins" (`/foo` over `/{}` and `/{}` over `/*`).
+
+See also <https://swagger.io/specification/#path-templating-matching>
+
+Example:
+
+```yaml
+/register: register
+"/user/{userId}": user
+/static/*: other
+```
+
+</dd>
+</dl>
+
 ### <span id="v1-policy"></span> v1Policy
 
-Policy is defined as a dataflow graph (circuit) of inter-connected components.
+Policy expresses reliability automation workflow that automatically protects services.
 
-Signals flow between components via ports.
-As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
-Policies are evaluated periodically in order to respond to changes in signal readings.
-
-:::info
-**Signal**
-
-Signals are floating-point values.
-
-A signal also have a special **Invalid** value. It's usually used to
-communicate that signal doesn't have a meaningful value at the moment, eg.
-[PromQL](#-v1promql) emits such a value if it cannot execute a query.
-Components know when their input signals are invalid and can act
-accordingly. They can either propagate the invalidness, by making their
-output itself invalid (like eg.
-[ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
-logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
-docs on how exactly it handles invalid inputs.
-:::
+Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 
 #### Properties
 
@@ -1437,26 +1752,15 @@ docs on how exactly it handles invalid inputs.
 <dt>circuit</dt>
 <dd>
 
-([[]V1Component](#v1-component)) Defines a signal processing graph as a list of components.
+([V1Circuit](#v1-circuit)) Defines the control-loop logic of the policy.
 
 </dd>
 </dl>
 <dl>
-<dt>evaluation_interval</dt>
+<dt>resources</dt>
 <dd>
 
-(string, default: `0.5s`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
-This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-
-</dd>
-</dl>
-<dl>
-<dt>flux_meters</dt>
-<dd>
-
-(map of [Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
-
-FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+([V1Resources](#v1-resources)) Resources (FluxMeters, Classifiers etc.) to setup.
 
 </dd>
 </dl>
@@ -1536,6 +1840,114 @@ Output for the PromQL component.
 <dd>
 
 ([V1Port](#v1-port), `required`, default: `-1`) negative limit means no limit is applied.
+
+</dd>
+</dl>
+
+### <span id="v1-resources"></span> v1Resources
+
+Resources that need to be setup for the policy to function.
+
+Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+
+#### Properties
+
+<dl>
+<dt>classifiers</dt>
+<dd>
+
+([[]V1Classifier](#v1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+
+The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
+
+</dd>
+</dl>
+<dl>
+<dt>flux_meters</dt>
+<dd>
+
+(map of [Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+
+FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+
+</dd>
+</dl>
+
+### <span id="v1-rule"></span> v1Rule
+
+Rule describes a single Flow Classification Rule
+
+Flow classification rule extracts a value from request metadata.
+More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
+See <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.
+There are two ways to define a flow classification rule:
+
+- Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.
+- Rego expression.
+
+Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
+[attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
+
+Example:
+
+```yaml
+Example of Declarative JSON extractor:
+  yaml:
+    extractor:
+      json:
+        from: request.http.body
+        pointer: /user/name
+    propagate: true
+    hidden: false
+Example of Rego module:
+  yaml:
+    rego:
+      query: data.user_from_cookie.user
+      source:
+        package: user_from_cookie
+        cookies: "split(input.attributes.request.http.headers.cookie, ';')"
+        cookie: "cookies[_]"
+        cookie.startswith: "('session=')"
+        session: "substring(cookie, count('session='), -1)"
+        parts: "split(session, '.')"
+        object: "json.unmarshal(base64url.decode(parts[0]))"
+        user: object.user
+    propagate: false
+    hidden: true
+```
+
+#### Properties
+
+<dl>
+<dt>extractor</dt>
+<dd>
+
+([V1Extractor](#v1-extractor)) High-level flow label declarative extractor.
+Rego extractor extracts a value from the rego module.
+
+</dd>
+</dl>
+<dl>
+<dt>hidden</dt>
+<dd>
+
+(bool) Decides if the created flow label should be hidden from the telemetry.
+
+</dd>
+</dl>
+<dl>
+<dt>propagate</dt>
+<dd>
+
+(bool) Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true).
+
+</dd>
+</dl>
+<dl>
+<dt>rego</dt>
+<dd>
+
+([RuleRego](#rule-rego)) Rego module to extract a value from the rego module.
 
 </dd>
 </dl>

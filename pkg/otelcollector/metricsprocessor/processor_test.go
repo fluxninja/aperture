@@ -121,7 +121,7 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionErrorReasonLabel:         "",
 				otelcollector.DecisionRejectReasonLabel:        "",
-				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
+				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar"},
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
 				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
@@ -337,7 +337,7 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionErrorReasonLabel:         "",
 				otelcollector.DecisionRejectReasonLabel:        "",
-				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar,policy_hash:foo-hash"},
+				otelcollector.FluxMetersLabel:                  []interface{}{"policy_name:foo,flux_meter_name:bar"},
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
 				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
@@ -587,7 +587,7 @@ func expectEngineCalls(engine *mocks.MockEngine, checkResponse *flowcontrolv1.Ch
 	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
 	for i, fm := range checkResponse.FluxMeters {
 		// TODO actually return some Histogram
-		expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetPolicyName(), fm.GetFluxMeterName(), fm.GetPolicyHash(), "201", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
+		expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetPolicyName(), fm.GetFluxMeterName(), "201", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
 	}
 	gomock.InOrder(expectedCalls...)
 }
