@@ -36,15 +36,17 @@ type SimpleService struct {
 	// If it's not set then value is -1 and we do not configure proxy.
 	// Istio proxy should handle requests without additional config
 	// if it's injected.
-	envoyPort int
+	envoyPort   int
+	concurrency int
 }
 
 // NewSimpleService creates a SimpleService instance.
-func NewSimpleService(hostname string, port, envoyPort int) *SimpleService {
+func NewSimpleService(hostname string, port, envoyPort int, concurrency int) *SimpleService {
 	return &SimpleService{
-		hostname:  hostname,
-		port:      port,
-		envoyPort: envoyPort,
+		hostname:    hostname,
+		port:        port,
+		envoyPort:   envoyPort,
+		concurrency: concurrency,
 	}
 }
 
@@ -67,7 +69,7 @@ func (simpleService SimpleService) Run() error {
 		}
 	}
 
-	http.Handle("/request", limitClients(handler, 10))
+	http.Handle("/request", limitClients(handler, simpleService.concurrency))
 	address := fmt.Sprintf(":%d", simpleService.port)
 
 	server := &http.Server{Addr: address}

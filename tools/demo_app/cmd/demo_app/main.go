@@ -20,6 +20,7 @@ func main() {
 	hostname := hostnameFromEnv()
 	port := portFromEnv()
 	envoyPort := envoyPortFromEnv()
+	concurrency := concurrencyFromEnv()
 
 	// We don't necessarily need tracing providers (just propagators), but lets
 	// do them anyway to have a "more realistic" otel usage
@@ -43,7 +44,7 @@ func main() {
 		propagation.Baggage{},
 	))
 
-	service := app.NewSimpleService(hostname, port, envoyPort)
+	service := app.NewSimpleService(hostname, port, envoyPort, concurrency)
 	err := service.Run()
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -74,6 +75,18 @@ func portFromEnv() int {
 
 func hostnameFromEnv() string {
 	return os.Getenv("HOSTNAME")
+}
+
+func concurrencyFromEnv() int {
+	concurrencyValue, exists := os.LookupEnv("SIMPLE_SERVICE_CONCURRENCY")
+	if !exists {
+		return 10
+	}
+	concurrency, err := strconv.Atoi(concurrencyValue)
+	if err != nil {
+		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_CONCURRENCY: %v", err)
+	}
+	return concurrency
 }
 
 // newResource returns a resource describing this application.
