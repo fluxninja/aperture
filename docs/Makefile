@@ -42,10 +42,10 @@ generate-config-markdown:
 	@rm merged-plugin-swagger.yaml
 	$(MAKE) -B $(POLICY_MARKDOWNS)
 
-POLICY_MARKDOWNS = gen/policies/swagger.md
+POLICY_MARKDOWNS = gen/policies/policy.md
 
 # Note: dependencies are underspecified, run with make -B
-$(POLICY_MARKDOWNS): %/swagger.md: %/config-swagger.yaml
+$(POLICY_MARKDOWNS): %/policy.md: %/config-swagger.yaml
 	@echo generating markdown $@
 	@cp ../api/gen/openapiv2/aperture.swagger.yaml $(@D)/
 	@yq -i eval 'del(.paths)' $(@D)/aperture.swagger.yaml
@@ -63,7 +63,6 @@ $(POLICY_MARKDOWNS): %/swagger.md: %/config-swagger.yaml
 		--allow-template-override --template-dir tools/swagger/swagger-templates \
 		--config-file tools/swagger/markdown-config.yaml
 	@npx prettier --write $(@D)/*.md
-	@rm $(@D)/gen.yaml
 	@rm $(@D)/aperture.swagger.yaml
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
