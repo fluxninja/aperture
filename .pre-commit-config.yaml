@@ -101,7 +101,6 @@ repos:
           - json
           - yaml
       - id: tanka-fmt
-        exclude: ^(libsonnet/1.0/_gen/.*)
         name: "Tanka fmt"
         language: system
         entry: tk
