@@ -23,14 +23,3 @@ type Service struct {
 	//+kubebuilder:validation:Optional
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
-
-// ServiceSpec defines the desired state of Services for Agent and Controller.
-type ServiceSpec struct {
-	// Configuration for Agent service
-	//+kubebuilder:validation:Optional
-	Agent Service `json:"agent"`
-
-	// Configuration for Controller service
-	//+kubebuilder:validation:Optional
-	Controller Service `json:"controller"`
-}

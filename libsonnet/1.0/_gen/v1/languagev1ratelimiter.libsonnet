@@ -18,11 +18,11 @@ local languagev1ratelimiterins = import './languagev1ratelimiterins.libsonnet';
   withLabelKeyMixin(label_key):: {
     label_key+: label_key,
   },
-  withLazySyncConfig(lazy_sync_config):: {
-    lazy_sync_config: lazy_sync_config,
+  withLazySync(lazy_sync):: {
+    lazy_sync: lazy_sync,
   },
-  withLazySyncConfigMixin(lazy_sync_config):: {
-    lazy_sync_config+: lazy_sync_config,
+  withLazySyncMixin(lazy_sync):: {
+    lazy_sync+: lazy_sync,
   },
   withLimitResetInterval(limit_reset_interval):: {
     limit_reset_interval: limit_reset_interval,

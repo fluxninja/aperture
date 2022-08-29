@@ -227,7 +227,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				return err
 			}
 			// check whether lazy limiter is enabled
-			if lazySyncConfig := rateLimiter.rateLimiterProto.GetLazySyncConfig(); lazySyncConfig != nil {
+			if lazySyncConfig := rateLimiter.rateLimiterProto.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
 					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
 					rateLimiter.rateTracker, err = ratetracker.NewLazySyncRateTracker(rateLimiter.rateTracker,

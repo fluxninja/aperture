@@ -1,0 +1,192 @@
+{{- if .Values.agent.create }}
+apiVersion: fluxninja.com/v1alpha1
+kind: Agent
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-operator
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if or .Values.agent.image.registry .Values.agent.image.repository .Values.agent.image.tag .Values.agent.image.pullPolicy .Values.agent.image.pullSecrets }}
+  image: {{ .Values.agent.image | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.serverPort }}
+  serverPort: {{ .Values.agent.serverPort }}
+  {{- end }}
+  {{- if .Values.agent.distributedCachePort }}
+  distributedCachePort: {{ .Values.agent.distributedCachePort }}
+  {{- end }}
+  {{- if .Values.agent.memberListPort }}
+  memberListPort: {{ .Values.agent.memberListPort }}
+  {{- end }}
+  {{- if or .Values.agent.batchPrerollup.timeout .Values.agent.batchPrerollup.sendBatchSize }}
+  batchPrerollup:
+    timeout: {{ .Values.agent.batchPrerollup.timeout }}
+    sendBatchSize: {{ .Values.agent.batchPrerollup.sendBatchSize }}
+  {{- end }}
+  {{- if or .Values.agent.batchPostrollup.timeout .Values.agent.batchPostrollup.sendBatchSize }}
+  batchPostrollup:
+    timeout: {{ .Values.agent.batchPostrollup.timeout }}
+    sendBatchSize: {{ .Values.agent.batchPostrollup.sendBatchSize }}
+  {{- end }}
+  {{- if or .Values.agent.batchMetricsFast.timeout .Values.agent.batchMetricsFast.sendBatchSize }}
+  batchMetricsFast:
+    timeout: {{ .Values.agent.batchMetricsFast.timeout }}
+    sendBatchSize: {{ .Values.agent.batchMetricsFast.sendBatchSize }}
+  {{- end }}
+  {{- if or .Values.agent.log.prettyConsole .Values.agent.log.nonBlocking .Values.agent.log.level .Values.agent.log.file }}
+  log: {{ .Values.agent.log | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.agentGroup }}
+  agentGroup: {{ .Values.agent.agentGroup }}
+  {{- end }}
+  serviceAccount:
+    create: {{ .Values.agent.serviceAccount.create }}
+    {{- if .Values.agent.serviceAccount.annotations }}
+    annotations: {{ .Values.agent.serviceAccount.annotations | toYaml | indent 6 }}
+    {{- end }}
+    {{- if .Values.agent.serviceAccount.automountServiceAccountToken }}
+    automountServiceAccountToken: {{ .Values.agent.serviceAccount.automountServiceAccountToken }}
+    {{- end }}
+  livenessProbe:
+    enabled: {{ .Values.agent.livenessProbe.enabled }}
+    {{- if  .Values.agent.livenessProbe.initialDelaySeconds }}
+    initialDelaySeconds: {{ .Values.agent.livenessProbe.initialDelaySeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.periodSeconds }}
+    periodSeconds: {{ .Values.agent.livenessProbe.periodSeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.timeoutSeconds }}
+    timeoutSeconds: {{ .Values.agent.livenessProbe.timeoutSeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.failureThreshold }}
+    failureThreshold: {{ .Values.agent.livenessProbe.failureThreshold }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.successThreshold }}
+    successThreshold: {{ .Values.agent.livenessProbe.successThreshold }}
+    {{- end }}
+  readinessProbe:
+    enabled: {{ .Values.agent.readinessProbe.enabled }}
+    {{- if  .Values.agent.livenessProbe.initialDelaySeconds }}
+    initialDelaySeconds: {{ .Values.agent.readinessProbe.initialDelaySeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.periodSeconds }}
+    periodSeconds: {{ .Values.agent.readinessProbe.periodSeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.timeoutSeconds }}
+    timeoutSeconds: {{ .Values.agent.readinessProbe.timeoutSeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.failureThreshold }}
+    failureThreshold: {{ .Values.agent.readinessProbe.failureThreshold }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.successThreshold }}
+    successThreshold: {{ .Values.agent.readinessProbe.successThreshold }}
+    {{- end }}
+  {{- if .Values.agent.customLivenessProbe }}
+  customLivenessProbe: {{ .Values.agent.customLivenessProbe | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.customReadinessProbe }}
+  customReadinessProbe: {{ .Values.agent.customReadinessProbe | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if or .Values.agent.resources.limits .Values.agent.resources.requests }}
+  resources: {{ .Values.agent.resources | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.podSecurityContext.enabled }}
+  podSecurityContext: {{- .Values.agent.podSecurityContext | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.podSecurityContext.enabled }}
+  containerSecurityContext: {{- .Values.agent.containerSecurityContext | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.command }}
+  command: {{ .Values.agent.command | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.args }}
+  args: {{ .Values.agent.args | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.podLabels }}
+  podLabels: {{ .Values.agent.podLabels | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.podAnnotations }}
+  podAnnotations: {{ .Values.agent.podAnnotations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.affinity }}
+  affinity: {{ .Values.agent.affinity | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.nodeSelector }}
+  nodeSelector: {{ .Values.agent.nodeSelector | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.tolerations }}
+  tolerations: {{ .Values.agent.tolerations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.terminationGracePeriodSeconds }}
+  terminationGracePeriodSeconds: {{ .Values.agent.terminationGracePeriodSeconds | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.lifecycleHooks }}
+  lifecycleHooks: {{ .Values.agent.lifecycleHooks | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.extraEnvVars }}
+  extraEnvVars: {{ .Values.agent.extraEnvVars | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.extraVolumes }}
+  extraVolumes: {{ .Values.agent.extraVolumes | toYaml | nindent 4}}
+  {{- end }}
+  {{- if .Values.agent.extraVolumeMounts }}
+  extraVolumeMounts: {{ .Values.agent.extraVolumeMounts | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.sidecars }}
+  sidecars: {{ .Values.agent.sidecars | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.initContainers }}
+  initContainers: {{ .Values.agent.initContainers | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.commonLabels }}
+  labels: {{ .Values.commonLabels | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{ .Values.commonAnnotations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.fluxninjaPlugin.enabled }}
+  fluxninjaPlugin:
+    enabled: {{ .Values.agent.fluxninjaPlugin.enabled }}
+    endpoint: {{ include "aperture.fluxninjaPlugin.endpoint" ( dict "aperture" .Values.agent $) }}
+    {{- if .Values.agent.fluxninjaPlugin.heartbeatsInterval }}
+    heartbeatsInterval: {{ .Values.agent.fluxninjaPlugin.heartbeatsInterval }}
+    {{- end }}
+    tls:
+      insecure: {{ .Values.agent.fluxninjaPlugin.tls.insecure }}
+      insecureSkipVerify: {{ .Values.agent.fluxninjaPlugin.tls.insecureSkipVerify }}
+      caFile: {{ .Values.agent.fluxninjaPlugin.tls.caFile }}
+    apiKeySecret:
+      create: {{ .Values.agent.fluxninjaPlugin.apiKeySecret.create }}
+      secretKeyRef:
+        name: {{ .Values.agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.name }}
+        key: {{ .Values.agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.key }}
+      value: {{ .Values.agent.fluxninjaPlugin.apiKeySecret.value }}
+  {{- end }}
+  {{- if .Values.agent.service.annotations }}
+  service:
+    {{- if .Values.agent.service.annotations }}
+    annotations: {{ .Values.agent.service.annotations }}
+    {{- end }}
+  {{- end }}
+  {{- if .Values.agent.sidecar.enabled }}
+  sidecar:
+    enabled: {{ .Values.agent.sidecar.enabled }}
+    enableNamespacesByDefault: {{ .Values.agent.sidecar.enableNamespacesByDefault }}
+  {{- end }}
+  {{- if or (not .Values.etcd.enabled) .Values.agent.etcd.endpoints }}
+  etcd:  {{- omit .Values.agent.etcd "endpoints" | toYaml | nindent 4 }}
+    endpoints: {{ include "aperture.etcd.endpoints" (dict "etcd" .Values.agent.etcd "context" . $) }}
+  {{- end }}
+  {{- if or (not .Values.agent.enabled) .Values.agent.prometheus.endpoints }}
+  prometheus:
+    address: {{ include "aperture.prometheus.address" (dict "prometheus" .Values.agent.prometheus "context" . $) }}
+  {{- end }}
+{{- end }}

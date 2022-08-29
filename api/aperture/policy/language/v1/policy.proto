@@ -497,7 +497,7 @@ message Decider {
 }
 
 message RateLimiter {
-  message LazySyncConfig {
+  message LazySync {
     bool enabled = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
@@ -524,7 +524,7 @@ message RateLimiter {
     }]; // @gotags: default:"5" validate:"gt=0"
   }
 
-  message OverrideConfig {
+  message Override {
     string label_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
@@ -598,8 +598,8 @@ message RateLimiter {
     }
   }]; // @gotags: validate:"required"
 
-  repeated OverrideConfig overrides = 5;
-  LazySyncConfig lazy_sync_config = 6;
+  repeated Override overrides = 5;
+  LazySync lazy_sync = 6;
 }
 
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.

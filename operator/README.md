@@ -10,7 +10,8 @@ The operator is used to deploy the Aperture Agent, Controller and its required r
 
 The operator has below custome resources:
 
-- Aperture
+- Agent
+- Controller
 
 all custom resources use the api group `fluxninja.com` and version `v1alpha1`.
 
@@ -21,7 +22,7 @@ Follow the below steps to deploy the operator on the local cluster:
 - Create Docker image for the operator:
 
   ```bash
-  make docker-build
+  make operator-docker-build
   ```
 
 - [**Optional**] If you are using [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/) cluster, upload the image to the cluster:
@@ -33,19 +34,21 @@ Follow the below steps to deploy the operator on the local cluster:
 - Deploy the operator and its required resources:
 
   ```bash
-  make deploy
+  make operator-deploy
   ```
 
 - [**Optional**] Run the sample CR to deploy the Aperture Agent and Controller
 
   ```bash
-  kubectl apply -f config/samples/v1alpha1_aperture.yaml
+  kubectl apply -f config/samples/fluxninja.com_v1alpha1_agent.yaml
+  kubectl apply -f config/samples/fluxninja.com_v1alpha1_controller.yaml
   ```
 
 - To uninstall the operator, run below commands:
 
   ```bash
-  kubectl delete -f config/samples/v1alpha1_aperture.yaml
+  kubectl delete -f config/samples/fluxninja.com_v1alpha1_agent.yaml
+  kubectl delete -f config/samples/fluxninja.com_v1alpha1_controller.yaml
   make undeploy
   ```
 
@@ -65,10 +68,13 @@ You can also deploy the operator and Aperture CR using the helm chart as well us
   helm upgrade --install aperture-operator manifests/charts/aperture-operator
   ```
 
-- [**Optional**] If you want to install just the operator and not the Aperture CR, create a `values.yaml` with below parameters and pass it with `helm upgrade`:
+- [**Optional**] If you want to install just the operator and not the Aperture Agent and Controller CR, create a `values.yaml` with below parameters and pass it with `helm upgrade`:
 
   ```bash
-  aperture:
+  agent:
+    create: false
+
+  controller:
     create: false
   ```
 

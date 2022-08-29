@@ -36,8 +36,8 @@ import (
 )
 
 // secretForAgentAPIKey prepares the Secret object for the ApiKey of Agent.
-func secretForAgentAPIKey(instance *v1alpha1.Aperture, scheme *runtime.Scheme) (*corev1.Secret, error) {
-	spec := &instance.Spec.FluxNinjaPlugin.APIKeySecret.Agent
+func secretForAgentAPIKey(instance *v1alpha1.Agent, scheme *runtime.Scheme) (*corev1.Secret, error) {
+	spec := &instance.Spec.FluxNinjaPlugin.APIKeySecret
 
 	if spec.Value == "" {
 		return nil, fmt.Errorf("value for the ApiKey of Agent cannot be empty")
@@ -47,7 +47,7 @@ func secretForAgentAPIKey(instance *v1alpha1.Aperture, scheme *runtime.Scheme) (
 		ObjectMeta: v1.ObjectMeta{
 			Name:        secretName(instance.GetName(), "agent", spec),
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, agentServiceName),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), agentServiceName),
 			Annotations: instance.Spec.Annotations,
 		},
 		Data: map[string][]byte{
@@ -65,8 +65,8 @@ func secretForAgentAPIKey(instance *v1alpha1.Aperture, scheme *runtime.Scheme) (
 }
 
 // secretForControllerAPIKey prepares the Secret object for the ApiKey of Agent.
-func secretForControllerAPIKey(instance *v1alpha1.Aperture, scheme *runtime.Scheme) (*corev1.Secret, error) {
-	spec := &instance.Spec.FluxNinjaPlugin.APIKeySecret.Controller
+func secretForControllerAPIKey(instance *v1alpha1.Controller, scheme *runtime.Scheme) (*corev1.Secret, error) {
+	spec := &instance.Spec.FluxNinjaPlugin.APIKeySecret
 
 	if spec.Value == "" {
 		return nil, fmt.Errorf("value for the ApiKey of Controller cannot be empty")
@@ -76,7 +76,7 @@ func secretForControllerAPIKey(instance *v1alpha1.Aperture, scheme *runtime.Sche
 		ObjectMeta: v1.ObjectMeta{
 			Name:        secretName(instance.GetName(), "controller", spec),
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, controllerServiceName),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
 			Annotations: instance.Spec.Annotations,
 		},
 		Data: map[string][]byte{
@@ -92,12 +92,12 @@ func secretForControllerAPIKey(instance *v1alpha1.Aperture, scheme *runtime.Sche
 }
 
 // secretForControllerApiKey prepares the Secret object for the ApiKey of Agent.
-func secretForControllerCert(instance *v1alpha1.Aperture, scheme *runtime.Scheme, serverCert, serverKey *bytes.Buffer) (*corev1.Secret, error) {
+func secretForControllerCert(instance *v1alpha1.Controller, scheme *runtime.Scheme, serverCert, serverKey *bytes.Buffer) (*corev1.Secret, error) {
 	secret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        fmt.Sprintf("%s-controller-cert", instance.GetName()),
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, controllerServiceName),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
 			Annotations: instance.Spec.Annotations,
 		},
 		Data: map[string][]byte{
@@ -121,15 +121,50 @@ func secretMutate(secret *corev1.Secret, data map[string][]byte) controllerutil.
 	}
 }
 
-// createSecret calls the Kubernetes API to create the provided Secret resource.
-func createSecret(
-	client client.Client, recorder record.EventRecorder, secret *corev1.Secret, ctx context.Context, instance *v1alpha1.Aperture) (
+// createSecret calls the Kubernetes API to create the provided Agent Secret resource.
+func createSecretForAgent(
+	client client.Client, recorder record.EventRecorder, secret *corev1.Secret, ctx context.Context, instance *v1alpha1.Agent) (
 	controllerutil.OperationResult, error,
 ) {
 	res, err := controllerutil.CreateOrUpdate(ctx, client, secret, secretMutate(secret, secret.Data))
 	if err != nil {
 		if errors.IsConflict(err) {
-			return createSecret(client, recorder, secret, ctx, instance)
+			return createSecretForAgent(client, recorder, secret, ctx, instance)
+		}
+
+		msg := fmt.Sprintf("failed to create Secret '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
+			secret.GetName(), instance.GetName(), instance.GetNamespace(), res, err.Error())
+		if recorder != nil {
+			recorder.Event(instance, corev1.EventTypeNormal, "SecretCreationFailed", msg)
+		}
+		return controllerutil.OperationResultNone, fmt.Errorf(msg)
+	}
+
+	if recorder != nil {
+		switch res {
+		case controllerutil.OperationResultCreated:
+			recorder.Eventf(instance, corev1.EventTypeNormal, "SecretCreationSuccessful",
+				"Created Secret '%s' in Namespace '%s'", secret.GetName(), secret.GetNamespace())
+		case controllerutil.OperationResultUpdated:
+			recorder.Eventf(instance, corev1.EventTypeNormal, "SecretUpdationSuccessful",
+				"Updated Secret '%s' in Namespace '%s'", secret.GetName(), secret.GetNamespace())
+		case controllerutil.OperationResultNone:
+		default:
+		}
+	}
+
+	return res, nil
+}
+
+// createSecret calls the Kubernetes API to create the provided Controller Secret resource.
+func createSecretForController(
+	client client.Client, recorder record.EventRecorder, secret *corev1.Secret, ctx context.Context, instance *v1alpha1.Controller) (
+	controllerutil.OperationResult, error,
+) {
+	res, err := controllerutil.CreateOrUpdate(ctx, client, secret, secretMutate(secret, secret.Data))
+	if err != nil {
+		if errors.IsConflict(err) {
+			return createSecretForController(client, recorder, secret, ctx, instance)
 		}
 
 		msg := fmt.Sprintf("failed to create Secret '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
@@ -157,16 +192,16 @@ func createSecret(
 }
 
 // createAgentSecretInNamespace creates the Agent Secret for ApiKey in the given namespace instead of the default one.
-func createAgentSecretInNamespace(instance *v1alpha1.Aperture, namespace string) (*corev1.Secret, error) {
+func createAgentSecretInNamespace(instance *v1alpha1.Agent, namespace string) (*corev1.Secret, error) {
 	copiedInstance := instance.DeepCopy()
-	value := copiedInstance.Spec.FluxNinjaPlugin.APIKeySecret.Agent.Value
+	value := copiedInstance.Spec.FluxNinjaPlugin.APIKeySecret.Value
 	value = strings.TrimPrefix(value, "enc::")
 	value = strings.TrimSuffix(value, "::enc")
 	decodedValue, err := base64.StdEncoding.DecodeString(value)
 	if err != nil {
 		return nil, err
 	}
-	copiedInstance.Spec.FluxNinjaPlugin.APIKeySecret.Agent.Value = string(decodedValue)
+	copiedInstance.Spec.FluxNinjaPlugin.APIKeySecret.Value = string(decodedValue)
 	secret, err := secretForAgentAPIKey(copiedInstance, nil)
 	if err != nil {
 		return nil, err
@@ -174,7 +209,7 @@ func createAgentSecretInNamespace(instance *v1alpha1.Aperture, namespace string)
 
 	secret.Namespace = namespace
 	secret.OwnerReferences = []v1.OwnerReference{}
-	secret.Annotations = getAnnotationsWithOwnerRef(copiedInstance)
+	secret.Annotations = getAgentAnnotationsWithOwnerRef(copiedInstance)
 
 	return secret, nil
 }

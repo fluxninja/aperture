@@ -39,7 +39,7 @@ import (
 var agentConfig string
 
 // filledAgentConfig prepares the Agent config by resolving values in `agent_config.tpl` based on the provided parameter.
-func filledAgentConfig(instance *v1alpha1.Aperture) (string, error) {
+func filledAgentConfig(instance *v1alpha1.Agent) (string, error) {
 	t, err := template.New("config").Parse(agentConfig)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse config for Agent. error: '%s'", err.Error())
@@ -53,14 +53,20 @@ func filledAgentConfig(instance *v1alpha1.Aperture) (string, error) {
 		FluxNinjaPlugin      v1alpha1.FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
 		PrometheusAddress    string
 		Ingestion            v1alpha1.Ingestion `json:"ingestion"`
+		BatchPrerollup       v1alpha1.Batch
+		BatchPostrollup      v1alpha1.Batch
+		BatchMetricsFast     v1alpha1.Batch
 	}{
-		ServerPort:           instance.Spec.Agent.ServerPort,
-		DistributedCachePort: instance.Spec.Agent.DistributedCachePort,
-		MemberListPort:       instance.Spec.Agent.MemberListPort,
-		Log:                  instance.Spec.Agent.Log,
+		ServerPort:           instance.Spec.ServerPort,
+		DistributedCachePort: instance.Spec.DistributedCachePort,
+		MemberListPort:       instance.Spec.MemberListPort,
+		Log:                  instance.Spec.Log,
 		Etcd:                 checkEtcdEndpoints(instance.Spec.Etcd, instance.GetName(), instance.GetNamespace()),
 		FluxNinjaPlugin:      instance.Spec.FluxNinjaPlugin,
 		PrometheusAddress:    checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.GetName(), instance.GetNamespace()),
+		BatchPrerollup:       instance.Spec.BatchPrerollup,
+		BatchPostrollup:      instance.Spec.BatchPostrollup,
+		BatchMetricsFast:     instance.Spec.BatchMetricsFast,
 	}
 
 	var config bytes.Buffer
@@ -71,7 +77,7 @@ func filledAgentConfig(instance *v1alpha1.Aperture) (string, error) {
 }
 
 // configMapForAgentConfig prepares the ConfigMap object for the Agent.
-func configMapForAgentConfig(instance *v1alpha1.Aperture, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
+func configMapForAgentConfig(instance *v1alpha1.Agent, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
 	config, err := filledAgentConfig(instance)
 	if err != nil {
 		return nil, err
@@ -81,7 +87,7 @@ func configMapForAgentConfig(instance *v1alpha1.Aperture, scheme *runtime.Scheme
 		ObjectMeta: v1.ObjectMeta{
 			Name:        agentServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, agentServiceName),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), agentServiceName),
 			Annotations: instance.Spec.Annotations,
 		},
 		Data: map[string]string{
@@ -102,7 +108,7 @@ func configMapForAgentConfig(instance *v1alpha1.Aperture, scheme *runtime.Scheme
 var controllerConfig string
 
 // filledControllerConfig prepares the Controller config by resolving values in `controller_config.tpl` based on the provided parameter.
-func filledControllerConfig(instance *v1alpha1.Aperture) (string, error) {
+func filledControllerConfig(instance *v1alpha1.Controller) (string, error) {
 	t, err := template.New("config").Parse(controllerConfig)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse config Controller. error: '%s'", err.Error())
@@ -118,11 +124,11 @@ func filledControllerConfig(instance *v1alpha1.Aperture) (string, error) {
 		CertName          string
 		CertKey           string
 	}{
-		Log:               instance.Spec.Controller.Log,
+		Log:               instance.Spec.Log,
 		Etcd:              checkEtcdEndpoints(instance.Spec.Etcd, instance.GetName(), instance.GetNamespace()),
 		FluxNinjaPlugin:   instance.Spec.FluxNinjaPlugin,
 		PrometheusAddress: checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.GetName(), instance.GetNamespace()),
-		ServerPort:        instance.Spec.Controller.ServerPort,
+		ServerPort:        instance.Spec.ServerPort,
 		CertPath:          controllerCertPath,
 		CertName:          controllerCertName,
 		CertKey:           controllerCertKeyName,
@@ -136,7 +142,7 @@ func filledControllerConfig(instance *v1alpha1.Aperture) (string, error) {
 }
 
 // configMapForAgentConfig prepares the ConfigMap object for the Controller.
-func configMapForControllerConfig(instance *v1alpha1.Aperture, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
+func configMapForControllerConfig(instance *v1alpha1.Controller, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
 	config, err := filledControllerConfig(instance)
 	if err != nil {
 		return nil, err
@@ -146,7 +152,7 @@ func configMapForControllerConfig(instance *v1alpha1.Aperture, scheme *runtime.S
 		ObjectMeta: v1.ObjectMeta{
 			Name:        controllerServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, controllerServiceName),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
 			Annotations: instance.Spec.Annotations,
 		},
 		Data: map[string]string{
@@ -169,15 +175,50 @@ func configMapMutate(cm *corev1.ConfigMap, files map[string]string) controllerut
 	}
 }
 
-// createConfigMap calls the Kubernetes API to create the provided ConfigMap resource.
-func createConfigMap(
-	client client.Client, recorder record.EventRecorder, configMap *corev1.ConfigMap, ctx context.Context, instance *v1alpha1.Aperture) (
+// createConfigMap calls the Kubernetes API to create the provided Agent ConfigMap resource.
+func createConfigMapForAgent(
+	client client.Client, recorder record.EventRecorder, configMap *corev1.ConfigMap, ctx context.Context, instance *v1alpha1.Agent) (
 	controllerutil.OperationResult, error,
 ) {
 	res, err := controllerutil.CreateOrUpdate(ctx, client, configMap, configMapMutate(configMap, configMap.Data))
 	if err != nil {
 		if errors.IsConflict(err) {
-			return createConfigMap(client, recorder, configMap, ctx, instance)
+			return createConfigMapForAgent(client, recorder, configMap, ctx, instance)
+		}
+
+		msg := fmt.Sprintf("failed to create ConfigMap '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
+			configMap.GetName(), instance.GetName(), instance.GetNamespace(), res, err.Error())
+		if recorder != nil {
+			recorder.Event(instance, corev1.EventTypeNormal, "ConfigMapCreationFailed", msg)
+		}
+		return controllerutil.OperationResultNone, fmt.Errorf(msg)
+	}
+
+	if recorder != nil {
+		switch res {
+		case controllerutil.OperationResultCreated:
+			recorder.Eventf(instance, corev1.EventTypeNormal, "ConfigMapCreationSuccessful",
+				"Created ConfigMap '%s' in Namespace '%s'", configMap.GetName(), configMap.GetNamespace())
+		case controllerutil.OperationResultUpdated:
+			recorder.Eventf(instance, corev1.EventTypeNormal, "ConfigMapUpdationSuccessful",
+				"Updated ConfigMap '%s' in Namespace '%s'", configMap.GetName(), configMap.GetNamespace())
+		case controllerutil.OperationResultNone:
+		default:
+		}
+	}
+
+	return res, nil
+}
+
+// createConfigMap calls the Kubernetes API to create the provided Controller ConfigMap resource.
+func createConfigMapForController(
+	client client.Client, recorder record.EventRecorder, configMap *corev1.ConfigMap, ctx context.Context, instance *v1alpha1.Controller) (
+	controllerutil.OperationResult, error,
+) {
+	res, err := controllerutil.CreateOrUpdate(ctx, client, configMap, configMapMutate(configMap, configMap.Data))
+	if err != nil {
+		if errors.IsConflict(err) {
+			return createConfigMapForController(client, recorder, configMap, ctx, instance)
 		}
 
 		msg := fmt.Sprintf("failed to create ConfigMap '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
@@ -205,10 +246,10 @@ func createConfigMap(
 }
 
 // createAgentConfigMapInNamespace creates the Agent ConfigMap in the given namespace instead of the default one.
-func createAgentConfigMapInNamespace(instance *v1alpha1.Aperture, namespace string) *corev1.ConfigMap {
+func createAgentConfigMapInNamespace(instance *v1alpha1.Agent, namespace string) *corev1.ConfigMap {
 	configMap, _ := configMapForAgentConfig(instance, nil)
 	configMap.Namespace = namespace
-	configMap.Annotations = getAnnotationsWithOwnerRef(instance)
+	configMap.Annotations = getAgentAnnotationsWithOwnerRef(instance)
 
 	return configMap
 }

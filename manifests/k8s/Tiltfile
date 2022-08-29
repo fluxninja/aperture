@@ -98,15 +98,24 @@ DEP_TREE = {
                     "new_name": "aperture-operator-bootstrap",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
-                        "apertures.fluxninja.com:customresourcedefinition"
+                        "agents.fluxninja.com:customresourcedefinition",
+                        "controllers.fluxninja.com:customresourcedefinition"
                     ]
                 },
                 {
-                    "workload": "aperture",
+                    "workload": "aperture:agent",
+                    "new_name": "aperture-agent",
                     "resource_deps": ["aperture-etcd", "aperture-aperture-operator"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
-                        {'app.kubernetes.io/component':  'controller', 'app.kubernetes.io/managed-by': 'aperture-operator'}
+                    ]
+                },
+                {
+                    "workload": "aperture:controller",
+                    "new_name": "aperture-controller",
+                    "resource_deps": ["aperture-etcd", "aperture-aperture-operator"],
+                    "extra_pod_selectors": [
+                        {'app.kubernetes.io/component':  'controller', 'app.kubernetes.io/managed-by': 'aperture-operator'},
                     ]
                 },
                 {
@@ -358,10 +367,8 @@ def wrapped_k8s_yaml(yaml, allow_duplicates=False):
     k8s_yaml(yaml, allow_duplicates)
 
     for i in range(0, len(objects)):
-        if objects[i]["kind"] == "Aperture":
-            k8s_kind("Aperture", image_object={'json_path': '{.spec.agent.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait')
-            k8s_kind("Aperture", image_object={'json_path': '{.spec.controller.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait')
-
+        if objects[i]["kind"] == "Agent" or objects[i]["kind"] == "Controller" :
+            k8s_kind(objects[i]["kind"], image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait')
 
 
 def render_tanka(environment, env_vars):
@@ -766,13 +773,14 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
 
     if "agent" in resources:
         forward_port_delayed(workload="aperture-agent-port-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
-                        resource_deps=["aperture"], service="aperture-agent", local_port=8089, remote_port=80)
+                        resource_deps=["aperture-agent"], service="aperture-agent", local_port=8089, remote_port=80)
         forward_port_delayed(workload="aperture-controller-port-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
-                        resource_deps=["aperture"], service="aperture-controller", local_port=8087, remote_port=80)
+                        resource_deps=["aperture-controller"], service="aperture-controller", local_port=8087, remote_port=80)
 
     if config.tilt_subcommand == "down":
         if "agent" in resources:
-            local('if (kubectl get aperture aperture -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete aperture aperture -n {0};  fi'.format(APERTURE_SYSTEM_NS))
+            local('if (kubectl get agent agent -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete agent agent -n {0};  fi'.format(APERTURE_SYSTEM_NS))
+            local('if (kubectl get controller controller -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete controller controller -n {0};  fi'.format(APERTURE_SYSTEM_NS))
         for resource_name in resources:
             resource = inv_dep_tree[resource_name]
             pvc_selectors = resource.get("pvc_selectors", [])

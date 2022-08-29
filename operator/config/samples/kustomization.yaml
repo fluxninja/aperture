@@ -1,4 +1,5 @@
 ## Append samples you want in your CSV to this file as resources ##
 resources:
-- v1alpha1_aperture.yaml
+- fluxninja.com_v1alpha1_agent.yaml
+- fluxninja.com_v1alpha1_controller.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

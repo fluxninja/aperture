@@ -33,24 +33,24 @@ import (
 )
 
 // daemonsetForAgent prepares the Daemonset object for the Agent.
-func daemonsetForAgent(instance *v1alpha1.Aperture, log logr.Logger, scheme *runtime.Scheme) (*appsv1.DaemonSet, error) {
-	agentSpec := instance.Spec.Agent
+func daemonsetForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtime.Scheme) (*appsv1.DaemonSet, error) {
+	spec := instance.Spec
 
-	podLabels := commonLabels(instance, agentServiceName)
-	if agentSpec.PodLabels != nil {
-		if err := mergo.Map(&podLabels, agentSpec.PodLabels, mergo.WithOverride); err != nil {
+	podLabels := commonLabels(spec.Labels, instance.GetName(), agentServiceName)
+	if spec.PodLabels != nil {
+		if err := mergo.Map(&podLabels, spec.PodLabels, mergo.WithOverride); err != nil {
 			log.Info(fmt.Sprintf("failed to merge the Pod labels for Deployment. error: %s.", err.Error()))
 		}
 	}
 
-	livenessProbe, readinessProbe := containerProbes(instance.Spec.Agent.CommonSpec)
+	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec)
 
 	daemonset := &appsv1.DaemonSet{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        agentServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, agentServiceName),
-			Annotations: instance.Spec.Annotations,
+			Labels:      commonLabels(spec.Labels, instance.GetName(), agentServiceName),
+			Annotations: spec.Annotations,
 		},
 		Spec: appsv1.DaemonSetSpec{
 			Selector: &v1.LabelSelector{
@@ -59,32 +59,32 @@ func daemonsetForAgent(instance *v1alpha1.Aperture, log logr.Logger, scheme *run
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: v1.ObjectMeta{
 					Labels:      podLabels,
-					Annotations: agentSpec.PodAnnotations,
+					Annotations: spec.PodAnnotations,
 				},
 				Spec: corev1.PodSpec{
 					ServiceAccountName:            agentServiceName,
-					ImagePullSecrets:              imagePullSecrets(instance.Spec.ImagePullSecrets, agentSpec.Image),
-					NodeSelector:                  agentSpec.NodeSelector,
-					Affinity:                      agentSpec.Affinity,
-					Tolerations:                   agentSpec.Tolerations,
-					SecurityContext:               podSecurityContext(agentSpec.PodSecurityContext),
-					TerminationGracePeriodSeconds: agentSpec.TerminationGracePeriodSeconds,
-					InitContainers:                agentSpec.InitContainers,
+					ImagePullSecrets:              imagePullSecrets(spec.Image),
+					NodeSelector:                  spec.NodeSelector,
+					Affinity:                      spec.Affinity,
+					Tolerations:                   spec.Tolerations,
+					SecurityContext:               podSecurityContext(spec.PodSecurityContext),
+					TerminationGracePeriodSeconds: spec.TerminationGracePeriodSeconds,
+					InitContainers:                spec.InitContainers,
 					Containers: []corev1.Container{
 						{
 							Name:            agentServiceName,
-							Image:           imageString(instance.Spec.ImageRegistry, agentSpec.Image),
-							ImagePullPolicy: corev1.PullPolicy(agentSpec.Image.PullPolicy),
-							SecurityContext: containerSecurityContext(agentSpec.ContainerSecurityContext),
-							Command:         agentSpec.Command,
-							Args:            agentSpec.Args,
+							Image:           imageString(spec.Image),
+							ImagePullPolicy: corev1.PullPolicy(spec.Image.PullPolicy),
+							SecurityContext: containerSecurityContext(spec.ContainerSecurityContext),
+							Command:         spec.Command,
+							Args:            spec.Args,
 							Env:             agentEnv(instance, ""),
-							EnvFrom:         containerEnvFrom(agentSpec.CommonSpec),
-							Resources:       agentSpec.Resources,
+							EnvFrom:         containerEnvFrom(spec.CommonSpec),
+							Resources:       spec.Resources,
 							Ports: []corev1.ContainerPort{
 								{
 									Name:          "grpc",
-									ContainerPort: agentSpec.ServerPort,
+									ContainerPort: spec.ServerPort,
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{
@@ -94,12 +94,12 @@ func daemonsetForAgent(instance *v1alpha1.Aperture, log logr.Logger, scheme *run
 								},
 								{
 									Name:          "dist-cache",
-									ContainerPort: agentSpec.DistributedCachePort,
+									ContainerPort: spec.DistributedCachePort,
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{
 									Name:          "memberlist",
-									ContainerPort: agentSpec.MemberListPort,
+									ContainerPort: spec.MemberListPort,
 									Protocol:      corev1.ProtocolTCP,
 								},
 							},
@@ -107,18 +107,18 @@ func daemonsetForAgent(instance *v1alpha1.Aperture, log logr.Logger, scheme *run
 							TerminationMessagePolicy: corev1.TerminationMessageReadFile,
 							LivenessProbe:            livenessProbe,
 							ReadinessProbe:           readinessProbe,
-							Lifecycle:                agentSpec.LifecycleHooks,
-							VolumeMounts:             agentVolumeMounts(agentSpec),
+							Lifecycle:                spec.LifecycleHooks,
+							VolumeMounts:             agentVolumeMounts(spec),
 						},
 					},
-					Volumes: agentVolumes(agentSpec),
+					Volumes: agentVolumes(spec),
 				},
 			},
 		},
 	}
 
-	if agentSpec.Sidecars != nil {
-		daemonset.Spec.Template.Spec.Containers = append(daemonset.Spec.Template.Spec.Containers, agentSpec.Sidecars...)
+	if spec.Sidecars != nil {
+		daemonset.Spec.Template.Spec.Containers = append(daemonset.Spec.Template.Spec.Containers, spec.Sidecars...)
 	}
 
 	if err := ctrl.SetControllerReference(instance, daemonset, scheme); err != nil {
