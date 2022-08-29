@@ -81,21 +81,25 @@ install_plugins() {
 		install_helm_plugins
 	fi
 
-	printf 'Installing Go tools\n'
-	go env
-	# install go tools
-	pushd "${git_root}" >/dev/null
-	make go-mod-tidy && make install-go-tools
-	popd >/dev/null
+	if go version &>/dev/null; then
+		printf 'Installing Go tools\n'
+		go env
+		# install go tools
+		pushd "${git_root}" >/dev/null
+		make go-mod-tidy && make install-go-tools
+		popd >/dev/null
+	fi
 	if asdf where golang &>/dev/null; then
 		asdf reshim golang
 	fi
 
-	printf 'Installing Python tools\n'
-	pushd "${git_root}" >/dev/null
-	make install-python-tools
-	popd >/dev/null
-
+	if python --version &>/dev/null; then
+		printf 'Installing Python tools\n'
+		# install python tools
+		pushd "${git_root}" >/dev/null
+		make install-python-tools
+		popd >/dev/null
+	fi
 	if asdf where python &>/dev/null; then
 		asdf reshim python
 	fi
