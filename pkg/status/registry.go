@@ -37,8 +37,6 @@ type registry struct {
 var _ Registry = (*registry)(nil)
 
 // NewRegistry returns a new instance of Registry.
-// Delim is the delimiter to use when specifying key paths,
-// e.g., . For "parent.child.key" or / for "parent/child/key".
 // It is possible to chain a Registry with another.
 func NewRegistry(reg Registry, path string) Registry {
 	r := &registry{

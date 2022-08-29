@@ -97,8 +97,8 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 	time.Sleep(groupConfig.jobRunConfig.sleepTime)
 
 	for _, job := range groupConfig.jobs {
-		livenessReg := status.NewRegistry(registry, "liveness")
-		jobExecutorReg := status.NewRegistry(livenessReg, job.Name())
+		// livenessReg := status.NewRegistry(registry, "liveness")
+		jobExecutorReg := status.NewRegistry(registry, job.Name())
 
 		gotStatusMsg := jobExecutorReg.Get().Status.GetMessage()
 		expectedStatusMsg, _ := anypb.New(wrapperspb.String(groupConfig.jobRunConfig.expectedStatusMsg))
