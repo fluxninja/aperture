@@ -10,23 +10,23 @@ keywords:
 
 ## Introduction
 
-Aperture comes with a pre-packaged list of policies and grafana dashboards that can
-be used both as a guide for creating new policies, and as ready-to-use blueprints that
-can be directly used for configuring Aperture Agent behaviour.
+Aperture comes with a pre-packaged list of policies and grafana dashboards that
+can be used both as a guide for creating new policies, and as ready-to-use
+blueprints that can be directly used for configuring Aperture Agent behaviour.
 
-All dashboards and policies are written using [Jsonnet][jsonnet-lang] language, and can
-be used both as jsonnet mixins, and standalone blueprints.
+All dashboards and policies are written using [Jsonnet][jsonnet-lang] language,
+and can be used both as jsonnet mixins, and standalone blueprints.
 
 [jsonnet-lang]: https://jsonnet.org
 
 ## Initial Setup
 
-All blueprints are available from a separate [repository][aperture-blueprints]. See repository
-[README.md][blueprints-readme] for the list of required tools, and how to install jsonnet
-dependencies with a help of [jsonnet bundler][jb].
+All blueprints are available from a separate [repository][aperture-blueprints].
+See repository [README.md][blueprints-readme] for the list of required tools,
+and how to install jsonnet dependencies with a help of [jsonnet bundler][jb].
 
-Blueprint Generator (used to generate JSON files from blueprints) also depends on a Python 3.8+
-and [jsonnet][go-jsonnet].
+Blueprint Generator (used to generate JSON files from blueprints) also depends
+on a Python 3.8+ and [jsonnet][go-jsonnet].
 
 [k8s-libsonnet]: https://github.com/jsonnet-libs/k8s-libsonnet
 [aperture-blueprints]: https://github.com/fluxninja/aperture-blueprints
@@ -62,42 +62,38 @@ options:
   --config CONFIG  jsonnet file with blueprint configuration
 ```
 
-This script takes as options an output directory path, where JSON files will be saved under,
-and a path to a `config.libsonnet` file with local blueprint configuration. It also takes BLUEPRINT
-argument, which is a path to the blueprint under `blueprints/` directory.
+This script takes as options an output directory path, where JSON files will be
+saved under, and a path to a `config.libsonnet` file with local blueprint
+configuration. It also takes BLUEPRINT argument, which is a path to the
+blueprint under `blueprints/` directory.
 
-Under `blueprints/` directory, there are all currently available blueprints, each one constiting
-of at least two files: `config.libsonnet` and `main.libsonnet`. `main.libsonnet` bundles actual
-policy and dashboard code (available under `lib/1.0`) into blueprints, and `config.libsonnet` comes
-with the default configuration for the given policy. This is what can be overriden by `--config` option
-passed to `aperture-generate.py` script.
+Under `blueprints/` directory, there are all currently available blueprints,
+each one constiting of at least two files: `config.libsonnet` and
+`main.libsonnet`. `main.libsonnet` bundles actual policy and dashboard code
+(available under `lib/1.0`) into blueprints, and `config.libsonnet` comes with
+the default configuration for the given policy. This is what can be overriden by
+`--config` option passed to `aperture-generate.py` script.
 
-Custom configuration will be merged with blueprints' `config.libsonnet` resulting in the final
-configuration, according to jsonnet language rules: keys can be overwritten by reusing them in
-custom configuration, and nested objects can be merged by using `+:` operator. Check `examples/`
-directory for more information.
+Custom configuration will be merged with blueprints' `config.libsonnet`
+resulting in the final configuration, according to jsonnet language rules: keys
+can be overwritten by reusing them in custom configuration, and nested objects
+can be merged by using `+:` operator. Check `examples/` directory for more
+information.
 
 The full command, using demoapp-latency-grand example, looks like that:
 
 ```sh
-aperture-blueprints $ jb install
-GET https://github.com/grafana/jsonnet-libs/archive/a2ba95acc8b7653d33bd57075678d8de2a64e5b3.tar.gz 200
-GET https://github.com/fluxninja/aperture-libsonnet/archive/a980995cd4168d5182be94111d84342b82fc05b3.tar.gz 200
-GET https://github.com/grafana/grafonnet-lib/archive/30280196507e0fe6fa978a3e0eaca3a62844f817.tar.gz 200
-
-aperture-blueprints $ ./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet blueprints/latency-gradient
-Creating /sources/aperture-blueprints/_gen/dashboards/demo1-decision-dashboard.json
-Creating /sources/aperture-blueprints/_gen/policies/demo1-latency-gradient.json
-$
+jb install
+./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet blueprints/latency-gradient
 ```
 
 ## Using aperture-blueprints as a jsonnet mixins library
 
-An alternate way of using aperture-blueprints repository is to import it from another jsonnet project
-and render policies or dashboards directly in jsonnet.
+An alternate way of using aperture-blueprints repository is to import it from
+another jsonnet project and render policies or dashboards directly in jsonnet.
 
-As an example, to create a ConfigMap with aperture policies that can be loaded by the controller, you need
-to install aperture-blueprints with jsonnet bundler:
+As an example, to create a ConfigMap with aperture policies that can be loaded
+by the controller, you need to install aperture-blueprints with jsonnet bundler:
 
 ```sh
 jb install github.com/fluxninja/aperture-blueprints@main
@@ -138,7 +134,8 @@ And then, render it with [jsonnet][jsonnet]:
 jsonnet --yaml-stream -J vendor [example file].jsonnet
 ```
 
-This can be also integrated with other kubernetes deployment tools like [tanka][tk]
+This can be also integrated with other kubernetes deployment tools like
+[tanka][tk]
 
 [jsonnet]: https://github.com/google/go-jsonnet
 [tk]: https://grafana.com/oss/tanka/
