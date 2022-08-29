@@ -320,6 +320,8 @@ def render_jsonnet_definition(definition: JsonnetDefinition) -> str:
 
 def render_main_libsonnet(custom_patches: Iterable[Path]) -> str:
     import_str = "(import 'gen.libsonnet')"
+    # sort custom_patches by name
+    custom_patches = sorted(custom_patches, key=lambda p: p.name)
     for patch_path in custom_patches:
         import_str += f" + (import '{patch_path}')"
     import_str += "\n"
