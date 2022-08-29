@@ -10,6 +10,7 @@
 | `client`            | [Client](#client)                      |
 | `dist_cache`        | [DistCache](#dist-cache)               |
 | `etcd`              | [Etcd](#etcd)                          |
+| `kubernetes_client` | [KubernetesClient](#kubernetes-client) |
 | `liveness`          | [Liveness](#liveness)                  |
 | `log`               | [Log](#log)                            |
 | `metrics`           | [Metrics](#metrics)                    |
@@ -171,6 +172,25 @@ Type: [GRPCClientConfig](#g-rpc-client-config)
 <dd>
 
 Env-Var Prefix: `APERTURE_AGENT_FLUXNINJA_PLUGIN_CLIENT_HTTP_`
+Type: [HTTPClientConfig](#http-client-config)
+
+</dd>
+</dl>
+
+### <span id="kubernetes-client"></span> _KubernetesClient_
+
+Key: `kubernetes_client`
+
+Env-Var Prefix: `APERTURE_AGENT_KUBERNETES_CLIENT_`
+
+#### Members
+
+<dl>
+
+<dt>http_client</dt>
+<dd>
+
+Env-Var Prefix: `APERTURE_AGENT_KUBERNETES_CLIENT_HTTP_CLIENT_`
 Type: [HTTPClientConfig](#http-client-config)
 
 </dd>
