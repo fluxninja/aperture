@@ -53,6 +53,9 @@ func filledAgentConfig(instance *v1alpha1.Agent) (string, error) {
 		FluxNinjaPlugin      v1alpha1.FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
 		PrometheusAddress    string
 		Ingestion            v1alpha1.Ingestion `json:"ingestion"`
+		BatchPrerollup       v1alpha1.Batch
+		BatchPostrollup      v1alpha1.Batch
+		BatchMetricsFast     v1alpha1.Batch
 	}{
 		ServerPort:           instance.Spec.ServerPort,
 		DistributedCachePort: instance.Spec.DistributedCachePort,
@@ -61,6 +64,9 @@ func filledAgentConfig(instance *v1alpha1.Agent) (string, error) {
 		Etcd:                 checkEtcdEndpoints(instance.Spec.Etcd, instance.GetName(), instance.GetNamespace()),
 		FluxNinjaPlugin:      instance.Spec.FluxNinjaPlugin,
 		PrometheusAddress:    checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.GetName(), instance.GetNamespace()),
+		BatchPrerollup:       instance.Spec.BatchPrerollup,
+		BatchPostrollup:      instance.Spec.BatchPostrollup,
+		BatchMetricsFast:     instance.Spec.BatchMetricsFast,
 	}
 
 	var config bytes.Buffer

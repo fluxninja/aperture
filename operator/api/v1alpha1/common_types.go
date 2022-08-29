@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"time"
+
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -411,4 +413,17 @@ type APIKeySecretSpec struct {
 	// API Key secret reference for Controller
 	//+kubebuilder:validation:Optional
 	Controller APIKeySecret `json:"controller"`
+}
+
+// Batch defines configuration for OTEL batch processor.
+type Batch struct {
+	// Timeout sets the time after which a batch will be sent regardless of size.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=1000000000
+	Timeout time.Duration `json:"timeout"`
+
+	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=10000
+	SendBatchSize uint32 `json:"sendBatchSize"`
 }

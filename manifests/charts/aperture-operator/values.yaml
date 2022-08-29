@@ -319,12 +319,13 @@ operator:
     automountServiceAccountToken: true
 
 ## @section Agent Custom Resource Parameters
+## @skip agent.createUninstallHook
 ##
 agent:
   ## @param agent.create Specifies whether a CR for Agent should be created
   ##
   create: true
-  ## @param agent.createUninstallHook Specifies whether to create the Job for for graceful termination of Agent CR and operator.
+  ## @skip agent.createUninstallHook Specifies whether to create the Job for for graceful termination of Agent CR and operator.
   ##
   createUninstallHook: true
   ## @param agent.fluxninjaPlugin.enabled Boolean flag for enabling FluxNinja cloud connection from Agent
@@ -384,6 +385,24 @@ agent:
   ## @param agent.memberListPort The Agent's member list service. Defaults to 3322.
   ##
   memberListPort: ~
+  ## @param agent.batchPrerollup.timeout Timeout for batch prerollup processor.
+  ## @param agent.batchPrerollup.sendBatchSize Size of a batch in prerollup processor which after hit, will trigger it to be sent.
+  ##
+  batchPrerollup:
+    timeout: ~
+    sendBatchSize: ~
+  ## @param agent.batchPostrollup.timeout Timeout for batch postrollup processor.
+  ## @param agent.batchPostrollup.sendBatchSize Size of a batch in postrollup processor which after hit, will trigger it to be sent.
+  ##
+  batchPostrollup:
+    timeout: ~
+    sendBatchSize: ~
+  ## @param agent.batchMetricsFast.timeout Timeout for batch metrics/fast processor.
+  ## @param agent.batchMetricsFast.sendBatchSize Size of a batch in metrics/fast processor which after hit, will trigger it to be sent.
+  ##
+  batchMetricsFast:
+    timeout: ~
+    sendBatchSize: ~
   ## @param agent.log.prettyConsole Additional log writer: pretty console (stdout) logging (not recommended for prod environments). Defaults to false.
   ## @param agent.log.nonBlocking Use non-blocking log writer (can lose logs at high throughput). Defaults to True.
   ## @param agent.log.level Log level. Keywords allowed - ["debug", "info", "warn", "fatal", "panic", "trace"]. Defaults to 'info'.
@@ -567,12 +586,13 @@ agent:
     address: ~
 
 ## @section Controller Custom Resource Parameters
+## @skip controller.createUninstallHook
 ##
 controller:
   ## @param controller.create Specifies whether a CR for Controller should be created
   ##
   create: true
-  ## @param controller.createUninstallHook Specifies whether to create the Job for for graceful termination of Controller CR and operator.
+  ## @skip controller.createUninstallHook Specifies whether to create the Job for for graceful termination of Controller CR and operator.
   ##
   createUninstallHook: true
   ## @param controller.fluxninjaPlugin.enabled Boolean flag for enabling FluxNinja cloud connection from Controller

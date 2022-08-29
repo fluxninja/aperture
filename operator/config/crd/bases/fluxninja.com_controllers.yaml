@@ -25,7 +25,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Controller is the Schema for the controllers API
+        description: Controller is the Schema for the controllers API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -5860,7 +5860,7 @@ spec:
                 type: array
             type: object
           status:
-            description: ControllerStatus defines the observed state of Controller
+            description: ControllerStatus defines the observed state of Controller.
             properties:
               resources:
                 type: string

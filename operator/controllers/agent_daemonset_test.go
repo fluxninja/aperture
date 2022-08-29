@@ -100,7 +100,7 @@ var _ = Describe("Agent Daemonset", func() {
 					DistributedCachePort: 3320,
 					MemberListPort:       3322,
 					Image: v1alpha1.Image{
-						Registry:   "gcr.io/devel-309501/cf-fn",
+						Registry:   "docker.io/fluxninja",
 						Repository: "aperture-agent",
 						Tag:        "latest",
 						PullPolicy: "IfNotPresent",
@@ -153,7 +153,7 @@ var _ = Describe("Agent Daemonset", func() {
 							Containers: []corev1.Container{
 								{
 									Name:            agentServiceName,
-									Image:           "gcr.io/devel-309501/cf-fn/aperture-agent:latest",
+									Image:           "docker.io/fluxninja/aperture-agent:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{},
 									Command:         nil,
@@ -322,7 +322,7 @@ var _ = Describe("Agent Daemonset", func() {
 						Affinity: affinity,
 					},
 					Image: v1alpha1.Image{
-						Registry:    "gcr.io/devel-309501/cf-fn",
+						Registry:    "docker.io/fluxninja",
 						Repository:  "aperture-agent",
 						Tag:         "latest",
 						PullPolicy:  "IfNotPresent",
@@ -391,7 +391,7 @@ var _ = Describe("Agent Daemonset", func() {
 							Containers: []corev1.Container{
 								{
 									Name:            agentServiceName,
-									Image:           "gcr.io/devel-309501/cf-fn/aperture-agent:latest",
+									Image:           "docker.io/fluxninja/aperture-agent:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
 										RunAsUser:              pointer.Int64Ptr(0),

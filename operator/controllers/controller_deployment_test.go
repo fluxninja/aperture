@@ -105,7 +105,7 @@ var _ = Describe("Controller Deployment", func() {
 						ServerPort: 80,
 					},
 					Image: v1alpha1.Image{
-						Registry:   "gcr.io/devel-309501/cf-fn",
+						Registry:   "docker.io/fluxninja",
 						Repository: "aperture-controller",
 						Tag:        "latest",
 						PullPolicy: "IfNotPresent",
@@ -164,7 +164,7 @@ var _ = Describe("Controller Deployment", func() {
 							Containers: []corev1.Container{
 								{
 									Name:            controllerServiceName,
-									Image:           "gcr.io/devel-309501/cf-fn/aperture-controller:latest",
+									Image:           "docker.io/fluxninja/aperture-controller:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{},
 									Command:         nil,
@@ -356,7 +356,7 @@ var _ = Describe("Controller Deployment", func() {
 						Affinity: affinity,
 					},
 					Image: v1alpha1.Image{
-						Registry:    "gcr.io/devel-309501/cf-fn",
+						Registry:    "docker.io/fluxninja",
 						Repository:  "aperture-controller",
 						Tag:         "latest",
 						PullPolicy:  "IfNotPresent",
@@ -431,7 +431,7 @@ var _ = Describe("Controller Deployment", func() {
 							Containers: []corev1.Container{
 								{
 									Name:            controllerServiceName,
-									Image:           "gcr.io/devel-309501/cf-fn/aperture-controller:latest",
+									Image:           "docker.io/fluxninja/aperture-controller:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
 										RunAsUser:              pointer.Int64Ptr(0),

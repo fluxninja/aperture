@@ -104,6 +104,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "aperture:agent",
+                    "new_name": "aperture-agent",
                     "resource_deps": ["aperture-etcd", "aperture-aperture-operator"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
@@ -111,6 +112,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "aperture:controller",
+                    "new_name": "aperture-controller",
                     "resource_deps": ["aperture-etcd", "aperture-aperture-operator"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'controller', 'app.kubernetes.io/managed-by': 'aperture-operator'},
@@ -771,9 +773,9 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
 
     if "agent" in resources:
         forward_port_delayed(workload="aperture-agent-port-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
-                        resource_deps=["aperture:agent"], service="aperture-agent", local_port=8089, remote_port=80)
+                        resource_deps=["aperture-agent"], service="aperture-agent", local_port=8089, remote_port=80)
         forward_port_delayed(workload="aperture-controller-port-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
-                        resource_deps=["aperture:controller"], service="aperture-controller", local_port=8087, remote_port=80)
+                        resource_deps=["aperture-controller"], service="aperture-controller", local_port=8087, remote_port=80)
 
     if config.tilt_subcommand == "down":
         if "agent" in resources:

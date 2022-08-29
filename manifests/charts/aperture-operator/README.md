@@ -115,7 +115,6 @@ Aperture Operator
 | Name                                                    | Description                                                                                                              | Value    |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------- |
 | `agent.create`                                          | Specifies whether a CR for Agent should be created                                                                       | `true`   |
-| `agent.createUninstallHook`                             | Specifies whether to create the Job for for graceful termination of Agent CR and operator.                               | `true`   |
 | `agent.fluxninjaPlugin.enabled`                         | Boolean flag for enabling FluxNinja cloud connection from Agent                                                          | `false`  |
 | `agent.fluxninjaPlugin.endpoint`                        | FluxNinja cloud instance endpoint                                                                                        | `nil`    |
 | `agent.fluxninjaPlugin.heartbeatsInterval`              | specifies how often to send heartbeats to the cloud. Defaults to '30s'.                                                  | `nil`    |
@@ -134,6 +133,12 @@ Aperture Operator
 | `agent.serverPort`                                      | The Agent's server port. Defaults to 80.                                                                                 | `nil`    |
 | `agent.distributedCachePort`                            | The Agent's distributed cache service. Defaults to 3320.                                                                 | `nil`    |
 | `agent.memberListPort`                                  | The Agent's member list service. Defaults to 3322.                                                                       | `nil`    |
+| `agent.batchPrerollup.timeout`                          | Timeout for batch prerollup processor.                                                                                   | `nil`    |
+| `agent.batchPrerollup.sendBatchSize`                    | Size of a batch in prerollup processor which after hit, will trigger it to be sent.                                      | `nil`    |
+| `agent.batchPostrollup.timeout`                         | Timeout for batch postrollup processor.                                                                                  | `nil`    |
+| `agent.batchPostrollup.sendBatchSize`                   | Size of a batch in postrollup processor which after hit, will trigger it to be sent.                                     | `nil`    |
+| `agent.batchMetricsFast.timeout`                        | Timeout for batch metrics/fast processor.                                                                                | `nil`    |
+| `agent.batchMetricsFast.sendBatchSize`                  | Size of a batch in metrics/fast processor which after hit, will trigger it to be sent.                                   | `nil`    |
 | `agent.log.prettyConsole`                               | Additional log writer: pretty console (stdout) logging (not recommended for prod environments). Defaults to false.       | `nil`    |
 | `agent.log.nonBlocking`                                 | Use non-blocking log writer (can lose logs at high throughput). Defaults to True.                                        | `nil`    |
 | `agent.log.level`                                       | Log level. Keywords allowed - ["debug", "info", "warn", "fatal", "panic", "trace"]. Defaults to 'info'.                  | `nil`    |
@@ -193,7 +198,6 @@ Aperture Operator
 | Name                                                         | Description                                                                                                              | Value    |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ | -------- |
 | `controller.create`                                          | Specifies whether a CR for Controller should be created                                                                  | `true`   |
-| `controller.createUninstallHook`                             | Specifies whether to create the Job for for graceful termination of Controller CR and operator.                          | `true`   |
 | `controller.fluxninjaPlugin.enabled`                         | Boolean flag for enabling FluxNinja cloud connection from Controller                                                     | `false`  |
 | `controller.fluxninjaPlugin.endpoint`                        | FluxNinja cloud instance endpoint                                                                                        | `nil`    |
 | `controller.fluxninjaPlugin.heartbeatsInterval`              | specifies how often to send heartbeats to the cloud. Defaults to '30s'.                                                  | `nil`    |
