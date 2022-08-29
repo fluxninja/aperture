@@ -1,7 +1,7 @@
 {
   MatchExpressionList: import 'matchexpressionlist.libsonnet',
-  RateLimiterLazySyncConfig: import 'ratelimiterlazysyncconfig.libsonnet',
-  RateLimiterOverrideConfig: import 'ratelimiteroverrideconfig.libsonnet',
+  RateLimiterLazySync: import 'ratelimiterlazysync.libsonnet',
+  RateLimiterOverride: import 'ratelimiteroverride.libsonnet',
   RuleRego: import 'rulerego.libsonnet',
   SchedulerWorkload: import 'schedulerworkload.libsonnet',
   SchedulerWorkloadAndLabelMatcher: import 'schedulerworkloadandlabelmatcher.libsonnet',

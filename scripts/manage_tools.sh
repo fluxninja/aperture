@@ -80,22 +80,23 @@ install_plugins() {
 		printf 'Installing helm plugins\n'
 		install_helm_plugins
 	fi
+
+	printf 'Installing Go tools\n'
+	go env
+	# install go tools
+	pushd "${git_root}" >/dev/null
+	make go-mod-tidy && make install-go-tools
+	popd >/dev/null
 	if asdf where golang &>/dev/null; then
-		printf 'Installing Go tools\n'
-		go env
-		# install go tools
-		pushd "${git_root}" >/dev/null
-		make go-mod-tidy && make install-go-tools
-		popd >/dev/null
 		asdf reshim golang
 	fi
-	pip install --upgrade pip
-	# install libsonnet requirements regardless of asdf python
-	pip install -r "${git_root}"/libsonnet/requirements.txt
+
+	printf 'Installing Python tools\n'
+	pushd "${git_root}" >/dev/null
+	make install-python-tools
+	popd >/dev/null
+
 	if asdf where python &>/dev/null; then
-		printf 'Installing Python tools\n'
-		pip install --quiet loguru
-		pip install --quiet requests
 		asdf reshim python
 	fi
 }
