@@ -42,7 +42,7 @@ generate-config-markdown:
 	@rm merged-plugin-swagger.yaml
 	$(MAKE) -B $(POLICY_MARKDOWNS)
 
-POLICY_MARKDOWNS = gen/classification/swagger.md gen/policies/swagger.md
+POLICY_MARKDOWNS = gen/policies/swagger.md
 
 # Note: dependencies are underspecified, run with make -B
 $(POLICY_MARKDOWNS): %/swagger.md: %/config-swagger.yaml

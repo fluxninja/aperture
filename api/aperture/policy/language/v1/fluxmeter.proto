@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package aperture.policy.language.v1;
+
+import "aperture/common/selector/v1/selector.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// FluxMeter gathers metrics for the traffic that matches its selector.
+//
+// Example of a selector that creates a histogram metric for all HTTP requests
+// to particular service:
+// ```yaml
+// selector:
+//   service: myservice.mynamespace.svc.cluster.local
+//   control_point:
+//     traffic: ingress
+// ```
+message FluxMeter {
+  // What latency should we measure in the histogram created by this FluxMeter.
+  //
+  // * For traffic control points, fluxmeter will measure the duration of the
+  //   whole http transaction (including sending request and receiving
+  //   response).
+  // * For feature control points, fluxmeter will measure execution of the span
+  //   associated with particular feature. What contributes to the span's
+  //   duration is entirely up to the user code that uses Aperture library.
+  common.selector.v1.Selector selector = 1;
+
+  // Latency histogram buckets (in ms) for this FluxMeter.
+  repeated double histogram_buckets = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {
+        string_value: "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+      }
+    }
+  }]; // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+}

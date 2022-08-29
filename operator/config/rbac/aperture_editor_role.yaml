@@ -5,7 +5,7 @@ metadata:
   name: aperture-editor-role
 rules:
 - apiGroups:
-  - aperture.tech
+  - fluxninja.com
   resources:
   - apertures
   verbs:
@@ -17,7 +17,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - aperture.tech
+  - fluxninja.com
   resources:
   - apertures/status
   verbs:

@@ -2,18 +2,15 @@ package controller
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"path"
 
-	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"github.com/ghodss/yaml"
 	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/classification/v1"
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -31,11 +28,6 @@ var (
 	// ---
 	// x-fn-config-env: true
 	// parameters:
-	// - name: classifiers_path
-	//   in: query
-	//   type: string
-	//   description: Directory containing classification rules
-	//   x-go-default: "/etc/aperture/aperture-controller/classifiers"
 	// - name: policies_path
 	//   in: query
 	//   type: string
@@ -56,15 +48,6 @@ var (
 // Module - Controller can be initialized by passing options from Module() to fx app.
 func Module() fx.Option {
 	return fx.Options(
-		// Syncing classifiers config to etcd
-		fx.Provide(provideClassifiersPathFlag),
-		filesystemwatcher.Constructor{Name: classifiersFxTag, PathKey: classifiersPathKey, Path: classifiersDefaultPath}.Annotate(), // Create a new filesystemwatcher
-		fx.Invoke(
-			fx.Annotate(
-				setupClassifiersNotifier,
-				fx.ParamTags(config.NameTag(classifiersFxTag)),
-			),
-		),
 		// Syncing policies config to etcd
 		fx.Provide(providePoliciesPathFlag),
 		filesystemwatcher.Constructor{Name: policiesFxTag, PathKey: policiesPathKey, Path: policiesDefaultPath}.Annotate(), // Create a new watcher
@@ -136,13 +119,14 @@ func setupClassifiersNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client
 			return key, bytes, errors.New("Classifier.Selector is nil")
 		}
 		agentGroup := selectorProto.GetAgentGroup()
-		etcdPath := path.Join(paths.Classifiers, paths.ClassifierKey(agentGroup, string(key)))
+		// TODO: Add correct classifierIndex for etcdPath
+		etcdPath := path.Join(paths.ClassifiersConfigPath, paths.ClassifierKey(agentGroup, string(key), 0))
 
 		return notifiers.Key(etcdPath), bytes, nil
 	}
 
 	notifier := etcdnotifier.NewPrefixToEtcdNotifier(
-		paths.Classifiers,
+		paths.ClassifiersConfigPath,
 		etcdClient,
 		true,
 	)
@@ -188,27 +172,6 @@ func setPoliciesPathFlag(fs *pflag.FlagSet) error {
 	return nil
 }
 
-// HashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
-func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*configv1.PolicyWrapper, error) {
-	dat, marshalErr := yaml.Marshal(policyMessage)
-	if marshalErr != nil {
-		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
-		return nil, marshalErr
-	}
-	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
-	if hashErr != nil {
-		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))
-		return nil, hashErr
-	}
-	hash := base64.StdEncoding.EncodeToString(hashBytes[:])
-
-	return &configv1.PolicyWrapper{
-		Policy:     policyMessage,
-		PolicyName: policyName,
-		PolicyHash: hash,
-	}, nil
-}
-
 // Sync policies config directory with etcd.
 func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry status.Registry) {
 	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
@@ -227,7 +190,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 				return key, nil, unmarshalErr
 			}
 
-			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
+			wrapper, wrapErr := controlplane.HashAndPolicyWrap(policyMessage, string(key))
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
 				return key, nil, wrapErr
@@ -242,7 +205,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 			s := status.NewStatus(wrapper, nil)
 			pushErr := reg.Push(s)
 			if pushErr != nil {
-				log.Error().Err(pushErr).Msg("could not push classification rules to status registry")
+				log.Error().Err(pushErr).Msg("could not push policies status")
 			}
 
 		case notifiers.Remove:
@@ -252,7 +215,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 	}
 
 	notifier := etcdnotifier.NewPrefixToEtcdNotifier(
-		paths.Policies,
+		paths.PoliciesConfigPath,
 		etcdClient,
 		true)
 	// content transform callback to wrap policy in config properties wrapper

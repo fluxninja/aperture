@@ -39,7 +39,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 // ApertureReconciler reconciles a Aperture object.
@@ -61,9 +61,9 @@ var (
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps,resources=daemonsets,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=aperture.tech,resources=apertures,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=aperture.tech,resources=apertures/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=aperture.tech,resources=apertures/finalizers,verbs=update
+//+kubebuilder:rbac:groups=fluxninja.com,resources=apertures,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=fluxninja.com,resources=apertures/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=fluxninja.com,resources=apertures/finalizers,verbs=update
 //+kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get
 //+kubebuilder:rbac:groups=core,resources=configmaps,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=componentstatuses,verbs=get;list;watch;create;update;patch;delete

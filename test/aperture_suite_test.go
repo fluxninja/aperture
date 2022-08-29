@@ -14,9 +14,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/classification"
 	"github.com/fluxninja/aperture/pkg/entitycache"
-	"github.com/fluxninja/aperture/pkg/envoy"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/flowcontrol"
@@ -28,6 +26,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/test/harness"
@@ -142,13 +141,8 @@ var _ = BeforeSuite(func() {
 			agentinfo.ProvideAgentInfo,
 		),
 		flowcontrol.Module,
-		classification.Module,
-		envoy.Module,
+		classifier.Module,
 		otelcollector.Module(),
-		fx.Invoke(
-			envoy.Register,
-			flowcontrol.Register,
-		),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),
 		jobs.JobGroupConstructor{Name: jobGroupName}.Annotate(),
 		fx.Populate(jgIn),

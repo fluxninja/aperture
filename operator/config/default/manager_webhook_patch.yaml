@@ -7,7 +7,7 @@ spec:
   template:
     metadata:
       annotations:
-        sidecar.aperture.tech/injection: "false"
+        sidecar.fluxninja.com/injection: "false"
     spec:
       containers:
       - name: manager

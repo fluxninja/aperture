@@ -33,7 +33,7 @@ import (
 
 	cryptorand "crypto/rand"
 
-	"aperture.tech/operators/aperture-operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	"github.com/imdario/mergo"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -429,8 +429,8 @@ func getAnnotationsWithOwnerRef(instance *v1alpha1.Aperture) map[string]string {
 	if annotations == nil {
 		annotations = map[string]string{}
 	}
-	annotations["aperture.tech/primary-resource"] = fmt.Sprintf("%s/%s", instance.GetNamespace(), instance.GetName())
-	annotations["aperture.tech/primary-resource-type"] = fmt.Sprintf("%s.%s",
+	annotations["fluxninja.com/primary-resource"] = fmt.Sprintf("%s/%s", instance.GetNamespace(), instance.GetName())
+	annotations["fluxninja.com/primary-resource-type"] = fmt.Sprintf("%s.%s",
 		instance.GetObjectKind().GroupVersionKind().GroupKind().Kind, instance.GetObjectKind().GroupVersionKind().GroupKind().Group)
 
 	return annotations
@@ -516,7 +516,7 @@ func generateCertificate(dnsPrefix, namespace string) (*bytes.Buffer, *bytes.Buf
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(2022),
 		Subject: pkix.Name{
-			Organization: []string{"aperture.tech"},
+			Organization: []string{"fluxninja.com"},
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(10, 0, 0),
@@ -560,7 +560,7 @@ func generateCertificate(dnsPrefix, namespace string) (*bytes.Buffer, *bytes.Buf
 		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
 			CommonName:   commonName,
-			Organization: []string{"aperture.tech"},
+			Organization: []string{"fluxninja.com"},
 		},
 		NotBefore:    time.Now(),
 		NotAfter:     time.Now().AddDate(10, 0, 0),

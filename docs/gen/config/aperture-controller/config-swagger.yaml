@@ -879,11 +879,6 @@ paths:
     post:
       operationId: Controller
       parameters:
-      - description: Directory containing classification rules
-        in: query
-        name: classifiers_path
-        type: string
-        x-go-default: /etc/aperture/aperture-controller/classifiers
       - description: Directory containing policies rules
         in: query
         name: policies_path

@@ -14,12 +14,11 @@ import (
 type FluxMeterID struct {
 	PolicyName    string
 	FluxMeterName string
-	PolicyHash    string
 }
 
 // String function returns the FluxMeterID as a string.
 func (fmID FluxMeterID) String() string {
-	return "policy_name-" + fmID.PolicyName + "-flux_meter_name-" + fmID.FluxMeterName + "-policy_hash-" + fmID.PolicyHash
+	return "policy_name-" + fmID.PolicyName + "-flux_meter_name-" + fmID.FluxMeterName
 }
 
 // FluxMeter in an interface for interacting with fluxmeters.
@@ -43,6 +42,6 @@ type FluxMeter interface {
 	// GetBuckets returns the buckets
 	GetBuckets() []float64
 
-	// GetHistogram returns the histogram for the flowcontrolv1.DecisionType
-	GetHistogram(flowcontrolv1.DecisionType) prometheus.Histogram
+	// GetHistogram returns the histogram observer for the flowcontrolv1.DecisionType
+	GetHistogram(flowcontrolv1.DecisionType, string) prometheus.Observer
 }

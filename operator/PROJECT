@@ -1,4 +1,4 @@
-domain: aperture.tech
+domain: fluxninja.com
 layout:
 - go.kubebuilder.io/v3
 plugins:
@@ -11,9 +11,9 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  group: aperture.tech
+  group: fluxninja.com
   kind: Aperture
-  path: aperture.tech/operators/aperture-operator/api/v1alpha1
+  path: fluxninja.com/operators/aperture-operator/api/v1alpha1
   version: v1alpha1
 - controller: true
   group: core

@@ -7,7 +7,7 @@ type TickEndCallback func(tickInfo TickInfo) error
 
 // CircuitAPI is for read only access to policy and also provides methods for acquiring & releasing circuit execution lock.
 type CircuitAPI interface {
-	iface.PolicyRead
+	iface.Policy
 	RegisterTickEndCallback(cb TickEndCallback)
 	LockExecution()
 	UnlockExecution()

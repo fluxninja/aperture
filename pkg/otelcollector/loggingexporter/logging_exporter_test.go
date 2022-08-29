@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//       http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,7 +30,7 @@ import (
 )
 
 func TestLoggingTracesExporterNoErrors(t *testing.T) {
-	lte, err := newTracesExporter(&config.ExporterSettings{}, componenttest.NewNopExporterCreateSettings())
+	lte, err := newTracesExporter(context.Background(), componenttest.NewNopExporterCreateSettings(), &config.ExporterSettings{})
 	require.NotNil(t, lte)
 	assert.NoError(t, err)
 
@@ -41,7 +41,7 @@ func TestLoggingTracesExporterNoErrors(t *testing.T) {
 }
 
 func TestLoggingMetricsExporterNoErrors(t *testing.T) {
-	lme, err := newMetricsExporter(&config.ExporterSettings{}, componenttest.NewNopExporterCreateSettings())
+	lme, err := newMetricsExporter(context.Background(), componenttest.NewNopExporterCreateSettings(), &config.ExporterSettings{})
 	require.NotNil(t, lme)
 	assert.NoError(t, err)
 
@@ -54,7 +54,7 @@ func TestLoggingMetricsExporterNoErrors(t *testing.T) {
 }
 
 func TestLoggingLogsExporterNoErrors(t *testing.T) {
-	lle, err := newLogsExporter(&config.ExporterSettings{}, componenttest.NewNopExporterCreateSettings())
+	lle, err := newLogsExporter(context.Background(), componenttest.NewNopExporterCreateSettings(), &config.ExporterSettings{})
 	require.NotNil(t, lle)
 	assert.NoError(t, err)
 

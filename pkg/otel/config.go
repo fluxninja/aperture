@@ -150,10 +150,11 @@ func addMetricsPipeline(config *otelcollector.OTELConfig, promClient promapi.Cli
 
 func addControllerMetricsPipeline(config *otelcollector.OTELConfig, promClient promapi.Client, cfg otelConfig) {
 	addControllerPrometheusReceiver(config, cfg)
+	config.AddBatchProcessor(ProcessorBatchMetricsFast, 1*time.Second, 1000)
 	addPrometheusRemoteWriteExporter(config, promClient)
-	config.Service.AddPipeline("metrics/controller", otelcollector.Pipeline{
+	config.Service.AddPipeline("metrics/controller-fast", otelcollector.Pipeline{
 		Receivers:  []string{ReceiverPrometheus},
-		Processors: []string{},
+		Processors: []string{ProcessorBatchMetricsFast},
 		Exporters:  []string{ExporterPrometheusRemoteWrite},
 	})
 }

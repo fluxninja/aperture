@@ -10,10 +10,10 @@ var (
 	ConfigPrefix = path.Join("/config")
 	// DecisionsPrefix is key prefix in etcd for decisions.
 	DecisionsPrefix = path.Join("/decisions")
-	// Classifiers is config path in etcd for classifiers.
-	Classifiers = path.Join(ConfigPrefix, "classifiers")
-	// Policies is config path in etcd for policies.
-	Policies = path.Join(ConfigPrefix, "policies")
+	// ClassifiersConfigPath is config path in etcd for classifiers.
+	ClassifiersConfigPath = path.Join(ConfigPrefix, "classifiers")
+	// PoliciesConfigPath is config path in etcd for policies.
+	PoliciesConfigPath = path.Join(ConfigPrefix, "policies")
 	// LoadShedDecisionsPath is decision path in etcd for load shed decisions.
 	LoadShedDecisionsPath = path.Join(DecisionsPrefix, "load_shed")
 	// AutoTokenResultsPath is config path in etcd for query tokens.
@@ -49,6 +49,6 @@ func FluxMeterKey(agentGroupName, policyName, fluxMeterName string) string {
 }
 
 // ClassifierKey returns the identifier for a Classifier in etcd.
-func ClassifierKey(agentGroupName, classifierName string) string {
-	return AgentGroupPrefix(agentGroupName) + "-classifier-" + classifierName
+func ClassifierKey(agentGroupName, policyName string, classifierIndex int64) string {
+	return PolicyPrefix(agentGroupName, policyName) + "-classifier_index-" + strconv.FormatInt(classifierIndex, 10)
 }

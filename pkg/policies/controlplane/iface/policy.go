@@ -2,8 +2,6 @@ package iface
 
 import (
 	"time"
-
-	"github.com/prometheus/prometheus/model/labels"
 )
 
 // swagger:operation POST /policies common-configuration PoliciesConfig
@@ -26,21 +24,8 @@ type PolicyBase interface {
 	GetPolicyHash() string
 }
 
-// PolicyRead is for read only access to full policy state.
-type PolicyRead interface {
-	PolicyBase
-	ResolveMetricNames(query string) (string, error)
-	GetEvaluationInterval() time.Duration
-}
-
-// MetricSubRegistry is for registering metric substitution patterns (used by FluxMeter).
-type MetricSubRegistry interface {
-	RegisterHistogramSub(metricNameOrig, metricNameSub string, labelMatchers []*labels.Matcher)
-	RegisterMetricSub(metricsNameOrig, metricNameSub string, labelMatchers []*labels.Matcher)
-}
-
-// Policy is the global interface composed of all of the above APIs.
+// Policy is for read only access to full policy state.
 type Policy interface {
-	PolicyRead
-	MetricSubRegistry
+	PolicyBase
+	GetEvaluationInterval() time.Duration
 }

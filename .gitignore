@@ -8,10 +8,11 @@
 *.dll
 *.so
 *.dylib
+bin/
 
 # Test binary, built with `go test -c`
 *.test
-unit-tests.xml
+unit-tests*
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
@@ -54,6 +55,3 @@ tags
 
 # Persistent undo
 [._]*.un~
-
-### Symlinks
-manifests/aperture-operator
