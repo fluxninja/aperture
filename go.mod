@@ -14,7 +14,7 @@ require (
 	github.com/elastic/gmux v0.2.0
 	github.com/elastic/gosigar v0.14.2
 	github.com/envoyproxy/go-control-plane v0.10.3
-	github.com/favadi/protoc-go-inject-tag v1.3.0
+	github.com/favadi/protoc-go-inject-tag v1.4.0
 	github.com/fluxninja/datasketches-go v0.0.0-20220128132852-065685ae83e0
 	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
 	github.com/getsentry/sentry-go v0.13.0
