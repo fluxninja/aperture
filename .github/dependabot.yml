@@ -7,9 +7,15 @@ updates:
     assignees:
       - "harjotgill"
       - "kwapik"
-      - "kasajna"
+      - "kklimonda-fn"
     rebase-strategy: "disabled"
   - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    open-pull-requests-limit: 20
+  - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "monthly"
