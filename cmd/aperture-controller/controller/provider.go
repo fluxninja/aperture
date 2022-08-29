@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"errors"
 	"path"
 
 	"github.com/ghodss/yaml"
@@ -33,11 +32,6 @@ var (
 	//   description: Directory containing policies rules
 	//   x-go-default: "/etc/aperture/aperture-controller/policies"
 
-	classifiersDefaultPath = path.Join(config.DefaultAssetsDirectory, "classifiers")
-	classifiersPathKey     = "controller.classifiers_path"
-	classifiersFxTag       = "Classifiers"
-	rulesetKey             = "ruleset"
-
 	policiesDefaultPath = path.Join(config.DefaultAssetsDirectory, "policies")
 	policiesPathKey     = "controller.policies_path"
 	policiesFxTag       = "Policies"
@@ -59,105 +53,6 @@ func Module() fx.Option {
 		// Policy factory
 		controlplane.PolicyFactoryModule(),
 	)
-}
-
-// provideClassifiersPathFlag registers a command line flag builder function.
-func provideClassifiersPathFlag() config.FlagSetBuilderOut {
-	return config.FlagSetBuilderOut{Builder: setClassifiersPathFlag}
-}
-
-// setClassifiersPathFlag registers command line flags.
-func setClassifiersPathFlag(fs *pflag.FlagSet) error {
-	fs.String(classifiersPathKey, classifiersDefaultPath, "path to classifiers directory")
-	return nil
-}
-
-// Sync classifiers config directory with etcd.
-func setupClassifiersNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry status.Registry) {
-	transformKey := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (retKey notifiers.Key, retBytes []byte, retErr error) {
-		rulesetReg := status.NewRegistry(statusRegistry, rulesetKey)
-		reg := status.NewRegistry(rulesetReg, key.String())
-
-		classifierMsg := &policylangv1.Classifier{}
-
-		updateStatus := func() {
-			if etype == notifiers.Remove {
-				err := reg.Delete()
-				if err != nil {
-					log.Error().Err(err).Msg("failed to delete status")
-				}
-			} else if etype == notifiers.Write {
-				if retErr != nil {
-					s := status.NewStatus(nil, retErr)
-					pushErr := reg.Push(s)
-					if pushErr != nil {
-						log.Error().Err(pushErr).Msg("could not push error to status registry")
-					}
-				} else {
-					s := status.NewStatus(classifierMsg, nil)
-					pushErr := reg.Push(s)
-					if pushErr != nil {
-						log.Error().Err(pushErr).Msg("could not push classifier to status registry")
-					}
-				}
-			}
-		}
-
-		defer updateStatus()
-
-		unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
-		unmarshalErr := unmarshaller.Unmarshal(classifierMsg)
-		if unmarshalErr != nil {
-			log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal classifier")
-
-			return key, bytes, unmarshalErr
-		}
-
-		selectorProto := classifierMsg.GetSelector()
-		if selectorProto == nil {
-			return key, bytes, errors.New("Classifier.Selector is nil")
-		}
-		agentGroup := selectorProto.GetAgentGroup()
-		// TODO: Add correct classifierIndex for etcdPath
-		etcdPath := path.Join(paths.ClassifiersConfigPath, paths.ClassifierKey(agentGroup, string(key), 0))
-
-		return notifiers.Key(etcdPath), bytes, nil
-	}
-
-	notifier := etcdnotifier.NewPrefixToEtcdNotifier(
-		paths.ClassifiersConfigPath,
-		etcdClient,
-		true,
-	)
-
-	// content transform callback to wrap policy in config properties wrapper
-	notifier.SetTransformFunc(transformKey)
-
-	lifecycle.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
-			err := notifier.Start()
-			if err != nil {
-				return err
-			}
-			err = w.AddPrefixNotifier(notifier)
-			if err != nil {
-				return err
-			}
-			return nil
-		},
-		OnStop: func(_ context.Context) error {
-			var merr, err error
-			err = w.RemovePrefixNotifier(notifier)
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-			err = notifier.Stop()
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-			return merr
-		},
-	})
 }
 
 // providePoliciesPathFlag registers a command line flag builder function.
