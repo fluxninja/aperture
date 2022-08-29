@@ -243,21 +243,7 @@ DEP_TREE = {
                     "extra_objects": [
                         "demo1-demo-app:serviceaccount"
                     ]
-                },
-                {
-                    "workload": "demo2-demo-app",
-                    "resource_deps": ["cluster-bootstrap"],
-                    "extra_objects": [
-                        "demo2-demo-app:serviceaccount"
-                    ]
-                },
-                {
-                    "workload": "demo3-demo-app",
-                    "resource_deps": ["cluster-bootstrap"],
-                    "extra_objects": [
-                        "demo3-demo-app:serviceaccount"
-                    ]
-                },
+                }
             ]
         },
     },

@@ -5,6 +5,7 @@ local demoApp = import 'apps/demoapp/main.libsonnet';
 local demoappMixin =
   demoApp {
     values+: {
+      replicaCount: 2,
       simplesrv+: {
         image: {
           repository: 'gcr.io/devel-309501/cf-fn/demo-app',
