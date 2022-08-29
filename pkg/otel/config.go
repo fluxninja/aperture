@@ -2,6 +2,7 @@ package otel
 
 import (
 	"fmt"
+	"time"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/config/configgrpc"

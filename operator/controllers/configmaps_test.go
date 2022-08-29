@@ -21,7 +21,6 @@ import (
 	_ "embed"
 	"fmt"
 	"text/template"
-	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -84,15 +83,15 @@ var _ = Describe("ConfigMap for Agent", func() {
 						},
 					},
 					BatchPrerollup: v1alpha1.Batch{
-						Timeout:       time.Second,
+						Timeout:       "1s",
 						SendBatchSize: 10000,
 					},
 					BatchPostrollup: v1alpha1.Batch{
-						Timeout:       time.Second,
+						Timeout:       "1s",
 						SendBatchSize: 10000,
 					},
 					BatchMetricsFast: v1alpha1.Batch{
-						Timeout:       time.Second,
+						Timeout:       "1s",
 						SendBatchSize: 10000,
 					},
 					DistributedCachePort: 3320,

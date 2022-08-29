@@ -877,7 +877,7 @@ spec:
               batchMetricsFast:
                 default:
                   sendBatchSize: 1000
-                  timeout: 1000000000
+                  timeout: 1s
                 description: Batch metrics/fast processor configuration.
                 properties:
                   sendBatchSize:
@@ -887,16 +887,15 @@ spec:
                     format: int32
                     type: integer
                   timeout:
-                    default: 1000000000
+                    default: 1s
                     description: Timeout sets the time after which a batch will be
                       sent regardless of size.
-                    format: int64
-                    type: integer
+                    type: string
                 type: object
               batchPostrollup:
                 default:
                   sendBatchSize: 10000
-                  timeout: 1000000000
+                  timeout: 1s
                 description: Batch postrollup processor configuration.
                 properties:
                   sendBatchSize:
@@ -906,16 +905,15 @@ spec:
                     format: int32
                     type: integer
                   timeout:
-                    default: 1000000000
+                    default: 1s
                     description: Timeout sets the time after which a batch will be
                       sent regardless of size.
-                    format: int64
-                    type: integer
+                    type: string
                 type: object
               batchPrerollup:
                 default:
                   sendBatchSize: 10000
-                  timeout: 1000000000
+                  timeout: 1s
                 description: Batch prerollup processor configuration.
                 properties:
                   sendBatchSize:
@@ -925,11 +923,10 @@ spec:
                     format: int32
                     type: integer
                   timeout:
-                    default: 1000000000
+                    default: 1s
                     description: Timeout sets the time after which a batch will be
                       sent regardless of size.
-                    format: int64
-                    type: integer
+                    type: string
                 type: object
               command:
                 description: Override default container command
