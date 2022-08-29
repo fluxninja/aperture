@@ -71,8 +71,6 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	fluxMeterProtos := make([]*flowcontrolv1.FluxMeter, len(fluxMeters))
 	for i, fluxMeter := range fluxMeters {
 		fluxMeterProtos[i] = &flowcontrolv1.FluxMeter{
-			PolicyName:    fluxMeter.GetPolicyName(),
-			PolicyHash:    fluxMeter.GetPolicyHash(),
 			FluxMeterName: fluxMeter.GetFluxMeterName(),
 		}
 	}
@@ -206,11 +204,10 @@ func (e *Engine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 }
 
 // GetFluxMeterHist Lookup function for getting histogram.
-func (e *Engine) GetFluxMeterHist(policyName, fluxMeterName, statusCode string, decisionType flowcontrolv1.DecisionType) prometheus.Observer {
+func (e *Engine) GetFluxMeterHist(fluxMeterName, statusCode string, decisionType flowcontrolv1.DecisionType) prometheus.Observer {
 	e.fluxMeterMapMutex.RLock()
 	defer e.fluxMeterMapMutex.RUnlock()
 	fmID := iface.FluxMeterID{
-		PolicyName:    policyName,
 		FluxMeterName: fluxMeterName,
 	}
 	fluxMeter := e.fluxMetersMap[fmID]

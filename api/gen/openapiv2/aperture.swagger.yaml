@@ -258,10 +258,6 @@ definitions:
     properties:
       flux_meter_name:
         type: string
-      policy_hash:
-        type: string
-      policy_name:
-        type: string
     description: FluxMeter describes detail for each FluxMeter.
   googlerpcStatus:
     type: object
