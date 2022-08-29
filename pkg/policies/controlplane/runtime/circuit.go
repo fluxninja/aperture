@@ -85,7 +85,7 @@ type signalToReading map[Signal]reading.Reading
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
 type Circuit struct {
 	// Policy Read API
-	iface.PolicyRead
+	iface.Policy
 	// Execution lock is taken when circuit needs to execute
 	executionLock sync.Mutex
 	// Looped signals persistence across ticks
@@ -100,9 +100,9 @@ type Circuit struct {
 var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
-func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts, policyReadAPI iface.PolicyRead) (*Circuit, fx.Option) {
+func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts, policyReadAPI iface.Policy) (*Circuit, fx.Option) {
 	circuit := &Circuit{
-		PolicyRead:    policyReadAPI,
+		Policy:        policyReadAPI,
 		loopedSignals: make(signalToReading),
 		components:    make([]CompiledComponentAndPorts, 0),
 	}
@@ -194,7 +194,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 		for signal, reading := range circuitSignalReadings {
 			circuitMetricsLabels := prometheus.Labels{
 				metrics.SignalNameLabel: signal.Name,
-				metrics.PolicyNameLabel: circuit.PolicyRead.GetPolicyName(),
+				metrics.PolicyNameLabel: circuit.Policy.GetPolicyName(),
 			}
 			signalSummaryVecMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
 			if err != nil {

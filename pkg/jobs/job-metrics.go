@@ -30,30 +30,30 @@ type GroupWatcherMetrics struct {
 
 // NewGroupWatcherMetrics creates a new GroupWatcherMetrics.
 func NewGroupWatcherMetrics(registry *prometheus.Registry) (*GroupWatcherMetrics, error) {
-	defaultGroupLabels := []string{"group_name"}
+	defaultGroupLabels := []string{metrics.GroupNameLabel}
 	groupWatcherMetrics := &GroupWatcherMetrics{
 		metricsRegistry: registry,
 		jobRegistered: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: "group_job_registered_number",
+				Name: metrics.GroupJobRegisteredMetricName,
 				Help: "Current number of group job registered",
 			}, defaultGroupLabels,
 		),
 		jobScheduled: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: "group_job_scheduled_number",
+				Name: metrics.GroupJobScheduledMetricName,
 				Help: "Current number of group job scheduled",
 			}, defaultGroupLabels,
 		),
 		jobCompleted: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: "group_job_completed_total",
+				Name: metrics.GroupJobCompletedMetricName,
 				Help: "Total number of group job completed",
-			}, []string{"group_name", "group_job_completed_healthy"},
+			}, []string{metrics.GroupNameLabel, metrics.GroupJobCompletedLabel},
 		),
 		jobLatency: *prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Name:    "group_job_latency_seconds",
+				Name:    metrics.GroupJobLatencyMetricName,
 				Help:    "The latency of the group jobs",
 				Buckets: prometheus.DefBuckets,
 			}, defaultGroupLabels,

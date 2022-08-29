@@ -10,8 +10,8 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/component"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/component/controller"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
 )
 
 var _ = Describe("Component factory", func() {
@@ -31,8 +31,8 @@ var _ = Describe("Component factory", func() {
 			FalseFor: durationpb.New(duration),
 		}
 		It("Creates Decider component", func() {
-			deciderComponent := &component.Decider{}
-			component, options, err := component.NewDeciderAndOptions(deciderProto, 0, nil)
+			deciderComponent := &components.Decider{}
+			component, options, err := components.NewDeciderAndOptions(deciderProto, 0, nil)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(reflect.TypeOf(component)).To(Equal(reflect.TypeOf(deciderComponent)))
 			Expect(options).To(BeNil())

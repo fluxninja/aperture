@@ -3,7 +3,6 @@ info:
   title: Aperture API
   version: "1.0"
 tags:
-  - name: RulesService
   - name: PolicyService
   - name: InfoService
   - name: StatusService
@@ -117,20 +116,6 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - PolicyService
-  /v1/rules:
-    get:
-      operationId: RulesService_AllRules
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1AllRulesResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      tags:
-        - RulesService
   /v1/status/{group}:
     get:
       operationId: StatusService_GetGroupStatus
@@ -191,10 +176,9 @@ definitions:
         items:
           $ref: '#/definitions/v1MatchExpression'
         description: List of subexpressions of the match expression.
-    description: |-
-      List of MatchExpressions that is used for all/any matching.
-      eg. {any: {of: [expr1, expr2]}}.
-  RateLimiterLazySyncConfig:
+    description: 'eg. {any: {of: [expr1, expr2]}}.'
+    title: List of MatchExpressions that is used for all/any matching
+  RateLimiterLazySync:
     type: object
     properties:
       enabled:
@@ -206,7 +190,7 @@ definitions:
         description: Number of times to lazy sync within the limit_reset_interval.
         x-go-default: 5
         x-go-validate: gt=0
-  RateLimiterOverrideConfig:
+  RateLimiterOverride:
     type: object
     properties:
       label_value:
@@ -231,9 +215,8 @@ definitions:
           Source code of the rego module.
 
           Note: Must include a "package" declaration.
-    description: |-
-      Raw rego rules are compiled 1:1 to rego queries.
-      High-level extractor-based rules are compiled into a single rego query.
+    description: High-level extractor-based rules are compiled into a single rego query.
+    title: Raw rego rules are compiled 1:1 to rego queries
   SchedulerWorkload:
     type: object
     properties:
@@ -315,15 +298,15 @@ definitions:
       label_key:
         type: string
         x-go-validate: required
-      lazy_sync_config:
-        $ref: '#/definitions/RateLimiterLazySyncConfig'
+      lazy_sync:
+        $ref: '#/definitions/RateLimiterLazySync'
       limit_reset_interval:
         type: string
         x-go-default: 60s
       overrides:
         type: array
         items:
-          $ref: '#/definitions/RateLimiterOverrideConfig'
+          $ref: '#/definitions/RateLimiterOverride'
       selector:
         $ref: '#/definitions/v1Selector'
         x-go-validate: required
@@ -497,7 +480,6 @@ definitions:
         description: Attribute path pointing to some string - eg. "source.address".
         x-go-validate: required
     description: |-
-      Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`.
       IP addresses in attribute context are defined as objects with separate ip and port fields.
       This is a helper to display an address as a single string.
 
@@ -509,6 +491,7 @@ definitions:
       ```yaml
       from: "source.address # or dstination.address"
       ```
+    title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
   v1AllPolicies:
     type: object
     properties:
@@ -521,20 +504,6 @@ definitions:
     properties:
       all_policies:
         $ref: '#/definitions/v1AllPolicies'
-  v1AllRules:
-    type: object
-    properties:
-      all_rules:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Classifier'
-        description: A map of {key, value} pairs mapping from the name of the classifier to the values of the classifier.
-    description: All the ruleset name to ruleset mapping.
-  v1AllRulesResponse:
-    type: object
-    properties:
-      all_rules:
-        $ref: '#/definitions/v1AllRules'
   v1ArithmeticCombinator:
     type: object
     properties:
@@ -605,6 +574,42 @@ definitions:
           $ref: '#/definitions/v1LimiterDecision'
         description: limiter_decisions contains information about decision made by each limiter.
     description: CheckResponse contains fields that represent decision made by Check call.
+  v1Circuit:
+    type: object
+    properties:
+      components:
+        type: array
+        items:
+          $ref: '#/definitions/v1Component'
+        description: Defines a signal processing graph as a list of components.
+      evaluation_interval:
+        type: string
+        description: |-
+          Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+          This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
+        x-go-default: 0.5s
+    description: |-
+      Circuit is defined as a dataflow graph of inter-connected components.
+
+      Signals flow between components via ports.
+      As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
+      Circuit evaluated periodically in order to respond to changes in signal readings.
+
+      :::info
+      **Signal**
+
+      Signals are floating-point values.
+
+      A signal also have a special **Invalid** value. It's usually used to
+      communicate that signal doesn't have a meaningful value at the moment, eg.
+      [PromQL](#-v1promql) emits such a value if it cannot execute a query.
+      Components know when their input signals are invalid and can act
+      accordingly. They can either propagate the invalidness, by making their
+      output itself invalid (like eg.
+      [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
+      logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+      docs on how exactly it handles invalid inputs.
+      :::
   v1Classifier:
     type: object
     properties:
@@ -617,8 +622,6 @@ definitions:
         $ref: '#/definitions/v1Selector'
         description: Defines where to apply the flow classification rule.
     description: |-
-      Set of classification rules sharing a common selector.
-
       Example:
       ```yaml
       selector:
@@ -630,6 +633,7 @@ definitions:
           extractor:
             from: request.http.headers.user
       ```
+    title: Set of classification rules sharing a common selector
   v1Component:
     type: object
     properties:
@@ -943,7 +947,6 @@ definitions:
       from:
         type: string
         description: |-
-          Use an attribute with no convertion.
           Attribute path is a dot-separated path to attribute.
 
           Should be either:
@@ -959,6 +962,7 @@ definitions:
           from: request.http.headers.user-agent
           ```
           [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto"
+        title: Use an attribute with no convertion
       json:
         $ref: '#/definitions/v1JSONExtractor'
         description: Deserialize a json, and extract one of the fields.
@@ -968,12 +972,12 @@ definitions:
       path_templates:
         $ref: '#/definitions/v1PathTemplateMatcher'
         description: Match HTTP Path to given path templates.
-    title: |-
-      Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write regod code.
+    description: |-
       There are multiple variants of extractor, specify exactly one:
       - JSON Extractor
       - Address Extractor
       - JWT Extractor
+    title: Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
   v1Extrapolator:
     type: object
     properties:
@@ -1135,13 +1139,12 @@ definitions:
           Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
           eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
     description: |-
-      Deserialize a json, and extract one of the fields.
-
       Example:
       ```yaml
       from: request.http.body
       pointer: /user/name
       ```
+    title: Deserialize a json, and extract one of the fields
   v1JWTExtractor:
     type: object
     properties:
@@ -1157,7 +1160,6 @@ definitions:
           Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
           eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
     description: |-
-      Parse the attribute as JWT and read the payload.
       Specify a field to be extracted from payload using "json_pointer".
 
       Note: The signature is not verified against the secret (we're assuming there's some
@@ -1168,6 +1170,7 @@ definitions:
       from: request.http.bearer
       json_pointer: /user/email
       ```
+    title: Parse the attribute as JWT and read the payload
   v1K8sLabelMatcherRequirement:
     type: object
     properties:
@@ -1294,7 +1297,6 @@ definitions:
         $ref: '#/definitions/v1MatchExpression'
         description: The expression negates the result of subexpression.
     description: |-
-      Defines a [map<string, string> → bool] expression to be evaluated on labels.
       MatchExpression has multiple variants, exactly one should be set.
 
       Example:
@@ -1304,6 +1306,7 @@ definitions:
           - label_exists: foo
           - label_equals: { label = app, value = frobnicator }
       ```
+    title: Defines a [map<string, string> → bool] expression to be evaluated on labels
   v1MatchesMatchExpression:
     type: object
     properties:
@@ -1404,10 +1407,10 @@ definitions:
           /static/*: other
           ```
     description: |-
-      Matches HTTP Path to given path templates.
       HTTP path will be matched against given path templates.
       If a match occurs, the value associated with the path template will be treated as a result.
       In case of multiple path templates matching, the most specific one will be chosen.
+    title: Matches HTTP Path to given path templates
   v1PeerInfo:
     type: object
     properties:
@@ -1423,46 +1426,15 @@ definitions:
     type: object
     properties:
       circuit:
-        type: array
-        items:
-          $ref: '#/definitions/v1Component'
-        description: Defines a signal processing graph as a list of components.
-      evaluation_interval:
-        type: string
-        description: |-
-          Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
-          This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-        x-go-default: 0.5s
-      flux_meters:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/policylanguagev1FluxMeter'
-        description: |-
-          FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
-
-          FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+        $ref: '#/definitions/v1Circuit'
+        description: Defines the control-loop logic of the policy.
+      resources:
+        $ref: '#/definitions/v1Resources'
+        description: Resources (FluxMeters, Classifiers etc.) to setup.
     description: |-
-      Policy is defined as a dataflow graph (circuit) of inter-connected components.
+      Policy expresses reliability automation workflow that automatically protects services.
 
-      Signals flow between components via ports.
-      As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
-      Policies are evaluated periodically in order to respond to changes in signal readings.
-
-      :::info
-      **Signal**
-
-      Signals are floating-point values.
-
-      A signal also have a special **Invalid** value. It's usually used to
-      communicate that signal doesn't have a meaningful value at the moment, eg.
-      [PromQL](#-v1promql) emits such a value if it cannot execute a query.
-      Components know when their input signals are invalid and can act
-      accordingly. They can either propagate the invalidness, by making their
-      output itself invalid (like eg.
-      [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
-      logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
-      docs on how exactly it handles invalid inputs.
-      :::
+      Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
   v1Port:
     type: object
     properties:
@@ -1537,6 +1509,29 @@ definitions:
   v1ReportResponse:
     type: object
     description: ReportResponse is empty for now.
+  v1Resources:
+    type: object
+    properties:
+      classifiers:
+        type: array
+        items:
+          $ref: '#/definitions/v1Classifier'
+        description: |-
+          Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+
+          The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
+      flux_meters:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/policylanguagev1FluxMeter'
+        description: |-
+          FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+
+          FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+    description: |-
+      Resources that need to be setup for the policy to function.
+
+      Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
   v1Rule:
     type: object
     properties:
@@ -1555,7 +1550,6 @@ definitions:
         $ref: '#/definitions/RuleRego'
         description: Rego module to extract a value from the rego module.
     description: |-
-      Rule describes a single Flow Classification Rule.
       Flow classification rule extracts a value from request metadata.
       More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
       See <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.
@@ -1592,6 +1586,7 @@ definitions:
           propagate: false
           hidden: true
       ```
+    title: Rule describes a single Flow Classification Rule
   v1Scheduler:
     type: object
     properties:

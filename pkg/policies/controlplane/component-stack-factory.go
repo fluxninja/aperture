@@ -6,7 +6,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/component/actuator/concurrency"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/concurrency"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -20,7 +20,7 @@ func componentStackFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.O
 func newComponentStackAndOptions(
 	componentStackProto *policylangv1.Component,
 	componentStackIndex int,
-	policyReadAPI iface.PolicyRead,
+	policyReadAPI iface.Policy,
 ) (runtime.CompiledComponent, []runtime.CompiledComponent, fx.Option, error) {
 	// Factory parser to determine what kind of component stack to create
 	if concurrencyLimiter := componentStackProto.GetConcurrencyLimiter(); concurrencyLimiter != nil {

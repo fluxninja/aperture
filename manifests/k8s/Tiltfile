@@ -832,54 +832,6 @@ watch_file("../../pkg/")
 watch_file("../../plugins/")
 watch_file("../../operator/")
 
-cmd_button(
-    'classification-1-demoapp',
-    resource='aperture-agent',
-    icon_name='content_paste_go',
-    text='Apply Example Classification For Demo App',
-    argv=['kubectl', 'apply', '-f', '../../example-classification-cm-demoapp.yaml']
-)
-
-cmd_button(
-    'classification-2-bookinfo',
-    resource='aperture-agent',
-    icon_name='content_paste_go',
-    text='Apply Example Classification For Bookinfo',
-    argv=['kubectl', 'apply', '-f', '../../example-classification-cm-bookinfo.yaml']
-)
-
-cmd_button(
-    'classification-3-delete',
-    resource='aperture-agent',
-    icon_name='content_paste_off',
-    text='Delete Classification configmap',
-    argv=['kubectl', '-n', APERTURE_SYSTEM_NS, 'delete', 'cm', 'classification']
-)
-
-cmd_button(
-    'policies-1-latency',
-    resource='aperture-controller',
-    icon_name='content_paste_go',
-    text='Apply Example Latency Gradient Policy For Demo App',
-    argv=['kubectl', 'apply', '-f', '../../latency-gradient-policy.yaml']
-)
-
-cmd_button(
-    'policies-2-rate-limit',
-    resource='aperture-controller',
-    icon_name='content_paste_go',
-    text='Apply Example Rate Limit Policy For Demo App',
-    argv=['kubectl', 'apply', '-f', '../../rate-limit-policy.yaml']
-)
-
-cmd_button(
-    'policies-3-delete',
-    resource='aperture-controller',
-    icon_name='content_paste_off',
-    text='Delete Policy configmap',
-    argv=['kubectl', '-n', APERTURE_SYSTEM_NS, 'delete', 'cm', 'policies']
-)
-
 run_load_generator = '''
 kubectl create configmap load-test --from-file=../../tools/load_generator/scenarios/load_test.js
 kubectl apply -f ../../tools/load_generator/scenarios/demoapp-load-test-cr.yaml
@@ -901,17 +853,6 @@ cmd_button('demoapp-load-test-del',
     icon_name='content_paste_off',
     text='Stop load test',
     argv=['sh', '-c', delete_load_generator],
-)
-
-run_stress_generator = '''
-kubectl create configmap load-test --from-file=../../tools/load_generator/scenarios/stress_test.js
-kubectl apply -f ../../tools/load_generator/scenarios/demoapp-stress-test-cr.yaml
-'''
-cmd_button('demoapp-stress-test',
-    resource='demo1-demo-app',
-    icon_name='content_paste_go',
-    text='Run stress test',
-    argv=['sh', '-c', run_stress_generator],
 )
 
 declare_resources(resources, DEP_TREE, inverted_dep_tree)

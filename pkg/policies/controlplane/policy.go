@@ -7,8 +7,6 @@ import (
 	"time"
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/promql/parser"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -19,8 +17,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/fluxmeter"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/fluxmeter"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -38,8 +37,6 @@ func policyModule() fx.Option {
 // Policy invokes the Circuit runtime at tick frequency.
 type Policy struct {
 	iface.PolicyBase
-	// Metric substitution map
-	metricSubMap map[string]*metricSub
 	// Circuit
 	circuit *runtime.Circuit
 	// job group
@@ -53,11 +50,6 @@ type Policy struct {
 // Make sure Policy complies with PolicyAPI interface.
 var _ iface.Policy = (*Policy)(nil)
 
-type metricSub struct {
-	metricName    string
-	labelMatchers []*labels.Matcher
-}
-
 // newPolicyOptions creates a new Policy object and returns its Fx options for the per Policy App.
 func newPolicyOptions(
 	wrapperMessage *configv1.PolicyWrapper,
@@ -70,7 +62,7 @@ func newPolicyOptions(
 	}
 	policyOptions = append(policyOptions, partialPolicyOption)
 	policyOptions = append(policyOptions, fx.Supply(
-		fx.Annotate(policy, fx.As(new(iface.PolicyRead))),
+		fx.Annotate(policy, fx.As(new(iface.Policy))),
 	))
 
 	// Create circuit
@@ -107,35 +99,50 @@ func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []ru
 	policy := &Policy{
 		PolicyBase: wrapperMessage,
 	}
-	policy.metricSubMap = make(map[string]*metricSub)
 
 	// Get Policy Proto
 	policyProto := wrapperMessage.GetPolicy()
 	if policyProto == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy proto")
 	}
-	// Read evaluation interval
-	policy.evaluationInterval = policyProto.EvaluationInterval.AsDuration()
 
-	var fluxMeterOptions []fx.Option
-	// Initialize flux meters
-	for name, fluxMeterProto := range policyProto.FluxMeters {
-		fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(name, fluxMeterProto, policy, policy)
+	var resourceOptions []fx.Option
+	if policyProto.GetResources() != nil {
+		// Initialize flux meters
+		for name, fluxMeterProto := range policyProto.GetResources().FluxMeters {
+			fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(name, fluxMeterProto, policy)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+			resourceOptions = append(resourceOptions, fluxMeterOption)
+		}
+		// Initialize classifiers
+		for index, classifierProto := range policyProto.GetResources().Classifiers {
+			classifierOption, err := classifier.NewClassifierOptions(int64(index), classifierProto, policy)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+			resourceOptions = append(resourceOptions, classifierOption)
+		}
+	}
+	var compWithPortsList []runtime.CompiledComponentAndPorts
+	partialCircuitOption := fx.Options()
+	var err error
+
+	if policyProto.GetCircuit() != nil {
+		// Read evaluation interval
+		policy.evaluationInterval = policyProto.GetCircuit().GetEvaluationInterval().AsDuration()
+
+		compWithPortsList, partialCircuitOption, err = compileCircuit(policyProto.GetCircuit().Components, policy)
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		fluxMeterOptions = append(fluxMeterOptions, fluxMeterOption)
-	}
-
-	compWithPortsList, partialCircuitOption, err := compileCircuit(policyProto.Circuit, policy)
-	if err != nil {
-		return nil, nil, nil, err
 	}
 
 	return policy, compWithPortsList, fx.Options(
-		fx.Options(fluxMeterOptions...),
+		fx.Options(resourceOptions...),
 		partialCircuitOption,
-		fx.Invoke(policy.setup),
+		fx.Invoke(policy.setupCircuitJob),
 	), nil
 }
 
@@ -144,45 +151,47 @@ func (policy *Policy) GetEvaluationInterval() time.Duration {
 	return policy.evaluationInterval
 }
 
-func (policy *Policy) setup(
+func (policy *Policy) setupCircuitJob(
 	lifecycle fx.Lifecycle,
 	circuitJobGroup *jobs.JobGroup,
 ) error {
-	// Job name
-	policy.jobName = fmt.Sprintf("Policy-%s", policy.GetPolicyName())
-	// Job group
-	policy.circuitJobGroup = circuitJobGroup
+	if policy.evaluationInterval > 0 {
+		// Job name
+		policy.jobName = fmt.Sprintf("Policy-%s", policy.GetPolicyName())
+		// Job group
+		policy.circuitJobGroup = circuitJobGroup
 
-	lifecycle.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
-			// Create a job that runs every tick i.e. evaluation_interval. Set timeout duration to half of evaluation_interval
-			job := jobs.BasicJob{
-				JobFunc: policy.executeTick,
-			}
-			job.JobName = policy.jobName
-			initialDelay := config.Duration{Duration: durationpb.New(time.Duration(0))}
-			executionPeriod := config.Duration{Duration: durationpb.New(policy.evaluationInterval)}
-			executionTimeout := config.Duration{Duration: durationpb.New(time.Millisecond * 100)}
-			jobConfig := jobs.JobConfig{
-				InitiallyHealthy: true,
-				InitialDelay:     initialDelay,
-				ExecutionPeriod:  executionPeriod,
-				ExecutionTimeout: executionTimeout,
-			}
-			// Register job with registry
-			err := policy.circuitJobGroup.RegisterJob(&job, jobConfig)
-			if err != nil {
-				log.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
-				return err
-			}
-			return nil
-		},
-		OnStop: func(_ context.Context) error {
-			// Deregister job from registry
-			_ = policy.circuitJobGroup.DeregisterJob(policy.jobName)
-			return nil
-		},
-	})
+		lifecycle.Append(fx.Hook{
+			OnStart: func(_ context.Context) error {
+				// Create a job that runs every tick i.e. evaluation_interval. Set timeout duration to half of evaluation_interval
+				job := jobs.BasicJob{
+					JobFunc: policy.executeTick,
+				}
+				job.JobName = policy.jobName
+				initialDelay := config.Duration{Duration: durationpb.New(time.Duration(0))}
+				executionPeriod := config.Duration{Duration: durationpb.New(policy.evaluationInterval)}
+				executionTimeout := config.Duration{Duration: durationpb.New(time.Millisecond * 100)}
+				jobConfig := jobs.JobConfig{
+					InitiallyHealthy: true,
+					InitialDelay:     initialDelay,
+					ExecutionPeriod:  executionPeriod,
+					ExecutionTimeout: executionTimeout,
+				}
+				// Register job with registry
+				err := policy.circuitJobGroup.RegisterJob(&job, jobConfig)
+				if err != nil {
+					log.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
+					return err
+				}
+				return nil
+			},
+			OnStop: func(_ context.Context) error {
+				// Deregister job from registry
+				_ = policy.circuitJobGroup.DeregisterJob(policy.jobName)
+				return nil
+			},
+		})
+	}
 
 	return nil
 }
@@ -203,89 +212,6 @@ func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error
 	err := policy.circuit.Execute(tickInfo)
 	// TODO: return tick info (publish to health framework) instead of returning nil proto.Message
 	return nil, err
-}
-
-// RegisterHistogramSub registers a metric substitution pattern for a histogram.
-// Not thread safe!
-func (policy *Policy) RegisterHistogramSub(metricNameOrig, metricNameSub string, labelMatchers []*labels.Matcher) {
-	// Assume histogram metric
-	policy.RegisterMetricSub(metricNameOrig+"_sum", metricNameSub+"_sum", labelMatchers)
-	policy.RegisterMetricSub(metricNameOrig+"_count", metricNameSub+"_count", labelMatchers)
-	policy.RegisterMetricSub(metricNameOrig+"_bucket", metricNameSub+"_bucket", labelMatchers)
-}
-
-// RegisterMetricSub registers a metric substitution pattern for a metric.
-// Not thread safe!
-func (policy *Policy) RegisterMetricSub(metricsNameOrig, metricNameSub string, labelMatchers []*labels.Matcher) {
-	metricSub := &metricSub{metricName: metricNameSub, labelMatchers: labelMatchers}
-	policy.metricSubMap[metricsNameOrig] = metricSub
-}
-
-// ResolveMetricNames resolves metric names based on the substitution patterns.
-func (policy *Policy) ResolveMetricNames(query string) (string, error) {
-	expr, err := parser.ParseExpr(query)
-	if err != nil {
-		return query, err
-	}
-	msv := &metricSubVisitor{policy: policy}
-	var path []parser.Node
-	err = parser.Walk(msv, expr, path)
-	if err != nil {
-		return query, err
-	}
-	newQuery := expr.String()
-	return newQuery, nil
-}
-
-func (policy *Policy) resolveMetric(metricName string, labelMatchers []*labels.Matcher) (string, []*labels.Matcher) {
-	if metricName != "" {
-		metricSub, ok := policy.metricSubMap[metricName]
-		if ok {
-			// Remove metric label if it exists in labelMatchers to prevent double setting the metric name
-			for i, labelMatcher := range labelMatchers {
-				if labelMatcher.Name == "__name__" {
-					labelMatchers = append(labelMatchers[:i], labelMatchers[i+1:]...)
-					break
-				}
-			}
-			return metricSub.metricName, append(labelMatchers, metricSub.labelMatchers...)
-		}
-	}
-
-	return metricName, labelMatchers
-}
-
-type metricSubVisitor struct {
-	policy *Policy
-}
-
-// Visit implements the visitor interface.
-func (msv *metricSubVisitor) Visit(node parser.Node, path []parser.Node) (parser.Visitor, error) {
-	if node == nil {
-		return msv, nil
-	}
-
-	switch n := node.(type) {
-	case *parser.VectorSelector:
-		n.Name, n.LabelMatchers = msv.policy.resolveMetric(n.Name, n.LabelMatchers)
-	case *parser.MatrixSelector:
-		switch v := n.VectorSelector.(type) {
-		case *parser.VectorSelector:
-			v.Name, v.LabelMatchers = msv.policy.resolveMetric(v.Name, v.LabelMatchers)
-		}
-	case *parser.AggregateExpr:
-	case *parser.BinaryExpr:
-	case *parser.Call:
-	case *parser.Expressions:
-	case *parser.NumberLiteral:
-	case *parser.StringLiteral:
-	case *parser.SubqueryExpr:
-	case *parser.ParenExpr:
-	case *parser.UnaryExpr:
-	default:
-		log.Warn().Msgf("Unknown type %T", n)
-	}
-	return msv, nil
 }
 
 // HashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.

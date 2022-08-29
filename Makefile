@@ -15,9 +15,11 @@ go-mod-tidy:
 
 go-test:
 	@echo Running go tests
-	envtest_path=$(make operator-setup_envtest -s)
-	KUBEBUILDER_ASSETS="${envtest_path}" gotestsum --format=pkgname
-	@cd ./pkg/watchdog && go test -v ./...
+	@{ \
+		envtest_path=$(make operator-setup_envtest -s); \
+		KUBEBUILDER_ASSETS="${envtest_path}"; \
+		gotestsum --format=pkgname; \
+	}
 
 go-lint:
 	@echo Linting go code
@@ -31,9 +33,17 @@ go-build-plugins:
 	@echo Building go plugins
 	@./scripts/go_build_plugins.sh
 
+install-asdf-tools:
+	@echo Installing Asdf tools
+	@./scripts/manage_tools.sh setup
+
 install-go-tools:
 	@echo Installing tools from tools.go
 	@./scripts/install_go_tools.sh
+
+install-python-tools:
+	@echo Installing tools from tools.py
+	@pip install -r requirements.txt
 
 go-generate-swagger:
 	@echo Generating swagger code
@@ -43,8 +53,11 @@ go-generate-swagger:
 generate-docs: generate-config-markdown generate-mermaid
 	@echo Generating docs
 
-generate-config-markdown: go-generate-swagger
+generate-config-markdown: go-generate-swagger generate-api
 	@cd ./docs && $(MAKE) generate-config-markdown
+
+generate-libsonnet: generate-config-markdown
+	@cd ./libsonnet && $(MAKE) gen-lib
 
 generate-mermaid:
 	@cd ./docs && $(MAKE) generate-mermaid
@@ -55,10 +68,10 @@ coverage_profile:
 show_coverage_in_browser: profile.coverprofile
 	go tool cover -html profile.coverprofile
 
-all: install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs
+all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs
 	@echo "Done"
 
-.PHONY: install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser
+.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser
 
 #####################################
 ###### OPERATOR section starts ######
