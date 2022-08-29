@@ -89,13 +89,11 @@ install_plugins() {
 		popd >/dev/null
 		asdf reshim golang
 	fi
-	pip install --upgrade pip
-	# install libsonnet requirements regardless of asdf python
-	pip install -r "${git_root}"/libsonnet/requirements.txt
 	if asdf where python &>/dev/null; then
 		printf 'Installing Python tools\n'
-		pip install --quiet loguru
-		pip install --quiet requests
+		pushd "${git_root}" >/dev/null
+		make install-python-tools
+		popd >/dev/null
 		asdf reshim python
 	fi
 }
