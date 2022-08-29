@@ -67,7 +67,10 @@ func newPolicyOptions(
 
 	compWithPortsList := make([]runtime.CompiledComponentAndPorts, len(compiledCircuit))
 	for _, compiledComponent := range compiledCircuit {
-		compWithPortsList = append(compWithPortsList, compiledComponent.CompiledComponentAndPorts)
+		// Skip nil component
+		if compiledComponent.CompiledComponent.Component != nil {
+			compWithPortsList = append(compWithPortsList, compiledComponent.CompiledComponentAndPorts)
+		}
 	}
 
 	// Create circuit
