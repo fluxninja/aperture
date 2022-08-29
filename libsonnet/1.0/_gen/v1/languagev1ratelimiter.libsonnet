@@ -1,0 +1,48 @@
+local languagev1ratelimiterins = import './languagev1ratelimiterins.libsonnet';
+{
+  new():: {
+    in_ports: {
+      limit: error 'Port limit is missing',
+    },
+  },
+  inPorts:: languagev1ratelimiterins,
+  withInPorts(in_ports):: {
+    in_ports: in_ports,
+  },
+  withInPortsMixin(in_ports):: {
+    in_ports+: in_ports,
+  },
+  withLabelKey(label_key):: {
+    label_key: label_key,
+  },
+  withLabelKeyMixin(label_key):: {
+    label_key+: label_key,
+  },
+  withLazySyncConfig(lazy_sync_config):: {
+    lazy_sync_config: lazy_sync_config,
+  },
+  withLazySyncConfigMixin(lazy_sync_config):: {
+    lazy_sync_config+: lazy_sync_config,
+  },
+  withLimitResetInterval(limit_reset_interval):: {
+    limit_reset_interval: limit_reset_interval,
+  },
+  withLimitResetIntervalMixin(limit_reset_interval):: {
+    limit_reset_interval+: limit_reset_interval,
+  },
+  withOverrides(overrides):: {
+    overrides:
+      if std.isArray(overrides)
+      then overrides
+      else [overrides],
+  },
+  withOverridesMixin(overrides):: {
+    overrides+: overrides,
+  },
+  withSelector(selector):: {
+    selector: selector,
+  },
+  withSelectorMixin(selector):: {
+    selector+: selector,
+  },
+}

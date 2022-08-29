@@ -7,7 +7,7 @@ grpcurl 1.8.6
 mockery 2.14.0
 buf 1.7.0
 nodejs 16.14.1
-python 3.10.5
+python 3.10.6
 shellcheck 0.8.0
 yq 4.27.2
 helm 3.9.2
