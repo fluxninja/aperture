@@ -1,0 +1,1433 @@
+consumes:
+- application/json
+produces:
+- application/json
+swagger: "2.0"
+info:
+  description: Policy
+  title: Policy
+basePath: /aperture-controller
+paths:
+  /:
+    post:
+      tags:
+      - policies-configuration
+      operationId: Policy
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1Policy'
+      responses:
+        "200":
+          description: A successful response.
+definitions:
+  MatchExpressionList:
+    description: 'eg. {any: {of: [expr1, expr2]}}.'
+    type: object
+    title: List of MatchExpressions that is used for all/any matching
+    properties:
+      of:
+        description: List of subexpressions of the match expression.
+        type: array
+        items:
+          $ref: '#/definitions/v1MatchExpression'
+        x-order: 0
+  RateLimiterLazySyncConfig:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+        x-go-default: true
+        x-order: 0
+      num_sync:
+        description: Number of times to lazy sync within the limit_reset_interval.
+        type: integer
+        format: int64
+        x-go-default: 5
+        x-go-validate: gt=0
+        x-order: 1
+  RateLimiterOverrideConfig:
+    type: object
+    properties:
+      label_value:
+        type: string
+        x-go-validate: required
+        x-order: 0
+      limit_scale_factor:
+        type: number
+        format: double
+        x-go-default: 1
+        x-order: 1
+  RuleRego:
+    description: High-level extractor-based rules are compiled into a single rego
+      query.
+    type: object
+    title: Raw rego rules are compiled 1:1 to rego queries
+    properties:
+      query:
+        description: |-
+          Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+
+          Note: The module name must match the package name from the "source".
+        type: string
+        x-order: 0
+      source:
+        description: |-
+          Source code of the rego module.
+
+          Note: Must include a "package" declaration.
+        type: string
+        x-order: 1
+  SchedulerWorkload:
+    description: Workload defines a class of requests that preferably have similar
+      properties such as response latency.
+    type: object
+    properties:
+      fairness_key:
+        type: string
+        x-order: 0
+      priority:
+        description: |-
+          Describes priority level of the requests within the workload.
+          Priority level ranges from 0 to 255.
+          Higher numbers means higher priority level.
+        type: integer
+        format: int64
+        x-go-validate: gte=0,lte=255
+        x-order: 1
+      timeout:
+        description: |-
+          Timeout override decides how long a request in the workload can wait for tokens.
+          This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
+        type: string
+        x-go-default: 0.005s
+        x-order: 2
+      tokens:
+        description: |-
+          Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+          This override is applicable only if auto_tokens is set to false.
+        type: string
+        format: uint64
+        x-go-default: 1
+        x-order: 3
+  SchedulerWorkloadAndLabelMatcher:
+    type: object
+    properties:
+      label_matcher:
+        description: Label Matcher to select a Workload.
+        x-order: 0
+        $ref: '#/definitions/v1LabelMatcher'
+      workload:
+        description: Workload associated with requests matching the label matcher.
+        x-order: 1
+        $ref: '#/definitions/SchedulerWorkload'
+  languagev1ConcurrencyLimiter:
+    description: |-
+      Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
+      It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+      Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+    type: object
+    properties:
+      load_shed_actuator:
+        description: Actuator based on load shedding a portion of requests.
+        x-order: 0
+        $ref: '#/definitions/v1LoadShedActuator'
+      scheduler:
+        description: Weighted Fair Queuing based workfload scheduler.
+        x-go-validate: required
+        x-order: 1
+        $ref: '#/definitions/v1Scheduler'
+  languagev1RateLimiter:
+    type: object
+    properties:
+      in_ports:
+        x-go-validate: required
+        x-order: 0
+        $ref: '#/definitions/v1RateLimiterIns'
+      label_key:
+        type: string
+        x-go-validate: required
+        x-order: 1
+      lazy_sync_config:
+        x-order: 2
+        $ref: '#/definitions/RateLimiterLazySyncConfig'
+      limit_reset_interval:
+        type: string
+        x-go-default: 60s
+        x-order: 3
+      overrides:
+        type: array
+        items:
+          $ref: '#/definitions/RateLimiterOverrideConfig'
+        x-order: 4
+      selector:
+        x-go-validate: required
+        x-order: 5
+        $ref: '#/definitions/v1Selector'
+  policylanguagev1FluxMeter:
+    description: |-
+      FluxMeter gathers metrics for the traffic that matches its selector.
+
+      Example of a selector that creates a histogram metric for all HTTP requests
+      to particular service:
+      ```yaml
+      selector:
+        service: myservice.mynamespace.svc.cluster.local
+        control_point:
+          traffic: ingress
+      ```
+    type: object
+    properties:
+      histogram_buckets:
+        description: Latency histogram buckets (in ms) for this FluxMeter.
+        type: array
+        items:
+          type: number
+          format: double
+        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+        x-order: 0
+      selector:
+        description: |-
+          What latency should we measure in the histogram created by this FluxMeter.
+
+          * For traffic control points, fluxmeter will measure the duration of the
+            whole http transaction (including sending request and receiving
+            response).
+          * For feature control points, fluxmeter will measure execution of the span
+            associated with particular feature. What contributes to the span's
+            duration is entirely up to the user code that uses Aperture library.
+        x-order: 1
+        $ref: '#/definitions/v1Selector'
+  v1AddressExtractor:
+    description: |-
+      IP addresses in attribute context are defined as objects with separate ip and port fields.
+      This is a helper to display an address as a single string.
+
+      Note: Use with care, as it might accidentally introduce a high-cardinality flow label values.
+
+      [ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
+
+      Example:
+      ```yaml
+      from: "source.address # or dstination.address"
+      ```
+    type: object
+    title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
+    properties:
+      from:
+        description: Attribute path pointing to some string - eg. "source.address".
+        type: string
+        x-go-validate: required
+        x-order: 0
+  v1ArithmeticCombinator:
+    description: Type of combinator that computes the arithmetic operation on the
+      operand signals.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Arithmetic Combinator component.
+        x-order: 0
+        $ref: '#/definitions/v1ArithmeticCombinatorIns'
+      operator:
+        description: |-
+          Operator of the arithmetic operation.
+
+          The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
+          In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
+        type: string
+        x-go-validate: oneof=add sub mul div xor lshift rshift
+        x-order: 1
+      out_ports:
+        description: Output ports for the Arithmetic Combinator component.
+        x-order: 2
+        $ref: '#/definitions/v1ArithmeticCombinatorOuts'
+  v1ArithmeticCombinatorIns:
+    description: Inputs for the Arithmetic Combinator component.
+    type: object
+    properties:
+      lhs:
+        description: Left hand side of the arithmetic operation.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+      rhs:
+        description: Right hand side of the arithmetic operation.
+        x-order: 1
+        $ref: '#/definitions/v1Port'
+  v1ArithmeticCombinatorOuts:
+    description: Outputs for the Arithmetic Combinator component.
+    type: object
+    properties:
+      output:
+        description: Result of arithmetic operation.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1Circuit:
+    description: |-
+      Circuit is defined as a dataflow graph of inter-connected components.
+
+      Signals flow between components via ports.
+      As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
+      Circuit evaluated periodically in order to respond to changes in signal readings.
+
+      :::info
+      **Signal**
+
+      Signals are floating-point values.
+
+      A signal also have a special **Invalid** value. It's usually used to
+      communicate that signal doesn't have a meaningful value at the moment, eg.
+      [PromQL](#-v1promql) emits such a value if it cannot execute a query.
+      Components know when their input signals are invalid and can act
+      accordingly. They can either propagate the invalidness, by making their
+      output itself invalid (like eg.
+      [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
+      logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+      docs on how exactly it handles invalid inputs.
+      :::
+    type: object
+    properties:
+      components:
+        description: Defines a signal processing graph as a list of components.
+        type: array
+        items:
+          $ref: '#/definitions/v1Component'
+        x-order: 0
+      evaluation_interval:
+        description: |-
+          Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+          This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
+        type: string
+        x-go-default: 0.5s
+        x-order: 1
+  v1Classifier:
+    description: |-
+      Example:
+      ```yaml
+      selector:
+        service: service1.default.svc.cluster.local
+        control_point:
+          traffic: ingress
+      rules:
+        user:
+          extractor:
+            from: request.http.headers.user
+      ```
+    type: object
+    title: Set of classification rules sharing a common selector
+    properties:
+      rules:
+        description: A map of {key, value} pairs mapping from flow label names to
+          rules that define how to extract and propagate them.
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Rule'
+        x-order: 0
+      selector:
+        description: Defines where to apply the flow classification rule.
+        x-order: 1
+        $ref: '#/definitions/v1Selector'
+  v1Component:
+    description: |-
+      Signals flow into the components via input ports and results are emitted on output ports.
+      Components are wired to each other based on signal names forming an execution graph of the circuit.
+
+      :::note
+      Loops are broken by the runtime at the earliest component index that is part of the loop.
+      The looped signals are saved in the tick they are generated and served in the subsequent tick.
+      :::
+
+      There are three categories of components:
+      * "source" components – they take some sort of input from "the real world" and output
+        a signal based on this input. Example: [PromQL](#-v1promql). In the UI
+        they're represented by green color.
+      * internal components – "pure" components that don't interact with the "real world".
+        Examples: [GradientController](#-v1gradientcontroller), [Max](#-v1max).
+        :::note
+        Internal components's output can depend on their internal state, in addition to the inputs.
+        Eg. see the [Exponential Moving Average filter](#-v1ema).
+        :::
+      * "sink" components – they affect the real world.
+        [Scheduler](#-v1scheduler) and [RateLimiter](#-languagev1ratelimiter).
+        Also sometimes called _actuators_. In the UI, represented by orange color.
+        Sink components are usually also "sources" too, they usually emit a
+        feedback signal, like `accepted_concurrency` in case of ConcurrencyLimiter.
+
+      :::tip
+      Sometimes you may want to use a constant value as one of component's inputs.
+      You can use the [Constant](#-constant) component for this.
+      :::
+
+      See also [Policy](#-v1policy) for a higher-level explanation of circuits.
+    type: object
+    title: Computational block that form the circuit
+    properties:
+      arithmetic_combinator:
+        description: Applies the given operator on input operands (signals) and emits
+          the result.
+        x-order: 0
+        $ref: '#/definitions/v1ArithmeticCombinator'
+      concurrency_limiter:
+        description: Concurrency Limiter provides service protection by applying prioritized
+          load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+        x-order: 1
+        $ref: '#/definitions/languagev1ConcurrencyLimiter'
+      constant:
+        description: Emits a constant signal.
+        x-order: 2
+        $ref: '#/definitions/v1Constant'
+      decider:
+        description: Decider acts as a switch that emits one of the two signals based
+          on the binary result of comparison operator on two operands.
+        x-order: 3
+        $ref: '#/definitions/v1Decider'
+      ema:
+        description: Exponential Moving Average filter.
+        x-order: 4
+        $ref: '#/definitions/v1EMA'
+      extrapolator:
+        description: Takes an input signal and emits the extrapolated value; either
+          mirroring the input value or repeating the last known value up to the maximum
+          extrapolation interval.
+        x-order: 5
+        $ref: '#/definitions/v1Extrapolator'
+      gradient_controller:
+        description: |-
+          Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+          This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
+        x-order: 6
+        $ref: '#/definitions/v1GradientController'
+      max:
+        description: Emits the maximum of the input siganls.
+        x-order: 7
+        $ref: '#/definitions/v1Max'
+      min:
+        description: Emits the minimum of the input signals.
+        x-order: 8
+        $ref: '#/definitions/v1Min'
+      promql:
+        description: Periodically runs a Prometheus query in the background and emits
+          the result.
+        x-order: 9
+        $ref: '#/definitions/v1PromQL'
+      rate_limiter:
+        description: Rate Limiter provides service protection by applying rate limiter.
+        x-order: 10
+        $ref: '#/definitions/languagev1RateLimiter'
+      sqrt:
+        description: Takes an input signal and emits the square root of the input
+          signal.
+        x-order: 11
+        $ref: '#/definitions/v1Sqrt'
+  v1Constant:
+    description: Component that emits a constant value as an output signal.
+    type: object
+    properties:
+      out_ports:
+        description: Output ports for the Constant component.
+        x-order: 0
+        $ref: '#/definitions/v1ConstantOuts'
+      value:
+        description: The constant value to be emitted.
+        type: number
+        format: double
+        x-order: 1
+  v1ConstantOuts:
+    description: Outputs for the Constant component.
+    type: object
+    properties:
+      output:
+        description: The constant value is emitted to the output port.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1ControlPoint:
+    description: |-
+      Identifies control point within a service that the rule or policy should apply to.
+      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
+    type: object
+    properties:
+      feature:
+        description: |-
+          Name of FlunxNinja library's feature.
+          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
+
+          Note: Flowcontrol only.
+        type: string
+        x-go-validate: required
+        x-order: 0
+      traffic:
+        description: |-
+          Type of traffic service, either "ingress" or "egress".
+          Apply the policy to the whole incoming/outgoing traffic of a service.
+          Usually powered by integration with a proxy (like envoy) or a web framework.
+
+          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
+          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
+        type: string
+        x-go-validate: required,oneof=ingress egress
+        x-order: 1
+  v1Decider:
+    description: |-
+      Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison.
+
+      The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
+
+      This component also supports time-based response, i.e. the output
+      transitions between on_true or on_false signal if the decider condition is
+      true or false for at least "positive_for" or "negative_for" duration. If
+      `true_for` and `false_for` durations are zero then the transitions are
+      instantaneous.
+    type: object
+    properties:
+      false_for:
+        description: |-
+          Duration of time to wait before a transition to false state.
+          If the duration is zero, the transition will happen instantaneously.
+        type: string
+        x-go-default: 0s
+        x-order: 0
+      in_ports:
+        description: Input ports for the Decider component.
+        x-order: 1
+        $ref: '#/definitions/v1DeciderIns'
+      operator:
+        description: Comparison operator that computes operation on lhs and rhs input
+          signals.
+        type: string
+        x-go-validate: oneof=gt lt gte lte eq neq
+        x-order: 2
+      out_ports:
+        description: Output ports for the Decider component.
+        x-order: 3
+        $ref: '#/definitions/v1DeciderOuts'
+      true_for:
+        description: |-
+          Duration of time to wait before a transition to true state.
+          If the duration is zero, the transition will happen instantaneously.
+        type: string
+        x-go-default: 0s
+        x-order: 4
+  v1DeciderIns:
+    description: Inputs for the Decider component.
+    type: object
+    properties:
+      lhs:
+        description: Left hand side input signal for the comparison operation.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+      on_false:
+        description: Output signal when the result of the operation is false.
+        x-order: 1
+        $ref: '#/definitions/v1Port'
+      on_true:
+        description: Output signal when the result of the operation is true.
+        x-order: 2
+        $ref: '#/definitions/v1Port'
+      rhs:
+        description: Right hand side input signal for the comparison operation.
+        x-order: 3
+        $ref: '#/definitions/v1Port'
+  v1DeciderOuts:
+    description: Outputs for the Decider component.
+    type: object
+    properties:
+      output:
+        description: Selected signal (on_true or on_false).
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1EMA:
+    description: |-
+      At any time EMA component operates in one of the following states:
+      1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
+         If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+      2. Normal state: The EMA is computed using following formula.
+
+      The EMA for a series $Y$ is calculated recursively as:
+
+      $$
+      \text{EMA} _t =
+      \begin{cases}
+        Y_0, &\text{for } t = 0 \\
+        \alpha Y_t + (1 - \alpha) \text{EMA} _{t-1}, &\text{for }t > 0
+      \end{cases}
+      $$
+
+      The coefficient $\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.
+      A higher $\alpha$ discounts older observations faster.
+      The $\alpha$ is computed using ema\_window:
+
+      $$
+      \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
+      $$
+
+      The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#-v1emains).
+    type: object
+    title: Exponential Moving Average (EMA) is a type of moving average that applies
+      exponenially more weight to recent signal readings
+    properties:
+      correction_factor_on_max_envelope_violation:
+        description: Correction factor to apply on the output value if its in violation
+          of the max envelope.
+        type: number
+        format: double
+        x-go-default: 1
+        x-go-validate: gte=0,lte=1.0
+        x-order: 0
+      correction_factor_on_min_envelope_violation:
+        description: Correction factor to apply on the output value if its in violation
+          of the min envelope.
+        type: number
+        format: double
+        x-go-default: 1
+        x-go-validate: gte=1.0
+        x-order: 1
+      ema_window:
+        description: Duration of EMA sampling window.
+        type: string
+        x-go-default: 5s
+        x-order: 2
+      in_ports:
+        description: Input ports for the EMA component.
+        x-order: 3
+        $ref: '#/definitions/v1EMAIns'
+      out_ports:
+        description: Output ports for the EMA component.
+        x-order: 4
+        $ref: '#/definitions/v1EMAOuts'
+      warm_up_window:
+        description: |-
+          Duration of EMA warming up window.
+
+          The initial value of the EMA is the average of signal readings received during the warm up window.
+        type: string
+        x-go-default: 0s
+        x-order: 5
+  v1EMAIns:
+    description: Inputs for the EMA component.
+    type: object
+    properties:
+      input:
+        description: Input signal to be used for the EMA computation.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+      max_envelope:
+        description: |-
+          Upper bound of the moving average.
+
+          Used during the warm-up stage: if the signal would exceed `max_envelope`
+          it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+
+          :::note
+          If the signal deviates from `max_envelope` faster than the correction
+          faster, it might end up exceeding the envelope.
+          :::
+
+          :::note
+          The envelope logic is **not** used outside the warm-up stage!
+          :::
+        x-order: 1
+        $ref: '#/definitions/v1Port'
+      min_envelope:
+        description: |-
+          Lower bound of the moving average.
+
+          Used during the warm-up stage analoguously to `max_envelope`.
+        x-order: 2
+        $ref: '#/definitions/v1Port'
+  v1EMAOuts:
+    description: Outputs for the EMA component.
+    type: object
+    properties:
+      output:
+        description: Exponential moving average of the series of reading as an output
+          signal.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1EqualsMatchExpression:
+    description: Label selector expression of the equal form "label == value".
+    type: object
+    properties:
+      label:
+        description: Name of the label to equal match the value.
+        type: string
+        x-go-validate: required
+        x-order: 0
+      value:
+        description: Exact value that the label should be equal to.
+        type: string
+        x-order: 1
+  v1Extractor:
+    description: |-
+      There are multiple variants of extractor, specify exactly one:
+      - JSON Extractor
+      - Address Extractor
+      - JWT Extractor
+    type: object
+    title: Defines a high-level way to specify how to extract a flow label given http
+      request metadata, without a need to write rego code
+    properties:
+      address:
+        description: Display an address as a single string - `<ip>:<port>`.
+        x-order: 0
+        $ref: '#/definitions/v1AddressExtractor'
+      from:
+        description: |-
+          Attribute path is a dot-separated path to attribute.
+
+          Should be either:
+          * one of the fields of [Attribute Context][attribute-context], or
+          * a special "request.http.bearer" pseudo-attribute.
+          Eg. "request.http.method" or "request.http.header.user-agent"
+
+          Note: The same attribute path syntax is shared by other extractor variants,
+          wherever attribute path is needed in their "from" syntax.
+
+          Example:
+          ```yaml
+          from: request.http.headers.user-agent
+          ```
+          [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto"
+        type: string
+        title: Use an attribute with no convertion
+        x-order: 1
+      json:
+        description: Deserialize a json, and extract one of the fields.
+        x-order: 2
+        $ref: '#/definitions/v1JSONExtractor'
+      jwt:
+        description: Parse the attribute as JWT and read the payload.
+        x-order: 3
+        $ref: '#/definitions/v1JWTExtractor'
+      path_templates:
+        description: Match HTTP Path to given path templates.
+        x-order: 4
+        $ref: '#/definitions/v1PathTemplateMatcher'
+  v1Extrapolator:
+    description: |-
+      Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
+      It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Extrapolator component.
+        x-order: 0
+        $ref: '#/definitions/v1ExtrapolatorIns'
+      max_extrapolation_interval:
+        description: Maximum time interval to repeat the last valid value of input
+          signal.
+        type: string
+        x-go-default: 10s
+        x-order: 1
+      out_ports:
+        description: Output ports for the Extrapolator component.
+        x-order: 2
+        $ref: '#/definitions/v1ExtrapolatorOuts'
+  v1ExtrapolatorIns:
+    description: Inputs for the Extrapolator component.
+    type: object
+    properties:
+      input:
+        description: Input signal for the Extrapolator component.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1ExtrapolatorOuts:
+    description: Outputs for the Extrapolator component.
+    type: object
+    properties:
+      output:
+        description: Extrapolated signal.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1GradientController:
+    description: |-
+      Gradient controller is a type of controller which tries to adjust the
+      control variable proportionally to the relative difference between setpoint
+      and actual value of the signal.
+
+      The `gradient` describes a corrective factor that should be applied to the
+      control variable to get the signal closer to the setpoint. It is computed as follows:
+
+      $$
+      \text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}
+      $$
+
+      `gradient` is then clamped to [min_gradient, max_gradient] range.
+
+      The output of gradient controller is computed as follows:
+      $$
+      \text{output} = \text{gradient}_{\text{clamped}} \cdot \text{control\_variable} + \text{optimize}.
+      $$
+
+      Note the additional `optimize` signal, that can be used to "nudge" the
+      controller into desired idle state.
+
+      The output can be _optionally_ clamped to desired range using `max` and
+      `min` input.
+
+      :::caution
+      Some changes are expected in the near future:
+      [#182](https://github.com/fluxninja/aperture/issues/182)
+      :::
+    type: object
+    properties:
+      in_ports:
+        description: Input ports of the Gradient Controller.
+        x-order: 0
+        $ref: '#/definitions/v1GradientControllerIns'
+      max_gradient:
+        description: Maximum gradient which clamps the computed gradient value to
+          the range, [min_gradient, max_gradient].
+        type: number
+        format: double
+        x-go-default: 1.7976931348623157e+308
+        x-order: 1
+      min_gradient:
+        description: Minimum gradient which clamps the computed gradient value to
+          the range, [min_gradient, max_gradient].
+        type: number
+        format: double
+        x-go-default: -1.7976931348623157e+308
+        x-order: 2
+      out_ports:
+        description: Output ports of the Gradient Controller.
+        x-order: 3
+        $ref: '#/definitions/v1GradientControllerOuts'
+      tolerance:
+        description: |-
+          Tolerance is a way to pre-multiply a setpoint by given value.
+
+          Value of tolerance should be close or equal to 1, eg. 1.1.
+
+          :::caution
+          [This is going to be deprecated](https://github.com/fluxninja/aperture/issues/182).
+          :::
+        type: number
+        format: double
+        x-go-validate: gte=0.0
+        x-order: 4
+  v1GradientControllerIns:
+    description: Inputs for the Gradient Controller component.
+    type: object
+    properties:
+      control_variable:
+        description: |-
+          Actual current value of the control variable.
+
+          This signal is multiplied by the gradient to produce the output.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+      max:
+        description: Maximum value to limit the output signal.
+        x-order: 1
+        $ref: '#/definitions/v1Port'
+      min:
+        description: Minimum value to limit the output signal.
+        x-order: 2
+        $ref: '#/definitions/v1Port'
+      optimize:
+        description: Optimize signal is added to the output of the gradient calculation.
+        x-order: 3
+        $ref: '#/definitions/v1Port'
+      setpoint:
+        description: Setpoint to be used for the gradient computation.
+        x-order: 4
+        $ref: '#/definitions/v1Port'
+      signal:
+        description: Signal to be used for the gradient computation.
+        x-order: 5
+        $ref: '#/definitions/v1Port'
+  v1GradientControllerOuts:
+    description: Outputs for the Gradient Controller component.
+    type: object
+    properties:
+      output:
+        description: Computed desired value of the control variable.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1JSONExtractor:
+    description: |-
+      Example:
+      ```yaml
+      from: request.http.body
+      pointer: /user/name
+      ```
+    type: object
+    title: Deserialize a json, and extract one of the fields
+    properties:
+      from:
+        description: Attribute path pointing to some strings - eg. "request.http.body".
+        type: string
+        x-go-validate: required
+        x-order: 0
+      pointer:
+        description: |-
+          Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
+
+          Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+          eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+        type: string
+        x-order: 1
+  v1JWTExtractor:
+    description: |-
+      Specify a field to be extracted from payload using "json_pointer".
+
+      Note: The signature is not verified against the secret (we're assuming there's some
+      other parts of the system that handles such verification).
+
+      Example:
+      ```yaml
+      from: request.http.bearer
+      json_pointer: /user/email
+      ```
+    type: object
+    title: Parse the attribute as JWT and read the payload
+    properties:
+      from:
+        description: Jwt token can be pulled from any input attribute, but most likely
+          you'd want to use "request.http.bearer".
+        type: string
+        x-go-validate: required
+        x-order: 0
+      json_pointer:
+        description: |-
+          Json pointer allowing to select a specified field from the json payload.
+
+          Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+          eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+        type: string
+        x-order: 1
+  v1K8sLabelMatcherRequirement:
+    description: Label selector requirement which is a selector that contains values,
+      a key, and an operator that relates the key and values.
+    type: object
+    properties:
+      key:
+        description: Label key that the selector applies to.
+        type: string
+        x-go-validate: required
+        x-order: 0
+      operator:
+        description: |-
+          Logical operator which represents a key's relationship to a set of values.
+          Valid operators are In, NotIn, Exists and DoesNotExist.
+        type: string
+        x-go-validate: oneof=In NotIn Exists DoesNotExists
+        x-order: 1
+      values:
+        description: |-
+          An array of string values that relates to the key by an operator.
+          If the operator is In or NotIn, the values array must be non-empty.
+          If the operator is Exists or DoesNotExist, the values array must be empty.
+        type: array
+        items:
+          type: string
+        x-order: 2
+  v1LabelMatcher:
+    description: |-
+      It provides three ways to define requirements:
+      - matchLabels
+      - matchExpressions
+      - arbitrary expression
+
+      If multiple requirements are set, they are all ANDed.
+      An empty label matcher always matches.
+    type: object
+    title: Allows to define rules whether a map of labels should be considered a match
+      or not
+    properties:
+      expression:
+        description: An arbitrary expression to be evaluated on the labels.
+        x-order: 0
+        $ref: '#/definitions/v1MatchExpression'
+      match_expressions:
+        description: |-
+          List of k8s-style label matcher requirements.
+
+          Note: The requirements are ANDed.
+        type: array
+        items:
+          $ref: '#/definitions/v1K8sLabelMatcherRequirement'
+        x-order: 1
+      match_labels:
+        description: |-
+          A map of {key,value} pairs representing labels to be matched.
+          A single {key,value} in the matchLabels requires that the label "key" is present and equal to "value".
+
+          Note: The requirements are ANDed.
+        type: object
+        additionalProperties:
+          type: string
+        x-order: 2
+  v1LoadShedActuator:
+    description: Takes the load shed factor input signal and publishes it to the schedulers
+      in the data-plane.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Load Shed Actuator component.
+        x-order: 0
+        $ref: '#/definitions/v1LoadShedActuatorIns'
+  v1LoadShedActuatorIns:
+    description: Input for the Load Shed Actuator component.
+    type: object
+    properties:
+      load_shed_factor:
+        description: Load shedding factor is a fraction of incoming concurrency (tokens
+          \* requests) that needs to be dropped.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1MatchExpression:
+    description: |-
+      MatchExpression has multiple variants, exactly one should be set.
+
+      Example:
+      ```yaml
+      all:
+        of:
+          - label_exists: foo
+          - label_equals: { label = app, value = frobnicator }
+      ```
+    type: object
+    title: Defines a [map<string, string> → bool] expression to be evaluated on labels
+    properties:
+      all:
+        description: The expression is true when all subexpressions are true.
+        x-order: 0
+        $ref: '#/definitions/MatchExpressionList'
+      any:
+        description: The expression is true when any subexpression is true.
+        x-order: 1
+        $ref: '#/definitions/MatchExpressionList'
+      label_equals:
+        description: The expression is true when label value equals given value.
+        x-order: 2
+        $ref: '#/definitions/v1EqualsMatchExpression'
+      label_exists:
+        description: The expression is true when label with given name exists.
+        type: string
+        x-go-validate: required
+        x-order: 3
+      label_matches:
+        description: The expression is true when label matches given regex.
+        x-order: 4
+        $ref: '#/definitions/v1MatchesMatchExpression'
+      not:
+        description: The expression negates the result of subexpression.
+        x-order: 5
+        $ref: '#/definitions/v1MatchExpression'
+  v1MatchesMatchExpression:
+    description: Label selector expression of the matches form "label matches regex".
+    type: object
+    properties:
+      label:
+        description: Name of the label to match the regular expression.
+        type: string
+        x-go-validate: required
+        x-order: 0
+      regex:
+        description: |-
+          Regular expression that should match the label value.
+          It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+        type: string
+        x-go-validate: required
+        x-order: 1
+  v1Max:
+    description: |-
+      Takes a list of input signals and emits the signal with the maximum value.
+      Max: output = max([]inputs).
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Max component.
+        x-order: 0
+        $ref: '#/definitions/v1MaxIns'
+      out_ports:
+        description: Output ports for the Max component.
+        x-order: 1
+        $ref: '#/definitions/v1MaxOuts'
+  v1MaxIns:
+    description: Inputs for the Max component.
+    type: object
+    properties:
+      inputs:
+        description: Array of input signals.
+        type: array
+        items:
+          $ref: '#/definitions/v1Port'
+        x-order: 0
+  v1MaxOuts:
+    description: Output for the Max component.
+    type: object
+    properties:
+      output:
+        description: Signal with maximum value as an output signal.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1Min:
+    description: |-
+      Takes an array of input signals and emits the signal with the minimum value.
+      Min: output = min([]inputs).
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Min component.
+        x-order: 0
+        $ref: '#/definitions/v1MinIns'
+      out_ports:
+        description: Output ports for the Min component.
+        x-order: 1
+        $ref: '#/definitions/v1MinOuts'
+  v1MinIns:
+    description: Inputs for the Min component.
+    type: object
+    properties:
+      inputs:
+        description: Array of input signals.
+        type: array
+        items:
+          $ref: '#/definitions/v1Port'
+        x-order: 0
+  v1MinOuts:
+    description: Output ports for the Min component.
+    type: object
+    properties:
+      output:
+        description: Signal with minimum value as an output signal.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1PathTemplateMatcher:
+    description: |-
+      HTTP path will be matched against given path templates.
+      If a match occurs, the value associated with the path template will be treated as a result.
+      In case of multiple path templates matching, the most specific one will be chosen.
+    type: object
+    title: Matches HTTP Path to given path templates
+    properties:
+      template_values:
+        description: |-
+          Template value keys are OpenAPI-inspired path templates.
+
+          * Static path segment `/foo` matches a path segment exactly
+          * `/{param}` matches arbitrary path segment.
+            (The param name is ignored and can be omitted (`{}`))
+          * The parameter must cover whole segment.
+          * Additionally, path template can end with `/*` wildcard to match
+            arbitrary number of trailing segments (0 or more).
+          * Multiple consecutive `/` are ignored, as well as trailing `/`.
+          * Parametrized path segments must come after static segments.
+          * `*`, if present, must come last.
+          * Most specific template "wins" (`/foo` over `/{}` and `/{}` over `/*`).
+
+          See also <https://swagger.io/specification/#path-templating-matching>
+
+          Example:
+          ```yaml
+          /register: register
+          "/user/{userId}": user
+          /static/*: other
+          ```
+        type: object
+        additionalProperties:
+          type: string
+        x-order: 0
+  v1Policy:
+    description: |-
+      Policy expresses reliability automation workflow that automatically protects services.
+
+      Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
+    type: object
+    properties:
+      circuit:
+        description: Defines the control-loop logic of the policy.
+        x-order: 0
+        $ref: '#/definitions/v1Circuit'
+      resources:
+        description: Resources (FluxMeters, Classifiers etc.) to setup.
+        x-order: 1
+        $ref: '#/definitions/v1Resources'
+  v1Port:
+    description: Components are interconnected with each other via Ports.
+    type: object
+    properties:
+      signal_name:
+        description: Name of the incoming or outgoing Signal on the Port.
+        type: string
+        x-order: 0
+  v1PromQL:
+    description: Component that runs a Prometheus query periodically and returns the
+      result as an output signal.
+    type: object
+    properties:
+      evaluation_interval:
+        description: Describes the interval between successive evaluations of the
+          Prometheus query.
+        type: string
+        x-go-default: 10s
+        x-order: 0
+      out_ports:
+        description: Output ports for the PromQL component.
+        x-order: 1
+        $ref: '#/definitions/v1PromQLOuts'
+      query_string:
+        description: |-
+          Describes the Prometheus query to be run.
+
+          :::caution
+          TODO we should describe how to construct the query, eg. how to employ the
+          fluxmeters here or link to appropriate place in docs.
+          :::
+        type: string
+        x-order: 2
+  v1PromQLOuts:
+    description: Output for the PromQL component.
+    type: object
+    properties:
+      output:
+        description: The result of the Prometheus query as an output signal.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1RateLimiterIns:
+    type: object
+    properties:
+      limit:
+        description: negative limit means no limit is applied.
+        x-go-default: -1
+        x-go-validate: required
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1Resources:
+    description: |-
+      Resources that need to be setup for the policy to function.
+
+      Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+    type: object
+    properties:
+      classifiers:
+        description: |-
+          Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+
+          The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
+        type: array
+        items:
+          $ref: '#/definitions/v1Classifier'
+        x-order: 0
+      flux_meters:
+        description: |-
+          FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+
+          FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/policylanguagev1FluxMeter'
+        x-order: 1
+  v1Rule:
+    description: |-
+      Flow classification rule extracts a value from request metadata.
+      More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
+      See <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.
+      There are two ways to define a flow classification rule:
+      * Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.
+      * Rego expression.
+
+      Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
+      [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
+
+      Example:
+      ```yaml
+      Example of Declarative JSON extractor:
+        yaml:
+          extractor:
+            json:
+              from: request.http.body
+              pointer: /user/name
+          propagate: true
+          hidden: false
+      Example of Rego module:
+        yaml:
+          rego:
+            query: data.user_from_cookie.user
+            source:
+              package: user_from_cookie
+              cookies: "split(input.attributes.request.http.headers.cookie, ';')"
+              cookie: "cookies[_]"
+              cookie.startswith: "('session=')"
+              session: "substring(cookie, count('session='), -1)"
+              parts: "split(session, '.')"
+              object: "json.unmarshal(base64url.decode(parts[0]))"
+              user: object.user
+          propagate: false
+          hidden: true
+      ```
+    type: object
+    title: Rule describes a single Flow Classification Rule
+    properties:
+      extractor:
+        description: |-
+          High-level flow label declarative extractor.
+          Rego extractor extracts a value from the rego module.
+        x-order: 0
+        $ref: '#/definitions/v1Extractor'
+      hidden:
+        description: Decides if the created flow label should be hidden from the telemetry.
+        type: boolean
+        x-order: 1
+      propagate:
+        description: Decides if the created label should be applied to the whole flow
+          (propagated in baggage) (default=true).
+        type: boolean
+        x-order: 2
+      rego:
+        description: Rego module to extract a value from the rego module.
+        x-order: 3
+        $ref: '#/definitions/RuleRego'
+  v1Scheduler:
+    description: Weighted Fair Queuing based workload scheduler.
+    type: object
+    properties:
+      auto_tokens:
+        type: boolean
+        x-go-default: "true"
+        x-order: 0
+      default_workload:
+        x-order: 1
+        $ref: '#/definitions/SchedulerWorkload'
+      out_ports:
+        description: Output ports for the Scheduler component.
+        x-order: 2
+        $ref: '#/definitions/v1SchedulerOuts'
+      selector:
+        description: Selector decides for which service or flows the scheduler will
+          be applied.
+        x-order: 3
+        $ref: '#/definitions/v1Selector'
+      workloads:
+        type: array
+        title: |-
+          list of workloads
+          workload can describe priority, tokens (if auto_tokens are set to false) and timeout
+        items:
+          $ref: '#/definitions/SchedulerWorkloadAndLabelMatcher'
+        x-order: 4
+  v1SchedulerOuts:
+    description: Output for the Scheduler component.
+    type: object
+    properties:
+      accepted_concurrency:
+        description: Accepted concurrency is the number of accepted tokens/sec.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+      incoming_concurrency:
+        description: Incoming concurrency is the number of incoming tokens/sec.
+        x-order: 1
+        $ref: '#/definitions/v1Port'
+  v1Selector:
+    description: |-
+      Example:
+      ```yaml
+      selector:
+        service: service1.default.svc.cluster.local
+        control_point:
+          traffic: ingress # Allowed values are `ingress` and `egress`.
+        label_matcher:
+          match_labels:
+            user_tier: gold
+          match_expressions:
+            - key: query
+              operator: In
+              values:
+                - insert
+                - delete
+            - label: user_agent
+              regex: ^(?!.*Chrome).*Safari
+      ```
+    type: object
+    title: Describes where a rule or actuation component should apply to
+    properties:
+      agent_group:
+        description: Describes where this selector applies to.
+        type: string
+        x-go-default: default
+        x-order: 0
+      control_point:
+        description: Describes control point within the entity where the policy should
+          apply to.
+        x-go-validate: required
+        x-order: 1
+        $ref: '#/definitions/v1ControlPoint'
+      label_matcher:
+        description: |-
+          This matcher allows to match on flow labels and request labels.
+          (Note: For classification we can only match flow labels that were created at
+          some **previous** control point).
+
+          Flow labels are available with the same label key as defined in
+          classification rule.
+
+          Request labels are always prefixed with `request_`. Available request
+          labels are `id` (available as `request_id`), `method`, `path`, `host`,
+          `scheme`, `size`, `protocol` (mapped from fields of
+          [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
+          Also, (non-pseudo) headers are available as `request_header_<headername>`, where
+          `<headername>` is a headername normalised to lowercase, eg. `request_header_user-agent`.
+
+          Note: Request headers are only available for `traffic` control points.
+        title: |-
+          Label matcher allows to add _additional_ condition on labels that must
+          also be satisfied (in addition to service+control point matching)
+        x-order: 2
+        $ref: '#/definitions/v1LabelMatcher'
+      service:
+        description: |-
+          The service (name) of the entities.
+          In k8s, this is the FQDN of the Service object.
+
+          Note: Entity may belong to multiple services.
+        type: string
+        x-order: 3
+  v1Sqrt:
+    description: |-
+      Takes an input signal and emits the square root of it multiplied by scale as an output.
+
+      $$
+      \text{output} = \text{scale} \sqrt{\text{input}}
+      $$
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Sqrt component.
+        x-order: 0
+        $ref: '#/definitions/v1SqrtIns'
+      out_ports:
+        description: Output ports for the Sqrt component.
+        x-order: 1
+        $ref: '#/definitions/v1SqrtOuts'
+      scale:
+        description: Scaling factor to be multiplied with the square root of the input
+          signal.
+        type: number
+        format: double
+        x-go-default: 1
+        x-order: 2
+  v1SqrtIns:
+    description: Inputs for the Sqrt component.
+    type: object
+    properties:
+      input:
+        description: Input signal.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1SqrtOuts:
+    description: Outputs for the Sqrt component.
+    type: object
+    properties:
+      output:
+        description: Output signal.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+tags:
+- name: PolicyService
+- name: InfoService
+- name: StatusService
+- name: FlowControlService
+- name: FluxNinjaService

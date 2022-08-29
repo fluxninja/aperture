@@ -1,4 +1,4 @@
-# Aperture Controller Configuration Reference
+# Policy Configuration Reference
 
 ## Table of contents
 
@@ -92,7 +92,7 @@ Resources are typic…
 
 <dl>
 
-<dt></dt>
+<dt>body</dt>
 <dd>
 
 Type: [V1Policy](#v1-policy)

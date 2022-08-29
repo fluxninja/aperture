@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd ./api && make buf-generate
+pushd ./api >/dev/null
+make buf-generate
+popd >/dev/null

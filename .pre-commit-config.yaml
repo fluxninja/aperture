@@ -7,12 +7,12 @@ repos:
   - repo: local
     hooks:
       - id: proto
-        name: "Proto"
+        name: "proto and libsonnet"
         entry: "./scripts/precommit/generate_api.sh"
         language: script
         files: '\.proto$'
         pass_filenames: false
-        description: "Protobuf generation"
+        description: "protobuf and libsonnet generation"
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.2.0
     hooks:
@@ -100,3 +100,11 @@ repos:
           - jsonnet
           - json
           - yaml
+      - id: tanka-fmt
+        name: "Tanka fmt"
+        language: system
+        entry: tk
+        args:
+          - fmt
+        types:
+          - jsonnet

@@ -6,3 +6,7 @@ set -euo pipefail
 # https://github.com/fluxninja/aperture/issues/126
 # Regenerating svgs needs to be done manually via `make generate-mermaid`.
 make generate-config-markdown
+
+pushd ./libsonnet >/dev/null
+make gen-lib
+popd >/dev/null
