@@ -7,12 +7,12 @@ repos:
   - repo: local
     hooks:
       - id: proto
-        name: "proto and libsonnet"
+        name: "Proto"
         entry: "./scripts/precommit/generate_api.sh"
         language: script
         files: '\.proto$'
         pass_filenames: false
-        description: "protobuf and libsonnet generation"
+        description: "Protobuf generation"
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.2.0
     hooks:
@@ -90,6 +90,13 @@ repos:
         exclude: ^ops/.*
         pass_filenames: false
         description: "Generate docs"
+      - id: generate-libsonnet
+        name: "libsonnet"
+        entry: "./scripts/precommit/generate_libsonnet.sh"
+        language: script
+        files: '\.proto$'
+        pass_filenames: false
+        description: "Generate Aperture libsonnet"
       - id: tanka-show
         name: "Check tanka parses jsonnet"
         language: script
