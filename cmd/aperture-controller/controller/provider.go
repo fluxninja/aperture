@@ -10,7 +10,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -79,7 +78,7 @@ func setupClassifiersNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client
 		rulesetReg := status.NewRegistry(statusRegistry, rulesetKey)
 		reg := status.NewRegistry(rulesetReg, key.String())
 
-		classifierMsg := &classificationv1.Classifier{}
+		classifierMsg := &policylangv1.Classifier{}
 
 		updateStatus := func() {
 			if etype == notifiers.Remove {
