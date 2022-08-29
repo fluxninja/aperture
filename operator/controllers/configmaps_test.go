@@ -21,6 +21,7 @@ import (
 	_ "embed"
 	"fmt"
 	"text/template"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -47,47 +48,55 @@ var controllerConfigWithFluxNinjaPluginTest string
 var _ = Describe("ConfigMap for Agent", func() {
 	Context("Instance with FluxNinja plugin enabled", func() {
 		It("returns correct ConfigMap", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-						Enabled:            true,
-						Endpoint:           test,
-						HeartbeatsInterval: "10s",
-						TLS: v1alpha1.TLSSpec{
-							Insecure:           true,
-							InsecureSkipVerify: true,
-							CAFile:             test,
-						},
-						APIKeySecret: v1alpha1.APIKeySecretSpec{
-							Agent: v1alpha1.APIKeySecret{
+				Spec: v1alpha1.AgentSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
+							Enabled:            true,
+							Endpoint:           test,
+							HeartbeatsInterval: "10s",
+							TLS: v1alpha1.TLSSpec{
+								Insecure:           true,
+								InsecureSkipVerify: true,
+								CAFile:             test,
+							},
+							APIKeySecret: v1alpha1.APIKeySecret{
 								Value: test,
 							},
 						},
-					},
-					Agent: v1alpha1.AgentSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort: 80,
-							Log: v1alpha1.Log{
-								PrettyConsole: false,
-								NonBlocking:   true,
-								Level:         "info",
-								File:          "stderr",
-							},
+						Etcd: v1alpha1.EtcdSpec{
+							Endpoints: []string{"http://agent-etcd:2379"},
+							LeaseTTL:  "60s",
 						},
-						DistributedCachePort: 3320,
-						MemberListPort:       3322,
+						Prometheus: v1alpha1.PrometheusSpec{
+							Address: "http://aperture-prometheus-server:80/",
+						},
+						ServerPort: 80,
+						Log: v1alpha1.Log{
+							PrettyConsole: false,
+							NonBlocking:   true,
+							Level:         "info",
+							File:          "stderr",
+						},
 					},
-					Etcd: v1alpha1.EtcdSpec{
-						Endpoints: []string{"http://agent-etcd:2379"},
-						LeaseTTL:  "60s",
+					BatchPrerollup: v1alpha1.Batch{
+						Timeout:       time.Second,
+						SendBatchSize: 10000,
 					},
-					Prometheus: v1alpha1.PrometheusSpec{
-						Address: "http://aperture-prometheus-server:80/",
+					BatchPostrollup: v1alpha1.Batch{
+						Timeout:       time.Second,
+						SendBatchSize: 10000,
 					},
+					BatchMetricsFast: v1alpha1.Batch{
+						Timeout:       time.Second,
+						SendBatchSize: 10000,
+					},
+					DistributedCachePort: 3320,
+					MemberListPort:       3322,
 				},
 			}
 
@@ -115,7 +124,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Agent",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -133,36 +142,34 @@ var _ = Describe("ConfigMap for Agent", func() {
 
 	Context("Instance without FluxNinja plugin enabled", func() {
 		It("returns correct ConfigMap", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Agent: v1alpha1.AgentSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort: 80,
-							Log: v1alpha1.Log{
-								PrettyConsole: false,
-								NonBlocking:   true,
-								Level:         "info",
-								File:          "stderr",
-							},
+				Spec: v1alpha1.AgentSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						ServerPort: 80,
+						Log: v1alpha1.Log{
+							PrettyConsole: false,
+							NonBlocking:   true,
+							Level:         "info",
+							File:          "stderr",
 						},
-						DistributedCachePort: 3320,
-						MemberListPort:       3322,
+						Etcd: v1alpha1.EtcdSpec{
+							Endpoints: []string{"http://agent-etcd:2379"},
+							LeaseTTL:  "60s",
+						},
+						Prometheus: v1alpha1.PrometheusSpec{
+							Address: "http://aperture-prometheus-server:80/",
+						},
+						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
+							Endpoint:           test,
+							HeartbeatsInterval: "10s",
+						},
 					},
-					Etcd: v1alpha1.EtcdSpec{
-						Endpoints: []string{"http://agent-etcd:2379"},
-						LeaseTTL:  "60s",
-					},
-					Prometheus: v1alpha1.PrometheusSpec{
-						Address: "http://aperture-prometheus-server:80/",
-					},
-					FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-						Endpoint:           test,
-						HeartbeatsInterval: "10s",
-					},
+					DistributedCachePort: 3320,
+					MemberListPort:       3322,
 				},
 			}
 
@@ -190,7 +197,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Agent",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -210,33 +217,31 @@ var _ = Describe("ConfigMap for Agent", func() {
 var _ = Describe("ConfigMap for Controller", func() {
 	Context("Instance without FluxNinja plugin enabled", func() {
 		It("returns correct ConfigMap", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Controller: v1alpha1.ControllerSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort: 80,
-							Log: v1alpha1.Log{
-								PrettyConsole: false,
-								NonBlocking:   true,
-								Level:         "info",
-								File:          "stderr",
-							},
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						ServerPort: 80,
+						Log: v1alpha1.Log{
+							PrettyConsole: false,
+							NonBlocking:   true,
+							Level:         "info",
+							File:          "stderr",
 						},
-					},
-					Etcd: v1alpha1.EtcdSpec{
-						Endpoints: []string{"http://agent-etcd:2379"},
-						LeaseTTL:  "60s",
-					},
-					Prometheus: v1alpha1.PrometheusSpec{
-						Address: "http://aperture-prometheus-server:80",
-					},
-					FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-						Endpoint:           test,
-						HeartbeatsInterval: "10s",
+						Etcd: v1alpha1.EtcdSpec{
+							Endpoints: []string{"http://agent-etcd:2379"},
+							LeaseTTL:  "60s",
+						},
+						Prometheus: v1alpha1.PrometheusSpec{
+							Address: "http://aperture-prometheus-server:80",
+						},
+						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
+							Endpoint:           test,
+							HeartbeatsInterval: "10s",
+						},
 					},
 				},
 			}
@@ -265,7 +270,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -283,41 +288,37 @@ var _ = Describe("ConfigMap for Controller", func() {
 
 	Context("Instance with FluxNinja plugin enabled", func() {
 		It("returns correct ConfigMap", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Controller: v1alpha1.ControllerSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort: 80,
-							Log: v1alpha1.Log{
-								PrettyConsole: false,
-								NonBlocking:   true,
-								Level:         "info",
-								File:          "stderr",
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						ServerPort: 80,
+						Log: v1alpha1.Log{
+							PrettyConsole: false,
+							NonBlocking:   true,
+							Level:         "info",
+							File:          "stderr",
+						},
+						Etcd: v1alpha1.EtcdSpec{
+							Endpoints: []string{"http://agent-etcd:2379"},
+							LeaseTTL:  "60s",
+						},
+						Prometheus: v1alpha1.PrometheusSpec{
+							Address: "http://aperture-prometheus-server:80",
+						},
+						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
+							Enabled:            true,
+							Endpoint:           test,
+							HeartbeatsInterval: "10s",
+							TLS: v1alpha1.TLSSpec{
+								Insecure:           true,
+								InsecureSkipVerify: true,
+								CAFile:             test,
 							},
-						},
-					},
-					Etcd: v1alpha1.EtcdSpec{
-						Endpoints: []string{"http://agent-etcd:2379"},
-						LeaseTTL:  "60s",
-					},
-					Prometheus: v1alpha1.PrometheusSpec{
-						Address: "http://aperture-prometheus-server:80",
-					},
-					FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-						Enabled:            true,
-						Endpoint:           test,
-						HeartbeatsInterval: "10s",
-						TLS: v1alpha1.TLSSpec{
-							Insecure:           true,
-							InsecureSkipVerify: true,
-							CAFile:             test,
-						},
-						APIKeySecret: v1alpha1.APIKeySecretSpec{
-							Controller: v1alpha1.APIKeySecret{
+							APIKeySecret: v1alpha1.APIKeySecret{
 								Value: test,
 							},
 						},
@@ -349,7 +350,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},

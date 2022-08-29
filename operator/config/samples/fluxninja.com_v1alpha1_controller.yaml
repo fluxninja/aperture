@@ -1,4 +1,4 @@
 apiVersion: fluxninja.com/v1alpha1
-kind: Aperture
+kind: Controller
 metadata:
-  name: aperture
+  name: controller-sample

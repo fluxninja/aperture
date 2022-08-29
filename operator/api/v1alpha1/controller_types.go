@@ -18,7 +18,10 @@ package v1alpha1
 
 import (
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // ControllerSpec defines the desired state for the Controller.
 type ControllerSpec struct {
@@ -33,4 +36,37 @@ type ControllerSpec struct {
 	// Pod's host aliases
 	//+kubebuilder:validation:Optional
 	HostAliases []corev1.HostAlias `json:"hostAliases"`
+}
+
+// ControllerStatus defines the observed state of Controller.
+type ControllerStatus struct {
+	Resources string `json:"resources,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Resources",type=string,JSONPath=`.status.resources`
+//+kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
+
+// Controller is the Schema for the controllers API.
+type Controller struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	//+kubebuilder:default:={serverPort:80}
+	Spec   ControllerSpec   `json:"spec,omitempty"`
+	Status ControllerStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// ControllerList contains a list of Controller.
+type ControllerList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Controller `json:"items"`
+}
+
+func init() {
+	SchemeBuilder.Register(&Controller{}, &ControllerList{})
 }

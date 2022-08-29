@@ -48,7 +48,8 @@ rules:
 - apiGroups:
   - fluxninja.com
   resources:
-  - apertures
+  - agents
+  - controllers
   verbs:
   - create
   - delete
@@ -60,13 +61,15 @@ rules:
 - apiGroups:
   - fluxninja.com
   resources:
-  - apertures/finalizers
+  - agents/finalizers
+  - controllers/finalizers
   verbs:
   - update
 - apiGroups:
   - fluxninja.com
   resources:
-  - apertures/status
+  - agents/status
+  - controllers/status
   verbs:
   - get
   - patch

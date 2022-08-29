@@ -95,22 +95,20 @@ var _ = Describe("Controller Deployment", func() {
 				"app.kubernetes.io/component":  controllerServiceName,
 			}
 
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Controller: v1alpha1.ControllerSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort: 80,
-						},
-						Image: v1alpha1.Image{
-							Registry:   "gcr.io/devel-309501/cf-fn",
-							Repository: "aperture-controller",
-							Tag:        "latest",
-							PullPolicy: "IfNotPresent",
-						},
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						ServerPort: 80,
+					},
+					Image: v1alpha1.Image{
+						Registry:   "docker.io/fluxninja",
+						Repository: "aperture-controller",
+						Tag:        "latest",
+						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -128,7 +126,7 @@ var _ = Describe("Controller Deployment", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -166,7 +164,7 @@ var _ = Describe("Controller Deployment", func() {
 							Containers: []corev1.Container{
 								{
 									Name:            controllerServiceName,
-									Image:           "gcr.io/devel-309501/cf-fn/aperture-controller:latest",
+									Image:           "docker.io/fluxninja/aperture-controller:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{},
 									Command:         nil,
@@ -289,85 +287,82 @@ var _ = Describe("Controller Deployment", func() {
 				"app.kubernetes.io/component":  controllerServiceName,
 			}
 
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Labels:        testMap,
-					Annotations:   testMap,
-					ImageRegistry: "docker.io",
-					Controller: v1alpha1.ControllerSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServerPort:     80,
-							LivenessProbe:  probe,
-							ReadinessProbe: probe,
-							Resources:      resourceRequirement,
-							PodSecurityContext: v1alpha1.PodSecurityContext{
-								Enabled: true,
-								FsGroup: pointer.Int64Ptr(1001),
-							},
-							ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
-								Enabled:                true,
-								RunAsUser:              pointer.Int64Ptr(0),
-								RunAsNonRootUser:       pointer.BoolPtr(false),
-								ReadOnlyRootFilesystem: pointer.BoolPtr(false),
-							},
-							Command:                       testArray,
-							Args:                          testArray,
-							PodLabels:                     testMap,
-							PodAnnotations:                testMap,
-							NodeSelector:                  testMap,
-							Tolerations:                   tolerations,
-							TerminationGracePeriodSeconds: pointer.Int64Ptr(10),
-							LifecycleHooks:                lifecycle,
-							ExtraEnvVars: []corev1.EnvVar{
-								{
-									Name:  test,
-									Value: test,
-								},
-							},
-							ExtraEnvVarsCM:     test,
-							ExtraEnvVarsSecret: test,
-							ExtraVolumes: []corev1.Volume{
-								{
-									Name: test,
-									VolumeSource: corev1.VolumeSource{
-										EmptyDir: &corev1.EmptyDirVolumeSource{},
-									},
-								},
-							},
-							ExtraVolumeMounts: []corev1.VolumeMount{
-								{
-									Name:      test,
-									MountPath: test,
-								},
-							},
-							Sidecars: []corev1.Container{
-								{
-									Name: test,
-								},
-							},
-							InitContainers: []corev1.Container{
-								{
-									Name: test,
-								},
-							},
-							ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
-								Create: true,
-							},
-							Affinity: affinity,
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						Labels:         testMap,
+						Annotations:    testMap,
+						ServerPort:     80,
+						LivenessProbe:  probe,
+						ReadinessProbe: probe,
+						Resources:      resourceRequirement,
+						PodSecurityContext: v1alpha1.PodSecurityContext{
+							Enabled: true,
+							FsGroup: pointer.Int64Ptr(1001),
 						},
-						Image: v1alpha1.Image{
-							Registry:    "gcr.io/devel-309501/cf-fn",
-							Repository:  "aperture-controller",
-							Tag:         "latest",
-							PullPolicy:  "IfNotPresent",
-							PullSecrets: testArray,
+						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
+							Enabled:                true,
+							RunAsUser:              pointer.Int64Ptr(0),
+							RunAsNonRootUser:       pointer.BoolPtr(false),
+							ReadOnlyRootFilesystem: pointer.BoolPtr(false),
 						},
-						HostAliases: hostAliases,
+						Command:                       testArray,
+						Args:                          testArray,
+						PodLabels:                     testMap,
+						PodAnnotations:                testMap,
+						NodeSelector:                  testMap,
+						Tolerations:                   tolerations,
+						TerminationGracePeriodSeconds: pointer.Int64Ptr(10),
+						LifecycleHooks:                lifecycle,
+						ExtraEnvVars: []corev1.EnvVar{
+							{
+								Name:  test,
+								Value: test,
+							},
+						},
+						ExtraEnvVarsCM:     test,
+						ExtraEnvVarsSecret: test,
+						ExtraVolumes: []corev1.Volume{
+							{
+								Name: test,
+								VolumeSource: corev1.VolumeSource{
+									EmptyDir: &corev1.EmptyDirVolumeSource{},
+								},
+							},
+						},
+						ExtraVolumeMounts: []corev1.VolumeMount{
+							{
+								Name:      test,
+								MountPath: test,
+							},
+						},
+						Sidecars: []corev1.Container{
+							{
+								Name: test,
+							},
+						},
+						InitContainers: []corev1.Container{
+							{
+								Name: test,
+							},
+						},
+						ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
+							Create: true,
+						},
+						Affinity: affinity,
 					},
+					Image: v1alpha1.Image{
+						Registry:    "docker.io/fluxninja",
+						Repository:  "aperture-controller",
+						Tag:         "latest",
+						PullPolicy:  "IfNotPresent",
+						PullSecrets: testArray,
+					},
+					HostAliases: hostAliases,
 				},
 			}
 			expected := &appsv1.Deployment{
@@ -385,7 +380,7 @@ var _ = Describe("Controller Deployment", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -436,7 +431,7 @@ var _ = Describe("Controller Deployment", func() {
 							Containers: []corev1.Container{
 								{
 									Name:            controllerServiceName,
-									Image:           "docker.io/aperture-controller:latest",
+									Image:           "docker.io/fluxninja/aperture-controller:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
 										RunAsUser:              pointer.Int64Ptr(0),

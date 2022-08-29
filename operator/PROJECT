@@ -7,17 +7,27 @@ plugins:
 projectName: aperture-operator
 repo: github.com/fluxninja/aperture-operator
 resources:
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  group: fluxninja.com
-  kind: Aperture
-  path: fluxninja.com/operators/aperture-operator/api/v1alpha1
-  version: v1alpha1
 - controller: true
   group: core
   kind: Namespace
   path: k8s.io/api/core/v1
   version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: fluxninja.com
+  group: fluxninja.com
+  kind: Agent
+  path: github.com/fluxninja/aperture-operator/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: fluxninja.com
+  group: fluxninja.com
+  kind: Controller
+  path: github.com/fluxninja/aperture-operator/api/v1alpha1
+  version: v1alpha1
 version: "3"

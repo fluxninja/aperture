@@ -79,14 +79,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	reconciler := &controllers.ApertureReconciler{
+	reconciler := &controllers.AgentReconciler{
 		Client:   mgr.GetClient(),
 		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorderFor("aperture-operator"),
+		Recorder: mgr.GetEventRecorderFor("aperture-agent"),
 	}
 
 	if err = reconciler.SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Aperture")
+		setupLog.Error(err, "unable to create controller", "controller", "Agent")
 		os.Exit(1)
 	}
 
@@ -97,6 +97,16 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Namespace")
 		os.Exit(1)
 	}
+
+	if err = (&controllers.ControllerReconciler{
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("aperture-controller"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Controller")
+		os.Exit(1)
+	}
+
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
