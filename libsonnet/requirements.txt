@@ -12,7 +12,6 @@ loguru==0.6.0
 MarkupSafe==2.0.1
 msgpack==1.0.4
 prance==0.21.8.0
-prelude==5.2.0
 pynvim==0.4.3
 pywatchman==1.4.1
 PyYAML==6.0
