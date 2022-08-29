@@ -178,7 +178,7 @@ definitions:
         description: List of subexpressions of the match expression.
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     title: List of MatchExpressions that is used for all/any matching
-  RateLimiterLazySyncConfig:
+  RateLimiterLazySync:
     type: object
     properties:
       enabled:
@@ -190,7 +190,7 @@ definitions:
         description: Number of times to lazy sync within the limit_reset_interval.
         x-go-default: 5
         x-go-validate: gt=0
-  RateLimiterOverrideConfig:
+  RateLimiterOverride:
     type: object
     properties:
       label_value:
@@ -298,15 +298,15 @@ definitions:
       label_key:
         type: string
         x-go-validate: required
-      lazy_sync_config:
-        $ref: '#/definitions/RateLimiterLazySyncConfig'
+      lazy_sync:
+        $ref: '#/definitions/RateLimiterLazySync'
       limit_reset_interval:
         type: string
         x-go-default: 60s
       overrides:
         type: array
         items:
-          $ref: '#/definitions/RateLimiterOverrideConfig'
+          $ref: '#/definitions/RateLimiterOverride'
       selector:
         $ref: '#/definitions/v1Selector'
         x-go-validate: required

@@ -34,7 +34,7 @@ definitions:
         items:
           $ref: '#/definitions/v1MatchExpression'
         x-order: 0
-  RateLimiterLazySyncConfig:
+  RateLimiterLazySync:
     type: object
     properties:
       enabled:
@@ -48,7 +48,7 @@ definitions:
         x-go-default: 5
         x-go-validate: gt=0
         x-order: 1
-  RateLimiterOverrideConfig:
+  RateLimiterOverride:
     type: object
     properties:
       label_value:
@@ -150,9 +150,9 @@ definitions:
         type: string
         x-go-validate: required
         x-order: 1
-      lazy_sync_config:
+      lazy_sync:
         x-order: 2
-        $ref: '#/definitions/RateLimiterLazySyncConfig'
+        $ref: '#/definitions/RateLimiterLazySync'
       limit_reset_interval:
         type: string
         x-go-default: 60s
@@ -160,7 +160,7 @@ definitions:
       overrides:
         type: array
         items:
-          $ref: '#/definitions/RateLimiterOverrideConfig'
+          $ref: '#/definitions/RateLimiterOverride'
         x-order: 4
       selector:
         x-go-validate: required

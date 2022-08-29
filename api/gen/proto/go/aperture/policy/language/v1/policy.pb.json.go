@@ -328,7 +328,7 @@ func (msg *RateLimiter) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *RateLimiter_LazySyncConfig) MarshalJSON() ([]byte, error) {
+func (msg *RateLimiter_LazySync) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -337,14 +337,14 @@ func (msg *RateLimiter_LazySyncConfig) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *RateLimiter_LazySyncConfig) UnmarshalJSON(b []byte) error {
+func (msg *RateLimiter_LazySync) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *RateLimiter_OverrideConfig) MarshalJSON() ([]byte, error) {
+func (msg *RateLimiter_Override) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -353,7 +353,7 @@ func (msg *RateLimiter_OverrideConfig) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *RateLimiter_OverrideConfig) UnmarshalJSON(b []byte) error {
+func (msg *RateLimiter_Override) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

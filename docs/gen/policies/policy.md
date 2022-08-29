@@ -11,8 +11,8 @@
 ### Object Index
 
 - [MatchExpressionList](#match-expression-list) – List of MatchExpressions that is used for all/any matching
-- [RateLimiterLazySyncConfig](#rate-limiter-lazy-sync-config)
-- [RateLimiterOverrideConfig](#rate-limiter-override-config)
+- [RateLimiterLazySync](#rate-limiter-lazy-sync)
+- [RateLimiterOverride](#rate-limiter-override)
 - [RuleRego](#rule-rego) – Raw rego rules are compiled 1:1 to rego queries
 - [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
 - [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
@@ -119,7 +119,7 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
-### <span id="rate-limiter-lazy-sync-config"></span> RateLimiterLazySyncConfig
+### <span id="rate-limiter-lazy-sync"></span> RateLimiterLazySync
 
 #### Properties
 
@@ -140,7 +140,7 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
-### <span id="rate-limiter-override-config"></span> RateLimiterOverrideConfig
+### <span id="rate-limiter-override"></span> RateLimiterOverride
 
 #### Properties
 
@@ -300,10 +300,10 @@ Concurrency is calculated in terms of total tokens which translate to (avg. late
 </dd>
 </dl>
 <dl>
-<dt>lazy_sync_config</dt>
+<dt>lazy_sync</dt>
 <dd>
 
-([RateLimiterLazySyncConfig](#rate-limiter-lazy-sync-config))
+([RateLimiterLazySync](#rate-limiter-lazy-sync))
 
 </dd>
 </dl>
@@ -319,7 +319,7 @@ Concurrency is calculated in terms of total tokens which translate to (avg. late
 <dt>overrides</dt>
 <dd>
 
-([[]RateLimiterOverrideConfig](#rate-limiter-override-config))
+([[]RateLimiterOverride](#rate-limiter-override))
 
 </dd>
 </dl>
