@@ -3,6 +3,7 @@ package k8s
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/go-logr/zerologr"
 	"go.uber.org/fx"
@@ -13,13 +14,38 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/fluxninja/aperture/pkg/log"
+	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
 )
 
-// K8sClientConstructorIn holds parameter for Providek8sDynamicClient.
+var (
+	// swagger:operation POST /kubernetes_client common-configuration KubernetesClient
+	// ---
+	// x-fn-config-env: true
+	// parameters:
+	// - name: http_client
+	//   in: body
+	//   schema:
+	//     "$ref": "#/definitions/HTTPClientConfig"
+
+	// KubernetesClientConfigKey is the key used to store the KubernetesClientConfig in the config.
+	kubernetesClientConfigKey = "kubernetes_client"
+	// HttpConfigKey is the key used to store the HTTPClientConfig in the config.
+	httpConfigKey = strings.Join([]string{kubernetesClientConfigKey, "http_client"}, ".")
+)
+
+// K8sClientConstructorIn holds parameter for Providek8sClient and Providek8sDynamicClient.
 type K8sClientConstructorIn struct {
 	fx.In
 	K8sClient *http.Client `name:"k8s-http-client"`
 	Logger    log.Logger
+}
+
+// Module provides a K8sClient.
+func Module() fx.Option {
+	return fx.Options(
+		commonhttp.ClientConstructor{Name: "k8s-http-client", Key: httpConfigKey}.Annotate(),
+		fx.Provide(Providek8sClient),
+	)
 }
 
 // Providek8sDynamicClient provides a dynamic kubernetes client.
