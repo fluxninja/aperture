@@ -1,7 +1,8 @@
 apiVersion: v2
 name: aperture-operator
 description: A Helm chart to deploy Aperture operator
-version: 0.1.0
+version: v0.0.1
+appVersion: v0.1.0
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami

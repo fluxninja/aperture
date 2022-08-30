@@ -1,7 +1,8 @@
 apiVersion: v2
 description: Aperture Agent & Controller
 name: aperture
-version: 0.1.0
+version: v0.0.1
+appVersion: v0.1.1
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami
