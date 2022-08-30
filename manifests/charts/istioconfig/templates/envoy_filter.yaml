@@ -34,11 +34,10 @@
     string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.authz_response)%"
 {{- end -}}
 
-{{ if .Values.istio.envoyFilter.install -}}
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: {{ .Values.istio.envoyFilter.name }}
+  name: {{ .Values.name }}
 spec:
   configPatches:
 
@@ -63,11 +62,7 @@ spec:
                   log_name: ingress
                   grpc_service:
                     google_grpc:
-                      {{- if .Values.agent.sidecar.enabled }}
-                      target_uri: localhost:4317
-                      {{- else }}
-                      target_uri: {{ .Release.Name }}-agent.{{ template "common.names.namespace" . }}.svc.cluster.local:4317
-                      {{- end }}
+                      target_uri: {{ .Values.agentservice.name }}.{{ .Values.agentservice.namespace }}.svc.cluster.local:{{ .Values.agentservice.otlpPort }}
                       stat_prefix: fn_otlp_access_log
                   transport_api_version: V3
                 body:
@@ -111,11 +106,7 @@ spec:
                   log_name: egress
                   grpc_service:
                     google_grpc:
-                      {{- if .Values.agent.sidecar.enabled }}
-                      target_uri: localhost:4317
-                      {{- else }}
-                      target_uri: {{ .Release.Name }}-agent.{{ template "common.names.namespace" . }}.svc.cluster.local:4317
-                      {{- end }}
+                      target_uri: {{ .Values.agentservice.name }}.{{ .Values.agentservice.namespace }}.svc.cluster.local:{{ .Values.agentservice.otlpPort }}
                       stat_prefix: fn_otlp_access_log
                   transport_api_version: V3
                 body:
@@ -154,18 +145,14 @@ spec:
           "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
           transport_api_version: V3
           with_request_body:
-            max_request_bytes: {{ .Values.istio.envoyFilter.maxRequestBytes }}
+            max_request_bytes: {{ .Values.maxRequestBytes }}
             allow_partial_message: true
           failure_mode_allow: true
           grpc_service:
             google_grpc:
-              {{- if .Values.agent.sidecar.enabled }}
-              target_uri: localhost:{{ .Values.agent.serverPort | default 80 }}
-              {{- else }}
-              target_uri: {{ .Release.Name }}-agent.{{ template "common.names.namespace" . }}.svc.cluster.local:80
-              {{- end }}
+              target_uri: {{ .Values.agentservice.name }}.{{ .Values.agentservice.namespace }}.svc.cluster.local:{{ .Values.agentservice.port }}
               stat_prefix: ext_authz
-            timeout: {{ .Values.istio.envoyFilter.authzGrpcTimeout }}
+            timeout: {{ .Values.authzGrpcTimeout }}
             initial_metadata:
               # Note: If there's more than one header in this list, make sure
               # to update the OUTBOUND filter also.
@@ -191,19 +178,14 @@ spec:
           "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
           transport_api_version: V3
           with_request_body:
-            max_request_bytes: {{ .Values.istio.envoyFilter.maxRequestBytes }}
+            max_request_bytes: {{ .Values.maxRequestBytes }}
             allow_partial_message: true
           failure_mode_allow: true
           grpc_service:
             google_grpc:
-              {{- if .Values.agent.sidecar.enabled }}
-              target_uri: localhost:{{ .Values.agent.serverPort | default 80 }}
-              {{- else }}
-              target_uri: {{ .Release.Name }}-agent.{{ template "common.names.namespace" . }}.svc.cluster.local:4317
-              {{- end }}
+              target_uri: {{ .Values.agentservice.name }}.{{ .Values.agentservice.namespace }}.svc.cluster.local:{{ .Values.agentservice.port }}
               stat_prefix: ext_authz
-            timeout: {{ .Values.istio.envoyFilter.authzGrpcTimeout }}
+            timeout: {{ .Values.authzGrpcTimeout }}
             initial_metadata:
               - key: traffic-direction
                 value: OUTBOUND
-{{ end -}}

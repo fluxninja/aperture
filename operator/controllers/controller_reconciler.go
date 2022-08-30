@@ -249,18 +249,18 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 		}
 	}
 	if deleteClusterRole {
-		if err := r.Delete(ctx, clusterRoleForController(instance)); err != nil {
+		if err := r.Delete(ctx, clusterRoleForController(instance)); err != nil && !errors.IsNotFound(err) {
 			log.Error(err, "failed to delete object of ClusterRole")
 			return err
 		}
 	}
 
-	if err := r.Delete(ctx, clusterRoleBindingForController(instance)); err != nil {
+	if err := r.Delete(ctx, clusterRoleBindingForController(instance)); err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "failed to delete object of ClusterRoleBinding")
 		return err
 	}
 
-	if err := r.Delete(ctx, validatingWebhookConfiguration(instance, nil)); err != nil {
+	if err := r.Delete(ctx, validatingWebhookConfiguration(instance, nil)); err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "failed to delete object of ValidatingWebhookConfiguration")
 		return err
 	}

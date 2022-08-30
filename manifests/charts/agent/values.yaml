@@ -2,7 +2,6 @@
 
 ## @param global.imageRegistry Global Docker image registry
 ## @param global.imagePullSecrets Global Docker registry secret names as an array
-## @param global.istioNamespace Specifies namespace for Istio resources
 ##
 global:
   ## Global Docker image parameters
@@ -15,11 +14,6 @@ global:
   ##   - myRegistryKeySecretName
   ##
   imagePullSecrets: []
-
-  ## Global namespace for Istio-resources.
-  ## This needs to be "aperture-system" to support with the aperture components.
-  ##
-  istioNamespace: "aperture-system"
 
 ## @section Common parameters
 
@@ -556,20 +550,3 @@ prometheus:
   kube-state-metrics:
     podAnnotations:
       "prometheus.io/scrape": "true"
-
-## @section istio
-## @param istio.enabled specifies whether to deploy embedded istio
-## @param istio.global.tag specifies the image tag for all the istio resources
-## @param istio.envoyFilter.install specifies whether to deploy EnvoyFilter
-## @param istio.envoyFilter.name specifies name for the EnvoyFilter
-## @param istio.envoyFilter.authzGrpcTimeout specifies timeout for the AuthZ gRPC connection
-## @param istio.envoyFilter.maxRequestBytes specifies allowed maximum request bytes
-istio:
-  enabled: true
-  global:
-    tag: "1.11.8"
-  envoyFilter:
-    install: true
-    name: aperture-envoy-filter
-    authzGrpcTimeout: 0.01s
-    maxRequestBytes: 8192

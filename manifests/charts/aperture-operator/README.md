@@ -12,11 +12,10 @@ Aperture Operator
 
 ### Global Parameters
 
-| Name                      | Description                                     | Value     |
-| ------------------------- | ----------------------------------------------- | --------- |
-| `global.imageRegistry`    | Global Docker image registry                    | `""`      |
-| `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`      |
-| `global.istioNamespace`   | Specifies namespace for Istio resources         | `default` |
+| Name                      | Description                                     | Value |
+| ------------------------- | ----------------------------------------------- | ----- |
+| `global.imageRegistry`    | Global Docker image registry                    | `""`  |
+| `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`  |
 
 
 ### Common Parameters
@@ -282,16 +281,4 @@ Aperture Operator
 | Name                 | Description                                     | Value  |
 | -------------------- | ----------------------------------------------- | ------ |
 | `prometheus.enabled` | specifies whether to deploy embedded prometheus | `true` |
-
-
-### istio
-
-| Name                                 | Description                                         | Value                   |
-| ------------------------------------ | --------------------------------------------------- | ----------------------- |
-| `istio.enabled`                      | specifies whether to deploy embedded istio          | `true`                  |
-| `istio.global.tag`                   | specifies the image tag for all the istio resources | `1.11.8`                |
-| `istio.envoyFilter.install`          | specifies whether to deploy EnvoyFilter             | `true`                  |
-| `istio.envoyFilter.name`             | specifies name for the EnvoyFilter                  | `aperture-envoy-filter` |
-| `istio.envoyFilter.authzGrpcTimeout` | specifies timeout for the AuthZ gRPC connection     | `0.01s`                 |
-| `istio.envoyFilter.maxRequestBytes`  | specifies allowed maximum request bytes             | `8192`                  |
 

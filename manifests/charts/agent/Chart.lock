@@ -8,8 +8,5 @@ dependencies:
 - name: prometheus
   repository: https://prometheus-community.github.io/helm-charts
   version: 15.5.3
-- name: istio
-  repository: https://getindata.github.io/helm-charts
-  version: 1.11.1
-digest: sha256:d7767f52034f7979921b2a6555faed43d5f0075efec00a5465e14764c61286e9
-generated: "2022-08-02T18:52:42.99296977+05:30"
+digest: sha256:7aa89384a058f85b89e8d945ed5cf25350018f566436a5fa115f1ba0d1353a02
+generated: "2022-08-30T10:22:19.271243519+05:30"

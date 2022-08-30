@@ -5,9 +5,6 @@ local apertureOperatorApp = import 'apps/aperture-operator/main.libsonnet';
 local apertureOperatorMixin =
   apertureOperatorApp {
     values+:: {
-      global+: {
-        istioNamespace: 'aperture-system',
-      },
       operator+: {
         image: {
           registry: 'gcr.io/devel-309501/cf-fn',
