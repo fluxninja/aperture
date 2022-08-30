@@ -52,22 +52,6 @@ Create the address of the Prometheus for Aperture Agent and Controller
 {{- end -}}
 
 {{/*
-Fetch the address of the Ingestion service for Aperture Agent
-{{ include "aperture.ingestion.address" ( dict "aperture" .Values.path.to.the.aperture $) }}
-*/}}
-{{- define "aperture.ingestion.address" -}}
-{{- if .aperture.cloudIntegration -}}
-    {{- if .aperture.agent.ingestion.address -}}
-        {{ print .aperture.agent.ingestion.address }}
-    {{- else -}}
-        {{- fail "Value of ingestion address for Agent cannot be empty when .Values.aperture.cloudIntegration is set to true." -}}
-    {{- end -}}
-{{- else -}}
-    {{ print "" }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Fetch the endpoint of the FluxNinja cloud instance
 {{ include "aperture.fluxninjaPlugin.endpoint" ( dict "aperture" .Values.path.to.the.aperture $) }}
 */}}
@@ -84,36 +68,16 @@ Fetch the endpoint of the FluxNinja cloud instance
 {{- end -}}
 
 {{/*
-Fetch the value of the API Key secret for Aperture Agent
-{{ include "aperture.agent.apisecret.value" ( dict "aperture" .Values.path.to.the.aperture $) }}
+Fetch the value of the API Key secret for Aperture Agent and Controller
+{{ include "aperture.apiSecret.value" ( dict "object" .Values.path.to.the.agent/controller $) }}
 */}}
-{{- define "aperture.agent.apisecret.value" -}}
-{{- if .aperture.cloudIntegration -}}
-    {{- if .aperture.agent.apiKeySecret.create -}}
-        {{- if .aperture.agent.apiKeySecret.value -}}
-            {{ print .aperture.agent.apiKeySecret.value }}
+{{- define "aperture.apisecret.value" -}}
+{{- if .object.fluxninjaPlugin.enabled -}}
+    {{- if .object.fluxninjaPlugin.apiKeySecret.create -}}
+        {{- if .object.fluxninjaPlugin.apiKeySecret.value -}}
+            {{ print .object.fluxninjaPlugin.apiKeySecret.value }}
         {{- else -}}
-            {{- fail "Value of API Key for Agent cannot be empty when .Values.aperture.cloudIntegration and .Values.aperture.agent.apiKeySecret.create is set to true." -}}
-        {{- end -}}
-    {{- else -}}
-        {{ print "" }}
-    {{- end -}}
-{{- else -}}
-    {{ print "" }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Fetch the value of the API Key secret for Aperture Controller
-{{ include "aperture.controller.apisecret.value" ( dict "aperture" .Values.path.to.the.aperture $) }}
-*/}}
-{{- define "aperture.controller.apisecret.value" -}}
-{{- if .aperture.cloudIntegration -}}
-    {{- if .aperture.controller.apiKeySecret.create -}}
-        {{- if .aperture.controller.apiKeySecret.value -}}
-            {{ print .aperture.controller.apiKeySecret.value }}
-        {{- else -}}
-            {{- fail "Value of API Key for Controller cannot be empty when .Values.aperture.cloudIntegration and .Values.aperture.controller.apiKeySecret.create is set to true." -}}
+            {{- fail "Value of API Key for Agent cannot be empty when .Values.agent/controller.fluxninjaPlugin.enabled and .Values.agent/controller.fluxninjaPlugin.apiKeySecret.create is set to true." -}}
         {{- end -}}
     {{- else -}}
         {{ print "" }}
