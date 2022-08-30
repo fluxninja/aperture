@@ -1,0 +1,38 @@
+# check https://nfpm.goreleaser.com/configuration for detailed usage
+name: "aperture-agent"
+arch: "${GOARCH}"
+platform: "${GOOS}"
+version: "${VERSION}"
+section: "default"
+priority: "extra"
+replaces: []
+provides: []
+depends: []
+recommends: []
+suggests: []
+conflicts: []
+maintainer: "FluxNinja <help@fluxninja.com>"
+description: |
+  Flow control and reliability management for modern web applications
+vendor: "FluxNinja"
+homepage: "https://www.fluxninja.com"
+license: "AGPL-3.0"
+#changelog: "changelog.yaml"
+contents:
+- src: ./dist/aperture-agent
+  dst: /usr/local/bin/aperture-agent
+- &conf_dir
+  dst: /etc/aperture/aperture-agent/flowcontrol
+  type: dir
+  file_info:
+    mode: 0700
+- <<: *conf_dir
+  dst: /etc/aperture/aperture-agent/classifiers
+- <<: *conf_dir
+  dst: /etc/aperture/aperture-agent/plugins
+- src: ./dist/plugins/*.so
+  dst: /etc/aperture/aperture-agent/plugins
+- <<: *conf_dir
+  dst: /etc/aperture/aperture-agent/config
+- src: ./packaging/aperture-agent.yaml
+  dst: /etc/aperture/aperture-agent/config/aperture-agent.yaml

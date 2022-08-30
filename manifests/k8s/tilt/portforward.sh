@@ -54,7 +54,7 @@ while sleep 1; do
 			fi
 			if ((++failures >= FAILURE_THRESHOLD)); then
 				printf 'Restarting port-forwarding\n' >&2
-				kill "${process_id}"
+				kill "${process_id}" || true # Ignore - might fail if the process exited by itself
 				wait "${process_id}" || true # Ignore exit code
 				break
 			fi
