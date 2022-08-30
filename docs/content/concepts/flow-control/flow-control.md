@@ -22,4 +22,4 @@ Aperture is similar to
 [OpenTelemetry Span](https://opentelemetry.io/docs/reference/specification/trace/api/#span).
 
 Flow are observed and controlled by Aperture Agents by using data-plane
-components such as classifiers,FluxMeters and actuators.
+components such as classifiers, FluxMeters and actuators.

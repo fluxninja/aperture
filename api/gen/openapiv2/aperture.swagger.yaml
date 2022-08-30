@@ -222,6 +222,11 @@ definitions:
     properties:
       fairness_key:
         type: string
+        description: |-
+          Any label that could be used in label matcher can be used here. Eg. if
+          you have a classifier that sets `user` flow label, you might want to set
+          `fairness_key = "user"`.
+        title: Fairness key is a label key that can be used to provide fairness within a workload
       priority:
         type: integer
         format: int64
@@ -233,17 +238,33 @@ definitions:
       timeout:
         type: string
         description: |-
-          Timeout override decides how long a request in the workload can wait for tokens.
           This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
+
+          :::caution
+          This timeout needs to be strictly less than the timeout set on the
+          client for the whole GRPC call:
+          * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
+          * in case of libraries, timeout configured... TODO.
+
+          We're using fail-open logic in integrations, so if the GRPC timeout
+          fires first, the flow will end up being unconditionally allowed while
+          it're still waiting on the scheduler.
+
+          To avoid such cases, the end-to-end GRPC timeout should also contain
+          some headroom for constant overhead like serialization, etc. Default
+          value for GRPC timeouts is 10ms, giving 5ms of headeroom, so when
+          tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+          :::
+        title: Timeout override decides how long a request in the workload can wait for tokens
         x-go-default: 0.005s
       tokens:
         type: string
         format: uint64
         description: |-
           Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-          This override is applicable only if auto_tokens is set to false.
+          This override is applicable only if `auto_tokens` is set to false.
         x-go-default: 1
-    description: Workload defines a class of requests that preferably have similar properties such as response latency.
+    description: Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
   SchedulerWorkloadAndLabelMatcher:
     type: object
     properties:
@@ -276,15 +297,30 @@ definitions:
     properties:
       load_shed_actuator:
         $ref: '#/definitions/v1LoadShedActuator'
-        description: Actuator based on load shedding a portion of requests.
+        description: |-
+          Actuator based on load shedding a portion of requests.
+
+          Actuation strategy defines the input signal that will drive the scheduler.
       scheduler:
         $ref: '#/definitions/v1Scheduler'
-        description: Weighted Fair Queuing based workfload scheduler.
+        description: |-
+          Configuration of Weighted Fair Queuing-based workload scheduler.
+
+          Contains configuration of per-agent scheduler, and also defines some
+          output signals.
         x-go-validate: required
     description: |-
-      Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
+      :::info
+      See also [Scheduler page in the Concepts section](/concepts/flow-control/actuators/scheduler.md)
+      for a more high-level description.
+      :::
+
       It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
       Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+
+      ConcurrencyLimiter configuration is split into two parts: An actuation
+      strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
+    title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
   languagev1RateLimiter:
     type: object
     properties:
@@ -517,7 +553,7 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1ArithmeticCombinatorOuts'
         description: Output ports for the Arithmetic Combinator component.
-    description: Type of combinator that computes the arithmetic operation on the operand signals.
+    title: Type of combinator that computes the arithmetic operation on the operand signals
   v1ArithmeticCombinatorIns:
     type: object
     properties:
@@ -585,8 +621,6 @@ definitions:
           This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
         x-go-default: 0.5s
     description: |-
-      Circuit is defined as a dataflow graph of inter-connected components.
-
       Signals flow between components via ports.
       As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
       Circuit evaluated periodically in order to respond to changes in signal readings.
@@ -606,6 +640,7 @@ definitions:
       logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
       docs on how exactly it handles invalid inputs.
       :::
+    title: Circuit is defined as a dataflow graph of inter-connected components
   v1Classifier:
     type: object
     properties:
@@ -691,10 +726,11 @@ definitions:
         Eg. see the [Exponential Moving Average filter](#-v1ema).
         :::
       * "sink" components – they affect the real world.
-        [Scheduler](#-v1scheduler) and [RateLimiter](#-languagev1ratelimiter).
-        Also sometimes called _actuators_. In the UI, represented by orange color.
-        Sink components are usually also "sources" too, they usually emit a
-        feedback signal, like `accepted_concurrency` in case of ConcurrencyLimiter.
+        [ConcurrencyLimiter](#-languagev1concurrencylimiter) and [RateLimiter](#-languagev1ratelimiter).
+        Also sometimes called [_actuators_](/concepts/flow-control/actuators/actuators.md).
+        In the UI, represented by orange color.  Sink components are usually also
+        "sources" too, they usually emit a feedback signal, like
+        `accepted_concurrency` in case of ConcurrencyLimiter.
 
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
@@ -713,7 +749,7 @@ definitions:
         type: number
         format: double
         description: The constant value to be emitted.
-    description: Component that emits a constant value as an output signal.
+    title: Component that emits a constant value as an output signal
   v1ConstantOuts:
     type: object
     properties:
@@ -776,8 +812,6 @@ definitions:
           If the duration is zero, the transition will happen instantaneously.
         x-go-default: 0s
     description: |-
-      Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison.
-
       The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
       This component also supports time-based response, i.e. the output
@@ -785,6 +819,7 @@ definitions:
       true or false for at least "positive_for" or "negative_for" duration. If
       `true_for` and `false_for` durations are zero then the transitions are
       instantaneous.
+    title: Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
   v1DeciderIns:
     type: object
     properties:
@@ -987,9 +1022,8 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1ExtrapolatorOuts'
         description: Output ports for the Extrapolator component.
-    description: |-
-      Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
-      It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+    description: It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+    title: Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
   v1ExtrapolatorIns:
     type: object
     properties:
@@ -1036,10 +1070,6 @@ definitions:
           :::
         x-go-validate: gte=0.0
     description: |-
-      Gradient controller is a type of controller which tries to adjust the
-      control variable proportionally to the relative difference between setpoint
-      and actual value of the signal.
-
       The `gradient` describes a corrective factor that should be applied to the
       control variable to get the signal closer to the setpoint. It is computed as follows:
 
@@ -1064,6 +1094,10 @@ definitions:
       Some changes are expected in the near future:
       [#182](https://github.com/fluxninja/aperture/issues/182)
       :::
+    title: |-
+      Gradient controller is a type of controller which tries to adjust the
+      control variable proportionally to the relative difference between setpoint
+      and actual value of the signal
   v1GradientControllerIns:
     type: object
     properties:
@@ -1262,13 +1296,15 @@ definitions:
       in_ports:
         $ref: '#/definitions/v1LoadShedActuatorIns'
         description: Input ports for the Load Shed Actuator component.
-    description: Takes the load shed factor input signal and publishes it to the schedulers in the data-plane.
+    title: Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
   v1LoadShedActuatorIns:
     type: object
     properties:
       load_shed_factor:
         $ref: '#/definitions/v1Port'
-        description: Load shedding factor is a fraction of incoming concurrency (tokens \* requests) that needs to be dropped.
+        description: |-
+          Load shedding factor is a fraction of [incoming
+          concurrency](#-v1schedulerouts) that needs to be dropped.
     description: Input for the Load Shed Actuator component.
   v1MatchExpression:
     type: object
@@ -1326,9 +1362,8 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1MaxOuts'
         description: Output ports for the Max component.
-    description: |-
-      Takes a list of input signals and emits the signal with the maximum value.
-      Max: output = max([]inputs).
+    description: 'Max: output = max([]inputs).'
+    title: Takes a list of input signals and emits the signal with the maximum value
   v1MaxIns:
     type: object
     properties:
@@ -1355,7 +1390,7 @@ definitions:
         $ref: '#/definitions/v1MinOuts'
         description: Output ports for the Min component.
     description: |-
-      Takes an array of input signals and emits the signal with the minimum value.
+      Takes an array of input signals and emits the signal with the minimum value
       Min: output = min([]inputs).
   v1MinIns:
     type: object
@@ -1427,17 +1462,15 @@ definitions:
       resources:
         $ref: '#/definitions/v1Resources'
         description: Resources (FluxMeters, Classifiers etc.) to setup.
-    description: |-
-      Policy expresses reliability automation workflow that automatically protects services.
-
-      Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
+    description: Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
+    title: Policy expresses reliability automation workflow that automatically protects services
   v1Port:
     type: object
     properties:
       signal_name:
         type: string
         description: Name of the incoming or outgoing Signal on the Port.
-    description: Components are interconnected with each other via Ports.
+    title: Components are interconnected with each other via Ports
   v1ProcessInfo:
     type: object
     properties:
@@ -1465,7 +1498,7 @@ definitions:
           TODO we should describe how to construct the query, eg. how to employ the
           fluxmeters here or link to appropriate place in docs.
           :::
-    description: Component that runs a Prometheus query periodically and returns the result as an output signal.
+    title: Component that runs a Prometheus query periodically and returns the result as an output signal
   v1PromQLOuts:
     type: object
     properties:
@@ -1524,10 +1557,8 @@ definitions:
           FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
 
           FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
-    description: |-
-      Resources that need to be setup for the policy to function.
-
-      Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+    description: Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+    title: Resources that need to be setup for the policy to function
   v1Rule:
     type: object
     properties:
@@ -1588,9 +1619,15 @@ definitions:
     properties:
       auto_tokens:
         type: boolean
+        description: |-
+          Automatically estimate weight of flows in each workload, based on
+          historical latency. Each workload's `tokens` will be set to average
+          latency of flows in that workload during last few seconds (exact duration
+          of this average can change).
         x-go-default: "true"
       default_workload:
         $ref: '#/definitions/SchedulerWorkload'
+        description: Workload to be used if none of workloads specified in `workloads` match.
       out_ports:
         $ref: '#/definitions/v1SchedulerOuts'
         description: Output ports for the Scheduler component.
@@ -1601,19 +1638,53 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/SchedulerWorkloadAndLabelMatcher'
-        title: |-
-          list of workloads
-          workload can describe priority, tokens (if auto_tokens are set to false) and timeout
-    description: Weighted Fair Queuing based workload scheduler.
+        description: |-
+          List of workloads to be used in scheduler.
+
+          Categorizing [flows](/concepts/flow-control#what-is-a-flow) into workloads
+          allows for load-shedding to be "smarter" than just "randomly deny 50% of
+          requests". There are two aspects of workloads:
+
+          Each workload in this list specifies also a matcher that's used to
+          determine which flow will be categorized into which workload.
+          In case of multiple matching workloads, the first matching one will be used.
+          If none of workloads match, `default_workload` will be used.
+
+          :::info
+          See also [workload definition in the concepts
+          section](/concepts/flow-control/actuators/scheduler#workload).
+          :::
+    description: |-
+      :::note
+      Each Agent instantiates an independent copy of the scheduler, but output
+      signal are aggregated across all agents.
+      :::
+
+      See [ConcurrencyLimiter](#-languagev1concurrencylimiter) for more context.
+    title: Weighted Fair Queuing-based workload scheduler
   v1SchedulerOuts:
     type: object
     properties:
       accepted_concurrency:
         $ref: '#/definitions/v1Port'
-        description: Accepted concurrency is the number of accepted tokens/sec.
+        description: |-
+          Accepted concurrency is the number of accepted tokens per second.
+
+          :::info
+          **Accepted tokens** are tokens associated with
+          [flows](/concepts/flow-control#what-is-a-flow) that were accepted by
+          this scheduler. Number of tokens for a flow is determined by a
+          [workload](#-schedulerworkload) that the flow was assigned to (either
+          via `auto_tokens` or explicitly by `Workload.tokens`).
+          :::
+
+          Value of this signal is the sum across all the relevant schedulers.
       incoming_concurrency:
         $ref: '#/definitions/v1Port'
-        description: Incoming concurrency is the number of incoming tokens/sec.
+        description: |-
+          Incoming concurrency is the number of incoming tokens/sec.
+          This is the same as `accepted_concurrency`, but across all the flows
+          entering scheduler, including rejected ones.
     description: Output for the Scheduler component.
   v1Selector:
     type: object
@@ -1689,11 +1760,10 @@ definitions:
         description: Scaling factor to be multiplied with the square root of the input signal.
         x-go-default: 1
     description: |-
-      Takes an input signal and emits the square root of it multiplied by scale as an output.
-
       $$
       \text{output} = \text{scale} \sqrt{\text{input}}
       $$
+    title: Takes an input signal and emits the square root of it multiplied by scale as an output
   v1SqrtIns:
     type: object
     properties:
