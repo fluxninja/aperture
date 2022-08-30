@@ -10,7 +10,6 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
@@ -71,8 +70,6 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	fluxMeterProtos := make([]*flowcontrolv1.FluxMeter, len(fluxMeters))
 	for i, fluxMeter := range fluxMeters {
 		fluxMeterProtos[i] = &flowcontrolv1.FluxMeter{
-			PolicyName:    fluxMeter.GetPolicyName(),
-			PolicyHash:    fluxMeter.GetPolicyHash(),
 			FluxMeterName: fluxMeter.GetFluxMeterName(),
 		}
 	}
@@ -169,7 +166,7 @@ func (e *Engine) UnregisterConcurrencyLimiter(cl iface.Limiter) error {
 	return e.unregister("ConcurrencyLimiter:"+cl.GetLimiterID().String(), selectorProto)
 }
 
-// RegisterFluxMeter adds fluxmeter to histogram map.
+// RegisterFluxMeter adds fluxmeter to histogram map and multimatcher.
 func (e *Engine) RegisterFluxMeter(fm iface.FluxMeter) error {
 	// Save the histogram in fluxMeterHists indexed by metric id
 	e.fluxMeterMapMutex.Lock()
@@ -193,7 +190,7 @@ func (e *Engine) RegisterFluxMeter(fm iface.FluxMeter) error {
 	return e.register("FluxMeter:"+fm.GetFluxMeterID().String(), selectorProto, fluxMeterMatchedCB)
 }
 
-// UnregisterFluxMeter removes fluxmeter from histogram map.
+// UnregisterFluxMeter removes fluxmeter from histogram map and multimatcher.
 func (e *Engine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 	// Remove the histogram from fluxMeterHists indexed by metric id
 	e.fluxMeterMapMutex.Lock()
@@ -206,11 +203,10 @@ func (e *Engine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 }
 
 // GetFluxMeterHist Lookup function for getting histogram.
-func (e *Engine) GetFluxMeterHist(policyName, fluxMeterName, statusCode string, decisionType flowcontrolv1.DecisionType) prometheus.Observer {
+func (e *Engine) GetFluxMeterHist(fluxMeterName, statusCode string, decisionType flowcontrolv1.DecisionType) prometheus.Observer {
 	e.fluxMeterMapMutex.RLock()
 	defer e.fluxMeterMapMutex.RUnlock()
 	fmID := iface.FluxMeterID{
-		PolicyName:    policyName,
 		FluxMeterName: fluxMeterName,
 	}
 	fluxMeter := e.fluxMetersMap[fmID]
@@ -279,7 +275,6 @@ func (e *Engine) register(key string, selectorProto *selectorv1.Selector, matche
 
 	selector, err := selectors.FromProto(selectorProto)
 	if err != nil {
-		log.Warn().Err(err).Msg("Failed to parse selector")
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
 
@@ -302,15 +297,13 @@ func (e *Engine) unregister(key string, selectorProto *selectorv1.Selector) erro
 
 	selector, err := selectors.FromProto(selectorProto)
 	if err != nil {
-		log.Warn().Err(err).Msg("Failed to parse selector")
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
 
 	// check if multi matcher exists for this control point id
 	mm, ok := e.multiMatchers[selector.ControlPointID]
 	if !ok {
-		log.Warn().Msg("Unable to unregister, multi matcher not found for control point id")
-		return nil
+		return fmt.Errorf("unable to unregister, multi matcher not found for control point id: %v", selector.ControlPointID)
 	}
 	err = mm.RemoveEntry(key)
 	if err != nil {

@@ -219,13 +219,13 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 		}
 	}
 	if deleteClusterRole {
-		if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil {
+		if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil && !errors.IsNotFound(err) {
 			log.Error(err, "failed to delete object of ClusterRole")
 			return err
 		}
 	}
 
-	if err := r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil {
+	if err := r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "failed to delete object of ClusterRoleBinding")
 		return err
 	}

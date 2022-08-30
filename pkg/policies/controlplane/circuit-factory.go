@@ -3,6 +3,7 @@ package controlplane
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/looplab/tarjan"
 	"go.uber.org/fx"
@@ -20,13 +21,23 @@ func circuitFactoryModule() fx.Option {
 	)
 }
 
-// compileCircuit takes a circuitProto and returns list of CompiledComponentAndPorts.
+// CompiledComponent is composed of runtime.CompiledComponent, ComponentID and ParentComponentID.
+type CompiledComponent struct {
+	runtime.CompiledComponentAndPorts
+	ComponentID       string
+	ParentComponentID string
+}
+
+// CompiledCircuit is a list of CompiledComponent(s).
+type CompiledCircuit []CompiledComponent
+
+// compileCircuit takes a circuitProto and returns list of CompiledCircuit.
 func compileCircuit(
 	circuitProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
-) ([]runtime.CompiledComponentAndPorts, fx.Option, error) {
-	// List of runtime.CompiledComponent. The index of runtime.CompiledComponents in compList is referred as graphNodeIndex.
-	var compList []runtime.CompiledComponent
+) (CompiledCircuit, fx.Option, error) {
+	// List of runtime.CompiledComponent. The index of CompiledComponent in compiledCircuit is referred as graphNodeIndex.
+	var compiledCircuit CompiledCircuit
 	// Map from signal name to a list of graphNodeIndex(es) which accept the signal as input.
 	inSignals := make(map[string][]int)
 	// Map from signal name to the graphNodeIndex which emits the signal as output.
@@ -43,33 +54,40 @@ func compileCircuit(
 		}
 		componentOptions = append(componentOptions, compOption)
 
-		// Add Component to compList
+		compID := strconv.Itoa(compIndex)
+		// Add Component to compiledCircuit
 		if compiledComp.Component != nil {
-			compList = append(compList, compiledComp)
+			compiledCircuit = append(compiledCircuit, CompiledComponent{
+				CompiledComponentAndPorts: runtime.CompiledComponentAndPorts{
+					CompiledComponent:   compiledComp,
+					InPortToSignalsMap:  make(runtime.PortToSignal),
+					OutPortToSignalsMap: make(runtime.PortToSignal),
+				},
+				ComponentID: compID,
+			})
 		}
 
-		// Add SubComponents to compList
-		if len(compiledSubComps) > 0 {
-			compList = append(compList, compiledSubComps...)
+		// Add SubComponents to compiledCircuit
+		for _, subComp := range compiledSubComps {
+			compiledCircuit = append(compiledCircuit, CompiledComponent{
+				CompiledComponentAndPorts: runtime.CompiledComponentAndPorts{
+					CompiledComponent:   subComp,
+					InPortToSignalsMap:  make(runtime.PortToSignal),
+					OutPortToSignalsMap: make(runtime.PortToSignal),
+				},
+				ComponentID:       compID + "." + subComp.Name,
+				ParentComponentID: compID,
+			})
 		}
 	}
-	log.Trace().Msgf("Comp list: %+v", compList)
 
-	// Second pass to initialize port maps for each component
-	compWithPortsList := make([]runtime.CompiledComponentAndPorts, len(compList))
-	for graphNodeIndex, compiledComp := range compList {
-		mapStruct := compiledComp.MapStruct
+	for graphNodeIndex, compiledComp := range compiledCircuit {
+		mapStruct := compiledComp.CompiledComponent.MapStruct
 		log.Trace().Msgf("mapStruct: %+v", mapStruct)
-
-		compWithPorts := runtime.CompiledComponentAndPorts{
-			InPortToSignalsMap:  make(runtime.PortToSignal),
-			OutPortToSignalsMap: make(runtime.PortToSignal),
-			CompiledComponent:   compiledComp,
-		}
 
 		// Read in_ports in mapStruct
 		inPorts, ok := mapStruct["in_ports"]
-		log.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", compiledComp.Name).Msg("mapStruct[in_ports]")
+		log.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", compiledComp.CompiledComponent.Name).Msg("mapStruct[in_ports]")
 		if ok {
 			// Convert in_ports to map[string]interface{}
 			inPortsMap, castOk := inPorts.(map[string]interface{})
@@ -79,12 +97,12 @@ func compileCircuit(
 					return nil, nil, err
 				}
 				log.Trace().Msgf("inPortToSignalsMap: %+v", inPortToSignalsMap)
-				compWithPorts.InPortToSignalsMap = inPortToSignalsMap
+				compiledComp.InPortToSignalsMap = inPortToSignalsMap
 			}
 		}
 		// Read out_ports in mapStruct
 		outPorts, ok := mapStruct["out_ports"]
-		log.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", compiledComp.Name).Msg("mapStruct[out_ports]")
+		log.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", compiledComp.CompiledComponent.Name).Msg("mapStruct[out_ports]")
 		if ok {
 			// Convert out_ports to map[string]interface{}
 			outPortsMap, castOk := outPorts.(map[string]interface{})
@@ -94,12 +112,9 @@ func compileCircuit(
 					return nil, nil, err
 				}
 				log.Trace().Msgf("inPortToSignalsMap: %+v", outPortToSignalsMap)
-				compWithPorts.OutPortToSignalsMap = outPortToSignalsMap
+				compiledComp.OutPortToSignalsMap = outPortToSignalsMap
 			}
 		}
-
-		// Append compWithPorts to compWithPortsList
-		compWithPortsList[graphNodeIndex] = compWithPorts
 	}
 
 	// Sanitization of inSignals i.e. all inSignals should be defined in outSignals
@@ -113,7 +128,7 @@ func compileCircuit(
 	// Create a graph for Tarjan's algorithm
 	graph := make(map[interface{}][]interface{})
 
-	for graphNodeIndex, compWithPorts := range compWithPortsList {
+	for graphNodeIndex, compWithPorts := range compiledCircuit {
 		destCompIndexes := make([]interface{}, 0)
 		for _, signals := range compWithPorts.OutPortToSignalsMap {
 			for _, signal := range signals {
@@ -166,14 +181,14 @@ func compileCircuit(
 			removeFromCompIndexLoopIdx := (smallestCompIndexLoopIdx + 1) % len(loop)
 			removeFromCompIndex := loop[removeFromCompIndexLoopIdx].(int)
 			// Remove connections from components at removeFromCompIndex to removeToCompIndex
-			if removeToCompIndex >= len(compWithPortsList) {
+			if removeToCompIndex >= len(compiledCircuit) {
 				return nil, fx.Options(), errors.New("removeToCompId is out of range")
 			}
-			removeToComp := compWithPortsList[removeToCompIndex]
-			if removeFromCompIndex >= len(compWithPortsList) {
+			removeToComp := compiledCircuit[removeToCompIndex]
+			if removeFromCompIndex >= len(compiledCircuit) {
 				return nil, fx.Options(), errors.New("removeFromCompId is out of range")
 			}
-			removeFromComp := compWithPortsList[removeFromCompIndex]
+			removeFromComp := compiledCircuit[removeFromCompIndex]
 			loopedSignals := make(map[string]bool)
 			// Mark looped signals in InPortToSignalsMap
 			for _, signals := range removeToComp.InPortToSignalsMap {
@@ -204,14 +219,12 @@ func compileCircuit(
 		}
 	}
 
-	log.Trace().Msgf("comp with ports list: %+v", compWithPortsList)
+	log.Trace().Msgf("comp with ports list: %+v", compiledCircuit)
 
-	// Log compWithPortsList
-	for _, compWithPorts := range compWithPortsList {
-		log.Trace().Msgf("comp with ports: %+v", compWithPorts)
-	}
+	// Log compiledCircuit
+	log.Trace().Msgf("compiled circuit: %+v", compiledCircuit)
 
-	return compWithPortsList, fx.Options(componentOptions...), nil
+	return compiledCircuit, fx.Options(componentOptions...), nil
 }
 
 type signalType int

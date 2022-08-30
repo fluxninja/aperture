@@ -52,7 +52,18 @@ type otelConfig struct {
 	// Addr is an address on which this app is serving metrics.
 	// TODO this should be inherited from the listener.Listener config, but it's
 	// not initialized at the provide state of app.
-	Addr string `json:"addr" validate:"hostname_port" default:":8080"`
+	Addr             string `json:"addr" validate:"hostname_port" default:":8080"`
+	BatchPrerollup   Batch  `json:"batch_prerollup"`
+	BatchPostrollup  Batch  `json:"batch_postrollup"`
+	BatchMetricsFast Batch  `json:"batch_metrics_fast"`
+}
+
+// Batch defines configuration for OTEL batch processor.
+type Batch struct {
+	// Timeout sets the time after which a batch will be sent regardless of size.
+	Timeout config.Duration `json:"timeout"`
+	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	SendBatchSize uint32 `json:"send_batch_size"`
 }
 
 // ProvideAnnotatedAgentConfig provides annotated OTEL config for agent.
@@ -86,7 +97,7 @@ func newAgentOTELConfig(unmarshaller config.Unmarshaller, promClient promapi.Cli
 	}
 	config := otelcollector.NewOTELConfig()
 	config.AddDebugExtensions()
-	addLogsAndTracesPipelines(config)
+	addLogsAndTracesPipelines(config, cfg)
 	addMetricsPipeline(config, promClient, cfg)
 	return config, nil
 }
@@ -102,14 +113,14 @@ func newControllerOTELConfig(unmarshaller config.Unmarshaller, promClient promap
 	return config, nil
 }
 
-func addLogsAndTracesPipelines(config *otelcollector.OTELConfig) {
+func addLogsAndTracesPipelines(config *otelcollector.OTELConfig, cfg otelConfig) {
 	// Common dependencies for pipelines
 	addOTLPReceiver(config)
 	config.AddProcessor(ProcessorEnrichment, nil)
 	addMetricsProcessor(config)
-	config.AddBatchProcessor(ProcessorBatchPrerollup, 1*time.Second, 10000)
+	config.AddBatchProcessor(ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.Duration.AsDuration(), cfg.BatchPrerollup.SendBatchSize)
 	addRollupProcessor(config)
-	config.AddBatchProcessor(ProcessorBatchPostrollup, 1*time.Second, 10000)
+	config.AddBatchProcessor(ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.Duration.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
 	config.AddExporter(ExporterLogging, nil)
 
 	processors := []string{
@@ -136,7 +147,7 @@ func addLogsAndTracesPipelines(config *otelcollector.OTELConfig) {
 func addMetricsPipeline(config *otelcollector.OTELConfig, promClient promapi.Client, cfg otelConfig) {
 	addPrometheusReceiver(config, cfg)
 	config.AddProcessor(ProcessorEnrichment, nil)
-	config.AddBatchProcessor(ProcessorBatchMetricsFast, 1*time.Second, 1000)
+	config.AddBatchProcessor(ProcessorBatchMetricsFast, cfg.BatchMetricsFast.Timeout.Duration.AsDuration(), cfg.BatchMetricsFast.SendBatchSize)
 	addPrometheusRemoteWriteExporter(config, promClient)
 	config.Service.AddPipeline("metrics/fast", otelcollector.Pipeline{
 		Receivers: []string{ReceiverPrometheus},

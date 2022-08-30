@@ -17,8 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"time"
-
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -419,8 +417,8 @@ type APIKeySecretSpec struct {
 type Batch struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=1000000000
-	Timeout time.Duration `json:"timeout"`
+	//+kubebuilder:default:="1s"
+	Timeout string `json:"timeout"`
 
 	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 	//+kubebuilder:validation:Optional

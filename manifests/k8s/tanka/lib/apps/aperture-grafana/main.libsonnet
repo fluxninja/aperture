@@ -1,6 +1,8 @@
 local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonnet/4.3/main.libsonnet';
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
+local decisionDashboard = import 'github.com/fluxninja/aperture-blueprints/lib/1.0/dashboards/decision.libsonnet';
+
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;
 local dataSource = grafanaOperator.integreatly.v1alpha1.grafanaDataSource;
@@ -36,6 +38,16 @@ local kubeDashboards =
 
 local dashboards =
   [
+    dashboard.new('example-dashboard') +
+    dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
+    dashboard.spec.withJson(std.manifestJsonEx(decisionDashboard({
+      policyName: 'demo1-demo-app',
+    }).dashboard, indent='  ')) +
+    dashboard.spec.withDatasources({
+      inputName: 'DS_APERTURE-PROMETHEUS',
+      datasourceName: 'aperture-prometheus',
+    }),
+
     dashboard.new('k8s-resources') +
     dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
     dashboard.spec.withJson(std.manifestJsonEx(kubeDashboards['k8s-resources-pod.json'], indent='  ')) +
