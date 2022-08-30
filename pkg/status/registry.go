@@ -19,7 +19,6 @@ type Registry interface {
 	Delim() string
 	Path() string
 	Keys() []string
-	Exists() bool
 	Get() *statusv1.GroupStatus
 	GetAllFlat() (map[string]*statusv1.GroupStatus, error)
 	Push(*statusv1.Status) error
@@ -79,10 +78,6 @@ func (reg *registry) Keys() []string {
 	reg.mu.Lock()
 	defer reg.mu.Unlock()
 
-	return getKeys(reg)
-}
-
-func getKeys(reg *registry) []string {
 	keyMap := generateKeyMap(reg.statusMap, nil, reg.delim)
 
 	keys := make([]string, 0, len(keyMap))
@@ -101,30 +96,13 @@ func getKeys(reg *registry) []string {
 	return prefixedKeys
 }
 
-// Exists returns true if the given path exists in the registry.
-func (reg *registry) Exists() bool {
-	return existsAtPath(reg, reg.path)
-}
-
-func existsAtPath(reg *registry, path string) bool {
-	reg.mu.Lock()
-	defer reg.mu.Unlock()
-
-	_, ok := existsInMap(reg.statusMap, reg.delim, path)
-	return ok
-}
-
 // Get returns the *statusv1.GroupStatus from the provided path in registry.
 // If the path does not exist, nil is returned.
 func (reg *registry) Get() *statusv1.GroupStatus {
-	return getAtPath(reg, reg.path)
-}
-
-func getAtPath(reg *registry, path string) *statusv1.GroupStatus {
 	reg.mu.Lock()
 	defer reg.mu.Unlock()
 
-	paths := strings.Split(path, reg.delim)
+	paths := strings.Split(reg.path, reg.delim)
 	gs := searchMap(reg.statusMap, paths)
 
 	out, _ := copystructure.Copy(gs)
@@ -154,32 +132,41 @@ func (reg *registry) GetAllFlat() (map[string]*statusv1.GroupStatus, error) {
 
 // Push adds a new result to the provided path.
 func (reg *registry) Push(status *statusv1.Status) error {
-	return pushAtPath(reg, reg.path, status)
-}
-
-func pushAtPath(reg *registry, path string, status *statusv1.Status) error {
 	reg.mu.Lock()
 	defer reg.mu.Unlock()
 
-	return pushToMap(reg.statusMap, reg.delim, path, status)
+	if reg.path == "" {
+		return errors.New("path doesn't exist")
+	}
+
+	gs := &statusv1.GroupStatus{
+		Status: status,
+		Groups: nil,
+	}
+
+	um := unflattenMap(
+		map[string]*statusv1.GroupStatus{
+			reg.path: gs,
+		},
+		reg.delim,
+	)
+
+	mergeMaps(um, reg.statusMap)
+	return nil
 }
 
 // Delete removes all nested values from registry.
 func (reg *registry) Delete() error {
-	return deleteAtPath(reg, reg.path)
-}
-
-func deleteAtPath(reg *registry, path string) error {
 	reg.mu.Lock()
 	defer reg.mu.Unlock()
 
 	// If no path is provided, empty the whole registry.
-	if path == "" {
+	if reg.path == "" {
 		reg.statusMap = make(map[string]*statusv1.GroupStatus)
 		return nil
 	}
 
-	keyPath, ok := existsInMap(reg.statusMap, reg.delim, path)
+	keyPath, ok := existsInMap(reg.statusMap, reg.delim, reg.path)
 	if !ok {
 		return errors.New("path doesn't exist")
 	}

@@ -1,7 +1,6 @@
 package status
 
 import (
-	"errors"
 	"strings"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
@@ -16,49 +15,25 @@ func existsInMap(m map[string]*statusv1.GroupStatus, delim string, path string) 
 	return keyPath, ok
 }
 
-func pushToMap(m map[string]*statusv1.GroupStatus, delim string, path string, status *statusv1.Status) error {
-	if path == "" {
-		return errors.New("path doesn't exist")
-	}
-
-	gs := &statusv1.GroupStatus{
-		Status: status,
-		Groups: nil,
-	}
-
-	um := unflattenMap(
-		map[string]*statusv1.GroupStatus{
-			path: gs,
-		},
-		delim,
-	)
-
-	mergeMaps(um, m)
-	return nil
-}
-
 // merge a into b.
 func mergeMaps(a, b map[string]*statusv1.GroupStatus) {
-	for ak, av := range a {
+	for key, val := range a {
 		// If key does not exist in b, add it and continue
-		bv, ok := b[ak]
+		bVal, ok := b[key]
 		if !ok {
-			b[ak] = av
+			b[key] = val
 			continue
 		}
 
-		if av.Status.Details != nil {
-			bv.Status.Details = av.Status.GetDetails()
-		}
-		if av.Status.Timestamp != nil {
-			bv.Status.Timestamp = av.Status.GetTimestamp()
+		if val.Status != nil {
+			b[key].Status = val.Status
 		}
 
 		// If key exists in b, merge the two
-		if bv.Groups != nil {
-			mergeMaps(av.Groups, bv.Groups)
+		if bVal.Groups != nil {
+			mergeMaps(val.Groups, bVal.Groups)
 		} else {
-			b[ak].Groups = av.Groups
+			b[key].Groups = val.Groups
 		}
 	}
 }
@@ -109,7 +84,7 @@ func unflattenMap(m map[string]*statusv1.GroupStatus, delim string) map[string]*
 			sub, ok := next[key]
 			if !ok {
 				sub = &statusv1.GroupStatus{
-					Status: &statusv1.Status{},
+					Status: nil,
 					Groups: make(map[string]*statusv1.GroupStatus),
 				}
 				next[key] = sub

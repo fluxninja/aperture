@@ -80,14 +80,6 @@ var _ = Describe("Status Registry", func() {
 		Expect(j1s2k1regKeys).To(HaveLen(1))
 	})
 
-	It("should have paths that were pushed", func() {
-		Expect(j1.Exists()).To(BeTrue())
-		Expect(j1s1k2.Exists()).To(BeTrue())
-
-		r := NewRegistry(reg, "r1")
-		Expect(r.Exists()).To(BeFalse())
-	})
-
 	It("should error when status is pushed without path", func() {
 		err := reg.Push(NewStatus(nil, errors.New("key1")))
 		Expect(err).To(HaveOccurred())
@@ -106,9 +98,8 @@ var _ = Describe("Status Registry", func() {
 	})
 
 	It("should delete the status", func() {
-		Expect(j1s1k1.Exists()).To(BeTrue())
 		j1s1k1.Delete()
-		Expect(j1s1k1.Exists()).To(BeFalse())
+		Expect(j1s1k1.Get()).To(BeNil())
 	})
 
 	It("should have no keys when root path is deleted", func() {
@@ -170,8 +161,7 @@ var _ = Describe("Status Registry", func() {
 			experiment.MeasureDuration("Delete", func() {
 				err := m.Delete()
 				Expect(err).ToNot(HaveOccurred())
-				ok := m.Exists()
-				Expect(ok).To(BeFalse())
+				Expect(m.Get()).To(BeNil())
 			})
 		}, gmeasure.SamplingConfig{N: 1000})
 	})
