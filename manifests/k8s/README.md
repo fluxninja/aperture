@@ -74,10 +74,10 @@ Tilt can be installed with `asdf install` or manually <https://docs.tilt.dev/ins
 
 ### Prerequisites - k8s cluster bootstrap
 
-Create a K8s cluster using Kind:
+Create a K8s cluster using Kind with configuration file:
 
 ```sh
-kind create cluster
+kind create cluster --name aperture-playground --config kind-config.yaml
 ```
 
 ### Services deployment
