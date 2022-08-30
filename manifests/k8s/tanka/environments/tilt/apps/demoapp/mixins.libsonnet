@@ -7,6 +7,7 @@ local latencyGradientPolicy = import 'github.com/fluxninja/aperture-blueprints/l
 local demoappMixin =
   demoApp {
     values+: {
+      replicaCount: 2,
       simplesrv+: {
         image: {
           repository: 'gcr.io/devel-309501/cf-fn/demo-app',

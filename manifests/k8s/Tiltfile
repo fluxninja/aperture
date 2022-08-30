@@ -887,7 +887,7 @@ kubectl delete configmap load-test
 cmd_button('demoapp-load-test-del',
     resource='demo1-demo-app',
     icon_name='content_paste_off',
-    text='Stop load test',
+    text='Delete load test',
     argv=['sh', '-c', delete_load_generator],
 )
 
