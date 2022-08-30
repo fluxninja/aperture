@@ -65,7 +65,7 @@ func newPolicyOptions(
 		fx.Annotate(policy, fx.As(new(iface.Policy))),
 	))
 
-	compWithPortsList := make([]runtime.CompiledComponentAndPorts, len(compiledCircuit))
+	compWithPortsList := make([]runtime.CompiledComponentAndPorts, 0, len(compiledCircuit))
 	for _, compiledComponent := range compiledCircuit {
 		// Skip nil component
 		if compiledComponent.CompiledComponent.Component != nil {
