@@ -30,18 +30,16 @@ import (
 var _ = Describe("ServiceAccount for Controller", func() {
 	Context("Instance with default parameters", func() {
 		It("returns correct ServiceAccount", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Controller: v1alpha1.ControllerSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
-								Create:                       true,
-								AutomountServiceAccountToken: true,
-							},
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
+							Create:                       true,
+							AutomountServiceAccountToken: true,
 						},
 					},
 				},
@@ -62,7 +60,7 @@ var _ = Describe("ServiceAccount for Controller", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -78,21 +76,19 @@ var _ = Describe("ServiceAccount for Controller", func() {
 
 	Context("Instance with all parameters", func() {
 		It("returns correct ServiceAccount", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Labels:      testMap,
-					Annotations: testMap,
-					Controller: v1alpha1.ControllerSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
-								Create:                       true,
-								Annotations:                  testMapTwo,
-								AutomountServiceAccountToken: false,
-							},
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						Labels:      testMap,
+						Annotations: testMap,
+						ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
+							Create:                       true,
+							Annotations:                  testMapTwo,
+							AutomountServiceAccountToken: false,
 						},
 					},
 				},
@@ -117,7 +113,7 @@ var _ = Describe("ServiceAccount for Controller", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -135,18 +131,16 @@ var _ = Describe("ServiceAccount for Controller", func() {
 var _ = Describe("ServiceAccount for Agent", func() {
 	Context("Instance with default parameters", func() {
 		It("returns correct ServiceAccount", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Agent: v1alpha1.AgentSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
-								Create:                       true,
-								AutomountServiceAccountToken: true,
-							},
+				Spec: v1alpha1.AgentSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
+							Create:                       true,
+							AutomountServiceAccountToken: true,
 						},
 					},
 				},
@@ -167,7 +161,7 @@ var _ = Describe("ServiceAccount for Agent", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Agent",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -183,21 +177,19 @@ var _ = Describe("ServiceAccount for Agent", func() {
 
 	Context("Instance with all parameters", func() {
 		It("returns correct ServiceAccount", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Labels:      testMap,
-					Annotations: testMap,
-					Agent: v1alpha1.AgentSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
-								Create:                       true,
-								Annotations:                  testMapTwo,
-								AutomountServiceAccountToken: false,
-							},
+				Spec: v1alpha1.AgentSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						Labels:      testMap,
+						Annotations: testMap,
+						ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
+							Create:                       true,
+							Annotations:                  testMapTwo,
+							AutomountServiceAccountToken: false,
 						},
 					},
 				},
@@ -222,7 +214,7 @@ var _ = Describe("ServiceAccount for Agent", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Agent",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},

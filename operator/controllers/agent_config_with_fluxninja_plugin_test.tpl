@@ -7,6 +7,15 @@ dist_cache:
 
 otel:
   addr: ":80"
+  batch_prerollup:
+    timeout: 1s
+    send_batch_size: 10000
+  batch_postrollup:
+    timeout: 1s
+    send_batch_size: 10000
+  batch_metrics_fast:
+    timeout: 1s
+    send_batch_size: 10000
 
 log:
   pretty_console: false

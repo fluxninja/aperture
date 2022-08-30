@@ -32,7 +32,7 @@ import (
 var _ = Describe("Service for Controller Webhook", func() {
 	Context("Instance with default parameters", func() {
 		It("returns correct Service", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
@@ -41,7 +41,7 @@ var _ = Describe("Service for Controller Webhook", func() {
 
 			expected := &corev1.Service{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "agent-webhooks",
+					Name:      validatingWebhookServiceName,
 					Namespace: appName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       appName,
@@ -54,7 +54,7 @@ var _ = Describe("Service for Controller Webhook", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -85,16 +85,16 @@ var _ = Describe("Service for Controller Webhook", func() {
 
 	Context("Instance with all parameters", func() {
 		It("returns correct Service", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Labels:      testMap,
-					Annotations: testMap,
-					Service: v1alpha1.ServiceSpec{
-						Controller: v1alpha1.Service{
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						Labels:      testMap,
+						Annotations: testMap,
+						Service: v1alpha1.Service{
 							Annotations: testMapTwo,
 						},
 					},
@@ -103,7 +103,7 @@ var _ = Describe("Service for Controller Webhook", func() {
 
 			expected := &corev1.Service{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "agent-webhooks",
+					Name:      validatingWebhookServiceName,
 					Namespace: appName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       appName,
@@ -120,7 +120,7 @@ var _ = Describe("Service for Controller Webhook", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -153,7 +153,7 @@ var _ = Describe("Service for Controller Webhook", func() {
 var _ = Describe("Service for Controller", func() {
 	Context("Instance with default parameters", func() {
 		It("returns correct Service", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
@@ -175,7 +175,7 @@ var _ = Describe("Service for Controller", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -206,16 +206,16 @@ var _ = Describe("Service for Controller", func() {
 
 	Context("Instance with all parameters", func() {
 		It("returns correct Service", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Labels:      testMap,
-					Annotations: testMap,
-					Service: v1alpha1.ServiceSpec{
-						Controller: v1alpha1.Service{
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						Labels:      testMap,
+						Annotations: testMap,
+						Service: v1alpha1.Service{
 							Annotations: testMapTwo,
 						},
 					},
@@ -241,7 +241,7 @@ var _ = Describe("Service for Controller", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -274,7 +274,7 @@ var _ = Describe("Service for Controller", func() {
 var _ = Describe("Service for Agent", func() {
 	Context("Instance with default parameters", func() {
 		It("returns correct Service", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
@@ -296,7 +296,7 @@ var _ = Describe("Service for Agent", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Agent",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -334,16 +334,16 @@ var _ = Describe("Service for Agent", func() {
 
 	Context("Instance with all parameters", func() {
 		It("returns correct Service", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Labels:      testMap,
-					Annotations: testMap,
-					Service: v1alpha1.ServiceSpec{
-						Agent: v1alpha1.Service{
+				Spec: v1alpha1.AgentSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						Labels:      testMap,
+						Annotations: testMap,
+						Service: v1alpha1.Service{
 							Annotations: testMapTwo,
 						},
 					},
@@ -369,7 +369,7 @@ var _ = Describe("Service for Agent", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Agent",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},

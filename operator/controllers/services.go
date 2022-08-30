@@ -34,23 +34,23 @@ import (
 )
 
 // serviceForControllerWebhook prepares an object of Service for Controller Webhook based on the provided parameters.
-func serviceForControllerWebhook(instance *v1alpha1.Aperture, log logr.Logger, scheme *runtime.Scheme) (*corev1.Service, error) {
-	agentControllerServiceSpec := instance.Spec.Service.Controller
+func serviceForControllerWebhook(instance *v1alpha1.Controller, log logr.Logger, scheme *runtime.Scheme) (*corev1.Service, error) {
+	controllerServiceSpec := instance.Spec.Service
 	annotations := instance.Spec.Annotations
-	if agentControllerServiceSpec.Annotations != nil {
+	if controllerServiceSpec.Annotations != nil {
 		if annotations == nil {
 			annotations = map[string]string{}
 		}
-		if err := mergo.Map(&annotations, agentControllerServiceSpec.Annotations, mergo.WithOverride); err != nil {
+		if err := mergo.Map(&annotations, controllerServiceSpec.Annotations, mergo.WithOverride); err != nil {
 			log.Info(fmt.Sprintf("failed to merge the Controller Webhook Service annotations. error: %s.", err.Error()))
 		}
 	}
 
 	svc := &corev1.Service{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        "agent-webhooks",
+			Name:        validatingWebhookServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, controllerServiceName),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
 			Annotations: annotations,
 		},
 		Spec: corev1.ServiceSpec{
@@ -74,8 +74,8 @@ func serviceForControllerWebhook(instance *v1alpha1.Aperture, log logr.Logger, s
 }
 
 // serviceForAgent prepares an object of Service for Agent based on the provided parameters.
-func serviceForAgent(instance *v1alpha1.Aperture, log logr.Logger, scheme *runtime.Scheme) (*corev1.Service, error) {
-	agentServiceSpec := instance.Spec.Service.Agent
+func serviceForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtime.Scheme) (*corev1.Service, error) {
+	agentServiceSpec := instance.Spec.Service
 	annotations := instance.Spec.Annotations
 	if agentServiceSpec.Annotations != nil {
 		if annotations == nil {
@@ -90,7 +90,7 @@ func serviceForAgent(instance *v1alpha1.Aperture, log logr.Logger, scheme *runti
 		ObjectMeta: v1.ObjectMeta{
 			Name:        agentServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, agentServiceName),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), agentServiceName),
 			Annotations: annotations,
 		},
 		Spec: corev1.ServiceSpec{
@@ -121,8 +121,8 @@ func serviceForAgent(instance *v1alpha1.Aperture, log logr.Logger, scheme *runti
 }
 
 // serviceForController prepares an object of Service for Controller based on the provided parameters.
-func serviceForController(instance *v1alpha1.Aperture, log logr.Logger, scheme *runtime.Scheme) (*corev1.Service, error) {
-	agentControllerServiceSpec := instance.Spec.Service.Controller
+func serviceForController(instance *v1alpha1.Controller, log logr.Logger, scheme *runtime.Scheme) (*corev1.Service, error) {
+	agentControllerServiceSpec := instance.Spec.Service
 	annotations := instance.Spec.Annotations
 	if agentControllerServiceSpec.Annotations != nil {
 		if annotations == nil {
@@ -137,7 +137,7 @@ func serviceForController(instance *v1alpha1.Aperture, log logr.Logger, scheme *
 		ObjectMeta: v1.ObjectMeta{
 			Name:        controllerServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, controllerServiceName),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
 			Annotations: instance.Spec.Annotations,
 		},
 		Spec: corev1.ServiceSpec{
@@ -169,8 +169,34 @@ func serviceMutate(svc *corev1.Service, spec corev1.ServiceSpec) controllerutil.
 	}
 }
 
-// createService calls the Kubernetes API to create the provided Service resource.
-func (r *ApertureReconciler) createService(service *corev1.Service, ctx context.Context, instance *v1alpha1.Aperture) error {
+// createService calls the Kubernetes API to create the provided Agent Service resource.
+func (r *AgentReconciler) createService(service *corev1.Service, ctx context.Context, instance *v1alpha1.Agent) error {
+	res, err := controllerutil.CreateOrUpdate(ctx, r.Client, service, serviceMutate(service, service.Spec))
+	if err != nil {
+		if errors.IsConflict(err) {
+			return r.createService(service, ctx, instance)
+		}
+
+		msg := fmt.Sprintf("failed to create Service '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
+			service.GetName(), instance.GetName(), instance.GetNamespace(), res, err.Error())
+		r.Recorder.Event(instance, corev1.EventTypeNormal, "ServiceCreationFailed", msg)
+		return fmt.Errorf(msg)
+	}
+
+	switch res {
+	case controllerutil.OperationResultCreated:
+		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "ServiceCreationSuccessful", "Created Service '%s'", service.GetName())
+	case controllerutil.OperationResultUpdated:
+		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "ServiceUpdationSuccessful", "Updated Service '%s'", service.GetName())
+	case controllerutil.OperationResultNone:
+	default:
+	}
+
+	return nil
+}
+
+// createService calls the Kubernetes API to create the provided Controller Service resource.
+func (r *ControllerReconciler) createService(service *corev1.Service, ctx context.Context, instance *v1alpha1.Controller) error {
 	res, err := controllerutil.CreateOrUpdate(ctx, r.Client, service, serviceMutate(service, service.Spec))
 	if err != nil {
 		if errors.IsConflict(err) {

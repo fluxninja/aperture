@@ -1,24 +1,20 @@
-# permissions for end users to edit apertures.
+# permissions for end users to view controllers.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: aperture-editor-role
+  name: controller-viewer-role
 rules:
 - apiGroups:
   - fluxninja.com
   resources:
-  - apertures
+  - controllers
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
 - apiGroups:
   - fluxninja.com
   resources:
-  - apertures/status
+  - controllers/status
   verbs:
   - get

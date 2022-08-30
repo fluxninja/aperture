@@ -29,7 +29,7 @@ import (
 )
 
 // MutatingWebhookConfiguration prepares the MutatingWebhookConfiguration object for the Operator, based on the provided parameter.
-func mutatingWebhookConfiguration(instance *v1alpha1.Aperture) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
+func mutatingWebhookConfiguration(instance *v1alpha1.Agent) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
 	certPath := fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), webhookClientCertName)
 	cert, err := os.ReadFile(certPath)
 	if err != nil {
@@ -39,8 +39,8 @@ func mutatingWebhookConfiguration(instance *v1alpha1.Aperture) (*admissionregist
 	mutatingWebhookConfiguration := &admissionregistrationv1.MutatingWebhookConfiguration{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        mutatingWebhookName,
-			Labels:      commonLabels(instance, operatorName),
-			Annotations: getAnnotationsWithOwnerRef(instance),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), operatorName),
+			Annotations: getAgentAnnotationsWithOwnerRef(instance),
 		},
 		Webhooks: []admissionregistrationv1.MutatingWebhook{
 			{

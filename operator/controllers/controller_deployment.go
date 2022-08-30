@@ -33,30 +33,30 @@ import (
 )
 
 // deploymentForAPIService prepares the Deployment object for the Controller.
-func deploymentForController(instance *v1alpha1.Aperture, log logr.Logger, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
-	controllerSpec := instance.Spec.Controller
+func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
+	spec := instance.Spec
 
-	podLabels := commonLabels(instance, controllerServiceName)
-	if controllerSpec.PodLabels != nil {
-		if err := mergo.Map(&podLabels, controllerSpec.PodLabels, mergo.WithOverride); err != nil {
+	podLabels := commonLabels(spec.Labels, instance.GetName(), controllerServiceName)
+	if spec.PodLabels != nil {
+		if err := mergo.Map(&podLabels, spec.PodLabels, mergo.WithOverride); err != nil {
 			log.Info(fmt.Sprintf("failed to merge the Pod labels for Deployment. error: %s.", err.Error()))
 		}
 	}
 
-	annotations := controllerSpec.PodAnnotations
+	annotations := spec.PodAnnotations
 	if annotations == nil {
 		annotations = map[string]string{}
 	}
 	annotations[sidecarAnnotationKey] = "false"
 
-	livenessProbe, readinessProbe := containerProbes(instance.Spec.Controller.CommonSpec)
+	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec)
 
 	dep := &appsv1.Deployment{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        controllerServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, controllerServiceName),
-			Annotations: instance.Spec.Annotations,
+			Labels:      commonLabels(spec.Labels, instance.GetName(), controllerServiceName),
+			Annotations: spec.Annotations,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Selector: &v1.LabelSelector{
@@ -73,29 +73,29 @@ func deploymentForController(instance *v1alpha1.Aperture, log logr.Logger, schem
 				},
 				Spec: corev1.PodSpec{
 					ServiceAccountName:            controllerServiceName,
-					HostAliases:                   controllerSpec.HostAliases,
-					ImagePullSecrets:              imagePullSecrets(instance.Spec.ImagePullSecrets, controllerSpec.Image),
-					NodeSelector:                  controllerSpec.NodeSelector,
-					Affinity:                      controllerSpec.Affinity,
-					Tolerations:                   controllerSpec.Tolerations,
-					SecurityContext:               podSecurityContext(controllerSpec.PodSecurityContext),
-					TerminationGracePeriodSeconds: controllerSpec.TerminationGracePeriodSeconds,
-					InitContainers:                controllerSpec.InitContainers,
+					HostAliases:                   spec.HostAliases,
+					ImagePullSecrets:              imagePullSecrets(spec.Image),
+					NodeSelector:                  spec.NodeSelector,
+					Affinity:                      spec.Affinity,
+					Tolerations:                   spec.Tolerations,
+					SecurityContext:               podSecurityContext(spec.PodSecurityContext),
+					TerminationGracePeriodSeconds: spec.TerminationGracePeriodSeconds,
+					InitContainers:                spec.InitContainers,
 					Containers: []corev1.Container{
 						{
 							Name:            controllerServiceName,
-							Image:           imageString(instance.Spec.ImageRegistry, controllerSpec.Image),
-							ImagePullPolicy: corev1.PullPolicy(controllerSpec.Image.PullPolicy),
-							SecurityContext: containerSecurityContext(controllerSpec.ContainerSecurityContext),
-							Command:         controllerSpec.Command,
-							Args:            controllerSpec.Args,
+							Image:           imageString(spec.Image),
+							ImagePullPolicy: corev1.PullPolicy(spec.Image.PullPolicy),
+							SecurityContext: containerSecurityContext(spec.ContainerSecurityContext),
+							Command:         spec.Command,
+							Args:            spec.Args,
 							Env:             controllerEnv(instance),
-							EnvFrom:         containerEnvFrom(controllerSpec.CommonSpec),
-							Resources:       controllerSpec.Resources,
+							EnvFrom:         containerEnvFrom(spec.CommonSpec),
+							Resources:       spec.Resources,
 							Ports: []corev1.ContainerPort{
 								{
 									Name:          "grpc",
-									ContainerPort: controllerSpec.ServerPort,
+									ContainerPort: spec.ServerPort,
 									Protocol:      "TCP",
 								},
 								{
@@ -108,8 +108,8 @@ func deploymentForController(instance *v1alpha1.Aperture, log logr.Logger, schem
 							TerminationMessagePolicy: corev1.TerminationMessageReadFile,
 							LivenessProbe:            livenessProbe,
 							ReadinessProbe:           readinessProbe,
-							Lifecycle:                controllerSpec.LifecycleHooks,
-							VolumeMounts:             controllerVolumeMounts(controllerSpec.CommonSpec),
+							Lifecycle:                spec.LifecycleHooks,
+							VolumeMounts:             controllerVolumeMounts(spec.CommonSpec),
 						},
 					},
 					Volumes: controllerVolumes(instance),
@@ -118,8 +118,8 @@ func deploymentForController(instance *v1alpha1.Aperture, log logr.Logger, schem
 		},
 	}
 
-	if controllerSpec.Sidecars != nil {
-		dep.Spec.Template.Spec.Containers = append(dep.Spec.Template.Spec.Containers, controllerSpec.Sidecars...)
+	if spec.Sidecars != nil {
+		dep.Spec.Template.Spec.Containers = append(dep.Spec.Template.Spec.Containers, spec.Sidecars...)
 	}
 
 	if err := ctrl.SetControllerReference(instance, dep, scheme); err != nil {
