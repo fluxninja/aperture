@@ -17,7 +17,7 @@ where it will get deployed on all the nodes of the cluster.
 1. The Aperture Agent can be installed in the DaemonSet mode using the Helm chart of Aperture Operator
    by using the default `values.yaml` or create a `values.yaml` with below parameters and pass it with `helm upgrade`:
 
-   ```bash
+   ```yaml
    agent:
      create: true
    ```
@@ -30,17 +30,17 @@ where it will get deployed on all the nodes of the cluster.
 
    1. Create a YAML file with below specifications:
 
-   ```yaml
-   apiVersion: fluxninja.com/v1alpha1
-   kind: Agent
-   metadata:
-     name: agent
-   spec:
-     image:
-       registry: docker.io/fluxninja
-       repository: aperture-agent
-       tag: latest
-   ```
+      ```yaml
+      apiVersion: fluxninja.com/v1alpha1
+      kind: Agent
+      metadata:
+        name: agent
+      spec:
+        image:
+          registry: docker.io/fluxninja
+          repository: aperture-agent
+          tag: latest
+      ```
 
    All the configuration parameters for the Agent Custom Resource are listed on the
    [README](https://artifacthub.io/packages/helm/aperture/aperture-operator#aperture-custom-resource-parameters)
@@ -48,9 +48,9 @@ where it will get deployed on all the nodes of the cluster.
 
    2. Apply the YAML file to Kubernetes cluster using `kubectl`
 
-   ```bash
-   kubectl apply -f agent.yaml
-   ```
+      ```bash
+      kubectl apply -f agent.yaml
+      ```
 
 3. Once you have successfully deployed the Helm release, confirm that the
    Aperture Agent is up and running:

@@ -42,9 +42,9 @@ file of the Helm chart.
 1. The Aperture Controller can be installed using the Helm chart of Aperture Operator
    by using the default `values.yaml` or create a `values.yaml` with below parameters and pass it with `helm upgrade`:
 
-   ```bash
+   ```yaml
    controller:
-    create: true
+     create: true
    ```
 
    ```bash
@@ -80,10 +80,10 @@ file of the Helm chart.
 3. Once you have successfully deployed the Custom Resource, confirm that the
    Aperture Controller is up and running:
 
-```bash
-kubectl get pod -A
+   ```bash
+   kubectl get pod -A
 
-kubectl get controller -A
-```
+   kubectl get controller -A
+   ```
 
-You should see pods for Aperture Controller in `RUNNING` state and `Controller` Custom Resource in `created` state..
+You should see pods for Aperture Controller in `RUNNING` state and `Controller` Custom Resource in `created` state.
