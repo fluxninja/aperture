@@ -44,4 +44,6 @@ bucket within a deadline period in order to be admitted.
 
 ## Timeouts
 
-The timeout parameter decides how long a request in the workload can wait for tokens. This value impacts fairness because the larger the timeout the higher the chance a request has to get scheduled.
+The timeout parameter decides how long a request in the workload can wait for tokens.
+This value impacts fairness because the larger the timeout the higher the chance a
+request has to get scheduled.
