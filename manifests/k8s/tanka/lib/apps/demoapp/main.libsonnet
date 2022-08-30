@@ -15,4 +15,14 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
       namespace: $.environment.namespace,
       values: $.values,
     }),
+  demo2:
+    helm.template('demo2', 'charts/demo-app', {
+      namespace: $.environment.namespace,
+      values: $.values,
+    }),
+  demo3:
+    helm.template('demo3', 'charts/demo-app', {
+      namespace: $.environment.namespace,
+      values: $.values,
+    }),
 }
