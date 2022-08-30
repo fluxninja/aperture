@@ -11,13 +11,12 @@ import (
 
 // FluxMeterID is the ID of the FluxMeter.
 type FluxMeterID struct {
-	PolicyName    string
 	FluxMeterName string
 }
 
 // String function returns the FluxMeterID as a string.
 func (fmID FluxMeterID) String() string {
-	return "policy_name-" + fmID.PolicyName + "-flux_meter_name-" + fmID.FluxMeterName
+	return "flux_meter_name-" + fmID.FluxMeterName
 }
 
 // FluxMeter in an interface for interacting with fluxmeters.

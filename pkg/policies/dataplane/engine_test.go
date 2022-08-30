@@ -54,7 +54,6 @@ var _ = Describe("Dataplane Engine", func() {
 			},
 		})
 		fluxMeterID = iface.FluxMeterID{
-			PolicyName:    "test",
 			FluxMeterName: "test",
 		}
 		limiterID = iface.LimiterID{
@@ -85,7 +84,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 		It("Unregisters not registered scheduler actuator", func() {
 			err := engine.UnregisterConcurrencyLimiter(mockLimiter)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("Unregisters existing scheduler actuator", func() {
@@ -118,7 +117,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 		It("Unregisters not registered Flux meter", func() {
 			err := engine.UnregisterFluxMeter(mockFluxmeter)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("Unregisters existing Flux meter", func() {
