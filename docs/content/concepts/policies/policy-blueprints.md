@@ -47,9 +47,7 @@ usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG]
 
 Aperture policies & dashboards generator utility.
 
-This utility can be used to generate policies and dashboards "in-place", that
-is generate json files with grafana dashboards and aperture policies, as opposed
-to using aperture-blueprints library as jsonnet library. Check main README.md for more
+This utility can be used to generate Aperture policies and Grafana dashboards "in-place". Check [aperture-blueprint's README.md](https://github.com/fluxninja/aperture-blueprints/blob/main/README.md) for more
 details.
 
 positional arguments:
