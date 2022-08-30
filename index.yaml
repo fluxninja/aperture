@@ -3,7 +3,7 @@ entries:
   aperture:
   - apiVersion: v2
     appVersion: v0.1.1
-    created: "2022-08-29T12:01:52.299681596+05:30"
+    created: "2022-08-30T18:58:23.396436137+05:30"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -16,12 +16,8 @@ entries:
       name: prometheus
       repository: https://prometheus-community.github.io/helm-charts
       version: =15.5.3
-    - condition: istio.enabled
-      name: istio
-      repository: https://getindata.github.io/helm-charts
-      version: =1.11.1
     description: Aperture Agent & Controller
-    digest: 0e25a0a77b8e61d82b206e81d6966acc9a7dfa719519a05526ff4af377e28890
+    digest: 1d59e35bb71e41be8ea36c3ebd05eaeb0ccbe5b5c27df6219957d25f33f50517
     name: aperture
     urls:
     - https://fluxninja.github.io/aperture/aperture-v0.0.1.tgz
@@ -29,7 +25,7 @@ entries:
   aperture-operator:
   - apiVersion: v2
     appVersion: v0.1.0
-    created: "2022-08-29T12:01:52.273470766+05:30"
+    created: "2022-08-30T18:58:23.389912314+05:30"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -42,14 +38,10 @@ entries:
       name: prometheus
       repository: https://prometheus-community.github.io/helm-charts
       version: =15.5.3
-    - condition: istio.enabled
-      name: istio
-      repository: https://getindata.github.io/helm-charts
-      version: =1.11.1
     description: A Helm chart to deploy Aperture operator
-    digest: 2a36abecd353dd9b516e3d324d88285e5efd5cc99afe3d6de6a9c59c1d516aad
+    digest: 127fca2573b6db091f0797dc2ca5fe02026fad0636d489be37243a2fe53840d9
     name: aperture-operator
     urls:
     - https://fluxninja.github.io/aperture/aperture-operator-v0.0.1.tgz
     version: v0.0.1
-generated: "2022-08-29T12:01:52.238239401+05:30"
+generated: "2022-08-30T18:58:23.378707173+05:30"
