@@ -39,89 +39,100 @@ func NewComponentAndOptions(
 		component, option, err := controller.NewGradientControllerAndOptions(gradientController, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(gradientController, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "Gradient",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "Gradient",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if limiter := componentProto.GetRateLimiter(); limiter != nil {
 		component, option, err := rate.NewRateLimiterAndOptions(limiter, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(limiter, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "RateLimiter",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "RateLimiter",
+			ComponentType: runtime.ComponentTypeSink,
 		}, nil, option, err
 	} else if ema := componentProto.GetEma(); ema != nil {
 		component, option, err := components.NewEMAAndOptions(ema, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(ema, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "EMA",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "EMA",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if arithmeticCombinator := componentProto.GetArithmeticCombinator(); arithmeticCombinator != nil {
 		component, option, err := components.NewArithmeticCombinatorAndOptions(arithmeticCombinator, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(arithmeticCombinator, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "ArithmeticCombinator",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "ArithmeticCombinator",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if promQL := componentProto.GetPromql(); promQL != nil {
 		component, option, err := components.NewPromQLAndOptions(promQL, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(promQL, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "PromQL",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "PromQL",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if constant := componentProto.GetConstant(); constant != nil {
 		component, option, err := components.NewConstantAndOptions(constant, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(constant, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "Constant",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "Constant",
+			ComponentType: runtime.ComponentTypeSource,
 		}, nil, option, err
 	} else if decider := componentProto.GetDecider(); decider != nil {
 		component, option, err := components.NewDeciderAndOptions(decider, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(decider, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "Decider",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "Decider",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if sqrt := componentProto.GetSqrt(); sqrt != nil {
 		component, option, err := components.NewSqrtAndOptions(sqrt, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(sqrt, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "Sqrt",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "Sqrt",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if max := componentProto.GetMax(); max != nil {
 		component, option, err := components.NewMaxAndOptions(max, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(max, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "Max",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "Max",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if min := componentProto.GetMin(); min != nil {
 		component, option, err := components.NewMinAndOptions(min, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(min, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "Min",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "Min",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if extrapolator := componentProto.GetExtrapolator(); extrapolator != nil {
 		component, option, err := components.NewExtrapolatorAndOptions(extrapolator, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(extrapolator, err)
 		return runtime.CompiledComponent{
-			Component: component,
-			MapStruct: mapStruct,
-			Name:      "Extrapolator",
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "Extrapolator",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else {
 		// Try Component Stack Factory
