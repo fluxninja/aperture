@@ -68,7 +68,13 @@ var _ = Describe("Status Registry", func() {
 		err := reg.Push("job1.subjob1", NewStatus(nil, errors.New("job1.subjob1")))
 		Expect(err).ToNot(HaveOccurred())
 
-		statusDetail := reg.Get("job1.subjob1").GetStatus().GetDetails()
+		groupStatus := reg.Get("job1.subjob1")
+		Expect(groupStatus).ToNot(BeNil())
+
+		status := groupStatus.GetStatus()
+		Expect(status).ToNot(BeNil())
+
+		statusDetail := status.GetDetails()
 		Expect(statusDetail).To(Equal(testGroupStatus("job1.subjob1").Status.Details))
 	})
 
@@ -89,11 +95,19 @@ var _ = Describe("Status Registry", func() {
 	})
 
 	It("should get the status details for the given key", func() {
-		statusDetail := reg.Get("key1").GetStatus().GetDetails()
-		Expect(statusDetail).To(Equal(testGroupStatus("key1").Status.Details))
+		groupStatus_key1 := reg.Get("key1")
+		Expect(groupStatus_key1).ToNot(BeNil())
+		status_key1 := groupStatus_key1.GetStatus()
+		Expect(status_key1).ToNot(BeNil())
+		statusDetail_key1 := status_key1.GetDetails()
+		Expect(statusDetail_key1).To(Equal(testGroupStatus("key1").Status.Details))
 
-		statusDetail = reg.Get("job1.subjob2.key1").GetStatus().GetDetails()
-		Expect(statusDetail).To(Equal(testGroupStatus("job1.subjob2.key1").Status.Details))
+		groupStatus_key2 := reg.Get("job1.subjob2.key1")
+		Expect(groupStatus_key2).ToNot(BeNil())
+		status_key2 := groupStatus_key2.GetStatus()
+		Expect(status_key2).ToNot(BeNil())
+		statusDetail_key2 := status_key2.GetDetails()
+		Expect(statusDetail_key2).To(Equal(testGroupStatus("job1.subjob2.key1").Status.Details))
 	})
 
 	It("should return correct flattened group status map", func() {
