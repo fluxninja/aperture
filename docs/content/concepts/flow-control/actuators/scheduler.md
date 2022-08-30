@@ -41,3 +41,9 @@ Aperture Agents use a variant of a
 [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket) is used to
 control the flows entering the system. Each flow has to acquire tokens from the
 bucket within a deadline period in order to be admitted.
+
+## Timeouts
+
+The timeout parameter decides how long a request in the workload can wait for tokens.
+This value impacts fairness because the larger the timeout the higher the chance a
+request has to get scheduled.

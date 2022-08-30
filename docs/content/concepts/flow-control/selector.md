@@ -47,4 +47,18 @@ within a Agent Group.
 
 ## Control Point
 
+A policy or rule is configured for a given control point within a service. Control
+Point is either a library feature name or one of ingress/egress traffic points.
+
 ## Label Matcher
+
+Label Matcher is part of the classifier on whether a map of labels should be considered
+a match or not. If multiple requirements are set, they are all ANDed. An empty label
+matcher always matches.
+
+This matcher allows to match the following labels:
+
+- Flow labels - We can only match flow labels that were created at some previous control point
+
+- Request labels - Request labels are always prefixed with request\_.Request headers are only
+  available for traffic control points
