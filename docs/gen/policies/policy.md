@@ -16,26 +16,23 @@
 - [RuleRego](#rule-rego) – Raw rego rules are compiled 1:1 to rego queries
 - [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
 - [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
-- [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to pr…
+- [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 - [languagev1RateLimiter](#languagev1-rate-limiter)
 - [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 
 Example of…
 
 - [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
-- [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals…
+- [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals
 - [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
 - [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the Arithmetic Combinator component.
-- [v1Circuit](#v1-circuit) – Circuit is defined as a dataflow graph of inter-connected components.
-
-Signals f…
-
+- [v1Circuit](#v1-circuit) – Circuit is defined as a dataflow graph of inter-connected components
 - [v1Classifier](#v1-classifier) – Set of classification rules sharing a common selector
 - [v1Component](#v1-component) – Computational block that form the circuit
-- [v1Constant](#v1-constant) – Component that emits a constant value as an output signal.
+- [v1Constant](#v1-constant) – Component that emits a constant value as an output signal
 - [v1ConstantOuts](#v1-constant-outs) – Outputs for the Constant component.
 - [v1ControlPoint](#v1-control-point) – Identifies control point within a service that the rule or policy should apply t…
-- [v1Decider](#v1-decider) – Type of combinator that computes the comparison operation on lhs and rhs signals…
+- [v1Decider](#v1-decider) – Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
 - [v1DeciderIns](#v1-decider-ins) – Inputs for the Decider component.
 - [v1DeciderOuts](#v1-decider-outs) – Outputs for the Decider component.
 - [v1EMA](#v1-e-m-a) – Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
@@ -43,44 +40,41 @@ Signals f…
 - [v1EMAOuts](#v1-e-m-a-outs) – Outputs for the EMA component.
 - [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
 - [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
-- [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the perio…
+- [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
 - [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator component.
 - [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator component.
 - [v1GradientController](#v1-gradient-controller) – Gradient controller is a type of controller which tries to adjust the
-  control va…
+  control variable proportionally to the relative difference between setpoint
+  and actual value of the signal
 - [v1GradientControllerIns](#v1-gradient-controller-ins) – Inputs for the Gradient Controller component.
 - [v1GradientControllerOuts](#v1-gradient-controller-outs) – Outputs for the Gradient Controller component.
 - [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of the fields
 - [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload
 - [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
 - [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not
-- [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in th…
+- [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
 - [v1LoadShedActuatorIns](#v1-load-shed-actuator-ins) – Input for the Load Shed Actuator component.
 - [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels
 - [v1MatchesMatchExpression](#v1-matches-match-expression) – Label selector expression of the matches form "label matches regex".
-- [v1Max](#v1-max) – Takes a list of input signals and emits the signal with the maximum value.
-  Max: …
+- [v1Max](#v1-max) – Takes a list of input signals and emits the signal with the maximum value
 - [v1MaxIns](#v1-max-ins) – Inputs for the Max component.
 - [v1MaxOuts](#v1-max-outs) – Output for the Max component.
-- [v1Min](#v1-min) – Takes an array of input signals and emits the signal with the minimum value.
-  Min…
+- [v1Min](#v1-min) – Takes an array of input signals and emits the signal with the minimum value
+  Min:…
 - [v1MinIns](#v1-min-ins) – Inputs for the Min component.
 - [v1MinOuts](#v1-min-outs) – Output ports for the Min component.
 - [v1PathTemplateMatcher](#v1-path-template-matcher) – Matches HTTP Path to given path templates
-- [v1Policy](#v1-policy) – Policy expresses reliability automation workflow that automatically protects ser…
-- [v1Port](#v1-port) – Components are interconnected with each other via Ports.
-- [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an…
+- [v1Policy](#v1-policy) – Policy expresses reliability automation workflow that automatically protects services
+- [v1Port](#v1-port) – Components are interconnected with each other via Ports
+- [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an output signal
 - [v1PromQLOuts](#v1-prom-q-l-outs) – Output for the PromQL component.
 - [v1RateLimiterIns](#v1-rate-limiter-ins)
-- [v1Resources](#v1-resources) – Resources that need to be setup for the policy to function.
-
-Resources are typic…
-
+- [v1Resources](#v1-resources) – Resources that need to be setup for the policy to function
 - [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule
-- [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing based workload scheduler.
+- [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing-based workload scheduler
 - [v1SchedulerOuts](#v1-scheduler-outs) – Output for the Scheduler component.
 - [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to
-- [v1Sqrt](#v1-sqrt) – Takes an input signal and emits the square root of it multiplied by scale as an …
+- [v1Sqrt](#v1-sqrt) – Takes an input signal and emits the square root of it multiplied by scale as an output
 - [v1SqrtIns](#v1-sqrt-ins) – Inputs for the Sqrt component.
 - [v1SqrtOuts](#v1-sqrt-outs) – Outputs for the Sqrt component.
 
@@ -192,7 +186,7 @@ Note: Must include a "package" declaration.
 
 ### <span id="scheduler-workload"></span> SchedulerWorkload
 
-Workload defines a class of requests that preferably have similar properties such as response latency.
+Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
 
 #### Properties
 
@@ -200,7 +194,11 @@ Workload defines a class of requests that preferably have similar properties suc
 <dt>fairness_key</dt>
 <dd>
 
-(string)
+(string) Fairness key is a label key that can be used to provide fairness within a workload
+
+Any label that could be used in label matcher can be used here. Eg. if
+you have a classifier that sets `user` flow label, you might want to set
+`fairness_key = "user"`.
 
 </dd>
 </dl>
@@ -218,8 +216,26 @@ Higher numbers means higher priority level.
 <dt>timeout</dt>
 <dd>
 
-(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens.
+(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens
+
 This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
+
+:::caution
+This timeout needs to be strictly less than the timeout set on the
+client for the whole GRPC call:
+
+- in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
+- in case of libraries, timeout configured... TODO.
+
+We're using fail-open logic in integrations, so if the GRPC timeout
+fires first, the flow will end up being unconditionally allowed while
+it're still waiting on the scheduler.
+
+To avoid such cases, the end-to-end GRPC timeout should also contain
+some headroom for constant overhead like serialization, etc. Default
+value for GRPC timeouts is 10ms, giving 5ms of headeroom, so when
+tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+:::
 
 </dd>
 </dl>
@@ -228,7 +244,7 @@ This value impacts the fairness because the larger the timeout the higher the ch
 <dd>
 
 (string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-This override is applicable only if auto_tokens is set to false.
+This override is applicable only if `auto_tokens` is set to false.
 
 </dd>
 </dl>
@@ -256,9 +272,18 @@ This override is applicable only if auto_tokens is set to false.
 
 ### <span id="languagev1-concurrency-limiter"></span> languagev1ConcurrencyLimiter
 
-Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
+Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
+
+:::info
+See also [Scheduler page in the Concepts section](/concepts/flow-control/actuators/scheduler.md)
+for a more high-level description.
+:::
+
 It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
 Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+
+ConcurrencyLimiter configuration is split into two parts: An actuation
+strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
 
 #### Properties
 
@@ -268,13 +293,18 @@ Concurrency is calculated in terms of total tokens which translate to (avg. late
 
 ([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a portion of requests.
 
+Actuation strategy defines the input signal that will drive the scheduler.
+
 </dd>
 </dl>
 <dl>
 <dt>scheduler</dt>
 <dd>
 
-([V1Scheduler](#v1-scheduler), `required`) Weighted Fair Queuing based workfload scheduler.
+([V1Scheduler](#v1-scheduler), `required`) Configuration of Weighted Fair Queuing-based workload scheduler.
+
+Contains configuration of per-agent scheduler, and also defines some
+output signals.
 
 </dd>
 </dl>
@@ -402,7 +432,7 @@ from: "source.address # or dstination.address"
 
 ### <span id="v1-arithmetic-combinator"></span> v1ArithmeticCombinator
 
-Type of combinator that computes the arithmetic operation on the operand signals.
+Type of combinator that computes the arithmetic operation on the operand signals
 
 #### Properties
 
@@ -474,7 +504,7 @@ Outputs for the Arithmetic Combinator component.
 
 ### <span id="v1-circuit"></span> v1Circuit
 
-Circuit is defined as a dataflow graph of inter-connected components.
+Circuit is defined as a dataflow graph of inter-connected components
 
 Signals flow between components via ports.
 As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
@@ -576,10 +606,11 @@ There are three categories of components:
   Eg. see the [Exponential Moving Average filter](#-v1ema).
   :::
 - "sink" components – they affect the real world.
-  [Scheduler](#-v1scheduler) and [RateLimiter](#-languagev1ratelimiter).
-  Also sometimes called _actuators_. In the UI, represented by orange color.
-  Sink components are usually also "sources" too, they usually emit a
-  feedback signal, like `accepted_concurrency` in case of ConcurrencyLimiter.
+  [ConcurrencyLimiter](#-languagev1concurrencylimiter) and [RateLimiter](#-languagev1ratelimiter).
+  Also sometimes called [_actuators_](/concepts/flow-control/actuators/actuators.md).
+  In the UI, represented by orange color. Sink components are usually also
+  "sources" too, they usually emit a feedback signal, like
+  `accepted_concurrency` in case of ConcurrencyLimiter.
 
 :::tip
 Sometimes you may want to use a constant value as one of component's inputs.
@@ -690,7 +721,7 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 
 ### <span id="v1-constant"></span> v1Constant
 
-Component that emits a constant value as an output signal.
+Component that emits a constant value as an output signal
 
 #### Properties
 
@@ -760,7 +791,7 @@ Usually powered by integration with a proxy (like envoy) or a web framework.
 
 ### <span id="v1-decider"></span> v1Decider
 
-Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison.
+Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
 
 The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
@@ -1109,7 +1140,8 @@ from: request.http.headers.user-agent
 
 ### <span id="v1-extrapolator"></span> v1Extrapolator
 
-Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
+Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
+
 It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 
 #### Properties
@@ -1173,7 +1205,7 @@ Outputs for the Extrapolator component.
 
 Gradient controller is a type of controller which tries to adjust the
 control variable proportionally to the relative difference between setpoint
-and actual value of the signal.
+and actual value of the signal
 
 The `gradient` describes a corrective factor that should be applied to the
 control variable to get the signal closer to the setpoint. It is computed as follows:
@@ -1474,7 +1506,7 @@ Note: The requirements are ANDed.
 
 ### <span id="v1-load-shed-actuator"></span> v1LoadShedActuator
 
-Takes the load shed factor input signal and publishes it to the schedulers in the data-plane.
+Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
 
 #### Properties
 
@@ -1497,7 +1529,8 @@ Input for the Load Shed Actuator component.
 <dt>load_shed_factor</dt>
 <dd>
 
-([V1Port](#v1-port)) Load shedding factor is a fraction of incoming concurrency (tokens \* requests) that needs to be dropped.
+([V1Port](#v1-port)) Load shedding factor is a fraction of [incoming
+concurrency](#-v1schedulerouts) that needs to be dropped.
 
 </dd>
 </dl>
@@ -1594,7 +1627,8 @@ It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/
 
 ### <span id="v1-max"></span> v1Max
 
-Takes a list of input signals and emits the signal with the maximum value.
+Takes a list of input signals and emits the signal with the maximum value
+
 Max: output = max([]inputs).
 
 #### Properties
@@ -1648,7 +1682,7 @@ Output for the Max component.
 
 ### <span id="v1-min"></span> v1Min
 
-Takes an array of input signals and emits the signal with the minimum value.
+Takes an array of input signals and emits the signal with the minimum value
 Min: output = min([]inputs).
 
 #### Properties
@@ -1742,7 +1776,7 @@ Example:
 
 ### <span id="v1-policy"></span> v1Policy
 
-Policy expresses reliability automation workflow that automatically protects services.
+Policy expresses reliability automation workflow that automatically protects services
 
 Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 
@@ -1767,7 +1801,7 @@ Policy specification contains a circuit that defines the controller logic and re
 
 ### <span id="v1-port"></span> v1Port
 
-Components are interconnected with each other via Ports.
+Components are interconnected with each other via Ports
 
 #### Properties
 
@@ -1782,7 +1816,7 @@ Components are interconnected with each other via Ports.
 
 ### <span id="v1-prom-q-l"></span> v1PromQL
 
-Component that runs a Prometheus query periodically and returns the result as an output signal.
+Component that runs a Prometheus query periodically and returns the result as an output signal
 
 #### Properties
 
@@ -1846,7 +1880,7 @@ Output for the PromQL component.
 
 ### <span id="v1-resources"></span> v1Resources
 
-Resources that need to be setup for the policy to function.
+Resources that need to be setup for the policy to function
 
 Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 
@@ -1954,7 +1988,14 @@ Rego extractor extracts a value from the rego module.
 
 ### <span id="v1-scheduler"></span> v1Scheduler
 
-Weighted Fair Queuing based workload scheduler.
+Weighted Fair Queuing-based workload scheduler
+
+:::note
+Each Agent instantiates an independent copy of the scheduler, but output
+signal are aggregated across all agents.
+:::
+
+See [ConcurrencyLimiter](#-languagev1concurrencylimiter) for more context.
 
 #### Properties
 
@@ -1962,7 +2003,10 @@ Weighted Fair Queuing based workload scheduler.
 <dt>auto_tokens</dt>
 <dd>
 
-(bool, default: `true`)
+(bool, default: `true`) Automatically estimate weight of flows in each workload, based on
+historical latency. Each workload's `tokens` will be set to average
+latency of flows in that workload during last few seconds (exact duration
+of this average can change).
 
 </dd>
 </dl>
@@ -1970,7 +2014,7 @@ Weighted Fair Queuing based workload scheduler.
 <dt>default_workload</dt>
 <dd>
 
-([SchedulerWorkload](#scheduler-workload))
+([SchedulerWorkload](#scheduler-workload)) Workload to be used if none of workloads specified in `workloads` match.
 
 </dd>
 </dl>
@@ -1994,8 +2038,21 @@ Weighted Fair Queuing based workload scheduler.
 <dt>workloads</dt>
 <dd>
 
-([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) list of workloads
-workload can describe priority, tokens (if auto_tokens are set to false) and timeout
+([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) List of workloads to be used in scheduler.
+
+Categorizing [flows](/concepts/flow-control#what-is-a-flow) into workloads
+allows for load-shedding to be "smarter" than just "randomly deny 50% of
+requests". There are two aspects of workloads:
+
+Each workload in this list specifies also a matcher that's used to
+determine which flow will be categorized into which workload.
+In case of multiple matching workloads, the first matching one will be used.
+If none of workloads match, `default_workload` will be used.
+
+:::info
+See also [workload definition in the concepts
+section](/concepts/flow-control/actuators/scheduler#workload).
+:::
 
 </dd>
 </dl>
@@ -2010,7 +2067,17 @@ Output for the Scheduler component.
 <dt>accepted_concurrency</dt>
 <dd>
 
-([V1Port](#v1-port)) Accepted concurrency is the number of accepted tokens/sec.
+([V1Port](#v1-port)) Accepted concurrency is the number of accepted tokens per second.
+
+:::info
+**Accepted tokens** are tokens associated with
+[flows](/concepts/flow-control#what-is-a-flow) that were accepted by
+this scheduler. Number of tokens for a flow is determined by a
+[workload](#-schedulerworkload) that the flow was assigned to (either
+via `auto_tokens` or explicitly by `Workload.tokens`).
+:::
+
+Value of this signal is the sum across all the relevant schedulers.
 
 </dd>
 </dl>
@@ -2019,6 +2086,8 @@ Output for the Scheduler component.
 <dd>
 
 ([V1Port](#v1-port)) Incoming concurrency is the number of incoming tokens/sec.
+This is the same as `accepted_concurrency`, but across all the flows
+entering scheduler, including rejected ones.
 
 </dd>
 </dl>
@@ -2104,7 +2173,7 @@ Note: Entity may belong to multiple services.
 
 ### <span id="v1-sqrt"></span> v1Sqrt
 
-Takes an input signal and emits the square root of it multiplied by scale as an output.
+Takes an input signal and emits the square root of it multiplied by scale as an output
 
 $$
 \text{output} = \text{scale} \sqrt{\text{input}}
