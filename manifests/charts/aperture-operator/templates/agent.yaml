@@ -159,27 +159,45 @@ spec:
     {{- if .Values.agent.fluxninjaPlugin.heartbeatsInterval }}
     heartbeatsInterval: {{ .Values.agent.fluxninjaPlugin.heartbeatsInterval }}
     {{- end }}
+    {{- if or .Values.agent.fluxninjaPlugin.tls.insecure .Values.agent.fluxninjaPlugin.tls.insecureSkipVerify .Values.agent.fluxninjaPlugin.tls.caFile }}
     tls:
+      {{- if .Values.agent.fluxninjaPlugin.tls.insecure }}
       insecure: {{ .Values.agent.fluxninjaPlugin.tls.insecure }}
+      {{- end }}
+      {{- if .Values.agent.fluxninjaPlugin.tls.insecureSkipVerify }}
       insecureSkipVerify: {{ .Values.agent.fluxninjaPlugin.tls.insecureSkipVerify }}
+      {{- end }}
+      {{- if .Values.agent.fluxninjaPlugin.tls.caFile }}
       caFile: {{ .Values.agent.fluxninjaPlugin.tls.caFile }}
+      {{- end }}
+    {{- end }}
+    {{- if or .Values.agent.fluxninjaPlugin.apiKeySecret.create .Values.agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.name .Values.agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.key .Values.agent.fluxninjaPlugin.apiKeySecret.value }}
     apiKeySecret:
+      {{- if .Values.agent.fluxninjaPlugin.apiKeySecret.create }}
       create: {{ .Values.agent.fluxninjaPlugin.apiKeySecret.create }}
+      {{- end }}
+      {{- if or .Values.agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.name .Values.agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.key }}
       secretKeyRef:
+        {{- if .Values.agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.name }}
         name: {{ .Values.agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.name }}
+        {{- end }}
+        {{- if .Values.agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.key }}
         key: {{ .Values.agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.key }}
-      value: {{ .Values.agent.fluxninjaPlugin.apiKeySecret.value }}
+        {{- end }}
+      {{- end }}
+      value: {{ include "aperture.apisecret.value" ( dict "object" .Values.agent $) }}
+    {{- end }}
   {{- end }}
   {{- if .Values.agent.service.annotations }}
   service:
-    {{- if .Values.agent.service.annotations }}
     annotations: {{ .Values.agent.service.annotations }}
-    {{- end }}
   {{- end }}
   {{- if .Values.agent.sidecar.enabled }}
   sidecar:
     enabled: {{ .Values.agent.sidecar.enabled }}
+    {{- if .Values.agent.sidecar.enableNamespacesByDefault }}
     enableNamespacesByDefault: {{ .Values.agent.sidecar.enableNamespacesByDefault }}
+    {{- end }}
   {{- end }}
   {{- if or (not .Values.etcd.enabled) .Values.agent.etcd.endpoints }}
   etcd:  {{- omit .Values.agent.etcd "endpoints" | toYaml | nindent 4 }}

@@ -138,22 +138,38 @@ spec:
     {{- if .Values.controller.fluxninjaPlugin.heartbeatsInterval }}
     heartbeatsInterval: {{ .Values.controller.fluxninjaPlugin.heartbeatsInterval }}
     {{- end }}
+    {{- if or .Values.controller.fluxninjaPlugin.tls.insecure .Values.controller.fluxninjaPlugin.tls.insecureSkipVerify .Values.controller.fluxninjaPlugin.tls.caFile }}
     tls:
+      {{- if .Values.controller.fluxninjaPlugin.tls.insecure }}
       insecure: {{ .Values.controller.fluxninjaPlugin.tls.insecure }}
+      {{- end }}
+      {{- if .Values.controller.fluxninjaPlugin.tls.insecureSkipVerify }}
       insecureSkipVerify: {{ .Values.controller.fluxninjaPlugin.tls.insecureSkipVerify }}
+      {{- end }}
+      {{- if .Values.controller.fluxninjaPlugin.tls.caFile }}
       caFile: {{ .Values.controller.fluxninjaPlugin.tls.caFile }}
+      {{- end }}
+    {{- end }}
+    {{- if or .Values.controller.fluxninjaPlugin.apiKeySecret.create .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key .Values.controller.fluxninjaPlugin.apiKeySecret.value }}
     apiKeySecret:
+      {{- if .Values.controller.fluxninjaPlugin.apiKeySecret.create }}
       create: {{ .Values.controller.fluxninjaPlugin.apiKeySecret.create }}
+      {{- end }}
+      {{- if or .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key }}
       secretKeyRef:
+        {{- if .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name }}
         name: {{ .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name }}
+        {{- end }}
+        {{- if .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key }}
         key: {{ .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key }}
-      value: {{ .Values.controller.fluxninjaPlugin.apiKeySecret.value }}
+        {{- end }}
+      {{- end }}
+      value: {{ include "aperture.apisecret.value" ( dict "object" .Values.controller $) }}
+    {{- end }}
   {{- end }}
   {{- if .Values.controller.service.annotations }}
   service:
-    {{- if .Values.controller.service.annotations }}
     annotations: {{ .Values.controller.service.annotations }}
-    {{- end }}
   {{- end }}
   {{- if or (not .Values.controller.etcd.enabled) .Values.controller.etcd.endpoints }}
   etcd:  {{- omit .Values.controller.etcd "endpoints" | toYaml | nindent 4 }}
