@@ -93,7 +93,10 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 
 	for _, job := range groupConfig.jobs {
 		regKey := strings.Join([]string{"liveness", "job_groups", jobGroup.GroupName(), job.Name()}, registry.Delim())
-		gotStatusMsg := registry.Get(regKey).Status.GetMessage()
+		groupStatus := registry.Get(regKey)
+		require.NotNil(t, groupStatus)
+
+		gotStatusMsg := groupStatus.Status.GetMessage()
 		expectedStatusMsg, _ := anypb.New(wrapperspb.String(groupConfig.jobRunConfig.expectedStatusMsg))
 		if !proto.Equal(gotStatusMsg, expectedStatusMsg) {
 			t.Errorf("Expected status message to be %v, got %v", expectedStatusMsg, gotStatusMsg)

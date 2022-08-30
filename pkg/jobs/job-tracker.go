@@ -152,6 +152,11 @@ func (gt *groupTracker) isHealthy() bool {
 	for _, tracker := range gt.trackers {
 		regPath := gt.getStatusRegPath(tracker.job.Name())
 		gs := gt.registry.Get(regPath)
+		if gs == nil {
+			log.Debug().Str("path", regPath).Msg("returned nil status")
+			continue
+		}
+
 		if gs.Status.GetError().GetMessage() != "" {
 			return false
 		}
