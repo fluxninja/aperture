@@ -120,7 +120,7 @@ func (x *AllPolicies) GetAllPolicies() map[string]*Policy {
 	return nil
 }
 
-// Policy expresses reliability automation workflow that automatically protects services.
+// Policy expresses reliability automation workflow that automatically protects services
 //
 // Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 type Policy struct {
@@ -180,7 +180,7 @@ func (x *Policy) GetResources() *Resources {
 	return nil
 }
 
-// Circuit is defined as a dataflow graph of inter-connected components.
+// Circuit is defined as a dataflow graph of inter-connected components
 //
 // Signals flow between components via ports.
 // As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
@@ -259,7 +259,7 @@ func (x *Circuit) GetComponents() []*Component {
 	return nil
 }
 
-// Resources that need to be setup for the policy to function.
+// Resources that need to be setup for the policy to function
 //
 // Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 type Resources struct {
@@ -344,10 +344,11 @@ func (x *Resources) GetClassifiers() []*Classifier {
 //   Eg. see the [Exponential Moving Average filter](#-v1ema).
 //   :::
 // * "sink" components – they affect the real world.
-//   [Scheduler](#-v1scheduler) and [RateLimiter](#-languagev1ratelimiter).
-//   Also sometimes called _actuators_. In the UI, represented by orange color.
-//   Sink components are usually also "sources" too, they usually emit a
-//   feedback signal, like `accepted_concurrency` in case of ConcurrencyLimiter.
+//   [ConcurrencyLimiter](#-languagev1concurrencylimiter) and [RateLimiter](#-languagev1ratelimiter).
+//   Also sometimes called [_actuators_](/concepts/flow-control/actuators/actuators.md).
+//   In the UI, represented by orange color.  Sink components are usually also
+//   "sources" too, they usually emit a feedback signal, like
+//   `accepted_concurrency` in case of ConcurrencyLimiter.
 //
 // :::tip
 // Sometimes you may want to use a constant value as one of component's inputs.
@@ -588,7 +589,7 @@ func (*Component_Max) isComponent_Component() {}
 
 func (*Component_Min) isComponent_Component() {}
 
-// Components are interconnected with each other via Ports.
+// Components are interconnected with each other via Ports
 type Port struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -639,7 +640,7 @@ func (x *Port) GetSignalName() string {
 
 // Gradient controller is a type of controller which tries to adjust the
 // control variable proportionally to the relative difference between setpoint
-// and actual value of the signal.
+// and actual value of the signal
 //
 // The `gradient` describes a corrective factor that should be applied to the
 // control variable to get the signal closer to the setpoint. It is computed as follows:
@@ -876,7 +877,7 @@ func (x *EMA) GetCorrectionFactorOnMaxEnvelopeViolation() float64 {
 	return 0
 }
 
-// Type of combinator that computes the arithmetic operation on the operand signals.
+// Type of combinator that computes the arithmetic operation on the operand signals
 type ArithmeticCombinator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -946,7 +947,7 @@ func (x *ArithmeticCombinator) GetOperator() string {
 	return ""
 }
 
-// Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison.
+// Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
 //
 // The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 //
@@ -1128,15 +1129,27 @@ func (x *RateLimiter) GetLazySync() *RateLimiter_LazySync {
 	return nil
 }
 
-// Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
+// Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
+//
+// :::info
+// See also [Scheduler page in the Concepts section](/concepts/flow-control/actuators/scheduler.md)
+// for a more high-level description.
+// :::
+//
 // It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
 // Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+//
+// ConcurrencyLimiter configuration is split into two parts: An actuation
+// strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
 type ConcurrencyLimiter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Weighted Fair Queuing based workfload scheduler.
+	// Configuration of Weighted Fair Queuing-based workload scheduler.
+	//
+	// Contains configuration of per-agent scheduler, and also defines some
+	// output signals.
 	Scheduler *Scheduler `protobuf:"bytes,1,opt,name=scheduler,proto3" json:"scheduler,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Types that are assignable to ActuationStrategy:
 	//	*ConcurrencyLimiter_LoadShedActuator
@@ -1202,12 +1215,21 @@ type isConcurrencyLimiter_ActuationStrategy interface {
 
 type ConcurrencyLimiter_LoadShedActuator struct {
 	// Actuator based on load shedding a portion of requests.
+	//
+	// Actuation strategy defines the input signal that will drive the scheduler.
 	LoadShedActuator *LoadShedActuator `protobuf:"bytes,2,opt,name=load_shed_actuator,json=loadShedActuator,proto3,oneof"`
 }
 
 func (*ConcurrencyLimiter_LoadShedActuator) isConcurrencyLimiter_ActuationStrategy() {}
 
-// Weighted Fair Queuing based workload scheduler.
+// Weighted Fair Queuing-based workload scheduler
+//
+// :::note
+// Each Agent instantiates an independent copy of the scheduler, but output
+// signal are aggregated across all agents.
+// :::
+//
+// See [ConcurrencyLimiter](#-languagev1concurrencylimiter) for more context.
 type Scheduler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1216,12 +1238,30 @@ type Scheduler struct {
 	// Output ports for the Scheduler component.
 	OutPorts *Scheduler_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Selector decides for which service or flows the scheduler will be applied.
-	Selector        *v1.Selector        `protobuf:"bytes,2,opt,name=selector,proto3" json:"selector,omitempty"`
-	AutoTokens      bool                `protobuf:"varint,3,opt,name=auto_tokens,json=autoTokens,proto3" json:"auto_tokens,omitempty" default:"true"` // @gotags: default:"true"
-	DefaultWorkload *Scheduler_Workload `protobuf:"bytes,4,opt,name=default_workload,json=defaultWorkload,proto3" json:"default_workload,omitempty"`
-	// list of workloads
-	// workload can describe priority, tokens (if auto_tokens are set to false) and timeout
+	Selector *v1.Selector `protobuf:"bytes,2,opt,name=selector,proto3" json:"selector,omitempty"`
+	// List of workloads to be used in scheduler.
+	//
+	// Categorizing [flows](/concepts/flow-control#what-is-a-flow) into workloads
+	// allows for load-shedding to be "smarter" than just "randomly deny 50% of
+	// requests". There are two aspects of workloads:
+	//
+	// Each workload in this list specifies also a matcher that's used to
+	// determine which flow will be categorized into which workload.
+	// In case of multiple matching workloads, the first matching one will be used.
+	// If none of workloads match, `default_workload` will be used.
+	//
+	// :::info
+	// See also [workload definition in the concepts
+	// section](/concepts/flow-control/actuators/scheduler#workload).
+	// :::
 	Workloads []*Scheduler_WorkloadAndLabelMatcher `protobuf:"bytes,5,rep,name=workloads,proto3" json:"workloads,omitempty"`
+	// Workload to be used if none of workloads specified in `workloads` match.
+	DefaultWorkload *Scheduler_Workload `protobuf:"bytes,4,opt,name=default_workload,json=defaultWorkload,proto3" json:"default_workload,omitempty"`
+	// Automatically estimate weight of flows in each workload, based on
+	// historical latency. Each workload's `tokens` will be set to average
+	// latency of flows in that workload during last few seconds (exact duration
+	// of this average can change).
+	AutoTokens bool `protobuf:"varint,3,opt,name=auto_tokens,json=autoTokens,proto3" json:"auto_tokens,omitempty" default:"true"` // @gotags: default:"true"
 }
 
 func (x *Scheduler) Reset() {
@@ -1270,11 +1310,11 @@ func (x *Scheduler) GetSelector() *v1.Selector {
 	return nil
 }
 
-func (x *Scheduler) GetAutoTokens() bool {
+func (x *Scheduler) GetWorkloads() []*Scheduler_WorkloadAndLabelMatcher {
 	if x != nil {
-		return x.AutoTokens
+		return x.Workloads
 	}
-	return false
+	return nil
 }
 
 func (x *Scheduler) GetDefaultWorkload() *Scheduler_Workload {
@@ -1284,14 +1324,14 @@ func (x *Scheduler) GetDefaultWorkload() *Scheduler_Workload {
 	return nil
 }
 
-func (x *Scheduler) GetWorkloads() []*Scheduler_WorkloadAndLabelMatcher {
+func (x *Scheduler) GetAutoTokens() bool {
 	if x != nil {
-		return x.Workloads
+		return x.AutoTokens
 	}
-	return nil
+	return false
 }
 
-// Takes the load shed factor input signal and publishes it to the schedulers in the data-plane.
+// Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
 type LoadShedActuator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1340,7 +1380,7 @@ func (x *LoadShedActuator) GetInPorts() *LoadShedActuator_Ins {
 	return nil
 }
 
-// Component that runs a Prometheus query periodically and returns the result as an output signal.
+// Component that runs a Prometheus query periodically and returns the result as an output signal
 type PromQL struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1412,7 +1452,7 @@ func (x *PromQL) GetEvaluationInterval() *durationpb.Duration {
 	return nil
 }
 
-// Component that emits a constant value as an output signal.
+// Component that emits a constant value as an output signal
 type Constant struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1470,7 +1510,7 @@ func (x *Constant) GetValue() float64 {
 	return 0
 }
 
-// Takes an input signal and emits the square root of it multiplied by scale as an output.
+// Takes an input signal and emits the square root of it multiplied by scale as an output
 //
 // $$
 // \text{output} = \text{scale} \sqrt{\text{input}}
@@ -1541,7 +1581,8 @@ func (x *Sqrt) GetScale() float64 {
 	return 0
 }
 
-// Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
+// Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
+//
 // It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 type Extrapolator struct {
 	state         protoimpl.MessageState
@@ -1609,7 +1650,8 @@ func (x *Extrapolator) GetMaxExtrapolationInterval() *durationpb.Duration {
 	return nil
 }
 
-// Takes a list of input signals and emits the signal with the maximum value.
+// Takes a list of input signals and emits the signal with the maximum value
+//
 // Max: output = max([]inputs).
 type Max struct {
 	state         protoimpl.MessageState
@@ -1668,7 +1710,7 @@ func (x *Max) GetOutPorts() *Max_Outs {
 	return nil
 }
 
-// Takes an array of input signals and emits the signal with the minimum value.
+// Takes an array of input signals and emits the signal with the minimum value
 // Min: output = min([]inputs).
 type Min struct {
 	state         protoimpl.MessageState
@@ -2393,7 +2435,7 @@ func (x *RateLimiter_Ins) GetLimit() *Port {
 	return nil
 }
 
-// Workload defines a class of requests that preferably have similar properties such as response latency.
+// Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
 type Scheduler_Workload struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2404,12 +2446,34 @@ type Scheduler_Workload struct {
 	// Higher numbers means higher priority level.
 	Priority uint32 `protobuf:"varint,1,opt,name=priority,proto3" json:"priority,omitempty" validate:"gte=0,lte=255"` // @gotags: validate:"gte=0,lte=255"
 	// Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-	// This override is applicable only if auto_tokens is set to false.
+	// This override is applicable only if `auto_tokens` is set to false.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" default:"1"` // @gotags: default:"1"
-	// Timeout override decides how long a request in the workload can wait for tokens.
+	// Timeout override decides how long a request in the workload can wait for tokens
+	//
 	// This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
-	Timeout     *durationpb.Duration `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty" default:"0.005s"` // @gotags: default:"0.005s"
-	FairnessKey string               `protobuf:"bytes,4,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`
+	//
+	// :::caution
+	// This timeout needs to be strictly less than the timeout set on the
+	// client for the whole GRPC call:
+	// * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
+	// * in case of libraries, timeout configured... TODO.
+	//
+	// We're using fail-open logic in integrations, so if the GRPC timeout
+	// fires first, the flow will end up being unconditionally allowed while
+	// it're still waiting on the scheduler.
+	//
+	// To avoid such cases, the end-to-end GRPC timeout should also contain
+	// some headroom for constant overhead like serialization, etc. Default
+	// value for GRPC timeouts is 10ms, giving 5ms of headeroom, so when
+	// tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+	// :::
+	Timeout *durationpb.Duration `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty" default:"0.005s"` // @gotags: default:"0.005s"
+	// Fairness key is a label key that can be used to provide fairness within a workload
+	//
+	// Any label that could be used in label matcher can be used here. Eg. if
+	// you have a classifier that sets `user` flow label, you might want to set
+	// `fairness_key = "user"`.
+	FairnessKey string `protobuf:"bytes,4,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`
 }
 
 func (x *Scheduler_Workload) Reset() {
@@ -2535,9 +2599,21 @@ type Scheduler_Outs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Accepted concurrency is the number of accepted tokens/sec.
+	// Accepted concurrency is the number of accepted tokens per second.
+	//
+	// :::info
+	// **Accepted tokens** are tokens associated with
+	// [flows](/concepts/flow-control#what-is-a-flow) that were accepted by
+	// this scheduler. Number of tokens for a flow is determined by a
+	// [workload](#-schedulerworkload) that the flow was assigned to (either
+	// via `auto_tokens` or explicitly by `Workload.tokens`).
+	// :::
+	//
+	// Value of this signal is the sum across all the relevant schedulers.
 	AcceptedConcurrency *Port `protobuf:"bytes,1,opt,name=accepted_concurrency,json=acceptedConcurrency,proto3" json:"accepted_concurrency,omitempty"`
 	// Incoming concurrency is the number of incoming tokens/sec.
+	// This is the same as `accepted_concurrency`, but across all the flows
+	// entering scheduler, including rejected ones.
 	IncomingConcurrency *Port `protobuf:"bytes,2,opt,name=incoming_concurrency,json=incomingConcurrency,proto3" json:"incoming_concurrency,omitempty"`
 }
 
@@ -2593,7 +2669,8 @@ type LoadShedActuator_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Load shedding factor is a fraction of incoming concurrency (tokens \* requests) that needs to be dropped.
+	// Load shedding factor is a fraction of [incoming
+	// concurrency](#-v1schedulerouts) that needs to be dropped.
 	LoadShedFactor *Port `protobuf:"bytes,1,opt,name=load_shed_factor,json=loadShedFactor,proto3" json:"load_shed_factor,omitempty"`
 }
 
@@ -3540,22 +3617,22 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x28, 0x0b, 0x32, 0x25, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x63, 0x6f,
 	0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x2e, 0x76, 0x31,
 	0x2e, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x52, 0x08, 0x73, 0x65, 0x6c, 0x65, 0x63,
-	0x74, 0x6f, 0x72, 0x12, 0x3d, 0x0a, 0x0b, 0x61, 0x75, 0x74, 0x6f, 0x5f, 0x74, 0x6f, 0x6b, 0x65,
-	0x6e, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x42, 0x1c, 0x92, 0x41, 0x19, 0x82, 0x03, 0x16,
-	0x0a, 0x0c, 0x78, 0x2d, 0x67, 0x6f, 0x2d, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x12, 0x06,
-	0x1a, 0x04, 0x74, 0x72, 0x75, 0x65, 0x52, 0x0a, 0x61, 0x75, 0x74, 0x6f, 0x54, 0x6f, 0x6b, 0x65,
-	0x6e, 0x73, 0x12, 0x5a, 0x0a, 0x10, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x5f, 0x77, 0x6f,
-	0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2f, 0x2e, 0x61,
-	0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c,
-	0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x64,
-	0x75, 0x6c, 0x65, 0x72, 0x2e, 0x57, 0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x52, 0x0f, 0x64,
-	0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x57, 0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x5c,
-	0x0a, 0x09, 0x77, 0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x73, 0x18, 0x05, 0x20, 0x03, 0x28,
-	0x0b, 0x32, 0x3e, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c,
-	0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e,
-	0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x72, 0x2e, 0x57, 0x6f, 0x72, 0x6b, 0x6c, 0x6f,
-	0x61, 0x64, 0x41, 0x6e, 0x64, 0x4c, 0x61, 0x62, 0x65, 0x6c, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x65,
-	0x72, 0x52, 0x09, 0x77, 0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x73, 0x1a, 0xff, 0x01, 0x0a,
+	0x74, 0x6f, 0x72, 0x12, 0x5c, 0x0a, 0x09, 0x77, 0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x73,
+	0x18, 0x05, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x3e, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72,
+	0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
+	0x65, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x72, 0x2e, 0x57,
+	0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x41, 0x6e, 0x64, 0x4c, 0x61, 0x62, 0x65, 0x6c, 0x4d,
+	0x61, 0x74, 0x63, 0x68, 0x65, 0x72, 0x52, 0x09, 0x77, 0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64,
+	0x73, 0x12, 0x5a, 0x0a, 0x10, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x5f, 0x77, 0x6f, 0x72,
+	0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2f, 0x2e, 0x61, 0x70,
+	0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61,
+	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x64, 0x75,
+	0x6c, 0x65, 0x72, 0x2e, 0x57, 0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x52, 0x0f, 0x64, 0x65,
+	0x66, 0x61, 0x75, 0x6c, 0x74, 0x57, 0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x3d, 0x0a,
+	0x0b, 0x61, 0x75, 0x74, 0x6f, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x08, 0x42, 0x1c, 0x92, 0x41, 0x19, 0x82, 0x03, 0x16, 0x0a, 0x0c, 0x78, 0x2d, 0x67, 0x6f,
+	0x2d, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x12, 0x06, 0x1a, 0x04, 0x74, 0x72, 0x75, 0x65,
+	0x52, 0x0a, 0x61, 0x75, 0x74, 0x6f, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x1a, 0xff, 0x01, 0x0a,
 	0x08, 0x57, 0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x42, 0x0a, 0x08, 0x70, 0x72, 0x69,
 	0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x42, 0x26, 0x92, 0x41, 0x23,
 	0x82, 0x03, 0x20, 0x0a, 0x0d, 0x78, 0x2d, 0x67, 0x6f, 0x2d, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61,
@@ -3856,8 +3933,8 @@ var file_aperture_policy_language_v1_policy_proto_depIdxs = []int32{
 	14, // 38: aperture.policy.language.v1.ConcurrencyLimiter.load_shed_actuator:type_name -> aperture.policy.language.v1.LoadShedActuator
 	36, // 39: aperture.policy.language.v1.Scheduler.out_ports:type_name -> aperture.policy.language.v1.Scheduler.Outs
 	50, // 40: aperture.policy.language.v1.Scheduler.selector:type_name -> aperture.common.selector.v1.Selector
-	34, // 41: aperture.policy.language.v1.Scheduler.default_workload:type_name -> aperture.policy.language.v1.Scheduler.Workload
-	35, // 42: aperture.policy.language.v1.Scheduler.workloads:type_name -> aperture.policy.language.v1.Scheduler.WorkloadAndLabelMatcher
+	35, // 41: aperture.policy.language.v1.Scheduler.workloads:type_name -> aperture.policy.language.v1.Scheduler.WorkloadAndLabelMatcher
+	34, // 42: aperture.policy.language.v1.Scheduler.default_workload:type_name -> aperture.policy.language.v1.Scheduler.Workload
 	37, // 43: aperture.policy.language.v1.LoadShedActuator.in_ports:type_name -> aperture.policy.language.v1.LoadShedActuator.Ins
 	38, // 44: aperture.policy.language.v1.PromQL.out_ports:type_name -> aperture.policy.language.v1.PromQL.Outs
 	48, // 45: aperture.policy.language.v1.PromQL.evaluation_interval:type_name -> google.protobuf.Duration
