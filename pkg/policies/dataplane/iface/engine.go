@@ -20,7 +20,7 @@ type Engine interface {
 
 	RegisterFluxMeter(fm FluxMeter) error
 	UnregisterFluxMeter(fm FluxMeter) error
-	GetFluxMeterHist(policyName, fluxMeterName, statusCode string, decisionType flowcontrolv1.DecisionType) prometheus.Observer
+	GetFluxMeterHist(fluxMeterName, statusCode string, decisionType flowcontrolv1.DecisionType) prometheus.Observer
 
 	RegisterRateLimiter(l RateLimiter) error
 	UnregisterRateLimiter(l RateLimiter) error

@@ -44,8 +44,8 @@ func DataplaneComponentKey(agentGroupName, policyName string, componentIndex int
 }
 
 // FluxMeterKey returns the identifier for FluxMeter in etcd.
-func FluxMeterKey(agentGroupName, policyName, fluxMeterName string) string {
-	return PolicyPrefix(agentGroupName, policyName) + "-flux_meter-" + fluxMeterName
+func FluxMeterKey(agentGroupName, fluxMeterName string) string {
+	return AgentGroupPrefix(agentGroupName) + "-flux_meter-" + fluxMeterName
 }
 
 // ClassifierKey returns the identifier for a Classifier in etcd.

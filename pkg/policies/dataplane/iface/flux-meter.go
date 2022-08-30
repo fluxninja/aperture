@@ -5,33 +5,24 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 //go:generate mockgen -source=flux-meter.go -destination=../../mocks/mock_flux_meter.go -package=mocks
 
 // FluxMeterID is the ID of the FluxMeter.
 type FluxMeterID struct {
-	PolicyName    string
 	FluxMeterName string
 }
 
 // String function returns the FluxMeterID as a string.
 func (fmID FluxMeterID) String() string {
-	return "policy_name-" + fmID.PolicyName + "-flux_meter_name-" + fmID.FluxMeterName
+	return "flux_meter_name-" + fmID.FluxMeterName
 }
 
 // FluxMeter in an interface for interacting with fluxmeters.
 type FluxMeter interface {
-	// Policy
-	GetPolicyName() string
-	GetPolicyHash() string
-
 	// GetSelector returns the selector
 	GetSelector() *selectorv1.Selector
-
-	// GetFluxMeterProto returns the flux meter proto
-	GetFluxMeterProto() *policylangv1.FluxMeter
 
 	// GetFluxMeterName returns the metric name
 	GetFluxMeterName() string

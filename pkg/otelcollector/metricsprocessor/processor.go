@@ -177,7 +177,6 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 	}
 	for _, fluxMeter := range checkResponse.FluxMeters {
 		rawValue := []string{
-			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, fluxMeter.GetPolicyName()),
 			fmt.Sprintf("%s:%v", metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()),
 		}
 		value := strings.Join(rawValue, ",")
@@ -266,14 +265,12 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	latency float64,
 ) {
 	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(
-		fluxMeter.GetPolicyName(),
 		fluxMeter.GetFluxMeterName(),
 		statusCode,
 		decisionType,
 	)
 	if fluxmeterHistogram == nil {
-		log.Debug().Str(metrics.PolicyNameLabel, fluxMeter.GetPolicyName()).
-			Str(metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()).
+		log.Debug().Str(metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
 			Msg("Fluxmeter not found")
