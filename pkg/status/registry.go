@@ -166,10 +166,8 @@ func (reg *registry) Delete() error {
 		return nil
 	}
 
-	keyPath, ok := existsInMap(reg.statusMap, reg.delim, reg.path)
-	if !ok {
-		return errors.New("path doesn't exist")
-	}
+	keyMap := generateKeyMap(reg.statusMap, nil, reg.delim)
+	keyPath := keyMap[reg.path]
 
 	removeFromMap(reg.statusMap, keyPath)
 	return nil

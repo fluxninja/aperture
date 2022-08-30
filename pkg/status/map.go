@@ -9,12 +9,6 @@ import (
 // kMap is a map of key paths to their corresponding possible traversal paths.
 type kMap map[string][]string
 
-func existsInMap(m map[string]*statusv1.GroupStatus, delim string, path string) ([]string, bool) {
-	keyMap := generateKeyMap(m, nil, delim)
-	keyPath, ok := keyMap[path]
-	return keyPath, ok
-}
-
 // merge a into b.
 func mergeMaps(a, b map[string]*statusv1.GroupStatus) {
 	for key, val := range a {
