@@ -3,7 +3,7 @@
 global:
   ## @param global.imageRegistry Global Docker image registry
   ##
-  imageRegistry: ""
+  imageRegistry: ~
   ## @param global.imagePullSecrets Global Docker registry secret names as an array
   ## E.g.
   ## imagePullSecrets:
@@ -48,7 +48,7 @@ operator:
   ## @param operator.image.pullSecrets Operator image pull secrets
   ##
   image:
-    registry: docker.io/aperturecontrol
+    registry: docker.io/fluxninja
     repository: aperture-operator
     tag: latest
     ## Specify a imagePullPolicy
