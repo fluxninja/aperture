@@ -13,6 +13,7 @@ TILT_OBJECTS = []
 APERTURE_SYSTEM_NS = "aperture-system"
 APERTURE_DEMOAPP_NS = "demoapp"
 APERTURE_BOOKINFO_NS = "bookinfo"
+APERTURE_ISTIO_NS = "istio-system"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
 # Mutable global state, since global values are not mutable
@@ -50,7 +51,7 @@ DEP_TREE = {
                 },
                 {
                     "new_name": "aperture-grafana",
-                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "resource_deps": ["aperture-grafana-operator"],
                     "extra_objects": [
                         "aperture-grafana:grafana",
                         "aperture-prometheus:grafanadatasource"
@@ -61,6 +62,13 @@ DEP_TREE = {
                     "resource_deps": ["aperture-grafana-operator-bootstrap"],
                     "extra_objects": [
                         (None, "GrafanaDashboard", APERTURE_SYSTEM_NS)
+                    ]
+                },
+                {
+                    "new_name": "aperture-grafana-data-sources",
+                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "extra_objects": [
+                        (None, "GrafanaDataSource", APERTURE_SYSTEM_NS)
                     ]
                 }
             ]
@@ -160,15 +168,24 @@ DEP_TREE = {
                     "ignored_objects": [
                         ("^aperture-kube-state-metrics", "Service|Deployment", APERTURE_SYSTEM_NS),
                     ]
-                },
+                }
+            ]
+        }
+    },
+    APERTURE_ISTIO_NS: {
+        "istio": {
+            "labels": ["Istio"],
+            "needs": ["agent"],
+            "tkenv": "tanka/environments/tilt/apps/istio",
+            "child_resources": [
                 {
                     "new_name": "istio-bootstrap",
                     "extra_objects": [
                         "istio:configmap",
                         "aperture-envoy-filter:envoyfilter",
-                        "istio-validator-%s:validatingwebhookconfiguration" % APERTURE_SYSTEM_NS,
+                        "istio-validator-istio-system:validatingwebhookconfiguration",
                         ("istio.io$", "customresourcedefinition"),
-                        (None, "EnvoyFilter", APERTURE_SYSTEM_NS),
+                        (None, "EnvoyFilter", "istio-system"),
                         ("^istio-reader", None),
                         ("^istio-sidecar", None),
                     ]
@@ -185,7 +202,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "istio-egressgateway",
-                    "resource_deps": ["istio-bootstrap"],
+                    "resource_deps": ["istio-bootstrap", "istiod"],
                     "extra_objects": [
                         ("^istio-egressgateway", None)
                     ],
@@ -195,16 +212,16 @@ DEP_TREE = {
                 },
                 {
                     "workload": "istio-ingressgateway",
-                    "resource_deps": ["istio-bootstrap"],
+                    "resource_deps": ["istio-bootstrap", "istiod"],
                     "extra_objects": [
                         ("^istio-ingressgateway", None)
                     ],
                     "ignored_objects": [
                         ("^istio-ingressgateway", "Service|Deployment")
                     ]
-                },
+                }
             ]
-        }
+        },
     },
     APERTURE_DEMOAPP_NS: {
         "k6-operator": {
@@ -228,6 +245,7 @@ DEP_TREE = {
         "demo-app": {
             "labels": ["DemoApplications"],
             "tkenv": "tanka/environments/tilt/apps/demoapp",
+            "needs": ["istio"],
             "images": [
                 {
                     "ref": "demo-app",
@@ -239,23 +257,30 @@ DEP_TREE = {
             "child_resources": [
                 {
                     "workload": "demo1-demo-app",
-                    "resource_deps": ["cluster-bootstrap"],
+                    "resource_deps": ["cluster-bootstrap", "istiod"],
                     "extra_objects": [
                         "demo1-demo-app:serviceaccount"
                     ]
                 },
                 {
                     "workload": "demo2-demo-app",
-                    "resource_deps": ["cluster-bootstrap"],
+                    "resource_deps": ["cluster-bootstrap", "istiod"],
                     "extra_objects": [
                         "demo2-demo-app:serviceaccount"
                     ]
                 },
                 {
                     "workload": "demo3-demo-app",
-                    "resource_deps": ["cluster-bootstrap"],
+                    "resource_deps": ["cluster-bootstrap", "istiod"],
                     "extra_objects": [
                         "demo3-demo-app:serviceaccount"
+                    ]
+                },
+                {
+                    "new_name": "policies",
+                    "resource_deps": ["cluster-bootstrap", "aperture-controller-port-forward"],
+                    "extra_objects": [
+                        ("policies$", "ConfigMap", APERTURE_SYSTEM_NS),
                     ]
                 },
             ]
@@ -264,11 +289,12 @@ DEP_TREE = {
     APERTURE_BOOKINFO_NS: {
         "bookinfo": {
             "labels": ["DemoApplications"],
+            "needs": ["istio"],
             "tkenv": "tanka/environments/tilt/apps/bookinfo",
             "child_resources": [
                 {
                     "new_name": "bookinfo-common",
-                    "resource_deps": ["cluster-bootstrap"],
+                    "resource_deps": ["cluster-bootstrap", "istiod"],
                     "extra_objects": [
                         ("^bookinfo", None, APERTURE_BOOKINFO_NS)
                     ],

@@ -16,8 +16,7 @@ go-mod-tidy:
 go-test:
 	@echo Running go tests
 	@{ \
-		envtest_path=$(make operator-setup_envtest -s); \
-		KUBEBUILDER_ASSETS="${envtest_path}"; \
+		export KUBEBUILDER_ASSETS=$(shell make operator-setup_envtest -s); \
 		gotestsum --format=pkgname; \
 	}
 

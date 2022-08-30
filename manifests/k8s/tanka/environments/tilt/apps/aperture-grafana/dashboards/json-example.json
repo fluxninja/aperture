@@ -1,7 +1,7 @@
 {
   "__inputs": [
     {
-      "name": "DS_AGENT-PROMETHEUS",
+      "name": "DS_APERTURE-PROMETHEUS",
       "label": "aperture-prometheus",
       "description": "",
       "type": "datasource",
@@ -63,7 +63,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_AGENT-PROMETHEUS}"
+        "uid": "${DS_APERTURE-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -137,7 +137,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_AGENT-PROMETHEUS}"
+            "uid": "${DS_APERTURE-PROMETHEUS}"
           },
           "expr": "vector(1)",
           "refId": "A"
