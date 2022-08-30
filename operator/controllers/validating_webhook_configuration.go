@@ -26,19 +26,19 @@ import (
 )
 
 // validatingWebhookConfiguration prepares the ValidatingWebhookConfiguration object for the Controller, based on the provided parameter.
-func validatingWebhookConfiguration(instance *v1alpha1.Aperture, cert []byte) *admissionregistrationv1.ValidatingWebhookConfiguration {
+func validatingWebhookConfiguration(instance *v1alpha1.Controller, cert []byte) *admissionregistrationv1.ValidatingWebhookConfiguration {
 	validatingWebhookConfiguration := &admissionregistrationv1.ValidatingWebhookConfiguration{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        "agent-cm-validator",
-			Labels:      commonLabels(instance, controllerServiceName),
-			Annotations: getAnnotationsWithOwnerRef(instance),
+			Name:        validatingWebhookServiceName,
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
+			Annotations: getControllerAnnotationsWithOwnerRef(instance),
 		},
 		Webhooks: []admissionregistrationv1.ValidatingWebhook{
 			{
 				Name: "cm-validator.fluxninja.com",
 				ClientConfig: admissionregistrationv1.WebhookClientConfig{
 					Service: &admissionregistrationv1.ServiceReference{
-						Name:      "agent-webhooks",
+						Name:      validatingWebhookServiceName,
 						Namespace: instance.GetNamespace(),
 						Path:      pointer.StringPtr("/validate/configmap"),
 						Port:      pointer.Int32(443),

@@ -30,74 +30,115 @@ import (
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
+var (
+	rules = []rbacv1.PolicyRule{
+		{
+			APIGroups: []string{""},
+			Resources: []string{"services", "events", "endpoints", "pods", "nodes", "namespaces", "componentstatuses"},
+			Verbs:     []string{"get", "list", "watch"},
+		},
+		{
+			APIGroups: []string{"quota.openshift.io"},
+			Resources: []string{"clusterresourcequotas"},
+			Verbs:     []string{"get"},
+		},
+		{
+			NonResourceURLs: []string{"/version", "/healthz"},
+			Verbs:           []string{"get"},
+		},
+		{
+			NonResourceURLs: []string{"/metrics"},
+			Verbs:           []string{"get"},
+		},
+		{
+			APIGroups: []string{""},
+			Resources: []string{"nodes/metrics", "nodes/spec", "nodes/proxy", "nodes/stats"},
+			Verbs:     []string{"get"},
+		},
+		{
+			APIGroups:     []string{"policy"},
+			Resources:     []string{"podsecuritypolicies"},
+			Verbs:         []string{"use"},
+			ResourceNames: []string{appName},
+		},
+		{
+			APIGroups:     []string{"security.openshift.io"},
+			Resources:     []string{"securitycontextconstraints"},
+			Verbs:         []string{"use"},
+			ResourceNames: []string{appName},
+		},
+		{
+			APIGroups: []string{"coordination.k8s.io"},
+			Resources: []string{"leases"},
+			Verbs:     []string{"get"},
+		},
+	}
+
+	roleRef = rbacv1.RoleRef{
+		APIGroup: "rbac.authorization.k8s.io",
+		Kind:     "ClusterRole",
+		Name:     appName,
+	}
+)
+
 // clusterRoleForAgent prepares the ClusterRole object for the Agent based on the provided parameter.
-func clusterRoleForAgent(instance *v1alpha1.Aperture) *rbacv1.ClusterRole {
+func clusterRoleForAgent(instance *v1alpha1.Agent) *rbacv1.ClusterRole {
 	clusterRole := &rbacv1.ClusterRole{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        appName,
-			Labels:      commonLabels(instance, agentServiceName),
-			Annotations: getAnnotationsWithOwnerRef(instance),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), operatorName),
+			Annotations: getAgentAnnotationsWithOwnerRef(instance),
 		},
-		Rules: []rbacv1.PolicyRule{
-			{
-				APIGroups: []string{""},
-				Resources: []string{"services", "events", "endpoints", "pods", "nodes", "namespaces", "componentstatuses"},
-				Verbs:     []string{"get", "list", "watch"},
-			},
-			{
-				APIGroups: []string{"quota.openshift.io"},
-				Resources: []string{"clusterresourcequotas"},
-				Verbs:     []string{"get"},
-			},
-			{
-				NonResourceURLs: []string{"/version", "/healthz"},
-				Verbs:           []string{"get"},
-			},
-			{
-				NonResourceURLs: []string{"/metrics"},
-				Verbs:           []string{"get"},
-			},
-			{
-				APIGroups: []string{""},
-				Resources: []string{"nodes/metrics", "nodes/spec", "nodes/proxy", "nodes/stats"},
-				Verbs:     []string{"get"},
-			},
-			{
-				APIGroups:     []string{"policy"},
-				Resources:     []string{"podsecuritypolicies"},
-				Verbs:         []string{"use"},
-				ResourceNames: []string{appName},
-			},
-			{
-				APIGroups:     []string{"security.openshift.io"},
-				Resources:     []string{"securitycontextconstraints"},
-				Verbs:         []string{"use"},
-				ResourceNames: []string{appName},
-			},
-			{
-				APIGroups: []string{"coordination.k8s.io"},
-				Resources: []string{"leases"},
-				Verbs:     []string{"get"},
-			},
+		Rules: rules,
+	}
+
+	return clusterRole
+}
+
+// clusterRoleForController prepares the ClusterRole object for the Controller based on the provided parameter.
+func clusterRoleForController(instance *v1alpha1.Controller) *rbacv1.ClusterRole {
+	clusterRole := &rbacv1.ClusterRole{
+		ObjectMeta: v1.ObjectMeta{
+			Name:        appName,
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), operatorName),
+			Annotations: getControllerAnnotationsWithOwnerRef(instance),
 		},
+		Rules: rules,
 	}
 
 	return clusterRole
 }
 
 // clusterRoleBindingForAgent prepares the ClusterRoleBinding object for the Agent based on the provided parameter.
-func clusterRoleBindingForAgent(instance *v1alpha1.Aperture) *rbacv1.ClusterRoleBinding {
+func clusterRoleBindingForAgent(instance *v1alpha1.Agent) *rbacv1.ClusterRoleBinding {
 	clusterRoleBinding := &rbacv1.ClusterRoleBinding{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        appName,
-			Labels:      commonLabels(instance, agentServiceName),
-			Annotations: getAnnotationsWithOwnerRef(instance),
+			Name:        agentServiceName,
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), agentServiceName),
+			Annotations: getAgentAnnotationsWithOwnerRef(instance),
 		},
-		RoleRef: rbacv1.RoleRef{
-			APIGroup: "rbac.authorization.k8s.io",
-			Kind:     "ClusterRole",
-			Name:     appName,
+		RoleRef: roleRef,
+		Subjects: []rbacv1.Subject{
+			{
+				Kind:      "ServiceAccount",
+				Name:      agentServiceName,
+				Namespace: instance.GetNamespace(),
+			},
 		},
+	}
+
+	return clusterRoleBinding
+}
+
+// clusterRoleBindingForController prepares the ClusterRoleBinding object for the Controller based on the provided parameter.
+func clusterRoleBindingForController(instance *v1alpha1.Controller) *rbacv1.ClusterRoleBinding {
+	clusterRoleBinding := &rbacv1.ClusterRoleBinding{
+		ObjectMeta: v1.ObjectMeta{
+			Name:        controllerServiceName,
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
+			Annotations: getControllerAnnotationsWithOwnerRef(instance),
+		},
+		RoleRef: roleRef,
 		Subjects: []rbacv1.Subject{
 			{
 				Kind:      "ServiceAccount",
@@ -105,14 +146,6 @@ func clusterRoleBindingForAgent(instance *v1alpha1.Aperture) *rbacv1.ClusterRole
 				Namespace: instance.GetNamespace(),
 			},
 		},
-	}
-
-	if !instance.Spec.Sidecar.Enabled {
-		clusterRoleBinding.Subjects = append(clusterRoleBinding.Subjects, rbacv1.Subject{
-			Kind:      "ServiceAccount",
-			Name:      agentServiceName,
-			Namespace: instance.GetNamespace(),
-		})
 	}
 
 	return clusterRoleBinding
@@ -137,7 +170,7 @@ func clusterRoleBindingMutate(crb *rbacv1.ClusterRoleBinding, roleRef rbacv1.Rol
 // updateClusterRoleBinding appends the Serviaccount in the ClusterRoleBinding if not exists.
 func updateClusterRoleBinding(client client.Client, subject rbacv1.Subject, ctx context.Context, namespace string) error {
 	crb := &rbacv1.ClusterRoleBinding{}
-	err := client.Get(ctx, types.NamespacedName{Name: appName, Namespace: namespace}, crb)
+	err := client.Get(ctx, types.NamespacedName{Name: agentServiceName, Namespace: namespace}, crb)
 	if err != nil {
 		return fmt.Errorf("failed to Get the ClusterRoleBinding. Error: %+v", err)
 	}

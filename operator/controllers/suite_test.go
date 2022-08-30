@@ -44,19 +44,20 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 var (
-	k8sClient           client.Client
-	k8sManager          ctrl.Manager
-	testEnv             *envtest.Environment
-	ctx                 context.Context
-	cancel              context.CancelFunc
-	defaultInstance     *v1alpha1.Aperture
-	namespaceReconciler *NamespaceReconciler
-	certDir             = filepath.Join(".", "certs")
-	test                = "test"
-	testTwo             = "test2"
-	testArray           = []string{test}
-	testArrayTwo        = []string{testTwo, test}
-	testMap             = map[string]string{
+	k8sClient                 client.Client
+	k8sManager                ctrl.Manager
+	testEnv                   *envtest.Environment
+	ctx                       context.Context
+	cancel                    context.CancelFunc
+	defaultAgentInstance      *v1alpha1.Agent
+	defaultControllerInstance *v1alpha1.Controller
+	namespaceReconciler       *NamespaceReconciler
+	certDir                   = filepath.Join(".", "certs")
+	test                      = "test"
+	testTwo                   = "test2"
+	testArray                 = []string{test}
+	testArrayTwo              = []string{testTwo, test}
+	testMap                   = map[string]string{
 		test: test,
 	}
 	testMapTwo = map[string]string{
@@ -120,61 +121,67 @@ var _ = BeforeSuite(func() {
 	}
 	Expect(k8sClient.Create(ctx, ns)).To(BeNil())
 
-	defaultInstance = &v1alpha1.Aperture{
+	defaultControllerInstance = &v1alpha1.Controller{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      appName,
 			Namespace: appName,
 		},
-		Spec: v1alpha1.ApertureSpec{
-			Agent: v1alpha1.AgentSpec{
-				CommonSpec: v1alpha1.CommonSpec{
-					LivenessProbe: v1alpha1.Probe{
-						FailureThreshold: 1,
-						PeriodSeconds:    1,
-						SuccessThreshold: 1,
-						TimeoutSeconds:   1,
-					},
-					ReadinessProbe: v1alpha1.Probe{
-						FailureThreshold: 1,
-						PeriodSeconds:    1,
-						SuccessThreshold: 1,
-						TimeoutSeconds:   1,
-					},
-					ServerPort: 80,
-					ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
-						Create: true,
-					},
+		Spec: v1alpha1.ControllerSpec{
+			CommonSpec: v1alpha1.CommonSpec{
+				FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{},
+				LivenessProbe: v1alpha1.Probe{
+					FailureThreshold: 1,
+					PeriodSeconds:    1,
+					SuccessThreshold: 1,
+					TimeoutSeconds:   1,
 				},
-				DistributedCachePort: 3320,
-				MemberListPort:       3322,
-				Image: v1alpha1.Image{
-					PullPolicy: string(corev1.PullAlways),
+				ReadinessProbe: v1alpha1.Probe{
+					FailureThreshold: 1,
+					PeriodSeconds:    1,
+					SuccessThreshold: 1,
+					TimeoutSeconds:   1,
+				},
+				ServerPort: 80,
+				ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
+					Create: true,
 				},
 			},
-			Controller: v1alpha1.ControllerSpec{
-				CommonSpec: v1alpha1.CommonSpec{
-					LivenessProbe: v1alpha1.Probe{
-						FailureThreshold: 1,
-						PeriodSeconds:    1,
-						SuccessThreshold: 1,
-						TimeoutSeconds:   1,
-					},
-					ReadinessProbe: v1alpha1.Probe{
-						FailureThreshold: 1,
-						PeriodSeconds:    1,
-						SuccessThreshold: 1,
-						TimeoutSeconds:   1,
-					},
-					ServerPort: 80,
-					ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
-						Create: true,
-					},
+			Image: v1alpha1.Image{
+				PullPolicy: string(corev1.PullAlways),
+			},
+		},
+	}
+
+	defaultAgentInstance = &v1alpha1.Agent{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      appName,
+			Namespace: appName,
+		},
+		Spec: v1alpha1.AgentSpec{
+			CommonSpec: v1alpha1.CommonSpec{
+				FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{},
+				LivenessProbe: v1alpha1.Probe{
+					FailureThreshold: 1,
+					PeriodSeconds:    1,
+					SuccessThreshold: 1,
+					TimeoutSeconds:   1,
 				},
-				Image: v1alpha1.Image{
-					PullPolicy: string(corev1.PullAlways),
+				ReadinessProbe: v1alpha1.Probe{
+					FailureThreshold: 1,
+					PeriodSeconds:    1,
+					SuccessThreshold: 1,
+					TimeoutSeconds:   1,
+				},
+				ServerPort: 80,
+				ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
+					Create: true,
 				},
 			},
-			FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{},
+			DistributedCachePort: 3320,
+			MemberListPort:       3322,
+			Image: v1alpha1.Image{
+				PullPolicy: string(corev1.PullAlways),
+			},
 		},
 	}
 })

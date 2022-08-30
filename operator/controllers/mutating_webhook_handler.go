@@ -32,7 +32,7 @@ import (
 type ApertureInjector struct {
 	Client   client.Client
 	decoder  *admission.Decoder
-	Instance *v1alpha1.Aperture
+	Instance *v1alpha1.Agent
 }
 
 // Handle receives incomming requests from MutatingWebhook for newly created Pods and injects Agent container in them.

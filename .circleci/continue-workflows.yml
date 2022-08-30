@@ -179,6 +179,7 @@ jobs:
                   - run:
                       name: Push images to DockerHub
                       command: |
+                        docker tag <<parameters.dockerhub-image>>:<<parameters.tag>> <<parameters.dockerhub-image>>:<<parameters.target-tag>>
                         docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
                         docker push <<parameters.dockerhub-image>>:<<parameters.target-tag>>
 

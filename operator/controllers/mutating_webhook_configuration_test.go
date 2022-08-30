@@ -34,18 +34,20 @@ import (
 var _ = Describe("MutatingWebhookConfiguration for Controller", func() {
 	Context("Instance with all parameters", func() {
 		It("returns correct MutatingWebhookConfiguration", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				TypeMeta: v1.TypeMeta{
-					Kind:       "Aperture",
+					Kind:       "Agent",
 					APIVersion: "fluxninja.com/v1alpha1",
 				},
 				ObjectMeta: v1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Labels:      testMap,
-					Annotations: testMapTwo,
+				Spec: v1alpha1.AgentSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						Labels:      testMap,
+						Annotations: testMapTwo,
+					},
 				},
 			}
 
@@ -73,7 +75,7 @@ var _ = Describe("MutatingWebhookConfiguration for Controller", func() {
 						test:                           test,
 					},
 					Annotations: map[string]string{
-						"fluxninja.com/primary-resource-type": "Aperture.fluxninja.com",
+						"fluxninja.com/primary-resource-type": "Agent.fluxninja.com",
 						"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", appName, appName),
 						test:                                  test,
 						testTwo:                               testTwo,

@@ -75,11 +75,11 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, nil
 	}
 
-	instance := &v1alpha1.Aperture{}
-	instances := &v1alpha1.ApertureList{}
+	instance := &v1alpha1.Agent{}
+	instances := &v1alpha1.AgentList{}
 	err = r.List(ctx, instances)
 	if err != nil {
-		logger.Error(err, "failed to list Aperture")
+		logger.Error(err, "failed to list Agent")
 		return ctrl.Result{}, err
 	}
 
@@ -120,7 +120,7 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 }
 
 // manageResources creates/updates required resources.
-func (r *NamespaceReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Aperture, namespace string) error {
+func (r *NamespaceReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Agent, namespace string) error {
 	if err := r.reconcileConfigMap(ctx, log, instance.DeepCopy(), namespace); err != nil {
 		return err
 	}
@@ -134,10 +134,10 @@ func (r *NamespaceReconciler) manageResources(ctx context.Context, log logr.Logg
 
 // reconcileConfigMap prepares the desired states for Agent configmap and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
-func (r *NamespaceReconciler) reconcileConfigMap(ctx context.Context, log logr.Logger, instance *v1alpha1.Aperture, namespace string) error {
+func (r *NamespaceReconciler) reconcileConfigMap(ctx context.Context, log logr.Logger, instance *v1alpha1.Agent, namespace string) error {
 	configMap := createAgentConfigMapInNamespace(instance, namespace)
 
-	res, err := createConfigMap(r.Client, nil, configMap, ctx, instance)
+	res, err := createConfigMapForAgent(r.Client, nil, configMap, ctx, instance)
 	if err != nil {
 		msg := fmt.Sprintf("failed to create/update ConfigMap in namespace '%s' for Instance '%s' in Namespace '%s'. Error='%s'",
 			namespace, instance.GetName(), instance.GetNamespace(), err.Error())
@@ -158,8 +158,8 @@ func (r *NamespaceReconciler) reconcileConfigMap(ctx context.Context, log logr.L
 
 // reconcileSecret prepares the desired states for Agent ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
-func (r *NamespaceReconciler) reconcileSecret(ctx context.Context, log logr.Logger, instance *v1alpha1.Aperture, namespace string) error {
-	if !instance.Spec.FluxNinjaPlugin.APIKeySecret.Agent.Create || !instance.Spec.FluxNinjaPlugin.Enabled {
+func (r *NamespaceReconciler) reconcileSecret(ctx context.Context, log logr.Logger, instance *v1alpha1.Agent, namespace string) error {
+	if !instance.Spec.FluxNinjaPlugin.APIKeySecret.Create || !instance.Spec.FluxNinjaPlugin.Enabled {
 		return nil
 	}
 
@@ -171,7 +171,7 @@ func (r *NamespaceReconciler) reconcileSecret(ctx context.Context, log logr.Logg
 		return fmt.Errorf(msg)
 	}
 
-	res, err := createSecret(r.Client, nil, secret, ctx, instance)
+	res, err := createSecretForAgent(r.Client, nil, secret, ctx, instance)
 	if err != nil {
 		msg := fmt.Sprintf("failed to create/update Secret in namespace '%s' for Instance '%s' in Namespace '%s'. Error='%s'",
 			namespace, instance.GetName(), instance.GetNamespace(), err.Error())

@@ -7,6 +7,17 @@ dist_cache:
 
 otel:
   addr: ":{{ .ServerPort }}"
+  {{- if .FluxNinjaPlugin.Enabled }}
+  batch_prerollup:
+    timeout: {{ .BatchPrerollup.Timeout }}
+    send_batch_size: {{ .BatchPrerollup.SendBatchSize }}
+  batch_postrollup:
+    timeout: {{ .BatchPostrollup.Timeout }}
+    send_batch_size: {{ .BatchPostrollup.SendBatchSize }}
+  batch_metrics_fast:
+    timeout: {{ .BatchMetricsFast.Timeout }}
+    send_batch_size: {{ .BatchMetricsFast.SendBatchSize }}
+  {{- end }}
 
 log:
   pretty_console: {{ .Log.PrettyConsole }}

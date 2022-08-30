@@ -32,8 +32,8 @@ import (
 )
 
 // serviceAccountForAgent prepares the ServiceAccount object for the Agent based on the provided parameter.
-func serviceAccountForAgent(instance *v1alpha1.Aperture, scheme *runtime.Scheme) (*corev1.ServiceAccount, error) {
-	saSpec := instance.Spec.Agent.ServiceAccountSpec
+func serviceAccountForAgent(instance *v1alpha1.Agent, scheme *runtime.Scheme) (*corev1.ServiceAccount, error) {
+	saSpec := instance.Spec.ServiceAccountSpec
 
 	annotations := instance.Spec.Annotations
 	if annotations == nil {
@@ -48,7 +48,7 @@ func serviceAccountForAgent(instance *v1alpha1.Aperture, scheme *runtime.Scheme)
 		ObjectMeta: v1.ObjectMeta{
 			Name:        agentServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, agentServiceName),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), agentServiceName),
 			Annotations: annotations,
 		},
 		AutomountServiceAccountToken: &saSpec.AutomountServiceAccountToken,
@@ -62,8 +62,8 @@ func serviceAccountForAgent(instance *v1alpha1.Aperture, scheme *runtime.Scheme)
 }
 
 // serviceAccountForController prepares the ServiceAccount object for the Controller based on the provided parameter.
-func serviceAccountForController(instance *v1alpha1.Aperture, scheme *runtime.Scheme) (*corev1.ServiceAccount, error) {
-	saSpec := instance.Spec.Controller.ServiceAccountSpec
+func serviceAccountForController(instance *v1alpha1.Controller, scheme *runtime.Scheme) (*corev1.ServiceAccount, error) {
+	saSpec := instance.Spec.ServiceAccountSpec
 
 	annotations := instance.Spec.Annotations
 	if annotations == nil {
@@ -78,7 +78,7 @@ func serviceAccountForController(instance *v1alpha1.Aperture, scheme *runtime.Sc
 		ObjectMeta: v1.ObjectMeta{
 			Name:        controllerServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance, controllerServiceName),
+			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
 			Annotations: annotations,
 		},
 		AutomountServiceAccountToken: &saSpec.AutomountServiceAccountToken,
@@ -99,8 +99,34 @@ func serviceAccountMutate(sa *corev1.ServiceAccount, automountServiceAccountToke
 	}
 }
 
-// createServiceAccount calls the Kubernetes API to create the provided ServiceAccount resource.
-func (r *ApertureReconciler) createServiceAccount(sa *corev1.ServiceAccount, ctx context.Context, instance *v1alpha1.Aperture) error {
+// createServiceAccount calls the Kubernetes API to create the provided Agent ServiceAccount resource.
+func (r *AgentReconciler) createServiceAccount(sa *corev1.ServiceAccount, ctx context.Context, instance *v1alpha1.Agent) error {
+	res, err := controllerutil.CreateOrUpdate(ctx, r.Client, sa, serviceAccountMutate(sa, sa.AutomountServiceAccountToken))
+	if err != nil {
+		if errors.IsConflict(err) {
+			return r.createServiceAccount(sa, ctx, instance)
+		}
+
+		msg := fmt.Sprintf("failed to create ServiceAccount '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
+			sa.GetName(), instance.GetName(), instance.GetNamespace(), res, err.Error())
+		r.Recorder.Event(instance, corev1.EventTypeNormal, "ServiceAccountCreationFailed", msg)
+		return fmt.Errorf(msg)
+	}
+
+	switch res {
+	case controllerutil.OperationResultCreated:
+		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "ServiceAccountCreationSuccessful", "Created ServiceAccount '%s'", sa.GetName())
+	case controllerutil.OperationResultUpdated:
+		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "ServiceAccountUpdationSuccessful", "Updated ServiceAccount '%s'", sa.GetName())
+	case controllerutil.OperationResultNone:
+	default:
+	}
+
+	return nil
+}
+
+// createServiceAccount calls the Kubernetes API to create the provided Controller ServiceAccount resource.
+func (r *ControllerReconciler) createServiceAccount(sa *corev1.ServiceAccount, ctx context.Context, instance *v1alpha1.Controller) error {
 	res, err := controllerutil.CreateOrUpdate(ctx, r.Client, sa, serviceAccountMutate(sa, sa.AutomountServiceAccountToken))
 	if err != nil {
 		if errors.IsConflict(err) {

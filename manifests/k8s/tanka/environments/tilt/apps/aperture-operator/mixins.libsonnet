@@ -15,39 +15,41 @@ local apertureOperatorMixin =
           tag: 'latest',
         },
       },
-      aperture+: {
+      agent+: {
         createUninstallHook: false,
         fluxninjaPlugin+: {
           enabled: false,
         },
-        agent+: {
-          log+: {
-            prettyConsole: true,
-            nonBlocking: false,
-            level: 'debug',
-            file: 'default',
-          },
-          image: {
-            registry: '',
-            repository: 'gcr.io/devel-309501/cf-fn/aperture-agent',
-            tag: 'latest',
-          },
+        log+: {
+          prettyConsole: true,
+          nonBlocking: false,
+          level: 'debug',
+          file: 'default',
         },
-        controller+: {
-          log+: {
-            prettyConsole: true,
-            nonBlocking: false,
-            level: 'debug',
-            file: 'default',
-          },
-          image: {
-            registry: '',
-            repository: 'gcr.io/devel-309501/cf-fn/aperture-controller',
-            tag: 'latest',
-          },
+        image: {
+          registry: '',
+          repository: 'gcr.io/devel-309501/cf-fn/aperture-agent',
+          tag: 'latest',
         },
         sidecar+: {
           enabled: false,
+        },
+      },
+      controller+: {
+        createUninstallHook: false,
+        fluxninjaPlugin+: {
+          enabled: false,
+        },
+        log+: {
+          prettyConsole: true,
+          nonBlocking: false,
+          level: 'debug',
+          file: 'default',
+        },
+        image: {
+          registry: '',
+          repository: 'gcr.io/devel-309501/cf-fn/aperture-controller',
+          tag: 'latest',
         },
       },
     },

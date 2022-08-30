@@ -38,10 +38,10 @@ import (
 
 var _ = Describe("Namespace controller", func() {
 	Context("testing Reconcile", func() {
-		var instance *v1alpha1.Aperture
+		var instance *v1alpha1.Agent
 
 		BeforeEach(func() {
-			instance = defaultInstance.DeepCopy()
+			instance = defaultAgentInstance.DeepCopy()
 			instance.Status.Resources = "created"
 		})
 
@@ -212,8 +212,8 @@ var _ = Describe("Namespace controller", func() {
 			instance.Spec.Sidecar.Enabled = true
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace}
 			instance.Spec.FluxNinjaPlugin.Enabled = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Agent.Create = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Agent.Value = fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(test)))
+			instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = true
+			instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(test)))
 			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
 			instance.Status.Resources = "created"
 			Expect(k8sClient.Status().Update(ctx, instance)).To(BeNil())
@@ -222,7 +222,7 @@ var _ = Describe("Namespace controller", func() {
 			configKey := types.NamespacedName{Name: agentServiceName, Namespace: namespace}
 
 			createdSecret := &corev1.Secret{}
-			secretKey := types.NamespacedName{Name: secretName(appName, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret.Agent), Namespace: namespace}
+			secretKey := types.NamespacedName{Name: secretName(appName, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace}
 
 			ns := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -251,7 +251,7 @@ var _ = Describe("Namespace controller", func() {
 		})
 
 		AfterEach(func() {
-			k8sClient.Delete(ctx, defaultInstance.DeepCopy())
+			k8sClient.Delete(ctx, defaultAgentInstance.DeepCopy())
 		})
 	})
 

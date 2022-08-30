@@ -74,11 +74,9 @@ func podSecurityContext(podSecurityContext v1alpha1.PodSecurityContext) *corev1.
 }
 
 // imageString prepares image string from the provided Image struct.
-func imageString(globalRegistry string, image v1alpha1.Image) string {
+func imageString(image v1alpha1.Image) string {
 	var imageStr string
-	if globalRegistry != "" {
-		imageStr = fmt.Sprintf("%s/%s:%s", globalRegistry, image.Repository, image.Tag)
-	} else if image.Registry != "" {
+	if image.Registry != "" {
 		imageStr = fmt.Sprintf("%s/%s:%s", image.Registry, image.Repository, image.Tag)
 	} else {
 		imageStr = fmt.Sprintf("%s:%s", image.Repository, image.Tag)
@@ -87,14 +85,8 @@ func imageString(globalRegistry string, image v1alpha1.Image) string {
 }
 
 // imagePullSecrets prepares imagePullSecrets string slice from the provided Image struct.
-func imagePullSecrets(globalPullSecrets []string, image v1alpha1.Image) []corev1.LocalObjectReference {
+func imagePullSecrets(image v1alpha1.Image) []corev1.LocalObjectReference {
 	imagePullSecrets := []corev1.LocalObjectReference{}
-	globalImagePullSecrets := []corev1.LocalObjectReference{}
-	for _, secret := range globalPullSecrets {
-		globalImagePullSecrets = append(globalImagePullSecrets, corev1.LocalObjectReference{
-			Name: secret,
-		})
-	}
 
 	for _, secret := range image.PullSecrets {
 		imagePullSecrets = append(imagePullSecrets, corev1.LocalObjectReference{
@@ -102,7 +94,7 @@ func imagePullSecrets(globalPullSecrets []string, image v1alpha1.Image) []corev1
 		})
 	}
 
-	return mergeImagePullSecrets(globalImagePullSecrets, imagePullSecrets)
+	return imagePullSecrets
 }
 
 // containerEnvFrom prepares EnvFrom resource for Agent and Controllers' container.
@@ -177,8 +169,8 @@ func containerProbes(spec v1alpha1.CommonSpec) (*corev1.Probe, *corev1.Probe) {
 }
 
 // agentEnv prepares env resources for Agents' container.
-func agentEnv(instance *v1alpha1.Aperture, agentGroup string) []corev1.EnvVar {
-	spec := instance.Spec.Agent
+func agentEnv(instance *v1alpha1.Agent, agentGroup string) []corev1.EnvVar {
+	spec := instance.Spec
 
 	envs := []corev1.EnvVar{
 		{
@@ -203,7 +195,7 @@ func agentEnv(instance *v1alpha1.Aperture, agentGroup string) []corev1.EnvVar {
 		})
 	}
 
-	if instance.Spec.Sidecar.Enabled {
+	if spec.Sidecar.Enabled {
 		envs = append(envs, corev1.EnvVar{
 			Name: "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_POD_NAME",
 			ValueFrom: &corev1.EnvVarSource{
@@ -239,9 +231,9 @@ func agentEnv(instance *v1alpha1.Aperture, agentGroup string) []corev1.EnvVar {
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: secretName(instance.GetName(), "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret.Agent),
+						Name: secretName(instance.GetName(), "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret),
 					},
-					Key:      secretDataKey(&instance.Spec.FluxNinjaPlugin.APIKeySecret.Agent.SecretKeyRef),
+					Key:      secretDataKey(&instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef),
 					Optional: pointer.BoolPtr(false),
 				},
 			},
@@ -283,8 +275,8 @@ func agentVolumes(agentSpec v1alpha1.AgentSpec) []corev1.Volume {
 }
 
 // controllerEnv prepares env resources for Controller' container.
-func controllerEnv(instance *v1alpha1.Aperture) []corev1.EnvVar {
-	spec := instance.Spec.Controller
+func controllerEnv(instance *v1alpha1.Controller) []corev1.EnvVar {
+	spec := instance.Spec
 
 	envs := []corev1.EnvVar{
 		{
@@ -298,15 +290,15 @@ func controllerEnv(instance *v1alpha1.Aperture) []corev1.EnvVar {
 		},
 	}
 
-	if instance.Spec.FluxNinjaPlugin.Enabled {
+	if spec.FluxNinjaPlugin.Enabled {
 		envs = append(envs, corev1.EnvVar{
 			Name: "APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: secretName(instance.GetName(), "controller", &instance.Spec.FluxNinjaPlugin.APIKeySecret.Controller),
+						Name: secretName(instance.GetName(), "controller", &instance.Spec.FluxNinjaPlugin.APIKeySecret),
 					},
-					Key:      secretDataKey(&instance.Spec.FluxNinjaPlugin.APIKeySecret.Controller.SecretKeyRef),
+					Key:      secretDataKey(&instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef),
 					Optional: pointer.BoolPtr(false),
 				},
 			},
@@ -344,7 +336,7 @@ func controllerVolumeMounts(controllerSpec v1alpha1.CommonSpec) []corev1.VolumeM
 }
 
 // controllerVolumes prepares volumes for Controller.
-func controllerVolumes(instance *v1alpha1.Aperture) []corev1.Volume {
+func controllerVolumes(instance *v1alpha1.Controller) []corev1.Volume {
 	volumes := []corev1.Volume{
 		{
 			Name: "aperture-controller-config",
@@ -392,20 +384,20 @@ func controllerVolumes(instance *v1alpha1.Aperture) []corev1.Volume {
 		},
 	}
 
-	return mergeVolumes(volumes, instance.Spec.Controller.ExtraVolumes)
+	return mergeVolumes(volumes, instance.Spec.ExtraVolumes)
 }
 
 // commonLabels prepares common labels used by all resources.
-func commonLabels(instance *v1alpha1.Aperture, component string) map[string]string {
+func commonLabels(commonLabels map[string]string, instanceName, component string) map[string]string {
 	labels := map[string]string{
 		"app.kubernetes.io/name":       appName,
-		"app.kubernetes.io/instance":   instance.GetName(),
+		"app.kubernetes.io/instance":   instanceName,
 		"app.kubernetes.io/managed-by": operatorName,
 		"app.kubernetes.io/component":  component,
 	}
 
-	if instance.Spec.Labels != nil {
-		if err := mergo.Map(&labels, instance.Spec.Labels, mergo.WithOverride); err != nil {
+	if commonLabels != nil {
+		if err := mergo.Map(&labels, commonLabels, mergo.WithOverride); err != nil {
 			return labels
 		}
 	}
@@ -423,8 +415,21 @@ func selectorLabels(instance, component string) map[string]string {
 	}
 }
 
-// getAnnotationsWithOwnerRef prepares the map for Annotation with reference to the creator instance.
-func getAnnotationsWithOwnerRef(instance *v1alpha1.Aperture) map[string]string {
+// getControllerAnnotationsWithOwnerRef prepares the map for Annotation with reference to the creator instance.
+func getControllerAnnotationsWithOwnerRef(instance *v1alpha1.Controller) map[string]string {
+	annotations := instance.Spec.Annotations
+	if annotations == nil {
+		annotations = map[string]string{}
+	}
+	annotations["fluxninja.com/primary-resource"] = fmt.Sprintf("%s/%s", instance.GetNamespace(), instance.GetName())
+	annotations["fluxninja.com/primary-resource-type"] = fmt.Sprintf("%s.%s",
+		instance.GetObjectKind().GroupVersionKind().GroupKind().Kind, instance.GetObjectKind().GroupVersionKind().GroupKind().Group)
+
+	return annotations
+}
+
+// getAgentAnnotationsWithOwnerRef prepares the map for Annotation with reference to the creator instance.
+func getAgentAnnotationsWithOwnerRef(instance *v1alpha1.Agent) map[string]string {
 	annotations := instance.Spec.Annotations
 	if annotations == nil {
 		annotations = map[string]string{}
