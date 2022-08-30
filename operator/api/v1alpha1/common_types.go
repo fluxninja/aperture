@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"time"
+
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -180,14 +182,44 @@ type FluxNinjaPluginSpec struct {
 	//+kubebuilder:default:={insecure:false,insecureSkipVerify:false}
 	TLS TLSSpec `json:"tls"`
 
-	// API Key secret references for Agent and Controller
+	// API Key secret references for Agent or Controller
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={agent:{create:true},controller:{create:true}}
-	APIKeySecret APIKeySecretSpec `json:"apiKeySecret"`
+	//+kubebuilder:default:={create:true}
+	APIKeySecret APIKeySecret `json:"apiKeySecret"`
 }
 
 // CommonSpec defines the desired the common state of Agent and Controller.
 type CommonSpec struct {
+	// Labels to add to all deployed objects
+	//+mapType=atomic
+	//+kubebuilder:validation:Optional
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
+	Labels map[string]string `json:"labels,omitempty"`
+
+	// Annotations to add to all deployed objects
+	//+kubebuilder:validation:Optional
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
+	Annotations map[string]string `json:"annotations,omitempty"`
+
+	// FluxNinjaPlugin defines the parameters for FluxNinja plugin with Agent or Controller
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={enabled:false,heartbeatsInterval:"30s"}
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
+	FluxNinjaPlugin FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
+
+	// Configuration for Agent or Controller service
+	//+kubebuilder:validation:Optional
+	Service Service `json:"service"`
+
+	// Etcd parameters for Agent or Controller
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={leaseTtl:"60s"}
+	Etcd EtcdSpec `json:"etcd"`
+
+	// Prometheus parameters for Agent or Controller
+	//+kubebuilder:validation:Optional
+	Prometheus PrometheusSpec `json:"prometheus"`
+
 	// Server port for the Agent
 	//+kubebuilder:default:=80
 	//+kubebuilder:validation:Optional
@@ -200,7 +232,7 @@ type CommonSpec struct {
 	//+kubebuilder:default:={prettyConsole:false,nonBlocking:true,level:"info",file:"stderr"}
 	Log Log `json:"log"`
 
-	// ServiceAccountSpec defines the the configuration pf Service account for Agent and Controller
+	// ServiceAccountSpec defines the the configuration pf Service account for Agent or Controller
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:={create:true,automountServiceAccountToken:true}
 	ServiceAccountSpec ServiceAccountSpec `json:"serviceAccount"`
@@ -381,4 +413,17 @@ type APIKeySecretSpec struct {
 	// API Key secret reference for Controller
 	//+kubebuilder:validation:Optional
 	Controller APIKeySecret `json:"controller"`
+}
+
+// Batch defines configuration for OTEL batch processor.
+type Batch struct {
+	// Timeout sets the time after which a batch will be sent regardless of size.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=1000000000
+	Timeout time.Duration `json:"timeout"`
+
+	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=10000
+	SendBatchSize uint32 `json:"sendBatchSize"`
 }

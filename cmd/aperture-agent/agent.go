@@ -20,7 +20,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
-	"github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
@@ -32,13 +31,12 @@ import (
 func main() {
 	app := platform.New(
 		platform.Config{}.Module(),
-		http.ClientConstructor{Name: "k8s-http-client", Key: "kubernetes.http_client"}.Annotate(),
 		notifiers.TrackersConstructor{Name: "entity_trackers"}.Annotate(),
 		prometheus.Module(),
+		k8s.Module(),
 		otel.ProvideAnnotatedAgentConfig(),
 		fx.Provide(
 			agentinfo.ProvideAgentInfo,
-			k8s.Providek8sClient,
 			clockwork.NewRealClock,
 			entitycache.ProvideEntityCache,
 			otel.AgentOTELComponents,

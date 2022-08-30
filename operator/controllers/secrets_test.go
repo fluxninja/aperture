@@ -34,16 +34,15 @@ import (
 var _ = Describe("Secret for Agent", func() {
 	Context("Instance with default parameters", func() {
 		It("returns correct Secret", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Agent: v1alpha1.AgentSpec{},
-					FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-						APIKeySecret: v1alpha1.APIKeySecretSpec{
-							Agent: v1alpha1.APIKeySecret{
+				Spec: v1alpha1.AgentSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
+							APIKeySecret: v1alpha1.APIKeySecret{
 								Value: test,
 							},
 						},
@@ -66,7 +65,7 @@ var _ = Describe("Secret for Agent", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Agent",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -84,17 +83,16 @@ var _ = Describe("Secret for Agent", func() {
 
 	Context("Instance with all parameters", func() {
 		It("returns correct Secret", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Annotations: testMap,
-					Agent:       v1alpha1.AgentSpec{},
-					FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-						APIKeySecret: v1alpha1.APIKeySecretSpec{
-							Agent: v1alpha1.APIKeySecret{
+				Spec: v1alpha1.AgentSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						Annotations: testMap,
+						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
+							APIKeySecret: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{
 									Name: test,
 									Key:  test,
@@ -121,7 +119,7 @@ var _ = Describe("Secret for Agent", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Agent",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -141,16 +139,15 @@ var _ = Describe("Secret for Agent", func() {
 var _ = Describe("Secret for Controller", func() {
 	Context("Instance with default parameters", func() {
 		It("returns correct Secret", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Controller: v1alpha1.ControllerSpec{},
-					FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-						APIKeySecret: v1alpha1.APIKeySecretSpec{
-							Controller: v1alpha1.APIKeySecret{
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
+							APIKeySecret: v1alpha1.APIKeySecret{
 								Value: test,
 							},
 						},
@@ -173,7 +170,7 @@ var _ = Describe("Secret for Controller", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -191,17 +188,16 @@ var _ = Describe("Secret for Controller", func() {
 
 	Context("Instance with all parameters", func() {
 		It("returns correct Secret", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Annotations: testMap,
-					Controller:  v1alpha1.ControllerSpec{},
-					FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-						APIKeySecret: v1alpha1.APIKeySecretSpec{
-							Controller: v1alpha1.APIKeySecret{
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						Annotations: testMap,
+						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
+							APIKeySecret: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{
 									Name: test,
 									Key:  test,
@@ -228,7 +224,7 @@ var _ = Describe("Secret for Controller", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -249,12 +245,12 @@ var _ = Describe("Secret for Controller Cert", func() {
 
 	Context("Instance with default parameters", func() {
 		It("returns correct Secret", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{},
+				Spec: v1alpha1.ControllerSpec{},
 			}
 
 			expected := &corev1.Secret{
@@ -272,7 +268,7 @@ var _ = Describe("Secret for Controller Cert", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},
@@ -291,13 +287,15 @@ var _ = Describe("Secret for Controller Cert", func() {
 
 	Context("Instance with all parameters", func() {
 		It("returns correct Secret", func() {
-			instance := &v1alpha1.Aperture{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.ApertureSpec{
-					Annotations: testMap,
+				Spec: v1alpha1.ControllerSpec{
+					CommonSpec: v1alpha1.CommonSpec{
+						Annotations: testMap,
+					},
 				},
 			}
 
@@ -316,7 +314,7 @@ var _ = Describe("Secret for Controller Cert", func() {
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
-							Kind:               "Aperture",
+							Kind:               "Controller",
 							Controller:         pointer.BoolPtr(true),
 							BlockOwnerDeletion: pointer.BoolPtr(true),
 						},

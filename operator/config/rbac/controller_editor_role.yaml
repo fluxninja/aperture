@@ -1,0 +1,24 @@
+# permissions for end users to edit controllers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: controller-editor-role
+rules:
+- apiGroups:
+  - fluxninja.com
+  resources:
+  - controllers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - fluxninja.com
+  resources:
+  - controllers/status
+  verbs:
+  - get

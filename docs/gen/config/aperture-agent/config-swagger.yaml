@@ -987,6 +987,17 @@ paths:
       tags:
       - common-configuration
       x-fn-config-env: true
+  /kubernetes_client:
+    post:
+      operationId: KubernetesClient
+      parameters:
+      - in: body
+        name: http_client
+        schema:
+          $ref: '#/definitions/HTTPClientConfig'
+      tags:
+      - common-configuration
+      x-fn-config-env: true
   /liveness:
     post:
       operationId: Liveness
