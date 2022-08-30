@@ -1,0 +1,8 @@
+log:
+  level: info
+  file: stderr
+
+plugins:
+  disable_plugins: false
+  disabled_plugins:
+    - aperture-plugin-fluxninja

@@ -7,6 +7,9 @@ executors:
   base-cimg-executor:
     docker:
       - image: cimg/base:2021.07
+  ubuntu-go-executor:
+    docker:
+      - image: cimg/go:1.19
 
 # TODO: Sync this with continue-workflows.yml
 commands:
@@ -54,19 +57,11 @@ commands:
           key: aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
           paths:
             - ~/.asdf
-jobs:
-  release-components:
-    executor: base-cimg-executor
+  opsninja_install:
     steps:
-      - checkout
       - add_ssh_keys:
           fingerprints:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-      - asdf_install:
-          cache_name: release
-          tools: |-
-            python
-            gcloud
       - run:
           name: Install opsninja and its dependencies
           command: |
@@ -80,12 +75,99 @@ jobs:
             pip uninstall -y opsninja
             pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
             asdf reshim
+
+jobs:
+  release-components:
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - asdf_install:
+          cache_name: release
+          tools: |-
+            python
+            gcloud
+      - opsninja_install
       - run:
           name: Schedule release jobs
           working_directory: ops/apps/opsninja
           command: fn circleci trigger-release --tag << pipeline.git.tag >>
       - asdf_save_cache:
           cache_name: release
+  package-agent:
+    parameters:
+      executor:
+        type: executor
+        description: executor to use for this job
+        default:  ubuntu-go-executor
+      workspace-name:
+        type: string
+        description: the name of the workspace to which built packages should be added
+        default: packages
+      goarch:
+        type: string
+        description: the GOARCH to use for the build
+        default: amd64
+    executor: <<parameters.executor>>
+    environment:
+      PACKAGES_DIR: "/tmp/packages"
+      GOARCH: <<parameters.goarch>>
+    steps:
+      - checkout
+      - run:
+          name: "Set build vars"
+          command: |
+            GIT_BRANCH="$(git branch --show-current)"
+            GIT_COMMIT_HASH="$(git log -n1 --format=%H)"
+            GOOS="$(go env GOOS)"
+            VERSION="$(cut -d/ -f3- \<<<"${RELEASE_TAG}")"
+            if which dpkg; then
+              PACKAGER=deb
+            elif which rpm; then
+              PACKAGER=rpm
+            elif which apk; then
+              PACKAGER=apk
+            else
+              echo "Unable to determine proper packager for current OS"
+              exit 1
+            fi
+
+            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION PACKAGER
+            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION PACKAGER >> "${BASH_ENV}"
+          environment:
+            RELEASE_TAG: <<pipeline.git.tag>>
+      - run:
+          name: "Compile agent and plugins"
+          command: |
+            SOURCE="./cmd/aperture-agent" TARGET="./dist/aperture-agent" ./pkg/info/build.sh
+            for plugin_dir in ./plugins/*/aperture-plugin-*; do
+              plugin="$(basename "${plugin_dir}")"
+              echo "Building plugin ${plugin}"
+              SOURCE="${plugin_dir}" TARGET="./dist/plugins/${plugin}.so" ./pkg/plugins/build.sh
+            done
+          environment:
+            CGO_ENABLED: "1"
+            PREFIX: "aperture"
+            LDFLAGS: "-s -w"
+      - run:
+          name: Install nFPM
+          command: |
+            filename="nfpm_amd64.${PACKAGER}"
+            file="/tmp/${filename}"
+            curl --silent --show-error --location https://github.com/goreleaser/nfpm/releases/latest/download/${filename} -o "${file}"
+            case "${PACKAGER}" in
+              deb) sudo dpkg -i "${file}";;
+              rpm) sudo rpm -i "${file}";;
+              apk) sudo apk add --allow-untrusted "${file}";;
+              *) echo "Unknown packager ${PACKAGER}"; exit 1;;
+            esac
+            which nfpm
+      - run:
+          name: Package
+          command: |
+            mkdir -p dist/packages/
+            nfpm package --packager "${PACKAGER}" --target dist/packages/
+            ls -l dist/packages/
+
 
 orbs:
   path-filtering: circleci/path-filtering@0.1.1
@@ -129,7 +211,8 @@ workflows:
           base-revision: main
   release-components:
     when:
-      matches: { value: << pipeline.git.tag >>, pattern: "^releases/.+$" }
+      # Ignore agent releases and handle them separately
+      matches: { value: << pipeline.git.tag >>, pattern: "^releases/(?!aperture-agent).*$" }
     jobs:
       - release-components:
           # both this and workflow's when is needed
@@ -137,4 +220,21 @@ workflows:
             branches:
               ignore: /.+/
             tags:
-              only: /releases\/.+/
+              only: /^releases\/.*$/
+  release-agent:
+    when:
+      matches: { value: << pipeline.git.tag >>, pattern: "^releases/aperture-agent/.*$" }
+    jobs:
+      - release-components: &agent-filters
+          # both this and workflow's when is needed
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^releases\/aperture-agent\/.*$/
+      - package-agent:
+          <<: *agent-filters
+          matrix:
+            parameters:
+              executor: [ ubuntu-go-executor ]
+              goarch: [ amd64 ]
