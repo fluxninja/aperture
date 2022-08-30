@@ -101,6 +101,10 @@ DEP_TREE = {
                 "aperture-etcd": "2379:2379",
             },
             "pvc_selectors": ["app.kubernetes.io/name=etcd"],
+            "kinds": [
+                dict(kind="Agent", image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait'),
+                dict(kind="Controller", image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait'),
+            ],
             "child_resources": [
                 {
                     "new_name": "aperture-operator-bootstrap",
@@ -391,10 +395,6 @@ def wrapped_k8s_yaml(yaml, allow_duplicates=False):
     update_tilt_objects(objects)
 
     k8s_yaml(yaml, allow_duplicates)
-
-    for i in range(0, len(objects)):
-        if objects[i]["kind"] == "Agent" or objects[i]["kind"] == "Controller" :
-            k8s_kind(objects[i]["kind"], image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait')
 
 
 def render_tanka(environment, env_vars):
@@ -792,6 +792,8 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
             child["labels"] = resource_labels
             verbose("Registering child", child)
             k8s_resource(**child)
+        for kind in resource_info.get("kinds", []):
+            k8s_kind(**kind)
 
     if "aperture-grafana" in resources:
         forward_port_delayed(workload="aperture-grafana-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],

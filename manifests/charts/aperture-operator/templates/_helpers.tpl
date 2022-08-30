@@ -10,7 +10,6 @@ Compile all warnings into a single message.
 */}}
 {{- define "aperture-operator.validateValues" -}}
 {{- $messages := list -}}
-{{- $messages := append $messages "placeholder" -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 
