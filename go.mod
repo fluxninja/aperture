@@ -35,7 +35,6 @@ require (
 	github.com/knadh/koanf v1.4.3
 	github.com/lithammer/dedent v1.1.0
 	github.com/looplab/tarjan v0.1.0
-	github.com/mitchellh/copystructure v1.2.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.1.4
@@ -96,6 +95,7 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/cronexpr v1.1.1 // indirect
 	github.com/hashicorp/nomad/api v0.0.0-20220726154010-ed202d492861 // indirect
+	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.58.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheus v0.58.0 // indirect
 	github.com/pascaldekloe/name v1.0.0 // indirect

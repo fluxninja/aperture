@@ -62,16 +62,11 @@ type JobGroupConstructor struct {
 	SchedulerMode SchedulerMode
 }
 
-// Annotate provides annotated instances of GroupWatcherMetrics and JobGroup.
+// Annotate provides annotated instances of JobGroup.
 func (jgc JobGroupConstructor) Annotate() fx.Option {
 	groupTag := config.GroupTag(jgc.Name)
 	nameTag := config.NameTag(jgc.Name)
 	return fx.Options(
-		fx.Provide(
-			fx.Annotate(
-				fx.ResultTags(groupTag),
-			),
-		),
 		fx.Provide(
 			fx.Annotate(
 				jgc.provideJobGroup,
