@@ -1,5 +1,6 @@
 ---
 title: FluxNinja Cloud Plugin
+sidebar_label: Plugin
 sidebar_position: 1
 keywords:
   - cloud

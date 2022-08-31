@@ -721,7 +721,7 @@ message Scheduler {
     //
     // :::info
     // **Accepted tokens** are tokens associated with
-    // [flows](/concepts/flow-control#what-is-a-flow) that were accepted by
+    // [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) that were accepted by
     // this scheduler. Number of tokens for a flow is determined by a
     // [workload](#-schedulerworkload) that the flow was assigned to (either
     // via `auto_tokens` or explicitly by `Workload.tokens`).
@@ -744,9 +744,13 @@ message Scheduler {
 
   // List of workloads to be used in scheduler.
   //
-  // Categorizing [flows](/concepts/flow-control#what-is-a-flow) into workloads
+  // Categorizing [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) into workloads
   // allows for load-shedding to be "smarter" than just "randomly deny 50% of
-  // requests". There are two aspects of workloads:
+  // requests". There are two aspects of this "smartness":
+  // * Scheduler can more precisely estimate concurrency if it understand
+  //   that different classes have different weights (eg. inserts vs lookups).
+  // * Setting different priorities to different workloads lets the scheduler
+  //   avoid dropping important traffic during overload.
   //
   // Each workload in this list specifies also a matcher that's used to
   // determine which flow will be categorized into which workload.
@@ -755,7 +759,7 @@ message Scheduler {
   //
   // :::info
   // See also [workload definition in the concepts
-  // section](/concepts/flow-control/actuators/scheduler#workload).
+  // section](/concepts/flow-control/actuators/scheduler.md#workload).
   // :::
   repeated WorkloadAndLabelMatcher workloads = 5;
 
