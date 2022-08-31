@@ -38,10 +38,10 @@ func main() {
 		fx.Provide(
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
-			entitycache.ProvideEntityCache,
 			otel.AgentOTELComponents,
 			agent.ProvidePeersPrefix,
 		),
+		entitycache.Module(),
 		flowcontrol.Module,
 		otelcollector.Module(),
 		distcache.Module(),

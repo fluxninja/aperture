@@ -2,24 +2,29 @@ package entitycache
 
 import (
 	"context"
-	"encoding/json"
-	"net/http"
 	"sync"
 
-	"github.com/gorilla/mux"
 	"go.uber.org/fx"
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/services"
 )
 
-const (
-	debugEndpoint = "/debug/entity_cache"
-)
+// Module sets up EntityCache with Fx.
+func Module() fx.Option {
+	return fx.Options(
+		fx.Provide(provideEntityCache),
+		grpcgateway.RegisterHandler{Handler: entitycachev1.RegisterEntityCacheServiceHandlerFromEndpoint}.Annotate(),
+		fx.Invoke(RegisterEntityCacheService),
+	)
+}
 
 // ServiceKey holds key for service.
 type ServiceKey struct {
@@ -88,6 +93,7 @@ func NewEntity(id EntityID, ipAddress, name string, services []string) *Entity {
 
 // EntityCache maps IP addresses and Entity names to entities.
 type EntityCache struct {
+	entitycachev1.UnimplementedEntityCacheServiceServer
 	sync.RWMutex
 	entitiesByIP   map[string]*Entity
 	entitiesByName map[string]*Entity
@@ -97,15 +103,12 @@ type EntityCache struct {
 type FxIn struct {
 	fx.In
 	Lifecycle      fx.Lifecycle
-	Router         *mux.Router
 	EntityTrackers notifiers.Trackers `name:"entity_trackers"`
 }
 
-// ProvideEntityCache creates Entity Cache.
-func ProvideEntityCache(in FxIn) (*EntityCache, error) {
+// provideEntityCache creates Entity Cache.
+func provideEntityCache(in FxIn) (*EntityCache, error) {
 	entityCache := NewEntityCache()
-
-	in.Router.HandleFunc(debugEndpoint, entityCache.DumpHandler)
 
 	// create a ConfigPrefixNotifier
 	configPrefixNotifier := &notifiers.UnmarshalPrefixNotifier{
@@ -249,7 +252,7 @@ func (c *EntityCache) Remove(entity *Entity) bool {
 // for an agent group is ignored.
 // Entities which have multiple values for service name will create one service
 // for each of them.
-func (c *EntityCache) Services() *entitycachev1.EntityCache {
+func (c *EntityCache) Services() *entitycachev1.ServicesList {
 	c.RLock()
 	defer c.RUnlock()
 
@@ -279,7 +282,7 @@ func (c *EntityCache) Services() *entitycachev1.EntityCache {
 
 	}
 
-	entityCache := &entitycachev1.EntityCache{
+	entityCache := &entitycachev1.ServicesList{
 		Services:            make([]*entitycachev1.Service, 0, len(services)),
 		OverlappingServices: make([]*entitycachev1.OverlappingService, 0, len(overlapping)),
 	}
@@ -297,18 +300,13 @@ func (c *EntityCache) Services() *entitycachev1.EntityCache {
 	return entityCache
 }
 
-// DumpHandler is used to return entity cache data in JSON format.
-func (c *EntityCache) DumpHandler(w http.ResponseWriter, req *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	err := json.NewEncoder(w).Encode(c.entitiesByIP)
-	if err != nil {
-		log.Error().Err(err).Msg("Error writing entity cache response body")
-		http.Error(w, "", http.StatusInternalServerError)
-	}
-}
-
 type pair struct {
 	x, y ServiceKey
+}
+
+// GetServicesList returns a list of services based on entities in cache.
+func (c *EntityCache) GetServicesList(ctx context.Context, _ *emptypb.Empty) (*entitycachev1.ServicesList, error) {
+	return c.Services(), nil
 }
 
 // eachPair returns each pair of elements in a slice. Elements in the pair are sorted so that
@@ -358,4 +356,9 @@ func servicesFromEntity(entity *Entity) ([]*entitycachev1.Service, error) {
 		})
 	}
 	return svcs, nil
+}
+
+// RegisterEntityCacheService registers a service for entity cache.
+func RegisterEntityCacheService(server *grpc.Server, cache *EntityCache) {
+	entitycachev1.RegisterEntityCacheServiceServer(server, cache)
 }

@@ -2,7 +2,27 @@ syntax = "proto3";
 
 package aperture.common.entitycache.v1;
 
-message EntityCache {
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+//
+// gRPC service
+//
+
+// EntityCacheService is used to query EntityCache.
+service EntityCacheService {
+  rpc GetServicesList(google.protobuf.Empty) returns (ServicesList) {
+    option (google.api.http) = {
+      get: "/v1/entity-cache/services-list"
+    };
+  }
+}
+
+//
+// Data models
+//
+
+message ServicesList {
   repeated Service services = 1;
   repeated OverlappingService overlapping_services = 2;
 }

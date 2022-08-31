@@ -29,6 +29,9 @@ func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.Grou
 
 	registry := svc.registry
 	for _, key := range req.Keys {
+		if key == "" {
+			continue
+		}
 		registry = registry.ChildIfExists(key)
 		if registry == nil {
 			return &statusv1.GroupStatus{}, nil
