@@ -62,9 +62,11 @@ func Module() fx.Option {
 // ProfilersConfig holds configuration for profilers.
 // swagger:model
 type ProfilersConfig struct {
-	// Path to save performance profiles. This can be set via command line arguments as well.
+	// Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
+	RegisterHTTPRoutes bool `json:"register_http_routes" default:"true"`
+	// Path to save performance profiles. This can be set via command line arguments as well. E.g. default path for aperture-agent is /var/log/aperture/aperture-agent/profiles.
 	ProfilesPath string `json:"profiles_path"`
-	// Flag to enable cpu profiling
+	// Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
 	CPUProfile bool `json:"cpu_profiler" default:"false"`
 }
 
@@ -90,16 +92,14 @@ func (constructor Constructor) setupProfilers(unmarshaller config.Unmarshaller,
 
 	var cpuProfileFile *lumberjack.Logger
 	var err error
-	registerRoutes := false
 
 	if config.CPUProfile {
 		filename := path.Join(profilesPath, defaultCPUFile)
 		log.Debug().Str("filename", filename).Msg("opening cpu profile writer")
 		cpuProfileFile = newProfileWriter(filename)
-		registerRoutes = true
 	}
 
-	if registerRoutes {
+	if config.RegisterHTTPRoutes {
 		router.HandleFunc(httpPathPrefix, httppprof.Index)
 		router.HandleFunc(path.Join(httpPathPrefix, "cmdline"), httppprof.Cmdline)
 		router.HandleFunc(path.Join(httpPathPrefix, "profile"), httppprof.Profile)

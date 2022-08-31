@@ -948,7 +948,7 @@ HTTPServerConfig holds configuration for HTTP Server.
 <dt>write_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `10s`) Write timeout
+(string, `gte=0s`, default: `45s`) Write timeout
 
 </dd>
 </dl>
@@ -1307,7 +1307,7 @@ ProfilersConfig holds configuration for profilers.
 <dt>cpu_profiler</dt>
 <dd>
 
-(bool, default: `false`) Flag to enable cpu profiling
+(bool, default: `false`) Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
 
 </dd>
 </dl>
@@ -1315,7 +1315,15 @@ ProfilersConfig holds configuration for profilers.
 <dt>profiles_path</dt>
 <dd>
 
-(string) Path to save performance profiles. This can be set via command line arguments as well.
+(string) Path to save performance profiles. This can be set via command line arguments as well. E.g. default path for aperture-agent is /var/log/aperture/aperture-agent/profiles.
+
+</dd>
+</dl>
+<dl>
+<dt>register_http_routes</dt>
+<dd>
+
+(bool, default: `true`) Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
 
 </dd>
 </dl>
