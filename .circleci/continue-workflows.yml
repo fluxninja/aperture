@@ -439,6 +439,7 @@ jobs:
       task-name:
         type: string
         description: name of the helm chart
+        default: Helm Chart release
       appVersion:
         type: string
         description: Give the appVersion
@@ -451,7 +452,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Helm Chart release
+          name: << parameters.task-name >>
           command: |
             helm package manifests/charts/agent --version << parameters.version >> --app-version << parameters.appVersion >>
             mv *.tgz /tmp
@@ -476,7 +477,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Helm Chart release
+          name: << parameters.task-name >>
           command: |
             helm package manifests/charts/agent-operator --version << parameters.version >> --app-version << parameters.appVersion >>
             mv *.tgz /tmp
