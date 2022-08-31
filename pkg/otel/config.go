@@ -2,7 +2,6 @@ package otel
 
 import (
 	"fmt"
-	"time"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/config/configgrpc"
@@ -34,9 +33,6 @@ const (
 	// ProcessorBatchPostrollup batches data after rolling up, as roll up process
 	// shrinks number of data points significantly.
 	ProcessorBatchPostrollup = "batch/postrollup"
-	// ProcessorBatchMetricsFast batches metrics in small and fast packages. Used
-	// in flow control policy.
-	ProcessorBatchMetricsFast = "batch/metrics-fast"
 	// ProcessorRollup rolls up data to decrease cardinality.
 	ProcessorRollup = "rollup"
 
@@ -52,10 +48,9 @@ type otelConfig struct {
 	// Addr is an address on which this app is serving metrics.
 	// TODO this should be inherited from the listener.Listener config, but it's
 	// not initialized at the provide state of app.
-	Addr             string `json:"addr" validate:"hostname_port" default:":8080"`
-	BatchPrerollup   Batch  `json:"batch_prerollup"`
-	BatchPostrollup  Batch  `json:"batch_postrollup"`
-	BatchMetricsFast Batch  `json:"batch_metrics_fast"`
+	Addr            string `json:"addr" validate:"hostname_port" default:":8080"`
+	BatchPrerollup  Batch  `json:"batch_prerollup"`
+	BatchPostrollup Batch  `json:"batch_postrollup"`
 }
 
 // Batch defines configuration for OTEL batch processor.
@@ -147,13 +142,11 @@ func addLogsAndTracesPipelines(config *otelcollector.OTELConfig, cfg otelConfig)
 func addMetricsPipeline(config *otelcollector.OTELConfig, promClient promapi.Client, cfg otelConfig) {
 	addPrometheusReceiver(config, cfg)
 	config.AddProcessor(ProcessorEnrichment, nil)
-	config.AddBatchProcessor(ProcessorBatchMetricsFast, cfg.BatchMetricsFast.Timeout.Duration.AsDuration(), cfg.BatchMetricsFast.SendBatchSize)
 	addPrometheusRemoteWriteExporter(config, promClient)
 	config.Service.AddPipeline("metrics/fast", otelcollector.Pipeline{
 		Receivers: []string{ReceiverPrometheus},
 		Processors: []string{
 			ProcessorEnrichment,
-			ProcessorBatchMetricsFast,
 		},
 		Exporters: []string{ExporterPrometheusRemoteWrite},
 	})
@@ -161,11 +154,10 @@ func addMetricsPipeline(config *otelcollector.OTELConfig, promClient promapi.Cli
 
 func addControllerMetricsPipeline(config *otelcollector.OTELConfig, promClient promapi.Client, cfg otelConfig) {
 	addControllerPrometheusReceiver(config, cfg)
-	config.AddBatchProcessor(ProcessorBatchMetricsFast, 1*time.Second, 1000)
 	addPrometheusRemoteWriteExporter(config, promClient)
 	config.Service.AddPipeline("metrics/controller-fast", otelcollector.Pipeline{
 		Receivers:  []string{ReceiverPrometheus},
-		Processors: []string{ProcessorBatchMetricsFast},
+		Processors: []string{},
 		Exporters:  []string{ExporterPrometheusRemoteWrite},
 	})
 }

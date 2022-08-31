@@ -36,11 +36,6 @@ spec:
     timeout: {{ .Values.agent.batchPostrollup.timeout }}
     sendBatchSize: {{ .Values.agent.batchPostrollup.sendBatchSize }}
   {{- end }}
-  {{- if or .Values.agent.batchMetricsFast.timeout .Values.agent.batchMetricsFast.sendBatchSize }}
-  batchMetricsFast:
-    timeout: {{ .Values.agent.batchMetricsFast.timeout }}
-    sendBatchSize: {{ .Values.agent.batchMetricsFast.sendBatchSize }}
-  {{- end }}
   {{- if or .Values.agent.log.prettyConsole .Values.agent.log.nonBlocking .Values.agent.log.level .Values.agent.log.file }}
   log: {{ .Values.agent.log | toYaml | nindent 4 }}
   {{- end }}

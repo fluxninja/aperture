@@ -65,11 +65,6 @@ type AgentSpec struct {
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:={timeout:"1s",sendBatchSize:10000}
 	BatchPostrollup Batch `json:"batchPostrollup"`
-
-	// Batch metrics/fast processor configuration.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={timeout:"1s",sendBatchSize:1000}
-	BatchMetricsFast Batch `json:"batchMetricsFast"`
 }
 
 // AgentStatus defines the observed state of Agent.
