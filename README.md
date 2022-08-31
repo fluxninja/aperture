@@ -23,7 +23,7 @@ Aperture is the first open-source flow control and reliability management platfo
 Aperture enables flow control through observing, analyzing, and actuating, facilitated by agents and a controller.
 
 <p align="center">
-  <img src="docs/content/assets/img/oaa.png" alt="Observe. Analyze. Actuate." width="100%">
+  <img src="docs/content/assets/img/oaa.jpg" alt="Observe. Analyze. Actuate." width="100%">
 </p>
 
 For more detailed description, refer to [the docs](docs/content/introduction.md).
