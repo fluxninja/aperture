@@ -173,11 +173,13 @@ definitions:
     properties:
       enabled:
         type: boolean
+        description: TODO document what happens when lazy sync is disabled
+        title: Enables lazy sync
         x-go-default: true
       num_sync:
         type: integer
         format: int64
-        description: Number of times to lazy sync within the limit_reset_interval.
+        description: Number of times to lazy sync within the _limit\_reset\_interval_.
         x-go-default: 5
         x-go-validate: gt=0
   RateLimiterOverride:
@@ -185,10 +187,12 @@ definitions:
     properties:
       label_value:
         type: string
+        description: Value of the label for which the override should be applied.
         x-go-validate: required
       limit_scale_factor:
         type: number
         format: double
+        description: Amount by which the _in\_ports.limit_ should be multiplied for this label value.
         x-go-default: 1
   RuleRego:
     type: object
@@ -301,8 +305,7 @@ definitions:
         x-go-validate: required
     description: |-
       :::info
-      See also [Scheduler page in the Concepts section](/concepts/flow-control/actuators/scheduler.md)
-      for a more high-level description.
+      See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
       :::
 
       It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -319,19 +322,39 @@ definitions:
         x-go-validate: required
       label_key:
         type: string
+        description: |-
+          Specifies which label the ratelimiter should be keyed by.
+
+          Rate limiting is done independently for each value of the label with given
+          key. Eg., to give each user a separate limit, assuming you have a _user_
+          flow label set up, set `label_key: "user"`.
+
+          TODO make it possible for this field to be optional – to achieve global ratelimit.
         x-go-validate: required
       lazy_sync:
         $ref: '#/definitions/RateLimiterLazySync'
+        title: Configuration of lazy-syncing behaviour of ratelimiter
       limit_reset_interval:
         type: string
+        description: Time after which the limit for a given label value will be reset.
         x-go-default: 60s
       overrides:
         type: array
         items:
           $ref: '#/definitions/RateLimiterOverride'
+        description: Allows to specify different limits for particular label values.
       selector:
         $ref: '#/definitions/v1Selector'
+        description: Which control point to apply this ratelimiter to.
         x-go-validate: required
+    description: |-
+      :::info
+      See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+      :::
+
+      Ratelimiting is done separately on per-label-value basis. Use _label\_key_
+      to select which label should be used as key.
+    title: Limits the traffic on a control point to specified rate
   policylanguagev1FluxMeter:
     type: object
     properties:
@@ -1519,9 +1542,16 @@ definitions:
     properties:
       limit:
         $ref: '#/definitions/v1Port'
-        description: negative limit means no limit is applied.
-        x-go-default: -1
+        description: |-
+          Number of flows allowed per _limit\_reset\_interval_ per each label.
+          Negative values disable the ratelimiter.
+
+          :::tip
+          Negative limit can be useful to _conditionally_ enable the ratelimiter
+          under certain circumstances. [Decider](#-v1decider) might be helpful.
+          :::
         x-go-validate: required
+    title: Inputs for the RateLimiter component
   v1ReportRequest:
     type: object
     properties:

@@ -17,7 +17,7 @@
 - [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
 - [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-- [languagev1RateLimiter](#languagev1-rate-limiter)
+- [languagev1RateLimiter](#languagev1-rate-limiter) – Limits the traffic on a control point to specified rate
 - [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 
 Example of…
@@ -68,7 +68,7 @@ Example of…
 - [v1Port](#v1-port) – Components are interconnected with each other via Ports
 - [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an output signal
 - [v1PromQLOuts](#v1-prom-q-l-outs) – Output for the PromQL component.
-- [v1RateLimiterIns](#v1-rate-limiter-ins)
+- [v1RateLimiterIns](#v1-rate-limiter-ins) – Inputs for the RateLimiter component
 - [v1Resources](#v1-resources) – Resources that need to be setup for the policy to function
 - [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule
 - [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing-based workload scheduler
@@ -121,7 +121,9 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>enabled</dt>
 <dd>
 
-(bool, default: `true`)
+(bool, default: `true`) Enables lazy sync
+
+TODO document what happens when lazy sync is disabled
 
 </dd>
 </dl>
@@ -129,7 +131,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>num_sync</dt>
 <dd>
 
-(int64, `gt=0`, default: `5`) Number of times to lazy sync within the limit_reset_interval.
+(int64, `gt=0`, default: `5`) Number of times to lazy sync within the _limit_reset_interval_.
 
 </dd>
 </dl>
@@ -142,7 +144,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>label_value</dt>
 <dd>
 
-(string, `required`)
+(string, `required`) Value of the label for which the override should be applied.
 
 </dd>
 </dl>
@@ -150,7 +152,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>limit_scale_factor</dt>
 <dd>
 
-(float64, default: `1`)
+(float64, default: `1`) Amount by which the _in_ports.limit_ should be multiplied for this label value.
 
 </dd>
 </dl>
@@ -275,8 +277,7 @@ This override is applicable only if `auto_tokens` is set to false.
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
 :::info
-See also [Scheduler page in the Concepts section](/concepts/flow-control/actuators/scheduler.md)
-for a more high-level description.
+See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
 :::
 
 It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -311,6 +312,15 @@ output signals.
 
 ### <span id="languagev1-rate-limiter"></span> languagev1RateLimiter
 
+Limits the traffic on a control point to specified rate
+
+:::info
+See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+:::
+
+Ratelimiting is done separately on per-label-value basis. Use _label_key_
+to select which label should be used as key.
+
 #### Properties
 
 <dl>
@@ -325,7 +335,13 @@ output signals.
 <dt>label_key</dt>
 <dd>
 
-(string, `required`)
+(string, `required`) Specifies which label the ratelimiter should be keyed by.
+
+Rate limiting is done independently for each value of the label with given
+key. Eg., to give each user a separate limit, assuming you have a _user_
+flow label set up, set `label_key: "user"`.
+
+TODO make it possible for this field to be optional – to achieve global ratelimit.
 
 </dd>
 </dl>
@@ -333,7 +349,7 @@ output signals.
 <dt>lazy_sync</dt>
 <dd>
 
-([RateLimiterLazySync](#rate-limiter-lazy-sync))
+([RateLimiterLazySync](#rate-limiter-lazy-sync)) Configuration of lazy-syncing behaviour of ratelimiter
 
 </dd>
 </dl>
@@ -341,7 +357,7 @@ output signals.
 <dt>limit_reset_interval</dt>
 <dd>
 
-(string, default: `60s`)
+(string, default: `60s`) Time after which the limit for a given label value will be reset.
 
 </dd>
 </dl>
@@ -349,7 +365,7 @@ output signals.
 <dt>overrides</dt>
 <dd>
 
-([[]RateLimiterOverride](#rate-limiter-override))
+([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
 
 </dd>
 </dl>
@@ -357,7 +373,7 @@ output signals.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector), `required`)
+([V1Selector](#v1-selector), `required`) Which control point to apply this ratelimiter to.
 
 </dd>
 </dl>
@@ -1863,13 +1879,21 @@ Output for the PromQL component.
 
 ### <span id="v1-rate-limiter-ins"></span> v1RateLimiterIns
 
+Inputs for the RateLimiter component
+
 #### Properties
 
 <dl>
 <dt>limit</dt>
 <dd>
 
-([V1Port](#v1-port), `required`, default: `-1`) negative limit means no limit is applied.
+([V1Port](#v1-port), `required`) Number of flows allowed per _limit_reset_interval_ per each label.
+Negative values disable the ratelimiter.
+
+:::tip
+Negative limit can be useful to _conditionally_ enable the ratelimiter
+under certain circumstances. [Decider](#-v1decider) might be helpful.
+:::
 
 </dd>
 </dl>
