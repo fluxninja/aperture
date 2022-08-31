@@ -48,3 +48,8 @@ plugins:
   disabled_plugins:
     - aperture-plugin-fluxninja
 ```
+
+For more details, see plugin configuration reference:
+
+- [Agent](/reference/configuration/agent#plugin-configuration)
+- [Controller](/reference/configuration/controller#plugin-configuration)
