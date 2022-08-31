@@ -136,8 +136,6 @@ Aperture Operator
 | `agent.batchPrerollup.sendBatchSize`                    | Size of a batch in prerollup processor which after hit, will trigger it to be sent.                                      | `nil`    |
 | `agent.batchPostrollup.timeout`                         | Timeout for batch postrollup processor.                                                                                  | `nil`    |
 | `agent.batchPostrollup.sendBatchSize`                   | Size of a batch in postrollup processor which after hit, will trigger it to be sent.                                     | `nil`    |
-| `agent.batchMetricsFast.timeout`                        | Timeout for batch metrics/fast processor.                                                                                | `nil`    |
-| `agent.batchMetricsFast.sendBatchSize`                  | Size of a batch in metrics/fast processor which after hit, will trigger it to be sent.                                   | `nil`    |
 | `agent.log.prettyConsole`                               | Additional log writer: pretty console (stdout) logging (not recommended for prod environments). Defaults to false.       | `nil`    |
 | `agent.log.nonBlocking`                                 | Use non-blocking log writer (can lose logs at high throughput). Defaults to True.                                        | `nil`    |
 | `agent.log.level`                                       | Log level. Keywords allowed - ["debug", "info", "warn", "fatal", "panic", "trace"]. Defaults to 'info'.                  | `nil`    |

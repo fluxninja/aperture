@@ -90,10 +90,6 @@ var _ = Describe("ConfigMap for Agent", func() {
 						Timeout:       "1s",
 						SendBatchSize: 10000,
 					},
-					BatchMetricsFast: v1alpha1.Batch{
-						Timeout:       "1s",
-						SendBatchSize: 10000,
-					},
 					DistributedCachePort: 3320,
 					MemberListPort:       3322,
 				},

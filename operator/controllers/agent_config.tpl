@@ -14,9 +14,6 @@ otel:
   batch_postrollup:
     timeout: {{ .BatchPostrollup.Timeout }}
     send_batch_size: {{ .BatchPostrollup.SendBatchSize }}
-  batch_metrics_fast:
-    timeout: {{ .BatchMetricsFast.Timeout }}
-    send_batch_size: {{ .BatchMetricsFast.SendBatchSize }}
   {{- end }}
 
 log:
