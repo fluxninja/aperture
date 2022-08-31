@@ -32,7 +32,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_EntitiesService_GetServicesList_0(ctx context.Context, marshaler runtime.Marshaler, client EntitiesServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_EntityCacheService_GetServicesList_0(ctx context.Context, marshaler runtime.Marshaler, client EntityCacheServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
@@ -41,7 +41,7 @@ func request_EntitiesService_GetServicesList_0(ctx context.Context, marshaler ru
 
 }
 
-func local_request_EntitiesService_GetServicesList_0(ctx context.Context, marshaler runtime.Marshaler, server EntitiesServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_EntityCacheService_GetServicesList_0(ctx context.Context, marshaler runtime.Marshaler, server EntityCacheServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
@@ -50,13 +50,13 @@ func local_request_EntitiesService_GetServicesList_0(ctx context.Context, marsha
 
 }
 
-// RegisterEntitiesServiceHandlerServer registers the http handlers for service EntitiesService to "mux".
-// UnaryRPC     :call EntitiesServiceServer directly.
+// RegisterEntityCacheServiceHandlerServer registers the http handlers for service EntityCacheService to "mux".
+// UnaryRPC     :call EntityCacheServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterEntitiesServiceHandlerFromEndpoint instead.
-func RegisterEntitiesServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EntitiesServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterEntityCacheServiceHandlerFromEndpoint instead.
+func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EntityCacheServiceServer) error {
 
-	mux.Handle("GET", pattern_EntitiesService_GetServicesList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EntityCacheService_GetServicesList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -64,12 +64,12 @@ func RegisterEntitiesServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntitiesService/GetServicesList", runtime.WithHTTPPathPattern("/v1/services-list"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetServicesList", runtime.WithHTTPPathPattern("/v1/entity-cache/services-list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_EntitiesService_GetServicesList_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_EntityCacheService_GetServicesList_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -77,16 +77,16 @@ func RegisterEntitiesServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 			return
 		}
 
-		forward_EntitiesService_GetServicesList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EntityCacheService_GetServicesList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterEntitiesServiceHandlerFromEndpoint is same as RegisterEntitiesServiceHandler but
+// RegisterEntityCacheServiceHandlerFromEndpoint is same as RegisterEntityCacheServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterEntitiesServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterEntityCacheServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -106,41 +106,41 @@ func RegisterEntitiesServiceHandlerFromEndpoint(ctx context.Context, mux *runtim
 		}()
 	}()
 
-	return RegisterEntitiesServiceHandler(ctx, mux, conn)
+	return RegisterEntityCacheServiceHandler(ctx, mux, conn)
 }
 
-// RegisterEntitiesServiceHandler registers the http handlers for service EntitiesService to "mux".
+// RegisterEntityCacheServiceHandler registers the http handlers for service EntityCacheService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterEntitiesServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterEntitiesServiceHandlerClient(ctx, mux, NewEntitiesServiceClient(conn))
+func RegisterEntityCacheServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterEntityCacheServiceHandlerClient(ctx, mux, NewEntityCacheServiceClient(conn))
 }
 
-// RegisterEntitiesServiceHandlerClient registers the http handlers for service EntitiesService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "EntitiesServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "EntitiesServiceClient"
+// RegisterEntityCacheServiceHandlerClient registers the http handlers for service EntityCacheService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "EntityCacheServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "EntityCacheServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "EntitiesServiceClient" to call the correct interceptors.
-func RegisterEntitiesServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client EntitiesServiceClient) error {
+// "EntityCacheServiceClient" to call the correct interceptors.
+func RegisterEntityCacheServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client EntityCacheServiceClient) error {
 
-	mux.Handle("GET", pattern_EntitiesService_GetServicesList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EntityCacheService_GetServicesList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntitiesService/GetServicesList", runtime.WithHTTPPathPattern("/v1/services-list"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetServicesList", runtime.WithHTTPPathPattern("/v1/entity-cache/services-list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_EntitiesService_GetServicesList_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_EntityCacheService_GetServicesList_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EntitiesService_GetServicesList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EntityCacheService_GetServicesList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -148,9 +148,9 @@ func RegisterEntitiesServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 }
 
 var (
-	pattern_EntitiesService_GetServicesList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "services-list"}, ""))
+	pattern_EntityCacheService_GetServicesList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "entity-cache", "services-list"}, ""))
 )
 
 var (
-	forward_EntitiesService_GetServicesList_0 = runtime.ForwardResponseMessage
+	forward_EntityCacheService_GetServicesList_0 = runtime.ForwardResponseMessage
 )

@@ -9,11 +9,11 @@ import "google/protobuf/empty.proto";
 // gRPC service
 //
 
-// EntitiesService is used to query EntityCache.
-service EntitiesService {
+// EntityCacheService is used to query EntityCache.
+service EntityCacheService {
   rpc GetServicesList(google.protobuf.Empty) returns (ServicesList) {
     option (google.api.http) = {
-      get: "/v1/services-list"
+      get: "/v1/entity-cache/services-list"
     };
   }
 }

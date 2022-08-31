@@ -4,7 +4,7 @@ info:
   version: "1.0"
 tags:
   - name: PolicyService
-  - name: EntitiesService
+  - name: EntityCacheService
   - name: InfoService
   - name: StatusService
   - name: FlowControlService
@@ -61,6 +61,20 @@ paths:
             $ref: '#/definitions/v1ReportRequest'
       tags:
         - FluxNinjaService
+  /v1/entity-cache/services-list:
+    get:
+      operationId: EntityCacheService_GetServicesList
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1ServicesList'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - EntityCacheService
   /v1/info/host:
     get:
       operationId: InfoService_Host
@@ -117,20 +131,6 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - PolicyService
-  /v1/services-list:
-    get:
-      operationId: EntitiesService_GetServicesList
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1ServicesList'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      tags:
-        - EntitiesService
   /v1/status/{keys}:
     get:
       operationId: StatusService_GetGroupStatus

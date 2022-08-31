@@ -1,3 +1,6 @@
+profilers:
+  cpu_profiler: true
+
 server:
   addr: ":{{ .Values.agent.serverPort }}"
 
