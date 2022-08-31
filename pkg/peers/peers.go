@@ -73,7 +73,7 @@ type PeerDiscoveryIn struct {
 	Unmarshaller   config.Unmarshaller
 	Client         *etcdclient.Client
 	Listener       *listener.Listener
-	StatusRegistry *status.Registry
+	StatusRegistry status.Registry
 	Prefix         PeerDiscoveryPrefix
 	Watchers       PeerWatchers `group:"peer-watchers"`
 }
@@ -249,13 +249,16 @@ func (pd *PeerDiscovery) Stop() error {
 }
 
 // GetPeers returns all the peer info that are added to PeerDiscovery.
-func (pd *PeerDiscovery) GetPeers() []*peersv1.PeerInfo {
+func (pd *PeerDiscovery) GetPeers() *peersv1.Peers {
 	pd.lock.RLock()
 	defer pd.lock.RUnlock()
 
-	peers := make([]*peersv1.PeerInfo, 0)
+	peers := &peersv1.Peers{
+		PeerInfos: make([]*peersv1.PeerInfo, 0, len(pd.peers)),
+	}
+
 	for _, peer := range pd.peers {
-		peers = append(peers, peer)
+		peers.PeerInfos = append(peers.PeerInfos, peer)
 	}
 
 	return peers

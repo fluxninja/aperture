@@ -18,12 +18,16 @@ import (
 )
 
 type enrichmentProcessor struct {
-	cache *entitycache.EntityCache
+	cache      *entitycache.EntityCache
+	agentGroup string
 }
 
-func newProcessor(cache *entitycache.EntityCache) *enrichmentProcessor {
+func newProcessor(cache *entitycache.EntityCache,
+	agentGroup string,
+) *enrichmentProcessor {
 	return &enrichmentProcessor{
-		cache: cache,
+		cache:      cache,
+		agentGroup: agentGroup,
 	}
 }
 
@@ -118,6 +122,7 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 
 func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map) {
 	unpackFlowLabels(attributes)
+	attributes.UpsertString(otelcollector.AgentGroupLabel, ep.agentGroup)
 	var hostIP string
 	controlPoint, exists := attributes.Get(otelcollector.ControlPointLabel)
 	if !exists {
@@ -166,12 +171,11 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map) {
 		log.Trace().Str("ip", hostIP).Msg("Skipping because entity not found in cache")
 		return
 	}
-
-	attributes.UpsertString(otelcollector.AgentGroupLabel, hostEntity.AgentGroup)
 	attributes.UpsertString(otelcollector.ServicesLabel, strings.Join(hostEntity.Services, ","))
 }
 
 func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
+	attributes.UpsertString(otelcollector.AgentGroupLabel, ep.agentGroup)
 	hostNamex, ok := attributes.Get(otelcollector.EntityNameLabel)
 	if !ok {
 		return
@@ -183,7 +187,6 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 		log.Trace().Str("name", hostName).Msg("Skipping because entity not found in cache")
 		return
 	}
-	attributes.UpsertString(otelcollector.AgentGroupLabel, hostEntity.AgentGroup)
 	attributes.UpsertString(otelcollector.ServicesLabel, strings.Join(hostEntity.Services, ","))
 }
 

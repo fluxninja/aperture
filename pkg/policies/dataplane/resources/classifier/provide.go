@@ -65,18 +65,19 @@ type ProvideClassifierIn struct {
 	Classifier *Classifier       `name:"empty"`
 	Watcher    notifiers.Watcher `name:"classifier"`
 	Lifecycle  fx.Lifecycle
-	Registry   *status.Registry
+	Registry   status.Registry
 }
 
 // ProvideClassifier provides a classifier that loads the rules from config file.
 func ProvideClassifier(in ProvideClassifierIn) *Classifier {
+	reg := in.Registry.Child("classifiers")
+
 	fxDriver := &notifiers.FxDriver{
 		FxOptionsFuncs: []notifiers.FxOptionsFunc{in.Classifier.provideClassifierFxOptions},
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
 		},
-		StatusRegistry: in.Registry,
-		StatusPath:     "classifier-driver",
+		StatusRegistry: reg,
 	}
 
 	in.Lifecycle.Append(fx.Hook{
@@ -94,7 +95,7 @@ func ProvideClassifier(in ProvideClassifierIn) *Classifier {
 func (c *Classifier) provideClassifierFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry *status.Registry,
+	_ status.Registry,
 ) (fx.Option, error) {
 	return fx.Options(
 		fx.Supply(c),

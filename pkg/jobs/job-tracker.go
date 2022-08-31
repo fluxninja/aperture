@@ -3,7 +3,6 @@ package jobs
 import (
 	"context"
 	"errors"
-	"strings"
 	"sync"
 	"time"
 
@@ -20,30 +19,31 @@ var (
 )
 
 type jobTracker struct {
-	job Job
+	job            Job
+	statusRegistry status.Registry
 }
 
-func newJobTracker(job Job) *jobTracker {
+func newJobTracker(job Job, statusRegistry status.Registry) *jobTracker {
+	reg := statusRegistry.Child(job.Name())
 	return &jobTracker{
-		job: job,
+		job:            job,
+		statusRegistry: reg,
 	}
 }
 
 // Common groupTracker.
 type groupTracker struct {
-	mu            sync.Mutex
-	trackers      map[string]*jobTracker
-	registry      *status.Registry
-	name          string
-	groupWatchers GroupWatchers
+	mu             sync.Mutex
+	trackers       map[string]*jobTracker
+	statusRegistry status.Registry
+	groupWatchers  GroupWatchers
 }
 
-func newGroupTracker(gws GroupWatchers, registry *status.Registry, name string) *groupTracker {
+func newGroupTracker(gws GroupWatchers, statusRegistry status.Registry) *groupTracker {
 	return &groupTracker{
-		name:          name,
-		trackers:      make(map[string]*jobTracker),
-		registry:      registry,
-		groupWatchers: gws,
+		trackers:       make(map[string]*jobTracker),
+		statusRegistry: statusRegistry,
+		groupWatchers:  gws,
 	}
 }
 
@@ -61,17 +61,9 @@ func (gt *groupTracker) updateStatus(job Job, s *statusv1.Status) error {
 		return errExistingJob
 	}
 
-	regPath := gt.getStatusRegPath(job.Name())
-	err := gt.registry.Push(regPath, s)
-	if err != nil {
-		return err
-	}
+	tracker.statusRegistry.SetStatus(s)
 
 	return nil
-}
-
-func (gt *groupTracker) getStatusRegPath(jobName string) string {
-	return strings.Join([]string{gt.name, jobName}, gt.registry.Delim())
 }
 
 func (gt *groupTracker) registerJob(job Job) error {
@@ -83,22 +75,14 @@ func (gt *groupTracker) registerJob(job Job) error {
 	gt.mu.Lock()
 	defer gt.mu.Unlock()
 
-	s := status.NewStatus(nil, nil)
-
 	_, ok := gt.trackers[job.Name()]
 	if ok {
 		return errExistingJob
 	}
 
-	tracker := newJobTracker(job)
+	tracker := newJobTracker(job, gt.statusRegistry)
 	gt.trackers[job.Name()] = tracker
 
-	regPath := gt.getStatusRegPath(job.Name())
-	err := gt.registry.Push(regPath, s)
-	if err != nil {
-		log.Error().Err(err).Msg("failed to push job status to registry")
-		return err
-	}
 	gt.groupWatchers.OnJobRegistered(job.Name())
 
 	return nil
@@ -119,8 +103,7 @@ func (gt *groupTracker) deregisterJob(name string) (Job, error) {
 	delete(gt.trackers, name)
 	gt.groupWatchers.OnJobDeregistered(name)
 
-	regPath := gt.getStatusRegPath(name)
-	gt.registry.Delete(regPath)
+	tracker.statusRegistry.Detach()
 
 	return tracker.job, nil
 }
@@ -136,8 +119,7 @@ func (gt *groupTracker) reset() []Job {
 		jobs = append(jobs, job)
 		gt.groupWatchers.OnJobDeregistered(job.Name())
 
-		regPath := gt.getStatusRegPath(job.Name())
-		gt.registry.Delete(regPath)
+		tracker.statusRegistry.Detach()
 	}
 
 	gt.trackers = make(map[string]*jobTracker)
@@ -150,14 +132,7 @@ func (gt *groupTracker) isHealthy() bool {
 	defer gt.mu.Unlock()
 
 	for _, tracker := range gt.trackers {
-		regPath := gt.getStatusRegPath(tracker.job.Name())
-		gs := gt.registry.Get(regPath)
-		if gs == nil {
-			log.Debug().Str("path", regPath).Msg("returned nil status")
-			continue
-		}
-
-		if gs.Status.GetError().GetMessage() != "" {
+		if tracker.statusRegistry.GetStatus().GetError() != nil {
 			return false
 		}
 	}
@@ -168,27 +143,7 @@ func (gt *groupTracker) results() (*statusv1.GroupStatus, bool) {
 	gt.mu.Lock()
 	defer gt.mu.Unlock()
 
-	gs := &statusv1.GroupStatus{
-		Groups: make(map[string]*statusv1.GroupStatus, len(gt.trackers)),
-	}
-
-	healthy := true
-
-	for name, tracker := range gt.trackers {
-		regPath := gt.getStatusRegPath(tracker.job.Name())
-		tgs := gt.registry.Get(regPath)
-		if tgs == nil {
-			log.Debug().Str("path", regPath).Msg("returned nil status")
-			continue
-		}
-
-		gs.Groups[name] = tgs
-		if tgs.Status.GetError().GetMessage() != "" {
-			healthy = false
-		}
-	}
-
-	return gs, healthy
+	return gt.statusRegistry.GetGroupStatus(), !gt.statusRegistry.HasError()
 }
 
 func (gt *groupTracker) getJobs() []Job {

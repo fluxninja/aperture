@@ -15,6 +15,6 @@ func Module() fx.Option {
 	)
 }
 
-func provideRegistry() *Registry {
-	return NewRegistry(".")
+func provideRegistry() Registry {
+	return NewRegistry()
 }

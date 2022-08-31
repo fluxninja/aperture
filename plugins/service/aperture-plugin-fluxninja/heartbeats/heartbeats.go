@@ -12,11 +12,10 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -38,9 +37,6 @@ const (
 	jobName            = "aperture-heartbeats"
 	jobNameHTTP        = "aperture-heartbeats-http"
 	jobTimeoutDuration = time.Minute * 2
-	healthKey          = "health"
-	healthDetailsKey   = "health-details"
-	healthyStatus      = "healthy"
 	entityCacheKey     = "entity-cache"
 	servicesKey        = entityCacheKey + ".services"
 	overlappingKey     = entityCacheKey + ".overlapping-services"
@@ -55,7 +51,7 @@ type Heartbeats struct {
 	interval         config.Duration
 	jobGroup         *jobs.JobGroup
 	clientConn       *grpc.ClientConn
-	statusRegistry   *status.Registry
+	statusRegistry   status.Registry
 	entityCache      *entitycache.EntityCache
 	controllerInfo   *heartbeatv1.ControllerInfo
 	heartbeatsAddr   string
@@ -70,7 +66,7 @@ func (h *Heartbeats) GetControllerInfo() *heartbeatv1.ControllerInfo {
 func newHeartbeats(
 	jobGroup *jobs.JobGroup,
 	p pluginconfig.FluxNinjaPluginConfig,
-	statusRegistry *status.Registry,
+	statusRegistry status.Registry,
 	entityCache *entitycache.EntityCache,
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
@@ -192,50 +188,20 @@ func (h *Heartbeats) stop() {
 
 func (h *Heartbeats) newHeartbeat(
 	jobCtxt context.Context,
-	health,
-	healthDetails string,
 ) *heartbeatv1.ReportRequest {
-	allStasuses := make(map[string]*anypb.Any)
-
-	flatResults, err := h.statusRegistry.GetAllFlat()
-	if err != nil {
-		log.Error().Err(err).Msg("could not get results from status registry")
-	} else {
-		for flatKey, flatValue := range flatResults {
-			allStasuses[flatKey] = flatValue.Status.GetMessage()
-		}
-	}
-
+	var entityCache *entitycachev1.EntityCache
 	if h.entityCache != nil {
-		serviceList, overlappingList := h.entityCache.Services()
-		packedSvcs := &heartbeatv1.Services{Services: serviceList}
-		anySvcs, err := anypb.New(packedSvcs)
-		if err != nil {
-			log.Error().Err(err).Msg("Cannot cast packed services to Any")
-		}
-
-		packedOverlaps := &heartbeatv1.OverlappingServices{OverlappingServices: overlappingList}
-		anyOverlaps, err := anypb.New(packedOverlaps)
-		if err != nil {
-			log.Error().Err(err).Msg("Cannot cast packed overlapping services to Any")
-		}
-		allStasuses[servicesKey] = anySvcs
-		allStasuses[overlappingKey] = anyOverlaps
+		entityCache = h.entityCache.Services()
 	}
-
-	anyHealth, _ := anypb.New(wrapperspb.String(health))
-	anyHealthDetails, _ := anypb.New(wrapperspb.String(healthDetails))
-	allStasuses[healthKey] = anyHealth
-	allStasuses[healthDetailsKey] = anyHealthDetails
 
 	var agentGroup string
 	if h.agentInfo != nil {
 		agentGroup = h.agentInfo.GetAgentGroup()
 	}
 
-	var peerInfos []*peersv1.PeerInfo
+	var peers *peersv1.Peers
 	if h.peersWatcher != nil {
-		peerInfos = h.peersWatcher.GetPeers()
+		peers = h.peersWatcher.GetPeers()
 	}
 
 	return &heartbeatv1.ReportRequest{
@@ -244,13 +210,14 @@ func (h *Heartbeats) newHeartbeat(
 		HostInfo:       info.GetHostInfo(),
 		AgentGroup:     agentGroup,
 		ControllerInfo: h.controllerInfo,
-		PeerInfos:      peerInfos,
-		AllStatuses:    allStasuses,
+		Peers:          peers,
+		EntityCache:    entityCache,
+		AllStatuses:    h.statusRegistry.GetGroupStatus(),
 	}
 }
 
 func (h *Heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message, error) {
-	report := h.newHeartbeat(jobCtxt, healthyStatus, "")
+	report := h.newHeartbeat(jobCtxt)
 
 	// Add api key value to metadata
 	md := metadata.Pairs("apiKey", h.APIKey)
@@ -263,7 +230,7 @@ func (h *Heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message
 }
 
 func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.Message, error) {
-	report := h.newHeartbeat(jobCtxt, healthyStatus, "")
+	report := h.newHeartbeat(jobCtxt)
 	reqBody, err := protojson.MarshalOptions{
 		UseProtoNames: true,
 	}.Marshal(report)

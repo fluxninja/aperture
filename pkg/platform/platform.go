@@ -2,6 +2,7 @@ package platform
 
 import (
 	"context"
+	"errors"
 	"os"
 	"time"
 
@@ -48,7 +49,7 @@ var platform = initPlatform()
 
 // Platform holds the state of the platform.
 type Platform struct {
-	statusRegistry *status.Registry
+	statusRegistry status.Registry
 	unmarshaller   config.Unmarshaller
 	dotgraph       fx.DotGraph
 }
@@ -118,7 +119,7 @@ func (cfg Config) Module() fx.Option {
 		etcdclient.Module(),
 		jobs.Module(),
 		status.Module(),
-		fx.Invoke(grpc.RegisterStatusService),
+		fx.Invoke(status.RegisterStatusService),
 		fx.Populate(&platform.statusRegistry),
 		platformStatusModule(),
 		plugins.ModuleConfig{OnlyCommandLineFlags: true}.Module(),
@@ -132,7 +133,6 @@ func (cfg Config) Module() fx.Option {
 			pluginOptions,
 		)
 	}
-
 	return options
 }
 
@@ -161,6 +161,7 @@ func ServerModule(testMode bool) fx.Option {
 
 // Run is an fx helper function to gracefully start and stop an app container.
 func Run(app *fx.App) {
+	platform.statusRegistry = platform.statusRegistry.Child(platformStatusPath)
 	// Check for dotflag
 	if platform.unmarshaller != nil {
 		dotfile := config.GetStringValue(platform.unmarshaller, dotFileKey, "")
@@ -184,15 +185,11 @@ func Run(app *fx.App) {
 
 	defer stop(app)
 
-	s := status.NewStatus(wrapperspb.String("platform running"), nil)
-	err := platform.statusRegistry.Push(platformReadinessStatusName, s)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to push platform readiness status")
-		return
-	}
+	platform.statusRegistry.SetStatus(status.NewStatus(wrapperspb.String("platform running"), nil))
 
 	// Wait for os.Signal
 	<-app.Done()
+	platform.statusRegistry.SetStatus(status.NewStatus(nil, errors.New("platform stopping")))
 }
 
 func stop(app *fx.App) {
@@ -205,6 +202,7 @@ func stop(app *fx.App) {
 	log.WaitFlush()
 	// cleanup temp
 	_ = os.RemoveAll(config.DefaultTempBase)
+	platform.statusRegistry.Detach()
 	os.Exit(0)
 }
 

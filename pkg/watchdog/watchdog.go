@@ -33,7 +33,6 @@ import (
 
 const (
 	watchdogConfigKey = "watchdog.memory"
-	heapStatusKey     = "watchdog.heap"
 	watchdogJobName   = "watchdog"
 	// PolicyTempDisabled is a marker value for policies to signal that the policy
 	// is temporarily disabled. Use it when all hope is lost to turn around from
@@ -60,18 +59,18 @@ type Constructor struct {
 type WatchdogIn struct {
 	fx.In
 
-	StatusRegistry *status.Registry
+	StatusRegistry status.Registry
 	JobGroup       *jobs.JobGroup `name:"liveness"`
 	Unmarshaller   config.Unmarshaller
 	Lifecycle      fx.Lifecycle
 }
 
 type watchdog struct {
-	sentinel       *gcSentinel
-	statusRegistry *status.Registry
-	jobGroup       *jobs.JobGroup
-	watchdogJob    *jobs.MultiJob
-	config         WatchdogConfig
+	sentinel           *gcSentinel
+	heapStatusRegistry status.Registry
+	jobGroup           *jobs.JobGroup
+	watchdogJob        *jobs.MultiJob
+	config             WatchdogConfig
 }
 
 func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
@@ -82,7 +81,9 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 		return err
 	}
 
-	w := newWatchdog(in.JobGroup, in.StatusRegistry, config)
+	watchdogRegistry := in.StatusRegistry.Child("liveness").Child(watchdogJobName)
+
+	w := newWatchdog(in.JobGroup, watchdogRegistry, config)
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -96,15 +97,17 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 	return nil
 }
 
-func newWatchdog(jobGroup *jobs.JobGroup, registry *status.Registry, config WatchdogConfig) *watchdog {
-	job := jobs.NewMultiJob(watchdogJobName, jobGroup.GroupName(), true, registry, nil, nil)
+func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config WatchdogConfig) *watchdog {
+	heapStatusRegistry := registry.Child("heap")
+
+	job := jobs.NewMultiJob(watchdogJobName, true, nil, nil)
 
 	w := &watchdog{
-		statusRegistry: registry,
-		jobGroup:       jobGroup,
-		watchdogJob:    job,
-		config:         config,
-		sentinel:       newSentinel(),
+		heapStatusRegistry: heapStatusRegistry,
+		jobGroup:           jobGroup,
+		watchdogJob:        job,
+		config:             config,
+		sentinel:           newSentinel(),
 	}
 
 	return w
@@ -157,11 +160,6 @@ func (w *watchdog) start() error {
 
 	if w.config.Heap.WatermarksPolicy.Enabled || w.config.Heap.AdaptivePolicy.Enabled {
 		hp = newHeapPolicy(w.config.Heap)
-		s := status.NewStatus(nil, nil)
-		err = w.statusRegistry.Push(heapStatusKey, s)
-		if err != nil {
-			return err
-		}
 	}
 
 	// register job with job group
@@ -179,11 +177,7 @@ func (w *watchdog) start() error {
 				w.jobGroup.TriggerJob(watchdogJobName)
 				if hp != nil {
 					details, e := hp.checkHeap()
-					s := status.NewStatus(details, e)
-					err := w.statusRegistry.Push(heapStatusKey, s)
-					if err != nil {
-						log.Error().Err(err).Msg("Unable to push heap check results to status registry")
-					}
+					w.heapStatusRegistry.SetStatus(status.NewStatus(details, e))
 				}
 			case <-w.sentinel.ctx.Done():
 				return
@@ -203,7 +197,7 @@ func (w *watchdog) stop() error {
 	}
 	_ = w.watchdogJob.DeregisterJob("cgroup")
 	_ = w.watchdogJob.DeregisterJob("system")
-	w.statusRegistry.Delete(heapStatusKey)
+	w.heapStatusRegistry.Detach()
 	return merr
 }
 

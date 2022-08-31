@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package aperture.common.entitycache.v1;
+
+message EntityCache {
+  repeated Service services = 1;
+  repeated OverlappingService overlapping_services = 2;
+}
+
+// Service contains information about single service discovered in agent group by a
+// particular agent
+message Service {
+  string name = 1;
+  int32 entities_count = 2;
+}
+
+// OverlappingService contains info about a service that overlaps with another one
+message OverlappingService {
+  string service1 = 1;
+  string service2 = 2;
+  int32 entities_count = 3;
+}

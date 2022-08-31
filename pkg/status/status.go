@@ -16,12 +16,12 @@ func NewStatus(d proto.Message, e error) *statusv1.Status {
 	}
 
 	if d != nil {
-		detailsMessage, err := anypb.New(d)
+		messageAny, err := anypb.New(d)
 		if err != nil {
 			return nil
 		}
 		s.Details = &statusv1.Status_Message{
-			Message: detailsMessage,
+			Message: messageAny,
 		}
 		return s
 	}
@@ -35,15 +35,17 @@ func NewStatus(d proto.Message, e error) *statusv1.Status {
 }
 
 // NewErrorDetails is a helper function to create a new instance of ErrorDetails.
-// This recursively fills the cause field from the provided error.
 func NewErrorDetails(e error) *statusv1.ErrorDetails {
 	errorDetails := &statusv1.ErrorDetails{}
 
-	if e == nil {
-		return errorDetails
+	if e != nil {
+		msg := e.Error()
+		if msg != "" {
+			errorDetails.Message = e.Error()
+		} else {
+			errorDetails.Message = "Unknown error"
+		}
 	}
-
-	errorDetails.Message = e.Error()
 
 	return errorDetails
 }

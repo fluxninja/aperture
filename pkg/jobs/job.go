@@ -3,7 +3,6 @@ package jobs
 import (
 	"context"
 	"math"
-	"strings"
 	"sync"
 	"time"
 
@@ -69,11 +68,12 @@ type JobConfig struct {
 type jobExecutor struct {
 	execLock sync.Mutex
 	Job
-	jg      *JobGroup
-	job     *gocron.Job
-	config  JobConfig
-	jobTag  string
-	stopped bool
+	jg               *JobGroup
+	job              *gocron.Job
+	config           JobConfig
+	jobTag           string
+	livenessRegistry status.Registry
+	stopped          bool
 }
 
 // Make sure jobExecutor complies with Job interface.
@@ -85,7 +85,12 @@ func newJobExecutor(job Job, jg *JobGroup, config JobConfig) *jobExecutor {
 		jg:     jg,
 		job:    &gocron.Job{},
 		config: config,
-		jobTag: jg.name + "." + job.Name(),
+		jobTag: job.Name(),
+		livenessRegistry: jg.gt.statusRegistry.Root().
+			Child("liveness").
+			Child("job_groups").
+			Child(jg.gt.statusRegistry.Key()).
+			Child(job.Name()),
 	}
 	return executor
 }
@@ -103,11 +108,6 @@ func (executor *jobExecutor) JobWatchers() JobWatchers {
 // Execute executes the Job that the executor is associated with.
 func (executor *jobExecutor) Execute(ctx context.Context) (proto.Message, error) {
 	return executor.Job.Execute(ctx)
-}
-
-func (executor *jobExecutor) getLivenessStatusPath() string {
-	// "liveness.job_groups.<jobGroupName>.<jobName>"
-	return strings.Join([]string{"liveness", "job_groups", executor.jg.GroupName(), executor.Name()}, executor.jg.gt.registry.Delim())
 }
 
 func (executor *jobExecutor) doJob() {
@@ -148,22 +148,15 @@ func (executor *jobExecutor) doJob() {
 		timerCh <- true
 	})
 
-	regPath := executor.getLivenessStatusPath()
 	for {
 		select {
 		case <-timerCh:
 			s := status.NewStatus(wrapperspb.String("Timeout"), nil)
-			err := executor.jg.gt.registry.Push(regPath, s)
-			if err != nil {
-				log.Error().Err(err).Str("job", executor.Name()).Msg("Unable to push status to registry")
-			}
+			executor.livenessRegistry.SetStatus(s)
 			timer.Reset(time.Second * 1)
 		case <-jobCh:
 			s := status.NewStatus(wrapperspb.String("OK"), nil)
-			err := executor.jg.gt.registry.Push(regPath, s)
-			if err != nil {
-				log.Error().Err(err).Str("job", executor.Name()).Msg("Unable to push status to registry")
-			}
+			executor.livenessRegistry.SetStatus(s)
 			timer.Stop()
 			return
 		}
@@ -210,8 +203,7 @@ func (executor *jobExecutor) stop() {
 	executor.execLock.Lock()
 	defer executor.execLock.Unlock()
 
-	regPath := executor.getLivenessStatusPath()
-	executor.jg.gt.registry.Delete(regPath)
+	executor.livenessRegistry.Detach()
 	err := executor.jg.scheduler.RemoveByTag(executor.jobTag)
 	if err != nil {
 		log.Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job")

@@ -33,14 +33,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-const (
-	// The path in status registry for concurrency limiter status.
-	concurrencyLimiterStatusRoot = "concurrency_limiter"
-)
-
 var (
 	// FxNameTag is Concurrency Limiter Watcher's Fx Tag.
-	fxNameTag = config.NameTag("concurrency_limiter")
+	fxNameTag = config.NameTag("concurrency_limiter_watcher")
 
 	// Array of Label Keys for WFQ and Token Bucket Metrics.
 	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel}
@@ -83,6 +78,7 @@ func provideWatcher(
 
 type concurrencyLimiterFactory struct {
 	engineAPI iface.Engine
+	registry  status.Registry
 
 	autoTokensFactory       *autoTokensFactory
 	loadShedActuatorFactory *loadShedActuatorFactory
@@ -101,7 +97,7 @@ func setupConcurrencyLimiterFactory(
 	watcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
 	e iface.Engine,
-	statusRegistry *status.Registry,
+	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
@@ -119,10 +115,13 @@ func setupConcurrencyLimiterFactory(
 		return err
 	}
 
+	reg := statusRegistry.Child("concurrency_limiter")
+
 	conLimiterFactory := &concurrencyLimiterFactory{
 		engineAPI:               e,
 		autoTokensFactory:       autoTokensFactory,
 		loadShedActuatorFactory: loadShedActuatorFactory,
+		registry:                reg,
 	}
 
 	conLimiterFactory.wfqFlowsGaugeVec = prometheus.NewGaugeVec(
@@ -159,9 +158,8 @@ func setupConcurrencyLimiterFactory(
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
 		},
-		StatusRegistry:     statusRegistry,
+		StatusRegistry:     reg,
 		PrometheusRegistry: prometheusRegistry,
-		StatusPath:         concurrencyLimiterStatusRoot,
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -228,15 +226,13 @@ type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
 func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry *status.Registry,
+	reg status.Registry,
 ) (fx.Option, error) {
-	registryPath := path.Join(concurrencyLimiterStatusRoot, key.String())
 	wrapperMessage := &configv1.ConcurrencyLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	concurrencyLimiterMessage := wrapperMessage.ConcurrencyLimiter
 	if err != nil || concurrencyLimiterMessage == nil {
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(registryPath, s)
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to unmarshal concurrency limiter config wrapper")
 		return fx.Options(), err
 	}
@@ -245,8 +241,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	schedulerProto := concurrencyLimiterMessage.Scheduler
 	if schedulerProto == nil {
 		err = fmt.Errorf("no scheduler specified")
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(registryPath, s)
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to unmarshal scheduler")
 		return fx.Options(), err
 	}
@@ -269,7 +264,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	conLimiter := &concurrencyLimiter{
 		Component:                 wrapperMessage,
 		concurrencyLimiterProto:   concurrencyLimiterMessage,
-		registryPath:              registryPath,
+		registry:                  reg,
 		concurrencyLimiterFactory: conLimiterFactory,
 		workloadMultiMatcher:      mm,
 		defaultWorkloadProto:      schedulerProto.DefaultWorkload,
@@ -301,6 +296,7 @@ func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult 
 type concurrencyLimiter struct {
 	iface.Component
 	scheduler                  scheduler.Scheduler
+	registry                   status.Registry
 	incomingConcurrencyCounter prometheus.Counter
 	acceptedConcurrencyCounter prometheus.Counter
 	concurrencyLimiterProto    *policylangv1.ConcurrencyLimiter
@@ -309,13 +305,12 @@ type concurrencyLimiter struct {
 	workloadMultiMatcher       *multiMatcher
 	defaultWorkloadProto       *policylangv1.Scheduler_Workload
 	schedulerProto             *policylangv1.Scheduler
-	registryPath               string
 }
 
 // Make sure ConcurrencyLimiter implements the iface.ConcurrencyLimiter.
 var _ iface.Limiter = &concurrencyLimiter{}
 
-func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *status.Registry) error {
+func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	// Factories
 	conLimiterFactory := conLimiter.concurrencyLimiterFactory
 	loadShedActuatorFactory := conLimiterFactory.loadShedActuatorFactory
@@ -327,7 +322,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegist
 	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(conLimiter.GetComponentIndex(), 10)
 	// Create sub components.
 	clock := clockwork.NewRealClock()
-	loadShedActuator, err := loadShedActuatorFactory.newLoadShedActuator(conLimiter.registryPath, conLimiter, statusRegistry, clock, lifecycle, metricLabels)
+	loadShedActuator, err := loadShedActuatorFactory.newLoadShedActuator(conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
 	if err != nil {
 		return err
 	}
@@ -350,12 +345,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegist
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			retErr := func(err error) error {
-				s := status.NewStatus(nil, err)
-				errStatus := statusRegistry.Push(conLimiter.registryPath, s)
-				if errStatus != nil {
-					errStatus = errors.Wrap(errStatus, "failed to push status")
-					return multierr.Append(err, errStatus)
-				}
+				conLimiter.registry.SetStatus(status.NewStatus(nil, err))
 				return err
 			}
 
@@ -423,11 +413,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle, statusRegist
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete accepted_concurrency counter from its metric vector"))
 			}
 
-			s := status.NewStatus(nil, errMulti)
-			rPErr := statusRegistry.Push(conLimiter.registryPath, s)
-			if rPErr != nil {
-				errMulti = multierr.Append(errMulti, rPErr)
-			}
+			conLimiter.registry.SetStatus(status.NewStatus(nil, errMulti))
 			return errMulti
 		},
 	})

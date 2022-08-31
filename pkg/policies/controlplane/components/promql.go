@@ -49,7 +49,7 @@ func PromQLModule() fx.Option {
 }
 
 func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.API) notifiers.FxOptionsFunc {
-	return func(key notifiers.Key, unmarshaller config.Unmarshaller, registry *status.Registry) (fx.Option, error) {
+	return func(key notifiers.Key, unmarshaller config.Unmarshaller, _ status.Registry) (fx.Option, error) {
 		return fx.Supply(fx.Annotated{Name: promQLJobGroupTag, Target: promQLJobGroup},
 			fx.Annotate(promAPI, fx.As(new(prometheusv1.API))),
 		), nil
@@ -58,7 +58,7 @@ func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.AP
 
 // PromQLModuleForPolicyApp returns fx options for PromQL in the policy app. Invoked only once per policy.
 func PromQLModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
-	providePromJobsExecutor := func(promQLJobGroup *jobs.JobGroup, registry *status.Registry, lifecycle fx.Lifecycle) (*promJobsExecutor, error) {
+	providePromJobsExecutor := func(promQLJobGroup *jobs.JobGroup, lifecycle fx.Lifecycle) (*promJobsExecutor, error) {
 		// Create this watcher as a singleton at the policy/circuit level
 		pje := &promJobsExecutor{
 			circuitAPI:     circuitAPI,
@@ -72,7 +72,7 @@ func PromQLModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 		jws = append(jws, pje)
 
 		// Create promMultiJob for this circuit
-		promMultiJob := jobs.NewMultiJob(circuitAPI.GetPolicyName(), promQLJobGroupTag, false, registry, jws, nil)
+		promMultiJob := jobs.NewMultiJob(circuitAPI.GetPolicyName(), false, jws, nil)
 		pje.promMultiJob = promMultiJob
 
 		initialDelay := config.Duration{Duration: durationpb.New(time.Duration(-1))}

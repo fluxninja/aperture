@@ -3,15 +3,13 @@ package entitycache
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"sync"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
 
-	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -25,27 +23,22 @@ const (
 
 // ServiceKey holds key for service.
 type ServiceKey struct {
-	AgentGroup string `json:"agent_group"`
-	Name       string `json:"name"`
+	Name string `json:"name"`
 }
 
 func (sk ServiceKey) lessThan(sk2 ServiceKey) bool {
-	if sk.AgentGroup == sk2.AgentGroup {
-		return sk.Name < sk2.Name
-	}
-	return sk.AgentGroup < sk2.AgentGroup
+	return sk.Name < sk2.Name
 }
 
 // keyFromService returns a service key for given service.
-func (c *EntityCache) keyFromService(service *heartbeatv1.Service) *ServiceKey {
+func (c *EntityCache) keyFromService(service *entitycachev1.Service) *ServiceKey {
 	return &ServiceKey{
-		AgentGroup: c.agentGroup,
-		Name:       service.Name,
+		Name: service.Name,
 	}
 }
 
 // Merge merges `mergedService` into `originalService`. This sums `EntitiesCount`.
-func Merge(originalService, mergedService *heartbeatv1.Service) {
+func Merge(originalService, mergedService *entitycachev1.Service) {
 	originalService.EntitiesCount += mergedService.EntitiesCount
 }
 
@@ -58,8 +51,6 @@ type Entity struct {
 
 	// IP Address of this entity
 	IPAddress string `json:"ip_address"`
-	// AgentGroup needs to be explicitly set using SetAgentGroup.
-	AgentGroup string `json:"agent_group"`
 	// Services is a List of names of services this entity is a part of.
 	// We store "well-known-labels" (identifying a service) in a separate
 	// fields for easier access. Note: we could store `[]agent_core/services/ServiceID`
@@ -77,11 +68,6 @@ func (e *Entity) IP() string {
 // Name returns Name of this entity.
 func (e *Entity) Name() string {
 	return e.EntityName
-}
-
-// SetAgentGroup sets agentGroup.
-func (e *Entity) SetAgentGroup(agentGroup string) {
-	e.AgentGroup = agentGroup
 }
 
 // EntityID is a unique Entity identifier.
@@ -105,7 +91,6 @@ type EntityCache struct {
 	sync.RWMutex
 	entitiesByIP   map[string]*Entity
 	entitiesByName map[string]*Entity
-	agentGroup     string
 }
 
 // FxIn are the parameters for ProvideEntityCache.
@@ -113,15 +98,12 @@ type FxIn struct {
 	fx.In
 	Lifecycle      fx.Lifecycle
 	Router         *mux.Router
-	AgentInfo      *agentinfo.AgentInfo
 	EntityTrackers notifiers.Trackers `name:"entity_trackers"`
 }
 
 // ProvideEntityCache creates Entity Cache.
 func ProvideEntityCache(in FxIn) (*EntityCache, error) {
 	entityCache := NewEntityCache()
-	agentGroup := in.AgentInfo.GetAgentGroup()
-	entityCache.agentGroup = agentGroup
 
 	in.Router.HandleFunc(debugEndpoint, entityCache.DumpHandler)
 
@@ -161,7 +143,6 @@ func (c *EntityCache) processUpdate(event notifiers.Event, unmarshaller config.U
 		return
 	}
 	entity := discoveryEntityToCacheEntity(&rawEntity)
-	entity.SetAgentGroup(c.agentGroup)
 	ip := entity.IP()
 	name := entity.Name()
 
@@ -268,10 +249,11 @@ func (c *EntityCache) Remove(entity *Entity) bool {
 // for an agent group is ignored.
 // Entities which have multiple values for service name will create one service
 // for each of them.
-func (c *EntityCache) Services() ([]*heartbeatv1.Service, []*heartbeatv1.OverlappingService) {
+func (c *EntityCache) Services() *entitycachev1.EntityCache {
 	c.RLock()
 	defer c.RUnlock()
-	services := map[ServiceKey]*heartbeatv1.Service{}
+
+	services := map[ServiceKey]*entitycachev1.Service{}
 	overlapping := make(map[pair]int)
 
 	for _, entity := range c.entitiesByIP {
@@ -296,19 +278,23 @@ func (c *EntityCache) Services() ([]*heartbeatv1.Service, []*heartbeatv1.Overlap
 		}
 
 	}
-	ret := make([]*heartbeatv1.Service, 0, len(services))
-	for _, svc := range services {
-		ret = append(ret, svc)
+
+	entityCache := &entitycachev1.EntityCache{
+		Services:            make([]*entitycachev1.Service, 0, len(services)),
+		OverlappingServices: make([]*entitycachev1.OverlappingService, 0, len(overlapping)),
 	}
-	retOverlapping := make([]*heartbeatv1.OverlappingService, 0, len(overlapping))
+
+	for _, svc := range services {
+		entityCache.Services = append(entityCache.Services, svc)
+	}
 	for k, v := range overlapping {
-		retOverlapping = append(retOverlapping, &heartbeatv1.OverlappingService{
+		entityCache.OverlappingServices = append(entityCache.OverlappingServices, &entitycachev1.OverlappingService{
 			Service1:      k.x.Name,
 			Service2:      k.y.Name,
 			EntitiesCount: int32(v),
 		})
 	}
-	return ret, retOverlapping
+	return entityCache
 }
 
 // DumpHandler is used to return entity cache data in JSON format.
@@ -362,15 +348,11 @@ func ServiceIDsFromEntity(entity *Entity) []services.ServiceID {
 	return svcs
 }
 
-func servicesFromEntity(entity *Entity) ([]*heartbeatv1.Service, error) {
-	if entity.AgentGroup == "" {
-		return nil, errors.New("missing agent group")
-	}
-
+func servicesFromEntity(entity *Entity) ([]*entitycachev1.Service, error) {
 	svcIDs := ServiceIDsFromEntity(entity)
-	svcs := make([]*heartbeatv1.Service, 0, len(svcIDs))
+	svcs := make([]*entitycachev1.Service, 0, len(svcIDs))
 	for _, svc := range svcIDs {
-		svcs = append(svcs, &heartbeatv1.Service{
+		svcs = append(svcs, &entitycachev1.Service{
 			Name:          svc.Service,
 			EntitiesCount: 1,
 		})

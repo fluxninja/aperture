@@ -66,6 +66,7 @@ func provideWatchers(
 
 type rateLimiterFactory struct {
 	engineAPI                 iface.Engine
+	statusRegistry            status.Registry
 	distCache                 *distcache.DistCache
 	lazySyncJobGroup          *jobs.JobGroup
 	rateLimitDecisionsWatcher notifiers.Watcher
@@ -78,7 +79,7 @@ func setupRateLimiterFactory(
 	lifecycle fx.Lifecycle,
 	e iface.Engine,
 	distCache *distcache.DistCache,
-	statusRegistry *status.Registry,
+	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
@@ -89,7 +90,10 @@ func setupRateLimiterFactory(
 	if err != nil {
 		return err
 	}
-	lazySyncJobGroup, err := jobs.NewJobGroup(rateLimiterStatusRoot+".lazy_sync_jobs", statusRegistry, 0, jobs.RescheduleMode, nil)
+
+	reg := statusRegistry.Child(rateLimiterStatusRoot)
+
+	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("lazy_sync_jobs"), 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create lazy sync job group")
 		return err
@@ -101,6 +105,7 @@ func setupRateLimiterFactory(
 		lazySyncJobGroup:          lazySyncJobGroup,
 		rateLimitDecisionsWatcher: rateLimitDecisionsWatcher,
 		agentGroupName:            agentGroupName,
+		statusRegistry:            reg,
 	}
 
 	fxDriver := &notifiers.FxDriver{
@@ -108,9 +113,8 @@ func setupRateLimiterFactory(
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
 		},
-		StatusRegistry:     statusRegistry,
+		StatusRegistry:     reg,
 		PrometheusRegistry: prometheusRegistry,
-		StatusPath:         rateLimiterStatusRoot,
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -148,15 +152,12 @@ func setupRateLimiterFactory(
 func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry *status.Registry,
+	reg status.Registry,
 ) (fx.Option, error) {
-	registryPath := path.Join(rateLimiterStatusRoot, key.String())
-
 	wrapperMessage := &configv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiter == nil {
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(registryPath, s)
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to unmarshal rate limiter config")
 		return fx.Options(), err
 	}
@@ -166,8 +167,8 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	rateLimiter := &rateLimiter{
 		Component:          wrapperMessage,
 		rateLimiterProto:   rateLimiterMessage,
-		registryPath:       registryPath,
 		rateLimiterFactory: rateLimiterFactory,
+		statusRegistry:     reg,
 	}
 	rateLimiter.name = iface.ComponentID(rateLimiter)
 
@@ -181,10 +182,10 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 // rateLimiter implements rate limiter on the data plane side.
 type rateLimiter struct {
 	iface.Component
+	statusRegistry     status.Registry
 	rateLimiterFactory *rateLimiterFactory
 	rateTracker        ratetracker.RateTracker
 	rateLimitChecker   *ratetracker.BasicRateLimitChecker
-	registryPath       string
 	rateLimiterProto   *policylangv1.RateLimiter
 	name               string
 }
@@ -192,7 +193,7 @@ type rateLimiter struct {
 // Make sure rateLimiter implements iface.Limiter.
 var _ iface.RateLimiter = (*rateLimiter)(nil)
 
-func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *status.Registry) error {
+func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	// decision notifier
 	unmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
@@ -267,12 +268,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 				merr = multierr.Append(merr, err)
 			}
 			rateLimiter.rateTracker.Close()
-			s := status.NewStatus(nil, merr)
-			err = statusRegistry.Push(rateLimiter.registryPath, s)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to push status")
-				merr = multierr.Append(merr, err)
-			}
+			rateLimiter.statusRegistry.SetStatus(status.NewStatus(nil, merr))
 
 			return merr
 		},

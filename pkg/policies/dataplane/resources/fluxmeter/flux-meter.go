@@ -24,9 +24,6 @@ import (
 )
 
 const (
-	// The path in status registry for concurrency control status.
-	fluxMeterStatusRoot = "concurrency_control"
-
 	// FxNameTag is Flux Meter Watcher's Fx Tag.
 	FxNameTag = "name:\"flux_meter\""
 )
@@ -76,7 +73,7 @@ func setupFluxMeterModule(
 	watcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
 	e iface.Engine,
-	sr *status.Registry,
+	sr status.Registry,
 	pr *prometheus.Registry,
 ) error {
 	// save policy config api
@@ -118,13 +115,18 @@ func setupFluxMeterModule(
 		},
 	})
 
+	reg := sr.Child("flux_meters")
+
+	fmf := &fluxMeterFactory{
+		statusRegistry: reg,
+	}
+
 	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{NewFluxMeterOptions},
+		FxOptionsFuncs: []notifiers.FxOptionsFunc{fmf.newFluxMeterOptions},
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
 		},
-		StatusPath:         fluxMeterStatusRoot,
-		StatusRegistry:     sr,
+		StatusRegistry:     reg,
 		PrometheusRegistry: pr,
 	}
 
@@ -140,18 +142,20 @@ type FluxMeter struct {
 	buckets       []float64
 }
 
+type fluxMeterFactory struct {
+	statusRegistry status.Registry
+}
+
 // NewFluxMeterOptions creates fluxmeter for usage in dataplane and also returns its fx options.
-func NewFluxMeterOptions(
+func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry *status.Registry,
+	reg status.Registry,
 ) (fx.Option, error) {
-	registryPath := path.Join(fluxMeterStatusRoot, key.String())
 	wrapperMessage := &configv1.FluxMeterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.FluxMeter == nil {
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(registryPath, s)
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to unmarshal flux meter config wrapper")
 		return fx.Options(), err
 	}

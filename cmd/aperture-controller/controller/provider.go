@@ -18,7 +18,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/pkg/status"
 )
 
 var (
@@ -35,7 +34,6 @@ var (
 	policiesDefaultPath = path.Join(config.DefaultAssetsDirectory, "policies")
 	policiesPathKey     = "controller.policies_path"
 	policiesFxTag       = "Policies"
-	policyKey           = "policy"
 )
 
 // Module - Controller can be initialized by passing options from Module() to fx app.
@@ -67,12 +65,9 @@ func setPoliciesPathFlag(fs *pflag.FlagSet) error {
 }
 
 // Sync policies config directory with etcd.
-func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry *status.Registry) {
+func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
 	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
-		statusPath := policyKey + "." + key.String()
-
 		var dat []byte
-
 		switch etype {
 		case notifiers.Write:
 			unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
@@ -94,15 +89,6 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
 				return key, nil, marshalWrapErr
 			}
-
-			s := status.NewStatus(wrapper, nil)
-			pushErr := statusRegistry.Push(statusPath, s)
-			if pushErr != nil {
-				log.Error().Err(pushErr).Msg("could not push policies status")
-			}
-
-		case notifiers.Remove:
-			statusRegistry.Delete(statusPath)
 		}
 		return key, dat, nil
 	}

@@ -116,7 +116,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - PolicyService
-  /v1/status/{group}:
+  /v1/status/{keys}:
     get:
       operationId: StatusService_GetGroupStatus
       responses:
@@ -129,24 +129,14 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
-        - name: group
+        - name: keys
           in: path
           required: true
-          type: string
-      tags:
-        - StatusService
-  /v1/statusgroups:
-    get:
-      operationId: StatusService_GetGroups
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1Groups'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          minItems: 1
       tags:
         - StatusService
 definitions:
@@ -952,6 +942,17 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Exponential moving average of the series of reading as an output signal.
     description: Outputs for the EMA component.
+  v1EntityCache:
+    type: object
+    properties:
+      overlapping_services:
+        type: array
+        items:
+          $ref: '#/definitions/v1OverlappingService'
+      services:
+        type: array
+        items:
+          $ref: '#/definitions/v1Service'
   v1EqualsMatchExpression:
     type: object
     properties:
@@ -1142,13 +1143,6 @@ definitions:
     description: |-
       Groups is nested structure that holds status information about the node and a
       pointer to the next node.
-  v1Groups:
-    type: object
-    properties:
-      groups:
-        type: array
-        items:
-          type: string
   v1HostInfo:
     type: object
     properties:
@@ -1408,6 +1402,17 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Signal with minimum value as an output signal.
     description: Output ports for the Min component.
+  v1OverlappingService:
+    type: object
+    properties:
+      entities_count:
+        type: integer
+        format: int32
+      service1:
+        type: string
+      service2:
+        type: string
+    title: OverlappingService contains info about a service that overlaps with another one
   v1PathTemplateMatcher:
     type: object
     properties:
@@ -1453,6 +1458,13 @@ definitions:
         type: object
         additionalProperties:
           type: string
+  v1Peers:
+    type: object
+    properties:
+      peer_infos:
+        type: array
+        items:
+          $ref: '#/definitions/v1PeerInfo'
   v1Policy:
     type: object
     properties:
@@ -1520,17 +1532,15 @@ definitions:
       agent_group:
         type: string
       all_statuses:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/protobufAny'
+        $ref: '#/definitions/v1GroupStatus'
       controller_info:
         $ref: '#/definitions/v1ControllerInfo'
+      entity_cache:
+        $ref: '#/definitions/v1EntityCache'
       host_info:
         $ref: '#/definitions/v1HostInfo'
-      peer_infos:
-        type: array
-        items:
-          $ref: '#/definitions/v1PeerInfo'
+      peers:
+        $ref: '#/definitions/v1Peers'
       process_info:
         $ref: '#/definitions/v1ProcessInfo'
       version_info:
@@ -1745,6 +1755,17 @@ definitions:
               regex: ^(?!.*Chrome).*Safari
       ```
     title: Describes where a rule or actuation component should apply to
+  v1Service:
+    type: object
+    properties:
+      entities_count:
+        type: integer
+        format: int32
+      name:
+        type: string
+    title: |-
+      Service contains information about single service discovered in agent group by a
+      particular agent
   v1Sqrt:
     type: object
     properties:

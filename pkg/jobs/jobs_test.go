@@ -2,7 +2,6 @@ package jobs
 
 import (
 	"context"
-	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -22,7 +21,6 @@ import (
 
 var (
 	jobGroup, err = createJobGroup() // Job group is created globally so that it can be used to schedule jobs contained in all tests, otherwise a jobgroup per test needs to be created
-	registry      = status.NewRegistry(".")
 	jws           JobWatchers
 	gws           GroupWatchers
 	jobConfig     = JobConfig{ // Job configuration can be manipulated in each test to test different scenarios, no need to create new job config for each test
@@ -37,6 +35,7 @@ var (
 		},
 		InitiallyHealthy: false,
 	}
+	registry = status.NewRegistry().Child("jobs")
 )
 
 var _ JobWatcher = (*groupConfig)(nil)
@@ -74,7 +73,7 @@ func (jws *groupConfig) OnJobCompleted(_ *statusv1.Status, _ JobStats) {
 }
 
 func createJobGroup() (*JobGroup, error) {
-	return NewJobGroup("job-group", registry, 10, RescheduleMode, gws)
+	return NewJobGroup(registry, 10, RescheduleMode, gws)
 }
 
 func runTest(t *testing.T, groupConfig *groupConfig) {
@@ -92,11 +91,13 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 	time.Sleep(groupConfig.jobRunConfig.sleepTime)
 
 	for _, job := range groupConfig.jobs {
-		regKey := strings.Join([]string{"liveness", "job_groups", jobGroup.GroupName(), job.Name()}, registry.Delim())
-		groupStatus := registry.Get(regKey)
-		require.NotNil(t, groupStatus)
+		livenessReg := registry.Root().
+			Child("liveness").
+			Child("job_groups").
+			Child(registry.Key()).
+			Child(job.Name())
 
-		gotStatusMsg := groupStatus.Status.GetMessage()
+		gotStatusMsg := livenessReg.GetStatus().GetMessage()
 		expectedStatusMsg, _ := anypb.New(wrapperspb.String(groupConfig.jobRunConfig.expectedStatusMsg))
 		if !proto.Equal(gotStatusMsg, expectedStatusMsg) {
 			t.Errorf("Expected status message to be %v, got %v", expectedStatusMsg, gotStatusMsg)
@@ -200,7 +201,7 @@ func TestMultiJobRun(t *testing.T) {
 	jobConfig.InitialDelay = config.Duration{
 		Duration: durationpb.New(time.Second * 0),
 	}
-	multiJob := NewMultiJob("multi-job", "job-group", false, registry, jws, gws)
+	multiJob := NewMultiJob("multi-job", false, jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
@@ -301,8 +302,8 @@ func TestMultipleMultiJobs(t *testing.T) {
 	var counter int32
 	var counter2 int32
 	var counter3 int32
-	multiJob := NewMultiJob("multiJob1", "job-group", false, registry, jws, gws)
-	multiJob2 := NewMultiJob("multiJob2", "job-group", false, registry, jws, gws)
+	multiJob := NewMultiJob("multiJob1", false, jws, gws)
+	multiJob2 := NewMultiJob("multiJob2", false, jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",

@@ -18,11 +18,10 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 				Prefix: "testPrefix",
 				UID:    "1",
 			},
-			AgentGroup: "fooGroup",
 			Services:   []string{"fooSvc1", "fooSvc2"},
 			EntityName: "someName",
 		})
-		processor := newProcessor(entityCache)
+		processor := newProcessor(entityCache, "fooGroup")
 		Expect(processor).NotTo(BeNil())
 
 		md := metricsFromLabels(map[string]string{
@@ -41,7 +40,7 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 
 	It("Does not enrich when there are no labels in entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache)
+		processor := newProcessor(entityCache, "fooGroup")
 		Expect(processor).NotTo(BeNil())
 
 		md := metricsFromLabels(map[string]string{
@@ -52,7 +51,8 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		assertMetricsEqual(md, metricsFromLabels(map[string]string{
-			"preserve": "this",
+			"preserve":    "this",
+			"agent_group": "fooGroup",
 		}))
 	})
 })

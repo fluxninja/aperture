@@ -41,7 +41,7 @@ type ConstructorIn struct {
 	JobGroup                   *jobs.JobGroup                     `name:"heartbeats-job-group"`
 	GRPClientConnectionBuilder grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
 	HTTPClient                 *http.Client                       `name:"heartbeats-http-client"`
-	StatusRegistry             *status.Registry
+	StatusRegistry             status.Registry
 	EntityCache                *entitycache.EntityCache `optional:"true"`
 	AgentInfo                  *agentinfo.AgentInfo     `optional:"true"`
 	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
