@@ -88,7 +88,6 @@ func provideFlagSetBuilder() config.FlagSetBuilderOut {
 
 // Module returns the platform module.
 func (cfg Config) Module() fx.Option {
-	var statusRegistry status.Registry
 	// purge previous temp
 	_ = os.RemoveAll(config.DefaultTempBase)
 	// mkdir temp
@@ -121,7 +120,7 @@ func (cfg Config) Module() fx.Option {
 		jobs.Module(),
 		status.Module(),
 		fx.Invoke(status.RegisterStatusService),
-		fx.Populate(&statusRegistry),
+		fx.Populate(&platform.statusRegistry),
 		platformStatusModule(),
 		plugins.ModuleConfig{OnlyCommandLineFlags: true}.Module(),
 		fx.Supply(registry),
@@ -134,8 +133,6 @@ func (cfg Config) Module() fx.Option {
 			pluginOptions,
 		)
 	}
-	platform.statusRegistry = statusRegistry.Child(platformStatusPath)
-
 	return options
 }
 
@@ -164,6 +161,7 @@ func ServerModule(testMode bool) fx.Option {
 
 // Run is an fx helper function to gracefully start and stop an app container.
 func Run(app *fx.App) {
+	platform.statusRegistry = platform.statusRegistry.Child(platformStatusPath)
 	// Check for dotflag
 	if platform.unmarshaller != nil {
 		dotfile := config.GetStringValue(platform.unmarshaller, dotFileKey, "")
