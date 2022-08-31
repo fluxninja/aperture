@@ -69,7 +69,6 @@ func (jgc JobGroupConstructor) Annotate() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			fx.Annotate(
-				provideGroupWatcherMetrics,
 				fx.ResultTags(groupTag),
 			),
 		),

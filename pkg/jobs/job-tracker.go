@@ -132,7 +132,8 @@ func (gt *groupTracker) isHealthy() bool {
 	defer gt.mu.Unlock()
 
 	for _, tracker := range gt.trackers {
-		if tracker.statusRegistry.GetStatus().GetError().GetMessage() != "" {
+		s := tracker.statusRegistry.GetStatus()
+		if s.GetError() != nil {
 			return false
 		}
 	}

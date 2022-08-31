@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
-	"github.com/mitchellh/copystructure"
 )
 
 // Registry .
@@ -96,11 +95,11 @@ func (r *registry) Detach() {
 func (r *registry) GetStatus() *statusv1.Status {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	statusCopy, err := copystructure.Copy(r.status)
-	if err != nil {
+	if r.status != nil {
+		return r.status
+	} else {
 		return &statusv1.Status{}
 	}
-	return statusCopy.(*statusv1.Status)
 }
 
 // SetStatus sets the status of the Registry.
@@ -125,13 +124,8 @@ func (r *registry) GetGroupStatus() *statusv1.GroupStatus {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	statusCopy, err := copystructure.Copy(r.status)
-	if err != nil {
-		return &statusv1.GroupStatus{}
-	}
-
 	groupStatus := &statusv1.GroupStatus{
-		Status: statusCopy.(*statusv1.Status),
+		Status: r.status,
 		Groups: make(map[string]*statusv1.GroupStatus),
 	}
 

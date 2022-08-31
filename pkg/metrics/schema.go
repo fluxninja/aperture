@@ -80,10 +80,6 @@ const (
 	FlowControlCheckErrorReasonLabel = "flowcontrol_check_error_reason"
 	// FlowControlCheckRejectReasonLabel - label for reject reason on FCS Check request.
 	FlowControlCheckRejectReasonLabel = "flowcontrol_check_reject_reason"
-	// GroupNameLabel - name fo the job group.
-	GroupNameLabel = "group_name"
-	// GroupJobCompletedLabel - amount of jobs that finished with a success.
-	GroupJobCompletedLabel = "group_job_completed_healthy"
 
 	// DEFAULTS.
 
