@@ -56,7 +56,7 @@ func newPolicyOptions(
 ) (fx.Option, error) {
 	// List of options for the policy.
 	policyOptions := []fx.Option{}
-	policy, compWithPortsList, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage)
+	policy, compiledCircuit, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage)
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +64,14 @@ func newPolicyOptions(
 	policyOptions = append(policyOptions, fx.Supply(
 		fx.Annotate(policy, fx.As(new(iface.Policy))),
 	))
+
+	compWithPortsList := make([]runtime.CompiledComponentAndPorts, 0, len(compiledCircuit))
+	for _, compiledComponent := range compiledCircuit {
+		// Skip nil component
+		if compiledComponent.CompiledComponent.Component != nil {
+			compWithPortsList = append(compWithPortsList, compiledComponent.CompiledComponentAndPorts)
+		}
+	}
 
 	// Create circuit
 	circuit, circuitOption := runtime.NewCircuitAndOptions(compWithPortsList, policy)
@@ -78,7 +86,7 @@ func newPolicyOptions(
 }
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
-func CompilePolicy(policyMessage *policylangv1.Policy) ([]runtime.CompiledComponentAndPorts, error) {
+func CompilePolicy(policyMessage *policylangv1.Policy) (CompiledCircuit, error) {
 	wrapperMessage, err := HashAndPolicyWrap(policyMessage, "DoesNotMatter")
 	if err != nil {
 		return nil, err
@@ -91,7 +99,7 @@ func CompilePolicy(policyMessage *policylangv1.Policy) ([]runtime.CompiledCompon
 }
 
 // compilePolicyWrapper takes policyProto and returns a compiled policy.
-func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []runtime.CompiledComponentAndPorts, fx.Option, error) {
+func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, CompiledCircuit, fx.Option, error) {
 	if wrapperMessage == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy wrapper message")
 	}
@@ -125,7 +133,7 @@ func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []ru
 			resourceOptions = append(resourceOptions, classifierOption)
 		}
 	}
-	var compWithPortsList []runtime.CompiledComponentAndPorts
+	var compiledCircuit CompiledCircuit
 	partialCircuitOption := fx.Options()
 	var err error
 
@@ -133,13 +141,13 @@ func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []ru
 		// Read evaluation interval
 		policy.evaluationInterval = policyProto.GetCircuit().GetEvaluationInterval().AsDuration()
 
-		compWithPortsList, partialCircuitOption, err = compileCircuit(policyProto.GetCircuit().Components, policy)
+		compiledCircuit, partialCircuitOption, err = compileCircuit(policyProto.GetCircuit().Components, policy)
 		if err != nil {
 			return nil, nil, nil, err
 		}
 	}
 
-	return policy, compWithPortsList, fx.Options(
+	return policy, compiledCircuit, fx.Options(
 		fx.Options(resourceOptions...),
 		partialCircuitOption,
 		fx.Invoke(policy.setupCircuitJob),

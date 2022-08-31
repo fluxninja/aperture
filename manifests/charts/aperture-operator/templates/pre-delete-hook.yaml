@@ -35,10 +35,10 @@ spec:
         command:
           - "/bin/bash"
           - "-xc"
-          {{- if .Values.agent.createUninstallHook }}
-          - "kubectl delete agent {{ .Release.Name }} -n {{ template "common.names.namespace" . }}; while (kubectl get agent {{ .Release.Name }} -n {{ template "common.names.namespace" . }}); ret=$?; [ $ret -eq 0 ]; do echo \"deleting\"; sleep 2; done"
-          {{- end }}
           {{- if .Values.controller.createUninstallHook }}
-          - "kubectl delete controller {{ .Release.Name }} -n {{ template "common.names.namespace" . }}; while (kubectl get controller {{ .Release.Name }} -n {{ template "common.names.namespace" . }}); ret=$?; [ $ret -eq 0 ]; do echo \"deleting\"; sleep 2; done"
+          - "kubectl delete controller {{ .Release.Name }} -n {{ template "common.names.namespace" . }}; while (kubectl get controller {{ .Release.Name }} -n {{ template "common.names.namespace" . }}); ret=$?; [ $ret -eq 0 ]; do echo deleting; sleep 2; done"
+          {{- end }}
+          {{- if .Values.agent.createUninstallHook }}
+          - "kubectl delete agent {{ .Release.Name }} -n {{ template "common.names.namespace" . }}; while (kubectl get agent {{ .Release.Name }} -n {{ template "common.names.namespace" . }}); ret=$?; [ $ret -eq 0 ]; do echo deleting; sleep 2; done"
           {{- end }}
 {{- end }}

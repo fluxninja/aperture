@@ -23,12 +23,12 @@ func newComponentStackAndOptions(
 	policyReadAPI iface.Policy,
 ) (runtime.CompiledComponent, []runtime.CompiledComponent, fx.Option, error) {
 	// Factory parser to determine what kind of component stack to create
-	if concurrencyLimiter := componentStackProto.GetConcurrencyLimiter(); concurrencyLimiter != nil {
+	if concurrencyLimiterProto := componentStackProto.GetConcurrencyLimiter(); concurrencyLimiterProto != nil {
 		var (
 			compiledComponents []runtime.CompiledComponent
 			options            []fx.Option
 		)
-		concurrencyLimiterOptions, agentGroupName, concurrencyLimiterErr := concurrency.NewConcurrencyLimiterOptions(concurrencyLimiter, componentStackIndex, policyReadAPI)
+		concurrencyLimiterOptions, agentGroupName, concurrencyLimiterErr := concurrency.NewConcurrencyLimiterOptions(concurrencyLimiterProto, componentStackIndex, policyReadAPI)
 		if concurrencyLimiterErr != nil {
 			return runtime.CompiledComponent{}, nil, nil, concurrencyLimiterErr
 		}
@@ -36,7 +36,7 @@ func newComponentStackAndOptions(
 		options = append(options, concurrencyLimiterOptions)
 
 		// Scheduler
-		if schedulerProto := concurrencyLimiter.GetScheduler(); schedulerProto != nil {
+		if schedulerProto := concurrencyLimiterProto.GetScheduler(); schedulerProto != nil {
 			scheduler, schedulerOptions, schedulerErr := concurrency.NewSchedulerAndOptions(schedulerProto, componentStackIndex, policyReadAPI, agentGroupName)
 			if schedulerErr != nil {
 				return runtime.CompiledComponent{}, nil, nil, schedulerErr
@@ -47,9 +47,10 @@ func newComponentStackAndOptions(
 			}
 			// Append scheduler as a runtime.CompiledComponent
 			compiledComponents = append(compiledComponents, runtime.CompiledComponent{
-				Component: scheduler,
-				MapStruct: schedulerMapStruct,
-				Name:      "Scheduler",
+				Component:     scheduler,
+				MapStruct:     schedulerMapStruct,
+				Name:          "Scheduler",
+				ComponentType: runtime.ComponentTypeSource,
 			})
 
 			// Append scheduler options
@@ -57,7 +58,7 @@ func newComponentStackAndOptions(
 		}
 
 		// Actuation Strategy
-		if loadShedActuatorProto := concurrencyLimiter.GetLoadShedActuator(); loadShedActuatorProto != nil {
+		if loadShedActuatorProto := concurrencyLimiterProto.GetLoadShedActuator(); loadShedActuatorProto != nil {
 			loadShedActuator, loadShedActuatorOptions, loadShedActuatorErr := concurrency.NewLoadShedActuatorAndOptions(loadShedActuatorProto, componentStackIndex, policyReadAPI, agentGroupName)
 			if loadShedActuatorErr != nil {
 				return runtime.CompiledComponent{}, nil, nil, loadShedActuatorErr
@@ -68,16 +69,26 @@ func newComponentStackAndOptions(
 			}
 			// Append loadShedActuator as a runtime.CompiledComponent
 			compiledComponents = append(compiledComponents, runtime.CompiledComponent{
-				Component: loadShedActuator,
-				MapStruct: loadShedActuatorMapStruct,
-				Name:      "LoadShedActuator",
+				Component:     loadShedActuator,
+				MapStruct:     loadShedActuatorMapStruct,
+				Name:          "LoadShedActuator",
+				ComponentType: runtime.ComponentTypeSink,
 			})
 
 			// Append loadShedActuator options
 			options = append(options, loadShedActuatorOptions)
 		}
 
-		return runtime.CompiledComponent{}, compiledComponents, fx.Options(options...), nil
+		concurrencyLimiterMapStruct, err := encodeMapStruct(concurrencyLimiterProto)
+		if err != nil {
+			return runtime.CompiledComponent{}, nil, nil, err
+		}
+		return runtime.CompiledComponent{
+			Component:     nil,
+			MapStruct:     concurrencyLimiterMapStruct,
+			Name:          "ConcurrencyLimiter",
+			ComponentType: runtime.ComponentTypeStandAlone,
+		}, compiledComponents, fx.Options(options...), nil
 	}
 	return runtime.CompiledComponent{}, nil, nil, fmt.Errorf("unsupported/missing component type")
 }

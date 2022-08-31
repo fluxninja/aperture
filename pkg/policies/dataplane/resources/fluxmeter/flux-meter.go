@@ -11,7 +11,6 @@ import (
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -86,7 +85,6 @@ func setupFluxMeterModule(
 			histMetric := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 				Name: metrics.FluxMeterMetricName,
 			}, []string{
-				metrics.PolicyNameLabel,
 				metrics.FluxMeterNameLabel,
 				metrics.DecisionTypeLabel,
 				metrics.StatusCodeLabel,
@@ -137,13 +135,11 @@ func setupFluxMeterModule(
 	return nil
 }
 
-// FluxMeter describes single fluxmeter from policy.
+// FluxMeter describes single fluxmeter.
 type FluxMeter struct {
-	iface.Policy
-	selector       *selectorv1.Selector
-	fluxMeterProto *policylangv1.FluxMeter
-	fluxMeterName  string
-	buckets        []float64
+	selector      *selectorv1.Selector
+	fluxMeterName string
+	buckets       []float64
 }
 
 type fluxMeterFactory struct {
@@ -166,11 +162,9 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	fluxMeterProto := wrapperMessage.FluxMeter
 
 	fluxMeter := &FluxMeter{
-		fluxMeterProto: fluxMeterProto,
-		Policy:         wrapperMessage,
-		fluxMeterName:  wrapperMessage.FluxmeterName,
-		selector:       fluxMeterProto.GetSelector(),
-		buckets:        fluxMeterProto.GetHistogramBuckets(),
+		fluxMeterName: wrapperMessage.FluxmeterName,
+		selector:      fluxMeterProto.GetSelector(),
+		buckets:       fluxMeterProto.GetHistogramBuckets(),
 	}
 
 	return fx.Options(
@@ -181,7 +175,6 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 
 func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheus.Registry) {
 	metricLabels := make(map[string]string)
-	metricLabels[metrics.PolicyNameLabel] = fluxMeter.GetPolicyName()
 	metricLabels[metrics.FluxMeterNameLabel] = fluxMeter.GetFluxMeterName()
 
 	lc.Append(fx.Hook{
@@ -189,7 +182,7 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 			// Register metric with PCA
 			err := engineAPI.RegisterFluxMeter(fluxMeter)
 			if err != nil {
-				log.Error().Err(err).Msgf("Failed to register FluxMeter %s with PolicyConfigAPI", fluxMeter.fluxMeterName)
+				log.Error().Err(err).Msgf("Failed to register FluxMeter %s with EngineAPI", fluxMeter.fluxMeterName)
 				return err
 			}
 			return nil
@@ -199,12 +192,12 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 			// Unregister metric with PCA
 			err := engineAPI.UnregisterFluxMeter(fluxMeter)
 			if err != nil {
-				log.Error().Err(err).Msgf("Failed to unregister FluxMeter %s with PolicyConfigAPI", fluxMeter.fluxMeterName)
+				log.Error().Err(err).Msgf("Failed to unregister FluxMeter %s with EngineAPI", fluxMeter.fluxMeterName)
 				errMulti = multierr.Append(errMulti, err)
 			}
 			// Delete this specific fluxmeter from prometheus
 			deleted := histogramVec.DeletePartialMatch(metricLabels)
-			log.Info().Msgf("Deleted %d metrics for fluxmeter: %+v in policy %s", deleted, fluxMeter.GetFluxMeterName(), fluxMeter.GetPolicyName())
+			log.Info().Msgf("Deleted %d metrics for fluxmeter: %+v", deleted, fluxMeter.GetFluxMeterName())
 
 			return errMulti
 		},
@@ -216,11 +209,6 @@ func (fluxMeter *FluxMeter) GetSelector() *selectorv1.Selector {
 	return fluxMeter.selector
 }
 
-// GetFluxMeterProto returns the flux meter proto.
-func (fluxMeter *FluxMeter) GetFluxMeterProto() *policylangv1.FluxMeter {
-	return fluxMeter.fluxMeterProto
-}
-
 // GetFluxMeterName returns the metric name.
 func (fluxMeter *FluxMeter) GetFluxMeterName() string {
 	return fluxMeter.fluxMeterName
@@ -229,7 +217,6 @@ func (fluxMeter *FluxMeter) GetFluxMeterName() string {
 // GetFluxMeterID returns the flux meter ID.
 func (fluxMeter *FluxMeter) GetFluxMeterID() iface.FluxMeterID {
 	return iface.FluxMeterID{
-		PolicyName:    fluxMeter.GetPolicyName(),
 		FluxMeterName: fluxMeter.GetFluxMeterName(),
 	}
 }
@@ -239,7 +226,6 @@ func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType
 	labels := make(map[string]string)
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
 	labels[metrics.StatusCodeLabel] = statusCode
-	labels[metrics.PolicyNameLabel] = fluxMeter.GetPolicyName()
 	labels[metrics.FluxMeterNameLabel] = fluxMeter.GetFluxMeterName()
 
 	fluxMeterHistogram, err := histogramVec.GetMetricWith(labels)

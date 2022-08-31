@@ -45,14 +45,6 @@ Use [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/).
 The Kubernetes command line tool.
 Follow the instructions: <https://kubernetes.io/docs/tasks/tools/#kubectl>
 
-## Configuration prerequisites
-
-- Make sure the git submodules are up-to-date, if they are not - run:
-
-  ```bash
-  git submodule update --init --recursive
-  ```
-
 ### Alpha features
 
 Agent core service uses feature gate for managing node-local traffic: <https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/>
@@ -82,10 +74,10 @@ Tilt can be installed with `asdf install` or manually <https://docs.tilt.dev/ins
 
 ### Prerequisites - k8s cluster bootstrap
 
-Create a K8s cluster using Kind:
+Create a K8s cluster using Kind with configuration file:
 
-```
-kind create cluster
+```sh
+kind create cluster --name aperture-playground --config kind-config.yaml
 ```
 
 ### Services deployment

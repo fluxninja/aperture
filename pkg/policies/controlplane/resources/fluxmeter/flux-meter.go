@@ -39,7 +39,7 @@ func NewFluxMeterOptions(
 	agentGroup := selectorProto.GetAgentGroup()
 
 	etcdPath := path.Join(paths.FluxMeterConfigPath,
-		paths.FluxMeterKey(agentGroup, policyBaseAPI.GetPolicyName(), name))
+		paths.FluxMeterKey(agentGroup, name))
 	configSync := &fluxMeterConfigSync{
 		fluxMeterProto: fluxMeterProto,
 		policyBaseAPI:  policyBaseAPI,
@@ -61,8 +61,6 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 			wrapper := &configv1.FluxMeterWrapper{
 				FluxmeterName: configSync.fluxmeterName,
 				FluxMeter:     configSync.fluxMeterProto,
-				PolicyName:    configSync.policyBaseAPI.GetPolicyName(),
-				PolicyHash:    configSync.policyBaseAPI.GetPolicyHash(),
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {
