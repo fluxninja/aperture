@@ -434,8 +434,67 @@ jobs:
             fi
             fn release sync-deployment-repo "${args[@]}"
 
+  agent-helm-chart:
+    parameters:
+      name:
+        type: string
+        description: name of the helm chart
+      appVersion:
+        type: string
+        description: Give the appVersion
+        default: v0.1.1
+      version:
+        type: string
+        description: Helm chart version
+        default: v0.0.1
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - run:
+          name: Helm Chart release
+          command: |
+            helm package manifests/charts/agent --version << parameters.version >> --app-version << parameters.appVersion >>
+            mv *.tgz /tmp
+            git checkout --orphan gh-pages-test-1
+            mv /tmp/*.tgz .
+            helm repo index . --url https://fluxninja.github.io/aperture/
+
+  agent-operator-helm-chart:
+    parameters:
+      name:
+        type: string
+        description: name of the helm chart
+      appVersion:
+        type: string
+        description: Give the appVersion
+        default: v0.1.0
+      version:
+        type: string
+        description: Helm chart version
+        default: v0.0.1
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - run:
+          name: Helm Chart release
+          command: |
+            helm package manifests/charts/agent-operator --version << parameters.version >> --app-version << parameters.appVersion >>
+            mv *.tgz /tmp
+            git checkout --orphan gh-pages-test-1
+            mv /tmp/*.tgz .
+            helm repo index . --url https://fluxninja.github.io/aperture/
+
+
+
 workflows:
   version: 2
+
+  aperture-helm-chart:
+    jobs:
+      - agent-helm-chart:
+          name: first-agent-chart
+      - agent-operator-helm-chart:
+          name: fist-operator-chart
 
   aperture:
     when:
