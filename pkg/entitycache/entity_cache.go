@@ -10,7 +10,6 @@ import (
 	"go.uber.org/fx"
 
 	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -99,7 +98,6 @@ type FxIn struct {
 	fx.In
 	Lifecycle      fx.Lifecycle
 	Router         *mux.Router
-	AgentInfo      *agentinfo.AgentInfo
 	EntityTrackers notifiers.Trackers `name:"entity_trackers"`
 }
 
@@ -282,8 +280,8 @@ func (c *EntityCache) Services() *entitycachev1.EntityCache {
 	}
 
 	entityCache := &entitycachev1.EntityCache{
-		Services:            make([]*entitycachev1.Service, len(services)),
-		OverlappingServices: make([]*entitycachev1.OverlappingService, len(overlapping)),
+		Services:            make([]*entitycachev1.Service, 0, len(services)),
+		OverlappingServices: make([]*entitycachev1.OverlappingService, 0, len(overlapping)),
 	}
 
 	for _, svc := range services {
