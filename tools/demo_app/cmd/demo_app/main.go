@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"strconv"
+	"time"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -21,6 +22,7 @@ func main() {
 	port := portFromEnv()
 	envoyPort := envoyPortFromEnv()
 	concurrency := concurrencyFromEnv()
+	latency := latencyFromEnv()
 
 	// We don't necessarily need tracing providers (just propagators), but lets
 	// do them anyway to have a "more realistic" otel usage
@@ -44,7 +46,7 @@ func main() {
 		propagation.Baggage{},
 	))
 
-	service := app.NewSimpleService(hostname, port, envoyPort, concurrency)
+	service := app.NewSimpleService(hostname, port, envoyPort, concurrency, latency)
 	err := service.Run()
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -87,6 +89,18 @@ func concurrencyFromEnv() int {
 		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_CONCURRENCY: %v", err)
 	}
 	return concurrency
+}
+
+func latencyFromEnv() time.Duration {
+	latencyValue, exists := os.LookupEnv("SIMPLE_SERVICE_LATENCY")
+	if !exists {
+		return time.Millisecond * 50
+	}
+	latency, err := time.ParseDuration(latencyValue)
+	if err != nil {
+		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_LATENCY: %v", err)
+	}
+	return latency
 }
 
 // newResource returns a resource describing this application.
