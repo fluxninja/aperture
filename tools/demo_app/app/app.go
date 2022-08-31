@@ -38,15 +38,17 @@ type SimpleService struct {
 	// if it's injected.
 	envoyPort   int
 	concurrency int
+	latency     time.Duration
 }
 
 // NewSimpleService creates a SimpleService instance.
-func NewSimpleService(hostname string, port, envoyPort int, concurrency int) *SimpleService {
+func NewSimpleService(hostname string, port, envoyPort int, concurrency int, latency time.Duration) *SimpleService {
 	return &SimpleService{
 		hostname:    hostname,
 		port:        port,
 		envoyPort:   envoyPort,
 		concurrency: concurrency,
+		latency:     latency,
 	}
 }
 
@@ -69,7 +71,7 @@ func (simpleService SimpleService) Run() error {
 		}
 	}
 
-	http.Handle("/request", limitClients(handler, simpleService.concurrency))
+	http.Handle("/request", limitClients(handler, simpleService.concurrency, simpleService.latency))
 	address := fmt.Sprintf(":%d", simpleService.port)
 
 	server := &http.Server{Addr: address}
@@ -77,14 +79,14 @@ func (simpleService SimpleService) Run() error {
 	return server.ListenAndServe()
 }
 
-func limitClients(h *RequestHandler, n int) http.Handler {
+func limitClients(h *RequestHandler, n int, l time.Duration) http.Handler {
 	sem := make(chan struct{}, n)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sem <- struct{}{}
 		defer func() {
 			<-sem
 		}()
-		time.Sleep(time.Millisecond * 10)
+		time.Sleep(l)
 		h.ServeHTTP(w, r)
 	})
 }
