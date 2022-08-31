@@ -39,7 +39,7 @@ type HTTPServerConfig struct {
 	// Read timeout
 	ReadTimeout config.Duration `json:"read_timeout" validate:"gte=0s" default:"10s"`
 	// Write timeout
-	WriteTimeout config.Duration `json:"write_timeout" validate:"gte=0s" default:"10s"`
+	WriteTimeout config.Duration `json:"write_timeout" validate:"gte=0s" default:"45s"`
 	// The lowest bucket in latency histogram
 	LatencyBucketStartMS float64 `json:"latency_bucket_start_ms" validate:"gte=0" default:"20"`
 	// Max header size in bytes

@@ -349,7 +349,7 @@ definitions:
         description: Write timeout
         format: string
         type: string
-        x-go-default: 10s
+        x-go-default: 45s
         x-go-name: WriteTimeout
         x-go-validate: gte=0s
     title: HTTPServerConfig holds configuration for HTTP Server.
@@ -692,15 +692,23 @@ definitions:
   ProfilersConfig:
     properties:
       cpu_profiler:
-        description: Flag to enable cpu profiling
+        description: Flag to enable cpu profiling on process start and save it to
+          a file. HTTP interface will not work if this is enabled as CPU profile will
+          always be running.
         type: boolean
         x-go-default: "false"
         x-go-name: CPUProfile
       profiles_path:
         description: Path to save performance profiles. This can be set via command
-          line arguments as well.
+          line arguments as well. E.g. default path for aperture-agent is /var/log/aperture/aperture-agent/profiles.
         type: string
         x-go-name: ProfilesPath
+      register_http_routes:
+        description: Register routes. Profile types profile, symbol and cmdline will
+          be registered at /debug/pprof/{profile,symbol,cmdline}.
+        type: boolean
+        x-go-default: "true"
+        x-go-name: RegisterHTTPRoutes
     title: ProfilersConfig holds configuration for profilers.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/profilers
