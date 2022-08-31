@@ -33,7 +33,6 @@ import (
 
 const (
 	watchdogConfigKey = "watchdog.memory"
-	heapStatusKey     = "heap"
 	watchdogJobName   = "watchdog"
 	// PolicyTempDisabled is a marker value for policies to signal that the policy
 	// is temporarily disabled. Use it when all hope is lost to turn around from
@@ -82,7 +81,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 		return err
 	}
 
-	watchdogRegistry := status.NewRegistry(in.StatusRegistry, watchdogJobName)
+	watchdogRegistry := in.StatusRegistry.Child("liveness").Child(watchdogJobName)
 
 	w := newWatchdog(in.JobGroup, watchdogRegistry, config)
 
@@ -99,10 +98,9 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 }
 
 func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config WatchdogConfig) *watchdog {
-	livenessReg := status.NewRegistry(registry, jobGroup.GroupName())
-	job := jobs.NewMultiJob(watchdogJobName, true, livenessReg, nil, nil)
+	heapStatusRegistry := registry.Child("heap")
 
-	heapStatusRegistry := status.NewRegistry(registry, heapStatusKey)
+	job := jobs.NewMultiJob(watchdogJobName, true, nil, nil)
 
 	w := &watchdog{
 		heapStatusRegistry: heapStatusRegistry,
@@ -162,11 +160,6 @@ func (w *watchdog) start() error {
 
 	if w.config.Heap.WatermarksPolicy.Enabled || w.config.Heap.AdaptivePolicy.Enabled {
 		hp = newHeapPolicy(w.config.Heap)
-		s := status.NewStatus(nil, nil)
-		err = w.heapStatusRegistry.Push(s)
-		if err != nil {
-			return err
-		}
 	}
 
 	// register job with job group
@@ -184,11 +177,7 @@ func (w *watchdog) start() error {
 				w.jobGroup.TriggerJob(watchdogJobName)
 				if hp != nil {
 					details, e := hp.checkHeap()
-					s := status.NewStatus(details, e)
-					err := w.heapStatusRegistry.Push(s)
-					if err != nil {
-						log.Error().Err(err).Msg("Unable to push heap check results to status registry")
-					}
+					w.heapStatusRegistry.SetStatus(status.NewStatus(details, e))
 				}
 			case <-w.sentinel.ctx.Done():
 				return
@@ -208,10 +197,7 @@ func (w *watchdog) stop() error {
 	}
 	_ = w.watchdogJob.DeregisterJob("cgroup")
 	_ = w.watchdogJob.DeregisterJob("system")
-	err = w.heapStatusRegistry.Delete()
-	if err != nil {
-		merr = multierr.Append(merr, err)
-	}
+	w.heapStatusRegistry.Detach()
 	return merr
 }
 

@@ -3,7 +3,6 @@ package controlplane
 import (
 	"context"
 
-	"github.com/pkg/errors"
 	"go.uber.org/fx"
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
@@ -20,12 +19,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-var (
-	// Path in status registry for policies results.
-	policiesStatusRoot = "policies"
-	// Fx tag to match etcd watcher name.
-	policiesDriverFxTag = "policies-driver"
-)
+// Fx tag to match etcd watcher name.
+var policiesDriverFxTag = "policies-driver"
 
 // PolicyFactoryModule module for policy factory.
 func PolicyFactoryModule() fx.Option {
@@ -59,13 +54,13 @@ func setupPolicyFxDriver(
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
 ) error {
-	circuitJobGroup, err := jobs.NewJobGroup(iface.PoliciesRoot+".circuit_jobs", registry, 0, jobs.RescheduleMode, nil)
+	policiesStatusRegistry := registry.Child(iface.PoliciesRoot)
+
+	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("circuit_jobs"), 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create job group")
 		return err
 	}
-
-	policiesStatusRegistry := status.NewRegistry(registry, policiesStatusRoot)
 
 	factory := &policyFactory{
 		registry:        policiesStatusRegistry,
@@ -111,12 +106,12 @@ func setupPolicyFxDriver(
 func (factory *policyFactory) provideControllerPolicyFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
+	reg status.Registry,
 ) (fx.Option, error) {
 	var wrapperMessage configv1.PolicyWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.Policy == nil {
-		s := status.NewStatus(nil, err)
-		_ = factory.registry.Push(s)
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to unmarshal policy config wrapper")
 		return fx.Options(), err
 	}
@@ -124,12 +119,7 @@ func (factory *policyFactory) provideControllerPolicyFxOptions(
 		&wrapperMessage,
 	)
 	if err != nil {
-		s := status.NewStatus(nil, err)
-		rPErr := factory.registry.Push(s)
-		if rPErr != nil {
-			// Wrap errors
-			err = errors.Wrap(err, rPErr.Error())
-		}
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to create policy options")
 		return fx.Options(), err
 	}

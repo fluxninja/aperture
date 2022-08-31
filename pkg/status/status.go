@@ -39,7 +39,12 @@ func NewErrorDetails(e error) *statusv1.ErrorDetails {
 	errorDetails := &statusv1.ErrorDetails{}
 
 	if e != nil {
-		errorDetails.Message = e.Error()
+		msg := e.Error()
+		if msg != "" {
+			errorDetails.Message = e.Error()
+		} else {
+			errorDetails.Message = "Unknown error"
+		}
 	}
 
 	return errorDetails

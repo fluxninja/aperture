@@ -25,9 +25,6 @@ import (
 )
 
 const (
-	// The path in status registry for concurrency control status.
-	fluxMeterStatusRoot = "concurrency_control"
-
 	// FxNameTag is Flux Meter Watcher's Fx Tag.
 	FxNameTag = "name:\"flux_meter\""
 )
@@ -120,7 +117,7 @@ func setupFluxMeterModule(
 		},
 	})
 
-	reg := status.NewRegistry(sr, fluxMeterStatusRoot)
+	reg := sr.Child("flux_meters")
 
 	fmf := &fluxMeterFactory{
 		statusRegistry: reg,
@@ -157,14 +154,12 @@ type fluxMeterFactory struct {
 func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
+	reg status.Registry,
 ) (fx.Option, error) {
-	reg := status.NewRegistry(fluxMeterFactory.statusRegistry, key.String())
-
 	wrapperMessage := &configv1.FluxMeterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.FluxMeter == nil {
-		s := status.NewStatus(nil, err)
-		_ = reg.Push(s)
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to unmarshal flux meter config wrapper")
 		return fx.Options(), err
 	}

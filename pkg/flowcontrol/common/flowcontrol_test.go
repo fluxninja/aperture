@@ -27,10 +27,9 @@ var (
 var _ = BeforeEach(func() {
 	entities := entitycache.NewEntityCache()
 	entities.Put(&entitycache.Entity{
-		ID:         entitycache.EntityID{},
-		Services:   hardCodedServices,
-		AgentGroup: hardCodedAgentGroup,
-		IPAddress:  hardCodedIPAddress,
+		ID:        entitycache.EntityID{},
+		Services:  hardCodedServices,
+		IPAddress: hardCodedIPAddress,
 	})
 	app = platform.New(
 		config.ModuleConfig{
@@ -76,9 +75,8 @@ var _ = Describe("FlowControl Check", func() {
 })
 
 var (
-	hardCodedServices   = []string{"service1", "service2"}
-	hardCodedAgentGroup = "nondefault"
-	hardCodedIPAddress  = "1.2.3.4"
+	hardCodedServices  = []string{"service1", "service2"}
+	hardCodedIPAddress = "1.2.3.4"
 )
 
 type fakeAddr string

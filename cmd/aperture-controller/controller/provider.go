@@ -68,12 +68,11 @@ func setPoliciesPathFlag(fs *pflag.FlagSet) error {
 
 // Sync policies config directory with etcd.
 func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, statusRegistry status.Registry) {
+	policiesReg := statusRegistry.Child(policyKey)
+
 	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
-		policyReg := status.NewRegistry(statusRegistry, policyKey)
-		reg := status.NewRegistry(policyReg, key.String())
-
 		var dat []byte
-
+		reg := policiesReg.Child(key.String())
 		switch etype {
 		case notifiers.Write:
 			unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
@@ -96,14 +95,10 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 				return key, nil, marshalWrapErr
 			}
 
-			s := status.NewStatus(wrapper, nil)
-			pushErr := reg.Push(s)
-			if pushErr != nil {
-				log.Error().Err(pushErr).Msg("could not push policies status")
-			}
+			reg.SetStatus(status.NewStatus(wrapper, nil))
 
 		case notifiers.Remove:
-			_ = reg.Delete()
+			reg.Detach()
 		}
 		return key, dat, nil
 	}
@@ -137,6 +132,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
+			policiesReg.Detach()
 			return merr
 		},
 	})

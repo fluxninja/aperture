@@ -91,9 +91,9 @@ func setupRateLimiterFactory(
 		return err
 	}
 
-	reg := status.NewRegistry(statusRegistry, rateLimiterStatusRoot)
+	reg := statusRegistry.Child(rateLimiterStatusRoot)
 
-	lazySyncJobGroup, err := jobs.NewJobGroup(rateLimiterStatusRoot+".lazy_sync_jobs", statusRegistry, 0, jobs.RescheduleMode, nil)
+	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("lazy_sync_jobs"), 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create lazy sync job group")
 		return err
@@ -152,14 +152,12 @@ func setupRateLimiterFactory(
 func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
+	reg status.Registry,
 ) (fx.Option, error) {
-	reg := status.NewRegistry(rateLimiterFactory.statusRegistry, key.String())
-
 	wrapperMessage := &configv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiter == nil {
-		s := status.NewStatus(nil, err)
-		_ = reg.Push(s)
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to unmarshal rate limiter config")
 		return fx.Options(), err
 	}
@@ -270,12 +268,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				merr = multierr.Append(merr, err)
 			}
 			rateLimiter.rateTracker.Close()
-			s := status.NewStatus(nil, merr)
-			err = rateLimiter.statusRegistry.Push(s)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to push status")
-				merr = multierr.Append(merr, err)
-			}
+			rateLimiter.statusRegistry.SetStatus(status.NewStatus(nil, merr))
 
 			return merr
 		},

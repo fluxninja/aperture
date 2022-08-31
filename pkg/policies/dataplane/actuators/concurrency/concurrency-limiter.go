@@ -33,14 +33,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-const (
-	// The path in status registry for concurrency limiter status.
-	concurrencyLimiterStatusRoot = "concurrency_limiter"
-)
-
 var (
 	// FxNameTag is Concurrency Limiter Watcher's Fx Tag.
-	fxNameTag = config.NameTag("concurrency_limiter")
+	fxNameTag = config.NameTag("concurrency_limiter_watcher")
 
 	// Array of Label Keys for WFQ and Token Bucket Metrics.
 	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel}
@@ -120,7 +115,7 @@ func setupConcurrencyLimiterFactory(
 		return err
 	}
 
-	reg := status.NewRegistry(statusRegistry, concurrencyLimiterStatusRoot)
+	reg := statusRegistry.Child("concurrency_limiter")
 
 	conLimiterFactory := &concurrencyLimiterFactory{
 		engineAPI:               e,
@@ -231,14 +226,13 @@ type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
 func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
+	reg status.Registry,
 ) (fx.Option, error) {
-	registry := status.NewRegistry(conLimiterFactory.registry, key.String())
 	wrapperMessage := &configv1.ConcurrencyLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	concurrencyLimiterMessage := wrapperMessage.ConcurrencyLimiter
 	if err != nil || concurrencyLimiterMessage == nil {
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(s)
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to unmarshal concurrency limiter config wrapper")
 		return fx.Options(), err
 	}
@@ -247,8 +241,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	schedulerProto := concurrencyLimiterMessage.Scheduler
 	if schedulerProto == nil {
 		err = fmt.Errorf("no scheduler specified")
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(s)
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to unmarshal scheduler")
 		return fx.Options(), err
 	}
@@ -271,7 +264,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	conLimiter := &concurrencyLimiter{
 		Component:                 wrapperMessage,
 		concurrencyLimiterProto:   concurrencyLimiterMessage,
-		registry:                  registry,
+		registry:                  reg,
 		concurrencyLimiterFactory: conLimiterFactory,
 		workloadMultiMatcher:      mm,
 		defaultWorkloadProto:      schedulerProto.DefaultWorkload,
@@ -352,12 +345,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			retErr := func(err error) error {
-				s := status.NewStatus(nil, err)
-				errStatus := conLimiter.registry.Push(s)
-				if errStatus != nil {
-					errStatus = errors.Wrap(errStatus, "failed to push status")
-					return multierr.Append(err, errStatus)
-				}
+				conLimiter.registry.SetStatus(status.NewStatus(nil, err))
 				return err
 			}
 
@@ -425,11 +413,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete accepted_concurrency counter from its metric vector"))
 			}
 
-			s := status.NewStatus(nil, errMulti)
-			rPErr := conLimiter.registry.Push(s)
-			if rPErr != nil {
-				errMulti = multierr.Append(errMulti, rPErr)
-			}
+			conLimiter.registry.SetStatus(status.NewStatus(nil, errMulti))
 			return errMulti
 		},
 	})

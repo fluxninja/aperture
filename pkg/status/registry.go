@@ -1,174 +1,174 @@
 package status
 
 import (
-	"errors"
-	"fmt"
-	"sort"
-	"strings"
 	"sync"
 
-	"github.com/mitchellh/copystructure"
-
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/mitchellh/copystructure"
 )
-
-const defaultDelim = "."
 
 // Registry .
 type Registry interface {
-	Delim() string
-	Path() string
-	Keys() []string
-	Get() *statusv1.GroupStatus
-	GetAllFlat() (map[string]*statusv1.GroupStatus, error)
-	Push(*statusv1.Status) error
-	Delete() error
+	GetStatus() *statusv1.Status
+	SetStatus(*statusv1.Status)
+	SetGroupStatus(*statusv1.GroupStatus)
+	GetGroupStatus() *statusv1.GroupStatus
+	Child(key string) Registry
+	ChildIfExists(key string) Registry
+	Parent() Registry
+	Root() Registry
+	Detach()
+	Key() string
+	HasError() bool
 }
 
 // registry implements Registry.
 type registry struct {
-	mu        sync.Mutex
-	statusMap map[string]*statusv1.GroupStatus
-	delim     string
-	path      string
+	mu       sync.RWMutex
+	status   *statusv1.Status
+	root     *registry
+	parent   *registry
+	children map[string]*registry
+	key      string
 }
 
-var _ Registry = (*registry)(nil)
-
-// NewRegistry returns a new instance of Registry.
-// It is possible to chain a Registry with another.
-func NewRegistry(reg Registry, path string) Registry {
+// NewRegistry creates a new Registry.
+func NewRegistry() Registry {
 	r := &registry{
-		delim: defaultDelim,
+		key:      "",
+		parent:   nil,
+		status:   &statusv1.Status{},
+		children: make(map[string]*registry),
 	}
-
-	if reg == nil {
-		r.statusMap = make(map[string]*statusv1.GroupStatus)
-		r.path = path
-		return r
-	}
-
-	typedReg := reg.(*registry)
-
-	r.statusMap = typedReg.statusMap
-	fullPath := typedReg.Path()
-	if fullPath == "" {
-		fullPath = path
-	} else {
-		fullPath = fmt.Sprintf("%s%s%s", fullPath, reg.Delim(), path)
-	}
-	r.path = fullPath
-
+	r.root = r
 	return r
 }
 
-// Delim returns the default delimiter used in registry.
-func (reg *registry) Delim() string {
-	return reg.delim
-}
-
-// Path returns the path used in Registry.
-// In the case of registry, it is always an empty string.
-func (reg *registry) Path() string {
-	return reg.path
-}
-
-// Keys returns all the keys stored in the Registry in order.
-func (reg *registry) Keys() []string {
-	reg.mu.Lock()
-	defer reg.mu.Unlock()
-
-	keyMap := generateKeyMap(reg.statusMap, nil, reg.delim)
-
-	keys := make([]string, 0, len(keyMap))
-	for key := range keyMap {
-		keys = append(keys, key)
-	}
-
-	prefixedKeys := make([]string, 0)
-	for _, key := range keys {
-		if strings.HasPrefix(key, reg.path) {
-			prefixedKeys = append(prefixedKeys, key)
+// Child creates a new Registry with the given key.
+func (r *registry) Child(key string) Registry {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	var child *registry
+	var ok bool
+	child, ok = r.children[key]
+	if !ok {
+		child = &registry{
+			key:      key,
+			parent:   r,
+			root:     r.root,
+			status:   &statusv1.Status{},
+			children: make(map[string]*registry),
 		}
+		r.children[key] = child
 	}
-
-	sort.Strings(prefixedKeys)
-	return prefixedKeys
+	return child
 }
 
-// Get returns the *statusv1.GroupStatus from the provided path in registry.
-// If the path does not exist, nil is returned.
-func (reg *registry) Get() *statusv1.GroupStatus {
-	reg.mu.Lock()
-	defer reg.mu.Unlock()
-
-	paths := strings.Split(reg.path, reg.delim)
-	gs := searchMap(reg.statusMap, paths)
-
-	out, _ := copystructure.Copy(gs)
-	sm, ok := out.(*statusv1.GroupStatus)
+// ChildIfExists returns the child Registry with the given key if it exists.
+func (r *registry) ChildIfExists(key string) Registry {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	child, ok := r.children[key]
 	if !ok {
 		return nil
 	}
-	return sm
+	return child
 }
 
-// GetAllFlat returns entire flattened map[string]*statusv1.GroupStatus of registry.
-func (reg *registry) GetAllFlat() (map[string]*statusv1.GroupStatus, error) {
-	reg.mu.Lock()
-	defer reg.mu.Unlock()
-
-	sm := make(map[string]*statusv1.GroupStatus)
-
-	keyMap := generateKeyMap(reg.statusMap, nil, reg.delim)
-	for k := range keyMap {
-		paths := strings.Split(k, reg.delim)
-		gs := searchMap(reg.statusMap, paths)
-		sm[k] = gs
+// Detach detaches the child from the parent.
+func (r *registry) Detach() {
+	if r.parent == nil {
+		return
 	}
-
-	return sm, nil
+	// lock parent
+	r.parent.mu.Lock()
+	defer func() {
+		r.parent.mu.Unlock()
+		r.parent = nil
+		r.root = r
+	}()
+	if r.parent.children[r.key] == r {
+		delete(r.parent.children, r.key)
+	}
 }
 
-// Push adds a new result to the provided path.
-func (reg *registry) Push(status *statusv1.Status) error {
-	reg.mu.Lock()
-	defer reg.mu.Unlock()
-
-	if reg.path == "" {
-		return errors.New("path doesn't exist")
+// GetStatus returns the status of the Registry.
+func (r *registry) GetStatus() *statusv1.Status {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	statusCopy, err := copystructure.Copy(r.status)
+	if err != nil {
+		return &statusv1.Status{}
 	}
-
-	gs := &statusv1.GroupStatus{
-		Status: status,
-		Groups: nil,
-	}
-
-	um := unflattenMap(
-		map[string]*statusv1.GroupStatus{
-			reg.path: gs,
-		},
-		reg.delim,
-	)
-
-	mergeMaps(um, reg.statusMap)
-	return nil
+	return statusCopy.(*statusv1.Status)
 }
 
-// Delete removes all nested values from registry.
-func (reg *registry) Delete() error {
-	reg.mu.Lock()
-	defer reg.mu.Unlock()
+// SetStatus sets the status of the Registry.
+func (r *registry) SetStatus(status *statusv1.Status) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.status = status
+}
 
-	// If no path is provided, empty the whole registry.
-	if reg.path == "" {
-		reg.statusMap = make(map[string]*statusv1.GroupStatus)
-		return nil
+// SetGroupStatus sets the status of the Registry.
+func (r *registry) SetGroupStatus(groupStatus *statusv1.GroupStatus) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.status = groupStatus.Status
+	for key, gs := range groupStatus.Groups {
+		r.Child(key).SetGroupStatus(gs)
+	}
+}
+
+// GetGroupStatus returns the status of the Registry.
+func (r *registry) GetGroupStatus() *statusv1.GroupStatus {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	statusCopy, err := copystructure.Copy(r.status)
+	if err != nil {
+		return &statusv1.GroupStatus{}
 	}
 
-	keyMap := generateKeyMap(reg.statusMap, nil, reg.delim)
-	keyPath := keyMap[reg.path]
+	groupStatus := &statusv1.GroupStatus{
+		Status: statusCopy.(*statusv1.Status),
+		Groups: make(map[string]*statusv1.GroupStatus),
+	}
 
-	removeFromMap(reg.statusMap, keyPath)
-	return nil
+	for _, child := range r.children {
+		groupStatus.Groups[child.key] = child.GetGroupStatus()
+	}
+	return groupStatus
+}
+
+// Parent returns the parent Registry.
+func (r *registry) Parent() Registry {
+	return r.parent
+}
+
+// Root returns the top-level Registry.
+func (r *registry) Root() Registry {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.root
+}
+
+// Key returns the key of the Registry that is registered with the parent.
+func (r *registry) Key() string {
+	return r.key
+}
+
+// HasError returns true if the Registry has an error.
+func (r *registry) HasError() bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if r.status.GetError().GetMessage() != "" {
+		return true
+	}
+	for _, child := range r.children {
+		if child.HasError() {
+			return true
+		}
+	}
+	return false
 }

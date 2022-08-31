@@ -68,11 +68,9 @@ type ProvideClassifierIn struct {
 	Registry   status.Registry
 }
 
-const classifierDriverRegistryPath = "classifier-driver"
-
 // ProvideClassifier provides a classifier that loads the rules from config file.
 func ProvideClassifier(in ProvideClassifierIn) *Classifier {
-	reg := status.NewRegistry(in.Registry, classifierDriverRegistryPath)
+	reg := in.Registry.Child("classifiers")
 
 	fxDriver := &notifiers.FxDriver{
 		FxOptionsFuncs: []notifiers.FxOptionsFunc{in.Classifier.provideClassifierFxOptions},
@@ -97,6 +95,7 @@ func ProvideClassifier(in ProvideClassifierIn) *Classifier {
 func (c *Classifier) provideClassifierFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
+	_ status.Registry,
 ) (fx.Option, error) {
 	return fx.Options(
 		fx.Supply(c),

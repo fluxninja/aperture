@@ -22,36 +22,17 @@ func platformStatusModule() fx.Option {
 
 type platformReadinessStatusIn struct {
 	fx.In
-
-	Lifecycle      fx.Lifecycle
-	StatusRegistry status.Registry
+	Lifecycle fx.Lifecycle
 }
 
 func platformReadinessStatus(in platformReadinessStatusIn) error {
-	readinessStatusRegistry := status.NewRegistry(in.StatusRegistry, readinessStatusPath)
-	platformStatusRegistry := status.NewRegistry(readinessStatusRegistry, platformStatusPath)
-
-	s := status.NewStatus(nil, nil)
-	err := platformStatusRegistry.Push(s)
-	if err != nil {
-		return err
-	}
-
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			s := status.NewStatus(nil, errors.New("platform starting"))
-			err := platformStatusRegistry.Push(s)
-			if err != nil {
-				return err
-			}
+			platform.statusRegistry.SetStatus(status.NewStatus(nil, errors.New("platform starting")))
 			return nil
 		},
 		OnStop: func(context.Context) error {
-			s := status.NewStatus(nil, errors.New("platform stopping"))
-			err := platformStatusRegistry.Push(s)
-			if err != nil {
-				return err
-			}
+			platform.statusRegistry.SetStatus(status.NewStatus(nil, errors.New("platform stopped")))
 			return nil
 		},
 	})

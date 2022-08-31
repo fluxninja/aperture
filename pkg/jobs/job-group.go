@@ -106,7 +106,7 @@ func (jgc JobGroupConstructor) provideJobGroup(
 		gwAll = append(gwAll, gw...)
 	}
 
-	jg, err := NewJobGroup(jgc.Name, registry, config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
+	jg, err := NewJobGroup(registry.Child(jgc.Name), config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
 	if err != nil {
 		return nil, err
 	}
@@ -130,12 +130,10 @@ var errInitialResult = errors.New("job hasn't been scheduled yet")
 type JobGroup struct {
 	scheduler *gocron.Scheduler
 	gt        *groupTracker
-	name      string
 }
 
 // NewJobGroup creates a new JobGroup.
 func NewJobGroup(
-	name string,
 	statusRegistry status.Registry,
 	maxConcurrentJobs int,
 	schedulerMode SchedulerMode,
@@ -155,9 +153,8 @@ func NewJobGroup(
 	scheduler.SingletonModeAll()
 
 	jg := &JobGroup{
-		name:      name,
 		scheduler: scheduler,
-		gt:        newGroupTracker(gws, statusRegistry, name),
+		gt:        newGroupTracker(gws, statusRegistry),
 	}
 
 	return jg, nil
@@ -174,11 +171,6 @@ func (jg *JobGroup) Stop() error {
 	jg.DeregisterAll()
 	jg.scheduler.Stop()
 	return nil
-}
-
-// GroupName returns the name of the JobGroup.
-func (jg *JobGroup) GroupName() string {
-	return jg.name
 }
 
 // RegisterJob registers a new Job in a JobGroup.
@@ -202,7 +194,7 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 	// set initial status
 	err = jg.gt.updateStatus(executor, status.NewStatus(nil, initialErr))
 	if err != nil {
-		log.Error().Err(err).Str("job", job.Name()).Str("jgName", jg.name).Msg("Unable to update status of job")
+		log.Error().Err(err).Str("job", job.Name()).Msg("Unable to update status of job")
 		return err
 	}
 
@@ -263,15 +255,17 @@ func (jg *JobGroup) JobInfo(name string) *JobInfo {
 	return nil
 }
 
-// // IsHealthy returns true if the job is healthy.
-// func (jg *JobGroup) IsHealthy() bool {
-// 	flatMap, _ := jg.gt.statusRegistry.GetAllFlat()
-// 	b, _ := json.MarshalIndent(flatMap, "", " ")
-// 	fmt.Printf("\n\n b: %+v\n", string(b))
-// 	return jg.gt.isHealthy()
-// }
+// IsHealthy returns true if the job is healthy.
+func (jg *JobGroup) IsHealthy() bool {
+	return jg.gt.isHealthy()
+}
 
 // Results returns the results of all jobs in the JobGroup.
 func (jg *JobGroup) Results() (*statusv1.GroupStatus, bool) {
 	return jg.gt.results()
+}
+
+// GetRegistry returns the registry of the JobGroup.
+func (jg *JobGroup) GetRegistry() status.Registry {
+	return jg.gt.statusRegistry
 }

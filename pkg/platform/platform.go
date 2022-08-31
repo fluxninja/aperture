@@ -2,6 +2,7 @@ package platform
 
 import (
 	"context"
+	"errors"
 	"os"
 	"time"
 
@@ -87,6 +88,7 @@ func provideFlagSetBuilder() config.FlagSetBuilderOut {
 
 // Module returns the platform module.
 func (cfg Config) Module() fx.Option {
+	var statusRegistry status.Registry
 	// purge previous temp
 	_ = os.RemoveAll(config.DefaultTempBase)
 	// mkdir temp
@@ -118,8 +120,8 @@ func (cfg Config) Module() fx.Option {
 		etcdclient.Module(),
 		jobs.Module(),
 		status.Module(),
-		fx.Invoke(grpc.RegisterStatusService),
-		fx.Populate(&platform.statusRegistry),
+		fx.Invoke(status.RegisterStatusService),
+		fx.Populate(&statusRegistry),
 		platformStatusModule(),
 		plugins.ModuleConfig{OnlyCommandLineFlags: true}.Module(),
 		fx.Supply(registry),
@@ -132,6 +134,7 @@ func (cfg Config) Module() fx.Option {
 			pluginOptions,
 		)
 	}
+	platform.statusRegistry = statusRegistry.Child(platformStatusPath)
 
 	return options
 }
@@ -184,18 +187,11 @@ func Run(app *fx.App) {
 
 	defer stop(app)
 
-	readinessStatusRegistry := status.NewRegistry(platform.statusRegistry, readinessStatusPath)
-	platformStatusRegistry := status.NewRegistry(readinessStatusRegistry, platformStatusPath)
-
-	s := status.NewStatus(wrapperspb.String("platform running"), nil)
-	err := platformStatusRegistry.Push(s)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to push platform readiness status")
-		return
-	}
+	platform.statusRegistry.SetStatus(status.NewStatus(wrapperspb.String("platform running"), nil))
 
 	// Wait for os.Signal
 	<-app.Done()
+	platform.statusRegistry.SetStatus(status.NewStatus(nil, errors.New("platform stopping")))
 }
 
 func stop(app *fx.App) {
@@ -208,6 +204,7 @@ func stop(app *fx.App) {
 	log.WaitFlush()
 	// cleanup temp
 	_ = os.RemoveAll(config.DefaultTempBase)
+	platform.statusRegistry.Detach()
 	os.Exit(0)
 }
 

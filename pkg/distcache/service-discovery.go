@@ -34,7 +34,7 @@ func (s *ServiceDiscovery) DiscoverPeers() ([]string, error) {
 	peers := []string{}
 
 	peerInfos := s.discovery.GetPeers()
-	for _, peerInfo := range peerInfos {
+	for _, peerInfo := range peerInfos.PeerInfos {
 		if olricMemberlistAddr, ok := peerInfo.Services[olricMemberlistServiceName]; ok {
 			peers = append(peers, olricMemberlistAddr)
 		}

@@ -31,9 +31,14 @@ func ProvideAgentInfo(unmarshaller config.Unmarshaller) (*AgentInfo, error) {
 	if err := unmarshaller.UnmarshalKey(configKey, &config); err != nil {
 		return nil, err
 	}
+	return NewAgentInfo(config.AgentGroup), nil
+}
+
+// NewAgentInfo creates a new agent info.
+func NewAgentInfo(agentGroup string) *AgentInfo {
 	return &AgentInfo{
-		agentGroup: config.AgentGroup,
-	}, nil
+		agentGroup: agentGroup,
+	}
 }
 
 // GetAgentGroup returns the agent group.

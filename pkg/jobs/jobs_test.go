@@ -2,8 +2,6 @@ package jobs
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -23,7 +21,6 @@ import (
 
 var (
 	jobGroup, err = createJobGroup() // Job group is created globally so that it can be used to schedule jobs contained in all tests, otherwise a jobgroup per test needs to be created
-	registry      = status.NewRegistry(nil, "")
 	jws           JobWatchers
 	gws           GroupWatchers
 	jobConfig     = JobConfig{ // Job configuration can be manipulated in each test to test different scenarios, no need to create new job config for each test
@@ -38,6 +35,7 @@ var (
 		},
 		InitiallyHealthy: false,
 	}
+	registry = status.NewRegistry().Child("jobs")
 )
 
 var _ JobWatcher = (*groupConfig)(nil)
@@ -75,7 +73,7 @@ func (jws *groupConfig) OnJobCompleted(_ *statusv1.Status, _ JobStats) {
 }
 
 func createJobGroup() (*JobGroup, error) {
-	return NewJobGroup("job-group", registry, 10, RescheduleMode, gws)
+	return NewJobGroup(registry, 10, RescheduleMode, gws)
 }
 
 func runTest(t *testing.T, groupConfig *groupConfig) {
@@ -87,20 +85,19 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 		require.NoError(t, err)
 	}
 
-	flatMap, _ := registry.GetAllFlat()
-	b, _ := json.MarshalIndent(flatMap, "", " ")
-	fmt.Printf("\n\n b: %+v\n", string(b))
-
-	// if jobGroup.IsHealthy() != jobConfig.InitiallyHealthy {
-	// 	t.Error("Job health status has changed")
-	// }
+	if jobGroup.IsHealthy() != jobConfig.InitiallyHealthy {
+		t.Error("Job health status has changed")
+	}
 	time.Sleep(groupConfig.jobRunConfig.sleepTime)
 
 	for _, job := range groupConfig.jobs {
-		// livenessReg := status.NewRegistry(registry, "liveness")
-		jobExecutorReg := status.NewRegistry(registry, job.Name())
+		livenessReg := registry.Root().
+			Child("liveness").
+			Child("job_groups").
+			Child(registry.Key()).
+			Child(job.Name())
 
-		gotStatusMsg := jobExecutorReg.Get().Status.GetMessage()
+		gotStatusMsg := livenessReg.GetStatus().GetMessage()
 		expectedStatusMsg, _ := anypb.New(wrapperspb.String(groupConfig.jobRunConfig.expectedStatusMsg))
 		if !proto.Equal(gotStatusMsg, expectedStatusMsg) {
 			t.Errorf("Expected status message to be %v, got %v", expectedStatusMsg, gotStatusMsg)
@@ -204,8 +201,7 @@ func TestMultiJobRun(t *testing.T) {
 	jobConfig.InitialDelay = config.Duration{
 		Duration: durationpb.New(time.Second * 0),
 	}
-	reg := status.NewRegistry(registry, "job-group")
-	multiJob := NewMultiJob("multi-job", false, reg, jws, gws)
+	multiJob := NewMultiJob("multi-job", false, jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
@@ -306,9 +302,8 @@ func TestMultipleMultiJobs(t *testing.T) {
 	var counter int32
 	var counter2 int32
 	var counter3 int32
-	reg := status.NewRegistry(registry, "job-group")
-	multiJob := NewMultiJob("multiJob1", false, reg, jws, gws)
-	multiJob2 := NewMultiJob("multiJob2", false, reg, jws, gws)
+	multiJob := NewMultiJob("multiJob1", false, jws, gws)
+	multiJob2 := NewMultiJob("multiJob2", false, jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
