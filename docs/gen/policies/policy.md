@@ -1070,11 +1070,7 @@ Label selector expression of the equal form "label == value".
 
 Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
 
-There are multiple variants of extractor, specify exactly one:
-
-- JSON Extractor
-- Address Extractor
-- JWT Extractor
+There are multiple variants of extractor, specify exactly one.
 
 #### Properties
 
@@ -1922,32 +1918,30 @@ There are two ways to define a flow classification rule:
 Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
 [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
 
-Example:
+Example of Declarative JSON extractor:
 
 ```yaml
-Example of Declarative JSON extractor:
-  yaml:
-    extractor:
-      json:
-        from: request.http.body
-        pointer: /user/name
-    propagate: true
-    hidden: false
-Example of Rego module:
-  yaml:
-    rego:
-      query: data.user_from_cookie.user
-      source:
-        package: user_from_cookie
-        cookies: "split(input.attributes.request.http.headers.cookie, ';')"
-        cookie: "cookies[_]"
-        cookie.startswith: "('session=')"
-        session: "substring(cookie, count('session='), -1)"
-        parts: "split(session, '.')"
-        object: "json.unmarshal(base64url.decode(parts[0]))"
-        user: object.user
-    propagate: false
-    hidden: true
+extractor:
+  json:
+    from: request.http.body
+    pointer: /user/name
+```
+
+Example of Rego module which also disables propagation of a label:
+
+```yaml
+rego:
+  query: data.user_from_cookie.user
+  source: |
+    package: user_from_cookie
+    cookies: split(input.attributes.request.http.headers.cookie, ';')
+    cookie: cookies[_]
+    cookie.startswith: ('session=')
+    session: substring(cookie, count('session='), -1)
+    parts: split(session, '.')
+    object: json.unmarshal(base64url.decode(parts[0]))
+    user: object.user
+propagate: false
 ```
 
 #### Properties
@@ -1956,8 +1950,7 @@ Example of Rego module:
 <dt>extractor</dt>
 <dd>
 
-([V1Extractor](#v1-extractor)) High-level flow label declarative extractor.
-Rego extractor extracts a value from the rego module.
+([V1Extractor](#v1-extractor)) High-level declarative extractor.
 
 </dd>
 </dl>
@@ -1966,6 +1959,16 @@ Rego extractor extracts a value from the rego module.
 <dd>
 
 (bool) Decides if the created flow label should be hidden from the telemetry.
+A hidden flow label is still accessible in policies and can be used as eg.
+fairness key.
+
+:::caution
+When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
+labels are sent to cloud for observability. We thus recommend to set this
+_hidden_ flag for high-cardinality labels, such as usernames or ids, to
+avoid bloating analytics database. _Hidden_ flag should also be set for
+sensitive labels.
+:::
 
 </dd>
 </dl>
@@ -1973,7 +1976,8 @@ Rego extractor extracts a value from the rego module.
 <dt>propagate</dt>
 <dd>
 
-(bool) Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true).
+(bool) Decides if the created label should be applied to the whole request chain
+(propagated in baggage) (default=true).
 
 </dd>
 </dl>
@@ -2040,9 +2044,15 @@ of this average can change).
 
 ([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) List of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/flow-control#what-is-a-flow) into workloads
+Categorizing [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
-requests". There are two aspects of workloads:
+requests". There are two aspects of this "smartness":
+
+- Scheduler can more precisely calculate concurrency if it understands
+  that flows belonging to different classes have different weights (eg.
+  inserts vs lookups).
+- Setting different priorities to different workloads lets the scheduler
+  avoid dropping important traffic during overload.
 
 Each workload in this list specifies also a matcher that's used to
 determine which flow will be categorized into which workload.
@@ -2051,7 +2061,7 @@ If none of workloads match, `default_workload` will be used.
 
 :::info
 See also [workload definition in the concepts
-section](/concepts/flow-control/actuators/scheduler#workload).
+section](/concepts/flow-control/actuators/scheduler.md#workload).
 :::
 
 </dd>
@@ -2071,7 +2081,7 @@ Output for the Scheduler component.
 
 :::info
 **Accepted tokens** are tokens associated with
-[flows](/concepts/flow-control#what-is-a-flow) that were accepted by
+[flows](/concepts/flow-control/flow-control.md#what-is-a-flow) that were accepted by
 this scheduler. Number of tokens for a flow is determined by a
 [workload](#-schedulerworkload) that the flow was assigned to (either
 via `auto_tokens` or explicitly by `Workload.tokens`).

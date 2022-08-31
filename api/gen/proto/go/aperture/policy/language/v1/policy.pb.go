@@ -1243,7 +1243,12 @@ type Scheduler struct {
 	//
 	// Categorizing [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) into workloads
 	// allows for load-shedding to be "smarter" than just "randomly deny 50% of
-	// requests". There are two aspects of workloads:
+	// requests". There are two aspects of this "smartness":
+	// * Scheduler can more precisely calculate concurrency if it understands
+	//   that flows belonging to different classes have different weights (eg.
+	//   inserts vs lookups).
+	// * Setting different priorities to different workloads lets the scheduler
+	//   avoid dropping important traffic during overload.
 	//
 	// Each workload in this list specifies also a matcher that's used to
 	// determine which flow will be categorized into which workload.
