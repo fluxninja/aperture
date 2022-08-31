@@ -115,6 +115,10 @@ func (factory *policyFactory) provideControllerPolicyFxOptions(
 		log.Warn().Err(err).Msg("Failed to unmarshal policy config wrapper")
 		return fx.Options(), err
 	}
+
+	// save policy wrapper proto in status registry
+	reg.Child("policy_config").SetStatus(status.NewStatus(&wrapperMessage, nil))
+
 	policyFxOptions, err := newPolicyOptions(
 		&wrapperMessage,
 	)
