@@ -4,6 +4,7 @@ info:
   version: "1.0"
 tags:
   - name: PolicyService
+  - name: EntityCacheService
   - name: InfoService
   - name: StatusService
   - name: FlowControlService
@@ -60,6 +61,20 @@ paths:
             $ref: '#/definitions/v1ReportRequest'
       tags:
         - FluxNinjaService
+  /v1/entity-cache/services-list:
+    get:
+      operationId: EntityCacheService_GetServicesList
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1ServicesList'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - EntityCacheService
   /v1/info/host:
     get:
       operationId: InfoService_Host
@@ -942,17 +957,6 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Exponential moving average of the series of reading as an output signal.
     description: Outputs for the EMA component.
-  v1EntityCache:
-    type: object
-    properties:
-      overlapping_services:
-        type: array
-        items:
-          $ref: '#/definitions/v1OverlappingService'
-      services:
-        type: array
-        items:
-          $ref: '#/definitions/v1Service'
   v1EqualsMatchExpression:
     type: object
     properties:
@@ -1535,14 +1539,14 @@ definitions:
         $ref: '#/definitions/v1GroupStatus'
       controller_info:
         $ref: '#/definitions/v1ControllerInfo'
-      entity_cache:
-        $ref: '#/definitions/v1EntityCache'
       host_info:
         $ref: '#/definitions/v1HostInfo'
       peers:
         $ref: '#/definitions/v1Peers'
       process_info:
         $ref: '#/definitions/v1ProcessInfo'
+      services_list:
+        $ref: '#/definitions/v1ServicesList'
       version_info:
         $ref: '#/definitions/v1VersionInfo'
   v1ReportResponse:
@@ -1766,6 +1770,17 @@ definitions:
     title: |-
       Service contains information about single service discovered in agent group by a
       particular agent
+  v1ServicesList:
+    type: object
+    properties:
+      overlapping_services:
+        type: array
+        items:
+          $ref: '#/definitions/v1OverlappingService'
+      services:
+        type: array
+        items:
+          $ref: '#/definitions/v1Service'
   v1Sqrt:
     type: object
     properties:

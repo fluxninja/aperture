@@ -1508,6 +1508,7 @@ definitions:
         $ref: '#/definitions/v1Port'
 tags:
 - name: PolicyService
+- name: EntityCacheService
 - name: InfoService
 - name: StatusService
 - name: FlowControlService
