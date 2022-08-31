@@ -1241,7 +1241,7 @@ type Scheduler struct {
 	Selector *v1.Selector `protobuf:"bytes,2,opt,name=selector,proto3" json:"selector,omitempty"`
 	// List of workloads to be used in scheduler.
 	//
-	// Categorizing [flows](/concepts/flow-control#what-is-a-flow) into workloads
+	// Categorizing [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) into workloads
 	// allows for load-shedding to be "smarter" than just "randomly deny 50% of
 	// requests". There are two aspects of workloads:
 	//
@@ -1252,7 +1252,7 @@ type Scheduler struct {
 	//
 	// :::info
 	// See also [workload definition in the concepts
-	// section](/concepts/flow-control/actuators/scheduler#workload).
+	// section](/concepts/flow-control/actuators/scheduler.md#workload).
 	// :::
 	Workloads []*Scheduler_WorkloadAndLabelMatcher `protobuf:"bytes,5,rep,name=workloads,proto3" json:"workloads,omitempty"`
 	// Workload to be used if none of workloads specified in `workloads` match.
@@ -2603,7 +2603,7 @@ type Scheduler_Outs struct {
 	//
 	// :::info
 	// **Accepted tokens** are tokens associated with
-	// [flows](/concepts/flow-control#what-is-a-flow) that were accepted by
+	// [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) that were accepted by
 	// this scheduler. Number of tokens for a flow is determined by a
 	// [workload](#-schedulerworkload) that the flow was assigned to (either
 	// via `auto_tokens` or explicitly by `Workload.tokens`).
