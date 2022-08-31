@@ -552,18 +552,13 @@ definitions:
       from: "source.address # or dstination.address"
       ```
     title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
-  v1AllPolicies:
+  v1AllPoliciesResponse:
     type: object
     properties:
       all_policies:
         type: object
         additionalProperties:
           $ref: '#/definitions/v1Policy'
-  v1AllPoliciesResponse:
-    type: object
-    properties:
-      all_policies:
-        $ref: '#/definitions/v1AllPolicies'
   v1ArithmeticCombinator:
     type: object
     properties:
@@ -1569,6 +1564,8 @@ definitions:
         $ref: '#/definitions/v1HostInfo'
       peers:
         $ref: '#/definitions/v1Peers'
+      policies:
+        $ref: '#/definitions/v1AllPoliciesResponse'
       process_info:
         $ref: '#/definitions/v1ProcessInfo'
       services_list:

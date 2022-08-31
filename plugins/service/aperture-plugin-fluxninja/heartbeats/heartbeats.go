@@ -18,6 +18,7 @@ import (
 	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/entitycache"
@@ -27,6 +28,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/peers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
@@ -54,6 +56,7 @@ type Heartbeats struct {
 	statusRegistry   status.Registry
 	entityCache      *entitycache.EntityCache
 	controllerInfo   *heartbeatv1.ControllerInfo
+	policyFactory    *controlplane.PolicyFactory
 	heartbeatsAddr   string
 	APIKey           string
 	jobName          string
@@ -70,6 +73,7 @@ func newHeartbeats(
 	entityCache *entitycache.EntityCache,
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
+	policyFactory *controlplane.PolicyFactory,
 ) *Heartbeats {
 	return &Heartbeats{
 		heartbeatsAddr: p.FluxNinjaEndpoint,
@@ -80,6 +84,7 @@ func newHeartbeats(
 		entityCache:    entityCache,
 		agentInfo:      agentInfo,
 		peersWatcher:   peersWatcher,
+		policyFactory:  policyFactory,
 	}
 }
 
@@ -204,6 +209,11 @@ func (h *Heartbeats) newHeartbeat(
 		peers = h.peersWatcher.GetPeers()
 	}
 
+	var policies *policylangv1.AllPoliciesResponse
+	if h.policyFactory != nil {
+		policies = h.policyFactory.GetPoliciesMap()
+	}
+
 	return &heartbeatv1.ReportRequest{
 		VersionInfo:    info.GetVersionInfo(),
 		ProcessInfo:    info.GetProcessInfo(),
@@ -211,6 +221,7 @@ func (h *Heartbeats) newHeartbeat(
 		AgentGroup:     agentGroup,
 		ControllerInfo: h.controllerInfo,
 		Peers:          peers,
+		Policies:       policies,
 		ServicesList:   servicesList,
 		AllStatuses:    h.statusRegistry.GetGroupStatus(),
 	}
