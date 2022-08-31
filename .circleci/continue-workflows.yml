@@ -436,7 +436,7 @@ jobs:
 
   agent-helm-chart:
     parameters:
-      name:
+      task-name:
         type: string
         description: name of the helm chart
       appVersion:
@@ -461,7 +461,7 @@ jobs:
 
   agent-operator-helm-chart:
     parameters:
-      name:
+      task-name:
         type: string
         description: name of the helm chart
       appVersion:
