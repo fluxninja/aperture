@@ -41,8 +41,8 @@ const (
 	MarshalledLabelsLabel = "aperture.labels"
 	// LabeledLabel describes if there are any labels matched to traffic.
 	LabeledLabel = "labeled"
-	// StatusCodeLabel describes HTTP status code of the response.
-	StatusCodeLabel = "http.status_code"
+	// StatusCodeLabel describes the status code of the span.
+	StatusCodeLabel = "aperture.status_code"
 	// HTTPDurationLabel describes duration of the HTTP request in milliseconds.
 	HTTPDurationLabel = "http.duration_millis"
 	// HTTPRequestContentLength describes length of the HTTP request content in bytes.

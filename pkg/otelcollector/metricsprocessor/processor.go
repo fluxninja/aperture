@@ -112,6 +112,16 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 		if checkResponse == nil {
 			return errors.New("failed getting check response from attributes")
 		}
+
+		spanStatus := span.Status()
+
+		durationTimeStamp := span.EndTimestamp()
+		if durationTimeStamp == 0 {
+			return errors.New("failed getting duration timestamp from span")
+		}
+
+		span.Attributes().InsertString(otelcollector.FeatureDurationLabel, strconv.FormatInt(int64(durationTimeStamp), 10))
+		span.Attributes().InsertString(otelcollector.StatusCodeLabel, spanStatus.Message())
 		p.addCheckResponseBasedLabels(span.Attributes(), checkResponse)
 		return p.updateMetrics(span.Attributes(), checkResponse)
 	})
