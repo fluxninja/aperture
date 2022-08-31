@@ -188,11 +188,13 @@ definitions:
     properties:
       enabled:
         type: boolean
+        description: TODO document what happens when lazy sync is disabled
+        title: Enables lazy sync
         x-go-default: true
       num_sync:
         type: integer
         format: int64
-        description: Number of times to lazy sync within the limit_reset_interval.
+        description: Number of times to lazy sync within the _limit\_reset\_interval_.
         x-go-default: 5
         x-go-validate: gt=0
   RateLimiterOverride:
@@ -200,10 +202,12 @@ definitions:
     properties:
       label_value:
         type: string
+        description: Value of the label for which the override should be applied.
         x-go-validate: required
       limit_scale_factor:
         type: number
         format: double
+        description: Amount by which the _in\_ports.limit_ should be multiplied for this label value.
         x-go-default: 1
   RuleRego:
     type: object
@@ -316,8 +320,7 @@ definitions:
         x-go-validate: required
     description: |-
       :::info
-      See also [Scheduler page in the Concepts section](/concepts/flow-control/actuators/scheduler.md)
-      for a more high-level description.
+      See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
       :::
 
       It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -334,19 +337,39 @@ definitions:
         x-go-validate: required
       label_key:
         type: string
+        description: |-
+          Specifies which label the ratelimiter should be keyed by.
+
+          Rate limiting is done independently for each value of the label with given
+          key. Eg., to give each user a separate limit, assuming you have a _user_
+          flow label set up, set `label_key: "user"`.
+
+          TODO make it possible for this field to be optional – to achieve global ratelimit.
         x-go-validate: required
       lazy_sync:
         $ref: '#/definitions/RateLimiterLazySync'
+        title: Configuration of lazy-syncing behaviour of ratelimiter
       limit_reset_interval:
         type: string
+        description: Time after which the limit for a given label value will be reset.
         x-go-default: 60s
       overrides:
         type: array
         items:
           $ref: '#/definitions/RateLimiterOverride'
+        description: Allows to specify different limits for particular label values.
       selector:
         $ref: '#/definitions/v1Selector'
+        description: Which control point to apply this ratelimiter to.
         x-go-validate: required
+    description: |-
+      :::info
+      See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+      :::
+
+      Ratelimiting is done separately on per-label-value basis. Use _label\_key_
+      to select which label should be used as key.
+    title: Limits the traffic on a control point to specified rate
   policylanguagev1FluxMeter:
     type: object
     properties:
@@ -1008,11 +1031,7 @@ definitions:
       path_templates:
         $ref: '#/definitions/v1PathTemplateMatcher'
         description: Match HTTP Path to given path templates.
-    description: |-
-      There are multiple variants of extractor, specify exactly one:
-      - JSON Extractor
-      - Address Extractor
-      - JWT Extractor
+    description: There are multiple variants of extractor, specify exactly one.
     title: Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
   v1Extrapolator:
     type: object
@@ -1527,9 +1546,16 @@ definitions:
     properties:
       limit:
         $ref: '#/definitions/v1Port'
-        description: negative limit means no limit is applied.
-        x-go-default: -1
+        description: |-
+          Number of flows allowed per _limit\_reset\_interval_ per each label.
+          Negative values disable the ratelimiter.
+
+          :::tip
+          Negative limit can be useful to _conditionally_ enable the ratelimiter
+          under certain circumstances. [Decider](#-v1decider) might be helpful.
+          :::
         x-go-validate: required
+    title: Inputs for the RateLimiter component
   v1ReportRequest:
     type: object
     properties:
@@ -1578,15 +1604,26 @@ definitions:
     properties:
       extractor:
         $ref: '#/definitions/v1Extractor'
-        description: |-
-          High-level flow label declarative extractor.
-          Rego extractor extracts a value from the rego module.
+        description: High-level declarative extractor.
       hidden:
         type: boolean
-        description: Decides if the created flow label should be hidden from the telemetry.
+        description: |-
+          Decides if the created flow label should be hidden from the telemetry.
+          A hidden flow label is still accessible in policies and can be used as eg.
+          fairness key.
+
+          :::caution
+          When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
+          labels are sent to cloud for observability. We thus recommend to set this
+          _hidden_ flag for high-cardinality labels, such as usernames or ids, to
+          avoid bloating analytics database. _Hidden_ flag should also be set for
+          sensitive labels.
+          :::
       propagate:
         type: boolean
-        description: Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true).
+        description: |-
+          Decides if the created label should be applied to the whole request chain
+          (propagated in baggage) (default=true).
       rego:
         $ref: '#/definitions/RuleRego'
         description: Rego module to extract a value from the rego module.
@@ -1601,31 +1638,28 @@ definitions:
       Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
       [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
 
-      Example:
-      ```yaml
       Example of Declarative JSON extractor:
-        yaml:
-          extractor:
-            json:
-              from: request.http.body
-              pointer: /user/name
-          propagate: true
-          hidden: false
-      Example of Rego module:
-        yaml:
-          rego:
-            query: data.user_from_cookie.user
-            source:
-              package: user_from_cookie
-              cookies: "split(input.attributes.request.http.headers.cookie, ';')"
-              cookie: "cookies[_]"
-              cookie.startswith: "('session=')"
-              session: "substring(cookie, count('session='), -1)"
-              parts: "split(session, '.')"
-              object: "json.unmarshal(base64url.decode(parts[0]))"
-              user: object.user
-          propagate: false
-          hidden: true
+      ```yaml
+      extractor:
+        json:
+          from: request.http.body
+          pointer: /user/name
+      ```
+
+      Example of Rego module which also disables propagation of a label:
+      ```yaml
+      rego:
+        query: data.user_from_cookie.user
+        source: |
+          package: user_from_cookie
+          cookies: split(input.attributes.request.http.headers.cookie, ';')
+          cookie: cookies[_]
+          cookie.startswith: ('session=')
+          session: substring(cookie, count('session='), -1)
+          parts: split(session, '.')
+          object: json.unmarshal(base64url.decode(parts[0]))
+          user: object.user
+      propagate: false
       ```
     title: Rule describes a single Flow Classification Rule
   v1Scheduler:
@@ -1655,9 +1689,14 @@ definitions:
         description: |-
           List of workloads to be used in scheduler.
 
-          Categorizing [flows](/concepts/flow-control#what-is-a-flow) into workloads
+          Categorizing [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) into workloads
           allows for load-shedding to be "smarter" than just "randomly deny 50% of
-          requests". There are two aspects of workloads:
+          requests". There are two aspects of this "smartness":
+          * Scheduler can more precisely calculate concurrency if it understands
+            that flows belonging to different classes have different weights (eg.
+            inserts vs lookups).
+          * Setting different priorities to different workloads lets the scheduler
+            avoid dropping important traffic during overload.
 
           Each workload in this list specifies also a matcher that's used to
           determine which flow will be categorized into which workload.
@@ -1666,7 +1705,7 @@ definitions:
 
           :::info
           See also [workload definition in the concepts
-          section](/concepts/flow-control/actuators/scheduler#workload).
+          section](/concepts/flow-control/actuators/scheduler.md#workload).
           :::
     description: |-
       :::note
@@ -1686,7 +1725,7 @@ definitions:
 
           :::info
           **Accepted tokens** are tokens associated with
-          [flows](/concepts/flow-control#what-is-a-flow) that were accepted by
+          [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) that were accepted by
           this scheduler. Number of tokens for a flow is determined by a
           [workload](#-schedulerworkload) that the flow was assigned to (either
           via `auto_tokens` or explicitly by `Workload.tokens`).

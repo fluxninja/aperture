@@ -105,31 +105,28 @@ func (x *Classifier) GetRules() map[string]*Rule {
 // Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
 // [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
 //
-// Example:
-// ```yaml
 // Example of Declarative JSON extractor:
-//   yaml:
-//     extractor:
-//       json:
-//         from: request.http.body
-//         pointer: /user/name
-//     propagate: true
-//     hidden: false
-// Example of Rego module:
-//   yaml:
-//     rego:
-//       query: data.user_from_cookie.user
-//       source:
-//         package: user_from_cookie
-//         cookies: "split(input.attributes.request.http.headers.cookie, ';')"
-//         cookie: "cookies[_]"
-//         cookie.startswith: "('session=')"
-//         session: "substring(cookie, count('session='), -1)"
-//         parts: "split(session, '.')"
-//         object: "json.unmarshal(base64url.decode(parts[0]))"
-//         user: object.user
-//     propagate: false
-//     hidden: true
+// ```yaml
+// extractor:
+//   json:
+//     from: request.http.body
+//     pointer: /user/name
+// ```
+//
+// Example of Rego module which also disables propagation of a label:
+// ```yaml
+// rego:
+//   query: data.user_from_cookie.user
+//   source: |
+//     package: user_from_cookie
+//     cookies: split(input.attributes.request.http.headers.cookie, ';')
+//     cookie: cookies[_]
+//     cookie.startswith: ('session=')
+//     session: substring(cookie, count('session='), -1)
+//     parts: split(session, '.')
+//     object: json.unmarshal(base64url.decode(parts[0]))
+//     user: object.user
+// propagate: false
 // ```
 type Rule struct {
 	state         protoimpl.MessageState
@@ -140,9 +137,20 @@ type Rule struct {
 	//	*Rule_Extractor
 	//	*Rule_Rego_
 	Source isRule_Source `protobuf_oneof:"source"`
-	// Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true).
+	// Decides if the created label should be applied to the whole request chain
+	// (propagated in baggage) (default=true).
 	Propagate *wrapperspb.BoolValue `protobuf:"bytes,3,opt,name=propagate,proto3" json:"propagate,omitempty"`
 	// Decides if the created flow label should be hidden from the telemetry.
+	// A hidden flow label is still accessible in policies and can be used as eg.
+	// fairness key.
+	//
+	// :::caution
+	// When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
+	// labels are sent to cloud for observability. We thus recommend to set this
+	// _hidden_ flag for high-cardinality labels, such as usernames or ids, to
+	// avoid bloating analytics database. _Hidden_ flag should also be set for
+	// sensitive labels.
+	// :::
 	Hidden bool `protobuf:"varint,4,opt,name=hidden,proto3" json:"hidden,omitempty"`
 }
 
@@ -218,8 +226,7 @@ type isRule_Source interface {
 }
 
 type Rule_Extractor struct {
-	// High-level flow label declarative extractor.
-	// Rego extractor extracts a value from the rego module.
+	// High-level declarative extractor.
 	Extractor *Extractor `protobuf:"bytes,1,opt,name=extractor,proto3,oneof"`
 }
 
@@ -234,10 +241,7 @@ func (*Rule_Rego_) isRule_Source() {}
 
 // Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
 //
-// There are multiple variants of extractor, specify exactly one:
-// - JSON Extractor
-// - Address Extractor
-// - JWT Extractor
+// There are multiple variants of extractor, specify exactly one.
 type Extractor struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

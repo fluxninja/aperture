@@ -17,7 +17,7 @@
 - [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
 - [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-- [languagev1RateLimiter](#languagev1-rate-limiter)
+- [languagev1RateLimiter](#languagev1-rate-limiter) – Limits the traffic on a control point to specified rate
 - [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 
 Example of…
@@ -68,7 +68,7 @@ Example of…
 - [v1Port](#v1-port) – Components are interconnected with each other via Ports
 - [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an output signal
 - [v1PromQLOuts](#v1-prom-q-l-outs) – Output for the PromQL component.
-- [v1RateLimiterIns](#v1-rate-limiter-ins)
+- [v1RateLimiterIns](#v1-rate-limiter-ins) – Inputs for the RateLimiter component
 - [v1Resources](#v1-resources) – Resources that need to be setup for the policy to function
 - [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule
 - [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing-based workload scheduler
@@ -121,7 +121,9 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>enabled</dt>
 <dd>
 
-(bool, default: `true`)
+(bool, default: `true`) Enables lazy sync
+
+TODO document what happens when lazy sync is disabled
 
 </dd>
 </dl>
@@ -129,7 +131,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>num_sync</dt>
 <dd>
 
-(int64, `gt=0`, default: `5`) Number of times to lazy sync within the limit_reset_interval.
+(int64, `gt=0`, default: `5`) Number of times to lazy sync within the _limit_reset_interval_.
 
 </dd>
 </dl>
@@ -142,7 +144,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>label_value</dt>
 <dd>
 
-(string, `required`)
+(string, `required`) Value of the label for which the override should be applied.
 
 </dd>
 </dl>
@@ -150,7 +152,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>limit_scale_factor</dt>
 <dd>
 
-(float64, default: `1`)
+(float64, default: `1`) Amount by which the _in_ports.limit_ should be multiplied for this label value.
 
 </dd>
 </dl>
@@ -275,8 +277,7 @@ This override is applicable only if `auto_tokens` is set to false.
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
 :::info
-See also [Scheduler page in the Concepts section](/concepts/flow-control/actuators/scheduler.md)
-for a more high-level description.
+See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
 :::
 
 It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -311,6 +312,15 @@ output signals.
 
 ### <span id="languagev1-rate-limiter"></span> languagev1RateLimiter
 
+Limits the traffic on a control point to specified rate
+
+:::info
+See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+:::
+
+Ratelimiting is done separately on per-label-value basis. Use _label_key_
+to select which label should be used as key.
+
 #### Properties
 
 <dl>
@@ -325,7 +335,13 @@ output signals.
 <dt>label_key</dt>
 <dd>
 
-(string, `required`)
+(string, `required`) Specifies which label the ratelimiter should be keyed by.
+
+Rate limiting is done independently for each value of the label with given
+key. Eg., to give each user a separate limit, assuming you have a _user_
+flow label set up, set `label_key: "user"`.
+
+TODO make it possible for this field to be optional – to achieve global ratelimit.
 
 </dd>
 </dl>
@@ -333,7 +349,7 @@ output signals.
 <dt>lazy_sync</dt>
 <dd>
 
-([RateLimiterLazySync](#rate-limiter-lazy-sync))
+([RateLimiterLazySync](#rate-limiter-lazy-sync)) Configuration of lazy-syncing behaviour of ratelimiter
 
 </dd>
 </dl>
@@ -341,7 +357,7 @@ output signals.
 <dt>limit_reset_interval</dt>
 <dd>
 
-(string, default: `60s`)
+(string, default: `60s`) Time after which the limit for a given label value will be reset.
 
 </dd>
 </dl>
@@ -349,7 +365,7 @@ output signals.
 <dt>overrides</dt>
 <dd>
 
-([[]RateLimiterOverride](#rate-limiter-override))
+([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
 
 </dd>
 </dl>
@@ -357,7 +373,7 @@ output signals.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector), `required`)
+([V1Selector](#v1-selector), `required`) Which control point to apply this ratelimiter to.
 
 </dd>
 </dl>
@@ -1070,11 +1086,7 @@ Label selector expression of the equal form "label == value".
 
 Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
 
-There are multiple variants of extractor, specify exactly one:
-
-- JSON Extractor
-- Address Extractor
-- JWT Extractor
+There are multiple variants of extractor, specify exactly one.
 
 #### Properties
 
@@ -1867,13 +1879,21 @@ Output for the PromQL component.
 
 ### <span id="v1-rate-limiter-ins"></span> v1RateLimiterIns
 
+Inputs for the RateLimiter component
+
 #### Properties
 
 <dl>
 <dt>limit</dt>
 <dd>
 
-([V1Port](#v1-port), `required`, default: `-1`) negative limit means no limit is applied.
+([V1Port](#v1-port), `required`) Number of flows allowed per _limit_reset_interval_ per each label.
+Negative values disable the ratelimiter.
+
+:::tip
+Negative limit can be useful to _conditionally_ enable the ratelimiter
+under certain circumstances. [Decider](#-v1decider) might be helpful.
+:::
 
 </dd>
 </dl>
@@ -1922,32 +1942,30 @@ There are two ways to define a flow classification rule:
 Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
 [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
 
-Example:
+Example of Declarative JSON extractor:
 
 ```yaml
-Example of Declarative JSON extractor:
-  yaml:
-    extractor:
-      json:
-        from: request.http.body
-        pointer: /user/name
-    propagate: true
-    hidden: false
-Example of Rego module:
-  yaml:
-    rego:
-      query: data.user_from_cookie.user
-      source:
-        package: user_from_cookie
-        cookies: "split(input.attributes.request.http.headers.cookie, ';')"
-        cookie: "cookies[_]"
-        cookie.startswith: "('session=')"
-        session: "substring(cookie, count('session='), -1)"
-        parts: "split(session, '.')"
-        object: "json.unmarshal(base64url.decode(parts[0]))"
-        user: object.user
-    propagate: false
-    hidden: true
+extractor:
+  json:
+    from: request.http.body
+    pointer: /user/name
+```
+
+Example of Rego module which also disables propagation of a label:
+
+```yaml
+rego:
+  query: data.user_from_cookie.user
+  source: |
+    package: user_from_cookie
+    cookies: split(input.attributes.request.http.headers.cookie, ';')
+    cookie: cookies[_]
+    cookie.startswith: ('session=')
+    session: substring(cookie, count('session='), -1)
+    parts: split(session, '.')
+    object: json.unmarshal(base64url.decode(parts[0]))
+    user: object.user
+propagate: false
 ```
 
 #### Properties
@@ -1956,8 +1974,7 @@ Example of Rego module:
 <dt>extractor</dt>
 <dd>
 
-([V1Extractor](#v1-extractor)) High-level flow label declarative extractor.
-Rego extractor extracts a value from the rego module.
+([V1Extractor](#v1-extractor)) High-level declarative extractor.
 
 </dd>
 </dl>
@@ -1966,6 +1983,16 @@ Rego extractor extracts a value from the rego module.
 <dd>
 
 (bool) Decides if the created flow label should be hidden from the telemetry.
+A hidden flow label is still accessible in policies and can be used as eg.
+fairness key.
+
+:::caution
+When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
+labels are sent to cloud for observability. We thus recommend to set this
+_hidden_ flag for high-cardinality labels, such as usernames or ids, to
+avoid bloating analytics database. _Hidden_ flag should also be set for
+sensitive labels.
+:::
 
 </dd>
 </dl>
@@ -1973,7 +2000,8 @@ Rego extractor extracts a value from the rego module.
 <dt>propagate</dt>
 <dd>
 
-(bool) Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true).
+(bool) Decides if the created label should be applied to the whole request chain
+(propagated in baggage) (default=true).
 
 </dd>
 </dl>
@@ -2040,9 +2068,15 @@ of this average can change).
 
 ([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) List of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/flow-control#what-is-a-flow) into workloads
+Categorizing [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
-requests". There are two aspects of workloads:
+requests". There are two aspects of this "smartness":
+
+- Scheduler can more precisely calculate concurrency if it understands
+  that flows belonging to different classes have different weights (eg.
+  inserts vs lookups).
+- Setting different priorities to different workloads lets the scheduler
+  avoid dropping important traffic during overload.
 
 Each workload in this list specifies also a matcher that's used to
 determine which flow will be categorized into which workload.
@@ -2051,7 +2085,7 @@ If none of workloads match, `default_workload` will be used.
 
 :::info
 See also [workload definition in the concepts
-section](/concepts/flow-control/actuators/scheduler#workload).
+section](/concepts/flow-control/actuators/scheduler.md#workload).
 :::
 
 </dd>
@@ -2071,7 +2105,7 @@ Output for the Scheduler component.
 
 :::info
 **Accepted tokens** are tokens associated with
-[flows](/concepts/flow-control#what-is-a-flow) that were accepted by
+[flows](/concepts/flow-control/flow-control.md#what-is-a-flow) that were accepted by
 this scheduler. Number of tokens for a flow is determined by a
 [workload](#-schedulerworkload) that the flow was assigned to (either
 via `auto_tokens` or explicitly by `Workload.tokens`).

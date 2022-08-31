@@ -497,8 +497,19 @@ message Decider {
   }]; // @gotags: default:"0s"
 }
 
+// Limits the traffic on a control point to specified rate
+//
+// :::info
+// See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+// :::
+//
+// Ratelimiting is done separately on per-label-value basis. Use _label\_key_
+// to select which label should be used as key.
 message RateLimiter {
   message LazySync {
+    // Enables lazy sync
+    //
+    // TODO document what happens when lazy sync is disabled
     bool enabled = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
@@ -508,7 +519,7 @@ message RateLimiter {
       }
     }]; // @gotags: default:"true"
 
-    // Number of times to lazy sync within the limit_reset_interval.
+    // Number of times to lazy sync within the _limit\_reset\_interval_.
     uint32 num_sync = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
@@ -526,6 +537,7 @@ message RateLimiter {
   }
 
   message Override {
+    // Value of the label for which the override should be applied.
     string label_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
@@ -535,6 +547,7 @@ message RateLimiter {
       }
     }]; // @gotags: validate:"required"
 
+    // Amount by which the _in\_ports.limit_ should be multiplied for this label value.
     double limit_scale_factor = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
@@ -545,8 +558,15 @@ message RateLimiter {
     }]; // @gotags: default:"1.0"
   }
 
+  // Inputs for the RateLimiter component
   message Ins {
-    // negative limit means no limit is applied.
+    // Number of flows allowed per _limit\_reset\_interval_ per each label.
+    // Negative values disable the ratelimiter.
+    //
+    // :::tip
+    // Negative limit can be useful to _conditionally_ enable the ratelimiter
+    // under certain circumstances. [Decider](#-v1decider) might be helpful.
+    // :::
     Port limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
@@ -554,13 +574,7 @@ message RateLimiter {
           string_value: "required"
         }
       }
-      extensions: {
-        key: "x-go-default"
-        value: {
-          number_value: -1
-        }
-      }
-    }]; // @gotags: validate:"required" default:"-1.0"
+    }]; // @gotags: validate:"required"
   }
 
   Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -572,6 +586,7 @@ message RateLimiter {
     }
   }]; // @gotags: validate:"required"
 
+  // Which control point to apply this ratelimiter to.
   common.selector.v1.Selector selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
@@ -581,6 +596,7 @@ message RateLimiter {
     }
   }]; // @gotags: validate:"required"
 
+  // Time after which the limit for a given label value will be reset.
   google.protobuf.Duration limit_reset_interval = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
@@ -590,6 +606,13 @@ message RateLimiter {
     }
   }]; // @gotags: default:"60s"
 
+  // Specifies which label the ratelimiter should be keyed by.
+  //
+  // Rate limiting is done independently for each value of the label with given
+  // key. Eg., to give each user a separate limit, assuming you have a _user_
+  // flow label set up, set `label_key: "user"`.
+  //
+  // TODO make it possible for this field to be optional – to achieve global ratelimit.
   string label_key = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
@@ -599,15 +622,17 @@ message RateLimiter {
     }
   }]; // @gotags: validate:"required"
 
+  // Allows to specify different limits for particular label values.
   repeated Override overrides = 5;
+
+  // Configuration of lazy-syncing behaviour of ratelimiter
   LazySync lazy_sync = 6;
 }
 
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
-// See also [Scheduler page in the Concepts section](/concepts/flow-control/actuators/scheduler.md)
-// for a more high-level description.
+// See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
 // :::
 //
 // It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -721,7 +746,7 @@ message Scheduler {
     //
     // :::info
     // **Accepted tokens** are tokens associated with
-    // [flows](/concepts/flow-control#what-is-a-flow) that were accepted by
+    // [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) that were accepted by
     // this scheduler. Number of tokens for a flow is determined by a
     // [workload](#-schedulerworkload) that the flow was assigned to (either
     // via `auto_tokens` or explicitly by `Workload.tokens`).
@@ -744,9 +769,14 @@ message Scheduler {
 
   // List of workloads to be used in scheduler.
   //
-  // Categorizing [flows](/concepts/flow-control#what-is-a-flow) into workloads
+  // Categorizing [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) into workloads
   // allows for load-shedding to be "smarter" than just "randomly deny 50% of
-  // requests". There are two aspects of workloads:
+  // requests". There are two aspects of this "smartness":
+  // * Scheduler can more precisely calculate concurrency if it understands
+  //   that flows belonging to different classes have different weights (eg.
+  //   inserts vs lookups).
+  // * Setting different priorities to different workloads lets the scheduler
+  //   avoid dropping important traffic during overload.
   //
   // Each workload in this list specifies also a matcher that's used to
   // determine which flow will be categorized into which workload.
@@ -755,7 +785,7 @@ message Scheduler {
   //
   // :::info
   // See also [workload definition in the concepts
-  // section](/concepts/flow-control/actuators/scheduler#workload).
+  // section](/concepts/flow-control/actuators/scheduler.md#workload).
   // :::
   repeated WorkloadAndLabelMatcher workloads = 5;
 
