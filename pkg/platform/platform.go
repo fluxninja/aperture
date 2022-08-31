@@ -119,7 +119,6 @@ func (cfg Config) Module() fx.Option {
 		etcdclient.Module(),
 		jobs.Module(),
 		status.Module(),
-		fx.Invoke(status.RegisterStatusService),
 		fx.Populate(&platform.statusRegistry),
 		platformStatusModule(),
 		plugins.ModuleConfig{OnlyCommandLineFlags: true}.Module(),

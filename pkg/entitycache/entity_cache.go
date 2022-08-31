@@ -249,7 +249,7 @@ func (c *EntityCache) Remove(entity *Entity) bool {
 // for an agent group is ignored.
 // Entities which have multiple values for service name will create one service
 // for each of them.
-func (c *EntityCache) Services() *entitycachev1.EntityCache {
+func (c *EntityCache) Services() *entitycachev1.ServicesList {
 	c.RLock()
 	defer c.RUnlock()
 
@@ -279,7 +279,7 @@ func (c *EntityCache) Services() *entitycachev1.EntityCache {
 
 	}
 
-	entityCache := &entitycachev1.EntityCache{
+	entityCache := &entitycachev1.ServicesList{
 		Services:            make([]*entitycachev1.Service, 0, len(services)),
 		OverlappingServices: make([]*entitycachev1.OverlappingService, 0, len(overlapping)),
 	}
