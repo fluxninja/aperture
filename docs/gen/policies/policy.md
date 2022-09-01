@@ -39,7 +39,7 @@ Example of…
 - [v1EMAIns](#v1-e-m-a-ins) – Inputs for the EMA component.
 - [v1EMAOuts](#v1-e-m-a-outs) – Outputs for the EMA component.
 - [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
-- [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
+- [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
 - [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
 - [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator component.
 - [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator component.
@@ -51,7 +51,9 @@ Example of…
 - [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of the fields
 - [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload
 - [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
-- [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not
+- [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of
+  [labels](/concepts/flow-control/label/label.md)
+  should be considered a match or not
 - [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
 - [v1LoadShedActuatorIns](#v1-load-shed-actuator-ins) – Input for the Load Shed Actuator component.
 - [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels
@@ -196,9 +198,8 @@ Workload defines a class of requests that preferably have similar properties suc
 <dt>fairness_key</dt>
 <dd>
 
-(string) Fairness key is a label key that can be used to provide fairness within a workload
-
-Any label that could be used in label matcher can be used here. Eg. if
+(string) Fairness key is a label key that can be used to provide fairness within a workload.
+Any [flow label](/concepts/flow-control/label/label.md) can be used here. Eg. if
 you have a classifier that sets `user` flow label, you might want to set
 `fairness_key = "user"`.
 
@@ -232,7 +233,8 @@ This override is applicable only if `auto_tokens` is set to false.
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload.
+([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based on
+[flow labels](/concepts/flow-control/label/label.md).
 
 </dd>
 </dl>
@@ -240,7 +242,7 @@ This override is applicable only if `auto_tokens` is set to false.
 <dt>workload</dt>
 <dd>
 
-([SchedulerWorkload](#scheduler-workload)) Workload associated with requests matching the label matcher.
+([SchedulerWorkload](#scheduler-workload)) Workload associated with flows matching the label matcher.
 
 </dd>
 </dl>
@@ -310,9 +312,10 @@ to select which label should be used as key.
 
 (string, `required`) Specifies which label the ratelimiter should be keyed by.
 
-Rate limiting is done independently for each value of the label with given
-key. Eg., to give each user a separate limit, assuming you have a _user_
-flow label set up, set `label_key: "user"`.
+Rate limiting is done independently for each value of the
+[label](/concepts/flow-control/label/label.md) with given key.
+Eg., to give each user a separate limit, assuming you have a _user_ flow
+label set up, set `label_key: "user"`.
 
 TODO make it possible for this field to be optional – to achieve global ratelimit.
 
@@ -539,6 +542,10 @@ This interval is typically aligned with how often the corrective action (actuati
 
 Set of classification rules sharing a common selector
 
+:::info
+See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+:::
+
 Example:
 
 ```yaml
@@ -558,7 +565,9 @@ rules:
 <dt>rules</dt>
 <dd>
 
-(map of [V1Rule](#v1-rule)) A map of {key, value} pairs mapping from flow label names to rules that define how to extract and propagate them.
+(map of [V1Rule](#v1-rule)) A map of {key, value} pairs mapping from
+[flow label](/concepts/flow-control/label/label.md) keys to rules that define
+how to extract and propagate flow labels with that key.
 
 </dd>
 </dl>
@@ -1057,7 +1066,7 @@ Label selector expression of the equal form "label == value".
 
 ### <span id="v1-extractor"></span> v1Extractor
 
-Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
+Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
 
 There are multiple variants of extractor, specify exactly one.
 
@@ -1446,7 +1455,9 @@ If the operator is Exists or DoesNotExist, the values array must be empty.
 
 ### <span id="v1-label-matcher"></span> v1LabelMatcher
 
-Allows to define rules whether a map of labels should be considered a match or not
+Allows to define rules whether a map of
+[labels](/concepts/flow-control/label/label.md)
+should be considered a match or not
 
 It provides three ways to define requirements:
 
@@ -1974,7 +1985,8 @@ sensitive labels.
 <dd>
 
 (bool) Decides if the created label should be applied to the whole request chain
-(propagated in baggage) (default=true).
+(propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
+(default=true).
 
 </dd>
 </dl>
@@ -2079,7 +2091,7 @@ This value impacts the prioritization and fairness because the larger the timeou
 
 ([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) List of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) into workloads
+Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
 requests". There are two aspects of this "smartness":
 
@@ -2116,7 +2128,7 @@ Output for the Scheduler component.
 
 :::info
 **Accepted tokens** are tokens associated with
-[flows](/concepts/flow-control/flow-control.md#what-is-a-flow) that were accepted by
+[flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
 this scheduler. Number of tokens for a flow is determined by a
 [workload](#-schedulerworkload) that the flow was assigned to (either
 via `auto_tokens` or explicitly by `Workload.tokens`).
@@ -2183,24 +2195,20 @@ selector:
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on labels that must
-also be satisfied (in addition to service+control point matching)
+([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
+[flow labels](/concepts/flow-control/label/label.md)
+must also be satisfied (in addition to service+control point matching)
 
-This matcher allows to match on flow labels and request labels.
-(Note: For classification we can only match flow labels that were created at
-some **previous** control point).
+:::note
+[Classifiers](#-v1classifier) _can_ use flow labels created by some other
+classifier, but only if they were created at some previous control point
+(and propagated in baggage).
 
-Flow labels are available with the same label key as defined in
-classification rule.
-
-Request labels are always prefixed with `request_`. Available request
-labels are `id` (available as `request_id`), `method`, `path`, `host`,
-`scheme`, `size`, `protocol` (mapped from fields of
-[HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
-Also, (non-pseudo) headers are available as `request_header_<headername>`, where
-`<headername>` is a headername normalised to lowercase, eg. `request_header_user-agent`.
-
-Note: Request headers are only available for `traffic` control points.
+This limitation doesn't apply to selectors of other entities, like
+FluxMeters or actuators. It's valid to create a flow label on a control
+point using classifier, and immediately use it for matching on the same
+control point.
+:::
 
 </dd>
 </dl>

@@ -608,9 +608,10 @@ message RateLimiter {
 
   // Specifies which label the ratelimiter should be keyed by.
   //
-  // Rate limiting is done independently for each value of the label with given
-  // key. Eg., to give each user a separate limit, assuming you have a _user_
-  // flow label set up, set `label_key: "user"`.
+  // Rate limiting is done independently for each value of the
+  // [label](/concepts/flow-control/label/label.md) with given key.
+  // Eg., to give each user a separate limit, assuming you have a _user_ flow
+  // label set up, set `label_key: "user"`.
   //
   // TODO make it possible for this field to be optional – to achieve global ratelimit.
   string label_key = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -696,19 +697,19 @@ message Scheduler {
       }
     }]; // @gotags: default:"1"
 
-    // Fairness key is a label key that can be used to provide fairness within a workload
-    //
-    // Any label that could be used in label matcher can be used here. Eg. if
+    // Fairness key is a label key that can be used to provide fairness within a workload.
+    // Any [flow label](/concepts/flow-control/label/label.md) can be used here. Eg. if
     // you have a classifier that sets `user` flow label, you might want to set
     // `fairness_key = "user"`.
     string fairness_key = 3;
   }
 
   message WorkloadAndLabelMatcher {
-    // Workload associated with requests matching the label matcher.
+    // Workload associated with flows matching the label matcher.
     Workload workload = 1;
 
-    // Label Matcher to select a Workload.
+    // Label Matcher to select a Workload based on
+    // [flow labels](/concepts/flow-control/label/label.md).
     common.labelmatcher.v1.LabelMatcher label_matcher = 2;
   }
 
@@ -718,7 +719,7 @@ message Scheduler {
     //
     // :::info
     // **Accepted tokens** are tokens associated with
-    // [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) that were accepted by
+    // [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
     // this scheduler. Number of tokens for a flow is determined by a
     // [workload](#-schedulerworkload) that the flow was assigned to (either
     // via `auto_tokens` or explicitly by `Workload.tokens`).
@@ -741,7 +742,7 @@ message Scheduler {
 
   // List of workloads to be used in scheduler.
   //
-  // Categorizing [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) into workloads
+  // Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
   // allows for load-shedding to be "smarter" than just "randomly deny 50% of
   // requests". There are two aspects of this "smartness":
   // * Scheduler can more precisely calculate concurrency if it understands
