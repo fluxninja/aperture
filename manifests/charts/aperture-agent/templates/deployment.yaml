@@ -2,10 +2,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "common.names.fullname" . }}
+  name: {{ template "common.names.fullname" . }}-manager
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-operator
+    app.kubernetes.io/component: aperture-agent-manager
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
@@ -17,7 +17,7 @@ spec:
   replicas: {{ .Values.operator.replicaCount | default 1 }}
   selector:
     matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
-      app.kubernetes.io/component: aperture-operator
+      app.kubernetes.io/component: aperture-agent-manager
   {{- if .Values.operator.updateStrategy }}
   strategy: {{ toYaml .Values.operator.updateStrategy | nindent 4 }}
   {{- end }}
@@ -29,7 +29,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.operator.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
       labels: {{- include "common.labels.standard" . | nindent 8 }}
-        app.kubernetes.io/component: aperture-operator
+        app.kubernetes.io/component: aperture-agent-manager
         {{- if .Values.operator.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.operator.podLabels "context" $) | nindent 8 }}
         {{- end }}
@@ -89,6 +89,7 @@ spec:
           {{- else }}
           command:
             - /aperture-operator
+            - --agent
           {{- end }}
           {{- if .Values.operator.args }}
           args: {{- include "common.tplvalues.render" (dict "value" .Values.operator.args "context" $) | nindent 12 }}
@@ -105,7 +106,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: APERTURE_OPERATOR_SERVICE_NAME
-              value: {{ template "common.names.fullname" . }}
+              value: {{ template "common.names.fullname" . }}-manager
             {{- if .Values.operator.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.operator.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}

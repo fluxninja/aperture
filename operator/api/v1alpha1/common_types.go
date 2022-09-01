@@ -205,6 +205,12 @@ type CommonSpec struct {
 	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	FluxNinjaPlugin FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
 
+	// OtelConfig is the configuration for the OTEL collector
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={grpcAddr:":4317"}
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
+	OtelConfig OtelConfig `json:"otelConfig"`
+
 	// Configuration for Agent or Controller service
 	//+kubebuilder:validation:Optional
 	Service Service `json:"service"`
@@ -424,4 +430,27 @@ type Batch struct {
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=10000
 	SendBatchSize uint32 `json:"sendBatchSize"`
+}
+
+// OtelConfig defines the configuration for the OTEL collector.
+type OtelConfig struct {
+	// GRPC listener addr for OTEL Collector
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=":4317"
+	GRPCAddr string `json:"grpcAddr"`
+
+	// HTTP listener addr for OTEL Collector
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=":4318"
+	HTTPAddr string `json:"httpAddr"`
+
+	// Batch prerollup processor configuration.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={timeout:"1s",sendBatchSize:10000}
+	BatchPrerollup Batch `json:"batchPrerollup"`
+
+	// Batch postrollup processor configuration.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={timeout:"1s",sendBatchSize:10000}
+	BatchPostrollup Batch `json:"batchPostrollup"`
 }

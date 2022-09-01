@@ -207,7 +207,7 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 	deleteClusterRole := true
 	instances := &v1alpha1.ControllerList{}
 	err := r.List(ctx, instances)
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "failed to list Controller")
 		return err
 	}

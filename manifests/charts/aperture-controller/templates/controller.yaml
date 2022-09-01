@@ -5,7 +5,7 @@ metadata:
   name: {{ .Release.Name }}
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-operator
+    app.kubernetes.io/component: aperture-controller-manager
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
@@ -178,5 +178,32 @@ spec:
   {{- if or (not .Values.controller.prometheus.enabled) .Values.controller.prometheus.endpoints }}
   prometheus:
     address: {{ include "aperture.prometheus.address" (dict "prometheus" .Values.controller.prometheus "context" . $) }}
+  {{- end }}
+  {{- if or .Values.controller.otelConfig.grpcAddr .Values.controller.otelConfig.httpAddr .Values.controller.otelConfig.batchPrerollup.sendBatchSize .Values.controller.otelConfig.batchPrerollup.timeout .Values.controller.otelConfig.batchPostrollup.sendBatchSize .Values.controller.otelConfig.batchPostrollup.timeout }}
+  otelConfig:
+    {{- if .Values.controller.otelConfig.grpcAddr }}
+    grpcAddr: {{ .Values.controller.otelConfig.grpcAddr }}
+    {{- end }}
+    {{- if .Values.controller.otelConfig.httpAddr }}
+    httpAddr: {{ .Values.controller.otelConfig.httpAddr }}
+    {{- end }}
+    {{- if or .Values.controller.otelConfig.batchPrerollup.sendBatchSize .Values.controller.otelConfig.batchPrerollup.timeout }}
+    batchPrerollup:
+      {{- if .Values.controller.otelConfig.batchPrerollup.sendBatchSize }}
+      sendBatchSize: {{ .Values.controller.otelConfig.batchPrerollup.sendBatchSize }}
+      {{- end }}
+      {{- if .Values.controller.otelConfig.batchPrerollup.timeout }}
+      timeout: {{ .Values.controller.otelConfig.batchPrerollup.timeout }}
+      {{- end }}
+    {{- end }}
+    {{- if or .Values.controller.otelConfig.batchPostrollup.sendBatchSize .Values.controller.otelConfig.batchPostrollup.timeout }}
+    batchPostrollup:
+      {{- if .Values.controller.otelConfig.batchPostrollup.sendBatchSize }}
+      sendBatchSize: {{ .Values.controller.otelConfig.batchPostrollup.sendBatchSize }}
+      {{- end }}
+      {{- if .Values.controller.otelConfig.batchPostrollup.timeout }}
+      timeout: {{ .Values.controller.otelConfig.batchPostrollup.timeout }}
+      {{- end }}
+    {{- end }}
   {{- end }}
 {{- end }}

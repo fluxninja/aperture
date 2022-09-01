@@ -6,15 +6,14 @@ dist_cache:
   memberlist_config_bind_addr: ":{{ .MemberListPort }}"
 
 otel:
-  addr: ":{{ .ServerPort }}"
-  {{- if .FluxNinjaPlugin.Enabled }}
+  grpc_addr: "{{ .OtelConfig.GRPCAddr }}"
+  http_addr: "{{ .OtelConfig.HTTPAddr }}"
   batch_prerollup:
-    timeout: {{ .BatchPrerollup.Timeout }}
-    send_batch_size: {{ .BatchPrerollup.SendBatchSize }}
+    timeout: {{ .OtelConfig.BatchPrerollup.Timeout }}
+    send_batch_size: {{ .OtelConfig.BatchPrerollup.SendBatchSize }}
   batch_postrollup:
-    timeout: {{ .BatchPostrollup.Timeout }}
-    send_batch_size: {{ .BatchPostrollup.SendBatchSize }}
-  {{- end }}
+    timeout: {{ .OtelConfig.BatchPostrollup.Timeout }}
+    send_batch_size: {{ .OtelConfig.BatchPostrollup.SendBatchSize }}
 
 log:
   pretty_console: {{ .Log.PrettyConsole }}

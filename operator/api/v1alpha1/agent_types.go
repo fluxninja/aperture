@@ -55,16 +55,6 @@ type AgentSpec struct {
 	//+kubebuilder:validation:Optional
 	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	Sidecar SidecarSpec `json:"sidecar"`
-
-	// Batch prerollup processor configuration.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={timeout:"1s",sendBatchSize:10000}
-	BatchPrerollup Batch `json:"batchPrerollup"`
-
-	// Batch postrollup processor configuration.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={timeout:"1s",sendBatchSize:10000}
-	BatchPostrollup Batch `json:"batchPostrollup"`
 }
 
 // AgentStatus defines the observed state of Agent.
