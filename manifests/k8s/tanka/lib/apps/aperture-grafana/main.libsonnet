@@ -1,7 +1,7 @@
 local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonnet/4.3/main.libsonnet';
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
-local dashboard = import 'github.com/fluxninja/aperture-blueprints/lib/1.0/dashboards/latency-gradient.libsonnet';
+local policyDashboard = import 'github.com/fluxninja/aperture-blueprints/lib/1.0/dashboards/latency-gradient.libsonnet';
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;
@@ -40,7 +40,7 @@ local dashboards =
   [
     dashboard.new('example-dashboard') +
     dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
-    dashboard.spec.withJson(std.manifestJsonEx(dashboard({
+    dashboard.spec.withJson(std.manifestJsonEx(policyDashboard({
       policyName: 'service1-demo-app',
     }).dashboard, indent='  ')) +
     dashboard.spec.withDatasources({
