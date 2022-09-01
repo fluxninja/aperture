@@ -40,8 +40,6 @@ spec:
           metadata:
             type: object
           spec:
-            default:
-              serverPort: 80
             description: AgentSpec defines the desired state for the Agent.
             properties:
               affinity:
@@ -1196,9 +1194,7 @@ spec:
                 minimum: 1
                 type: integer
               etcd:
-                default:
-                  leaseTtl: 60s
-                description: Etcd parameters for Agent or Controller
+                description: Etcd parameters for Agent
                 properties:
                   endpoints:
                     description: Etcd endpoints
@@ -4529,11 +4525,13 @@ spec:
                 - enabled
                 type: object
               prometheus:
-                description: Prometheus parameters for Agent or Controller
+                description: Prometheus parameters for Agent
                 properties:
                   address:
                     description: Address for Prometheus
                     type: string
+                required:
+                - address
                 type: object
               readinessProbe:
                 default:
@@ -5923,6 +5921,9 @@ spec:
                       type: string
                   type: object
                 type: array
+            required:
+            - etcd
+            - prometheus
             type: object
           status:
             description: AgentStatus defines the observed state of Agent.

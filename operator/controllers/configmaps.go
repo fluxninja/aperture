@@ -49,7 +49,7 @@ func filledAgentConfig(instance *v1alpha1.Agent) (string, error) {
 		DistributedCachePort int32
 		MemberListPort       int32
 		Log                  v1alpha1.Log                 `json:"log"`
-		Etcd                 v1alpha1.EtcdSpec            `json:"etcd"`
+		Etcd                 v1alpha1.AgentEtcdSpec       `json:"etcd"`
 		FluxNinjaPlugin      v1alpha1.FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
 		PrometheusAddress    string
 		Ingestion            v1alpha1.Ingestion `json:"ingestion"`
@@ -59,7 +59,7 @@ func filledAgentConfig(instance *v1alpha1.Agent) (string, error) {
 		DistributedCachePort: instance.Spec.DistributedCachePort,
 		MemberListPort:       instance.Spec.MemberListPort,
 		Log:                  instance.Spec.Log,
-		Etcd:                 checkEtcdEndpoints(instance.Spec.Etcd, instance.GetName(), instance.GetNamespace()),
+		Etcd:                 instance.Spec.Etcd,
 		FluxNinjaPlugin:      instance.Spec.FluxNinjaPlugin,
 		PrometheusAddress:    checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.GetName(), instance.GetNamespace()),
 		OtelConfig:           instance.Spec.OtelConfig,
@@ -112,7 +112,7 @@ func filledControllerConfig(instance *v1alpha1.Controller) (string, error) {
 
 	data := struct {
 		Log               v1alpha1.Log                 `json:"log"`
-		Etcd              v1alpha1.EtcdSpec            `json:"etcd"`
+		Etcd              v1alpha1.ControllerEtcdSpec  `json:"etcd"`
 		FluxNinjaPlugin   v1alpha1.FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
 		PrometheusAddress string
 		ServerPort        int32
