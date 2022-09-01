@@ -30,54 +30,123 @@ within the optimal range.
 The Aperture Controller related configurations are stored in a configmap which
 is created during the installation using Helm. All the configuration parameters
 are listed on the
-[README](https://artifacthub.io/packages/helm/aperture/aperture-operator#aperture-custom-resource-parameters)
+[README](https://artifacthub.io/packages/helm/aperture/aperture-controller#controller-custom-resource-parameters)
 file of the Helm chart.
 
 ## Installation {#controller-installation}
 
 (Consult [Supported Platforms](setup/supported-platforms.md) before installing.)
 
-**Note**: Make sure you have the [Aperture Operator](setup/installation.md#installation-operator-installation) in running state before following the below steps.
+The Aperture Controller will be installed using the
+[Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
+which will be managed by the Aperture Operator.
 
-1. The Aperture Controller can be installed using the Helm chart of Aperture Operator
-   by using the default `values.yaml` or create a `values.yaml` with below parameters and pass it with `helm upgrade`:
+Below are the steps to install or upgrade the Aperture Controller into your setup using
+the [Aperture Controller Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-controller).
+
+By following these instructions, you will have deployed the Aperture Controller into your cluster.
+
+1. Add the Helm chart repo in your environment:
+
+   ```bash
+   helm repo add aperture https://fluxninja.github.io/aperture/
+   helm repo update
+   ```
+
+2. The Aperture Controller can be installed using the default `values.yaml`:
+
+   ```bash
+   helm upgrade --install controller aperture/aperture-controller
+   ```
+
+3. Alternatively, you can create the Controller Custom Resource directly on the Kubernetes cluster using the below steps:
+
+   1. Create a `values.yaml` for just starting the operator and disabling the creation of Controller Custom Resource
+      and pass it with `helm upgrade`:
+
+      ```yaml
+      controller:
+        create: false
+      ```
+
+      ```bash
+      helm upgrade --install controller aperture/aperture-controller -f values.yaml
+      ```
+
+   2. Create a YAML file with below specifications:
+
+      ```yaml
+      apiVersion: fluxninja.com/v1alpha1
+      kind: Controller
+      metadata:
+        name: controller
+      spec:
+        image:
+          registry: docker.io/fluxninja
+          repository: aperture-controller
+          tag: latest
+      ```
+
+      All the configuration parameters for the Controller Custom Resource are listed on the
+      [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#controller-custom-resource-parameters)
+      file of the Helm chart.
+
+   3. Apply the YAML file to Kubernetes cluster using `kubectl`
+
+      ```bash
+      kubectl apply -f controller.yaml
+      ```
+
+4. The chart installs Prometheus and Etcd instances by default. If you
+   don't want to install and use your existing instances of Prometheus or
+   Etcd, configure below values in the `values.yaml` file and pass it with
+   `helm upgrade`:
 
    ```yaml
    controller:
-     create: true
+     etcd:
+       endpoints: ["ETCD_ENDPOINT_HERE"]
+     prometheus:
+       address: "PROMETHEUS_ADDRESS_HERE"
+   etcd:
+     enabled: false
+
+   prometheus:
+     enabled: false
    ```
+
+   Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with the actual values of Etcd and Prometheus,
+   which will be used by the Aperture Controller.
 
    ```bash
-   helm upgrade --install aperture aperture/operator -f values.yaml
+   helm upgrade --install controller aperture/aperture-controller -f values.yaml
    ```
 
-2. Alternatively, you can create the Controller Custom Resource directly on the Kubernetes cluster using the below YAML:
+   A list of other configurable parameters for Etcd and Prometheus can be
+   found in the [README](https://artifacthub.io/packages/helm/aperture/aperture-operator#istio).
 
-   1. Create a YAML file with below specifications:
+   **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
+   is enabled on your existing Prometheus instance as it is required by the
+   Controller.
 
-   ```yaml
-   apiVersion: fluxninja.com/v1alpha1
-   kind: Controller
-   metadata:
-     name: controller
-   spec:
-     image:
-       registry: docker.io/fluxninja
-       repository: aperture-controller
-       tag: latest
-   ```
-
-   All the configuration parameters for the Controller Custom Resource are listed on the
-   [README](https://artifacthub.io/packages/helm/aperture/aperture-operator#aperture-custom-resource-parameters)
-   file of the Helm chart.
-
-   2. Apply the YAML file to Kubernetes cluster using `kubectl`
+5. If you want to modify the default parameters, you can create or update the
+   `values.yaml` file and pass it with `helm upgrade`:
 
    ```bash
-   kubectl apply -f controller.yaml
+   helm upgrade --install controller aperture/aperture-controller -f values.yaml
    ```
 
-3. Once you have successfully deployed the Custom Resource, confirm that the
+   A list of configurable parameters can be found in the
+   [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters).
+
+6. If you want to deploy the Aperture Controller into a namespace
+   other than `default`, use the `-n` flag:
+
+   ```bash
+   helm upgrade --install controller aperture/aperture-controller -n "aperture-system" --create-namespace
+   ```
+
+7. Once you have successfully deployed the resources, confirm that the
    Aperture Controller is up and running:
 
    ```bash
@@ -86,4 +155,4 @@ file of the Helm chart.
    kubectl get controller -A
    ```
 
-You should see pods for Aperture Controller in `RUNNING` state and `Controller` Custom Resource in `created` state.
+You should see pods for Aperture Controller and Controller Manager in `RUNNING` state and `Controller` Custom Resource in `created` state.
