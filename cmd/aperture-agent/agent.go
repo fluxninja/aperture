@@ -34,7 +34,7 @@ func main() {
 		notifiers.TrackersConstructor{Name: "entity_trackers"}.Annotate(),
 		prometheus.Module(),
 		k8s.Module(),
-		otel.ProvideAnnotatedAgentConfig(),
+		otel.OTELConfigConstructor{Type: otel.AgentType}.Annotate(),
 		fx.Provide(
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,

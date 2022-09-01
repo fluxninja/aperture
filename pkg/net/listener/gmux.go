@@ -38,6 +38,7 @@ func (constructor GMuxConstructor) configureServer(server *http.Server) (*Listen
 		log.Error().Err(err).Msg("Unable to setup gmux listener!")
 		return nil, err
 	}
+	listener.addr = server.Addr
 
 	return listener, nil
 }
