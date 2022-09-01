@@ -468,6 +468,8 @@ jobs:
             echo "Moved the tgz file"
             helm repo index . --url https://fluxninja.github.io/aperture/
             echo "created index.yaml file"
+            ls -l
+            cat index.yaml
 
   agent-operator-helm-chart:
     parameters:
@@ -500,6 +502,8 @@ jobs:
             git rm -rf .
             mv /tmp/*.tgz .
             helm repo index . --url https://fluxninja.github.io/aperture/
+            ls -l
+            cat index.yaml
 
 
 
