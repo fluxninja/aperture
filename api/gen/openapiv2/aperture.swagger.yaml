@@ -1171,6 +1171,8 @@ definitions:
     properties:
       hostname:
         type: string
+      uuid:
+        type: string
   v1JSONExtractor:
     type: object
     properties:
