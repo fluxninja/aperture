@@ -28,9 +28,9 @@ local demoappMixin =
   };
 
 local policy = latencyGradientPolicy({
-  policyName: 'demo1-demo-app',
+  policyName: 'service1-demo-app',
   serviceSelector+: {
-    service: 'demo1-demo-app.demoapp.svc.cluster.local',
+    service: 'service1-demo-app.demoapp.svc.cluster.local',
   },
 }).policy;
 
@@ -40,7 +40,7 @@ local policy = latencyGradientPolicy({
     + k.core.v1.configMap.metadata.withLabels({ 'fluxninja.com/validate': 'true' })
     + k.core.v1.configMap.metadata.withNamespace('aperture-system')
     + k.core.v1.configMap.withData({
-      'demo1-demo-app.yaml': std.manifestYamlDoc(policy, quote_keys=false),
+      'service1-demo-app.yaml': std.manifestYamlDoc(policy, quote_keys=false),
     }),
   demoapp: demoappMixin,
 }

@@ -66,12 +66,12 @@ data:
       flux_meters:
         "service_latency":
           selector:
-            service: "demo1-demo-app.demoapp.svc.cluster.local"
+            service: "service1-demo-app.demoapp.svc.cluster.local"
             control_point:
               traffic: "ingress"
       classifiers:
         - selector:
-            service: demo1-demo-app.demoapp.svc.cluster.local
+            service: service1-demo-app.demoapp.svc.cluster.local
             control_point: { traffic: ingress }
           rules:
             # An example rule using extractor.
@@ -167,7 +167,7 @@ data:
         - concurrency_limiter:
             scheduler:
               selector:
-                service: "demo1-demo-app.demoapp.svc.cluster.local"
+                service: "service1-demo-app.demoapp.svc.cluster.local"
                 control_point:
                   traffic: "ingress"
               auto_tokens: true
@@ -331,7 +331,7 @@ const rateLimitPolicy = `
               limit:
                 signal_name: "RATE_LIMIT"
             selector:
-              service: "demo1-demo-app.demoapp.svc.cluster.local"
+              service: "service1-demo-app.demoapp.svc.cluster.local"
               control_point:
                 traffic: "ingress"
             label_key: "request_header_user-type"

@@ -260,24 +260,24 @@ DEP_TREE = {
             ],
             "child_resources": [
                 {
-                    "workload": "demo1-demo-app",
+                    "workload": "service1-demo-app",
                     "resource_deps": ["cluster-bootstrap", "istiod"],
                     "extra_objects": [
-                        "demo1-demo-app:serviceaccount"
+                        "service1-demo-app:serviceaccount"
                     ]
                 },
                 {
-                    "workload": "demo2-demo-app",
+                    "workload": "service2-demo-app",
                     "resource_deps": ["cluster-bootstrap", "istiod"],
                     "extra_objects": [
-                        "demo2-demo-app:serviceaccount"
+                        "service2-demo-app:serviceaccount"
                     ]
                 },
                 {
-                    "workload": "demo3-demo-app",
+                    "workload": "service3-demo-app",
                     "resource_deps": ["cluster-bootstrap", "istiod"],
                     "extra_objects": [
-                        "demo3-demo-app:serviceaccount"
+                        "service3-demo-app:serviceaccount"
                     ]
                 },
                 {
@@ -900,7 +900,7 @@ kubectl create configmap load-test --from-file=../../tools/load_generator/scenar
 kubectl apply -f ../../tools/load_generator/scenarios/demoapp-load-test-cr.yaml
 '''
 cmd_button('demoapp-load-test-run',
-    resource='demo1-demo-app',
+    resource='k6-operator-controller-manager',
     icon_name='content_paste_go',
     text='Run load test',
     argv=['sh', '-c', run_load_generator],
@@ -912,7 +912,7 @@ kubectl delete -f ../../tools/load_generator/scenarios/demoapp-load-test-cr.yaml
 kubectl delete configmap load-test
 '''
 cmd_button('demoapp-load-test-del',
-    resource='demo1-demo-app',
+    resource='k6-operator-controller-manager',
     icon_name='content_paste_off',
     text='Delete load test',
     argv=['sh', '-c', delete_load_generator],
