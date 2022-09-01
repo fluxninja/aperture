@@ -13,6 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/info/v1"
+	guuid "github.com/google/uuid"
 )
 
 // Default build-time variables. These values are overridden via ldflags.
@@ -35,6 +36,8 @@ var (
 	Prefix = "aperture"
 	// Hostname is the hostname of the machine that is running the process.
 	Hostname = "unknown"
+	// UUID is the unique identifier for the process.
+	UUID = "unknown"
 )
 
 var (
@@ -68,6 +71,8 @@ func init() {
 	if hostname != "" {
 		Hostname = hostname
 	}
+	// generate UUID
+	UUID = guuid.NewString()
 }
 
 // GetVersionInfo returns the version info for the application.
@@ -92,6 +97,7 @@ func GetHostInfo() *infov1.HostInfo {
 	defer mutex.Unlock()
 	return &infov1.HostInfo{
 		Hostname: Hostname,
+		Uuid:     UUID,
 	}
 }
 
