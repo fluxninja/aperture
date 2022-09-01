@@ -133,8 +133,8 @@ DEP_TREE = {
                     "workload": "controller-aperture-controller-manager",
                     "resource_deps": ["aperture-operator-bootstrap"],
                     "extra_objects": [
-                        ("^controller-aperture-controller-manager", "Role|RoleBinding|ServiceAccount", APERTURE_SYSTEM_NS),
-                        ("^controller-aperture-controller-manager", "ClusterRole|ClusterRoleBinding"),
+                        ("^controller-aperture-controller", "Role|RoleBinding|ServiceAccount", APERTURE_SYSTEM_NS),
+                        ("^controller-aperture-controller", "ClusterRole|ClusterRoleBinding"),
                     ],
                     "ignored_objects": [
                         ("^controller-aperture-controller-manager", "Service|Deployment", APERTURE_SYSTEM_NS),
@@ -144,8 +144,8 @@ DEP_TREE = {
                     "workload": "agent-aperture-agent-manager",
                     "resource_deps": ["aperture-operator-bootstrap"],
                     "extra_objects": [
-                        ("^agent-aperture-agent-manager", "Role|RoleBinding|ServiceAccount", APERTURE_SYSTEM_NS),
-                        ("^agent-aperture-agent-manager", "ClusterRole|ClusterRoleBinding"),
+                        ("^agent-aperture-agent", "Role|RoleBinding|ServiceAccount", APERTURE_SYSTEM_NS),
+                        ("^agent-aperture-agent", "ClusterRole|ClusterRoleBinding"),
                     ],
                     "ignored_objects": [
                         ("^agent-aperture-agent-manager", "Service|Deployment", APERTURE_SYSTEM_NS),

@@ -39,7 +39,7 @@ Aperture Operator
 | `operator.image.registry`                                    | Operator image registry                                                                                                | `docker.io/fluxninja` |
 | `operator.image.repository`                                  | Operator image repository                                                                                              | `aperture-operator`   |
 | `operator.image.tag`                                         | Operator image tag (immutable tags are recommended)                                                                    | `latest`              |
-| `operator.image.pullPolicy`                                  | Operator image pull policy                                                                                             | `IfNotPresent`        |
+| `operator.image.pullPolicy`                                  | Operator image pull policy                                                                                             | `Never`               |
 | `operator.image.pullSecrets`                                 | Operator image pull secrets                                                                                            | `[]`                  |
 | `operator.replicaCount`                                      | Number of replicas for Operator deployment                                                                             | `1`                   |
 | `operator.podAnnotations`                                    | Pod annotations                                                                                                        | `{}`                  |
@@ -121,10 +121,10 @@ Aperture Operator
 | `controller.fluxninjaPlugin.tls.insecureSkipVerify`          | specifies whether to verify FluxNinja cloud certificate. Defaults to false.                                              | `nil`    |
 | `controller.fluxninjaPlugin.tls.caFile`                      | specifies an alternative CA certificates bundle to use to validate FluxNinja cloud certificate                           | `nil`    |
 | `controller.fluxninjaPlugin.apiKeySecret.create`             | Whether to create Kubernetes Secret with provided Controller API Key.                                                    | `true`   |
-| `controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name`  | specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey      | `nil`    |
+| `controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name`  | specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey | `nil`    |
 | `controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key`   | specifies which key from the Secret for Controller API Key to use                                                        | `apiKey` |
 | `controller.fluxninjaPlugin.apiKeySecret.value`              | API Key to use when creating a new Controller API Key Secret                                                             | `nil`    |
-| `controller.image.registry`                                  | Controller image registry. Defaults to 'docker.io/aperturecontrol'.                                                      | `nil`    |
+| `controller.image.registry`                                  | Controller image registry. Defaults to 'docker.io/fluxninja'.                                                            | `nil`    |
 | `controller.image.repository`                                | Controller image repository. Defaults to 'aperture-controller'.                                                          | `nil`    |
 | `controller.image.tag`                                       | Controller image tag (immutable tags are recommended). Defaults to 'latest'.                                             | `nil`    |
 | `controller.image.pullPolicy`                                | Controller image pull policy. Defaults to 'IfNotPresent'.                                                                | `nil`    |
@@ -182,6 +182,12 @@ Aperture Operator
 | `controller.etcd.endpoints`                                  | List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty when etcd.enabled is set to false. | `[]`     |
 | `controller.etcd.leaseTtl`                                   | Lease time-to-live.                                                                                                      | `60s`    |
 | `controller.prometheus.address`                              | specifies the address of the Prometheus server. This must not be empty when prometheus.enabled is set to false.          | `nil`    |
+| `controller.otelConfig.grpcAddr`                             | GRPC listener addr for OTEL Collector. Defaults to ":4317"                                                               | `nil`    |
+| `controller.otelConfig.httpAddr`                             | HTTP listener addr for OTEL Collector. Defaults to ":4318"                                                               | `nil`    |
+| `controller.otelConfig.batchPrerollup.sendBatchSize`         | SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".                   | `nil`    |
+| `controller.otelConfig.batchPrerollup.timeout`               | Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".                             | `nil`    |
+| `controller.otelConfig.batchPostrollup.sendBatchSize`        | SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".                   | `nil`    |
+| `controller.otelConfig.batchPostrollup.timeout`              | Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".                             | `nil`    |
 
 
 ### etcd

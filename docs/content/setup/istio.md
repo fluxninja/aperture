@@ -20,6 +20,7 @@ to be added via the Envoy Filter.
 **Note**: In all the below patches, it is presumed that the Aperture Agent is
 installed with `DaemonSet` mode and is installed in the `aperture-system` namespace,
 which makes the target URL value `aperture-agent.aperture-system.svc.cluster.local`.
+If you are running the Aperture Agents in the Sidecar mode, use `localhost` as Target URL.
 
 1. The below patch merges the
    [Access Log](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log)

@@ -48,7 +48,7 @@ operator:
   ## @param operator.image.pullSecrets Operator image pull secrets
   ##
   image:
-    registry:
+    registry: docker.io/fluxninja
     repository: aperture-operator
     tag: latest
     ## Specify a imagePullPolicy
@@ -348,7 +348,7 @@ agent:
         name: ~
         key: apiKey
       value: ~
-  ## @param agent.image.registry Agent image registry. Defaults to 'docker.io/aperturecontrol'.
+  ## @param agent.image.registry Agent image registry. Defaults to 'docker.io/fluxninja'.
   ## @param agent.image.repository Agent image repository. Defaults to 'aperture-agent'.
   ## @param agent.image.tag Agent image tag (immutable tags are recommended). Defaults to 'latest'.
   ## @param agent.image.pullPolicy Agent image pull policy. Defaults to 'IfNotPresent'.
@@ -380,18 +380,6 @@ agent:
   ## @param agent.memberListPort The Agent's member list service. Defaults to 3322.
   ##
   memberListPort: ~
-  ## @param agent.batchPrerollup.timeout Timeout for batch prerollup processor.
-  ## @param agent.batchPrerollup.sendBatchSize Size of a batch in prerollup processor which after hit, will trigger it to be sent.
-  ##
-  batchPrerollup:
-    timeout: ~
-    sendBatchSize: ~
-  ## @param agent.batchPostrollup.timeout Timeout for batch postrollup processor.
-  ## @param agent.batchPostrollup.sendBatchSize Size of a batch in postrollup processor which after hit, will trigger it to be sent.
-  ##
-  batchPostrollup:
-    timeout: ~
-    sendBatchSize: ~
   ## @param agent.log.prettyConsole Additional log writer: pretty console (stdout) logging (not recommended for prod environments). Defaults to false.
   ## @param agent.log.nonBlocking Use non-blocking log writer (can lose logs at high throughput). Defaults to True.
   ## @param agent.log.level Log level. Keywords allowed - ["debug", "info", "warn", "fatal", "panic", "trace"]. Defaults to 'info'.

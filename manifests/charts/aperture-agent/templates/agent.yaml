@@ -26,16 +26,6 @@ spec:
   {{- if .Values.agent.memberListPort }}
   memberListPort: {{ .Values.agent.memberListPort }}
   {{- end }}
-  {{- if or .Values.agent.batchPrerollup.timeout .Values.agent.batchPrerollup.sendBatchSize }}
-  batchPrerollup:
-    timeout: {{ .Values.agent.batchPrerollup.timeout }}
-    sendBatchSize: {{ .Values.agent.batchPrerollup.sendBatchSize }}
-  {{- end }}
-  {{- if or .Values.agent.batchPostrollup.timeout .Values.agent.batchPostrollup.sendBatchSize }}
-  batchPostrollup:
-    timeout: {{ .Values.agent.batchPostrollup.timeout }}
-    sendBatchSize: {{ .Values.agent.batchPostrollup.sendBatchSize }}
-  {{- end }}
   {{- if or .Values.agent.log.prettyConsole .Values.agent.log.nonBlocking .Values.agent.log.level .Values.agent.log.file }}
   log: {{ .Values.agent.log | toYaml | nindent 4 }}
   {{- end }}

@@ -48,7 +48,7 @@ operator:
   ## @param operator.image.pullSecrets Operator image pull secrets
   ##
   image:
-    registry:
+    registry: docker.io/fluxninja
     repository: aperture-operator
     tag: latest
     ## Specify a imagePullPolicy
@@ -348,7 +348,7 @@ controller:
         name: ~
         key: apiKey
       value: ~
-  ## @param controller.image.registry Controller image registry. Defaults to 'docker.io/aperturecontrol'.
+  ## @param controller.image.registry Controller image registry. Defaults to 'docker.io/fluxninja'.
   ## @param controller.image.repository Controller image repository. Defaults to 'aperture-controller'.
   ## @param controller.image.tag Controller image tag (immutable tags are recommended). Defaults to 'latest'.
   ## @param controller.image.pullPolicy Controller image pull policy. Defaults to 'IfNotPresent'.
