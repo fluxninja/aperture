@@ -459,7 +459,6 @@ jobs:
             helm dependency update
             cd ../../../
             helm package manifests/charts/agent --version << parameters.version >> --app-version << parameters.appVersion >>
-            ehco "failed to run the package command"
             mv *.tgz /tmp
             git checkout --orphan gh-pages-test-1
             git rm -rf .
