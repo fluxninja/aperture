@@ -82,8 +82,8 @@ var _ = Describe("Authorization handler", func() {
 	})
 })
 
-var demo1Selector = selectorv1.Selector{
-	Service: "demo1-demo-app.demoapp.svc.cluster.local",
+var service1Selector = selectorv1.Selector{
+	Service: "service1-demo-app.demoapp.svc.cluster.local",
 	ControlPoint: &selectorv1.ControlPoint{
 		Controlpoint: &selectorv1.ControlPoint_Traffic{
 			Traffic: "ingress",
@@ -92,7 +92,7 @@ var demo1Selector = selectorv1.Selector{
 }
 
 var hardcodedRegoRules = classificationv1.Classifier{
-	Selector: &demo1Selector,
+	Selector: &service1Selector,
 	Rules: map[string]*classificationv1.Rule{
 		"destination": {
 			Source: &classificationv1.Rule_Rego_{

@@ -111,9 +111,9 @@ local k = import "github.com/jsonnet-libs/k8s-libsonnet/1.24/main.libsonnet";
 local latencyGradientPolicy = import "github.com/fluxninja/aperture-blueprints/lib/1.0/policies/latency-gradient.libsonnet";
 
 local policy = latencyGradientPolicy({
-  fluxmeterName: "demo1-demo-app",
+  fluxmeterName: "service1-demo-app",
   serviceSelector+: {
-    service: "demo1-demo-app.demoapp.svc.cluster.local"
+    service: "service1-demo-app.demoapp.svc.cluster.local"
   },
 }).policy;
 
