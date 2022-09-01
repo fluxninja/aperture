@@ -457,9 +457,12 @@ jobs:
             curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
             ls -l
             cd manifests/charts/agent
+            echo "change the dir" , pwd
             ls -l
             helm dependency update
+            echo "Done with depl update"
             helm package manifests/charts/agent --version << parameters.version >> --app-version << parameters.appVersion >>
+            ehco "failed to run the package command"
             mv *.tgz /tmp
             git checkout --orphan gh-pages-test-1
             git rm -rf .
