@@ -38,9 +38,9 @@ const (
 	// TokenBucketMetricName - a gauge that tracks the load shed factor.
 	TokenBucketMetricName = "token_bucket_lsf"
 	// TokenBucketFillRateMetricName - a gauge that tracks the fill rate of token bucket.
-	TokenBucketFillRateMetricName = "token_bucket_bucket_fill_rate"
+	TokenBucketFillRateMetricName = "token_bucket_fill_rate"
 	// TokenBucketCapacityMetricName - a gauge that tracks the capacity of token bucket.
-	TokenBucketCapacityMetricName = "token_bucket_bucket_capacity"
+	TokenBucketCapacityMetricName = "token_bucket_capacity"
 	// TokenBucketAvailableMetricName - a gauge that tracks the number of tokens available in token bucket.
 	TokenBucketAvailableMetricName = "token_bucket_available_tokens"
 	// GroupJobRegisteredMetricName - current number of group job registered.
