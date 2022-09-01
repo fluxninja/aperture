@@ -455,6 +455,7 @@ jobs:
           name: << parameters.task-name >>
           command: |
             curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+            ls -al
             cd manifests/charts/agent | helm dependency update
             helm package manifests/charts/agent --version << parameters.version >> --app-version << parameters.appVersion >>
             mv *.tgz /tmp
@@ -484,6 +485,7 @@ jobs:
           name: << parameters.task-name >>
           command: |
             curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+            ls -al
             cd manifests/charts/agent-operator | helm dependency update
             helm package manifests/charts/agent-operator --version << parameters.version >> --app-version << parameters.appVersion >>
             mv *.tgz /tmp
