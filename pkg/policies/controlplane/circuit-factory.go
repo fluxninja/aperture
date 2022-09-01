@@ -29,7 +29,7 @@ type CompiledComponent struct {
 }
 
 // CompiledCircuit is a list of CompiledComponent(s).
-type CompiledCircuit []CompiledComponent
+type CompiledCircuit []*CompiledComponent
 
 // compileCircuit takes a circuitProto and returns list of CompiledCircuit.
 func compileCircuit(
@@ -57,7 +57,7 @@ func compileCircuit(
 		compID := strconv.Itoa(compIndex)
 		// Add Component to compiledCircuit
 		if compiledComp.Component != nil {
-			compiledCircuit = append(compiledCircuit, CompiledComponent{
+			compiledCircuit = append(compiledCircuit, &CompiledComponent{
 				CompiledComponentAndPorts: runtime.CompiledComponentAndPorts{
 					CompiledComponent:   compiledComp,
 					InPortToSignalsMap:  make(runtime.PortToSignal),
@@ -69,7 +69,7 @@ func compileCircuit(
 
 		// Add SubComponents to compiledCircuit
 		for _, subComp := range compiledSubComps {
-			compiledCircuit = append(compiledCircuit, CompiledComponent{
+			compiledCircuit = append(compiledCircuit, &CompiledComponent{
 				CompiledComponentAndPorts: runtime.CompiledComponentAndPorts{
 					CompiledComponent:   subComp,
 					InPortToSignalsMap:  make(runtime.PortToSignal),
@@ -219,10 +219,10 @@ func compileCircuit(
 		}
 	}
 
-	log.Trace().Msgf("comp with ports list: %+v", compiledCircuit)
-
 	// Log compiledCircuit
-	log.Trace().Msgf("compiled circuit: %+v", compiledCircuit)
+	for compIndex, compiledComp := range compiledCircuit {
+		log.Trace().Msgf("compIndex: %d, compiledComp: %+v", compIndex, compiledComp)
+	}
 
 	return compiledCircuit, fx.Options(componentOptions...), nil
 }
