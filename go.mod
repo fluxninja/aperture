@@ -57,7 +57,7 @@ require (
 	go.etcd.io/etcd/api/v3 v3.5.4
 	go.etcd.io/etcd/client/v3 v3.5.4
 	go.opentelemetry.io/collector v0.58.0
-	go.opentelemetry.io/collector/pdata v0.58.0
+	go.opentelemetry.io/collector/pdata v0.59.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0
 	go.opentelemetry.io/otel v1.9.0
 	go.uber.org/automaxprocs v1.5.1
@@ -68,7 +68,7 @@ require (
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 	golang.org/x/net v0.0.0-20220728030405-41545e8bf201
 	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc
-	google.golang.org/grpc v1.48.0
+	google.golang.org/grpc v1.49.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/yaml.v2 v2.4.0
