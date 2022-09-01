@@ -3,7 +3,6 @@ package jobs
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -175,8 +174,6 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 	if !config.InitiallyHealthy {
 		initialErr = errInitialResult
 	}
-
-	fmt.Printf("\n\n registering job: %+v\n", job)
 
 	executor := newJobExecutor(job, jg, config)
 	// add to the tracker
