@@ -463,8 +463,11 @@ jobs:
             git --help
             git checkout --orphan gh-pages-test-1
             git rm -rf .
+            ls -l /tmp
             mv /tmp/*.tgz .
+            echo "Moved the tgz file"
             helm repo index . --url https://fluxninja.github.io/aperture/
+            echo "created index.yaml file"
 
   agent-operator-helm-chart:
     parameters:
