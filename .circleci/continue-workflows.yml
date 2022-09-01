@@ -455,9 +455,11 @@ jobs:
           name: << parameters.task-name >>
           command: |
             curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+            cd manifests/charts/agent | helm dependency update
             helm package manifests/charts/agent --version << parameters.version >> --app-version << parameters.appVersion >>
             mv *.tgz /tmp
             git checkout --orphan gh-pages-test-1
+            git rm -rf .
             mv /tmp/*.tgz .
             helm repo index . --url https://fluxninja.github.io/aperture/
 
@@ -482,9 +484,11 @@ jobs:
           name: << parameters.task-name >>
           command: |
             curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+            cd manifests/charts/agent-operator | helm dependency update
             helm package manifests/charts/agent-operator --version << parameters.version >> --app-version << parameters.appVersion >>
             mv *.tgz /tmp
             git checkout --orphan gh-pages-test-1
+            git rm -rf .
             mv /tmp/*.tgz .
             helm repo index . --url https://fluxninja.github.io/aperture/
 
