@@ -335,6 +335,12 @@ def trace(*msg):
     if TRACE:
         print("TRACE:", *msg)
 
+def merge_dicts(*dicts):
+    merged = {}
+    for d in dicts:
+        merged.update(d)
+    return merged
+
 def build_docker_img(ref, context, dockerfile="Dockerfile", **kwargs):
     # Wrapper around docker_build to not repeat image repo,
     # have context relative to git root
@@ -674,14 +680,24 @@ def resolve_objects(included_matchers, ignored_matchers):
 #################################
 
 
-def forward_port_delayed(workload, labels, resource_deps, namespace, service, local_port, remote_port):
-    cmd = "kubectl port-forward -n %s svc/%s %s:%s" % (namespace, service, local_port, remote_port)
+def forward_port_delayed(workload, labels, resource_deps, namespace, service, local_port, remote_port, extra_env={}, readiness_probe=None):
+    if not readiness_probe:
+        readiness_probe=probe(exec=exec_action(['lsof', '-i', ":%s" % local_port])) # Treat as success if some process listens on this port
     local_resource(
         name=workload,
         labels=labels,
         resource_deps=resource_deps,
-        serve_cmd='while sleep 3; do %s; done' % cmd,
-        readiness_probe=probe(exec=exec_action(['lsof', '-i', ":%s" % local_port])), # Treat as success if some process listens on this port
+        serve_cmd=['./tilt/portforward.sh'],
+        serve_env=merge_dicts(
+            {
+                "NAMESPACE": namespace,
+                "RESOURCE_NAME": service,
+                "LOCAL_PORT": str(local_port),
+                "REMOTE_PORT": str(remote_port),
+            },
+            extra_env,
+        ),
+        readiness_probe=readiness_probe,
     )
 
 
@@ -796,8 +812,19 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
             k8s_kind(**kind)
 
     if "aperture-grafana" in resources:
-        forward_port_delayed(workload="aperture-grafana-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
-                          resource_deps=["aperture-grafana"], service="aperture-grafana", local_port=3000, remote_port=3000)
+        forward_port_delayed(
+            workload="aperture-grafana-forward",
+            namespace=APERTURE_SYSTEM_NS,
+            labels=["Aperture"],
+            resource_deps=["aperture-grafana"],
+            service="aperture-grafana",
+            local_port=3000,
+            remote_port=3000,
+            extra_env={
+                "PERIOD": "1s",
+                "INITIAL_DELAY": "1s",
+            },
+        )
 
     if "agent" in resources:
         forward_port_delayed(workload="aperture-agent-port-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
