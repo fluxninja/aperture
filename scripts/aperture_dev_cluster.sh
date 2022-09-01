@@ -4,11 +4,7 @@ set -euo pipefail
 
 # Values selected due to minikube using them by default
 # If this is changed, update entries in GCP
-readonly cluster_subnet_prefix=192.168.49
-readonly cluster_subnet_mask=24
-readonly cluster_docker_network="ninja-cluster"
-readonly cluster_subnet="${cluster_subnet_prefix}.0/${cluster_subnet_mask}"
-readonly cluster_gateway="${cluster_subnet_prefix}.1"
+readonly cluster_docker_network="kind"
 git_root="$(git rev-parse --show-toplevel)"
 readonly git_root="${git_root}"
 readonly kind_node_version='kindest/node:v1.23.3'
@@ -17,7 +13,6 @@ readonly registry_port='5001' # Docker registry usually uses port 5000, but MacO
 readonly registry_image='registry:2'
 
 setup() {
-  create_cluster_network
   create_registry
   case "${1:-}" in
     kind) setup_kind_cluster;;
@@ -31,7 +26,6 @@ teardown() {
     kind) teardown_kind_cluster;;
     *) printf 'Unknown cluster provider - "%s"\n' "${1:-}"; return 1;;
   esac
-  delete_cluster_network
 }
 
 main() {
@@ -104,43 +98,6 @@ print_help() {
   printf 'Usage: %s <up|down|flip> [kind]\n' "${script_called_name}" >&2
   printf '\tYou can set NINJA_DEV_CLUSTER_PROVIDER env var to declare default value for second argument.\n' >&2
   printf '\tIf neither argument is passed or envar set, it defaults to "kind".\n' >&2
-}
-
-create_cluster_network() {
-  command -v jq &>/dev/null || {
-    printf 'Please install jq: https://stedolan.github.io/jq/download/\n' >&2
-    return 1
-  }
-  local network_config
-  if network_config="$(docker network inspect "${cluster_docker_network}" 2>/dev/null)"; then
-    # Network already exists
-    local configured_subnet
-    configured_subnet="$(<<<"${network_config}" jq -r 'first|.IPAM.Config|first|.Subnet')"
-    if [ "${configured_subnet}" = "${cluster_subnet}" ]; then
-      printf 'Network already configured properly - skipping\n' >&2
-      return
-    else
-      printf 'ERROR: Expected network %s to have subnet %s configured, found %s instead.\n' \
-        "${cluster_docker_network}" "${cluster_subnet}" "${configured_subnet}" >&2
-      return 1
-    fi
-  else
-    # Network doesn't exist - try to create it
-    docker network create --subnet "${cluster_subnet}" --gateway "${cluster_gateway}" "${cluster_docker_network}"
-  fi
-
-  if command -v ip &>/dev/null; then
-    [ -n "$(ip route list "${cluster_subnet}")" ] || {
-      printf 'Expected route to %s subnet to exist.\n' "${cluster_subnet}" >&2
-      return 1
-    }
-  else
-    printf 'Unable to confirm routing table, "ip" command not found\n' >&2
-  fi
-}
-
-delete_cluster_network() {
-  docker network rm "${cluster_docker_network}"
 }
 
 create_registry() {
