@@ -1,14 +1,14 @@
 # Deleting the Aperture Custom Resource creating with the chart in the 'pre-delete' hook.
 # The CR required the operator to gracefully delete all the resources and if the chart is
 # deleted before deleting the CR, it won't get cleaned up properly.
-{{- if or .Values.agent.createUninstallHook .Values.controller.createUninstallHook }}
+{{- if .Values.controller.createUninstallHook }}
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ template "common.names.fullname" . }}-hook
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-operator
+    app.kubernetes.io/component: aperture-controller-manager
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
@@ -25,7 +25,7 @@ spec:
       annotations:
         sidecar.fluxninja.com/injection: "false"
       labels: {{- include "common.labels.standard" . | nindent 8 }}
-        app.kubernetes.io/component: aperture-operator
+        app.kubernetes.io/component: aperture-controller-manager
     spec:
       serviceAccountName: {{ include "aperture-operator.serviceAccountName" . }}
       restartPolicy: Never
@@ -35,10 +35,5 @@ spec:
         command:
           - "/bin/bash"
           - "-xc"
-          {{- if .Values.controller.createUninstallHook }}
           - "kubectl delete controller {{ .Release.Name }} -n {{ template "common.names.namespace" . }}; while (kubectl get controller {{ .Release.Name }} -n {{ template "common.names.namespace" . }}); ret=$?; [ $ret -eq 0 ]; do echo deleting; sleep 2; done"
-          {{- end }}
-          {{- if .Values.agent.createUninstallHook }}
-          - "kubectl delete agent {{ .Release.Name }} -n {{ template "common.names.namespace" . }}; while (kubectl get agent {{ .Release.Name }} -n {{ template "common.names.namespace" . }}); ret=$?; [ $ret -eq 0 ]; do echo deleting; sleep 2; done"
-          {{- end }}
 {{- end }}

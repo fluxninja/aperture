@@ -1,6 +1,6 @@
 apiVersion: v2
-name: aperture-operator
-description: A Helm chart to deploy Aperture operator
+name: aperture-controller
+description: A Helm chart to deploy Aperture Controller
 version: v0.0.1
 appVersion: v0.1.0
 dependencies:

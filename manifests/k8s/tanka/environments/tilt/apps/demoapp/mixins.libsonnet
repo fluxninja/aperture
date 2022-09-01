@@ -10,7 +10,7 @@ local demoappMixin =
       replicaCount: 2,
       simplesrv+: {
         image: {
-          repository: 'gcr.io/devel-309501/cf-fn/demo-app',
+          repository: 'docker.io/fluxninja/demo-app',
           tag: 'test',
         },
       },

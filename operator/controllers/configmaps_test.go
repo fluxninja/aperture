@@ -81,14 +81,18 @@ var _ = Describe("ConfigMap for Agent", func() {
 							Level:         "info",
 							File:          "stderr",
 						},
-					},
-					BatchPrerollup: v1alpha1.Batch{
-						Timeout:       "1s",
-						SendBatchSize: 10000,
-					},
-					BatchPostrollup: v1alpha1.Batch{
-						Timeout:       "1s",
-						SendBatchSize: 10000,
+						OtelConfig: v1alpha1.OtelConfig{
+							GRPCAddr: ":4317",
+							HTTPAddr: ":4318",
+							BatchPrerollup: v1alpha1.Batch{
+								Timeout:       "1s",
+								SendBatchSize: 10000,
+							},
+							BatchPostrollup: v1alpha1.Batch{
+								Timeout:       "1s",
+								SendBatchSize: 10000,
+							},
+						},
 					},
 					DistributedCachePort: 3320,
 					MemberListPort:       3322,
@@ -161,6 +165,18 @@ var _ = Describe("ConfigMap for Agent", func() {
 						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
 							Endpoint:           test,
 							HeartbeatsInterval: "10s",
+						},
+						OtelConfig: v1alpha1.OtelConfig{
+							GRPCAddr: ":4317",
+							HTTPAddr: ":4318",
+							BatchPrerollup: v1alpha1.Batch{
+								Timeout:       "1s",
+								SendBatchSize: 10000,
+							},
+							BatchPostrollup: v1alpha1.Batch{
+								Timeout:       "1s",
+								SendBatchSize: 10000,
+							},
 						},
 					},
 					DistributedCachePort: 3320,
@@ -236,6 +252,18 @@ var _ = Describe("ConfigMap for Controller", func() {
 						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
 							Endpoint:           test,
 							HeartbeatsInterval: "10s",
+						},
+						OtelConfig: v1alpha1.OtelConfig{
+							GRPCAddr: ":4317",
+							HTTPAddr: ":4318",
+							BatchPrerollup: v1alpha1.Batch{
+								Timeout:       "1s",
+								SendBatchSize: 10000,
+							},
+							BatchPostrollup: v1alpha1.Batch{
+								Timeout:       "1s",
+								SendBatchSize: 10000,
+							},
 						},
 					},
 				},
@@ -315,6 +343,18 @@ var _ = Describe("ConfigMap for Controller", func() {
 							},
 							APIKeySecret: v1alpha1.APIKeySecret{
 								Value: test,
+							},
+						},
+						OtelConfig: v1alpha1.OtelConfig{
+							GRPCAddr: ":4317",
+							HTTPAddr: ":4318",
+							BatchPrerollup: v1alpha1.Batch{
+								Timeout:       "1s",
+								SendBatchSize: 10000,
+							},
+							BatchPostrollup: v1alpha1.Batch{
+								Timeout:       "1s",
+								SendBatchSize: 10000,
 							},
 						},
 					},
