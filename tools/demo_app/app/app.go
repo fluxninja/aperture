@@ -14,6 +14,7 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/rs/zerolog"
 )
 
 const (
@@ -80,8 +81,11 @@ func (simpleService SimpleService) Run() error {
 }
 
 func limitClients(h *RequestHandler, n int, l time.Duration) http.Handler {
+	logger := log.Sample(&zerolog.BasicSampler{N: 100})
+
 	sem := make(chan struct{}, n)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger.Info().Msgf("Received request: %s", r.URL.Path)
 		sem <- struct{}{}
 		defer func() {
 			<-sem
