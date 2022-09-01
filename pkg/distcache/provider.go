@@ -133,7 +133,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	}
 	oc.MemberlistConfig.BindAddr = memberlistBindAddr
 	oc.MemberlistConfig.BindPort = memberlistBindPort
-	memberlistAddr := config.MemberlistConfigBindAddr
+	memberlistAddr := oc.MemberlistConfig.BindAddr + ":" + strconv.Itoa(oc.MemberlistConfig.BindPort)
 
 	if config.MemberlistConfigAdvertiseAddr != "" {
 		advertiseAddr, p, e := net.SplitHostPort(config.MemberlistConfigAdvertiseAddr)
