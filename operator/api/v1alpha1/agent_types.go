@@ -51,6 +51,12 @@ type AgentSpec struct {
 	//+kubebuilder:validation:Optional
 	AgentGroup string `json:"agentGroup"`
 
+	// Etcd parameters for Agent
+	Etcd AgentEtcdSpec `json:"etcd"`
+
+	// Prometheus parameters for Agent
+	Prometheus PrometheusSpec `json:"prometheus"`
+
 	// Sidecar defines the desired state of Sidecar setup for Agent
 	//+kubebuilder:validation:Optional
 	//+operator-sdk:csv:customresourcedefinitions:type=spec
@@ -72,7 +78,6 @@ type Agent struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	//+kubebuilder:default:={serverPort:80}
 	Spec   AgentSpec   `json:"spec,omitempty"`
 	Status AgentStatus `json:"status,omitempty"`
 }

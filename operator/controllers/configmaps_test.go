@@ -67,13 +67,6 @@ var _ = Describe("ConfigMap for Agent", func() {
 								Value: test,
 							},
 						},
-						Etcd: v1alpha1.EtcdSpec{
-							Endpoints: []string{"http://agent-etcd:2379"},
-							LeaseTTL:  "60s",
-						},
-						Prometheus: v1alpha1.PrometheusSpec{
-							Address: "http://aperture-prometheus-server:80/",
-						},
 						ServerPort: 80,
 						Log: v1alpha1.Log{
 							PrettyConsole: false,
@@ -93,6 +86,13 @@ var _ = Describe("ConfigMap for Agent", func() {
 								SendBatchSize: 10000,
 							},
 						},
+					},
+					Etcd: v1alpha1.AgentEtcdSpec{
+						Endpoints: []string{"http://agent-etcd:2379"},
+						LeaseTTL:  "60s",
+					},
+					Prometheus: v1alpha1.PrometheusSpec{
+						Address: "http://aperture-prometheus-server:80/",
 					},
 					DistributedCachePort: 3320,
 					MemberListPort:       3322,
@@ -155,13 +155,6 @@ var _ = Describe("ConfigMap for Agent", func() {
 							Level:         "info",
 							File:          "stderr",
 						},
-						Etcd: v1alpha1.EtcdSpec{
-							Endpoints: []string{"http://agent-etcd:2379"},
-							LeaseTTL:  "60s",
-						},
-						Prometheus: v1alpha1.PrometheusSpec{
-							Address: "http://aperture-prometheus-server:80/",
-						},
 						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
 							Endpoint:           test,
 							HeartbeatsInterval: "10s",
@@ -178,6 +171,13 @@ var _ = Describe("ConfigMap for Agent", func() {
 								SendBatchSize: 10000,
 							},
 						},
+					},
+					Etcd: v1alpha1.AgentEtcdSpec{
+						Endpoints: []string{"http://agent-etcd:2379"},
+						LeaseTTL:  "60s",
+					},
+					Prometheus: v1alpha1.PrometheusSpec{
+						Address: "http://aperture-prometheus-server:80/",
 					},
 					DistributedCachePort: 3320,
 					MemberListPort:       3322,
@@ -242,13 +242,6 @@ var _ = Describe("ConfigMap for Controller", func() {
 							Level:         "info",
 							File:          "stderr",
 						},
-						Etcd: v1alpha1.EtcdSpec{
-							Endpoints: []string{"http://agent-etcd:2379"},
-							LeaseTTL:  "60s",
-						},
-						Prometheus: v1alpha1.PrometheusSpec{
-							Address: "http://aperture-prometheus-server:80",
-						},
 						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
 							Endpoint:           test,
 							HeartbeatsInterval: "10s",
@@ -265,6 +258,13 @@ var _ = Describe("ConfigMap for Controller", func() {
 								SendBatchSize: 10000,
 							},
 						},
+					},
+					Etcd: v1alpha1.ControllerEtcdSpec{
+						Endpoints: []string{"http://controller-etcd:2379"},
+						LeaseTTL:  "60s",
+					},
+					Prometheus: v1alpha1.PrometheusSpec{
+						Address: "http://aperture-prometheus-server:80",
 					},
 				},
 			}
@@ -325,13 +325,6 @@ var _ = Describe("ConfigMap for Controller", func() {
 							Level:         "info",
 							File:          "stderr",
 						},
-						Etcd: v1alpha1.EtcdSpec{
-							Endpoints: []string{"http://agent-etcd:2379"},
-							LeaseTTL:  "60s",
-						},
-						Prometheus: v1alpha1.PrometheusSpec{
-							Address: "http://aperture-prometheus-server:80",
-						},
 						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
 							Enabled:            true,
 							Endpoint:           test,
@@ -357,6 +350,13 @@ var _ = Describe("ConfigMap for Controller", func() {
 								SendBatchSize: 10000,
 							},
 						},
+					},
+					Etcd: v1alpha1.ControllerEtcdSpec{
+						Endpoints: []string{"http://controller-etcd:2379"},
+						LeaseTTL:  "60s",
+					},
+					Prometheus: v1alpha1.PrometheusSpec{
+						Address: "http://aperture-prometheus-server:80",
 					},
 				},
 			}

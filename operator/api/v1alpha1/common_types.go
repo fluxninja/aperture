@@ -105,8 +105,19 @@ type Probe struct {
 	SuccessThreshold int32 `json:"successThreshold"`
 }
 
-// EtcdSpec defines Endpoints and LeaseTtl of etcd.
-type EtcdSpec struct {
+// AgentEtcdSpec defines Endpoints and LeaseTtl of etcd used by Aperture Agent.
+type AgentEtcdSpec struct {
+	// Etcd endpoints
+	Endpoints []string `json:"endpoints,omitempty"`
+
+	// Etcd leaseTtl
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="60s"
+	LeaseTTL string `json:"leaseTtl"`
+}
+
+// ControllerEtcdSpec defines Endpoints and LeaseTtl of etcd used by Aperture Controller.
+type ControllerEtcdSpec struct {
 	// Etcd endpoints
 	//+kubebuilder:validation:Optional
 	Endpoints []string `json:"endpoints,omitempty"`
@@ -120,7 +131,6 @@ type EtcdSpec struct {
 // PrometheusSpec defines parameters required for Prometheus connection.
 type PrometheusSpec struct {
 	// Address for Prometheus
-	//+kubebuilder:validation:Optional
 	Address string `json:"address"`
 }
 
@@ -214,15 +224,6 @@ type CommonSpec struct {
 	// Configuration for Agent or Controller service
 	//+kubebuilder:validation:Optional
 	Service Service `json:"service"`
-
-	// Etcd parameters for Agent or Controller
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={leaseTtl:"60s"}
-	Etcd EtcdSpec `json:"etcd"`
-
-	// Prometheus parameters for Agent or Controller
-	//+kubebuilder:validation:Optional
-	Prometheus PrometheusSpec `json:"prometheus"`
 
 	// Server port for the Agent
 	//+kubebuilder:default:=80

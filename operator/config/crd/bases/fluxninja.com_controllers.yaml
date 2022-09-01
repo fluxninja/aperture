@@ -1188,7 +1188,7 @@ spec:
               etcd:
                 default:
                   leaseTtl: 60s
-                description: Etcd parameters for Agent or Controller
+                description: Etcd parameters for Controller
                 properties:
                   endpoints:
                     description: Etcd endpoints
@@ -4528,11 +4528,13 @@ spec:
                 - enabled
                 type: object
               prometheus:
-                description: Prometheus parameters for Agent or Controller
+                description: Prometheus parameters for Controller
                 properties:
                   address:
                     description: Address for Prometheus
                     type: string
+                required:
+                - address
                 type: object
               readinessProbe:
                 default:

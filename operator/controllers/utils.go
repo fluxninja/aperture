@@ -442,7 +442,7 @@ func getAgentAnnotationsWithOwnerRef(instance *v1alpha1.Agent) map[string]string
 }
 
 // checkEtcdEndpoints generates endpoints list based on the release name if that is not provided else returns the provided values.
-func checkEtcdEndpoints(etcd v1alpha1.EtcdSpec, name, namespace string) v1alpha1.EtcdSpec {
+func checkEtcdEndpoints(etcd v1alpha1.ControllerEtcdSpec, name, namespace string) v1alpha1.ControllerEtcdSpec {
 	endpoints := []string{}
 	if etcd.Endpoints != nil {
 		for _, endpoint := range etcd.Endpoints {

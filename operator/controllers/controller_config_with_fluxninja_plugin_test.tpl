@@ -26,7 +26,7 @@ log:
   file:  "stderr"
 
 etcd:
-  endpoints: [http://agent-etcd:2379]
+  endpoints: [http://controller-etcd:2379]
   lease_ttl: 60s
 
 prometheus:
