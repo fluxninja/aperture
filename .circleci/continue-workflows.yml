@@ -439,7 +439,7 @@ jobs:
       task-name:
         type: string
         description: name of the helm chart
-        default: Helm Chart release
+        default: Helm Chart agent release
       appVersion:
         type: string
         description: Give the appVersion
@@ -465,6 +465,7 @@ jobs:
       task-name:
         type: string
         description: name of the helm chart
+        default: Helm Chart agent-operator release
       appVersion:
         type: string
         description: Give the appVersion
