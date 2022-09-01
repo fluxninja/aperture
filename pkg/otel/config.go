@@ -53,7 +53,17 @@ type otelParams struct {
 	OtelConfig
 }
 
+// swagger:operation POST /otel common-configuration Otel
+// ---
+// x-fn-config-env: true
+// parameters:
+// - name: proxy
+//   in: body
+//   schema:
+//     "$ref": "#/definitions/OtelConfig"
+
 // OtelConfig is the configuration for the OTEL collector.
+// swagger:model
 type OtelConfig struct {
 	// GRPC listener addr for OTEL Collector.
 	GRPCAddr string `json:"grpc_addr" validate:"hostname_port" default:":4317"`

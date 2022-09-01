@@ -14,6 +14,7 @@
 | `liveness`          | [Liveness](#liveness)                  |
 | `log`               | [Log](#log)                            |
 | `metrics`           | [Metrics](#metrics)                    |
+| `otel`              | [Otel](#otel)                          |
 | `peer_discovery`    | [PeerDiscovery](#peer-discovery)       |
 | `plugins`           | [Plugins](#plugins)                    |
 | `profilers`         | [Profilers](#profilers)                |
@@ -35,6 +36,7 @@
 - [AdaptivePolicy](#adaptive-policy) – AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
 - [AgentInfoConfig](#agent-info-config) – AgentInfoConfig is the configuration for the agent group etc.
 - [BackoffConfig](#backoff-config) – BackoffConfig holds configuration for GRPC Client Backoff.
+- [Batch](#batch) – Batch defines configuration for OTEL batch processor.
 - [ClientTLSConfig](#client-tls-config) – ClientTLSConfig is the config for client TLS.
 - [DistCacheConfig](#dist-cache-config) – DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
 - [EntityConfig](#entity-config) – EntityConfig describes a single entity.
@@ -54,6 +56,7 @@
 - [LogConfig](#log-config) – LogConfig holds configuration for a logger and log writers.
 - [LogWriterConfig](#log-writer-config) – LogWriterConfig holds configuration for a log writer.
 - [MetricsConfig](#metrics-config) – MetricsConfig holds configuration for service metrics.
+- [OtelConfig](#otel-config) – OtelConfig is the configuration for the OTEL collector.
 - [PeerDiscoveryConfig](#peer-discovery-config) – PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
 - [PluginsConfig](#plugins-config) – PluginsConfig holds configuration for plugins.
 - [ProfilersConfig](#profilers-config) – ProfilersConfig holds configuration for profilers.
@@ -257,6 +260,25 @@ Env-Var Prefix: `APERTURE_AGENT_METRICS_`
 
 Env-Var Prefix: `APERTURE_AGENT_METRICS_`
 Type: [MetricsConfig](#metrics-config)
+
+</dd>
+</dl>
+
+### <span id="otel"></span> _Otel_
+
+Key: `otel`
+
+Env-Var Prefix: `APERTURE_AGENT_OTEL_`
+
+#### Members
+
+<dl>
+
+<dt>proxy</dt>
+<dd>
+
+Env-Var Prefix: `APERTURE_AGENT_OTEL_PROXY_`
+Type: [OtelConfig](#otel-config)
 
 </dd>
 </dl>
@@ -560,6 +582,29 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 <dd>
 
 (float64, `gte=0`, default: `1.6`) Backoff multiplier
+
+</dd>
+</dl>
+
+### <span id="batch"></span> Batch
+
+Batch defines configuration for OTEL batch processor.
+
+#### Properties
+
+<dl>
+<dt>send_batch_size</dt>
+<dd>
+
+(uint32, `gt=0`, default: `10000`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+
+</dd>
+</dl>
+<dl>
+<dt>timeout</dt>
+<dd>
+
+(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
 
 </dd>
 </dl>
@@ -1375,6 +1420,45 @@ MetricsConfig holds configuration for service metrics.
 <dd>
 
 (bool, default: `false`) Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+
+</dd>
+</dl>
+
+### <span id="otel-config"></span> OtelConfig
+
+OtelConfig is the configuration for the OTEL collector.
+
+#### Properties
+
+<dl>
+<dt>grpc_addr</dt>
+<dd>
+
+(string, `hostname_port`, default: `:4317`) GRPC listener addr for OTEL Collector.
+
+</dd>
+</dl>
+<dl>
+<dt>http_addr</dt>
+<dd>
+
+(string, `hostname_port`, default: `:4318`) HTTP listener addr for OTEL Collector.
+
+</dd>
+</dl>
+<dl>
+<dt>batch_postrollup</dt>
+<dd>
+
+([Batch](#batch))
+
+</dd>
+</dl>
+<dl>
+<dt>batch_prerollup</dt>
+<dd>
+
+([Batch](#batch))
 
 </dd>
 </dl>
