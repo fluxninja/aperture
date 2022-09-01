@@ -3,6 +3,7 @@ package distcache
 import (
 	"context"
 	"errors"
+	stdlog "log"
 	"net"
 	"strconv"
 	"sync"
@@ -107,6 +108,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	oc.ReadQuorum = 1
 	oc.MemberCountQuorum = 1
 	oc.DMaps.Custom = make(map[string]olricconfig.DMap)
+	oc.Logger = stdlog.New(&OlricLogWriter{Logger: log.GetGlobalLogger()}, "", 0)
 
 	bindAddr, port, err := net.SplitHostPort(config.BindAddr)
 	if err != nil {
