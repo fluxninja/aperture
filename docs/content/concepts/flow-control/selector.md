@@ -1,5 +1,5 @@
 ---
-title: Selector
+title: Flow Selector
 sidebar_position: 1
 keywords:
   - flows
@@ -8,14 +8,16 @@ keywords:
   - labels
 ---
 
-# Selector
+:::info
+See also [Selector reference](/reference/configuration/policies#-v1selector)
+:::
 
 Flow observability and control components are instantiated on Aperture Agents
 and select flows based on scoping rules defined in the Selectors.
 
 A Selector consists of following fields:
 
-## Agent Group
+### Agent Group
 
 Agent Group is a flexible label that defines a collection of agents that operate
 as peers. For example, an Agent Group can be a Kubernetes cluster name in case
@@ -28,7 +30,7 @@ Agents within an Agent Group form a peer-to-peer network. Agents synchronize
 fine-grained state such as per label global counters that are used for rate
 limiting purposes.
 
-## Service
+### Service
 
 Service in Aperture is similar to services tracked in Kubernetes, Consul etc. A
 Service is a collection of entities delivering a common functionality, such as,
@@ -45,12 +47,12 @@ In addition, Aperture also has a concept of a `*` catch-all service. When the
 Selector contains a catch-all service, it matches for all discovered entities
 within a Agent Group.
 
-## Control Point
+### Control Point
 
 A policy or rule is configured for a given control point within a service. Control
 Point is either a library feature name or one of ingress/egress traffic points.
 
-## Label Matcher
+### Label Matcher
 
 Label Matcher is part of the classifier on whether a map of labels should be considered
 a match or not. If multiple requirements are set, they are all ANDed. An empty label

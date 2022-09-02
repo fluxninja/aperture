@@ -1062,9 +1062,10 @@ type RateLimiter struct {
 	LimitResetInterval *durationpb.Duration `protobuf:"bytes,3,opt,name=limit_reset_interval,json=limitResetInterval,proto3" json:"limit_reset_interval,omitempty" default:"60s"` // @gotags: default:"60s"
 	// Specifies which label the ratelimiter should be keyed by.
 	//
-	// Rate limiting is done independently for each value of the label with given
-	// key. Eg., to give each user a separate limit, assuming you have a _user_
-	// flow label set up, set `label_key: "user"`.
+	// Rate limiting is done independently for each value of the
+	// [label](/concepts/flow-control/label/label.md) with given key.
+	// Eg., to give each user a separate limit, assuming you have a _user_ flow
+	// label set up, set `label_key: "user"`.
 	//
 	// TODO make it possible for this field to be optional – to achieve global ratelimit.
 	LabelKey string `protobuf:"bytes,4,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -1259,7 +1260,7 @@ type Scheduler struct {
 	Selector *v1.Selector `protobuf:"bytes,2,opt,name=selector,proto3" json:"selector,omitempty"`
 	// List of workloads to be used in scheduler.
 	//
-	// Categorizing [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) into workloads
+	// Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 	// allows for load-shedding to be "smarter" than just "randomly deny 50% of
 	// requests". There are two aspects of this "smartness":
 	// * Scheduler can more precisely calculate concurrency if it understands
@@ -2522,9 +2523,8 @@ type Scheduler_Workload struct {
 	// Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
 	// This override is applicable only if `auto_tokens` is set to false.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" default:"1"` // @gotags: default:"1"
-	// Fairness key is a label key that can be used to provide fairness within a workload
-	//
-	// Any label that could be used in label matcher can be used here. Eg. if
+	// Fairness key is a label key that can be used to provide fairness within a workload.
+	// Any [flow label](/concepts/flow-control/label/label.md) can be used here. Eg. if
 	// you have a classifier that sets `user` flow label, you might want to set
 	// `fairness_key = "user"`.
 	FairnessKey string `protobuf:"bytes,3,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`
@@ -2588,9 +2588,10 @@ type Scheduler_WorkloadAndLabelMatcher struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Workload associated with requests matching the label matcher.
+	// Workload associated with flows matching the label matcher.
 	Workload *Scheduler_Workload `protobuf:"bytes,1,opt,name=workload,proto3" json:"workload,omitempty"`
-	// Label Matcher to select a Workload.
+	// Label Matcher to select a Workload based on
+	// [flow labels](/concepts/flow-control/label/label.md).
 	LabelMatcher *v11.LabelMatcher `protobuf:"bytes,2,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty"`
 }
 
@@ -2650,7 +2651,7 @@ type Scheduler_Outs struct {
 	//
 	// :::info
 	// **Accepted tokens** are tokens associated with
-	// [flows](/concepts/flow-control/flow-control.md#what-is-a-flow) that were accepted by
+	// [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
 	// this scheduler. Number of tokens for a flow is determined by a
 	// [workload](#-schedulerworkload) that the flow was assigned to (either
 	// via `auto_tokens` or explicitly by `Workload.tokens`).
