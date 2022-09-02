@@ -66,6 +66,20 @@ func (mr *MockEngineMockRecorder) ProcessRequest(controlPoint, serviceIDs, label
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessRequest", reflect.TypeOf((*MockEngine)(nil).ProcessRequest), controlPoint, serviceIDs, labels)
 }
 
+// RegisterClassifier mocks base method.
+func (m *MockEngine) RegisterClassifier(c iface.Classifier) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RegisterClassifier", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RegisterClassifier indicates an expected call of RegisterClassifier.
+func (mr *MockEngineMockRecorder) RegisterClassifier(c interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterClassifier", reflect.TypeOf((*MockEngine)(nil).RegisterClassifier), c)
+}
+
 // RegisterConcurrencyLimiter mocks base method.
 func (m *MockEngine) RegisterConcurrencyLimiter(sa iface.Limiter) error {
 	m.ctrl.T.Helper()
@@ -106,6 +120,20 @@ func (m *MockEngine) RegisterRateLimiter(l iface.RateLimiter) error {
 func (mr *MockEngineMockRecorder) RegisterRateLimiter(l interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterRateLimiter", reflect.TypeOf((*MockEngine)(nil).RegisterRateLimiter), l)
+}
+
+// UnregisterClassifier mocks base method.
+func (m *MockEngine) UnregisterClassifier(c iface.Classifier) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UnregisterClassifier", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UnregisterClassifier indicates an expected call of UnregisterClassifier.
+func (mr *MockEngineMockRecorder) UnregisterClassifier(c interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterClassifier", reflect.TypeOf((*MockEngine)(nil).UnregisterClassifier), c)
 }
 
 // UnregisterConcurrencyLimiter mocks base method.
