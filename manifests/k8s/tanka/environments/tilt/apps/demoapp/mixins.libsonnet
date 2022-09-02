@@ -3,6 +3,11 @@ local k = import 'github.com/jsonnet-libs/k8s-libsonnet/1.22/main.libsonnet';
 
 local demoApp = import 'apps/demoapp/main.libsonnet';
 local latencyGradientPolicy = import 'github.com/fluxninja/aperture-blueprints/lib/1.0/policies/latency-gradient.libsonnet';
+local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
+
+local Workload = aperture.v1.SchedulerWorkload;
+local LabelMatcher = aperture.v1.LabelMatcher;
+local WorkloadWithLabelMatcher = aperture.v1.SchedulerWorkloadAndLabelMatcher;
 
 local demoappMixin =
   demoApp {
@@ -31,6 +36,22 @@ local policy = latencyGradientPolicy({
   policyName: 'service1-demo-app',
   serviceSelector+: {
     service: 'service1-demo-app.demoapp.svc.cluster.local',
+  },
+  concurrencyLimiter+: {
+    defaultWorkload: {
+      priority: 20,
+      timeout: '0.025s',
+    },
+    workloads: [
+      WorkloadWithLabelMatcher.new(
+        workload=Workload.withPriority(50) + Workload.withTimeout('0.025s'),
+        label_matcher=LabelMatcher.withMatchLabels({ 'request_header_user-type': 'guest' })
+      ),
+      WorkloadWithLabelMatcher.new(
+        workload=Workload.withPriority(200) + Workload.withTimeout('0.025s'),
+        label_matcher=LabelMatcher.withMatchLabels({ 'request_header_user-type': 'subscriber' })
+      ),
+    ],
   },
 }).policy;
 

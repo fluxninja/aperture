@@ -6,5 +6,5 @@ agentservice:
   port: 80
   otlpPort: 4317
 
-authzGrpcTimeout: 0.01s
+authzGrpcTimeout: 0.5s
 maxRequestBytes: 8192
