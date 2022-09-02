@@ -225,19 +225,19 @@ func (p *metricsProcessor) updateMetrics(
 	statusCodeStr := statusCode.StringVal()
 
 	for _, decision := range checkResponse.LimiterDecisions {
+		workload := ""
+		if cl := decision.GetConcurrencyLimiter(); cl != nil {
+			workload = cl.GetWorkloadIndex()
+		}
 		labels := map[string]string{
 			metrics.PolicyNameLabel:     decision.PolicyName,
 			metrics.PolicyHashLabel:     decision.PolicyHash,
 			metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
 			metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
+			metrics.WorkloadIndexLabel:  workload,
 		}
-		log.Trace().Msgf("labels: %v", labels)
 
-		workload := ""
-		if cl := decision.GetConcurrencyLimiter(); cl != nil {
-			workload = cl.GetWorkloadIndex()
-		}
-		err = p.updateMetricsForWorkload(labels, latency, workload)
+		err = p.updateMetricsForWorkload(labels, latency)
 		if err != nil {
 			return err
 		}
@@ -250,8 +250,7 @@ func (p *metricsProcessor) updateMetrics(
 	return nil
 }
 
-func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64, workload string) error {
-	labels[metrics.WorkloadIndexLabel] = workload
+func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64) error {
 	latencyHistogram, err := p.workloadLatencyHistogram.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Getting latency histogram")

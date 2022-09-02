@@ -40,15 +40,15 @@ local policy = latencyGradientPolicy({
   concurrencyLimiter+: {
     defaultWorkload: {
       priority: 20,
-      timeout: '0.05s',
+      timeout: '0.01s',
     },
     workloads: [
       WorkloadWithLabelMatcher.new(
-        workload=Workload.withPriority(50) + Workload.withTimeout('0.05s'),
+        workload=Workload.withPriority(50) + Workload.withTimeout('0.01s'),
         label_matcher=LabelMatcher.withMatchLabels({ 'request_header_user-type': 'guest' })
       ),
       WorkloadWithLabelMatcher.new(
-        workload=Workload.withPriority(200) + Workload.withTimeout('0.05s'),
+        workload=Workload.withPriority(200) + Workload.withTimeout('0.01s'),
         label_matcher=LabelMatcher.withMatchLabels({ 'request_header_user-type': 'subscriber' })
       ),
     ],
