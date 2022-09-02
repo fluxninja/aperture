@@ -42,12 +42,12 @@ See our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ### Reporting bugs or requesting features
 
-Reporting bugs helps us improve our product to be more reliable and user friendly.
+Reporting bugs helps us improve Aperture to be more reliable and user friendly.
 Please make sure to include all the required information to reproduce and understand the bug you are reporting.
 
 Follow helper questions in bug report template to make it easier.
 
-If you see a way to improve Aperture, by extending it's rich features portfolio, use the feature request
+If you see a way to improve Aperture, use the feature request
 template to create an issue. Make sure to explain the problem you are trying to solve and what is the
 expected behavior.
 
@@ -58,7 +58,7 @@ Try starting with:
 
 - [Good First Issue](https://github.com/fluxninja/aperture/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 
-For your convenience, all the needed development tools can be install with [`asdf`](manifests/k8s/README.md#tools).
+For your convenience, all the needed development tools can be installed with [`asdf`](manifests/k8s/README.md#tools).
 
 Before committing, install `pre-commit` hooks, which will automatically check if your code meets our standards.
 
@@ -71,6 +71,6 @@ After your first PR is created you would be asked to sign our [Contributor Licen
 
 ## Resources
 
-For better understanding of Aperture, refer to the following external resources.
+For better understanding of Aperture, refer to the following resources.
 
 - [Documentation](docs/content/introduction.md)
