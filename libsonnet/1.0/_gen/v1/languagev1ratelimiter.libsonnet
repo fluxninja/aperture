@@ -1,4 +1,4 @@
-local languagev1ratelimiterins = import './languagev1ratelimiterins.libsonnet';
+local languagev1ratelimiterins = import './ratelimiterins.libsonnet';
 {
   new():: {
     in_ports: {
