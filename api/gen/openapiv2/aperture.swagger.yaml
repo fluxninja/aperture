@@ -244,28 +244,6 @@ definitions:
           Priority level ranges from 0 to 255.
           Higher numbers means higher priority level.
         x-go-validate: gte=0,lte=255
-      timeout:
-        type: string
-        description: |-
-          This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
-
-          :::caution
-          This timeout needs to be strictly less than the timeout set on the
-          client for the whole GRPC call:
-          * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-          * in case of libraries, timeout configured... TODO.
-
-          We're using fail-open logic in integrations, so if the GRPC timeout
-          fires first, the flow will end up being unconditionally allowed while
-          it're still waiting on the scheduler.
-
-          To avoid such cases, the end-to-end GRPC timeout should also contain
-          some headroom for constant overhead like serialization, etc. Default
-          value for GRPC timeouts is 10ms, giving 5ms of headeroom, so when
-          tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
-          :::
-        title: Timeout override decides how long a request in the workload can wait for tokens
-        x-go-default: 0.005s
       tokens:
         type: string
         format: uint64
@@ -1678,12 +1656,43 @@ definitions:
       default_workload:
         $ref: '#/definitions/SchedulerWorkload'
         description: Workload to be used if none of workloads specified in `workloads` match.
+      max_timeout:
+        type: string
+        description: |-
+          :::caution
+          This timeout needs to be strictly less than the timeout set on the
+          client for the whole GRPC call:
+          * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
+          * in case of libraries, timeout configured... TODO.
+
+          We're using fail-open logic in integrations, so if the GRPC timeout
+          fires first, the flow will end up being unconditionally allowed while
+          it're still waiting on the scheduler.
+
+          To avoid such cases, the end-to-end GRPC timeout should also contain
+          some headroom for constant overhead like serialization, etc. Default
+          value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+          tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+          :::
+        title: Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
+        x-go-default: 0.45s
       out_ports:
         $ref: '#/definitions/v1SchedulerOuts'
         description: Output ports for the Scheduler component.
       selector:
         $ref: '#/definitions/v1Selector'
         description: Selector decides for which service or flows the scheduler will be applied.
+      timeout_factor:
+        type: number
+        format: double
+        description: |-
+          If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+          it will be rejected.
+
+          This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
+        title: Timeout as a factor of tokens for a flow in a workload
+        x-go-default: 0.5
+        x-go-validate: gte=0.0
       workloads:
         type: array
         items:
