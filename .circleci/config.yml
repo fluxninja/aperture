@@ -241,10 +241,10 @@ workflows:
             parameters:
               executor: [ ubuntu-go-executor ]
               goarch: [ amd64 ]
-  helm-chart-lint:
-    jobs:
-      - path-filtering/filter:
-          base-revision: main
-          config-path: .circleci/continue-workflows.yml
-          mapping: |
-            manifests/charts/.* updated-aperture-charts true
+  # helm-chart-lint:
+  #   jobs:
+  #     - path-filtering/filter:
+  #         base-revision: main
+  #         config-path: .circleci/continue-workflows.yml
+  #         mapping: |
+  #           manifests/charts/.* updated-aperture-charts true
