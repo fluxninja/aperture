@@ -16,3 +16,4 @@ kustomize 4.5.5
 kind 0.14.0
 jb 0.5.1
 tanka 0.22.1
+tilt 0.30.7
