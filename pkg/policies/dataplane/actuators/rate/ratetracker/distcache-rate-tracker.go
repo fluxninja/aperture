@@ -10,16 +10,16 @@ import (
 	"github.com/fluxninja/aperture/pkg/distcache"
 )
 
-// OlricRateTracker implements Limiter.
-type OlricRateTracker struct {
+// DistCacheRateTracker implements Limiter.
+type DistCacheRateTracker struct {
 	mu         sync.RWMutex
 	limitCheck RateLimitChecker
 	dMap       *olric.DMap
 	name       string
 }
 
-// NewOlricRateTracker creates a new instance of OlricRateLimiter.
-func NewOlricRateTracker(limitCheck RateLimitChecker, dc *distcache.DistCache, name string, ttl time.Duration) (RateTracker, error) {
+// NewDistCacheRateTracker creates a new instance of DistCacheRateTracker.
+func NewDistCacheRateTracker(limitCheck RateLimitChecker, dc *distcache.DistCache, name string, ttl time.Duration) (RateTracker, error) {
 	dmapConfig := config.DMap{
 		TTLDuration: ttl,
 	}
@@ -33,7 +33,7 @@ func NewOlricRateTracker(limitCheck RateLimitChecker, dc *distcache.DistCache, n
 	}
 	dc.RemoveDMapCustomConfig(name)
 
-	ol := &OlricRateTracker{
+	ol := &DistCacheRateTracker{
 		name:       name,
 		dMap:       dMap,
 		limitCheck: limitCheck,
@@ -42,13 +42,13 @@ func NewOlricRateTracker(limitCheck RateLimitChecker, dc *distcache.DistCache, n
 	return ol, nil
 }
 
-// Name returns the name of the OlricRateLimiter.
-func (ol *OlricRateTracker) Name() string {
+// Name returns the name of the DistCacheRateTracker.
+func (ol *DistCacheRateTracker) Name() string {
 	return ol.name
 }
 
-// Close cleans up DMap held within the OlricRateLimiter.
-func (ol *OlricRateTracker) Close() error {
+// Close cleans up DMap held within the DistCacheRateTracker.
+func (ol *DistCacheRateTracker) Close() error {
 	ol.mu.Lock()
 	defer ol.mu.Unlock()
 	err := ol.dMap.Destroy()
@@ -59,13 +59,13 @@ func (ol *OlricRateTracker) Close() error {
 }
 
 // Take is a wrapper for TakeN(label, 1).
-func (ol *OlricRateTracker) Take(label string) (bool, int, int) {
+func (ol *DistCacheRateTracker) Take(label string) (bool, int, int) {
 	return ol.TakeN(label, 1)
 }
 
 // TakeN increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // If an error occurred it returns true, 0 and 0 (fail open).
-func (ol *OlricRateTracker) TakeN(label string, n int) (bool, int, int) {
+func (ol *DistCacheRateTracker) TakeN(label string, n int) (bool, int, int) {
 	ol.mu.RLock()
 	defer ol.mu.RUnlock()
 	newN, err := ol.dMap.Incr(label, n)
@@ -76,10 +76,10 @@ func (ol *OlricRateTracker) TakeN(label string, n int) (bool, int, int) {
 	return ok, remaining, newN
 }
 
-// GetRateLimitChecker returns the RateLimitCheck of the OlricRateLimiter.
-func (ol *OlricRateTracker) GetRateLimitChecker() RateLimitChecker {
+// GetRateLimitChecker returns the RateLimitCheck of the DistCacheRateTracker.
+func (ol *DistCacheRateTracker) GetRateLimitChecker() RateLimitChecker {
 	return ol.limitCheck
 }
 
-// Make sure OlricRateLimiter implements Limiter interface.
-var _ RateTracker = (*OlricRateTracker)(nil)
+// Make sure DistCacheRateTracker implements Limiter interface.
+var _ RateTracker = (*DistCacheRateTracker)(nil)
