@@ -2,3 +2,8 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Controller
 metadata:
   name: controller-sample
+spec:
+  config:
+    otel:
+      batch_prerollup:
+        timeout: 2s

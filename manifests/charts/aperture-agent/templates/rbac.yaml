@@ -303,7 +303,7 @@ subjects:
   namespace: {{ template "common.names.namespace" . }}
 {{- end }}
 ---
-{{- if .Values.operator.serviceAccount.create -}}
+{{ if .Values.operator.serviceAccount.create -}}
 apiVersion: v1
 kind: ServiceAccount
 metadata:

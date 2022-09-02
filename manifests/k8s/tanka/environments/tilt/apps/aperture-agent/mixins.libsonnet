@@ -18,6 +18,13 @@ local apertureControllerMixin =
         fluxninjaPlugin+: {
           enabled: false,
         },
+        config+: {
+          otel: {
+            batch_prerollup: {
+              timeout: '2s',
+            },
+          },
+        },
         log+: {
           prettyConsole: true,
           nonBlocking: false,
@@ -47,6 +54,13 @@ local apertureAgentMixin =
         createUninstallHook: false,
         fluxninjaPlugin+: {
           enabled: false,
+        },
+        config+: {
+          otel: {
+            batch_prerollup: {
+              timeout: '2s',
+            },
+          },
         },
         log+: {
           prettyConsole: true,

@@ -18,14 +18,17 @@ package controllers
 
 import (
 	"bytes"
+	_ "embed"
 	"encoding/pem"
 	"fmt"
 	"os"
+	"text/template"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 
@@ -340,11 +343,11 @@ var _ = Describe("Tests for containerProbes", func() {
 				SuccessThreshold:    1,
 			}
 
-			var expectedRediness *corev1.Probe
+			var expectedReadiness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -378,11 +381,11 @@ var _ = Describe("Tests for containerProbes", func() {
 
 			expectedLiveness := probe
 
-			var expectedRediness *corev1.Probe
+			var expectedReadiness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -407,7 +410,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				},
 			}
 
-			expectedRediness := &corev1.Probe{
+			expectedReadiness := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/readiness",
@@ -424,9 +427,9 @@ var _ = Describe("Tests for containerProbes", func() {
 
 			var expectedLiveness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -458,13 +461,13 @@ var _ = Describe("Tests for containerProbes", func() {
 				},
 			}
 
-			expectedRediness := probe
+			expectedReadiness := probe
 
 			var expectedLiveness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -497,7 +500,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				},
 			}
 
-			expectedRediness := &corev1.Probe{
+			expectedReadiness := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/readiness",
@@ -527,9 +530,9 @@ var _ = Describe("Tests for containerProbes", func() {
 				SuccessThreshold:    1,
 			}
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 })
@@ -1470,7 +1473,7 @@ var _ = Describe("Tests for checkCertificate", func() {
 })
 
 var _ = Describe("Tests for CheckAndGenerateCert", func() {
-	Context("When service name is not provided in envrionment variable", func() {
+	Context("When service name is not provided in environment variable", func() {
 		It("it should not create cert", func() {
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", certDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls3.crt")
@@ -1495,6 +1498,66 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 			Expect(checkCertificate()).To(Equal(false))
 			Expect(CheckAndGenerateCertForOperator()).To(BeNil())
 			Expect(checkCertificate()).To(Equal(true))
+		})
+	})
+})
+
+//go:embed agent_config_without_fluxninja_plugin_custom_test.tpl
+var agentConfigWithOutFluxNinjaPluginCustomTest string
+
+var _ = Describe("Tests for mergeConfigMaps", func() {
+	Context("When custom config is provided", func() {
+		It("it should return overridden config", func() {
+			t, err := template.New("config").Parse(agentConfigWithOutFluxNinjaPluginTest)
+			if err != nil {
+				panic(fmt.Errorf("failed to parse test config for Agent. error: '%s'", err.Error()))
+			}
+			var config bytes.Buffer
+			if err := t.Execute(&config, struct{}{}); err != nil {
+				panic(err)
+			}
+			custom := map[string]interface{}{
+				"dist_cache": map[string]interface{}{
+					"memberlist_config_bind_addr": ":8000",
+				},
+				"otel": map[string]interface{}{
+					"batch_prerollup": map[string]interface{}{
+						"send_batch_size": 500,
+					},
+				},
+			}
+			t, err = template.New("config").Parse(agentConfigWithOutFluxNinjaPluginCustomTest)
+			if err != nil {
+				panic(fmt.Errorf("failed to parse test config for Agent. error: '%s'", err.Error()))
+			}
+			var expected bytes.Buffer
+			if err := t.Execute(&expected, struct{}{}); err != nil {
+				panic(err)
+			}
+
+			overridden, err := mergeConfigMaps(custom, config.String())
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(expected.String()).To(Equal(overridden))
+		})
+	})
+
+	Context("When custom config is not provided", func() {
+		It("it should return default config", func() {
+			t, err := template.New("config").Parse(agentConfigWithOutFluxNinjaPluginTest)
+			if err != nil {
+				panic(fmt.Errorf("failed to parse test config for Agent. error: '%s'", err.Error()))
+			}
+			var config bytes.Buffer
+			if err := t.Execute(&config, struct{}{}); err != nil {
+				panic(err)
+			}
+			custom := unstructured.Unstructured{}.Object
+
+			overridden, err := mergeConfigMaps(custom, config.String())
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(config.String()).To(Equal(overridden))
 		})
 	})
 })

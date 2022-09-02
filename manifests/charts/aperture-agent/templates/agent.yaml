@@ -32,10 +32,13 @@ spec:
   {{- if .Values.agent.agentGroup }}
   agentGroup: {{ .Values.agent.agentGroup }}
   {{- end }}
+  {{- if .Values.agent.config }}
+  config: {{ .Values.agent.config | toYaml | nindent 4 }}
+  {{- end }}
   serviceAccount:
     create: {{ .Values.agent.serviceAccount.create }}
     {{- if .Values.agent.serviceAccount.annotations }}
-    annotations: {{ .Values.agent.serviceAccount.annotations | toYaml | indent 6 }}
+    annotations: {{ .Values.agent.serviceAccount.annotations | toYaml | nindent 6 }}
     {{- end }}
     {{- if .Values.agent.serviceAccount.automountServiceAccountToken }}
     automountServiceAccountToken: {{ .Values.agent.serviceAccount.automountServiceAccountToken }}

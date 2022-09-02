@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"k8s.io/apimachinery/pkg/runtime"
+
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -198,6 +200,11 @@ type FluxNinjaPluginSpec struct {
 
 // CommonSpec defines the desired the common state of Agent and Controller.
 type CommonSpec struct {
+	// Custom config block for Agent or Controller
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:pruning:PreserveUnknownFields
+	Config runtime.RawExtension `json:"config,omitempty"`
+
 	// Labels to add to all deployed objects
 	//+mapType=atomic
 	//+kubebuilder:validation:Optional

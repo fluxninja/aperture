@@ -374,6 +374,9 @@ controller:
   ## @param controller.serverPort The Controller's server port. Defaults to 80.
   ##
   serverPort: ~
+  ## @param controller.config Custom configuration for the Controller. Available configuration parameters can be found at https://github.com/fluxninja/aperture/blob/main/docs/gen/config/aperture-controller/swagger.md.
+  ##
+  config: ~
   ## @param controller.hostAliases Add deployment host aliases for Controller deployment
   ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
   ##

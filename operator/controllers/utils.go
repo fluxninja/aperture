@@ -35,6 +35,7 @@ import (
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	"github.com/imdario/mergo"
+	"gopkg.in/yaml.v2"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -823,4 +824,27 @@ func updateResource(client client.Client, ctx context.Context, instance client.O
 	}
 
 	return nil
+}
+
+// mergeConfigMaps merges the default config map with the config provided by the User.
+func mergeConfigMaps(dest map[string]interface{}, defaultConfig string) (string, error) {
+	if dest == nil {
+		return defaultConfig, nil
+	}
+
+	var source map[string]interface{}
+	if err := yaml.Unmarshal([]byte(defaultConfig), &source); err != nil {
+		return "", fmt.Errorf("failed to override the config. Error: '%s'", err.Error())
+	}
+
+	if err := mergo.Map(&source, dest, mergo.WithOverride); err != nil {
+		return "", fmt.Errorf("failed to merge the config. Error: '%s'", err.Error())
+	}
+
+	yamlData, err := yaml.Marshal(source)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal the config in YAML. Error: '%s'", err.Error())
+	}
+
+	return string(yamlData), nil
 }

@@ -877,6 +877,10 @@ spec:
                 items:
                   type: string
                 type: array
+              config:
+                description: Custom config block for Agent or Controller
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
               containerSecurityContext:
                 default:
                   enabled: false

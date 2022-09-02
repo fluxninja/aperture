@@ -1,52 +1,44 @@
-server:
-  addr: ":{{ .ServerPort }}"
-
 dist_cache:
   bind_addr: ":{{ .DistributedCachePort }}"
   memberlist_config_bind_addr: ":{{ .MemberListPort }}"
-
-otel:
-  grpc_addr: "{{ .OtelConfig.GRPCAddr }}"
-  http_addr: "{{ .OtelConfig.HTTPAddr }}"
-  batch_prerollup:
-    timeout: {{ .OtelConfig.BatchPrerollup.Timeout }}
-    send_batch_size: {{ .OtelConfig.BatchPrerollup.SendBatchSize }}
-  batch_postrollup:
-    timeout: {{ .OtelConfig.BatchPostrollup.Timeout }}
-    send_batch_size: {{ .OtelConfig.BatchPostrollup.SendBatchSize }}
-
-log:
-  pretty_console: {{ .Log.PrettyConsole }}
-  non_blocking:  {{ .Log.NonBlocking }}
-  level: "{{ .Log.Level }}"
-  file:  "{{ .Log.File }}"
-
 etcd:
   endpoints: {{ .Etcd.Endpoints }}
   lease_ttl: {{ .Etcd.LeaseTTL }}
-
-prometheus:
-  address: "{{ .PrometheusAddress }}"
-
+{{- if .FluxNinjaPlugin.Enabled }}
+fluxninja_plugin:
+  client_grpc:
+    insecure: {{ .FluxNinjaPlugin.TLS.Insecure }}
+    tls:
+      ca_file: {{ .FluxNinjaPlugin.TLS.CAFile }}
+      insecure_skip_verify: {{ .FluxNinjaPlugin.TLS.InsecureSkipVerify }}
+  client_http:
+    tls:
+      ca_file: {{ .FluxNinjaPlugin.TLS.CAFile }}
+      insecure_skip_verify: {{ .FluxNinjaPlugin.TLS.InsecureSkipVerify }}
+  fluxninja_endpoint: "{{ .FluxNinjaPlugin.Endpoint }}"
+  heartbeat_interval: "{{ .FluxNinjaPlugin.HeartbeatsInterval }}"
+{{- end }}
+log:
+  file: "{{ .Log.File }}"
+  level: "{{ .Log.Level }}"
+  non_blocking: {{ .Log.NonBlocking }}
+  pretty_console: {{ .Log.PrettyConsole }}
+otel:
+  batch_postrollup:
+    send_batch_size: {{ .OtelConfig.BatchPostrollup.SendBatchSize }}
+    timeout: {{ .OtelConfig.BatchPostrollup.Timeout }}
+  batch_prerollup:
+    send_batch_size: {{ .OtelConfig.BatchPrerollup.SendBatchSize }}
+    timeout: {{ .OtelConfig.BatchPrerollup.Timeout }}
+  grpc_addr: "{{ .OtelConfig.GRPCAddr }}"
+  http_addr: "{{ .OtelConfig.HTTPAddr }}"
 plugins:
   disable_plugins: false
   {{- if not .FluxNinjaPlugin.Enabled }}
   disabled_plugins:
-    - aperture-plugin-fluxninja
+  - aperture-plugin-fluxninja
   {{- end }}
-
-{{- if .FluxNinjaPlugin.Enabled }}
-
-fluxninja_plugin:
-  fluxninja_endpoint: "{{ .FluxNinjaPlugin.Endpoint }}"
-  heartbeat_interval: "{{ .FluxNinjaPlugin.HeartbeatsInterval }}"
-  client_grpc:
-    insecure: {{ .FluxNinjaPlugin.TLS.Insecure }}
-    tls:
-      insecure_skip_verify: {{ .FluxNinjaPlugin.TLS.InsecureSkipVerify }}
-      ca_file: {{ .FluxNinjaPlugin.TLS.CAFile }}
-  client_http:
-    tls:
-      insecure_skip_verify: {{ .FluxNinjaPlugin.TLS.InsecureSkipVerify }}
-      ca_file: {{ .FluxNinjaPlugin.TLS.CAFile }}
-{{- end }}
+prometheus:
+  address: "{{ .PrometheusAddress }}"
+server:
+  addr: ":{{ .ServerPort }}"

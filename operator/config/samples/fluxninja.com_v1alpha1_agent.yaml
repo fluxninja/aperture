@@ -7,3 +7,7 @@ spec:
     endpoints: ["http://controller-etcd:2379"]
   prometheus:
     address: "http://controller-prometheus-server:80"
+  config:
+    otel:
+      batch_prerollup:
+        timeout: 2s

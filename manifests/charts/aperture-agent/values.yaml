@@ -392,6 +392,9 @@ agent:
     file: ~
   ## @param agent.agentGroup Agent Group name. Defaults to 'default' Agent group
   agentGroup: ~
+  ## @param agent.config Custom configuration for the Agent. Available configuration parameters can be found at https://github.com/fluxninja/aperture/blob/main/docs/gen/config/aperture-agent/swagger.md.
+  ##
+  config: ~
   ## @param agent.serviceAccount.create Specifies whether a ServiceAccount should be created
   ## @param agent.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
   ## @param agent.serviceAccount.automountServiceAccountToken Automount service account token for the server service account. Defaults to true

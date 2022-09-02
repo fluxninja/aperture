@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"gopkg.in/yaml.v2"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -77,6 +78,18 @@ func configMapForAgentConfig(instance *v1alpha1.Agent, scheme *runtime.Scheme) (
 	config, err := filledAgentConfig(instance)
 	if err != nil {
 		return nil, err
+	}
+
+	if instance.Spec.Config.Raw != nil {
+		var customConfig map[string]interface{}
+		if err = yaml.Unmarshal(instance.Spec.Config.Raw, &customConfig); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal custom config object. Error: %s", err.Error())
+		}
+
+		config, err = mergeConfigMaps(customConfig, config)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	cm := &corev1.ConfigMap{
@@ -144,6 +157,18 @@ func configMapForControllerConfig(instance *v1alpha1.Controller, scheme *runtime
 	config, err := filledControllerConfig(instance)
 	if err != nil {
 		return nil, err
+	}
+
+	if instance.Spec.Config.Raw != nil {
+		var customConfig map[string]interface{}
+		if err = yaml.Unmarshal(instance.Spec.Config.Raw, &customConfig); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal custom config object. Error: %s", err.Error())
+		}
+
+		config, err = mergeConfigMaps(customConfig, config)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	cm := &corev1.ConfigMap{

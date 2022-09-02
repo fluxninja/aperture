@@ -20,6 +20,9 @@ spec:
   {{- if .Values.controller.serverPort }}
   serverPort: {{ .Values.controller.serverPort }}
   {{- end }}
+  {{- if .Values.controller.config }}
+  config: {{ .Values.controller.config | toYaml | nindent 4 }}
+  {{- end }}
   {{- if .Values.controller.hostAliases }}
   hostAliases: {{ .Values.controller.hostAliases }}
   {{- end }}
