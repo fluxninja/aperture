@@ -19,7 +19,7 @@ Compile all warnings into a single message.
 {{- end -}}
 
 {{/*
-Create the endpoint of the etcd for Aperture Agent and Controller
+Create the endpoint of the etcd for Aperture Controller
 {{ include "aperture.etcd.endpoints" ( dict "etcd" .Values.path.to.the.etcd "context" $.context $) }}
 */}}
 {{- define "aperture.etcd.endpoints" -}}
@@ -29,14 +29,14 @@ Create the endpoint of the etcd for Aperture Agent and Controller
 {{- else -}}
     {{ $endpoints = without .etcd.endpoints "" }}
     {{- if empty $endpoints -}}
-        {{- fail "Value for etcd endpoints of Agent or Controller cannot be empty when .Values.etcd.enbled is set to false." -}}
+        {{- fail "Value for etcd endpoints of Controller cannot be empty when .Values.etcd.enbled is set to false." -}}
     {{- end -}}
 {{- end -}}
 {{ print $endpoints }}
 {{- end -}}
 
 {{/*
-Create the address of the Prometheus for Aperture Agent and Controller
+Create the address of the Prometheus for Aperture Controller
 {{ include "aperture.prometheus.address" ( dict "prometheus" .Values.path.to.the.prometheus "context" $.context $) }}
 */}}
 {{- define "aperture.prometheus.address" -}}
@@ -46,7 +46,7 @@ Create the address of the Prometheus for Aperture Agent and Controller
     {{- if .prometheus.address -}}
         {{ print .prometheus.address }}
     {{- else -}}
-        {{- fail "Value for prometheus address of Agent or Controller cannot be empty when .Values.prometheus.enbled is set to false." -}}
+        {{- fail "Value for prometheus address of Controller cannot be empty when .Values.prometheus.enbled is set to false." -}}
     {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -68,7 +68,7 @@ Fetch the endpoint of the FluxNinja cloud instance
 {{- end -}}
 
 {{/*
-Fetch the value of the API Key secret for Aperture Agent and Controller
+Fetch the value of the API Key secret for Aperture Controller
 {{ include "aperture.apiSecret.value" ( dict "object" .Values.path.to.the.agent/controller $) }}
 */}}
 {{- define "aperture.apisecret.value" -}}
@@ -77,7 +77,7 @@ Fetch the value of the API Key secret for Aperture Agent and Controller
         {{- if .object.fluxninjaPlugin.apiKeySecret.value -}}
             {{ print .object.fluxninjaPlugin.apiKeySecret.value }}
         {{- else -}}
-            {{- fail "Value of API Key for Agent cannot be empty when .Values.agent/controller.fluxninjaPlugin.enabled and .Values.agent/controller.fluxninjaPlugin.apiKeySecret.create is set to true." -}}
+            {{- fail "Value of API Key for Controller cannot be empty when .Values.agent/controller.fluxninjaPlugin.enabled and .Values.agent/controller.fluxninjaPlugin.apiKeySecret.create is set to true." -}}
         {{- end -}}
     {{- else -}}
         {{ print "" }}
