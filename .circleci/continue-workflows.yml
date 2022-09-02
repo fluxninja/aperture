@@ -174,6 +174,19 @@ jobs:
                         docker tag <<parameters.dockerhub-image>>:<<parameters.tag>> <<parameters.dockerhub-image>>:<<parameters.target-tag>>
                         docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
                         docker push <<parameters.dockerhub-image>>:<<parameters.target-tag>>
+  helm-chart-lint-job:
+    executors: base-cimg-executor
+    steps:
+      - checkout
+      - run:
+          name: Install helm and lint the helm chart
+          command: |
+            curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+            cd manifests/charts/aperture-agent
+            helm lint
+            cd ../../../
+            cd manifests/charts/aperture-controller
+            helm lint
 
   go-test-coverage:
     parameters:
@@ -428,6 +441,13 @@ jobs:
 
 workflows:
   version: 2
+
+  aperture-helm-lint:
+    when: << pipeline.parameters.updated-aperture-charts >>
+    jobs:
+      - helm-chart-lint-job:
+          name: helm-chart-lint
+
 
   aperture:
     when:

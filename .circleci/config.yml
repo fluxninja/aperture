@@ -10,6 +10,9 @@ executors:
   ubuntu-go-executor:
     docker:
       - image: cimg/go:1.19
+  helm-ct-executor:
+    docker:
+      - image: quay.io/helmpack/chart-testing:v3.7.0
 
 # TODO: Sync this with continue-workflows.yml
 commands:
@@ -238,3 +241,10 @@ workflows:
             parameters:
               executor: [ ubuntu-go-executor ]
               goarch: [ amd64 ]
+  helm-chart-lint:
+    jobs:
+      - path-filtering/filter:
+          base-revision: main
+          config-path: .circleci/continue-workflows.yml
+          mapping: |
+            manifests/charts/.* updated-aperture-charts true
