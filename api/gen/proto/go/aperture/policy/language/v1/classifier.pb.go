@@ -25,6 +25,10 @@ const (
 
 // Set of classification rules sharing a common selector
 //
+// :::info
+// See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+// :::
+//
 // Example:
 // ```yaml
 // selector:
@@ -43,7 +47,9 @@ type Classifier struct {
 
 	// Defines where to apply the flow classification rule.
 	Selector *v1.Selector `protobuf:"bytes,1,opt,name=selector,proto3" json:"selector,omitempty"`
-	// A map of {key, value} pairs mapping from flow label names to rules that define how to extract and propagate them.
+	// A map of {key, value} pairs mapping from
+	// [flow label](/concepts/flow-control/label/label.md) keys to rules that define
+	// how to extract and propagate flow labels with that key.
 	Rules map[string]*Rule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -138,7 +144,8 @@ type Rule struct {
 	//	*Rule_Rego_
 	Source isRule_Source `protobuf_oneof:"source"`
 	// Decides if the created label should be applied to the whole request chain
-	// (propagated in baggage) (default=true).
+	// (propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
+	// (default=true).
 	Propagate *wrapperspb.BoolValue `protobuf:"bytes,3,opt,name=propagate,proto3" json:"propagate,omitempty"`
 	// Decides if the created flow label should be hidden from the telemetry.
 	// A hidden flow label is still accessible in policies and can be used as eg.
@@ -239,7 +246,7 @@ func (*Rule_Extractor) isRule_Source() {}
 
 func (*Rule_Rego_) isRule_Source() {}
 
-// Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
+// Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
 //
 // There are multiple variants of extractor, specify exactly one.
 type Extractor struct {
