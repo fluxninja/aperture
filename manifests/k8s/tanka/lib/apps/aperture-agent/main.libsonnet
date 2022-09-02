@@ -8,12 +8,12 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
   environment:: {
     namespace: 'aperture-system',
     includeCrds: true,
-    name: 'aperture',
+    name: 'agent',
   },
   values:: {
   },
-  'aperture-operator':
-    helm.template($.environment.name, 'charts/aperture-operator', {
+  'aperture-agent':
+    helm.template($.environment.name, 'charts/aperture-agent', {
       namespace: $.environment.namespace,
       includeCrds: $.environment.includeCrds,
       values: $.values,

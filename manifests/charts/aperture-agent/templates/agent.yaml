@@ -5,7 +5,7 @@ metadata:
   name: {{ .Release.Name }}
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-operator
+    app.kubernetes.io/component: aperture-agent-manager
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
@@ -25,16 +25,6 @@ spec:
   {{- end }}
   {{- if .Values.agent.memberListPort }}
   memberListPort: {{ .Values.agent.memberListPort }}
-  {{- end }}
-  {{- if or .Values.agent.batchPrerollup.timeout .Values.agent.batchPrerollup.sendBatchSize }}
-  batchPrerollup:
-    timeout: {{ .Values.agent.batchPrerollup.timeout }}
-    sendBatchSize: {{ .Values.agent.batchPrerollup.sendBatchSize }}
-  {{- end }}
-  {{- if or .Values.agent.batchPostrollup.timeout .Values.agent.batchPostrollup.sendBatchSize }}
-  batchPostrollup:
-    timeout: {{ .Values.agent.batchPostrollup.timeout }}
-    sendBatchSize: {{ .Values.agent.batchPostrollup.sendBatchSize }}
   {{- end }}
   {{- if or .Values.agent.log.prettyConsole .Values.agent.log.nonBlocking .Values.agent.log.level .Values.agent.log.file }}
   log: {{ .Values.agent.log | toYaml | nindent 4 }}
@@ -194,12 +184,35 @@ spec:
     enableNamespacesByDefault: {{ .Values.agent.sidecar.enableNamespacesByDefault }}
     {{- end }}
   {{- end }}
-  {{- if or (not .Values.etcd.enabled) .Values.agent.etcd.endpoints }}
   etcd:  {{- omit .Values.agent.etcd "endpoints" | toYaml | nindent 4 }}
     endpoints: {{ include "aperture.etcd.endpoints" (dict "etcd" .Values.agent.etcd "context" . $) }}
-  {{- end }}
-  {{- if or (not .Values.agent.enabled) .Values.agent.prometheus.endpoints }}
   prometheus:
     address: {{ include "aperture.prometheus.address" (dict "prometheus" .Values.agent.prometheus "context" . $) }}
+  {{- if or .Values.agent.otelConfig.grpcAddr .Values.agent.otelConfig.httpAddr .Values.agent.otelConfig.batchPrerollup.sendBatchSize .Values.agent.otelConfig.batchPrerollup.timeout .Values.agent.otelConfig.batchPostrollup.sendBatchSize .Values.agent.otelConfig.batchPostrollup.timeout }}
+  otelConfig:
+    {{- if .Values.agent.otelConfig.grpcAddr }}
+    grpcAddr: {{ .Values.agent.otelConfig.grpcAddr }}
+    {{- end }}
+    {{- if .Values.agent.otelConfig.httpAddr }}
+    httpAddr: {{ .Values.agent.otelConfig.httpAddr }}
+    {{- end }}
+    {{- if or .Values.agent.otelConfig.batchPrerollup.sendBatchSize .Values.agent.otelConfig.batchPrerollup.timeout }}
+    batchPrerollup:
+      {{- if .Values.agent.otelConfig.batchPrerollup.sendBatchSize }}
+      sendBatchSize: {{ .Values.agent.otelConfig.batchPrerollup.sendBatchSize }}
+      {{- end }}
+      {{- if .Values.agent.otelConfig.batchPrerollup.timeout }}
+      timeout: {{ .Values.agent.otelConfig.batchPrerollup.timeout }}
+      {{- end }}
+    {{- end }}
+    {{- if or .Values.agent.otelConfig.batchPostrollup.sendBatchSize .Values.agent.otelConfig.batchPostrollup.timeout }}
+    batchPostrollup:
+      {{- if .Values.agent.otelConfig.batchPostrollup.sendBatchSize }}
+      sendBatchSize: {{ .Values.agent.otelConfig.batchPostrollup.sendBatchSize }}
+      {{- end }}
+      {{- if .Values.agent.otelConfig.batchPostrollup.timeout }}
+      timeout: {{ .Values.agent.otelConfig.batchPostrollup.timeout }}
+      {{- end }}
+    {{- end }}
   {{- end }}
-{{- end }}
+ {{- end }}

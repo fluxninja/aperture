@@ -4,7 +4,7 @@ kind: ClusterRole
 metadata:
   name: {{ template "common.names.fullname" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-operator
+    app.kubernetes.io/component: aperture-controller-manager
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
@@ -49,6 +49,13 @@ rules:
   - fluxninja.com
   resources:
   - agents
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - fluxninja.com
+  resources:
   - controllers
   verbs:
   - create
@@ -61,14 +68,12 @@ rules:
 - apiGroups:
   - fluxninja.com
   resources:
-  - agents/finalizers
   - controllers/finalizers
   verbs:
   - update
 - apiGroups:
   - fluxninja.com
   resources:
-  - agents/status
   - controllers/status
   verbs:
   - get
@@ -210,7 +215,7 @@ kind: ClusterRoleBinding
 metadata:
   name: {{ template "common.names.fullname" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-operator
+    app.kubernetes.io/component: aperture-controller-manager
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
@@ -233,7 +238,7 @@ kind: Role
 metadata:
   name: {{ template "common.names.fullname" . }}-leader-election-role
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-operator
+    app.kubernetes.io/component: aperture-controller-manager
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
@@ -280,7 +285,7 @@ kind: RoleBinding
 metadata:
   name: {{ template "common.names.fullname" . }}-leader-election-rolebinding
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-operator
+    app.kubernetes.io/component: aperture-controller-manager
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
@@ -305,7 +310,7 @@ metadata:
   name: {{ include "aperture-operator.serviceAccountName" . }}
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-operator
+    app.kubernetes.io/component: aperture-controller-manager
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}

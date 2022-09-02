@@ -36,6 +36,15 @@ type ControllerSpec struct {
 	// Pod's host aliases
 	//+kubebuilder:validation:Optional
 	HostAliases []corev1.HostAlias `json:"hostAliases"`
+
+	// Etcd parameters for Controller
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={leaseTtl:"60s"}
+	Etcd ControllerEtcdSpec `json:"etcd"`
+
+	// Prometheus parameters for Controller
+	//+kubebuilder:validation:Optional
+	Prometheus PrometheusSpec `json:"prometheus"`
 }
 
 // ControllerStatus defines the observed state of Controller.

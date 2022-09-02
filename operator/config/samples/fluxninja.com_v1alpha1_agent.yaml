@@ -3,7 +3,7 @@ kind: Agent
 metadata:
   name: agent-sample
 spec:
-  sidecar:
-    enabled: true
-    enableNamespacesByDefault:
-      - "default"
+  etcd:
+    endpoints: ["http://controller-etcd:2379"]
+  prometheus:
+    address: "http://controller-prometheus-server:80"

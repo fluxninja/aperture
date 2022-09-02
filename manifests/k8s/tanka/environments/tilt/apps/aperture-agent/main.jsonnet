@@ -4,7 +4,7 @@ function(apiServer='API SERVER MISSING') {
   apiVersion: 'tanka.dev/v1alpha1',
   kind: 'Environment',
   metadata: {
-    name: 'environment/tilt/apps/aperture-operator',
+    name: 'environment/tilt/apps/aperture-agent',
   },
   spec: {
     apiServer: apiServer,

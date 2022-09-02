@@ -1169,15 +1169,15 @@ var _ = Describe("Tests for commonLabels", func() {
 var _ = Describe("Tests for checkEtcdEndpoints", func() {
 	Context("When Etcd endpoints are not provided", func() {
 		It("returns correct etcd config", func() {
-			instance := &v1alpha1.Agent{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.AgentSpec{},
+				Spec: v1alpha1.ControllerSpec{},
 			}
 
-			expected := v1alpha1.EtcdSpec{
+			expected := v1alpha1.ControllerEtcdSpec{
 				Endpoints: []string{
 					fmt.Sprintf("http://%s-etcd.%s:2379", appName, appName),
 				},
@@ -1190,21 +1190,19 @@ var _ = Describe("Tests for checkEtcdEndpoints", func() {
 
 	Context("When Etcd endpoints are provided", func() {
 		It("returns correct etcd config", func() {
-			instance := &v1alpha1.Agent{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Etcd: v1alpha1.EtcdSpec{
-							Endpoints: testArray,
-						},
+				Spec: v1alpha1.ControllerSpec{
+					Etcd: v1alpha1.ControllerEtcdSpec{
+						Endpoints: testArray,
 					},
 				},
 			}
 
-			expected := v1alpha1.EtcdSpec{
+			expected := v1alpha1.ControllerEtcdSpec{
 				Endpoints: testArray,
 			}
 
@@ -1215,21 +1213,19 @@ var _ = Describe("Tests for checkEtcdEndpoints", func() {
 
 	Context("When Etcd endpoints are provided with empty string", func() {
 		It("returns correct etcd config", func() {
-			instance := &v1alpha1.Agent{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Etcd: v1alpha1.EtcdSpec{
-							Endpoints: []string{""},
-						},
+				Spec: v1alpha1.ControllerSpec{
+					Etcd: v1alpha1.ControllerEtcdSpec{
+						Endpoints: []string{""},
 					},
 				},
 			}
 
-			expected := v1alpha1.EtcdSpec{
+			expected := v1alpha1.ControllerEtcdSpec{
 				Endpoints: []string{
 					fmt.Sprintf("http://%s-etcd.%s:2379", appName, appName),
 				},
@@ -1267,10 +1263,8 @@ var _ = Describe("Tests for checkPrometheusAddress", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Prometheus: v1alpha1.PrometheusSpec{
-							Address: test,
-						},
+					Prometheus: v1alpha1.PrometheusSpec{
+						Address: test,
 					},
 				},
 			}

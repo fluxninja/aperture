@@ -6,8 +6,7 @@ load('ext://uibutton', 'cmd_button')
 #################
 ### CONSTANTS ###
 #################
-GCP_PROJECT = "devel-309501"
-IMG_REPO = "gcr.io/{project}/cf-fn".format(project=GCP_PROJECT)
+IMG_REPO = "docker.io/fluxninja"
 GIT_ROOT = str(local("git rev-parse --show-toplevel")).strip()
 TILT_OBJECTS = []
 APERTURE_SYSTEM_NS = "aperture-system"
@@ -54,7 +53,7 @@ DEP_TREE = {
                     "resource_deps": ["aperture-grafana-operator"],
                     "extra_objects": [
                         "aperture-grafana:grafana",
-                        "aperture-prometheus:grafanadatasource"
+                        "controller-prometheus:grafanadatasource"
                     ]
                 },
                 {
@@ -75,7 +74,7 @@ DEP_TREE = {
         },
         "agent": {
             "labels": ["Aperture"],
-            "tkenv": "tanka/environments/tilt/apps/aperture-operator",
+            "tkenv": "tanka/environments/tilt/apps/aperture-agent",
             "images": [
                 {
                     "ref": "aperture-agent",
@@ -97,8 +96,8 @@ DEP_TREE = {
                 }
             ],
             "port_forwards": {
-                "aperture-prometheus-server": "9090:9090",
-                "aperture-etcd": "2379:2379",
+                "controller-prometheus-server": "9090:9090",
+                "controller-etcd": "2379:2379",
             },
             "pvc_selectors": ["app.kubernetes.io/name=etcd"],
             "kinds": [
@@ -115,62 +114,73 @@ DEP_TREE = {
                     ]
                 },
                 {
-                    "workload": "aperture:agent",
+                    "workload": "agent",
                     "new_name": "aperture-agent",
-                    "resource_deps": ["aperture-etcd", "aperture-aperture-operator"],
+                    "resource_deps": ["controller-etcd", "agent-aperture-agent-manager"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
                     ]
                 },
                 {
-                    "workload": "aperture:controller",
+                    "workload": "controller",
                     "new_name": "aperture-controller",
-                    "resource_deps": ["aperture-etcd", "aperture-aperture-operator"],
+                    "resource_deps": ["controller-etcd", "controller-aperture-controller-manager", "controller-prometheus"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'controller', 'app.kubernetes.io/managed-by': 'aperture-operator'},
                     ]
                 },
                 {
-                    "workload": "aperture-aperture-operator",
+                    "workload": "controller-aperture-controller-manager",
                     "resource_deps": ["aperture-operator-bootstrap"],
                     "extra_objects": [
-                        ("^aperture-aperture-operator", "Role|RoleBinding|ServiceAccount", APERTURE_SYSTEM_NS),
-                        ("^aperture-aperture-operator", "ClusterRole|ClusterRoleBinding"),
+                        ("^controller-aperture-controller", "Role|RoleBinding|ServiceAccount", APERTURE_SYSTEM_NS),
+                        ("^controller-aperture-controller", "ClusterRole|ClusterRoleBinding"),
                     ],
                     "ignored_objects": [
-                        ("^aperture-aperture-operator", "Service|Deployment", APERTURE_SYSTEM_NS),
+                        ("^controller-aperture-controller-manager", "Service|Deployment", APERTURE_SYSTEM_NS),
+                    ]
+                },
+                 {
+                    "workload": "agent-aperture-agent-manager",
+                    "resource_deps": ["aperture-operator-bootstrap"],
+                    "extra_objects": [
+                        ("^agent-aperture-agent", "Role|RoleBinding|ServiceAccount", APERTURE_SYSTEM_NS),
+                        ("^agent-aperture-agent", "ClusterRole|ClusterRoleBinding"),
+                    ],
+                    "ignored_objects": [
+                        ("^agent-aperture-agent-manager", "Service|Deployment", APERTURE_SYSTEM_NS),
                     ]
                 },
                 {
-                    "workload": "aperture-etcd",
+                    "workload": "controller-etcd",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
-                        ("^aperture-etcd", None),
+                        ("^controller-etcd", None),
                     ],
                     "ignored_objects": [
-                        ("^aperture-etcd", "Service|StatefulSet")
+                        ("^controller-etcd", "Service|StatefulSet")
                     ]
                 },
                 {
-                    "workload": "aperture-prometheus-server",
-                    "new_name": "aperture-prometheus",
+                    "workload": "controller-prometheus-server",
+                    "new_name": "controller-prometheus",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
-                        ("^aperture-prometheus", None),
+                        ("^controller-prometheus", None),
                     ],
                     "ignored_objects": [
-                        ("^aperture-prometheus", "Service|Deployment"),
-                        "aperture-prometheus:grafanadatasource"
+                        ("^controller-prometheus", "Service|Deployment"),
+                        "controller-prometheus:grafanadatasource"
                     ]
                 },
                 {
-                    "workload": "aperture-kube-state-metrics",
+                    "workload": "controller-kube-state-metrics",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
-                        ("^aperture-kube-state-metrics", None),
+                        ("^controller-kube-state-metrics", None),
                     ],
                     "ignored_objects": [
-                        ("^aperture-kube-state-metrics", "Service|Deployment", APERTURE_SYSTEM_NS),
+                        ("^controller-kube-state-metrics", "Service|Deployment", APERTURE_SYSTEM_NS),
                     ]
                 }
             ]
@@ -403,6 +413,15 @@ def wrapped_k8s_yaml(yaml, allow_duplicates=False):
     k8s_yaml(yaml, allow_duplicates)
 
 
+def refresh_chart_dependencies(chart_dir):
+    dep_output = local(command=["helm", "dependency", "list"], dir=chart_dir)
+    lines = str(dep_output).splitlines()
+    for number in range(1, len(lines) - 1):
+        if not lines[number].strip().endswith("ok"):
+            local(command=["helm", "dependency", "update"], dir=chart_dir)
+            return
+
+
 def render_tanka(environment, env_vars):
     print(
         "Rendering tanka environment",
@@ -421,7 +440,8 @@ def render_tanka(environment, env_vars):
         local(command=["jb", "install"], dir=base_dir)
 
         # Refreshing the dependencies for the Agent chart
-        local(command=["helm", "dependency", "update"], dir=base_dir + "charts/aperture-operator")
+        refresh_chart_dependencies(base_dir + "charts/aperture-agent")
+        refresh_chart_dependencies(base_dir + "charts/aperture-controller")
 
         # Fetch any vendored charts that are not included in our repository
         local(command=[TANKA, "tool", "charts", "vendor"], dir=base_dir)
@@ -876,8 +896,7 @@ cfg_verbose = cfg.get("verbose", os.getenv("NINJA_TILT_VERBOSE", cfg_trace)).low
 VERBOSE = cfg_verbose == "true"
 
 run_only_listed = cfg.get("only", False)
-# We almost never want all resources - deploy only cloud by default
-to_run = cfg.get("to-run", ["agent"])
+to_run = cfg.get("to-run", ["all"])
 
 inverted_dep_tree = invert_dep_tree(DEP_TREE)
 resources = get_resource_list_to_deploy(to_run, run_only_listed, DEP_TREE, inverted_dep_tree)
