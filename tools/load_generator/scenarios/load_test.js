@@ -7,7 +7,7 @@ export let vuStages = [
   { duration: "1m", target: 15 }, // ramp-up to 10 users over 1 minutes
   { duration: "2m", target: 15 }, // stay at 10 users for 2 minutes (peak hour)
   { duration: "1s", target: 5 }, // ramp-down to 5 users in 10 seconds
-  { duration: "2m", target: 5 }, // stay at to 5 users in 30 seconds
+  { duration: "5m", target: 5 }, // stay at to 5 users in 30 seconds
 ];
 
 export let options = {
