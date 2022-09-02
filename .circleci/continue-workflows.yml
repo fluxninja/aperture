@@ -158,14 +158,6 @@ jobs:
           image: <<parameters.gcr-image>>
           tag: <<parameters.tag>>
       - when:
-          condition: <<parameters.push-to-dockerhub>>
-          steps:
-            - run:
-                name: Push images to DockerHub
-                command: |
-                  docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
-                  docker push <<parameters.dockerhub-image>>:<<parameters.tag>>
-      - when:
           condition:
             equal: [main, << pipeline.git.branch >>]
           steps:
