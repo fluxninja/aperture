@@ -108,30 +108,6 @@ definitions:
         format: int64
         x-go-validate: gte=0,lte=255
         x-order: 1
-      timeout:
-        description: |-
-          This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
-
-          :::caution
-          This timeout needs to be strictly less than the timeout set on the
-          client for the whole GRPC call:
-          * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-          * in case of libraries, timeout configured... TODO.
-
-          We're using fail-open logic in integrations, so if the GRPC timeout
-          fires first, the flow will end up being unconditionally allowed while
-          it're still waiting on the scheduler.
-
-          To avoid such cases, the end-to-end GRPC timeout should also contain
-          some headroom for constant overhead like serialization, etc. Default
-          value for GRPC timeouts is 10ms, giving 5ms of headeroom, so when
-          tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
-          :::
-        type: string
-        title: Timeout override decides how long a request in the workload can wait
-          for tokens
-        x-go-default: 0.005s
-        x-order: 2
       tokens:
         description: |-
           Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
@@ -139,7 +115,7 @@ definitions:
         type: string
         format: uint64
         x-go-default: 1
-        x-order: 3
+        x-order: 2
   SchedulerWorkloadAndLabelMatcher:
     type: object
     properties:
@@ -1380,15 +1356,49 @@ definitions:
           match.
         x-order: 1
         $ref: '#/definitions/SchedulerWorkload'
+      max_timeout:
+        description: |-
+          :::caution
+          This timeout needs to be strictly less than the timeout set on the
+          client for the whole GRPC call:
+          * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
+          * in case of libraries, timeout configured... TODO.
+
+          We're using fail-open logic in integrations, so if the GRPC timeout
+          fires first, the flow will end up being unconditionally allowed while
+          it're still waiting on the scheduler.
+
+          To avoid such cases, the end-to-end GRPC timeout should also contain
+          some headroom for constant overhead like serialization, etc. Default
+          value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+          tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+          :::
+        type: string
+        title: Max Timeout is the value with which the flow timeout calculated by
+          `timeout_factor` is capped
+        x-go-default: 0.45s
+        x-order: 2
       out_ports:
         description: Output ports for the Scheduler component.
-        x-order: 2
+        x-order: 3
         $ref: '#/definitions/v1SchedulerOuts'
       selector:
         description: Selector decides for which service or flows the scheduler will
           be applied.
-        x-order: 3
+        x-order: 4
         $ref: '#/definitions/v1Selector'
+      timeout_factor:
+        description: |-
+          If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+          it will be rejected.
+
+          This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
+        type: number
+        format: double
+        title: Timeout as a factor of tokens for a flow in a workload
+        x-go-default: 0.5
+        x-go-validate: gte=0.0
+        x-order: 5
       workloads:
         description: |-
           List of workloads to be used in scheduler.
@@ -1414,7 +1424,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/SchedulerWorkloadAndLabelMatcher'
-        x-order: 4
+        x-order: 6
   v1SchedulerOuts:
     description: Output for the Scheduler component.
     type: object

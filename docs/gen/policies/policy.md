@@ -215,33 +215,6 @@ Higher numbers means higher priority level.
 </dd>
 </dl>
 <dl>
-<dt>timeout</dt>
-<dd>
-
-(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens
-
-This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
-
-:::caution
-This timeout needs to be strictly less than the timeout set on the
-client for the whole GRPC call:
-
-- in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-- in case of libraries, timeout configured... TODO.
-
-We're using fail-open logic in integrations, so if the GRPC timeout
-fires first, the flow will end up being unconditionally allowed while
-it're still waiting on the scheduler.
-
-To avoid such cases, the end-to-end GRPC timeout should also contain
-some headroom for constant overhead like serialization, etc. Default
-value for GRPC timeouts is 10ms, giving 5ms of headeroom, so when
-tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
-:::
-
-</dd>
-</dl>
-<dl>
 <dt>tokens</dt>
 <dd>
 
@@ -2047,6 +2020,31 @@ of this average can change).
 </dd>
 </dl>
 <dl>
+<dt>max_timeout</dt>
+<dd>
+
+(string, default: `0.45s`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
+
+:::caution
+This timeout needs to be strictly less than the timeout set on the
+client for the whole GRPC call:
+
+- in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
+- in case of libraries, timeout configured... TODO.
+
+We're using fail-open logic in integrations, so if the GRPC timeout
+fires first, the flow will end up being unconditionally allowed while
+it're still waiting on the scheduler.
+
+To avoid such cases, the end-to-end GRPC timeout should also contain
+some headroom for constant overhead like serialization, etc. Default
+value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+:::
+
+</dd>
+</dl>
+<dl>
 <dt>out_ports</dt>
 <dd>
 
@@ -2059,6 +2057,19 @@ of this average can change).
 <dd>
 
 ([V1Selector](#v1-selector)) Selector decides for which service or flows the scheduler will be applied.
+
+</dd>
+</dl>
+<dl>
+<dt>timeout_factor</dt>
+<dd>
+
+(float64, `gte=0.0`, default: `0.5`) Timeout as a factor of tokens for a flow in a workload
+
+If a flow is not able to get tokens within `timeout_factor` \* `tokens` of duration,
+it will be rejected.
+
+This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
 
 </dd>
 </dl>

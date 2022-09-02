@@ -173,17 +173,14 @@ data:
               auto_tokens: true
               default_workload:
                 priority: 20
-                timeout: "0.005s"
               workloads:
                 - workload:
                     priority: 50
-                    timeout: "0.005s"
                   label_matcher:
                     match_labels:
                       user-type: "guest"
                 - workload:
                     priority: 200
-                    timeout: "0.005s"
                   label_matcher:
                     match_labels:
                       request_header_user-type: "subscriber"
