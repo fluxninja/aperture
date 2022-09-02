@@ -220,13 +220,15 @@ def portsImports(definition: JsonnetDefinition) -> str:
     in_ports = definition.properties.get("in_ports")
     if in_ports:
         ports_name = f"{definition.jsonnet_name.lower()}ins"
-        ports_fname = f"{ports_name}.libsonnet"
+        ports_v1name = ports_name.split("v1")[1] if 'v1' in ports_name else ports_name
+        ports_fname = f"{ports_v1name}.libsonnet"
         imports += f"local {ports_name} = import './{ports_fname}';\n"
 
     out_ports = definition.properties.get("out_ports")
     if out_ports:
         ports_name = f"{definition.jsonnet_name.lower()}outs"
-        ports_fname = f"{ports_name}.libsonnet"
+        ports_v1name = ports_name.split("v1")[1] if 'v1' in ports_name else ports_name
+        ports_fname = f"{ports_v1name}.libsonnet"
         imports += f"local {ports_name} = import './{ports_fname}';\n"
 
     return imports
