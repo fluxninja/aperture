@@ -696,40 +696,12 @@ message Scheduler {
       }
     }]; // @gotags: default:"1"
 
-    // Timeout override decides how long a request in the workload can wait for tokens
-    //
-    // This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
-    //
-    // :::caution
-    // This timeout needs to be strictly less than the timeout set on the
-    // client for the whole GRPC call:
-    // * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-    // * in case of libraries, timeout configured... TODO.
-    //
-    // We're using fail-open logic in integrations, so if the GRPC timeout
-    // fires first, the flow will end up being unconditionally allowed while
-    // it're still waiting on the scheduler.
-    //
-    // To avoid such cases, the end-to-end GRPC timeout should also contain
-    // some headroom for constant overhead like serialization, etc. Default
-    // value for GRPC timeouts is 10ms, giving 5ms of headeroom, so when
-    // tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
-    // :::
-    google.protobuf.Duration timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {
-          string_value: "0.005s"
-        }
-      }
-    }]; // @gotags: default:"0.005s"
-
     // Fairness key is a label key that can be used to provide fairness within a workload
     //
     // Any label that could be used in label matcher can be used here. Eg. if
     // you have a classifier that sets `user` flow label, you might want to set
     // `fairness_key = "user"`.
-    string fairness_key = 4;
+    string fairness_key = 3;
   }
 
   message WorkloadAndLabelMatcher {
@@ -787,7 +759,7 @@ message Scheduler {
   // See also [workload definition in the concepts
   // section](/concepts/flow-control/actuators/scheduler.md#workload).
   // :::
-  repeated WorkloadAndLabelMatcher workloads = 5;
+  repeated WorkloadAndLabelMatcher workloads = 3;
 
   // Workload to be used if none of workloads specified in `workloads` match.
   Workload default_workload = 4;
@@ -796,7 +768,7 @@ message Scheduler {
   // historical latency. Each workload's `tokens` will be set to average
   // latency of flows in that workload during last few seconds (exact duration
   // of this average can change).
-  bool auto_tokens = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  bool auto_tokens = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {
@@ -804,6 +776,53 @@ message Scheduler {
       }
     }
   }]; // @gotags: default:"true"
+
+  // Timeout as a factor of tokens for a flow in a workload
+  //
+  // If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+  // it will be rejected.
+  //
+  // This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
+  double timeout_factor = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {
+        number_value: 0.5
+      }
+    }
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "gte=0.0"
+      }
+    }
+  }]; // @gotags: validate:"gte=0.0" default:"0.5"
+
+  // Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
+  //
+  // :::caution
+  // This timeout needs to be strictly less than the timeout set on the
+  // client for the whole GRPC call:
+  // * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
+  // * in case of libraries, timeout configured... TODO.
+  //
+  // We're using fail-open logic in integrations, so if the GRPC timeout
+  // fires first, the flow will end up being unconditionally allowed while
+  // it're still waiting on the scheduler.
+  //
+  // To avoid such cases, the end-to-end GRPC timeout should also contain
+  // some headroom for constant overhead like serialization, etc. Default
+  // value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+  // tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+  // :::
+  google.protobuf.Duration max_timeout = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {
+        string_value: "0.45s"
+      }
+    }
+  }]; // @gotags: default:"0.45s"
 }
 
 // Takes the load shed factor input signal and publishes it to the schedulers in the data-plane

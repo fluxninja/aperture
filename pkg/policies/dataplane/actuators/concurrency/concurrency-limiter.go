@@ -365,9 +365,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// setup scheduler
-			// TODO: get timeout from policy config
-			timeout, _ := time.ParseDuration("5ms")
-			conLimiter.scheduler = scheduler.NewWFQScheduler(timeout, loadShedActuator.tokenBucketLoadShed, clock, wfqMetrics)
+			conLimiter.scheduler = scheduler.NewWFQScheduler(conLimiter.schedulerProto.MaxTimeout.AsDuration(), loadShedActuator.tokenBucketLoadShed, clock, wfqMetrics)
 
 			incomingConcurrencyCounter, err := incomingConcurrencyCounterVec.GetMetricWith(metricLabels)
 			if err != nil {
@@ -469,10 +467,17 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowc
 		tokens = matchedWorkloadProto.Tokens
 	}
 
+	// timeout is tokens(which is in milliseconds) * conLimiter.schedulerProto.TimeoutFactor(float64)
+	timeout := time.Duration(float64(tokens)*conLimiter.schedulerProto.TimeoutFactor) * time.Millisecond
+
+	if timeout > conLimiter.schedulerProto.MaxTimeout.AsDuration() {
+		timeout = conLimiter.schedulerProto.MaxTimeout.AsDuration()
+	}
+
 	reqContext := scheduler.RequestContext{
 		FairnessLabel: fairnessLabel,
 		Priority:      uint8(matchedWorkloadProto.Priority),
-		Timeout:       matchedWorkloadProto.Timeout.AsDuration(),
+		Timeout:       timeout,
 		Tokens:        tokens,
 	}
 
