@@ -92,6 +92,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 				},
 				LimiterDecisions: nil,
 				FluxMeters:       nil,
+				Classifiers:      nil,
 			}
 		}
 		marshalledCheckResponse, err := protoMessageAsPbValue(fcResponse)
