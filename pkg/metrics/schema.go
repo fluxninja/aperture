@@ -27,30 +27,22 @@ const (
 	WFQFlowsMetricName = "wfq_flows"
 	// WFQRequestsMetricName - weighted fair queuing number of requests gauge.
 	WFQRequestsMetricName = "wfq_requests"
-	// FlowControlCheckRequestsMetricName - counter for Check requests for flowcontrol.
-	FlowControlCheckRequestsMetricName = "flowcontrol_check_requests_total"
-	// FlowControlCheckDecisionsMetricName - counter for Check requests per decision type.
-	FlowControlCheckDecisionsMetricName = "flowcontrol_check_decisions_total"
-	// FlowControlCheckErrorReasonMetricName - metric for error reason on FCS Check requests.
-	FlowControlCheckErrorReasonMetricName = "flowcontrol_check_error_reason_total"
-	// FlowControlCheckRejectReasonMetricName - metric for reject reason on FCS Check requests.
-	FlowControlCheckRejectReasonMetricName = "flowcontrol_check_reject_reason_total"
+	// FlowControlRequestsMetricName - counter for Check requests for flowcontrol.
+	FlowControlRequestsMetricName = "flowcontrol_requests_count"
+	// FlowControlDecisionsMetricName - counter for Check requests per decision type.
+	FlowControlDecisionsMetricName = "flowcontrol_decisions_count"
+	// FlowControlErrorReasonMetricName - metric for error reason on FCS Check requests.
+	FlowControlErrorReasonMetricName = "flowcontrol_error_reason_count"
+	// FlowControlRejectReasonMetricName - metric for reject reason on FCS Check requests.
+	FlowControlRejectReasonMetricName = "flowcontrol_reject_reason_count"
 	// TokenBucketMetricName - a gauge that tracks the load shed factor.
 	TokenBucketMetricName = "token_bucket_lsf"
 	// TokenBucketFillRateMetricName - a gauge that tracks the fill rate of token bucket.
-	TokenBucketFillRateMetricName = "token_bucket_bucket_fill_rate"
+	TokenBucketFillRateMetricName = "token_bucket_fill_rate"
 	// TokenBucketCapacityMetricName - a gauge that tracks the capacity of token bucket.
-	TokenBucketCapacityMetricName = "token_bucket_bucket_capacity"
+	TokenBucketCapacityMetricName = "token_bucket_capacity"
 	// TokenBucketAvailableMetricName - a gauge that tracks the number of tokens available in token bucket.
 	TokenBucketAvailableMetricName = "token_bucket_available_tokens"
-	// GroupJobRegisteredMetricName - current number of group job registered.
-	GroupJobRegisteredMetricName = "group_job_registered_number"
-	// GroupJobScheduledMetricName - current number of group job scheduled.
-	GroupJobScheduledMetricName = "group_job_scheduled_number"
-	// GroupJobCompletedMetricName - total number of group job completed.
-	GroupJobCompletedMetricName = "group_job_completed_total"
-	// GroupJobLatencyMetricName - the latency of the group jobs.
-	GroupJobLatencyMetricName = "group_job_latency_seconds"
 
 	// PROMETHEUS LABELS.
 
@@ -75,11 +67,11 @@ const (
 	// ResponseStatusCodeLabel - label from response status code.
 	ResponseStatusCodeLabel = "response_status_code"
 	// FlowControlCheckDecisionTypeLabel - label for decision type dropped or accepted.
-	FlowControlCheckDecisionTypeLabel = "flowcontrol_check_decision_type"
+	FlowControlCheckDecisionTypeLabel = "decision_type"
 	// FlowControlCheckErrorReasonLabel - label for error reason on FCS Check request.
-	FlowControlCheckErrorReasonLabel = "flowcontrol_check_error_reason"
+	FlowControlCheckErrorReasonLabel = "error_reason"
 	// FlowControlCheckRejectReasonLabel - label for reject reason on FCS Check request.
-	FlowControlCheckRejectReasonLabel = "flowcontrol_check_reject_reason"
+	FlowControlCheckRejectReasonLabel = "reject_reason"
 
 	// DEFAULTS.
 
