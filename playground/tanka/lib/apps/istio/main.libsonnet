@@ -9,14 +9,27 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
     namespace: 'istio-system',
   },
   values:: {
-    istio: {},
+    base: {},
+    istiod: {},
     envoyfilter: {},
   },
-  istio:
-    helm.template('istio', 'charts/istio', {
+  base:
+    helm.template('base', 'charts/base', {
       namespace: $.environment.namespace,
       includeCrds: true,
-      values: $.values.istio,
+      values: $.values.base,
+    }),
+  istiod:
+    helm.template('istiod', 'charts/istiod', {
+      namespace: $.environment.namespace,
+      includeCrds: true,
+      values: $.values.istiod,
+    }),
+  gateway:
+    helm.template('gateway', 'charts/gateway', {
+      namespace: $.environment.namespace,
+      includeCrds: true,
+      values: $.values.gateway,
     }),
   envoyfilter:
     helm.template('envoyfilter', 'charts/istioconfig', {

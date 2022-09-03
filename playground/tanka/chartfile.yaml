@@ -1,12 +1,16 @@
 directory: charts
 repositories:
-- name: bitnami
-  url: https://charts.bitnami.com/bitnami
-- name: getindata
-  url: https://getindata.github.io/helm-charts/
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts
 requires:
-- chart: bitnami/grafana-operator
-  version: 2.6.2
-- chart: getindata/istio
-  version: 1.11.1
+  - chart: bitnami/grafana-operator
+    version: 2.6.2
+  - chart: istio/base
+    version: 1.14.3
+  - chart: istio/istiod
+    version: 1.14.3
+  - chart: istio/gateway
+    version: 1.14.3
 version: 1
