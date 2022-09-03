@@ -63,7 +63,7 @@ spec:
                   grpc_service:
                     google_grpc:
                       target_uri: {{ .Values.agentservice.name }}.{{ .Values.agentservice.namespace }}.svc.cluster.local:{{ .Values.agentservice.otlpPort }}
-                      stat_prefix: fn_otlp_access_log
+                      stat_prefix: aperture_access_log
                   transport_api_version: V3
                 body:
                   string_value: "%REQ(:METHOD)%"
@@ -107,7 +107,7 @@ spec:
                   grpc_service:
                     google_grpc:
                       target_uri: {{ .Values.agentservice.name }}.{{ .Values.agentservice.namespace }}.svc.cluster.local:{{ .Values.agentservice.otlpPort }}
-                      stat_prefix: fn_otlp_access_log
+                      stat_prefix: aperture_access_log
                   transport_api_version: V3
                 body:
                   string_value: "%REQ(:METHOD)%"

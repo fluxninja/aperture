@@ -18,9 +18,10 @@ Aperture Agent requires some of the additional details and needs the below
 to be added via the Envoy Filter.
 
 **Note**: In all the below patches, it is presumed that the Aperture Agent is
-installed with `DaemonSet` mode and is installed in the `aperture-system` namespace,
-which makes the target URL value `aperture-agent.aperture-system.svc.cluster.local`.
-If you are running the Aperture Agents in the Sidecar mode, use `localhost` as Target URL.
+installed with `DaemonSet` mode and is installed in the `aperture-system`
+namespace, which makes the target URL value
+`aperture-agent.aperture-system.svc.cluster.local`. If you are running the
+Aperture Agents in the Sidecar mode, use `localhost` as Target URL.
 
 1. The below patch merges the
    [Access Log](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log)
@@ -56,7 +57,7 @@ If you are running the Aperture Agents in the Sidecar mode, use `localhost` as T
          access_log:
            - name: envoy.access_loggers.open_telemetry
              typed_config:
-               "@type": "type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3alpha.OpenTelemetryAccessLogConfig"
+               "@type": "type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig"
                common_config:
                  log_name: egress
                  grpc_service:
@@ -146,7 +147,7 @@ If you are running the Aperture Agents in the Sidecar mode, use `localhost` as T
          access_log:
            - name: envoy.access_loggers.open_telemetry
              typed_config:
-               "@type": "type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3alpha.OpenTelemetryAccessLogConfig"
+               "@type": "type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig"
                common_config:
                  log_name: ingress
                  grpc_service:
