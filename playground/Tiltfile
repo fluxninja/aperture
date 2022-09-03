@@ -916,16 +916,16 @@ print("Will deploy resources:", ", ".join(resources))
 watch_file("Tiltfile")
 watch_file("./tanka/environments/")
 watch_file("./tanka/lib/")
-watch_file("../tanka/charts/")
-watch_file("../../api/")
-watch_file("../../cmd/")
-watch_file("../../pkg/")
-watch_file("../../plugins/")
-watch_file("../../operator/")
+watch_file("./tanka/charts/")
+watch_file(GIT_ROOT + "/api/")
+watch_file(GIT_ROOT + "/cmd/")
+watch_file(GIT_ROOT + "/pkg/")
+watch_file(GIT_ROOT + "/plugins/")
+watch_file(GIT_ROOT + "/operator/")
 
 run_load_generator = '''
-kubectl create configmap load-test --from-file=../../tools/load_generator/scenarios/load_test.js
-kubectl apply -f ../../tools/load_generator/scenarios/demoapp-load-test-cr.yaml
+kubectl create configmap load-test --from-file=''' + GIT_ROOT + '''/tools/load_generator/scenarios/load_test.js
+kubectl apply -f ''' + GIT_ROOT + '''/tools/load_generator/scenarios/demoapp-load-test-cr.yaml
 '''
 cmd_button('demoapp-load-test-run',
     resource='k6-operator-controller-manager',
@@ -936,7 +936,7 @@ cmd_button('demoapp-load-test-run',
 
 delete_load_generator = '''
 # delete load-test
-kubectl delete -f ../../tools/load_generator/scenarios/demoapp-load-test-cr.yaml
+kubectl delete -f ''' + GIT_ROOT + '''/tools/load_generator/scenarios/demoapp-load-test-cr.yaml
 kubectl delete configmap load-test
 '''
 cmd_button('demoapp-load-test-del',
