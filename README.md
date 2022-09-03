@@ -30,7 +30,7 @@ For more detailed description, refer to [the docs](docs/content/introduction.md)
 
 ## Playground
 
-To try aperture in local K8s environment, refer to [deployment docs](manifests/k8s/README.md).
+To try aperture in local K8s environment, refer to [Playground docs](playground/README.md).
 
 ## Contributing
 
