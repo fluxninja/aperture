@@ -231,22 +231,14 @@ DEP_TREE = {
                     "workload": "gateway",
                     "resource_deps": ["istio-bootstrap", "istiod"],
                     "extra_objects": [
-                        ("^istio-egressgateway", None)
-                    ],
-                    "ignored_objects": [
-                        ("^istio-egressgateway", "Service|Deployment")
-                    ]
-                },
-                {
-                    "workload": "gateway",
-                    "resource_deps": ["istio-bootstrap", "istiod"],
-                    "extra_objects": [
+                        ("^istio-egressgateway", None),
                         ("^istio-ingressgateway", None)
                     ],
                     "ignored_objects": [
+                        ("^istio-egressgateway", "Service|Deployment"),
                         ("^istio-ingressgateway", "Service|Deployment")
                     ]
-                }
+                },
             ]
         },
     },
