@@ -716,7 +716,7 @@ def forward_port_delayed(workload, labels, resource_deps, namespace, service, lo
         name=workload,
         labels=labels,
         resource_deps=resource_deps,
-        serve_cmd=['./tilt/portforward.sh'],
+        serve_cmd=['./scripts/portforward.sh'],
         serve_env=merge_dicts(
             {
                 "NAMESPACE": namespace,
