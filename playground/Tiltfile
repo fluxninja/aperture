@@ -210,7 +210,7 @@ DEP_TREE = {
                     "extra_objects": [
                         "istio:configmap",
                         "aperture-envoy-filter:envoyfilter",
-                        "istio-validator-istio-system:validatingwebhookconfiguration",
+                        "istiod-default-validator:validatingwebhookconfiguration",
                         ("istio.io$", "customresourcedefinition"),
                         (None, "EnvoyFilter", "istio-system"),
                         ("^istio-reader", None),
@@ -228,25 +228,15 @@ DEP_TREE = {
                     ]
                 },
                 {
-                    "workload": "istio-egressgateway",
+                    "workload": "gateway",
                     "resource_deps": ["istio-bootstrap", "istiod"],
                     "extra_objects": [
-                        ("^istio-egressgateway", None)
+                        ("^gateway", None),
                     ],
                     "ignored_objects": [
-                        ("^istio-egressgateway", "Service|Deployment")
+                        ("^gateway", "Service|Deployment"),
                     ]
                 },
-                {
-                    "workload": "istio-ingressgateway",
-                    "resource_deps": ["istio-bootstrap", "istiod"],
-                    "extra_objects": [
-                        ("^istio-ingressgateway", None)
-                    ],
-                    "ignored_objects": [
-                        ("^istio-ingressgateway", "Service|Deployment")
-                    ]
-                }
             ]
         },
     },
