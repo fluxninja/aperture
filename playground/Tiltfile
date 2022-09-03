@@ -8,6 +8,8 @@ load('ext://uibutton', 'cmd_button')
 #################
 IMG_REPO = "docker.io/fluxninja"
 GIT_ROOT = str(local("git rev-parse --show-toplevel")).strip()
+PLAYGROUND_ROOT = GIT_ROOT + "/playground"
+TANKA_ROOT = GIT_ROOT + "/playground/tanka"
 TILT_OBJECTS = []
 APERTURE_SYSTEM_NS = "aperture-system"
 APERTURE_DEMOAPP_NS = "demoapp"
@@ -22,15 +24,26 @@ GLOBAL_RAN_TANKA_DEPS_KEY = "RAN_TANKA_DEPS"
 # Dependency tree and service configuration.
 # Top level maps NAMESPACE to services
 # Services are a mapping of service name to their config, which consists of:
+# "labels": A list of labels to apply to the service
 # "needs": list of services (from any namespace) which need to be brought up for the service to work
-# "images": list of dicts, defining arguments passed to build_docker_img
-# "port_forwards": any value accepted by k8s_resource's port_forwards argument.
-#                  In addition to that, it can be a dict describing multiple port_forwards (mapping name to port_forwards, as above)
+# "tkenv": Path to
+# "images": list of dicts, defining arguments passed to build_docker_img. Arguments are:
+## "tag": Docker image tag. If specified, image is pulled, else, it is built
+## "ref": Docker image name
+## "live_update": Live update callback
+## "context": Context to build the image in
+## "dockerfile": Location of Dockerfile to build the image from
+## "ssh": Unused. TODO: Remove
+# "port_forwards": any value accepted by k8s_resource's port_forwards argument. In addition to that, it can be a dict describing multiple port_forwards (mapping name to port_forwards, as above)
+# "child_resources"
+# "pvc_selectors"
+# "kinds"
 DEP_TREE = {
     APERTURE_SYSTEM_NS: {
         "aperture-grafana": {
             "labels": ["Aperture"],
-            "tkenv": "tanka/environments/tilt/apps/aperture-grafana",
+            # construct directory path to tkenv
+            "tkenv": TANKA_ROOT + "/environments/tilt/apps/aperture-grafana",
             "child_resources": [
                 {
                     "new_name": "aperture-grafana-operator-bootstrap",
@@ -74,24 +87,24 @@ DEP_TREE = {
         },
         "agent": {
             "labels": ["Aperture"],
-            "tkenv": "tanka/environments/tilt/apps/aperture-agent",
+            "tkenv": TANKA_ROOT + "/environments/tilt/apps/aperture-agent",
             "images": [
                 {
                     "ref": "aperture-agent",
-                    "context": "./",
-                    "dockerfile": "cmd/aperture-agent/Dockerfile",
+                    "context": GIT_ROOT,
+                    "dockerfile": GIT_ROOT + "/cmd/aperture-agent/Dockerfile",
                     "ssh": "default",
                 },
                 {
                     "ref": "aperture-controller",
-                    "context": "./",
-                    "dockerfile": "cmd/aperture-controller/Dockerfile",
+                    "context": GIT_ROOT,
+                    "dockerfile": GIT_ROOT + "/cmd/aperture-controller/Dockerfile",
                     "ssh": "default",
                 },
                 {
                     "ref": "aperture-operator",
-                    "context": "./",
-                    "dockerfile": "./operator/Dockerfile",
+                    "context": GIT_ROOT,
+                    "dockerfile": GIT_ROOT + "/operator/Dockerfile",
                     "ssh": "default",
                 }
             ],
@@ -190,7 +203,7 @@ DEP_TREE = {
         "istio": {
             "labels": ["Istio"],
             "needs": ["agent"],
-            "tkenv": "tanka/environments/tilt/apps/istio",
+            "tkenv": TANKA_ROOT + "/environments/tilt/apps/istio",
             "child_resources": [
                 {
                     "new_name": "istio-bootstrap",
@@ -240,7 +253,7 @@ DEP_TREE = {
     APERTURE_DEMOAPP_NS: {
         "k6-operator": {
             "labels": ["K6"],
-            "tkenv": "tanka/environments/tilt/apps/k6-operator",
+            "tkenv": TANKA_ROOT + "/environments/tilt/apps/k6-operator",
             "child_resources": [
                 {
                     "workload": "k6-operator-controller-manager",
@@ -258,13 +271,13 @@ DEP_TREE = {
         },
         "demo-app": {
             "labels": ["DemoApplications"],
-            "tkenv": "tanka/environments/tilt/apps/demoapp",
+            "tkenv": TANKA_ROOT + "/environments/tilt/apps/demoapp",
             "needs": ["istio"],
             "images": [
                 {
                     "ref": "demo-app",
-                    "context": "./",
-                    "dockerfile": "tools/demo_app/Dockerfile",
+                    "context": GIT_ROOT,
+                    "dockerfile": GIT_ROOT + "/tools/demo_app/Dockerfile",
                     "ssh": "default",
                 }
             ],
@@ -304,7 +317,7 @@ DEP_TREE = {
         "bookinfo": {
             "labels": ["DemoApplications"],
             "needs": ["istio"],
-            "tkenv": "tanka/environments/tilt/apps/bookinfo",
+            "tkenv": TANKA_ROOT + "/environments/tilt/apps/bookinfo",
             "child_resources": [
                 {
                     "new_name": "bookinfo-common",
@@ -353,8 +366,6 @@ def merge_dicts(*dicts):
 
 def build_docker_img(ref, context, dockerfile="Dockerfile", **kwargs):
     # Wrapper around docker_build to not repeat image repo,
-    # have context relative to git root
-    # as well as have dockerfile relative to context
     print(
         "Will build",
         ref,
@@ -366,8 +377,6 @@ def build_docker_img(ref, context, dockerfile="Dockerfile", **kwargs):
         kwargs,
     )
     ref = IMG_REPO.rstrip("/") + "/" + ref
-    context = GIT_ROOT + "/" + context
-    dockerfile = context + "/" + dockerfile
     docker_build(ref, context, dockerfile=dockerfile, **kwargs)
 
 
