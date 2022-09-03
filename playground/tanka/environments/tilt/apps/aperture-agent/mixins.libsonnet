@@ -1,5 +1,6 @@
 local k = import 'k.libsonnet';
 
+// TODO: rename environment from aperture-agent to just aperture since it is for both agent and controller
 local apertureAgentApp = import 'apps/aperture-agent/main.libsonnet';
 local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
 

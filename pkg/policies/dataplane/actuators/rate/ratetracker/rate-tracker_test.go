@@ -29,7 +29,7 @@ func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit int, ttl
 	for label, limit := range overrides {
 		limitCheck.AddOverride(label, limit)
 	}
-	limiter, err := NewOlricRateTracker(limitCheck, distCache, "Limiter", ttl)
+	limiter, err := NewDistCacheRateTracker(limitCheck, distCache, "Limiter", ttl)
 	if err != nil {
 		t.Logf("Failed to create OlricLimiter: %v", err)
 		return nil, err
