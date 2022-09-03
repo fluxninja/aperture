@@ -1,6 +1,8 @@
-# Deployment for k8s
+# Playground
 
-This directory contains definitions used for local k8s deployments.
+Playground is a Kubernetes based environment for exploring the capabilities of Aperture. Additionaly it is used as development environment for Aperture. Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in Kubernetes. Tilt watches for changes to local files and auto-deploys any resources that change. This is very convenient for getting quick feedback during development of Aperture.
+
+Playground deploys resources to the Kubernetes cluster that `kubectl` on your machine points at. For convience, this README includes instructions for deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
 
 ## Tools
 
@@ -15,7 +17,7 @@ When using `asdf`:
 - Install tools: `asdf install`
 
 > Note:
-> Last command will install tools which has been added as plugins and which are defined/versioned in `.tool-versions` file
+> Last command will install tools which have been added as plugins and which are defined/versioned in `.tool-versions` file
 
 ## Tools used for k8s deployment
 
@@ -38,7 +40,7 @@ To install manually, follow instructions: <https://tanka.dev/install>
 
 ### Local k8s cluster
 
-Use [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/).
+May use [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/).
 
 ### Kubectl
 
@@ -59,8 +61,7 @@ featureGates:
 ## Tilt based deployment
 
 In case of local deployments and development work,
-it's nice to be able to automatically rebuild images and services,
-expose common ports as well as automatically cleanup the DB on teardown.
+it's nice to be able to automatically rebuild images and services.
 
 This can be achieved by using `tilt`.
 
