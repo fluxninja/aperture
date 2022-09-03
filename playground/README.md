@@ -1,6 +1,6 @@
 # Playground
 
-Playground is a Kubernetes based environment for exploring the capabilities of Aperture. Additionaly it is used as development environment for Aperture. Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in Kubernetes. Tilt watches for changes to local files and auto-deploys any resources that change. This is very convenient for getting quick feedback during development of Aperture.
+Playground is a Kubernetes based environment for exploring the capabilities of Aperture. Additionaly it is used as a development environment for Aperture. Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in Kubernetes. Tilt watches for changes to local files and auto-deploys any resources that change. This is very convenient for getting quick feedback during development of Aperture.
 
 Playground deploys resources to the Kubernetes cluster that `kubectl` on your machine points at. For convience, this README includes instructions for deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
 
