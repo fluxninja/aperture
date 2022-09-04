@@ -57,7 +57,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: policies
-  namespace: aperture-system
+  namespace: aperture-controller
   labels:
     fluxninja.com/validate: "true"
 data:
@@ -285,7 +285,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: policies
-  namespace: aperture-system
+  namespace: aperture-controller
   labels:
     fluxninja.com/validate: "true"
 data:

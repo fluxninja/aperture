@@ -18,9 +18,9 @@ Aperture Agent requires some of the additional details and needs the below
 to be added via the Envoy Filter.
 
 **Note**: In all the below patches, it is presumed that the Aperture Agent is
-installed with `DaemonSet` mode and is installed in the `aperture-system`
+installed with `DaemonSet` mode and is installed in the `aperture-agent`
 namespace, which makes the target URL value
-`aperture-agent.aperture-system.svc.cluster.local`. If you are running the
+`aperture-agent.aperture-agent.svc.cluster.local`. If you are running the
 Aperture Agents in the Sidecar mode, use `localhost` as Target URL.
 
 1. The below patch merges the
@@ -62,7 +62,7 @@ Aperture Agents in the Sidecar mode, use `localhost` as Target URL.
                  log_name: egress
                  grpc_service:
                    google_grpc:
-                     target_uri: aperture-agent.aperture-system.svc.cluster.local:4317
+                     target_uri: aperture-agent.aperture-agent.svc.cluster.local:4317
                      stat_prefix: fn_otlp_access_log
                  transport_api_version: V3
                body:
@@ -152,7 +152,7 @@ Aperture Agents in the Sidecar mode, use `localhost` as Target URL.
                  log_name: ingress
                  grpc_service:
                    google_grpc:
-                     target_uri: aperture-agent.aperture-system.svc.cluster.local:4317
+                     target_uri: aperture-agent.aperture-agent.svc.cluster.local:4317
                      stat_prefix: fn_otlp_access_log
                  transport_api_version: V3
                body:
@@ -245,7 +245,7 @@ Aperture Agents in the Sidecar mode, use `localhost` as Target URL.
          failure_mode_allow: true
          grpc_service:
            google_grpc:
-             target_uri: aperture-agent.aperture-system.svc.cluster.local:80
+             target_uri: aperture-agent.aperture-agent.svc.cluster.local:80
              stat_prefix: ext_authz
            timeout: 0.01s
            initial_metadata:
@@ -292,7 +292,7 @@ Aperture Agents in the Sidecar mode, use `localhost` as Target URL.
          failure_mode_allow: true
          grpc_service:
            google_grpc:
-             target_uri: aperture-agent.aperture-system.svc.cluster.local:80
+             target_uri: aperture-agent.aperture-agent.svc.cluster.local:80
              stat_prefix: ext_authz
            timeout: 0.01s
            initial_metadata:

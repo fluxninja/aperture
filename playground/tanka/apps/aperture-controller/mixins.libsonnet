@@ -1,9 +1,9 @@
 local k = import 'k.libsonnet';
 
-local apertureAgentApp = import 'apps/aperture-agent/main.libsonnet';
+local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
 
-local apertureAgentMixin =
-  apertureAgentApp {
+local apertureControllerMixin =
+  apertureControllerApp {
     values+:: {
       operator+: {
         image: {
@@ -12,7 +12,7 @@ local apertureAgentMixin =
           tag: 'latest',
         },
       },
-      agent+: {
+      controller+: {
         createUninstallHook: false,
         fluxninjaPlugin+: {
           enabled: false,
@@ -25,22 +25,13 @@ local apertureAgentMixin =
         },
         image: {
           registry: '',
-          repository: 'docker.io/fluxninja/aperture-agent',
+          repository: 'docker.io/fluxninja/aperture-controller',
           tag: 'latest',
-        },
-        sidecar+: {
-          enabled: false,
-        },
-        etcd+: {
-          endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
-        },
-        prometheus+: {
-          address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',
         },
       },
     },
   };
 
 {
-  agent: apertureAgentMixin,
+  controller: apertureControllerMixin,
 }

@@ -546,14 +546,14 @@ controller:
     ##
     enableNamespacesByDefault: []
   ## Etcd parameters for Controller
-  ## @param controller.etcd.endpoints List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty when etcd.enabled is set to false.
+  ## @param controller.etcd.endpoints List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty when etcd is not craeted by this chart (i.e. etcd.enabled is set to false).
   ## @param controller.etcd.leaseTtl Lease time-to-live.
   ##
   etcd:
     endpoints: []
     leaseTtl: 60s
   ## Prometheus parameters for Controller
-  ## @param controller.prometheus.address specifies the address of the Prometheus server. This must not be empty when prometheus.enabled is set to false.
+  ## @param controller.prometheus.address specifies the address of the Prometheus server. This must not be empty when prometheus is not created by this chart (i.e. prometheus.enabled is set to false).
   ##
   prometheus:
     address: ~

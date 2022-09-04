@@ -8,8 +8,8 @@
           "subdir": ""
         }
       },
-      "version": "34c9d588c0d4c449bb0a316285c4e4df368844b7",
-      "sum": "1SF5BTFItXtg8cSWgT96F/i991jnprodiVuU+rBKB50="
+      "version": "c986ab02105fe80ab7604721c00b036e64ae6fb2",
+      "sum": "ntOIyy4QRSQwlBwabsAFSztfFHGb2JcdVYuUiHZjdkI="
     },
     {
       "source": {
@@ -18,8 +18,8 @@
           "subdir": "lib/1.0"
         }
       },
-      "version": "34c9d588c0d4c449bb0a316285c4e4df368844b7",
-      "sum": "BJ+m4XhZ7KmA+BNSX0eGaNqM6Z/U3G9pNi9FXHZZpu4="
+      "version": "c986ab02105fe80ab7604721c00b036e64ae6fb2",
+      "sum": "uaIkLQIC6uxxY5NnZf/tVeGDEGNv7SQHRQpXzWCSAXI="
     },
     {
       "source": {
@@ -28,8 +28,8 @@
           "subdir": "libsonnet/1.0"
         }
       },
-      "version": "a9c28e53909ad493d3de38ebd516ebdf5c305039",
-      "sum": "KFpQRn+zixzOoBr6dAo03gk5Hoz7R8uUcLY5w7MVbmE="
+      "version": "84ac1fa9a5231d92ea918d64b201cc00a2fcca19",
+      "sum": "HrvDOYR6sNNrN3qEzqMgydb+xnfKEEKyG1uBo5aAobw="
     },
     {
       "source": {

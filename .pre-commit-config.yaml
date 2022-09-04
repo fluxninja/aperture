@@ -21,7 +21,7 @@ repos:
       - id: end-of-file-fixer
         exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$
       - id: check-yaml
-        exclude: ^(manifests/charts/.*/(templates|files)/.*)
+        exclude: ^(manifests/charts/.*/(templates|files)/.*|certs/.*)
         args:
           - "--allow-multiple-documents"
       - id: check-added-large-files
