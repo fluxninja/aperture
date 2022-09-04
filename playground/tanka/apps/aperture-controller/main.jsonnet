@@ -4,11 +4,11 @@ function(apiServer='API SERVER MISSING') {
   apiVersion: 'tanka.dev/v1alpha1',
   kind: 'Environment',
   metadata: {
-    name: 'environment/tilt/apps/bookinfo',
+    name: 'apps/aperture-agent',
   },
   spec: {
     apiServer: apiServer,
-    namespace: 'bookinfo',
+    namespace: 'aperture-controller',
     applyStrategy: 'server',
   },
   data: mixins,

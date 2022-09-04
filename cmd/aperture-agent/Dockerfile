@@ -43,7 +43,6 @@ RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache curl
 # Ensure config dirs exists, even if not mounted
 RUN mkdir -p /etc/aperture/aperture-agent/flowcontrol /etc/aperture/aperture-agent/classifiers /etc/aperture/aperture-agent/plugins
-COPY --link certs /etc/aperture/aperture-agent/certs
 COPY --link --from=builder /aperture-agent /aperture-agent
 COPY --link --from=plugins-builder /plugins /var/lib/aperture/aperture-agent/plugins
 CMD ["/aperture-agent"]

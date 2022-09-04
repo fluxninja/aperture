@@ -4,11 +4,11 @@ function(apiServer='API SERVER MISSING') {
   apiVersion: 'tanka.dev/v1alpha1',
   kind: 'Environment',
   metadata: {
-    name: 'environment/tilt/apps/aperture-agent',
+    name: 'apps/istio',
   },
   spec: {
     apiServer: apiServer,
-    namespace: 'aperture-system',
+    namespace: 'istio-system',
     applyStrategy: 'server',
   },
   data: mixins,

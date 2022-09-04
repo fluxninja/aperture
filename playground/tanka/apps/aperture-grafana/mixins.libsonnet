@@ -4,7 +4,7 @@ local grafanaOperatorApp = import 'apps/grafana-operator/main.libsonnet';
 local grafanaOperatorMixin =
   grafanaOperatorApp {
     environment+:: {
-      namespace: 'aperture-system',
+      namespace: 'aperture-controller',
       name: 'aperture-grafana-operator',
     },
     values+:: {

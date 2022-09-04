@@ -41,10 +41,12 @@ The Aperture Controller will be installed using the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
 which will be managed by the Aperture Operator.
 
-Below are the steps to install or upgrade the Aperture Controller into your setup using
-the [Aperture Controller Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-controller).
+Below are the steps to install or upgrade the Aperture Controller into your
+setup using the
+[Aperture Controller Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-controller).
 
-By following these instructions, you will have deployed the Aperture Controller into your cluster.
+By following these instructions, you will have deployed the Aperture Controller
+into your cluster.
 
 1. Add the Helm chart repo in your environment:
 
@@ -59,10 +61,11 @@ By following these instructions, you will have deployed the Aperture Controller 
    helm upgrade --install controller aperture/aperture-controller
    ```
 
-3. Alternatively, you can create the Controller Custom Resource directly on the Kubernetes cluster using the below steps:
+3. Alternatively, you can create the Controller Custom Resource directly on the
+   Kubernetes cluster using the below steps:
 
-   1. Create a `values.yaml` for just starting the operator and disabling the creation of Controller Custom Resource
-      and pass it with `helm upgrade`:
+   1. Create a `values.yaml` for just starting the operator and disabling the
+      creation of Controller Custom Resource and pass it with `helm upgrade`:
 
       ```yaml
       controller:
@@ -87,7 +90,8 @@ By following these instructions, you will have deployed the Aperture Controller 
           tag: latest
       ```
 
-      All the configuration parameters for the Controller Custom Resource are listed on the
+      All the configuration parameters for the Controller Custom Resource are
+      listed on the
       [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#controller-custom-resource-parameters)
       file of the Helm chart.
 
@@ -97,9 +101,9 @@ By following these instructions, you will have deployed the Aperture Controller 
       kubectl apply -f controller.yaml
       ```
 
-4. The chart installs Prometheus and Etcd instances by default. If you
-   don't want to install and use your existing instances of Prometheus or
-   Etcd, configure below values in the `values.yaml` file and pass it with
+4. The chart installs Prometheus and Etcd instances by default. If you don't
+   want to install and use your existing instances of Prometheus or Etcd,
+   configure below values in the `values.yaml` file and pass it with
    `helm upgrade`:
 
    ```yaml
@@ -115,15 +119,17 @@ By following these instructions, you will have deployed the Aperture Controller 
      enabled: false
    ```
 
-   Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with the actual values of Etcd and Prometheus,
-   which will be used by the Aperture Controller.
+   Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
+   the actual values of Etcd and Prometheus, which will be used by the Aperture
+   Controller.
 
    ```bash
    helm upgrade --install controller aperture/aperture-controller -f values.yaml
    ```
 
-   A list of other configurable parameters for Etcd and Prometheus can be
-   found in the [README](https://artifacthub.io/packages/helm/aperture/aperture-operator#istio).
+   A list of other configurable parameters for Etcd and Prometheus can be found
+   in the
+   [README](https://artifacthub.io/packages/helm/aperture/aperture-operator#istio).
 
    **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
    is enabled on your existing Prometheus instance as it is required by the
@@ -139,15 +145,15 @@ By following these instructions, you will have deployed the Aperture Controller 
    A list of configurable parameters can be found in the
    [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters).
 
-6. If you want to deploy the Aperture Controller into a namespace
-   other than `default`, use the `-n` flag:
+6. If you want to deploy the Aperture Controller into a namespace other than
+   `default`, use the `-n` flag:
 
    ```bash
-   helm upgrade --install controller aperture/aperture-controller -n "aperture-system" --create-namespace
+   helm upgrade --install controller aperture/aperture-controller -n "aperture-controller" --create-namespace
    ```
 
-7. Once you have successfully deployed the resources, confirm that the
-   Aperture Controller is up and running:
+7. Once you have successfully deployed the resources, confirm that the Aperture
+   Controller is up and running:
 
    ```bash
    kubectl get pod -A
@@ -155,4 +161,5 @@ By following these instructions, you will have deployed the Aperture Controller 
    kubectl get controller -A
    ```
 
-You should see pods for Aperture Controller and Controller Manager in `RUNNING` state and `Controller` Custom Resource in `created` state.
+You should see pods for Aperture Controller and Controller Manager in `RUNNING`
+state and `Controller` Custom Resource in `created` state.
