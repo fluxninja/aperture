@@ -32,17 +32,17 @@ When using `asdf`:
 > Note: Last command will install tools which have been added as plugins and
 > which are defined/versioned in `.tool-versions` file
 
-## Tools used for k8s deployment
+### Tools required for k8s deployment
 
 Tools which are required for local k8s deployment:
 
-### helm
+#### helm
 
 Helm is a package manager for k8s.
 
 To install manually, follow instructions: <https://helm.sh/docs/intro/install/>
 
-### tanka and Jsonnet Bundler
+#### tanka and Jsonnet Bundler
 
 Grafana Tanka is the robust configuration utility for your Kubernetes cluster,
 powered by the unique Jsonnet language.
@@ -51,16 +51,16 @@ Jsonnet Bundler is used to manage Jsonnet dependencies.
 
 To install manually, follow instructions: <https://tanka.dev/install>
 
-### Local k8s cluster
+#### Local k8s cluster
 
 May use [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/).
 
-### Kubectl
+#### kubectl
 
 The Kubernetes command line tool. Follow the instructions:
 <https://kubernetes.io/docs/tasks/tools/#kubectl>
 
-### Alpha features
+#### Alpha features
 
 Agent core service uses feature gate for managing node-local traffic:
 <https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/>
@@ -73,7 +73,7 @@ featureGates:
   ServiceInternalTrafficPolicy: true
 ```
 
-## Tilt based deployment
+## Deploying with Tilt
 
 In case of local deployments and development work, it's nice to be able to
 automatically rebuild images and services.
