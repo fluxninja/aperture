@@ -14,7 +14,7 @@
 - key: http.user_agent
   value:
     string_value: "%REQ(USER-AGENT)%"
-- key: http.duration_millis
+- key: duration_millis
   value:
     string_value: "%DURATION%"
 - key: http.request_content_length

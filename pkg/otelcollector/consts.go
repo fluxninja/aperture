@@ -43,14 +43,12 @@ const (
 	LabeledLabel = "labeled"
 	// StatusCodeLabel describes HTTP status code of the response.
 	StatusCodeLabel = "http.status_code"
-	// HTTPDurationLabel describes duration of the HTTP request in milliseconds.
-	HTTPDurationLabel = "http.duration_millis"
+	// DurationLabel describes duration of the HTTP request in milliseconds.
+	DurationLabel = "duration_millis"
 	// HTTPRequestContentLength describes length of the HTTP request content in bytes.
 	HTTPRequestContentLength = "http.request_content_length"
 	// HTTPResponseContentLength describes length of the HTTP response content in bytes.
 	HTTPResponseContentLength = "http.response_content_length"
-	// FeatureDurationLabel describes duration of the feature in milliseconds.
-	FeatureDurationLabel = "feature.duration_millis"
 	// DecisionTypeLabel describes the decision type taken by policy.
 	DecisionTypeLabel = "decision_type"
 	// DecisionErrorReasonLabel describes the error reason of the decision taken by policy.
@@ -81,6 +79,8 @@ const (
 	FeatureAddressLabel = "feature.ip"
 	// FeatureIDLabel describes the ID of the feature.
 	FeatureIDLabel = "feature.id"
+	// FeatureStatusLabel describes the status of the feature.
+	FeatureStatusLabel = "feature.status"
 	// EntityNameLabel describes entity name e.g. pod name.
 	EntityNameLabel = "entity_name"
 	// TimestampLabel describes timestamp of the request.

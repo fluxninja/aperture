@@ -53,9 +53,7 @@ var _ = Describe("Metrics Processor", func() {
 		) {
 			ctx := context.Background()
 
-			expectEngineCalls(engine, checkResponse)
-
-			logs := someLogs(checkResponse, authzResponse, controlPoint)
+			logs := someLogs(engine, checkResponse, authzResponse, controlPoint)
 			modifiedLogs, err := processor.ConsumeLogs(ctx, logs)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -271,9 +269,7 @@ var _ = Describe("Metrics Processor", func() {
 		) {
 			ctx := context.Background()
 
-			expectEngineCalls(engine, checkResponse)
-
-			traces := someTraces(checkResponse, controlPoint)
+			traces := someTraces(engine, checkResponse, controlPoint)
 			modifiedTraces, err := processor.ConsumeTraces(ctx, traces)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -475,6 +471,7 @@ var _ = Describe("Metrics Processor", func() {
 
 // someLogs will return a plog.Logs instance with single LogRecord
 func someLogs(
+	engine *mocks.MockEngine,
 	checkResponse *flowcontrolv1.CheckResponse,
 	authzResponse *flowcontrolv1.AuthzResponse,
 	controlPoint string,
@@ -482,6 +479,7 @@ func someLogs(
 	logs := plog.NewLogs()
 	logs.ResourceLogs().AppendEmpty()
 
+	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
 	resourceLogsSlice := logs.ResourceLogs()
 	for i := 0; i < resourceLogsSlice.Len(); i++ {
 		resourceLogsSlice.At(i).ScopeLogs().AppendEmpty()
@@ -497,26 +495,28 @@ func someLogs(
 			logRecord.Attributes().InsertString(otelcollector.MarshalledAuthzResponseLabel, string(marshalledAuthzResponse))
 			logRecord.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
 			logRecord.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
-			switch controlPoint {
-			case otelcollector.ControlPointIngress, otelcollector.ControlPointEgress:
-				logRecord.Attributes().InsertString(otelcollector.HTTPDurationLabel, "5")
-			case otelcollector.ControlPointFeature:
-				logRecord.Attributes().InsertString(otelcollector.FeatureDurationLabel, "5")
+			logRecord.Attributes().InsertString(otelcollector.DurationLabel, "5")
+			for i, fm := range checkResponse.FluxMeters {
+				// TODO actually return some Histogram
+				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetFluxMeterName(), "201", "", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
 			}
 		}
 	}
+	gomock.InOrder(expectedCalls...)
 
 	return logs
 }
 
 // someTraces will return a ptrace.Traces instance with single SpanRecord
 func someTraces(
+	engine *mocks.MockEngine,
 	checkResponse *flowcontrolv1.CheckResponse,
 	controlPoint string,
 ) ptrace.Traces {
 	traces := ptrace.NewTraces()
 	traces.ResourceSpans().AppendEmpty()
 
+	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
 	resourceSpansSlice := traces.ResourceSpans()
 	for i := 0; i < resourceSpansSlice.Len(); i++ {
 		resourceSpansSlice.At(i).ScopeSpans().AppendEmpty()
@@ -527,16 +527,16 @@ func someTraces(
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
 			span.Attributes().InsertString(otelcollector.MarshalledCheckResponseLabel, string(marshalledCheckResponse))
-			span.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
+			span.Attributes().InsertString(otelcollector.FeatureStatusLabel, "Ok")
 			span.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
-			switch controlPoint {
-			case otelcollector.ControlPointIngress, otelcollector.ControlPointEgress:
-				span.Attributes().InsertString(otelcollector.HTTPDurationLabel, "5")
-			case otelcollector.ControlPointFeature:
-				span.Attributes().InsertString(otelcollector.FeatureDurationLabel, "5")
+			span.Attributes().InsertString(otelcollector.DurationLabel, "5")
+			for i, fm := range checkResponse.FluxMeters {
+				// TODO actually return some Histogram
+				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetFluxMeterName(), "", "Ok", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
 			}
 		}
 	}
+	gomock.InOrder(expectedCalls...)
 
 	return traces
 }
@@ -577,13 +577,4 @@ func allTraceRecords(traces ptrace.Traces) []ptrace.Span {
 	}
 
 	return spanRecords
-}
-
-func expectEngineCalls(engine *mocks.MockEngine, checkResponse *flowcontrolv1.CheckResponse) {
-	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
-	for i, fm := range checkResponse.FluxMeters {
-		// TODO actually return some Histogram
-		expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetFluxMeterName(), "201", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
-	}
-	gomock.InOrder(expectedCalls...)
 }

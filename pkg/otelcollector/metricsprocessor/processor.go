@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/component"
@@ -112,6 +113,12 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 		if checkResponse == nil {
 			return errors.New("failed getting check response from attributes")
 		}
+
+		endTimestamp := span.EndTimestamp()
+		startTimeStamp := span.StartTimestamp()
+		latency := float64(endTimestamp.AsTime().Sub(startTimeStamp.AsTime())) / float64(time.Millisecond)
+
+		span.Attributes().InsertDouble(otelcollector.DurationLabel, latency)
 		p.addCheckResponseBasedLabels(span.Attributes(), checkResponse)
 		return p.updateMetrics(span.Attributes(), checkResponse)
 	})
@@ -201,15 +208,9 @@ func (p *metricsProcessor) updateMetrics(
 	attributes pcommon.Map,
 	checkResponse *flowcontrolv1.CheckResponse,
 ) error {
-	latencyLabel := getLatencyLabel(attributes)
-
-	if latencyLabel == "" {
-		log.Debug().Msg("Failed determining latency label")
-		return nil
-	}
-	rawLatency, exists := attributes.Get(latencyLabel)
+	rawLatency, exists := attributes.Get(otelcollector.DurationLabel)
 	if !exists {
-		log.Debug().Str("label", latencyLabel).Msg("Label does not exist")
+		log.Debug().Str("label", otelcollector.DurationLabel).Msg("Label does not exist")
 		return nil
 	}
 	latency, err := strconv.ParseFloat(rawLatency.StringVal(), 64)
@@ -217,12 +218,16 @@ func (p *metricsProcessor) updateMetrics(
 		log.Debug().Str("rawLatency", rawLatency.AsString()).Msg("Could not parse raw latency to float")
 		return nil
 	}
+	statusCodeStr := ""
 	statusCode, exists := attributes.Get(otelcollector.StatusCodeLabel)
-	if !exists {
-		log.Debug().Str("label", otelcollector.StatusCodeLabel).Msg("Label does not exist")
-		return nil
+	if exists {
+		statusCodeStr = statusCode.StringVal()
 	}
-	statusCodeStr := statusCode.StringVal()
+	featureStatusStr := ""
+	featureStatus, exists := attributes.Get(otelcollector.FeatureStatusLabel)
+	if exists {
+		featureStatusStr = featureStatus.StringVal()
+	}
 
 	for _, decision := range checkResponse.LimiterDecisions {
 		workload := ""
@@ -244,7 +249,7 @@ func (p *metricsProcessor) updateMetrics(
 	}
 
 	for _, fluxMeter := range checkResponse.FluxMeters {
-		p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, latency)
+		p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, latency)
 	}
 
 	return nil
@@ -265,35 +270,22 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	fluxMeter *flowcontrolv1.FluxMeter,
 	decisionType flowcontrolv1.DecisionType,
 	statusCode string,
+	featureStatus string,
 	latency float64,
 ) {
 	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(
 		fluxMeter.GetFluxMeterName(),
 		statusCode,
+		featureStatus,
 		decisionType,
 	)
 	if fluxmeterHistogram == nil {
 		log.Debug().Str(metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
+			Str(metrics.FeatureStatusLabel, featureStatus).
 			Msg("Fluxmeter not found")
 		return
 	}
 	fluxmeterHistogram.Observe(latency)
-}
-
-func getLatencyLabel(attributes pcommon.Map) string {
-	controlPoint, exists := attributes.Get(otelcollector.ControlPointLabel)
-	if !exists {
-		log.Debug().Str("label", otelcollector.ControlPointLabel).Msg("Label does not exist")
-		// This should not happen
-		return ""
-	}
-	switch controlPoint.AsString() {
-	case otelcollector.ControlPointFeature:
-		return otelcollector.FeatureDurationLabel
-	case otelcollector.ControlPointIngress, otelcollector.ControlPointEgress:
-		return otelcollector.HTTPDurationLabel
-	}
-	return ""
 }

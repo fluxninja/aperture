@@ -80,17 +80,17 @@ func (mr *MockFluxMeterMockRecorder) GetFluxMeterName() *gomock.Call {
 }
 
 // GetHistogram mocks base method.
-func (m *MockFluxMeter) GetHistogram(arg0 flowcontrolv1.DecisionType, arg1 string) prometheus.Observer {
+func (m *MockFluxMeter) GetHistogram(arg0 flowcontrolv1.DecisionType, arg1, arg2 string) prometheus.Observer {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetHistogram", arg0, arg1)
+	ret := m.ctrl.Call(m, "GetHistogram", arg0, arg1, arg2)
 	ret0, _ := ret[0].(prometheus.Observer)
 	return ret0
 }
 
 // GetHistogram indicates an expected call of GetHistogram.
-func (mr *MockFluxMeterMockRecorder) GetHistogram(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockFluxMeterMockRecorder) GetHistogram(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram), arg0, arg1, arg2)
 }
 
 // GetSelector mocks base method.
