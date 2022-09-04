@@ -8,7 +8,7 @@ local istioAppMixin =
       gateway+: {},
       envoyfilter+: {
         apertureAgent+: {
-          authzPort: 8080,
+          authzPort: 80,
         },
       },
     },
