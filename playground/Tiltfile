@@ -200,7 +200,7 @@ DEP_TREE = {
                 {
                     "workload": "agent",
                     "new_name": "aperture-agent",
-                    "resource_deps": ["agent-aperture-agent-manager"],
+                    "resource_deps": ["controller-etcd", "agent-aperture-agent-manager", "controller-prometheus"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
                     ]
