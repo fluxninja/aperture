@@ -19,6 +19,12 @@ local schedulerouts = import './schedulerouts.libsonnet';
   withDefaultWorkloadMixin(default_workload):: {
     default_workload+: default_workload,
   },
+  withMaxTimeout(max_timeout):: {
+    max_timeout: max_timeout,
+  },
+  withMaxTimeoutMixin(max_timeout):: {
+    max_timeout+: max_timeout,
+  },
   withOutPorts(out_ports):: {
     out_ports: out_ports,
   },
@@ -30,6 +36,12 @@ local schedulerouts = import './schedulerouts.libsonnet';
   },
   withSelectorMixin(selector):: {
     selector+: selector,
+  },
+  withTimeoutFactor(timeout_factor):: {
+    timeout_factor: timeout_factor,
+  },
+  withTimeoutFactorMixin(timeout_factor):: {
+    timeout_factor+: timeout_factor,
   },
   withWorkloads(workloads):: {
     workloads:

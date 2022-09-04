@@ -27,7 +27,7 @@ message ReportRequest {
   string agent_group = 4;
   ControllerInfo controller_info = 5;
   aperture.common.peers.v1.Peers peers = 6;
-  aperture.common.entitycache.v1.EntityCache entity_cache = 8;
+  aperture.common.entitycache.v1.ServicesList services_list = 8;
   aperture.common.status.v1.GroupStatus all_statuses = 9;
 }
 

@@ -40,8 +40,6 @@ spec:
           metadata:
             type: object
           spec:
-            default:
-              serverPort: 80
             description: AgentSpec defines the desired state for the Agent.
             properties:
               affinity:
@@ -874,60 +872,6 @@ spec:
                 items:
                   type: string
                 type: array
-              batchMetricsFast:
-                default:
-                  sendBatchSize: 1000
-                  timeout: 1s
-                description: Batch metrics/fast processor configuration.
-                properties:
-                  sendBatchSize:
-                    default: 10000
-                    description: SendBatchSize is the size of a batch which after
-                      hit, will trigger it to be sent.
-                    format: int32
-                    type: integer
-                  timeout:
-                    default: 1s
-                    description: Timeout sets the time after which a batch will be
-                      sent regardless of size.
-                    type: string
-                type: object
-              batchPostrollup:
-                default:
-                  sendBatchSize: 10000
-                  timeout: 1s
-                description: Batch postrollup processor configuration.
-                properties:
-                  sendBatchSize:
-                    default: 10000
-                    description: SendBatchSize is the size of a batch which after
-                      hit, will trigger it to be sent.
-                    format: int32
-                    type: integer
-                  timeout:
-                    default: 1s
-                    description: Timeout sets the time after which a batch will be
-                      sent regardless of size.
-                    type: string
-                type: object
-              batchPrerollup:
-                default:
-                  sendBatchSize: 10000
-                  timeout: 1s
-                description: Batch prerollup processor configuration.
-                properties:
-                  sendBatchSize:
-                    default: 10000
-                    description: SendBatchSize is the size of a batch which after
-                      hit, will trigger it to be sent.
-                    format: int32
-                    type: integer
-                  timeout:
-                    default: 1s
-                    description: Timeout sets the time after which a batch will be
-                      sent regardless of size.
-                    type: string
-                type: object
               command:
                 description: Override default container command
                 items:
@@ -1250,9 +1194,7 @@ spec:
                 minimum: 1
                 type: integer
               etcd:
-                default:
-                  leaseTtl: 60s
-                description: Etcd parameters for Agent or Controller
+                description: Etcd parameters for Agent
                 properties:
                   endpoints:
                     description: Etcd endpoints
@@ -4504,6 +4446,56 @@ spec:
                 description: Node labels for pods assignment
                 type: object
                 x-kubernetes-map-type: atomic
+              otelConfig:
+                default:
+                  grpcAddr: :4317
+                description: OtelConfig is the configuration for the OTEL collector
+                properties:
+                  batchPostrollup:
+                    default:
+                      sendBatchSize: 10000
+                      timeout: 1s
+                    description: Batch postrollup processor configuration.
+                    properties:
+                      sendBatchSize:
+                        default: 10000
+                        description: SendBatchSize is the size of a batch which after
+                          hit, will trigger it to be sent.
+                        format: int32
+                        type: integer
+                      timeout:
+                        default: 1s
+                        description: Timeout sets the time after which a batch will
+                          be sent regardless of size.
+                        type: string
+                    type: object
+                  batchPrerollup:
+                    default:
+                      sendBatchSize: 10000
+                      timeout: 1s
+                    description: Batch prerollup processor configuration.
+                    properties:
+                      sendBatchSize:
+                        default: 10000
+                        description: SendBatchSize is the size of a batch which after
+                          hit, will trigger it to be sent.
+                        format: int32
+                        type: integer
+                      timeout:
+                        default: 1s
+                        description: Timeout sets the time after which a batch will
+                          be sent regardless of size.
+                        type: string
+                    type: object
+                  grpcAddr:
+                    default: :4317
+                    description: GRPC listener addr for OTEL Collector
+                    type: string
+                  httpAddr:
+                    default: :4318
+                    description: HTTP listener addr for OTEL Collector
+                    type: string
+                type: object
               podAnnotations:
                 additionalProperties:
                   type: string
@@ -4533,11 +4525,13 @@ spec:
                 - enabled
                 type: object
               prometheus:
-                description: Prometheus parameters for Agent or Controller
+                description: Prometheus parameters for Agent
                 properties:
                   address:
                     description: Address for Prometheus
                     type: string
+                required:
+                - address
                 type: object
               readinessProbe:
                 default:
@@ -5927,6 +5921,9 @@ spec:
                       type: string
                   type: object
                 type: array
+            required:
+            - etcd
+            - prometheus
             type: object
           status:
             description: AgentStatus defines the observed state of Agent.

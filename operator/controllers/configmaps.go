@@ -49,22 +49,20 @@ func filledAgentConfig(instance *v1alpha1.Agent) (string, error) {
 		DistributedCachePort int32
 		MemberListPort       int32
 		Log                  v1alpha1.Log                 `json:"log"`
-		Etcd                 v1alpha1.EtcdSpec            `json:"etcd"`
+		Etcd                 v1alpha1.AgentEtcdSpec       `json:"etcd"`
 		FluxNinjaPlugin      v1alpha1.FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
 		PrometheusAddress    string
 		Ingestion            v1alpha1.Ingestion `json:"ingestion"`
-		BatchPrerollup       v1alpha1.Batch
-		BatchPostrollup      v1alpha1.Batch
+		OtelConfig           v1alpha1.OtelConfig
 	}{
 		ServerPort:           instance.Spec.ServerPort,
 		DistributedCachePort: instance.Spec.DistributedCachePort,
 		MemberListPort:       instance.Spec.MemberListPort,
 		Log:                  instance.Spec.Log,
-		Etcd:                 checkEtcdEndpoints(instance.Spec.Etcd, instance.GetName(), instance.GetNamespace()),
+		Etcd:                 instance.Spec.Etcd,
 		FluxNinjaPlugin:      instance.Spec.FluxNinjaPlugin,
 		PrometheusAddress:    checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.GetName(), instance.GetNamespace()),
-		BatchPrerollup:       instance.Spec.BatchPrerollup,
-		BatchPostrollup:      instance.Spec.BatchPostrollup,
+		OtelConfig:           instance.Spec.OtelConfig,
 	}
 
 	var config bytes.Buffer
@@ -114,13 +112,14 @@ func filledControllerConfig(instance *v1alpha1.Controller) (string, error) {
 
 	data := struct {
 		Log               v1alpha1.Log                 `json:"log"`
-		Etcd              v1alpha1.EtcdSpec            `json:"etcd"`
+		Etcd              v1alpha1.ControllerEtcdSpec  `json:"etcd"`
 		FluxNinjaPlugin   v1alpha1.FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
 		PrometheusAddress string
 		ServerPort        int32
 		CertPath          string
 		CertName          string
 		CertKey           string
+		OtelConfig        v1alpha1.OtelConfig
 	}{
 		Log:               instance.Spec.Log,
 		Etcd:              checkEtcdEndpoints(instance.Spec.Etcd, instance.GetName(), instance.GetNamespace()),
@@ -130,6 +129,7 @@ func filledControllerConfig(instance *v1alpha1.Controller) (string, error) {
 		CertPath:          controllerCertPath,
 		CertName:          controllerCertName,
 		CertKey:           controllerCertKeyName,
+		OtelConfig:        instance.Spec.OtelConfig,
 	}
 
 	var config bytes.Buffer

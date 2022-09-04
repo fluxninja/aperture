@@ -3,6 +3,7 @@ package ratetracker
 import (
 	"context"
 	"fmt"
+	stdlog "log"
 	"math"
 	"math/rand"
 	"net"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/jobs"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -27,7 +29,7 @@ func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit int, ttl
 	for label, limit := range overrides {
 		limitCheck.AddOverride(label, limit)
 	}
-	limiter, err := NewOlricRateTracker(limitCheck, distCache, "Limiter", ttl)
+	limiter, err := NewDistCacheRateTracker(limitCheck, distCache, "Limiter", ttl)
 	if err != nil {
 		t.Logf("Failed to create OlricLimiter: %v", err)
 		return nil, err
@@ -99,6 +101,7 @@ func newTestOlricConfig() *olricconfig.Config {
 	mc.BindAddr = "127.0.0.1"
 	mc.BindPort = 0
 	c.MemberlistConfig = mc
+	c.Logger = stdlog.New(&distcache.OlricLogWriter{Logger: log.GetGlobalLogger()}, "", 0)
 
 	port, err := getFreePort()
 	if err != nil {

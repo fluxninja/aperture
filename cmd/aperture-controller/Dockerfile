@@ -37,8 +37,8 @@ RUN --mount=type=cache,target=/go/pkg/ \
 FROM alpine:3.15.0
 # Needed for linker to be compatible
 RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache curl
 RUN mkdir -p /etc/aperture/aperture-controller/classifiers /etc/aperture/aperture-controller/policies /etc/aperture/aperture-controller/plugins
-COPY --link certs /etc/aperture/aperture-controller/certs
 COPY --link --from=builder /aperture-controller /aperture-controller
 COPY --link --from=plugins-builder /plugins /var/lib/aperture/aperture-controller/plugins
 CMD ["/aperture-controller"]

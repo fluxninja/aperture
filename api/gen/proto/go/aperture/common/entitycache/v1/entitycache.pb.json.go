@@ -8,7 +8,7 @@ import (
 )
 
 // MarshalJSON implements json.Marshaler
-func (msg *EntityCache) MarshalJSON() ([]byte, error) {
+func (msg *ServicesList) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -17,7 +17,7 @@ func (msg *EntityCache) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *EntityCache) UnmarshalJSON(b []byte) error {
+func (msg *ServicesList) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

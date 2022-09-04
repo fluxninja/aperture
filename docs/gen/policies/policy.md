@@ -17,7 +17,7 @@
 - [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
 - [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-- [languagev1RateLimiter](#languagev1-rate-limiter)
+- [languagev1RateLimiter](#languagev1-rate-limiter) – Limits the traffic on a control point to specified rate
 - [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 
 Example of…
@@ -39,7 +39,7 @@ Example of…
 - [v1EMAIns](#v1-e-m-a-ins) – Inputs for the EMA component.
 - [v1EMAOuts](#v1-e-m-a-outs) – Outputs for the EMA component.
 - [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
-- [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
+- [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
 - [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
 - [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator component.
 - [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator component.
@@ -51,7 +51,9 @@ Example of…
 - [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of the fields
 - [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload
 - [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
-- [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of labels should be considered a match or not
+- [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of
+  [labels](/concepts/flow-control/label/label.md)
+  should be considered a match or not
 - [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
 - [v1LoadShedActuatorIns](#v1-load-shed-actuator-ins) – Input for the Load Shed Actuator component.
 - [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels
@@ -68,7 +70,7 @@ Example of…
 - [v1Port](#v1-port) – Components are interconnected with each other via Ports
 - [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an output signal
 - [v1PromQLOuts](#v1-prom-q-l-outs) – Output for the PromQL component.
-- [v1RateLimiterIns](#v1-rate-limiter-ins)
+- [v1RateLimiterIns](#v1-rate-limiter-ins) – Inputs for the RateLimiter component
 - [v1Resources](#v1-resources) – Resources that need to be setup for the policy to function
 - [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule
 - [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing-based workload scheduler
@@ -121,7 +123,9 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>enabled</dt>
 <dd>
 
-(bool, default: `true`)
+(bool, default: `true`) Enables lazy sync
+
+TODO document what happens when lazy sync is disabled
 
 </dd>
 </dl>
@@ -129,7 +133,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>num_sync</dt>
 <dd>
 
-(int64, `gt=0`, default: `5`) Number of times to lazy sync within the limit_reset_interval.
+(int64, `gt=0`, default: `5`) Number of times to lazy sync within the _limit_reset_interval_.
 
 </dd>
 </dl>
@@ -142,7 +146,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>label_value</dt>
 <dd>
 
-(string, `required`)
+(string, `required`) Value of the label for which the override should be applied.
 
 </dd>
 </dl>
@@ -150,7 +154,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>limit_scale_factor</dt>
 <dd>
 
-(float64, default: `1`)
+(float64, default: `1`) Amount by which the _in_ports.limit_ should be multiplied for this label value.
 
 </dd>
 </dl>
@@ -194,9 +198,8 @@ Workload defines a class of requests that preferably have similar properties suc
 <dt>fairness_key</dt>
 <dd>
 
-(string) Fairness key is a label key that can be used to provide fairness within a workload
-
-Any label that could be used in label matcher can be used here. Eg. if
+(string) Fairness key is a label key that can be used to provide fairness within a workload.
+Any [flow label](/concepts/flow-control/label/label.md) can be used here. Eg. if
 you have a classifier that sets `user` flow label, you might want to set
 `fairness_key = "user"`.
 
@@ -209,33 +212,6 @@ you have a classifier that sets `user` flow label, you might want to set
 (int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
 Priority level ranges from 0 to 255.
 Higher numbers means higher priority level.
-
-</dd>
-</dl>
-<dl>
-<dt>timeout</dt>
-<dd>
-
-(string, default: `0.005s`) Timeout override decides how long a request in the workload can wait for tokens
-
-This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
-
-:::caution
-This timeout needs to be strictly less than the timeout set on the
-client for the whole GRPC call:
-
-- in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-- in case of libraries, timeout configured... TODO.
-
-We're using fail-open logic in integrations, so if the GRPC timeout
-fires first, the flow will end up being unconditionally allowed while
-it're still waiting on the scheduler.
-
-To avoid such cases, the end-to-end GRPC timeout should also contain
-some headroom for constant overhead like serialization, etc. Default
-value for GRPC timeouts is 10ms, giving 5ms of headeroom, so when
-tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
-:::
 
 </dd>
 </dl>
@@ -257,7 +233,8 @@ This override is applicable only if `auto_tokens` is set to false.
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload.
+([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based on
+[flow labels](/concepts/flow-control/label/label.md).
 
 </dd>
 </dl>
@@ -265,7 +242,7 @@ This override is applicable only if `auto_tokens` is set to false.
 <dt>workload</dt>
 <dd>
 
-([SchedulerWorkload](#scheduler-workload)) Workload associated with requests matching the label matcher.
+([SchedulerWorkload](#scheduler-workload)) Workload associated with flows matching the label matcher.
 
 </dd>
 </dl>
@@ -275,8 +252,7 @@ This override is applicable only if `auto_tokens` is set to false.
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
 :::info
-See also [Scheduler page in the Concepts section](/concepts/flow-control/actuators/scheduler.md)
-for a more high-level description.
+See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
 :::
 
 It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -311,6 +287,15 @@ output signals.
 
 ### <span id="languagev1-rate-limiter"></span> languagev1RateLimiter
 
+Limits the traffic on a control point to specified rate
+
+:::info
+See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+:::
+
+Ratelimiting is done separately on per-label-value basis. Use _label_key_
+to select which label should be used as key.
+
 #### Properties
 
 <dl>
@@ -325,7 +310,14 @@ output signals.
 <dt>label_key</dt>
 <dd>
 
-(string, `required`)
+(string, `required`) Specifies which label the ratelimiter should be keyed by.
+
+Rate limiting is done independently for each value of the
+[label](/concepts/flow-control/label/label.md) with given key.
+Eg., to give each user a separate limit, assuming you have a _user_ flow
+label set up, set `label_key: "user"`.
+
+TODO make it possible for this field to be optional – to achieve global ratelimit.
 
 </dd>
 </dl>
@@ -333,7 +325,7 @@ output signals.
 <dt>lazy_sync</dt>
 <dd>
 
-([RateLimiterLazySync](#rate-limiter-lazy-sync))
+([RateLimiterLazySync](#rate-limiter-lazy-sync)) Configuration of lazy-syncing behaviour of ratelimiter
 
 </dd>
 </dl>
@@ -341,7 +333,7 @@ output signals.
 <dt>limit_reset_interval</dt>
 <dd>
 
-(string, default: `60s`)
+(string, default: `60s`) Time after which the limit for a given label value will be reset.
 
 </dd>
 </dl>
@@ -349,7 +341,7 @@ output signals.
 <dt>overrides</dt>
 <dd>
 
-([[]RateLimiterOverride](#rate-limiter-override))
+([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
 
 </dd>
 </dl>
@@ -357,7 +349,7 @@ output signals.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector), `required`)
+([V1Selector](#v1-selector), `required`) Which control point to apply this ratelimiter to.
 
 </dd>
 </dl>
@@ -550,6 +542,10 @@ This interval is typically aligned with how often the corrective action (actuati
 
 Set of classification rules sharing a common selector
 
+:::info
+See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+:::
+
 Example:
 
 ```yaml
@@ -569,7 +565,9 @@ rules:
 <dt>rules</dt>
 <dd>
 
-(map of [V1Rule](#v1-rule)) A map of {key, value} pairs mapping from flow label names to rules that define how to extract and propagate them.
+(map of [V1Rule](#v1-rule)) A map of {key, value} pairs mapping from
+[flow label](/concepts/flow-control/label/label.md) keys to rules that define
+how to extract and propagate flow labels with that key.
 
 </dd>
 </dl>
@@ -1068,13 +1066,9 @@ Label selector expression of the equal form "label == value".
 
 ### <span id="v1-extractor"></span> v1Extractor
 
-Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
+Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
 
-There are multiple variants of extractor, specify exactly one:
-
-- JSON Extractor
-- Address Extractor
-- JWT Extractor
+There are multiple variants of extractor, specify exactly one.
 
 #### Properties
 
@@ -1461,7 +1455,9 @@ If the operator is Exists or DoesNotExist, the values array must be empty.
 
 ### <span id="v1-label-matcher"></span> v1LabelMatcher
 
-Allows to define rules whether a map of labels should be considered a match or not
+Allows to define rules whether a map of
+[labels](/concepts/flow-control/label/label.md)
+should be considered a match or not
 
 It provides three ways to define requirements:
 
@@ -1867,13 +1863,21 @@ Output for the PromQL component.
 
 ### <span id="v1-rate-limiter-ins"></span> v1RateLimiterIns
 
+Inputs for the RateLimiter component
+
 #### Properties
 
 <dl>
 <dt>limit</dt>
 <dd>
 
-([V1Port](#v1-port), `required`, default: `-1`) negative limit means no limit is applied.
+([V1Port](#v1-port), `required`) Number of flows allowed per _limit_reset_interval_ per each label.
+Negative values disable the ratelimiter.
+
+:::tip
+Negative limit can be useful to _conditionally_ enable the ratelimiter
+under certain circumstances. [Decider](#-v1decider) might be helpful.
+:::
 
 </dd>
 </dl>
@@ -1922,32 +1926,30 @@ There are two ways to define a flow classification rule:
 Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
 [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
 
-Example:
+Example of Declarative JSON extractor:
 
 ```yaml
-Example of Declarative JSON extractor:
-  yaml:
-    extractor:
-      json:
-        from: request.http.body
-        pointer: /user/name
-    propagate: true
-    hidden: false
-Example of Rego module:
-  yaml:
-    rego:
-      query: data.user_from_cookie.user
-      source:
-        package: user_from_cookie
-        cookies: "split(input.attributes.request.http.headers.cookie, ';')"
-        cookie: "cookies[_]"
-        cookie.startswith: "('session=')"
-        session: "substring(cookie, count('session='), -1)"
-        parts: "split(session, '.')"
-        object: "json.unmarshal(base64url.decode(parts[0]))"
-        user: object.user
-    propagate: false
-    hidden: true
+extractor:
+  json:
+    from: request.http.body
+    pointer: /user/name
+```
+
+Example of Rego module which also disables propagation of a label:
+
+```yaml
+rego:
+  query: data.user_from_cookie.user
+  source: |
+    package: user_from_cookie
+    cookies: split(input.attributes.request.http.headers.cookie, ';')
+    cookie: cookies[_]
+    cookie.startswith: ('session=')
+    session: substring(cookie, count('session='), -1)
+    parts: split(session, '.')
+    object: json.unmarshal(base64url.decode(parts[0]))
+    user: object.user
+propagate: false
 ```
 
 #### Properties
@@ -1956,8 +1958,7 @@ Example of Rego module:
 <dt>extractor</dt>
 <dd>
 
-([V1Extractor](#v1-extractor)) High-level flow label declarative extractor.
-Rego extractor extracts a value from the rego module.
+([V1Extractor](#v1-extractor)) High-level declarative extractor.
 
 </dd>
 </dl>
@@ -1966,6 +1967,16 @@ Rego extractor extracts a value from the rego module.
 <dd>
 
 (bool) Decides if the created flow label should be hidden from the telemetry.
+A hidden flow label is still accessible in policies and can be used as eg.
+fairness key.
+
+:::caution
+When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
+labels are sent to cloud for observability. We thus recommend to set this
+_hidden_ flag for high-cardinality labels, such as usernames or ids, to
+avoid bloating analytics database. _Hidden_ flag should also be set for
+sensitive labels.
+:::
 
 </dd>
 </dl>
@@ -1973,7 +1984,9 @@ Rego extractor extracts a value from the rego module.
 <dt>propagate</dt>
 <dd>
 
-(bool) Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true).
+(bool) Decides if the created label should be applied to the whole request chain
+(propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
+(default=true).
 
 </dd>
 </dl>
@@ -2019,6 +2032,31 @@ of this average can change).
 </dd>
 </dl>
 <dl>
+<dt>max_timeout</dt>
+<dd>
+
+(string, default: `0.45s`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
+
+:::caution
+This timeout needs to be strictly less than the timeout set on the
+client for the whole GRPC call:
+
+- in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
+- in case of libraries, timeout configured... TODO.
+
+We're using fail-open logic in integrations, so if the GRPC timeout
+fires first, the flow will end up being unconditionally allowed while
+it're still waiting on the scheduler.
+
+To avoid such cases, the end-to-end GRPC timeout should also contain
+some headroom for constant overhead like serialization, etc. Default
+value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+:::
+
+</dd>
+</dl>
+<dl>
 <dt>out_ports</dt>
 <dd>
 
@@ -2035,14 +2073,33 @@ of this average can change).
 </dd>
 </dl>
 <dl>
+<dt>timeout_factor</dt>
+<dd>
+
+(float64, `gte=0.0`, default: `0.5`) Timeout as a factor of tokens for a flow in a workload
+
+If a flow is not able to get tokens within `timeout_factor` \* `tokens` of duration,
+it will be rejected.
+
+This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
+
+</dd>
+</dl>
+<dl>
 <dt>workloads</dt>
 <dd>
 
 ([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) List of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/flow-control#what-is-a-flow) into workloads
+Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
-requests". There are two aspects of workloads:
+requests". There are two aspects of this "smartness":
+
+- Scheduler can more precisely calculate concurrency if it understands
+  that flows belonging to different classes have different weights (eg.
+  inserts vs lookups).
+- Setting different priorities to different workloads lets the scheduler
+  avoid dropping important traffic during overload.
 
 Each workload in this list specifies also a matcher that's used to
 determine which flow will be categorized into which workload.
@@ -2051,7 +2108,7 @@ If none of workloads match, `default_workload` will be used.
 
 :::info
 See also [workload definition in the concepts
-section](/concepts/flow-control/actuators/scheduler#workload).
+section](/concepts/flow-control/actuators/scheduler.md#workload).
 :::
 
 </dd>
@@ -2071,7 +2128,7 @@ Output for the Scheduler component.
 
 :::info
 **Accepted tokens** are tokens associated with
-[flows](/concepts/flow-control#what-is-a-flow) that were accepted by
+[flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
 this scheduler. Number of tokens for a flow is determined by a
 [workload](#-schedulerworkload) that the flow was assigned to (either
 via `auto_tokens` or explicitly by `Workload.tokens`).
@@ -2138,24 +2195,20 @@ selector:
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on labels that must
-also be satisfied (in addition to service+control point matching)
+([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
+[flow labels](/concepts/flow-control/label/label.md)
+must also be satisfied (in addition to service+control point matching)
 
-This matcher allows to match on flow labels and request labels.
-(Note: For classification we can only match flow labels that were created at
-some **previous** control point).
+:::note
+[Classifiers](#-v1classifier) _can_ use flow labels created by some other
+classifier, but only if they were created at some previous control point
+(and propagated in baggage).
 
-Flow labels are available with the same label key as defined in
-classification rule.
-
-Request labels are always prefixed with `request_`. Available request
-labels are `id` (available as `request_id`), `method`, `path`, `host`,
-`scheme`, `size`, `protocol` (mapped from fields of
-[HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
-Also, (non-pseudo) headers are available as `request_header_<headername>`, where
-`<headername>` is a headername normalised to lowercase, eg. `request_header_user-agent`.
-
-Note: Request headers are only available for `traffic` control points.
+This limitation doesn't apply to selectors of other entities, like
+FluxMeters or actuators. It's valid to create a flow label on a control
+point using classifier, and immediately use it for matching on the same
+control point.
+:::
 
 </dd>
 </dl>

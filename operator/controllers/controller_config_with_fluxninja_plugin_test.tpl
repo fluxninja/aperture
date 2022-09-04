@@ -2,7 +2,14 @@ server:
   addr: ":80"
 
 otel:
-  addr: ":80"
+  grpc_addr: ":4317"
+  http_addr: ":4318"
+  batch_prerollup:
+    timeout: 1s
+    send_batch_size: 10000
+  batch_postrollup:
+    timeout: 1s
+    send_batch_size: 10000
 
 webhooks:
   addr: ":8086"
@@ -19,7 +26,7 @@ log:
   file:  "stderr"
 
 etcd:
-  endpoints: [http://agent-etcd:2379]
+  endpoints: [http://controller-etcd:2379]
   lease_ttl: 60s
 
 prometheus:

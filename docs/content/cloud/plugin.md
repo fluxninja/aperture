@@ -1,5 +1,6 @@
 ---
 title: FluxNinja Cloud Plugin
+sidebar_label: Plugin
 sidebar_position: 1
 keywords:
   - cloud
@@ -47,3 +48,14 @@ plugins:
   disabled_plugins:
     - aperture-plugin-fluxninja
 ```
+
+For more details, see plugin configuration reference:
+
+- [Agent](/reference/configuration/agent#plugin-configuration)
+- [Controller](/reference/configuration/controller#plugin-configuration)
+
+## See also
+
+How various components interact with the plugin:
+
+- [Flow labels](/concepts/flow-control/label/label.md#plugin)

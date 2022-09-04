@@ -117,11 +117,11 @@ func newLoadShedActuatorFactory(
 				errMulti = multierr.Append(errMulti, err)
 			}
 			if !prometheusRegistry.Unregister(f.tokenBucketFillRateGaugeVec) {
-				err := fmt.Errorf("failed to unregister token_bucket_bucket_fill_rate metric")
+				err := fmt.Errorf("failed to unregister token_bucket_fill_rate metric")
 				errMulti = multierr.Append(errMulti, err)
 			}
 			if !prometheusRegistry.Unregister(f.tokenBucketBucketCapacityGaugeVec) {
-				err := fmt.Errorf("failed to unregister token_bucket_bucket_capacity metric")
+				err := fmt.Errorf("failed to unregister token_bucket_capacity metric")
 				errMulti = multierr.Append(errMulti, err)
 			}
 			if !prometheusRegistry.Unregister(f.tokenBucketAvailableTokensGaugeVec) {
@@ -218,11 +218,11 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concu
 			}
 			deleted = lsaFactory.tokenBucketFillRateGaugeVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_bucket_fill_rate gauge from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_fill_rate gauge from its metric vector"))
 			}
 			deleted = lsaFactory.tokenBucketBucketCapacityGaugeVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_bucket_capacity gauge from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_capacity gauge from its metric vector"))
 			}
 			deleted = lsaFactory.tokenBucketAvailableTokensGaugeVec.Delete(metricLabels)
 			if !deleted {

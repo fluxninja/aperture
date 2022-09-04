@@ -1,4 +1,4 @@
-namespace: aperture-system
+namespace: aperture-controller
 
 bases:
   - default/

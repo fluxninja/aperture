@@ -105,8 +105,19 @@ type Probe struct {
 	SuccessThreshold int32 `json:"successThreshold"`
 }
 
-// EtcdSpec defines Endpoints and LeaseTtl of etcd.
-type EtcdSpec struct {
+// AgentEtcdSpec defines Endpoints and LeaseTtl of etcd used by Aperture Agent.
+type AgentEtcdSpec struct {
+	// Etcd endpoints
+	Endpoints []string `json:"endpoints,omitempty"`
+
+	// Etcd leaseTtl
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="60s"
+	LeaseTTL string `json:"leaseTtl"`
+}
+
+// ControllerEtcdSpec defines Endpoints and LeaseTtl of etcd used by Aperture Controller.
+type ControllerEtcdSpec struct {
 	// Etcd endpoints
 	//+kubebuilder:validation:Optional
 	Endpoints []string `json:"endpoints,omitempty"`
@@ -120,7 +131,6 @@ type EtcdSpec struct {
 // PrometheusSpec defines parameters required for Prometheus connection.
 type PrometheusSpec struct {
 	// Address for Prometheus
-	//+kubebuilder:validation:Optional
 	Address string `json:"address"`
 }
 
@@ -205,18 +215,15 @@ type CommonSpec struct {
 	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	FluxNinjaPlugin FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
 
+	// OtelConfig is the configuration for the OTEL collector
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={grpcAddr:":4317"}
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
+	OtelConfig OtelConfig `json:"otelConfig"`
+
 	// Configuration for Agent or Controller service
 	//+kubebuilder:validation:Optional
 	Service Service `json:"service"`
-
-	// Etcd parameters for Agent or Controller
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={leaseTtl:"60s"}
-	Etcd EtcdSpec `json:"etcd"`
-
-	// Prometheus parameters for Agent or Controller
-	//+kubebuilder:validation:Optional
-	Prometheus PrometheusSpec `json:"prometheus"`
 
 	// Server port for the Agent
 	//+kubebuilder:default:=80
@@ -424,4 +431,27 @@ type Batch struct {
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=10000
 	SendBatchSize uint32 `json:"sendBatchSize"`
+}
+
+// OtelConfig defines the configuration for the OTEL collector.
+type OtelConfig struct {
+	// GRPC listener addr for OTEL Collector
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=":4317"
+	GRPCAddr string `json:"grpcAddr"`
+
+	// HTTP listener addr for OTEL Collector
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=":4318"
+	HTTPAddr string `json:"httpAddr"`
+
+	// Batch prerollup processor configuration.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={timeout:"1s",sendBatchSize:10000}
+	BatchPrerollup Batch `json:"batchPrerollup"`
+
+	// Batch postrollup processor configuration.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={timeout:"1s",sendBatchSize:10000}
+	BatchPostrollup Batch `json:"batchPostrollup"`
 }

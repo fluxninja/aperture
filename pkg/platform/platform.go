@@ -119,7 +119,6 @@ func (cfg Config) Module() fx.Option {
 		etcdclient.Module(),
 		jobs.Module(),
 		status.Module(),
-		fx.Invoke(status.RegisterStatusService),
 		fx.Populate(&platform.statusRegistry),
 		platformStatusModule(),
 		plugins.ModuleConfig{OnlyCommandLineFlags: true}.Module(),
@@ -175,7 +174,7 @@ func Run(app *fx.App) {
 	}
 
 	log.Info().Msg("Starting application")
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	if err := app.Start(ctx); err != nil {

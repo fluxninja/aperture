@@ -24,7 +24,7 @@ import (
 func main() {
 	app := platform.New(
 		platform.Config{}.Module(),
-		otel.ProvideAnnotatedControllerConfig(),
+		otel.OTELConfigConstructor{Type: otel.ControllerType}.Annotate(),
 		fx.Provide(
 			clockwork.NewRealClock,
 			controlplane.ProvideCMFileValidator,

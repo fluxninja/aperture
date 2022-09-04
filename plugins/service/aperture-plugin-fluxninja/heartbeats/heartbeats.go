@@ -189,9 +189,9 @@ func (h *Heartbeats) stop() {
 func (h *Heartbeats) newHeartbeat(
 	jobCtxt context.Context,
 ) *heartbeatv1.ReportRequest {
-	var entityCache *entitycachev1.EntityCache
+	var servicesList *entitycachev1.ServicesList
 	if h.entityCache != nil {
-		entityCache = h.entityCache.Services()
+		servicesList = h.entityCache.Services()
 	}
 
 	var agentGroup string
@@ -211,7 +211,7 @@ func (h *Heartbeats) newHeartbeat(
 		AgentGroup:     agentGroup,
 		ControllerInfo: h.controllerInfo,
 		Peers:          peers,
-		EntityCache:    entityCache,
+		ServicesList:   servicesList,
 		AllStatuses:    h.statusRegistry.GetGroupStatus(),
 	}
 }

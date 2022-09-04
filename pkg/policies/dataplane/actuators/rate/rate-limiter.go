@@ -216,7 +216,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
 				rateLimiter.rateLimitChecker.AddOverride(label, override.GetLimitScaleFactor())
 			}
-			rateLimiter.rateTracker, err = ratetracker.NewOlricRateTracker(rateLimiter.rateLimitChecker,
+			rateLimiter.rateTracker, err = ratetracker.NewDistCacheRateTracker(rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
 				rateLimiter.name,
 				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())

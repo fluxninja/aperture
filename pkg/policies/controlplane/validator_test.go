@@ -57,7 +57,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: policies
-  namespace: aperture-system
+  namespace: aperture-controller
   labels:
     fluxninja.com/validate: "true"
 data:
@@ -66,12 +66,12 @@ data:
       flux_meters:
         "service_latency":
           selector:
-            service: "demo1-demo-app.demoapp.svc.cluster.local"
+            service: "service1-demo-app.demoapp.svc.cluster.local"
             control_point:
               traffic: "ingress"
       classifiers:
         - selector:
-            service: demo1-demo-app.demoapp.svc.cluster.local
+            service: service1-demo-app.demoapp.svc.cluster.local
             control_point: { traffic: ingress }
           rules:
             # An example rule using extractor.
@@ -167,23 +167,20 @@ data:
         - concurrency_limiter:
             scheduler:
               selector:
-                service: "demo1-demo-app.demoapp.svc.cluster.local"
+                service: "service1-demo-app.demoapp.svc.cluster.local"
                 control_point:
                   traffic: "ingress"
               auto_tokens: true
               default_workload:
                 priority: 20
-                timeout: "0.005s"
               workloads:
                 - workload:
                     priority: 50
-                    timeout: "0.005s"
                   label_matcher:
                     match_labels:
                       user-type: "guest"
                 - workload:
                     priority: 200
-                    timeout: "0.005s"
                   label_matcher:
                     match_labels:
                       request_header_user-type: "subscriber"
@@ -288,7 +285,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: policies
-  namespace: aperture-system
+  namespace: aperture-controller
   labels:
     fluxninja.com/validate: "true"
 data:
@@ -331,7 +328,7 @@ const rateLimitPolicy = `
               limit:
                 signal_name: "RATE_LIMIT"
             selector:
-              service: "demo1-demo-app.demoapp.svc.cluster.local"
+              service: "service1-demo-app.demoapp.svc.cluster.local"
               control_point:
                 traffic: "ingress"
             label_key: "request_header_user-type"

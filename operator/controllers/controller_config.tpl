@@ -2,7 +2,14 @@ server:
   addr: ":{{ .ServerPort }}"
 
 otel:
-  addr: ":{{ .ServerPort }}"
+  grpc_addr: "{{ .OtelConfig.GRPCAddr }}"
+  http_addr: "{{ .OtelConfig.HTTPAddr }}"
+  batch_prerollup:
+    timeout: {{ .OtelConfig.BatchPrerollup.Timeout }}
+    send_batch_size: {{ .OtelConfig.BatchPrerollup.SendBatchSize }}
+  batch_postrollup:
+    timeout: {{ .OtelConfig.BatchPostrollup.Timeout }}
+    send_batch_size: {{ .OtelConfig.BatchPostrollup.SendBatchSize }}
 
 webhooks:
   addr: ":8086"

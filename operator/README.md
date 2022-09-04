@@ -54,53 +54,80 @@ Follow the below steps to deploy the operator on the local cluster:
 
 ## Deploying the operator using `helm`
 
-You can also deploy the operator and Aperture CR using the helm chart as well using below steps.
+You can also deploy the operator and Agent CR using the helm chart as well using below steps.
 
 - Install the dependencies of the chart:
 
   ```bash
-  helm dependency build manifests/charts/aperture-operator
+  helm dependency build manifests/charts/aperture-controller
+  helm dependency build manifests/charts/aperture-agent
+  ```
+
+- Configure Etcd configuration for Agent by modifying the Aperture Agent chart as below if you are installing the Aperture Controller chart as well:
+
+  ```yaml
+  agent:
+    etcd:
+      endpoints: ["http://controller-etcd:2379"]
+    prometheus:
+      address: "http://controller-prometheus-server:80"
   ```
 
 - Install or upgrade the chart:
 
   ```bash
-  helm upgrade --install aperture-operator manifests/charts/aperture-operator
+  helm upgrade --install controller manifests/charts/aperture-controller
+  helm upgrade --install agent manifests/charts/aperture-agent
   ```
 
 - [**Optional**] If you want to install just the operator and not the Aperture Agent and Controller CR, create a `values.yaml` with below parameters and pass it with `helm upgrade`:
 
-  ```bash
+  ```yaml
   agent:
     create: false
+  ```
 
+  ```yaml
   controller:
     create: false
   ```
 
   ```bash
-  helm upgrade --install aperture-operator manifests/charts/aperture-operator -f values.yaml
+  helm upgrade --install controller manifests/charts/aperture-controller -f controller-values.yaml
+  helm upgrade --install agent manifests/charts/aperture-agent -f agent-values.yaml
   ```
 
-  All the configurable parameters for the Aperture Operator and CR can be found [here](./manifests/charts/aperture-operator/README.md).
+  All the configurable parameters for the Aperture Operator and CR can be found at
+  [Agent](./manifests/charts/aperture-agent/README.md).
+  and [Controller](./manifests/charts/aperture-controller/README.md)
 
-- The chart installs Istio, Prometheus and Etcd instances by default. If you don't want to install and use your existing instances of Istio, Prometheus or Etcd, configure below values in the `values.yaml` file and pass it with `helm upgrade`:
+- The Controller chart installs Prometheus and Etcd instances by default. If you don't want to install and use your existing instances of Prometheus or Etcd, configure below values in the `values.yaml` file and pass it with `helm upgrade`:
 
-  ```bash
+  ```yaml
+  controller:
+    etcd:
+      endpoints: ["ETCD_ENDPOINT"]
+    prometheus:
+      address: "PROMETHEUS_ENDPOINT"
+
   etcd:
     enabled: false
-    endpoints: ["ETCD_INSTANCE_ENDPOINT"]
 
   prometheus:
     enabled: false
-    address: "PROMETHEUS_INSTANCE_ADDRESS"
+  ```
 
-  istio:
-    enabled: false
+  ```yaml
+  agent:
+    etcd:
+      endpoints: ["ETCD_ENDPOINT"]
+    prometheus:
+      address: "PROMETHEUS_ENDPOINT"
   ```
 
 - To uninstall the operator, run below commands:
 
   ```bash
-  helm uninstall aperture-operator
+  helm uninstall controller
+  helm uninstall agent
   ```
