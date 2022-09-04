@@ -497,12 +497,7 @@ func someLogs(
 			logRecord.Attributes().InsertString(otelcollector.MarshalledAuthzResponseLabel, string(marshalledAuthzResponse))
 			logRecord.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
 			logRecord.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
-			switch controlPoint {
-			case otelcollector.ControlPointIngress, otelcollector.ControlPointEgress:
-				logRecord.Attributes().InsertString(otelcollector.HTTPDurationLabel, "5")
-			case otelcollector.ControlPointFeature:
-				logRecord.Attributes().InsertString(otelcollector.FeatureDurationLabel, "5")
-			}
+			logRecord.Attributes().InsertString(otelcollector.DurationLabel, "5")
 		}
 	}
 
@@ -527,14 +522,9 @@ func someTraces(
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
 			span.Attributes().InsertString(otelcollector.MarshalledCheckResponseLabel, string(marshalledCheckResponse))
-			span.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
+			span.Attributes().InsertString(otelcollector.FeatureStatusLabel, "Ok")
 			span.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
-			switch controlPoint {
-			case otelcollector.ControlPointIngress, otelcollector.ControlPointEgress:
-				span.Attributes().InsertString(otelcollector.HTTPDurationLabel, "5")
-			case otelcollector.ControlPointFeature:
-				span.Attributes().InsertString(otelcollector.FeatureDurationLabel, "5")
-			}
+			span.Attributes().InsertString(otelcollector.DurationLabel, "5")
 		}
 	}
 
@@ -583,7 +573,7 @@ func expectEngineCalls(engine *mocks.MockEngine, checkResponse *flowcontrolv1.Ch
 	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
 	for i, fm := range checkResponse.FluxMeters {
 		// TODO actually return some Histogram
-		expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetFluxMeterName(), "201", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
+		expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetFluxMeterName(), "201", "", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
 	}
 	gomock.InOrder(expectedCalls...)
 }

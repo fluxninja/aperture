@@ -18,8 +18,9 @@ Aperture Agent requires some of the additional details and needs the below
 to be added via the Envoy Filter.
 
 **Note**: In all the below patches, it is presumed that the Aperture Agent is
-installed with `DaemonSet` mode and is installed in the `aperture-system` namespace,
-which makes the target URL value `aperture-agent.aperture-system.svc.cluster.local`.
+installed with `DaemonSet` mode and is installed in the `aperture-system`
+namespace, which makes the target URL value
+`aperture-agent.aperture-system.svc.cluster.local`.
 
 1. The below patch merges the
    [Access Log](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log)
@@ -79,7 +80,7 @@ which makes the target URL value `aperture-agent.aperture-system.svc.cluster.loc
                    - key: http.user_agent
                      value:
                        string_value: "%REQ(USER-AGENT)%"
-                   - key: http.duration_millis
+                   - key: duration_millis
                      value:
                        string_value: "%DURATION%"
                    - key: http.request_content_length
@@ -169,7 +170,7 @@ which makes the target URL value `aperture-agent.aperture-system.svc.cluster.loc
                    - key: http.user_agent
                      value:
                        string_value: "%REQ(USER-AGENT)%"
-                   - key: http.duration_millis
+                   - key: duration_millis
                      value:
                        string_value: "%DURATION%"
                    - key: http.request_content_length
@@ -308,7 +309,7 @@ The Aperture Agent collects the below data using the Envoy Filter:
 | http.target                  | "%REQ(:PATH)%"                                                 | The HTTP path requested by the client                                                  | Inbound, Outbound |
 | http.host                    | "%REQ(HOST)%"                                                  | The value of the Host (HTTP/1.1)                                                       | Inbound, Outbound |
 | http.user_agent              | "%REQ(USER-AGENT)%"                                            | The user agent string to identify the specific type of software request agent          | Inbound, Outbound |
-| http.duration_millis         | "%DURATION%"                                                   | Total duration in milliseconds of the request from the start time to the last byte out | Inbound, Outbound |
+| duration_millis              | "%DURATION%"                                                   | Total duration in milliseconds of the request from the start time to the last byte out | Inbound, Outbound |
 | http.request_content_length  | "%BYTES_RECEIVED%"                                             | Body bytes received                                                                    | Inbound, Outbound |
 | http.response_content_length | "%BYTES_SENT%"                                                 | Body bytes sent. For WebSocket connection it will also include response header bytes   | Inbound, Outbound |
 | http.status_code             | "%RESPONSE_CODE%"                                              | HTTP response code                                                                     | Inbound, Outbound |
