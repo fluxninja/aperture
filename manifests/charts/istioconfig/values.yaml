@@ -1,10 +1,18 @@
+## @param name Name of the CRD
 name: aperture-envoy-filter
 
-agentservice:
+## @section Envoy Filter Parameters
+##
+envoyFilter:
+  ## @param envoyFilter.name Name of service running aperture-agent
   name: aperture-agent
+  ## @param envoyFilter.namespace Namespace where aperture-agent is running
   namespace: aperture-agent
-  port: 80
+  ## @param envoyFilter.authzPort Port serving ext authz API
+  authzPort: 8080
+  ## @param envoyFilter.otlpPort Port for streaming access logs
   otlpPort: 4317
-
-authzGrpcTimeout: 0.5s
-maxRequestBytes: 8192
+  ## @param envoyFilter.authzGrpcTimeout Timeout in seconds to authz requests made to aperture-agent. Note: aperture-agent scheduler has max_timeout parameter that must tuned to match the setting here.
+  authzGrpcTimeout: 0.5s
+  ## @param envoyFilter.maxRequestBytes Maximum size of request that is sent over ext authz API
+  maxRequestBytes: 8192
