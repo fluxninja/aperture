@@ -49,11 +49,15 @@ go-generate-swagger:
 	@echo Generating swagger specs from go code
 	@./scripts/go_generate_swagger.sh
 
-generate-docs: generate-config-markdown generate-mermaid
+generate-docs: generate-config-markdown generate-mermaid generate-helm-readme
 	@echo Generating docs
 
 generate-config-markdown: go-generate-swagger generate-api
 	@cd ./docs && $(MAKE) generate-config-markdown
+
+generate-helm-readme:
+	@echo Generating helm readme
+	@cd ./manifests/charts && $(MAKE) generate-helm-readme
 
 generate-libsonnet: generate-config-markdown
 	@cd ./libsonnet && $(MAKE) gen-lib
@@ -67,10 +71,10 @@ coverage_profile:
 show_coverage_in_browser: profile.coverprofile
 	go tool cover -html profile.coverprofile
 
-all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs
+all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-libsonnet
 	@echo "Done"
 
-.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser
+.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme
 
 #####################################
 ###### OPERATOR section starts ######

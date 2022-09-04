@@ -82,6 +82,14 @@ repos:
           - commit
         args:
           - --fix
+      - id: generate-helm-readme
+        name: "Helm Readme"
+        entry: "./scripts/precommit/generate_helm_readme.sh"
+        language: script
+        files: "values.yaml$"
+        exclude: ^ops/.*
+        pass_filenames: false
+        description: "Generate docs"
       - id: generate-docs
         name: "Docs"
         entry: "./scripts/precommit/generate_docs.sh"

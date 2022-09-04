@@ -7,7 +7,7 @@ local istioAppMixin =
       istiod+: {},
       gateway+: {},
       envoyfilter+: {
-        apertureAgent+: {
+        envoyFilter+: {
           authzPort: 80,
         },
       },

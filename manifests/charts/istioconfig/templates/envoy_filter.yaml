@@ -65,7 +65,7 @@ spec:
                   log_name: ingress
                   grpc_service:
                     google_grpc:
-                      target_uri: {{ .Values.apertureAgent.name }}.{{ .Values.apertureAgent.namespace }}.svc.cluster.local:{{ .Values.apertureAgent.otlpPort }}
+                      target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.otlpPort }}
                       stat_prefix: aperture_access_log
                   transport_api_version: V3
                 body:
@@ -109,7 +109,7 @@ spec:
                   log_name: egress
                   grpc_service:
                     google_grpc:
-                      target_uri: {{ .Values.apertureAgent.name }}.{{ .Values.apertureAgent.namespace }}.svc.cluster.local:{{ .Values.apertureAgent.otlpPort }}
+                      target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.otlpPort }}
                       stat_prefix: aperture_access_log
                   transport_api_version: V3
                 body:
@@ -148,14 +148,14 @@ spec:
           "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
           transport_api_version: V3
           with_request_body:
-            max_request_bytes: {{ .Values.maxRequestBytes }}
+            max_request_bytes: {{ .Values.envoyFilter.maxRequestBytes }}
             allow_partial_message: true
           failure_mode_allow: true
           grpc_service:
             google_grpc:
-              target_uri: {{ .Values.apertureAgent.name }}.{{ .Values.apertureAgent.namespace }}.svc.cluster.local:{{ .Values.apertureAgent.authzPort }}
+              target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.authzPort }}
               stat_prefix: ext_authz
-            timeout: {{ .Values.authzGrpcTimeout }}
+            timeout: {{ .Values.envoyFilter.authzGrpcTimeout }}
             initial_metadata:
               # Note: If there's more than one header in this list, make sure
               # to update the OUTBOUND filter also.
@@ -181,14 +181,14 @@ spec:
           "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
           transport_api_version: V3
           with_request_body:
-            max_request_bytes: {{ .Values.maxRequestBytes }}
+            max_request_bytes: {{ .Values.envoyFilter.maxRequestBytes }}
             allow_partial_message: true
           failure_mode_allow: true
           grpc_service:
             google_grpc:
-              target_uri: {{ .Values.apertureAgent.name }}.{{ .Values.apertureAgent.namespace }}.svc.cluster.local:{{ .Values.apertureAgent.authzPort }}
+              target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.authzPort }}
               stat_prefix: ext_authz
-            timeout: {{ .Values.authzGrpcTimeout }}
+            timeout: {{ .Values.envoyFilter.authzGrpcTimeout }}
             initial_metadata:
               - key: traffic-direction
                 value: OUTBOUND
