@@ -93,7 +93,22 @@ Tilt can be installed with `asdf install` or manually
 Create a K8s cluster using Kind with configuration file:
 
 ```sh
-kind create cluster --name aperture-playground --config kind-config.yaml
+kind create cluster --config kind-config.yaml
+```
+
+This will start a cluster with the name `aperture-playground`.
+
+Once done, you can delete the cluster with following command:
+
+```sh
+kind delete cluster --name aperture-playground
+```
+
+Alternatively, you can use [`ctlptl`](https://github.com/tilt-dev/ctlptl) to
+start a cluster with built-in local registry for Docker images:
+
+```sh
+ctlptl apply -f ctlptl-kind-config.yaml
 ```
 
 ### Services deployment

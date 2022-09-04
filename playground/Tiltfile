@@ -43,7 +43,7 @@ DEP_TREE = {
         "aperture-grafana": {
             "labels": ["Aperture"],
             # construct directory path to tkenv
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/aperture-grafana",
+            "tkenv": TANKA_ROOT + "/apps/aperture-grafana",
             "child_resources": [
                 {
                     "new_name": "aperture-grafana-operator-bootstrap",
@@ -87,7 +87,7 @@ DEP_TREE = {
         },
         "agent": {
             "labels": ["Aperture"],
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/aperture-agent",
+            "tkenv": TANKA_ROOT + "/apps/aperture-agent",
             "images": [
                 {
                     "ref": "aperture-agent",
@@ -203,7 +203,7 @@ DEP_TREE = {
         "istio": {
             "labels": ["Istio"],
             "needs": ["agent"],
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/istio",
+            "tkenv": TANKA_ROOT + "/apps/istio",
             "child_resources": [
                 {
                     "new_name": "istio-bootstrap",
@@ -243,7 +243,7 @@ DEP_TREE = {
     APERTURE_DEMOAPP_NS: {
         "k6-operator": {
             "labels": ["K6"],
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/k6-operator",
+            "tkenv": TANKA_ROOT + "/apps/k6-operator",
             "child_resources": [
                 {
                     "workload": "k6-operator-controller-manager",
@@ -261,7 +261,7 @@ DEP_TREE = {
         },
         "demo-app": {
             "labels": ["DemoApplications"],
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/demoapp",
+            "tkenv": TANKA_ROOT + "/apps/demoapp",
             "needs": ["istio"],
             "images": [
                 {
@@ -307,7 +307,7 @@ DEP_TREE = {
         "bookinfo": {
             "labels": ["DemoApplications"],
             "needs": ["istio"],
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/bookinfo",
+            "tkenv": TANKA_ROOT + "/apps/bookinfo",
             "child_resources": [
                 {
                     "new_name": "bookinfo-common",
@@ -426,15 +426,15 @@ def render_tanka(environment, env_vars):
         "Rendering tanka environment",
         environment,
     )
-    base_dir = environment.split("environments/")[0] or "./"
+    base_dir = environment.split("apps/")[0] or "./"
 
     if SKIP_LOCAL_CMDS:
         return
 
     if not GLOBAL_STATE.get(GLOBAL_RAN_TANKA_DEPS_KEY):
         # Get base directory for Jsonnet Bundler execution
-        # tanka/environments/default -> tanka/
-        # environments/default -> ./
+        # tanka/apps/default -> tanka/
+        # apps/default -> ./
         # Make sure jb dependencies are up to date
         local(command=["jb", "install"], dir=base_dir)
 
@@ -904,7 +904,7 @@ print("Will deploy resources:", ", ".join(resources))
 
 # Watch charts and code
 watch_file("Tiltfile")
-watch_file("./tanka/environments/")
+watch_file("./tanka/apps/")
 watch_file("./tanka/lib/")
 watch_file("./tanka/charts/")
 watch_file(GIT_ROOT + "/api/")
