@@ -58,7 +58,7 @@ local policy = latencyGradientPolicy({
   configMap:
     k.core.v1.configMap.new('policies')
     + k.core.v1.configMap.metadata.withLabels({ 'fluxninja.com/validate': 'true' })
-    + k.core.v1.configMap.metadata.withNamespace('aperture-system')
+    + k.core.v1.configMap.metadata.withNamespace('aperture-controller')
     + k.core.v1.configMap.withData({
       'service1-demo-app.yaml': std.manifestYamlDoc(policy, quote_keys=false),
     }),

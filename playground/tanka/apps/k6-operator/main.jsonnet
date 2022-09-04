@@ -1,15 +1,15 @@
-local mixins = import 'mixins.libsonnet';
+local k6_operator = import 'apps/k6-operator/main.libsonnet';
 
 function(apiServer='API SERVER MISSING') {
   apiVersion: 'tanka.dev/v1alpha1',
   kind: 'Environment',
   metadata: {
-    name: 'environment/tilt/apps/demoapp',
+    name: 'apps/k6-operator',
   },
   spec: {
     apiServer: apiServer,
     namespace: 'demoapp',
     applyStrategy: 'server',
   },
-  data: mixins,
+  data: k6_operator,
 }

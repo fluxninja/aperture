@@ -11,7 +11,8 @@ GIT_ROOT = str(local("git rev-parse --show-toplevel")).strip()
 PLAYGROUND_ROOT = GIT_ROOT + "/playground"
 TANKA_ROOT = GIT_ROOT + "/playground/tanka"
 TILT_OBJECTS = []
-APERTURE_SYSTEM_NS = "aperture-system"
+APERTURE_AGENT_NS = "aperture-agent"
+APERTURE_CONTROLLER_NS = "aperture-controller"
 APERTURE_DEMOAPP_NS = "demoapp"
 APERTURE_BOOKINFO_NS = "bookinfo"
 APERTURE_ISTIO_NS = "istio-system"
@@ -39,11 +40,11 @@ GLOBAL_RAN_TANKA_DEPS_KEY = "RAN_TANKA_DEPS"
 # "pvc_selectors"
 # "kinds"
 DEP_TREE = {
-    APERTURE_SYSTEM_NS: {
+    APERTURE_CONTROLLER_NS: {
         "aperture-grafana": {
-            "labels": ["Aperture"],
+            "labels": ["ApertureController"],
             # construct directory path to tkenv
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/aperture-grafana",
+            "tkenv": TANKA_ROOT + "/apps/aperture-grafana",
             "child_resources": [
                 {
                     "new_name": "aperture-grafana-operator-bootstrap",
@@ -55,10 +56,10 @@ DEP_TREE = {
                     "workload": "aperture-grafana-operator",
                     "resource_deps": ["aperture-grafana-operator-bootstrap"],
                     "extra_objects": [
-                        ("^aperture-grafana-operator", None, APERTURE_SYSTEM_NS)
+                        ("^aperture-grafana-operator", None, APERTURE_CONTROLLER_NS)
                     ],
                     "ignored_objects": [
-                        ("^aperture-grafana-operator", "Deployment", APERTURE_SYSTEM_NS)
+                        ("^aperture-grafana-operator", "Deployment", APERTURE_CONTROLLER_NS)
                     ]
                 },
                 {
@@ -73,28 +74,22 @@ DEP_TREE = {
                     "new_name": "aperture-dashboards",
                     "resource_deps": ["aperture-grafana-operator-bootstrap"],
                     "extra_objects": [
-                        (None, "GrafanaDashboard", APERTURE_SYSTEM_NS)
+                        (None, "GrafanaDashboard", APERTURE_CONTROLLER_NS)
                     ]
                 },
                 {
                     "new_name": "aperture-grafana-data-sources",
                     "resource_deps": ["aperture-grafana-operator-bootstrap"],
                     "extra_objects": [
-                        (None, "GrafanaDataSource", APERTURE_SYSTEM_NS)
+                        (None, "GrafanaDataSource", APERTURE_CONTROLLER_NS)
                     ]
                 }
             ]
         },
-        "agent": {
-            "labels": ["Aperture"],
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/aperture-agent",
+        "controller": {
+            "labels": ["ApertureController"],
+            "tkenv": TANKA_ROOT + "/apps/aperture-controller",
             "images": [
-                {
-                    "ref": "aperture-agent",
-                    "context": GIT_ROOT,
-                    "dockerfile": GIT_ROOT + "/cmd/aperture-agent/Dockerfile",
-                    "ssh": "default",
-                },
                 {
                     "ref": "aperture-controller",
                     "context": GIT_ROOT,
@@ -114,24 +109,14 @@ DEP_TREE = {
             },
             "pvc_selectors": ["app.kubernetes.io/name=etcd"],
             "kinds": [
-                dict(kind="Agent", image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait'),
                 dict(kind="Controller", image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait'),
             ],
             "child_resources": [
                 {
-                    "new_name": "aperture-operator-bootstrap",
+                    "new_name": "aperture-controller-operator-bootstrap",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
-                        "agents.fluxninja.com:customresourcedefinition",
                         "controllers.fluxninja.com:customresourcedefinition"
-                    ]
-                },
-                {
-                    "workload": "agent",
-                    "new_name": "aperture-agent",
-                    "resource_deps": ["controller-etcd", "agent-aperture-agent-manager"],
-                    "extra_pod_selectors": [
-                        {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
                     ]
                 },
                 {
@@ -144,24 +129,13 @@ DEP_TREE = {
                 },
                 {
                     "workload": "controller-aperture-controller-manager",
-                    "resource_deps": ["aperture-operator-bootstrap"],
+                    "resource_deps": ["aperture-controller-operator-bootstrap"],
                     "extra_objects": [
-                        ("^controller-aperture-controller", "Role|RoleBinding|ServiceAccount", APERTURE_SYSTEM_NS),
+                        ("^controller-aperture-controller", "Role|RoleBinding|ServiceAccount", APERTURE_CONTROLLER_NS),
                         ("^controller-aperture-controller", "ClusterRole|ClusterRoleBinding"),
                     ],
                     "ignored_objects": [
-                        ("^controller-aperture-controller-manager", "Service|Deployment", APERTURE_SYSTEM_NS),
-                    ]
-                },
-                 {
-                    "workload": "agent-aperture-agent-manager",
-                    "resource_deps": ["aperture-operator-bootstrap"],
-                    "extra_objects": [
-                        ("^agent-aperture-agent", "Role|RoleBinding|ServiceAccount", APERTURE_SYSTEM_NS),
-                        ("^agent-aperture-agent", "ClusterRole|ClusterRoleBinding"),
-                    ],
-                    "ignored_objects": [
-                        ("^agent-aperture-agent-manager", "Service|Deployment", APERTURE_SYSTEM_NS),
+                        ("^controller-aperture-controller-manager", "Service|Deployment", APERTURE_CONTROLLER_NS),
                     ]
                 },
                 {
@@ -193,7 +167,53 @@ DEP_TREE = {
                         ("^controller-kube-state-metrics", None),
                     ],
                     "ignored_objects": [
-                        ("^controller-kube-state-metrics", "Service|Deployment", APERTURE_SYSTEM_NS),
+                        ("^controller-kube-state-metrics", "Service|Deployment", APERTURE_CONTROLLER_NS),
+                    ]
+                }
+            ]
+        }
+    },
+    APERTURE_AGENT_NS: {
+        "agent": {
+            "labels": ["ApertureAgent"],
+            "needs": ["controller"],
+            "tkenv": TANKA_ROOT + "/apps/aperture-agent",
+            "images": [
+                {
+                    "ref": "aperture-agent",
+                    "context": GIT_ROOT,
+                    "dockerfile": GIT_ROOT + "/cmd/aperture-agent/Dockerfile",
+                    "ssh": "default",
+                }
+            ],
+            "kinds": [
+                dict(kind="Agent", image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait'),
+            ],
+            "child_resources": [
+                {
+                    "new_name": "aperture-agent-operator-bootstrap",
+                    "resource_deps": ["cluster-bootstrap"],
+                    "extra_objects": [
+                        "agents.fluxninja.com:customresourcedefinition",
+                    ]
+                },
+                {
+                    "workload": "agent",
+                    "new_name": "aperture-agent",
+                    "resource_deps": ["controller-etcd", "agent-aperture-agent-manager", "controller-prometheus"],
+                    "extra_pod_selectors": [
+                        {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
+                    ]
+                },
+                {
+                    "workload": "agent-aperture-agent-manager",
+                    "resource_deps": ["aperture-agent-operator-bootstrap"],
+                    "extra_objects": [
+                        ("^agent-aperture-agent", "Role|RoleBinding|ServiceAccount", APERTURE_AGENT_NS),
+                        ("^agent-aperture-agent", "ClusterRole|ClusterRoleBinding"),
+                    ],
+                    "ignored_objects": [
+                        ("^agent-aperture-agent-manager", "Service|Deployment", APERTURE_AGENT_NS),
                     ]
                 }
             ]
@@ -202,8 +222,8 @@ DEP_TREE = {
     APERTURE_ISTIO_NS: {
         "istio": {
             "labels": ["Istio"],
-            "needs": ["agent"],
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/istio",
+            "needs": ["controller", "agent"],
+            "tkenv": TANKA_ROOT + "/apps/istio",
             "child_resources": [
                 {
                     "new_name": "istio-bootstrap",
@@ -243,7 +263,7 @@ DEP_TREE = {
     APERTURE_DEMOAPP_NS: {
         "k6-operator": {
             "labels": ["K6"],
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/k6-operator",
+            "tkenv": TANKA_ROOT + "/apps/k6-operator",
             "child_resources": [
                 {
                     "workload": "k6-operator-controller-manager",
@@ -261,7 +281,7 @@ DEP_TREE = {
         },
         "demo-app": {
             "labels": ["DemoApplications"],
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/demoapp",
+            "tkenv": TANKA_ROOT + "/apps/demoapp",
             "needs": ["istio"],
             "images": [
                 {
@@ -297,7 +317,7 @@ DEP_TREE = {
                     "new_name": "policies",
                     "resource_deps": ["cluster-bootstrap", "aperture-controller-port-forward"],
                     "extra_objects": [
-                        ("policies$", "ConfigMap", APERTURE_SYSTEM_NS),
+                        ("policies$", "ConfigMap", APERTURE_CONTROLLER_NS),
                     ]
                 },
             ]
@@ -307,7 +327,7 @@ DEP_TREE = {
         "bookinfo": {
             "labels": ["DemoApplications"],
             "needs": ["istio"],
-            "tkenv": TANKA_ROOT + "/environments/tilt/apps/bookinfo",
+            "tkenv": TANKA_ROOT + "/apps/bookinfo",
             "child_resources": [
                 {
                     "new_name": "bookinfo-common",
@@ -426,15 +446,15 @@ def render_tanka(environment, env_vars):
         "Rendering tanka environment",
         environment,
     )
-    base_dir = environment.split("environments/")[0] or "./"
+    base_dir = environment.split("apps/")[0] or "./"
 
     if SKIP_LOCAL_CMDS:
         return
 
     if not GLOBAL_STATE.get(GLOBAL_RAN_TANKA_DEPS_KEY):
         # Get base directory for Jsonnet Bundler execution
-        # tanka/environments/default -> tanka/
-        # environments/default -> ./
+        # tanka/apps/default -> tanka/
+        # apps/default -> ./
         # Make sure jb dependencies are up to date
         local(command=["jb", "install"], dir=base_dir)
 
@@ -833,8 +853,8 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
     if "aperture-grafana" in resources:
         forward_port_delayed(
             workload="aperture-grafana-forward",
-            namespace=APERTURE_SYSTEM_NS,
-            labels=["Aperture"],
+            namespace=APERTURE_CONTROLLER_NS,
+            labels=["ApertureController"],
             resource_deps=["aperture-grafana"],
             service="aperture-grafana",
             local_port=3000,
@@ -846,15 +866,17 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
         )
 
     if "agent" in resources:
-        forward_port_delayed(workload="aperture-agent-port-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
+        forward_port_delayed(workload="aperture-agent-port-forward", namespace=APERTURE_AGENT_NS, labels=["ApertureAgent"],
                         resource_deps=["aperture-agent"], service="aperture-agent", local_port=8089, remote_port=80)
-        forward_port_delayed(workload="aperture-controller-port-forward", namespace=APERTURE_SYSTEM_NS, labels=["Aperture"],
+    if "controller" in resources:
+        forward_port_delayed(workload="aperture-controller-port-forward", namespace=APERTURE_CONTROLLER_NS, labels=["ApertureController"],
                         resource_deps=["aperture-controller"], service="aperture-controller", local_port=8087, remote_port=80)
 
     if config.tilt_subcommand == "down":
         if "agent" in resources:
-            local('if (kubectl get agent agent -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete agent agent -n {0};  fi'.format(APERTURE_SYSTEM_NS))
-            local('if (kubectl get controller controller -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete controller controller -n {0};  fi'.format(APERTURE_SYSTEM_NS))
+            local('if (kubectl get agent agent -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete agent agent -n {0};  fi'.format(APERTURE_AGENT_NS))
+        if "controller" in resources:
+            local('if (kubectl get controller controller -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete controller controller -n {0};  fi'.format(APERTURE_CONTROLLER_NS))
         for resource_name in resources:
             resource = inv_dep_tree[resource_name]
             pvc_selectors = resource.get("pvc_selectors", [])
@@ -888,11 +910,11 @@ if cfg.get("manual", False):
     trigger_mode(TRIGGER_MODE_MANUAL)
 
 
-cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false")).lower()
-TRACE = cfg_trace == "true"
+cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false"))
+TRACE = cfg_trace == True
 
-cfg_verbose = cfg.get("verbose", os.getenv("NINJA_TILT_VERBOSE", cfg_trace)).lower()
-VERBOSE = cfg_verbose == "true"
+cfg_verbose = cfg.get("verbose", os.getenv("NINJA_TILT_VERBOSE", cfg_trace))
+VERBOSE = cfg_verbose == True
 
 run_only_listed = cfg.get("only", False)
 to_run = cfg.get("to-run", ["all"])
@@ -904,7 +926,7 @@ print("Will deploy resources:", ", ".join(resources))
 
 # Watch charts and code
 watch_file("Tiltfile")
-watch_file("./tanka/environments/")
+watch_file("./tanka/apps/")
 watch_file("./tanka/lib/")
 watch_file("./tanka/charts/")
 watch_file(GIT_ROOT + "/api/")

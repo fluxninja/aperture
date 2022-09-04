@@ -2,7 +2,7 @@ name: aperture-envoy-filter
 
 agentservice:
   name: aperture-agent
-  namespace: aperture-system
+  namespace: aperture-agent
   port: 80
   otlpPort: 4317
 
