@@ -91,7 +91,6 @@ repos:
         entry: "./scripts/precommit/generate_helm_readme.sh"
         language: script
         files: "values.yaml$"
-        exclude: ^ops/.*
         pass_filenames: false
         description: "Generate docs"
       - id: generate-docs
@@ -99,7 +98,6 @@ repos:
         entry: "./scripts/precommit/generate_docs.sh"
         language: script
         files: '\.proto$|\.go$|\.md$|\.mmd$'
-        exclude: ^ops/.*
         pass_filenames: false
         description: "Generate docs"
       - id: generate-libsonnet
