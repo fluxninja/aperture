@@ -4,7 +4,10 @@
     string_value: "%REQ(:METHOD)%"
 - key: http.target
   value:
-    string_value: "%REQ(:PATH)%"
+    string_value: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+- key: http.flavor
+  value:
+    string_value: "%PROTOCOL%"
 - key: http.host
   value:
     string_value: "%REQ(HOST)%"
