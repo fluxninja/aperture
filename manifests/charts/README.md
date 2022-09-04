@@ -7,11 +7,11 @@
 You didn't install chart dependencies defined in Chart.yaml.
 
 ```sh
-helm dependency build ./agent
+helm dependency build ./aperture-controller
 ```
 
-It might fail with `no repository definition for <URL>`,
-in which case you should run:
+It might fail with `no repository definition for <URL>`, in which case you
+should run:
 
 ```sh
 help repo add <URL>

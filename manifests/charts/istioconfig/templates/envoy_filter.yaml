@@ -65,7 +65,7 @@ spec:
                   log_name: ingress
                   grpc_service:
                     google_grpc:
-                      target_uri: {{ .Values.agentservice.name }}.{{ .Values.agentservice.namespace }}.svc.cluster.local:{{ .Values.agentservice.otlpPort }}
+                      target_uri: {{ .Values.apertureAgent.name }}.{{ .Values.apertureAgent.namespace }}.svc.cluster.local:{{ .Values.apertureAgent.otlpPort }}
                       stat_prefix: aperture_access_log
                   transport_api_version: V3
                 body:
@@ -84,7 +84,7 @@ spec:
                     - key: net.host.ip
                       value:
                         string_value: "%DOWNSTREAM_LOCAL_ADDRESS_WITHOUT_PORT%"
-                    - key: net.host.port
+                    - key: net.host.authzPort
                       value:
                         string_value: "%DOWNSTREAM_LOCAL_PORT%"
 
@@ -109,7 +109,7 @@ spec:
                   log_name: egress
                   grpc_service:
                     google_grpc:
-                      target_uri: {{ .Values.agentservice.name }}.{{ .Values.agentservice.namespace }}.svc.cluster.local:{{ .Values.agentservice.otlpPort }}
+                      target_uri: {{ .Values.apertureAgent.name }}.{{ .Values.apertureAgent.namespace }}.svc.cluster.local:{{ .Values.apertureAgent.otlpPort }}
                       stat_prefix: aperture_access_log
                   transport_api_version: V3
                 body:
@@ -153,7 +153,7 @@ spec:
           failure_mode_allow: true
           grpc_service:
             google_grpc:
-              target_uri: {{ .Values.agentservice.name }}.{{ .Values.agentservice.namespace }}.svc.cluster.local:{{ .Values.agentservice.port }}
+              target_uri: {{ .Values.apertureAgent.name }}.{{ .Values.apertureAgent.namespace }}.svc.cluster.local:{{ .Values.apertureAgent.authzPort }}
               stat_prefix: ext_authz
             timeout: {{ .Values.authzGrpcTimeout }}
             initial_metadata:
@@ -186,7 +186,7 @@ spec:
           failure_mode_allow: true
           grpc_service:
             google_grpc:
-              target_uri: {{ .Values.agentservice.name }}.{{ .Values.agentservice.namespace }}.svc.cluster.local:{{ .Values.agentservice.port }}
+              target_uri: {{ .Values.apertureAgent.name }}.{{ .Values.apertureAgent.namespace }}.svc.cluster.local:{{ .Values.apertureAgent.authzPort }}
               stat_prefix: ext_authz
             timeout: {{ .Values.authzGrpcTimeout }}
             initial_metadata:
