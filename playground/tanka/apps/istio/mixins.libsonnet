@@ -6,7 +6,11 @@ local istioAppMixin =
       base+: {},
       istiod+: {},
       gateway+: {},
-      envoyfilter+: {},
+      envoyfilter+: {
+        envoyFilter+: {
+          authzPort: 80,
+        },
+      },
     },
   };
 

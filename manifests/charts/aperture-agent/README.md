@@ -1,12 +1,4 @@
-# Aperture Cont
-
-Aperture Operator
-
-## Introduction
-
-Aperture Operator
-
-## Installation
+# Aperture Agent
 
 ## Parameters
 
@@ -190,4 +182,5 @@ Aperture Operator
 | `agent.otelConfig.batchPrerollup.timeout`               | Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".                       | `nil`    |
 | `agent.otelConfig.batchPostrollup.sendBatchSize`        | SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".             | `nil`    |
 | `agent.otelConfig.batchPostrollup.timeout`              | Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".                       | `nil`    |
+
 

@@ -1,12 +1,4 @@
-# Aperture Cont
-
-Aperture Operator
-
-## Introduction
-
-Aperture Operator
-
-## Installation
+# Aperture Controller
 
 ## Parameters
 
@@ -111,83 +103,83 @@ Aperture Operator
 
 ### Controller Custom Resource Parameters
 
-| Name                                                         | Description                                                                                                              | Value    |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ | -------- |
-| `controller.create`                                          | Specifies whether a CR for Controller should be created                                                                  | `true`   |
-| `controller.fluxninjaPlugin.enabled`                         | Boolean flag for enabling FluxNinja cloud connection from Controller                                                     | `false`  |
-| `controller.fluxninjaPlugin.endpoint`                        | FluxNinja cloud instance endpoint                                                                                        | `nil`    |
-| `controller.fluxninjaPlugin.heartbeatsInterval`              | specifies how often to send heartbeats to the cloud. Defaults to '30s'.                                                  | `nil`    |
-| `controller.fluxninjaPlugin.tls.insecure`                    | specifies whether to communicate with FluxNinja cloud over TLS or in plain text. Defaults to false.                      | `nil`    |
-| `controller.fluxninjaPlugin.tls.insecureSkipVerify`          | specifies whether to verify FluxNinja cloud certificate. Defaults to false.                                              | `nil`    |
-| `controller.fluxninjaPlugin.tls.caFile`                      | specifies an alternative CA certificates bundle to use to validate FluxNinja cloud certificate                           | `nil`    |
-| `controller.fluxninjaPlugin.apiKeySecret.create`             | Whether to create Kubernetes Secret with provided Controller API Key.                                                    | `true`   |
-| `controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name`  | specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey | `nil`    |
-| `controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key`   | specifies which key from the Secret for Controller API Key to use                                                        | `apiKey` |
-| `controller.fluxninjaPlugin.apiKeySecret.value`              | API Key to use when creating a new Controller API Key Secret                                                             | `nil`    |
-| `controller.image.registry`                                  | Controller image registry. Defaults to 'docker.io/fluxninja'.                                                            | `nil`    |
-| `controller.image.repository`                                | Controller image repository. Defaults to 'aperture-controller'.                                                          | `nil`    |
-| `controller.image.tag`                                       | Controller image tag (immutable tags are recommended). Defaults to 'latest'.                                             | `nil`    |
-| `controller.image.pullPolicy`                                | Controller image pull policy. Defaults to 'IfNotPresent'.                                                                | `nil`    |
-| `controller.image.pullSecrets`                               | Controller image pull secrets                                                                                            | `[]`     |
-| `controller.serverPort`                                      | The Controller's server port. Defaults to 80.                                                                            | `nil`    |
-| `controller.hostAliases`                                     | Add deployment host aliases for Controller deployment                                                                    | `[]`     |
-| `controller.log.prettyConsole`                               | Additional log writer: pretty console (stdout) logging (not recommended for prod environments). Defaults to false.       | `nil`    |
-| `controller.log.nonBlocking`                                 | Use non-blocking log writer (can lose logs at high throughput). Defaults to True.                                        | `nil`    |
-| `controller.log.level`                                       | Log level. Keywords allowed - ["debug", "info", "warn", "fatal", "panic", "trace"]. Defaults to 'info'.                  | `nil`    |
-| `controller.log.file`                                        | Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. Defaults to 'stderr'.                          | `nil`    |
-| `controller.serviceAccount.create`                           | Specifies whether a ServiceAccount should be created                                                                     | `true`   |
-| `controller.serviceAccount.annotations`                      | Additional Service Account annotations (evaluated as a template)                                                         | `{}`     |
-| `controller.serviceAccount.automountServiceAccountToken`     | Automount service account token for the server service account. Defaults to true                                         | `nil`    |
-| `controller.livenessProbe.enabled`                           | Enable livenessProbe on Controller containers                                                                            | `true`   |
-| `controller.livenessProbe.initialDelaySeconds`               | Initial delay seconds for livenessProbe. Defaults to 15.                                                                 | `nil`    |
-| `controller.livenessProbe.periodSeconds`                     | Period seconds for livenessProbe. Defaults to 15.                                                                        | `nil`    |
-| `controller.livenessProbe.timeoutSeconds`                    | Timeout seconds for livenessProbe. Defaults to 5.                                                                        | `nil`    |
-| `controller.livenessProbe.failureThreshold`                  | Failure threshold for livenessProbe. Defaults to 6.                                                                      | `nil`    |
-| `controller.livenessProbe.successThreshold`                  | Success threshold for livenessProbe. Defaults to 1.                                                                      | `nil`    |
-| `controller.readinessProbe.enabled`                          | Enable readinessProbe on Controller containers                                                                           | `true`   |
-| `controller.readinessProbe.initialDelaySeconds`              | Initial delay seconds for readinessProbe. Defaults to 15.                                                                | `nil`    |
-| `controller.readinessProbe.periodSeconds`                    | Period seconds for readinessProbe. Defaults to 15.                                                                       | `nil`    |
-| `controller.readinessProbe.timeoutSeconds`                   | Timeout seconds for readinessProbe. Defaults to 5.                                                                       | `nil`    |
-| `controller.readinessProbe.failureThreshold`                 | Failure threshold for readinessProbe. Defaults to 6.                                                                     | `nil`    |
-| `controller.readinessProbe.successThreshold`                 | Success threshold for readinessProbe. Defaults to 1.                                                                     | `nil`    |
-| `controller.customLivenessProbe`                             | Custom livenessProbe that overrides the default one                                                                      | `{}`     |
-| `controller.customReadinessProbe`                            | Custom readinessProbe that overrides the default one                                                                     | `{}`     |
-| `controller.resources.limits`                                | The resources limits for the Controller containers                                                                       | `{}`     |
-| `controller.resources.requests`                              | The requested resources for the Controller containers                                                                    | `{}`     |
-| `controller.podSecurityContext.enabled`                      | Enabled Controller pods' Security Context                                                                                | `false`  |
-| `controller.podSecurityContext.fsGroup`                      | Set Controller pod's Security Context fsGroup. Defaults to 1001.                                                         | `nil`    |
-| `controller.containerSecurityContext.enabled`                | Enabled Controller containers' Security Context. Defaults to false.                                                      | `false`  |
-| `controller.containerSecurityContext.runAsUser`              | Set Controller containers' Security Context runAsUser. Defaults to 1001.                                                 | `nil`    |
-| `controller.containerSecurityContext.runAsNonRoot`           | Set Controller containers' Security Context runAsNonRoot. Defaults to false.                                             | `nil`    |
-| `controller.containerSecurityContext.readOnlyRootFilesystem` | Set Controller containers' Security Context runAsNonRoot. Defaults to false.                                             | `nil`    |
-| `controller.command`                                         | Override default container command (useful when using custom images)                                                     | `[]`     |
-| `controller.args`                                            | Override default container args (useful when using custom images)                                                        | `[]`     |
-| `controller.podLabels`                                       | Extra labels for Controller pods                                                                                         | `{}`     |
-| `controller.podAnnotations`                                  | Annotations for Controller pods                                                                                          | `{}`     |
-| `controller.affinity`                                        | Affinity for Controller pods assignment                                                                                  | `{}`     |
-| `controller.nodeSelector`                                    | Node labels for Controller pods assignment                                                                               | `{}`     |
-| `controller.tolerations`                                     | Tolerations for Controller pods assignment                                                                               | `[]`     |
-| `controller.terminationGracePeriodSeconds`                   | configures how long kubelet gives Controller chart to terminate cleanly                                                  | `nil`    |
-| `controller.lifecycleHooks`                                  | for the Controller container(s) to automate configuration before or after startup                                        | `{}`     |
-| `controller.extraEnvVars`                                    | Array with extra environment variables to add to Controller nodes                                                        | `[]`     |
-| `controller.extraEnvVarsCM`                                  | Name of existing ConfigMap containing extra env vars for Controller nodes                                                | `""`     |
-| `controller.extraEnvVarsSecret`                              | Name of existing Secret containing extra env vars for Controller nodes                                                   | `""`     |
-| `controller.extraVolumes`                                    | Optionally specify extra list of additional volumes for the Controller pod(s)                                            | `[]`     |
-| `controller.extraVolumeMounts`                               | Optionally specify extra list of additional volumeMounts for the Controller container(s)                                 | `[]`     |
-| `controller.sidecars`                                        | Add additional sidecar containers to the Controller pod(s)                                                               | `[]`     |
-| `controller.initContainers`                                  | Add additional init containers to the Controller pod(s)                                                                  | `[]`     |
-| `controller.service.annotations`                             | Additional custom annotations for Controller service                                                                     | `{}`     |
-| `controller.sidecar.enabled`                                 | Enables sidecar mode for the Controller                                                                                  | `false`  |
-| `controller.sidecar.enableNamespacesByDefault`               | List of namespaces in which sidecar injection will be enabled when Sidecar mode is enabled.                              | `[]`     |
-| `controller.etcd.endpoints`                                  | List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty when etcd.enabled is set to false. | `[]`     |
-| `controller.etcd.leaseTtl`                                   | Lease time-to-live.                                                                                                      | `60s`    |
-| `controller.prometheus.address`                              | specifies the address of the Prometheus server. This must not be empty when prometheus.enabled is set to false.          | `nil`    |
-| `controller.otelConfig.grpcAddr`                             | GRPC listener addr for OTEL Collector. Defaults to ":4317"                                                               | `nil`    |
-| `controller.otelConfig.httpAddr`                             | HTTP listener addr for OTEL Collector. Defaults to ":4318"                                                               | `nil`    |
-| `controller.otelConfig.batchPrerollup.sendBatchSize`         | SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".                   | `nil`    |
-| `controller.otelConfig.batchPrerollup.timeout`               | Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".                             | `nil`    |
-| `controller.otelConfig.batchPostrollup.sendBatchSize`        | SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".                   | `nil`    |
-| `controller.otelConfig.batchPostrollup.timeout`              | Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".                             | `nil`    |
+| Name                                                         | Description                                                                                                                                                       | Value    |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `controller.create`                                          | Specifies whether a CR for Controller should be created                                                                                                           | `true`   |
+| `controller.fluxninjaPlugin.enabled`                         | Boolean flag for enabling FluxNinja cloud connection from Controller                                                                                              | `false`  |
+| `controller.fluxninjaPlugin.endpoint`                        | FluxNinja cloud instance endpoint                                                                                                                                 | `nil`    |
+| `controller.fluxninjaPlugin.heartbeatsInterval`              | specifies how often to send heartbeats to the cloud. Defaults to '30s'.                                                                                           | `nil`    |
+| `controller.fluxninjaPlugin.tls.insecure`                    | specifies whether to communicate with FluxNinja cloud over TLS or in plain text. Defaults to false.                                                               | `nil`    |
+| `controller.fluxninjaPlugin.tls.insecureSkipVerify`          | specifies whether to verify FluxNinja cloud certificate. Defaults to false.                                                                                       | `nil`    |
+| `controller.fluxninjaPlugin.tls.caFile`                      | specifies an alternative CA certificates bundle to use to validate FluxNinja cloud certificate                                                                    | `nil`    |
+| `controller.fluxninjaPlugin.apiKeySecret.create`             | Whether to create Kubernetes Secret with provided Controller API Key.                                                                                             | `true`   |
+| `controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name`  | specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey                                          | `nil`    |
+| `controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key`   | specifies which key from the Secret for Controller API Key to use                                                                                                 | `apiKey` |
+| `controller.fluxninjaPlugin.apiKeySecret.value`              | API Key to use when creating a new Controller API Key Secret                                                                                                      | `nil`    |
+| `controller.image.registry`                                  | Controller image registry. Defaults to 'docker.io/fluxninja'.                                                                                                     | `nil`    |
+| `controller.image.repository`                                | Controller image repository. Defaults to 'aperture-controller'.                                                                                                   | `nil`    |
+| `controller.image.tag`                                       | Controller image tag (immutable tags are recommended). Defaults to 'latest'.                                                                                      | `nil`    |
+| `controller.image.pullPolicy`                                | Controller image pull policy. Defaults to 'IfNotPresent'.                                                                                                         | `nil`    |
+| `controller.image.pullSecrets`                               | Controller image pull secrets                                                                                                                                     | `[]`     |
+| `controller.serverPort`                                      | The Controller's server port. Defaults to 80.                                                                                                                     | `nil`    |
+| `controller.hostAliases`                                     | Add deployment host aliases for Controller deployment                                                                                                             | `[]`     |
+| `controller.log.prettyConsole`                               | Additional log writer: pretty console (stdout) logging (not recommended for prod environments). Defaults to false.                                                | `nil`    |
+| `controller.log.nonBlocking`                                 | Use non-blocking log writer (can lose logs at high throughput). Defaults to True.                                                                                 | `nil`    |
+| `controller.log.level`                                       | Log level. Keywords allowed - ["debug", "info", "warn", "fatal", "panic", "trace"]. Defaults to 'info'.                                                           | `nil`    |
+| `controller.log.file`                                        | Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. Defaults to 'stderr'.                                                                   | `nil`    |
+| `controller.serviceAccount.create`                           | Specifies whether a ServiceAccount should be created                                                                                                              | `true`   |
+| `controller.serviceAccount.annotations`                      | Additional Service Account annotations (evaluated as a template)                                                                                                  | `{}`     |
+| `controller.serviceAccount.automountServiceAccountToken`     | Automount service account token for the server service account. Defaults to true                                                                                  | `nil`    |
+| `controller.livenessProbe.enabled`                           | Enable livenessProbe on Controller containers                                                                                                                     | `true`   |
+| `controller.livenessProbe.initialDelaySeconds`               | Initial delay seconds for livenessProbe. Defaults to 15.                                                                                                          | `nil`    |
+| `controller.livenessProbe.periodSeconds`                     | Period seconds for livenessProbe. Defaults to 15.                                                                                                                 | `nil`    |
+| `controller.livenessProbe.timeoutSeconds`                    | Timeout seconds for livenessProbe. Defaults to 5.                                                                                                                 | `nil`    |
+| `controller.livenessProbe.failureThreshold`                  | Failure threshold for livenessProbe. Defaults to 6.                                                                                                               | `nil`    |
+| `controller.livenessProbe.successThreshold`                  | Success threshold for livenessProbe. Defaults to 1.                                                                                                               | `nil`    |
+| `controller.readinessProbe.enabled`                          | Enable readinessProbe on Controller containers                                                                                                                    | `true`   |
+| `controller.readinessProbe.initialDelaySeconds`              | Initial delay seconds for readinessProbe. Defaults to 15.                                                                                                         | `nil`    |
+| `controller.readinessProbe.periodSeconds`                    | Period seconds for readinessProbe. Defaults to 15.                                                                                                                | `nil`    |
+| `controller.readinessProbe.timeoutSeconds`                   | Timeout seconds for readinessProbe. Defaults to 5.                                                                                                                | `nil`    |
+| `controller.readinessProbe.failureThreshold`                 | Failure threshold for readinessProbe. Defaults to 6.                                                                                                              | `nil`    |
+| `controller.readinessProbe.successThreshold`                 | Success threshold for readinessProbe. Defaults to 1.                                                                                                              | `nil`    |
+| `controller.customLivenessProbe`                             | Custom livenessProbe that overrides the default one                                                                                                               | `{}`     |
+| `controller.customReadinessProbe`                            | Custom readinessProbe that overrides the default one                                                                                                              | `{}`     |
+| `controller.resources.limits`                                | The resources limits for the Controller containers                                                                                                                | `{}`     |
+| `controller.resources.requests`                              | The requested resources for the Controller containers                                                                                                             | `{}`     |
+| `controller.podSecurityContext.enabled`                      | Enabled Controller pods' Security Context                                                                                                                         | `false`  |
+| `controller.podSecurityContext.fsGroup`                      | Set Controller pod's Security Context fsGroup. Defaults to 1001.                                                                                                  | `nil`    |
+| `controller.containerSecurityContext.enabled`                | Enabled Controller containers' Security Context. Defaults to false.                                                                                               | `false`  |
+| `controller.containerSecurityContext.runAsUser`              | Set Controller containers' Security Context runAsUser. Defaults to 1001.                                                                                          | `nil`    |
+| `controller.containerSecurityContext.runAsNonRoot`           | Set Controller containers' Security Context runAsNonRoot. Defaults to false.                                                                                      | `nil`    |
+| `controller.containerSecurityContext.readOnlyRootFilesystem` | Set Controller containers' Security Context runAsNonRoot. Defaults to false.                                                                                      | `nil`    |
+| `controller.command`                                         | Override default container command (useful when using custom images)                                                                                              | `[]`     |
+| `controller.args`                                            | Override default container args (useful when using custom images)                                                                                                 | `[]`     |
+| `controller.podLabels`                                       | Extra labels for Controller pods                                                                                                                                  | `{}`     |
+| `controller.podAnnotations`                                  | Annotations for Controller pods                                                                                                                                   | `{}`     |
+| `controller.affinity`                                        | Affinity for Controller pods assignment                                                                                                                           | `{}`     |
+| `controller.nodeSelector`                                    | Node labels for Controller pods assignment                                                                                                                        | `{}`     |
+| `controller.tolerations`                                     | Tolerations for Controller pods assignment                                                                                                                        | `[]`     |
+| `controller.terminationGracePeriodSeconds`                   | configures how long kubelet gives Controller chart to terminate cleanly                                                                                           | `nil`    |
+| `controller.lifecycleHooks`                                  | for the Controller container(s) to automate configuration before or after startup                                                                                 | `{}`     |
+| `controller.extraEnvVars`                                    | Array with extra environment variables to add to Controller nodes                                                                                                 | `[]`     |
+| `controller.extraEnvVarsCM`                                  | Name of existing ConfigMap containing extra env vars for Controller nodes                                                                                         | `""`     |
+| `controller.extraEnvVarsSecret`                              | Name of existing Secret containing extra env vars for Controller nodes                                                                                            | `""`     |
+| `controller.extraVolumes`                                    | Optionally specify extra list of additional volumes for the Controller pod(s)                                                                                     | `[]`     |
+| `controller.extraVolumeMounts`                               | Optionally specify extra list of additional volumeMounts for the Controller container(s)                                                                          | `[]`     |
+| `controller.sidecars`                                        | Add additional sidecar containers to the Controller pod(s)                                                                                                        | `[]`     |
+| `controller.initContainers`                                  | Add additional init containers to the Controller pod(s)                                                                                                           | `[]`     |
+| `controller.service.annotations`                             | Additional custom annotations for Controller service                                                                                                              | `{}`     |
+| `controller.sidecar.enabled`                                 | Enables sidecar mode for the Controller                                                                                                                           | `false`  |
+| `controller.sidecar.enableNamespacesByDefault`               | List of namespaces in which sidecar injection will be enabled when Sidecar mode is enabled.                                                                       | `[]`     |
+| `controller.etcd.endpoints`                                  | List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty when etcd is not craeted by this chart (i.e. etcd.enabled is set to false). | `[]`     |
+| `controller.etcd.leaseTtl`                                   | Lease time-to-live.                                                                                                                                               | `60s`    |
+| `controller.prometheus.address`                              | specifies the address of the Prometheus server. This must not be empty when prometheus is not created by this chart (i.e. prometheus.enabled is set to false).    | `nil`    |
+| `controller.otelConfig.grpcAddr`                             | GRPC listener addr for OTEL Collector. Defaults to ":4317"                                                                                                        | `nil`    |
+| `controller.otelConfig.httpAddr`                             | HTTP listener addr for OTEL Collector. Defaults to ":4318"                                                                                                        | `nil`    |
+| `controller.otelConfig.batchPrerollup.sendBatchSize`         | SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".                                                            | `nil`    |
+| `controller.otelConfig.batchPrerollup.timeout`               | Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".                                                                      | `nil`    |
+| `controller.otelConfig.batchPostrollup.sendBatchSize`        | SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".                                                            | `nil`    |
+| `controller.otelConfig.batchPostrollup.timeout`              | Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".                                                                      | `nil`    |
 
 
 ### etcd
@@ -204,4 +196,5 @@ Aperture Operator
 | Name                 | Description                                     | Value  |
 | -------------------- | ----------------------------------------------- | ------ |
 | `prometheus.enabled` | specifies whether to deploy embedded prometheus | `true` |
+
 
