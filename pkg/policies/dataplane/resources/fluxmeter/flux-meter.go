@@ -88,6 +88,7 @@ func setupFluxMeterModule(
 				metrics.FluxMeterNameLabel,
 				metrics.DecisionTypeLabel,
 				metrics.StatusCodeLabel,
+				metrics.FeatureStatusLabel,
 			})
 			histogramVec = histMetric
 			// Register metric with Prometheus
@@ -222,10 +223,11 @@ func (fluxMeter *FluxMeter) GetFluxMeterID() iface.FluxMeterID {
 }
 
 // GetHistogram returns the histogram.
-func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode string) prometheus.Observer {
+func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode string, featureStatus string) prometheus.Observer {
 	labels := make(map[string]string)
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
 	labels[metrics.StatusCodeLabel] = statusCode
+	labels[metrics.FeatureStatusLabel] = featureStatus
 	labels[metrics.FluxMeterNameLabel] = fluxMeter.GetFluxMeterName()
 
 	fluxMeterHistogram, err := histogramVec.GetMetricWith(labels)

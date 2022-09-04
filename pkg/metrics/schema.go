@@ -60,8 +60,10 @@ const (
 	SignalNameLabel = "signal_name"
 	// FluxMeterNameLabel - specifying flux meter's name.
 	FluxMeterNameLabel = "flux_meter_name"
-	// StatusCodeLabel - http/library return code.
+	// StatusCodeLabel - http status code.
 	StatusCodeLabel = "status_code"
+	// FeatureStatusLabel - feature status.
+	FeatureStatusLabel = "feature_status"
 	// MethodLabel - label from http method.
 	MethodLabel = "method"
 	// ResponseStatusCodeLabel - label from response status code.
