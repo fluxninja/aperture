@@ -16,7 +16,7 @@
     string_value: "%REQ(USER-AGENT)%"
 - key: duration_millis
   value:
-    string_value: "%DURATION%"
+    string_value: "%RESPONSE_DURATION%"
 - key: http.request_content_length
   value:
     string_value: "%BYTES_RECEIVED%"
