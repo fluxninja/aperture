@@ -429,7 +429,7 @@ jobs:
     executor: base-cimg-executor
     steps:
       - checkout
-      - command: helm-package-push
+      - helm-package-push
 
 workflows:
   version: 2
