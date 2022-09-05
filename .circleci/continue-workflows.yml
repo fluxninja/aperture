@@ -439,7 +439,7 @@ workflows:
       - helm-release:
           filters:
             tags:
-              only: /^releases\/.*$/
+              only: /^releases/charts/*/v*/
 
   aperture:
     when:
