@@ -63,22 +63,22 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 		return fmt.Errorf("invalid value '%v' provided for 'server.addr' config", spec.ConfigSpec.Server.Addr)
 	}
 
-	otelGRPCPort, _ := getPort(spec.ConfigSpec.Otel.GRPCAddr)
+	otelGRPCPort, err := getPort(spec.ConfigSpec.Otel.GRPCAddr)
 	if err != nil {
 		return fmt.Errorf("invalid value '%v' provided for 'otel.grpc_addr' config", spec.ConfigSpec.Otel.GRPCAddr)
 	}
 
-	otelHTTPPort, _ := getPort(spec.ConfigSpec.Otel.HTTPAddr)
+	otelHTTPPort, err := getPort(spec.ConfigSpec.Otel.HTTPAddr)
 	if err != nil {
 		return fmt.Errorf("invalid value '%v' provided for 'otel.http_addr' config", spec.ConfigSpec.Otel.HTTPAddr)
 	}
 
-	distCachePort, _ := getPort(spec.ConfigSpec.DistCache.BindAddr)
+	distCachePort, err := getPort(spec.ConfigSpec.DistCache.BindAddr)
 	if err != nil {
 		return fmt.Errorf("invalid value '%v' provided for 'dist_cache.bind_addr' config", spec.ConfigSpec.DistCache.BindAddr)
 	}
 
-	memberListPort, _ := getPort(spec.ConfigSpec.DistCache.MemberlistBindAddr)
+	memberListPort, err := getPort(spec.ConfigSpec.DistCache.MemberlistBindAddr)
 	if err != nil {
 		return fmt.Errorf("invalid value '%v' provided for 'dist_cache.memberlist_bind_addr' config", spec.ConfigSpec.DistCache.MemberlistBindAddr)
 	}
