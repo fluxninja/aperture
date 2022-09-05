@@ -2,5 +2,5 @@ apiVersion: v2
 name: istioconfig
 description: A Helm chart that deploys Aperture Envoy Filter via Istio
 type: application
-version: 0.1.0
-appVersion: 0.1.0
+version: v0.0.1
+appVersion: v0.1.0
