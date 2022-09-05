@@ -22,6 +22,10 @@ plugins:
       - paths=source_relative
       - orig_name=true
       - emit_defaults=true
+  - remote: buf.build/fluxninja/plugins/protoc-gen-go-deepcopy:v1.15.0
+    out: gen/proto/go
+    opt:
+      - paths=source_relative
   - remote: buf.build/grpc-ecosystem/plugins/grpc-gateway:v2.11.1-1
     out: gen/proto/go
     opt:
