@@ -10,26 +10,25 @@ sidebar_position: 1
 
 ## Overview
 
-The Aperture Controller functions as the primary decision maker of the system.
-Leveraging our advanced control loop, the controller routinely analyzes polled
+The Aperture Controller functions as the brain of the Aperture system.
+Leveraging an advanced control loop, the Controller routinely analyzes polled
 metrics and indicators to determine how traffic should be shaped as defined by
-set policies. Once determined, these decisions are then exported to all agents
-in order to effectively handle workloads. Only one controller is needed to
-effectively manage each cluster.
+set policies. Once determined, these decisions are then exported to all Aperture Agents
+to effectively handle workloads. Only one Controller is needed to
+manage each cluster.
 
 The closed feedback loop functions primarily by monitoring the variables
 reflecting stability conditions (i.e. process variables) and compares them
 against set points. The difference in the variable values against these points
 is referred to as the error signal. The feedback loop then works to minimize
-these error signals by determining and distributing specific decisions, or
-control actions, that adjust these process variables and maintain their values
+these error signals by determining and distributing control actions, that adjust these process variables and maintain their values
 within the optimal range.
 
 ## Configuration
 
 The Aperture Controller related configurations are stored in a configmap which
 is created during the installation using Helm. All the configuration parameters
-are listed on the
+are listed in the
 [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#controller-custom-resource-parameters)
 file of the Helm chart.
 
@@ -64,7 +63,7 @@ into your cluster.
 3. Alternatively, you can create the Controller Custom Resource directly on the
    Kubernetes cluster using the below steps:
 
-   1. Create a `values.yaml` for just starting the operator and disabling the
+   1. Create a `values.yaml` for starting the operator and disabling the
       creation of Controller Custom Resource and pass it with `helm upgrade`:
 
       ```yaml
@@ -95,7 +94,7 @@ into your cluster.
       [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#controller-custom-resource-parameters)
       file of the Helm chart.
 
-   3. Apply the YAML file to Kubernetes cluster using `kubectl`
+   3. Apply the YAML file to the Kubernetes cluster using `kubectl`
 
       ```bash
       kubectl apply -f controller.yaml
