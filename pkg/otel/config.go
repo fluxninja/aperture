@@ -247,10 +247,7 @@ func addOTLPReceiver(cfg *otelParams) {
 
 func addMetricsProcessor(config *otelcollector.OTELConfig) {
 	config.AddProcessor(ProcessorMetrics, metricsprocessor.Config{
-		LatencyBucketStartMS: 20,
-		LatencyBucketWidthMS: 20,
-		LatencyBucketCount:   100,
-		Rollups:              rollups,
+		Rollups: rollups,
 	})
 }
 

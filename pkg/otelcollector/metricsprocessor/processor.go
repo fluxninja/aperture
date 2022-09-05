@@ -21,9 +21,9 @@ import (
 )
 
 type metricsProcessor struct {
-	cfg                      *Config
-	workloadLatencyHistogram *prometheus.HistogramVec
-	durationRollup           *otelcollector.Rollup
+	cfg                    *Config
+	workloadLatencySummary *prometheus.SummaryVec
+	durationRollup         *otelcollector.Rollup
 }
 
 func newProcessor(cfg *Config) (*metricsProcessor, error) {
@@ -51,14 +51,9 @@ func newProcessor(cfg *Config) (*metricsProcessor, error) {
 }
 
 func (p *metricsProcessor) registerRequestLatencyHistogram() error {
-	p.workloadLatencyHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	p.workloadLatencySummary = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadLatencyMetricName,
-		Help: "Latency histogram of workload",
-		Buckets: prometheus.LinearBuckets(
-			p.cfg.LatencyBucketStartMS,
-			p.cfg.LatencyBucketWidthMS,
-			p.cfg.LatencyBucketCount,
-		),
+		Help: "Latency summary of workload",
 	}, []string{
 		metrics.PolicyNameLabel,
 		metrics.PolicyHashLabel,
@@ -66,7 +61,7 @@ func (p *metricsProcessor) registerRequestLatencyHistogram() error {
 		metrics.DecisionTypeLabel,
 		metrics.WorkloadIndexLabel,
 	})
-	err := p.cfg.promRegistry.Register(p.workloadLatencyHistogram)
+	err := p.cfg.promRegistry.Register(p.workloadLatencySummary)
 	if err != nil {
 		if are, ok := err.(prometheus.AlreadyRegisteredError); ok {
 			// We're registering this histogram vec from multiple processors
@@ -74,7 +69,7 @@ func (p *metricsProcessor) registerRequestLatencyHistogram() error {
 			// enabled, it's expected that whichever processor is created
 			// second, it will see that the histogram vec was already
 			// registered. Use the existing histogram vec from now on.
-			p.workloadLatencyHistogram = are.ExistingCollector.(*prometheus.HistogramVec)
+			p.workloadLatencySummary = are.ExistingCollector.(*prometheus.SummaryVec)
 			return nil
 		}
 	}
@@ -263,7 +258,7 @@ func (p *metricsProcessor) updateMetrics(
 }
 
 func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64) error {
-	latencyHistogram, err := p.workloadLatencyHistogram.GetMetricWith(labels)
+	latencyHistogram, err := p.workloadLatencySummary.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Getting latency histogram")
 		return err
