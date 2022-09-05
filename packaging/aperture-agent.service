@@ -1,0 +1,18 @@
+[Unit]
+Description=Aperture Agent - Flow control and reliability management for modern web applications
+Documentation=https://docs.fluxninja.com
+StartLimitIntervalSec=60
+StartLimitBurst=4
+
+[Service]
+ExecStart=/usr/local/bin/aperture-agent
+Restart=on-failure
+RestartSec=1
+
+# Hardening
+SystemCallArchitectures=native
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target
