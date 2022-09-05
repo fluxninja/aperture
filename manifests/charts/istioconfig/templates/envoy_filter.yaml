@@ -60,7 +60,7 @@ spec:
           access_log:
             - name: envoy.access_loggers.open_telemetry
               typed_config:
-                "@type": type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig
+                "@type": type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3alpha.OpenTelemetryAccessLogConfig
                 common_config:
                   log_name: ingress
                   grpc_service:
@@ -84,7 +84,7 @@ spec:
                     - key: net.host.ip
                       value:
                         string_value: "%DOWNSTREAM_LOCAL_ADDRESS_WITHOUT_PORT%"
-                    - key: net.host.authzPort
+                    - key: net.host.port
                       value:
                         string_value: "%DOWNSTREAM_LOCAL_PORT%"
 
@@ -104,7 +104,7 @@ spec:
           access_log:
             - name: envoy.access_loggers.open_telemetry
               typed_config:
-                "@type": type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig
+                "@type": type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3alpha.OpenTelemetryAccessLogConfig
                 common_config:
                   log_name: egress
                   grpc_service:
