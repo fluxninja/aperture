@@ -910,7 +910,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 					ReadOnly:  true,
 				},
 				{
-					Name:      "webhook-cert",
+					Name:      "server-cert",
 					MountPath: "/etc/aperture/aperture-controller/certs",
 					ReadOnly:  true,
 				},
@@ -960,7 +960,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 					ReadOnly:  true,
 				},
 				{
-					Name:      "webhook-cert",
+					Name:      "server-cert",
 					MountPath: "/etc/aperture/aperture-controller/certs",
 					ReadOnly:  true,
 				},
@@ -1020,7 +1020,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 					},
 				},
 				{
-					Name: "webhook-cert",
+					Name: "server-cert",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							DefaultMode: pointer.Int32Ptr(420),
@@ -1099,7 +1099,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 					},
 				},
 				{
-					Name: "webhook-cert",
+					Name: "server-cert",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							DefaultMode: pointer.Int32Ptr(420),

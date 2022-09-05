@@ -44,7 +44,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 
 			expected := &admissionregistrationv1.ValidatingWebhookConfiguration{
 				ObjectMeta: v1.ObjectMeta{
-					Name: validatingWebhookServiceName,
+					Name: controllerServiceName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       appName,
 						"app.kubernetes.io/instance":   appName,
@@ -61,10 +61,10 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						Name: "cm-validator.fluxninja.com",
 						ClientConfig: admissionregistrationv1.WebhookClientConfig{
 							Service: &admissionregistrationv1.ServiceReference{
-								Name:      validatingWebhookServiceName,
+								Name:      controllerServiceName,
 								Namespace: instance.GetNamespace(),
 								Path:      pointer.StringPtr("/validate/configmap"),
-								Port:      pointer.Int32(443),
+								Port:      pointer.Int32(80),
 							},
 							CABundle: []byte(test),
 						},
@@ -123,7 +123,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 
 			expected := &admissionregistrationv1.ValidatingWebhookConfiguration{
 				ObjectMeta: v1.ObjectMeta{
-					Name: validatingWebhookServiceName,
+					Name: controllerServiceName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       appName,
 						"app.kubernetes.io/instance":   appName,
@@ -143,10 +143,10 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						Name: "cm-validator.fluxninja.com",
 						ClientConfig: admissionregistrationv1.WebhookClientConfig{
 							Service: &admissionregistrationv1.ServiceReference{
-								Name:      validatingWebhookServiceName,
+								Name:      controllerServiceName,
 								Namespace: instance.GetNamespace(),
 								Path:      pointer.StringPtr("/validate/configmap"),
-								Port:      pointer.Int32(443),
+								Port:      pointer.Int32(80),
 							},
 							CABundle: []byte(test),
 						},

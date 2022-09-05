@@ -266,7 +266,7 @@ type CommonSpec struct {
 type Secrets struct {
 	// FluxNinja plugin.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={create:true}
+	//+kubebuilder:default:={create:false}
 	FluxNinjaPlugin APIKeySecret `json:"fluxNinjaPlugin"`
 }
 
@@ -274,7 +274,7 @@ type Secrets struct {
 type APIKeySecret struct {
 	// Create new secret or not
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=true
+	//+kubebuilder:default:=false
 	Create bool `json:"create"`
 
 	// Secret details

@@ -109,7 +109,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			controllerDeploymentKey := types.NamespacedName{Name: controllerServiceName, Namespace: namespace}
 
 			createdVWC := &admissionregistrationv1.ValidatingWebhookConfiguration{}
-			vwcKey := types.NamespacedName{Name: validatingWebhookServiceName}
+			vwcKey := types.NamespacedName{Name: controllerServiceName}
 
 			createdControllerSecret := &corev1.Secret{}
 			controllerSecretKey := types.NamespacedName{Name: secretName(test, "controller", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
@@ -184,7 +184,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			controllerDeploymentKey := types.NamespacedName{Name: controllerServiceName, Namespace: namespace}
 
 			createdVWC := &admissionregistrationv1.ValidatingWebhookConfiguration{}
-			vwcKey := types.NamespacedName{Name: validatingWebhookServiceName}
+			vwcKey := types.NamespacedName{Name: controllerServiceName}
 
 			createdControllerSecret := &corev1.Secret{}
 			controllerSecretKey := types.NamespacedName{Name: secretName(test, "controller", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}

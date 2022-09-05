@@ -96,6 +96,11 @@ prometheus:
   address: http://aperture-prometheus-server:80
 server:
   addr: :80
+  tls:
+    certs_path: /etc/aperture/aperture-controller/certs
+    enable: true
+    server_cert: crt.pem
+    server_key: key.pem
 `
 
 var _ = Describe("ConfigMap for Agent", func() {

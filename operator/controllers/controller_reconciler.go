@@ -451,7 +451,7 @@ func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr
 func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSecret(ctx context.Context, instance *v1alpha1.Controller) error {
 	var err error
 	if controllerCert == nil || controllerKey == nil || controllerClientCert == nil {
-		controllerCert, controllerKey, controllerClientCert, err = generateCertificate(validatingWebhookSvcName, instance.GetNamespace())
+		controllerCert, controllerKey, controllerClientCert, err = generateCertificate(controllerServiceName, instance.GetNamespace())
 		if err != nil {
 			return err
 		}

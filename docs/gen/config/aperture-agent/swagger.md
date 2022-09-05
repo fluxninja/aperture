@@ -676,7 +676,7 @@ DistCacheConfig configures distributed cache that holds per-label counters in di
 <dt>bind_addr</dt>
 <dd>
 
-(string, `hostname_port`, default: `:3320`) BindAddr denotes the address that Olric will bind to for communication with other Olric nodes.
+(string, `hostname_port`, default: `"=\":3320\""`, default: `:3320`) BindAddr denotes the address that Olric will bind to for communication with other Olric nodes.
 
 </dd>
 </dl>
@@ -692,7 +692,7 @@ DistCacheConfig configures distributed cache that holds per-label counters in di
 <dt>memberlist_bind_addr</dt>
 <dd>
 
-(string, `hostname_port`, default: `:3322`) Address to bind mememberlist server to.
+(string, `hostname_port`, default: `"=\":3322\""`, default: `:3322`) Address to bind mememberlist server to.
 
 </dd>
 </dl>
@@ -1269,7 +1269,7 @@ ListenerConfig holds configuration for socket listeners.
 <dt>addr</dt>
 <dd>
 
-(string, `hostname_port`, default: `:8080`) Address to bind to in the form of [host%zone]:port
+(string, `hostname_port`, default: `"=\":8080\""`, default: `:8080`) Address to bind to in the form of [host%zone]:port
 
 </dd>
 </dl>
@@ -1277,7 +1277,7 @@ ListenerConfig holds configuration for socket listeners.
 <dt>keep_alive</dt>
 <dd>
 
-(string, `gte=0s`, default: `180s`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alives are disabled.
+(string, `gte=0s`, default: `"=\"180s\""`, default: `180s`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alives are disabled.
 
 </dd>
 </dl>
@@ -1285,7 +1285,7 @@ ListenerConfig holds configuration for socket listeners.
 <dt>network</dt>
 <dd>
 
-(string, `oneof=tcp tcp4 tcp6`, default: `tcp`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+(string, `oneof=tcp tcp4 tcp6`, default: `"=\"tcp\""`, default: `tcp`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
 
 </dd>
 </dl>

@@ -115,6 +115,7 @@ definitions:
   DistCacheConfig:
     properties:
       bind_addr:
+        default: =":3320"
         description: BindAddr denotes the address that Olric will bind to for communication
           with other Olric nodes.
         type: string
@@ -128,6 +129,7 @@ definitions:
         x-go-name: MemberlistAdvertiseAddr
         x-go-validate: omitempty,hostname_port
       memberlist_bind_addr:
+        default: =":3322"
         description: Address to bind mememberlist server to.
         type: string
         x-go-default: :3322
@@ -556,12 +558,14 @@ definitions:
   ListenerConfig:
     properties:
       addr:
+        default: =":8080"
         description: Address to bind to in the form of [host%zone]:port
         type: string
         x-go-default: :8080
         x-go-name: Addr
         x-go-validate: hostname_port
       keep_alive:
+        default: ="180s"
         description: Keep-alive period - 0 = enabled if supported by protocol or OS.
           If negative then keep-alives are disabled.
         format: string
@@ -570,6 +574,7 @@ definitions:
         x-go-name: KeepAlive
         x-go-validate: gte=0s
       network:
+        default: ="tcp"
         description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
         type: string
         x-go-default: tcp

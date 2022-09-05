@@ -44,10 +44,12 @@ func Module() fx.Option {
 // +kubebuilder:object:generate=true
 type DistCacheConfig struct {
 	// BindAddr denotes the address that Olric will bind to for communication with other Olric nodes.
+	//+kubebuilder:default:=":3320"
 	BindAddr string `json:"bind_addr,omitempty" default:":3320" validate:"hostname_port"`
 	// ReplicaCount is 1 by default.
 	ReplicaCount int `json:"replica_count,omitempty" default:"1"`
 	// Address to bind mememberlist server to.
+	//+kubebuilder:default:=":3322"
 	MemberlistBindAddr string `json:"memberlist_bind_addr,omitempty" default:":3322" validate:"hostname_port"`
 	// Address of memberlist to advertise to other cluster members. Used for nat traversal if provided.
 	MemberlistAdvertiseAddr string `json:"memberlist_advertise_addr,omitempty" validate:"omitempty,hostname_port"`

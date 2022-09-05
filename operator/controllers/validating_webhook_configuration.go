@@ -29,7 +29,7 @@ import (
 func validatingWebhookConfiguration(instance *v1alpha1.Controller, cert []byte) *admissionregistrationv1.ValidatingWebhookConfiguration {
 	validatingWebhookConfiguration := &admissionregistrationv1.ValidatingWebhookConfiguration{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        validatingWebhookServiceName,
+			Name:        controllerServiceName,
 			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
 			Annotations: getControllerAnnotationsWithOwnerRef(instance),
 		},
@@ -38,10 +38,10 @@ func validatingWebhookConfiguration(instance *v1alpha1.Controller, cert []byte) 
 				Name: "cm-validator.fluxninja.com",
 				ClientConfig: admissionregistrationv1.WebhookClientConfig{
 					Service: &admissionregistrationv1.ServiceReference{
-						Name:      validatingWebhookServiceName,
+						Name:      controllerServiceName,
 						Namespace: instance.GetNamespace(),
 						Path:      pointer.StringPtr("/validate/configmap"),
-						Port:      pointer.Int32(443),
+						Port:      pointer.Int32(80),
 					},
 					CABundle: cert,
 				},

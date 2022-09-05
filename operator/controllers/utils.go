@@ -328,7 +328,7 @@ func controllerVolumeMounts(controllerSpec v1alpha1.CommonSpec) []corev1.VolumeM
 			ReadOnly:  true,
 		},
 		{
-			Name:      "webhook-cert",
+			Name:      "server-cert",
 			MountPath: "/etc/aperture/aperture-controller/certs",
 			ReadOnly:  true,
 		},
@@ -376,7 +376,7 @@ func controllerVolumes(instance *v1alpha1.Controller) []corev1.Volume {
 			},
 		},
 		{
-			Name: "webhook-cert",
+			Name: "server-cert",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					DefaultMode: pointer.Int32Ptr(420),

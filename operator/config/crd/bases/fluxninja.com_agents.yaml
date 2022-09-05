@@ -917,6 +917,7 @@ spec:
                     description: DistCache configuration.
                     properties:
                       bind_addr:
+                        default: :3320
                         description: BindAddr denotes the address that Olric will
                           bind to for communication with other Olric nodes.
                         type: string
@@ -925,6 +926,7 @@ spec:
                           members. Used for nat traversal if provided.
                         type: string
                       memberlist_bind_addr:
+                        default: :3322
                         description: Address to bind mememberlist server to.
                         type: string
                       replica_count:
@@ -1428,6 +1430,7 @@ spec:
                     description: Server configuration.
                     properties:
                       addr:
+                        default: :8080
                         description: Address to bind to in the form of [host%zone]:port
                         type: string
                       grpc:
@@ -1481,10 +1484,12 @@ spec:
                             type: string
                         type: object
                       keep_alive:
+                        default: 180s
                         description: Keep-alive period - 0 = enabled if supported
                           by protocol or OS. If negative then keep-alives are disabled.
                         type: string
                       network:
+                        default: tcp
                         description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6"
                           (IPv6-only)
                         type: string
@@ -5241,11 +5246,11 @@ spec:
                 properties:
                   fluxNinjaPlugin:
                     default:
-                      create: true
+                      create: false
                     description: FluxNinja plugin.
                     properties:
                       create:
-                        default: true
+                        default: false
                         description: Create new secret or not
                         type: boolean
                       secretKeyRef:

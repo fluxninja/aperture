@@ -491,12 +491,14 @@ definitions:
   ListenerConfig:
     properties:
       addr:
+        default: =":8080"
         description: Address to bind to in the form of [host%zone]:port
         type: string
         x-go-default: :8080
         x-go-name: Addr
         x-go-validate: hostname_port
       keep_alive:
+        default: ="180s"
         description: Keep-alive period - 0 = enabled if supported by protocol or OS.
           If negative then keep-alives are disabled.
         format: string
@@ -505,6 +507,7 @@ definitions:
         x-go-name: KeepAlive
         x-go-validate: gte=0s
       network:
+        default: ="tcp"
         description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
         type: string
         x-go-default: tcp

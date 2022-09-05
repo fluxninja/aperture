@@ -14,14 +14,16 @@ local apertureControllerMixin =
       },
       controller+: {
         createUninstallHook: false,
-        fluxninjaPlugin+: {
-          enabled: false,
-        },
-        log+: {
-          prettyConsole: true,
-          nonBlocking: false,
-          level: 'debug',
-          file: 'default',
+        config+: {
+          fluxninja_plugin+: {
+            enabled: false,
+          },
+          log+: {
+            prettyConsole: true,
+            nonBlocking: false,
+            level: 'debug',
+            file: 'default',
+          },
         },
         image: {
           registry: '',

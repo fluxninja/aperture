@@ -1331,6 +1331,7 @@ spec:
                     description: Server configuration.
                     properties:
                       addr:
+                        default: :8080
                         description: Address to bind to in the form of [host%zone]:port
                         type: string
                       grpc:
@@ -1384,10 +1385,12 @@ spec:
                             type: string
                         type: object
                       keep_alive:
+                        default: 180s
                         description: Keep-alive period - 0 = enabled if supported
                           by protocol or OS. If negative then keep-alives are disabled.
                         type: string
                       network:
+                        default: tcp
                         description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6"
                           (IPv6-only)
                         type: string
@@ -5160,11 +5163,11 @@ spec:
                 properties:
                   fluxNinjaPlugin:
                     default:
-                      create: true
+                      create: false
                     description: FluxNinja plugin.
                     properties:
                       create:
-                        default: true
+                        default: false
                         description: Create new secret or not
                         type: boolean
                       secretKeyRef:
