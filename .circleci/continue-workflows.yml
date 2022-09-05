@@ -735,4 +735,4 @@ commands:
     steps:
       -run:
         name: "Package and release Helm Chart"
-        command: .circleci/scripts/helm_release.sh "$GITHUB_TOKEN" "$CIRCLE_PROJECT_USERNAME"
+        command: .circleci/scripts/helm_release.sh

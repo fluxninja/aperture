@@ -4,8 +4,8 @@ set -o errexit
 set -o pipefail
 
 
-GITHUB_TOKEN=$1
-CIRCLE_PROJECT_USERNAME=$2
+# GITHUB_TOKEN=$1
+# CIRCLE_PROJECT_USERNAME=$2
 REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/fluxninja/aperture.git"
 BRANCH="gh-pages"
 TARGET_DIR="."
@@ -48,12 +48,11 @@ dependencies() {
 }
 
 package() {
-
   for chart in "${CHARTS[@]}"; do
     CHART_VERSION_CMD=$(helm inspect chart "$chart" | grep version | cut -d' ' -f2)
     APP_VERSION_CMD=$(helm inspect chart "$chart" | grep appVersion | cut -d' ' -f2)
-
-    helm package "$chart" --destination "${CHARTS_TMP_DIR}" --version "$CHART_VERSION_CMD" --app-version "$APP_VERSION_CMD"
+    # shellcheck disable=SC2086
+    helm package "$chart" --destination "${CHARTS_TMP_DIR}" --version $CHART_VERSION_CMD --app-version $APP_VERSION_CMD
   done
 }
 
