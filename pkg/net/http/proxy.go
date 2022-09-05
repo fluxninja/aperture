@@ -30,6 +30,7 @@ type ProxyConstructor struct {
 // ProxyConfig holds proxy configuration.
 // This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
 // swagger:model
+// +kubebuilder:object:generate=true
 type ProxyConfig struct {
 	HTTPProxy  string   `json:"http" validate:"omitempty,url|hostname_port"`
 	HTTPSProxy string   `json:"https" validate:"omitempty,url|hostname_port"`

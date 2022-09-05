@@ -17,6 +17,7 @@ var configKey = common.DiscoveryConfigKey + ".kubernetes"
 
 // KubernetesDiscoveryConfig for Kubernetes service discovery.
 // swagger:model
+// +kubebuilder:object:generate=true
 type KubernetesDiscoveryConfig struct {
 	// NodeName is the name of the k8s node the agent should be monitoring
 	NodeName         string `json:"node_name"`

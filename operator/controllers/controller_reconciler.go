@@ -495,7 +495,7 @@ func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSec
 // reconcileSecret prepares the desired states for Controller ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *v1alpha1.Controller) error {
-	if !instance.Spec.FluxNinjaPlugin.APIKeySecret.Create || !instance.Spec.FluxNinjaPlugin.Enabled {
+	if !instance.Spec.Secrets.FluxNinjaPlugin.Create {
 		return nil
 	}
 	secret, err := secretForControllerAPIKey(instance.DeepCopy(), r.Scheme)
@@ -506,10 +506,10 @@ func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *v1
 		return err
 	}
 
-	instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = false
-	instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = ""
-	instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef.Name = secretName(
-		instance.GetName(), "controller", &instance.Spec.FluxNinjaPlugin.APIKeySecret)
+	instance.Spec.Secrets.FluxNinjaPlugin.Create = false
+	instance.Spec.Secrets.FluxNinjaPlugin.Value = ""
+	instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name = secretName(
+		instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin)
 
 	return nil
 }
@@ -534,8 +534,8 @@ func eventFiltersForController() predicate.Predicate {
 
 			diffObjects := !reflect.DeepEqual(old.Spec, new.Spec)
 			// Skipping update events for Secret updates
-			if diffObjects && old.Spec.FluxNinjaPlugin.APIKeySecret.Value != "" &&
-				new.Spec.FluxNinjaPlugin.APIKeySecret.Value == "" {
+			if diffObjects && old.Spec.Secrets.FluxNinjaPlugin.Value != "" &&
+				new.Spec.Secrets.FluxNinjaPlugin.Value == "" {
 				return false
 			}
 

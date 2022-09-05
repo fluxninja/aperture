@@ -112,7 +112,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			vwcKey := types.NamespacedName{Name: validatingWebhookServiceName}
 
 			createdControllerSecret := &corev1.Secret{}
-			controllerSecretKey := types.NamespacedName{Name: secretName(test, "controller", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace}
+			controllerSecretKey := types.NamespacedName{Name: secretName(test, "controller", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
 
 			createdControllerCertSecret := &corev1.Secret{}
 			controllerCertSecretKey := types.NamespacedName{Name: fmt.Sprintf("%s-controller-cert", instance.GetName()), Namespace: namespace}
@@ -151,9 +151,8 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(k8sClient.Create(ctx, ns)).To(BeNil())
 
 			instance.Namespace = namespace
-			instance.Spec.FluxNinjaPlugin.Enabled = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = test
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = test
 			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
 
 			res, err := reconciler.Reconcile(ctx, reconcile.Request{
@@ -188,7 +187,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			vwcKey := types.NamespacedName{Name: validatingWebhookServiceName}
 
 			createdControllerSecret := &corev1.Secret{}
-			controllerSecretKey := types.NamespacedName{Name: secretName(test, "controller", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace}
+			controllerSecretKey := types.NamespacedName{Name: secretName(test, "controller", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
 
 			createdControllerCertSecret := &corev1.Secret{}
 			controllerCertSecretKey := types.NamespacedName{Name: fmt.Sprintf("%s-controller-cert", instance.GetName()), Namespace: namespace}
@@ -214,8 +213,8 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: test, Namespace: namespace}, instance)).To(BeNil())
 			Expect(instance.Status.Resources).To(Equal("created"))
 			Expect(instance.Finalizers).To(Equal([]string{finalizerName}))
-			Expect(instance.Spec.FluxNinjaPlugin.APIKeySecret.Create).To(BeFalse())
-			Expect(instance.Spec.FluxNinjaPlugin.APIKeySecret.Value).To(Equal(""))
+			Expect(instance.Spec.Secrets.FluxNinjaPlugin.Create).To(BeFalse())
+			Expect(instance.Spec.Secrets.FluxNinjaPlugin.Value).To(Equal(""))
 
 			Expect(k8sClient.Delete(ctx, ns)).To(BeNil())
 		})
@@ -275,10 +274,9 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(k8sClient.Create(ctx, ns)).To(BeNil())
 
 			instance.Namespace = namespace
-			instance.Spec.FluxNinjaPlugin.Enabled = true
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = test
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = test
 
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", certDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls6.crt")
@@ -364,13 +362,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			ControllerEventValid1 := event.UpdateEvent{
 				ObjectOld: &v1alpha1.Controller{},
 				ObjectNew: &v1alpha1.Controller{
-					Spec: v1alpha1.ControllerSpec{
-						CommonSpec: v1alpha1.CommonSpec{
-							FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-								Enabled: true,
-							},
-						},
-					},
+					Spec: v1alpha1.ControllerSpec{},
 				},
 			}
 
@@ -406,8 +398,8 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 				ObjectOld: &v1alpha1.Controller{
 					Spec: v1alpha1.ControllerSpec{
 						CommonSpec: v1alpha1.CommonSpec{
-							FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-								APIKeySecret: v1alpha1.APIKeySecret{
+							Secrets: v1alpha1.Secrets{
+								FluxNinjaPlugin: v1alpha1.APIKeySecret{
 									Value: test,
 								},
 							},
@@ -417,8 +409,8 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 				ObjectNew: &v1alpha1.Controller{
 					Spec: v1alpha1.ControllerSpec{
 						CommonSpec: v1alpha1.CommonSpec{
-							FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-								APIKeySecret: v1alpha1.APIKeySecret{
+							Secrets: v1alpha1.Secrets{
+								FluxNinjaPlugin: v1alpha1.APIKeySecret{
 									Value: "",
 								},
 							},

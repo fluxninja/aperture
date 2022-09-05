@@ -31,6 +31,7 @@ func ServerModule() fx.Option {
 
 // HTTPServerConfig holds configuration for HTTP Server.
 // swagger:model
+// +kubebuilder:object:generate=true
 type HTTPServerConfig struct {
 	// Idle timeout
 	IdleTimeout config.Duration `json:"idle_timeout" validate:"gte=0s" default:"30s"`

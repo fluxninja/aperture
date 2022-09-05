@@ -12,42 +12,20 @@ import (
 	admissionv1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	nethttp "github.com/fluxninja/aperture/pkg/net/http"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-)
-
-const (
-	webhooksKey         = "webhooks"
-	defaultListenerAddr = ":8086"
 )
 
 // Module is a fx module that provides annotated http server using the default listener
-// and kubernetes registry. Currently, the module is setting up a separate server with TLS enabled and
-// it cannot be done on main server yet because OTEL collector does not support TLS.
+// and kubernetes registry.
 func Module() fx.Option {
 	return fx.Options(
-		tlsconfig.Constructor{Name: webhooksKey, Key: webhooksKey + ".tls"}.Annotate(),
-		fx.Provide(listener.Constructor{
-			Name: webhooksKey,
-			Key:  webhooksKey,
-			DefaultConfig: listener.ListenerConfig{
-				Addr: defaultListenerAddr,
-			},
-		}.ProvideAnnotated()),
-		nethttp.ServerConstructor{Name: webhooksKey, ListenerName: webhooksKey, TLSConfigName: webhooksKey}.Annotate(),
-		fx.Provide(fx.Annotate(
-			ProvideK8sRegistry,
-			fx.ParamTags(config.NameTag(webhooksKey)),
-		)),
+		fx.Provide(provideK8sRegistry),
 	)
 }
 
-// ProvideK8sRegistry provides k8s registry which allows serving k8s webhooks
+// provideK8sRegistry provides k8s registry which allows serving k8s webhooks
 // using given router.
-func ProvideK8sRegistry(mux *mux.Router) *K8sRegistry {
+func provideK8sRegistry(mux *mux.Router) *K8sRegistry {
 	return &K8sRegistry{
 		mux:      mux,
 		handlers: make(map[string]*handler),

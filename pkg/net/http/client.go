@@ -28,6 +28,7 @@ type ClientConstructor struct {
 
 // HTTPClientConfig holds configuration for HTTP Client.
 // swagger:model
+// +kubebuilder:object:generate=true
 type HTTPClientConfig struct {
 	// Network level keep-alive duration
 	NetworkKeepAlive config.Duration `json:"network_keep_alive" validate:"gte=0s" default:"30s"`

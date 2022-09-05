@@ -31,6 +31,7 @@ import (
 	"k8s.io/utils/pointer"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/net/listener"
 )
 
 var _ = Describe("Controller Deployment", func() {
@@ -101,8 +102,14 @@ var _ = Describe("Controller Deployment", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.ControllerSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						ServerPort: 80,
+					ConfigSpec: v1alpha1.ControllerConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":80",
+								},
+							},
+						},
 					},
 					Image: v1alpha1.Image{
 						Registry:   "docker.io/fluxninja",
@@ -293,10 +300,18 @@ var _ = Describe("Controller Deployment", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.ControllerSpec{
+					ConfigSpec: v1alpha1.ControllerConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":80",
+								},
+							},
+						},
+					},
 					CommonSpec: v1alpha1.CommonSpec{
 						Labels:         testMap,
 						Annotations:    testMap,
-						ServerPort:     80,
 						LivenessProbe:  probe,
 						ReadinessProbe: probe,
 						Resources:      resourceRequirement,

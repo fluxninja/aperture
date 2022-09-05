@@ -48,14 +48,14 @@ func LogModule() fx.Option {
 
 // LogConfig holds configuration for a logger and log writers.
 // swagger:model
+// +kubebuilder:object:generate=true
 type LogConfig struct {
 	// Log level
 	LogLevel string `json:"level" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
 	// Additional log writers
 	Writers []LogWriterConfig `json:"writers" validate:"omitempty,dive,omitempty"`
-	// internal fields
-	writers []io.Writer
-	LogWriterConfig
+	// Base LogWriterConfig
+	LogWriterConfig `json:",inline"`
 	// Use non-blocking log writer (can lose logs at high throughput)
 	NonBlocking bool `json:"non_blocking" default:"true"`
 	// Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
@@ -64,6 +64,7 @@ type LogConfig struct {
 
 // LogWriterConfig holds configuration for a log writer.
 // swagger:model
+// +kubebuilder:object:generate=true
 type LogWriterConfig struct {
 	// Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
 	File string `json:"file" default:"stderr"`
@@ -107,7 +108,7 @@ func (constructor LoggerConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor LoggerConstructor) provideLogger(writers []io.Writer,
+func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 	unmarshaller Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (log.Logger, error) {
@@ -116,15 +117,15 @@ func (constructor LoggerConstructor) provideLogger(writers []io.Writer,
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
 		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
 	}
-	config.writers = writers
-
 	logger, writers := NewLogger(config)
+	// append additional writers provided via Fx
+	writers = append(writers, w...)
 
 	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
 			return nil
 		},
-		OnStop: func(c context.Context) error {
+		OnStop: func(context.Context) error {
 			panichandler.Go(func() {
 				logger.Close()
 				log.WaitFlush()
@@ -171,9 +172,6 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 			_ = lj.Close()
 		})
 	}
-
-	// append additional writers provided via Fx
-	writers = append(writers, config.writers...)
 
 	if config.PrettyConsole {
 		writers = append(writers, zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})

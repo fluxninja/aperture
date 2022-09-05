@@ -41,6 +41,7 @@ func GMuxServerModule() fx.Option {
 
 // GRPCServerConfig holds configuration for GRPC Server.
 // swagger:model
+// +kubebuilder:object:generate=true
 type GRPCServerConfig struct {
 	// Connection timeout
 	ConnectionTimeout config.Duration `json:"connection_timeout" validate:"gte=0s" default:"120s"`

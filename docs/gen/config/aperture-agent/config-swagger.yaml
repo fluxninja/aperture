@@ -63,7 +63,7 @@ definitions:
     title: BackoffConfig holds configuration for GRPC Client Backoff.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
-  Batch:
+  BatchConfig:
     properties:
       send_batch_size:
         description: SendBatchSize is the size of a batch which after hit, will trigger
@@ -81,7 +81,7 @@ definitions:
         x-go-default: 1s
         x-go-name: Timeout
         x-go-validate: gt=0
-    title: Batch defines configuration for OTEL batch processor.
+    title: BatchConfig defines configuration for OTEL batch processor.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otel
   ClientTLSConfig:
@@ -117,17 +117,17 @@ definitions:
         x-go-default: :3320
         x-go-name: BindAddr
         x-go-validate: hostname_port
-      memberlist_config_advertise_addr:
+      memberlist_advertise_addr:
         description: Address of memberlist to advertise to other cluster members.
           Used for nat traversal if provided.
         type: string
-        x-go-name: MemberlistConfigAdvertiseAddr
+        x-go-name: MemberlistAdvertiseAddr
         x-go-validate: omitempty,hostname_port
-      memberlist_config_bind_addr:
+      memberlist_bind_addr:
         description: Address to bind mememberlist server to.
         type: string
         x-go-default: :3322
-        x-go-name: MemberlistConfigBindAddr
+        x-go-name: MemberlistBindAddr
         x-go-validate: hostname_port
       replica_count:
         description: ReplicaCount is 1 by default.
@@ -729,9 +729,9 @@ definitions:
   OtelConfig:
     properties:
       batch_postrollup:
-        $ref: '#/definitions/Batch'
+        $ref: '#/definitions/BatchConfig'
       batch_prerollup:
-        $ref: '#/definitions/Batch'
+        $ref: '#/definitions/BatchConfig'
       grpc_addr:
         description: GRPC listener addr for OTEL Collector.
         type: string
@@ -949,28 +949,6 @@ definitions:
     title: WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both
       algorithms are configured then only watermark algorithm is used.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/watchdog
-  WatchdogResult:
-    properties:
-      force_gc_took:
-        format: string
-        type: string
-        x-go-name: ForceGCTook
-      threshold:
-        format: uint64
-        type: integer
-        x-go-name: Threshold
-      total:
-        format: uint64
-        type: integer
-        x-go-name: Total
-      used:
-        format: uint64
-        type: integer
-        x-go-name: Used
-    title: Result holds the result of the Watchdog check.
-    type: object
-    x-go-name: Result
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
   WatermarksPolicy:
     properties:

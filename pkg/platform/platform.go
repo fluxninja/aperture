@@ -26,7 +26,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -113,7 +112,6 @@ func (cfg Config) Module() fx.Option {
 		metrics.Module(),
 		watchdog.Module(),
 		fswatcher.Module(),
-		peers.Constructor{}.Module(),
 		profilers.Module(),
 		ServerModule(false),
 		etcdclient.Module(),

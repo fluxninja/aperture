@@ -26,8 +26,10 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
+	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -184,8 +186,8 @@ func agentEnv(instance *v1alpha1.Agent, agentGroup string) []corev1.EnvVar {
 		},
 	}
 
-	if agentGroup == "" && spec.AgentGroup != "" {
-		agentGroup = spec.AgentGroup
+	if agentGroup == "" && spec.ConfigSpec.AgentInfo.AgentGroup != "" {
+		agentGroup = spec.ConfigSpec.AgentInfo.AgentGroup
 	}
 
 	if agentGroup != "" {
@@ -225,15 +227,15 @@ func agentEnv(instance *v1alpha1.Agent, agentGroup string) []corev1.EnvVar {
 		})
 	}
 
-	if instance.Spec.FluxNinjaPlugin.Enabled {
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create {
 		envs = append(envs, corev1.EnvVar{
 			Name: "APERTURE_AGENT_FLUXNINJA_PLUGIN_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: secretName(instance.GetName(), "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret),
+						Name: secretName(instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaPlugin),
 					},
-					Key:      secretDataKey(&instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef),
+					Key:      secretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
 					Optional: pointer.BoolPtr(false),
 				},
 			},
@@ -290,15 +292,15 @@ func controllerEnv(instance *v1alpha1.Controller) []corev1.EnvVar {
 		},
 	}
 
-	if spec.FluxNinjaPlugin.Enabled {
+	if spec.Secrets.FluxNinjaPlugin.Create {
 		envs = append(envs, corev1.EnvVar{
 			Name: "APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: secretName(instance.GetName(), "controller", &instance.Spec.FluxNinjaPlugin.APIKeySecret),
+						Name: secretName(instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin),
 					},
-					Key:      secretDataKey(&instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef),
+					Key:      secretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
 					Optional: pointer.BoolPtr(false),
 				},
 			},
@@ -439,33 +441,6 @@ func getAgentAnnotationsWithOwnerRef(instance *v1alpha1.Agent) map[string]string
 		instance.GetObjectKind().GroupVersionKind().GroupKind().Kind, instance.GetObjectKind().GroupVersionKind().GroupKind().Group)
 
 	return annotations
-}
-
-// checkEtcdEndpoints generates endpoints list based on the release name if that is not provided else returns the provided values.
-func checkEtcdEndpoints(etcd v1alpha1.ControllerEtcdSpec, name, namespace string) v1alpha1.ControllerEtcdSpec {
-	endpoints := []string{}
-	if etcd.Endpoints != nil {
-		for _, endpoint := range etcd.Endpoints {
-			if endpoint != "" {
-				endpoints = append(endpoints, endpoint)
-			}
-		}
-	}
-
-	if len(endpoints) == 0 {
-		endpoints = append(endpoints, fmt.Sprintf("http://%s-etcd.%s:2379", name, namespace))
-	}
-
-	etcd.Endpoints = endpoints
-	return etcd
-}
-
-// checkPrometheusAddress generates prometheus address based on the release name if that is not provided else returns the provided value.
-func checkPrometheusAddress(address, name, namespace string) string {
-	if address == "" {
-		address = fmt.Sprintf("http://%s-prometheus-server.%s:80", name, namespace)
-	}
-	return strings.TrimRight(address, "/")
 }
 
 // secretName fetches name for ApiKey secret from config or generates the name if not present in config.
@@ -823,4 +798,17 @@ func updateResource(client client.Client, ctx context.Context, instance client.O
 	}
 
 	return nil
+}
+
+func getPort(addr string) (int32, error) {
+	_, portStr, err := net.SplitHostPort(addr)
+	if err != nil {
+		return 0, err
+	}
+	// read 32 bit integer from string
+	port, err := strconv.ParseInt(portStr, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return int32(port), nil
 }

@@ -27,17 +27,18 @@ plugins:
 fluxninja_plugin:
   fluxninja_endpoint: "placeholder.local.dev.fluxninja.com:443"
   heartbeat_interval: "10s"
-  client_grpc:
-    insecure: false
-    tls:
-      insecure_skip_verify: true
-      cert_file: "cert.pem"
-      key_file: "key.pem"
-      ca_file: test
-  client_http:
-    tls:
-      insecure_skip_verify: true
-      ca_file: test
+  client:
+    grpc:
+      insecure: false
+      tls:
+        insecure_skip_verify: true
+        cert_file: "cert.pem"
+        key_file: "key.pem"
+        ca_file: test
+    http:
+      tls:
+        insecure_skip_verify: true
+        ca_file: test
 ```
 
 You can also selectively disable plugins like this:

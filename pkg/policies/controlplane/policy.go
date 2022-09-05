@@ -87,7 +87,7 @@ func newPolicyOptions(
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
 func CompilePolicy(policyMessage *policylangv1.Policy) (CompiledCircuit, error) {
-	wrapperMessage, err := HashAndPolicyWrap(policyMessage, "DoesNotMatter")
+	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter")
 	if err != nil {
 		return nil, err
 	}
@@ -222,8 +222,8 @@ func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error
 	return nil, err
 }
 
-// HashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
-func HashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*configv1.PolicyWrapper, error) {
+// hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
+func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*configv1.PolicyWrapper, error) {
 	dat, marshalErr := yaml.Marshal(policyMessage)
 	if marshalErr != nil {
 		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)

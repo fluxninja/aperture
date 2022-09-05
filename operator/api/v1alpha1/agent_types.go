@@ -17,6 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/distcache"
+	"github.com/fluxninja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/pkg/peers"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -28,39 +32,38 @@ type AgentSpec struct {
 	// CommonSpec defines the common state between Agent and Controller
 	CommonSpec `json:",inline"`
 
-	// Port for the Agent's distributed cache service
-	//+kubebuilder:default:=3320
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Maximum:=65535
-	//+kubebuilder:validation:Minimum:=1
-	DistributedCachePort int32 `json:"distributedCachePort"`
-
-	// Port for the Agent's member list service
-	//+kubebuilder:default:=3322
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Maximum:=65535
-	//+kubebuilder:validation:Minimum:=1
-	MemberListPort int32 `json:"memberListPort"`
-
 	// Image configuration
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:={tag:"latest",pullPolicy:"IfNotPresent",registry:"docker.io/fluxninja",repository:"aperture-agent"}
 	Image Image `json:"image"`
 
-	// AgentGroup name for the Agent
-	//+kubebuilder:validation:Optional
-	AgentGroup string `json:"agentGroup"`
-
-	// Etcd parameters for Agent
-	Etcd AgentEtcdSpec `json:"etcd"`
-
-	// Prometheus parameters for Agent
-	Prometheus PrometheusSpec `json:"prometheus"`
-
 	// Sidecar defines the desired state of Sidecar setup for Agent
 	//+kubebuilder:validation:Optional
 	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	Sidecar SidecarSpec `json:"sidecar"`
+
+	// Agent Configuration
+	//+kubebuilder:validation:Optional
+	ConfigSpec AgentConfigSpec `json:"config"`
+}
+
+// AgentConfigSpec holds agent configuration.
+type AgentConfigSpec struct {
+	// CommonConfigSpec
+	//+kubebuilder:validation:Optional
+	CommonConfigSpec `json:",inline"`
+	// AgentInfo configuration.
+	//+kubebuilder:validation:Optional
+	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info"`
+	// DistCache configuration.
+	//+kubebuilder:validation:Optional
+	DistCache distcache.DistCacheConfig `json:"dist_cache"`
+	// Kubernetes client configuration.
+	//+kubebuilder:validation:Optional
+	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client"`
+	// Peer discovery configuration.
+	//+kubebuilder:validation:Optional
+	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery"`
 }
 
 // AgentStatus defines the observed state of Agent.
@@ -92,5 +95,4 @@ type AgentList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&Agent{}, &AgentList{})
 }

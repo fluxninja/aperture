@@ -35,6 +35,7 @@ var (
 
 // PrometheusConfig holds configuration for Prometheus Server.
 // swagger:model
+// +kubebuilder:object:generate=true
 type PrometheusConfig struct {
 	// Address of the prometheus server
 	Address string `json:"address" validate:"hostname_port|url|fqdn"`

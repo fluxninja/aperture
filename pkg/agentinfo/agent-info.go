@@ -1,3 +1,4 @@
+// +kubebuilder:object:generate=true
 package agentinfo
 
 import "github.com/fluxninja/aperture/pkg/config"

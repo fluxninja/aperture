@@ -35,34 +35,19 @@ import (
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
-//go:embed agent_config.tpl
+//go:embed config.tpl
 var agentConfig string
 
-// filledAgentConfig prepares the Agent config by resolving values in `agent_config.tpl` based on the provided parameter.
+// filledAgentConfig prepares the Agent config by resolving values in `config.tpl` based on the provided parameter.
 func filledAgentConfig(instance *v1alpha1.Agent) (string, error) {
 	t, err := template.New("config").Parse(agentConfig)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse config for Agent. error: '%s'", err.Error())
 	}
 	data := struct {
-		ServerPort           int32
-		DistributedCachePort int32
-		MemberListPort       int32
-		Log                  v1alpha1.Log                 `json:"log"`
-		Etcd                 v1alpha1.AgentEtcdSpec       `json:"etcd"`
-		FluxNinjaPlugin      v1alpha1.FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
-		PrometheusAddress    string
-		Ingestion            v1alpha1.Ingestion `json:"ingestion"`
-		OtelConfig           v1alpha1.OtelConfig
+		ConfigSpec v1alpha1.AgentConfigSpec
 	}{
-		ServerPort:           instance.Spec.ServerPort,
-		DistributedCachePort: instance.Spec.DistributedCachePort,
-		MemberListPort:       instance.Spec.MemberListPort,
-		Log:                  instance.Spec.Log,
-		Etcd:                 instance.Spec.Etcd,
-		FluxNinjaPlugin:      instance.Spec.FluxNinjaPlugin,
-		PrometheusAddress:    checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.GetName(), instance.GetNamespace()),
-		OtelConfig:           instance.Spec.OtelConfig,
+		ConfigSpec: instance.Spec.ConfigSpec,
 	}
 
 	var config bytes.Buffer
@@ -100,36 +85,19 @@ func configMapForAgentConfig(instance *v1alpha1.Agent, scheme *runtime.Scheme) (
 	return cm, nil
 }
 
-//go:embed controller_config.tpl
+//go:embed config.tpl
 var controllerConfig string
 
-// filledControllerConfig prepares the Controller config by resolving values in `controller_config.tpl` based on the provided parameter.
+// filledControllerConfig prepares the Controller config by resolving values in `config.tpl` based on the provided parameter.
 func filledControllerConfig(instance *v1alpha1.Controller) (string, error) {
 	t, err := template.New("config").Parse(controllerConfig)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse config Controller. error: '%s'", err.Error())
 	}
-
 	data := struct {
-		Log               v1alpha1.Log                 `json:"log"`
-		Etcd              v1alpha1.ControllerEtcdSpec  `json:"etcd"`
-		FluxNinjaPlugin   v1alpha1.FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
-		PrometheusAddress string
-		ServerPort        int32
-		CertPath          string
-		CertName          string
-		CertKey           string
-		OtelConfig        v1alpha1.OtelConfig
+		ConfigSpec v1alpha1.ControllerConfigSpec
 	}{
-		Log:               instance.Spec.Log,
-		Etcd:              checkEtcdEndpoints(instance.Spec.Etcd, instance.GetName(), instance.GetNamespace()),
-		FluxNinjaPlugin:   instance.Spec.FluxNinjaPlugin,
-		PrometheusAddress: checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.GetName(), instance.GetNamespace()),
-		ServerPort:        instance.Spec.ServerPort,
-		CertPath:          controllerCertPath,
-		CertName:          controllerCertName,
-		CertKey:           controllerCertKeyName,
-		OtelConfig:        instance.Spec.OtelConfig,
+		ConfigSpec: instance.Spec.ConfigSpec,
 	}
 
 	var config bytes.Buffer

@@ -29,6 +29,7 @@ type ClientConstructor struct {
 
 // GRPCClientConfig holds configuration for GRPC Client.
 // swagger:model
+// +kubebuilder:object:generate=true
 type GRPCClientConfig struct {
 	// Minimum connection timeout
 	MinConnectionTimeout config.Duration `json:"min_connection_timeout" validate:"gte=0" default:"20s"`
@@ -44,6 +45,7 @@ type GRPCClientConfig struct {
 
 // BackoffConfig holds configuration for GRPC Client Backoff.
 // swagger:model
+// +kubebuilder:object:generate=true
 type BackoffConfig struct {
 	// Base Delay
 	BaseDelay config.Duration `json:"base_delay" validate:"gte=0" default:"1s"`

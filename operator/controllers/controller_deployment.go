@@ -51,6 +51,21 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 
 	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec)
 
+	serverPort, err := getPort(spec.ConfigSpec.Server.Addr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelGRPCPort, err := getPort(spec.ConfigSpec.Otel.GRPCAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelHTTPPort, err := getPort(spec.ConfigSpec.Otel.HTTPAddr)
+	if err != nil {
+		return nil, err
+	}
+
 	dep := &appsv1.Deployment{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        controllerServiceName,
@@ -94,14 +109,19 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 							Resources:       spec.Resources,
 							Ports: []corev1.ContainerPort{
 								{
-									Name:          "grpc",
-									ContainerPort: spec.ServerPort,
+									Name:          "server",
+									ContainerPort: serverPort,
 									Protocol:      "TCP",
 								},
 								{
-									Name:          "webhooks-port",
-									ContainerPort: 8086,
-									Protocol:      "TCP",
+									Name:          "grpc-otel",
+									ContainerPort: otelGRPCPort,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          "grpc-http",
+									ContainerPort: otelHTTPPort,
+									Protocol:      corev1.ProtocolTCP,
 								},
 							},
 							TerminationMessagePath:   "/dev/termination-log",

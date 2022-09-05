@@ -68,6 +68,7 @@ type PluginTrackers map[string]*PluginTracker
 
 // PluginsConfig holds configuration for plugins.
 // swagger:model
+// +kubebuilder:object:generate=true
 type PluginsConfig struct {
 	// Path to plugins directory. This can be set via command line arguments as well.
 	PluginsPath string `json:"plugins_path"`

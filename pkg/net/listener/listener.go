@@ -10,6 +10,7 @@ import (
 
 // ListenerConfig holds configuration for socket listeners.
 // swagger:model
+// +kubebuilder:object:generate=true
 type ListenerConfig struct {
 	// Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alives are disabled.
 	KeepAlive config.Duration `json:"keep_alive" validate:"gte=0s" default:"180s"`

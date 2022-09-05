@@ -56,15 +56,41 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 		container.Resources.Requests = spec.Resources.Requests
 	}
 
-	// Not allowing Port override until it is supported by Agent
+	serverPort, _ := getPort(spec.ConfigSpec.Server.Addr)
+
+	otelGRPCPort, _ := getPort(spec.ConfigSpec.Otel.GRPCAddr)
+
+	otelHTTPPort, _ := getPort(spec.ConfigSpec.Otel.HTTPAddr)
+
+	distCachePort, _ := getPort(spec.ConfigSpec.DistCache.BindAddr)
+
+	memberListPort, _ := getPort(spec.ConfigSpec.DistCache.MemberlistBindAddr)
+
 	container.Ports = []corev1.ContainerPort{
 		{
-			Name:          "grpc",
-			ContainerPort: int32(spec.ServerPort),
+			Name:          "server",
+			ContainerPort: serverPort,
+			Protocol:      corev1.ProtocolTCP,
 		},
 		{
 			Name:          "grpc-otel",
-			ContainerPort: 4317,
+			ContainerPort: otelGRPCPort,
+			Protocol:      corev1.ProtocolTCP,
+		},
+		{
+			Name:          "grpc-http",
+			ContainerPort: otelHTTPPort,
+			Protocol:      corev1.ProtocolTCP,
+		},
+		{
+			Name:          "dist-cache",
+			ContainerPort: distCachePort,
+			Protocol:      corev1.ProtocolTCP,
+		},
+		{
+			Name:          "memberlist",
+			ContainerPort: memberListPort,
+			Protocol:      corev1.ProtocolTCP,
 		},
 	}
 

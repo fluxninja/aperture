@@ -36,6 +36,7 @@ const (
 
 // MetricsConfig holds configuration for service metrics.
 // swagger:model
+// +kubebuilder:object:generate=true
 type MetricsConfig struct {
 	// Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
 	Pedantic bool `json:"pedantic" default:"false"`

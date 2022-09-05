@@ -54,6 +54,7 @@ func (job JobBase) JobWatchers() JobWatchers {
 
 // JobConfig is config for Job
 // swagger:model
+// +kubebuilder:object:generate=true
 type JobConfig struct {
 	// Initial delay to start the job. Zero value will schedule the job immediately. Negative value will wait for next scheduled interval.
 	InitialDelay config.Duration `json:"initial_delay" default:"0s"`

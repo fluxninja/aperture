@@ -41,8 +41,8 @@ var _ = Describe("Secret for Agent", func() {
 				},
 				Spec: v1alpha1.AgentSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								Value: test,
 							},
 						},
@@ -91,8 +91,8 @@ var _ = Describe("Secret for Agent", func() {
 				Spec: v1alpha1.AgentSpec{
 					CommonSpec: v1alpha1.CommonSpec{
 						Annotations: testMap,
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{
 									Name: test,
 									Key:  test,
@@ -146,8 +146,8 @@ var _ = Describe("Secret for Controller", func() {
 				},
 				Spec: v1alpha1.ControllerSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								Value: test,
 							},
 						},
@@ -196,8 +196,8 @@ var _ = Describe("Secret for Controller", func() {
 				Spec: v1alpha1.ControllerSpec{
 					CommonSpec: v1alpha1.CommonSpec{
 						Annotations: testMap,
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{
 									Name: test,
 									Key:  test,
@@ -242,7 +242,6 @@ var _ = Describe("Secret for Controller", func() {
 })
 
 var _ = Describe("Secret for Controller Cert", func() {
-
 	Context("Instance with default parameters", func() {
 		It("returns correct Secret", func() {
 			instance := &v1alpha1.Controller{

@@ -7,11 +7,3 @@ package pluginconfig
 // - in: body
 //   schema:
 //     "$ref": "#/definitions/FluxNinjaPluginConfig"
-// - name: client_grpc
-//   in: body
-//   schema:
-//     "$ref": "#/definitions/GRPCClientConfig"
-// - name: client_http
-//   in: body
-//   schema:
-//     "$ref": "#/definitions/HTTPClientConfig"

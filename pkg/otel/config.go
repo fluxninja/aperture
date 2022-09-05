@@ -64,19 +64,22 @@ type otelParams struct {
 
 // OtelConfig is the configuration for the OTEL collector.
 // swagger:model
+// +kubebuilder:object:generate=true
 type OtelConfig struct {
 	// GRPC listener addr for OTEL Collector.
 	GRPCAddr string `json:"grpc_addr" validate:"hostname_port" default:":4317"`
 	// HTTP listener addr for OTEL Collector.
 	HTTPAddr string `json:"http_addr" validate:"hostname_port" default:":4318"`
 	// BatchPrerollup configures batch prerollup processor.
-	BatchPrerollup Batch `json:"batch_prerollup"`
+	BatchPrerollup BatchConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
-	BatchPostrollup Batch `json:"batch_postrollup"`
+	BatchPostrollup BatchConfig `json:"batch_postrollup"`
 }
 
-// Batch defines configuration for OTEL batch processor.
-type Batch struct {
+// BatchConfig defines configuration for OTEL batch processor.
+// swagger:model
+// +kubebuilder:object:generate=true
+type BatchConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
 	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.

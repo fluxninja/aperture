@@ -61,6 +61,7 @@ func Module() fx.Option {
 
 // ProfilersConfig holds configuration for profilers.
 // swagger:model
+// +kubebuilder:object:generate=true
 type ProfilersConfig struct {
 	// Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
 	RegisterHTTPRoutes bool `json:"register_http_routes" default:"true"`
