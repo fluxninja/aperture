@@ -362,7 +362,11 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			ControllerEventValid1 := event.UpdateEvent{
 				ObjectOld: &v1alpha1.Controller{},
 				ObjectNew: &v1alpha1.Controller{
-					Spec: v1alpha1.ControllerSpec{},
+					Spec: v1alpha1.ControllerSpec{
+						CommonSpec: v1alpha1.CommonSpec{
+							Command: testArray,
+						},
+					},
 				},
 			}
 

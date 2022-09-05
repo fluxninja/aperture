@@ -505,6 +505,7 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 <dd>
 
 (bool, default: `false`) Flag to enable the policy
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -513,6 +514,7 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 <dd>
 
 (float64, `gte=0,lte=1`, default: `0.50`) Factor sets user-configured limit of available memory
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -784,6 +786,7 @@ FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugi
 <dd>
 
 (string, `gte=0s`, default: `5s`) Interval between each heartbeat.
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1111,7 +1114,7 @@ HTTPServerConfig holds configuration for HTTP Server.
 </dd>
 </dl>
 <dl>
-<dt>write_timeout</dt>
+<dt>write_timeou</dt>
 <dd>
 
 (string, `gte=0s`, default: `45s`) Write timeout
@@ -1178,6 +1181,7 @@ JobConfig is config for Job
 <dd>
 
 (string, default: `10s`) Time period between job executions. Zero or negative value means that the job will never execute periodically.
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1186,6 +1190,7 @@ JobConfig is config for Job
 <dd>
 
 (string, `gte=0s`, default: `5s`) Execution timeout
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1194,6 +1199,7 @@ JobConfig is config for Job
 <dd>
 
 (string, default: `0s`) Initial delay to start the job. Zero value will schedule the job immediately. Negative value will wait for next scheduled interval.
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1202,6 +1208,7 @@ JobConfig is config for Job
 <dd>
 
 (bool, default: `false`) Sets whether the job is initially healthy
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1310,6 +1317,7 @@ LogConfig holds configuration for a logger and log writers.
 <dd>
 
 (string, `oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED`, default: `info`) Log level
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1342,6 +1350,7 @@ LogConfig holds configuration for a logger and log writers.
 <dd>
 
 (bool, default: `true`) Use non-blocking log writer (can lose logs at high throughput)
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1350,6 +1359,7 @@ LogConfig holds configuration for a logger and log writers.
 <dd>
 
 (bool, default: `false`) Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1358,6 +1368,7 @@ LogConfig holds configuration for a logger and log writers.
 <dd>
 
 ([[]LogWriterConfig](#log-writer-config), `omitempty,dive,omitempty`) Additional log writers
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1591,7 +1602,7 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 <dt>http</dt>
 <dd>
 
-(string, `omitempty,url|hostname_port`)
+(string, `omitempty,url|hostname_port`) +kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1599,7 +1610,7 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 <dt>https</dt>
 <dd>
 
-(string, `omitempty,url|hostname_port`)
+(string, `omitempty,url|hostname_port`) +kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1607,7 +1618,7 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 <dt>no_proxy</dt>
 <dd>
 
-([]string, `dive,ip|cidr|fqdn|hostname_port`)
+([]string, `dive,ip|cidr|fqdn|hostname_port`) +kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1843,6 +1854,7 @@ WatermarksPolicy creates a Watchdog policy that schedules GC at concrete waterma
 <dd>
 
 (bool, default: `false`) Flag to enable the policy
++kubebuilder:validation:Optional
 
 </dd>
 </dl>
@@ -1851,6 +1863,7 @@ WatermarksPolicy creates a Watchdog policy that schedules GC at concrete waterma
 <dd>
 
 ([]float64, `omitempty,dive,gte=0,lte=1`, default: `[0.50,0.75,0.80,0.85,0.90,0.95,0.99]`) Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
++kubebuilder:validation:Optional
 
 </dd>
 </dl>

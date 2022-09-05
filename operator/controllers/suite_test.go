@@ -37,7 +37,9 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/otel"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -135,6 +137,10 @@ var _ = BeforeSuite(func() {
 							Addr: ":80",
 						},
 					},
+					Otel: otel.OtelConfig{
+						GRPCAddr: ":4317",
+						HTTPAddr: ":4318",
+					},
 				},
 			},
 			CommonSpec: v1alpha1.CommonSpec{
@@ -173,6 +179,14 @@ var _ = BeforeSuite(func() {
 							Addr: ":80",
 						},
 					},
+					Otel: otel.OtelConfig{
+						GRPCAddr: ":4317",
+						HTTPAddr: ":4318",
+					},
+				},
+				DistCache: distcache.DistCacheConfig{
+					BindAddr:           ":3320",
+					MemberlistBindAddr: ":3322",
 				},
 			},
 			CommonSpec: v1alpha1.CommonSpec{

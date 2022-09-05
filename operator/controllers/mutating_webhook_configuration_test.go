@@ -121,7 +121,9 @@ var _ = Describe("MutatingWebhookConfiguration for Controller", func() {
 				},
 			}
 
-			result, _ := mutatingWebhookConfiguration(instance.DeepCopy())
+			result, err := mutatingWebhookConfiguration(instance.DeepCopy())
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 
 			os.Remove(certPath)
@@ -165,6 +167,7 @@ var _ = Describe("Test MutatingWebhookConfiguration Mutate", func() {
 			},
 		}
 		err := mutatingWebhookConfigurationMutate(mwc, expected.Webhooks)()
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mwc).To(Equal(expected))
 	})

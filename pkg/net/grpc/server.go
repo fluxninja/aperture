@@ -44,9 +44,9 @@ func GMuxServerModule() fx.Option {
 // +kubebuilder:object:generate=true
 type GRPCServerConfig struct {
 	// Connection timeout
-	ConnectionTimeout config.Duration `json:"connection_timeout" validate:"gte=0s" default:"120s"`
+	ConnectionTimeout config.Duration `json:"connection_timeout,omitempty" validate:"gte=0s" default:"120s"`
 	// Enable Reflection
-	EnableReflection bool `json:"enable_reflection" default:"false"`
+	EnableReflection bool `json:"enable_reflection,omitempty" default:"false"`
 }
 
 // ServerConstructor holds fields to create an annotated GRPC Server.

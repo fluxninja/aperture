@@ -32,6 +32,7 @@ import (
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/otel"
 )
 
 var _ = Describe("Controller Deployment", func() {
@@ -108,6 +109,10 @@ var _ = Describe("Controller Deployment", func() {
 								ListenerConfig: listener.ListenerConfig{
 									Addr: ":80",
 								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
 							},
 						},
 					},
@@ -191,13 +196,18 @@ var _ = Describe("Controller Deployment", func() {
 									Resources: corev1.ResourceRequirements{},
 									Ports: []corev1.ContainerPort{
 										{
-											Name:          "grpc",
+											Name:          "server",
 											ContainerPort: 80,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "webhooks-port",
-											ContainerPort: 8086,
+											Name:          "grpc-otel",
+											ContainerPort: 4317,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          "grpc-http",
+											ContainerPort: 4318,
 											Protocol:      corev1.ProtocolTCP,
 										},
 									},
@@ -280,7 +290,9 @@ var _ = Describe("Controller Deployment", func() {
 				},
 			}
 
-			result, _ := deploymentForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := deploymentForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Spec.Template.Spec.Containers).To(Equal(expected.Spec.Template.Spec.Containers))
 		})
 	})
@@ -306,6 +318,10 @@ var _ = Describe("Controller Deployment", func() {
 								ListenerConfig: listener.ListenerConfig{
 									Addr: ":80",
 								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
 							},
 						},
 					},
@@ -489,13 +505,18 @@ var _ = Describe("Controller Deployment", func() {
 									Resources: resourceRequirement,
 									Ports: []corev1.ContainerPort{
 										{
-											Name:          "grpc",
+											Name:          "server",
 											ContainerPort: 80,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "webhooks-port",
-											ContainerPort: 8086,
+											Name:          "grpc-otel",
+											ContainerPort: 4317,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          "grpc-http",
+											ContainerPort: 4318,
 											Protocol:      corev1.ProtocolTCP,
 										},
 									},
@@ -505,7 +526,7 @@ var _ = Describe("Controller Deployment", func() {
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
 												Path:   "/v1/status/liveness",
-												Port:   intstr.FromString("grpc"),
+												Port:   intstr.FromString("server"),
 												Scheme: corev1.URISchemeHTTP,
 											},
 										},
@@ -519,7 +540,7 @@ var _ = Describe("Controller Deployment", func() {
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
 												Path:   "/v1/status/readiness",
-												Port:   intstr.FromString("grpc"),
+												Port:   intstr.FromString("server"),
 												Scheme: corev1.URISchemeHTTP,
 											},
 										},
@@ -617,7 +638,9 @@ var _ = Describe("Controller Deployment", func() {
 				},
 			}
 
-			result, _ := deploymentForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := deploymentForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -662,6 +685,7 @@ var _ = Describe("Test Deployment Mutate", func() {
 
 		dep := &appsv1.Deployment{}
 		err := deploymentMutate(dep, expected.Spec)()
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(dep).To(Equal(expected))
 	})

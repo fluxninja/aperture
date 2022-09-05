@@ -11,11 +11,11 @@ import (
 // Duration is encoded as a string message which represents a signed span of time.
 // It holds *durationpb.Duration which is generated types for google/protobuf/duration.proto.
 // swagger:strfmt string
-// +kubebuilder:validation:type=string
+// +kubebuilder:validation:Type=string
 type Duration struct {
 	// swagger:ignore
 	//+kubebuilder:validation:Schemaless
-	Duration *durationpb.Duration `json:"duration"`
+	Duration *durationpb.Duration `json:"duration,omitempty"`
 }
 
 // UnmarshalJSON unmarshals and reads given bytes into a new Duration proto message.

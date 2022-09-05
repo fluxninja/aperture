@@ -31,6 +31,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/otel"
 )
 
 var _ = Describe("Agent Daemonset", func() {
@@ -102,6 +103,10 @@ var _ = Describe("Agent Daemonset", func() {
 								ListenerConfig: listener.ListenerConfig{
 									Addr: ":80",
 								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
 							},
 						},
 						DistCache: distcache.DistCacheConfig{
@@ -252,7 +257,9 @@ var _ = Describe("Agent Daemonset", func() {
 				},
 			}
 
-			result, _ := daemonsetForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := daemonsetForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -278,6 +285,10 @@ var _ = Describe("Agent Daemonset", func() {
 								ListenerConfig: listener.ListenerConfig{
 									Addr: ":80",
 								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
 							},
 						},
 						DistCache: distcache.DistCacheConfig{
@@ -567,7 +578,9 @@ var _ = Describe("Agent Daemonset", func() {
 				},
 			}
 
-			result, _ := daemonsetForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := daemonsetForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -608,6 +621,7 @@ var _ = Describe("Test Daemonset Mutate", func() {
 
 		dms := &appsv1.DaemonSet{}
 		err := daemonsetMutate(dms, expected.Spec)()
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(dms).To(Equal(expected))
 	})

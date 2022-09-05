@@ -51,15 +51,24 @@ func LogModule() fx.Option {
 // +kubebuilder:object:generate=true
 type LogConfig struct {
 	// Log level
-	LogLevel string `json:"level" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
+	//+kubebuilder:validation:Optional
+	LogLevel string `json:"level,omitempty" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
+
 	// Additional log writers
+	//+kubebuilder:validation:Optional
 	Writers []LogWriterConfig `json:"writers" validate:"omitempty,dive,omitempty"`
+
 	// Base LogWriterConfig
-	LogWriterConfig `json:",inline"`
+	//+kubebuilder:validation:Optional
+	LogWriterConfig `json:",inline,omitempty"`
+
 	// Use non-blocking log writer (can lose logs at high throughput)
-	NonBlocking bool `json:"non_blocking" default:"true"`
+	//+kubebuilder:validation:Optional
+	NonBlocking bool `json:"non_blocking,omitempty" default:"true"`
+
 	// Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
-	PrettyConsole bool `json:"pretty_console" default:"false"`
+	//+kubebuilder:validation:Optional
+	PrettyConsole bool `json:"pretty_console,omitempty" default:"false"`
 }
 
 // LogWriterConfig holds configuration for a log writer.
@@ -67,15 +76,15 @@ type LogConfig struct {
 // +kubebuilder:object:generate=true
 type LogWriterConfig struct {
 	// Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-	File string `json:"file" default:"stderr"`
+	File string `json:"file,omitempty" default:"stderr"`
 	// Log file max size in MB
-	MaxSize int `json:"max_size" validate:"gte=0" default:"50"`
+	MaxSize int `json:"max_size,omitempty" validate:"gte=0" default:"50"`
 	// Max log file backups
-	MaxBackups int `json:"max_backups" validate:"gte=0" default:"3"`
+	MaxBackups int `json:"max_backups,omitempty" validate:"gte=0" default:"3"`
 	// Max age in days for log files
-	MaxAge int `json:"max_age" validate:"gte=0" default:"7"`
+	MaxAge int `json:"max_age,omitempty" validate:"gte=0" default:"7"`
 	// Compress
-	Compress bool `json:"compress" default:"false"`
+	Compress bool `json:"compress,omitempty" default:"false"`
 }
 
 // LoggerConstructor holds fields used to create an annotated instance of a logger.

@@ -67,13 +67,13 @@ type otelParams struct {
 // +kubebuilder:object:generate=true
 type OtelConfig struct {
 	// GRPC listener addr for OTEL Collector.
-	GRPCAddr string `json:"grpc_addr" validate:"hostname_port" default:":4317"`
+	GRPCAddr string `json:"grpc_addr,omitempty" validate:"hostname_port" default:":4317"`
 	// HTTP listener addr for OTEL Collector.
-	HTTPAddr string `json:"http_addr" validate:"hostname_port" default:":4318"`
+	HTTPAddr string `json:"http_addr,omitempty" validate:"hostname_port" default:":4318"`
 	// BatchPrerollup configures batch prerollup processor.
-	BatchPrerollup BatchConfig `json:"batch_prerollup"`
+	BatchPrerollup BatchConfig `json:"batch_prerollup,omitempty"`
 	// BatchPostrollup configures batch postrollup processor.
-	BatchPostrollup BatchConfig `json:"batch_postrollup"`
+	BatchPostrollup BatchConfig `json:"batch_postrollup,omitempty"`
 }
 
 // BatchConfig defines configuration for OTEL batch processor.
@@ -81,9 +81,9 @@ type OtelConfig struct {
 // +kubebuilder:object:generate=true
 type BatchConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
-	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
+	Timeout config.Duration `json:"timeout,omitempty" validate:"gt=0" default:"1s"`
 	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
-	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"10000"`
+	SendBatchSize uint32 `json:"send_batch_size,omitempty" validate:"gt=0" default:"10000"`
 }
 
 // Type decides which configuration to use.

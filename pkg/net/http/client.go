@@ -31,43 +31,43 @@ type ClientConstructor struct {
 // +kubebuilder:object:generate=true
 type HTTPClientConfig struct {
 	// Network level keep-alive duration
-	NetworkKeepAlive config.Duration `json:"network_keep_alive" validate:"gte=0s" default:"30s"`
+	NetworkKeepAlive config.Duration `json:"network_keep_alive,omitempty" validate:"gte=0s" default:"30s"`
 	// Timeout for making network connection
-	NetworkTimeout config.Duration `json:"network_timeout" validate:"gte=0s" default:"30s"`
+	NetworkTimeout config.Duration `json:"network_timeout,omitempty" validate:"gte=0s" default:"30s"`
 	// HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
-	Timeout config.Duration `json:"timeout" validate:"gte=0s" default:"60s"`
+	Timeout config.Duration `json:"timeout,omitempty" validate:"gte=0s" default:"60s"`
 	// Proxy Connect Header - map[string][]string
-	ProxyConnectHeader http.Header `json:"proxy_connect_header"`
+	ProxyConnectHeader http.Header `json:"proxy_connect_header,omitempty"`
 	// TLS Handshake Timeout. 0 = no timeout
-	TLSHandshakeTimeout config.Duration `json:"tls_handshake_timeout" validate:"gte=0s" default:"10s"`
+	TLSHandshakeTimeout config.Duration `json:"tls_handshake_timeout,omitempty" validate:"gte=0s" default:"10s"`
 	// Expect Continue Timeout. 0 = no timeout.
-	ExpectContinueTimeout config.Duration `json:"expect_continue_timeout" validate:"gte=0s" default:"1s"`
+	ExpectContinueTimeout config.Duration `json:"expect_continue_timeout,omitempty" validate:"gte=0s" default:"1s"`
 	// Response Header Timeout. 0 = no timeout.
-	ResponseHeaderTimeout config.Duration `json:"response_header_timeout" validate:"gte=0s" default:"0s"`
+	ResponseHeaderTimeout config.Duration `json:"response_header_timeout,omitempty" validate:"gte=0s" default:"0s"`
 	// Idle Connection Timeout. 0 = no timeout.
-	IdleConnTimeout config.Duration `json:"idle_connection_timeout" validate:"gte=0s" default:"90s"`
+	IdleConnTimeout config.Duration `json:"idle_connection_timeout,omitempty" validate:"gte=0s" default:"90s"`
 	// SSL key log file (useful for debugging with wireshark)
-	KeyLogWriter string `json:"key_log_file" validate:"omitempty,file"`
+	KeyLogWriter string `json:"key_log_file,omitempty" validate:"omitempty,file"`
 	// Client TLS configuration
-	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
+	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls,omitempty"`
 	// Max Idle Connections per host. 0 = no limit.
-	MaxIdleConnsPerHost int `json:"max_idle_connections_per_host" validate:"gte=0" default:"5"`
+	MaxIdleConnsPerHost int `json:"max_idle_connections_per_host,omitempty" validate:"gte=0" default:"5"`
 	// Max Idle Connections. 0 = no limit.
-	MaxIdleConns int `json:"max_idle_connections" validate:"gte=0" default:"100"`
+	MaxIdleConns int `json:"max_idle_connections,omitempty" validate:"gte=0" default:"100"`
 	// Max Connections Per Host. 0 = no limit.
-	MaxConnsPerHost int `json:"max_conns_per_host" validate:"gte=0" default:"0"`
+	MaxConnsPerHost int `json:"max_conns_per_host,omitempty" validate:"gte=0" default:"0"`
 	// Max Response Header Bytes. 0 = no limit.
-	MaxResponseHeaderBytes int64 `json:"max_response_header_bytes" validate:"gte=0" default:"0"`
+	MaxResponseHeaderBytes int64 `json:"max_response_header_bytes,omitempty" validate:"gte=0" default:"0"`
 	// Write Buffer Size. 0 = 4KB.
-	WriteBufferSize int `json:"write_buffer_size" validate:"gte=0" default:"0"`
+	WriteBufferSize int `json:"write_buffer_size,omitempty" validate:"gte=0" default:"0"`
 	// Read Buffer Size. 0 = 4KB
-	ReadBufferSize int `json:"read_buffer_size" validate:"gte=0" default:"0"`
+	ReadBufferSize int `json:"read_buffer_size,omitempty" validate:"gte=0" default:"0"`
 	// Disable Compression
-	DisableCompression bool `json:"disable_compression" default:"false"`
+	DisableCompression bool `json:"disable_compression,omitempty" default:"false"`
 	// Use Proxy
-	UseProxy bool `json:"use_proxy" default:"false"`
+	UseProxy bool `json:"use_proxy,omitempty" default:"false"`
 	// Disable HTTP Keep Alives
-	DisableKeepAlives bool `json:"disable_keep_alives" default:"false"`
+	DisableKeepAlives bool `json:"disable_keep_alives,omitempty" default:"false"`
 }
 
 // Annotate creates an annotated instance of HTTP Client.

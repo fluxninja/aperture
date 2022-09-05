@@ -41,82 +41,61 @@ import (
 	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
-const agentConfigYAML = `
-server:
-  addr: ":80"
-
-dist_cache:
-  bind_addr: ":3320"
-  memberlist_config_bind_addr: ":3322"
-
-otel:
-  grpc_addr: ":4317"
-  http_addr: ":4318"
-  batch_prerollup:
-    timeout: 1s
-    send_batch_size: 15000
-  batch_postrollup:
-    timeout: 1s
-    send_batch_size: 15000
-
-log:
-  pretty_console: false
-  non_blocking:  true
-  level: "info"
-  file:  "stderr"
-
+const agentConfigYAML = `dist_cache:
+  bind_addr: :3320
+  memberlist_bind_addr: :3322
 etcd:
-  endpoints: [http://agent-etcd:2379]
+  endpoints:
+  - http://agent-etcd:2379
   lease_ttl: 60s
-
-prometheus:
-  address: "http://aperture-prometheus-server:80"
-
+log:
+  file: stderr
+  level: info
+  non_blocking: true
+  writers: null
+otel:
+  batch_postrollup:
+    send_batch_size: 15000
+    timeout: 1s
+  batch_prerollup:
+    send_batch_size: 15000
+    timeout: 1s
+  grpc_addr: :4317
+  http_addr: :4318
 plugins:
-  disable_plugins: false
   disabled_plugins:
-    - aperture-plugin-fluxninja
+  - aperture-plugin-fluxninja
+prometheus:
+  address: http://aperture-prometheus-server:80
+server:
+  addr: :80
 `
 
-const controllerConfigYAML = `
-server:
-  addr: ":80"
-
-otel:
-  grpc_addr: ":4317"
-  http_addr: ":4318"
-  batch_prerollup:
-    timeout: 1s
-    send_batch_size: 15000
-  batch_postrollup:
-    timeout: 1s
-    send_batch_size: 15000
-
-webhooks:
-  addr: ":8086"
-  tls:
-    enable: true
-    certs_path: "/etc/aperture/aperture-controller/certs"
-    server_cert: "crt.pem"
-    server_key: "key.pem"
-
-log:
-  pretty_console: false
-  non_blocking:  true
-  level: "info"
-  file:  "stderr"
-
-etcd:
-  endpoints: [http://controller-etcd:2379]
+const controllerConfigYAML = `etcd:
+  endpoints:
+  - http://agent-etcd:2379
   lease_ttl: 60s
-
-prometheus:
-  address: "http://aperture-prometheus-server:80"
-
+log:
+  file: stderr
+  level: info
+  non_blocking: true
+  writers: null
+otel:
+  batch_postrollup:
+    send_batch_size: 15000
+    timeout: 1s
+  batch_prerollup:
+    send_batch_size: 15000
+    timeout: 1s
+  grpc_addr: :4317
+  http_addr: :4318
 plugins:
-  disable_plugins: false
   disabled_plugins:
-    - aperture-plugin-fluxninja
+  - aperture-plugin-fluxninja
+prometheus:
+  address: http://aperture-prometheus-server:80
+server:
+  addr: :80
 `
 
 var _ = Describe("ConfigMap for Agent", func() {
@@ -216,8 +195,10 @@ var _ = Describe("ConfigMap for Agent", func() {
 				},
 			}
 
-			result, _ := configMapForAgentConfig(instance.DeepCopy(), scheme.Scheme)
-			Expect(result.Data["aperture-agent.yaml"]).To(Equal(expected.Data["aperture-agent.yaml"]))
+			result, err := configMapForAgentConfig(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Data).To(Equal(expected.Data))
 		})
 	})
 })
@@ -315,7 +296,9 @@ var _ = Describe("ConfigMap for Controller", func() {
 				},
 			}
 
-			result, _ := configMapForControllerConfig(instance.DeepCopy(), scheme.Scheme)
+			result, err := configMapForControllerConfig(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Data).To(Equal(expected.Data))
 		})
 	})
@@ -330,6 +313,7 @@ var _ = Describe("Test ConfigMap Mutate", func() {
 
 		cm := &corev1.ConfigMap{}
 		err := configMapMutate(cm, expected.Data)()
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cm).To(Equal(expected))
 	})

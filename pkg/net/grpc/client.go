@@ -32,15 +32,15 @@ type ClientConstructor struct {
 // +kubebuilder:object:generate=true
 type GRPCClientConfig struct {
 	// Minimum connection timeout
-	MinConnectionTimeout config.Duration `json:"min_connection_timeout" validate:"gte=0" default:"20s"`
+	MinConnectionTimeout config.Duration `json:"min_connection_timeout,omitempty" validate:"gte=0" default:"20s"`
 	// Client TLS configuration
-	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
+	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls,omitempty"`
 	// Backoff config
-	Backoff BackoffConfig `json:"backoff"`
+	Backoff BackoffConfig `json:"backoff,omitempty"`
 	// Disable ClientTLS
-	Insecure bool `json:"insecure" default:"false"`
+	Insecure bool `json:"insecure,omitempty" default:"false"`
 	// Use HTTP CONNECT Proxy
-	UseProxy bool `json:"use_proxy" default:"false"`
+	UseProxy bool `json:"use_proxy,omitempty" default:"false"`
 }
 
 // BackoffConfig holds configuration for GRPC Client Backoff.
@@ -48,13 +48,13 @@ type GRPCClientConfig struct {
 // +kubebuilder:object:generate=true
 type BackoffConfig struct {
 	// Base Delay
-	BaseDelay config.Duration `json:"base_delay" validate:"gte=0" default:"1s"`
+	BaseDelay config.Duration `json:"base_delay,omitempty" validate:"gte=0" default:"1s"`
 	// Max Delay
-	MaxDelay config.Duration `json:"max_delay" validate:"gte=0" default:"120s"`
+	MaxDelay config.Duration `json:"max_delay,omitempty" validate:"gte=0" default:"120s"`
 	// Backoff multiplier
-	Multiplier float64 `json:"multiplier" validate:"gte=0" default:"1.6"`
+	Multiplier float64 `json:"multiplier,omitempty" validate:"gte=0" default:"1.6"`
 	// Jitter
-	Jitter float64 `json:"jitter" validate:"gte=0" default:"0.2"`
+	Jitter float64 `json:"jitter,omitempty" validate:"gte=0" default:"0.2"`
 }
 
 // Annotate creates an annotated instance of GRPC ClientConnectionBuilder.

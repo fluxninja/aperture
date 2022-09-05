@@ -9,6 +9,7 @@ require (
 	github.com/buraksezer/olric v0.0.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cenkalti/backoff/v4 v4.1.3
+	github.com/clarketm/json v1.17.1
 	github.com/containerd/cgroups v1.0.4
 	github.com/eapache/queue v1.1.0
 	github.com/elastic/gmux v0.2.0
@@ -298,7 +299,7 @@ require (
 	k8s.io/utils v0.0.0-20220728103510-ee6ede2d64ed
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
-	sigs.k8s.io/yaml v1.3.0 // indirect
+	sigs.k8s.io/yaml v1.3.0
 )
 
 exclude github.com/prometheus/prometheus v1.8.2

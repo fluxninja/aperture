@@ -71,13 +71,13 @@ type PluginTrackers map[string]*PluginTracker
 // +kubebuilder:object:generate=true
 type PluginsConfig struct {
 	// Path to plugins directory. This can be set via command line arguments as well.
-	PluginsPath string `json:"plugins_path"`
+	PluginsPath string `json:"plugins_path,omitempty"`
 	// Specific plugin types to disable
-	DisabledSymbols []string `json:"disabled_symbols"`
+	DisabledSymbols []string `json:"disabled_symbols,omitempty"`
 	// Specific plugins to disable
-	DisabledPlugins []string `json:"disabled_plugins"`
+	DisabledPlugins []string `json:"disabled_plugins,omitempty"`
 	// Disables all plugins
-	DisablePlugins bool `json:"disable_plugins" default:"false"`
+	DisablePlugins bool `json:"disable_plugins,omitempty" default:"false"`
 }
 
 // Constructor holds fields for constructing a PluginRegistry.

@@ -27,7 +27,9 @@ import (
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/otel"
 )
 
 var _ = Describe("Sidecar container for Agent", func() {
@@ -75,6 +77,14 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
 						},
 					},
 					Image: v1alpha1.Image{
@@ -159,7 +169,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 				},
 			}
 
-			agentContainer(instance.DeepCopy(), &container, "")
+			err := agentContainer(instance.DeepCopy(), &container, "")
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(container).To(Equal(expected))
 		})
 	})
@@ -182,6 +194,14 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
 						},
 					},
 					Image: v1alpha1.Image{
@@ -308,7 +328,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 				},
 			}
 
-			agentContainer(instance.DeepCopy(), &container, "")
+			err := agentContainer(instance.DeepCopy(), &container, "")
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(container).To(Equal(expected))
 		})
 	})
@@ -334,6 +356,14 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":8000",
 								},
 							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
 						},
 					},
 					CommonSpec: v1alpha1.CommonSpec{
@@ -535,7 +565,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 				},
 			}
 
-			agentContainer(instance.DeepCopy(), &container, "")
+			err := agentContainer(instance.DeepCopy(), &container, "")
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(container).To(Equal(expected))
 		})
 	})
@@ -560,6 +592,14 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
 						},
 					},
 					Image: v1alpha1.Image{
@@ -664,7 +704,9 @@ var _ = Describe("Pod modification for Agent", func() {
 				},
 			}
 
-			agentPod(instance, pod)
+			err := agentPod(instance, pod)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(&pod).To(Equal(&expected))
 		})
 	})
@@ -687,6 +729,14 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
 						},
 					},
 					CommonSpec: v1alpha1.CommonSpec{
@@ -857,7 +907,9 @@ var _ = Describe("Pod modification for Agent", func() {
 				},
 			}
 
-			agentPod(instance, pod)
+			err := agentPod(instance, pod)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(&pod).To(Equal(&expected))
 		})
 	})

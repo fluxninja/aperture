@@ -19,18 +19,28 @@ import (
 // swagger:model
 // +kubebuilder:object:generate=true
 type WatchdogConfig struct {
-	Job    jobs.JobConfig     `json:"job"`
-	CGroup WatchdogPolicyType `json:"cgroup"`
-	System WatchdogPolicyType `json:"system"`
-	Heap   HeapConfig         `json:"heap"`
+	//+kubebuilder:validation:Optional
+	Job jobs.JobConfig `json:"job,omitempty"`
+
+	//+kubebuilder:validation:Optional
+	CGroup WatchdogPolicyType `json:"cgroup,omitempty"`
+
+	//+kubebuilder:validation:Optional
+	System WatchdogPolicyType `json:"system,omitempty"`
+
+	//+kubebuilder:validation:Optional
+	Heap HeapConfig `json:"heap,omitempty"`
 }
 
 // WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
 // swagger:model WatchdogPolicyType
 // +kubebuilder:object:generate=true
 type WatchdogPolicyType struct {
-	WatermarksPolicy WatermarksPolicy `json:"watermarks_policy"`
-	AdaptivePolicy   AdaptivePolicy   `json:"adaptive_policy"`
+	//+kubebuilder:validation:Optional
+	WatermarksPolicy WatermarksPolicy `json:"watermarks_policy,omitempty"`
+
+	//+kubebuilder:validation:Optional
+	AdaptivePolicy AdaptivePolicy `json:"adaptive_policy,omitempty"`
 }
 
 // HeapLimit holds configuration for Watchdog heap limit.
@@ -38,17 +48,20 @@ type WatchdogPolicyType struct {
 // +kubebuilder:object:generate=true
 type HeapLimit struct {
 	// Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
-	MinGoGC int `json:"min_gogc" validate:"gt=0,lte=100" default:"25"`
+	MinGoGC int `json:"min_gogc,omitempty" validate:"gt=0,lte=100" default:"25"`
 	// Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
-	Limit uint64 `json:"limit" validate:"gt=0" default:"268435456"`
+	Limit uint64 `json:"limit,omitempty" validate:"gt=0" default:"268435456"`
 }
 
 // HeapConfig holds configuration for heap Watchdog.
 // swagger:model
 // +kubebuilder:object:generate=true
 type HeapConfig struct {
-	WatchdogPolicyType `json:",inline"`
-	HeapLimit          `json:",inline"`
+	//+kubebuilder:validation:Optional
+	WatchdogPolicyType `json:",inline,omitempty"`
+
+	//+kubebuilder:validation:Optional
+	HeapLimit `json:",inline,omitempty"`
 }
 
 // PolicyCommon holds common configuration for Watchdog policies.
@@ -56,9 +69,12 @@ type HeapConfig struct {
 // +kubebuilder:object:generate=true
 type PolicyCommon struct {
 	// Flag to enable the policy
-	Enabled bool `json:"enabled" default:"false"`
+	//+kubebuilder:validation:Optional
+	Enabled bool `json:"enabled,omitempty" default:"false"`
+
 	// total
 	// swagger:ignore
+	//+kubebuilder:validation:Optional
 	total uint64
 }
 
@@ -73,11 +89,16 @@ type policyInterface interface {
 // +kubebuilder:object:generate=true
 type WatermarksPolicy struct {
 	// Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
-	Watermarks []float64 `json:"watermarks" validate:"omitempty,dive,gte=0,lte=1" default:"[0.50,0.75,0.80,0.85,0.90,0.95,0.99]"`
+	//+kubebuilder:validation:Optional
+	Watermarks []float64 `json:"watermarks,omitempty" validate:"omitempty,dive,gte=0,lte=1" default:"[0.50,0.75,0.80,0.85,0.90,0.95,0.99]"`
+
 	// internal fields
 	// swagger:ignore
-	thresholds   []uint64
-	PolicyCommon `json:",inline"`
+	//+kubebuilder:validation:Optional
+	thresholds []uint64
+
+	//+kubebuilder:validation:Optional
+	PolicyCommon `json:",inline,omitempty"`
 }
 
 func (policy *WatermarksPolicy) nextThreshold(total, used uint64) uint64 {
@@ -106,9 +127,12 @@ func (policy *WatermarksPolicy) nextThreshold(total, used uint64) uint64 {
 // AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)*factor.
 // swagger:model
 type AdaptivePolicy struct {
-	PolicyCommon `json:",inline"`
+	//+kubebuilder:validation:Optional
+	PolicyCommon `json:",inline,omitempty"`
+
 	// Factor sets user-configured limit of available memory
-	Factor float64 `json:"factor" validate:"gte=0,lte=1" default:"0.50"`
+	//+kubebuilder:validation:Optional
+	Factor float64 `json:"factor,omitempty" validate:"gte=0,lte=1" default:"0.50"`
 }
 
 func (policy *AdaptivePolicy) nextThreshold(total, used uint64) uint64 {

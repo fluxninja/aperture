@@ -17,13 +17,15 @@ limitations under the License.
 package controllers
 
 import (
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
 // agentContainer prepares Sidecar container for the Agent based on the received parameters.
-func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agentGroup string) {
+func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agentGroup string) error {
 	spec := instance.Spec
 	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec)
 	container.Name = agentServiceName
@@ -56,15 +58,30 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 		container.Resources.Requests = spec.Resources.Requests
 	}
 
-	serverPort, _ := getPort(spec.ConfigSpec.Server.Addr)
+	serverPort, err := getPort(spec.ConfigSpec.Server.Addr)
+	if err != nil {
+		return fmt.Errorf("invalid value '%v' provided for 'server.addr' config", spec.ConfigSpec.Server.Addr)
+	}
 
 	otelGRPCPort, _ := getPort(spec.ConfigSpec.Otel.GRPCAddr)
+	if err != nil {
+		return fmt.Errorf("invalid value '%v' provided for 'otel.grpc_addr' config", spec.ConfigSpec.Otel.GRPCAddr)
+	}
 
 	otelHTTPPort, _ := getPort(spec.ConfigSpec.Otel.HTTPAddr)
+	if err != nil {
+		return fmt.Errorf("invalid value '%v' provided for 'otel.http_addr' config", spec.ConfigSpec.Otel.HTTPAddr)
+	}
 
 	distCachePort, _ := getPort(spec.ConfigSpec.DistCache.BindAddr)
+	if err != nil {
+		return fmt.Errorf("invalid value '%v' provided for 'dist_cache.bind_addr' config", spec.ConfigSpec.DistCache.BindAddr)
+	}
 
 	memberListPort, _ := getPort(spec.ConfigSpec.DistCache.MemberlistBindAddr)
+	if err != nil {
+		return fmt.Errorf("invalid value '%v' provided for 'dist_cache.memberlist_bind_addr' config", spec.ConfigSpec.DistCache.MemberlistBindAddr)
+	}
 
 	container.Ports = []corev1.ContainerPort{
 		{
@@ -109,10 +126,12 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 	container.Env = mergeEnvVars(agentEnv(instance, agentGroup), container.Env)
 	container.EnvFrom = mergeEnvFromSources(containerEnvFrom(spec.CommonSpec), container.EnvFrom)
 	container.VolumeMounts = mergeVolumeMounts(agentVolumeMounts(spec), container.VolumeMounts)
+
+	return nil
 }
 
 // agentPod updates the received Pod spec to add Sidecar for the Agent.
-func agentPod(instance *v1alpha1.Agent, pod *corev1.Pod) {
+func agentPod(instance *v1alpha1.Agent, pod *corev1.Pod) error {
 	apec := instance.Spec
 	agentGroup := ""
 	if pod.Annotations != nil {
@@ -130,7 +149,10 @@ func agentPod(instance *v1alpha1.Agent, pod *corev1.Pod) {
 		}
 	}
 
-	agentContainer(instance, &container, agentGroup)
+	err := agentContainer(instance, &container, agentGroup)
+	if err != nil {
+		return err
+	}
 	if appendContainer {
 		pod.Spec.Containers = append(pod.Spec.Containers, container)
 	} else {
@@ -140,4 +162,6 @@ func agentPod(instance *v1alpha1.Agent, pod *corev1.Pod) {
 	pod.Spec.ImagePullSecrets = mergeImagePullSecrets(imagePullSecrets(apec.Image), pod.Spec.ImagePullSecrets)
 	pod.Spec.InitContainers = mergeContainers(apec.InitContainers, pod.Spec.InitContainers)
 	pod.Spec.Volumes = mergeVolumes(agentVolumes(apec), pod.Spec.Volumes)
+
+	return nil
 }

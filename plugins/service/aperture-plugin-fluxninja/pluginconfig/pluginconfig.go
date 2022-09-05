@@ -16,13 +16,14 @@ const (
 // +kubebuilder:object:generate=true
 type FluxNinjaPluginConfig struct {
 	// Interval between each heartbeat.
-	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
+	//+kubebuilder:validation:Optional
+	HeartbeatInterval config.Duration `json:"heartbeat_interval,omitempty" validate:"gte=0s" default:"5s"`
 	// Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
-	FluxNinjaEndpoint string `json:"fluxninja_endpoint" validate:"omitempty,hostname_port|url|fqdn"`
+	FluxNinjaEndpoint string `json:"fluxninja_endpoint,omitempty" validate:"omitempty,hostname_port|url|fqdn"`
 	// API Key for this agent.
-	APIKey string `json:"api_key"`
+	APIKey string `json:"api_key,omitempty"`
 	// Client configuration.
-	ClientConfig ClientConfig `json:"client"`
+	ClientConfig ClientConfig `json:"client,omitempty"`
 }
 
 // ClientConfig is the client configuration.
@@ -30,7 +31,7 @@ type FluxNinjaPluginConfig struct {
 // +kubebuilder:object:generate=true
 type ClientConfig struct {
 	// HTTP client settings.
-	HTTPClient http.HTTPClientConfig `json:"http"`
+	HTTPClient http.HTTPClientConfig `json:"http,omitempty"`
 	// GRPC client settings.
-	GRPCClient grpc.GRPCClientConfig `json:"grpc"`
+	GRPCClient grpc.GRPCClientConfig `json:"grpc,omitempty"`
 }

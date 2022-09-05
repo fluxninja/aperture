@@ -40,8 +40,6 @@ spec:
           metadata:
             type: object
           spec:
-            default:
-              serverPort: 80
             description: ControllerSpec defines the desired state for the Controller.
             properties:
               affinity:
@@ -904,10 +902,6 @@ spec:
                             items:
                               type: string
                             type: array
-                        required:
-                        - http
-                        - https
-                        - no_proxy
                         type: object
                     type: object
                   etcd:
@@ -920,15 +914,7 @@ spec:
                         type: array
                       lease_ttl:
                         description: Lease time-to-live
-                        properties:
-                          duration:
-                            description: swagger:ignore
-                        required:
-                        - duration
-                        type: object
-                    required:
-                    - endpoints
-                    - lease_ttl
+                        type: string
                     type: object
                   fluxninja_plugin:
                     description: FluxNinja Cloud plugin configuration.
@@ -947,43 +933,23 @@ spec:
                                 properties:
                                   base_delay:
                                     description: Base Delay
-                                    properties:
-                                      duration:
-                                        description: swagger:ignore
-                                    required:
-                                    - duration
-                                    type: object
+                                    type: string
                                   jitter:
                                     description: Jitter
                                     type: number
                                   max_delay:
                                     description: Max Delay
-                                    properties:
-                                      duration:
-                                        description: swagger:ignore
-                                    required:
-                                    - duration
-                                    type: object
+                                    type: string
                                   multiplier:
                                     description: Backoff multiplier
                                     type: number
-                                required:
-                                - base_delay
-                                - jitter
-                                - max_delay
-                                - multiplier
                                 type: object
                               insecure:
                                 description: Disable ClientTLS
                                 type: boolean
                               min_connection_timeout:
                                 description: Minimum connection timeout
-                                properties:
-                                  duration:
-                                    description: swagger:ignore
-                                required:
-                                - duration
-                                type: object
+                                type: string
                               tls:
                                 description: Client TLS configuration
                                 properties:
@@ -997,22 +963,10 @@ spec:
                                     type: string
                                   key_log_file:
                                     type: string
-                                required:
-                                - ca_file
-                                - cert_file
-                                - insecure_skip_verify
-                                - key_file
-                                - key_log_file
                                 type: object
                               use_proxy:
                                 description: Use HTTP CONNECT Proxy
                                 type: boolean
-                            required:
-                            - backoff
-                            - insecure
-                            - min_connection_timeout
-                            - tls
-                            - use_proxy
                             type: object
                           http:
                             description: HTTP client settings.
@@ -1025,20 +979,10 @@ spec:
                                 type: boolean
                               expect_continue_timeout:
                                 description: Expect Continue Timeout. 0 = no timeout.
-                                properties:
-                                  duration:
-                                    description: swagger:ignore
-                                required:
-                                - duration
-                                type: object
+                                type: string
                               idle_connection_timeout:
                                 description: Idle Connection Timeout. 0 = no timeout.
-                                properties:
-                                  duration:
-                                    description: swagger:ignore
-                                required:
-                                - duration
-                                type: object
+                                type: string
                               key_log_file:
                                 description: SSL key log file (useful for debugging
                                   with wireshark)
@@ -1059,20 +1003,10 @@ spec:
                                 type: integer
                               network_keep_alive:
                                 description: Network level keep-alive duration
-                                properties:
-                                  duration:
-                                    description: swagger:ignore
-                                required:
-                                - duration
-                                type: object
+                                type: string
                               network_timeout:
                                 description: Timeout for making network connection
-                                properties:
-                                  duration:
-                                    description: swagger:ignore
-                                required:
-                                - duration
-                                type: object
+                                type: string
                               proxy_connect_header:
                                 additionalProperties:
                                   items:
@@ -1085,22 +1019,12 @@ spec:
                                 type: integer
                               response_header_timeout:
                                 description: Response Header Timeout. 0 = no timeout.
-                                properties:
-                                  duration:
-                                    description: swagger:ignore
-                                required:
-                                - duration
-                                type: object
+                                type: string
                               timeout:
                                 description: HTTP client timeout - Timeouts includes
                                   connection time, redirects, reading the response
                                   etc. 0 = no timeout.
-                                properties:
-                                  duration:
-                                    description: swagger:ignore
-                                required:
-                                - duration
-                                type: object
+                                type: string
                               tls:
                                 description: Client TLS configuration
                                 properties:
@@ -1114,51 +1038,17 @@ spec:
                                     type: string
                                   key_log_file:
                                     type: string
-                                required:
-                                - ca_file
-                                - cert_file
-                                - insecure_skip_verify
-                                - key_file
-                                - key_log_file
                                 type: object
                               tls_handshake_timeout:
                                 description: TLS Handshake Timeout. 0 = no timeout
-                                properties:
-                                  duration:
-                                    description: swagger:ignore
-                                required:
-                                - duration
-                                type: object
+                                type: string
                               use_proxy:
                                 description: Use Proxy
                                 type: boolean
                               write_buffer_size:
                                 description: Write Buffer Size. 0 = 4KB.
                                 type: integer
-                            required:
-                            - disable_compression
-                            - disable_keep_alives
-                            - expect_continue_timeout
-                            - idle_connection_timeout
-                            - key_log_file
-                            - max_conns_per_host
-                            - max_idle_connections
-                            - max_idle_connections_per_host
-                            - max_response_header_bytes
-                            - network_keep_alive
-                            - network_timeout
-                            - proxy_connect_header
-                            - read_buffer_size
-                            - response_header_timeout
-                            - timeout
-                            - tls
-                            - tls_handshake_timeout
-                            - use_proxy
-                            - write_buffer_size
                             type: object
-                        required:
-                        - grpc
-                        - http
                         type: object
                       fluxninja_endpoint:
                         description: Address to grpc or http(s) server listening in
@@ -1167,17 +1057,7 @@ spec:
                         type: string
                       heartbeat_interval:
                         description: Interval between each heartbeat.
-                        properties:
-                          duration:
-                            description: swagger:ignore
-                        required:
-                        - duration
-                        type: object
-                    required:
-                    - api_key
-                    - client
-                    - fluxninja_endpoint
-                    - heartbeat_interval
+                        type: string
                     type: object
                   liveness:
                     description: Liveness probe configuration.
@@ -1191,8 +1071,6 @@ spec:
                               jobs and a precise start time is not critical. 0 = no
                               limit.
                             type: integer
-                        required:
-                        - max_concurrent_jobs
                         type: object
                       service:
                         description: Service settings.
@@ -1201,38 +1079,18 @@ spec:
                             description: Time period between job executions. Zero
                               or negative value means that the job will never execute
                               periodically.
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           execution_timeout:
                             description: Execution timeout
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           initial_delay:
                             description: Initial delay to start the job. Zero value
                               will schedule the job immediately. Negative value will
                               wait for next scheduled interval.
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           initially_healthy:
                             description: Sets whether the job is initially healthy
                             type: boolean
-                        required:
-                        - execution_period
-                        - execution_timeout
-                        - initial_delay
-                        - initially_healthy
                         type: object
                     type: object
                   log:
@@ -1288,24 +1146,8 @@ spec:
                             max_size:
                               description: Log file max size in MB
                               type: integer
-                          required:
-                          - compress
-                          - file
-                          - max_age
-                          - max_backups
-                          - max_size
                           type: object
                         type: array
-                    required:
-                    - compress
-                    - file
-                    - level
-                    - max_age
-                    - max_backups
-                    - max_size
-                    - non_blocking
-                    - pretty_console
-                    - writers
                     type: object
                   metrics:
                     description: Metrics configuration.
@@ -1322,10 +1164,6 @@ spec:
                         description: Pedantic controls whether a pedantic Registerer
                           is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
                         type: boolean
-                    required:
-                    - enable_go_metrics
-                    - enable_process_collector
-                    - pedantic
                     type: object
                   otel:
                     description: OTEL configuration.
@@ -1341,15 +1179,7 @@ spec:
                           timeout:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
-                        required:
-                        - send_batch_size
-                        - timeout
+                            type: string
                         type: object
                       batch_prerollup:
                         description: BatchPrerollup configures batch prerollup processor.
@@ -1362,15 +1192,7 @@ spec:
                           timeout:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
-                        required:
-                        - send_batch_size
-                        - timeout
+                            type: string
                         type: object
                       grpc_addr:
                         description: GRPC listener addr for OTEL Collector.
@@ -1378,11 +1200,6 @@ spec:
                       http_addr:
                         description: HTTP listener addr for OTEL Collector.
                         type: string
-                    required:
-                    - batch_postrollup
-                    - batch_prerollup
-                    - grpc_addr
-                    - http_addr
                     type: object
                   plugins:
                     description: Plugins configuration.
@@ -1404,11 +1221,6 @@ spec:
                         description: Path to plugins directory. This can be set via
                           command line arguments as well.
                         type: string
-                    required:
-                    - disable_plugins
-                    - disabled_plugins
-                    - disabled_symbols
-                    - plugins_path
                     type: object
                   policies:
                     description: Policies configuration.
@@ -1425,12 +1237,7 @@ spec:
                               jobs and a precise start time is not critical. 0 = no
                               limit.
                             type: integer
-                        required:
-                        - max_concurrent_jobs
                         type: object
-                    required:
-                    - policies_path
-                    - promql_jobs_scheduler
                     type: object
                   profilers:
                     description: Profilers configuration.
@@ -1449,10 +1256,6 @@ spec:
                         description: Register routes. Profile types profile, symbol
                           and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
                         type: boolean
-                    required:
-                    - cpu_profiler
-                    - profiles_path
-                    - register_http_routes
                     type: object
                   prometheus:
                     description: Prometheus configuration.
@@ -1460,8 +1263,6 @@ spec:
                       address:
                         description: Address of the prometheus server
                         type: string
-                    required:
-                    - address
                     type: object
                   readiness:
                     description: Readiness probe configuration.
@@ -1475,8 +1276,6 @@ spec:
                               jobs and a precise start time is not critical. 0 = no
                               limit.
                             type: integer
-                        required:
-                        - max_concurrent_jobs
                         type: object
                       service:
                         description: Service settings.
@@ -1485,38 +1284,18 @@ spec:
                             description: Time period between job executions. Zero
                               or negative value means that the job will never execute
                               periodically.
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           execution_timeout:
                             description: Execution timeout
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           initial_delay:
                             description: Initial delay to start the job. Zero value
                               will schedule the job immediately. Negative value will
                               wait for next scheduled interval.
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           initially_healthy:
                             description: Sets whether the job is initially healthy
                             type: boolean
-                        required:
-                        - execution_period
-                        - execution_timeout
-                        - initial_delay
-                        - initially_healthy
                         type: object
                     type: object
                   sentry_plugin:
@@ -1547,14 +1326,6 @@ spec:
                       traces_sample_rate:
                         description: Sample rate for sampling traces i.e. 0.0 to 1.0
                         type: number
-                    required:
-                    - attach_stack_trace
-                    - debug
-                    - disabled
-                    - dsn
-                    - environment
-                    - sample_rate
-                    - traces_sample_rate
                     type: object
                   server:
                     description: Server configuration.
@@ -1567,18 +1338,10 @@ spec:
                         properties:
                           connection_timeout:
                             description: Connection timeout
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           enable_reflection:
                             description: Enable Reflection
                             type: boolean
-                        required:
-                        - connection_timeout
-                        - enable_reflection
                         type: object
                       grpc_gateway:
                         description: GRPC Gateway configuration.
@@ -1588,8 +1351,6 @@ spec:
                               it points to HTTP server port because FluxNinja stack
                               runs GRPC and HTTP servers on the same port
                             type: string
-                        required:
-                        - grpc_server_address
                         type: object
                       http:
                         description: HTTP server configuration.
@@ -1599,12 +1360,7 @@ spec:
                             type: boolean
                           idle_timeout:
                             description: Idle timeout
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           latency_bucket_count:
                             description: The number of buckets in latency histogram
                             type: integer
@@ -1619,48 +1375,18 @@ spec:
                             type: integer
                           read_header_timeout:
                             description: Read header timeout
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           read_timeout:
                             description: Read timeout
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
-                          write_timeout:
+                            type: string
+                          write_timeou:
                             description: Write timeout
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
-                        required:
-                        - disable_http_keep_alives
-                        - idle_timeout
-                        - latency_bucket_count
-                        - latency_bucket_start_ms
-                        - latency_bucket_width_ms
-                        - max_header_bytes
-                        - read_header_timeout
-                        - read_timeout
-                        - write_timeout
+                            type: string
                         type: object
                       keep_alive:
                         description: Keep-alive period - 0 = enabled if supported
                           by protocol or OS. If negative then keep-alives are disabled.
-                        properties:
-                          duration:
-                            description: swagger:ignore
-                        required:
-                        - duration
-                        type: object
+                        type: string
                       network:
                         description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6"
                           (IPv6-only)
@@ -1687,18 +1413,7 @@ spec:
                           server_key:
                             description: Server Key file
                             type: string
-                        required:
-                        - allowed_cn
-                        - certs_path
-                        - client_ca
-                        - enable
-                        - server_cert
-                        - server_key
                         type: object
-                    required:
-                    - addr
-                    - keep_alive
-                    - network
                     type: object
                   watchdog:
                     description: Watchdog configuration.
@@ -1721,9 +1436,6 @@ spec:
                                 description: Factor sets user-configured limit of
                                   available memory
                                 type: number
-                            required:
-                            - enabled
-                            - factor
                             type: object
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy
@@ -1740,13 +1452,7 @@ spec:
                                 items:
                                   type: number
                                 type: array
-                            required:
-                            - enabled
-                            - watermarks
                             type: object
-                        required:
-                        - adaptive_policy
-                        - watermarks_policy
                         type: object
                       heap:
                         description: HeapConfig holds configuration for heap Watchdog.
@@ -1765,9 +1471,6 @@ spec:
                                 description: Factor sets user-configured limit of
                                   available memory
                                 type: number
-                            required:
-                            - enabled
-                            - factor
                             type: object
                           limit:
                             description: Maximum memory (in bytes) sets limit of process
@@ -1794,15 +1497,7 @@ spec:
                                 items:
                                   type: number
                                 type: array
-                            required:
-                            - enabled
-                            - watermarks
                             type: object
-                        required:
-                        - adaptive_policy
-                        - limit
-                        - min_gogc
-                        - watermarks_policy
                         type: object
                       job:
                         description: JobConfig is config for Job swagger:model
@@ -1811,38 +1506,18 @@ spec:
                             description: Time period between job executions. Zero
                               or negative value means that the job will never execute
                               periodically.
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           execution_timeout:
                             description: Execution timeout
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           initial_delay:
                             description: Initial delay to start the job. Zero value
                               will schedule the job immediately. Negative value will
                               wait for next scheduled interval.
-                            properties:
-                              duration:
-                                description: swagger:ignore
-                            required:
-                            - duration
-                            type: object
+                            type: string
                           initially_healthy:
                             description: Sets whether the job is initially healthy
                             type: boolean
-                        required:
-                        - execution_period
-                        - execution_timeout
-                        - initial_delay
-                        - initially_healthy
                         type: object
                       system:
                         description: WatchdogPolicyType holds configuration Watchdog
@@ -1862,9 +1537,6 @@ spec:
                                 description: Factor sets user-configured limit of
                                   available memory
                                 type: number
-                            required:
-                            - enabled
-                            - factor
                             type: object
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy
@@ -1881,19 +1553,8 @@ spec:
                                 items:
                                   type: number
                                 type: array
-                            required:
-                            - enabled
-                            - watermarks
                             type: object
-                        required:
-                        - adaptive_policy
-                        - watermarks_policy
                         type: object
-                    required:
-                    - cgroup
-                    - heap
-                    - job
-                    - system
                     type: object
                 type: object
               containerSecurityContext:

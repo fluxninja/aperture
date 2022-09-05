@@ -24,7 +24,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // AgentSpec defines the desired state for the Agent.
@@ -51,19 +50,19 @@ type AgentSpec struct {
 type AgentConfigSpec struct {
 	// CommonConfigSpec
 	//+kubebuilder:validation:Optional
-	CommonConfigSpec `json:",inline"`
+	CommonConfigSpec `json:",inline,omitempty"`
 	// AgentInfo configuration.
 	//+kubebuilder:validation:Optional
-	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info"`
+	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info,omitempty"`
 	// DistCache configuration.
 	//+kubebuilder:validation:Optional
-	DistCache distcache.DistCacheConfig `json:"dist_cache"`
+	DistCache distcache.DistCacheConfig `json:"dist_cache,omitempty"`
 	// Kubernetes client configuration.
 	//+kubebuilder:validation:Optional
-	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client"`
+	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client,omitempty"`
 	// Peer discovery configuration.
 	//+kubebuilder:validation:Optional
-	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery"`
+	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery,omitempty"`
 }
 
 // AgentStatus defines the observed state of Agent.
@@ -95,4 +94,5 @@ type AgentList struct {
 }
 
 func init() {
+	SchemeBuilder.Register(&Agent{}, &AgentList{})
 }

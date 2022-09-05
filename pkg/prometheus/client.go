@@ -38,7 +38,7 @@ var (
 // +kubebuilder:object:generate=true
 type PrometheusConfig struct {
 	// Address of the prometheus server
-	Address string `json:"address" validate:"hostname_port|url|fqdn"`
+	Address string `json:"address,omitempty" validate:"hostname_port|url|fqdn"`
 }
 
 // Module provides a singleton pointer to prometheusv1.API via FX.

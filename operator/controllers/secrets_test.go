@@ -76,7 +76,9 @@ var _ = Describe("Secret for Agent", func() {
 				},
 			}
 
-			result, _ := secretForAgentAPIKey(instance.DeepCopy(), scheme.Scheme)
+			result, err := secretForAgentAPIKey(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -130,7 +132,9 @@ var _ = Describe("Secret for Agent", func() {
 				},
 			}
 
-			result, _ := secretForAgentAPIKey(instance.DeepCopy(), scheme.Scheme)
+			result, err := secretForAgentAPIKey(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -181,7 +185,9 @@ var _ = Describe("Secret for Controller", func() {
 				},
 			}
 
-			result, _ := secretForControllerAPIKey(instance.DeepCopy(), scheme.Scheme)
+			result, err := secretForControllerAPIKey(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -235,7 +241,9 @@ var _ = Describe("Secret for Controller", func() {
 				},
 			}
 
-			result, _ := secretForControllerAPIKey(instance.DeepCopy(), scheme.Scheme)
+			result, err := secretForControllerAPIKey(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -279,7 +287,9 @@ var _ = Describe("Secret for Controller Cert", func() {
 				},
 			}
 
-			result, _ := secretForControllerCert(instance.DeepCopy(), scheme.Scheme, bytes.NewBuffer([]byte(test)), bytes.NewBuffer([]byte(test)))
+			result, err := secretForControllerCert(instance.DeepCopy(), scheme.Scheme, bytes.NewBuffer([]byte(test)), bytes.NewBuffer([]byte(test)))
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -325,7 +335,9 @@ var _ = Describe("Secret for Controller Cert", func() {
 				},
 			}
 
-			result, _ := secretForControllerCert(instance.DeepCopy(), scheme.Scheme, bytes.NewBuffer([]byte(test)), bytes.NewBuffer([]byte(test)))
+			result, err := secretForControllerCert(instance.DeepCopy(), scheme.Scheme, bytes.NewBuffer([]byte(test)), bytes.NewBuffer([]byte(test)))
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -342,6 +354,7 @@ var _ = Describe("Test Secret Mutate", func() {
 
 		secret := &corev1.Secret{}
 		err := secretMutate(secret, expected.Data)()
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(secret).To(Equal(expected))
 	})

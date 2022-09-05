@@ -78,7 +78,9 @@ var _ = Describe("Service for Controller Webhook", func() {
 				},
 			}
 
-			result, _ := serviceForControllerWebhook(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := serviceForControllerWebhook(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -144,7 +146,9 @@ var _ = Describe("Service for Controller Webhook", func() {
 				},
 			}
 
-			result, _ := serviceForControllerWebhook(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := serviceForControllerWebhook(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -199,7 +203,9 @@ var _ = Describe("Service for Controller", func() {
 				},
 			}
 
-			result, _ := serviceForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := serviceForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -265,7 +271,9 @@ var _ = Describe("Service for Controller", func() {
 				},
 			}
 
-			result, _ := serviceForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := serviceForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -327,7 +335,9 @@ var _ = Describe("Service for Agent", func() {
 				},
 			}
 
-			result, _ := serviceForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := serviceForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -400,7 +410,9 @@ var _ = Describe("Service for Agent", func() {
 				},
 			}
 
-			result, _ := serviceForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := serviceForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -423,6 +435,7 @@ var _ = Describe("Test Service Mutate", func() {
 
 		svc := &corev1.Service{}
 		err := serviceMutate(svc, expected.Spec)()
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(svc).To(Equal(expected))
 	})

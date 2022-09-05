@@ -550,7 +550,11 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			AgentEventValid1 := event.UpdateEvent{
 				ObjectOld: &v1alpha1.Agent{},
 				ObjectNew: &v1alpha1.Agent{
-					Spec: v1alpha1.AgentSpec{},
+					Spec: v1alpha1.AgentSpec{
+						CommonSpec: v1alpha1.CommonSpec{
+							Command: testArray,
+						},
+					},
 				},
 			}
 

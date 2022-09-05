@@ -18,7 +18,7 @@ const (
 // swagger:model
 type AgentInfoConfig struct {
 	// All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
-	AgentGroup string `json:"agent_group" default:"default"`
+	AgentGroup string `json:"agent_group,omitempty" default:"default"`
 }
 
 // AgentInfo is the agent info.
