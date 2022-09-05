@@ -95,7 +95,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			etcdClient.Watcher = namespacev3.NewWatcher(etcdClient.Client, namespace)
 
 			// Create a lease with etcd for this client, exit app if lease maintenance fails
-			resp, err := etcdClient.Lease.Grant(ctx, (int64)(config.LeaseTTL.Duration.AsDuration().Seconds()))
+			resp, err := etcdClient.Lease.Grant(ctx, (int64)(config.LeaseTTL.AsDuration().Seconds()))
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to grant a lease")
 				cancel()

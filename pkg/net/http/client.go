@@ -104,18 +104,18 @@ func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmar
 	transport := &http.Transport{
 		TLSClientConfig: tlsConfig,
 		DialContext: (&net.Dialer{
-			Timeout:   config.NetworkTimeout.Duration.AsDuration(),
-			KeepAlive: config.NetworkKeepAlive.Duration.AsDuration(),
+			Timeout:   config.NetworkTimeout.AsDuration(),
+			KeepAlive: config.NetworkKeepAlive.AsDuration(),
 		}).DialContext,
-		TLSHandshakeTimeout:    config.TLSHandshakeTimeout.Duration.AsDuration(),
+		TLSHandshakeTimeout:    config.TLSHandshakeTimeout.AsDuration(),
 		DisableKeepAlives:      config.DisableKeepAlives,
 		DisableCompression:     config.DisableCompression,
 		MaxIdleConns:           config.MaxIdleConns,
 		MaxIdleConnsPerHost:    config.MaxIdleConnsPerHost,
 		MaxConnsPerHost:        config.MaxConnsPerHost,
-		IdleConnTimeout:        config.IdleConnTimeout.Duration.AsDuration(),
-		ResponseHeaderTimeout:  config.ResponseHeaderTimeout.Duration.AsDuration(),
-		ExpectContinueTimeout:  config.ExpectContinueTimeout.Duration.AsDuration(),
+		IdleConnTimeout:        config.IdleConnTimeout.AsDuration(),
+		ResponseHeaderTimeout:  config.ResponseHeaderTimeout.AsDuration(),
+		ExpectContinueTimeout:  config.ExpectContinueTimeout.AsDuration(),
 		ProxyConnectHeader:     config.ProxyConnectHeader,
 		MaxResponseHeaderBytes: config.MaxResponseHeaderBytes,
 		WriteBufferSize:        config.WriteBufferSize,
@@ -128,7 +128,7 @@ func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmar
 
 	client := &http.Client{
 		Transport: transport,
-		Timeout:   config.Timeout.Duration.AsDuration(),
+		Timeout:   config.Timeout.AsDuration(),
 	}
 
 	// return a middleware chain -- call invokes on this object to chain middleware functions

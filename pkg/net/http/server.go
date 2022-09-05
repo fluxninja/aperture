@@ -144,10 +144,10 @@ func (constructor ServerConstructor) provideServer(
 	server := &http.Server{
 		Handler:           router,
 		MaxHeaderBytes:    config.MaxHeaderBytes,
-		IdleTimeout:       config.IdleTimeout.Duration.AsDuration(),
-		ReadHeaderTimeout: config.ReadHeaderTimeout.Duration.AsDuration(),
-		ReadTimeout:       config.ReadTimeout.Duration.AsDuration(),
-		WriteTimeout:      config.WriteTimeout.Duration.AsDuration(),
+		IdleTimeout:       config.IdleTimeout.AsDuration(),
+		ReadHeaderTimeout: config.ReadHeaderTimeout.AsDuration(),
+		ReadTimeout:       config.ReadTimeout.AsDuration(),
+		WriteTimeout:      config.WriteTimeout.AsDuration(),
 		TLSConfig:         tlsConfig,
 	}
 

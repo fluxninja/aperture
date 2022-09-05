@@ -150,9 +150,9 @@ func addLogsAndTracesPipelines(cfg *otelParams) {
 	addOTLPReceiver(cfg)
 	config.AddProcessor(ProcessorEnrichment, nil)
 	addMetricsProcessor(config)
-	config.AddBatchProcessor(ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.Duration.AsDuration(), cfg.BatchPrerollup.SendBatchSize)
+	config.AddBatchProcessor(ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPrerollup.SendBatchSize)
 	addRollupProcessor(config)
-	config.AddBatchProcessor(ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.Duration.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
+	config.AddBatchProcessor(ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
 	config.AddExporter(ExporterLogging, nil)
 
 	processors := []string{

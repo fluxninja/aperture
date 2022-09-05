@@ -11,7 +11,7 @@ import (
 func (msg *HeapResult) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -27,7 +27,7 @@ func (msg *HeapResult) UnmarshalJSON(b []byte) error {
 func (msg *WatchdogResult) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }

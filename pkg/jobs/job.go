@@ -126,7 +126,7 @@ func (executor *jobExecutor) doJob() {
 		return
 	}
 
-	executionTimeout := executor.config.ExecutionTimeout.Duration.AsDuration()
+	executionTimeout := executor.config.ExecutionTimeout.AsDuration()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	if executionTimeout > 0 {
@@ -176,9 +176,9 @@ func (executor *jobExecutor) start() {
 	defer executor.execLock.Unlock()
 
 	var scheduler *gocron.Scheduler
-	if executor.config.ExecutionPeriod.Duration.AsDuration() > 0 {
+	if executor.config.ExecutionPeriod.AsDuration() > 0 {
 		scheduler = executor.jg.scheduler.
-			Every(executor.config.ExecutionPeriod.Duration.AsDuration())
+			Every(executor.config.ExecutionPeriod.AsDuration())
 	} else {
 		scheduler = executor.jg.scheduler.
 			Every(time.Duration(math.MaxInt64))
@@ -188,7 +188,7 @@ func (executor *jobExecutor) start() {
 		Tag(executor.jobTag).
 		SingletonMode()
 
-	initialDelay := executor.config.InitialDelay.Duration.AsDuration()
+	initialDelay := executor.config.InitialDelay.AsDuration()
 
 	if initialDelay > 0 {
 		scheduler = scheduler.StartAt(time.Now().Add(initialDelay))

@@ -9,7 +9,6 @@ import (
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
 	"gopkg.in/yaml.v2"
 
 	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
@@ -176,9 +175,9 @@ func (policy *Policy) setupCircuitJob(
 					JobFunc: policy.executeTick,
 				}
 				job.JobName = policy.jobName
-				initialDelay := config.Duration{Duration: durationpb.New(time.Duration(0))}
-				executionPeriod := config.Duration{Duration: durationpb.New(policy.evaluationInterval)}
-				executionTimeout := config.Duration{Duration: durationpb.New(time.Millisecond * 100)}
+				initialDelay := config.MakeDuration(0)
+				executionPeriod := config.MakeDuration(policy.evaluationInterval)
+				executionTimeout := config.MakeDuration(time.Millisecond * 100)
 				jobConfig := jobs.JobConfig{
 					InitiallyHealthy: true,
 					InitialDelay:     initialDelay,

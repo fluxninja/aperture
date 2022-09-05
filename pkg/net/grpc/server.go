@@ -95,7 +95,7 @@ func (constructor ServerConstructor) provideServer(
 	grpcServerMetrics := grpc_prometheus.NewServerMetrics()
 
 	// Connection timeout from config
-	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.Duration.AsDuration()))
+	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))
 
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		grpcServerMetrics.UnaryServerInterceptor(),

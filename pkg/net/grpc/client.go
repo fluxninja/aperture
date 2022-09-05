@@ -97,12 +97,12 @@ func (c ClientConstructor) provideClientConnectionBuilder(unmarshaller config.Un
 	))
 	dialOptions = append(dialOptions, grpc.WithConnectParams(grpc.ConnectParams{
 		Backoff: backoff.Config{
-			BaseDelay:  config.Backoff.BaseDelay.Duration.AsDuration(),
+			BaseDelay:  config.Backoff.BaseDelay.AsDuration(),
 			Multiplier: config.Backoff.Multiplier,
 			Jitter:     config.Backoff.Jitter,
-			MaxDelay:   config.Backoff.MaxDelay.Duration.AsDuration(),
+			MaxDelay:   config.Backoff.MaxDelay.AsDuration(),
 		},
-		MinConnectTimeout: config.MinConnectionTimeout.Duration.AsDuration(),
+		MinConnectTimeout: config.MinConnectionTimeout.AsDuration(),
 	}))
 
 	if !config.UseProxy {

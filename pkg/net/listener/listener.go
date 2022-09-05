@@ -26,7 +26,7 @@ type ListenerConfig struct {
 }
 
 func newListener(config ListenerConfig) (net.Listener, error) {
-	listenConfig := net.ListenConfig{KeepAlive: config.KeepAlive.Duration.AsDuration()}
+	listenConfig := net.ListenConfig{KeepAlive: config.KeepAlive.AsDuration()}
 
 	listener, err := listenConfig.Listen(context.Background(), config.Network, config.Addr)
 	if err != nil {

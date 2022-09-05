@@ -11,7 +11,7 @@ import (
 func (msg *ReportRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -27,7 +27,7 @@ func (msg *ReportRequest) UnmarshalJSON(b []byte) error {
 func (msg *ReportResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -43,7 +43,7 @@ func (msg *ReportResponse) UnmarshalJSON(b []byte) error {
 func (msg *ControllerInfo) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }

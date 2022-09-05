@@ -25,7 +25,6 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"google.golang.org/protobuf/types/known/durationpb"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -135,23 +134,17 @@ var _ = Describe("ConfigMap for Agent", func() {
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
 								BatchPrerollup: otel.BatchConfig{
-									Timeout: config.Duration{
-										Duration: durationpb.New(1 * time.Second),
-									},
+									Timeout:       config.MakeDuration(1 * time.Second),
 									SendBatchSize: 15000,
 								},
 								BatchPostrollup: otel.BatchConfig{
-									Timeout: config.Duration{
-										Duration: durationpb.New(1 * time.Second),
-									},
+									Timeout:       config.MakeDuration(1 * time.Second),
 									SendBatchSize: 15000,
 								},
 							},
 							Etcd: etcd.EtcdConfig{
 								Endpoints: []string{"http://agent-etcd:2379"},
-								LeaseTTL: config.Duration{
-									Duration: durationpb.New(60 * time.Second),
-								},
+								LeaseTTL:  config.MakeDuration(60 * time.Second),
 							},
 							Prometheus: prometheus.PrometheusConfig{
 								Address: "http://aperture-prometheus-server:80",
@@ -170,7 +163,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 				panic(fmt.Errorf("failed to parse test config for Agent. error: '%s'", err.Error()))
 			}
 			var config bytes.Buffer
-			if err := t.Execute(&config, struct{}{}); err != nil {
+			if err = t.Execute(&config, struct{}{}); err != nil {
 				panic(err)
 			}
 
@@ -240,23 +233,17 @@ var _ = Describe("ConfigMap for Controller", func() {
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
 								BatchPrerollup: otel.BatchConfig{
-									Timeout: config.Duration{
-										Duration: durationpb.New(1 * time.Second),
-									},
+									Timeout:       config.MakeDuration(1 * time.Second),
 									SendBatchSize: 15000,
 								},
 								BatchPostrollup: otel.BatchConfig{
-									Timeout: config.Duration{
-										Duration: durationpb.New(1 * time.Second),
-									},
+									Timeout:       config.MakeDuration(1 * time.Second),
 									SendBatchSize: 15000,
 								},
 							},
 							Etcd: etcd.EtcdConfig{
 								Endpoints: []string{"http://agent-etcd:2379"},
-								LeaseTTL: config.Duration{
-									Duration: durationpb.New(60 * time.Second),
-								},
+								LeaseTTL:  config.MakeDuration(60 * time.Second),
 							},
 							Prometheus: prometheus.PrometheusConfig{
 								Address: "http://aperture-prometheus-server:80",
@@ -271,7 +258,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 				panic(fmt.Errorf("failed to parse test config for Controller. error: '%s'", err.Error()))
 			}
 			var config bytes.Buffer
-			if err := t.Execute(&config, struct{}{}); err != nil {
+			if err = t.Execute(&config, struct{}{}); err != nil {
 				panic(err)
 			}
 
