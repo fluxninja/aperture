@@ -425,9 +425,21 @@ jobs:
               args+=( --dry-run )
             fi
             fn release sync-deployment-repo "${args[@]}"
+  helm-release:
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - helm-package-push
 
 workflows:
   version: 2
+
+  helm-release-workflow:
+    jobs:
+      - helm-release:
+          filters:
+            tags:
+              only: /^releases/charts/*/v*/
 
   aperture:
     when:
@@ -719,3 +731,8 @@ commands:
             PARAM_DEST_IMAGE: <<parameters.dest-image>>
             PARAM_DEST_TAG: <<parameters.dest-tag>>
           name: <<parameters.step-name>>
+  helm-package-push:
+    steps:
+      - run:
+          name: "Package and release Helm Chart"
+          command: .circleci/scripts/helm_release.sh
