@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -24,11 +23,24 @@ import (
 type metricsProcessor struct {
 	cfg                      *Config
 	workloadLatencyHistogram *prometheus.HistogramVec
+	durationRollup           *otelcollector.Rollup
 }
 
 func newProcessor(cfg *Config) (*metricsProcessor, error) {
+	// retrieve the duration rollup from the config
+	var durationRollup *otelcollector.Rollup
+	for _, rollup := range cfg.Rollups {
+		if rollup.FromField == otelcollector.DurationLabel {
+			durationRollup = rollup
+			break
+		}
+	}
+	if durationRollup == nil {
+		return nil, fmt.Errorf("%s rollup not found in config", otelcollector.DurationLabel)
+	}
 	p := &metricsProcessor{
-		cfg: cfg,
+		cfg:            cfg,
+		durationRollup: durationRollup,
 	}
 	err := p.registerRequestLatencyHistogram()
 	if err != nil {
@@ -208,14 +220,9 @@ func (p *metricsProcessor) updateMetrics(
 	attributes pcommon.Map,
 	checkResponse *flowcontrolv1.CheckResponse,
 ) error {
-	rawLatency, exists := attributes.Get(otelcollector.DurationLabel)
-	if !exists {
-		log.Debug().Str("label", otelcollector.DurationLabel).Msg("Label does not exist")
-		return nil
-	}
-	latency, err := strconv.ParseFloat(rawLatency.StringVal(), 64)
-	if err != nil {
-		log.Debug().Str("rawLatency", rawLatency.AsString()).Msg("Could not parse raw latency to float")
+	latency, found := p.durationRollup.GetFromFieldValue(attributes)
+	if !found {
+		otelcollector.SampledLog.Warn().Str("label", otelcollector.DurationLabel).Msg("Unable to update latency metric because of missing label")
 		return nil
 	}
 	statusCodeStr := ""
@@ -242,7 +249,7 @@ func (p *metricsProcessor) updateMetrics(
 			metrics.WorkloadIndexLabel:  workload,
 		}
 
-		err = p.updateMetricsForWorkload(labels, latency)
+		err := p.updateMetricsForWorkload(labels, latency)
 		if err != nil {
 			return err
 		}

@@ -4,6 +4,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/config"
 
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
 
@@ -18,4 +19,6 @@ type Config struct {
 	LatencyBucketWidthMS float64 `mapstructure:"latency_bucket_width_ms" validate:"gte=0" default:"20"`
 	// The number of buckets in latency histogram
 	LatencyBucketCount int `mapstructure:"latency_bucket_count" validate:"gte=0" default:"100"`
+	// Rollups
+	Rollups []*otelcollector.Rollup `mapstructure:"rollups"`
 }

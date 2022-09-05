@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"strconv"
 	"time"
 
 	"github.com/fluxninja/datasketches-go/sketches"
@@ -129,97 +128,57 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 	return rp.exportLogs(ctx, rollupData)
 }
 
-func (rollup Rollup) getInt64(attributes pcommon.Map) (int64, bool) {
-	rawNewValue, exists := attributes.Get(rollup.FromField)
-	if !exists {
-		log.Trace().Msg("FromField not found")
-		return 0, false
-	}
-	newValue, err := strconv.ParseInt(rawNewValue.AsString(), 10, 64)
-	if err != nil {
-		log.Warn().Str("value", rawNewValue.AsString()).Msg("Failed parsing value as int")
-		return 0, false
-	}
-	return newValue, true
-}
-
-func (rollup Rollup) getFloat64(attributes pcommon.Map) (float64, bool) {
-	rawNewValue, exists := attributes.Get(rollup.FromField)
-	if !exists {
-		log.Trace().Msg("FromField not found")
-		return 0, false
-	}
-	newValue, err := strconv.ParseFloat(rawNewValue.AsString(), 64)
-	if err != nil {
-		log.Warn().Str("value", rawNewValue.AsString()).Msg("Failed parsing value as int")
-		return 0, false
-	}
-	return newValue, true
-}
-
-func max(a, b int64) int64 {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func min(a, b int64) int64 {
-	if a > b {
-		return b
-	}
-	return a
-}
-
 func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.HeapDoublesSketch, baseAttributes, attributes pcommon.Map) {
 	for _, rollup := range rp.cfg.Rollups {
 		switch rollup.Type {
-		case RollupSum:
-			newValue, found := rollup.getInt64(attributes)
+		case otelcollector.RollupSum:
+			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
 				continue
 			}
-			rawSum, exists := baseAttributes.Get(rollup.ToField)
+			rollupSum, exists := rollup.GetToFieldValue(baseAttributes)
 			if !exists {
-				baseAttributes.UpsertInt(rollup.ToField, 0)
+				rollupSum = 0
+				baseAttributes.UpsertDouble(rollup.ToField, rollupSum)
 			}
-			baseAttributes.UpdateInt(rollup.ToField, rawSum.IntVal()+newValue)
-		case RollupSumOfSquares:
-			newValue, found := rollup.getInt64(attributes)
+			baseAttributes.UpdateDouble(rollup.ToField, rollupSum+newValue)
+		case otelcollector.RollupSumOfSquares:
+			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
 				continue
 			}
-			rawSum, exists := baseAttributes.Get(rollup.ToField)
+			rollupSos, exists := rollup.GetToFieldValue(baseAttributes)
 			if !exists {
-				baseAttributes.UpsertInt(rollup.ToField, 0)
+				rollupSos = 0
+				baseAttributes.UpsertDouble(rollup.ToField, rollupSos)
 			}
-			baseAttributes.UpdateInt(rollup.ToField, rawSum.IntVal()+newValue*newValue)
-		case RollupMin:
-			newValue, found := rollup.getInt64(attributes)
+			baseAttributes.UpdateDouble(rollup.ToField, rollupSos+newValue*newValue)
+		case otelcollector.RollupMin:
+			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
 				continue
 			}
-			prevMin, exists := baseAttributes.Get(rollup.ToField)
+			rollupMin, exists := rollup.GetToFieldValue(baseAttributes)
 			if !exists {
-				prevMin = pcommon.NewValueInt(newValue)
-				baseAttributes.UpsertInt(rollup.ToField, newValue)
+				rollupMin = newValue
+				baseAttributes.UpsertDouble(rollup.ToField, rollupMin)
 			}
-			newMin := min(prevMin.IntVal(), newValue)
-			baseAttributes.UpdateInt(rollup.ToField, newMin)
-		case RollupMax:
-			newValue, found := rollup.getInt64(attributes)
+			newMin := otelcollector.Min(rollupMin, newValue)
+			baseAttributes.UpdateDouble(rollup.ToField, newMin)
+		case otelcollector.RollupMax:
+			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
 				continue
 			}
-			prevMax, exists := baseAttributes.Get(rollup.ToField)
+			rollupMax, exists := rollup.GetToFieldValue(baseAttributes)
 			if !exists {
-				prevMax = pcommon.NewValueInt(newValue)
-				baseAttributes.UpsertInt(rollup.ToField, newValue)
+				rollupMax = newValue
+				baseAttributes.UpsertDouble(rollup.ToField, rollupMax)
 			}
-			newMax := max(prevMax.IntVal(), newValue)
-			baseAttributes.UpdateInt(rollup.ToField, newMax)
-		case RollupDatasketch:
-			newValue, found := rollup.getFloat64(attributes)
+			newMax := otelcollector.Max(rollupMax, newValue)
+			baseAttributes.UpdateDouble(rollup.ToField, newMax)
+		case otelcollector.RollupDatasketch:
+			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
 				continue
 			}

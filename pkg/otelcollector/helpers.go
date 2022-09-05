@@ -2,6 +2,7 @@ package otelcollector
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
@@ -10,7 +11,11 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/rs/zerolog"
 )
+
+// SampledLog provides log sampling for OTEL collector.
+var SampledLog log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
 
 // IterateLogRecords calls given function for each logRecord. If the function
 // returns error further logRecords will not be processed and the error will be returned.
@@ -183,4 +188,48 @@ func unmarshalAttributesMap(attributes pcommon.Map, label string, output interfa
 		return false
 	}
 	return true
+}
+
+// GetFloat64 returns float64 value from given attribute map at given key.
+func GetFloat64(attributes pcommon.Map, key string, treatAsZero []string) (float64, bool) {
+	rawNewValue, exists := attributes.Get(key)
+	if !exists {
+		log.Trace().Msg("key not found")
+		return 0, false
+	}
+	if rawNewValue.Type() == pcommon.ValueTypeDouble {
+		return rawNewValue.DoubleVal(), true
+	} else if rawNewValue.Type() == pcommon.ValueTypeInt {
+		return float64(rawNewValue.IntVal()), true
+	} else if rawNewValue.Type() == pcommon.ValueTypeString {
+		newValue, err := strconv.ParseFloat(rawNewValue.StringVal(), 64)
+		if err != nil {
+			for _, treatAsZeroValue := range treatAsZero {
+				if rawNewValue.StringVal() == treatAsZeroValue {
+					return 0, true
+				}
+			}
+			SampledLog.Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Failed parsing value as float")
+			return 0, false
+		}
+		return newValue, true
+	}
+	SampledLog.Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Unsupported value type")
+	return 0, false
+}
+
+// Max returns the maximum value of the given values.
+func Max(a, b float64) float64 {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+// Min returns the minimum value of the given values.
+func Min(a, b float64) float64 {
+	if a > b {
+		return b
+	}
+	return a
 }

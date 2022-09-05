@@ -44,7 +44,37 @@ const (
 	ExporterPrometheusRemoteWrite = "prometheusremotewrite"
 )
 
-var baseFxTag = config.NameTag("base")
+var (
+	baseFxTag = config.NameTag("base")
+	rollups   = initRollups()
+)
+
+func initRollups() []*otelcollector.Rollup {
+	rlpsInit := []otelcollector.Rollup{
+		{
+			FromField:   otelcollector.DurationLabel,
+			TreatAsZero: []string{"-"},
+		},
+		{
+			FromField: otelcollector.HTTPRequestContentLength,
+		},
+		{
+			FromField: otelcollector.HTTPResponseContentLength,
+		},
+	}
+	var rlps []*otelcollector.Rollup
+	for _, rollupInit := range rlpsInit {
+		for _, t := range otelcollector.RollupTypes {
+			rlps = append(rlps, &otelcollector.Rollup{
+				FromField:   rollupInit.FromField,
+				ToField:     fmt.Sprintf("%s_%s", rollupInit.FromField, t),
+				Type:        t,
+				TreatAsZero: rollupInit.TreatAsZero,
+			})
+		}
+	}
+	return rlps
+}
 
 type otelParams struct {
 	promClient promapi.Client
@@ -220,25 +250,11 @@ func addMetricsProcessor(config *otelcollector.OTELConfig) {
 		LatencyBucketStartMS: 20,
 		LatencyBucketWidthMS: 20,
 		LatencyBucketCount:   100,
+		Rollups:              rollups,
 	})
 }
 
 func addRollupProcessor(config *otelcollector.OTELConfig) {
-	rollupFields := []string{
-		otelcollector.DurationLabel,
-		otelcollector.HTTPRequestContentLength,
-		otelcollector.HTTPResponseContentLength,
-	}
-	rollups := []rollupprocessor.Rollup{}
-	for _, field := range rollupFields {
-		for _, t := range rollupprocessor.RollupTypes {
-			rollups = append(rollups, rollupprocessor.Rollup{
-				FromField: field,
-				ToField:   fmt.Sprintf("%s_%s", field, t),
-				Type:      t,
-			})
-		}
-	}
 	config.AddProcessor(ProcessorRollup, rollupprocessor.Config{
 		Rollups: rollups,
 	})

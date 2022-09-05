@@ -14,6 +14,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
 )
 
@@ -25,7 +26,7 @@ var _ = Describe("Rollup processor", func() {
 
 	BeforeEach(func() {
 		config = &rollupprocessor.Config{
-			Rollups: []rollupprocessor.Rollup{
+			Rollups: []*otelcollector.Rollup{
 				{FromField: "foo", ToField: "foo_datasketch", Type: "datasketch"},
 				{FromField: "foo", ToField: "foo_sum", Type: "sum"},
 				{FromField: "foo", ToField: "foo_min", Type: "min"},
