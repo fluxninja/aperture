@@ -158,14 +158,16 @@ message Extractor {
 // ```
 message JSONExtractor {
   // Attribute path pointing to some strings - eg. "request.http.body".
-  string from = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "required"
+  string from = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
+        }
       }
     }
-  }]; //@gotags: validate:"required"
+  ]; //@gotags: validate:"required"
 
   // Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
   //
@@ -189,14 +191,16 @@ message JSONExtractor {
 // ```
 message AddressExtractor {
   // Attribute path pointing to some string - eg. "source.address".
-  string from = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "required"
+  string from = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
+        }
       }
     }
-  }]; //@gotags: validate:"required"
+  ]; //@gotags: validate:"required"
 }
 
 // Parse the attribute as JWT and read the payload
@@ -213,14 +217,16 @@ message AddressExtractor {
 // ```
 message JWTExtractor {
   // Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
-  string from = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "required"
+  string from = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
+        }
       }
     }
-  }]; //@gotags: validate:"required"
+  ]; //@gotags: validate:"required"
 
   // Json pointer allowing to select a specified field from the json payload.
   //
