@@ -27,16 +27,14 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // ```
 message Selector {
   // Describes where this selector applies to.
-  string agent_group = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {
-          string_value: "default"
-        }
+  string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {
+        string_value: "default"
       }
     }
-  ]; // @gotags: default:"default"
+  }]; // @gotags: default:"default"
 
   // The service (name) of the entities.
   // In k8s, this is the FQDN of the Service object.
@@ -45,16 +43,14 @@ message Selector {
   string service = 2;
 
   // Describes control point within the entity where the policy should apply to.
-  ControlPoint control_point = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {
-          string_value: "required"
-        }
+  ControlPoint control_point = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
       }
     }
-  ]; // @gotags: validate:"required"
+  }]; // @gotags: validate:"required"
 
   // Label matcher allows to add _additional_ condition on
   // [flow labels](/concepts/flow-control/label/label.md)
@@ -82,16 +78,14 @@ message ControlPoint {
     // Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
     //
     // Note: Flowcontrol only.
-    string feature = 1 [
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-validate"
-          value: {
-            string_value: "required"
-          }
+    string feature = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
         }
       }
-    ]; //@gotags: validate:"required"
+    }]; //@gotags: validate:"required"
 
     // Type of traffic service, either "ingress" or "egress".
     // Apply the policy to the whole incoming/outgoing traffic of a service.
@@ -99,15 +93,13 @@ message ControlPoint {
     //
     // * Flowcontrol: Blockable atom here is a single HTTP-transaction.
     // * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
-    string traffic = 2 [
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-validate"
-          value: {
-            string_value: "required,oneof=ingress egress"
-          }
+    string traffic = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required,oneof=ingress egress"
         }
       }
-    ]; // @gotags: validate:"required,oneof=ingress egress"
+    }]; // @gotags: validate:"required,oneof=ingress egress"
   }
 }
