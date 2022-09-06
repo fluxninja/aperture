@@ -70,16 +70,24 @@ These events are rolled up and sent to the analytics database in the cloud. This
 allows:
 
 - for the flow labels to be used as filters,
-- to see analytics for each flow label, eg. distribution of its values
+- to see analytics for each flow label, eg. distribution of its values.
 
-:::note For classifier-created labels, you can disable this behaviour by setting
-`propagate: false` in
-[the classification rule](/reference/configuration/policies.md#-v1rule). :::
+:::note
 
-:::danger This means that by default the already-present-in-baggage labels are
-sent to the cloud.
+For classifier-created labels, you can disable this behaviour by setting
+`hidden: true` in
+[the classification rule](/reference/configuration/policies.md#-v1rule).
 
-TODO perhaps we should invert the default? :::
+:::
+
+:::danger
+
+This means that by default the already-present-in-baggage labels are sent to the
+cloud.
+
+TODO perhaps we should invert the default?
+
+:::
 
 [flow]: /concepts/flow-control/flow-control.md#flow
 [selector]: /concepts/flow-control/selector.md
