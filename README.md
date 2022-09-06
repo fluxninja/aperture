@@ -58,7 +58,7 @@ Try starting with:
 
 - [Good First Issue](https://github.com/fluxninja/aperture/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 
-For your convenience, all the needed development tools can be installed with [`asdf`](manifests/k8s/README.md#tools).
+For your convenience, all the needed development tools can be installed with [`asdf`](playground/README.md#tools).
 
 Before committing, install `pre-commit` hooks, which will automatically check if your code meets our standards.
 
