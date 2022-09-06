@@ -126,7 +126,7 @@ func containerEnvFrom(controllerSpec v1alpha1.CommonSpec) []corev1.EnvFromSource
 }
 
 // containerProbes prepares livenessProbe and readinessProbe based on the provided parameters.
-func containerProbes(spec v1alpha1.CommonSpec) (*corev1.Probe, *corev1.Probe) {
+func containerProbes(spec v1alpha1.CommonSpec, scheme corev1.URIScheme) (*corev1.Probe, *corev1.Probe) {
 	var livenessProbe *corev1.Probe
 	var readinessProbe *corev1.Probe
 	if spec.LivenessProbe.Enabled {
@@ -135,7 +135,7 @@ func containerProbes(spec v1alpha1.CommonSpec) (*corev1.Probe, *corev1.Probe) {
 				HTTPGet: &corev1.HTTPGetAction{
 					Path:   "/v1/status/liveness",
 					Port:   intstr.FromString("server"),
-					Scheme: corev1.URISchemeHTTP,
+					Scheme: scheme,
 				},
 			},
 			InitialDelaySeconds: spec.LivenessProbe.InitialDelaySeconds,
@@ -154,7 +154,7 @@ func containerProbes(spec v1alpha1.CommonSpec) (*corev1.Probe, *corev1.Probe) {
 				HTTPGet: &corev1.HTTPGetAction{
 					Path:   "/v1/status/readiness",
 					Port:   intstr.FromString("server"),
-					Scheme: corev1.URISchemeHTTP,
+					Scheme: scheme,
 				},
 			},
 			InitialDelaySeconds: spec.ReadinessProbe.InitialDelaySeconds,

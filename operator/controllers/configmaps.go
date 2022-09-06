@@ -33,7 +33,6 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 )
 
 // configMapForAgentConfig prepares the ConfigMap object for the Agent.
@@ -75,13 +74,6 @@ func configMapForAgentConfig(instance *v1alpha1.Agent, scheme *runtime.Scheme) (
 
 // configMapForAgentConfig prepares the ConfigMap object for the Controller.
 func configMapForControllerConfig(instance *v1alpha1.Controller, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
-	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
-		CertsPath:  controllerCertPath,
-		ServerCert: controllerCertName,
-		ServerKey:  controllerCertKeyName,
-		Enable:     true,
-	}
-
 	jsonConfig, err := json.Marshal(instance.Spec.ConfigSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal Controller config to JSON. Error: '%s'", err.Error())

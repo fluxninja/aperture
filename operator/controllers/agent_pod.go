@@ -27,7 +27,11 @@ import (
 // agentContainer prepares Sidecar container for the Agent based on the received parameters.
 func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agentGroup string) error {
 	spec := instance.Spec
-	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec)
+	probeScheme := corev1.URISchemeHTTP
+	if instance.Spec.ConfigSpec.Server.TLS.Enabled {
+		probeScheme = corev1.URISchemeHTTPS
+	}
+	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec, probeScheme)
 	container.Name = agentServiceName
 
 	if container.Image == "" || container.Image == "auto" {

@@ -804,11 +804,11 @@ definitions:
         type: string
         x-go-name: ClientCA
         x-go-validate: omitempty
-      enable:
-        description: Enable TLS
+      enabled:
+        description: Enabled TLS
         type: boolean
         x-go-default: "false"
-        x-go-name: Enable
+        x-go-name: Enabled
       server_cert:
         description: Server Cert file
         type: string

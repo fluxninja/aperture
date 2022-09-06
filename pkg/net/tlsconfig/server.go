@@ -46,10 +46,10 @@ type ServerTLSConfig struct {
 	// Allowed CN
 	//+kubebuilder:validation:Optional
 	AllowedCN string `json:"allowed_cn,omitempty" validate:"omitempty,fqdn"`
-	// Enable TLS
+	// Enabled TLS
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=false
-	Enable bool `json:"enable" default:"false"`
+	Enabled bool `json:"enabled" default:"false"`
 }
 
 // Constructor holds fields to create an annotated instance of *tls.Config.
@@ -77,7 +77,7 @@ func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller
 		return nil, err
 	}
 
-	if config.Enable {
+	if config.Enabled {
 		certPath := config.CertsPath
 		serverCertKeyPair, err := tls.LoadX509KeyPair(
 			path.Join(certPath, config.ServerCert),

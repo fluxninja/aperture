@@ -1708,10 +1708,10 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 </dd>
 </dl>
 <dl>
-<dt>enable</dt>
+<dt>enabled</dt>
 <dd>
 
-(bool, default: `false`) Enable TLS
+(bool, default: `false`) Enabled TLS
 
 </dd>
 </dl>

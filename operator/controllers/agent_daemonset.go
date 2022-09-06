@@ -43,7 +43,12 @@ func daemonsetForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtim
 		}
 	}
 
-	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec)
+	probeScheme := corev1.URISchemeHTTP
+	if instance.Spec.ConfigSpec.Server.TLS.Enabled {
+		probeScheme = corev1.URISchemeHTTPS
+	}
+
+	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec, probeScheme)
 
 	serverPort, err := getPort(spec.ConfigSpec.Server.Addr)
 	if err != nil {

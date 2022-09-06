@@ -36,6 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/go-logr/logr"
 )
 
@@ -270,6 +271,14 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
+	// Always enable TLS on the controller
+	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
+		CertsPath:  controllerCertPath,
+		ServerCert: controllerCertName,
+		ServerKey:  controllerCertKeyName,
+		Enabled:    true,
+	}
+
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}

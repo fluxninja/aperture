@@ -341,11 +341,11 @@ var _ = Describe("Tests for containerProbes", func() {
 				SuccessThreshold:    1,
 			}
 
-			var expectedRediness *corev1.Probe
+			var expectedReadiness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -379,11 +379,11 @@ var _ = Describe("Tests for containerProbes", func() {
 
 			expectedLiveness := probe
 
-			var expectedRediness *corev1.Probe
+			var expectedReadiness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -408,7 +408,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				},
 			}
 
-			expectedRediness := &corev1.Probe{
+			expectedReadiness := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/readiness",
@@ -425,9 +425,9 @@ var _ = Describe("Tests for containerProbes", func() {
 
 			var expectedLiveness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -459,13 +459,13 @@ var _ = Describe("Tests for containerProbes", func() {
 				},
 			}
 
-			expectedRediness := probe
+			expectedReadiness := probe
 
 			var expectedLiveness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -498,7 +498,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				},
 			}
 
-			expectedRediness := &corev1.Probe{
+			expectedReadiness := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/readiness",
@@ -528,9 +528,9 @@ var _ = Describe("Tests for containerProbes", func() {
 				SuccessThreshold:    1,
 			}
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 })
