@@ -99,7 +99,7 @@ func serviceForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtime.
 					Name:       "server",
 					Protocol:   corev1.Protocol("TCP"),
 					Port:       int32(8080),
-					TargetPort: intstr.FromString("grpc"),
+					TargetPort: intstr.FromString("server"),
 				},
 				{
 					Name:       "grpc-otel",
@@ -149,10 +149,10 @@ func serviceForController(instance *v1alpha1.Controller, log logr.Logger, scheme
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
 				{
-					Name:       "grpc",
+					Name:       "server",
 					Protocol:   corev1.Protocol("TCP"),
 					Port:       int32(80),
-					TargetPort: intstr.FromString("grpc"),
+					TargetPort: intstr.FromString("server"),
 				},
 			},
 			Selector: selectorLabels(instance.GetName(), controllerServiceName),
