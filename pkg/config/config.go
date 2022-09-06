@@ -151,8 +151,6 @@ func (constructor FileUnmarshallerConstructor) NewFileUnmarshaller(flagSet *pfla
 		}
 	}
 
-	fmt.Println("bytes is \n", string(bytes))
-
 	unmarshaller, err := KoanfUnmarshallerConstructor{
 		FlagSet:     flagSet,
 		EnableEnv:   constructor.EnableEnv,

@@ -42,8 +42,6 @@ func configMapForAgentConfig(instance *v1alpha1.Agent, scheme *runtime.Scheme) (
 		return nil, fmt.Errorf("failed to marshal Agent config to JSON. Error: '%s'", err.Error())
 	}
 
-	fmt.Printf("jsonConfig: %s", string(jsonConfig))
-
 	config, err := yaml.JSONToYAML(jsonConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal Agent config to YAML. Error: '%s'", err.Error())
@@ -67,8 +65,6 @@ func configMapForAgentConfig(instance *v1alpha1.Agent, scheme *runtime.Scheme) (
 		}
 	}
 
-	fmt.Printf("configMap: %v", cm)
-
 	return cm, nil
 }
 
@@ -78,8 +74,6 @@ func configMapForControllerConfig(instance *v1alpha1.Controller, scheme *runtime
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal Controller config to JSON. Error: '%s'", err.Error())
 	}
-
-	fmt.Printf("jsonConfig: %s", string(jsonConfig))
 
 	config, err := yaml.JSONToYAML(jsonConfig)
 	if err != nil {
@@ -101,8 +95,6 @@ func configMapForControllerConfig(instance *v1alpha1.Controller, scheme *runtime
 	if err := ctrl.SetControllerReference(instance, cm, scheme); err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("configMap: %v", cm)
 
 	return cm, nil
 }
