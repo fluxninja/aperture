@@ -262,10 +262,13 @@ definitions:
           [flow labels](/concepts/flow-control/label/label.md).
       workload:
         $ref: '#/definitions/SchedulerWorkload'
-        description: Workload associated with requests matching the label matcher.
+        description: Workload associated with flows matching the label matcher.
   apertureflowcontrolv1Classifier:
     type: object
     properties:
+      classifier_index:
+        type: string
+        format: int64
       policy_hash:
         type: string
       policy_name:
@@ -366,11 +369,18 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/v1Rule'
-        description: A map of {key, value} pairs mapping from flow label names to rules that define how to extract and propagate them.
+        description: |-
+          A map of {key, value} pairs mapping from
+          [flow label](/concepts/flow-control/label/label.md) keys to rules that define
+          how to extract and propagate flow labels with that key.
       selector:
         $ref: '#/definitions/v1Selector'
         description: Defines where to apply the flow classification rule.
     description: |-
+      :::info
+      See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+      :::
+
       Example:
       ```yaml
       selector:
@@ -687,37 +697,6 @@ definitions:
       docs on how exactly it handles invalid inputs.
       :::
     title: Circuit is defined as a dataflow graph of inter-connected components
-  v1Classifier:
-    type: object
-    properties:
-      rules:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Rule'
-        description: |-
-          A map of {key, value} pairs mapping from
-          [flow label](/concepts/flow-control/label/label.md) keys to rules that define
-          how to extract and propagate flow labels with that key.
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Defines where to apply the flow classification rule.
-    description: |-
-      :::info
-      See also [Classifier overview](/concepts/flow-control/label/classifier.md).
-      :::
-
-      Example:
-      ```yaml
-      selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress
-      rules:
-        user:
-          extractor:
-            from: request.http.headers.user
-      ```
-    title: Set of classification rules sharing a common selector
   v1Component:
     type: object
     properties:

@@ -29,6 +29,8 @@ message ClassifierWrapper {
   string policy_name = 2;
   // Hash of the entire Policy spec.
   string policy_hash = 3;
+  // Index of the classifier within Policy.
+  int64 classifier_index = 4;
 }
 
 message ConcurrencyLimiterWrapper {

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"path"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
@@ -56,10 +56,11 @@ func NewClassifierOptions(
 func (configSync *classifierConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &configv1.ClassifierWrapper{
-				PolicyName: configSync.policyBaseAPI.GetPolicyName(),
-				PolicyHash: configSync.policyBaseAPI.GetPolicyHash(),
-				Classifier: configSync.classifierProto,
+			wrapper := &wrappersv1.ClassifierWrapper{
+				PolicyName:      configSync.policyBaseAPI.GetPolicyName(),
+				PolicyHash:      configSync.policyBaseAPI.GetPolicyHash(),
+				ClassifierIndex: configSync.classifierIndex,
+				Classifier:      configSync.classifierProto,
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {

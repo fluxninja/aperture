@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/fx"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -115,7 +115,7 @@ func invokeMiniApp(
 	unmarshaller config.Unmarshaller,
 	classifier *Classifier,
 ) error {
-	wrapperMessage := &configv1.ClassifierWrapper{}
+	wrapperMessage := &wrappersv1.ClassifierWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.Classifier == nil {
 		log.Warn().Err(err).Msg("Failed to unmarshal classifier config wrapper")
@@ -126,7 +126,7 @@ func invokeMiniApp(
 	classifier.classifierProto = rs
 	classifier.policyName = wrapperMessage.PolicyName
 	classifier.policyHash = wrapperMessage.PolicyHash
-
+	classifier.classifierIndex = wrapperMessage.ClassifierIndex
 	lc.Append(
 		fx.Hook{
 			OnStart: func(startCtx context.Context) error {

@@ -207,6 +207,39 @@ definitions:
         x-go-validate: required
         x-order: 5
         $ref: '#/definitions/v1Selector'
+  policylanguagev1Classifier:
+    description: |-
+      :::info
+      See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+      :::
+
+      Example:
+      ```yaml
+      selector:
+        service: service1.default.svc.cluster.local
+        control_point:
+          traffic: ingress
+      rules:
+        user:
+          extractor:
+            from: request.http.headers.user
+      ```
+    type: object
+    title: Set of classification rules sharing a common selector
+    properties:
+      rules:
+        description: |-
+          A map of {key, value} pairs mapping from
+          [flow label](/concepts/flow-control/label/label.md) keys to rules that define
+          how to extract and propagate flow labels with that key.
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Rule'
+        x-order: 0
+      selector:
+        description: Defines where to apply the flow classification rule.
+        x-order: 1
+        $ref: '#/definitions/v1Selector'
   policylanguagev1FluxMeter:
     description: |-
       FluxMeter gathers metrics for the traffic that matches its selector.
@@ -341,39 +374,6 @@ definitions:
         type: string
         x-go-default: 0.5s
         x-order: 1
-  v1Classifier:
-    description: |-
-      :::info
-      See also [Classifier overview](/concepts/flow-control/label/classifier.md).
-      :::
-
-      Example:
-      ```yaml
-      selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress
-      rules:
-        user:
-          extractor:
-            from: request.http.headers.user
-      ```
-    type: object
-    title: Set of classification rules sharing a common selector
-    properties:
-      rules:
-        description: |-
-          A map of {key, value} pairs mapping from
-          [flow label](/concepts/flow-control/label/label.md) keys to rules that define
-          how to extract and propagate flow labels with that key.
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Rule'
-        x-order: 0
-      selector:
-        description: Defines where to apply the flow classification rule.
-        x-order: 1
-        $ref: '#/definitions/v1Selector'
   v1Component:
     description: |-
       Signals flow into the components via input ports and results are emitted on output ports.
@@ -1289,7 +1289,7 @@ definitions:
           The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
         type: array
         items:
-          $ref: '#/definitions/v1Classifier'
+          $ref: '#/definitions/policylanguagev1Classifier'
         x-order: 0
       flux_meters:
         description: |-
