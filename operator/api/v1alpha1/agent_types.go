@@ -55,8 +55,7 @@ type AgentConfigSpec struct {
 
 	// AgentInfo configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={agent_group:"default"}
-	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info,omitempty"`
+	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info"`
 
 	// DistCache configuration.
 	//+kubebuilder:validation:Optional

@@ -78,12 +78,10 @@ type OtelConfig struct {
 	HTTPAddr string `json:"http_addr" validate:"hostname_port" default:":4318"`
 	// BatchPrerollup configures batch prerollup processor.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={send_batch_size:10000,timeout:"1s"}
-	BatchPrerollup BatchConfig `json:"batch_prerollup,omitempty"`
+	BatchPrerollup BatchConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={send_batch_size:10000,timeout:"1s"}
-	BatchPostrollup BatchConfig `json:"batch_postrollup,omitempty"`
+	BatchPostrollup BatchConfig `json:"batch_postrollup"`
 }
 
 // BatchConfig defines configuration for OTEL batch processor.

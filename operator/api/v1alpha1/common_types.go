@@ -360,7 +360,6 @@ type CommonConfigSpec struct {
 
 	// Watchdog configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={heap:{min_gogc:25,limit:268435456}}
 	Watchdog watchdog.WatchdogConfig `json:"watchdog,omitempty"`
 
 	// BundledPluginsSpec defines configuration for bundled plugins.

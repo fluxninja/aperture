@@ -271,6 +271,13 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
+	if len(instance.Spec.ConfigSpec.Prometheus.Address) == 0 {
+		return fmt.Errorf("config.prometheus.address can not be empty for the Aperture Agent")
+	} else if instance.Spec.ConfigSpec.Etcd.Endpoints == nil ||
+		len(instance.Spec.ConfigSpec.Etcd.Endpoints) == 0 {
+		return fmt.Errorf("config.etcd.endpoints can not be empty for the Aperture Agent")
+	}
+
 	// Always enable TLS on the controller
 	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
 		CertsPath:  controllerCertPath,
