@@ -131,7 +131,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.HeapDoublesSketch, baseAttributes, attributes pcommon.Map) {
 	for _, rollup := range rp.cfg.Rollups {
 		switch rollup.Type {
-		case otelcollector.RollupSum:
+		case RollupSum:
 			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
 				continue
@@ -142,7 +142,7 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 				baseAttributes.UpsertDouble(rollup.ToField, rollupSum)
 			}
 			baseAttributes.UpdateDouble(rollup.ToField, rollupSum+newValue)
-		case otelcollector.RollupSumOfSquares:
+		case RollupSumOfSquares:
 			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
 				continue
@@ -153,7 +153,7 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 				baseAttributes.UpsertDouble(rollup.ToField, rollupSos)
 			}
 			baseAttributes.UpdateDouble(rollup.ToField, rollupSos+newValue*newValue)
-		case otelcollector.RollupMin:
+		case RollupMin:
 			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
 				continue
@@ -165,7 +165,7 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 			}
 			newMin := otelcollector.Min(rollupMin, newValue)
 			baseAttributes.UpdateDouble(rollup.ToField, newMin)
-		case otelcollector.RollupMax:
+		case RollupMax:
 			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
 				continue
@@ -177,7 +177,7 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 			}
 			newMax := otelcollector.Max(rollupMax, newValue)
 			baseAttributes.UpdateDouble(rollup.ToField, newMax)
-		case otelcollector.RollupDatasketch:
+		case RollupDatasketch:
 			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
 				continue

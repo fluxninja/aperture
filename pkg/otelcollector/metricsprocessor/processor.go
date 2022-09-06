@@ -23,24 +23,11 @@ import (
 type metricsProcessor struct {
 	cfg                    *Config
 	workloadLatencySummary *prometheus.SummaryVec
-	durationRollup         *otelcollector.Rollup
 }
 
 func newProcessor(cfg *Config) (*metricsProcessor, error) {
-	// retrieve the duration rollup from the config
-	var durationRollup *otelcollector.Rollup
-	for _, rollup := range cfg.Rollups {
-		if rollup.FromField == otelcollector.DurationLabel {
-			durationRollup = rollup
-			break
-		}
-	}
-	if durationRollup == nil {
-		return nil, fmt.Errorf("%s rollup not found in config", otelcollector.DurationLabel)
-	}
 	p := &metricsProcessor{
-		cfg:            cfg,
-		durationRollup: durationRollup,
+		cfg: cfg,
 	}
 	err := p.registerRequestLatencyHistogram()
 	if err != nil {
@@ -215,43 +202,42 @@ func (p *metricsProcessor) updateMetrics(
 	attributes pcommon.Map,
 	checkResponse *flowcontrolv1.CheckResponse,
 ) error {
-	latency, found := p.durationRollup.GetFromFieldValue(attributes)
-	if !found {
-		otelcollector.SampledLog.Warn().Str("label", otelcollector.DurationLabel).Msg("Unable to update latency metric because of missing label")
-		return nil
-	}
-	statusCodeStr := ""
-	statusCode, exists := attributes.Get(otelcollector.StatusCodeLabel)
-	if exists {
-		statusCodeStr = statusCode.StringVal()
-	}
-	featureStatusStr := ""
-	featureStatus, exists := attributes.Get(otelcollector.FeatureStatusLabel)
-	if exists {
-		featureStatusStr = featureStatus.StringVal()
-	}
+	if len(checkResponse.LimiterDecisions) > 0 {
+		// Update workload metrics
+		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.DurationLabel, []string{})
+		for _, decision := range checkResponse.LimiterDecisions {
+			if cl := decision.GetConcurrencyLimiter(); cl != nil {
+				labels := map[string]string{
+					metrics.PolicyNameLabel:     decision.PolicyName,
+					metrics.PolicyHashLabel:     decision.PolicyHash,
+					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
+					metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
+					metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
+				}
 
-	for _, decision := range checkResponse.LimiterDecisions {
-		workload := ""
-		if cl := decision.GetConcurrencyLimiter(); cl != nil {
-			workload = cl.GetWorkloadIndex()
-		}
-		labels := map[string]string{
-			metrics.PolicyNameLabel:     decision.PolicyName,
-			metrics.PolicyHashLabel:     decision.PolicyHash,
-			metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
-			metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
-			metrics.WorkloadIndexLabel:  workload,
-		}
-
-		err := p.updateMetricsForWorkload(labels, latency)
-		if err != nil {
-			return err
+				err := p.updateMetricsForWorkload(labels, latency)
+				if err != nil {
+					return err
+				}
+			} // TODO: add rate limiter metrics
 		}
 	}
 
-	for _, fluxMeter := range checkResponse.FluxMeters {
-		p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, latency)
+	if len(checkResponse.FluxMeters) > 0 {
+		// Update flux meter metrics
+		statusCodeStr := ""
+		statusCode, exists := attributes.Get(otelcollector.StatusCodeLabel)
+		if exists {
+			statusCodeStr = statusCode.StringVal()
+		}
+		featureStatusStr := ""
+		featureStatus, exists := attributes.Get(otelcollector.FeatureStatusLabel)
+		if exists {
+			featureStatusStr = featureStatus.StringVal()
+		}
+		for _, fluxMeter := range checkResponse.FluxMeters {
+			p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, attributes)
+		}
 	}
 
 	return nil
@@ -269,25 +255,27 @@ func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, la
 }
 
 func (p *metricsProcessor) updateMetricsForFluxMeters(
-	fluxMeter *flowcontrolv1.FluxMeter,
+	fluxMeterMessage *flowcontrolv1.FluxMeter,
 	decisionType flowcontrolv1.DecisionType,
 	statusCode string,
 	featureStatus string,
-	latency float64,
+	attributes pcommon.Map,
 ) {
-	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(
-		fluxMeter.GetFluxMeterName(),
-		statusCode,
-		featureStatus,
-		decisionType,
-	)
-	if fluxmeterHistogram == nil {
-		log.Debug().Str(metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()).
+	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
+	if fluxMeter == nil {
+		log.Debug().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
 			Str(metrics.FeatureStatusLabel, featureStatus).
-			Msg("Fluxmeter not found")
+			Msg("FluxMeter not found")
 		return
 	}
-	fluxmeterHistogram.Observe(latency)
+
+	// metricValue is the value at fluxMeter's AttributeKey
+	metricValue, _ := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), []string{})
+
+	fluxMeterHistogram := fluxMeter.GetHistogram(decisionType, statusCode, featureStatus)
+	if fluxMeterHistogram != nil {
+		fluxMeterHistogram.Observe(metricValue)
+	}
 }

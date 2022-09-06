@@ -24,15 +24,15 @@ type FluxMeter interface {
 	// GetSelector returns the selector
 	GetSelector() *selectorv1.Selector
 
+	// GetAttributeKey returns the attribute key
+	GetAttributeKey() string
+
 	// GetFluxMeterName returns the metric name
 	GetFluxMeterName() string
 
 	// GetFluxMeterID returns the flux meter ID
 	GetFluxMeterID() FluxMeterID
 
-	// GetBuckets returns the buckets
-	GetBuckets() []float64
-
 	// GetHistogram returns the histogram observer for the flowcontrolv1.DecisionType
-	GetHistogram(flowcontrolv1.DecisionType, string, string) prometheus.Observer
+	GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode string, featureStatus string) prometheus.Observer
 }

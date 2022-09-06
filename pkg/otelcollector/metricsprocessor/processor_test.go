@@ -1,7 +1,6 @@
 package metricsprocessor
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/golang/mock/gomock"
@@ -34,15 +33,6 @@ var _ = Describe("Metrics Processor", func() {
 		cfg = &Config{
 			engine:       engine,
 			promRegistry: pr,
-			Rollups: []*otelcollector.Rollup{
-				{
-					FromField: otelcollector.DurationLabel,
-					ToField:   fmt.Sprintf("%s_%s", otelcollector.DurationLabel, otelcollector.RollupSum),
-					Type:      otelcollector.RollupSum,
-					// TODO: add test to check that TreatAsZero is honoured
-					TreatAsZero: []string{"-"},
-				},
-			},
 		}
 		var err error
 		processor, err = newProcessor(cfg)
@@ -409,8 +399,6 @@ var _ = Describe("Metrics Processor", func() {
 			# TYPE workload_latency_ms summary
 			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
 			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
-			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index=""} 5
-			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index=""} 1
 			workload_latency_ms_sum{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
 			workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 			`,
@@ -465,7 +453,7 @@ func someLogs(
 			logRecord.Attributes().InsertString(otelcollector.DurationLabel, "5")
 			for i, fm := range checkResponse.FluxMeters {
 				// TODO actually return some Histogram
-				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetFluxMeterName(), "201", "", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
+				expectedCalls[i] = engine.EXPECT().GetFluxMeter(fm.GetFluxMeterName()).Return(nil)
 			}
 		}
 	}
@@ -499,7 +487,7 @@ func someTraces(
 			span.Attributes().InsertString(otelcollector.DurationLabel, "5")
 			for i, fm := range checkResponse.FluxMeters {
 				// TODO actually return some Histogram
-				expectedCalls[i] = engine.EXPECT().GetFluxMeterHist(fm.GetFluxMeterName(), "", "Ok", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED).Return(nil)
+				expectedCalls[i] = engine.EXPECT().GetFluxMeter(fm.GetFluxMeterName()).Return(nil)
 			}
 		}
 	}

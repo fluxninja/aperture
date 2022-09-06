@@ -35,6 +35,24 @@
 - key: aperture.authz_response
   value:
     string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.authz_response)%"
+- key: DURATION
+  value:
+    string_value: "%DURATION%"
+- key: REQUEST_DURATION
+  value:
+    string_value: "%REQUEST_DURATION%"
+- key: REQUEST_TX_DURATION
+  value:
+    string_value: "%REQUEST_TX_DURATION%"
+- key: RESPONSE_DURATION
+  value:
+    string_value: "%RESPONSE_DURATION%"
+- key: RESPONSE_TX_DURATION
+  value:
+    string_value: "%RESPONSE_TX_DURATION%"
+- key: DOWNSTREAM_HANDSHAKE_DURATION
+  value:
+    string_value: "%DOWNSTREAM_HANDSHAKE_DURATION%"
 {{- end -}}
 
 apiVersion: networking.istio.io/v1alpha3

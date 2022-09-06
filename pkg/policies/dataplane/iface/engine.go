@@ -1,8 +1,6 @@
 package iface
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/selectors"
@@ -20,7 +18,7 @@ type Engine interface {
 
 	RegisterFluxMeter(fm FluxMeter) error
 	UnregisterFluxMeter(fm FluxMeter) error
-	GetFluxMeterHist(fluxMeterName, statusCode string, featureStatus string, decisionType flowcontrolv1.DecisionType) prometheus.Observer
+	GetFluxMeter(fluxMeterName string) FluxMeter
 
 	RegisterRateLimiter(l RateLimiter) error
 	UnregisterRateLimiter(l RateLimiter) error

@@ -4,7 +4,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/config"
 
-	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
 
@@ -13,6 +12,4 @@ type Config struct {
 	promRegistry             *prometheus.Registry
 	engine                   iface.Engine
 	config.ProcessorSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct
-	// Rollups
-	Rollups []*otelcollector.Rollup `mapstructure:"rollups"`
 }

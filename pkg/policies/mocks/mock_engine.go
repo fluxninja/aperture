@@ -12,7 +12,6 @@ import (
 	selectors "github.com/fluxninja/aperture/pkg/selectors"
 	services "github.com/fluxninja/aperture/pkg/services"
 	gomock "github.com/golang/mock/gomock"
-	prometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 // MockEngine is a mock of Engine interface.
@@ -38,18 +37,18 @@ func (m *MockEngine) EXPECT() *MockEngineMockRecorder {
 	return m.recorder
 }
 
-// GetFluxMeterHist mocks base method.
-func (m *MockEngine) GetFluxMeterHist(fluxMeterName, statusCode, featureStatus string, decisionType flowcontrolv1.DecisionType) prometheus.Observer {
+// GetFluxMeter mocks base method.
+func (m *MockEngine) GetFluxMeter(fluxMeterName string) iface.FluxMeter {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFluxMeterHist", fluxMeterName, statusCode, featureStatus, decisionType)
-	ret0, _ := ret[0].(prometheus.Observer)
+	ret := m.ctrl.Call(m, "GetFluxMeter", fluxMeterName)
+	ret0, _ := ret[0].(iface.FluxMeter)
 	return ret0
 }
 
-// GetFluxMeterHist indicates an expected call of GetFluxMeterHist.
-func (mr *MockEngineMockRecorder) GetFluxMeterHist(fluxMeterName, statusCode, featureStatus, decisionType interface{}) *gomock.Call {
+// GetFluxMeter indicates an expected call of GetFluxMeter.
+func (mr *MockEngineMockRecorder) GetFluxMeter(fluxMeterName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeterHist", reflect.TypeOf((*MockEngine)(nil).GetFluxMeterHist), fluxMeterName, statusCode, featureStatus, decisionType)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeter", reflect.TypeOf((*MockEngine)(nil).GetFluxMeter), fluxMeterName)
 }
 
 // ProcessRequest mocks base method.

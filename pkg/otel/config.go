@@ -49,8 +49,8 @@ var (
 	rollups   = initRollups()
 )
 
-func initRollups() []*otelcollector.Rollup {
-	rlpsInit := []otelcollector.Rollup{
+func initRollups() []*rollupprocessor.Rollup {
+	rlpsInit := []rollupprocessor.Rollup{
 		{
 			FromField:   otelcollector.DurationLabel,
 			TreatAsZero: []string{"-"},
@@ -62,10 +62,10 @@ func initRollups() []*otelcollector.Rollup {
 			FromField: otelcollector.HTTPResponseContentLength,
 		},
 	}
-	var rlps []*otelcollector.Rollup
+	var rlps []*rollupprocessor.Rollup
 	for _, rollupInit := range rlpsInit {
-		for _, t := range otelcollector.RollupTypes {
-			rlps = append(rlps, &otelcollector.Rollup{
+		for _, t := range rollupprocessor.RollupTypes {
+			rlps = append(rlps, &rollupprocessor.Rollup{
 				FromField:   rollupInit.FromField,
 				ToField:     fmt.Sprintf("%s_%s", rollupInit.FromField, t),
 				Type:        t,
@@ -246,9 +246,7 @@ func addOTLPReceiver(cfg *otelParams) {
 }
 
 func addMetricsProcessor(config *otelcollector.OTELConfig) {
-	config.AddProcessor(ProcessorMetrics, metricsprocessor.Config{
-		Rollups: rollups,
-	})
+	config.AddProcessor(ProcessorMetrics, metricsprocessor.Config{})
 }
 
 func addRollupProcessor(config *otelcollector.OTELConfig) {

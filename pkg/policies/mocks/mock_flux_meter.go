@@ -37,18 +37,18 @@ func (m *MockFluxMeter) EXPECT() *MockFluxMeterMockRecorder {
 	return m.recorder
 }
 
-// GetBuckets mocks base method.
-func (m *MockFluxMeter) GetBuckets() []float64 {
+// GetAttributeKey mocks base method.
+func (m *MockFluxMeter) GetAttributeKey() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetBuckets")
-	ret0, _ := ret[0].([]float64)
+	ret := m.ctrl.Call(m, "GetAttributeKey")
+	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetBuckets indicates an expected call of GetBuckets.
-func (mr *MockFluxMeterMockRecorder) GetBuckets() *gomock.Call {
+// GetAttributeKey indicates an expected call of GetAttributeKey.
+func (mr *MockFluxMeterMockRecorder) GetAttributeKey() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBuckets", reflect.TypeOf((*MockFluxMeter)(nil).GetBuckets))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAttributeKey", reflect.TypeOf((*MockFluxMeter)(nil).GetAttributeKey))
 }
 
 // GetFluxMeterID mocks base method.
@@ -80,17 +80,17 @@ func (mr *MockFluxMeterMockRecorder) GetFluxMeterName() *gomock.Call {
 }
 
 // GetHistogram mocks base method.
-func (m *MockFluxMeter) GetHistogram(arg0 flowcontrolv1.DecisionType, arg1, arg2 string) prometheus.Observer {
+func (m *MockFluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode, featureStatus string) prometheus.Observer {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetHistogram", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "GetHistogram", decisionType, statusCode, featureStatus)
 	ret0, _ := ret[0].(prometheus.Observer)
 	return ret0
 }
 
 // GetHistogram indicates an expected call of GetHistogram.
-func (mr *MockFluxMeterMockRecorder) GetHistogram(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockFluxMeterMockRecorder) GetHistogram(decisionType, statusCode, featureStatus interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram), decisionType, statusCode, featureStatus)
 }
 
 // GetSelector mocks base method.
