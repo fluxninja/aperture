@@ -167,7 +167,13 @@ jobs:
             mkdir -p dist/packages/
             nfpm package --packager "${PACKAGER}" --target dist/packages/
             ls -l dist/packages/
-
+  helm-release:
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - run:
+          name: "Package and release Helm Chart"
+          command: .circleci/scripts/helm_release.sh
 
 orbs:
   path-filtering: circleci/path-filtering@0.1.1
@@ -238,3 +244,9 @@ workflows:
             parameters:
               executor: [ ubuntu-go-executor ]
               goarch: [ amd64 ]
+  helm-release:
+    jobs:
+      - helm-release:
+          filters:
+            tags:
+              only: /^releases/charts/*/v*/
