@@ -70,11 +70,11 @@ events. These events are rolled up and sent to the analytics database in the
 cloud. This allows:
 
 - for the flow labels to be used as filters,
-- to see analytics for each flow label, eg. distribution of its values
+- to see analytics for each flow label, eg. distribution of its values.
 
 :::note
 For classifier-created labels, you can disable this behaviour by setting
-`propagate: false`
+`hidden: true`
 in [the classification rule](/reference/configuration/policies.md#-v1rule).
 :::
 

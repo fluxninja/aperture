@@ -33,7 +33,7 @@ published by Aperture Controller.
 ### Service
 
 Service in Aperture is similar to services tracked in Kubernetes or Consul. A
-Service is a collection of entities delivering a common functionality, such as 
+Service is a collection of entities delivering a common functionality, such as
 checkout, billing etc. Aperture maintains a mapping of entity IP addresses to
 Service names. For each flow control decision request sent by an entity,
 Aperture looks up the service name and then decides which flow control

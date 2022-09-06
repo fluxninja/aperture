@@ -260,7 +260,7 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
    filter, but for outbound listener in the Istio sidecar running with the
    application.
 
-   The External Authorization filter buffers the client request body with a 
+   The External Authorization filter buffers the client request body with a
    maximum size of `8192` bytes, and forwards it to the Aperture Agent instance
    using gRPC with a timeout of `0.01s`, having `OUTBOUND` value for key
    `traffic-direction` metadata included in the streams initiated to the gRPC
