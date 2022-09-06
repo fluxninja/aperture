@@ -25,13 +25,13 @@ entries:
   aperture-agent:
   - apiVersion: v2
     appVersion: v0.1.1
-    created: "2022-09-06T05:02:27.001015037Z"
+    created: "2022-09-06T05:07:45.477177523Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
       version: =1.14.1
     description: A Helm chart to deploy Aperture Agent
-    digest: be6fd3a8b12b1101ddaf51394991c9a1f19821f0ffbd72c571beb06b59612168
+    digest: cfb5278c96f2e88d52865cdc5bb5c86ff08128933c7cce5ab4e4808e21900da2
     name: aperture-agent
     urls:
     - https://fluxninja.github.io/aperture/aperture-agent-v0.0.1.tgz
@@ -39,7 +39,7 @@ entries:
   aperture-controller:
   - apiVersion: v2
     appVersion: v0.1.1
-    created: "2022-09-06T05:02:27.013567384Z"
+    created: "2022-09-06T05:07:45.489247852Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -53,7 +53,7 @@ entries:
       repository: https://prometheus-community.github.io/helm-charts
       version: =15.5.3
     description: A Helm chart to deploy Aperture Controller
-    digest: 7404d83834d83dcd806f5fdb21ac34964b20359740aabb7635ae47a154065995
+    digest: 02cf2ad276196ad8fa1420d71aa38cf91bce4e921c2926bc918885728ab8fc70
     name: aperture-controller
     urls:
     - https://fluxninja.github.io/aperture/aperture-controller-v0.0.1.tgz
@@ -83,12 +83,12 @@ entries:
   istioconfig:
   - apiVersion: v2
     appVersion: v0.1.0
-    created: "2022-09-06T05:02:27.01383898Z"
+    created: "2022-09-06T05:07:45.489533289Z"
     description: A Helm chart that deploys Aperture Envoy Filter via Istio
-    digest: b2c0f167a97795d607649599d8f9666914b394a4e4ee022dcf9027f431d9c256
+    digest: d7901b6da076bd08e14ce2dba2fd8020599fe6e382f65529254c11d2d498d5bd
     name: istioconfig
     type: application
     urls:
     - https://fluxninja.github.io/aperture/istioconfig-v0.0.1.tgz
     version: v0.0.1
-generated: "2022-09-06T05:02:26.996627976Z"
+generated: "2022-09-06T05:07:45.472030085Z"
