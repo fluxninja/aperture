@@ -43,7 +43,7 @@ func (msg *FluxMeterWrapper) UnmarshalJSON(b []byte) error {
 func (msg *ClassifierWrapper) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }

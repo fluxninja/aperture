@@ -93,6 +93,13 @@ var _ = Describe("Metrics Processor", func() {
 						},
 					},
 				},
+				Classifiers: []*flowcontrolv1.Classifier{
+					{
+						PolicyName:      "foo",
+						PolicyHash:      "foo-hash",
+						ClassifierIndex: 1,
+					},
+				},
 				FluxMeters: []*flowcontrolv1.FluxMeter{
 					{
 						FluxMeterName: "bar",
@@ -117,6 +124,7 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionErrorReasonLabel:         "",
 				otelcollector.DecisionRejectReasonLabel:        "",
+				otelcollector.ClassifiersLabel:                 []interface{}{"policy_name:foo,classifier_index:1"},
 				otelcollector.FluxMetersLabel:                  []interface{}{"flux_meter_name:bar"},
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
@@ -309,6 +317,13 @@ var _ = Describe("Metrics Processor", func() {
 						},
 					},
 				},
+				Classifiers: []*flowcontrolv1.Classifier{
+					{
+						PolicyName:      "foo",
+						PolicyHash:      "foo-hash",
+						ClassifierIndex: 1,
+					},
+				},
 				FluxMeters: []*flowcontrolv1.FluxMeter{
 					{
 						FluxMeterName: "bar",
@@ -329,6 +344,7 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionErrorReasonLabel:         "",
 				otelcollector.DecisionRejectReasonLabel:        "",
+				otelcollector.ClassifiersLabel:                 []interface{}{"policy_name:foo,classifier_index:1"},
 				otelcollector.FluxMetersLabel:                  []interface{}{"flux_meter_name:bar"},
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},

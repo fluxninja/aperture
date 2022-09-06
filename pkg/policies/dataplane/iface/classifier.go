@@ -1,16 +1,21 @@
 package iface
 
-import selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+import (
+	"fmt"
+
+	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+)
 
 // ClassifierID is the ID of the Classifier.
 type ClassifierID struct {
-	PolicyName string
-	PolicyHash string
+	PolicyName      string
+	PolicyHash      string
+	ClassifierIndex int64
 }
 
 // String function returns the ClassifierID as a string.
 func (cID ClassifierID) String() string {
-	return "policy_name-" + cID.PolicyName + "-policy_hash-" + cID.PolicyHash
+	return fmt.Sprintf("policy_name-%s-policy_hash-%s-%d", cID.PolicyName, cID.PolicyHash, cID.ClassifierIndex)
 }
 
 // Classifier interface.

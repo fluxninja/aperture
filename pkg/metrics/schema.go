@@ -60,6 +60,8 @@ const (
 	SignalNameLabel = "signal_name"
 	// FluxMeterNameLabel - specifying flux meter's name.
 	FluxMeterNameLabel = "flux_meter_name"
+	// ClassifierIndexLabel - prometheus label specifying clasiffier index.
+	ClassifierIndexLabel = "classifier_index"
 	// StatusCodeLabel - http status code.
 	StatusCodeLabel = "status_code"
 	// FeatureStatusLabel - feature status.

@@ -123,7 +123,7 @@ func (msg *FluxMeter) UnmarshalJSON(b []byte) error {
 func (msg *Classifier) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
