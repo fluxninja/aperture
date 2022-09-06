@@ -31,13 +31,15 @@ file of the Helm chart.
 
 The Aperture Agent can be installed in below listed modes:
 
-1. **DaemonSet**
+1. **Kubernetes**
 
-   The Aperture Agent can be installed as a
-   [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
-   where it will get deployed on all the nodes of the cluster.
+   1. **DaemonSet**
 
-2. **Sidecar**
+      The Aperture Agent can be installed as a
+      [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
+      where it will get deployed on all the nodes of the cluster.
 
-   The Aperture Agent can also be installed as a Sidecar. In this mode, whenever a new pod is started
-   with required labels and annotations, the Agent container will be attached with the pod.
+   2. **Sidecar**
+
+      The Aperture Agent can also be installed as a Sidecar. In this mode, whenever a new pod is started
+      with required labels and annotations, the Agent container will be attached with the pod.

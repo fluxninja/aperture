@@ -5,7 +5,8 @@ keywords:
   - install
   - setup
   - agent
-  - daemonset
+  - sidecar
+sidebar_position: 2
 ---
 
 The Aperture Agent can also be installed as a Sidecar. In this mode, whenever a new pod is started
@@ -55,10 +56,11 @@ By following these instructions, you will have deployed the Aperture Agent into 
    agent:
      sidecar:
        enabled: true
-     etcd:
-       endpoints: ["ETCD_ENDPOINT_HERE"]
-     prometheus:
-       address: "PROMETHEUS_ADDRESS_HERE"
+     config:
+       etcd:
+         endpoints: ["ETCD_ENDPOINT_HERE"]
+       prometheus:
+         address: "PROMETHEUS_ADDRESS_HERE"
    ```
 
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with the actual values of Etcd and Prometheus,
@@ -124,10 +126,11 @@ By following these instructions, you will have deployed the Aperture Agent into 
        enableNamespacesByDefault:
          - NAMESPACE1
          - NAMESPACE2
-     etcd:
-       endpoints: ["ETCD_ENDPOINT_HERE"]
-     prometheus:
-       address: "PROMETHEUS_ADDRESS_HERE"
+     config:
+       etcd:
+         endpoints: ["ETCD_ENDPOINT_HERE"]
+       prometheus:
+         address: "PROMETHEUS_ADDRESS_HERE"
    ```
 
    Replace the `NAMESPACE1`, `NAMESPACE2` and so on, with the actual namespaces and add more if required.

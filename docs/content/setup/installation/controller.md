@@ -107,10 +107,12 @@ into your cluster.
 
    ```yaml
    controller:
-     etcd:
-       endpoints: ["ETCD_ENDPOINT_HERE"]
-     prometheus:
-       address: "PROMETHEUS_ADDRESS_HERE"
+     config:
+       etcd:
+         endpoints: ["ETCD_ENDPOINT_HERE"]
+       prometheus:
+         address: "PROMETHEUS_ADDRESS_HERE"
+
    etcd:
      enabled: false
 
@@ -126,9 +128,10 @@ into your cluster.
    helm upgrade --install controller aperture/aperture-controller -f values.yaml
    ```
 
-   A list of other configurable parameters for Etcd and Prometheus can be found
-   in the
-   [README](https://artifacthub.io/packages/helm/aperture/aperture-operator#istio).
+   A list of all the configurable parameters for Etcd are available
+   [here](https://github.com/fluxninja/aperture/blob/main/docs/gen/config/aperture-controller/swagger.md#-etcd)
+   and Prometheus are available
+   [here](https://github.com/fluxninja/aperture/blob/main/docs/gen/config/aperture-controller/swagger.md#-prometheus).
 
    **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
    is enabled on your existing Prometheus instance as it is required by the
