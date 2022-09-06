@@ -25,7 +25,10 @@ Aperture enables flow control through observing, analyzing, and actuating,
 facilitated by agents and a controller.
 
 <p align="center">
-  <img src="docs/content/assets/img/oaalight.png" alt="Observe. Analyze. Actuate." width="100%">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/content/assets/img/oaadark.png">
+    <img alt="Observe. Analyze. Actuate." src="./docs/content/assets/img/oaalight.png">
+  </picture>
 </p>
 
 For more detailed description, refer to [the docs](https://docs.fluxninja.com/).
