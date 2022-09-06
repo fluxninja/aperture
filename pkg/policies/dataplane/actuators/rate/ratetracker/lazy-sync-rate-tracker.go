@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -46,15 +45,9 @@ func NewLazySyncRateTracker(limiter RateTracker,
 	job.JobName = lsl.name
 	// register job with job group
 	err := lsl.jobGroup.RegisterJob(job, jobs.JobConfig{
-		ExecutionPeriod: config.Duration{
-			Duration: durationpb.New(syncDuration),
-		},
-		ExecutionTimeout: config.Duration{
-			Duration: durationpb.New(syncDuration),
-		},
-		InitialDelay: config.Duration{
-			Duration: durationpb.New(-1),
-		},
+		ExecutionPeriod:  config.MakeDuration(syncDuration),
+		ExecutionTimeout: config.MakeDuration(syncDuration),
+		InitialDelay:     config.MakeDuration(-1),
 	})
 	if err != nil {
 		return nil, err

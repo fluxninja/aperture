@@ -262,7 +262,7 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 				log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 
-			if instance.Spec.FluxNinjaPlugin.APIKeySecret.Create && instance.Spec.FluxNinjaPlugin.Enabled {
+			if instance.Spec.Secrets.FluxNinjaPlugin.Create {
 				secret, err := secretForAgentAPIKey(instance, nil)
 				if err != nil && !errors.IsNotFound(err) {
 					log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
@@ -528,7 +528,7 @@ func (r *AgentReconciler) reconcileMutatingWebhookConfiguration(ctx context.Cont
 // reconcileSecret prepares the desired states for Agent ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileSecret(ctx context.Context, instance *v1alpha1.Agent) error {
-	if instance.Spec.FluxNinjaPlugin.APIKeySecret.Create && instance.Spec.FluxNinjaPlugin.Enabled {
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create {
 		if !instance.Spec.Sidecar.Enabled {
 			secret, err := secretForAgentAPIKey(instance.DeepCopy(), r.Scheme)
 			if err != nil {
@@ -537,15 +537,15 @@ func (r *AgentReconciler) reconcileSecret(ctx context.Context, instance *v1alpha
 			if _, err = createSecretForAgent(r.Client, r.Recorder, secret, ctx, instance); err != nil {
 				return err
 			}
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = false
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = ""
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef.Name = secretName(
-				instance.GetName(), "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret)
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = false
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = ""
+			instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name = secretName(
+				instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
 		} else {
-			value := instance.Spec.FluxNinjaPlugin.APIKeySecret.Value
+			value := instance.Spec.Secrets.FluxNinjaPlugin.Value
 			if !strings.HasPrefix(value, "enc::") && !strings.HasSuffix(value, "::enc") {
-				instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = fmt.Sprintf(
-					"enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(instance.Spec.FluxNinjaPlugin.APIKeySecret.Value)))
+				instance.Spec.Secrets.FluxNinjaPlugin.Value = fmt.Sprintf(
+					"enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(instance.Spec.Secrets.FluxNinjaPlugin.Value)))
 			}
 		}
 	}
@@ -591,7 +591,7 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 			return err
 		}
 
-		if instance.Spec.FluxNinjaPlugin.APIKeySecret.Create && instance.Spec.FluxNinjaPlugin.Enabled {
+		if instance.Spec.Secrets.FluxNinjaPlugin.Create {
 			secret, err := createAgentSecretInNamespace(instance.DeepCopy(), ns.GetName())
 			if err != nil {
 				return err
@@ -631,8 +631,8 @@ func eventFiltersForAgent() predicate.Predicate {
 
 			diffObjects := !reflect.DeepEqual(old.Spec, new.Spec)
 			// Skipping update events for Secret updates
-			if diffObjects && old.Spec.FluxNinjaPlugin.APIKeySecret.Value != "" &&
-				(new.Spec.FluxNinjaPlugin.APIKeySecret.Value == "" || strings.HasPrefix(new.Spec.FluxNinjaPlugin.APIKeySecret.Value, "enc::")) {
+			if diffObjects && old.Spec.Secrets.FluxNinjaPlugin.Value != "" &&
+				(new.Spec.Secrets.FluxNinjaPlugin.Value == "" || strings.HasPrefix(new.Spec.Secrets.FluxNinjaPlugin.Value, "enc::")) {
 				return false
 			}
 

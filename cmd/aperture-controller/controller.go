@@ -11,7 +11,6 @@ import (
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
@@ -27,17 +26,12 @@ func main() {
 		otel.OTELConfigConstructor{Type: otel.ControllerType}.Annotate(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			controlplane.ProvideCMFileValidator,
-			validation.ProvideCMValidator,
 			otel.ControllerOTELComponents,
 		),
 		otelcollector.Module(),
-		controller.Module(),
+		controlplane.Module(),
 		webhooks.Module(),
-		fx.Invoke(
-			controlplane.RegisterCMFileValidator,
-			validation.RegisterCMValidator,
-		),
+		validation.Module(),
 	)
 
 	if err := app.Err(); err != nil {

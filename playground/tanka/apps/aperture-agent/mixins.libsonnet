@@ -14,14 +14,24 @@ local apertureAgentMixin =
       },
       agent+: {
         createUninstallHook: false,
-        fluxninjaPlugin+: {
-          enabled: false,
-        },
-        log+: {
-          prettyConsole: true,
-          nonBlocking: false,
-          level: 'debug',
-          file: 'default',
+        config+: {
+          plugins+: {
+            disabled_plugins: [
+              'aperture-plugin-fluxninja',
+            ],
+          },
+          log+: {
+            pretty_console: true,
+            non_blocking: true,
+            level: 'debug',
+            file: 'default',
+          },
+          etcd+: {
+            endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
+          },
+          prometheus+: {
+            address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',
+          },
         },
         image: {
           registry: '',
@@ -30,12 +40,6 @@ local apertureAgentMixin =
         },
         sidecar+: {
           enabled: false,
-        },
-        etcd+: {
-          endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
-        },
-        prometheus+: {
-          address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',
         },
       },
     },

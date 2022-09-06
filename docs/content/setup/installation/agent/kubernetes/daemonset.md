@@ -6,6 +6,7 @@ keywords:
   - setup
   - agent
   - daemonset
+sidebar_position: 1
 ---
 
 The Aperture Agent can be installed as a
@@ -40,10 +41,11 @@ your cluster.
 
    ```yaml
    agent:
-     etcd:
-       endpoints: ["ETCD_ENDPOINT_HERE"]
-     prometheus:
-       address: "PROMETHEUS_ADDRESS_HERE"
+     config:
+       etcd:
+         endpoints: ["ETCD_ENDPOINT_HERE"]
+       prometheus:
+         address: "PROMETHEUS_ADDRESS_HERE"
    ```
 
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
@@ -77,10 +79,11 @@ your cluster.
       metadata:
         name: Agent
       spec:
-        etcd:
-          endpoints: ["ETCD_ENDPOINT_HERE"]
-        prometheus:
-          address: "PROMETHEUS_ADDRESS_HERE"
+        config:
+          etcd:
+            endpoints: ["ETCD_ENDPOINT_HERE"]
+          prometheus:
+            address: "PROMETHEUS_ADDRESS_HERE"
       ```
 
       Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE`

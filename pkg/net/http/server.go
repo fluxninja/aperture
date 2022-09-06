@@ -31,24 +31,47 @@ func ServerModule() fx.Option {
 
 // HTTPServerConfig holds configuration for HTTP Server.
 // swagger:model
+// +kubebuilder:object:generate=true
 type HTTPServerConfig struct {
 	// Idle timeout
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="30s"
 	IdleTimeout config.Duration `json:"idle_timeout" validate:"gte=0s" default:"30s"`
 	// Read header timeout
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="10s"
 	ReadHeaderTimeout config.Duration `json:"read_header_timeout" validate:"gte=0s" default:"10s"`
 	// Read timeout
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="10s"
 	ReadTimeout config.Duration `json:"read_timeout" validate:"gte=0s" default:"10s"`
 	// Write timeout
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="45s"
 	WriteTimeout config.Duration `json:"write_timeout" validate:"gte=0s" default:"45s"`
 	// The lowest bucket in latency histogram
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=20
+	//+kubebuilder:validation:Minimum:=0
 	LatencyBucketStartMS float64 `json:"latency_bucket_start_ms" validate:"gte=0" default:"20"`
 	// Max header size in bytes
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=1048576
+	//+kubebuilder:validation:Minimum:=0
 	MaxHeaderBytes int `json:"max_header_bytes" validate:"gte=0" default:"1048576"`
 	// The bucket width in latency histogram
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=20
+	//+kubebuilder:validation:Minimum:=0
 	LatencyBucketWidthMS float64 `json:"latency_bucket_width_ms" validate:"gte=0" default:"20"`
 	// The number of buckets in latency histogram
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=100
+	//+kubebuilder:validation:Minimum:=0
 	LatencyBucketCount int `json:"latency_bucket_count" validate:"gte=0" default:"100"`
 	// Disable HTTP Keep Alives
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
 	DisableHTTPKeepAlives bool `json:"disable_http_keep_alives" default:"false"`
 }
 
@@ -143,10 +166,10 @@ func (constructor ServerConstructor) provideServer(
 	server := &http.Server{
 		Handler:           router,
 		MaxHeaderBytes:    config.MaxHeaderBytes,
-		IdleTimeout:       config.IdleTimeout.Duration.AsDuration(),
-		ReadHeaderTimeout: config.ReadHeaderTimeout.Duration.AsDuration(),
-		ReadTimeout:       config.ReadTimeout.Duration.AsDuration(),
-		WriteTimeout:      config.WriteTimeout.Duration.AsDuration(),
+		IdleTimeout:       config.IdleTimeout.AsDuration(),
+		ReadHeaderTimeout: config.ReadHeaderTimeout.AsDuration(),
+		ReadTimeout:       config.ReadTimeout.AsDuration(),
+		WriteTimeout:      config.WriteTimeout.AsDuration(),
 		TLSConfig:         tlsConfig,
 	}
 

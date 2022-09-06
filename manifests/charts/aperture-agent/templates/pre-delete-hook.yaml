@@ -27,7 +27,7 @@ spec:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
         app.kubernetes.io/component: aperture-agent-manager
     spec:
-      serviceAccountName: {{ include "aperture-operator.serviceAccountName" . }}
+      serviceAccountName: {{ include "agent-operator.serviceAccountName" . }}
       restartPolicy: Never
       containers:
       - name: pre-delete-job

@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.8.0
+    controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
   name: agents.fluxninja.com
 spec:
@@ -144,6 +144,7 @@ spec:
                                     type: object
                                   type: array
                               type: object
+                              x-kubernetes-map-type: atomic
                             weight:
                               description: Weight associated with matching the corresponding
                                 nodeSelectorTerm, in the range 1-100.
@@ -244,10 +245,12 @@ spec:
                                     type: object
                                   type: array
                               type: object
+                              x-kubernetes-map-type: atomic
                             type: array
                         required:
                         - nodeSelectorTerms
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   podAffinity:
                     description: Describes pod affinity scheduling rules (e.g. co-locate
@@ -324,6 +327,7 @@ spec:
                                         The requirements are ANDed.
                                       type: object
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 namespaceSelector:
                                   description: A label query over the set of namespaces
                                     that the term applies to. The term is applied
@@ -380,6 +384,7 @@ spec:
                                         The requirements are ANDed.
                                       type: object
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 namespaces:
                                   description: namespaces specifies a static list
                                     of namespace names that the term applies to. The
@@ -478,6 +483,7 @@ spec:
                                     requirements are ANDed.
                                   type: object
                               type: object
+                              x-kubernetes-map-type: atomic
                             namespaceSelector:
                               description: A label query over the set of namespaces
                                 that the term applies to. The term is applied to the
@@ -529,6 +535,7 @@ spec:
                                     requirements are ANDed.
                                   type: object
                               type: object
+                              x-kubernetes-map-type: atomic
                             namespaces:
                               description: namespaces specifies a static list of namespace
                                 names that the term applies to. The term is applied
@@ -629,6 +636,7 @@ spec:
                                         The requirements are ANDed.
                                       type: object
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 namespaceSelector:
                                   description: A label query over the set of namespaces
                                     that the term applies to. The term is applied
@@ -685,6 +693,7 @@ spec:
                                         The requirements are ANDed.
                                       type: object
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 namespaces:
                                   description: namespaces specifies a static list
                                     of namespace names that the term applies to. The
@@ -783,6 +792,7 @@ spec:
                                     requirements are ANDed.
                                   type: object
                               type: object
+                              x-kubernetes-map-type: atomic
                             namespaceSelector:
                               description: A label query over the set of namespaces
                                 that the term applies to. The term is applied to the
@@ -834,6 +844,7 @@ spec:
                                     requirements are ANDed.
                                   type: object
                               type: object
+                              x-kubernetes-map-type: atomic
                             namespaces:
                               description: namespaces specifies a static list of namespace
                                 names that the term applies to. The term is applied
@@ -859,9 +870,6 @@ spec:
                         type: array
                     type: object
                 type: object
-              agentGroup:
-                description: AgentGroup name for the Agent
-                type: string
               annotations:
                 additionalProperties:
                   type: string
@@ -877,6 +885,1016 @@ spec:
                 items:
                   type: string
                 type: array
+              config:
+                description: Agent Configuration
+                properties:
+                  agent_info:
+                    default:
+                      agent_group: default
+                    description: AgentInfo configuration.
+                    properties:
+                      agent_group:
+                        default: default
+                        description: All agents within an agent_group receive the
+                          same data-plane configuration (e.g. schedulers, FluxMeters,
+                          rate limiter).
+                        type: string
+                    type: object
+                  client:
+                    description: Client configuration such as proxy settings.
+                    properties:
+                      proxy:
+                        description: Proxy settings for the client.
+                        properties:
+                          http:
+                            type: string
+                          https:
+                            type: string
+                          no_proxy:
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                    type: object
+                  dist_cache:
+                    default:
+                      bind_addr: :3320
+                      memberlist_bind_addr: :3322
+                    description: DistCache configuration.
+                    properties:
+                      bind_addr:
+                        default: :3320
+                        description: BindAddr denotes the address that Olric will
+                          bind to for communication with other Olric nodes.
+                        type: string
+                      memberlist_advertise_addr:
+                        description: Address of memberlist to advertise to other cluster
+                          members. Used for nat traversal if provided.
+                        type: string
+                      memberlist_bind_addr:
+                        default: :3322
+                        description: Address to bind mememberlist server to.
+                        type: string
+                      replica_count:
+                        default: 1
+                        description: ReplicaCount is 1 by default.
+                        type: integer
+                    type: object
+                  etcd:
+                    description: Etcd configuration.
+                    properties:
+                      endpoints:
+                        description: List of Etcd server endpoints
+                        items:
+                          type: string
+                        type: array
+                      lease_ttl:
+                        default: 60s
+                        description: Lease time-to-live
+                        type: string
+                    type: object
+                  fluxninja_plugin:
+                    description: FluxNinja Cloud plugin configuration.
+                    properties:
+                      api_key:
+                        description: API Key for this agent.
+                        type: string
+                      client:
+                        description: Client configuration.
+                        properties:
+                          grpc:
+                            default:
+                              backoff:
+                                base_delay: 1s
+                                multiplier: 1.6
+                            description: GRPC client settings.
+                            properties:
+                              backoff:
+                                default:
+                                  base_delay: 1s
+                                  multiplier: 1.6
+                                description: Backoff config
+                                properties:
+                                  base_delay:
+                                    default: 1s
+                                    description: Base Delay
+                                    type: string
+                                  jitter:
+                                    default: 0.2
+                                    description: Jitter
+                                    minimum: 0
+                                    type: number
+                                  max_delay:
+                                    default: 120s
+                                    description: Max Delay
+                                    type: string
+                                  multiplier:
+                                    default: 1.6
+                                    description: Backoff multiplier
+                                    minimum: 0
+                                    type: number
+                                type: object
+                              insecure:
+                                default: false
+                                description: Disable ClientTLS
+                                type: boolean
+                              min_connection_timeout:
+                                default: 20s
+                                description: Minimum connection timeout
+                                type: string
+                              tls:
+                                description: Client TLS configuration
+                                properties:
+                                  ca_file:
+                                    type: string
+                                  cert_file:
+                                    type: string
+                                  insecure_skip_verify:
+                                    type: boolean
+                                  key_file:
+                                    type: string
+                                  key_log_file:
+                                    type: string
+                                type: object
+                              use_proxy:
+                                default: false
+                                description: Use HTTP CONNECT Proxy
+                                type: boolean
+                            type: object
+                          http:
+                            description: HTTP client settings.
+                            properties:
+                              disable_compression:
+                                default: false
+                                description: Disable Compression
+                                type: boolean
+                              disable_keep_alives:
+                                default: false
+                                description: Disable HTTP Keep Alives
+                                type: boolean
+                              expect_continue_timeout:
+                                default: 1s
+                                description: Expect Continue Timeout. 0 = no timeout.
+                                type: string
+                              idle_connection_timeout:
+                                default: 90s
+                                description: Idle Connection Timeout. 0 = no timeout.
+                                type: string
+                              key_log_file:
+                                description: SSL key log file (useful for debugging
+                                  with wireshark)
+                                type: string
+                              max_conns_per_host:
+                                default: 0
+                                description: Max Connections Per Host. 0 = no limit.
+                                minimum: 0
+                                type: integer
+                              max_idle_connections:
+                                default: 100
+                                description: Max Idle Connections. 0 = no limit.
+                                minimum: 0
+                                type: integer
+                              max_idle_connections_per_host:
+                                default: 5
+                                description: Max Idle Connections per host. 0 = no
+                                  limit.
+                                minimum: 0
+                                type: integer
+                              max_response_header_bytes:
+                                default: 0
+                                description: Max Response Header Bytes. 0 = no limit.
+                                format: int64
+                                minimum: 0
+                                type: integer
+                              network_keep_alive:
+                                default: 30s
+                                description: Network level keep-alive duration
+                                type: string
+                              network_timeout:
+                                default: 30s
+                                description: Timeout for making network connection
+                                type: string
+                              proxy_connect_header:
+                                additionalProperties:
+                                  items:
+                                    type: string
+                                  type: array
+                                description: Proxy Connect Header - map[string][]string
+                                type: object
+                              read_buffer_size:
+                                default: 0
+                                description: Read Buffer Size. 0 = 4KB
+                                minimum: 0
+                                type: integer
+                              response_header_timeout:
+                                default: 0s
+                                description: Response Header Timeout. 0 = no timeout.
+                                type: string
+                              timeout:
+                                default: 60s
+                                description: HTTP client timeout - Timeouts includes
+                                  connection time, redirects, reading the response
+                                  etc. 0 = no timeout.
+                                type: string
+                              tls:
+                                default:
+                                  insecure_skip_verify: false
+                                description: Client TLS configuration
+                                properties:
+                                  ca_file:
+                                    type: string
+                                  cert_file:
+                                    type: string
+                                  insecure_skip_verify:
+                                    type: boolean
+                                  key_file:
+                                    type: string
+                                  key_log_file:
+                                    type: string
+                                type: object
+                              tls_handshake_timeout:
+                                default: 10s
+                                description: TLS Handshake Timeout. 0 = no timeout
+                                type: string
+                              use_proxy:
+                                default: false
+                                description: Use Proxy
+                                type: boolean
+                              write_buffer_size:
+                                default: 0
+                                description: Write Buffer Size. 0 = 4KB.
+                                minimum: 0
+                                type: integer
+                            type: object
+                        type: object
+                      fluxninja_endpoint:
+                        description: Address to grpc or http(s) server listening in
+                          agent service. To use http protocol, the address must start
+                          with http(s)://.
+                        type: string
+                      heartbeat_interval:
+                        default: 5s
+                        description: Interval between each heartbeat.
+                        type: string
+                    type: object
+                  kubernetes_client:
+                    description: Kubernetes client configuration.
+                    properties:
+                      disable_compression:
+                        default: false
+                        description: Disable Compression
+                        type: boolean
+                      disable_keep_alives:
+                        default: false
+                        description: Disable HTTP Keep Alives
+                        type: boolean
+                      expect_continue_timeout:
+                        default: 1s
+                        description: Expect Continue Timeout. 0 = no timeout.
+                        type: string
+                      idle_connection_timeout:
+                        default: 90s
+                        description: Idle Connection Timeout. 0 = no timeout.
+                        type: string
+                      key_log_file:
+                        description: SSL key log file (useful for debugging with wireshark)
+                        type: string
+                      max_conns_per_host:
+                        default: 0
+                        description: Max Connections Per Host. 0 = no limit.
+                        minimum: 0
+                        type: integer
+                      max_idle_connections:
+                        default: 100
+                        description: Max Idle Connections. 0 = no limit.
+                        minimum: 0
+                        type: integer
+                      max_idle_connections_per_host:
+                        default: 5
+                        description: Max Idle Connections per host. 0 = no limit.
+                        minimum: 0
+                        type: integer
+                      max_response_header_bytes:
+                        default: 0
+                        description: Max Response Header Bytes. 0 = no limit.
+                        format: int64
+                        minimum: 0
+                        type: integer
+                      network_keep_alive:
+                        default: 30s
+                        description: Network level keep-alive duration
+                        type: string
+                      network_timeout:
+                        default: 30s
+                        description: Timeout for making network connection
+                        type: string
+                      proxy_connect_header:
+                        additionalProperties:
+                          items:
+                            type: string
+                          type: array
+                        description: Proxy Connect Header - map[string][]string
+                        type: object
+                      read_buffer_size:
+                        default: 0
+                        description: Read Buffer Size. 0 = 4KB
+                        minimum: 0
+                        type: integer
+                      response_header_timeout:
+                        default: 0s
+                        description: Response Header Timeout. 0 = no timeout.
+                        type: string
+                      timeout:
+                        default: 60s
+                        description: HTTP client timeout - Timeouts includes connection
+                          time, redirects, reading the response etc. 0 = no timeout.
+                        type: string
+                      tls:
+                        default:
+                          insecure_skip_verify: false
+                        description: Client TLS configuration
+                        properties:
+                          ca_file:
+                            type: string
+                          cert_file:
+                            type: string
+                          insecure_skip_verify:
+                            type: boolean
+                          key_file:
+                            type: string
+                          key_log_file:
+                            type: string
+                        type: object
+                      tls_handshake_timeout:
+                        default: 10s
+                        description: TLS Handshake Timeout. 0 = no timeout
+                        type: string
+                      use_proxy:
+                        default: false
+                        description: Use Proxy
+                        type: boolean
+                      write_buffer_size:
+                        default: 0
+                        description: Write Buffer Size. 0 = 4KB.
+                        minimum: 0
+                        type: integer
+                    type: object
+                  liveness:
+                    description: Liveness probe configuration.
+                    properties:
+                      scheduler:
+                        description: Scheduler settings.
+                        properties:
+                          max_concurrent_jobs:
+                            default: 0
+                            description: Limits how many jobs can be running at the
+                              same time. This is useful when running resource intensive
+                              jobs and a precise start time is not critical. 0 = no
+                              limit.
+                            minimum: 0
+                            type: integer
+                        type: object
+                      service:
+                        description: Service settings.
+                        properties:
+                          execution_period:
+                            default: 10s
+                            description: Time period between job executions. Zero
+                              or negative value means that the job will never execute
+                              periodically.
+                            type: string
+                          execution_timeout:
+                            default: 5s
+                            description: Execution timeout
+                            type: string
+                          initial_delay:
+                            default: 0s
+                            description: Initial delay to start the job. Zero value
+                              will schedule the job immediately. Negative value will
+                              wait for next scheduled interval.
+                            type: string
+                          initially_healthy:
+                            default: false
+                            description: Sets whether the job is initially healthy
+                            type: boolean
+                        type: object
+                    type: object
+                  log:
+                    description: Log configuration.
+                    properties:
+                      compress:
+                        default: false
+                        description: Compress
+                        type: boolean
+                      file:
+                        default: stderr
+                        description: Output file for logs. Keywords allowed - ["stderr",
+                          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+                        enum:
+                        - stderr
+                        - default
+                        type: string
+                      level:
+                        default: info
+                        description: Log level
+                        enum:
+                        - debug
+                        - DEBUG
+                        - info
+                        - INFO
+                        - warn
+                        - WARN
+                        - error
+                        - ERROR
+                        - fatal
+                        - FATAL
+                        - panic
+                        - PANIC
+                        - trace
+                        - TRACE
+                        - disabled
+                        - DISABLED
+                        type: string
+                      max_age:
+                        default: 7
+                        description: Max age in days for log files
+                        minimum: 0
+                        type: integer
+                      max_backups:
+                        default: 3
+                        description: Max log file backups
+                        minimum: 0
+                        type: integer
+                      max_size:
+                        default: 50
+                        description: Log file max size in MB
+                        minimum: 0
+                        type: integer
+                      non_blocking:
+                        default: true
+                        description: Use non-blocking log writer (can lose logs at
+                          high throughput)
+                        type: boolean
+                      pretty_console:
+                        default: false
+                        description: 'Additional log writer: pretty console (stdout)
+                          logging (not recommended for prod environments)'
+                        type: boolean
+                      writers:
+                        description: Additional log writers
+                        items:
+                          description: LogWriterConfig holds configuration for a log
+                            writer. swagger:model
+                          properties:
+                            compress:
+                              default: false
+                              description: Compress
+                              type: boolean
+                            file:
+                              default: stderr
+                              description: Output file for logs. Keywords allowed
+                                - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+                              enum:
+                              - stderr
+                              - default
+                              type: string
+                            max_age:
+                              default: 7
+                              description: Max age in days for log files
+                              minimum: 0
+                              type: integer
+                            max_backups:
+                              default: 3
+                              description: Max log file backups
+                              minimum: 0
+                              type: integer
+                            max_size:
+                              default: 50
+                              description: Log file max size in MB
+                              minimum: 0
+                              type: integer
+                          type: object
+                        type: array
+                    type: object
+                  metrics:
+                    description: Metrics configuration.
+                    properties:
+                      enable_go_metrics:
+                        default: false
+                        description: EnableGoCollector controls whether the go collector
+                          is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
+                        type: boolean
+                      enable_process_collector:
+                        default: false
+                        description: EnableProcessCollector controls whether the process
+                          collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
+                        type: boolean
+                      pedantic:
+                        default: false
+                        description: Pedantic controls whether a pedantic Registerer
+                          is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+                        type: boolean
+                    type: object
+                  otel:
+                    default:
+                      grpc_addr: :4317
+                      http_addr: :4318
+                    description: OTEL configuration.
+                    properties:
+                      batch_postrollup:
+                        default:
+                          send_batch_size: 10000
+                          timeout: 1s
+                        description: BatchPostrollup configures batch postrollup processor.
+                        properties:
+                          send_batch_size:
+                            default: 10000
+                            description: SendBatchSize is the size of a batch which
+                              after hit, will trigger it to be sent.
+                            format: int32
+                            type: integer
+                          timeout:
+                            default: 1s
+                            description: Timeout sets the time after which a batch
+                              will be sent regardless of size.
+                            type: string
+                        type: object
+                      batch_prerollup:
+                        default:
+                          send_batch_size: 10000
+                          timeout: 1s
+                        description: BatchPrerollup configures batch prerollup processor.
+                        properties:
+                          send_batch_size:
+                            default: 10000
+                            description: SendBatchSize is the size of a batch which
+                              after hit, will trigger it to be sent.
+                            format: int32
+                            type: integer
+                          timeout:
+                            default: 1s
+                            description: Timeout sets the time after which a batch
+                              will be sent regardless of size.
+                            type: string
+                        type: object
+                      grpc_addr:
+                        default: :4317
+                        description: GRPC listener addr for OTEL Collector.
+                        type: string
+                      http_addr:
+                        default: :4318
+                        description: HTTP listener addr for OTEL Collector.
+                        type: string
+                    type: object
+                  peer_discovery:
+                    description: Peer discovery configuration.
+                    properties:
+                      advertisement_addr:
+                        description: Network address of aperture server to advertise
+                          to peers - this address should be reachable from other agents.
+                          Used for nat traversal when provided.
+                        type: string
+                    type: object
+                  plugins:
+                    description: Plugins configuration.
+                    properties:
+                      disable_plugins:
+                        default: false
+                        description: Disables all plugins
+                        type: boolean
+                      disabled_plugins:
+                        description: Specific plugins to disable
+                        items:
+                          type: string
+                        type: array
+                      disabled_symbols:
+                        description: Specific plugin types to disable
+                        items:
+                          type: string
+                        type: array
+                      plugins_path:
+                        description: Path to plugins directory. This can be set via
+                          command line arguments as well.
+                        type: string
+                    type: object
+                  profilers:
+                    description: Profilers configuration.
+                    properties:
+                      cpu_profiler:
+                        default: false
+                        description: Flag to enable cpu profiling on process start
+                          and save it to a file. HTTP interface will not work if this
+                          is enabled as CPU profile will always be running.
+                        type: boolean
+                      profiles_path:
+                        description: Path to save performance profiles. This can be
+                          set via command line arguments as well. E.g. default path
+                          for aperture-agent is /var/log/aperture/aperture-agent/profiles.
+                        type: string
+                      register_http_routes:
+                        default: true
+                        description: Register routes. Profile types profile, symbol
+                          and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
+                        type: boolean
+                    type: object
+                  prometheus:
+                    description: Prometheus configuration.
+                    properties:
+                      address:
+                        description: Address of the prometheus server
+                        type: string
+                    required:
+                    - address
+                    type: object
+                  readiness:
+                    description: Readiness probe configuration.
+                    properties:
+                      scheduler:
+                        description: Scheduler settings.
+                        properties:
+                          max_concurrent_jobs:
+                            default: 0
+                            description: Limits how many jobs can be running at the
+                              same time. This is useful when running resource intensive
+                              jobs and a precise start time is not critical. 0 = no
+                              limit.
+                            minimum: 0
+                            type: integer
+                        type: object
+                      service:
+                        description: Service settings.
+                        properties:
+                          execution_period:
+                            default: 10s
+                            description: Time period between job executions. Zero
+                              or negative value means that the job will never execute
+                              periodically.
+                            type: string
+                          execution_timeout:
+                            default: 5s
+                            description: Execution timeout
+                            type: string
+                          initial_delay:
+                            default: 0s
+                            description: Initial delay to start the job. Zero value
+                              will schedule the job immediately. Negative value will
+                              wait for next scheduled interval.
+                            type: string
+                          initially_healthy:
+                            default: false
+                            description: Sets whether the job is initially healthy
+                            type: boolean
+                        type: object
+                    type: object
+                  sentry_plugin:
+                    description: Sentry plugin configuration.
+                    properties:
+                      attach_stack_trace:
+                        default: true
+                        description: Configure to generate and attach stacktraces
+                          to capturing message calls
+                        type: boolean
+                      debug:
+                        default: true
+                        description: Debug enables printing of Sentry SDK debug messages
+                        type: boolean
+                      disabled:
+                        default: false
+                        description: Sentry crash report disabled
+                        type: boolean
+                      dsn:
+                        description: If DSN is not set, the client is effectively
+                          disabled You can set test project's dsn to send log events.
+                          oss-aperture project dsn is set as default.
+                        type: string
+                      environment:
+                        default: production
+                        description: Environment
+                        type: string
+                      sample_rate:
+                        default: 1
+                        description: Sample rate for event submission i.e. 0.0 to
+                          1.0
+                        maximum: 1
+                        minimum: 0
+                        type: number
+                      traces_sample_rate:
+                        default: 0.2
+                        description: Sample rate for sampling traces i.e. 0.0 to 1.0
+                        maximum: 1
+                        minimum: 0
+                        type: number
+                    type: object
+                  server:
+                    default:
+                      addr: :8080
+                    description: Server configuration.
+                    properties:
+                      addr:
+                        default: :8080
+                        description: Address to bind to in the form of [host%zone]:port
+                        type: string
+                      grpc:
+                        description: GRPC server configuration.
+                        properties:
+                          connection_timeout:
+                            default: 120s
+                            description: Connection timeout
+                            type: string
+                          enable_reflection:
+                            default: false
+                            description: Enable Reflection
+                            type: boolean
+                        type: object
+                      grpc_gateway:
+                        description: GRPC Gateway configuration.
+                        properties:
+                          grpc_server_address:
+                            default: 0.0.0.0:1
+                            description: GRPC server address to connect to - By default
+                              it points to HTTP server port because FluxNinja stack
+                              runs GRPC and HTTP servers on the same port
+                            type: string
+                        type: object
+                      http:
+                        description: HTTP server configuration.
+                        properties:
+                          disable_http_keep_alives:
+                            default: false
+                            description: Disable HTTP Keep Alives
+                            type: boolean
+                          idle_timeout:
+                            default: 30s
+                            description: Idle timeout
+                            type: string
+                          latency_bucket_count:
+                            default: 100
+                            description: The number of buckets in latency histogram
+                            minimum: 0
+                            type: integer
+                          latency_bucket_start_ms:
+                            default: 20
+                            description: The lowest bucket in latency histogram
+                            minimum: 0
+                            type: number
+                          latency_bucket_width_ms:
+                            default: 20
+                            description: The bucket width in latency histogram
+                            minimum: 0
+                            type: number
+                          max_header_bytes:
+                            default: 1048576
+                            description: Max header size in bytes
+                            minimum: 0
+                            type: integer
+                          read_header_timeout:
+                            default: 10s
+                            description: Read header timeout
+                            type: string
+                          read_timeout:
+                            default: 10s
+                            description: Read timeout
+                            type: string
+                          write_timeout:
+                            default: 45s
+                            description: Write timeout
+                            type: string
+                        type: object
+                      keep_alive:
+                        default: 180s
+                        description: Keep-alive period - 0 = enabled if supported
+                          by protocol or OS. If negative then keep-alives are disabled.
+                        type: string
+                      network:
+                        default: tcp
+                        description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6"
+                          (IPv6-only)
+                        enum:
+                        - tcp
+                        - tcp4
+                        - tcp6
+                        type: string
+                      tls:
+                        description: TLS configuration.
+                        properties:
+                          allowed_cn:
+                            description: Allowed CN
+                            type: string
+                          certs_path:
+                            description: Path to credentials. This can be set via
+                              command line arguments as well.
+                            type: string
+                          client_ca:
+                            description: Client CA file
+                            type: string
+                          enabled:
+                            default: false
+                            description: Enabled TLS
+                            type: boolean
+                          server_cert:
+                            default: ca.crt
+                            description: Server Cert file
+                            type: string
+                          server_key:
+                            default: ca.key
+                            description: Server Key file
+                            type: string
+                        type: object
+                    type: object
+                  watchdog:
+                    default:
+                      heap:
+                        limit: 268435456
+                        min_gogc: 25
+                    description: Watchdog configuration.
+                    properties:
+                      cgroup:
+                        description: WatchdogPolicyType holds configuration Watchdog
+                          Policy algorithms. If both algorithms are configured then
+                          only watermark algorithm is used. swagger:model WatchdogPolicyType
+                        properties:
+                          adaptive_policy:
+                            description: AdaptivePolicy creates a policy that forces
+                              GC when the usage surpasses the configured factor of
+                              the available memory. This policy calculates next target
+                              as usage+(limit-usage)*factor. swagger:model
+                            properties:
+                              enabled:
+                                default: false
+                                description: Flag to enable the policy
+                                type: boolean
+                              factor:
+                                default: 0.5
+                                description: Factor sets user-configured limit of
+                                  available memory
+                                maximum: 1
+                                minimum: 0
+                                type: number
+                            type: object
+                          watermarks_policy:
+                            description: WatermarksPolicy creates a Watchdog policy
+                              that schedules GC at concrete watermarks. swagger:model
+                            properties:
+                              enabled:
+                                default: false
+                                description: Flag to enable the policy
+                                type: boolean
+                              watermarks:
+                                default:
+                                - 0.5
+                                - 0.75
+                                - 0.8
+                                - 0.85
+                                - 0.9
+                                - 0.95
+                                - 0.99
+                                description: Watermarks are increasing limits on which
+                                  to trigger GC. Watchdog disarms when the last watermark
+                                  is surpassed. It is recommended to set an extreme
+                                  watermark for the last element (e.g. 0.99).
+                                items:
+                                  type: number
+                                type: array
+                            type: object
+                        type: object
+                      heap:
+                        description: HeapConfig holds configuration for heap Watchdog.
+                          swagger:model
+                        properties:
+                          adaptive_policy:
+                            description: AdaptivePolicy creates a policy that forces
+                              GC when the usage surpasses the configured factor of
+                              the available memory. This policy calculates next target
+                              as usage+(limit-usage)*factor. swagger:model
+                            properties:
+                              enabled:
+                                default: false
+                                description: Flag to enable the policy
+                                type: boolean
+                              factor:
+                                default: 0.5
+                                description: Factor sets user-configured limit of
+                                  available memory
+                                maximum: 1
+                                minimum: 0
+                                type: number
+                            type: object
+                          limit:
+                            default: 268435456
+                            description: Maximum memory (in bytes) sets limit of process
+                              usage. Default = 256MB.
+                            format: int64
+                            type: integer
+                          min_gogc:
+                            default: 25
+                            description: Minimum GoGC sets the minimum garbage collection
+                              target percentage for heap driven Watchdogs. This setting
+                              helps avoid overscheduling.
+                            type: integer
+                          watermarks_policy:
+                            description: WatermarksPolicy creates a Watchdog policy
+                              that schedules GC at concrete watermarks. swagger:model
+                            properties:
+                              enabled:
+                                default: false
+                                description: Flag to enable the policy
+                                type: boolean
+                              watermarks:
+                                default:
+                                - 0.5
+                                - 0.75
+                                - 0.8
+                                - 0.85
+                                - 0.9
+                                - 0.95
+                                - 0.99
+                                description: Watermarks are increasing limits on which
+                                  to trigger GC. Watchdog disarms when the last watermark
+                                  is surpassed. It is recommended to set an extreme
+                                  watermark for the last element (e.g. 0.99).
+                                items:
+                                  type: number
+                                type: array
+                            type: object
+                        type: object
+                      job:
+                        description: JobConfig is config for Job swagger:model
+                        properties:
+                          execution_period:
+                            default: 10s
+                            description: Time period between job executions. Zero
+                              or negative value means that the job will never execute
+                              periodically.
+                            type: string
+                          execution_timeout:
+                            default: 5s
+                            description: Execution timeout
+                            type: string
+                          initial_delay:
+                            default: 0s
+                            description: Initial delay to start the job. Zero value
+                              will schedule the job immediately. Negative value will
+                              wait for next scheduled interval.
+                            type: string
+                          initially_healthy:
+                            default: false
+                            description: Sets whether the job is initially healthy
+                            type: boolean
+                        type: object
+                      system:
+                        description: WatchdogPolicyType holds configuration Watchdog
+                          Policy algorithms. If both algorithms are configured then
+                          only watermark algorithm is used. swagger:model WatchdogPolicyType
+                        properties:
+                          adaptive_policy:
+                            description: AdaptivePolicy creates a policy that forces
+                              GC when the usage surpasses the configured factor of
+                              the available memory. This policy calculates next target
+                              as usage+(limit-usage)*factor. swagger:model
+                            properties:
+                              enabled:
+                                default: false
+                                description: Flag to enable the policy
+                                type: boolean
+                              factor:
+                                default: 0.5
+                                description: Factor sets user-configured limit of
+                                  available memory
+                                maximum: 1
+                                minimum: 0
+                                type: number
+                            type: object
+                          watermarks_policy:
+                            description: WatermarksPolicy creates a Watchdog policy
+                              that schedules GC at concrete watermarks. swagger:model
+                            properties:
+                              enabled:
+                                default: false
+                                description: Flag to enable the policy
+                                type: boolean
+                              watermarks:
+                                default:
+                                - 0.5
+                                - 0.75
+                                - 0.8
+                                - 0.85
+                                - 0.9
+                                - 0.95
+                                - 0.99
+                                description: Watermarks are increasing limits on which
+                                  to trigger GC. Watchdog disarms when the last watermark
+                                  is surpassed. It is recommended to set an extreme
+                                  watermark for the last element (e.g. 0.99).
+                                items:
+                                  type: number
+                                type: array
+                            type: object
+                        type: object
+                    type: object
+                required:
+                - etcd
+                - prometheus
+                type: object
               containerSecurityContext:
                 default:
                   enabled: false
@@ -1186,26 +2204,6 @@ spec:
                     format: int32
                     type: integer
                 type: object
-              distributedCachePort:
-                default: 3320
-                description: Port for the Agent's distributed cache service
-                format: int32
-                maximum: 65535
-                minimum: 1
-                type: integer
-              etcd:
-                description: Etcd parameters for Agent
-                properties:
-                  endpoints:
-                    description: Etcd endpoints
-                    items:
-                      type: string
-                    type: array
-                  leaseTtl:
-                    default: 60s
-                    description: Etcd leaseTtl
-                    type: string
-                type: object
               extraEnvVars:
                 description: Array with extra environment variables to add
                 items:
@@ -1247,6 +2245,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         fieldRef:
                           description: 'Selects a field of the pod: supports metadata.name,
                             metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`,
@@ -1264,6 +2263,7 @@ spec:
                           required:
                           - fieldPath
                           type: object
+                          x-kubernetes-map-type: atomic
                         resourceFieldRef:
                           description: 'Selects a resource of the container: only
                             resources limits and requests (limits.cpu, limits.memory,
@@ -1288,6 +2288,7 @@ spec:
                           required:
                           - resource
                           type: object
+                          x-kubernetes-map-type: atomic
                         secretKeyRef:
                           description: Selects a key of a secret in the pod's namespace
                           properties:
@@ -1306,6 +2307,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                       type: object
                   required:
                   - name
@@ -1485,6 +2487,7 @@ spec:
                                 TODO: Add other useful fields. apiVersion, kind, uid?'
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         user:
                           description: 'user is optional: User is the rados user name,
                             default is admin More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it'
@@ -1516,6 +2519,7 @@ spec:
                                 TODO: Add other useful fields. apiVersion, kind, uid?'
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         volumeID:
                           description: 'volumeID used to identify the volume in cinder.
                             More info: https://examples.k8s.io/mysql-cinder-pd/README.md'
@@ -1587,6 +2591,7 @@ spec:
                             keys must be defined
                           type: boolean
                       type: object
+                      x-kubernetes-map-type: atomic
                     csi:
                       description: csi (Container Storage Interface) represents ephemeral
                         storage that is handled by certain external CSI drivers (Beta
@@ -1617,6 +2622,7 @@ spec:
                                 TODO: Add other useful fields. apiVersion, kind, uid?'
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         readOnly:
                           description: readOnly specifies a read-only configuration
                             for the volume. Defaults to false (read/write).
@@ -1670,6 +2676,7 @@ spec:
                                 required:
                                 - fieldPath
                                 type: object
+                                x-kubernetes-map-type: atomic
                               mode:
                                 description: 'Optional: mode bits used to set permissions
                                   on this file, must be an octal value between 0000
@@ -1713,6 +2720,7 @@ spec:
                                 required:
                                 - resource
                                 type: object
+                                x-kubernetes-map-type: atomic
                             required:
                             - path
                             type: object
@@ -1829,6 +2837,7 @@ spec:
                                   - kind
                                   - name
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 dataSourceRef:
                                   description: 'dataSourceRef specifies the object
                                     from which to populate the volume with data, if
@@ -1874,6 +2883,7 @@ spec:
                                   - kind
                                   - name
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 resources:
                                   description: 'resources represents the minimum resources
                                     the volume should have. If RecoverVolumeExpansionFailure
@@ -1958,6 +2968,7 @@ spec:
                                         The requirements are ANDed.
                                       type: object
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 storageClassName:
                                   description: 'storageClassName is the name of the
                                     StorageClass required by the claim. More info:
@@ -2048,6 +3059,7 @@ spec:
                                 TODO: Add other useful fields. apiVersion, kind, uid?'
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                       required:
                       - driver
                       type: object
@@ -2225,6 +3237,7 @@ spec:
                                 TODO: Add other useful fields. apiVersion, kind, uid?'
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         targetPortal:
                           description: targetPortal is iSCSI Target Portal. The Portal
                             is either an IP or ip_addr:port if the port is other than
@@ -2395,6 +3408,7 @@ spec:
                                       or its keys must be defined
                                     type: boolean
                                 type: object
+                                x-kubernetes-map-type: atomic
                               downwardAPI:
                                 description: downwardAPI information about the downwardAPI
                                   data to project
@@ -2424,6 +3438,7 @@ spec:
                                           required:
                                           - fieldPath
                                           type: object
+                                          x-kubernetes-map-type: atomic
                                         mode:
                                           description: 'Optional: mode bits used to
                                             set permissions on this file, must be
@@ -2472,6 +3487,7 @@ spec:
                                           required:
                                           - resource
                                           type: object
+                                          x-kubernetes-map-type: atomic
                                       required:
                                       - path
                                       type: object
@@ -2537,6 +3553,7 @@ spec:
                                       Secret or its key must be defined
                                     type: boolean
                                 type: object
+                                x-kubernetes-map-type: atomic
                               serviceAccountToken:
                                 description: serviceAccountToken is information about
                                   the serviceAccountToken data to project
@@ -2653,6 +3670,7 @@ spec:
                                 TODO: Add other useful fields. apiVersion, kind, uid?'
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         user:
                           description: 'user is the rados user name. Default is admin.
                             More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it'
@@ -2692,6 +3710,7 @@ spec:
                                 TODO: Add other useful fields. apiVersion, kind, uid?'
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         sslEnabled:
                           description: sslEnabled Flag enable/disable SSL communication
                             with Gateway, default false
@@ -2807,6 +3826,7 @@ spec:
                                 TODO: Add other useful fields. apiVersion, kind, uid?'
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         volumeName:
                           description: volumeName is the human-readable name of the
                             StorageOS volume.  Volume names are only unique within
@@ -2852,69 +3872,6 @@ spec:
                   - name
                   type: object
                 type: array
-              fluxninjaPlugin:
-                default:
-                  enabled: false
-                  heartbeatsInterval: 30s
-                description: FluxNinjaPlugin defines the parameters for FluxNinja
-                  plugin with Agent or Controller
-                properties:
-                  apiKeySecret:
-                    default:
-                      create: true
-                    description: API Key secret references for Agent or Controller
-                    properties:
-                      create:
-                        default: true
-                        description: Create new secret or not
-                        type: boolean
-                      secretKeyRef:
-                        default:
-                          key: apiKey
-                        description: Secret details
-                        properties:
-                          key:
-                            default: apiKey
-                            description: Key of the secret in Data
-                            type: string
-                          name:
-                            description: Name of the secret
-                            type: string
-                        type: object
-                      value:
-                        description: Value for the ApiKey
-                        type: string
-                    type: object
-                  enabled:
-                    description: Enabled the FluxNinja plugin with Aperture
-                    type: boolean
-                  endpoint:
-                    description: FluxNinja cloud instance address
-                    type: string
-                  heartbeatsInterval:
-                    default: 30s
-                    description: Specifies how often to send heartbeats to the FluxNinja
-                      cloud
-                    type: string
-                  tls:
-                    default:
-                      insecure: false
-                      insecureSkipVerify: false
-                    description: tls configuration to communicate with FluxNinja cloud
-                    properties:
-                      caFile:
-                        description: Alternative CA certificates bundle to use to
-                          validate FluxNinja cloud certificate
-                        type: string
-                      insecure:
-                        description: Specifies whether to communicate with FluxNinja
-                          cloud over TLS or in plain text
-                        type: boolean
-                      insecureSkipVerify:
-                        description: Specifies whether to verify FluxNinja cloud certificate
-                        type: boolean
-                    type: object
-                type: object
               image:
                 default:
                   pullPolicy: IfNotPresent
@@ -3029,6 +3986,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                               fieldRef:
                                 description: 'Selects a field of the pod: supports
                                   metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`,
@@ -3047,6 +4005,7 @@ spec:
                                 required:
                                 - fieldPath
                                 type: object
+                                x-kubernetes-map-type: atomic
                               resourceFieldRef:
                                 description: 'Selects a resource of the container:
                                   only resources limits and requests (limits.cpu,
@@ -3072,6 +4031,7 @@ spec:
                                 required:
                                 - resource
                                 type: object
+                                x-kubernetes-map-type: atomic
                               secretKeyRef:
                                 description: Selects a key of a secret in the pod's
                                   namespace
@@ -3093,6 +4053,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                             type: object
                         required:
                         - name
@@ -3123,6 +4084,7 @@ spec:
                                   defined
                                 type: boolean
                             type: object
+                            x-kubernetes-map-type: atomic
                           prefix:
                             description: An optional identifier to prepend to each
                               key in the ConfigMap. Must be a C_IDENTIFIER.
@@ -3139,6 +4101,7 @@ spec:
                                 description: Specify whether the Secret must be defined
                                 type: boolean
                             type: object
+                            x-kubernetes-map-type: atomic
                         type: object
                       type: array
                     image:
@@ -4408,94 +5371,12 @@ spec:
                 required:
                 - enabled
                 type: object
-              log:
-                default:
-                  file: stderr
-                  level: info
-                  nonBlocking: true
-                  prettyConsole: false
-                description: Log related configurations
-                properties:
-                  file:
-                    default: stderr
-                    description: Log filename
-                    type: string
-                  level:
-                    default: info
-                    description: Log level
-                    type: string
-                  nonBlocking:
-                    default: true
-                    description: Flag for non-blocking
-                    type: boolean
-                  prettyConsole:
-                    default: false
-                    description: Flag for pretty console
-                    type: boolean
-                type: object
-              memberListPort:
-                default: 3322
-                description: Port for the Agent's member list service
-                format: int32
-                maximum: 65535
-                minimum: 1
-                type: integer
               nodeSelector:
                 additionalProperties:
                   type: string
                 description: Node labels for pods assignment
                 type: object
                 x-kubernetes-map-type: atomic
-              otelConfig:
-                default:
-                  grpcAddr: :4317
-                description: OtelConfig is the configuration for the OTEL collector
-                properties:
-                  batchPostrollup:
-                    default:
-                      sendBatchSize: 10000
-                      timeout: 1s
-                    description: Batch postrollup processor configuration.
-                    properties:
-                      sendBatchSize:
-                        default: 10000
-                        description: SendBatchSize is the size of a batch which after
-                          hit, will trigger it to be sent.
-                        format: int32
-                        type: integer
-                      timeout:
-                        default: 1s
-                        description: Timeout sets the time after which a batch will
-                          be sent regardless of size.
-                        type: string
-                    type: object
-                  batchPrerollup:
-                    default:
-                      sendBatchSize: 10000
-                      timeout: 1s
-                    description: Batch prerollup processor configuration.
-                    properties:
-                      sendBatchSize:
-                        default: 10000
-                        description: SendBatchSize is the size of a batch which after
-                          hit, will trigger it to be sent.
-                        format: int32
-                        type: integer
-                      timeout:
-                        default: 1s
-                        description: Timeout sets the time after which a batch will
-                          be sent regardless of size.
-                        type: string
-                    type: object
-                  grpcAddr:
-                    default: :4317
-                    description: GRPC listener addr for OTEL Collector
-                    type: string
-                  httpAddr:
-                    default: :4318
-                    description: HTTP listener addr for OTEL Collector
-                    type: string
-                type: object
               podAnnotations:
                 additionalProperties:
                   type: string
@@ -4523,15 +5404,6 @@ spec:
                     type: integer
                 required:
                 - enabled
-                type: object
-              prometheus:
-                description: Prometheus parameters for Agent
-                properties:
-                  address:
-                    description: Address for Prometheus
-                    type: string
-                required:
-                - address
                 type: object
               readinessProbe:
                 default:
@@ -4605,13 +5477,36 @@ spec:
                       to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                     type: object
                 type: object
-              serverPort:
-                default: 80
-                description: Server port for the Agent
-                format: int32
-                maximum: 65535
-                minimum: 1
-                type: integer
+              secrets:
+                description: Secrets
+                properties:
+                  fluxNinjaPlugin:
+                    default:
+                      create: false
+                    description: FluxNinja plugin.
+                    properties:
+                      create:
+                        default: false
+                        description: Create new secret or not
+                        type: boolean
+                      secretKeyRef:
+                        default:
+                          key: apiKey
+                        description: Secret details
+                        properties:
+                          key:
+                            default: apiKey
+                            description: Key of the secret in Data
+                            type: string
+                          name:
+                            description: Name of the secret
+                            type: string
+                        type: object
+                      value:
+                        description: Value for the ApiKey
+                        type: string
+                    type: object
+                type: object
               service:
                 description: Configuration for Agent or Controller service
                 properties:
@@ -4738,6 +5633,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                               fieldRef:
                                 description: 'Selects a field of the pod: supports
                                   metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`,
@@ -4756,6 +5652,7 @@ spec:
                                 required:
                                 - fieldPath
                                 type: object
+                                x-kubernetes-map-type: atomic
                               resourceFieldRef:
                                 description: 'Selects a resource of the container:
                                   only resources limits and requests (limits.cpu,
@@ -4781,6 +5678,7 @@ spec:
                                 required:
                                 - resource
                                 type: object
+                                x-kubernetes-map-type: atomic
                               secretKeyRef:
                                 description: Selects a key of a secret in the pod's
                                   namespace
@@ -4802,6 +5700,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                             type: object
                         required:
                         - name
@@ -4832,6 +5731,7 @@ spec:
                                   defined
                                 type: boolean
                             type: object
+                            x-kubernetes-map-type: atomic
                           prefix:
                             description: An optional identifier to prepend to each
                               key in the ConfigMap. Must be a C_IDENTIFIER.
@@ -4848,6 +5748,7 @@ spec:
                                 description: Specify whether the Secret must be defined
                                 type: boolean
                             type: object
+                            x-kubernetes-map-type: atomic
                         type: object
                       type: array
                     image:
@@ -5921,9 +6822,6 @@ spec:
                       type: string
                   type: object
                 type: array
-            required:
-            - etcd
-            - prometheus
             type: object
           status:
             description: AgentStatus defines the observed state of Agent.
@@ -5936,9 +6834,3 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []

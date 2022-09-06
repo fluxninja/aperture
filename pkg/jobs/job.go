@@ -54,14 +54,26 @@ func (job JobBase) JobWatchers() JobWatchers {
 
 // JobConfig is config for Job
 // swagger:model
+// +kubebuilder:object:generate=true
 type JobConfig struct {
 	// Initial delay to start the job. Zero value will schedule the job immediately. Negative value will wait for next scheduled interval.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="0s"
 	InitialDelay config.Duration `json:"initial_delay" default:"0s"`
+
 	// Time period between job executions. Zero or negative value means that the job will never execute periodically.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="10s"
 	ExecutionPeriod config.Duration `json:"execution_period" default:"10s"`
+
 	// Execution timeout
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="5s"
 	ExecutionTimeout config.Duration `json:"execution_timeout" validate:"gte=0s" default:"5s"`
+
 	// Sets whether the job is initially healthy
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
 	InitiallyHealthy bool `json:"initially_healthy" default:"false"`
 }
 
@@ -118,7 +130,7 @@ func (executor *jobExecutor) doJob() {
 		return
 	}
 
-	executionTimeout := executor.config.ExecutionTimeout.Duration.AsDuration()
+	executionTimeout := executor.config.ExecutionTimeout.AsDuration()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	if executionTimeout > 0 {
@@ -168,9 +180,9 @@ func (executor *jobExecutor) start() {
 	defer executor.execLock.Unlock()
 
 	var scheduler *gocron.Scheduler
-	if executor.config.ExecutionPeriod.Duration.AsDuration() > 0 {
+	if executor.config.ExecutionPeriod.AsDuration() > 0 {
 		scheduler = executor.jg.scheduler.
-			Every(executor.config.ExecutionPeriod.Duration.AsDuration())
+			Every(executor.config.ExecutionPeriod.AsDuration())
 	} else {
 		scheduler = executor.jg.scheduler.
 			Every(time.Duration(math.MaxInt64))
@@ -180,7 +192,7 @@ func (executor *jobExecutor) start() {
 		Tag(executor.jobTag).
 		SingletonMode()
 
-	initialDelay := executor.config.InitialDelay.Duration.AsDuration()
+	initialDelay := executor.config.InitialDelay.AsDuration()
 
 	if initialDelay > 0 {
 		scheduler = scheduler.StartAt(time.Now().Add(initialDelay))

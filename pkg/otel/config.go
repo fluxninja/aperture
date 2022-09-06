@@ -1,6 +1,7 @@
 package otel
 
 import (
+	"crypto/tls"
 	"fmt"
 
 	promapi "github.com/prometheus/client_golang/api"
@@ -50,6 +51,7 @@ type otelParams struct {
 	promClient promapi.Client
 	config     *otelcollector.OTELConfig
 	listener   *listener.Listener
+	tlsConfig  *tls.Config
 	OtelConfig
 }
 
@@ -64,22 +66,38 @@ type otelParams struct {
 
 // OtelConfig is the configuration for the OTEL collector.
 // swagger:model
+// +kubebuilder:object:generate=true
 type OtelConfig struct {
 	// GRPC listener addr for OTEL Collector.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=":4317"
 	GRPCAddr string `json:"grpc_addr" validate:"hostname_port" default:":4317"`
 	// HTTP listener addr for OTEL Collector.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=":4318"
 	HTTPAddr string `json:"http_addr" validate:"hostname_port" default:":4318"`
 	// BatchPrerollup configures batch prerollup processor.
-	BatchPrerollup Batch `json:"batch_prerollup"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={send_batch_size:10000,timeout:"1s"}
+	BatchPrerollup BatchConfig `json:"batch_prerollup,omitempty"`
 	// BatchPostrollup configures batch postrollup processor.
-	BatchPostrollup Batch `json:"batch_postrollup"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={send_batch_size:10000,timeout:"1s"}
+	BatchPostrollup BatchConfig `json:"batch_postrollup,omitempty"`
 }
 
-// Batch defines configuration for OTEL batch processor.
-type Batch struct {
+// BatchConfig defines configuration for OTEL batch processor.
+// swagger:model
+// +kubebuilder:object:generate=true
+type BatchConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="1s"
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
+
 	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=10000
 	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"10000"`
 }
 
@@ -110,21 +128,28 @@ func (c OTELConfigConstructor) Annotate() fx.Option {
 	return options
 }
 
-func newOtelConfig(unmarshaller config.Unmarshaller,
-	listener *listener.Listener,
-	promClient promapi.Client,
-) (*otelParams, error) {
+// FxIn consumes parameters via Fx.
+type FxIn struct {
+	fx.In
+	Unmarshaller config.Unmarshaller
+	Listener     *listener.Listener
+	PromClient   promapi.Client
+	TLSConfig    *tls.Config `optional:"true"`
+}
+
+func newOtelConfig(in FxIn) (*otelParams, error) {
 	config := otelcollector.NewOTELConfig()
 	config.AddDebugExtensions()
 
 	var userCfg OtelConfig
-	if err := unmarshaller.UnmarshalKey("otel", &userCfg); err != nil {
+	if err := in.Unmarshaller.UnmarshalKey("otel", &userCfg); err != nil {
 		return nil, err
 	}
 	cfg := &otelParams{
 		OtelConfig: userCfg,
-		listener:   listener,
-		promClient: promClient,
+		listener:   in.Listener,
+		promClient: in.PromClient,
+		tlsConfig:  in.TLSConfig,
 		config:     config,
 	}
 	return cfg, nil
@@ -147,9 +172,9 @@ func addLogsAndTracesPipelines(cfg *otelParams) {
 	addOTLPReceiver(cfg)
 	config.AddProcessor(ProcessorEnrichment, nil)
 	addMetricsProcessor(config)
-	config.AddBatchProcessor(ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.Duration.AsDuration(), cfg.BatchPrerollup.SendBatchSize)
+	config.AddBatchProcessor(ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPrerollup.SendBatchSize)
 	addRollupProcessor(config)
-	config.AddBatchProcessor(ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.Duration.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
+	config.AddBatchProcessor(ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
 	config.AddExporter(ExporterLogging, nil)
 
 	processors := []string{
@@ -293,9 +318,16 @@ func addPrometheusRemoteWriteExporter(config *otelcollector.OTELConfig, promClie
 }
 
 func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]interface{} {
+	scheme := "http"
+	if cfg.tlsConfig != nil {
+		scheme = "https"
+	}
 	return map[string]interface{}{
-		"job_name":        name,
-		"scheme":          "http",
+		"job_name": name,
+		"scheme":   scheme,
+		"tls_config": map[string]interface{}{
+			"insecure_skip_verify": true,
+		},
 		"scrape_interval": "1s",
 		"scrape_timeout":  "900ms",
 		"metrics_path":    "/metrics",

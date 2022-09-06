@@ -61,12 +61,18 @@ func Module() fx.Option {
 
 // ProfilersConfig holds configuration for profilers.
 // swagger:model
+// +kubebuilder:object:generate=true
 type ProfilersConfig struct {
 	// Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=true
 	RegisterHTTPRoutes bool `json:"register_http_routes" default:"true"`
 	// Path to save performance profiles. This can be set via command line arguments as well. E.g. default path for aperture-agent is /var/log/aperture/aperture-agent/profiles.
-	ProfilesPath string `json:"profiles_path"`
+	//+kubebuilder:validation:Optional
+	ProfilesPath string `json:"profiles_path,omitempty"`
 	// Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
 	CPUProfile bool `json:"cpu_profiler" default:"false"`
 }
 

@@ -27,19 +27,29 @@ func Module() fx.Option {
 
 // ServerTLSConfig holds configuration for setting up server TLS support.
 // swagger:model
+// +kubebuilder:object:generate=true
 type ServerTLSConfig struct {
 	// Path to credentials. This can be set via command line arguments as well.
-	CertsPath string `json:"certs_path"`
+	//+kubebuilder:validation:Optional
+	CertsPath string `json:"certs_path,omitempty"`
 	// Server Cert file
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="ca.crt"
 	ServerCert string `json:"server_cert" default:"ca.crt"`
 	// Server Key file
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="ca.key"
 	ServerKey string `json:"server_key" default:"ca.key"`
 	// Client CA file
-	ClientCA string `json:"client_ca" validate:"omitempty"`
+	//+kubebuilder:validation:Optional
+	ClientCA string `json:"client_ca,omitempty" validate:"omitempty"`
 	// Allowed CN
-	AllowedCN string `json:"allowed_cn" validate:"omitempty,fqdn"`
-	// Enable TLS
-	Enable bool `json:"enable" default:"false"`
+	//+kubebuilder:validation:Optional
+	AllowedCN string `json:"allowed_cn,omitempty" validate:"omitempty,fqdn"`
+	// Enabled TLS
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
+	Enabled bool `json:"enabled" default:"false"`
 }
 
 // Constructor holds fields to create an annotated instance of *tls.Config.
@@ -67,7 +77,7 @@ func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller
 		return nil, err
 	}
 
-	if config.Enable {
+	if config.Enabled {
 		certPath := config.CertsPath
 		serverCertKeyPair, err := tls.LoadX509KeyPair(
 			path.Join(certPath, config.ServerCert),

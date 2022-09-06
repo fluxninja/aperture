@@ -68,14 +68,20 @@ type PluginTrackers map[string]*PluginTracker
 
 // PluginsConfig holds configuration for plugins.
 // swagger:model
+// +kubebuilder:object:generate=true
 type PluginsConfig struct {
 	// Path to plugins directory. This can be set via command line arguments as well.
-	PluginsPath string `json:"plugins_path"`
+	//+kubebuilder:validation:Optional
+	PluginsPath string `json:"plugins_path,omitempty"`
 	// Specific plugin types to disable
-	DisabledSymbols []string `json:"disabled_symbols"`
+	//+kubebuilder:validation:Optional
+	DisabledSymbols []string `json:"disabled_symbols,omitempty"`
 	// Specific plugins to disable
-	DisabledPlugins []string `json:"disabled_plugins"`
+	//+kubebuilder:validation:Optional
+	DisabledPlugins []string `json:"disabled_plugins,omitempty"`
 	// Disables all plugins
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
 	DisablePlugins bool `json:"disable_plugins" default:"false"`
 }
 

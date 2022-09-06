@@ -51,6 +51,7 @@ type concurrencyToken struct{}
 // RegisterCMFileValidator adds a configmap file validator to be handled on validator
 //
 // This function should be only called before Start phase.
+// TODO: Use Fx Value Groups here.
 func (v *CMValidator) RegisterCMFileValidator(validator CMFileValidator) {
 	v.fileValidators = append(v.fileValidators, validator)
 }

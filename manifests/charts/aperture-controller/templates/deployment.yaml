@@ -67,7 +67,7 @@ spec:
       {{- if .Values.operator.tolerations }}
       tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.operator.tolerations "context" $) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "aperture-operator.serviceAccountName" . }}
+      serviceAccountName: {{ include "controller-operator.serviceAccountName" . }}
       {{- if .Values.operator.podSecurityContext.enabled }}
       securityContext: {{- omit .Values.operator.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
