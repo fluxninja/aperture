@@ -57,9 +57,10 @@ func (configSync *classifierConfigSync) doSync(etcdClient *etcdclient.Client, li
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			wrapper := &configv1.ClassifierWrapper{
-				PolicyName: configSync.policyBaseAPI.GetPolicyName(),
-				PolicyHash: configSync.policyBaseAPI.GetPolicyHash(),
-				Classifier: configSync.classifierProto,
+				PolicyName:      configSync.policyBaseAPI.GetPolicyName(),
+				PolicyHash:      configSync.policyBaseAPI.GetPolicyHash(),
+				ClassifierIndex: configSync.classifierIndex,
+				Classifier:      configSync.classifierProto,
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {

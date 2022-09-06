@@ -126,7 +126,7 @@ func invokeMiniApp(
 	classifier.classifierProto = rs
 	classifier.policyName = wrapperMessage.PolicyName
 	classifier.policyHash = wrapperMessage.PolicyHash
-
+	classifier.classifierIndex = wrapperMessage.ClassifierIndex
 	lc.Append(
 		fx.Hook{
 			OnStart: func(startCtx context.Context) error {

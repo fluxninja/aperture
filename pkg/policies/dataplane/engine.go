@@ -81,8 +81,9 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	classifierProtos := make([]*flowcontrolv1.Classifier, len(classifiers))
 	for i, classifier := range classifiers {
 		classifierProtos[i] = &flowcontrolv1.Classifier{
-			PolicyName: classifier.GetClassifierID().PolicyName,
-			PolicyHash: classifier.GetClassifierID().PolicyHash,
+			PolicyName:      classifier.GetClassifierID().PolicyName,
+			PolicyHash:      classifier.GetClassifierID().PolicyHash,
+			ClassifierIndex: classifier.GetClassifierID().ClassifierIndex,
 		}
 	}
 	response.Classifiers = classifierProtos

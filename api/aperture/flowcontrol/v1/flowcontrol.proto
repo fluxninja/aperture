@@ -90,4 +90,5 @@ message FluxMeter {
 message Classifier {
   string policy_name = 1;
   string policy_hash = 2;
+  int64 classifier_index = 3;
 }

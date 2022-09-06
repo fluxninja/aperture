@@ -72,6 +72,7 @@ type Classifier struct {
 	classifierProto *classificationv1.Classifier
 	policyName      string
 	policyHash      string
+	classifierIndex int64
 }
 
 type rulesetID = uint64
@@ -281,8 +282,9 @@ func (c *Classifier) GetSelector() *selectorv1.Selector {
 // GetClassifierID returns ClassifierID object that should uniquely identify classifier.
 func (c *Classifier) GetClassifierID() iface.ClassifierID {
 	return iface.ClassifierID{
-		PolicyName: c.policyName,
-		PolicyHash: c.policyHash,
+		PolicyName:      c.policyName,
+		PolicyHash:      c.policyHash,
+		ClassifierIndex: c.classifierIndex,
 	}
 }
 
