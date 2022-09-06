@@ -22,6 +22,42 @@ entries:
     urls:
     - https://fluxninja.github.io/aperture/aperture-v0.0.1.tgz
     version: v0.0.1
+  aperture-agent:
+  - apiVersion: v2
+    appVersion: v0.1.1
+    created: "2022-09-06T05:02:27.001015037Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: =1.14.1
+    description: A Helm chart to deploy Aperture Agent
+    digest: be6fd3a8b12b1101ddaf51394991c9a1f19821f0ffbd72c571beb06b59612168
+    name: aperture-agent
+    urls:
+    - https://fluxninja.github.io/aperture/aperture-agent-v0.0.1.tgz
+    version: v0.0.1
+  aperture-controller:
+  - apiVersion: v2
+    appVersion: v0.1.1
+    created: "2022-09-06T05:02:27.013567384Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: =1.14.1
+    - condition: etcd.enabled
+      name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: =6.13.5
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: =15.5.3
+    description: A Helm chart to deploy Aperture Controller
+    digest: 7404d83834d83dcd806f5fdb21ac34964b20359740aabb7635ae47a154065995
+    name: aperture-controller
+    urls:
+    - https://fluxninja.github.io/aperture/aperture-controller-v0.0.1.tgz
+    version: v0.0.1
   aperture-operator:
   - apiVersion: v2
     appVersion: v0.1.0
@@ -44,4 +80,15 @@ entries:
     urls:
     - https://fluxninja.github.io/aperture/aperture-operator-v0.0.1.tgz
     version: v0.0.1
-generated: "2022-08-30T19:43:44.638560893+05:30"
+  istioconfig:
+  - apiVersion: v2
+    appVersion: v0.1.0
+    created: "2022-09-06T05:02:27.01383898Z"
+    description: A Helm chart that deploys Aperture Envoy Filter via Istio
+    digest: b2c0f167a97795d607649599d8f9666914b394a4e4ee022dcf9027f431d9c256
+    name: istioconfig
+    type: application
+    urls:
+    - https://fluxninja.github.io/aperture/istioconfig-v0.0.1.tgz
+    version: v0.0.1
+generated: "2022-09-06T05:02:26.996627976Z"
