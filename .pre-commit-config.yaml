@@ -124,3 +124,8 @@ repos:
           - fmt
         types:
           - jsonnet
+      - id: helmlint
+        name: "Helm Lint"
+        description: Run helm lint, a linter for helm charts
+        entry: ./scripts/precommit/helmlint.sh
+        language: script
