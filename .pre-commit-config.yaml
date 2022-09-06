@@ -6,6 +6,15 @@ default_stages:
 repos:
   - repo: local
     hooks:
+      - id: tools
+        name: "Install tools"
+        entry: "./scripts/precommit/install_tools.sh"
+        language: script
+        always_run: true
+        pass_filenames: false
+        description: "Install tools"
+  - repo: local
+    hooks:
       - id: proto
         name: "Proto"
         entry: "./scripts/precommit/generate_api.sh"
