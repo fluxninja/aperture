@@ -28,8 +28,7 @@ facilitated by agents and a controller.
   <img src="docs/content/assets/img/oaalight.png" alt="Observe. Analyze. Actuate." width="100%">
 </p>
 
-For more detailed description, refer to
-[the docs](docs/content/introduction.md).
+For more detailed description, refer to [the docs](https://docs.fluxninja.com/).
 
 ## Playground
 
@@ -81,4 +80,4 @@ After your first PR is created you would be asked to sign our
 
 For better understanding of Aperture, refer to the following resources.
 
-- [Documentation](docs/content/introduction.md)
+- [Documentation](https://docs.fluxninja.com/)
