@@ -35,7 +35,7 @@ generate-config-markdown:
 				--allow-template-override \
 				--template-dir ./tools/swagger/swagger-templates \
 				--config-file ./tools/swagger/markdown-config.yaml; \
-			npx prettier --write $$dir/*.md; \
+			npx prettier --no-config --write $$dir/*.md; \
 			rm $$dir/gen.yaml; \
 		done; \
 	}
