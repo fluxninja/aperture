@@ -8,8 +8,11 @@ keywords:
   - labels
 ---
 
-:::info See also
-[Selector reference](/reference/configuration/policies#-v1selector) :::
+:::info
+
+See also [Selector reference](/reference/configuration/policies#-v1selector)
+
+:::
 
 Flow observability and control components are instantiated on Aperture Agents
 and they select flows based on scoping rules defined in Selectors.
