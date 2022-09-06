@@ -114,7 +114,7 @@ definitions:
         description: BindAddr denotes the address that Olric will bind to for communication
           with other Olric nodes.
         type: string
-        x-go-default: :3320
+        x-go-default: :3320,omitempty
         x-go-name: BindAddr
         x-go-validate: hostname_port
       memberlist_advertise_addr:
@@ -576,8 +576,8 @@ definitions:
         x-go-default: "false"
         x-go-name: Compress
       file:
-        description: Output file for logs. Keywords allowed - ["stderr", "stderr",
-          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+        description: Output file for logs. Keywords allowed - ["stderr", "default"].
+          "default" maps to `/var/log/fluxninja/<service>.log`
         type: string
         x-go-default: stderr
         x-go-name: File
@@ -638,8 +638,8 @@ definitions:
         x-go-default: "false"
         x-go-name: Compress
       file:
-        description: Output file for logs. Keywords allowed - ["stderr", "stderr",
-          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+        description: Output file for logs. Keywords allowed - ["stderr", "default"].
+          "default" maps to `/var/log/fluxninja/<service>.log`
         type: string
         x-go-default: stderr
         x-go-name: File
