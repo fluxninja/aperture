@@ -1,6 +1,10 @@
 *                                            @FluxNinja/backend
 /.circleci/                                  @FluxNinja/devops
 /.github/                                    @FluxNinja/devops
+/manifests/                                  @FluxNinja/devops
+/playground/                                 @FluxNinja/devops
+/libsonnet/                                  @FluxNinja/devops
+/packaging/                                  @FluxNinja/devops
+/nfpm.yaml                                   @FluxNinja/devops
 /docs/content                                @FluxNinja/documentation
 /docs/diagrams                               @FluxNinja/documentation
-/manifests/                                  @FluxNinja/devops
