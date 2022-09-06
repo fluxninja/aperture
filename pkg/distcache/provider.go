@@ -43,7 +43,7 @@ func Module() fx.Option {
 // swagger:model
 // +kubebuilder:object:generate=true
 type DistCacheConfig struct {
-	// BindAddr denotes the address that Olric will bind to for communication with other Olric nodes.
+	// BindAddr denotes the address that DistCache will bind to for communication with other peer nodes.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=":3320"
 	BindAddr string `json:"bind_addr,omitempty" default:":3320" validate:"hostname_port"`
@@ -60,7 +60,7 @@ type DistCacheConfig struct {
 	MemberlistAdvertiseAddr string `json:"memberlist_advertise_addr,omitempty" validate:"omitempty,hostname_port"`
 }
 
-// DistCache wraps an Olric instance along with its config for further reference.
+// DistCache is a peer to peer distributed cache.
 type DistCache struct {
 	sync.Mutex
 	Config *olricconfig.Config
@@ -93,7 +93,7 @@ type DistCacheConstructor struct {
 	DefaultConfig DistCacheConfig
 }
 
-// ProvideDistCache creates a new instance of Olric distributed cache in embded mode.
+// ProvideDistCache creates a new instance of distributed cache.
 // It also hooks in the service discovery plugin.
 func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructorIn) (*DistCache, error) {
 	config := constructor.DefaultConfig
@@ -161,7 +161,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	startChan := make(chan struct{})
 	oc.Started = func() {
-		log.Info().Msg("Olric started")
+		log.Info().Msg("DistCache started")
 		startChan <- struct{}{}
 	}
 

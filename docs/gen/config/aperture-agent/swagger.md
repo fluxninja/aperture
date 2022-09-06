@@ -674,7 +674,7 @@ DistCacheConfig configures distributed cache that holds per-label counters in di
 <dt>bind_addr</dt>
 <dd>
 
-(string, `hostname_port`, default: `:3320`) BindAddr denotes the address that Olric will bind to for communication with other Olric nodes.
+(string, `hostname_port`, default: `:3320`) BindAddr denotes the address that DistCache will bind to for communication with other peer nodes.
 
 </dd>
 </dl>
