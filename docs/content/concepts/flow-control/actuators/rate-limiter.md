@@ -9,10 +9,17 @@ keywords:
   - queuing
 ---
 
-:::info See also what are [actuators](actuators.md) in general. :::
+:::info
 
-:::info See also
+See also what are [actuators](actuators.md) in general.
+
+:::
+
+:::info
+
+See also
 [Rate Limiter reference](/reference/configuration/policies.md#-languagev1ratelimiter).
+
 :::
 
 ## Distributed Counters
