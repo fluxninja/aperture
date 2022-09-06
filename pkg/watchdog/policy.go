@@ -48,8 +48,7 @@ type WatchdogPolicyType struct {
 // +kubebuilder:object:generate=true
 type HeapLimit struct {
 	// Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
-	//+kubebuilder:validation:Mimimum=1
-	//+kubebuilder:validation:Maximum=100
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=25
 	MinGoGC int `json:"min_gogc" validate:"gt=0,lte=100" default:"25"`
 	// Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
@@ -136,8 +135,7 @@ type AdaptivePolicy struct {
 	PolicyCommon `json:",inline"`
 
 	// Factor sets user-configured limit of available memory
-	//+kubebuilder:validation:Minimum=0
-	//+kubebuilder:validation:Maximum=1
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=0.50
 	Factor float64 `json:"factor" validate:"gte=0,lte=1" default:"0.50"`
 }

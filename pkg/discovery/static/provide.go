@@ -21,7 +21,7 @@ const (
 // +kubebuilder:object:generate=true
 type EntityConfig struct {
 	// IP address of the entity.
-	//+kubebuilder:validation:Pattern=`^(\d{1,3}\.){3}\d{1,3}$`
+	//+kubebuilder:validation:Optional
 	IPAddress string `json:"ip_address,omitempty" validate:"required,ip"`
 	// UID of the entity.
 	//+kubebuilder:validation:Optional
@@ -36,7 +36,7 @@ type EntityConfig struct {
 // +kubebuilder:object:generate=true
 type ServiceConfig struct {
 	// Name of the service.
-	//+kubebuilder:validation:MinLength=1
+	//+kubebuilder:validation:Optional
 	Name string `json:"name" validate:"required"`
 	// Entities of the service.
 	//+kubebuilder:validation:Optional

@@ -1651,11 +1651,7 @@ spec:
                                 default: 0.5
                                 description: Factor sets user-configured limit of
                                   available memory
-                                maximum: 1
-                                minimum: 0
                                 type: number
-                            required:
-                            - factor
                             type: object
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy
@@ -1698,11 +1694,7 @@ spec:
                                 default: 0.5
                                 description: Factor sets user-configured limit of
                                   available memory
-                                maximum: 1
-                                minimum: 0
                                 type: number
-                            required:
-                            - factor
                             type: object
                           limit:
                             default: 268435456
@@ -1715,7 +1707,6 @@ spec:
                             description: Minimum GoGC sets the minimum garbage collection
                               target percentage for heap driven Watchdogs. This setting
                               helps avoid overscheduling.
-                            maximum: 100
                             type: integer
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy
@@ -1739,8 +1730,6 @@ spec:
                                   type: number
                                 type: array
                             type: object
-                        required:
-                        - min_gogc
                         type: object
                       job:
                         description: JobConfig is config for Job swagger:model
@@ -1785,11 +1774,7 @@ spec:
                                 default: 0.5
                                 description: Factor sets user-configured limit of
                                   available memory
-                                maximum: 1
-                                minimum: 0
                                 type: number
-                            required:
-                            - factor
                             type: object
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy
