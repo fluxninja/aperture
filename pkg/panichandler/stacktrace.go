@@ -56,9 +56,7 @@ func (c Callstack) Entries() []Entry {
 	for {
 		frame, more := frames.Next()
 		dir, file := path.Split(frame.File)
-		// fmt.Println("dir:", dir, "file:", file)
 		fullname := frame.Function
-		// fmt.Println("fullname: ",fullname)
 		var pkg, name string
 		if i := strings.LastIndex(fullname, "/"); i > 0 {
 			i += strings.IndexRune(fullname[i+1:], '.')

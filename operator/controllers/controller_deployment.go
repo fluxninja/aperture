@@ -49,7 +49,27 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 	}
 	annotations[sidecarAnnotationKey] = "false"
 
-	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec)
+	probeScheme := corev1.URISchemeHTTP
+	if instance.Spec.ConfigSpec.Server.TLS.Enabled {
+		probeScheme = corev1.URISchemeHTTPS
+	}
+
+	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec, probeScheme)
+
+	serverPort, err := getPort(spec.ConfigSpec.Server.Addr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelGRPCPort, err := getPort(spec.ConfigSpec.Otel.GRPCAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelHTTPPort, err := getPort(spec.ConfigSpec.Otel.HTTPAddr)
+	if err != nil {
+		return nil, err
+	}
 
 	dep := &appsv1.Deployment{
 		ObjectMeta: v1.ObjectMeta{
@@ -94,14 +114,19 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 							Resources:       spec.Resources,
 							Ports: []corev1.ContainerPort{
 								{
-									Name:          "grpc",
-									ContainerPort: spec.ServerPort,
-									Protocol:      "TCP",
+									Name:          server,
+									ContainerPort: serverPort,
+									Protocol:      tcp,
 								},
 								{
-									Name:          "webhooks-port",
-									ContainerPort: 8086,
-									Protocol:      "TCP",
+									Name:          grpcOtel,
+									ContainerPort: otelGRPCPort,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          httpOtel,
+									ContainerPort: otelHTTPPort,
+									Protocol:      corev1.ProtocolTCP,
 								},
 							},
 							TerminationMessagePath:   "/dev/termination-log",

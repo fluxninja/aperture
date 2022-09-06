@@ -39,4 +39,10 @@ const (
 	controllerCertKeyName        = "key.pem"
 	controllerCertName           = "crt.pem"
 	controllerCertPath           = "/etc/aperture/aperture-controller/certs"
+	server                       = "server"
+	grpcOtel                     = "grpc-otel"
+	httpOtel                     = "http-otel"
+	tcp                          = "TCP"
+	distCache                    = "dist-cache"
+	memberList                   = "memberlist"
 )

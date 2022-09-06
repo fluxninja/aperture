@@ -11,7 +11,7 @@ import (
 func (msg *LabelMatcher) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -27,7 +27,7 @@ func (msg *LabelMatcher) UnmarshalJSON(b []byte) error {
 func (msg *K8SLabelMatcherRequirement) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -43,7 +43,7 @@ func (msg *K8SLabelMatcherRequirement) UnmarshalJSON(b []byte) error {
 func (msg *MatchExpression) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -59,7 +59,7 @@ func (msg *MatchExpression) UnmarshalJSON(b []byte) error {
 func (msg *MatchExpression_List) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -75,7 +75,7 @@ func (msg *MatchExpression_List) UnmarshalJSON(b []byte) error {
 func (msg *EqualsMatchExpression) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -91,7 +91,7 @@ func (msg *EqualsMatchExpression) UnmarshalJSON(b []byte) error {
 func (msg *MatchesMatchExpression) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }

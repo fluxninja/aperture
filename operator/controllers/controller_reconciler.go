@@ -36,6 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/go-logr/logr"
 )
 
@@ -270,6 +271,14 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
+	// Always enable TLS on the controller
+	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
+		CertsPath:  controllerCertPath,
+		ServerCert: controllerCertName,
+		ServerKey:  controllerCertKeyName,
+		Enabled:    true,
+	}
+
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
@@ -322,15 +331,7 @@ func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance 
 // reconcileService prepares the desired states for Controller services and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileService(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
-	service, err := serviceForControllerWebhook(instance.DeepCopy(), log, r.Scheme)
-	if err != nil {
-		return err
-	}
-	if err = r.createService(service, ctx, instance); err != nil {
-		return err
-	}
-
-	service, err = serviceForController(instance.DeepCopy(), log, r.Scheme)
+	service, err := serviceForController(instance.DeepCopy(), log, r.Scheme)
 	if err != nil {
 		return err
 	}
@@ -451,7 +452,7 @@ func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr
 func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSecret(ctx context.Context, instance *v1alpha1.Controller) error {
 	var err error
 	if controllerCert == nil || controllerKey == nil || controllerClientCert == nil {
-		controllerCert, controllerKey, controllerClientCert, err = generateCertificate(validatingWebhookSvcName, instance.GetNamespace())
+		controllerCert, controllerKey, controllerClientCert, err = generateCertificate(controllerServiceName, instance.GetNamespace())
 		if err != nil {
 			return err
 		}
@@ -495,7 +496,7 @@ func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSec
 // reconcileSecret prepares the desired states for Controller ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *v1alpha1.Controller) error {
-	if !instance.Spec.FluxNinjaPlugin.APIKeySecret.Create || !instance.Spec.FluxNinjaPlugin.Enabled {
+	if !instance.Spec.Secrets.FluxNinjaPlugin.Create {
 		return nil
 	}
 	secret, err := secretForControllerAPIKey(instance.DeepCopy(), r.Scheme)
@@ -506,10 +507,10 @@ func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *v1
 		return err
 	}
 
-	instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = false
-	instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = ""
-	instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef.Name = secretName(
-		instance.GetName(), "controller", &instance.Spec.FluxNinjaPlugin.APIKeySecret)
+	instance.Spec.Secrets.FluxNinjaPlugin.Create = false
+	instance.Spec.Secrets.FluxNinjaPlugin.Value = ""
+	instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name = secretName(
+		instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin)
 
 	return nil
 }
@@ -534,8 +535,8 @@ func eventFiltersForController() predicate.Predicate {
 
 			diffObjects := !reflect.DeepEqual(old.Spec, new.Spec)
 			// Skipping update events for Secret updates
-			if diffObjects && old.Spec.FluxNinjaPlugin.APIKeySecret.Value != "" &&
-				new.Spec.FluxNinjaPlugin.APIKeySecret.Value == "" {
+			if diffObjects && old.Spec.Secrets.FluxNinjaPlugin.Value != "" &&
+				new.Spec.Secrets.FluxNinjaPlugin.Value == "" {
 				return false
 			}
 

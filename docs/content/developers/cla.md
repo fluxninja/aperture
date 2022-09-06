@@ -19,27 +19,28 @@ right, title, and interest in and to Your Contributions.
 
 1.  Definitions.
 
-    ("<ins>You</ins>") (or ("<ins>Your</ins>")) shall mean the copyright owner or
-    legal entity authorized by the copyright owner that is making this Agreement
-    with Company. For legal entities, the entity making a Contribution and all other
-    entities that control, are controlled by, or are under common control with that
-    entity are considered to be a single Contributor. For the purposes of this
-    definition, "<ins>control</ins>" means (i) the power, direct or indirect, to
-    cause the direction or management of such entity, whether by contract or
-    otherwise, or (ii) ownership of fifty percent (50%) or more of the outstanding
-    shares, or (iii) beneficial ownership of such entity.
+    ("<ins>You</ins>") (or ("<ins>Your</ins>")) shall mean the copyright owner
+    or legal entity authorized by the copyright owner that is making this
+    Agreement with Company. For legal entities, the entity making a Contribution
+    and all other entities that control, are controlled by, or are under common
+    control with that entity are considered to be a single Contributor. For the
+    purposes of this definition, "<ins>control</ins>" means (i) the power,
+    direct or indirect, to cause the direction or management of such entity,
+    whether by contract or otherwise, or (ii) ownership of fifty percent (50%)
+    or more of the outstanding shares, or (iii) beneficial ownership of such
+    entity.
 
-    "<ins>Contribution</ins>" shall mean any original work of authorship, including
-    any modifications or additions to an existing work, that is intentionally
-    submitted by You to Company for inclusion in, or documentation of, any of the
-    products owned or managed by Company (the "<ins>Work</ins>"). For the purposes
-    of this definition, "<ins>submitted</ins>" means any form of electronic, verbal,
-    or written communication sent to Company or its representatives, including but
-    not limited to communication on electronic mailing lists, source code control
-    systems, and issue tracking systems that are managed by, or on behalf of,
-    Company for the purpose of discussing and improving the Work, but excluding
-    communication that is conspicuously marked or otherwise designated in writing by
-    You as "Not a Contribution."
+    "<ins>Contribution</ins>" shall mean any original work of authorship,
+    including any modifications or additions to an existing work, that is
+    intentionally submitted by You to Company for inclusion in, or documentation
+    of, any of the products owned or managed by Company (the "<ins>Work</ins>").
+    For the purposes of this definition, "<ins>submitted</ins>" means any form
+    of electronic, verbal, or written communication sent to Company or its
+    representatives, including but not limited to communication on electronic
+    mailing lists, source code control systems, and issue tracking systems that
+    are managed by, or on behalf of, Company for the purpose of discussing and
+    improving the Work, but excluding communication that is conspicuously marked
+    or otherwise designated in writing by You as "Not a Contribution."
 
 2.  <ins>Grant of Copyright License</ins>. Subject to the terms and conditions
     of this Agreement, You hereby grant to Company and to recipients of software

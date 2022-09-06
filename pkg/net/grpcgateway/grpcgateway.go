@@ -47,7 +47,8 @@ type Constructor struct {
 // swagger:model
 type GRPCGatewayConfig struct {
 	// GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
-	GRPCAddr string `json:"grpc_server_address" validate:"hostname_port" default:"0.0.0.0:1"`
+	//+kubebuilder:default:="0.0.0.0:1"
+	GRPCAddr string `json:"grpc_server_address,omitempty" validate:"hostname_port" default:"0.0.0.0:1"`
 }
 
 // GRPCGateway holds fields required for grpc-http gateway.

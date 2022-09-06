@@ -13,16 +13,16 @@ sidebar_position: 1
 The Aperture Controller functions as the brain of the Aperture system.
 Leveraging an advanced control loop, the Controller routinely analyzes polled
 metrics and indicators to determine how traffic should be shaped as defined by
-set policies. Once determined, these decisions are then exported to all Aperture Agents
-to effectively handle workloads. Only one Controller is needed to
-manage each cluster.
+set policies. Once determined, these decisions are then exported to all Aperture
+Agents to effectively handle workloads. Only one Controller is needed to manage
+each cluster.
 
 The closed feedback loop functions primarily by monitoring the variables
 reflecting stability conditions (i.e. process variables) and compares them
 against set points. The difference in the variable values against these points
 is referred to as the error signal. The feedback loop then works to minimize
-these error signals by determining and distributing control actions, that adjust these process variables and maintain their values
-within the optimal range.
+these error signals by determining and distributing control actions, that adjust
+these process variables and maintain their values within the optimal range.
 
 ## Configuration
 
@@ -107,10 +107,12 @@ into your cluster.
 
    ```yaml
    controller:
-     etcd:
-       endpoints: ["ETCD_ENDPOINT_HERE"]
-     prometheus:
-       address: "PROMETHEUS_ADDRESS_HERE"
+     config:
+       etcd:
+         endpoints: ["ETCD_ENDPOINT_HERE"]
+       prometheus:
+         address: "PROMETHEUS_ADDRESS_HERE"
+
    etcd:
      enabled: false
 
@@ -126,9 +128,10 @@ into your cluster.
    helm upgrade --install controller aperture/aperture-controller -f values.yaml
    ```
 
-   A list of other configurable parameters for Etcd and Prometheus can be found
-   in the
-   [README](https://artifacthub.io/packages/helm/aperture/aperture-operator#istio).
+   A list of all the configurable parameters for Etcd are available
+   [here](https://github.com/fluxninja/aperture/blob/main/docs/gen/config/aperture-controller/swagger.md#-etcd)
+   and Prometheus are available
+   [here](https://github.com/fluxninja/aperture/blob/main/docs/gen/config/aperture-controller/swagger.md#-prometheus).
 
    **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
    is enabled on your existing Prometheus instance as it is required by the

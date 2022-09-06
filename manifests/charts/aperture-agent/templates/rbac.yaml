@@ -229,7 +229,7 @@ roleRef:
   name: {{ template "common.names.fullname" . }}
 subjects:
 - kind: ServiceAccount
-  name: {{ include "aperture-operator.serviceAccountName" . }}
+  name: {{ include "agent-operator.serviceAccountName" . }}
   namespace: {{ template "common.names.namespace" . }}
 
 ---
@@ -299,15 +299,15 @@ roleRef:
   name: {{ template "common.names.fullname" . }}-leader-election-role
 subjects:
 - kind: ServiceAccount
-  name: {{ include "aperture-operator.serviceAccountName" . }}
+  name: {{ include "agent-operator.serviceAccountName" . }}
   namespace: {{ template "common.names.namespace" . }}
 {{- end }}
 ---
-{{- if .Values.operator.serviceAccount.create -}}
+{{ if .Values.operator.serviceAccount.create -}}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "aperture-operator.serviceAccountName" . }}
+  name: {{ include "agent-operator.serviceAccountName" . }}
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: aperture-agent-manager

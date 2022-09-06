@@ -62,7 +62,7 @@ func ValidateStruct(rawVal interface{}) error {
 
 func durationCustomTypeFunc(field reflect.Value) interface{} {
 	if value, ok := field.Interface().(Duration); ok {
-		return value.Duration.AsDuration()
+		return value.AsDuration()
 	}
 	return nil
 }

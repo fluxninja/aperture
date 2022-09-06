@@ -49,7 +49,11 @@ func (apertureInjector *ApertureInjector) Handle(ctx context.Context, req admiss
 	}
 
 	updatedPod := pod.DeepCopy()
-	agentPod(apertureInjector.Instance, updatedPod)
+	err = agentPod(apertureInjector.Instance, updatedPod)
+	if err != nil {
+		return admission.Errored(http.StatusBadRequest, err)
+	}
+
 	marshaledPod, err := json.Marshal(updatedPod)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)

@@ -1,4 +1,4 @@
-package controller
+package controlplane
 
 import (
 	"context"
@@ -17,28 +17,33 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 )
 
-var (
-	// swagger:operation POST /controller common-configuration Controller
-	// ---
-	// x-fn-config-env: true
-	// parameters:
-	// - name: policies_path
-	//   in: query
-	//   type: string
-	//   description: Directory containing policies rules
-	//   x-go-default: "/etc/aperture/aperture-controller/policies"
+// swagger:operation POST /policies common-configuration PoliciesConfig
+// ---
+// x-fn-config-env: true
+// parameters:
+// - name: promql_jobs_scheduler
+//   in: body
+//   schema:
+//     "$ref": "#/definitions/JobGroupConfig"
+// - name: policies_path
+//   in: query
+//   type: string
+//   description: Directory containing policies rules
+//   x-go-default: "/etc/aperture/aperture-controller/policies"
 
+var (
 	policiesDefaultPath = path.Join(config.DefaultAssetsDirectory, "policies")
-	policiesPathKey     = "controller.policies_path"
+	policiesPathKey     = iface.PoliciesRoot + ".policies_path"
 	policiesFxTag       = "Policies"
 )
 
 // Module - Controller can be initialized by passing options from Module() to fx app.
 func Module() fx.Option {
 	return fx.Options(
+		fx.Provide(provideCMFileValidator),
 		// Syncing policies config to etcd
 		fx.Provide(providePoliciesPathFlag),
 		filesystemwatcher.Constructor{Name: policiesFxTag, PathKey: policiesPathKey, Path: policiesDefaultPath}.Annotate(), // Create a new watcher
@@ -49,7 +54,8 @@ func Module() fx.Option {
 			),
 		),
 		// Policy factory
-		controlplane.PolicyFactoryModule(),
+		policyFactoryModule(),
+		fx.Invoke(registerCMFileValidator),
 	)
 }
 
@@ -78,7 +84,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 				return key, nil, unmarshalErr
 			}
 
-			wrapper, wrapErr := controlplane.HashAndPolicyWrap(policyMessage, string(key))
+			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
 				return key, nil, wrapErr

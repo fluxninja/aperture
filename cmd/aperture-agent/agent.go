@@ -23,6 +23,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane"
 	"github.com/fluxninja/aperture/pkg/prometheus"
@@ -35,6 +36,7 @@ func main() {
 		prometheus.Module(),
 		k8s.Module(),
 		otel.OTELConfigConstructor{Type: otel.AgentType}.Annotate(),
+		peers.Constructor{}.Module(),
 		fx.Provide(
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,

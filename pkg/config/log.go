@@ -48,33 +48,61 @@ func LogModule() fx.Option {
 
 // LogConfig holds configuration for a logger and log writers.
 // swagger:model
+// +kubebuilder:object:generate=true
 type LogConfig struct {
 	// Log level
-	LogLevel string `json:"level" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="info"
+	//+kubebuilder:validation:Enum=debug;DEBUG;info;INFO;warn;WARN;error;ERROR;fatal;FATAL;panic;PANIC;trace;TRACE;disabled;DISABLED
+	LogLevel string `json:"level,omitempty" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
+
 	// Additional log writers
-	Writers []LogWriterConfig `json:"writers" validate:"omitempty,dive,omitempty"`
-	// internal fields
-	writers []io.Writer
-	LogWriterConfig
+	//+kubebuilder:validation:Optional
+	Writers []LogWriterConfig `json:"writers,omitempty" validate:"omitempty,dive,omitempty"`
+
+	// Base LogWriterConfig
+	//+kubebuilder:validation:Optional
+	LogWriterConfig `json:",inline,omitempty"`
+
 	// Use non-blocking log writer (can lose logs at high throughput)
-	NonBlocking bool `json:"non_blocking" default:"true"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=true
+	NonBlocking bool `json:"non_blocking,omitempty" default:"true"`
+
 	// Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
-	PrettyConsole bool `json:"pretty_console" default:"false"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
+	PrettyConsole bool `json:"pretty_console,omitempty" default:"false"`
 }
 
 // LogWriterConfig holds configuration for a log writer.
 // swagger:model
+// +kubebuilder:object:generate=true
 type LogWriterConfig struct {
-	// Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-	File string `json:"file" default:"stderr"`
+	// Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="stderr"
+	//+kubebuilder:validation:Enum=stderr;default
+	File string `json:"file,omitempty" default:"stderr"`
 	// Log file max size in MB
-	MaxSize int `json:"max_size" validate:"gte=0" default:"50"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=50
+	//+kubebuilder:validation:Minimum:=0
+	MaxSize int `json:"max_size,omitempty" validate:"gte=0" default:"50"`
 	// Max log file backups
-	MaxBackups int `json:"max_backups" validate:"gte=0" default:"3"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=3
+	//+kubebuilder:validation:Minimum:=0
+	MaxBackups int `json:"max_backups,omitempty" validate:"gte=0" default:"3"`
 	// Max age in days for log files
-	MaxAge int `json:"max_age" validate:"gte=0" default:"7"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=7
+	//+kubebuilder:validation:Minimum:=0
+	MaxAge int `json:"max_age,omitempty" validate:"gte=0" default:"7"`
 	// Compress
-	Compress bool `json:"compress" default:"false"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
+	Compress bool `json:"compress,omitempty" default:"false"`
 }
 
 // LoggerConstructor holds fields used to create an annotated instance of a logger.
@@ -107,7 +135,7 @@ func (constructor LoggerConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor LoggerConstructor) provideLogger(writers []io.Writer,
+func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 	unmarshaller Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (log.Logger, error) {
@@ -116,15 +144,15 @@ func (constructor LoggerConstructor) provideLogger(writers []io.Writer,
 	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
 		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
 	}
-	config.writers = writers
-
 	logger, writers := NewLogger(config)
+	// append additional writers provided via Fx
+	writers = append(writers, w...)
 
 	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
 			return nil
 		},
-		OnStop: func(c context.Context) error {
+		OnStop: func(context.Context) error {
 			panichandler.Go(func() {
 				logger.Close()
 				log.WaitFlush()
@@ -171,9 +199,6 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 			_ = lj.Close()
 		})
 	}
-
-	// append additional writers provided via Fx
-	writers = append(writers, config.writers...)
 
 	if config.PrettyConsole {
 		writers = append(writers, zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})

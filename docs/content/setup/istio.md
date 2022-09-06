@@ -32,9 +32,8 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
    filter for the outbound listener, in the Istio sidecar running with the
    application.
 
-   The Open Telemetry config in the following patch has
-   extracted values which get forwarded to the Aperture Agent instance using
-   gRPC.
+   The Open Telemetry config in the following patch has extracted values which
+   get forwarded to the Aperture Agent instance using gRPC.
 
    The prepared log has the request method value as log body and `egress` as the
    log name to differentiate between different access logs coming from the same
@@ -122,9 +121,8 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
    filter but for the inbound listener in the Istio sidecar running with the
    application.
 
-   The Open Telemetry config in the following patch has
-   extracted values which get forwarded to the Aperture Agent instance using
-   gRPC.
+   The Open Telemetry config in the following patch has extracted values which
+   get forwarded to the Aperture Agent instance using gRPC.
 
    The prepared log has the request method value as log body and `ingress` as
    the log name to differentiate between different access logs coming from the
@@ -217,9 +215,9 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
    maximum size of `8192` bytes, and forwards it to the Aperture Agent instance
    using gRPC with a timeout of `0.01s`, having `INBOUND` value for key
    `traffic-direction` metadata included in the streams initiated to the gRPC
-   service. The filter will accept the client request even if the communication with
-   the authorization service has failed, or if the authorization service has
-   returned a HTTP 5xx error.
+   service. The filter will accept the client request even if the communication
+   with the authorization service has failed, or if the authorization service
+   has returned a HTTP 5xx error.
 
    ```yaml
    applyTo: HTTP_FILTER
@@ -260,13 +258,13 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
    filter, but for outbound listener in the Istio sidecar running with the
    application.
 
-   The External Authorization filter buffers the client request body with a 
+   The External Authorization filter buffers the client request body with a
    maximum size of `8192` bytes, and forwards it to the Aperture Agent instance
    using gRPC with a timeout of `0.01s`, having `OUTBOUND` value for key
    `traffic-direction` metadata included in the streams initiated to the gRPC
-   service. The filter will accept the client request even if the communication with
-   the authorization service has failed, or if the authorization service has
-   returned a HTTP 5xx error.
+   service. The filter will accept the client request even if the communication
+   with the authorization service has failed, or if the authorization service
+   has returned a HTTP 5xx error.
 
    ```yaml
    applyTo: HTTP_FILTER
