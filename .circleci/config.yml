@@ -177,6 +177,7 @@ jobs:
 
 orbs:
   path-filtering: circleci/path-filtering@0.1.1
+  continuation: circleci/continuation@0.3.1
 
 workflows:
   version: 2
@@ -215,38 +216,9 @@ workflows:
       - path-filtering/filter:
           <<: *path_filtering_job
           base-revision: main
-  release-components:
+  release:
     when:
-      # Ignore agent releases and handle them separately
-      matches: { value: << pipeline.git.tag >>, pattern: "^releases/(?!aperture-agent).*$" }
+        matches: { value: << pipeline.git.tag >>, pattern: "^releases/.*$" }
     jobs:
-      - release-components:
-          # both this and workflow's when is needed
-          filters:
-            branches:
-              ignore: /.+/
-            tags:
-              only: /^releases\/.*$/
-  release-agent:
-    when:
-      matches: { value: << pipeline.git.tag >>, pattern: "^releases/aperture-agent/.*$" }
-    jobs:
-      - release-components: &agent-filters
-          # both this and workflow's when is needed
-          filters:
-            branches:
-              ignore: /.+/
-            tags:
-              only: /^releases\/aperture-agent\/.*$/
-      - package-agent:
-          <<: *agent-filters
-          matrix:
-            parameters:
-              executor: [ ubuntu-go-executor ]
-              goarch: [ amd64 ]
-  helm-release:
-    jobs:
-      - helm-release:
-          filters:
-            tags:
-              only: /^releases/charts/*/v*/
+      - continuation/continue:
+          configuration_path: .circleci/release.yaml
