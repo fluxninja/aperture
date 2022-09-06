@@ -330,7 +330,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/liveness",
-						Port:   intstr.FromString("server"),
+						Port:   intstr.FromString(server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -355,7 +355,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path: "/v1/status/liveness",
-						Port: intstr.FromString("server"),
+						Port: intstr.FromString(server),
 					},
 				},
 				InitialDelaySeconds: 10,
@@ -412,7 +412,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/readiness",
-						Port:   intstr.FromString("server"),
+						Port:   intstr.FromString(server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -437,7 +437,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path: "/v1/status/readiness",
-						Port: intstr.FromString("server"),
+						Port: intstr.FromString(server),
 					},
 				},
 				InitialDelaySeconds: 10,
@@ -502,7 +502,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/readiness",
-						Port:   intstr.FromString("server"),
+						Port:   intstr.FromString(server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -517,7 +517,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/liveness",
-						Port:   intstr.FromString("server"),
+						Port:   intstr.FromString(server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},

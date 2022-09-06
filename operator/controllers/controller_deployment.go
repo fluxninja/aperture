@@ -114,17 +114,17 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 							Resources:       spec.Resources,
 							Ports: []corev1.ContainerPort{
 								{
-									Name:          "server",
+									Name:          server,
 									ContainerPort: serverPort,
-									Protocol:      "TCP",
+									Protocol:      tcp,
 								},
 								{
-									Name:          "grpc-otel",
+									Name:          grpcOtel,
 									ContainerPort: otelGRPCPort,
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{
-									Name:          "grpc-http",
+									Name:          httpOtel,
 									ContainerPort: otelHTTPPort,
 									Protocol:      corev1.ProtocolTCP,
 								},

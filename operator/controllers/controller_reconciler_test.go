@@ -93,9 +93,6 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			createdControllerService := &corev1.Service{}
 			controllerServiceKey := types.NamespacedName{Name: controllerServiceName, Namespace: namespace}
 
-			createdControllerWebhookService := &corev1.Service{}
-			controllerWebhookServiceKey := types.NamespacedName{Name: validatingWebhookServiceName, Namespace: namespace}
-
 			createdClusterRole := &rbacv1.ClusterRole{}
 			clusterRoleKey := types.NamespacedName{Name: appName}
 
@@ -123,16 +120,15 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Eventually(func() bool {
 				err1 := k8sClient.Get(ctx, controllerConfigKey, createdControllerConfigMap)
 				err2 := k8sClient.Get(ctx, controllerServiceKey, createdControllerService)
-				err3 := k8sClient.Get(ctx, controllerWebhookServiceKey, createdControllerWebhookService)
-				err4 := k8sClient.Get(ctx, clusterRoleKey, createdClusterRole)
-				err5 := k8sClient.Get(ctx, clusterRoleBindingKey, createdClusterRoleBinding)
-				err6 := k8sClient.Get(ctx, controllerServiceAccountKey, createdControllerServiceAccount)
-				err7 := k8sClient.Get(ctx, controllerDeploymentKey, createdControllerDeployment)
-				err8 := k8sClient.Get(ctx, vwcKey, createdVWC)
-				err9 := k8sClient.Get(ctx, controllerSecretKey, createdControllerSecret)
-				err10 := k8sClient.Get(ctx, controllerCertSecretKey, createdControllerCertSecret)
-				return err1 == nil && err2 == nil && err3 == nil && err4 == nil && err5 == nil &&
-					err6 == nil && err7 == nil && err8 == nil && err9 != nil && err10 == nil
+				err3 := k8sClient.Get(ctx, clusterRoleKey, createdClusterRole)
+				err4 := k8sClient.Get(ctx, clusterRoleBindingKey, createdClusterRoleBinding)
+				err5 := k8sClient.Get(ctx, controllerServiceAccountKey, createdControllerServiceAccount)
+				err6 := k8sClient.Get(ctx, controllerDeploymentKey, createdControllerDeployment)
+				err7 := k8sClient.Get(ctx, vwcKey, createdVWC)
+				err8 := k8sClient.Get(ctx, controllerSecretKey, createdControllerSecret)
+				err9 := k8sClient.Get(ctx, controllerCertSecretKey, createdControllerCertSecret)
+				return err1 == nil && err2 == nil && err3 == nil && err4 == nil &&
+					err5 == nil && err6 == nil && err7 == nil && err8 != nil && err9 == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
 			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: test, Namespace: namespace}, instance)).To(BeNil())
@@ -168,9 +164,6 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			createdControllerService := &corev1.Service{}
 			controllerServiceKey := types.NamespacedName{Name: controllerServiceName, Namespace: namespace}
 
-			createdControllerWebhookService := &corev1.Service{}
-			controllerWebhookServiceKey := types.NamespacedName{Name: validatingWebhookServiceName, Namespace: namespace}
-
 			createdClusterRole := &rbacv1.ClusterRole{}
 			clusterRoleKey := types.NamespacedName{Name: appName}
 
@@ -195,16 +188,15 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Eventually(func() bool {
 				err1 := k8sClient.Get(ctx, controllerConfigKey, createdControllerConfigMap)
 				err2 := k8sClient.Get(ctx, controllerServiceKey, createdControllerService)
-				err3 := k8sClient.Get(ctx, controllerWebhookServiceKey, createdControllerWebhookService)
-				err4 := k8sClient.Get(ctx, clusterRoleKey, createdClusterRole)
-				err5 := k8sClient.Get(ctx, clusterRoleBindingKey, createdClusterRoleBinding)
-				err6 := k8sClient.Get(ctx, controllerServiceAccountKey, createdControllerServiceAccount)
-				err7 := k8sClient.Get(ctx, controllerDeploymentKey, createdControllerDeployment)
-				err8 := k8sClient.Get(ctx, vwcKey, createdVWC)
-				err9 := k8sClient.Get(ctx, controllerSecretKey, createdControllerSecret)
-				err10 := k8sClient.Get(ctx, controllerCertSecretKey, createdControllerCertSecret)
-				return err1 == nil && err2 == nil && err3 == nil && err4 == nil && err5 == nil &&
-					err6 == nil && err7 == nil && err8 == nil && err9 == nil && err10 == nil
+				err3 := k8sClient.Get(ctx, clusterRoleKey, createdClusterRole)
+				err4 := k8sClient.Get(ctx, clusterRoleBindingKey, createdClusterRoleBinding)
+				err5 := k8sClient.Get(ctx, controllerServiceAccountKey, createdControllerServiceAccount)
+				err6 := k8sClient.Get(ctx, controllerDeploymentKey, createdControllerDeployment)
+				err7 := k8sClient.Get(ctx, vwcKey, createdVWC)
+				err8 := k8sClient.Get(ctx, controllerSecretKey, createdControllerSecret)
+				err9 := k8sClient.Get(ctx, controllerCertSecretKey, createdControllerCertSecret)
+				return err1 == nil && err2 == nil && err3 == nil && err4 == nil &&
+					err5 == nil && err6 == nil && err7 == nil && err8 == nil && err9 == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
 			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))

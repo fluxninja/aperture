@@ -38,8 +38,10 @@ import (
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/distcache"
+	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/prometheus"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -141,6 +143,12 @@ var _ = BeforeSuite(func() {
 						GRPCAddr: ":4317",
 						HTTPAddr: ":4318",
 					},
+					Etcd: etcd.EtcdConfig{
+						Endpoints: testArray,
+					},
+					Prometheus: prometheus.PrometheusConfig{
+						Address: test,
+					},
 				},
 			},
 			CommonSpec: v1alpha1.CommonSpec{
@@ -182,6 +190,12 @@ var _ = BeforeSuite(func() {
 					Otel: otel.OtelConfig{
 						GRPCAddr: ":4317",
 						HTTPAddr: ":4318",
+					},
+					Etcd: etcd.EtcdConfig{
+						Endpoints: testArray,
+					},
+					Prometheus: prometheus.PrometheusConfig{
+						Address: test,
 					},
 				},
 				DistCache: distcache.DistCacheConfig{

@@ -66,31 +66,37 @@ type HTTPClientConfig struct {
 	KeyLogWriter string `json:"key_log_file,omitempty" validate:"omitempty,file"`
 	// Client TLS configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={ "insecure_skip_verify": false }
+	//+kubebuilder:default:={insecure_skip_verify:false}
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
 	// Max Idle Connections per host. 0 = no limit.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=5
+	//+kubebuilder:validation:Minimum:=0
 	MaxIdleConnsPerHost int `json:"max_idle_connections_per_host" validate:"gte=0" default:"5"`
 	// Max Idle Connections. 0 = no limit.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=100
+	//+kubebuilder:validation:Minimum:=0
 	MaxIdleConns int `json:"max_idle_connections" validate:"gte=0" default:"100"`
 	// Max Connections Per Host. 0 = no limit.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=0
+	//+kubebuilder:validation:Minimum:=0
 	MaxConnsPerHost int `json:"max_conns_per_host" validate:"gte=0" default:"0"`
 	// Max Response Header Bytes. 0 = no limit.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=0
+	//+kubebuilder:validation:Minimum:=0
 	MaxResponseHeaderBytes int64 `json:"max_response_header_bytes" validate:"gte=0" default:"0"`
 	// Write Buffer Size. 0 = 4KB.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=0
+	//+kubebuilder:validation:Minimum:=0
 	WriteBufferSize int `json:"write_buffer_size" validate:"gte=0" default:"0"`
 	// Read Buffer Size. 0 = 4KB
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=0
+	//+kubebuilder:validation:Minimum:=0
 	ReadBufferSize int `json:"read_buffer_size" validate:"gte=0" default:"0"`
 	// Disable Compression
 	//+kubebuilder:validation:Optional

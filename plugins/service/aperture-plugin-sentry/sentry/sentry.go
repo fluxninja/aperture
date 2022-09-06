@@ -33,10 +33,14 @@ type SentryConfig struct {
 	// Sample rate for sampling traces i.e. 0.0 to 1.0
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=0.2
+	//+kubebuilder:validation:Minimum:=0
+	//+kubebuilder:validation:Maximum:=1
 	TracesSampleRate float64 `json:"traces_sample_rate" default:"0.2"`
 	// Sample rate for event submission i.e. 0.0 to 1.0
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=1.0
+	//+kubebuilder:validation:Minimum:=0
+	//+kubebuilder:validation:Maximum:=1
 	SampleRate float64 `json:"sample_rate" default:"1.0"`
 	// Debug enables printing of Sentry SDK debug messages
 	//+kubebuilder:validation:Optional

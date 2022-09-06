@@ -331,15 +331,7 @@ func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance 
 // reconcileService prepares the desired states for Controller services and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileService(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
-	service, err := serviceForControllerWebhook(instance.DeepCopy(), log, r.Scheme)
-	if err != nil {
-		return err
-	}
-	if err = r.createService(service, ctx, instance); err != nil {
-		return err
-	}
-
-	service, err = serviceForController(instance.DeepCopy(), log, r.Scheme)
+	service, err := serviceForController(instance.DeepCopy(), log, r.Scheme)
 	if err != nil {
 		return err
 	}

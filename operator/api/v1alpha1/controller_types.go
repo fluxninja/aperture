@@ -48,6 +48,7 @@ type ControllerConfigSpec struct {
 	// CommonSpec
 	//+kubebuilder:validation:Optional
 	CommonConfigSpec `json:",inline"`
+
 	// Policies configuration.
 	//+kubebuilder:validation:Optional
 	Policies PoliciesConfig `json:"policies,omitempty"`
@@ -57,6 +58,7 @@ type ControllerConfigSpec struct {
 type PoliciesConfig struct {
 	// Policies path configuration.
 	PoliciesPath string `json:"policies_path,omitempty"`
+
 	// Scheduler for PromQL jobs.
 	PromQLJobsScheduler jobs.JobGroupConfig `json:"promql_jobs_scheduler,omitempty"`
 }

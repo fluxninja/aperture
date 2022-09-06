@@ -89,27 +89,27 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 
 	container.Ports = []corev1.ContainerPort{
 		{
-			Name:          "server",
+			Name:          server,
 			ContainerPort: serverPort,
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
-			Name:          "grpc-otel",
+			Name:          grpcOtel,
 			ContainerPort: otelGRPCPort,
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
-			Name:          "grpc-http",
+			Name:          httpOtel,
 			ContainerPort: otelHTTPPort,
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
-			Name:          "dist-cache",
+			Name:          distCache,
 			ContainerPort: distCachePort,
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
-			Name:          "memberlist",
+			Name:          memberList,
 			ContainerPort: memberListPort,
 			Protocol:      corev1.ProtocolTCP,
 		},

@@ -927,9 +927,16 @@ spec:
                         description: Client configuration.
                         properties:
                           grpc:
+                            default:
+                              backoff:
+                                base_delay: 1s
+                                multiplier: 1.6
                             description: GRPC client settings.
                             properties:
                               backoff:
+                                default:
+                                  base_delay: 1s
+                                  multiplier: 1.6
                                 description: Backoff config
                                 properties:
                                   base_delay:
@@ -939,6 +946,7 @@ spec:
                                   jitter:
                                     default: 0.2
                                     description: Jitter
+                                    minimum: 0
                                     type: number
                                   max_delay:
                                     default: 120s
@@ -947,6 +955,7 @@ spec:
                                   multiplier:
                                     default: 1.6
                                     description: Backoff multiplier
+                                    minimum: 0
                                     type: number
                                 type: object
                               insecure:
@@ -1002,20 +1011,24 @@ spec:
                               max_conns_per_host:
                                 default: 0
                                 description: Max Connections Per Host. 0 = no limit.
+                                minimum: 0
                                 type: integer
                               max_idle_connections:
                                 default: 100
                                 description: Max Idle Connections. 0 = no limit.
+                                minimum: 0
                                 type: integer
                               max_idle_connections_per_host:
                                 default: 5
                                 description: Max Idle Connections per host. 0 = no
                                   limit.
+                                minimum: 0
                                 type: integer
                               max_response_header_bytes:
                                 default: 0
                                 description: Max Response Header Bytes. 0 = no limit.
                                 format: int64
+                                minimum: 0
                                 type: integer
                               network_keep_alive:
                                 default: 30s
@@ -1035,6 +1048,7 @@ spec:
                               read_buffer_size:
                                 default: 0
                                 description: Read Buffer Size. 0 = 4KB
+                                minimum: 0
                                 type: integer
                               response_header_timeout:
                                 default: 0s
@@ -1073,6 +1087,7 @@ spec:
                               write_buffer_size:
                                 default: 0
                                 description: Write Buffer Size. 0 = 4KB.
+                                minimum: 0
                                 type: integer
                             type: object
                         type: object
@@ -1098,6 +1113,7 @@ spec:
                               same time. This is useful when running resource intensive
                               jobs and a precise start time is not critical. 0 = no
                               limit.
+                            minimum: 0
                             type: integer
                         type: object
                       service:
@@ -1135,23 +1151,46 @@ spec:
                       file:
                         default: stderr
                         description: Output file for logs. Keywords allowed - ["stderr",
-                          "stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+                          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+                        enum:
+                        - stderr
+                        - default
                         type: string
                       level:
                         default: info
                         description: Log level
+                        enum:
+                        - debug
+                        - DEBUG
+                        - info
+                        - INFO
+                        - warn
+                        - WARN
+                        - error
+                        - ERROR
+                        - fatal
+                        - FATAL
+                        - panic
+                        - PANIC
+                        - trace
+                        - TRACE
+                        - disabled
+                        - DISABLED
                         type: string
                       max_age:
                         default: 7
                         description: Max age in days for log files
+                        minimum: 0
                         type: integer
                       max_backups:
                         default: 3
                         description: Max log file backups
+                        minimum: 0
                         type: integer
                       max_size:
                         default: 50
                         description: Log file max size in MB
+                        minimum: 0
                         type: integer
                       non_blocking:
                         default: true
@@ -1176,20 +1215,25 @@ spec:
                             file:
                               default: stderr
                               description: Output file for logs. Keywords allowed
-                                - ["stderr", "stderr", "default"]. "default" maps
-                                to `/var/log/fluxninja/<service>.log`
+                                - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+                              enum:
+                              - stderr
+                              - default
                               type: string
                             max_age:
                               default: 7
                               description: Max age in days for log files
+                              minimum: 0
                               type: integer
                             max_backups:
                               default: 3
                               description: Max log file backups
+                              minimum: 0
                               type: integer
                             max_size:
                               default: 50
                               description: Log file max size in MB
+                              minimum: 0
                               type: integer
                           type: object
                         type: array
@@ -1220,6 +1264,9 @@ spec:
                     description: OTEL configuration.
                     properties:
                       batch_postrollup:
+                        default:
+                          send_batch_size: 10000
+                          timeout: 1s
                         description: BatchPostrollup configures batch postrollup processor.
                         properties:
                           send_batch_size:
@@ -1235,6 +1282,9 @@ spec:
                             type: string
                         type: object
                       batch_prerollup:
+                        default:
+                          send_batch_size: 10000
+                          timeout: 1s
                         description: BatchPrerollup configures batch prerollup processor.
                         properties:
                           send_batch_size:
@@ -1295,6 +1345,7 @@ spec:
                               same time. This is useful when running resource intensive
                               jobs and a precise start time is not critical. 0 = no
                               limit.
+                            minimum: 0
                             type: integer
                         type: object
                     type: object
@@ -1339,6 +1390,7 @@ spec:
                               same time. This is useful when running resource intensive
                               jobs and a precise start time is not critical. 0 = no
                               limit.
+                            minimum: 0
                             type: integer
                         type: object
                       service:
@@ -1395,10 +1447,14 @@ spec:
                         default: 1
                         description: Sample rate for event submission i.e. 0.0 to
                           1.0
+                        maximum: 1
+                        minimum: 0
                         type: number
                       traces_sample_rate:
                         default: 0.2
                         description: Sample rate for sampling traces i.e. 0.0 to 1.0
+                        maximum: 1
+                        minimum: 0
                         type: number
                     type: object
                   server:
@@ -1426,6 +1482,7 @@ spec:
                         description: GRPC Gateway configuration.
                         properties:
                           grpc_server_address:
+                            default: 0.0.0.0:1
                             description: GRPC server address to connect to - By default
                               it points to HTTP server port because FluxNinja stack
                               runs GRPC and HTTP servers on the same port
@@ -1445,18 +1502,22 @@ spec:
                           latency_bucket_count:
                             default: 100
                             description: The number of buckets in latency histogram
+                            minimum: 0
                             type: integer
                           latency_bucket_start_ms:
                             default: 20
                             description: The lowest bucket in latency histogram
+                            minimum: 0
                             type: number
                           latency_bucket_width_ms:
                             default: 20
                             description: The bucket width in latency histogram
+                            minimum: 0
                             type: number
                           max_header_bytes:
                             default: 1048576
                             description: Max header size in bytes
+                            minimum: 0
                             type: integer
                           read_header_timeout:
                             default: 10s
@@ -1480,6 +1541,10 @@ spec:
                         default: tcp
                         description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6"
                           (IPv6-only)
+                        enum:
+                        - tcp
+                        - tcp4
+                        - tcp6
                         type: string
                       tls:
                         description: TLS configuration.
@@ -1494,9 +1559,9 @@ spec:
                           client_ca:
                             description: Client CA file
                             type: string
-                          enable:
+                          enabled:
                             default: false
-                            description: Enable TLS
+                            description: Enabled TLS
                             type: boolean
                           server_cert:
                             default: ca.crt
@@ -1509,6 +1574,10 @@ spec:
                         type: object
                     type: object
                   watchdog:
+                    default:
+                      heap:
+                        limit: 268435456
+                        min_gogc: 25
                     description: Watchdog configuration.
                     properties:
                       cgroup:
@@ -1530,6 +1599,8 @@ spec:
                                 default: 0.5
                                 description: Factor sets user-configured limit of
                                   available memory
+                                maximum: 1
+                                minimum: 0
                                 type: number
                             type: object
                           watermarks_policy:
@@ -1542,10 +1613,13 @@ spec:
                                 type: boolean
                               watermarks:
                                 default:
-                                - 0.25
                                 - 0.5
                                 - 0.75
+                                - 0.8
+                                - 0.85
                                 - 0.9
+                                - 0.95
+                                - 0.99
                                 description: Watermarks are increasing limits on which
                                   to trigger GC. Watchdog disarms when the last watermark
                                   is surpassed. It is recommended to set an extreme
@@ -1573,6 +1647,8 @@ spec:
                                 default: 0.5
                                 description: Factor sets user-configured limit of
                                   available memory
+                                maximum: 1
+                                minimum: 0
                                 type: number
                             type: object
                           limit:
@@ -1597,10 +1673,13 @@ spec:
                                 type: boolean
                               watermarks:
                                 default:
-                                - 0.25
                                 - 0.5
                                 - 0.75
+                                - 0.8
+                                - 0.85
                                 - 0.9
+                                - 0.95
+                                - 0.99
                                 description: Watermarks are increasing limits on which
                                   to trigger GC. Watchdog disarms when the last watermark
                                   is surpassed. It is recommended to set an extreme
@@ -1653,6 +1732,8 @@ spec:
                                 default: 0.5
                                 description: Factor sets user-configured limit of
                                   available memory
+                                maximum: 1
+                                minimum: 0
                                 type: number
                             type: object
                           watermarks_policy:
@@ -1665,10 +1746,13 @@ spec:
                                 type: boolean
                               watermarks:
                                 default:
-                                - 0.25
                                 - 0.5
                                 - 0.75
+                                - 0.8
+                                - 0.85
                                 - 0.9
+                                - 0.95
+                                - 0.99
                                 description: Watermarks are increasing limits on which
                                   to trigger GC. Watchdog disarms when the last watermark
                                   is surpassed. It is recommended to set an extreme

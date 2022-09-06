@@ -315,41 +315,54 @@ type CommonConfigSpec struct {
 	// Client configuration such as proxy settings.
 	//+kubebuilder:validation:Optional
 	Client ClientConfigSpec `json:"client,omitempty"`
+
 	// Etcd configuration.
 	//+kubebuilder:validation:Required
 	Etcd etcd.EtcdConfig `json:"etcd"`
+
 	// Liveness probe configuration.
 	//+kubebuilder:validation:Optional
 	Liveness ProbeConfigSpec `json:"liveness,omitempty"`
+
 	// Readiness probe configuration.
 	//+kubebuilder:validation:Optional
 	Readiness ProbeConfigSpec `json:"readiness,omitempty"`
+
 	// Log configuration.
 	//+kubebuilder:validation:Optional
 	Log config.LogConfig `json:"log,omitempty"`
+
 	// Metrics configuration.
 	//+kubebuilder:validation:Optional
 	Metrics metrics.MetricsConfig `json:"metrics,omitempty"`
+
 	// OTEL configuration.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:={grpc_addr:":4317",http_addr:":4318"}
 	Otel otel.OtelConfig `json:"otel"`
+
 	// Plugins configuration.
 	//+kubebuilder:validation:Optional
 	Plugins plugins.PluginsConfig `json:"plugins,omitempty"`
+
 	// Profilers configuration.
 	//+kubebuilder:validation:Optional
 	Profilers profilers.ProfilersConfig `json:"profilers,omitempty"`
+
 	// Prometheus configuration.
 	//+kubebuilder:validation:Required
 	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
+
 	// Server configuration.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:={addr:":8080"}
 	Server ServerConfigSpec `json:"server"`
+
 	// Watchdog configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={heap:{min_gogc:25,limit:268435456}}
 	Watchdog watchdog.WatchdogConfig `json:"watchdog,omitempty"`
+
 	// BundledPluginsSpec defines configuration for bundled plugins.
 	//+kubebuilder:validation:Optional
 	BundledPluginsSpec `json:",inline,omitempty"`
@@ -360,15 +373,19 @@ type ServerConfigSpec struct {
 	// Listener configuration.
 	//+kubebuilder:validation:Optional
 	listener.ListenerConfig `json:",inline"`
+
 	// GRPC server configuration.
 	//+kubebuilder:validation:Optional
 	Grpc grpc.GRPCServerConfig `json:"grpc,omitempty"`
+
 	// GRPC Gateway configuration.
 	//+kubebuilder:validation:Optional
 	GrpcGateway grpcgateway.GRPCGatewayConfig `json:"grpc_gateway,omitempty"`
+
 	// HTTP server configuration.
 	//+kubebuilder:validation:Optional
 	HTTP http.HTTPServerConfig `json:"http,omitempty"`
+
 	// TLS configuration.
 	//+kubebuilder:validation:Optional
 	TLS tlsconfig.ServerTLSConfig `json:"tls,omitempty"`
@@ -379,6 +396,7 @@ type ProbeConfigSpec struct {
 	// Scheduler settings.
 	//+kubebuilder:validation:Optional
 	Scheduler jobs.JobGroupConfig `json:"scheduler,omitempty"`
+
 	// Service settings.
 	//+kubebuilder:validation:Optional
 	Service jobs.JobConfig `json:"service,omitempty"`
@@ -396,6 +414,7 @@ type BundledPluginsSpec struct {
 	// FluxNinja Cloud plugin configuration.
 	//+kubebuilder:validation:Optional
 	FluxNinjaPlugin pluginconfig.FluxNinjaPluginConfig `json:"fluxninja_plugin,omitempty"`
+
 	// Sentry plugin configuration.
 	//+kubebuilder:validation:Optional
 	SentryPlugin sentry.SentryConfig `json:"sentry_plugin,omitempty"`

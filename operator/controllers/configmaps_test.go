@@ -35,6 +35,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/distcache"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/prometheus"
@@ -51,7 +52,6 @@ log:
   file: stderr
   level: info
   non_blocking: true
-  writers: null
 otel:
   batch_postrollup:
     send_batch_size: 15000
@@ -62,6 +62,7 @@ otel:
   grpc_addr: :4317
   http_addr: :4318
 plugins:
+  disable_plugins: false
   disabled_plugins:
   - aperture-plugin-fluxninja
 prometheus:
@@ -78,7 +79,6 @@ log:
   file: stderr
   level: info
   non_blocking: true
-  writers: null
 otel:
   batch_postrollup:
     send_batch_size: 15000
@@ -89,6 +89,7 @@ otel:
   grpc_addr: :4317
   http_addr: :4318
 plugins:
+  disable_plugins: false
   disabled_plugins:
   - aperture-plugin-fluxninja
 prometheus:
@@ -97,7 +98,7 @@ server:
   addr: :80
   tls:
     certs_path: /etc/aperture/aperture-controller/certs
-    enable: true
+    enabled: true
     server_cert: crt.pem
     server_key: key.pem
 `
@@ -215,6 +216,12 @@ var _ = Describe("ConfigMap for Controller", func() {
 							Server: v1alpha1.ServerConfigSpec{
 								ListenerConfig: listener.ListenerConfig{
 									Addr: ":80",
+								},
+								TLS: tlsconfig.ServerTLSConfig{
+									CertsPath:  controllerCertPath,
+									ServerCert: controllerCertName,
+									ServerKey:  controllerCertKeyName,
+									Enabled:    true,
 								},
 							},
 							Log: config.LogConfig{

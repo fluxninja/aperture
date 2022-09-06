@@ -134,7 +134,7 @@ func containerProbes(spec v1alpha1.CommonSpec, scheme corev1.URIScheme) (*corev1
 			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
 					Path:   "/v1/status/liveness",
-					Port:   intstr.FromString("server"),
+					Port:   intstr.FromString(server),
 					Scheme: scheme,
 				},
 			},
@@ -153,7 +153,7 @@ func containerProbes(spec v1alpha1.CommonSpec, scheme corev1.URIScheme) (*corev1
 			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
 					Path:   "/v1/status/readiness",
-					Port:   intstr.FromString("server"),
+					Port:   intstr.FromString(server),
 					Scheme: scheme,
 				},
 			},

@@ -51,16 +51,21 @@ type AgentConfigSpec struct {
 	// CommonConfigSpec
 	//+kubebuilder:validation:Optional
 	CommonConfigSpec `json:",inline"`
+
 	// AgentInfo configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={agent_group:"default"}
 	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info,omitempty"`
+
 	// DistCache configuration.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:={bind_addr:":3320","memberlist_bind_addr": ":3322"}
 	DistCache distcache.DistCacheConfig `json:"dist_cache"`
+
 	// Kubernetes client configuration.
 	//+kubebuilder:validation:Optional
 	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client,omitempty"`
+
 	// Peer discovery configuration.
 	//+kubebuilder:validation:Optional
 	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery,omitempty"`

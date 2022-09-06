@@ -40,6 +40,7 @@ type GRPCClientConfig struct {
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
 	// Backoff config
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={base_delay:"1s",multiplier:1.6}
 	Backoff BackoffConfig `json:"backoff"`
 	// Disable ClientTLS
 	//+kubebuilder:validation:Optional
@@ -66,10 +67,12 @@ type BackoffConfig struct {
 	// Backoff multiplier
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=1.6
+	//+kubebuilder:validation:Minimum:=0
 	Multiplier float64 `json:"multiplier" validate:"gte=0" default:"1.6"`
 	// Jitter
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=0.2
+	//+kubebuilder:validation:Minimum:=0
 	Jitter float64 `json:"jitter" validate:"gte=0" default:"0.2"`
 }
 

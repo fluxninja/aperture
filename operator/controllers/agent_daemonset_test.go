@@ -201,27 +201,27 @@ var _ = Describe("Agent Daemonset", func() {
 									Resources: corev1.ResourceRequirements{},
 									Ports: []corev1.ContainerPort{
 										{
-											Name:          "server",
+											Name:          server,
 											ContainerPort: 80,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "grpc-otel",
+											Name:          grpcOtel,
 											ContainerPort: 4317,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "grpc-http",
+											Name:          httpOtel,
 											ContainerPort: 4318,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "dist-cache",
+											Name:          distCache,
 											ContainerPort: 3320,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "memberlist",
+											Name:          memberList,
 											ContainerPort: 3322,
 											Protocol:      corev1.ProtocolTCP,
 										},
@@ -483,27 +483,27 @@ var _ = Describe("Agent Daemonset", func() {
 									Resources: resourceRequirement,
 									Ports: []corev1.ContainerPort{
 										{
-											Name:          "server",
+											Name:          server,
 											ContainerPort: 80,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "grpc-otel",
+											Name:          grpcOtel,
 											ContainerPort: 4317,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "grpc-http",
+											Name:          httpOtel,
 											ContainerPort: 4318,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "dist-cache",
+											Name:          distCache,
 											ContainerPort: 3320,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "memberlist",
+											Name:          memberList,
 											ContainerPort: 3322,
 											Protocol:      corev1.ProtocolTCP,
 										},
@@ -514,7 +514,7 @@ var _ = Describe("Agent Daemonset", func() {
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
 												Path:   "/v1/status/liveness",
-												Port:   intstr.FromString("server"),
+												Port:   intstr.FromString(server),
 												Scheme: corev1.URISchemeHTTP,
 											},
 										},
@@ -528,7 +528,7 @@ var _ = Describe("Agent Daemonset", func() {
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
 												Path:   "/v1/status/readiness",
-												Port:   intstr.FromString("server"),
+												Port:   intstr.FromString(server),
 												Scheme: corev1.URISchemeHTTP,
 											},
 										},

@@ -52,18 +52,22 @@ type HTTPServerConfig struct {
 	// The lowest bucket in latency histogram
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=20
+	//+kubebuilder:validation:Minimum:=0
 	LatencyBucketStartMS float64 `json:"latency_bucket_start_ms" validate:"gte=0" default:"20"`
 	// Max header size in bytes
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=1048576
+	//+kubebuilder:validation:Minimum:=0
 	MaxHeaderBytes int `json:"max_header_bytes" validate:"gte=0" default:"1048576"`
 	// The bucket width in latency histogram
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=20
+	//+kubebuilder:validation:Minimum:=0
 	LatencyBucketWidthMS float64 `json:"latency_bucket_width_ms" validate:"gte=0" default:"20"`
 	// The number of buckets in latency histogram
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=100
+	//+kubebuilder:validation:Minimum:=0
 	LatencyBucketCount int `json:"latency_bucket_count" validate:"gte=0" default:"100"`
 	// Disable HTTP Keep Alives
 	//+kubebuilder:validation:Optional

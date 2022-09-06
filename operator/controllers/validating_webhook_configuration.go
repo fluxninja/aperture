@@ -27,6 +27,8 @@ import (
 
 // validatingWebhookConfiguration prepares the ValidatingWebhookConfiguration object for the Controller, based on the provided parameter.
 func validatingWebhookConfiguration(instance *v1alpha1.Controller, cert []byte) *admissionregistrationv1.ValidatingWebhookConfiguration {
+	serverPort, _ := getPort(instance.Spec.ConfigSpec.Server.Addr)
+
 	validatingWebhookConfiguration := &admissionregistrationv1.ValidatingWebhookConfiguration{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        controllerServiceName,
@@ -41,7 +43,7 @@ func validatingWebhookConfiguration(instance *v1alpha1.Controller, cert []byte) 
 						Name:      controllerServiceName,
 						Namespace: instance.GetNamespace(),
 						Path:      pointer.StringPtr("/validate/configmap"),
-						Port:      pointer.Int32(80),
+						Port:      pointer.Int32(serverPort),
 					},
 					CABundle: cert,
 				},

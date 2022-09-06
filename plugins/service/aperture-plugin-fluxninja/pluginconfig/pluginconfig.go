@@ -39,5 +39,6 @@ type ClientConfig struct {
 	HTTPClient http.HTTPClientConfig `json:"http"`
 	// GRPC client settings.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={backoff:{base_delay:"1s",multiplier:1.6}}
 	GRPCClient grpc.GRPCClientConfig `json:"grpc"`
 }

@@ -151,7 +151,15 @@ spec:
     enableNamespacesByDefault: {{ .Values.agent.sidecar.enableNamespacesByDefault }}
     {{- end }}
   {{- end }}
-  {{- if .Values.agent.config }}
-  config: {{ .Values.agent.config | toYaml | nindent 4 }}
-  {{- end }}
+  config:
+    {{- if (omit .Values.agent.config "etcd" "prometheus") }}
+    {{- omit .Values.agent.config "etcd" "prometheus" | toYaml | nindent 4 }}
+    {{- end }}
+    etcd:
+      {{- if (omit .Values.agent.config.etcd "endpoints")}}
+      {{- omit .Values.agent.config.etcd "endpoints" | toYaml | nindent 6 }}
+      {{- end }}
+      endpoints: {{ include "agent.etcd.endpoints" (dict "etcd" .Values.agent.config.etcd "context" . $) }}
+    prometheus:
+      address: {{ include "agent.prometheus.address" (dict "prometheus" .Values.agent.config.prometheus "context" . $) }}
 {{- end }}
