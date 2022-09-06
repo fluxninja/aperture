@@ -35,7 +35,7 @@ generate-config-markdown:
 				--allow-template-override \
 				--template-dir ./tools/swagger/swagger-templates \
 				--config-file ./tools/swagger/markdown-config.yaml; \
-			npx prettier --write $$dir/*.md; \
+			npx prettier --no-config --write $$dir/*.md; \
 			rm $$dir/gen.yaml; \
 		done; \
 	}
@@ -62,7 +62,7 @@ $(POLICY_MARKDOWNS): %/policy.md: %/config-swagger.yaml
 		--tags=$(shell basename $(@D))-configuration \
 		--allow-template-override --template-dir tools/swagger/swagger-templates \
 		--config-file tools/swagger/markdown-config.yaml
-	@npx prettier --write $(@D)/*.md
+	@npx prettier --no-config --write $(@D)/*.md
 	@rm $(@D)/aperture.swagger.yaml
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update

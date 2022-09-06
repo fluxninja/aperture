@@ -1,14 +1,14 @@
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "aperture-operator.serviceAccountName" -}}
+{{- define "controller-operator.serviceAccountName" -}}
 {{- default (include "common.names.fullname" .) .Values.operator.serviceAccount.name }}
 {{- end }}
 
 {{/*
 Compile all warnings into a single message.
 */}}
-{{- define "aperture-operator.validateValues" -}}
+{{- define "controller-operator.validateValues" -}}
 {{- $messages := list -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
@@ -20,9 +20,9 @@ Compile all warnings into a single message.
 
 {{/*
 Create the endpoint of the etcd for Aperture Controller
-{{ include "aperture.etcd.endpoints" ( dict "etcd" .Values.path.to.the.etcd "context" $.context $) }}
+{{ include "controller.etcd.endpoints" ( dict "etcd" .Values.path.to.the.etcd "context" $.context $) }}
 */}}
-{{- define "aperture.etcd.endpoints" -}}
+{{- define "controller.etcd.endpoints" -}}
 {{- $endpoints := list -}}
 {{- if .context.Values.etcd.enabled -}}
     {{- $endpoints = append $endpoints (printf "http://%s-etcd:2379" .context.Release.Name) -}}
@@ -37,9 +37,9 @@ Create the endpoint of the etcd for Aperture Controller
 
 {{/*
 Create the address of the Prometheus for Aperture Controller
-{{ include "aperture.prometheus.address" ( dict "prometheus" .Values.path.to.the.prometheus "context" $.context $) }}
+{{ include "controller.prometheus.address" ( dict "prometheus" .Values.path.to.the.prometheus "context" $.context $) }}
 */}}
-{{- define "aperture.prometheus.address" -}}
+{{- define "controller.prometheus.address" -}}
 {{- if .context.Values.prometheus.enabled -}}
     {{- printf "http://%s-prometheus-server:80" .context.Release.Name -}}
 {{- else -}}
@@ -53,14 +53,14 @@ Create the address of the Prometheus for Aperture Controller
 
 {{/*
 Fetch the endpoint of the FluxNinja cloud instance
-{{ include "aperture.fluxninjaPlugin.endpoint" ( dict "aperture" .Values.path.to.the.aperture $) }}
+{{ include "controller.fluxninjaPlugin.endpoint" ( dict "controller" .Values.path.to.the.controller $) }}
 */}}
-{{- define "aperture.fluxninjaPlugin.endpoint" -}}
-{{- if .aperture.fluxninjaPlugin.enabled -}}
-    {{- if .aperture.fluxninjaPlugin.endpoint -}}
-        {{ print .aperture.fluxninjaPlugin.endpoint }}
+{{- define "controller.fluxninjaPlugin.endpoint" -}}
+{{- if .controller.config.fluxninja_plugin.enabled -}}
+    {{- if .controller.config.fluxninja_plugin.endpoint -}}
+        {{ print .controller.config.fluxninja_plugin.endpoint }}
     {{- else -}}
-        {{- fail "Value of endpoint for FluxNinja plugin cannot be empty when .Values.aperture.fluxninjaPlugin.enabled is set to true." -}}
+        {{- fail "Value of endpoint for FluxNinja plugin cannot be empty when .Values.controller.config.fluxninja_plugin.enabled is set to true." -}}
     {{- end -}}
 {{- else -}}
     {{ print "" }}
@@ -69,18 +69,14 @@ Fetch the endpoint of the FluxNinja cloud instance
 
 {{/*
 Fetch the value of the API Key secret for Aperture Controller
-{{ include "aperture.apiSecret.value" ( dict "object" .Values.path.to.the.agent/controller $) }}
+{{ include "controller.apiSecret.value" ( dict "controller" .Values.path.to.the.controller $) }}
 */}}
-{{- define "aperture.apisecret.value" -}}
-{{- if .object.fluxninjaPlugin.enabled -}}
-    {{- if .object.fluxninjaPlugin.apiKeySecret.create -}}
-        {{- if .object.fluxninjaPlugin.apiKeySecret.value -}}
-            {{ print .object.fluxninjaPlugin.apiKeySecret.value }}
-        {{- else -}}
-            {{- fail "Value of API Key for Controller cannot be empty when .Values.agent/controller.fluxninjaPlugin.enabled and .Values.agent/controller.fluxninjaPlugin.apiKeySecret.create is set to true." -}}
-        {{- end -}}
+{{- define "controller.apisecret.value" -}}
+{{- if .controller.secrets.fluxninjaPlugin.create -}}
+    {{- if .controller.secrets.fluxninjaPlugin.value -}}
+        {{ print .controller.secrets.fluxninjaPlugin.value }}
     {{- else -}}
-        {{ print "" }}
+        {{- fail "Value of API Key for Controller cannot be empty when .Values.controller.secrets.fluxninjaPlugin.create is set to true." -}}
     {{- end -}}
 {{- else -}}
     {{ print "" }}

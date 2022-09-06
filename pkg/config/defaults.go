@@ -20,8 +20,8 @@ import (
 type fieldData struct {
 	Parent   *fieldData
 	TagValue string
-	Field    reflect.StructField
 	Value    reflect.Value
+	Field    reflect.StructField
 }
 
 type fillerFunc func(field *fieldData)
@@ -277,13 +277,13 @@ func newDefaultFiller() *filler {
 
 	types[getTypeHash(reflect.TypeOf(Duration{}))] = func(field *fieldData) {
 		if value, ok := field.Value.Interface().(Duration); ok {
-			if value.Duration.AsDuration() != 0 {
+			if value.AsDuration() != 0 {
 				return
 			}
 			if field.TagValue != "" {
 				durationJSON, _ := json.Marshal(field.TagValue)
 				dur := Duration{}
-				dur.Duration = durationpb.New(0)
+				dur.duration = durationpb.New(0)
 				err := json.Unmarshal(durationJSON, &dur)
 				if err != nil {
 					log.Error().Err(err).Msg("Unable to unmarshal default duration")

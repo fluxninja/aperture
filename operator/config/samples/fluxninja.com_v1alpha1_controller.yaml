@@ -2,3 +2,9 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Controller
 metadata:
   name: controller-sample
+spec:
+  config:
+    etcd:
+      endpoints: ["http://controller-etcd:2379"]
+    prometheus:
+      address: "http://controller-prometheus-server:80"

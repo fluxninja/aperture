@@ -37,6 +37,11 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/distcache"
+	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/prometheus"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -127,8 +132,26 @@ var _ = BeforeSuite(func() {
 			Namespace: appName,
 		},
 		Spec: v1alpha1.ControllerSpec{
+			ConfigSpec: v1alpha1.ControllerConfigSpec{
+				CommonConfigSpec: v1alpha1.CommonConfigSpec{
+					Server: v1alpha1.ServerConfigSpec{
+						ListenerConfig: listener.ListenerConfig{
+							Addr: ":80",
+						},
+					},
+					Otel: otel.OtelConfig{
+						GRPCAddr: ":4317",
+						HTTPAddr: ":4318",
+					},
+					Etcd: etcd.EtcdConfig{
+						Endpoints: testArray,
+					},
+					Prometheus: prometheus.PrometheusConfig{
+						Address: test,
+					},
+				},
+			},
 			CommonSpec: v1alpha1.CommonSpec{
-				FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{},
 				LivenessProbe: v1alpha1.Probe{
 					FailureThreshold: 1,
 					PeriodSeconds:    1,
@@ -141,7 +164,6 @@ var _ = BeforeSuite(func() {
 					SuccessThreshold: 1,
 					TimeoutSeconds:   1,
 				},
-				ServerPort: 80,
 				ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
 					Create: true,
 				},
@@ -158,8 +180,30 @@ var _ = BeforeSuite(func() {
 			Namespace: appName,
 		},
 		Spec: v1alpha1.AgentSpec{
+			ConfigSpec: v1alpha1.AgentConfigSpec{
+				CommonConfigSpec: v1alpha1.CommonConfigSpec{
+					Server: v1alpha1.ServerConfigSpec{
+						ListenerConfig: listener.ListenerConfig{
+							Addr: ":80",
+						},
+					},
+					Otel: otel.OtelConfig{
+						GRPCAddr: ":4317",
+						HTTPAddr: ":4318",
+					},
+					Etcd: etcd.EtcdConfig{
+						Endpoints: testArray,
+					},
+					Prometheus: prometheus.PrometheusConfig{
+						Address: test,
+					},
+				},
+				DistCache: distcache.DistCacheConfig{
+					BindAddr:           ":3320",
+					MemberlistBindAddr: ":3322",
+				},
+			},
 			CommonSpec: v1alpha1.CommonSpec{
-				FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{},
 				LivenessProbe: v1alpha1.Probe{
 					FailureThreshold: 1,
 					PeriodSeconds:    1,
@@ -172,13 +216,10 @@ var _ = BeforeSuite(func() {
 					SuccessThreshold: 1,
 					TimeoutSeconds:   1,
 				},
-				ServerPort: 80,
 				ServiceAccountSpec: v1alpha1.ServiceAccountSpec{
 					Create: true,
 				},
 			},
-			DistributedCachePort: 3320,
-			MemberListPort:       3322,
 			Image: v1alpha1.Image{
 				PullPolicy: string(corev1.PullAlways),
 			},

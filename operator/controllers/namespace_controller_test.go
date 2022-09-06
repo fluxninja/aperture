@@ -211,9 +211,8 @@ var _ = Describe("Namespace controller", func() {
 
 			instance.Spec.Sidecar.Enabled = true
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace}
-			instance.Spec.FluxNinjaPlugin.Enabled = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(test)))
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(test)))
 			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
 			instance.Status.Resources = "created"
 			Expect(k8sClient.Status().Update(ctx, instance)).To(BeNil())
@@ -222,7 +221,7 @@ var _ = Describe("Namespace controller", func() {
 			configKey := types.NamespacedName{Name: agentServiceName, Namespace: namespace}
 
 			createdSecret := &corev1.Secret{}
-			secretKey := types.NamespacedName{Name: secretName(appName, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace}
+			secretKey := types.NamespacedName{Name: secretName(appName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
 
 			ns := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{

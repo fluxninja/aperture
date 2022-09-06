@@ -17,6 +17,23 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/fluxninja/aperture/pkg/config"
+	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/jobs"
+	"github.com/fluxninja/aperture/pkg/metrics"
+	"github.com/fluxninja/aperture/pkg/net/grpc"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
+	"github.com/fluxninja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
+	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/plugins"
+	"github.com/fluxninja/aperture/pkg/profilers"
+	"github.com/fluxninja/aperture/pkg/prometheus"
+	"github.com/fluxninja/aperture/pkg/watchdog"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/sentry"
+
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -44,29 +61,6 @@ type Image struct {
 	// The PullSecrets for the image
 	//+kubebuilder:validation:Optional
 	PullSecrets []string `json:"pullSecrets,omitempty"`
-}
-
-// Log defines logger configuration.
-type Log struct {
-	// Log level
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="info"
-	Level string `json:"level"`
-
-	// Log filename
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="stderr"
-	File string `json:"file"`
-
-	// Flag for non-blocking
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=true
-	NonBlocking bool `json:"nonBlocking"`
-
-	// Flag for pretty console
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
-	PrettyConsole bool `json:"prettyConsole"`
 }
 
 // Probe defines Enabled, InitialDelaySeconds, PeriodSeconds, TimeoutSeconds, FailureThreshold and SuccessThreshold for probes like livenessProbe.
@@ -105,35 +99,6 @@ type Probe struct {
 	SuccessThreshold int32 `json:"successThreshold"`
 }
 
-// AgentEtcdSpec defines Endpoints and LeaseTtl of etcd used by Aperture Agent.
-type AgentEtcdSpec struct {
-	// Etcd endpoints
-	Endpoints []string `json:"endpoints,omitempty"`
-
-	// Etcd leaseTtl
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="60s"
-	LeaseTTL string `json:"leaseTtl"`
-}
-
-// ControllerEtcdSpec defines Endpoints and LeaseTtl of etcd used by Aperture Controller.
-type ControllerEtcdSpec struct {
-	// Etcd endpoints
-	//+kubebuilder:validation:Optional
-	Endpoints []string `json:"endpoints,omitempty"`
-
-	// Etcd leaseTtl
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="60s"
-	LeaseTTL string `json:"leaseTtl"`
-}
-
-// PrometheusSpec defines parameters required for Prometheus connection.
-type PrometheusSpec struct {
-	// Address for Prometheus
-	Address string `json:"address"`
-}
-
 // PodSecurityContext defines Enabled and FsGroup for the Pods' security context.
 type PodSecurityContext struct {
 	// Enable PodSecurityContext on Pod
@@ -170,32 +135,6 @@ type ContainerSecurityContext struct {
 	ReadOnlyRootFilesystem *bool `json:"readOnlyRootFilesystem"`
 }
 
-// FluxNinjaPluginSpec defines the parameters for FluxNinja Plugin.
-type FluxNinjaPluginSpec struct {
-	// Enabled the FluxNinja plugin with Aperture
-	//+kubebuilder:validation:Optional
-	Enabled bool `json:"enabled"`
-
-	// FluxNinja cloud instance address
-	//+kubebuilder:validation:Optional
-	Endpoint string `json:"endpoint"`
-
-	// Specifies how often to send heartbeats to the FluxNinja cloud
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="30s"
-	HeartbeatsInterval string `json:"heartbeatsInterval"`
-
-	// tls configuration to communicate with FluxNinja cloud
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={insecure:false,insecureSkipVerify:false}
-	TLS TLSSpec `json:"tls"`
-
-	// API Key secret references for Agent or Controller
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={create:true}
-	APIKeySecret APIKeySecret `json:"apiKeySecret"`
-}
-
 // CommonSpec defines the desired the common state of Agent and Controller.
 type CommonSpec struct {
 	// Labels to add to all deployed objects
@@ -209,33 +148,9 @@ type CommonSpec struct {
 	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	Annotations map[string]string `json:"annotations,omitempty"`
 
-	// FluxNinjaPlugin defines the parameters for FluxNinja plugin with Agent or Controller
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={enabled:false,heartbeatsInterval:"30s"}
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
-	FluxNinjaPlugin FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
-
-	// OtelConfig is the configuration for the OTEL collector
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={grpcAddr:":4317"}
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
-	OtelConfig OtelConfig `json:"otelConfig"`
-
 	// Configuration for Agent or Controller service
 	//+kubebuilder:validation:Optional
 	Service Service `json:"service"`
-
-	// Server port for the Agent
-	//+kubebuilder:default:=80
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Maximum:=65535
-	//+kubebuilder:validation:Minimum:=1
-	ServerPort int32 `json:"serverPort"`
-
-	// Log related configurations
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={prettyConsole:false,nonBlocking:true,level:"info",file:"stderr"}
-	Log Log `json:"log"`
 
 	// ServiceAccountSpec defines the the configuration pf Service account for Agent or Controller
 	//+kubebuilder:validation:Optional
@@ -341,35 +256,25 @@ type CommonSpec struct {
 	// Add additional init containers
 	//+kubebuilder:validation:Optional
 	InitContainers []corev1.Container `json:"initContainers,omitempty"`
+
+	// Secrets
+	//+kubebuilder:validation:Optional
+	Secrets Secrets `json:"secrets"`
 }
 
-// Ingestion defines the fields required for configuring the FluxNinja cloud connection details.
-type Ingestion struct {
-	// Specifies address of FluxNinja cloud instance to connect to
+// Secrets for Agent or Controller.
+type Secrets struct {
+	// FluxNinja plugin.
 	//+kubebuilder:validation:Optional
-	Address string `json:"address"`
-
-	// Specifies port of FluxNinja cloud instance to connect to
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Maximum:=65535
-	//+kubebuilder:validation:Minimum:=1
-	//+kubebuilder:default:=443
-	Port int `json:"port"`
-
-	// Specifies whether to connect to the FluxNinja cloud over TLS or in plain text
-	//+kubebuilder:validation:Optional
-	Insecure bool `json:"insecure"`
-
-	// Specifies whether to verify FluxNinja cloud server certificate
-	//+kubebuilder:validation:Optional
-	InsecureSkipVerify bool `json:"insecureSkipVerify"`
+	//+kubebuilder:default:={create:false}
+	FluxNinjaPlugin APIKeySecret `json:"fluxNinjaPlugin"`
 }
 
 // APIKeySecret defines fields required for creation/usage of secret for the ApiKey of Agent and Controller.
 type APIKeySecret struct {
 	// Create new secret or not
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=true
+	//+kubebuilder:default:=false
 	Create bool `json:"create"`
 
 	// Secret details
@@ -394,21 +299,6 @@ type SecretKeyRef struct {
 	Key string `json:"key"`
 }
 
-// TLSSpec defines fields for TLS configuration for FluxNinja Plugin.
-type TLSSpec struct {
-	// Specifies whether to communicate with FluxNinja cloud over TLS or in plain text
-	//+kubebuilder:validation:Optional
-	Insecure bool `json:"insecure"`
-
-	// Specifies whether to verify FluxNinja cloud certificate
-	//+kubebuilder:validation:Optional
-	InsecureSkipVerify bool `json:"insecureSkipVerify"`
-
-	// Alternative CA certificates bundle to use to validate FluxNinja cloud certificate
-	//+kubebuilder:validation:Optional
-	CAFile string `json:"caFile"`
-}
-
 // APIKeySecretSpec defines API Key secret details for Agent and Controller.
 type APIKeySecretSpec struct {
 	// API Key secret reference for Agent
@@ -420,38 +310,112 @@ type APIKeySecretSpec struct {
 	Controller APIKeySecret `json:"controller"`
 }
 
-// Batch defines configuration for OTEL batch processor.
-type Batch struct {
-	// Timeout sets the time after which a batch will be sent regardless of size.
+// CommonConfigSpec defines common configuration for agent and controller.
+type CommonConfigSpec struct {
+	// Client configuration such as proxy settings.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="1s"
-	Timeout string `json:"timeout"`
+	Client ClientConfigSpec `json:"client,omitempty"`
 
-	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	// Etcd configuration.
+	//+kubebuilder:validation:Required
+	Etcd etcd.EtcdConfig `json:"etcd"`
+
+	// Liveness probe configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=10000
-	SendBatchSize uint32 `json:"sendBatchSize"`
+	Liveness ProbeConfigSpec `json:"liveness,omitempty"`
+
+	// Readiness probe configuration.
+	//+kubebuilder:validation:Optional
+	Readiness ProbeConfigSpec `json:"readiness,omitempty"`
+
+	// Log configuration.
+	//+kubebuilder:validation:Optional
+	Log config.LogConfig `json:"log,omitempty"`
+
+	// Metrics configuration.
+	//+kubebuilder:validation:Optional
+	Metrics metrics.MetricsConfig `json:"metrics,omitempty"`
+
+	// OTEL configuration.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={grpc_addr:":4317",http_addr:":4318"}
+	Otel otel.OtelConfig `json:"otel"`
+
+	// Plugins configuration.
+	//+kubebuilder:validation:Optional
+	Plugins plugins.PluginsConfig `json:"plugins,omitempty"`
+
+	// Profilers configuration.
+	//+kubebuilder:validation:Optional
+	Profilers profilers.ProfilersConfig `json:"profilers,omitempty"`
+
+	// Prometheus configuration.
+	//+kubebuilder:validation:Required
+	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
+
+	// Server configuration.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={addr:":8080"}
+	Server ServerConfigSpec `json:"server"`
+
+	// Watchdog configuration.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={heap:{min_gogc:25,limit:268435456}}
+	Watchdog watchdog.WatchdogConfig `json:"watchdog,omitempty"`
+
+	// BundledPluginsSpec defines configuration for bundled plugins.
+	//+kubebuilder:validation:Optional
+	BundledPluginsSpec `json:",inline,omitempty"`
 }
 
-// OtelConfig defines the configuration for the OTEL collector.
-type OtelConfig struct {
-	// GRPC listener addr for OTEL Collector
+// ServerConfigSpec configures main server.
+type ServerConfigSpec struct {
+	// Listener configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=":4317"
-	GRPCAddr string `json:"grpcAddr"`
+	listener.ListenerConfig `json:",inline"`
 
-	// HTTP listener addr for OTEL Collector
+	// GRPC server configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=":4318"
-	HTTPAddr string `json:"httpAddr"`
+	Grpc grpc.GRPCServerConfig `json:"grpc,omitempty"`
 
-	// Batch prerollup processor configuration.
+	// GRPC Gateway configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={timeout:"1s",sendBatchSize:10000}
-	BatchPrerollup Batch `json:"batchPrerollup"`
+	GrpcGateway grpcgateway.GRPCGatewayConfig `json:"grpc_gateway,omitempty"`
 
-	// Batch postrollup processor configuration.
+	// HTTP server configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={timeout:"1s",sendBatchSize:10000}
-	BatchPostrollup Batch `json:"batchPostrollup"`
+	HTTP http.HTTPServerConfig `json:"http,omitempty"`
+
+	// TLS configuration.
+	//+kubebuilder:validation:Optional
+	TLS tlsconfig.ServerTLSConfig `json:"tls,omitempty"`
+}
+
+// ProbeConfigSpec defines liveness and readiness probe configuration.
+type ProbeConfigSpec struct {
+	// Scheduler settings.
+	//+kubebuilder:validation:Optional
+	Scheduler jobs.JobGroupConfig `json:"scheduler,omitempty"`
+
+	// Service settings.
+	//+kubebuilder:validation:Optional
+	Service jobs.JobConfig `json:"service,omitempty"`
+}
+
+// ClientConfigSpec defines client configuration.
+type ClientConfigSpec struct {
+	// Proxy settings for the client.
+	//+kubebuilder:validation:Optional
+	Proxy http.ProxyConfig `json:"proxy,omitempty"`
+}
+
+// BundledPluginsSpec defines configuration for bundled plugins.
+type BundledPluginsSpec struct {
+	// FluxNinja Cloud plugin configuration.
+	//+kubebuilder:validation:Optional
+	FluxNinjaPlugin pluginconfig.FluxNinjaPluginConfig `json:"fluxninja_plugin,omitempty"`
+
+	// Sentry plugin configuration.
+	//+kubebuilder:validation:Optional
+	SentryPlugin sentry.SentryConfig `json:"sentry_plugin,omitempty"`
 }

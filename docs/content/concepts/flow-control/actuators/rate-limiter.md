@@ -10,11 +10,16 @@ keywords:
 ---
 
 :::info
+
 See also what are [actuators](actuators.md) in general.
+
 :::
 
 :::info
-See also [Rate Limiter reference](/reference/configuration/policies.md#-languagev1ratelimiter).
+
+See also
+[Rate Limiter reference](/reference/configuration/policies.md#-languagev1ratelimiter).
+
 :::
 
 ## Distributed Counters

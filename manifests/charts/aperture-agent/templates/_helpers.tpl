@@ -1,14 +1,14 @@
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "aperture-operator.serviceAccountName" -}}
+{{- define "agent-operator.serviceAccountName" -}}
 {{- default (include "common.names.fullname" .) .Values.operator.serviceAccount.name }}
 {{- end }}
 
 {{/*
 Compile all warnings into a single message.
 */}}
-{{- define "aperture-operator.validateValues" -}}
+{{- define "agent-operator.validateValues" -}}
 {{- $messages := list -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
@@ -20,9 +20,9 @@ Compile all warnings into a single message.
 
 {{/*
 Create the endpoint of the etcd for Aperture Agent
-{{ include "aperture.etcd.endpoints" ( dict "etcd" .Values.path.to.the.etcd "context" $.context $) }}
+{{ include "agent.etcd.endpoints" ( dict "etcd" .Values.path.to.the.etcd "context" $.context $) }}
 */}}
-{{- define "aperture.etcd.endpoints" -}}
+{{- define "agent.etcd.endpoints" -}}
 {{- $endpoints := list -}}
 {{ $endpoints = without .etcd.endpoints "" }}
 {{- if empty $endpoints -}}
@@ -33,9 +33,9 @@ Create the endpoint of the etcd for Aperture Agent
 
 {{/*
 Create the address of the Prometheus for Aperture Agent
-{{ include "aperture.prometheus.address" ( dict "prometheus" .Values.path.to.the.prometheus "context" $.context $) }}
+{{ include "agent.prometheus.address" ( dict "prometheus" .Values.path.to.the.prometheus "context" $.context $) }}
 */}}
-{{- define "aperture.prometheus.address" -}}
+{{- define "agent.prometheus.address" -}}
 {{- if .prometheus.address -}}
     {{ print .prometheus.address }}
 {{- else -}}
@@ -45,14 +45,14 @@ Create the address of the Prometheus for Aperture Agent
 
 {{/*
 Fetch the endpoint of the FluxNinja cloud instance
-{{ include "aperture.fluxninjaPlugin.endpoint" ( dict "aperture" .Values.path.to.the.aperture $) }}
+{{ include "agent.fluxninjaPlugin.endpoint" ( dict "agent" .Values.path.to.the.agent $) }}
 */}}
-{{- define "aperture.fluxninjaPlugin.endpoint" -}}
-{{- if .aperture.fluxninjaPlugin.enabled -}}
-    {{- if .aperture.fluxninjaPlugin.endpoint -}}
-        {{ print .aperture.fluxninjaPlugin.endpoint }}
+{{- define "agent.fluxninjaPlugin.endpoint" -}}
+{{- if .agent.config.fluxninja_plugin.enabled -}}
+    {{- if .agent.config.fluxninja_plugin.fluxninja_endpoint -}}
+        {{ print .agent.config.fluxninja_plugin.fluxninja_endpoint }}
     {{- else -}}
-        {{- fail "Value of endpoint for FluxNinja plugin cannot be empty when .Values.aperture.fluxninjaPlugin.enabled is set to true." -}}
+        {{- fail "Value of fluxninja_endpoint for FluxNinja plugin cannot be empty when .Values.agent.config.fluxninja_plugin.enabled is set to true." -}}
     {{- end -}}
 {{- else -}}
     {{ print "" }}
@@ -61,18 +61,14 @@ Fetch the endpoint of the FluxNinja cloud instance
 
 {{/*
 Fetch the value of the API Key secret for Aperture Agent
-{{ include "aperture.apiSecret.value" ( dict "object" .Values.path.to.the.agent/controller $) }}
+{{ include "agent.apiSecret.value" ( dict "agent" .Values.path.to.the.agent $) }}
 */}}
-{{- define "aperture.apisecret.value" -}}
-{{- if .object.fluxninjaPlugin.enabled -}}
-    {{- if .object.fluxninjaPlugin.apiKeySecret.create -}}
-        {{- if .object.fluxninjaPlugin.apiKeySecret.value -}}
-            {{ print .object.fluxninjaPlugin.apiKeySecret.value }}
-        {{- else -}}
-            {{- fail "Value of API Key for Agent cannot be empty when .Values.agent/controller.fluxninjaPlugin.enabled and .Values.agent/controller.fluxninjaPlugin.apiKeySecret.create is set to true." -}}
-        {{- end -}}
+{{- define "agent.apisecret.value" -}}
+{{- if .agent.secrets.fluxninjaPlugin.create -}}
+    {{- if .agent.secrets.fluxninjaPlugin.value -}}
+        {{ print .agent.secrets.fluxninjaPlugin.value }}
     {{- else -}}
-        {{ print "" }}
+        {{- fail "Value of API Key for Agent cannot be empty when .Values.agent.secrets.fluxninjaPlugin.create is set to true." -}}
     {{- end -}}
 {{- else -}}
     {{ print "" }}

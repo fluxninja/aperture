@@ -159,7 +159,7 @@ func (r *NamespaceReconciler) reconcileConfigMap(ctx context.Context, log logr.L
 // reconcileSecret prepares the desired states for Agent ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *NamespaceReconciler) reconcileSecret(ctx context.Context, log logr.Logger, instance *v1alpha1.Agent, namespace string) error {
-	if !instance.Spec.FluxNinjaPlugin.APIKeySecret.Create || !instance.Spec.FluxNinjaPlugin.Enabled {
+	if !instance.Spec.Secrets.FluxNinjaPlugin.Create {
 		return nil
 	}
 

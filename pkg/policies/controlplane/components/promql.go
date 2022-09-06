@@ -75,9 +75,9 @@ func PromQLModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 		promMultiJob := jobs.NewMultiJob(circuitAPI.GetPolicyName(), false, jws, nil)
 		pje.promMultiJob = promMultiJob
 
-		initialDelay := config.Duration{Duration: durationpb.New(time.Duration(-1))}
-		executionPeriod := config.Duration{Duration: durationpb.New(-1)}
-		executionTimeout := config.Duration{Duration: durationpb.New(promTimeout * 2)}
+		initialDelay := config.MakeDuration(-1)
+		executionPeriod := config.MakeDuration(-1)
+		executionTimeout := config.MakeDuration(promTimeout * 2)
 		jobConfig := jobs.JobConfig{
 			InitiallyHealthy: true,
 			InitialDelay:     initialDelay,

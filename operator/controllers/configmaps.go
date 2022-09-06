@@ -17,12 +17,11 @@ limitations under the License.
 package controllers
 
 import (
-	"bytes"
 	"context"
 	_ "embed"
 	"fmt"
-	"text/template"
 
+	"github.com/clarketm/json"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,52 +30,21 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/yaml"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
-//go:embed agent_config.tpl
-var agentConfig string
-
-// filledAgentConfig prepares the Agent config by resolving values in `agent_config.tpl` based on the provided parameter.
-func filledAgentConfig(instance *v1alpha1.Agent) (string, error) {
-	t, err := template.New("config").Parse(agentConfig)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse config for Agent. error: '%s'", err.Error())
-	}
-	data := struct {
-		ServerPort           int32
-		DistributedCachePort int32
-		MemberListPort       int32
-		Log                  v1alpha1.Log                 `json:"log"`
-		Etcd                 v1alpha1.AgentEtcdSpec       `json:"etcd"`
-		FluxNinjaPlugin      v1alpha1.FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
-		PrometheusAddress    string
-		Ingestion            v1alpha1.Ingestion `json:"ingestion"`
-		OtelConfig           v1alpha1.OtelConfig
-	}{
-		ServerPort:           instance.Spec.ServerPort,
-		DistributedCachePort: instance.Spec.DistributedCachePort,
-		MemberListPort:       instance.Spec.MemberListPort,
-		Log:                  instance.Spec.Log,
-		Etcd:                 instance.Spec.Etcd,
-		FluxNinjaPlugin:      instance.Spec.FluxNinjaPlugin,
-		PrometheusAddress:    checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.GetName(), instance.GetNamespace()),
-		OtelConfig:           instance.Spec.OtelConfig,
-	}
-
-	var config bytes.Buffer
-	if err := t.Execute(&config, data); err != nil {
-		return "", err
-	}
-	return config.String(), nil
-}
-
 // configMapForAgentConfig prepares the ConfigMap object for the Agent.
 func configMapForAgentConfig(instance *v1alpha1.Agent, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
-	config, err := filledAgentConfig(instance)
+	jsonConfig, err := json.Marshal(instance.Spec.ConfigSpec)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal Agent config to JSON. Error: '%s'", err.Error())
+	}
+
+	config, err := yaml.JSONToYAML(jsonConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal Agent config to YAML. Error: '%s'", err.Error())
 	}
 
 	cm := &corev1.ConfigMap{
@@ -87,7 +55,7 @@ func configMapForAgentConfig(instance *v1alpha1.Agent, scheme *runtime.Scheme) (
 			Annotations: instance.Spec.Annotations,
 		},
 		Data: map[string]string{
-			"aperture-agent.yaml": config,
+			"aperture-agent.yaml": string(config),
 		},
 	}
 
@@ -100,50 +68,16 @@ func configMapForAgentConfig(instance *v1alpha1.Agent, scheme *runtime.Scheme) (
 	return cm, nil
 }
 
-//go:embed controller_config.tpl
-var controllerConfig string
-
-// filledControllerConfig prepares the Controller config by resolving values in `controller_config.tpl` based on the provided parameter.
-func filledControllerConfig(instance *v1alpha1.Controller) (string, error) {
-	t, err := template.New("config").Parse(controllerConfig)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse config Controller. error: '%s'", err.Error())
-	}
-
-	data := struct {
-		Log               v1alpha1.Log                 `json:"log"`
-		Etcd              v1alpha1.ControllerEtcdSpec  `json:"etcd"`
-		FluxNinjaPlugin   v1alpha1.FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
-		PrometheusAddress string
-		ServerPort        int32
-		CertPath          string
-		CertName          string
-		CertKey           string
-		OtelConfig        v1alpha1.OtelConfig
-	}{
-		Log:               instance.Spec.Log,
-		Etcd:              checkEtcdEndpoints(instance.Spec.Etcd, instance.GetName(), instance.GetNamespace()),
-		FluxNinjaPlugin:   instance.Spec.FluxNinjaPlugin,
-		PrometheusAddress: checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.GetName(), instance.GetNamespace()),
-		ServerPort:        instance.Spec.ServerPort,
-		CertPath:          controllerCertPath,
-		CertName:          controllerCertName,
-		CertKey:           controllerCertKeyName,
-		OtelConfig:        instance.Spec.OtelConfig,
-	}
-
-	var config bytes.Buffer
-	if err := t.Execute(&config, data); err != nil {
-		return "", err
-	}
-	return config.String(), nil
-}
-
 // configMapForAgentConfig prepares the ConfigMap object for the Controller.
 func configMapForControllerConfig(instance *v1alpha1.Controller, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
-	config, err := filledControllerConfig(instance)
+	jsonConfig, err := json.Marshal(instance.Spec.ConfigSpec)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal Controller config to JSON. Error: '%s'", err.Error())
+	}
+
+	config, err := yaml.JSONToYAML(jsonConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal Controller config to YAML. Error: '%s'", err.Error())
 	}
 
 	cm := &corev1.ConfigMap{
@@ -154,7 +88,7 @@ func configMapForControllerConfig(instance *v1alpha1.Controller, scheme *runtime
 			Annotations: instance.Spec.Annotations,
 		},
 		Data: map[string]string{
-			"aperture-controller.yaml": config,
+			"aperture-controller.yaml": string(config),
 		},
 	}
 

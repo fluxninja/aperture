@@ -35,9 +35,11 @@ var (
 
 // PrometheusConfig holds configuration for Prometheus Server.
 // swagger:model
+// +kubebuilder:object:generate=true
 type PrometheusConfig struct {
 	// Address of the prometheus server
-	Address string `json:"address" validate:"hostname_port|url|fqdn"`
+	//+kubebuilder:validation:Required
+	Address string `json:"address" validate:"required,hostname_port|url|fqdn"`
 }
 
 // Module provides a singleton pointer to prometheusv1.API via FX.

@@ -69,7 +69,9 @@ var _ = Describe("ServiceAccount for Controller", func() {
 				AutomountServiceAccountToken: pointer.BoolPtr(true),
 			}
 
-			result, _ := serviceAccountForController(instance.DeepCopy(), scheme.Scheme)
+			result, err := serviceAccountForController(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -122,7 +124,9 @@ var _ = Describe("ServiceAccount for Controller", func() {
 				AutomountServiceAccountToken: pointer.BoolPtr(false),
 			}
 
-			result, _ := serviceAccountForController(instance.DeepCopy(), scheme.Scheme)
+			result, err := serviceAccountForController(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -170,7 +174,9 @@ var _ = Describe("ServiceAccount for Agent", func() {
 				AutomountServiceAccountToken: pointer.BoolPtr(true),
 			}
 
-			result, _ := serviceAccountForAgent(instance.DeepCopy(), scheme.Scheme)
+			result, err := serviceAccountForAgent(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -223,7 +229,9 @@ var _ = Describe("ServiceAccount for Agent", func() {
 				AutomountServiceAccountToken: pointer.BoolPtr(false),
 			}
 
-			result, _ := serviceAccountForAgent(instance.DeepCopy(), scheme.Scheme)
+			result, err := serviceAccountForAgent(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -238,6 +246,7 @@ var _ = Describe("Test ServiceAccount Mutate", func() {
 
 		sa := &corev1.ServiceAccount{}
 		err := serviceAccountMutate(sa, expected.AutomountServiceAccountToken)()
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(sa).To(Equal(expected))
 	})

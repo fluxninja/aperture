@@ -11,4 +11,15 @@ generate-helm-readme:
 		\
 	}
 
-.PHONY: generate-helm-readme
+helm-lint:
+	@{ \
+		dirs=$$(find ./ -name 'values.yaml' -exec dirname {} \;); \
+		for dir in $${dirs}; do \
+			chart=$$(basename $${dir}); \
+			echo "Linting for $${chart}"; \
+			helm lint $${chart};\
+		done; \
+		\
+	}
+
+.PHONY: generate-helm-readme helm-lint
