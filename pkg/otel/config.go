@@ -1,6 +1,7 @@
 package otel
 
 import (
+	"crypto/tls"
 	"fmt"
 
 	promapi "github.com/prometheus/client_golang/api"
@@ -50,6 +51,7 @@ type otelParams struct {
 	promClient promapi.Client
 	config     *otelcollector.OTELConfig
 	listener   *listener.Listener
+	tlsConfig  *tls.Config
 	OtelConfig
 }
 
@@ -123,21 +125,28 @@ func (c OTELConfigConstructor) Annotate() fx.Option {
 	return options
 }
 
-func newOtelConfig(unmarshaller config.Unmarshaller,
-	listener *listener.Listener,
-	promClient promapi.Client,
-) (*otelParams, error) {
+// FxIn consumes parameters via Fx.
+type FxIn struct {
+	fx.In
+	Unmarshaller config.Unmarshaller
+	Listener     *listener.Listener
+	PromClient   promapi.Client
+	TLSConfig    *tls.Config `optional:"true"`
+}
+
+func newOtelConfig(in FxIn) (*otelParams, error) {
 	config := otelcollector.NewOTELConfig()
 	config.AddDebugExtensions()
 
 	var userCfg OtelConfig
-	if err := unmarshaller.UnmarshalKey("otel", &userCfg); err != nil {
+	if err := in.Unmarshaller.UnmarshalKey("otel", &userCfg); err != nil {
 		return nil, err
 	}
 	cfg := &otelParams{
 		OtelConfig: userCfg,
-		listener:   listener,
-		promClient: promClient,
+		listener:   in.Listener,
+		promClient: in.PromClient,
+		tlsConfig:  in.TLSConfig,
 		config:     config,
 	}
 	return cfg, nil
@@ -306,9 +315,16 @@ func addPrometheusRemoteWriteExporter(config *otelcollector.OTELConfig, promClie
 }
 
 func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]interface{} {
+	scheme := "http"
+	if cfg.tlsConfig != nil {
+		scheme = "https"
+	}
 	return map[string]interface{}{
-		"job_name":        name,
-		"scheme":          "http",
+		"job_name": name,
+		"scheme":   scheme,
+		"tls_config": map[string]interface{}{
+			"insecure_skip_verify": true,
+		},
 		"scrape_interval": "1s",
 		"scrape_timeout":  "900ms",
 		"metrics_path":    "/metrics",
