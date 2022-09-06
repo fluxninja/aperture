@@ -495,13 +495,13 @@ agent:
   ##
   initContainers: []
   ## Agent API secret for FluxNinja cloud connection
-  ## @param agent.secrets.fluxninjaPlugin.create Whether to create Kubernetes Secret with provided Agent API Key.
-  ## @param agent.secrets.fluxninjaPlugin.secretKeyRef.name specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey
-  ## @param agent.secrets.fluxninjaPlugin.secretKeyRef.key specifies which key from the Secret for Agent API Key to use
-  ## @param agent.secrets.fluxninjaPlugin.value API Key to use when creating a new Agent API Key Secret
+  ## @param agent.secrets.fluxNinjaPlugin.create Whether to create Kubernetes Secret with provided Agent API Key.
+  ## @param agent.secrets.fluxNinjaPlugin.secretKeyRef.name specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey
+  ## @param agent.secrets.fluxNinjaPlugin.secretKeyRef.key specifies which key from the Secret for Agent API Key to use
+  ## @param agent.secrets.fluxNinjaPlugin.value API Key to use when creating a new Agent API Key Secret
   ##
   secrets:
-    fluxninjaPlugin:
+    fluxNinjaPlugin:
       create: false
       secretKeyRef:
         name: ~
@@ -521,11 +521,11 @@ agent:
   config:
     ## Etcd parameters for Agent
     ## @param agent.config.etcd.endpoints List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty.
-    ## @param agent.config.etcd.leaseTtl Lease time-to-live.
+    ## @param agent.config.etcd.lease_ttl Lease time-to-live.
     ##
     etcd:
       endpoints: []
-      leaseTtl: 60s
+      lease_ttl: 60s
     ## Prometheus parameters for Agent
     ## @param agent.config.prometheus.address specifies the address of the Prometheus server. This must not be empty.
     ##
