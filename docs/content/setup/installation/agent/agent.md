@@ -34,13 +34,13 @@ The Aperture Agent can be installed in below listed modes:
 
 1. **Kubernetes**
 
-   1. **DaemonSet**
+   1. [**DaemonSet**](kubernetes/daemonset.md)
 
       The Aperture Agent can be installed as a
       [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
       where it will get deployed on all the nodes of the cluster.
 
-   2. **Sidecar**
+   2. [**Sidecar**](kubernetes/sidecar.md)
 
       The Aperture Agent can also be installed as a Sidecar. In this mode,
       whenever a new pod is started with required labels and annotations, the

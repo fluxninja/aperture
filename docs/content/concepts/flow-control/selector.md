@@ -17,7 +17,7 @@ See also [Selector reference](/reference/configuration/policies#-v1selector)
 Flow observability and control components are instantiated on Aperture Agents
 and they select flows based on scoping rules defined in Selectors.
 
-A Selector consists of following fields:
+A Selector consists of the following fields:
 
 ### Agent Group
 
