@@ -218,7 +218,7 @@ workflows:
           base-revision: main
   release:
     when:
-        matches: { value: << pipeline.git.tag >>, pattern: "^releases/.*$" }
+      matches: { value: << pipeline.git.tag >>, pattern: "^releases/.*$" }
     jobs:
       - continuation/continue:
           configuration_path: .circleci/release.yaml
