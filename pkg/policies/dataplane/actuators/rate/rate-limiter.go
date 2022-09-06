@@ -85,8 +85,8 @@ func setupRateLimiterFactory(
 	ai *agentinfo.AgentInfo,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
-	rateLimitDecisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient,
-		path.Join(paths.RateLimiterDecisionsPath, paths.AgentGroupPrefix(agentGroupName)))
+	etcdPath := path.Join(paths.RateLimiterDecisionsPath)
+	rateLimitDecisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,9 @@ func setupRateLimiterFactory(
 	}
 
 	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{rateLimiterFactory.newRateLimiterOptions},
+		FxOptionsFuncs: []notifiers.FxOptionsFunc{
+			rateLimiterFactory.newRateLimiterOptions,
+		},
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
 		},
@@ -162,11 +164,11 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 		return fx.Options(), err
 	}
 
-	rateLimiterMessage := wrapperMessage.RateLimiter
+	rateLimiterProto := wrapperMessage.RateLimiter
 
 	rateLimiter := &rateLimiter{
 		Component:          wrapperMessage,
-		rateLimiterProto:   rateLimiterMessage,
+		rateLimiterProto:   rateLimiterProto,
 		rateLimiterFactory: rateLimiterFactory,
 		statusRegistry:     reg,
 	}
@@ -199,10 +201,9 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	if err != nil {
 		return err
 	}
+	decisionKey := paths.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName, rateLimiter.GetPolicyName(), rateLimiter.GetComponentIndex())
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
-			rateLimiter.GetPolicyName(),
-			rateLimiter.GetComponentIndex())),
+		notifiers.Key(decisionKey),
 		unmarshaller,
 		rateLimiter.decisionUpdateCallback,
 	)
@@ -216,7 +217,8 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
 				rateLimiter.rateLimitChecker.AddOverride(label, override.GetLimitScaleFactor())
 			}
-			rateLimiter.rateTracker, err = ratetracker.NewDistCacheRateTracker(rateLimiter.rateLimitChecker,
+			rateLimiter.rateTracker, err = ratetracker.NewDistCacheRateTracker(
+				rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
 				rateLimiter.name,
 				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())
