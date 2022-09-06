@@ -58,18 +58,22 @@ func (job JobBase) JobWatchers() JobWatchers {
 type JobConfig struct {
 	// Initial delay to start the job. Zero value will schedule the job immediately. Negative value will wait for next scheduled interval.
 	//+kubebuilder:validation:Optional
-	InitialDelay config.Duration `json:"initial_delay,omitempty" default:"0s"`
+	//+kubebuilder:default:="0s"
+	InitialDelay config.Duration `json:"initial_delay" default:"0s"`
 
 	// Time period between job executions. Zero or negative value means that the job will never execute periodically.
 	//+kubebuilder:validation:Optional
-	ExecutionPeriod config.Duration `json:"execution_period,omitempty" default:"10s"`
+	//+kubebuilder:default:="10s"
+	ExecutionPeriod config.Duration `json:"execution_period" default:"10s"`
 
 	// Execution timeout
 	//+kubebuilder:validation:Optional
-	ExecutionTimeout config.Duration `json:"execution_timeout,omitempty" validate:"gte=0s" default:"5s"`
+	//+kubebuilder:default:="5s"
+	ExecutionTimeout config.Duration `json:"execution_timeout" validate:"gte=0s" default:"5s"`
 
 	// Sets whether the job is initially healthy
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
 	InitiallyHealthy bool `json:"initially_healthy,omitempty" default:"false"`
 }
 

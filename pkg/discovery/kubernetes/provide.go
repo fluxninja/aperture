@@ -20,9 +20,10 @@ var configKey = common.DiscoveryConfigKey + ".kubernetes"
 // +kubebuilder:object:generate=true
 type KubernetesDiscoveryConfig struct {
 	// NodeName is the name of the k8s node the agent should be monitoring
-	NodeName         string `json:"node_name"`
-	PodName          string `json:"pod_name"`
-	DiscoveryEnabled bool   `json:"discovery_enabled" default:"true"`
+	NodeName string `json:"node_name,omitempty"`
+	PodName  string `json:"pod_name,omitempty"`
+	//+kubebuilder:default:=true
+	DiscoveryEnabled bool `json:"discovery_enabled,omitempty" default:"true"`
 }
 
 // FxIn describes parameters passed to k8s discovery constructor.

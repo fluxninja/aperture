@@ -47,7 +47,8 @@ type DistCacheConfig struct {
 	//+kubebuilder:default:=":3320"
 	BindAddr string `json:"bind_addr,omitempty" default:":3320" validate:"hostname_port"`
 	// ReplicaCount is 1 by default.
-	ReplicaCount int `json:"replica_count,omitempty" default:"1"`
+	//+kubebuilder:default:=1
+	ReplicaCount int `json:"replica_count" default:"1"`
 	// Address to bind mememberlist server to.
 	//+kubebuilder:default:=":3322"
 	MemberlistBindAddr string `json:"memberlist_bind_addr,omitempty" default:":3322" validate:"hostname_port"`

@@ -1,4 +1,3 @@
-// +kubebuilder:object:generate=true
 package agentinfo
 
 import "github.com/fluxninja/aperture/pkg/config"
@@ -16,8 +15,10 @@ const (
 
 // AgentInfoConfig is the configuration for the agent group etc.
 // swagger:model
+// +kubebuilder:object:generate=true
 type AgentInfoConfig struct {
 	// All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
+	//+kubebuilder:default:="default"
 	AgentGroup string `json:"agent_group,omitempty" default:"default"`
 }
 

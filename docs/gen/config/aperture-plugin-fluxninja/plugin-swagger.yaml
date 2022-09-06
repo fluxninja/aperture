@@ -86,9 +86,7 @@ definitions:
         x-go-name: FluxNinjaEndpoint
         x-go-validate: omitempty,hostname_port|url|fqdn
       heartbeat_interval:
-        description: |-
-          Interval between each heartbeat.
-          +kubebuilder:validation:Optional
+        description: Interval between each heartbeat.
         format: string
         type: string
         x-go-default: 5s

@@ -77,6 +77,7 @@ type PluginsConfig struct {
 	// Specific plugins to disable
 	DisabledPlugins []string `json:"disabled_plugins,omitempty"`
 	// Disables all plugins
+	//+kubebuilder:default:=false
 	DisablePlugins bool `json:"disable_plugins,omitempty" default:"false"`
 }
 

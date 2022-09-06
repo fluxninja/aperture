@@ -308,5 +308,5 @@ replace (
 	cloud.google.com/go => cloud.google.com/go v0.100.2
 	github.com/buraksezer/olric => github.com/fluxninja/olric v0.4.5-fn-patch.3
 	github.com/go-openapi/analysis => github.com/fluxninja/analysis v0.21.2-fn.patch.1
-	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.7
+	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.8
 )

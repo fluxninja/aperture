@@ -44,7 +44,7 @@ func GMuxServerModule() fx.Option {
 // +kubebuilder:object:generate=true
 type GRPCServerConfig struct {
 	// Connection timeout
-	ConnectionTimeout config.Duration `json:"connection_timeout,omitempty" validate:"gte=0s" default:"120s"`
+	ConnectionTimeout config.Duration `json:"connection_timeout" validate:"gte=0s" default:"120s"`
 	// Enable Reflection
 	EnableReflection bool `json:"enable_reflection,omitempty" default:"false"`
 }
@@ -112,7 +112,7 @@ func (constructor ServerConstructor) provideServer(
 	server := grpc.NewServer(constructor.ServerOptions...)
 
 	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
 			panichandler.Go(func() {
 				// request shutdown if this server exits
 				defer func() { _ = shutdowner.Shutdown() }()
@@ -131,7 +131,7 @@ func (constructor ServerConstructor) provideServer(
 			})
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(context.Context) error {
 			listener := listener.GetListener()
 			log.Info().Str("constructor", constructor.Key).Str("addr", listener.Addr().String()).Msg("Stopping GRPC server")
 			server.GracefulStop()

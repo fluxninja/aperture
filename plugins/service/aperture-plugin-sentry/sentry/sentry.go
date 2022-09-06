@@ -19,6 +19,7 @@ import (
 
 // SentryConfig holds configuration for Sentry.
 // swagger:model
+// +kubebuilder:object:generate=true
 type SentryConfig struct {
 	// If DSN is not set, the client is effectively disabled
 	// You can set test project's dsn to send log events.

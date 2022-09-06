@@ -15,14 +15,23 @@ local apertureControllerMixin =
       controller+: {
         createUninstallHook: false,
         config+: {
-          fluxninja_plugin+: {
-            enabled: false,
+          plugins+: {
+            disabled_plugins: [
+              'aperture-plugin-fluxninja',
+            ],
           },
           log+: {
-            prettyConsole: true,
-            nonBlocking: false,
+            pretty_console: true,
+            non_blocking: false,
             level: 'debug',
             file: 'default',
+          },
+          etcd+: {
+            endpoints: ['http://controller-etcd:2379'],
+            lease_ttl: '60s',
+          },
+          prometheus+: {
+            address: 'http://controller-prometheus-server.local:80',
           },
         },
         image: {

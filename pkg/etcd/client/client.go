@@ -36,9 +36,11 @@ const (
 // +kubebuilder:object:generate=true
 type EtcdConfig struct {
 	// Lease time-to-live
-	LeaseTTL config.Duration `json:"lease_ttl,omitempty" validate:"gte=1s" default:"60s"`
+	//+kubebuilder:default:="60s"
+	LeaseTTL config.Duration `json:"lease_ttl" validate:"gte=1s" default:"60s"`
 	// List of Etcd server endpoints
-	Endpoints []string `json:"endpoints,omitempty" validate:"dive,hostname_port|url|fqdn"`
+	//+kubebuilder:validate:MinItems=1
+	Endpoints []string `json:"endpoints,omitempty" validate:"gt=0,dive,hostname_port|url|fqdn"`
 	// TODO: add auth params
 }
 
