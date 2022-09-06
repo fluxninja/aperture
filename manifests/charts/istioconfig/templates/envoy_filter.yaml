@@ -102,7 +102,7 @@ spec:
                     - key: net.host.ip
                       value:
                         string_value: "%DOWNSTREAM_LOCAL_ADDRESS_WITHOUT_PORT%"
-                    - key: net.host.authzPort
+                    - key: net.host.port
                       value:
                         string_value: "%DOWNSTREAM_LOCAL_PORT%"
 

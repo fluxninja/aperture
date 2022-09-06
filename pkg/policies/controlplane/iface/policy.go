@@ -4,15 +4,6 @@ import (
 	"time"
 )
 
-// swagger:operation POST /policies common-configuration PoliciesConfig
-// ---
-// x-fn-config-env: true
-// parameters:
-// - name: promql_jobs_scheduler
-//   in: body
-//   schema:
-//     "$ref": "#/definitions/JobGroupConfig"
-
 const (
 	// PoliciesRoot - path in config and status registry for policies results.
 	PoliciesRoot = "policies"

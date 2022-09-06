@@ -17,23 +17,21 @@ spec:
   {{- if or .Values.controller.image.registry .Values.controller.image.repository .Values.controller.image.tag .Values.controller.image.pullPolicy .Values.controller.image.pullSecrets }}
   image: {{ .Values.controller.image | toYaml | nindent 4 }}
   {{- end }}
-  {{- if .Values.controller.serverPort }}
-  serverPort: {{ .Values.controller.serverPort }}
-  {{- end }}
-  {{- if .Values.controller.hostAliases }}
-  hostAliases: {{ .Values.controller.hostAliases }}
-  {{- end }}
-  {{- if or .Values.controller.log.prettyConsole .Values.controller.log.nonBlocking .Values.controller.log.level .Values.controller.log.file }}
-  log: {{ .Values.controller.log | toYaml | nindent 4 }}
+  {{- if .Values.controller.service.annotations }}
+  service:
+    annotations: {{ .Values.controller.service.annotations }}
   {{- end }}
   serviceAccount:
     create: {{ .Values.controller.serviceAccount.create }}
     {{- if .Values.controller.serviceAccount.annotations }}
-    annotations: {{ .Values.controller.serviceAccount.annotations }}
+    annotations: {{ .Values.controller.serviceAccount.annotations | toYaml | indent 6 }}
     {{- end }}
     {{- if .Values.controller.serviceAccount.automountServiceAccountToken }}
     automountServiceAccountToken: {{ .Values.controller.serviceAccount.automountServiceAccountToken }}
     {{- end }}
+  {{- if .Values.controller.hostAliases }}
+  hostAliases: {{ .Values.controller.hostAliases }}
+  {{- end }}
   livenessProbe:
     enabled: {{ .Values.controller.livenessProbe.enabled }}
     {{- if  .Values.controller.livenessProbe.initialDelaySeconds }}
@@ -131,79 +129,32 @@ spec:
   {{- if .Values.commonAnnotations }}
   annotations: {{ .Values.commonAnnotations | toYaml | nindent 4 }}
   {{- end }}
-  {{- if .Values.controller.fluxninjaPlugin.enabled }}
-  fluxninjaPlugin:
-    enabled: {{ .Values.controller.fluxninjaPlugin.enabled }}
-    endpoint: {{ include "aperture.fluxninjaPlugin.endpoint" ( dict "aperture" .Values.controller $) }}
-    {{- if .Values.controller.fluxninjaPlugin.heartbeatsInterval }}
-    heartbeatsInterval: {{ .Values.controller.fluxninjaPlugin.heartbeatsInterval }}
-    {{- end }}
-    {{- if or .Values.controller.fluxninjaPlugin.tls.insecure .Values.controller.fluxninjaPlugin.tls.insecureSkipVerify .Values.controller.fluxninjaPlugin.tls.caFile }}
-    tls:
-      {{- if .Values.controller.fluxninjaPlugin.tls.insecure }}
-      insecure: {{ .Values.controller.fluxninjaPlugin.tls.insecure }}
+  {{- if and .Values.controller.secrets .Values.controller.secrets.fluxninjaPlugin .Values.controller.secrets.fluxninjaPlugin .Values.controller.secrets.fluxninjaPlugin.create }}
+  secrets:
+    fluxninjaPlugin:
+      {{- if .Values.controller.secrets.fluxninjaPlugin.create }}
+      create: {{ .Values.controller.secrets.fluxninjaPlugin.create }}
       {{- end }}
-      {{- if .Values.controller.fluxninjaPlugin.tls.insecureSkipVerify }}
-      insecureSkipVerify: {{ .Values.controller.fluxninjaPlugin.tls.insecureSkipVerify }}
-      {{- end }}
-      {{- if .Values.controller.fluxninjaPlugin.tls.caFile }}
-      caFile: {{ .Values.controller.fluxninjaPlugin.tls.caFile }}
-      {{- end }}
-    {{- end }}
-    {{- if or .Values.controller.fluxninjaPlugin.apiKeySecret.create .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key .Values.controller.fluxninjaPlugin.apiKeySecret.value }}
-    apiKeySecret:
-      {{- if .Values.controller.fluxninjaPlugin.apiKeySecret.create }}
-      create: {{ .Values.controller.fluxninjaPlugin.apiKeySecret.create }}
-      {{- end }}
-      {{- if or .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key }}
+      {{- if or .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.name .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.key }}
       secretKeyRef:
-        {{- if .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name }}
-        name: {{ .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name }}
+        {{- if .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.name }}
+        name: {{ .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.name }}
         {{- end }}
-        {{- if .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key }}
-        key: {{ .Values.controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key }}
+        {{- if .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.key }}
+        key: {{ .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.key }}
         {{- end }}
       {{- end }}
-      value: {{ include "aperture.apisecret.value" ( dict "object" .Values.controller $) }}
+      value: {{ include "controller.apisecret.value" ( dict "controller" .Values.controller $) }}
+  {{- end }}
+  config:
+    {{- if (omit .Values.controller.config "etcd" "prometheus") }}
+    {{- omit .Values.controller.config "etcd" "prometheus" | toYaml | nindent 4 }}
     {{- end }}
-  {{- end }}
-  {{- if .Values.controller.service.annotations }}
-  service:
-    annotations: {{ .Values.controller.service.annotations }}
-  {{- end }}
-  {{- if or (not .Values.controller.etcd.enabled) .Values.controller.etcd.endpoints }}
-  etcd:  {{- omit .Values.controller.etcd "endpoints" | toYaml | nindent 4 }}
-    endpoints: {{ include "aperture.etcd.endpoints" (dict "etcd" .Values.controller.etcd "context" . $) }}
-  {{- end }}
-  {{- if or (not .Values.controller.prometheus.enabled) .Values.controller.prometheus.endpoints }}
-  prometheus:
-    address: {{ include "aperture.prometheus.address" (dict "prometheus" .Values.controller.prometheus "context" . $) }}
-  {{- end }}
-  {{- if or .Values.controller.otelConfig.grpcAddr .Values.controller.otelConfig.httpAddr .Values.controller.otelConfig.batchPrerollup.sendBatchSize .Values.controller.otelConfig.batchPrerollup.timeout .Values.controller.otelConfig.batchPostrollup.sendBatchSize .Values.controller.otelConfig.batchPostrollup.timeout }}
-  otelConfig:
-    {{- if .Values.controller.otelConfig.grpcAddr }}
-    grpcAddr: {{ .Values.controller.otelConfig.grpcAddr }}
-    {{- end }}
-    {{- if .Values.controller.otelConfig.httpAddr }}
-    httpAddr: {{ .Values.controller.otelConfig.httpAddr }}
-    {{- end }}
-    {{- if or .Values.controller.otelConfig.batchPrerollup.sendBatchSize .Values.controller.otelConfig.batchPrerollup.timeout }}
-    batchPrerollup:
-      {{- if .Values.controller.otelConfig.batchPrerollup.sendBatchSize }}
-      sendBatchSize: {{ .Values.controller.otelConfig.batchPrerollup.sendBatchSize }}
+    etcd:
+      {{- if (omit .Values.controller.config.etcd "endpoints")}}
+      {{- omit .Values.controller.config.etcd "endpoints" | toYaml | nindent 6 }}
       {{- end }}
-      {{- if .Values.controller.otelConfig.batchPrerollup.timeout }}
-      timeout: {{ .Values.controller.otelConfig.batchPrerollup.timeout }}
-      {{- end }}
-    {{- end }}
-    {{- if or .Values.controller.otelConfig.batchPostrollup.sendBatchSize .Values.controller.otelConfig.batchPostrollup.timeout }}
-    batchPostrollup:
-      {{- if .Values.controller.otelConfig.batchPostrollup.sendBatchSize }}
-      sendBatchSize: {{ .Values.controller.otelConfig.batchPostrollup.sendBatchSize }}
-      {{- end }}
-      {{- if .Values.controller.otelConfig.batchPostrollup.timeout }}
-      timeout: {{ .Values.controller.otelConfig.batchPostrollup.timeout }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
+      endpoints: {{ include "controller.etcd.endpoints" (dict "etcd" .Values.controller.config.etcd "context" . $) }}
+    prometheus:
+      address: {{ include "controller.prometheus.address" (dict "prometheus" .Values.controller.config.prometheus "context" . $) }}
 {{- end }}

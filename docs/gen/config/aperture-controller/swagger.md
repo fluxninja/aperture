@@ -4,24 +4,22 @@
 
 ### COMMON CONFIGURATION
 
-| Key              | Reference                          |
-| ---------------- | ---------------------------------- |
-| `agent_info`     | [AgentInfo](#agent-info)           |
-| `client`         | [Client](#client)                  |
-| `controller`     | [Controller](#controller)          |
-| `etcd`           | [Etcd](#etcd)                      |
-| `liveness`       | [Liveness](#liveness)              |
-| `log`            | [Log](#log)                        |
-| `metrics`        | [Metrics](#metrics)                |
-| `otel`           | [Otel](#otel)                      |
-| `peer_discovery` | [PeerDiscovery](#peer-discovery)   |
-| `plugins`        | [Plugins](#plugins)                |
-| `policies`       | [PoliciesConfig](#policies-config) |
-| `profilers`      | [Profilers](#profilers)            |
-| `prometheus`     | [Prometheus](#prometheus)          |
-| `readiness`      | [Readiness](#readiness)            |
-| `server`         | [Server](#server)                  |
-| `watchdog`       | [Watchdog](#watchdog)              |
+| Key          | Reference                          |
+| ------------ | ---------------------------------- |
+| `agent_info` | [AgentInfo](#agent-info)           |
+| `client`     | [Client](#client)                  |
+| `etcd`       | [Etcd](#etcd)                      |
+| `liveness`   | [Liveness](#liveness)              |
+| `log`        | [Log](#log)                        |
+| `metrics`    | [Metrics](#metrics)                |
+| `otel`       | [Otel](#otel)                      |
+| `plugins`    | [Plugins](#plugins)                |
+| `policies`   | [PoliciesConfig](#policies-config) |
+| `profilers`  | [Profilers](#profilers)            |
+| `prometheus` | [Prometheus](#prometheus)          |
+| `readiness`  | [Readiness](#readiness)            |
+| `server`     | [Server](#server)                  |
+| `watchdog`   | [Watchdog](#watchdog)              |
 
 ### PLUGIN CONFIGURATION
 
@@ -35,7 +33,8 @@
 - [AdaptivePolicy](#adaptive-policy) – AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
 - [AgentInfoConfig](#agent-info-config) – AgentInfoConfig is the configuration for the agent group etc.
 - [BackoffConfig](#backoff-config) – BackoffConfig holds configuration for GRPC Client Backoff.
-- [Batch](#batch) – Batch defines configuration for OTEL batch processor.
+- [BatchConfig](#batch-config) – BatchConfig defines configuration for OTEL batch processor.
+- [ClientConfig](#client-config) – ClientConfig is the client configuration.
 - [ClientTLSConfig](#client-tls-config) – ClientTLSConfig is the config for client TLS.
 - [EtcdConfig](#etcd-config) – EtcdConfig holds configuration for etcd client.
 - [FluxNinjaPluginConfig](#flux-ninja-plugin-config) – FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugin.
@@ -53,7 +52,6 @@
 - [LogWriterConfig](#log-writer-config) – LogWriterConfig holds configuration for a log writer.
 - [MetricsConfig](#metrics-config) – MetricsConfig holds configuration for service metrics.
 - [OtelConfig](#otel-config) – OtelConfig is the configuration for the OTEL collector.
-- [PeerDiscoveryConfig](#peer-discovery-config) – PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
 - [PluginsConfig](#plugins-config) – PluginsConfig holds configuration for plugins.
 - [ProfilersConfig](#profilers-config) – ProfilersConfig holds configuration for profilers.
 - [PrometheusConfig](#prometheus-config) – PrometheusConfig holds configuration for Prometheus Server.
@@ -101,23 +99,6 @@ Type: [ProxyConfig](#proxy-config)
 </dd>
 </dl>
 
-### <span id="controller"></span> _Controller_
-
-Key: `controller`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_CONTROLLER_`
-
-#### Members
-
-<dl>
-<dt>policies_path</dt>
-<dd>
-
-(string, default: `/etc/aperture/aperture-controller/policies`, env-var: `APERTURE_CONTROLLER_CONTROLLER_POLICIES_PATH`) Directory containing policies rules
-
-</dd>
-</dl>
-
 ### <span id="etcd"></span> _Etcd_
 
 Key: `etcd`
@@ -152,22 +133,6 @@ Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_`
 
 Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_`
 Type: [FluxNinjaPluginConfig](#flux-ninja-plugin-config)
-
-</dd>
-
-<dt>client_grpc</dt>
-<dd>
-
-Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_CLIENT_GRPC_`
-Type: [GRPCClientConfig](#g-rpc-client-config)
-
-</dd>
-
-<dt>client_http</dt>
-<dd>
-
-Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_CLIENT_HTTP_`
-Type: [HTTPClientConfig](#http-client-config)
 
 </dd>
 </dl>
@@ -256,22 +221,6 @@ Type: [OtelConfig](#otel-config)
 </dd>
 </dl>
 
-### <span id="peer-discovery"></span> _PeerDiscovery_
-
-Key: `peer_discovery`
-
-#### Members
-
-<dl>
-
-<dt></dt>
-<dd>
-
-Type: [PeerDiscoveryConfig](#peer-discovery-config)
-
-</dd>
-</dl>
-
 ### <span id="plugins"></span> _Plugins_
 
 Key: `plugins`
@@ -300,6 +249,16 @@ Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_`
 #### Members
 
 <dl>
+<dt>policies_path</dt>
+<dd>
+
+(string, default: `/etc/aperture/aperture-controller/policies`, env-var: `APERTURE_CONTROLLER_POLICIES_POLICIES_PATH`) Directory containing policies rules
+
+</dd>
+</dl>
+
+<dl>
+</dd>
 
 <dt>promql_jobs_scheduler</dt>
 <dd>
@@ -551,9 +510,9 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 </dd>
 </dl>
 
-### <span id="batch"></span> Batch
+### <span id="batch-config"></span> BatchConfig
 
-Batch defines configuration for OTEL batch processor.
+BatchConfig defines configuration for OTEL batch processor.
 
 #### Properties
 
@@ -570,6 +529,29 @@ Batch defines configuration for OTEL batch processor.
 <dd>
 
 (string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
+
+</dd>
+</dl>
+
+### <span id="client-config"></span> ClientConfig
+
+ClientConfig is the client configuration.
+
+#### Properties
+
+<dl>
+<dt>grpc</dt>
+<dd>
+
+([GRPCClientConfig](#g-rpc-client-config))
+
+</dd>
+</dl>
+<dl>
+<dt>http</dt>
+<dd>
+
+([HTTPClientConfig](#http-client-config))
 
 </dd>
 </dl>
@@ -631,7 +613,7 @@ EtcdConfig holds configuration for etcd client.
 <dt>endpoints</dt>
 <dd>
 
-([]string, `dive,hostname_port|url|fqdn`) List of Etcd server endpoints
+([]string, `gt=0,dive,hostname_port|url|fqdn`) List of Etcd server endpoints
 
 </dd>
 </dl>
@@ -671,6 +653,14 @@ FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugi
 <dd>
 
 (string, `gte=0s`, default: `5s`) Interval between each heartbeat.
+
+</dd>
+</dl>
+<dl>
+<dt>client</dt>
+<dd>
+
+([ClientConfig](#client-config))
 
 </dd>
 </dl>
@@ -1149,7 +1139,7 @@ LogConfig holds configuration for a logger and log writers.
 <dt>file</dt>
 <dd>
 
-(string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+(string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
 
 </dd>
 </dl>
@@ -1228,7 +1218,7 @@ LogWriterConfig holds configuration for a log writer.
 <dt>file</dt>
 <dd>
 
-(string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+(string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
 
 </dd>
 </dl>
@@ -1314,7 +1304,7 @@ OtelConfig is the configuration for the OTEL collector.
 <dt>batch_postrollup</dt>
 <dd>
 
-([Batch](#batch))
+([BatchConfig](#batch-config))
 
 </dd>
 </dl>
@@ -1322,22 +1312,7 @@ OtelConfig is the configuration for the OTEL collector.
 <dt>batch_prerollup</dt>
 <dd>
 
-([Batch](#batch))
-
-</dd>
-</dl>
-
-### <span id="peer-discovery-config"></span> PeerDiscoveryConfig
-
-PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
-
-#### Properties
-
-<dl>
-<dt>advertisement_addr</dt>
-<dd>
-
-(string, `omitempty,hostname_port`) Network address of aperture server to advertise to peers - this address should be reachable from other agents. Used for nat traversal when provided.
+([BatchConfig](#batch-config))
 
 </dd>
 </dl>
@@ -1422,7 +1397,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 <dt>address</dt>
 <dd>
 
-(string, `hostname_port|url|fqdn`) Address of the prometheus server
+(string, `required,hostname_port|url|fqdn`) Address of the prometheus server
 
 </dd>
 </dl>
@@ -1556,10 +1531,10 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 </dd>
 </dl>
 <dl>
-<dt>enable</dt>
+<dt>enabled</dt>
 <dd>
 
-(bool, default: `false`) Enable TLS
+(bool, default: `false`) Enabled TLS
 
 </dd>
 </dl>

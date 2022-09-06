@@ -12,7 +12,6 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
@@ -163,7 +162,7 @@ func (h *Heartbeats) createHTTPJob(ctx context.Context, restapiClientConnection 
 }
 
 func (h *Heartbeats) registerHearbeatsJob(job jobs.Job) {
-	executionTimeout := config.Duration{Duration: durationpb.New(jobTimeoutDuration)}
+	executionTimeout := config.MakeDuration(jobTimeoutDuration)
 	jobConfig := jobs.JobConfig{
 		InitiallyHealthy: true,
 		ExecutionPeriod:  h.interval,

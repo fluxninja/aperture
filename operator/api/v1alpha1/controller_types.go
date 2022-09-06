@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/fluxninja/aperture/pkg/jobs"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -37,14 +38,29 @@ type ControllerSpec struct {
 	//+kubebuilder:validation:Optional
 	HostAliases []corev1.HostAlias `json:"hostAliases"`
 
-	// Etcd parameters for Controller
+	// Controller Configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={leaseTtl:"60s"}
-	Etcd ControllerEtcdSpec `json:"etcd"`
+	ConfigSpec ControllerConfigSpec `json:"config"`
+}
 
-	// Prometheus parameters for Controller
+// ControllerConfigSpec holds controller configuration.
+type ControllerConfigSpec struct {
+	// CommonSpec
 	//+kubebuilder:validation:Optional
-	Prometheus PrometheusSpec `json:"prometheus"`
+	CommonConfigSpec `json:",inline"`
+
+	// Policies configuration.
+	//+kubebuilder:validation:Optional
+	Policies PoliciesConfig `json:"policies,omitempty"`
+}
+
+// PoliciesConfig for policy engine.
+type PoliciesConfig struct {
+	// Policies path configuration.
+	PoliciesPath string `json:"policies_path,omitempty"`
+
+	// Scheduler for PromQL jobs.
+	PromQLJobsScheduler jobs.JobGroupConfig `json:"promql_jobs_scheduler,omitempty"`
 }
 
 // ControllerStatus defines the observed state of Controller.
@@ -62,7 +78,6 @@ type Controller struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	//+kubebuilder:default:={serverPort:80}
 	Spec   ControllerSpec   `json:"spec,omitempty"`
 	Status ControllerStatus `json:"status,omitempty"`
 }
