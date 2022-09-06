@@ -1,8 +1,5 @@
 version: 2.1
 
-# this allows to use CircleCI's dynamic configuration feature
-setup: true
-
 executors:
   base-cimg-executor:
     docker:
