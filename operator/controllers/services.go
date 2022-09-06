@@ -33,50 +33,11 @@ import (
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
-// serviceForControllerWebhook prepares an object of Service for Controller Webhook based on the provided parameters.
-func serviceForControllerWebhook(instance *v1alpha1.Controller, log logr.Logger, scheme *runtime.Scheme) (*corev1.Service, error) {
-	controllerServiceSpec := instance.Spec.Service
-	annotations := instance.Spec.Annotations
-	if controllerServiceSpec.Annotations != nil {
-		if annotations == nil {
-			annotations = map[string]string{}
-		}
-		if err := mergo.Map(&annotations, controllerServiceSpec.Annotations, mergo.WithOverride); err != nil {
-			log.Info(fmt.Sprintf("failed to merge the Controller Webhook Service annotations. error: %s.", err.Error()))
-		}
-	}
-
-	svc := &corev1.Service{
-		ObjectMeta: v1.ObjectMeta{
-			Name:        validatingWebhookServiceName,
-			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
-			Annotations: annotations,
-		},
-		Spec: corev1.ServiceSpec{
-			Ports: []corev1.ServicePort{
-				{
-					Name:       "https",
-					Protocol:   corev1.Protocol("TCP"),
-					Port:       int32(443),
-					TargetPort: intstr.FromInt(8086),
-				},
-			},
-			Selector: selectorLabels(instance.GetName(), controllerServiceName),
-		},
-	}
-
-	if err := ctrl.SetControllerReference(instance, svc, scheme); err != nil {
-		return nil, err
-	}
-
-	return svc, nil
-}
-
 // serviceForAgent prepares an object of Service for Agent based on the provided parameters.
 func serviceForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtime.Scheme) (*corev1.Service, error) {
-	agentServiceSpec := instance.Spec.Service
-	annotations := instance.Spec.Annotations
+	spec := instance.Spec
+	agentServiceSpec := spec.Service
+	annotations := spec.Annotations
 	if agentServiceSpec.Annotations != nil {
 		if annotations == nil {
 			annotations = map[string]string{}
@@ -86,26 +47,69 @@ func serviceForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtime.
 		}
 	}
 
+	serverPort, err := getPort(spec.ConfigSpec.Server.Addr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelGRPCPort, err := getPort(spec.ConfigSpec.Otel.GRPCAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelHTTPPort, err := getPort(spec.ConfigSpec.Otel.HTTPAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	distCachePort, err := getPort(spec.ConfigSpec.DistCache.BindAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	memberListPort, err := getPort(spec.ConfigSpec.DistCache.MemberlistBindAddr)
+	if err != nil {
+		return nil, err
+	}
+
 	svc := &corev1.Service{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        agentServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), agentServiceName),
+			Labels:      commonLabels(spec.Labels, instance.GetName(), agentServiceName),
 			Annotations: annotations,
 		},
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
 				{
-					Name:       "grpc",
-					Protocol:   corev1.Protocol("TCP"),
-					Port:       int32(80),
-					TargetPort: intstr.FromString("grpc"),
+					Name:       server,
+					Protocol:   corev1.Protocol(tcp),
+					Port:       int32(serverPort),
+					TargetPort: intstr.FromString(server),
 				},
 				{
-					Name:       "grpc-otel",
-					Protocol:   corev1.Protocol("TCP"),
-					Port:       int32(4317),
-					TargetPort: intstr.FromString("grpc-otel"),
+					Name:       grpcOtel,
+					Protocol:   corev1.Protocol(tcp),
+					Port:       int32(otelGRPCPort),
+					TargetPort: intstr.FromString(grpcOtel),
+				},
+				{
+					Name:       httpOtel,
+					Protocol:   corev1.Protocol(tcp),
+					Port:       int32(otelHTTPPort),
+					TargetPort: intstr.FromString(httpOtel),
+				},
+				{
+					Name:       distCache,
+					Protocol:   corev1.Protocol(tcp),
+					Port:       int32(distCachePort),
+					TargetPort: intstr.FromString(distCache),
+				},
+				{
+					Name:       memberList,
+					Protocol:   corev1.Protocol(tcp),
+					Port:       int32(memberListPort),
+					TargetPort: intstr.FromString(memberList),
 				},
 			},
 			InternalTrafficPolicy: &[]corev1.ServiceInternalTrafficPolicyType{corev1.ServiceInternalTrafficPolicyLocal}[0],
@@ -122,31 +126,59 @@ func serviceForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtime.
 
 // serviceForController prepares an object of Service for Controller based on the provided parameters.
 func serviceForController(instance *v1alpha1.Controller, log logr.Logger, scheme *runtime.Scheme) (*corev1.Service, error) {
-	agentControllerServiceSpec := instance.Spec.Service
-	annotations := instance.Spec.Annotations
-	if agentControllerServiceSpec.Annotations != nil {
+	spec := instance.Spec
+	controllerServiceSpec := spec.Service
+	annotations := spec.Annotations
+	if controllerServiceSpec.Annotations != nil {
 		if annotations == nil {
 			annotations = map[string]string{}
 		}
-		if err := mergo.Map(&annotations, agentControllerServiceSpec.Annotations, mergo.WithOverride); err != nil {
+		if err := mergo.Map(&annotations, controllerServiceSpec.Annotations, mergo.WithOverride); err != nil {
 			log.Info(fmt.Sprintf("failed to merge the Controller Service annotations. error: %s.", err.Error()))
 		}
+	}
+
+	serverPort, err := getPort(spec.ConfigSpec.Server.Addr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelGRPCPort, err := getPort(spec.ConfigSpec.Otel.GRPCAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelHTTPPort, err := getPort(spec.ConfigSpec.Otel.HTTPAddr)
+	if err != nil {
+		return nil, err
 	}
 
 	svc := &corev1.Service{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        controllerServiceName,
 			Namespace:   instance.GetNamespace(),
-			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), controllerServiceName),
-			Annotations: instance.Spec.Annotations,
+			Labels:      commonLabels(spec.Labels, instance.GetName(), controllerServiceName),
+			Annotations: spec.Annotations,
 		},
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
 				{
-					Name:       "grpc",
-					Protocol:   corev1.Protocol("TCP"),
-					Port:       int32(80),
-					TargetPort: intstr.FromString("grpc"),
+					Name:       server,
+					Protocol:   corev1.Protocol(tcp),
+					Port:       int32(serverPort),
+					TargetPort: intstr.FromString(server),
+				},
+				{
+					Name:       grpcOtel,
+					Protocol:   corev1.Protocol(tcp),
+					Port:       int32(otelGRPCPort),
+					TargetPort: intstr.FromString(grpcOtel),
+				},
+				{
+					Name:       httpOtel,
+					Protocol:   corev1.Protocol(tcp),
+					Port:       int32(otelHTTPPort),
+					TargetPort: intstr.FromString(httpOtel),
 				},
 			},
 			Selector: selectorLabels(instance.GetName(), controllerServiceName),

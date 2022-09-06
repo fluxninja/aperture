@@ -103,84 +103,64 @@
 
 ### Agent Custom Resource Parameters
 
-| Name                                                    | Description                                                                                                        | Value    |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------- |
-| `agent.create`                                          | Specifies whether a CR for Agent should be created                                                                 | `true`   |
-| `agent.fluxninjaPlugin.enabled`                         | Boolean flag for enabling FluxNinja cloud connection from Agent                                                    | `false`  |
-| `agent.fluxninjaPlugin.endpoint`                        | FluxNinja cloud instance endpoint                                                                                  | `nil`    |
-| `agent.fluxninjaPlugin.heartbeatsInterval`              | specifies how often to send heartbeats to the cloud. Defaults to '30s'.                                            | `nil`    |
-| `agent.fluxninjaPlugin.tls.insecure`                    | specifies whether to communicate with FluxNinja cloud over TLS or in plain text. Defaults to false.                | `nil`    |
-| `agent.fluxninjaPlugin.tls.insecureSkipVerify`          | specifies whether to verify FluxNinja cloud certificate. Defaults to false.                                        | `nil`    |
-| `agent.fluxninjaPlugin.tls.caFile`                      | specifies an alternative CA certificates bundle to use to validate FluxNinja cloud certificate                     | `nil`    |
-| `agent.fluxninjaPlugin.apiKeySecret.create`             | Whether to create Kubernetes Secret with provided Agent API Key.                                                   | `true`   |
-| `agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.name`  | specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey     | `nil`    |
-| `agent.fluxninjaPlugin.apiKeySecret.secretKeyRef.key`   | specifies which key from the Secret for Agent API Key to use                                                       | `apiKey` |
-| `agent.fluxninjaPlugin.apiKeySecret.value`              | API Key to use when creating a new Agent API Key Secret                                                            | `nil`    |
-| `agent.image.registry`                                  | Agent image registry. Defaults to 'docker.io/fluxninja'.                                                           | `nil`    |
-| `agent.image.repository`                                | Agent image repository. Defaults to 'aperture-agent'.                                                              | `nil`    |
-| `agent.image.tag`                                       | Agent image tag (immutable tags are recommended). Defaults to 'latest'.                                            | `nil`    |
-| `agent.image.pullPolicy`                                | Agent image pull policy. Defaults to 'IfNotPresent'.                                                               | `nil`    |
-| `agent.image.pullSecrets`                               | Agent image pull secrets                                                                                           | `[]`     |
-| `agent.serverPort`                                      | The Agent's server port. Defaults to 80.                                                                           | `nil`    |
-| `agent.distributedCachePort`                            | The Agent's distributed cache service. Defaults to 3320.                                                           | `nil`    |
-| `agent.memberListPort`                                  | The Agent's member list service. Defaults to 3322.                                                                 | `nil`    |
-| `agent.log.prettyConsole`                               | Additional log writer: pretty console (stdout) logging (not recommended for prod environments). Defaults to false. | `nil`    |
-| `agent.log.nonBlocking`                                 | Use non-blocking log writer (can lose logs at high throughput). Defaults to True.                                  | `nil`    |
-| `agent.log.level`                                       | Log level. Keywords allowed - ["debug", "info", "warn", "fatal", "panic", "trace"]. Defaults to 'info'.            | `nil`    |
-| `agent.log.file`                                        | Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. Defaults to 'stderr'.                    | `nil`    |
-| `agent.agentGroup`                                      | Agent Group name. Defaults to 'default' Agent group                                                                | `nil`    |
-| `agent.serviceAccount.create`                           | Specifies whether a ServiceAccount should be created                                                               | `true`   |
-| `agent.serviceAccount.annotations`                      | Additional Service Account annotations (evaluated as a template)                                                   | `{}`     |
-| `agent.serviceAccount.automountServiceAccountToken`     | Automount service account token for the server service account. Defaults to true                                   | `nil`    |
-| `agent.livenessProbe.enabled`                           | Enable livenessProbe on Agent containers                                                                           | `true`   |
-| `agent.livenessProbe.initialDelaySeconds`               | Initial delay seconds for livenessProbe. Defaults to 15.                                                           | `nil`    |
-| `agent.livenessProbe.periodSeconds`                     | Period seconds for livenessProbe. Defaults to 15.                                                                  | `nil`    |
-| `agent.livenessProbe.timeoutSeconds`                    | Timeout seconds for livenessProbe. Defaults to 5.                                                                  | `nil`    |
-| `agent.livenessProbe.failureThreshold`                  | Failure threshold for livenessProbe. Defaults to 6.                                                                | `nil`    |
-| `agent.livenessProbe.successThreshold`                  | Success threshold for livenessProbe. Defaults to 1.                                                                | `nil`    |
-| `agent.readinessProbe.enabled`                          | Enable readinessProbe on Agent containers                                                                          | `true`   |
-| `agent.readinessProbe.initialDelaySeconds`              | Initial delay seconds for readinessProbe. Defaults to 15.                                                          | `nil`    |
-| `agent.readinessProbe.periodSeconds`                    | Period seconds for readinessProbe. Defaults to 15.                                                                 | `nil`    |
-| `agent.readinessProbe.timeoutSeconds`                   | Timeout seconds for readinessProbe. Defaults to 5.                                                                 | `nil`    |
-| `agent.readinessProbe.failureThreshold`                 | Failure threshold for readinessProbe. Defaults to 6.                                                               | `nil`    |
-| `agent.readinessProbe.successThreshold`                 | Success threshold for readinessProbe. Defaults to 1.                                                               | `nil`    |
-| `agent.customLivenessProbe`                             | Custom livenessProbe that overrides the default one                                                                | `{}`     |
-| `agent.customReadinessProbe`                            | Custom readinessProbe that overrides the default one                                                               | `{}`     |
-| `agent.resources.limits`                                | The resources limits for the Agent containers                                                                      | `{}`     |
-| `agent.resources.requests`                              | The requested resources for the Agent containers                                                                   | `{}`     |
-| `agent.podSecurityContext.enabled`                      | Enabled Agent pods' Security Context                                                                               | `false`  |
-| `agent.podSecurityContext.fsGroup`                      | Set Agent pod's Security Context fsGroup. Defaults to 1001.                                                        | `nil`    |
-| `agent.containerSecurityContext.enabled`                | Enabled Agent containers' Security Context. Defaults to false.                                                     | `false`  |
-| `agent.containerSecurityContext.runAsUser`              | Set Agent containers' Security Context runAsUser. Defaults to 1001.                                                | `nil`    |
-| `agent.containerSecurityContext.runAsNonRoot`           | Set Agent containers' Security Context runAsNonRoot. Defaults to false.                                            | `nil`    |
-| `agent.containerSecurityContext.readOnlyRootFilesystem` | Set Agent containers' Security Context runAsNonRoot. Defaults to false.                                            | `nil`    |
-| `agent.command`                                         | Override default container command (useful when using custom images)                                               | `[]`     |
-| `agent.args`                                            | Override default container args (useful when using custom images)                                                  | `[]`     |
-| `agent.podLabels`                                       | Extra labels for Agent pods                                                                                        | `{}`     |
-| `agent.podAnnotations`                                  | Annotations for Agent pods                                                                                         | `{}`     |
-| `agent.affinity`                                        | Affinity for Agent pods assignment                                                                                 | `{}`     |
-| `agent.nodeSelector`                                    | Node labels for Agent pods assignment                                                                              | `{}`     |
-| `agent.tolerations`                                     | Tolerations for Agent pods assignment                                                                              | `[]`     |
-| `agent.terminationGracePeriodSeconds`                   | configures how long kubelet gives Agent chart to terminate cleanly                                                 | `nil`    |
-| `agent.lifecycleHooks`                                  | for the Agent container(s) to automate configuration before or after startup                                       | `{}`     |
-| `agent.extraEnvVars`                                    | Array with extra environment variables to add to Agent nodes                                                       | `[]`     |
-| `agent.extraEnvVarsCM`                                  | Name of existing ConfigMap containing extra env vars for Agent nodes                                               | `""`     |
-| `agent.extraEnvVarsSecret`                              | Name of existing Secret containing extra env vars for Agent nodes                                                  | `""`     |
-| `agent.extraVolumes`                                    | Optionally specify extra list of additional volumes for the Agent pod(s)                                           | `[]`     |
-| `agent.extraVolumeMounts`                               | Optionally specify extra list of additional volumeMounts for the Agent container(s)                                | `[]`     |
-| `agent.sidecars`                                        | Add additional sidecar containers to the Agent pod(s)                                                              | `[]`     |
-| `agent.initContainers`                                  | Add additional init containers to the Agent pod(s)                                                                 | `[]`     |
-| `agent.service.annotations`                             | Additional custom annotations for Agent service                                                                    | `{}`     |
-| `agent.sidecar.enabled`                                 | Enables sidecar mode for the Agent                                                                                 | `false`  |
-| `agent.sidecar.enableNamespacesByDefault`               | List of namespaces in which sidecar injection will be enabled when Sidecar mode is enabled.                        | `[]`     |
-| `agent.etcd.endpoints`                                  | List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty.                             | `[]`     |
-| `agent.etcd.leaseTtl`                                   | Lease time-to-live.                                                                                                | `60s`    |
-| `agent.prometheus.address`                              | specifies the address of the Prometheus server. This must not be empty.                                            | `nil`    |
-| `agent.otelConfig.grpcAddr`                             | GRPC listener addr for OTEL Collector. Defaults to ":4317"                                                         | `nil`    |
-| `agent.otelConfig.httpAddr`                             | HTTP listener addr for OTEL Collector. Defaults to ":4318"                                                         | `nil`    |
-| `agent.otelConfig.batchPrerollup.sendBatchSize`         | SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".             | `nil`    |
-| `agent.otelConfig.batchPrerollup.timeout`               | Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".                       | `nil`    |
-| `agent.otelConfig.batchPostrollup.sendBatchSize`        | SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".             | `nil`    |
-| `agent.otelConfig.batchPostrollup.timeout`              | Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".                       | `nil`    |
+| Name                                                    | Description                                                                                                    | Value    |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------- |
+| `agent.create`                                          | Specifies whether a CR for Agent should be created                                                             | `true`   |
+| `agent.image.registry`                                  | Agent image registry. Defaults to 'docker.io/fluxninja'.                                                       | `nil`    |
+| `agent.image.repository`                                | Agent image repository. Defaults to 'aperture-agent'.                                                          | `nil`    |
+| `agent.image.tag`                                       | Agent image tag (immutable tags are recommended). Defaults to 'latest'.                                        | `nil`    |
+| `agent.image.pullPolicy`                                | Agent image pull policy. Defaults to 'IfNotPresent'.                                                           | `nil`    |
+| `agent.image.pullSecrets`                               | Agent image pull secrets                                                                                       | `[]`     |
+| `agent.service.annotations`                             | Additional custom annotations for Agent service                                                                | `{}`     |
+| `agent.serviceAccount.create`                           | Specifies whether a ServiceAccount should be created                                                           | `true`   |
+| `agent.serviceAccount.annotations`                      | Additional Service Account annotations (evaluated as a template)                                               | `{}`     |
+| `agent.serviceAccount.automountServiceAccountToken`     | Automount service account token for the server service account. Defaults to true                               | `nil`    |
+| `agent.livenessProbe.enabled`                           | Enable livenessProbe on Agent containers                                                                       | `true`   |
+| `agent.livenessProbe.initialDelaySeconds`               | Initial delay seconds for livenessProbe. Defaults to 15.                                                       | `nil`    |
+| `agent.livenessProbe.periodSeconds`                     | Period seconds for livenessProbe. Defaults to 15.                                                              | `nil`    |
+| `agent.livenessProbe.timeoutSeconds`                    | Timeout seconds for livenessProbe. Defaults to 5.                                                              | `nil`    |
+| `agent.livenessProbe.failureThreshold`                  | Failure threshold for livenessProbe. Defaults to 6.                                                            | `nil`    |
+| `agent.livenessProbe.successThreshold`                  | Success threshold for livenessProbe. Defaults to 1.                                                            | `nil`    |
+| `agent.readinessProbe.enabled`                          | Enable readinessProbe on Agent containers                                                                      | `true`   |
+| `agent.readinessProbe.initialDelaySeconds`              | Initial delay seconds for readinessProbe. Defaults to 15.                                                      | `nil`    |
+| `agent.readinessProbe.periodSeconds`                    | Period seconds for readinessProbe. Defaults to 15.                                                             | `nil`    |
+| `agent.readinessProbe.timeoutSeconds`                   | Timeout seconds for readinessProbe. Defaults to 5.                                                             | `nil`    |
+| `agent.readinessProbe.failureThreshold`                 | Failure threshold for readinessProbe. Defaults to 6.                                                           | `nil`    |
+| `agent.readinessProbe.successThreshold`                 | Success threshold for readinessProbe. Defaults to 1.                                                           | `nil`    |
+| `agent.customLivenessProbe`                             | Custom livenessProbe that overrides the default one                                                            | `{}`     |
+| `agent.customReadinessProbe`                            | Custom readinessProbe that overrides the default one                                                           | `{}`     |
+| `agent.resources.limits`                                | The resources limits for the Agent containers                                                                  | `{}`     |
+| `agent.resources.requests`                              | The requested resources for the Agent containers                                                               | `{}`     |
+| `agent.podSecurityContext.enabled`                      | Enabled Agent pods' Security Context                                                                           | `false`  |
+| `agent.podSecurityContext.fsGroup`                      | Set Agent pod's Security Context fsGroup. Defaults to 1001.                                                    | `nil`    |
+| `agent.containerSecurityContext.enabled`                | Enabled Agent containers' Security Context. Defaults to false.                                                 | `false`  |
+| `agent.containerSecurityContext.runAsUser`              | Set Agent containers' Security Context runAsUser. Defaults to 1001.                                            | `nil`    |
+| `agent.containerSecurityContext.runAsNonRoot`           | Set Agent containers' Security Context runAsNonRoot. Defaults to false.                                        | `nil`    |
+| `agent.containerSecurityContext.readOnlyRootFilesystem` | Set Agent containers' Security Context runAsNonRoot. Defaults to false.                                        | `nil`    |
+| `agent.command`                                         | Override default container command (useful when using custom images)                                           | `[]`     |
+| `agent.args`                                            | Override default container args (useful when using custom images)                                              | `[]`     |
+| `agent.podLabels`                                       | Extra labels for Agent pods                                                                                    | `{}`     |
+| `agent.podAnnotations`                                  | Annotations for Agent pods                                                                                     | `{}`     |
+| `agent.affinity`                                        | Affinity for Agent pods assignment                                                                             | `{}`     |
+| `agent.nodeSelector`                                    | Node labels for Agent pods assignment                                                                          | `{}`     |
+| `agent.tolerations`                                     | Tolerations for Agent pods assignment                                                                          | `[]`     |
+| `agent.terminationGracePeriodSeconds`                   | configures how long kubelet gives Agent chart to terminate cleanly                                             | `nil`    |
+| `agent.lifecycleHooks`                                  | for the Agent container(s) to automate configuration before or after startup                                   | `{}`     |
+| `agent.extraEnvVars`                                    | Array with extra environment variables to add to Agent nodes                                                   | `[]`     |
+| `agent.extraEnvVarsCM`                                  | Name of existing ConfigMap containing extra env vars for Agent nodes                                           | `""`     |
+| `agent.extraEnvVarsSecret`                              | Name of existing Secret containing extra env vars for Agent nodes                                              | `""`     |
+| `agent.extraVolumes`                                    | Optionally specify extra list of additional volumes for the Agent pod(s)                                       | `[]`     |
+| `agent.extraVolumeMounts`                               | Optionally specify extra list of additional volumeMounts for the Agent container(s)                            | `[]`     |
+| `agent.sidecars`                                        | Add additional sidecar containers to the Agent pod(s)                                                          | `[]`     |
+| `agent.initContainers`                                  | Add additional init containers to the Agent pod(s)                                                             | `[]`     |
+| `agent.secrets.fluxninjaPlugin.create`                  | Whether to create Kubernetes Secret with provided Agent API Key.                                               | `false`  |
+| `agent.secrets.fluxninjaPlugin.secretKeyRef.name`       | specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey | `nil`    |
+| `agent.secrets.fluxninjaPlugin.secretKeyRef.key`        | specifies which key from the Secret for Agent API Key to use                                                   | `apiKey` |
+| `agent.secrets.fluxninjaPlugin.value`                   | API Key to use when creating a new Agent API Key Secret                                                        | `nil`    |
+| `agent.sidecar.enabled`                                 | Enables sidecar mode for the Agent                                                                             | `false`  |
+| `agent.sidecar.enableNamespacesByDefault`               | List of namespaces in which sidecar injection will be enabled when Sidecar mode is enabled.                    | `[]`     |
+| `agent.config.etcd.endpoints`                           | List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty.                         | `[]`     |
+| `agent.config.etcd.leaseTtl`                            | Lease time-to-live.                                                                                            | `60s`    |
+| `agent.config.prometheus.address`                       | specifies the address of the Prometheus server. This must not be empty.                                        | `nil`    |
 
 

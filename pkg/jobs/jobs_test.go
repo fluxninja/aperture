@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
@@ -24,15 +23,9 @@ var (
 	jws           JobWatchers
 	gws           GroupWatchers
 	jobConfig     = JobConfig{ // Job configuration can be manipulated in each test to test different scenarios, no need to create new job config for each test
-		InitialDelay: config.Duration{
-			Duration: durationpb.New(time.Second * 0),
-		},
-		ExecutionPeriod: config.Duration{
-			Duration: durationpb.New(time.Millisecond * 200),
-		},
-		ExecutionTimeout: config.Duration{
-			Duration: durationpb.New(time.Millisecond * 200),
-		},
+		InitialDelay:     config.MakeDuration(0),
+		ExecutionPeriod:  config.MakeDuration(time.Millisecond * 200),
+		ExecutionTimeout: config.MakeDuration(time.Millisecond * 200),
 		InitiallyHealthy: false,
 	}
 	registry = status.NewRegistry().Child("jobs")
@@ -162,9 +155,7 @@ func TestInstantRunJob(t *testing.T) {
 // TestTimeoutJob tests the liveness of the job, when the job is stuck.
 func TestTimeoutJob(t *testing.T) {
 	var counter int32
-	jobConfig.InitialDelay = config.Duration{
-		Duration: durationpb.New(time.Millisecond * 100),
-	}
+	jobConfig.InitialDelay = config.MakeDuration(time.Millisecond * 100)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "timeout-job",
@@ -198,9 +189,7 @@ func TestTimeoutJob(t *testing.T) {
 func TestMultiJobRun(t *testing.T) {
 	var counter int32
 	var counter2 int32
-	jobConfig.InitialDelay = config.Duration{
-		Duration: durationpb.New(time.Second * 0),
-	}
+	jobConfig.InitialDelay = config.MakeDuration(0)
 	multiJob := NewMultiJob("multi-job", false, jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{

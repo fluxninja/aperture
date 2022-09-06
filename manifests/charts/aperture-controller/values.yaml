@@ -323,31 +323,6 @@ controller:
   ## @skip controller.createUninstallHook Specifies whether to create the Job for for graceful termination of Controller CR and operator.
   ##
   createUninstallHook: true
-  ## @param controller.fluxninjaPlugin.enabled Boolean flag for enabling FluxNinja cloud connection from Controller
-  ## @param controller.fluxninjaPlugin.endpoint FluxNinja cloud instance endpoint
-  ## @param controller.fluxninjaPlugin.heartbeatsInterval specifies how often to send heartbeats to the cloud. Defaults to '30s'.
-  ## @param controller.fluxninjaPlugin.tls.insecure specifies whether to communicate with FluxNinja cloud over TLS or in plain text. Defaults to false.
-  ## @param controller.fluxninjaPlugin.tls.insecureSkipVerify specifies whether to verify FluxNinja cloud certificate. Defaults to false.
-  ## @param controller.fluxninjaPlugin.tls.caFile specifies an alternative CA certificates bundle to use to validate FluxNinja cloud certificate
-  ## @param controller.fluxninjaPlugin.apiKeySecret.create Whether to create Kubernetes Secret with provided Controller API Key.
-  ## @param controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.name specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey
-  ## @param controller.fluxninjaPlugin.apiKeySecret.secretKeyRef.key specifies which key from the Secret for Controller API Key to use
-  ## @param controller.fluxninjaPlugin.apiKeySecret.value API Key to use when creating a new Controller API Key Secret
-  ##
-  fluxninjaPlugin:
-    enabled: false
-    endpoint: ~
-    heartbeatsInterval: ~
-    tls:
-      insecure: ~
-      insecureSkipVerify: ~
-      caFile: ~
-    apiKeySecret:
-      create: true
-      secretKeyRef:
-        name: ~
-        key: apiKey
-      value: ~
   ## @param controller.image.registry Controller image registry. Defaults to 'docker.io/fluxninja'.
   ## @param controller.image.repository Controller image repository. Defaults to 'aperture-controller'.
   ## @param controller.image.tag Controller image tag (immutable tags are recommended). Defaults to 'latest'.
@@ -371,23 +346,12 @@ controller:
     ##   - myRegistryKeySecretName
     ##
     pullSecrets: []
-  ## @param controller.serverPort The Controller's server port. Defaults to 80.
+  ## Controller service parameters
   ##
-  serverPort: ~
-  ## @param controller.hostAliases Add deployment host aliases for Controller deployment
-  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
-  ##
-  hostAliases: []
-  ## @param controller.log.prettyConsole Additional log writer: pretty console (stdout) logging (not recommended for prod environments). Defaults to false.
-  ## @param controller.log.nonBlocking Use non-blocking log writer (can lose logs at high throughput). Defaults to True.
-  ## @param controller.log.level Log level. Keywords allowed - ["debug", "info", "warn", "fatal", "panic", "trace"]. Defaults to 'info'.
-  ## @param controller.log.file Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. Defaults to 'stderr'.
-  ##
-  log:
-    prettyConsole: ~
-    nonBlocking: ~
-    level: ~
-    file: ~
+  service:
+    ## @param controller.service.annotations Additional custom annotations for Controller service
+    ##
+    annotations: {}
   ## @param controller.serviceAccount.create Specifies whether a ServiceAccount should be created
   ## @param controller.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
   ## @param controller.serviceAccount.automountServiceAccountToken Automount service account token for the server service account. Defaults to true
@@ -396,6 +360,10 @@ controller:
     create: true
     annotations: {}
     automountServiceAccountToken: ~
+  ## @param controller.hostAliases Add deployment host aliases for Controller deployment
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
   ## Configure extra options for Controller containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param controller.livenessProbe.enabled Enable livenessProbe on Controller containers
@@ -530,53 +498,34 @@ controller:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-  ## Controller service parameters
+  ## Controller API secret for FluxNinja cloud connection
+  ## @param controller.secrets.fluxninjaPlugin.create Whether to create Kubernetes Secret with provided Controller API Key.
+  ## @param controller.secrets.fluxninjaPlugin.secretKeyRef.name specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey
+  ## @param controller.secrets.fluxninjaPlugin.secretKeyRef.key specifies which key from the Secret for Controller API Key to use
+  ## @param controller.secrets.fluxninjaPlugin.value API Key to use when creating a new Controller API Key Secret
   ##
-  service:
-    ## @param controller.service.annotations Additional custom annotations for Controller service
-    ##
-    annotations: {}
-  ## Sidecar parameters
+  secrets:
+    fluxninjaPlugin:
+      create: false
+      secretKeyRef:
+        name: ~
+        key: apiKey
+      value: ~
+  ## Controller Configuration: All the available configuration parameters can be found at https://github.com/fluxninja/aperture/blob/main/docs/gen/config/aperture-controller/swagger.md.
   ##
-  sidecar:
-    ## @param controller.sidecar.enabled Enables sidecar mode for the Controller
+  config:
+    ## Etcd parameters for Controller
+    ## @param controller.config.etcd.endpoints List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty.
+    ## @param controller.config.etcd.leaseTtl Lease time-to-live.
     ##
-    enabled: false
-    ## @param controller.sidecar.enableNamespacesByDefault List of namespaces in which sidecar injection will be enabled when Sidecar mode is enabled.
+    etcd:
+      endpoints: []
+      leaseTtl: 60s
+    ## Prometheus parameters for Controller
+    ## @param controller.config.prometheus.address specifies the address of the Prometheus server. This must not be empty.
     ##
-    enableNamespacesByDefault: []
-  ## Etcd parameters for Controller
-  ## @param controller.etcd.endpoints List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty when etcd is not craeted by this chart (i.e. etcd.enabled is set to false).
-  ## @param controller.etcd.leaseTtl Lease time-to-live.
-  ##
-  etcd:
-    endpoints: []
-    leaseTtl: 60s
-  ## Prometheus parameters for Controller
-  ## @param controller.prometheus.address specifies the address of the Prometheus server. This must not be empty when prometheus is not created by this chart (i.e. prometheus.enabled is set to false).
-  ##
-  prometheus:
-    address: ~
-  ## otelConfig is the configuration for the OTEL collector
-  otelConfig:
-    ## @param controller.otelConfig.grpcAddr GRPC listener addr for OTEL Collector. Defaults to ":4317"
-    ##
-    grpcAddr: ~
-    ## @param controller.otelConfig.httpAddr HTTP listener addr for OTEL Collector. Defaults to ":4318"
-    ##
-    httpAddr: ~
-    ## @param controller.otelConfig.batchPrerollup.sendBatchSize SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".
-    ## @param controller.otelConfig.batchPrerollup.timeout Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".
-    ##
-    batchPrerollup:
-      sendBatchSize: ~
-      timeout: ~
-    ## @param controller.otelConfig.batchPostrollup.sendBatchSize SendBatchSize is the size of a batch which after hit, will trigger it to be sent. Defaults to "10000".
-    ## @param controller.otelConfig.batchPostrollup.timeout Timeout sets the time after which a batch will be sent regardless of size. Defaults to "1s".
-    ##
-    batchPostrollup:
-      sendBatchSize: ~
-      timeout: ~
+    prometheus:
+      address: ~
 
 ## @section etcd
 ## @param etcd.enabled Whether to deploy a small etcd cluster as part of this chart

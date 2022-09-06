@@ -41,15 +41,23 @@ func Module() fx.Option {
 
 // DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
 // swagger:model
+// +kubebuilder:object:generate=true
 type DistCacheConfig struct {
 	// BindAddr denotes the address that Olric will bind to for communication with other Olric nodes.
-	BindAddr string `json:"bind_addr" default:":3320" validate:"hostname_port"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=":3320"
+	BindAddr string `json:"bind_addr,omitempty" default:":3320" validate:"hostname_port"`
 	// ReplicaCount is 1 by default.
-	ReplicaCount int `json:"replica_count" default:"1"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=1
+	ReplicaCount int `json:"replica_count,omitempty" default:"1"`
 	// Address to bind mememberlist server to.
-	MemberlistConfigBindAddr string `json:"memberlist_config_bind_addr" default:":3322" validate:"hostname_port"`
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=":3322"
+	MemberlistBindAddr string `json:"memberlist_bind_addr,omitempty" default:":3322" validate:"hostname_port"`
 	// Address of memberlist to advertise to other cluster members. Used for nat traversal if provided.
-	MemberlistConfigAdvertiseAddr string `json:"memberlist_config_advertise_addr" validate:"omitempty,hostname_port"`
+	//+kubebuilder:validation:Optional
+	MemberlistAdvertiseAddr string `json:"memberlist_advertise_addr,omitempty" validate:"omitempty,hostname_port"`
 }
 
 // DistCache wraps an Olric instance along with its config for further reference.
@@ -123,7 +131,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	oc.BindAddr = bindAddr
 	oc.BindPort = bindPort
 
-	memberlistBindAddr, p, err := net.SplitHostPort(config.MemberlistConfigBindAddr)
+	memberlistBindAddr, p, err := net.SplitHostPort(config.MemberlistBindAddr)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to split memberlist bind address")
 		return nil, err
@@ -137,8 +145,8 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	oc.MemberlistConfig.BindPort = memberlistBindPort
 	memberlistAddr := oc.MemberlistConfig.BindAddr + ":" + strconv.Itoa(oc.MemberlistConfig.BindPort)
 
-	if config.MemberlistConfigAdvertiseAddr != "" {
-		advertiseAddr, p, e := net.SplitHostPort(config.MemberlistConfigAdvertiseAddr)
+	if config.MemberlistAdvertiseAddr != "" {
+		advertiseAddr, p, e := net.SplitHostPort(config.MemberlistAdvertiseAddr)
 		if e != nil {
 			log.Error().Err(e).Msg("Unable to split memberlist advertise address")
 			return nil, e
@@ -146,7 +154,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		advertisePort, _ := strconv.Atoi(p)
 		oc.MemberlistConfig.AdvertiseAddr = advertiseAddr
 		oc.MemberlistConfig.AdvertisePort = advertisePort
-		memberlistAddr = config.MemberlistConfigAdvertiseAddr
+		memberlistAddr = config.MemberlistAdvertiseAddr
 	}
 
 	in.PeerDiscovery.RegisterService(olricMemberlistServiceName, memberlistAddr)

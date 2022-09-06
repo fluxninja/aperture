@@ -28,44 +28,87 @@ type ClientConstructor struct {
 
 // HTTPClientConfig holds configuration for HTTP Client.
 // swagger:model
+// +kubebuilder:object:generate=true
 type HTTPClientConfig struct {
 	// Network level keep-alive duration
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="30s"
 	NetworkKeepAlive config.Duration `json:"network_keep_alive" validate:"gte=0s" default:"30s"`
 	// Timeout for making network connection
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="30s"
 	NetworkTimeout config.Duration `json:"network_timeout" validate:"gte=0s" default:"30s"`
 	// HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="60s"
 	Timeout config.Duration `json:"timeout" validate:"gte=0s" default:"60s"`
 	// Proxy Connect Header - map[string][]string
-	ProxyConnectHeader http.Header `json:"proxy_connect_header"`
+	//+kubebuilder:validation:Optional
+	ProxyConnectHeader http.Header `json:"proxy_connect_header,omitempty"`
 	// TLS Handshake Timeout. 0 = no timeout
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="10s"
 	TLSHandshakeTimeout config.Duration `json:"tls_handshake_timeout" validate:"gte=0s" default:"10s"`
 	// Expect Continue Timeout. 0 = no timeout.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="1s"
 	ExpectContinueTimeout config.Duration `json:"expect_continue_timeout" validate:"gte=0s" default:"1s"`
 	// Response Header Timeout. 0 = no timeout.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="0s"
 	ResponseHeaderTimeout config.Duration `json:"response_header_timeout" validate:"gte=0s" default:"0s"`
 	// Idle Connection Timeout. 0 = no timeout.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:="90s"
 	IdleConnTimeout config.Duration `json:"idle_connection_timeout" validate:"gte=0s" default:"90s"`
 	// SSL key log file (useful for debugging with wireshark)
-	KeyLogWriter string `json:"key_log_file" validate:"omitempty,file"`
+	//+kubebuilder:validation:Optional
+	KeyLogWriter string `json:"key_log_file,omitempty" validate:"omitempty,file"`
 	// Client TLS configuration
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={insecure_skip_verify:false}
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
 	// Max Idle Connections per host. 0 = no limit.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=5
+	//+kubebuilder:validation:Minimum:=0
 	MaxIdleConnsPerHost int `json:"max_idle_connections_per_host" validate:"gte=0" default:"5"`
 	// Max Idle Connections. 0 = no limit.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=100
+	//+kubebuilder:validation:Minimum:=0
 	MaxIdleConns int `json:"max_idle_connections" validate:"gte=0" default:"100"`
 	// Max Connections Per Host. 0 = no limit.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=0
+	//+kubebuilder:validation:Minimum:=0
 	MaxConnsPerHost int `json:"max_conns_per_host" validate:"gte=0" default:"0"`
 	// Max Response Header Bytes. 0 = no limit.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=0
+	//+kubebuilder:validation:Minimum:=0
 	MaxResponseHeaderBytes int64 `json:"max_response_header_bytes" validate:"gte=0" default:"0"`
 	// Write Buffer Size. 0 = 4KB.
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=0
+	//+kubebuilder:validation:Minimum:=0
 	WriteBufferSize int `json:"write_buffer_size" validate:"gte=0" default:"0"`
 	// Read Buffer Size. 0 = 4KB
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=0
+	//+kubebuilder:validation:Minimum:=0
 	ReadBufferSize int `json:"read_buffer_size" validate:"gte=0" default:"0"`
 	// Disable Compression
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
 	DisableCompression bool `json:"disable_compression" default:"false"`
 	// Use Proxy
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
 	UseProxy bool `json:"use_proxy" default:"false"`
 	// Disable HTTP Keep Alives
+	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:=false
 	DisableKeepAlives bool `json:"disable_keep_alives" default:"false"`
 }
 
@@ -103,18 +146,18 @@ func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmar
 	transport := &http.Transport{
 		TLSClientConfig: tlsConfig,
 		DialContext: (&net.Dialer{
-			Timeout:   config.NetworkTimeout.Duration.AsDuration(),
-			KeepAlive: config.NetworkKeepAlive.Duration.AsDuration(),
+			Timeout:   config.NetworkTimeout.AsDuration(),
+			KeepAlive: config.NetworkKeepAlive.AsDuration(),
 		}).DialContext,
-		TLSHandshakeTimeout:    config.TLSHandshakeTimeout.Duration.AsDuration(),
+		TLSHandshakeTimeout:    config.TLSHandshakeTimeout.AsDuration(),
 		DisableKeepAlives:      config.DisableKeepAlives,
 		DisableCompression:     config.DisableCompression,
 		MaxIdleConns:           config.MaxIdleConns,
 		MaxIdleConnsPerHost:    config.MaxIdleConnsPerHost,
 		MaxConnsPerHost:        config.MaxConnsPerHost,
-		IdleConnTimeout:        config.IdleConnTimeout.Duration.AsDuration(),
-		ResponseHeaderTimeout:  config.ResponseHeaderTimeout.Duration.AsDuration(),
-		ExpectContinueTimeout:  config.ExpectContinueTimeout.Duration.AsDuration(),
+		IdleConnTimeout:        config.IdleConnTimeout.AsDuration(),
+		ResponseHeaderTimeout:  config.ResponseHeaderTimeout.AsDuration(),
+		ExpectContinueTimeout:  config.ExpectContinueTimeout.AsDuration(),
 		ProxyConnectHeader:     config.ProxyConnectHeader,
 		MaxResponseHeaderBytes: config.MaxResponseHeaderBytes,
 		WriteBufferSize:        config.WriteBufferSize,
@@ -127,7 +170,7 @@ func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmar
 
 	client := &http.Client{
 		Transport: transport,
-		Timeout:   config.Timeout.Duration.AsDuration(),
+		Timeout:   config.Timeout.AsDuration(),
 	}
 
 	// return a middleware chain -- call invokes on this object to chain middleware functions

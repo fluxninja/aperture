@@ -18,28 +18,37 @@ const (
 
 // EntityConfig describes a single entity.
 // swagger:model
+// +kubebuilder:object:generate=true
 type EntityConfig struct {
 	// IP address of the entity.
-	IPAddress string `json:"ip_address" validate:"required,ip"`
+	//+kubebuilder:validation:Optional
+	IPAddress string `json:"ip_address,omitempty" validate:"required,ip"`
 	// UID of the entity.
-	UID string `json:"uid"`
+	//+kubebuilder:validation:Optional
+	UID string `json:"uid,omitempty"`
 	// Name of the entity.
-	Name string `json:"name"`
+	//+kubebuilder:validation:Optional
+	Name string `json:"name,omitempty"`
 }
 
 // ServiceConfig describes a service and its entities.
 // swagger:model
+// +kubebuilder:object:generate=true
 type ServiceConfig struct {
 	// Name of the service.
+	//+kubebuilder:validation:Optional
 	Name string `json:"name" validate:"required"`
 	// Entities of the service.
+	//+kubebuilder:validation:Optional
 	Entities []*EntityConfig `json:"entities"`
 }
 
 // StaticDiscoveryConfig for pre-determined list of services.
 // swagger:model
+// +kubebuilder:object:generate=true
 type StaticDiscoveryConfig struct {
 	// Services list.
+	//+kubebuilder:validation:Optional
 	Services []*ServiceConfig `json:"services"`
 }
 

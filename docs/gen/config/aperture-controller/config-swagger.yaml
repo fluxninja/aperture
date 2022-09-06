@@ -63,7 +63,7 @@ definitions:
     title: BackoffConfig holds configuration for GRPC Client Backoff.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
-  Batch:
+  BatchConfig:
     properties:
       send_batch_size:
         description: SendBatchSize is the size of a batch which after hit, will trigger
@@ -81,7 +81,7 @@ definitions:
         x-go-default: 1s
         x-go-name: Timeout
         x-go-validate: gt=0
-    title: Batch defines configuration for OTEL batch processor.
+    title: BatchConfig defines configuration for OTEL batch processor.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otel
   ClientTLSConfig:
@@ -122,7 +122,7 @@ definitions:
           type: string
         type: array
         x-go-name: Endpoints
-        x-go-validate: dive,hostname_port|url|fqdn
+        x-go-validate: gt=0,dive,hostname_port|url|fqdn
       lease_ttl:
         description: Lease time-to-live
         format: string
@@ -511,8 +511,8 @@ definitions:
         x-go-default: "false"
         x-go-name: Compress
       file:
-        description: Output file for logs. Keywords allowed - ["stderr", "stderr",
-          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+        description: Output file for logs. Keywords allowed - ["stderr", "default"].
+          "default" maps to `/var/log/fluxninja/<service>.log`
         type: string
         x-go-default: stderr
         x-go-name: File
@@ -573,8 +573,8 @@ definitions:
         x-go-default: "false"
         x-go-name: Compress
       file:
-        description: Output file for logs. Keywords allowed - ["stderr", "stderr",
-          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+        description: Output file for logs. Keywords allowed - ["stderr", "default"].
+          "default" maps to `/var/log/fluxninja/<service>.log`
         type: string
         x-go-default: stderr
         x-go-name: File
@@ -664,9 +664,9 @@ definitions:
   OtelConfig:
     properties:
       batch_postrollup:
-        $ref: '#/definitions/Batch'
+        $ref: '#/definitions/BatchConfig'
       batch_prerollup:
-        $ref: '#/definitions/Batch'
+        $ref: '#/definitions/BatchConfig'
       grpc_addr:
         description: GRPC listener addr for OTEL Collector.
         type: string
@@ -682,18 +682,6 @@ definitions:
     title: OtelConfig is the configuration for the OTEL collector.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otel
-  PeerDiscoveryConfig:
-    properties:
-      advertisement_addr:
-        description: Network address of aperture server to advertise to peers - this
-          address should be reachable from other agents. Used for nat traversal when
-          provided.
-        type: string
-        x-go-name: AdvertisementAddr
-        x-go-validate: omitempty,hostname_port
-    title: PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/peers
   PluginsConfig:
     properties:
       disable_plugins:
@@ -760,7 +748,7 @@ definitions:
         description: Address of the prometheus server
         type: string
         x-go-name: Address
-        x-go-validate: hostname_port|url|fqdn
+        x-go-validate: required,hostname_port|url|fqdn
     title: PrometheusConfig holds configuration for Prometheus Server.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/prometheus
@@ -816,11 +804,11 @@ definitions:
         type: string
         x-go-name: ClientCA
         x-go-validate: omitempty
-      enable:
-        description: Enable TLS
+      enabled:
+        description: Enabled TLS
         type: boolean
         x-go-default: "false"
-        x-go-name: Enable
+        x-go-name: Enabled
       server_cert:
         description: Server Cert file
         type: string
@@ -857,28 +845,6 @@ definitions:
     title: WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both
       algorithms are configured then only watermark algorithm is used.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/watchdog
-  WatchdogResult:
-    properties:
-      force_gc_took:
-        format: string
-        type: string
-        x-go-name: ForceGCTook
-      threshold:
-        format: uint64
-        type: integer
-        x-go-name: Threshold
-      total:
-        format: uint64
-        type: integer
-        x-go-name: Total
-      used:
-        format: uint64
-        type: integer
-        x-go-name: Used
-    title: Result holds the result of the Watchdog check.
-    type: object
-    x-go-name: Result
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
   WatermarksPolicy:
     properties:
@@ -922,18 +888,6 @@ paths:
         name: proxy
         schema:
           $ref: '#/definitions/ProxyConfig'
-      tags:
-      - common-configuration
-      x-fn-config-env: true
-  /controller:
-    post:
-      operationId: Controller
-      parameters:
-      - description: Directory containing policies rules
-        in: query
-        name: policies_path
-        type: string
-        x-go-default: /etc/aperture/aperture-controller/policies
       tags:
       - common-configuration
       x-fn-config-env: true
@@ -993,15 +947,6 @@ paths:
       tags:
       - common-configuration
       x-fn-config-env: true
-  /peer_discovery:
-    post:
-      operationId: PeerDiscovery
-      parameters:
-      - in: body
-        schema:
-          $ref: '#/definitions/PeerDiscoveryConfig'
-      tags:
-      - common-configuration
   /plugins:
     post:
       operationId: Plugins
@@ -1020,6 +965,11 @@ paths:
         name: promql_jobs_scheduler
         schema:
           $ref: '#/definitions/JobGroupConfig'
+      - description: Directory containing policies rules
+        in: query
+        name: policies_path
+        type: string
+        x-go-default: /etc/aperture/aperture-controller/policies
       tags:
       - common-configuration
       x-fn-config-env: true

@@ -3,7 +3,8 @@ kind: Agent
 metadata:
   name: agent-sample
 spec:
-  etcd:
-    endpoints: ["http://controller-etcd:2379"]
-  prometheus:
-    address: "http://controller-prometheus-server:80"
+  config:
+    etcd:
+      endpoints: ["http://controller-etcd:2379"]
+    prometheus:
+      address: "http://controller-prometheus-server:80"

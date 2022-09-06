@@ -14,8 +14,8 @@ Aperture comes with a pre-packaged list of policies and Grafana dashboards that
 can be used both as a guide for creating new policies, and as ready-to-use
 blueprints for configuring Aperture Agent behaviour.
 
-All dashboards and policies are written using the [Jsonnet][jsonnet-lang] language,
-and can be used both as jsonnet mixins or as standalone blueprints.
+All dashboards and policies are written using the [Jsonnet][jsonnet-lang]
+language, and can be used both as jsonnet mixins or as standalone blueprints.
 
 [jsonnet-lang]: https://jsonnet.org
 
@@ -23,14 +23,16 @@ and can be used both as jsonnet mixins or as standalone blueprints.
 
 All blueprints are available from a separate [repository][aperture-blueprints].
 See the repository [README.md][blueprints-readme] for the list of required tools
-and instructions on installing jsonnet dependencies with the help of a [jsonnet bundler][jb].
+and instructions on installing jsonnet dependencies with the help of a [jsonnet
+bundler][jb].
 
-The Blueprint Generator (used to generate JSON files from blueprints) also depends
-on Python 3.8+ and [jsonnet][go-jsonnet].
+The Blueprint Generator (used to generate JSON files from blueprints) also
+depends on Python 3.8+ and [jsonnet][go-jsonnet].
 
 [k8s-libsonnet]: https://github.com/jsonnet-libs/k8s-libsonnet
 [aperture-blueprints]: https://github.com/fluxninja/aperture-blueprints
-[blueprints-readme]: https://github.com/fluxninja/aperture-blueprints/blob/main/README.md
+[blueprints-readme]:
+  https://github.com/fluxninja/aperture-blueprints/blob/main/README.md
 [jb]: https://github.com/jsonnet-bundler/jsonnet-bundler
 [go-jsonnet]: https://github.com/google/go-jsonnet
 
@@ -65,8 +67,8 @@ saved and a path to a `config.libsonnet` file with local blueprint
 configuration. It also takes the BLUEPRINT argument, which is a path to the
 blueprint under the `blueprints/` directory.
 
-Under the `blueprints/` directory, the currently available blueprints can be found.
-Each blueprint consists of at least two files: `config.libsonnet` and
+Under the `blueprints/` directory, the currently available blueprints can be
+found. Each blueprint consists of at least two files: `config.libsonnet` and
 `main.libsonnet`. `main.libsonnet` bundles actual policy and dashboard code
 (available under `lib/1.0`) into blueprints, and `config.libsonnet` comes with
 the default configuration for the given policy. This can be overriden by the
@@ -74,9 +76,9 @@ the default configuration for the given policy. This can be overriden by the
 
 Custom configurations will be merged with blueprints' `config.libsonnet`
 resulting in the final configuration, according to jsonnet language rules: keys
-can be overwritten by reusing them in the custom configuration and nested objects
-can be merged by using `+:` operator. Check the `examples/` directory for more
-information.
+can be overwritten by reusing them in the custom configuration and nested
+objects can be merged by using `+:` operator. Check the `examples/` directory
+for more information.
 
 The full command using the demoapp-latency-grand example looks like this:
 
@@ -87,11 +89,13 @@ jb install
 
 ## Using aperture-blueprints as a jsonnet mixins library
 
-An alternate way of using the aperture-blueprints repository is to import it from
-another jsonnet project and render policies or dashboards directly in jsonnet.
+An alternate way of using the aperture-blueprints repository is to import it
+from another jsonnet project and render policies or dashboards directly in
+jsonnet.
 
-For example, to create a ConfigMap with Aperture policies that can be loaded
-by the controller, you need to install aperture-blueprints with the jsonnet bundler:
+For example, to create a ConfigMap with Aperture policies that can be loaded by
+the controller, you need to install aperture-blueprints with the jsonnet
+bundler:
 
 ```sh
 jb install github.com/fluxninja/aperture-blueprints@main

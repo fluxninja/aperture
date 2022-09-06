@@ -9,6 +9,7 @@ require (
 	github.com/buraksezer/olric v0.0.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cenkalti/backoff/v4 v4.1.3
+	github.com/clarketm/json v1.17.1
 	github.com/containerd/cgroups v1.0.4
 	github.com/eapache/queue v1.1.0
 	github.com/elastic/gmux v0.2.0
@@ -103,8 +104,8 @@ require (
 	golang.org/x/tools v0.1.12 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.24.2 // indirect
-	k8s.io/component-base v0.24.2 // indirect
+	k8s.io/apiextensions-apiserver v0.24.3 // indirect
+	k8s.io/component-base v0.24.3 // indirect
 )
 
 require (
@@ -298,7 +299,7 @@ require (
 	k8s.io/utils v0.0.0-20220728103510-ee6ede2d64ed
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
-	sigs.k8s.io/yaml v1.3.0 // indirect
+	sigs.k8s.io/yaml v1.3.0
 )
 
 exclude github.com/prometheus/prometheus v1.8.2
@@ -307,5 +308,5 @@ replace (
 	cloud.google.com/go => cloud.google.com/go v0.100.2
 	github.com/buraksezer/olric => github.com/fluxninja/olric v0.4.5-fn-patch.3
 	github.com/go-openapi/analysis => github.com/fluxninja/analysis v0.21.2-fn.patch.1
-	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.7
+	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.8
 )

@@ -41,8 +41,8 @@ var _ = Describe("Secret for Agent", func() {
 				},
 				Spec: v1alpha1.AgentSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								Value: test,
 							},
 						},
@@ -76,7 +76,9 @@ var _ = Describe("Secret for Agent", func() {
 				},
 			}
 
-			result, _ := secretForAgentAPIKey(instance.DeepCopy(), scheme.Scheme)
+			result, err := secretForAgentAPIKey(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -91,8 +93,8 @@ var _ = Describe("Secret for Agent", func() {
 				Spec: v1alpha1.AgentSpec{
 					CommonSpec: v1alpha1.CommonSpec{
 						Annotations: testMap,
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{
 									Name: test,
 									Key:  test,
@@ -130,7 +132,9 @@ var _ = Describe("Secret for Agent", func() {
 				},
 			}
 
-			result, _ := secretForAgentAPIKey(instance.DeepCopy(), scheme.Scheme)
+			result, err := secretForAgentAPIKey(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -146,8 +150,8 @@ var _ = Describe("Secret for Controller", func() {
 				},
 				Spec: v1alpha1.ControllerSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								Value: test,
 							},
 						},
@@ -181,7 +185,9 @@ var _ = Describe("Secret for Controller", func() {
 				},
 			}
 
-			result, _ := secretForControllerAPIKey(instance.DeepCopy(), scheme.Scheme)
+			result, err := secretForControllerAPIKey(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -196,8 +202,8 @@ var _ = Describe("Secret for Controller", func() {
 				Spec: v1alpha1.ControllerSpec{
 					CommonSpec: v1alpha1.CommonSpec{
 						Annotations: testMap,
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{
 									Name: test,
 									Key:  test,
@@ -235,14 +241,15 @@ var _ = Describe("Secret for Controller", func() {
 				},
 			}
 
-			result, _ := secretForControllerAPIKey(instance.DeepCopy(), scheme.Scheme)
+			result, err := secretForControllerAPIKey(instance.DeepCopy(), scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
 })
 
 var _ = Describe("Secret for Controller Cert", func() {
-
 	Context("Instance with default parameters", func() {
 		It("returns correct Secret", func() {
 			instance := &v1alpha1.Controller{
@@ -280,7 +287,9 @@ var _ = Describe("Secret for Controller Cert", func() {
 				},
 			}
 
-			result, _ := secretForControllerCert(instance.DeepCopy(), scheme.Scheme, bytes.NewBuffer([]byte(test)), bytes.NewBuffer([]byte(test)))
+			result, err := secretForControllerCert(instance.DeepCopy(), scheme.Scheme, bytes.NewBuffer([]byte(test)), bytes.NewBuffer([]byte(test)))
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -326,7 +335,9 @@ var _ = Describe("Secret for Controller Cert", func() {
 				},
 			}
 
-			result, _ := secretForControllerCert(instance.DeepCopy(), scheme.Scheme, bytes.NewBuffer([]byte(test)), bytes.NewBuffer([]byte(test)))
+			result, err := secretForControllerCert(instance.DeepCopy(), scheme.Scheme, bytes.NewBuffer([]byte(test)), bytes.NewBuffer([]byte(test)))
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -343,6 +354,7 @@ var _ = Describe("Test Secret Mutate", func() {
 
 		secret := &corev1.Secret{}
 		err := secretMutate(secret, expected.Data)()
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(secret).To(Equal(expected))
 	})

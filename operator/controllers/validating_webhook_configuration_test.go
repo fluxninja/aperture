@@ -26,6 +26,7 @@ import (
 	"k8s.io/utils/pointer"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/net/listener"
 )
 
 var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
@@ -40,11 +41,22 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 					Name:      appName,
 					Namespace: appName,
 				},
+				Spec: v1alpha1.ControllerSpec{
+					ConfigSpec: v1alpha1.ControllerConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":8080",
+								},
+							},
+						},
+					},
+				},
 			}
 
 			expected := &admissionregistrationv1.ValidatingWebhookConfiguration{
 				ObjectMeta: v1.ObjectMeta{
-					Name: validatingWebhookServiceName,
+					Name: controllerServiceName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       appName,
 						"app.kubernetes.io/instance":   appName,
@@ -61,10 +73,10 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						Name: "cm-validator.fluxninja.com",
 						ClientConfig: admissionregistrationv1.WebhookClientConfig{
 							Service: &admissionregistrationv1.ServiceReference{
-								Name:      validatingWebhookServiceName,
+								Name:      controllerServiceName,
 								Namespace: instance.GetNamespace(),
 								Path:      pointer.StringPtr("/validate/configmap"),
-								Port:      pointer.Int32(443),
+								Port:      pointer.Int32(8080),
 							},
 							CABundle: []byte(test),
 						},
@@ -118,12 +130,21 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						Labels:      testMap,
 						Annotations: testMapTwo,
 					},
+					ConfigSpec: v1alpha1.ControllerConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":80",
+								},
+							},
+						},
+					},
 				},
 			}
 
 			expected := &admissionregistrationv1.ValidatingWebhookConfiguration{
 				ObjectMeta: v1.ObjectMeta{
-					Name: validatingWebhookServiceName,
+					Name: controllerServiceName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       appName,
 						"app.kubernetes.io/instance":   appName,
@@ -143,10 +164,10 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						Name: "cm-validator.fluxninja.com",
 						ClientConfig: admissionregistrationv1.WebhookClientConfig{
 							Service: &admissionregistrationv1.ServiceReference{
-								Name:      validatingWebhookServiceName,
+								Name:      controllerServiceName,
 								Namespace: instance.GetNamespace(),
 								Path:      pointer.StringPtr("/validate/configmap"),
-								Port:      pointer.Int32(443),
+								Port:      pointer.Int32(80),
 							},
 							CABundle: []byte(test),
 						},

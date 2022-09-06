@@ -11,15 +11,15 @@ import (
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
 
-// ProvideCMFileValidator provides classification config map file validator
+// provideCMFileValidator provides classification config map file validator
 //
 // Note: This validator must be registered to be accessible.
-func ProvideCMFileValidator() *CMFileValidator {
+func provideCMFileValidator() *CMFileValidator {
 	return &CMFileValidator{}
 }
 
-// RegisterCMFileValidator registers classification configmap validator as configmap file validator.
-func RegisterCMFileValidator(validator *CMFileValidator, configMapValidator *validation.CMValidator) {
+// registerCMFileValidator registers classification configmap validator as configmap file validator.
+func registerCMFileValidator(validator *CMFileValidator, configMapValidator *validation.CMValidator) {
 	// The path is not configurable – if one doesn't want default path, one
 	// could just write their own Register function
 	configMapValidator.RegisterCMFileValidator(validator)

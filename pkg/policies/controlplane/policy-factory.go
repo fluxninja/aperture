@@ -22,8 +22,8 @@ import (
 // Fx tag to match etcd watcher name.
 var policiesDriverFxTag = "policies-driver"
 
-// PolicyFactoryModule module for policy factory.
-func PolicyFactoryModule() fx.Option {
+// policyFactoryModule module for policy factory.
+func policyFactoryModule() fx.Option {
 	return fx.Options(
 		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: paths.PoliciesConfigPath}.Annotate(),
 		fx.Invoke(

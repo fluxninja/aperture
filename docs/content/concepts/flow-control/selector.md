@@ -8,9 +8,8 @@ keywords:
   - labels
 ---
 
-:::info
-See also [Selector reference](/reference/configuration/policies#-v1selector)
-:::
+:::info See also
+[Selector reference](/reference/configuration/policies#-v1selector) :::
 
 Flow observability and control components are instantiated on Aperture Agents
 and they select flows based on scoping rules defined in Selectors.
@@ -33,7 +32,7 @@ published by Aperture Controller.
 ### Service
 
 Service in Aperture is similar to services tracked in Kubernetes or Consul. A
-Service is a collection of entities delivering a common functionality, such as 
+Service is a collection of entities delivering a common functionality, such as
 checkout, billing etc. Aperture maintains a mapping of entity IP addresses to
 Service names. For each flow control decision request sent by an entity,
 Aperture looks up the service name and then decides which flow control
@@ -49,18 +48,20 @@ within a Agent Group.
 
 ### Control Point
 
-A policy or rule is configured for a given Control Point within a service. Control
-Point is either a library feature name or one of ingress/egress traffic points.
+A policy or rule is configured for a given Control Point within a service.
+Control Point is either a library feature name or one of ingress/egress traffic
+points.
 
 ### Label Matcher
 
-Label Matcher is part of the classifier for whether a map of labels should be considered
-a match or not. If multiple requirements are set, they are all ANDed. An empty label
-matcher always matches.
+Label Matcher is part of the classifier for whether a map of labels should be
+considered a match or not. If multiple requirements are set, they are all ANDed.
+An empty label matcher always matches.
 
 This matcher allows matching the following labels:
 
-- Flow labels - We can only match flow labels that were created at a previous control point
+- Flow labels - We can only match flow labels that were created at a previous
+  control point
 
-- Request labels - Request labels are always prefixed with request\_ and request headers are only
-  available for traffic control points
+- Request labels - Request labels are always prefixed with request\_ and request
+  headers are only available for traffic control points
