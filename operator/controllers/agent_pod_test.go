@@ -30,6 +30,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/plugins"
 )
 
 var _ = Describe("Sidecar container for Agent", func() {
@@ -80,6 +81,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 							Otel: otel.OtelConfig{
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
+							},
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
 							},
 						},
 						DistCache: distcache.DistCacheConfig{
@@ -197,6 +201,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 							Otel: otel.OtelConfig{
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
+							},
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
 							},
 						},
 						DistCache: distcache.DistCacheConfig{
@@ -359,6 +366,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 							Otel: otel.OtelConfig{
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
+							},
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
 							},
 						},
 						DistCache: distcache.DistCacheConfig{
@@ -596,6 +606,9 @@ var _ = Describe("Pod modification for Agent", func() {
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
 							},
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
+							},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -732,6 +745,9 @@ var _ = Describe("Pod modification for Agent", func() {
 							Otel: otel.OtelConfig{
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
+							},
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
 							},
 						},
 						DistCache: distcache.DistCacheConfig{

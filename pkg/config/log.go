@@ -67,7 +67,7 @@ type LogConfig struct {
 	// Use non-blocking log writer (can lose logs at high throughput)
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=true
-	NonBlocking bool `json:"non_blocking,omitempty" default:"true"`
+	NonBlocking bool `json:"non_blocking" default:"true"`
 
 	// Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
 	//+kubebuilder:validation:Optional

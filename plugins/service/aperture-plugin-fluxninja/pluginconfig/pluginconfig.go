@@ -27,6 +27,7 @@ type FluxNinjaPluginConfig struct {
 	APIKey string `json:"api_key,omitempty"`
 	// Client configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={http:{network_keep_alive:"30s"}}
 	ClientConfig ClientConfig `json:"client"`
 }
 
@@ -36,6 +37,7 @@ type FluxNinjaPluginConfig struct {
 type ClientConfig struct {
 	// HTTP client settings.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={network_keep_alive:"30s"}
 	HTTPClient http.HTTPClientConfig `json:"http"`
 	// GRPC client settings.
 	//+kubebuilder:validation:Optional

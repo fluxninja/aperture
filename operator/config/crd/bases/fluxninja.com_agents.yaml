@@ -886,6 +886,14 @@ spec:
                   type: string
                 type: array
               config:
+                default:
+                  agent_info:
+                    agent_group: default
+                  etcd:
+                    lease_ttl: 60s
+                  watchdog:
+                    heap:
+                      limit: 268435456
                 description: Agent Configuration
                 properties:
                   agent_info:
@@ -941,6 +949,8 @@ spec:
                         type: integer
                     type: object
                   etcd:
+                    default:
+                      lease_ttl: 60s
                     description: Etcd configuration.
                     properties:
                       endpoints:
@@ -954,12 +964,17 @@ spec:
                         type: string
                     type: object
                   fluxninja_plugin:
+                    default:
+                      heartbeat_interval: 5s
                     description: FluxNinja Cloud plugin configuration.
                     properties:
                       api_key:
                         description: API Key for this agent.
                         type: string
                       client:
+                        default:
+                          http:
+                            network_keep_alive: 30s
                         description: Client configuration.
                         properties:
                           grpc:
@@ -1022,6 +1037,8 @@ spec:
                                 type: boolean
                             type: object
                           http:
+                            default:
+                              network_keep_alive: 30s
                             description: HTTP client settings.
                             properties:
                               disable_compression:
@@ -1138,6 +1155,8 @@ spec:
                         type: string
                     type: object
                   kubernetes_client:
+                    default:
+                      network_keep_alive: 30s
                     description: Kubernetes client configuration.
                     properties:
                       disable_compression:
@@ -1240,9 +1259,14 @@ spec:
                         type: integer
                     type: object
                   liveness:
+                    default:
+                      scheduler:
+                        max_concurrent_jobs: 0
                     description: Liveness probe configuration.
                     properties:
                       scheduler:
+                        default:
+                          max_concurrent_jobs: 0
                         description: Scheduler settings.
                         properties:
                           max_concurrent_jobs:
@@ -1255,6 +1279,8 @@ spec:
                             type: integer
                         type: object
                       service:
+                        default:
+                          initial_delay: 0s
                         description: Service settings.
                         properties:
                           execution_period:
@@ -1280,6 +1306,8 @@ spec:
                         type: object
                     type: object
                   log:
+                    default:
+                      level: info
                     description: Log configuration.
                     properties:
                       compress:
@@ -1377,6 +1405,8 @@ spec:
                         type: array
                     type: object
                   metrics:
+                    default:
+                      pedantic: false
                     description: Metrics configuration.
                     properties:
                       enable_go_metrics:
@@ -1478,6 +1508,8 @@ spec:
                         type: string
                     type: object
                   profilers:
+                    default:
+                      register_http_routes: true
                     description: Profilers configuration.
                     properties:
                       cpu_profiler:
@@ -1503,13 +1535,16 @@ spec:
                       address:
                         description: Address of the prometheus server
                         type: string
-                    required:
-                    - address
                     type: object
                   readiness:
+                    default:
+                      scheduler:
+                        max_concurrent_jobs: 0
                     description: Readiness probe configuration.
                     properties:
                       scheduler:
+                        default:
+                          max_concurrent_jobs: 0
                         description: Scheduler settings.
                         properties:
                           max_concurrent_jobs:
@@ -1522,6 +1557,8 @@ spec:
                             type: integer
                         type: object
                       service:
+                        default:
+                          initial_delay: 0s
                         description: Service settings.
                         properties:
                           execution_period:
@@ -1547,6 +1584,8 @@ spec:
                         type: object
                     type: object
                   sentry_plugin:
+                    default:
+                      traces_sample_rate: 0.2
                     description: Sentry plugin configuration.
                     properties:
                       attach_stack_trace:
@@ -1595,6 +1634,8 @@ spec:
                         description: Address to bind to in the form of [host%zone]:port
                         type: string
                       grpc:
+                        default:
+                          connection_timeout: 120s
                         description: GRPC server configuration.
                         properties:
                           connection_timeout:
@@ -1607,6 +1648,8 @@ spec:
                             type: boolean
                         type: object
                       grpc_gateway:
+                        default:
+                          grpc_server_address: 0.0.0.0:1
                         description: GRPC Gateway configuration.
                         properties:
                           grpc_server_address:
@@ -1617,6 +1660,8 @@ spec:
                             type: string
                         type: object
                       http:
+                        default:
+                          idle_timeout: 30s
                         description: HTTP server configuration.
                         properties:
                           disable_http_keep_alives:
@@ -1675,6 +1720,8 @@ spec:
                         - tcp6
                         type: string
                       tls:
+                        default:
+                          server_key: ca.key
                         description: TLS configuration.
                         properties:
                           allowed_cn:
@@ -1709,11 +1756,23 @@ spec:
                     description: Watchdog configuration.
                     properties:
                       cgroup:
+                        default:
+                          watermarks_policy:
+                            watermarks:
+                            - 0.5
+                            - 0.75
+                            - 0.8
+                            - 0.85
+                            - 0.9
+                            - 0.95
+                            - 0.99
                         description: WatchdogPolicyType holds configuration Watchdog
                           Policy algorithms. If both algorithms are configured then
                           only watermark algorithm is used. swagger:model WatchdogPolicyType
                         properties:
                           adaptive_policy:
+                            default:
+                              factor: 0.5
                             description: AdaptivePolicy creates a policy that forces
                               GC when the usage surpasses the configured factor of
                               the available memory. This policy calculates next target
@@ -1732,6 +1791,15 @@ spec:
                                 type: number
                             type: object
                           watermarks_policy:
+                            default:
+                              watermarks:
+                              - 0.5
+                              - 0.75
+                              - 0.8
+                              - 0.85
+                              - 0.9
+                              - 0.95
+                              - 0.99
                             description: WatermarksPolicy creates a Watchdog policy
                               that schedules GC at concrete watermarks. swagger:model
                             properties:
@@ -1758,10 +1826,23 @@ spec:
                             type: object
                         type: object
                       heap:
+                        default:
+                          limit: 268435456
+                          watermarks_policy:
+                            watermarks:
+                            - 0.5
+                            - 0.75
+                            - 0.8
+                            - 0.85
+                            - 0.9
+                            - 0.95
+                            - 0.99
                         description: HeapConfig holds configuration for heap Watchdog.
                           swagger:model
                         properties:
                           adaptive_policy:
+                            default:
+                              factor: 0.5
                             description: AdaptivePolicy creates a policy that forces
                               GC when the usage surpasses the configured factor of
                               the available memory. This policy calculates next target
@@ -1792,6 +1873,15 @@ spec:
                               helps avoid overscheduling.
                             type: integer
                           watermarks_policy:
+                            default:
+                              watermarks:
+                              - 0.5
+                              - 0.75
+                              - 0.8
+                              - 0.85
+                              - 0.9
+                              - 0.95
+                              - 0.99
                             description: WatermarksPolicy creates a Watchdog policy
                               that schedules GC at concrete watermarks. swagger:model
                             properties:
@@ -1818,6 +1908,8 @@ spec:
                             type: object
                         type: object
                       job:
+                        default:
+                          initial_delay: 0s
                         description: JobConfig is config for Job swagger:model
                         properties:
                           execution_period:
@@ -1842,11 +1934,23 @@ spec:
                             type: boolean
                         type: object
                       system:
+                        default:
+                          watermarks_policy:
+                            watermarks:
+                            - 0.5
+                            - 0.75
+                            - 0.8
+                            - 0.85
+                            - 0.9
+                            - 0.95
+                            - 0.99
                         description: WatchdogPolicyType holds configuration Watchdog
                           Policy algorithms. If both algorithms are configured then
                           only watermark algorithm is used. swagger:model WatchdogPolicyType
                         properties:
                           adaptive_policy:
+                            default:
+                              factor: 0.5
                             description: AdaptivePolicy creates a policy that forces
                               GC when the usage surpasses the configured factor of
                               the available memory. This policy calculates next target
@@ -1865,6 +1969,15 @@ spec:
                                 type: number
                             type: object
                           watermarks_policy:
+                            default:
+                              watermarks:
+                              - 0.5
+                              - 0.75
+                              - 0.8
+                              - 0.85
+                              - 0.9
+                              - 0.95
+                              - 0.99
                             description: WatermarksPolicy creates a Watchdog policy
                               that schedules GC at concrete watermarks. swagger:model
                             properties:
@@ -1893,7 +2006,6 @@ spec:
                     type: object
                 required:
                 - etcd
-                - prometheus
                 type: object
               containerSecurityContext:
                 default:

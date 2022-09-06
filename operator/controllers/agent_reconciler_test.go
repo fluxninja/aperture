@@ -40,6 +40,8 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
 var _ = Describe("Agent Reconcile", Ordered, func() {
@@ -68,6 +70,77 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			})
 			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
 			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should not create resources when etcd endpoints is missing", func() {
+			namespace := test + "51"
+			ns := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}
+			Expect(k8sClient.Create(ctx, ns)).To(BeNil())
+
+			instance.Namespace = namespace
+			instance.Spec.ConfigSpec.Etcd = etcd.EtcdConfig{}
+			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
+
+			_, err := reconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      test,
+					Namespace: namespace,
+				},
+			})
+
+			Expect(err).NotTo(BeNil())
+		})
+
+		It("should not create resources when etcd endpoints is empty", func() {
+			namespace := test + "52"
+			ns := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}
+			Expect(k8sClient.Create(ctx, ns)).To(BeNil())
+
+			instance.Namespace = namespace
+			instance.Spec.ConfigSpec.Etcd = etcd.EtcdConfig{
+				Endpoints: []string{},
+			}
+			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
+
+			_, err := reconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      test,
+					Namespace: namespace,
+				},
+			})
+
+			Expect(err).NotTo(BeNil())
+		})
+
+		It("should not create resources when prometheus address empty", func() {
+			namespace := test + "53"
+			ns := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}
+			Expect(k8sClient.Create(ctx, ns)).To(BeNil())
+
+			instance.Namespace = namespace
+			instance.Spec.ConfigSpec.Prometheus = prometheus.PrometheusConfig{}
+			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
+
+			_, err := reconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      test,
+					Namespace: namespace,
+				},
+			})
+
+			Expect(err).NotTo(BeNil())
 		})
 
 		It("should create required resources when Agent is created with default parameters", func() {
@@ -149,6 +222,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Namespace = namespace
 			instance.Spec.Sidecar.Enabled = false
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
+			instance.Spec.ConfigSpec.CommonConfigSpec.Plugins.DisabledPlugins = []string{}
 			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = test
 			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
@@ -260,6 +334,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Spec.Sidecar.Enabled = true
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
+			instance.Spec.ConfigSpec.CommonConfigSpec.Plugins.DisabledPlugins = []string{}
 			encodedString := fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(test)))
 			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = test
@@ -435,6 +510,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Namespace = namespace
 			instance.Spec.Sidecar.Enabled = true
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
+			instance.Spec.ConfigSpec.CommonConfigSpec.Plugins.DisabledPlugins = []string{}
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
 			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = test

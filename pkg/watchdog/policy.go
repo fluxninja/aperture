@@ -20,15 +20,19 @@ import (
 // +kubebuilder:object:generate=true
 type WatchdogConfig struct {
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={initial_delay:"0s"}
 	Job jobs.JobConfig `json:"job"`
 
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={watermarks_policy:{watermarks:{0.50,0.75,0.80,0.85,0.90,0.95,0.99}}}
 	CGroup WatchdogPolicyType `json:"cgroup"`
 
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={watermarks_policy:{watermarks:{0.50,0.75,0.80,0.85,0.90,0.95,0.99}}}
 	System WatchdogPolicyType `json:"system"`
 
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={limit:268435456,watermarks_policy:{watermarks:{0.50,0.75,0.80,0.85,0.90,0.95,0.99}}}
 	Heap HeapConfig `json:"heap"`
 }
 
@@ -37,9 +41,11 @@ type WatchdogConfig struct {
 // +kubebuilder:object:generate=true
 type WatchdogPolicyType struct {
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={watermarks:{0.50,0.75,0.80,0.85,0.90,0.95,0.99}}
 	WatermarksPolicy WatermarksPolicy `json:"watermarks_policy"`
 
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={factor:0.50}
 	AdaptivePolicy AdaptivePolicy `json:"adaptive_policy"`
 }
 

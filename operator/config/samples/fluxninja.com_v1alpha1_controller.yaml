@@ -1,10 +1,54 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Controller
 metadata:
-  name: controller-sample
+  labels:
+    app.kubernetes.io/component: aperture-controller-manager
+    app.kubernetes.io/instance: controller
+    app.kubernetes.io/managed-by: Helmraiser
+    app.kubernetes.io/name: aperture-controller
+    helm.sh/chart: aperture-controller-v0.0.1
+  name: controller
+  namespace: aperture-system
 spec:
   config:
     etcd:
-      endpoints: ["http://controller-etcd:2379"]
+      endpoints:
+      - http://controller-etcd:2379
+      lease_ttl: 60s
+    fluxninja_plugin:
+      client:
+        grpc:
+          insecure: false
+          tls:
+            insecure_skip_verify: true
+        http:
+          tls:
+            insecure_skip_verify: true
+      fluxninja_endpoint: placeholder.changeme.example.com:443
+    log:
+      file: default
+      level: debug
+      non_blocking: false
+      pretty_console: true
+    plugins:
+      disabled_plugins: []
     prometheus:
-      address: "http://controller-prometheus-server:80"
+      address: http://controller-prometheus-server:80
+  image:
+    pullPolicy: null
+    pullSecrets: []
+    registry: ""
+    repository: gcr.io/devel-309501/cf-fn/aperture-controller
+    tag: latest
+  livenessProbe:
+    enabled: true
+  readinessProbe:
+    enabled: true
+  secrets:
+    fluxNinjaPlugin:
+      create: true
+      secretKeyRef:
+        key: apiKey
+      value: 2e833b1a7795457ab65f8190061a5790
+  serviceAccount:
+    create: true

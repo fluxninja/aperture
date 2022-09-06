@@ -28,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/utils/strings/slices"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -271,6 +272,13 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
+	if len(instance.Spec.ConfigSpec.Prometheus.Address) == 0 {
+		return fmt.Errorf("config.prometheus.address can not be empty for the Aperture Agent")
+	} else if instance.Spec.ConfigSpec.Etcd.Endpoints == nil ||
+		len(instance.Spec.ConfigSpec.Etcd.Endpoints) == 0 {
+		return fmt.Errorf("config.etcd.endpoints can not be empty for the Aperture Agent")
+	}
+
 	// Always enable TLS on the controller
 	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
 		CertsPath:  controllerCertPath,
@@ -496,7 +504,8 @@ func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSec
 // reconcileSecret prepares the desired states for Controller ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *v1alpha1.Controller) error {
-	if !instance.Spec.Secrets.FluxNinjaPlugin.Create {
+	if !instance.Spec.Secrets.FluxNinjaPlugin.Create || (instance.Spec.ConfigSpec.Plugins.DisabledPlugins != nil &&
+		slices.Contains(instance.Spec.ConfigSpec.Plugins.DisabledPlugins, apertureFluxNinjaPlugin)) {
 		return nil
 	}
 	secret, err := secretForControllerAPIKey(instance.DeepCopy(), r.Scheme)

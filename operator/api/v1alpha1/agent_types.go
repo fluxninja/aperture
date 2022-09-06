@@ -43,6 +43,8 @@ type AgentSpec struct {
 
 	// Agent Configuration
 	//+kubebuilder:validation:Optional
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
+	//+kubebuilder:default:={agent_info:{agent_group:"default"},watchdog:{heap:{limit:268435456}},etcd:{lease_ttl:"60s"}}
 	ConfigSpec AgentConfigSpec `json:"config"`
 }
 
@@ -64,6 +66,7 @@ type AgentConfigSpec struct {
 
 	// Kubernetes client configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={network_keep_alive:"30s"}
 	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client,omitempty"`
 
 	// Peer discovery configuration.

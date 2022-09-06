@@ -32,6 +32,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/plugins"
 )
 
 var _ = Describe("Agent Daemonset", func() {
@@ -107,6 +108,9 @@ var _ = Describe("Agent Daemonset", func() {
 							Otel: otel.OtelConfig{
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
+							},
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
 							},
 						},
 						DistCache: distcache.DistCacheConfig{
@@ -289,6 +293,9 @@ var _ = Describe("Agent Daemonset", func() {
 							Otel: otel.OtelConfig{
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
+							},
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
 							},
 						},
 						DistCache: distcache.DistCacheConfig{

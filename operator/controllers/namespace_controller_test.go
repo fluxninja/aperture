@@ -211,6 +211,7 @@ var _ = Describe("Namespace controller", func() {
 
 			instance.Spec.Sidecar.Enabled = true
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace}
+			instance.Spec.ConfigSpec.CommonConfigSpec.Plugins.DisabledPlugins = []string{}
 			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(test)))
 			Expect(k8sClient.Create(ctx, instance)).To(BeNil())

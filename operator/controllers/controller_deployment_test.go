@@ -33,6 +33,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/plugins"
 )
 
 var _ = Describe("Controller Deployment", func() {
@@ -113,6 +114,9 @@ var _ = Describe("Controller Deployment", func() {
 							Otel: otel.OtelConfig{
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
+							},
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
 							},
 						},
 					},
@@ -322,6 +326,9 @@ var _ = Describe("Controller Deployment", func() {
 							Otel: otel.OtelConfig{
 								GRPCAddr: ":4317",
 								HTTPAddr: ":4318",
+							},
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
 							},
 						},
 					},

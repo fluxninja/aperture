@@ -32,6 +32,7 @@ import (
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
@@ -616,6 +617,13 @@ var _ = Describe("Tests for agentEnv", func() {
 							},
 						},
 					},
+					ConfigSpec: v1alpha1.AgentConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
+							},
+						},
+					},
 				},
 			}
 
@@ -855,6 +863,13 @@ var _ = Describe("Tests for controllerEnv", func() {
 							{
 								Name:  test,
 								Value: test,
+							},
+						},
+					},
+					ConfigSpec: v1alpha1.ControllerConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Plugins: plugins.PluginsConfig{
+								DisabledPlugins: []string{apertureFluxNinjaPlugin},
 							},
 						},
 					},

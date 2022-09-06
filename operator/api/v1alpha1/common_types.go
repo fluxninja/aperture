@@ -318,22 +318,27 @@ type CommonConfigSpec struct {
 
 	// Etcd configuration.
 	//+kubebuilder:validation:Required
+	//+kubebuilder:default:={lease_ttl:"60s"}
 	Etcd etcd.EtcdConfig `json:"etcd"`
 
 	// Liveness probe configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={scheduler:{max_concurrent_jobs:0}}
 	Liveness ProbeConfigSpec `json:"liveness,omitempty"`
 
 	// Readiness probe configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={scheduler:{max_concurrent_jobs:0}}
 	Readiness ProbeConfigSpec `json:"readiness,omitempty"`
 
 	// Log configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={level:"info"}
 	Log config.LogConfig `json:"log,omitempty"`
 
 	// Metrics configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={pedantic:false}
 	Metrics metrics.MetricsConfig `json:"metrics,omitempty"`
 
 	// OTEL configuration.
@@ -347,10 +352,11 @@ type CommonConfigSpec struct {
 
 	// Profilers configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={register_http_routes:true}
 	Profilers profilers.ProfilersConfig `json:"profilers,omitempty"`
 
 	// Prometheus configuration.
-	//+kubebuilder:validation:Required
+	//+kubebuilder:validation:Optional
 	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
 
 	// Server configuration.
@@ -376,18 +382,22 @@ type ServerConfigSpec struct {
 
 	// GRPC server configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={connection_timeout:"120s"}
 	Grpc grpc.GRPCServerConfig `json:"grpc,omitempty"`
 
 	// GRPC Gateway configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={grpc_server_address:"0.0.0.0:1"}
 	GrpcGateway grpcgateway.GRPCGatewayConfig `json:"grpc_gateway,omitempty"`
 
 	// HTTP server configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={idle_timeout:"30s"}
 	HTTP http.HTTPServerConfig `json:"http,omitempty"`
 
 	// TLS configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={server_key:"ca.key"}
 	TLS tlsconfig.ServerTLSConfig `json:"tls,omitempty"`
 }
 
@@ -395,10 +405,12 @@ type ServerConfigSpec struct {
 type ProbeConfigSpec struct {
 	// Scheduler settings.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={max_concurrent_jobs:0}
 	Scheduler jobs.JobGroupConfig `json:"scheduler,omitempty"`
 
 	// Service settings.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={initial_delay:"0s"}
 	Service jobs.JobConfig `json:"service,omitempty"`
 }
 
@@ -413,9 +425,11 @@ type ClientConfigSpec struct {
 type BundledPluginsSpec struct {
 	// FluxNinja Cloud plugin configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={heartbeat_interval:"5s"}
 	FluxNinjaPlugin pluginconfig.FluxNinjaPluginConfig `json:"fluxninja_plugin,omitempty"`
 
 	// Sentry plugin configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={traces_sample_rate:0.2}
 	SentryPlugin sentry.SentryConfig `json:"sentry_plugin,omitempty"`
 }

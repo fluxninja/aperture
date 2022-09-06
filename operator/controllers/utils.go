@@ -42,6 +42,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
+	"k8s.io/utils/strings/slices"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -227,7 +228,8 @@ func agentEnv(instance *v1alpha1.Agent, agentGroup string) []corev1.EnvVar {
 		})
 	}
 
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create {
+	if spec.ConfigSpec.Plugins.DisabledPlugins == nil ||
+		!slices.Contains(spec.ConfigSpec.Plugins.DisabledPlugins, apertureFluxNinjaPlugin) {
 		envs = append(envs, corev1.EnvVar{
 			Name: "APERTURE_AGENT_FLUXNINJA_PLUGIN_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
@@ -292,7 +294,8 @@ func controllerEnv(instance *v1alpha1.Controller) []corev1.EnvVar {
 		},
 	}
 
-	if spec.Secrets.FluxNinjaPlugin.Create {
+	if spec.ConfigSpec.Plugins.DisabledPlugins == nil ||
+		!slices.Contains(instance.Spec.ConfigSpec.Plugins.DisabledPlugins, apertureFluxNinjaPlugin) {
 		envs = append(envs, corev1.EnvVar{
 			Name: "APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{

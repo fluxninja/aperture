@@ -64,11 +64,11 @@ Fetch the value of the API Key secret for Aperture Agent
 {{ include "agent.apiSecret.value" ( dict "agent" .Values.path.to.the.agent $) }}
 */}}
 {{- define "agent.apisecret.value" -}}
-{{- if .agent.secrets.fluxninjaPlugin.create -}}
-    {{- if .agent.secrets.fluxninjaPlugin.value -}}
-        {{ print .agent.secrets.fluxninjaPlugin.value }}
+{{- if .agent.secrets.fluxNinjaPlugin.create -}}
+    {{- if .agent.secrets.fluxNinjaPlugin.value -}}
+        {{ print .agent.secrets.fluxNinjaPlugin.value }}
     {{- else -}}
-        {{- fail "Value of API Key for Agent cannot be empty when .Values.agent.secrets.fluxninjaPlugin.create is set to true." -}}
+        {{- fail "Value of API Key for Agent cannot be empty when .Values.agent.secrets.fluxNinjaPlugin.create is set to true." -}}
     {{- end -}}
 {{- else -}}
     {{ print "" }}

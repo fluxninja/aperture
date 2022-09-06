@@ -308,6 +308,13 @@ func (r *AgentReconciler) updateAgent(ctx context.Context, instance *v1alpha1.Ag
 
 // manageResources creates/updates required resources.
 func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Agent) error {
+	if len(instance.Spec.ConfigSpec.Prometheus.Address) == 0 {
+		return fmt.Errorf("config.prometheus.address can not be empty for the Aperture Agent")
+	} else if instance.Spec.ConfigSpec.Etcd.Endpoints == nil ||
+		len(instance.Spec.ConfigSpec.Etcd.Endpoints) == 0 {
+		return fmt.Errorf("config.etcd.endpoints can not be empty for the Aperture Agent")
+	}
+
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
@@ -528,7 +535,8 @@ func (r *AgentReconciler) reconcileMutatingWebhookConfiguration(ctx context.Cont
 // reconcileSecret prepares the desired states for Agent ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileSecret(ctx context.Context, instance *v1alpha1.Agent) error {
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create {
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create && (instance.Spec.ConfigSpec.Plugins.DisabledPlugins == nil ||
+		!slices.Contains(instance.Spec.ConfigSpec.Plugins.DisabledPlugins, apertureFluxNinjaPlugin)) {
 		if !instance.Spec.Sidecar.Enabled {
 			secret, err := secretForAgentAPIKey(instance.DeepCopy(), r.Scheme)
 			if err != nil {
@@ -591,7 +599,8 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 			return err
 		}
 
-		if instance.Spec.Secrets.FluxNinjaPlugin.Create {
+		if instance.Spec.Secrets.FluxNinjaPlugin.Create && (instance.Spec.ConfigSpec.Plugins.DisabledPlugins == nil ||
+			!slices.Contains(instance.Spec.ConfigSpec.Plugins.DisabledPlugins, apertureFluxNinjaPlugin)) {
 			secret, err := createAgentSecretInNamespace(instance.DeepCopy(), ns.GetName())
 			if err != nil {
 				return err

@@ -40,6 +40,7 @@ type ControllerSpec struct {
 
 	// Controller Configuration
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={watchdog:{heap:{limit:268435456}},etcd:{lease_ttl:"60s"}}
 	ConfigSpec ControllerConfigSpec `json:"config"`
 }
 
@@ -51,6 +52,7 @@ type ControllerConfigSpec struct {
 
 	// Policies configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={promql_jobs_scheduler:{max_concurrent_jobs:0}}
 	Policies PoliciesConfig `json:"policies,omitempty"`
 }
 
@@ -60,6 +62,7 @@ type PoliciesConfig struct {
 	PoliciesPath string `json:"policies_path,omitempty"`
 
 	// Scheduler for PromQL jobs.
+	//+kubebuilder:default:={max_concurrent_jobs:0}
 	PromQLJobsScheduler jobs.JobGroupConfig `json:"promql_jobs_scheduler,omitempty"`
 }
 

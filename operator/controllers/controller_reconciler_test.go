@@ -39,6 +39,8 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
 var _ = Describe("Controller Reconciler", Ordered, func() {
@@ -66,6 +68,77 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			})
 			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
 			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should not create resources when etcd endpoints is missing", func() {
+			namespace := test + "61"
+			ns := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}
+			Expect(k8sClient.Create(ctx, ns)).To(BeNil())
+
+			instance.Namespace = namespace
+			instance.Spec.ConfigSpec.Etcd = etcd.EtcdConfig{}
+			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
+
+			_, err := reconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      test,
+					Namespace: namespace,
+				},
+			})
+
+			Expect(err).NotTo(BeNil())
+		})
+
+		It("should not create resources when etcd endpoints is empty", func() {
+			namespace := test + "62"
+			ns := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}
+			Expect(k8sClient.Create(ctx, ns)).To(BeNil())
+
+			instance.Namespace = namespace
+			instance.Spec.ConfigSpec.Etcd = etcd.EtcdConfig{
+				Endpoints: []string{},
+			}
+			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
+
+			_, err := reconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      test,
+					Namespace: namespace,
+				},
+			})
+
+			Expect(err).NotTo(BeNil())
+		})
+
+		It("should not create resources when prometheus address empty", func() {
+			namespace := test + "63"
+			ns := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}
+			Expect(k8sClient.Create(ctx, ns)).To(BeNil())
+
+			instance.Namespace = namespace
+			instance.Spec.ConfigSpec.Prometheus = prometheus.PrometheusConfig{}
+			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
+
+			_, err := reconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      test,
+					Namespace: namespace,
+				},
+			})
+
+			Expect(err).NotTo(BeNil())
 		})
 
 		It("should create required resources when Controller is created with default parameters", func() {
@@ -147,6 +220,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(k8sClient.Create(ctx, ns)).To(BeNil())
 
 			instance.Namespace = namespace
+			instance.Spec.ConfigSpec.CommonConfigSpec.Plugins.DisabledPlugins = []string{}
 			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = test
 			Expect(k8sClient.Create(ctx, instance)).To(BeNil())

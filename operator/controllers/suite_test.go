@@ -41,6 +41,7 @@ import (
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	//+kubebuilder:scaffold:imports
 )
@@ -149,6 +150,9 @@ var _ = BeforeSuite(func() {
 					Prometheus: prometheus.PrometheusConfig{
 						Address: test,
 					},
+					Plugins: plugins.PluginsConfig{
+						DisabledPlugins: []string{apertureFluxNinjaPlugin},
+					},
 				},
 			},
 			CommonSpec: v1alpha1.CommonSpec{
@@ -196,6 +200,9 @@ var _ = BeforeSuite(func() {
 					},
 					Prometheus: prometheus.PrometheusConfig{
 						Address: test,
+					},
+					Plugins: plugins.PluginsConfig{
+						DisabledPlugins: []string{apertureFluxNinjaPlugin},
 					},
 				},
 				DistCache: distcache.DistCacheConfig{
