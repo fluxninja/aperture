@@ -55,7 +55,7 @@ high-importance features over others.
 At the fundamental level, Aperture enables flow control through observing,
 analyzing, and actuating, facilitated by agents and a controller.
 
-![Aperture Control Loop](./assets/img/control-loop.svg)
+![Aperture Control Loop](./assets/img/oaalight.png)
 
 ### Aperture Agents
 
