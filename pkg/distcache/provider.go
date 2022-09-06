@@ -46,7 +46,7 @@ type DistCacheConfig struct {
 	// BindAddr denotes the address that Olric will bind to for communication with other Olric nodes.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=":3320"
-	BindAddr string `json:"bind_addr" default:":3320,omitempty" validate:"hostname_port"`
+	BindAddr string `json:"bind_addr,omitempty" default:":3320" validate:"hostname_port"`
 	// ReplicaCount is 1 by default.
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=1

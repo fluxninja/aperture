@@ -708,8 +708,8 @@ distributed rate limiters.
 <dt>bind_addr</dt>
 <dd>
 
-(string, `hostname_port`, default: `:3320,omitempty`) BindAddr denotes the
-address that Olric will bind to for communication with other Olric nodes.
+(string, `hostname_port`, default: `:3320`) BindAddr denotes the address that
+Olric will bind to for communication with other Olric nodes.
 
 </dd>
 </dl>

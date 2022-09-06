@@ -114,7 +114,7 @@ definitions:
         description: BindAddr denotes the address that Olric will bind to for communication
           with other Olric nodes.
         type: string
-        x-go-default: :3320,omitempty
+        x-go-default: :3320
         x-go-name: BindAddr
         x-go-validate: hostname_port
       memberlist_advertise_addr:
