@@ -46,19 +46,19 @@ type HTTPServerConfig struct {
 	//+kubebuilder:default:="45s"
 	WriteTimeout config.Duration `json:"write_timeout" validate:"gte=0s" default:"45s"`
 	// The lowest bucket in latency histogram
-	//+kubebuilder:default:="20"
+	//+kubebuilder:default:=20
 	LatencyBucketStartMS float64 `json:"latency_bucket_start_ms" validate:"gte=0" default:"20"`
 	// Max header size in bytes
-	//+kubebuilder:default:="1048576"
+	//+kubebuilder:default:=1048576
 	MaxHeaderBytes int `json:"max_header_bytes" validate:"gte=0" default:"1048576"`
 	// The bucket width in latency histogram
-	//+kubebuilder:default:="20"
+	//+kubebuilder:default:=20
 	LatencyBucketWidthMS float64 `json:"latency_bucket_width_ms" validate:"gte=0" default:"20"`
 	// The number of buckets in latency histogram
-	//+kubebuilder:default:="100"
+	//+kubebuilder:default:=100
 	LatencyBucketCount int `json:"latency_bucket_count" validate:"gte=0" default:"100"`
 	// Disable HTTP Keep Alives
-	//+kubebuilder:default:="false"
+	//+kubebuilder:default:=false
 	DisableHTTPKeepAlives bool `json:"disable_http_keep_alives" default:"false"`
 }
 
