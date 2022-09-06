@@ -13,16 +13,16 @@ sidebar_position: 1
 The Aperture Controller functions as the brain of the Aperture system.
 Leveraging an advanced control loop, the Controller routinely analyzes polled
 metrics and indicators to determine how traffic should be shaped as defined by
-set policies. Once determined, these decisions are then exported to all Aperture Agents
-to effectively handle workloads. Only one Controller is needed to
-manage each cluster.
+set policies. Once determined, these decisions are then exported to all Aperture
+Agents to effectively handle workloads. Only one Controller is needed to manage
+each cluster.
 
 The closed feedback loop functions primarily by monitoring the variables
 reflecting stability conditions (i.e. process variables) and compares them
 against set points. The difference in the variable values against these points
 is referred to as the error signal. The feedback loop then works to minimize
-these error signals by determining and distributing control actions, that adjust these process variables and maintain their values
-within the optimal range.
+these error signals by determining and distributing control actions, that adjust
+these process variables and maintain their values within the optimal range.
 
 ## Configuration
 

@@ -9,16 +9,19 @@ keywords:
 
 # FluxNinja cloud plugin
 
-If you are a FluxNinja Cloud customer you can enhance your Aperture experience by enabling FluxNinja plugins.
-Plugins provide us with the ability to enrich your logs and traces with additional information.
-The plugins process logs and traces according to the Open Telemetry standard.
-We batch/rollup metrics so that they do not take a lot of bandwidth.
-In FluxNinja Cloud, you can visualize policies and use the information from plugins to refine your policies.
-We also send heartbeats from Aperture Agents and Controllers to track their liveness, policy allocation and history.
+If you are a FluxNinja Cloud customer you can enhance your Aperture experience
+by enabling FluxNinja plugins. Plugins provide us with the ability to enrich
+your logs and traces with additional information. The plugins process logs and
+traces according to the Open Telemetry standard. We batch/rollup metrics so that
+they do not take a lot of bandwidth. In FluxNinja Cloud, you can visualize
+policies and use the information from plugins to refine your policies. We also
+send heartbeats from Aperture Agents and Controllers to track their liveness,
+policy allocation and history.
 
 ## Configuration
 
-If you enable plugins then you can configure certificates for a secure connection with FluxNinja Cloud or a heartbeat interval.
+If you enable plugins then you can configure certificates for a secure
+connection with FluxNinja Cloud or a heartbeat interval.
 
 ```yaml
 plugins:

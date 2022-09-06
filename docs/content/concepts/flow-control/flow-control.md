@@ -12,10 +12,16 @@ keywords:
 
 Reliable operations at web-scale are impossible without effective flow control.
 
-Aperture provides sophisticated flow control capabilities by locating Aperture Agents next to your service instances as a sidecar. Aperture Agents monitor golden signals using an in-built telemetry system and a programmable, high-fidelity flow classifier used to label requests based on attributes such as customer tier or request type. These metrics are analyzed by the controller. 
+Aperture provides sophisticated flow control capabilities by locating Aperture
+Agents next to your service instances as a sidecar. Aperture Agents monitor
+golden signals using an in-built telemetry system and a programmable,
+high-fidelity flow classifier used to label requests based on attributes such as
+customer tier or request type. These metrics are analyzed by the controller.
 
-The Aperture Controller is powered by always-on, dataflow-driven policies that continuously track deviations from service-level objectives (SLOs) and calculate recovery or escalation actions. The policies running in the controller are expressed as circuits, much like circuit networks in the game Factorio.
-
+The Aperture Controller is powered by always-on, dataflow-driven policies that
+continuously track deviations from service-level objectives (SLOs) and calculate
+recovery or escalation actions. The policies running in the controller are
+expressed as circuits, much like circuit networks in the game Factorio.
 
 ## What is a flow? {#flow}
 
