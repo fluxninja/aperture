@@ -10,113 +10,73 @@
 
 ### Object Index
 
-- [MatchExpressionList](#match-expression-list) – List of MatchExpressions that
-  is used for all/any matching
+- [MatchExpressionList](#match-expression-list) – List of MatchExpressions that is used for all/any matching
 - [RateLimiterLazySync](#rate-limiter-lazy-sync)
 - [RateLimiterOverride](#rate-limiter-override)
 - [RuleRego](#rule-rego) – Raw rego rules are compiled 1:1 to rego queries
-- [SchedulerWorkload](#scheduler-workload) – Workload defines a class of
-  requests that preferably have similar properties suc…
+- [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
 - [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
-- [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency
-  Limiter is an actuator component that regulates flows in order to provide
-  active service protection
-- [languagev1RateLimiter](#languagev1-rate-limiter) – Limits the traffic on a
-  control point to specified rate
-- [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers
-  metrics for the traffic that matches its selector.
+- [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
+- [languagev1RateLimiter](#languagev1-rate-limiter) – Limits the traffic on a control point to specified rate
+- [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 
 Example of…
 
-- [v1AddressExtractor](#v1-address-extractor) – Display an
-  [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
-- [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that
-  computes the arithmetic operation on the operand signals
-- [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the
-  Arithmetic Combinator component.
-- [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the
-  Arithmetic Combinator component.
-- [v1Circuit](#v1-circuit) – Circuit is defined as a dataflow graph of
-  inter-connected components
-- [v1Classifier](#v1-classifier) – Set of classification rules sharing a common
-  selector
+- [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
+- [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals
+- [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
+- [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the Arithmetic Combinator component.
+- [v1Circuit](#v1-circuit) – Circuit is defined as a dataflow graph of inter-connected components
+- [v1Classifier](#v1-classifier) – Set of classification rules sharing a common selector
 - [v1Component](#v1-component) – Computational block that form the circuit
-- [v1Constant](#v1-constant) – Component that emits a constant value as an
-  output signal
+- [v1Constant](#v1-constant) – Component that emits a constant value as an output signal
 - [v1ConstantOuts](#v1-constant-outs) – Outputs for the Constant component.
-- [v1ControlPoint](#v1-control-point) – Identifies control point within a
-  service that the rule or policy should apply t…
-- [v1Decider](#v1-decider) – Type of combinator that computes the comparison
-  operation on lhs and rhs signals and switches between `on_true` and `on_false`
-  signals based on the result of the comparison
+- [v1ControlPoint](#v1-control-point) – Identifies control point within a service that the rule or policy should apply t…
+- [v1Decider](#v1-decider) – Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
 - [v1DeciderIns](#v1-decider-ins) – Inputs for the Decider component.
 - [v1DeciderOuts](#v1-decider-outs) – Outputs for the Decider component.
-- [v1EMA](#v1-e-m-a) – Exponential Moving Average (EMA) is a type of moving
-  average that applies exponenially more weight to recent signal readings
+- [v1EMA](#v1-e-m-a) – Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
 - [v1EMAIns](#v1-e-m-a-ins) – Inputs for the EMA component.
 - [v1EMAOuts](#v1-e-m-a-outs) – Outputs for the EMA component.
-- [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector
-  expression of the equal form "label == value".
-- [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to
-  extract a flow label value given http request metadata, without a need to
-  write rego code
-- [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by
-  repeating the last valid value during the period in which it is invalid
-- [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator
-  component.
-- [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator
-  component.
-- [v1GradientController](#v1-gradient-controller) – Gradient controller is a
-  type of controller which tries to adjust the control variable proportionally
-  to the relative difference between setpoint and actual value of the signal
-- [v1GradientControllerIns](#v1-gradient-controller-ins) – Inputs for the
-  Gradient Controller component.
-- [v1GradientControllerOuts](#v1-gradient-controller-outs) – Outputs for the
-  Gradient Controller component.
-- [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of
-  the fields
-- [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read
-  the payload
-- [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label
-  selector requirement which is a selector that contains values, a key, and …
+- [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
+- [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
+- [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
+- [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator component.
+- [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator component.
+- [v1GradientController](#v1-gradient-controller) – Gradient controller is a type of controller which tries to adjust the
+  control variable proportionally to the relative difference between setpoint
+  and actual value of the signal
+- [v1GradientControllerIns](#v1-gradient-controller-ins) – Inputs for the Gradient Controller component.
+- [v1GradientControllerOuts](#v1-gradient-controller-outs) – Outputs for the Gradient Controller component.
+- [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of the fields
+- [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload
+- [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
 - [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of
-  [labels](/concepts/flow-control/label/label.md) should be considered a match
-  or not
-- [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor
-  input signal and publishes it to the schedulers in the data-plane
-- [v1LoadShedActuatorIns](#v1-load-shed-actuator-ins) – Input for the Load Shed
-  Actuator component.
-- [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string>
-  → bool] expression to be evaluated on labels
-- [v1MatchesMatchExpression](#v1-matches-match-expression) – Label selector
-  expression of the matches form "label matches regex".
-- [v1Max](#v1-max) – Takes a list of input signals and emits the signal with the
-  maximum value
+  [labels](/concepts/flow-control/label/label.md)
+  should be considered a match or not
+- [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
+- [v1LoadShedActuatorIns](#v1-load-shed-actuator-ins) – Input for the Load Shed Actuator component.
+- [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels
+- [v1MatchesMatchExpression](#v1-matches-match-expression) – Label selector expression of the matches form "label matches regex".
+- [v1Max](#v1-max) – Takes a list of input signals and emits the signal with the maximum value
 - [v1MaxIns](#v1-max-ins) – Inputs for the Max component.
 - [v1MaxOuts](#v1-max-outs) – Output for the Max component.
-- [v1Min](#v1-min) – Takes an array of input signals and emits the signal with
-  the minimum value Min:…
+- [v1Min](#v1-min) – Takes an array of input signals and emits the signal with the minimum value
+  Min:…
 - [v1MinIns](#v1-min-ins) – Inputs for the Min component.
 - [v1MinOuts](#v1-min-outs) – Output ports for the Min component.
-- [v1PathTemplateMatcher](#v1-path-template-matcher) – Matches HTTP Path to
-  given path templates
-- [v1Policy](#v1-policy) – Policy expresses reliability automation workflow that
-  automatically protects services
+- [v1PathTemplateMatcher](#v1-path-template-matcher) – Matches HTTP Path to given path templates
+- [v1Policy](#v1-policy) – Policy expresses reliability automation workflow that automatically protects services
 - [v1Port](#v1-port) – Components are interconnected with each other via Ports
-- [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically
-  and returns the result as an output signal
+- [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an output signal
 - [v1PromQLOuts](#v1-prom-q-l-outs) – Output for the PromQL component.
-- [v1RateLimiterIns](#v1-rate-limiter-ins) – Inputs for the RateLimiter
-  component
-- [v1Resources](#v1-resources) – Resources that need to be setup for the policy
-  to function
+- [v1RateLimiterIns](#v1-rate-limiter-ins) – Inputs for the RateLimiter component
+- [v1Resources](#v1-resources) – Resources that need to be setup for the policy to function
 - [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule
 - [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing-based workload scheduler
 - [v1SchedulerOuts](#v1-scheduler-outs) – Output for the Scheduler component.
-- [v1Selector](#v1-selector) – Describes where a rule or actuation component
-  should apply to
-- [v1Sqrt](#v1-sqrt) – Takes an input signal and emits the square root of it
-  multiplied by scale as an output
+- [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to
+- [v1Sqrt](#v1-sqrt) – Takes an input signal and emits the square root of it multiplied by scale as an output
 - [v1SqrtIns](#v1-sqrt-ins) – Inputs for the Sqrt component.
 - [v1SqrtOuts](#v1-sqrt-outs) – Outputs for the Sqrt component.
 
@@ -150,8 +110,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>of</dt>
 <dd>
 
-([[]V1MatchExpression](#v1-match-expression)) List of subexpressions of the
-match expression.
+([[]V1MatchExpression](#v1-match-expression)) List of subexpressions of the match expression.
 
 </dd>
 </dl>
@@ -174,8 +133,7 @@ TODO document what happens when lazy sync is disabled
 <dt>num_sync</dt>
 <dd>
 
-(int64, `gt=0`, default: `5`) Number of times to lazy sync within the
-_limit_reset_interval_.
+(int64, `gt=0`, default: `5`) Number of times to lazy sync within the _limit_reset_interval_.
 
 </dd>
 </dl>
@@ -188,8 +146,7 @@ _limit_reset_interval_.
 <dt>label_value</dt>
 <dd>
 
-(string, `required`) Value of the label for which the override should be
-applied.
+(string, `required`) Value of the label for which the override should be applied.
 
 </dd>
 </dl>
@@ -197,8 +154,7 @@ applied.
 <dt>limit_scale_factor</dt>
 <dd>
 
-(float64, default: `1`) Amount by which the _in_ports.limit_ should be
-multiplied for this label value.
+(float64, default: `1`) Amount by which the _in_ports.limit_ should be multiplied for this label value.
 
 </dd>
 </dl>
@@ -215,8 +171,7 @@ High-level extractor-based rules are compiled into a single rego query.
 <dt>query</dt>
 <dd>
 
-(string) Query string to extract a value (eg.
-`data.<mymodulename>.<variablename>`).
+(string) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
 Note: The module name must match the package name from the "source".
 
@@ -235,8 +190,7 @@ Note: Must include a "package" declaration.
 
 ### <span id="scheduler-workload"></span> SchedulerWorkload
 
-Workload defines a class of requests that preferably have similar properties
-such as response latency or desired priority.
+Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
 
 #### Properties
 
@@ -244,10 +198,10 @@ such as response latency or desired priority.
 <dt>fairness_key</dt>
 <dd>
 
-(string) Fairness key is a label key that can be used to provide fairness within
-a workload. Any [flow label](/concepts/flow-control/label/label.md) can be used
-here. Eg. if you have a classifier that sets `user` flow label, you might want
-to set `fairness_key = "user"`.
+(string) Fairness key is a label key that can be used to provide fairness within a workload.
+Any [flow label](/concepts/flow-control/label/label.md) can be used here. Eg. if
+you have a classifier that sets `user` flow label, you might want to set
+`fairness_key = "user"`.
 
 </dd>
 </dl>
@@ -255,9 +209,9 @@ to set `fairness_key = "user"`.
 <dt>priority</dt>
 <dd>
 
-(int64, `gte=0,lte=255`) Describes priority level of the requests within the
-workload. Priority level ranges from 0 to 255. Higher numbers means higher
-priority level.
+(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
+Priority level ranges from 0 to 255.
+Higher numbers means higher priority level.
 
 </dd>
 </dl>
@@ -265,8 +219,7 @@ priority level.
 <dt>tokens</dt>
 <dd>
 
-(string, default: `1`) Tokens determines the cost of admitting a single request
-the workload, which is typically defined as milliseconds of response latency.
+(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
 This override is applicable only if `auto_tokens` is set to false.
 
 </dd>
@@ -280,8 +233,8 @@ This override is applicable only if `auto_tokens` is set to false.
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based
-on [flow labels](/concepts/flow-control/label/label.md).
+([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based on
+[flow labels](/concepts/flow-control/label/label.md).
 
 </dd>
 </dl>
@@ -289,27 +242,24 @@ on [flow labels](/concepts/flow-control/label/label.md).
 <dt>workload</dt>
 <dd>
 
-([SchedulerWorkload](#scheduler-workload)) Workload associated with flows
-matching the label matcher.
+([SchedulerWorkload](#scheduler-workload)) Workload associated with flows matching the label matcher.
 
 </dd>
 </dl>
 
 ### <span id="languagev1-concurrency-limiter"></span> languagev1ConcurrencyLimiter
 
-Concurrency Limiter is an actuator component that regulates flows in order to
-provide active service protection
+Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
-:::info See also
-[Scheduler overview](/concepts/flow-control/actuators/scheduler.md). :::
+:::info
+See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
+:::
 
-It is based on the actuation strategy (e.g. load shed) and workload scheduling
-which is based on Weighted Fair Queuing principles. Concurrency is calculated in
-terms of total tokens which translate to (avg. latency \* inflight requests),
-i.e. Little's Law.
+It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
 
-ConcurrencyLimiter configuration is split into two parts: An actuation strategy
-and a scheduler. Right now, only `load_shed_actuator` strategy is available.
+ConcurrencyLimiter configuration is split into two parts: An actuation
+strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
 
 #### Properties
 
@@ -317,8 +267,7 @@ and a scheduler. Right now, only `load_shed_actuator` strategy is available.
 <dt>load_shed_actuator</dt>
 <dd>
 
-([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a
-portion of requests.
+([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a portion of requests.
 
 Actuation strategy defines the input signal that will drive the scheduler.
 
@@ -328,11 +277,10 @@ Actuation strategy defines the input signal that will drive the scheduler.
 <dt>scheduler</dt>
 <dd>
 
-([V1Scheduler](#v1-scheduler), `required`) Configuration of Weighted Fair
-Queuing-based workload scheduler.
+([V1Scheduler](#v1-scheduler), `required`) Configuration of Weighted Fair Queuing-based workload scheduler.
 
-Contains configuration of per-agent scheduler, and also defines some output
-signals.
+Contains configuration of per-agent scheduler, and also defines some
+output signals.
 
 </dd>
 </dl>
@@ -341,11 +289,12 @@ signals.
 
 Limits the traffic on a control point to specified rate
 
-:::info See also
-[Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md). :::
+:::info
+See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+:::
 
-Ratelimiting is done separately on per-label-value basis. Use _label_key_ to
-select which label should be used as key.
+Ratelimiting is done separately on per-label-value basis. Use _label_key_
+to select which label should be used as key.
 
 #### Properties
 
@@ -364,12 +313,11 @@ select which label should be used as key.
 (string, `required`) Specifies which label the ratelimiter should be keyed by.
 
 Rate limiting is done independently for each value of the
-[label](/concepts/flow-control/label/label.md) with given key. Eg., to give each
-user a separate limit, assuming you have a _user_ flow label set up, set
-`label_key: "user"`.
+[label](/concepts/flow-control/label/label.md) with given key.
+Eg., to give each user a separate limit, assuming you have a _user_ flow
+label set up, set `label_key: "user"`.
 
-TODO make it possible for this field to be optional – to achieve global
-ratelimit.
+TODO make it possible for this field to be optional – to achieve global ratelimit.
 
 </dd>
 </dl>
@@ -377,8 +325,7 @@ ratelimit.
 <dt>lazy_sync</dt>
 <dd>
 
-([RateLimiterLazySync](#rate-limiter-lazy-sync)) Configuration of lazy-syncing
-behaviour of ratelimiter
+([RateLimiterLazySync](#rate-limiter-lazy-sync)) Configuration of lazy-syncing behaviour of ratelimiter
 
 </dd>
 </dl>
@@ -386,8 +333,7 @@ behaviour of ratelimiter
 <dt>limit_reset_interval</dt>
 <dd>
 
-(string, default: `60s`) Time after which the limit for a given label value will
-be reset.
+(string, default: `60s`) Time after which the limit for a given label value will be reset.
 
 </dd>
 </dl>
@@ -395,8 +341,7 @@ be reset.
 <dt>overrides</dt>
 <dd>
 
-([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different
-limits for particular label values.
+([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
 
 </dd>
 </dl>
@@ -404,8 +349,7 @@ limits for particular label values.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector), `required`) Which control point to apply this
-ratelimiter to.
+([V1Selector](#v1-selector), `required`) Which control point to apply this ratelimiter to.
 
 </dd>
 </dl>
@@ -414,8 +358,8 @@ ratelimiter to.
 
 FluxMeter gathers metrics for the traffic that matches its selector.
 
-Example of a selector that creates a histogram metric for all HTTP requests to
-particular service:
+Example of a selector that creates a histogram metric for all HTTP requests
+to particular service:
 
 ```yaml
 selector:
@@ -430,9 +374,7 @@ selector:
 <dt>histogram_buckets</dt>
 <dd>
 
-([]float64, default:
-`[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) Latency
-histogram buckets (in ms) for this FluxMeter.
+([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) Latency histogram buckets (in ms) for this FluxMeter.
 
 </dd>
 </dl>
@@ -440,14 +382,14 @@ histogram buckets (in ms) for this FluxMeter.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector)) What latency should we measure in the histogram
-created by this FluxMeter.
+([V1Selector](#v1-selector)) What latency should we measure in the histogram created by this FluxMeter.
 
-- For traffic control points, fluxmeter will measure the duration of the whole
-  http transaction (including sending request and receiving response).
+- For traffic control points, fluxmeter will measure the duration of the
+  whole http transaction (including sending request and receiving
+  response).
 - For feature control points, fluxmeter will measure execution of the span
-  associated with particular feature. What contributes to the span's duration is
-  entirely up to the user code that uses Aperture library.
+  associated with particular feature. What contributes to the span's
+  duration is entirely up to the user code that uses Aperture library.
 
 </dd>
 </dl>
@@ -456,14 +398,12 @@ created by this FluxMeter.
 
 Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
 
-IP addresses in attribute context are defined as objects with separate ip and
-port fields. This is a helper to display an address as a single string.
+IP addresses in attribute context are defined as objects with separate ip and port fields.
+This is a helper to display an address as a single string.
 
-Note: Use with care, as it might accidentally introduce a high-cardinality flow
-label values.
+Note: Use with care, as it might accidentally introduce a high-cardinality flow label values.
 
-[ext-authz-address]:
-  https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
+[ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
 
 Example:
 
@@ -477,8 +417,7 @@ from: "source.address # or dstination.address"
 <dt>from</dt>
 <dd>
 
-(string, `required`) Attribute path pointing to some string - eg.
-"source.address".
+(string, `required`) Attribute path pointing to some string - eg. "source.address".
 
 </dd>
 </dl>
@@ -493,8 +432,7 @@ Type of combinator that computes the arithmetic operation on the operand signals
 <dt>in_ports</dt>
 <dd>
 
-([V1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins)) Input ports for the
-Arithmetic Combinator component.
+([V1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins)) Input ports for the Arithmetic Combinator component.
 
 </dd>
 </dl>
@@ -502,12 +440,10 @@ Arithmetic Combinator component.
 <dt>operator</dt>
 <dd>
 
-(string, `oneof=add sub mul div xor lshift rshift`) Operator of the arithmetic
-operation.
+(string, `oneof=add sub mul div xor lshift rshift`) Operator of the arithmetic operation.
 
-The arithmetic operation can be addition, subtraction, multiplication, division,
-XOR, right bit shift or left bit shift. In case of XOR and bitshifts, value of
-signals is cast to integers before performing the operation.
+The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
+In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
 
 </dd>
 </dl>
@@ -515,8 +451,7 @@ signals is cast to integers before performing the operation.
 <dt>out_ports</dt>
 <dd>
 
-([V1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs)) Output ports for
-the Arithmetic Combinator component.
+([V1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs)) Output ports for the Arithmetic Combinator component.
 
 </dd>
 </dl>
@@ -563,23 +498,25 @@ Outputs for the Arithmetic Combinator component.
 
 Circuit is defined as a dataflow graph of inter-connected components
 
-Signals flow between components via ports. As signals traverse the circuit, they
-get processed, stored within components or get acted upon (e.g. load shed,
-rate-limit, auto-scale etc.). Circuit evaluated periodically in order to respond
-to changes in signal readings.
+Signals flow between components via ports.
+As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
+Circuit evaluated periodically in order to respond to changes in signal readings.
 
-:::info **Signal**
+:::info
+**Signal**
 
 Signals are floating-point values.
 
-A signal also have a special **Invalid** value. It's usually used to communicate
-that signal doesn't have a meaningful value at the moment, eg.
-[PromQL](#-v1promql) emits such a value if it cannot execute a query. Components
-know when their input signals are invalid and can act accordingly. They can
-either propagate the invalidness, by making their output itself invalid (like
-eg. [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
-logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's docs on
-how exactly it handles invalid inputs. :::
+A signal also have a special **Invalid** value. It's usually used to
+communicate that signal doesn't have a meaningful value at the moment, eg.
+[PromQL](#-v1promql) emits such a value if it cannot execute a query.
+Components know when their input signals are invalid and can act
+accordingly. They can either propagate the invalidness, by making their
+output itself invalid (like eg.
+[ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
+logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+docs on how exactly it handles invalid inputs.
+:::
 
 #### Properties
 
@@ -587,8 +524,7 @@ how exactly it handles invalid inputs. :::
 <dt>components</dt>
 <dd>
 
-([[]V1Component](#v1-component)) Defines a signal processing graph as a list of
-components.
+([[]V1Component](#v1-component)) Defines a signal processing graph as a list of components.
 
 </dd>
 </dl>
@@ -596,9 +532,8 @@ components.
 <dt>evaluation_interval</dt>
 <dd>
 
-(string, default: `0.5s`) Evaluation interval (tick) is the time period between
-consecutive runs of the policy circuit. This interval is typically aligned with
-how often the corrective action (actuation) needs to be taken.
+(string, default: `0.5s`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 
 </dd>
 </dl>
@@ -607,8 +542,9 @@ how often the corrective action (actuation) needs to be taken.
 
 Set of classification rules sharing a common selector
 
-:::info See also
-[Classifier overview](/concepts/flow-control/label/classifier.md). :::
+:::info
+See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+:::
 
 Example:
 
@@ -639,8 +575,7 @@ how to extract and propagate flow labels with that key.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector)) Defines where to apply the flow classification
-rule.
+([V1Selector](#v1-selector)) Defines where to apply the flow classification rule.
 
 </dd>
 </dl>
@@ -649,34 +584,36 @@ rule.
 
 Computational block that form the circuit
 
-Signals flow into the components via input ports and results are emitted on
-output ports. Components are wired to each other based on signal names forming
-an execution graph of the circuit.
+Signals flow into the components via input ports and results are emitted on output ports.
+Components are wired to each other based on signal names forming an execution graph of the circuit.
 
-:::note Loops are broken by the runtime at the earliest component index that is
-part of the loop. The looped signals are saved in the tick they are generated
-and served in the subsequent tick. :::
+:::note
+Loops are broken by the runtime at the earliest component index that is part of the loop.
+The looped signals are saved in the tick they are generated and served in the subsequent tick.
+:::
 
 There are three categories of components:
 
-- "source" components – they take some sort of input from "the real world" and
-  output a signal based on this input. Example: [PromQL](#-v1promql). In the UI
+- "source" components – they take some sort of input from "the real world" and output
+  a signal based on this input. Example: [PromQL](#-v1promql). In the UI
   they're represented by green color.
-- internal components – "pure" components that don't interact with the "real
-  world". Examples: [GradientController](#-v1gradientcontroller),
-  [Max](#-v1max). :::note Internal components's output can depend on their
-  internal state, in addition to the inputs. Eg. see the
-  [Exponential Moving Average filter](#-v1ema). :::
+- internal components – "pure" components that don't interact with the "real world".
+  Examples: [GradientController](#-v1gradientcontroller), [Max](#-v1max).
+  :::note
+  Internal components's output can depend on their internal state, in addition to the inputs.
+  Eg. see the [Exponential Moving Average filter](#-v1ema).
+  :::
 - "sink" components – they affect the real world.
-  [ConcurrencyLimiter](#-languagev1concurrencylimiter) and
-  [RateLimiter](#-languagev1ratelimiter). Also sometimes called
-  [_actuators_](/concepts/flow-control/actuators/actuators.md). In the UI,
-  represented by orange color. Sink components are usually also "sources" too,
-  they usually emit a feedback signal, like `accepted_concurrency` in case of
-  ConcurrencyLimiter.
+  [ConcurrencyLimiter](#-languagev1concurrencylimiter) and [RateLimiter](#-languagev1ratelimiter).
+  Also sometimes called [_actuators_](/concepts/flow-control/actuators/actuators.md).
+  In the UI, represented by orange color. Sink components are usually also
+  "sources" too, they usually emit a feedback signal, like
+  `accepted_concurrency` in case of ConcurrencyLimiter.
 
-:::tip Sometimes you may want to use a constant value as one of component's
-inputs. You can use the [Constant](#-constant) component for this. :::
+:::tip
+Sometimes you may want to use a constant value as one of component's inputs.
+You can use the [Constant](#-constant) component for this.
+:::
 
 See also [Policy](#-v1policy) for a higher-level explanation of circuits.
 
@@ -686,8 +623,7 @@ See also [Policy](#-v1policy) for a higher-level explanation of circuits.
 <dt>arithmetic_combinator</dt>
 <dd>
 
-([V1ArithmeticCombinator](#v1-arithmetic-combinator)) Applies the given operator
-on input operands (signals) and emits the result.
+([V1ArithmeticCombinator](#v1-arithmetic-combinator)) Applies the given operator on input operands (signals) and emits the result.
 
 </dd>
 </dl>
@@ -695,9 +631,7 @@ on input operands (signals) and emits the result.
 <dt>concurrency_limiter</dt>
 <dd>
 
-([Languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter)) Concurrency
-Limiter provides service protection by applying prioritized load shedding of
-flows using a network scheduler (e.g. Weighted Fair Queuing).
+([Languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
 
 </dd>
 </dl>
@@ -713,8 +647,7 @@ flows using a network scheduler (e.g. Weighted Fair Queuing).
 <dt>decider</dt>
 <dd>
 
-([V1Decider](#v1-decider)) Decider acts as a switch that emits one of the two
-signals based on the binary result of comparison operator on two operands.
+([V1Decider](#v1-decider)) Decider acts as a switch that emits one of the two signals based on the binary result of comparison operator on two operands.
 
 </dd>
 </dl>
@@ -730,9 +663,7 @@ signals based on the binary result of comparison operator on two operands.
 <dt>extrapolator</dt>
 <dd>
 
-([V1Extrapolator](#v1-extrapolator)) Takes an input signal and emits the
-extrapolated value; either mirroring the input value or repeating the last known
-value up to the maximum extrapolation interval.
+([V1Extrapolator](#v1-extrapolator)) Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.
 
 </dd>
 </dl>
@@ -740,11 +671,8 @@ value up to the maximum extrapolation interval.
 <dt>gradient_controller</dt>
 <dd>
 
-([V1GradientController](#v1-gradient-controller)) Gradient controller basically
-calculates the ratio between the signal and the setpoint to determine the
-magnitude of the correction that need to be applied. This controller can be used
-to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style
-response.
+([V1GradientController](#v1-gradient-controller)) Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 
 </dd>
 </dl>
@@ -768,8 +696,7 @@ response.
 <dt>promql</dt>
 <dd>
 
-([V1PromQL](#v1-prom-q-l)) Periodically runs a Prometheus query in the
-background and emits the result.
+([V1PromQL](#v1-prom-q-l)) Periodically runs a Prometheus query in the background and emits the result.
 
 </dd>
 </dl>
@@ -777,8 +704,7 @@ background and emits the result.
 <dt>rate_limiter</dt>
 <dd>
 
-([Languagev1RateLimiter](#languagev1-rate-limiter)) Rate Limiter provides
-service protection by applying rate limiter.
+([Languagev1RateLimiter](#languagev1-rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
 
 </dd>
 </dl>
@@ -786,8 +712,7 @@ service protection by applying rate limiter.
 <dt>sqrt</dt>
 <dd>
 
-([V1Sqrt](#v1-sqrt)) Takes an input signal and emits the square root of the
-input signal.
+([V1Sqrt](#v1-sqrt)) Takes an input signal and emits the square root of the input signal.
 
 </dd>
 </dl>
@@ -832,9 +757,8 @@ Outputs for the Constant component.
 
 ### <span id="v1-control-point"></span> v1ControlPoint
 
-Identifies control point within a service that the rule or policy should apply
-to. Controlpoint is either a library feature name or one of ingress/egress
-traffic control point.
+Identifies control point within a service that the rule or policy should apply to.
+Controlpoint is either a library feature name or one of ingress/egress traffic control point.
 
 #### Properties
 
@@ -842,9 +766,8 @@ traffic control point.
 <dt>feature</dt>
 <dd>
 
-(string, `required`) Name of FlunxNinja library's feature. Feature corresponds
-to a block of code that can be "switched off" which usually is a "named
-opentelemetry's Span".
+(string, `required`) Name of FlunxNinja library's feature.
+Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
 
 Note: Flowcontrol only.
 
@@ -854,31 +777,27 @@ Note: Flowcontrol only.
 <dt>traffic</dt>
 <dd>
 
-(string, `required,oneof=ingress egress`) Type of traffic service, either
-"ingress" or "egress". Apply the policy to the whole incoming/outgoing traffic
-of a service. Usually powered by integration with a proxy (like envoy) or a web
-framework.
+(string, `required,oneof=ingress egress`) Type of traffic service, either "ingress" or "egress".
+Apply the policy to the whole incoming/outgoing traffic of a service.
+Usually powered by integration with a proxy (like envoy) or a web framework.
 
 - Flowcontrol: Blockable atom here is a single HTTP-transaction.
-- Classification: Apply the classification rules to every incoming/outgoing
-  request and attach the resulting flow labels to baggage and telemetry.
+- Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
 
 </dd>
 </dl>
 
 ### <span id="v1-decider"></span> v1Decider
 
-Type of combinator that computes the comparison operation on lhs and rhs signals
-and switches between `on_true` and `on_false` signals based on the result of the
-comparison
+Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
 
-The comparison operator can be greater-than, less-than, greater-than-or-equal,
-less-than-or-equal, equal, or not-equal.
+The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
-This component also supports time-based response, i.e. the output transitions
-between on_true or on_false signal if the decider condition is true or false for
-at least "positive_for" or "negative_for" duration. If `true_for` and
-`false_for` durations are zero then the transitions are instantaneous.
+This component also supports time-based response, i.e. the output
+transitions between on_true or on_false signal if the decider condition is
+true or false for at least "positive_for" or "negative_for" duration. If
+`true_for` and `false_for` durations are zero then the transitions are
+instantaneous.
 
 #### Properties
 
@@ -886,8 +805,8 @@ at least "positive_for" or "negative_for" duration. If `true_for` and
 <dt>false_for</dt>
 <dd>
 
-(string, default: `0s`) Duration of time to wait before a transition to false
-state. If the duration is zero, the transition will happen instantaneously.
+(string, default: `0s`) Duration of time to wait before a transition to false state.
+If the duration is zero, the transition will happen instantaneously.
 
 </dd>
 </dl>
@@ -903,8 +822,7 @@ state. If the duration is zero, the transition will happen instantaneously.
 <dt>operator</dt>
 <dd>
 
-(string, `oneof=gt lt gte lte eq neq`) Comparison operator that computes
-operation on lhs and rhs input signals.
+(string, `oneof=gt lt gte lte eq neq`) Comparison operator that computes operation on lhs and rhs input signals.
 
 </dd>
 </dl>
@@ -920,8 +838,8 @@ operation on lhs and rhs input signals.
 <dt>true_for</dt>
 <dd>
 
-(string, default: `0s`) Duration of time to wait before a transition to true
-state. If the duration is zero, the transition will happen instantaneously.
+(string, default: `0s`) Duration of time to wait before a transition to true state.
+If the duration is zero, the transition will happen instantaneously.
 
 </dd>
 </dl>
@@ -982,15 +900,12 @@ Outputs for the Decider component.
 
 ### <span id="v1-e-m-a"></span> v1EMA
 
-Exponential Moving Average (EMA) is a type of moving average that applies
-exponenially more weight to recent signal readings
+Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
 
 At any time EMA component operates in one of the following states:
 
-1. Warm up state: The first warm_up_window samples are used to compute the
-   initial EMA. If an invalid reading is received during the warm_up_window, the
-   last good average is emitted and the state gets reset back to beginning of
-   Warm up state.
+1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
+   If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
 2. Normal state: The EMA is computed using following formula.
 
 The EMA for a series $Y$ is calculated recursively as:
@@ -1003,16 +918,15 @@ $$
 \end{cases}
 $$
 
-The coefficient $\alpha$ represents the degree of weighting decrease, a constant
-smoothing factor between 0 and 1. A higher $\alpha$ discounts older observations
-faster. The $\alpha$ is computed using ema_window:
+The coefficient $\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.
+A higher $\alpha$ discounts older observations faster.
+The $\alpha$ is computed using ema_window:
 
 $$
 \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
 $$
 
-The EMA filter also employs a min-max-envolope logic during warm up stage,
-explained [here](#-v1emains).
+The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#-v1emains).
 
 #### Properties
 
@@ -1020,8 +934,7 @@ explained [here](#-v1emains).
 <dt>correction_factor_on_max_envelope_violation</dt>
 <dd>
 
-(float64, `gte=0,lte=1.0`, default: `1`) Correction factor to apply on the
-output value if its in violation of the max envelope.
+(float64, `gte=0,lte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the max envelope.
 
 </dd>
 </dl>
@@ -1029,8 +942,7 @@ output value if its in violation of the max envelope.
 <dt>correction_factor_on_min_envelope_violation</dt>
 <dd>
 
-(float64, `gte=1.0`, default: `1`) Correction factor to apply on the output
-value if its in violation of the min envelope.
+(float64, `gte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the min envelope.
 
 </dd>
 </dl>
@@ -1064,8 +976,7 @@ value if its in violation of the min envelope.
 
 (string, default: `0s`) Duration of EMA warming up window.
 
-The initial value of the EMA is the average of signal readings received during
-the warm up window.
+The initial value of the EMA is the average of signal readings received during the warm up window.
 
 </dd>
 </dl>
@@ -1090,13 +1001,17 @@ Inputs for the EMA component.
 
 ([V1Port](#v1-port)) Upper bound of the moving average.
 
-Used during the warm-up stage: if the signal would exceed `max_envelope` it's
-multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+Used during the warm-up stage: if the signal would exceed `max_envelope`
+it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
 
-:::note If the signal deviates from `max_envelope` faster than the correction
-faster, it might end up exceeding the envelope. :::
+:::note
+If the signal deviates from `max_envelope` faster than the correction
+faster, it might end up exceeding the envelope.
+:::
 
-:::note The envelope logic is **not** used outside the warm-up stage! :::
+:::note
+The envelope logic is **not** used outside the warm-up stage!
+:::
 
 </dd>
 </dl>
@@ -1121,8 +1036,7 @@ Outputs for the EMA component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Exponential moving average of the series of reading as an
-output signal.
+([V1Port](#v1-port)) Exponential moving average of the series of reading as an output signal.
 
 </dd>
 </dl>
@@ -1152,8 +1066,7 @@ Label selector expression of the equal form "label == value".
 
 ### <span id="v1-extractor"></span> v1Extractor
 
-Defines a high-level way to specify how to extract a flow label value given http
-request metadata, without a need to write rego code
+Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
 
 There are multiple variants of extractor, specify exactly one.
 
@@ -1163,8 +1076,7 @@ There are multiple variants of extractor, specify exactly one.
 <dt>address</dt>
 <dd>
 
-([V1AddressExtractor](#v1-address-extractor)) Display an address as a single
-string - `<ip>:<port>`.
+([V1AddressExtractor](#v1-address-extractor)) Display an address as a single string - `<ip>:<port>`.
 
 </dd>
 </dl>
@@ -1179,8 +1091,8 @@ Attribute path is a dot-separated path to attribute.
 Should be either:
 
 - one of the fields of [Attribute Context][attribute-context], or
-- a special "request.http.bearer" pseudo-attribute. Eg. "request.http.method" or
-  "request.http.header.user-agent"
+- a special "request.http.bearer" pseudo-attribute.
+  Eg. "request.http.method" or "request.http.header.user-agent"
 
 Note: The same attribute path syntax is shared by other extractor variants,
 wherever attribute path is needed in their "from" syntax.
@@ -1191,8 +1103,7 @@ Example:
 from: request.http.headers.user-agent
 ```
 
-[attribute-context]:
-  https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto"
+[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto"
 
 </dd>
 </dl>
@@ -1200,8 +1111,7 @@ from: request.http.headers.user-agent
 <dt>json</dt>
 <dd>
 
-([V1JSONExtractor](#v1-json-extractor)) Deserialize a json, and extract one of
-the fields.
+([V1JSONExtractor](#v1-json-extractor)) Deserialize a json, and extract one of the fields.
 
 </dd>
 </dl>
@@ -1209,8 +1119,7 @@ the fields.
 <dt>jwt</dt>
 <dd>
 
-([V1JWTExtractor](#v1-j-w-t-extractor)) Parse the attribute as JWT and read the
-payload.
+([V1JWTExtractor](#v1-j-w-t-extractor)) Parse the attribute as JWT and read the payload.
 
 </dd>
 </dl>
@@ -1218,19 +1127,16 @@ payload.
 <dt>path_templates</dt>
 <dd>
 
-([V1PathTemplateMatcher](#v1-path-template-matcher)) Match HTTP Path to given
-path templates.
+([V1PathTemplateMatcher](#v1-path-template-matcher)) Match HTTP Path to given path templates.
 
 </dd>
 </dl>
 
 ### <span id="v1-extrapolator"></span> v1Extrapolator
 
-Extrapolates the input signal by repeating the last valid value during the
-period in which it is invalid
+Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
 
-It does so until `maximum_extrapolation_interval` is reached, beyond which it
-emits invalid signal unless input signal becomes valid again.
+It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 
 #### Properties
 
@@ -1238,8 +1144,7 @@ emits invalid signal unless input signal becomes valid again.
 <dt>in_ports</dt>
 <dd>
 
-([V1ExtrapolatorIns](#v1-extrapolator-ins)) Input ports for the Extrapolator
-component.
+([V1ExtrapolatorIns](#v1-extrapolator-ins)) Input ports for the Extrapolator component.
 
 </dd>
 </dl>
@@ -1247,8 +1152,7 @@ component.
 <dt>max_extrapolation_interval</dt>
 <dd>
 
-(string, default: `10s`) Maximum time interval to repeat the last valid value of
-input signal.
+(string, default: `10s`) Maximum time interval to repeat the last valid value of input signal.
 
 </dd>
 </dl>
@@ -1256,8 +1160,7 @@ input signal.
 <dt>out_ports</dt>
 <dd>
 
-([V1ExtrapolatorOuts](#v1-extrapolator-outs)) Output ports for the Extrapolator
-component.
+([V1ExtrapolatorOuts](#v1-extrapolator-outs)) Output ports for the Extrapolator component.
 
 </dd>
 </dl>
@@ -1294,13 +1197,12 @@ Outputs for the Extrapolator component.
 
 ### <span id="v1-gradient-controller"></span> v1GradientController
 
-Gradient controller is a type of controller which tries to adjust the control
-variable proportionally to the relative difference between setpoint and actual
-value of the signal
+Gradient controller is a type of controller which tries to adjust the
+control variable proportionally to the relative difference between setpoint
+and actual value of the signal
 
 The `gradient` describes a corrective factor that should be applied to the
-control variable to get the signal closer to the setpoint. It is computed as
-follows:
+control variable to get the signal closer to the setpoint. It is computed as follows:
 
 $$
 \text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}
@@ -1317,11 +1219,13 @@ $$
 Note the additional `optimize` signal, that can be used to "nudge" the
 controller into desired idle state.
 
-The output can be _optionally_ clamped to desired range using `max` and `min`
-input.
+The output can be _optionally_ clamped to desired range using `max` and
+`min` input.
 
-:::caution Some changes are expected in the near future:
-[#182](https://github.com/fluxninja/aperture/issues/182) :::
+:::caution
+Some changes are expected in the near future:
+[#182](https://github.com/fluxninja/aperture/issues/182)
+:::
 
 #### Properties
 
@@ -1329,8 +1233,7 @@ input.
 <dt>in_ports</dt>
 <dd>
 
-([V1GradientControllerIns](#v1-gradient-controller-ins)) Input ports of the
-Gradient Controller.
+([V1GradientControllerIns](#v1-gradient-controller-ins)) Input ports of the Gradient Controller.
 
 </dd>
 </dl>
@@ -1338,8 +1241,7 @@ Gradient Controller.
 <dt>max_gradient</dt>
 <dd>
 
-(float64, default: `1.7976931348623157e+308`) Maximum gradient which clamps the
-computed gradient value to the range, [min_gradient, max_gradient].
+(float64, default: `1.7976931348623157e+308`) Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 
 </dd>
 </dl>
@@ -1347,8 +1249,7 @@ computed gradient value to the range, [min_gradient, max_gradient].
 <dt>min_gradient</dt>
 <dd>
 
-(float64, default: `-1.7976931348623157e+308`) Minimum gradient which clamps the
-computed gradient value to the range, [min_gradient, max_gradient].
+(float64, default: `-1.7976931348623157e+308`) Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 
 </dd>
 </dl>
@@ -1356,8 +1257,7 @@ computed gradient value to the range, [min_gradient, max_gradient].
 <dt>out_ports</dt>
 <dd>
 
-([V1GradientControllerOuts](#v1-gradient-controller-outs)) Output ports of the
-Gradient Controller.
+([V1GradientControllerOuts](#v1-gradient-controller-outs)) Output ports of the Gradient Controller.
 
 </dd>
 </dl>
@@ -1365,8 +1265,7 @@ Gradient Controller.
 <dt>tolerance</dt>
 <dd>
 
-(float64, `gte=0.0`) Tolerance is a way to pre-multiply a setpoint by given
-value.
+(float64, `gte=0.0`) Tolerance is a way to pre-multiply a setpoint by given value.
 
 Value of tolerance should be close or equal to 1, eg. 1.1.
 
@@ -1413,8 +1312,7 @@ This signal is multiplied by the gradient to produce the output.
 <dt>optimize</dt>
 <dd>
 
-([V1Port](#v1-port)) Optimize signal is added to the output of the gradient
-calculation.
+([V1Port](#v1-port)) Optimize signal is added to the output of the gradient calculation.
 
 </dd>
 </dl>
@@ -1467,8 +1365,7 @@ pointer: /user/name
 <dt>from</dt>
 <dd>
 
-(string, `required`) Attribute path pointing to some strings - eg.
-"request.http.body".
+(string, `required`) Attribute path pointing to some strings - eg. "request.http.body".
 
 </dd>
 </dl>
@@ -1476,8 +1373,7 @@ pointer: /user/name
 <dt>pointer</dt>
 <dd>
 
-(string) Json pointer represents a parsed json pointer which allows to select a
-specified field from the json payload.
+(string) Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
 
 Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
 eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
@@ -1491,8 +1387,8 @@ Parse the attribute as JWT and read the payload
 
 Specify a field to be extracted from payload using "json_pointer".
 
-Note: The signature is not verified against the secret (we're assuming there's
-some other parts of the system that handles such verification).
+Note: The signature is not verified against the secret (we're assuming there's some
+other parts of the system that handles such verification).
 
 Example:
 
@@ -1507,8 +1403,7 @@ json_pointer: /user/email
 <dt>from</dt>
 <dd>
 
-(string, `required`) Jwt token can be pulled from any input attribute, but most
-likely you'd want to use "request.http.bearer".
+(string, `required`) Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
 
 </dd>
 </dl>
@@ -1516,8 +1411,7 @@ likely you'd want to use "request.http.bearer".
 <dt>json_pointer</dt>
 <dd>
 
-(string) Json pointer allowing to select a specified field from the json
-payload.
+(string) Json pointer allowing to select a specified field from the json payload.
 
 Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
 eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
@@ -1527,8 +1421,7 @@ eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
 
 ### <span id="v1-k8s-label-matcher-requirement"></span> v1K8sLabelMatcherRequirement
 
-Label selector requirement which is a selector that contains values, a key, and
-an operator that relates the key and values.
+Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
 
 #### Properties
 
@@ -1544,9 +1437,8 @@ an operator that relates the key and values.
 <dt>operator</dt>
 <dd>
 
-(string, `oneof=In NotIn Exists DoesNotExists`) Logical operator which
-represents a key's relationship to a set of values. Valid operators are In,
-NotIn, Exists and DoesNotExist.
+(string, `oneof=In NotIn Exists DoesNotExists`) Logical operator which represents a key's relationship to a set of values.
+Valid operators are In, NotIn, Exists and DoesNotExist.
 
 </dd>
 </dl>
@@ -1554,9 +1446,9 @@ NotIn, Exists and DoesNotExist.
 <dt>values</dt>
 <dd>
 
-([]string) An array of string values that relates to the key by an operator. If
-the operator is In or NotIn, the values array must be non-empty. If the operator
-is Exists or DoesNotExist, the values array must be empty.
+([]string) An array of string values that relates to the key by an operator.
+If the operator is In or NotIn, the values array must be non-empty.
+If the operator is Exists or DoesNotExist, the values array must be empty.
 
 </dd>
 </dl>
@@ -1564,8 +1456,8 @@ is Exists or DoesNotExist, the values array must be empty.
 ### <span id="v1-label-matcher"></span> v1LabelMatcher
 
 Allows to define rules whether a map of
-[labels](/concepts/flow-control/label/label.md) should be considered a match or
-not
+[labels](/concepts/flow-control/label/label.md)
+should be considered a match or not
 
 It provides three ways to define requirements:
 
@@ -1573,8 +1465,8 @@ It provides three ways to define requirements:
 - matchExpressions
 - arbitrary expression
 
-If multiple requirements are set, they are all ANDed. An empty label matcher
-always matches.
+If multiple requirements are set, they are all ANDed.
+An empty label matcher always matches.
 
 #### Properties
 
@@ -1582,8 +1474,7 @@ always matches.
 <dt>expression</dt>
 <dd>
 
-([V1MatchExpression](#v1-match-expression)) An arbitrary expression to be
-evaluated on the labels.
+([V1MatchExpression](#v1-match-expression)) An arbitrary expression to be evaluated on the labels.
 
 </dd>
 </dl>
@@ -1591,8 +1482,7 @@ evaluated on the labels.
 <dt>match_expressions</dt>
 <dd>
 
-([[]V1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement)) List of
-k8s-style label matcher requirements.
+([[]V1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement)) List of k8s-style label matcher requirements.
 
 Note: The requirements are ANDed.
 
@@ -1602,9 +1492,8 @@ Note: The requirements are ANDed.
 <dt>match_labels</dt>
 <dd>
 
-(map of string) A map of {key,value} pairs representing labels to be matched. A
-single {key,value} in the matchLabels requires that the label "key" is present
-and equal to "value".
+(map of string) A map of {key,value} pairs representing labels to be matched.
+A single {key,value} in the matchLabels requires that the label "key" is present and equal to "value".
 
 Note: The requirements are ANDed.
 
@@ -1613,8 +1502,7 @@ Note: The requirements are ANDed.
 
 ### <span id="v1-load-shed-actuator"></span> v1LoadShedActuator
 
-Takes the load shed factor input signal and publishes it to the schedulers in
-the data-plane
+Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
 
 #### Properties
 
@@ -1622,8 +1510,7 @@ the data-plane
 <dt>in_ports</dt>
 <dd>
 
-([V1LoadShedActuatorIns](#v1-load-shed-actuator-ins)) Input ports for the Load
-Shed Actuator component.
+([V1LoadShedActuatorIns](#v1-load-shed-actuator-ins)) Input ports for the Load Shed Actuator component.
 
 </dd>
 </dl>
@@ -1638,8 +1525,8 @@ Input for the Load Shed Actuator component.
 <dt>load_shed_factor</dt>
 <dd>
 
-([V1Port](#v1-port)) Load shedding factor is a fraction of
-[incoming concurrency](#-v1schedulerouts) that needs to be dropped.
+([V1Port](#v1-port)) Load shedding factor is a fraction of [incoming
+concurrency](#-v1schedulerouts) that needs to be dropped.
 
 </dd>
 </dl>
@@ -1665,8 +1552,7 @@ all:
 <dt>all</dt>
 <dd>
 
-([MatchExpressionList](#match-expression-list)) The expression is true when all
-subexpressions are true.
+([MatchExpressionList](#match-expression-list)) The expression is true when all subexpressions are true.
 
 </dd>
 </dl>
@@ -1674,8 +1560,7 @@ subexpressions are true.
 <dt>any</dt>
 <dd>
 
-([MatchExpressionList](#match-expression-list)) The expression is true when any
-subexpression is true.
+([MatchExpressionList](#match-expression-list)) The expression is true when any subexpression is true.
 
 </dd>
 </dl>
@@ -1683,8 +1568,7 @@ subexpression is true.
 <dt>label_equals</dt>
 <dd>
 
-([V1EqualsMatchExpression](#v1-equals-match-expression)) The expression is true
-when label value equals given value.
+([V1EqualsMatchExpression](#v1-equals-match-expression)) The expression is true when label value equals given value.
 
 </dd>
 </dl>
@@ -1700,8 +1584,7 @@ when label value equals given value.
 <dt>label_matches</dt>
 <dd>
 
-([V1MatchesMatchExpression](#v1-matches-match-expression)) The expression is
-true when label matches given regex.
+([V1MatchesMatchExpression](#v1-matches-match-expression)) The expression is true when label matches given regex.
 
 </dd>
 </dl>
@@ -1709,8 +1592,7 @@ true when label matches given regex.
 <dt>not</dt>
 <dd>
 
-([V1MatchExpression](#v1-match-expression)) The expression negates the result of
-subexpression.
+([V1MatchExpression](#v1-match-expression)) The expression negates the result of subexpression.
 
 </dd>
 </dl>
@@ -1733,9 +1615,8 @@ Label selector expression of the matches form "label matches regex".
 <dt>regex</dt>
 <dd>
 
-(string, `required`) Regular expression that should match the label value. It
-uses
-[golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+(string, `required`) Regular expression that should match the label value.
+It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
 
 </dd>
 </dl>
@@ -1797,8 +1678,8 @@ Output for the Max component.
 
 ### <span id="v1-min"></span> v1Min
 
-Takes an array of input signals and emits the signal with the minimum value Min:
-output = min([]inputs).
+Takes an array of input signals and emits the signal with the minimum value
+Min: output = min([]inputs).
 
 #### Properties
 
@@ -1853,9 +1734,9 @@ Output ports for the Min component.
 
 Matches HTTP Path to given path templates
 
-HTTP path will be matched against given path templates. If a match occurs, the
-value associated with the path template will be treated as a result. In case of
-multiple path templates matching, the most specific one will be chosen.
+HTTP path will be matched against given path templates.
+If a match occurs, the value associated with the path template will be treated as a result.
+In case of multiple path templates matching, the most specific one will be chosen.
 
 #### Properties
 
@@ -1866,11 +1747,11 @@ multiple path templates matching, the most specific one will be chosen.
 (map of string) Template value keys are OpenAPI-inspired path templates.
 
 - Static path segment `/foo` matches a path segment exactly
-- `/{param}` matches arbitrary path segment. (The param name is ignored and can
-  be omitted (`{}`))
+- `/{param}` matches arbitrary path segment.
+  (The param name is ignored and can be omitted (`{}`))
 - The parameter must cover whole segment.
-- Additionally, path template can end with `/*` wildcard to match arbitrary
-  number of trailing segments (0 or more).
+- Additionally, path template can end with `/*` wildcard to match
+  arbitrary number of trailing segments (0 or more).
 - Multiple consecutive `/` are ignored, as well as trailing `/`.
 - Parametrized path segments must come after static segments.
 - `*`, if present, must come last.
@@ -1891,11 +1772,9 @@ Example:
 
 ### <span id="v1-policy"></span> v1Policy
 
-Policy expresses reliability automation workflow that automatically protects
-services
+Policy expresses reliability automation workflow that automatically protects services
 
-Policy specification contains a circuit that defines the controller logic and
-resources that need to be setup.
+Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 
 #### Properties
 
@@ -1911,8 +1790,7 @@ resources that need to be setup.
 <dt>resources</dt>
 <dd>
 
-([V1Resources](#v1-resources)) Resources (FluxMeters, Classifiers etc.) to
-setup.
+([V1Resources](#v1-resources)) Resources (FluxMeters, Classifiers etc.) to setup.
 
 </dd>
 </dl>
@@ -1934,8 +1812,7 @@ Components are interconnected with each other via Ports
 
 ### <span id="v1-prom-q-l"></span> v1PromQL
 
-Component that runs a Prometheus query periodically and returns the result as an
-output signal
+Component that runs a Prometheus query periodically and returns the result as an output signal
 
 #### Properties
 
@@ -1943,8 +1820,7 @@ output signal
 <dt>evaluation_interval</dt>
 <dd>
 
-(string, default: `10s`) Describes the interval between successive evaluations
-of the Prometheus query.
+(string, default: `10s`) Describes the interval between successive evaluations of the Prometheus query.
 
 </dd>
 </dl>
@@ -1962,8 +1838,10 @@ of the Prometheus query.
 
 (string) Describes the Prometheus query to be run.
 
-:::caution TODO we should describe how to construct the query, eg. how to employ
-the fluxmeters here or link to appropriate place in docs. :::
+:::caution
+TODO we should describe how to construct the query, eg. how to employ the
+fluxmeters here or link to appropriate place in docs.
+:::
 
 </dd>
 </dl>
@@ -1993,11 +1871,13 @@ Inputs for the RateLimiter component
 <dt>limit</dt>
 <dd>
 
-([V1Port](#v1-port), `required`) Number of flows allowed per
-_limit_reset_interval_ per each label. Negative values disable the ratelimiter.
+([V1Port](#v1-port), `required`) Number of flows allowed per _limit_reset_interval_ per each label.
+Negative values disable the ratelimiter.
 
-:::tip Negative limit can be useful to _conditionally_ enable the ratelimiter
-under certain circumstances. [Decider](#-v1decider) might be helpful. :::
+:::tip
+Negative limit can be useful to _conditionally_ enable the ratelimiter
+under certain circumstances. [Decider](#-v1decider) might be helpful.
+:::
 
 </dd>
 </dl>
@@ -2006,8 +1886,7 @@ under certain circumstances. [Decider](#-v1decider) might be helpful. :::
 
 Resources that need to be setup for the policy to function
 
-Resources are typically FluxMeters, Classifiers, etc. that can be used to create
-on-demand metrics or label the flows.
+Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 
 #### Properties
 
@@ -2015,11 +1894,9 @@ on-demand metrics or label the flows.
 <dt>classifiers</dt>
 <dd>
 
-([[]V1Classifier](#v1-classifier)) Classifiers are installed in the data-plane
-and are used to label the requests based on payload content.
+([[]V1Classifier](#v1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
-The flow labels created by Classifiers can be matched by FluxMeters to create
-metrics for control purposes.
+The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
 
 </dd>
 </dl>
@@ -2027,12 +1904,9 @@ metrics for control purposes.
 <dt>flux_meters</dt>
 <dd>
 
-(map of [Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters
-are installed in the data-plane and form the observability leg of the feedback
-loop.
+(map of [Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
 
-FluxMeters'-created metrics can be consumed as input to the circuit via the
-PromQL component.
+FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
 
 </dd>
 </dl>
@@ -2041,18 +1915,15 @@ PromQL component.
 
 Rule describes a single Flow Classification Rule
 
-Flow classification rule extracts a value from request metadata. More
-specifically, from `input`, which has the same spec as [Envoy's External
-Authorization Attribute Context][attribute-context]. See
-<https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input. There are
-two ways to define a flow classification rule:
+Flow classification rule extracts a value from request metadata.
+More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
+See <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.
+There are two ways to define a flow classification rule:
 
-- Using a declarative extractor – suitable from simple cases, such as directly
-  reading a value from header or a field from json body.
+- Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.
 - Rego expression.
 
-Performance note: It's recommended to use declarative extractors where possible,
-as they may be slightly performant than Rego expressions.
+Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
 [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
 
 Example of Declarative JSON extractor:
@@ -2095,15 +1966,17 @@ propagate: false
 <dt>hidden</dt>
 <dd>
 
-(bool) Decides if the created flow label should be hidden from the telemetry. A
-hidden flow label is still accessible in policies and can be used as eg.
+(bool) Decides if the created flow label should be hidden from the telemetry.
+A hidden flow label is still accessible in policies and can be used as eg.
 fairness key.
 
-:::caution When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
+:::caution
+When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
 labels are sent to cloud for observability. We thus recommend to set this
-_hidden_ flag for high-cardinality labels, such as usernames or ids, to avoid
-bloating analytics database. _Hidden_ flag should also be set for sensitive
-labels. :::
+_hidden_ flag for high-cardinality labels, such as usernames or ids, to
+avoid bloating analytics database. _Hidden_ flag should also be set for
+sensitive labels.
+:::
 
 </dd>
 </dl>
@@ -2130,8 +2003,10 @@ labels. :::
 
 Weighted Fair Queuing-based workload scheduler
 
-:::note Each Agent instantiates an independent copy of the scheduler, but output
-signal are aggregated across all agents. :::
+:::note
+Each Agent instantiates an independent copy of the scheduler, but output
+signal are aggregated across all agents.
+:::
 
 See [ConcurrencyLimiter](#-languagev1concurrencylimiter) for more context.
 
@@ -2141,10 +2016,10 @@ See [ConcurrencyLimiter](#-languagev1concurrencylimiter) for more context.
 <dt>auto_tokens</dt>
 <dd>
 
-(bool, default: `true`) Automatically estimate weight of flows in each workload,
-based on historical latency. Each workload's `tokens` will be set to average
-latency of flows in that workload during last few seconds (exact duration of
-this average can change).
+(bool, default: `true`) Automatically estimate weight of flows in each workload, based on
+historical latency. Each workload's `tokens` will be set to average
+latency of flows in that workload during last few seconds (exact duration
+of this average can change).
 
 </dd>
 </dl>
@@ -2152,8 +2027,7 @@ this average can change).
 <dt>default_workload</dt>
 <dd>
 
-([SchedulerWorkload](#scheduler-workload)) Workload to be used if none of
-workloads specified in `workloads` match.
+([SchedulerWorkload](#scheduler-workload)) Workload to be used if none of workloads specified in `workloads` match.
 
 </dd>
 </dl>
@@ -2161,23 +2035,24 @@ workloads specified in `workloads` match.
 <dt>max_timeout</dt>
 <dd>
 
-(string, default: `0.45s`) Max Timeout is the value with which the flow timeout
-calculated by `timeout_factor` is capped
+(string, default: `0.45s`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
 
-:::caution This timeout needs to be strictly less than the timeout set on the
+:::caution
+This timeout needs to be strictly less than the timeout set on the
 client for the whole GRPC call:
 
 - in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
 - in case of libraries, timeout configured... TODO.
 
-We're using fail-open logic in integrations, so if the GRPC timeout fires first,
-the flow will end up being unconditionally allowed while it're still waiting on
-the scheduler.
+We're using fail-open logic in integrations, so if the GRPC timeout
+fires first, the flow will end up being unconditionally allowed while
+it're still waiting on the scheduler.
 
-To avoid such cases, the end-to-end GRPC timeout should also contain some
-headroom for constant overhead like serialization, etc. Default value for GRPC
-timeouts is 500ms, giving 50ms of headeroom, so when tweaking this timeout, make
-sure to adjust the GRPC timeout accordingly. :::
+To avoid such cases, the end-to-end GRPC timeout should also contain
+some headroom for constant overhead like serialization, etc. Default
+value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+:::
 
 </dd>
 </dl>
@@ -2185,8 +2060,7 @@ sure to adjust the GRPC timeout accordingly. :::
 <dt>out_ports</dt>
 <dd>
 
-([V1SchedulerOuts](#v1-scheduler-outs)) Output ports for the Scheduler
-component.
+([V1SchedulerOuts](#v1-scheduler-outs)) Output ports for the Scheduler component.
 
 </dd>
 </dl>
@@ -2194,8 +2068,7 @@ component.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector)) Selector decides for which service or flows the
-scheduler will be applied.
+([V1Selector](#v1-selector)) Selector decides for which service or flows the scheduler will be applied.
 
 </dd>
 </dl>
@@ -2203,14 +2076,12 @@ scheduler will be applied.
 <dt>timeout_factor</dt>
 <dd>
 
-(float64, `gte=0.0`, default: `0.5`) Timeout as a factor of tokens for a flow in
-a workload
+(float64, `gte=0.0`, default: `0.5`) Timeout as a factor of tokens for a flow in a workload
 
-If a flow is not able to get tokens within `timeout_factor` \* `tokens` of
-duration, it will be rejected.
+If a flow is not able to get tokens within `timeout_factor` \* `tokens` of duration,
+it will be rejected.
 
-This value impacts the prioritization and fairness because the larger the
-timeout the higher the chance a request has to get scheduled.
+This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
 
 </dd>
 </dl>
@@ -2218,26 +2089,26 @@ timeout the higher the chance a request has to get scheduled.
 <dt>workloads</dt>
 <dd>
 
-([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher))
-List of workloads to be used in scheduler.
+([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) List of workloads to be used in scheduler.
 
 Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
 requests". There are two aspects of this "smartness":
 
-- Scheduler can more precisely calculate concurrency if it understands that
-  flows belonging to different classes have different weights (eg. inserts vs
-  lookups).
-- Setting different priorities to different workloads lets the scheduler avoid
-  dropping important traffic during overload.
+- Scheduler can more precisely calculate concurrency if it understands
+  that flows belonging to different classes have different weights (eg.
+  inserts vs lookups).
+- Setting different priorities to different workloads lets the scheduler
+  avoid dropping important traffic during overload.
 
-Each workload in this list specifies also a matcher that's used to determine
-which flow will be categorized into which workload. In case of multiple matching
-workloads, the first matching one will be used. If none of workloads match,
-`default_workload` will be used.
+Each workload in this list specifies also a matcher that's used to
+determine which flow will be categorized into which workload.
+In case of multiple matching workloads, the first matching one will be used.
+If none of workloads match, `default_workload` will be used.
 
-:::info See also
-[workload definition in the concepts section](/concepts/flow-control/actuators/scheduler.md#workload).
+:::info
+See also [workload definition in the concepts
+section](/concepts/flow-control/actuators/scheduler.md#workload).
 :::
 
 </dd>
@@ -2253,14 +2124,15 @@ Output for the Scheduler component.
 <dt>accepted_concurrency</dt>
 <dd>
 
-([V1Port](#v1-port)) Accepted concurrency is the number of accepted tokens per
-second.
+([V1Port](#v1-port)) Accepted concurrency is the number of accepted tokens per second.
 
-:::info **Accepted tokens** are tokens associated with
-[flows](/concepts/flow-control/flow-control.md#flow) that were accepted by this
-scheduler. Number of tokens for a flow is determined by a
-[workload](#-schedulerworkload) that the flow was assigned to (either via
-`auto_tokens` or explicitly by `Workload.tokens`). :::
+:::info
+**Accepted tokens** are tokens associated with
+[flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+this scheduler. Number of tokens for a flow is determined by a
+[workload](#-schedulerworkload) that the flow was assigned to (either
+via `auto_tokens` or explicitly by `Workload.tokens`).
+:::
 
 Value of this signal is the sum across all the relevant schedulers.
 
@@ -2271,8 +2143,8 @@ Value of this signal is the sum across all the relevant schedulers.
 <dd>
 
 ([V1Port](#v1-port)) Incoming concurrency is the number of incoming tokens/sec.
-This is the same as `accepted_concurrency`, but across all the flows entering
-scheduler, including rejected ones.
+This is the same as `accepted_concurrency`, but across all the flows
+entering scheduler, including rejected ones.
 
 </dd>
 </dl>
@@ -2315,8 +2187,7 @@ selector:
 <dt>control_point</dt>
 <dd>
 
-([V1ControlPoint](#v1-control-point), `required`) Describes control point within
-the entity where the policy should apply to.
+([V1ControlPoint](#v1-control-point), `required`) Describes control point within the entity where the policy should apply to.
 
 </dd>
 </dl>
@@ -2324,17 +2195,20 @@ the entity where the policy should apply to.
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_
-condition on [flow labels](/concepts/flow-control/label/label.md) must also be
-satisfied (in addition to service+control point matching)
+([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
+[flow labels](/concepts/flow-control/label/label.md)
+must also be satisfied (in addition to service+control point matching)
 
-:::note [Classifiers](#-v1classifier) _can_ use flow labels created by some
-other classifier, but only if they were created at some previous control point
+:::note
+[Classifiers](#-v1classifier) _can_ use flow labels created by some other
+classifier, but only if they were created at some previous control point
 (and propagated in baggage).
 
-This limitation doesn't apply to selectors of other entities, like FluxMeters or
-actuators. It's valid to create a flow label on a control point using
-classifier, and immediately use it for matching on the same control point. :::
+This limitation doesn't apply to selectors of other entities, like
+FluxMeters or actuators. It's valid to create a flow label on a control
+point using classifier, and immediately use it for matching on the same
+control point.
+:::
 
 </dd>
 </dl>
@@ -2342,8 +2216,8 @@ classifier, and immediately use it for matching on the same control point. :::
 <dt>service</dt>
 <dd>
 
-(string) The service (name) of the entities. In k8s, this is the FQDN of the
-Service object.
+(string) The service (name) of the entities.
+In k8s, this is the FQDN of the Service object.
 
 Note: Entity may belong to multiple services.
 
@@ -2352,8 +2226,7 @@ Note: Entity may belong to multiple services.
 
 ### <span id="v1-sqrt"></span> v1Sqrt
 
-Takes an input signal and emits the square root of it multiplied by scale as an
-output
+Takes an input signal and emits the square root of it multiplied by scale as an output
 
 $$
 \text{output} = \text{scale} \sqrt{\text{input}}
@@ -2381,8 +2254,7 @@ $$
 <dt>scale</dt>
 <dd>
 
-(float64, default: `1`) Scaling factor to be multiplied with the square root of
-the input signal.
+(float64, default: `1`) Scaling factor to be multiplied with the square root of the input signal.
 
 </dd>
 </dl>
