@@ -924,8 +924,8 @@ spec:
                     properties:
                       bind_addr:
                         default: :3320
-                        description: BindAddr denotes the address that Olric will
-                          bind to for communication with other Olric nodes.
+                        description: BindAddr denotes the address that DistCache will
+                          bind to for communication with other peer nodes.
                         type: string
                       memberlist_advertise_addr:
                         description: Address of memberlist to advertise to other cluster

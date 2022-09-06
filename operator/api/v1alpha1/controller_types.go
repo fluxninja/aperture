@@ -40,6 +40,7 @@ type ControllerSpec struct {
 
 	// Controller Configuration
 	//+kubebuilder:validation:Optional
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	ConfigSpec ControllerConfigSpec `json:"config"`
 }
 

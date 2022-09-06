@@ -43,6 +43,7 @@ type AgentSpec struct {
 
 	// Agent Configuration
 	//+kubebuilder:validation:Optional
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	ConfigSpec AgentConfigSpec `json:"config"`
 }
 
