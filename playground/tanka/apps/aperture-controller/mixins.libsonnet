@@ -27,10 +27,10 @@ local apertureControllerMixin =
             file: 'default',
           },
           etcd+: {
-            endpoints: ['http://controller-etcd:2379'],
+            endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
           },
           prometheus+: {
-            address: 'http://controller-prometheus-server.local:80',
+            address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',
           },
         },
         image: {

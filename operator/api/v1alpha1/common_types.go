@@ -316,7 +316,7 @@ type CommonConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	Client ClientConfigSpec `json:"client,omitempty"`
 	// Etcd configuration.
-	//+kubebuilder:validation:Optional
+	//+kubebuilder:validation:Required
 	Etcd etcd.EtcdConfig `json:"etcd"`
 	// Liveness probe configuration.
 	//+kubebuilder:validation:Optional
@@ -332,6 +332,7 @@ type CommonConfigSpec struct {
 	Metrics metrics.MetricsConfig `json:"metrics,omitempty"`
 	// OTEL configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={grpc_addr:":4317",http_addr:":4318"}
 	Otel otel.OtelConfig `json:"otel"`
 	// Plugins configuration.
 	//+kubebuilder:validation:Optional
@@ -340,10 +341,11 @@ type CommonConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	Profilers profilers.ProfilersConfig `json:"profilers,omitempty"`
 	// Prometheus configuration.
-	//+kubebuilder:validation:Optional
+	//+kubebuilder:validation:Required
 	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
 	// Server configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={addr:":8080"}
 	Server ServerConfigSpec `json:"server"`
 	// Watchdog configuration.
 	//+kubebuilder:validation:Optional

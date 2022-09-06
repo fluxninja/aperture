@@ -38,6 +38,10 @@ func (d *Duration) AsDuration() time.Duration {
 // UnmarshalJSON unmarshals and reads given bytes into a new Duration proto message.
 func (d *Duration) UnmarshalJSON(b []byte) error {
 	d.duration = durationpb.New(0)
+	// skip if bytes == "null"
+	if string(b) == "null" {
+		return nil
+	}
 	if err := protojson.Unmarshal(b, d.duration); err != nil {
 		log.Error().Err(err).Bytes("b", b).Msg("Unable to unmarshal duration")
 		return err

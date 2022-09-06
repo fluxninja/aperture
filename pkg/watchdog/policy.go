@@ -53,8 +53,8 @@ type HeapLimit struct {
 	//+kubebuilder:default:=25
 	MinGoGC int `json:"min_gogc" validate:"gt=0,lte=100" default:"25"`
 	// Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=268435456
-	//+kubebuilder:validation:Minimum=1
 	Limit uint64 `json:"limit" validate:"gt=0" default:"268435456"`
 }
 

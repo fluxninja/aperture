@@ -56,6 +56,7 @@ type AgentConfigSpec struct {
 	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info,omitempty"`
 	// DistCache configuration.
 	//+kubebuilder:validation:Optional
+	//+kubebuilder:default:={bind_addr:":3320","memberlist_bind_addr": ":3322"}
 	DistCache distcache.DistCacheConfig `json:"dist_cache"`
 	// Kubernetes client configuration.
 	//+kubebuilder:validation:Optional

@@ -915,6 +915,9 @@ spec:
                         type: object
                     type: object
                   dist_cache:
+                    default:
+                      bind_addr: :3320
+                      memberlist_bind_addr: :3322
                     description: DistCache configuration.
                     properties:
                       bind_addr:
@@ -1341,6 +1344,9 @@ spec:
                         type: boolean
                     type: object
                   otel:
+                    default:
+                      grpc_addr: :4317
+                      http_addr: :4318
                     description: OTEL configuration.
                     properties:
                       batch_postrollup:
@@ -1517,6 +1523,8 @@ spec:
                         type: number
                     type: object
                   server:
+                    default:
+                      addr: :8080
                     description: Server configuration.
                     properties:
                       addr:
@@ -1701,7 +1709,6 @@ spec:
                             description: Maximum memory (in bytes) sets limit of process
                               usage. Default = 256MB.
                             format: int64
-                            minimum: 1
                             type: integer
                           min_gogc:
                             default: 25
@@ -1733,7 +1740,6 @@ spec:
                                 type: array
                             type: object
                         required:
-                        - limit
                         - min_gogc
                         type: object
                       job:
@@ -1809,6 +1815,9 @@ spec:
                             type: object
                         type: object
                     type: object
+                required:
+                - etcd
+                - prometheus
                 type: object
               containerSecurityContext:
                 default:
