@@ -47,7 +47,7 @@ type ControllerSpec struct {
 type ControllerConfigSpec struct {
 	// CommonSpec
 	//+kubebuilder:validation:Optional
-	CommonConfigSpec `json:",inline,omitempty"`
+	CommonConfigSpec `json:",inline"`
 	// Policies configuration.
 	//+kubebuilder:validation:Optional
 	Policies PoliciesConfig `json:"policies,omitempty"`

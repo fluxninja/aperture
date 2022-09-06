@@ -18,8 +18,9 @@ const (
 // +kubebuilder:object:generate=true
 type AgentInfoConfig struct {
 	// All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:="default"
-	AgentGroup string `json:"agent_group,omitempty" default:"default"`
+	AgentGroup string `json:"agent_group" default:"default"`
 }
 
 // AgentInfo is the agent info.

@@ -22,13 +22,12 @@ local apertureControllerMixin =
           },
           log+: {
             pretty_console: true,
-            non_blocking: false,
+            non_blocking: true,
             level: 'debug',
             file: 'default',
           },
           etcd+: {
             endpoints: ['http://controller-etcd:2379'],
-            lease_ttl: '60s',
           },
           prometheus+: {
             address: 'http://controller-prometheus-server.local:80',

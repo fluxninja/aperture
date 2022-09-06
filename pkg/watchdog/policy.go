@@ -51,11 +51,11 @@ type HeapLimit struct {
 	//+kubebuilder:validation:Mimimum=1
 	//+kubebuilder:validation:Maximum=100
 	//+kubebuilder:default:=25
-	MinGoGC int `json:"min_gogc,omitempty" validate:"gt=0,lte=100" default:"25"`
+	MinGoGC int `json:"min_gogc" validate:"gt=0,lte=100" default:"25"`
 	// Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
 	//+kubebuilder:default:=268435456
 	//+kubebuilder:validation:Minimum=1
-	Limit uint64 `json:"limit,omitempty" validate:"gt=0" default:"268435456"`
+	Limit uint64 `json:"limit" validate:"gt=0" default:"268435456"`
 }
 
 // HeapConfig holds configuration for heap Watchdog.
@@ -76,11 +76,10 @@ type PolicyCommon struct {
 	// Flag to enable the policy
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=false
-	Enabled bool `json:"enabled,omitempty" default:"false"`
+	Enabled bool `json:"enabled" default:"false"`
 
 	// total
 	// swagger:ignore
-	//+kubebuilder:validation:Optional
 	total uint64
 }
 
@@ -97,11 +96,10 @@ type WatermarksPolicy struct {
 	// Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:={0.25,0.5,0.75,0.9}
-	Watermarks []float64 `json:"watermarks,omitempty" validate:"omitempty,dive,gte=0,lte=1" default:"[0.50,0.75,0.80,0.85,0.90,0.95,0.99]"`
+	Watermarks []float64 `json:"watermarks" validate:"omitempty,dive,gte=0,lte=1" default:"[0.50,0.75,0.80,0.85,0.90,0.95,0.99]"`
 
 	// internal fields
 	// swagger:ignore
-	//+kubebuilder:validation:Optional
 	thresholds []uint64
 
 	//+kubebuilder:validation:Optional
@@ -138,10 +136,9 @@ type AdaptivePolicy struct {
 	PolicyCommon `json:",inline"`
 
 	// Factor sets user-configured limit of available memory
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=0.50
 	//+kubebuilder:validation:Minimum=0
 	//+kubebuilder:validation:Maximum=1
+	//+kubebuilder:default:=0.50
 	Factor float64 `json:"factor" validate:"gte=0,lte=1" default:"0.50"`
 }
 

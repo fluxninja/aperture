@@ -30,20 +30,26 @@ func Module() fx.Option {
 // +kubebuilder:object:generate=true
 type ServerTLSConfig struct {
 	// Path to credentials. This can be set via command line arguments as well.
+	//+kubebuilder:validation:Optional
 	CertsPath string `json:"certs_path,omitempty"`
 	// Server Cert file
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:="ca.crt"
-	ServerCert string `json:"server_cert,omitempty" default:"ca.crt"`
+	ServerCert string `json:"server_cert" default:"ca.crt"`
 	// Server Key file
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:="ca.key"
-	ServerKey string `json:"server_key,omitempty" default:"ca.key"`
+	ServerKey string `json:"server_key" default:"ca.key"`
 	// Client CA file
+	//+kubebuilder:validation:Optional
 	ClientCA string `json:"client_ca,omitempty" validate:"omitempty"`
 	// Allowed CN
+	//+kubebuilder:validation:Optional
 	AllowedCN string `json:"allowed_cn,omitempty" validate:"omitempty,fqdn"`
 	// Enable TLS
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=false
-	Enable bool `json:"enable,omitempty" default:"false"`
+	Enable bool `json:"enable" default:"false"`
 }
 
 // Constructor holds fields to create an annotated instance of *tls.Config.

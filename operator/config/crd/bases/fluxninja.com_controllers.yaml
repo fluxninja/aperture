@@ -916,8 +916,6 @@ spec:
                         default: 60s
                         description: Lease time-to-live
                         type: string
-                    required:
-                    - lease_ttl
                     type: object
                   fluxninja_plugin:
                     description: FluxNinja Cloud plugin configuration.
@@ -935,6 +933,7 @@ spec:
                                 description: Backoff config
                                 properties:
                                   base_delay:
+                                    default: 1s
                                     description: Base Delay
                                     type: string
                                   jitter:
@@ -942,21 +941,20 @@ spec:
                                     description: Jitter
                                     type: number
                                   max_delay:
+                                    default: 120s
                                     description: Max Delay
                                     type: string
                                   multiplier:
                                     default: 1.6
                                     description: Backoff multiplier
                                     type: number
-                                required:
-                                - base_delay
-                                - max_delay
                                 type: object
                               insecure:
                                 default: false
                                 description: Disable ClientTLS
                                 type: boolean
                               min_connection_timeout:
+                                default: 20s
                                 description: Minimum connection timeout
                                 type: string
                               tls:
@@ -977,8 +975,6 @@ spec:
                                 default: false
                                 description: Use HTTP CONNECT Proxy
                                 type: boolean
-                            required:
-                            - min_connection_timeout
                             type: object
                           http:
                             description: HTTP client settings.
@@ -1078,15 +1074,6 @@ spec:
                                 default: 0
                                 description: Write Buffer Size. 0 = 4KB.
                                 type: integer
-                            required:
-                            - expect_continue_timeout
-                            - idle_connection_timeout
-                            - network_keep_alive
-                            - network_timeout
-                            - response_header_timeout
-                            - timeout
-                            - tls
-                            - tls_handshake_timeout
                             type: object
                         type: object
                       fluxninja_endpoint:
@@ -1204,18 +1191,8 @@ spec:
                               default: 50
                               description: Log file max size in MB
                               type: integer
-                          required:
-                          - compress
-                          - max_age
-                          - max_backups
-                          - max_size
                           type: object
                         type: array
-                    required:
-                    - compress
-                    - max_age
-                    - max_backups
-                    - max_size
                     type: object
                   metrics:
                     description: Metrics configuration.
@@ -1253,8 +1230,6 @@ spec:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
-                        required:
-                        - timeout
                         type: object
                       batch_prerollup:
                         description: BatchPrerollup configures batch prerollup processor.
@@ -1270,8 +1245,6 @@ spec:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
-                        required:
-                        - timeout
                         type: object
                       grpc_addr:
                         default: :4317
@@ -1394,13 +1367,16 @@ spec:
                     description: Sentry plugin configuration.
                     properties:
                       attach_stack_trace:
+                        default: true
                         description: Configure to generate and attach stacktraces
                           to capturing message calls
                         type: boolean
                       debug:
+                        default: true
                         description: Debug enables printing of Sentry SDK debug messages
                         type: boolean
                       disabled:
+                        default: false
                         description: Sentry crash report disabled
                         type: boolean
                       dsn:
@@ -1409,13 +1385,16 @@ spec:
                           oss-aperture project dsn is set as default.
                         type: string
                       environment:
+                        default: production
                         description: Environment
                         type: string
                       sample_rate:
+                        default: 1
                         description: Sample rate for event submission i.e. 0.0 to
                           1.0
                         type: number
                       traces_sample_rate:
+                        default: 0.2
                         description: Sample rate for sampling traces i.e. 0.0 to 1.0
                         type: number
                     type: object
@@ -1430,13 +1409,13 @@ spec:
                         description: GRPC server configuration.
                         properties:
                           connection_timeout:
+                            default: 120s
                             description: Connection timeout
                             type: string
                           enable_reflection:
+                            default: false
                             description: Enable Reflection
                             type: boolean
-                        required:
-                        - connection_timeout
                         type: object
                       grpc_gateway:
                         description: GRPC Gateway configuration.
@@ -1486,16 +1465,6 @@ spec:
                             default: 45s
                             description: Write timeout
                             type: string
-                        required:
-                        - disable_http_keep_alives
-                        - idle_timeout
-                        - latency_bucket_count
-                        - latency_bucket_start_ms
-                        - latency_bucket_width_ms
-                        - max_header_bytes
-                        - read_header_timeout
-                        - read_timeout
-                        - write_timeout
                         type: object
                       keep_alive:
                         default: 180s
@@ -1533,8 +1502,6 @@ spec:
                             description: Server Key file
                             type: string
                         type: object
-                    required:
-                    - keep_alive
                     type: object
                   watchdog:
                     description: Watchdog configuration.
@@ -1561,6 +1528,8 @@ spec:
                                 maximum: 1
                                 minimum: 0
                                 type: number
+                            required:
+                            - factor
                             type: object
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy
@@ -1606,6 +1575,8 @@ spec:
                                 maximum: 1
                                 minimum: 0
                                 type: number
+                            required:
+                            - factor
                             type: object
                           limit:
                             default: 268435456
@@ -1643,6 +1614,9 @@ spec:
                                   type: number
                                 type: array
                             type: object
+                        required:
+                        - limit
+                        - min_gogc
                         type: object
                       job:
                         description: JobConfig is config for Job swagger:model
@@ -1690,6 +1664,8 @@ spec:
                                 maximum: 1
                                 minimum: 0
                                 type: number
+                            required:
+                            - factor
                             type: object
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy

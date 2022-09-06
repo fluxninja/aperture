@@ -50,13 +50,13 @@ type AgentSpec struct {
 type AgentConfigSpec struct {
 	// CommonConfigSpec
 	//+kubebuilder:validation:Optional
-	CommonConfigSpec `json:",inline,omitempty"`
+	CommonConfigSpec `json:",inline"`
 	// AgentInfo configuration.
 	//+kubebuilder:validation:Optional
 	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info,omitempty"`
 	// DistCache configuration.
 	//+kubebuilder:validation:Optional
-	DistCache distcache.DistCacheConfig `json:"dist_cache,omitempty"`
+	DistCache distcache.DistCacheConfig `json:"dist_cache"`
 	// Kubernetes client configuration.
 	//+kubebuilder:validation:Optional
 	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client,omitempty"`

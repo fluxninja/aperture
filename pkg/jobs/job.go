@@ -74,7 +74,7 @@ type JobConfig struct {
 	// Sets whether the job is initially healthy
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=false
-	InitiallyHealthy bool `json:"initially_healthy,omitempty" default:"false"`
+	InitiallyHealthy bool `json:"initially_healthy" default:"false"`
 }
 
 type jobExecutor struct {

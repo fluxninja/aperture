@@ -332,7 +332,7 @@ type CommonConfigSpec struct {
 	Metrics metrics.MetricsConfig `json:"metrics,omitempty"`
 	// OTEL configuration.
 	//+kubebuilder:validation:Optional
-	Otel otel.OtelConfig `json:"otel,omitempty"`
+	Otel otel.OtelConfig `json:"otel"`
 	// Plugins configuration.
 	//+kubebuilder:validation:Optional
 	Plugins plugins.PluginsConfig `json:"plugins,omitempty"`
@@ -341,10 +341,10 @@ type CommonConfigSpec struct {
 	Profilers profilers.ProfilersConfig `json:"profilers,omitempty"`
 	// Prometheus configuration.
 	//+kubebuilder:validation:Optional
-	Prometheus prometheus.PrometheusConfig `json:"prometheus,omitempty"`
+	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
 	// Server configuration.
 	//+kubebuilder:validation:Optional
-	Server ServerConfigSpec `json:"server,omitempty"`
+	Server ServerConfigSpec `json:"server"`
 	// Watchdog configuration.
 	//+kubebuilder:validation:Optional
 	Watchdog watchdog.WatchdogConfig `json:"watchdog,omitempty"`
@@ -357,7 +357,7 @@ type CommonConfigSpec struct {
 type ServerConfigSpec struct {
 	// Listener configuration.
 	//+kubebuilder:validation:Optional
-	listener.ListenerConfig `json:",inline,omitempty"`
+	listener.ListenerConfig `json:",inline"`
 	// GRPC server configuration.
 	//+kubebuilder:validation:Optional
 	Grpc grpc.GRPCServerConfig `json:"grpc,omitempty"`

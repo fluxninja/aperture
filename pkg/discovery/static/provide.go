@@ -24,8 +24,10 @@ type EntityConfig struct {
 	//+kubebuilder:validation:Pattern=`^(\d{1,3}\.){3}\d{1,3}$`
 	IPAddress string `json:"ip_address,omitempty" validate:"required,ip"`
 	// UID of the entity.
+	//+kubebuilder:validation:Optional
 	UID string `json:"uid,omitempty"`
 	// Name of the entity.
+	//+kubebuilder:validation:Optional
 	Name string `json:"name,omitempty"`
 }
 
@@ -37,6 +39,7 @@ type ServiceConfig struct {
 	//+kubebuilder:validation:MinLength=1
 	Name string `json:"name" validate:"required"`
 	// Entities of the service.
+	//+kubebuilder:validation:Optional
 	Entities []*EntityConfig `json:"entities"`
 }
 
@@ -45,6 +48,7 @@ type ServiceConfig struct {
 // +kubebuilder:object:generate=true
 type StaticDiscoveryConfig struct {
 	// Services list.
+	//+kubebuilder:validation:Optional
 	Services []*ServiceConfig `json:"services"`
 }
 

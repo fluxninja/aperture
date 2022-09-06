@@ -22,13 +22,12 @@ local apertureAgentMixin =
           },
           log+: {
             pretty_console: true,
-            non_blocking: false,
+            non_blocking: true,
             level: 'debug',
             file: 'default',
           },
           etcd+: {
             endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
-            lease_ttl: '60s',
           },
           prometheus+: {
             address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',

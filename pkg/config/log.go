@@ -53,7 +53,7 @@ type LogConfig struct {
 	// Log level
 	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:="info"
-	LogLevel string `json:"level,omitempty" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
+	LogLevel string `json:"level" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
 
 	// Additional log writers
 	//+kubebuilder:validation:Optional
@@ -79,18 +79,23 @@ type LogConfig struct {
 // +kubebuilder:object:generate=true
 type LogWriterConfig struct {
 	// Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:="stderr"
-	File string `json:"file,omitempty" default:"stderr"`
+	File string `json:"file" default:"stderr"`
 	// Log file max size in MB
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=50
 	MaxSize int `json:"max_size" validate:"gte=0" default:"50"`
 	// Max log file backups
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=3
 	MaxBackups int `json:"max_backups" validate:"gte=0" default:"3"`
 	// Max age in days for log files
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=7
 	MaxAge int `json:"max_age" validate:"gte=0" default:"7"`
 	// Compress
+	//+kubebuilder:validation:Optional
 	//+kubebuilder:default:=false
 	Compress bool `json:"compress" default:"false"`
 }
