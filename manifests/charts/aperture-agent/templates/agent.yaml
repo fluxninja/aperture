@@ -126,13 +126,10 @@ spec:
   {{- if .Values.commonAnnotations }}
   annotations: {{ .Values.commonAnnotations | toYaml | nindent 4 }}
   {{- end }}
-  {{- if and .Values.agent.secrets .Values.agent.secrets.fluxNinjaPlugin .Values.agent.secrets.fluxNinjaPlugin .Values.agent.secrets.fluxNinjaPlugin.create }}
+  {{- if and .Values.agent.secrets .Values.agent.secrets.fluxNinjaPlugin .Values.agent.secrets.fluxNinjaPlugin.create }}
   secrets:
     fluxNinjaPlugin:
-      apiKeySecret:
-      {{- if .Values.agent.secrets.fluxNinjaPlugin.create }}
       create: {{ .Values.agent.secrets.fluxNinjaPlugin.create }}
-      {{- end }}
       {{- if or .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.name .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.key }}
       secretKeyRef:
         {{- if .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.name }}
