@@ -36,6 +36,11 @@ jobs:
           command: |
             ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run:
+          name: Configure git identity for tag annotations
+          command: |
+            git config --global user.name "CircleCI-Gitbot"
+            git config --global user.email "circleci-gitbot@fluxninja.com"
+      - run:
           name: Checkout github repository
           command: |
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "<< parameters.deployment-key >>" | tr -d ':')"
