@@ -36,6 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/go-logr/logr"
 )
@@ -271,6 +272,15 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
+	spec := &instance.Spec.ConfigSpec
+
+	// fill defaults
+	config.SetDefaults(spec)
+	// validate
+	if err := config.ValidateStruct(spec); err != nil {
+		return err
+	}
+
 	// Always enable TLS on the controller
 	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
 		CertsPath:  controllerCertPath,
@@ -317,10 +327,13 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 // reconcileConfigMap prepares the desired states for Controller configmaps and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance *v1alpha1.Controller) error {
+	logger := log.FromContext(ctx)
 	configMap, err := configMapForControllerConfig(instance.DeepCopy(), r.Scheme)
 	if err != nil {
 		return err
 	}
+	logger.Info("reconcileConfigMap", "configMap", configMap)
+
 	if _, err = createConfigMapForController(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 		return err
 	}

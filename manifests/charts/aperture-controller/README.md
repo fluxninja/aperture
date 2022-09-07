@@ -154,12 +154,12 @@
 | `controller.extraVolumeMounts`                               | Optionally specify extra list of additional volumeMounts for the Controller container(s)                                 | `[]`     |
 | `controller.sidecars`                                        | Add additional sidecar containers to the Controller pod(s)                                                               | `[]`     |
 | `controller.initContainers`                                  | Add additional init containers to the Controller pod(s)                                                                  | `[]`     |
-| `controller.secrets.fluxninjaPlugin.create`                  | Whether to create Kubernetes Secret with provided Controller API Key.                                                    | `false`  |
-| `controller.secrets.fluxninjaPlugin.secretKeyRef.name`       | specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey | `nil`    |
-| `controller.secrets.fluxninjaPlugin.secretKeyRef.key`        | specifies which key from the Secret for Controller API Key to use                                                        | `apiKey` |
-| `controller.secrets.fluxninjaPlugin.value`                   | API Key to use when creating a new Controller API Key Secret                                                             | `nil`    |
+| `controller.secrets.fluxNinjaPlugin.create`                  | Whether to create Kubernetes Secret with provided Controller API Key.                                                    | `false`  |
+| `controller.secrets.fluxNinjaPlugin.secretKeyRef.name`       | specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey | `nil`    |
+| `controller.secrets.fluxNinjaPlugin.secretKeyRef.key`        | specifies which key from the Secret for Controller API Key to use                                                        | `apiKey` |
+| `controller.secrets.fluxNinjaPlugin.value`                   | API Key to use when creating a new Controller API Key Secret                                                             | `nil`    |
 | `controller.config.etcd.endpoints`                           | List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty.                                   | `[]`     |
-| `controller.config.etcd.leaseTtl`                            | Lease time-to-live.                                                                                                      | `60s`    |
+| `controller.config.etcd.lease_ttl`                           | Lease time-to-live.                                                                                                      | `60s`    |
 | `controller.config.prometheus.address`                       | specifies the address of the Prometheus server. This must not be empty.                                                  | `nil`    |
 
 

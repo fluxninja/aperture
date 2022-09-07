@@ -31,7 +31,7 @@ func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit int, ttl
 	}
 	limiter, err := NewDistCacheRateTracker(limitCheck, distCache, "Limiter", ttl)
 	if err != nil {
-		t.Logf("Failed to create OlricLimiter: %v", err)
+		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
 	}
 
@@ -73,7 +73,7 @@ func newTestDistCacheWithConfig(t *testing.T, c *olricconfig.Config) (*distcache
 	distCache.Olric = o
 
 	go func() {
-		t.Log("Starting OlricLimiter")
+		t.Log("Starting DistCacheLimiter")
 		err = distCache.Olric.Start()
 		if err != nil {
 			t.Errorf("Failed to start olric: %v", err)
@@ -82,7 +82,7 @@ func newTestDistCacheWithConfig(t *testing.T, c *olricconfig.Config) (*distcache
 
 	select {
 	case <-time.After(time.Second):
-		t.Fatal("Olric cannot be started in one second")
+		t.Fatal("DistCache cannot be started in one second")
 	case <-ctx.Done():
 		// everything is fine
 	}

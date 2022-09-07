@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package sentry
 
 import (
@@ -24,35 +25,18 @@ type SentryConfig struct {
 	// If DSN is not set, the client is effectively disabled
 	// You can set test project's dsn to send log events.
 	// oss-aperture project dsn is set as default.
-	//+kubebuilder:validation:Optional
 	Dsn string `json:"dsn" default:"https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877"`
 	// Environment
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="production"
 	Environment string `json:"environment" default:"production"`
 	// Sample rate for sampling traces i.e. 0.0 to 1.0
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=0.2
-	//+kubebuilder:validation:Minimum:=0
-	//+kubebuilder:validation:Maximum:=1
 	TracesSampleRate float64 `json:"traces_sample_rate" default:"0.2"`
 	// Sample rate for event submission i.e. 0.0 to 1.0
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=1.0
-	//+kubebuilder:validation:Minimum:=0
-	//+kubebuilder:validation:Maximum:=1
 	SampleRate float64 `json:"sample_rate" default:"1.0"`
 	// Debug enables printing of Sentry SDK debug messages
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=true
 	Debug bool `json:"debug" default:"true"`
 	// Configure to generate and attach stacktraces to capturing message calls
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=true
 	AttachStacktrace bool `json:"attach_stack_trace" default:"true"`
 	// Sentry crash report disabled
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
 	Disabled bool `json:"disabled" default:"false"`
 }
 

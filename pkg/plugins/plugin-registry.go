@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package plugins
 
 import (
@@ -71,17 +72,12 @@ type PluginTrackers map[string]*PluginTracker
 // +kubebuilder:object:generate=true
 type PluginsConfig struct {
 	// Path to plugins directory. This can be set via command line arguments as well.
-	//+kubebuilder:validation:Optional
-	PluginsPath string `json:"plugins_path,omitempty"`
+	PluginsPath string `json:"plugins_path"`
 	// Specific plugin types to disable
-	//+kubebuilder:validation:Optional
-	DisabledSymbols []string `json:"disabled_symbols,omitempty"`
+	DisabledSymbols []string `json:"disabled_symbols"`
 	// Specific plugins to disable
-	//+kubebuilder:validation:Optional
-	DisabledPlugins []string `json:"disabled_plugins,omitempty"`
+	DisabledPlugins []string `json:"disabled_plugins"`
 	// Disables all plugins
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
 	DisablePlugins bool `json:"disable_plugins" default:"false"`
 }
 

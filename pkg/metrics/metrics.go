@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package metrics
 
 import (
@@ -39,19 +40,13 @@ const (
 // +kubebuilder:object:generate=true
 type MetricsConfig struct {
 	// Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
-	Pedantic bool `json:"pedantic,omitempty" default:"false"`
+	Pedantic bool `json:"pedantic" default:"false"`
 
 	// EnableGoCollector controls whether the go collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
-	EnableGoCollector bool `json:"enable_go_metrics,omitempty" default:"false"`
+	EnableGoCollector bool `json:"enable_go_metrics" default:"false"`
 
 	// EnableProcessCollector controls whether the process collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
-	EnableProcessCollector bool `json:"enable_process_collector,omitempty" default:"false"`
+	EnableProcessCollector bool `json:"enable_process_collector" default:"false"`
 }
 
 // ProvidePrometheusRegistry creates a new Prometheus Registry and provides it via Fx.
