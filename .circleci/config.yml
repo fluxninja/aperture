@@ -49,7 +49,7 @@ workflows:
       matches: { value: << pipeline.git.tag >>, pattern: "^releases/.*$" }
     jobs:
       - continuation/continue:
-          configuration_path: .circleci/release.yaml
+          configuration_path: .circleci/releases.yaml
           # both this and workflow's "when" is needed
           filters:
             branches:
