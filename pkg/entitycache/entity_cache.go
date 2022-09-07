@@ -193,25 +193,67 @@ func (c *EntityCache) Put(entity *Entity) {
 }
 
 // GetByIP retrieves entity with a given IP address.
-func (c *EntityCache) GetByIP(entityIP string) *Entity {
+func (c *EntityCache) GetByIP(entityIP string) *entitycachev1.Entity {
 	c.RLock()
 	defer c.RUnlock()
+
 	v, ok := c.entitiesByIP[entityIP]
 	if !ok {
 		return nil
 	}
-	return v
+
+	services := make([]string, len(v.Services))
+	for _, serviceName := range ServiceIDsFromEntity(v) {
+		services = append(services, serviceName.Service)
+	}
+
+	entity := &entitycachev1.Entity{
+		EntityId: &entitycachev1.EntityID{
+			Prefix: v.ID.Prefix,
+			Uid:    v.ID.UID,
+		},
+		IpAddress:  v.IPAddress,
+		Services:   services,
+		EntityName: v.EntityName,
+	}
+
+	return entity
+}
+
+// GetEntityByIP returns an entity found with given ip address.
+func (c *EntityCache) GetEntityByIP(ctx context.Context, req *entitycachev1.GetEntityByIpRequest) (*entitycachev1.Entity, error) {
+	return c.GetByIP(req.IpAddress), nil
 }
 
 // GetByName retrieves entity with a given name.
-func (c *EntityCache) GetByName(entityName string) *Entity {
+func (c *EntityCache) GetByName(entityName string) *entitycachev1.Entity {
 	c.RLock()
 	defer c.RUnlock()
+
 	v, ok := c.entitiesByName[entityName]
 	if !ok {
 		return nil
 	}
-	return v
+
+	services := make([]string, len(v.Services))
+	for _, serviceName := range ServiceIDsFromEntity(v) {
+		services = append(services, serviceName.Service)
+	}
+	entity := &entitycachev1.Entity{
+		EntityId: &entitycachev1.EntityID{
+			Prefix: v.ID.Prefix,
+			Uid:    v.ID.UID,
+		},
+		IpAddress:  v.IPAddress,
+		Services:   services,
+		EntityName: v.EntityName,
+	}
+	return entity
+}
+
+// GetEntityByName returns an entity found with given entity name.
+func (c *EntityCache) GetEntityByName(ctx context.Context, req *entitycachev1.GetEntityByNameRequest) (*entitycachev1.Entity, error) {
+	return c.GetByName(req.EntityName), nil
 }
 
 // Clear removes all entities from the cache.
