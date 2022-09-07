@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Push protobuf to buf.build
           command: |
-            echo "cd api && ${HOME}/bin/buf push --tag << parameters.tag >>"
+            cd api && ${HOME}/bin/buf push --tag << parameters.tag >>
 
   tag-github-repository:
     executor: base-cimg-executor
@@ -74,14 +74,15 @@ jobs:
           command: |
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "<< parameters.deployment-key >>" | tr -d ':')"
             export SSH_AUTH_SOCK=""
-            echo "git push origin --tags"
+            cd /home/circleci/project
+            git push origin --tags
 
 workflows:
   version: 2
 
   tag-aperture-blueprints:
     when: &job-when-clause
-      matches: { value: << pipeline.git.tag >>, pattern: ^.*$ }
+      matches: { value: << pipeline.git.tag >>, pattern: ^v.*$ }
     jobs:
       - tag-github-repository: &tag-github-repository
           # both this and workflow's when is needed
