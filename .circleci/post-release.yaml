@@ -1,0 +1,87 @@
+version: 2.1
+
+executors:
+  base-cimg-executor:
+    docker:
+      - image: cimg/base:2021.07
+
+jobs:
+  publish-protobuf-files:
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - run:
+          name: Publish protobuf to buf.build
+          command: |
+            echo "Will publish protobuf to buf.build"
+
+  tag-github-repository:
+    executor: base-cimg-executor
+    parameters:
+      repository:
+        type: string
+        description: Github repository to tag (organization/repository)
+      deployment-key:
+        type: string
+        description: Deployment key to use when interacting with remote repository
+      tag:
+        type: string
+        description: What git tag to use when tagging remote repository
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - << parameters.deployment-key >>
+      - run:
+          name: Fetch git ssh host keys and add them to known_hosts
+          command: |
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - run:
+          name: Checkout github repository
+          command: |
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "<< parameters.deployment-key >>" | tr -d ':')"
+            export SSH_AUTH_SOCK=""
+            git clone ssh://git@github.com/<< parameters.repository >> /home/circleci/project
+      - run:
+          name: Create release tag in the repository
+          command: |
+            cd /home/circleci/project
+            git tag --annotate -m "Releasing version << parameters.tag >>" << parameters.tag >>
+      - run:
+          name: Push release tags to remote repository
+          command: |
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "<< parameters.deployment-key >>" | tr -d ':')"
+            export SSH_AUTH_SOCK=""
+            echo "git push origin --tags"
+
+workflows:
+  version: 2
+
+  tag-aperture-blueprints:
+    when: &job-when-clause
+      matches: { value: << pipeline.git.tag >>, pattern: ^.*$ }
+    jobs:
+      - tag-github-repository: &tag-github-repository
+          # both this and workflow's when is needed
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^v.*/
+          name: tag-aperture-blueprints
+          repository: fluxninja/aperture-blueprints
+          tag: << pipeline.git.tag >>
+          deployment-key: f5:19:15:04:d3:5d:f4:66:3e:24:4f:7f:c6:e8:82:68
+
+  tag-aperture-go-sdk:
+    when: *job-when-clause
+    jobs:
+      - tag-github-repository:
+          <<: *tag-github-repository
+          name: tag-aperture-go-sdk
+          repository: fluxninja/aperture-go
+          deployment-key: af:55:26:47:84:7f:0e:36:6b:74:25:19:64:4a:f2:41
+
+  publish-protobuf-files:
+    when: *job-when-clause
+    jobs:
+      - publish-protobuf-files
