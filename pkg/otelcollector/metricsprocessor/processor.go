@@ -149,6 +149,8 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 		otelcollector.DroppingRateLimitersLabel:        pcommon.NewValueSlice(),
 		otelcollector.ConcurrencyLimitersLabel:         pcommon.NewValueSlice(),
 		otelcollector.DroppingConcurrencyLimitersLabel: pcommon.NewValueSlice(),
+		otelcollector.WorkloadsLabel:                   pcommon.NewValueSlice(),
+		otelcollector.DroppingWorkloadsLabel:           pcommon.NewValueSlice(),
 		otelcollector.FluxMetersLabel:                  pcommon.NewValueSlice(),
 		otelcollector.FlowLabelKeysLabel:               pcommon.NewValueSlice(),
 		otelcollector.DecisionTypeLabel:                pcommon.NewValueString(checkResponse.DecisionType.String()),
@@ -176,7 +178,6 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 			rawValue := []string{
 				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
 				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
-				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.GetWorkloadIndex()),
 				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
 			}
 			value := strings.Join(rawValue, ",")
@@ -184,13 +185,22 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 			if decision.Dropped {
 				labels[otelcollector.DroppingConcurrencyLimitersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 			}
+
+			workloadsRawValue := []string{
+				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
+				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
+				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.GetWorkloadIndex()),
+				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
+			}
+			value = strings.Join(workloadsRawValue, ",")
+			labels[otelcollector.WorkloadsLabel].SliceVal().AppendEmpty().SetStringVal(value)
+			if decision.Dropped {
+				labels[otelcollector.DroppingWorkloadsLabel].SliceVal().AppendEmpty().SetStringVal(value)
+			}
 		}
 	}
 	for _, fluxMeter := range checkResponse.FluxMeters {
-		rawValue := []string{
-			fmt.Sprintf("%s:%v", metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()),
-		}
-		value := strings.Join(rawValue, ",")
+		value := fluxMeter.GetFluxMeterName()
 		labels[otelcollector.FluxMetersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 	}
 
