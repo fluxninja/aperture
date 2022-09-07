@@ -85,8 +85,8 @@ func setupRateLimiterFactory(
 	ai *agentinfo.AgentInfo,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
-	rateLimitDecisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient,
-		path.Join(paths.RateLimiterDecisionsPath, paths.AgentGroupPrefix(agentGroupName)))
+	etcdPath := path.Join(paths.RateLimiterDecisionsPath)
+	rateLimitDecisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,9 @@ func setupRateLimiterFactory(
 	}
 
 	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{rateLimiterFactory.newRateLimiterOptions},
+		FxOptionsFuncs: []notifiers.FxOptionsFunc{
+			rateLimiterFactory.newRateLimiterOptions,
+		},
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
 		},
@@ -162,11 +164,11 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 		return fx.Options(), err
 	}
 
-	rateLimiterMessage := wrapperMessage.RateLimiter
+	rateLimiterProto := wrapperMessage.RateLimiter
 
 	rateLimiter := &rateLimiter{
 		Component:          wrapperMessage,
-		rateLimiterProto:   rateLimiterMessage,
+		rateLimiterProto:   rateLimiterProto,
 		rateLimiterFactory: rateLimiterFactory,
 		statusRegistry:     reg,
 	}
@@ -199,10 +201,9 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	if err != nil {
 		return err
 	}
+	decisionKey := paths.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName, rateLimiter.GetPolicyName(), rateLimiter.GetComponentIndex())
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
-			rateLimiter.GetPolicyName(),
-			rateLimiter.GetComponentIndex())),
+		notifiers.Key(decisionKey),
 		unmarshaller,
 		rateLimiter.decisionUpdateCallback,
 	)
@@ -216,7 +217,8 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
 				rateLimiter.rateLimitChecker.AddOverride(label, override.GetLimitScaleFactor())
 			}
-			rateLimiter.rateTracker, err = ratetracker.NewDistCacheRateTracker(rateLimiter.rateLimitChecker,
+			rateLimiter.rateTracker, err = ratetracker.NewDistCacheRateTracker(
+				rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
 				rateLimiter.name,
 				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())
@@ -282,7 +284,7 @@ func (rateLimiter *rateLimiter) GetSelector() *selectorv1.Selector {
 }
 
 // RunLimiter runs the limiter.
-func (rateLimiter *rateLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
+func (rateLimiter *rateLimiter) RunLimiter(labels selectors.Labels, decision *flowcontrolv1.LimiterDecision) {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
 	label, ok, remaining, current := rateLimiter.TakeN(labels, 1)
@@ -291,18 +293,16 @@ func (rateLimiter *rateLimiter) RunLimiter(labels selectors.Labels) *flowcontrol
 		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND
 	}
 
-	return &flowcontrolv1.LimiterDecision{
-		PolicyName:     rateLimiter.GetPolicyName(),
-		PolicyHash:     rateLimiter.GetPolicyHash(),
-		ComponentIndex: rateLimiter.GetComponentIndex(),
-		Dropped:        !ok,
-		Reason:         reason,
-		Details: &flowcontrolv1.LimiterDecision_RateLimiter_{
-			RateLimiter: &flowcontrolv1.LimiterDecision_RateLimiter{
-				Label:     label,
-				Remaining: int64(remaining),
-				Current:   int64(current),
-			},
+	decision.PolicyName = rateLimiter.GetPolicyName()
+	decision.PolicyHash = rateLimiter.GetPolicyHash()
+	decision.ComponentIndex = rateLimiter.GetComponentIndex()
+	decision.Dropped = !ok
+	decision.Reason = reason
+	decision.Details = &flowcontrolv1.LimiterDecision_RateLimiter_{
+		RateLimiter: &flowcontrolv1.LimiterDecision_RateLimiter{
+			Label:     label,
+			Remaining: int64(remaining),
+			Current:   int64(current),
 		},
 	}
 }
@@ -320,7 +320,6 @@ func (rateLimiter *rateLimiter) TakeN(labels selectors.Labels, n int) (label str
 	label = labelKey + ":" + labelValue
 
 	ok, remaining, current = rateLimiter.rateTracker.TakeN(label, n)
-
 	return
 }
 

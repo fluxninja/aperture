@@ -190,7 +190,7 @@ definitions:
         type: boolean
         description: TODO document what happens when lazy sync is disabled
         title: Enables lazy sync
-        x-go-default: true
+        x-go-default: false
       num_sync:
         type: integer
         format: int64
