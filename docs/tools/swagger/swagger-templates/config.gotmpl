@@ -159,8 +159,8 @@ any
     {{- if .Properties }}
 #### {{ if .IsTuple }}Tuple members{{ else }}Properties{{ end }}
 
-      {{- range .Properties }}
 <dl>
+      {{- range .Properties }}
 <dt>{{ .OriginalName }}</dt>
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
@@ -171,8 +171,8 @@ any
 {{- .Description }}
 
 </dd>
-</dl>
       {{- end }}
+</dl>
     {{- end }}
   {{- end -}}
 {{- end }}
@@ -229,8 +229,8 @@ any
 {{- $base := .BasePath }}
 {{- $path := .Path }}
 {{- $env := index .Extensions "x-fn-config-env" }}
-  {{- if .QueryParams }}
 <dl>
+  {{- if .QueryParams }}
 {{- range .QueryParams }}
 <dt>{{ .Name }}</dt>
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
@@ -242,11 +242,9 @@ any
 
 </dd>
 {{- end }}
-</dl>
   {{- end }}
   {{- if .HasBodyParams }}
 
-<dl>
 {{- range .Params }}
 {{- if .IsBodyParam }}
 
@@ -254,12 +252,13 @@ any
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
 {{ if $env  }} Env-Var Prefix: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}_{{ end }}`{{ end }}
-Type: {{ template "fnSchemaSimple" . -}}
-{{ end }}
+Type: {{ template "fnSchemaSimple" . }}
+
 </dd>
+{{ end }}
 {{- end }}
-</dl>
 {{- end }}{{/* end .HasBodyParams */}}
+</dl>
 {{- end }}{{/* end .Operations */}}
 
 ## Objects

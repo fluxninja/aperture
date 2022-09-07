@@ -356,6 +356,10 @@ jobs:
         type: boolean
         default: false
         description: Whether to push changes to the deployment repository
+      task-name:
+        type: string
+        default: Publish documentation updates
+        description: The name of the actual task
     steps:
       - checkout
       - add_ssh_keys:
@@ -371,7 +375,7 @@ jobs:
           name: Install yarn
           command: npm install --global yarn
       - run:
-          name: Publish documentation updates
+          name: << parameters.task-name >>
           command: |
             export LOGURU_LEVEL=TRACE
             export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
@@ -490,6 +494,18 @@ workflows:
         - << pipeline.parameters.updated-aperture-docs >>
     jobs:
       - publish-aperture-docs
+
+  build-aperture-docs:
+    when:
+      and:
+        - not:
+            equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-aperture-docs >>
+    jobs:
+      - publish-aperture-docs:
+          name: build-aperture-docs
+          task-name: Build aperture documentation and verify changes
+          dry-run: true
 
   push-deployment-changes:
     when:
