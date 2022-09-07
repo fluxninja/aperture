@@ -1171,7 +1171,7 @@ The sign of slope depends on correlation between the signal and control variable
 :::note
 You need to set _negative_ slope for a _positive_ correlation, as you're
 describing the _action_ which controller should make when the signal
-icreases.
+increases.
 :::
 
 The magnitude of slope describes how aggresively should the controller
