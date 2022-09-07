@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package tlsconfig
 
 import (
@@ -30,25 +31,16 @@ func Module() fx.Option {
 // +kubebuilder:object:generate=true
 type ServerTLSConfig struct {
 	// Path to credentials. This can be set via command line arguments as well.
-	//+kubebuilder:validation:Optional
-	CertsPath string `json:"certs_path,omitempty"`
+	CertsPath string `json:"certs_path"`
 	// Server Cert file
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="ca.crt"
 	ServerCert string `json:"server_cert" default:"ca.crt"`
 	// Server Key file
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="ca.key"
 	ServerKey string `json:"server_key" default:"ca.key"`
 	// Client CA file
-	//+kubebuilder:validation:Optional
-	ClientCA string `json:"client_ca,omitempty" validate:"omitempty"`
+	ClientCA string `json:"client_ca" validate:"omitempty"`
 	// Allowed CN
-	//+kubebuilder:validation:Optional
-	AllowedCN string `json:"allowed_cn,omitempty" validate:"omitempty,fqdn"`
+	AllowedCN string `json:"allowed_cn" validate:"omitempty,fqdn"`
 	// Enabled TLS
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
 	Enabled bool `json:"enabled" default:"false"`
 }
 

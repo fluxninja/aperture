@@ -17,28 +17,12 @@ limitations under the License.
 package controllers
 
 import (
-	"bytes"
 	_ "embed"
-	"fmt"
-	"text/template"
-	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/utils/pointer"
-
-	"github.com/fluxninja/aperture/operator/api/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/distcache"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	"github.com/fluxninja/aperture/pkg/otel"
-	"github.com/fluxninja/aperture/pkg/plugins"
-	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
 const agentConfigYAML = `dist_cache:
@@ -103,7 +87,7 @@ server:
     server_key: key.pem
 `
 
-var _ = Describe("ConfigMap for Agent", func() {
+/*var _ = Describe("ConfigMap for Agent", func() {
 	Context("Instance without FluxNinja plugin enabled", func() {
 		It("returns correct ConfigMap", func() {
 			instance := &v1alpha1.Agent{
@@ -301,7 +285,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 			Expect(result.Data).To(Equal(expected.Data))
 		})
 	})
-})
+})*/
 
 var _ = Describe("Test ConfigMap Mutate", func() {
 	It("Mutate should update required fields only", func() {

@@ -129,19 +129,19 @@ spec:
   {{- if .Values.commonAnnotations }}
   annotations: {{ .Values.commonAnnotations | toYaml | nindent 4 }}
   {{- end }}
-  {{- if and .Values.controller.secrets .Values.controller.secrets.fluxninjaPlugin .Values.controller.secrets.fluxninjaPlugin .Values.controller.secrets.fluxninjaPlugin.create }}
+  {{- if and .Values.controller.secrets .Values.controller.secrets.fluxNinjaPlugin .Values.controller.secrets.fluxNinjaPlugin .Values.controller.secrets.fluxNinjaPlugin.create }}
   secrets:
-    fluxninjaPlugin:
-      {{- if .Values.controller.secrets.fluxninjaPlugin.create }}
-      create: {{ .Values.controller.secrets.fluxninjaPlugin.create }}
+    fluxNinjaPlugin:
+      {{- if .Values.controller.secrets.fluxNinjaPlugin.create }}
+      create: {{ .Values.controller.secrets.fluxNinjaPlugin.create }}
       {{- end }}
-      {{- if or .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.name .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.key }}
+      {{- if or .Values.controller.secrets.fluxNinjaPlugin.secretKeyRef.name .Values.controller.secrets.fluxNinjaPlugin.secretKeyRef.key }}
       secretKeyRef:
-        {{- if .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.name }}
-        name: {{ .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.name }}
+        {{- if .Values.controller.secrets.fluxNinjaPlugin.secretKeyRef.name }}
+        name: {{ .Values.controller.secrets.fluxNinjaPlugin.secretKeyRef.name }}
         {{- end }}
-        {{- if .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.key }}
-        key: {{ .Values.controller.secrets.fluxninjaPlugin.secretKeyRef.key }}
+        {{- if .Values.controller.secrets.fluxNinjaPlugin.secretKeyRef.key }}
+        key: {{ .Values.controller.secrets.fluxNinjaPlugin.secretKeyRef.key }}
         {{- end }}
       {{- end }}
       value: {{ include "controller.apisecret.value" ( dict "controller" .Values.controller $) }}

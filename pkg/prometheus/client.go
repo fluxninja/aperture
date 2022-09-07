@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package prometheus
 
 import (
@@ -38,7 +39,6 @@ var (
 // +kubebuilder:object:generate=true
 type PrometheusConfig struct {
 	// Address of the prometheus server
-	//+kubebuilder:validation:Required
 	Address string `json:"address" validate:"required,hostname_port|url|fqdn"`
 }
 

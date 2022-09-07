@@ -153,14 +153,14 @@
 | `agent.extraVolumeMounts`                               | Optionally specify extra list of additional volumeMounts for the Agent container(s)                            | `[]`     |
 | `agent.sidecars`                                        | Add additional sidecar containers to the Agent pod(s)                                                          | `[]`     |
 | `agent.initContainers`                                  | Add additional init containers to the Agent pod(s)                                                             | `[]`     |
-| `agent.secrets.fluxninjaPlugin.create`                  | Whether to create Kubernetes Secret with provided Agent API Key.                                               | `false`  |
-| `agent.secrets.fluxninjaPlugin.secretKeyRef.name`       | specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey | `nil`    |
-| `agent.secrets.fluxninjaPlugin.secretKeyRef.key`        | specifies which key from the Secret for Agent API Key to use                                                   | `apiKey` |
-| `agent.secrets.fluxninjaPlugin.value`                   | API Key to use when creating a new Agent API Key Secret                                                        | `nil`    |
+| `agent.secrets.fluxNinjaPlugin.create`                  | Whether to create Kubernetes Secret with provided Agent API Key.                                               | `false`  |
+| `agent.secrets.fluxNinjaPlugin.secretKeyRef.name`       | specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey | `nil`    |
+| `agent.secrets.fluxNinjaPlugin.secretKeyRef.key`        | specifies which key from the Secret for Agent API Key to use                                                   | `apiKey` |
+| `agent.secrets.fluxNinjaPlugin.value`                   | API Key to use when creating a new Agent API Key Secret                                                        | `nil`    |
 | `agent.sidecar.enabled`                                 | Enables sidecar mode for the Agent                                                                             | `false`  |
 | `agent.sidecar.enableNamespacesByDefault`               | List of namespaces in which sidecar injection will be enabled when Sidecar mode is enabled.                    | `[]`     |
 | `agent.config.etcd.endpoints`                           | List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty.                         | `[]`     |
-| `agent.config.etcd.leaseTtl`                            | Lease time-to-live.                                                                                            | `60s`    |
+| `agent.config.etcd.lease_ttl`                           | Lease time-to-live.                                                                                            | `60s`    |
 | `agent.config.prometheus.address`                       | specifies the address of the Prometheus server. This must not be empty.                                        | `nil`    |
 
 

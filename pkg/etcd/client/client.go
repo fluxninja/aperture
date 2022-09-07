@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package etcd
 
 import (
@@ -36,12 +37,8 @@ const (
 // +kubebuilder:object:generate=true
 type EtcdConfig struct {
 	// Lease time-to-live
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="60s"
 	LeaseTTL config.Duration `json:"lease_ttl" validate:"gte=1s" default:"60s"`
 	// List of Etcd server endpoints
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:validate:MinItems=1
 	Endpoints []string `json:"endpoints" validate:"gt=0,dive,hostname_port|url|fqdn"`
 	// TODO: add auth params
 }
