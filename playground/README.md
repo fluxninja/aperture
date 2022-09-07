@@ -8,7 +8,7 @@ resources that change. This is very convenient for getting quick feedback during
 development of Aperture.
 
 Playground deploys resources to the Kubernetes cluster that `kubectl` on your
-machine points at. For convience, this README includes instructions for
+machine points at. For convenience, this README includes instructions for
 deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
 
 ## Tools
@@ -17,16 +17,20 @@ Described hereafter deployment methods assume usage of specific deployment and
 configuration/management tools (which must be installed beforehand).
 
 To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install
-manually (check [Tools used for k8s deployment](#tools-used-for-k8s-deployment)
-).
+manually (check
+[Tools used for k8s deployment](#tools-used-for-k8s-deployment)).
 
 When using `asdf`:
 
-- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
-  and [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
+- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)and
+  [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
   `asdf`
-- Add intended plugins (tools/applications which will be managed by `asdf`) e.g.
-  `asdf plugin-add terraform`
+- Run the below command to add all the required plugins.
+
+```
+cat .tool-versions | cut -d' ' -f1 | grep "^[^\#]" | xargs -i asdf plugin add  {}
+```
+
 - Install tools: `asdf install`
 
 > Note: Last command will install tools which have been added as plugins and
@@ -110,6 +114,12 @@ start a cluster with built-in local registry for Docker images:
 ```sh
 ctlptl apply -f ctlptl-kind-config.yaml
 ```
+
+There is another option which can be used to set up a 3 node kind cluster which
+will also set up internal `docker-registry` based on the requirement.
+
+- Run a script available in `aperture/scripts` directory
+  `aperture_dev_cluster.sh`.
 
 ### Services deployment
 
