@@ -10,7 +10,7 @@ keywords:
 
 :::info
 
-See also [Selector reference](/reference/configuration/policies#-v1selector)
+See also [Selector reference](/reference/configuration/policies.md#v1-selector)
 
 :::
 

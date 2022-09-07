@@ -18,7 +18,7 @@ See also what are [actuators](actuators.md) in general.
 :::info
 
 See also
-[Rate Limiter reference](/reference/configuration/policies.md#-languagev1ratelimiter).
+[Rate Limiter reference](/reference/configuration/policies.md#languagev1-rate-limiter).
 
 :::
 
