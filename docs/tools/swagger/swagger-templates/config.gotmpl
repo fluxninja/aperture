@@ -216,7 +216,7 @@ any
 {{- range .Operations }}
  {{- $opname := .Name }}
 
-### <span id="{{ dasherize .Name }}"></span> *{{ .Name }}*
+### *{{ .Name }}* {# {{- dasherize .Name -}} }
 {{ if .Summary }}{{ printf "\n" }}{{ trimSpace .Summary }}{{ end }}
 
 
@@ -264,7 +264,7 @@ Type: {{ template "fnSchemaSimple" . }}
 ## Objects
 {{- range .Models }}
 
-### <span id="{{ dasherize .Name }}"></span> {{ .Name }}
+### {{ .Name }} {# {{- dasherize .Name -}} }
 {{ template "fnModel" . }}
 {{- end }}
 

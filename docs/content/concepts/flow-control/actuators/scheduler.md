@@ -18,7 +18,7 @@ See also what are [actuators](actuators.md) in general.
 :::info
 
 See also
-[Concurrency Limiter reference](/reference/configuration/policies.md#-languagev1concurrencylimiter).
+[Concurrency Limiter reference](/reference/configuration/policies.md#languagev1-concurrency-limiter).
 
 :::
 

@@ -193,12 +193,12 @@ func (x *Policy) GetResources() *Resources {
 //
 // A signal also have a special **Invalid** value. It's usually used to
 // communicate that signal doesn't have a meaningful value at the moment, eg.
-// [PromQL](#-v1promql) emits such a value if it cannot execute a query.
+// [PromQL](#v1-prom-q-l) emits such a value if it cannot execute a query.
 // Components know when their input signals are invalid and can act
 // accordingly. They can either propagate the invalidness, by making their
 // output itself invalid (like eg.
-// [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
-// logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+// [ArithmeticCombinator](#v1-arithmetic-combinator)) or use some different
+// logic, like eg. [Extrapolator](#v1-extrapolator). Refer to a component's
 // docs on how exactly it handles invalid inputs.
 // :::
 type Circuit struct {
@@ -335,16 +335,16 @@ func (x *Resources) GetClassifiers() []*Classifier {
 //
 // There are three categories of components:
 // * "source" components – they take some sort of input from "the real world" and output
-//   a signal based on this input. Example: [PromQL](#-v1promql). In the UI
+//   a signal based on this input. Example: [PromQL](#v1-prom-q-l). In the UI
 //   they're represented by green color.
 // * internal components – "pure" components that don't interact with the "real world".
-//   Examples: [GradientController](#-v1gradientcontroller), [Max](#-v1max).
+//   Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
 //   :::note
 //   Internal components's output can depend on their internal state, in addition to the inputs.
-//   Eg. see the [Exponential Moving Average filter](#-v1ema).
+//   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
 //   :::
 // * "sink" components – they affect the real world.
-//   [ConcurrencyLimiter](#-languagev1concurrencylimiter) and [RateLimiter](#-languagev1ratelimiter).
+//   [ConcurrencyLimiter](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
 //   Also sometimes called [_actuators_](/concepts/flow-control/actuators/actuators.md).
 //   In the UI, represented by orange color.  Sink components are usually also
 //   "sources" too, they usually emit a feedback signal, like
@@ -352,10 +352,10 @@ func (x *Resources) GetClassifiers() []*Classifier {
 //
 // :::tip
 // Sometimes you may want to use a constant value as one of component's inputs.
-// You can use the [Constant](#-constant) component for this.
+// You can use the [Constant](#v1-constant) component for this.
 // :::
 //
-// See also [Policy](#-v1policy) for a higher-level explanation of circuits.
+// See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 type Component struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -781,7 +781,7 @@ func (x *GradientController) GetMaxGradient() float64 {
 // \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
 // $$
 //
-// The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#-v1emains).
+// The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
 type EMA struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1248,7 +1248,7 @@ func (*ConcurrencyLimiter_LoadShedActuator) isConcurrencyLimiter_ActuationStrate
 // signal are aggregated across all agents.
 // :::
 //
-// See [ConcurrencyLimiter](#-languagev1concurrencylimiter) for more context.
+// See [ConcurrencyLimiter](#languagev1-concurrency-limiter) for more context.
 type Scheduler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2466,7 +2466,7 @@ type RateLimiter_Ins struct {
 	//
 	// :::tip
 	// Negative limit can be useful to _conditionally_ enable the ratelimiter
-	// under certain circumstances. [Decider](#-v1decider) might be helpful.
+	// under certain circumstances. [Decider](#v1-decider) might be helpful.
 	// :::
 	Limit *Port `protobuf:"bytes,1,opt,name=limit,proto3" json:"limit,omitempty" validate:"required"` // @gotags: validate:"required"
 }
@@ -2653,7 +2653,7 @@ type Scheduler_Outs struct {
 	// **Accepted tokens** are tokens associated with
 	// [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
 	// this scheduler. Number of tokens for a flow is determined by a
-	// [workload](#-schedulerworkload) that the flow was assigned to (either
+	// [workload](#scheduler-workload) that the flow was assigned to (either
 	// via `auto_tokens` or explicitly by `Workload.tokens`).
 	// :::
 	//
@@ -2718,7 +2718,7 @@ type LoadShedActuator_Ins struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Load shedding factor is a fraction of [incoming
-	// concurrency](#-v1schedulerouts) that needs to be dropped.
+	// concurrency](#v1-scheduler-outs) that needs to be dropped.
 	LoadShedFactor *Port `protobuf:"bytes,1,opt,name=load_shed_factor,json=loadShedFactor,proto3" json:"load_shed_factor,omitempty"`
 }
 
