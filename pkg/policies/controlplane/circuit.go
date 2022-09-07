@@ -7,6 +7,7 @@ import (
 	"github.com/emicklei/dot"
 )
 
+// ComponentDTO takes a CompiledCircuit and returns its graph representation.
 func ComponentDTO(circuit CompiledCircuit) ([]Component, []Link) {
 	var componentsDTO []Component
 	var links []Link
@@ -73,6 +74,7 @@ func ComponentDTO(circuit CompiledCircuit) ([]Component, []Link) {
 	return componentsDTO, links
 }
 
+// DOT returns Components and Links as a DOT graph description.
 func DOT(components []Component, links []Link) string {
 	g := dot.NewGraph(dot.Directed)
 	g.AttributesMap.Attr("splines", "ortho")
@@ -104,6 +106,7 @@ func DOT(components []Component, links []Link) string {
 	return g.String()
 }
 
+// Port is enables Component connection.
 type Port struct {
 	Name   string `json:"portName"`
 	Signal string `json:"signalName"`
@@ -112,6 +115,7 @@ type Port struct {
 
 type jsonb map[string]any
 
+// Component is a computational block that forms the circuit.
 type Component struct {
 	ComponentID       string `json:"componentID"`
 	ComponentName     string `json:"componentName"`
@@ -122,11 +126,13 @@ type Component struct {
 	ParentComponentID string `json:"parentComponentID,omitempty"`
 }
 
+// SourceTarget describes a link attachment to a component.
 type SourceTarget struct {
 	ComponentID string `json:"componentID"`
 	PortName    string `json:"portName"`
 }
 
+// Link is a connection between Components.
 type Link struct {
 	Source     SourceTarget `json:"source"`
 	Target     SourceTarget `json:"target"`
