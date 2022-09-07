@@ -46,16 +46,21 @@ const (
 	ExporterPrometheusRemoteWrite = "prometheusremotewrite"
 )
 
-var (
-	baseFxTag = config.NameTag("base")
-	rollups   = initRollups()
-)
+var baseFxTag = config.NameTag("base")
 
-func initRollups() []*rollupprocessor.Rollup {
-	rlpsInit := []rollupprocessor.Rollup{
+var rollupTypes = []rollupprocessor.RollupType{
+	rollupprocessor.RollupSum,
+	rollupprocessor.RollupDatasketch,
+	rollupprocessor.RollupMax,
+	rollupprocessor.RollupMin,
+	rollupprocessor.RollupSumOfSquares,
+}
+
+func initRollupsLog() []*rollupprocessor.Rollup {
+	rollupsInit := []*rollupprocessor.Rollup{
 		{
 			FromField:   otelcollector.DurationLabel,
-			TreatAsZero: []string{"-"},
+			TreatAsZero: []string{otelcollector.MissingAttributeSourceValue},
 		},
 		{
 			FromField: otelcollector.HTTPRequestContentLength,
@@ -64,10 +69,25 @@ func initRollups() []*rollupprocessor.Rollup {
 			FromField: otelcollector.HTTPResponseContentLength,
 		},
 	}
-	var rlps []*rollupprocessor.Rollup
-	for _, rollupInit := range rlpsInit {
-		for _, t := range rollupprocessor.RollupTypes {
-			rlps = append(rlps, &rollupprocessor.Rollup{
+
+	return _initRollupsPerType(rollupsInit, rollupTypes)
+}
+
+func initRollupsSpan() []*rollupprocessor.Rollup {
+	rollupsInit := []*rollupprocessor.Rollup{
+		{
+			FromField: otelcollector.DurationLabel,
+		},
+	}
+
+	return _initRollupsPerType(rollupsInit, rollupTypes)
+}
+
+func _initRollupsPerType(rollupsInit []*rollupprocessor.Rollup, rollupTypes []rollupprocessor.RollupType) []*rollupprocessor.Rollup {
+	var rollups []*rollupprocessor.Rollup
+	for _, rollupInit := range rollupsInit {
+		for _, t := range rollupTypes {
+			rollups = append(rollups, &rollupprocessor.Rollup{
 				FromField:   rollupInit.FromField,
 				ToField:     fmt.Sprintf("%s_%s", rollupInit.FromField, t),
 				Type:        t,
@@ -75,7 +95,7 @@ func initRollups() []*rollupprocessor.Rollup {
 			})
 		}
 	}
-	return rlps
+	return rollups
 }
 
 type otelParams struct {
@@ -265,7 +285,8 @@ func addMetricsProcessor(config *otelcollector.OTELConfig) {
 
 func addRollupProcessor(config *otelcollector.OTELConfig) {
 	config.AddProcessor(ProcessorRollup, rollupprocessor.Config{
-		Rollups: rollups,
+		RollupsLog:  initRollupsLog(),
+		RollupsSpan: initRollupsSpan(),
 	})
 }
 

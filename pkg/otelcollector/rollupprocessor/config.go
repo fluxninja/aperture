@@ -8,7 +8,8 @@ import (
 type Config struct {
 	config.ProcessorSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct
 
-	Rollups []*Rollup `mapstructure:"rollups"`
+	RollupsLog  []*Rollup `mapstructure:"rollups"`
+	RollupsSpan []*Rollup `mapstructure:"rollups"`
 }
 
 var _ config.Processor = (*Config)(nil)

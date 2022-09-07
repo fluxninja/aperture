@@ -111,6 +111,12 @@ start a cluster with built-in local registry for Docker images:
 ctlptl apply -f ctlptl-kind-config.yaml
 ```
 
+Once done, you can delete the cluster and registry with following command:
+
+```sh
+ctlptl delete -f ctlptl-kind-config.yaml
+```
+
 ### Services deployment
 
 Simply run `tilt up` - it'll automatically start building and deploying!

@@ -57,7 +57,7 @@ func (ep *enrichmentProcessor) ConsumeLogs(ctx context.Context, origLd plog.Logs
 	}
 	ld := origLd.Clone()
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		ep.enrichAttributes(logRecord.Attributes())
+		ep.enrichAttributes(logRecord.Attributes(), []string{otelcollector.MissingAttributeSourceValue})
 		return nil
 	})
 	return ld, err
@@ -70,7 +70,7 @@ func (ep *enrichmentProcessor) ConsumeTraces(ctx context.Context, origTd ptrace.
 	}
 	td := origTd.Clone()
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		ep.enrichAttributes(span.Attributes())
+		ep.enrichAttributes(span.Attributes(), []string{})
 		return nil
 	})
 	return td, err
@@ -120,8 +120,8 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 	return md, err
 }
 
-func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map) {
-	unpackFlowLabels(attributes)
+func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsMissing []string) {
+	unpackFlowLabels(attributes, treatAsMissing)
 	attributes.UpsertString(otelcollector.AgentGroupLabel, ep.agentGroup)
 	var hostIP string
 	controlPoint, exists := attributes.Get(otelcollector.ControlPointLabel)
@@ -192,19 +192,15 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 
 // unpackFlowLabels tries to parse `LabelsLabel` attribute as json, and adds
 // unmarshalled attributes to given map.
-func unpackFlowLabels(attributes pcommon.Map) {
+func unpackFlowLabels(attributes pcommon.Map, treatAsMissing []string) {
 	labeled := "false"
 	defer func() {
 		attributes.UpsertString(otelcollector.LabeledLabel, labeled)
 	}()
-	rawFlow, exists := attributes.Get(otelcollector.MarshalledLabelsLabel)
-	if !exists {
-		return
-	}
-	defer attributes.Remove(otelcollector.MarshalledLabelsLabel)
 
 	var flowAttributes map[string]string
-	otelcollector.UnmarshalStringVal(rawFlow, otelcollector.MarshalledLabelsLabel, &flowAttributes)
+	otelcollector.GetStruct(attributes, otelcollector.MarshalledLabelsLabel, &flowAttributes, treatAsMissing)
+	defer attributes.Remove(otelcollector.MarshalledLabelsLabel)
 	for k, v := range flowAttributes {
 		labeled = "true"
 		// FIXME – this is quadratic (every upsert iterates to search whether label already exists)

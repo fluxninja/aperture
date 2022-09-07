@@ -40,6 +40,3 @@ const (
 	// RollupDatasketch rolls up fields by creating datasketch from them.
 	RollupDatasketch RollupType = "datasketch"
 )
-
-// RollupTypes contains all available rollup types.
-var RollupTypes = []RollupType{RollupSum, RollupDatasketch, RollupMax, RollupMin, RollupSumOfSquares}

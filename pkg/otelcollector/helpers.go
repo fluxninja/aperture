@@ -9,7 +9,6 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/rs/zerolog"
 )
@@ -131,62 +130,40 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 	return nil
 }
 
-// UnmarshalStringVal is a helper for cases we're sending more complex
-// structure json-encoded in a string label
+// GetStruct is a helper for decoding complex structs encoded into an attribute
+// as a json-encoded string.
+// Takes:
+// attributes to read from
+// label key to read in attributes
+// output interface that is filled via json unmarshal
+// treatAsMissing is a list of values that are treated as attribute missing from source
 //
-// Returns whether label was actually a string and unmarshaling was attempted.
-func UnmarshalStringVal(value pcommon.Value, labelName string, output interface{}) bool {
+// Returns true is label was decoded successfully, false otherwise.
+func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAsMissing []string) bool {
+	value, ok := attributes.Get(label)
+	if !ok {
+		SampledLog.Warn().Str("label", label).Msg("Label does not exist in attributes map")
+		return false
+	}
 	if value.Type() != pcommon.ValueTypeString {
+		SampledLog.Warn().Str("label", label).Msg("Label is not a string")
 		return false
 	}
 
 	stringVal := value.StringVal()
 
-	if stringVal == MissingAttributeSourceValue {
-		log.Trace().Str("label", labelName).Msg("Missing attribute source")
-		return true
+	for _, markerForMissing := range treatAsMissing {
+		if stringVal == markerForMissing {
+			SampledLog.Info().Str("label", label).Msg("Missing attribute from source")
+			return false
+		}
 	}
 
 	err := json.Unmarshal([]byte(stringVal), output)
 	if err != nil {
-		log.Error().Err(err).Str("label", labelName).Msg("Failed to unmarshal")
-		// This is almost impossible to happen (eg. broken sdk), so ignoring error is ok
+		SampledLog.Error().Err(err).Str("label", label).Msg("Failed to unmarshal")
 	}
 
-	return true
-}
-
-// GetCheckResponse unmarshalls flowcontrol CheckResponse from string label.
-func GetCheckResponse(attributes pcommon.Map) *flowcontrolv1.CheckResponse {
-	checkResponse := &flowcontrolv1.CheckResponse{}
-	ok := unmarshalAttributesMap(attributes, MarshalledCheckResponseLabel, &checkResponse)
-	if !ok {
-		log.Debug().Str("label", MarshalledCheckResponseLabel).Msg("Failed to unmarshal attributes into AuthzResponse")
-	}
-	return checkResponse
-}
-
-// GetAuthzResponse unmarshalls authz response from string label.
-func GetAuthzResponse(attributes pcommon.Map) *flowcontrolv1.AuthzResponse {
-	authzResponse := &flowcontrolv1.AuthzResponse{}
-	ok := unmarshalAttributesMap(attributes, MarshalledAuthzResponseLabel, &authzResponse)
-	if !ok {
-		log.Debug().Str("label", MarshalledAuthzResponseLabel).Msg("Failed to unmarshal attributes into AuthzResponse")
-	}
-	return authzResponse
-}
-
-func unmarshalAttributesMap(attributes pcommon.Map, label string, output interface{}) bool {
-	value, ok := attributes.Get(label)
-	if !ok {
-		log.Error().Str("label", label).Msg("Label does not exist in attributes map")
-		return false
-	}
-	ok = UnmarshalStringVal(value, label, &output)
-	if !ok {
-		log.Debug().Str("label", label).Msg("Label is not a string")
-		return false
-	}
 	return true
 }
 

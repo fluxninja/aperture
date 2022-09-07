@@ -50,9 +50,6 @@
 - key: RESPONSE_TX_DURATION
   value:
     string_value: "%RESPONSE_TX_DURATION%"
-- key: DOWNSTREAM_HANDSHAKE_DURATION
-  value:
-    string_value: "%DOWNSTREAM_HANDSHAKE_DURATION%"
 {{- end -}}
 
 apiVersion: networking.istio.io/v1alpha3

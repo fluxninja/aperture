@@ -71,7 +71,7 @@ func (rp *rollupProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 		}
 		rawCount, _ := rollupData[key].Get(rollupCountKey)
 		rollupData[key].UpdateInt(rollupCountKey, rawCount.IntVal()+1)
-		rp.rollupAttributes(datasketches[key], rollupData[key], span.Attributes())
+		rp.rollupAttributes(datasketches[key], rollupData[key], span.Attributes(), rp.cfg.RollupsSpan)
 		return nil
 	})
 	if err != nil {
@@ -108,7 +108,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 		}
 		rawCount, _ := rollupData[key].Get(rollupCountKey)
 		rollupData[key].UpdateInt(rollupCountKey, rawCount.IntVal()+1)
-		rp.rollupAttributes(datasketches[key], rollupData[key], logRecord.Attributes())
+		rp.rollupAttributes(datasketches[key], rollupData[key], logRecord.Attributes(), rp.cfg.RollupsLog)
 		return nil
 	})
 	if err != nil {
@@ -128,8 +128,8 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 	return rp.exportLogs(ctx, rollupData)
 }
 
-func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.HeapDoublesSketch, baseAttributes, attributes pcommon.Map) {
-	for _, rollup := range rp.cfg.Rollups {
+func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.HeapDoublesSketch, baseAttributes, attributes pcommon.Map, rollups []*Rollup) {
+	for _, rollup := range rollups {
 		switch rollup.Type {
 		case RollupSum:
 			newValue, found := rollup.GetFromFieldValue(attributes)
@@ -198,7 +198,7 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 			}
 		}
 	}
-	for _, rollup := range rp.cfg.Rollups {
+	for _, rollup := range rp.cfg.RollupsLog {
 		baseAttributes.Remove(rollup.FromField)
 	}
 }
@@ -237,7 +237,7 @@ func (rp *rollupProcessor) exportTraces(ctx context.Context, rollupData map[stri
 // the map to JSON. This might be suboptimal.
 func (rp *rollupProcessor) key(am pcommon.Map) string {
 	raw := am.AsRaw()
-	for _, rollup := range rp.cfg.Rollups {
+	for _, rollup := range rp.cfg.RollupsLog {
 		// Removing all fields from which we will get rolled up values, as those
 		// are dimensions not to be considered as "key".
 		delete(raw, rollup.FromField)
