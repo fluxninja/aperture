@@ -135,7 +135,7 @@ data:
             operator: "mul"
             in_ports:
               lhs:
-                signal_name: "LATENCY"
+                signal_name: "LATENCY_EMA"
               rhs:
                 signal_name: "EMA_SETPOINT_MULTIPLIER"
             out_ports:
