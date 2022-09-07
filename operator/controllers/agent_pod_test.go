@@ -372,9 +372,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 						Resources:      resourceRequirement,
 						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
 							Enabled:                true,
-							RunAsUser:              pointer.Int64Ptr(0),
-							RunAsNonRootUser:       pointer.BoolPtr(false),
-							ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+							RunAsUser:              0,
+							RunAsNonRootUser:       false,
+							ReadOnlyRootFilesystem: false,
 						},
 						Command:        testArray,
 						Args:           testArray,

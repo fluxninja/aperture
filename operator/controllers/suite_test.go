@@ -37,6 +37,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/config"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	//+kubebuilder:scaffold:imports
@@ -123,6 +124,9 @@ var _ = BeforeSuite(func() {
 	}
 	Expect(k8sClient.Create(ctx, ns)).To(BeNil())
 
+	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
+	Expect(err).NotTo(HaveOccurred())
+
 	defaultControllerInstance = &v1alpha1.Controller{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      appName,
@@ -161,6 +165,7 @@ var _ = BeforeSuite(func() {
 			},
 		},
 	}
+	unmarshaller.Unmarshal(&defaultControllerInstance.Spec)
 
 	defaultAgentInstance = &v1alpha1.Agent{
 		ObjectMeta: metav1.ObjectMeta{
@@ -200,6 +205,7 @@ var _ = BeforeSuite(func() {
 			},
 		},
 	}
+	unmarshaller.Unmarshal(&defaultAgentInstance.Spec)
 })
 
 var _ = AfterSuite(func() {

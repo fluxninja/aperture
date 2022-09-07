@@ -50,9 +50,9 @@ func containerSecurityContext(containerSecurityContext v1alpha1.ContainerSecurit
 	var securityContext *corev1.SecurityContext
 	if containerSecurityContext.Enabled {
 		securityContext = &corev1.SecurityContext{
-			RunAsUser:              containerSecurityContext.RunAsUser,
-			RunAsNonRoot:           containerSecurityContext.RunAsNonRootUser,
-			ReadOnlyRootFilesystem: containerSecurityContext.ReadOnlyRootFilesystem,
+			RunAsUser:              pointer.Int64(containerSecurityContext.RunAsUser),
+			RunAsNonRoot:           pointer.Bool(containerSecurityContext.RunAsNonRootUser),
+			ReadOnlyRootFilesystem: pointer.Bool(containerSecurityContext.ReadOnlyRootFilesystem),
 		}
 	} else {
 		securityContext = &corev1.SecurityContext{}
@@ -66,7 +66,7 @@ func podSecurityContext(podSecurityContext v1alpha1.PodSecurityContext) *corev1.
 	var securityContext *corev1.PodSecurityContext
 	if podSecurityContext.Enabled {
 		securityContext = &corev1.PodSecurityContext{
-			FSGroup: podSecurityContext.FsGroup,
+			FSGroup: pointer.Int64(podSecurityContext.FsGroup),
 		}
 	} else {
 		securityContext = &corev1.PodSecurityContext{}

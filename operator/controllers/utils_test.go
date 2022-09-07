@@ -68,9 +68,9 @@ var _ = Describe("Tests for containerSecurityContext", func() {
 					CommonSpec: v1alpha1.CommonSpec{
 						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
 							Enabled:                true,
-							RunAsUser:              pointer.Int64Ptr(0),
-							RunAsNonRootUser:       pointer.BoolPtr(false),
-							ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+							RunAsUser:              0,
+							RunAsNonRootUser:       false,
+							ReadOnlyRootFilesystem: false,
 						},
 					},
 				},
@@ -121,7 +121,7 @@ var _ = Describe("Tests for podSecurityContext", func() {
 					CommonSpec: v1alpha1.CommonSpec{
 						PodSecurityContext: v1alpha1.PodSecurityContext{
 							Enabled: true,
-							FsGroup: pointer.Int64Ptr(1001),
+							FsGroup: 1001,
 						},
 					},
 				},

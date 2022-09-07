@@ -26,6 +26,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -98,7 +99,7 @@ func daemonsetForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtim
 					Affinity:                      spec.Affinity,
 					Tolerations:                   spec.Tolerations,
 					SecurityContext:               podSecurityContext(spec.PodSecurityContext),
-					TerminationGracePeriodSeconds: spec.TerminationGracePeriodSeconds,
+					TerminationGracePeriodSeconds: pointer.Int64(spec.TerminationGracePeriodSeconds),
 					InitContainers:                spec.InitContainers,
 					Containers: []corev1.Container{
 						{
