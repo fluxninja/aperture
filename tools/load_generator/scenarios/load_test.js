@@ -4,8 +4,8 @@ import { check } from "k6";
 export let vuStages = [
   { duration: "1s", target: 5 },
   { duration: "2m", target: 5 },
-  { duration: "1m", target: 25 },
-  { duration: "2m", target: 25 },
+  { duration: "1m", target: 30 },
+  { duration: "2m", target: 30 },
   { duration: "1s", target: 5 },
   { duration: "5m", target: 5 },
 ];
