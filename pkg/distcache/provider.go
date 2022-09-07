@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package distcache
 
 import (
@@ -44,20 +45,13 @@ func Module() fx.Option {
 // +kubebuilder:object:generate=true
 type DistCacheConfig struct {
 	// BindAddr denotes the address that DistCache will bind to for communication with other peer nodes.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=":3320"
 	BindAddr string `json:"bind_addr" default:":3320" validate:"hostname_port"`
 	// ReplicaCount is 1 by default.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=1
 	ReplicaCount int `json:"replica_count" default:"1"`
 	// Address to bind mememberlist server to.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=":3322"
 	MemberlistBindAddr string `json:"memberlist_bind_addr" default:":3322" validate:"hostname_port"`
 	// Address of memberlist to advertise to other cluster members. Used for nat traversal if provided.
-	//+kubebuilder:validation:Optional
-	MemberlistAdvertiseAddr string `json:"memberlist_advertise_addr,omitempty" validate:"omitempty,hostname_port"`
+	MemberlistAdvertiseAddr string `json:"memberlist_advertise_addr" validate:"omitempty,hostname_port"`
 }
 
 // DistCache is a peer to peer distributed cache.

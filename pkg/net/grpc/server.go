@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package grpc
 
 import (
@@ -44,12 +45,8 @@ func GMuxServerModule() fx.Option {
 // +kubebuilder:object:generate=true
 type GRPCServerConfig struct {
 	// Connection timeout
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="120s"
 	ConnectionTimeout config.Duration `json:"connection_timeout" validate:"gte=0s" default:"120s"`
 	// Enable Reflection
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
 	EnableReflection bool `json:"enable_reflection" default:"false"`
 }
 

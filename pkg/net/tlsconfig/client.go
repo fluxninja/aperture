@@ -16,16 +16,11 @@ import (
 // swagger:model
 // +kubebuilder:object:generate=true
 type ClientTLSConfig struct {
-	//+kubebuilder:validation:Optional
-	CertFile string `json:"cert_file,omitempty" validate:"omitempty,file"`
-	//+kubebuilder:validation:Optional
-	KeyFile string `json:"key_file,omitempty" validate:"omitempty,file"`
-	//+kubebuilder:validation:Optional
-	CAFile string `json:"ca_file,omitempty" validate:"omitempty,file"`
-	//+kubebuilder:validation:Optional
-	KeyLogWriter string `json:"key_log_file,omitempty" validate:"omitempty,file"`
-	//+kubebuilder:validation:Optional
-	InsecureSkipVerify bool `json:"insecure_skip_verify,omitempty"`
+	CertFile           string `json:"cert_file" validate:"omitempty,file"`
+	KeyFile            string `json:"key_file" validate:"omitempty,file"`
+	CAFile             string `json:"ca_file" validate:"omitempty,file"`
+	KeyLogWriter       string `json:"key_log_file" validate:"omitempty,file"`
+	InsecureSkipVerify bool   `json:"insecure_skip_verify"`
 }
 
 // GetTLSConfig initializes tls.Config from config options.

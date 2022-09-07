@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package watchdog
 
 import (
@@ -19,16 +20,12 @@ import (
 // swagger:model
 // +kubebuilder:object:generate=true
 type WatchdogConfig struct {
-	//+kubebuilder:validation:Optional
 	Job jobs.JobConfig `json:"job"`
 
-	//+kubebuilder:validation:Optional
 	CGroup WatchdogPolicyType `json:"cgroup"`
 
-	//+kubebuilder:validation:Optional
 	System WatchdogPolicyType `json:"system"`
 
-	//+kubebuilder:validation:Optional
 	Heap HeapConfig `json:"heap"`
 }
 
@@ -36,10 +33,8 @@ type WatchdogConfig struct {
 // swagger:model WatchdogPolicyType
 // +kubebuilder:object:generate=true
 type WatchdogPolicyType struct {
-	//+kubebuilder:validation:Optional
 	WatermarksPolicy WatermarksPolicy `json:"watermarks_policy"`
 
-	//+kubebuilder:validation:Optional
 	AdaptivePolicy AdaptivePolicy `json:"adaptive_policy"`
 }
 
@@ -48,13 +43,9 @@ type WatchdogPolicyType struct {
 // +kubebuilder:object:generate=true
 type HeapLimit struct {
 	// Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=25
 	MinGoGC int `json:"min_gogc" validate:"gt=0,lte=100" default:"25"`
 
 	// Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=268435456
 	Limit uint64 `json:"limit" validate:"gt=0" default:"268435456"`
 }
 
@@ -62,10 +53,8 @@ type HeapLimit struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type HeapConfig struct {
-	//+kubebuilder:validation:Optional
 	WatchdogPolicyType `json:",inline"`
 
-	//+kubebuilder:validation:Optional
 	HeapLimit `json:",inline"`
 }
 
@@ -74,8 +63,6 @@ type HeapConfig struct {
 // +kubebuilder:object:generate=true
 type PolicyCommon struct {
 	// Flag to enable the policy
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
 	Enabled bool `json:"enabled" default:"false"`
 
 	// total
@@ -94,15 +81,12 @@ type policyInterface interface {
 // +kubebuilder:object:generate=true
 type WatermarksPolicy struct {
 	// Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={0.50,0.75,0.80,0.85,0.90,0.95,0.99}
 	Watermarks []float64 `json:"watermarks" validate:"omitempty,dive,gte=0,lte=1" default:"[0.50,0.75,0.80,0.85,0.90,0.95,0.99]"`
 
 	// internal fields
 	// swagger:ignore
 	thresholds []uint64
 
-	//+kubebuilder:validation:Optional
 	PolicyCommon `json:",inline"`
 }
 
@@ -131,15 +115,11 @@ func (policy *WatermarksPolicy) nextThreshold(total, used uint64) uint64 {
 
 // AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)*factor.
 // swagger:model
+// +kubebuilder:object:generate=true
 type AdaptivePolicy struct {
-	//+kubebuilder:validation:Optional
 	PolicyCommon `json:",inline"`
 
 	// Factor sets user-configured limit of available memory
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=0.50
-	//+kubebuilder:validation:Minimum:=0
-	//+kubebuilder:validation:Maximum:=1
 	Factor float64 `json:"factor" validate:"gte=0,lte=1" default:"0.50"`
 }
 

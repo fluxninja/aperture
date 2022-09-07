@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package static
 
 import (
@@ -21,14 +22,11 @@ const (
 // +kubebuilder:object:generate=true
 type EntityConfig struct {
 	// IP address of the entity.
-	//+kubebuilder:validation:Optional
-	IPAddress string `json:"ip_address,omitempty" validate:"required,ip"`
+	IPAddress string `json:"ip_address" validate:"required,ip"`
 	// UID of the entity.
-	//+kubebuilder:validation:Optional
-	UID string `json:"uid,omitempty"`
+	UID string `json:"uid"`
 	// Name of the entity.
-	//+kubebuilder:validation:Optional
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 }
 
 // ServiceConfig describes a service and its entities.
@@ -36,10 +34,8 @@ type EntityConfig struct {
 // +kubebuilder:object:generate=true
 type ServiceConfig struct {
 	// Name of the service.
-	//+kubebuilder:validation:Optional
 	Name string `json:"name" validate:"required"`
 	// Entities of the service.
-	//+kubebuilder:validation:Optional
 	Entities []*EntityConfig `json:"entities"`
 }
 
@@ -48,7 +44,6 @@ type ServiceConfig struct {
 // +kubebuilder:object:generate=true
 type StaticDiscoveryConfig struct {
 	// Services list.
-	//+kubebuilder:validation:Optional
 	Services []*ServiceConfig `json:"services"`
 }
 

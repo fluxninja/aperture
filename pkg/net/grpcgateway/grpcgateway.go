@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package grpcgateway
 
 import (
@@ -47,8 +48,7 @@ type Constructor struct {
 // swagger:model
 type GRPCGatewayConfig struct {
 	// GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
-	//+kubebuilder:default:="0.0.0.0:1"
-	GRPCAddr string `json:"grpc_server_address,omitempty" validate:"hostname_port" default:"0.0.0.0:1"`
+	GRPCAddr string `json:"grpc_server_address" validate:"hostname_port" default:"0.0.0.0:1"`
 }
 
 // GRPCGateway holds fields required for grpc-http gateway.
@@ -199,7 +199,7 @@ func (constructor Constructor) setupGRPCGateway(
 	return nil
 }
 
-func httpResponseModifier(ctx context.Context, w http.ResponseWriter, p proto.Message) error {
+func httpResponseModifier(ctx context.Context, w http.ResponseWriter, _ proto.Message) error {
 	md, ok := runtime.ServerMetadataFromContext(ctx)
 	if !ok {
 		return nil

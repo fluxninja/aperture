@@ -59,16 +59,15 @@ type AgentConfigSpec struct {
 
 	// DistCache configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={bind_addr:":3320","memberlist_bind_addr": ":3322"}
 	DistCache distcache.DistCacheConfig `json:"dist_cache"`
 
 	// Kubernetes client configuration.
 	//+kubebuilder:validation:Optional
-	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client,omitempty"`
+	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client"`
 
 	// Peer discovery configuration.
 	//+kubebuilder:validation:Optional
-	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery,omitempty"`
+	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery"`
 }
 
 // AgentStatus defines the observed state of Agent.
