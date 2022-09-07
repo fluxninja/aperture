@@ -54,7 +54,7 @@ var _ = Describe("Rollup processor", func() {
 				LogRecords()
 			logRecord := logs.AppendEmpty()
 			logRecord.Attributes().InsertString("fizz", "buzz")
-			logRecord.Attributes().InsertString("foo", strconv.Itoa(attributeValues[0]))
+			logRecord.Attributes().InsertString(otelcollector.DurationLabel, strconv.Itoa(attributeValues[0]))
 
 			err = logsProcessor.ConsumeLogs(context.TODO(), input)
 			Expect(err).NotTo(HaveOccurred())
@@ -81,11 +81,11 @@ var _ = Describe("Rollup processor", func() {
 				ScopeLogs().AppendEmpty().
 				LogRecords()
 			logRecord := logs.AppendEmpty()
-			logRecord.Attributes().InsertString("foo", strconv.Itoa(attributeValues[0]))
+			logRecord.Attributes().InsertString(otelcollector.DurationLabel, strconv.Itoa(attributeValues[0]))
 			logRecord = logs.AppendEmpty()
-			logRecord.Attributes().InsertString("foo", strconv.Itoa(attributeValues[1]))
+			logRecord.Attributes().InsertString(otelcollector.DurationLabel, strconv.Itoa(attributeValues[1]))
 			logRecord = logs.AppendEmpty()
-			logRecord.Attributes().InsertString("foo", strconv.Itoa(attributeValues[2]))
+			logRecord.Attributes().InsertString(otelcollector.DurationLabel, strconv.Itoa(attributeValues[2]))
 
 			err = logsProcessor.ConsumeLogs(context.TODO(), input)
 			Expect(err).NotTo(HaveOccurred())
@@ -151,11 +151,11 @@ var _ = Describe("Rollup processor", func() {
 				ScopeSpans().AppendEmpty().
 				Spans()
 			spanRecord := spans.AppendEmpty()
-			spanRecord.Attributes().InsertString("foo", strconv.Itoa(attributeValues[0]))
+			spanRecord.Attributes().InsertString(otelcollector.DurationLabel, strconv.Itoa(attributeValues[0]))
 			spanRecord = spans.AppendEmpty()
-			spanRecord.Attributes().InsertString("foo", strconv.Itoa(attributeValues[1]))
+			spanRecord.Attributes().InsertString(otelcollector.DurationLabel, strconv.Itoa(attributeValues[1]))
 			spanRecord = spans.AppendEmpty()
-			spanRecord.Attributes().InsertString("foo", strconv.Itoa(attributeValues[2]))
+			spanRecord.Attributes().InsertString(otelcollector.DurationLabel, strconv.Itoa(attributeValues[2]))
 
 			err = tracesProcessor.ConsumeTraces(context.TODO(), input)
 			Expect(err).NotTo(HaveOccurred())

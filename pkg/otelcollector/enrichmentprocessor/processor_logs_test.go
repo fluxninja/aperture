@@ -21,7 +21,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
+		ld := logsFromLabels(map[string]interface{}{
 			"control_point":    "egress",
 			"net.host.address": "192.0.2.0:80",
 			"net.peer.address": "192.0.2.1:80",
@@ -29,11 +29,11 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			"control_point": "egress",
 			"labeled":       "false",
 			"agent_group":   "defaultAG",
-			"services":      "svc1,svc2",
+			"services":      []string{"svc1", "svc2"},
 		}))
 	})
 
@@ -46,7 +46,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
+		ld := logsFromLabels(map[string]interface{}{
 			"control_point":    "egress",
 			"net.host.address": "-",
 			"net.peer.address": "192.0.2.1:80",
@@ -54,7 +54,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			"control_point":    "egress",
 			"labeled":          "false",
 			"net.host.address": "-",
@@ -72,7 +72,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
+		ld := logsFromLabels(map[string]interface{}{
 			"control_point":    "egress",
 			"net.host.address": "this is :: definitely not an IP ::::",
 			"net.peer.address": "192.0.2.1:80",
@@ -80,7 +80,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			"control_point": "egress",
 			"labeled":       "false",
 			"agent_group":   "defaultAG",
@@ -97,7 +97,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
+		ld := logsFromLabels(map[string]interface{}{
 			"control_point": "ingress",
 			"net.host.ip":   "192.0.2.0",
 			"net.peer.ip":   "192.0.2.1",
@@ -105,11 +105,11 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			"control_point": "ingress",
 			"labeled":       "false",
 			"agent_group":   "defaultAG",
-			"services":      "svc1,svc2",
+			"services":      []string{"svc1", "svc2"},
 		}))
 	})
 
@@ -118,7 +118,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
+		ld := logsFromLabels(map[string]interface{}{
 			"control_point":    "egress",
 			"net.host.address": "192.0.2.0:80",
 			"net.peer.address": "192.0.2.1:80",
@@ -126,7 +126,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			"control_point": "egress",
 			"labeled":       "false",
 			"agent_group":   "defaultAG",
@@ -138,14 +138,14 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
+		ld := logsFromLabels(map[string]interface{}{
 			"control_point":   "egress",
 			"aperture.labels": `{"foo": "bar", "fizz": "buzz"}`,
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			"control_point": "egress",
 			"foo":           "bar",
 			"fizz":          "buzz",
@@ -159,14 +159,14 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
+		ld := logsFromLabels(map[string]interface{}{
 			"control_point":   "egress",
 			"aperture.labels": ``,
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			"control_point": "egress",
 			"labeled":       "false",
 			"agent_group":   "defaultAG",
@@ -178,14 +178,14 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
+		ld := logsFromLabels(map[string]interface{}{
 			"control_point":   "feature",
 			"aperture.labels": `-`,
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			"control_point": "feature",
 			"labeled":       "false",
 			"agent_group":   "defaultAG",
@@ -193,16 +193,13 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 	})
 })
 
-func logsFromLabels(labels map[string]string) plog.Logs {
+func logsFromLabels(labels map[string]interface{}) plog.Logs {
 	ld := plog.NewLogs()
 	logs := ld.ResourceLogs().AppendEmpty().
 		ScopeLogs().AppendEmpty().
 		LogRecords()
 	logRecord := logs.AppendEmpty()
-	attr := logRecord.Attributes()
-	for k, v := range labels {
-		attr.InsertString(k, v)
-	}
+	populateAttrsFromLabels(logRecord.Attributes(), labels)
 	return ld
 }
 

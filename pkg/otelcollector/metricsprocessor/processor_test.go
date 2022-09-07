@@ -2,12 +2,14 @@ package metricsprocessor
 
 import (
 	"strings"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 	"golang.org/x/net/context"
@@ -485,6 +487,11 @@ func someTraces(
 			span.Attributes().InsertString(otelcollector.FeatureStatusLabel, "Ok")
 			span.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
 			span.Attributes().InsertString(otelcollector.DurationLabel, "5")
+			// Set a delta of 5ms between start and end timestamps on this span
+			spanEndTimestamp := time.Now()
+			spanStartTimestamp := spanEndTimestamp.Add(-5 * time.Millisecond)
+			span.SetStartTimestamp(pcommon.NewTimestampFromTime(spanStartTimestamp))
+			span.SetEndTimestamp(pcommon.NewTimestampFromTime(spanEndTimestamp))
 			for i, fm := range checkResponse.FluxMeters {
 				// TODO actually return some Histogram
 				expectedCalls[i] = engine.EXPECT().GetFluxMeter(fm.GetFluxMeterName()).Return(nil)

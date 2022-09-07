@@ -267,10 +267,14 @@ func whitelistSpanAttributes(attributes pcommon.Map) {
 }
 
 func _whitelistAttributes(attributes pcommon.Map, whitelist map[string]bool) {
+	keysToRemove := make([]string, 0)
 	attributes.Range(func(key string, _ pcommon.Value) bool {
 		if !whitelist[key] {
-			attributes.Remove(key)
+			keysToRemove = append(keysToRemove, key)
 		}
 		return true
 	})
+	for _, key := range keysToRemove {
+		attributes.Remove(key)
+	}
 }
