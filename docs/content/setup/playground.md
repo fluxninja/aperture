@@ -13,23 +13,23 @@ sidebar_position: 2
 
 Playground is a Kubernetes-based environment for exploring the capabilities of
 Aperture. Additionally, it is used as a development environment for Aperture.
-The playground uses [Tilt](https://tilt.dev/)](https://tilt.dev/) for
-orchestrating the deployments in Kubernetes. Tilt watches for changes to local
+Playground uses [Tilt](https://tilt.dev/)](https://tilt.dev/) for
+orchestrating deployments in Kubernetes. Tilt watches for changes to local
 files and auto-deploys any resources that change. This is very convenient for
-getting quick feedback during development of Aperture.
+getting quick feedback when developing with Aperture.
 
 Playground deploys resources to the Kubernetes cluster that `kubectl` on your
-machine points at. For convience, this README includes instructions for
+machine points at. For convience, this document includes instructions for
 deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
 
 ## Tools
 
-Described hereafter deployment methods assume usage of specific deployment and
+The following deployment methods assume usage of specific deployment and
 configuration/management tools (which must be installed beforehand).
 
-To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install
-manually (check [Tools used for k8s deployment](#tools-used-for-k8s-deployment)
-).
+To install the required tools, you can use [ASDF](https://asdf-vm.com/) OR install
+manually by checking [Tools used for k8s deployment](#tools-used-for-k8s-deployment)
+.
 
 When using `asdf`:
 
@@ -76,7 +76,7 @@ The Kubernetes command line tool. Follow the instructions:
 Agent core service uses feature gate for managing node-local traffic:
 <https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/>
 
-For kubernetes 1.21 it requires a feature gate activation. For kubernetes 1.22
+For Kubernetes 1.21 it requires a feature gate activation. For kubernetes 1.22
 it's in beta so nothing needs to be added to cluster config.
 
 ```yaml
