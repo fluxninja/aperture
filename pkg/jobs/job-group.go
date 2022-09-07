@@ -41,8 +41,7 @@ const (
 // swagger:model
 // +kubebuilder:object:generate=true
 type JobGroupConfig struct {
-	//+kubebuilder:validation:Optional
-	SchedulerConfig `json:",inline,omitempty"`
+	SchedulerConfig `json:",inline"`
 }
 
 // SchedulerConfig holds configuration for job Scheduler.
@@ -50,9 +49,6 @@ type JobGroupConfig struct {
 // +kubebuilder:object:generate=true
 type SchedulerConfig struct {
 	// Limits how many jobs can be running at the same time. This is useful when running resource intensive jobs and a precise start time is not critical. 0 = no limit.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=0
-	//+kubebuilder:validation:Minimum:=0
 	MaxConcurrentJobs int `json:"max_concurrent_jobs" validate:"gte=0" default:"0"`
 }
 

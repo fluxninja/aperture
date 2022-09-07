@@ -38,6 +38,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/go-logr/logr"
 )
 
@@ -308,6 +309,15 @@ func (r *AgentReconciler) updateAgent(ctx context.Context, instance *v1alpha1.Ag
 
 // manageResources creates/updates required resources.
 func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Agent) error {
+	spec := &instance.Spec.ConfigSpec
+
+	// fill defaults
+	config.SetDefaults(spec)
+	// validate
+	if err := config.ValidateStruct(spec); err != nil {
+		return err
+	}
+
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
@@ -349,11 +359,13 @@ func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, 
 // reconcileConfigMap prepares the desired states for Agent configmaps and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileConfigMap(ctx context.Context, instance *v1alpha1.Agent) error {
+	logger := log.FromContext(ctx)
 	if !instance.Spec.Sidecar.Enabled {
 		configMap, err := configMapForAgentConfig(instance.DeepCopy(), r.Scheme)
 		if err != nil {
 			return err
 		}
+		logger.Info("reconciling ConfigMap", "config", configMap)
 		if _, err = createConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}

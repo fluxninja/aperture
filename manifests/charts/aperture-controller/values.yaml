@@ -499,13 +499,13 @@ controller:
   ##
   initContainers: []
   ## Controller API secret for FluxNinja cloud connection
-  ## @param controller.secrets.fluxninjaPlugin.create Whether to create Kubernetes Secret with provided Controller API Key.
-  ## @param controller.secrets.fluxninjaPlugin.secretKeyRef.name specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey
-  ## @param controller.secrets.fluxninjaPlugin.secretKeyRef.key specifies which key from the Secret for Controller API Key to use
-  ## @param controller.secrets.fluxninjaPlugin.value API Key to use when creating a new Controller API Key Secret
+  ## @param controller.secrets.fluxNinjaPlugin.create Whether to create Kubernetes Secret with provided Controller API Key.
+  ## @param controller.secrets.fluxNinjaPlugin.secretKeyRef.name specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey
+  ## @param controller.secrets.fluxNinjaPlugin.secretKeyRef.key specifies which key from the Secret for Controller API Key to use
+  ## @param controller.secrets.fluxNinjaPlugin.value API Key to use when creating a new Controller API Key Secret
   ##
   secrets:
-    fluxninjaPlugin:
+    fluxNinjaPlugin:
       create: false
       secretKeyRef:
         name: ~
@@ -516,11 +516,11 @@ controller:
   config:
     ## Etcd parameters for Controller
     ## @param controller.config.etcd.endpoints List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty.
-    ## @param controller.config.etcd.leaseTtl Lease time-to-live.
+    ## @param controller.config.etcd.lease_ttl Lease time-to-live.
     ##
     etcd:
       endpoints: []
-      leaseTtl: 60s
+      lease_ttl: 60s
     ## Prometheus parameters for Controller
     ## @param controller.config.prometheus.address specifies the address of the Prometheus server. This must not be empty.
     ##

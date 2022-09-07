@@ -889,12 +889,9 @@ spec:
                 description: Agent Configuration
                 properties:
                   agent_info:
-                    default:
-                      agent_group: default
                     description: AgentInfo configuration.
                     properties:
                       agent_group:
-                        default: default
                         description: All agents within an agent_group receive the
                           same data-plane configuration (e.g. schedulers, FluxMeters,
                           rate limiter).
@@ -917,26 +914,20 @@ spec:
                         type: object
                     type: object
                   dist_cache:
-                    default:
-                      bind_addr: :3320
-                      memberlist_bind_addr: :3322
                     description: DistCache configuration.
                     properties:
                       bind_addr:
-                        default: :3320
-                        description: BindAddr denotes the address that Olric will
-                          bind to for communication with other Olric nodes.
+                        description: BindAddr denotes the address that DistCache will
+                          bind to for communication with other peer nodes.
                         type: string
                       memberlist_advertise_addr:
                         description: Address of memberlist to advertise to other cluster
                           members. Used for nat traversal if provided.
                         type: string
                       memberlist_bind_addr:
-                        default: :3322
                         description: Address to bind mememberlist server to.
                         type: string
                       replica_count:
-                        default: 1
                         description: ReplicaCount is 1 by default.
                         type: integer
                     type: object
@@ -949,7 +940,6 @@ spec:
                           type: string
                         type: array
                       lease_ttl:
-                        default: 60s
                         description: Lease time-to-live
                         type: string
                     type: object
@@ -963,43 +953,28 @@ spec:
                         description: Client configuration.
                         properties:
                           grpc:
-                            default:
-                              backoff:
-                                base_delay: 1s
-                                multiplier: 1.6
                             description: GRPC client settings.
                             properties:
                               backoff:
-                                default:
-                                  base_delay: 1s
-                                  multiplier: 1.6
                                 description: Backoff config
                                 properties:
                                   base_delay:
-                                    default: 1s
                                     description: Base Delay
                                     type: string
                                   jitter:
-                                    default: 0.2
                                     description: Jitter
-                                    minimum: 0
                                     type: number
                                   max_delay:
-                                    default: 120s
                                     description: Max Delay
                                     type: string
                                   multiplier:
-                                    default: 1.6
                                     description: Backoff multiplier
-                                    minimum: 0
                                     type: number
                                 type: object
                               insecure:
-                                default: false
                                 description: Disable ClientTLS
                                 type: boolean
                               min_connection_timeout:
-                                default: 20s
                                 description: Minimum connection timeout
                                 type: string
                               tls:
@@ -1017,7 +992,6 @@ spec:
                                     type: string
                                 type: object
                               use_proxy:
-                                default: false
                                 description: Use HTTP CONNECT Proxy
                                 type: boolean
                             type: object
@@ -1025,19 +999,15 @@ spec:
                             description: HTTP client settings.
                             properties:
                               disable_compression:
-                                default: false
                                 description: Disable Compression
                                 type: boolean
                               disable_keep_alives:
-                                default: false
                                 description: Disable HTTP Keep Alives
                                 type: boolean
                               expect_continue_timeout:
-                                default: 1s
                                 description: Expect Continue Timeout. 0 = no timeout.
                                 type: string
                               idle_connection_timeout:
-                                default: 90s
                                 description: Idle Connection Timeout. 0 = no timeout.
                                 type: string
                               key_log_file:
@@ -1045,33 +1015,23 @@ spec:
                                   with wireshark)
                                 type: string
                               max_conns_per_host:
-                                default: 0
                                 description: Max Connections Per Host. 0 = no limit.
-                                minimum: 0
                                 type: integer
                               max_idle_connections:
-                                default: 100
                                 description: Max Idle Connections. 0 = no limit.
-                                minimum: 0
                                 type: integer
                               max_idle_connections_per_host:
-                                default: 5
                                 description: Max Idle Connections per host. 0 = no
                                   limit.
-                                minimum: 0
                                 type: integer
                               max_response_header_bytes:
-                                default: 0
                                 description: Max Response Header Bytes. 0 = no limit.
                                 format: int64
-                                minimum: 0
                                 type: integer
                               network_keep_alive:
-                                default: 30s
                                 description: Network level keep-alive duration
                                 type: string
                               network_timeout:
-                                default: 30s
                                 description: Timeout for making network connection
                                 type: string
                               proxy_connect_header:
@@ -1082,23 +1042,17 @@ spec:
                                 description: Proxy Connect Header - map[string][]string
                                 type: object
                               read_buffer_size:
-                                default: 0
                                 description: Read Buffer Size. 0 = 4KB
-                                minimum: 0
                                 type: integer
                               response_header_timeout:
-                                default: 0s
                                 description: Response Header Timeout. 0 = no timeout.
                                 type: string
                               timeout:
-                                default: 60s
                                 description: HTTP client timeout - Timeouts includes
                                   connection time, redirects, reading the response
                                   etc. 0 = no timeout.
                                 type: string
                               tls:
-                                default:
-                                  insecure_skip_verify: false
                                 description: Client TLS configuration
                                 properties:
                                   ca_file:
@@ -1113,17 +1067,13 @@ spec:
                                     type: string
                                 type: object
                               tls_handshake_timeout:
-                                default: 10s
                                 description: TLS Handshake Timeout. 0 = no timeout
                                 type: string
                               use_proxy:
-                                default: false
                                 description: Use Proxy
                                 type: boolean
                               write_buffer_size:
-                                default: 0
                                 description: Write Buffer Size. 0 = 4KB.
-                                minimum: 0
                                 type: integer
                             type: object
                         type: object
@@ -1133,7 +1083,6 @@ spec:
                           with http(s)://.
                         type: string
                       heartbeat_interval:
-                        default: 5s
                         description: Interval between each heartbeat.
                         type: string
                     type: object
@@ -1141,51 +1090,37 @@ spec:
                     description: Kubernetes client configuration.
                     properties:
                       disable_compression:
-                        default: false
                         description: Disable Compression
                         type: boolean
                       disable_keep_alives:
-                        default: false
                         description: Disable HTTP Keep Alives
                         type: boolean
                       expect_continue_timeout:
-                        default: 1s
                         description: Expect Continue Timeout. 0 = no timeout.
                         type: string
                       idle_connection_timeout:
-                        default: 90s
                         description: Idle Connection Timeout. 0 = no timeout.
                         type: string
                       key_log_file:
                         description: SSL key log file (useful for debugging with wireshark)
                         type: string
                       max_conns_per_host:
-                        default: 0
                         description: Max Connections Per Host. 0 = no limit.
-                        minimum: 0
                         type: integer
                       max_idle_connections:
-                        default: 100
                         description: Max Idle Connections. 0 = no limit.
-                        minimum: 0
                         type: integer
                       max_idle_connections_per_host:
-                        default: 5
                         description: Max Idle Connections per host. 0 = no limit.
-                        minimum: 0
                         type: integer
                       max_response_header_bytes:
-                        default: 0
                         description: Max Response Header Bytes. 0 = no limit.
                         format: int64
-                        minimum: 0
                         type: integer
                       network_keep_alive:
-                        default: 30s
                         description: Network level keep-alive duration
                         type: string
                       network_timeout:
-                        default: 30s
                         description: Timeout for making network connection
                         type: string
                       proxy_connect_header:
@@ -1196,22 +1131,16 @@ spec:
                         description: Proxy Connect Header - map[string][]string
                         type: object
                       read_buffer_size:
-                        default: 0
                         description: Read Buffer Size. 0 = 4KB
-                        minimum: 0
                         type: integer
                       response_header_timeout:
-                        default: 0s
                         description: Response Header Timeout. 0 = no timeout.
                         type: string
                       timeout:
-                        default: 60s
                         description: HTTP client timeout - Timeouts includes connection
                           time, redirects, reading the response etc. 0 = no timeout.
                         type: string
                       tls:
-                        default:
-                          insecure_skip_verify: false
                         description: Client TLS configuration
                         properties:
                           ca_file:
@@ -1226,17 +1155,13 @@ spec:
                             type: string
                         type: object
                       tls_handshake_timeout:
-                        default: 10s
                         description: TLS Handshake Timeout. 0 = no timeout
                         type: string
                       use_proxy:
-                        default: false
                         description: Use Proxy
                         type: boolean
                       write_buffer_size:
-                        default: 0
                         description: Write Buffer Size. 0 = 4KB.
-                        minimum: 0
                         type: integer
                     type: object
                   liveness:
@@ -1246,35 +1171,29 @@ spec:
                         description: Scheduler settings.
                         properties:
                           max_concurrent_jobs:
-                            default: 0
                             description: Limits how many jobs can be running at the
                               same time. This is useful when running resource intensive
                               jobs and a precise start time is not critical. 0 = no
                               limit.
-                            minimum: 0
                             type: integer
                         type: object
                       service:
                         description: Service settings.
                         properties:
                           execution_period:
-                            default: 10s
                             description: Time period between job executions. Zero
                               or negative value means that the job will never execute
                               periodically.
                             type: string
                           execution_timeout:
-                            default: 5s
                             description: Execution timeout
                             type: string
                           initial_delay:
-                            default: 0s
                             description: Initial delay to start the job. Zero value
                               will schedule the job immediately. Negative value will
                               wait for next scheduled interval.
                             type: string
                           initially_healthy:
-                            default: false
                             description: Sets whether the job is initially healthy
                             type: boolean
                         type: object
@@ -1283,60 +1202,29 @@ spec:
                     description: Log configuration.
                     properties:
                       compress:
-                        default: false
                         description: Compress
                         type: boolean
                       file:
-                        default: stderr
                         description: Output file for logs. Keywords allowed - ["stderr",
                           "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-                        enum:
-                        - stderr
-                        - default
                         type: string
                       level:
-                        default: info
                         description: Log level
-                        enum:
-                        - debug
-                        - DEBUG
-                        - info
-                        - INFO
-                        - warn
-                        - WARN
-                        - error
-                        - ERROR
-                        - fatal
-                        - FATAL
-                        - panic
-                        - PANIC
-                        - trace
-                        - TRACE
-                        - disabled
-                        - DISABLED
                         type: string
                       max_age:
-                        default: 7
                         description: Max age in days for log files
-                        minimum: 0
                         type: integer
                       max_backups:
-                        default: 3
                         description: Max log file backups
-                        minimum: 0
                         type: integer
                       max_size:
-                        default: 50
                         description: Log file max size in MB
-                        minimum: 0
                         type: integer
                       non_blocking:
-                        default: true
                         description: Use non-blocking log writer (can lose logs at
                           high throughput)
                         type: boolean
                       pretty_console:
-                        default: false
                         description: 'Additional log writer: pretty console (stdout)
                           logging (not recommended for prod environments)'
                         type: boolean
@@ -1347,31 +1235,20 @@ spec:
                             writer. swagger:model
                           properties:
                             compress:
-                              default: false
                               description: Compress
                               type: boolean
                             file:
-                              default: stderr
                               description: Output file for logs. Keywords allowed
                                 - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-                              enum:
-                              - stderr
-                              - default
                               type: string
                             max_age:
-                              default: 7
                               description: Max age in days for log files
-                              minimum: 0
                               type: integer
                             max_backups:
-                              default: 3
                               description: Max log file backups
-                              minimum: 0
                               type: integer
                             max_size:
-                              default: 50
                               description: Log file max size in MB
-                              minimum: 0
                               type: integer
                           type: object
                         type: array
@@ -1380,69 +1257,51 @@ spec:
                     description: Metrics configuration.
                     properties:
                       enable_go_metrics:
-                        default: false
                         description: EnableGoCollector controls whether the go collector
                           is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
                         type: boolean
                       enable_process_collector:
-                        default: false
                         description: EnableProcessCollector controls whether the process
                           collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
                         type: boolean
                       pedantic:
-                        default: false
                         description: Pedantic controls whether a pedantic Registerer
                           is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
                         type: boolean
                     type: object
                   otel:
-                    default:
-                      grpc_addr: :4317
-                      http_addr: :4318
                     description: OTEL configuration.
                     properties:
                       batch_postrollup:
-                        default:
-                          send_batch_size: 10000
-                          timeout: 1s
                         description: BatchPostrollup configures batch postrollup processor.
                         properties:
                           send_batch_size:
-                            default: 10000
                             description: SendBatchSize is the size of a batch which
                               after hit, will trigger it to be sent.
                             format: int32
                             type: integer
                           timeout:
-                            default: 1s
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
                         type: object
                       batch_prerollup:
-                        default:
-                          send_batch_size: 10000
-                          timeout: 1s
                         description: BatchPrerollup configures batch prerollup processor.
                         properties:
                           send_batch_size:
-                            default: 10000
                             description: SendBatchSize is the size of a batch which
                               after hit, will trigger it to be sent.
                             format: int32
                             type: integer
                           timeout:
-                            default: 1s
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
                         type: object
                       grpc_addr:
-                        default: :4317
                         description: GRPC listener addr for OTEL Collector.
                         type: string
                       http_addr:
-                        default: :4318
                         description: HTTP listener addr for OTEL Collector.
                         type: string
                     type: object
@@ -1459,7 +1318,6 @@ spec:
                     description: Plugins configuration.
                     properties:
                       disable_plugins:
-                        default: false
                         description: Disables all plugins
                         type: boolean
                       disabled_plugins:
@@ -1481,7 +1339,6 @@ spec:
                     description: Profilers configuration.
                     properties:
                       cpu_profiler:
-                        default: false
                         description: Flag to enable cpu profiling on process start
                           and save it to a file. HTTP interface will not work if this
                           is enabled as CPU profile will always be running.
@@ -1492,7 +1349,6 @@ spec:
                           for aperture-agent is /var/log/aperture/aperture-agent/profiles.
                         type: string
                       register_http_routes:
-                        default: true
                         description: Register routes. Profile types profile, symbol
                           and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
                         type: boolean
@@ -1503,8 +1359,6 @@ spec:
                       address:
                         description: Address of the prometheus server
                         type: string
-                    required:
-                    - address
                     type: object
                   readiness:
                     description: Readiness probe configuration.
@@ -1513,35 +1367,29 @@ spec:
                         description: Scheduler settings.
                         properties:
                           max_concurrent_jobs:
-                            default: 0
                             description: Limits how many jobs can be running at the
                               same time. This is useful when running resource intensive
                               jobs and a precise start time is not critical. 0 = no
                               limit.
-                            minimum: 0
                             type: integer
                         type: object
                       service:
                         description: Service settings.
                         properties:
                           execution_period:
-                            default: 10s
                             description: Time period between job executions. Zero
                               or negative value means that the job will never execute
                               periodically.
                             type: string
                           execution_timeout:
-                            default: 5s
                             description: Execution timeout
                             type: string
                           initial_delay:
-                            default: 0s
                             description: Initial delay to start the job. Zero value
                               will schedule the job immediately. Negative value will
                               wait for next scheduled interval.
                             type: string
                           initially_healthy:
-                            default: false
                             description: Sets whether the job is initially healthy
                             type: boolean
                         type: object
@@ -1550,16 +1398,13 @@ spec:
                     description: Sentry plugin configuration.
                     properties:
                       attach_stack_trace:
-                        default: true
                         description: Configure to generate and attach stacktraces
                           to capturing message calls
                         type: boolean
                       debug:
-                        default: true
                         description: Debug enables printing of Sentry SDK debug messages
                         type: boolean
                       disabled:
-                        default: false
                         description: Sentry crash report disabled
                         type: boolean
                       dsn:
@@ -1568,41 +1413,29 @@ spec:
                           oss-aperture project dsn is set as default.
                         type: string
                       environment:
-                        default: production
                         description: Environment
                         type: string
                       sample_rate:
-                        default: 1
                         description: Sample rate for event submission i.e. 0.0 to
                           1.0
-                        maximum: 1
-                        minimum: 0
                         type: number
                       traces_sample_rate:
-                        default: 0.2
                         description: Sample rate for sampling traces i.e. 0.0 to 1.0
-                        maximum: 1
-                        minimum: 0
                         type: number
                     type: object
                   server:
-                    default:
-                      addr: :8080
                     description: Server configuration.
                     properties:
                       addr:
-                        default: :8080
                         description: Address to bind to in the form of [host%zone]:port
                         type: string
                       grpc:
                         description: GRPC server configuration.
                         properties:
                           connection_timeout:
-                            default: 120s
                             description: Connection timeout
                             type: string
                           enable_reflection:
-                            default: false
                             description: Enable Reflection
                             type: boolean
                         type: object
@@ -1610,7 +1443,6 @@ spec:
                         description: GRPC Gateway configuration.
                         properties:
                           grpc_server_address:
-                            default: 0.0.0.0:1
                             description: GRPC server address to connect to - By default
                               it points to HTTP server port because FluxNinja stack
                               runs GRPC and HTTP servers on the same port
@@ -1620,59 +1452,40 @@ spec:
                         description: HTTP server configuration.
                         properties:
                           disable_http_keep_alives:
-                            default: false
                             description: Disable HTTP Keep Alives
                             type: boolean
                           idle_timeout:
-                            default: 30s
                             description: Idle timeout
                             type: string
                           latency_bucket_count:
-                            default: 100
                             description: The number of buckets in latency histogram
-                            minimum: 0
                             type: integer
                           latency_bucket_start_ms:
-                            default: 20
                             description: The lowest bucket in latency histogram
-                            minimum: 0
                             type: number
                           latency_bucket_width_ms:
-                            default: 20
                             description: The bucket width in latency histogram
-                            minimum: 0
                             type: number
                           max_header_bytes:
-                            default: 1048576
                             description: Max header size in bytes
-                            minimum: 0
                             type: integer
                           read_header_timeout:
-                            default: 10s
                             description: Read header timeout
                             type: string
                           read_timeout:
-                            default: 10s
                             description: Read timeout
                             type: string
                           write_timeout:
-                            default: 45s
                             description: Write timeout
                             type: string
                         type: object
                       keep_alive:
-                        default: 180s
                         description: Keep-alive period - 0 = enabled if supported
                           by protocol or OS. If negative then keep-alives are disabled.
                         type: string
                       network:
-                        default: tcp
                         description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6"
                           (IPv6-only)
-                        enum:
-                        - tcp
-                        - tcp4
-                        - tcp6
                         type: string
                       tls:
                         description: TLS configuration.
@@ -1688,24 +1501,17 @@ spec:
                             description: Client CA file
                             type: string
                           enabled:
-                            default: false
                             description: Enabled TLS
                             type: boolean
                           server_cert:
-                            default: ca.crt
                             description: Server Cert file
                             type: string
                           server_key:
-                            default: ca.key
                             description: Server Key file
                             type: string
                         type: object
                     type: object
                   watchdog:
-                    default:
-                      heap:
-                        limit: 268435456
-                        min_gogc: 25
                     description: Watchdog configuration.
                     properties:
                       cgroup:
@@ -1720,15 +1526,11 @@ spec:
                               as usage+(limit-usage)*factor. swagger:model
                             properties:
                               enabled:
-                                default: false
                                 description: Flag to enable the policy
                                 type: boolean
                               factor:
-                                default: 0.5
                                 description: Factor sets user-configured limit of
                                   available memory
-                                maximum: 1
-                                minimum: 0
                                 type: number
                             type: object
                           watermarks_policy:
@@ -1736,18 +1538,9 @@ spec:
                               that schedules GC at concrete watermarks. swagger:model
                             properties:
                               enabled:
-                                default: false
                                 description: Flag to enable the policy
                                 type: boolean
                               watermarks:
-                                default:
-                                - 0.5
-                                - 0.75
-                                - 0.8
-                                - 0.85
-                                - 0.9
-                                - 0.95
-                                - 0.99
                                 description: Watermarks are increasing limits on which
                                   to trigger GC. Watchdog disarms when the last watermark
                                   is surpassed. It is recommended to set an extreme
@@ -1768,25 +1561,19 @@ spec:
                               as usage+(limit-usage)*factor. swagger:model
                             properties:
                               enabled:
-                                default: false
                                 description: Flag to enable the policy
                                 type: boolean
                               factor:
-                                default: 0.5
                                 description: Factor sets user-configured limit of
                                   available memory
-                                maximum: 1
-                                minimum: 0
                                 type: number
                             type: object
                           limit:
-                            default: 268435456
                             description: Maximum memory (in bytes) sets limit of process
                               usage. Default = 256MB.
                             format: int64
                             type: integer
                           min_gogc:
-                            default: 25
                             description: Minimum GoGC sets the minimum garbage collection
                               target percentage for heap driven Watchdogs. This setting
                               helps avoid overscheduling.
@@ -1796,18 +1583,9 @@ spec:
                               that schedules GC at concrete watermarks. swagger:model
                             properties:
                               enabled:
-                                default: false
                                 description: Flag to enable the policy
                                 type: boolean
                               watermarks:
-                                default:
-                                - 0.5
-                                - 0.75
-                                - 0.8
-                                - 0.85
-                                - 0.9
-                                - 0.95
-                                - 0.99
                                 description: Watermarks are increasing limits on which
                                   to trigger GC. Watchdog disarms when the last watermark
                                   is surpassed. It is recommended to set an extreme
@@ -1821,23 +1599,19 @@ spec:
                         description: JobConfig is config for Job swagger:model
                         properties:
                           execution_period:
-                            default: 10s
                             description: Time period between job executions. Zero
                               or negative value means that the job will never execute
                               periodically.
                             type: string
                           execution_timeout:
-                            default: 5s
                             description: Execution timeout
                             type: string
                           initial_delay:
-                            default: 0s
                             description: Initial delay to start the job. Zero value
                               will schedule the job immediately. Negative value will
                               wait for next scheduled interval.
                             type: string
                           initially_healthy:
-                            default: false
                             description: Sets whether the job is initially healthy
                             type: boolean
                         type: object
@@ -1853,15 +1627,11 @@ spec:
                               as usage+(limit-usage)*factor. swagger:model
                             properties:
                               enabled:
-                                default: false
                                 description: Flag to enable the policy
                                 type: boolean
                               factor:
-                                default: 0.5
                                 description: Factor sets user-configured limit of
                                   available memory
-                                maximum: 1
-                                minimum: 0
                                 type: number
                             type: object
                           watermarks_policy:
@@ -1869,18 +1639,9 @@ spec:
                               that schedules GC at concrete watermarks. swagger:model
                             properties:
                               enabled:
-                                default: false
                                 description: Flag to enable the policy
                                 type: boolean
                               watermarks:
-                                default:
-                                - 0.5
-                                - 0.75
-                                - 0.8
-                                - 0.85
-                                - 0.9
-                                - 0.95
-                                - 0.99
                                 description: Watermarks are increasing limits on which
                                   to trigger GC. Watchdog disarms when the last watermark
                                   is surpassed. It is recommended to set an extreme

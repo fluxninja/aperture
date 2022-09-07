@@ -45,4 +45,5 @@ const (
 	tcp                          = "TCP"
 	distCache                    = "dist-cache"
 	memberList                   = "memberlist"
+	apertureFluxNinjaPlugin      = "aperture-plugin-fluxninja"
 )

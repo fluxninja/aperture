@@ -32,14 +32,11 @@ type ProxyConstructor struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type ProxyConfig struct {
-	//+kubebuilder:validation:Optional
-	HTTPProxy string `json:"http,omitempty" validate:"omitempty,url|hostname_port"`
+	HTTPProxy string `json:"http" validate:"omitempty,url|hostname_port"`
 
-	//+kubebuilder:validation:Optional
-	HTTPSProxy string `json:"https,omitempty" validate:"omitempty,url|hostname_port"`
+	HTTPSProxy string `json:"https" validate:"omitempty,url|hostname_port"`
 
-	//+kubebuilder:validation:Optional
-	NoProxy []string `json:"no_proxy,omitempty" validate:"dive,ip|cidr|fqdn|hostname_port"`
+	NoProxy []string `json:"no_proxy" validate:"dive,ip|cidr|fqdn|hostname_port"`
 }
 
 func (constructor ProxyConstructor) applyProxyConfig(unmarshaller config.Unmarshaller) error {
