@@ -6,7 +6,7 @@ keywords:
   - service mesh
   - istio
   - envoy filter
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 ## Envoy Filter
