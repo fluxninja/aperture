@@ -50,3 +50,9 @@ workflows:
     jobs:
       - continuation/continue:
           configuration_path: .circleci/release.yaml
+          # both this and workflow's "when" is needed
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^releases\/.*$/
