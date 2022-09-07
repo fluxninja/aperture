@@ -1,5 +1,6 @@
 import http from "k6/http";
 import { check } from "k6";
+import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 
 export let vuStages = [
   { duration: "1s", target: 5 },
@@ -39,7 +40,11 @@ export default function () {
   let res = http.request("POST", url, JSON.stringify(body), {
     headers: headers,
   });
-  check(res, {
+  const ret = check(res, {
     "http status was 200": res.status === 200,
   });
+  if (!ret) {
+    // sleep for 25ms to 100ms
+    sleep(randomIntBetween(0.025, 0.1));
+  }
 }
