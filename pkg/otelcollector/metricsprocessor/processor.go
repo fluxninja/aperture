@@ -84,9 +84,9 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		checkResponse := p.addCheckResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.MissingAttributeSourceValue})
+		checkResponse := p.addCheckResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
 
-		p.addAuthzResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.MissingAttributeSourceValue})
+		p.addAuthzResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
 
 		return p.updateMetrics(logRecord.Attributes(), checkResponse)
 		// TODO tgill: Pass attributes through white list to ensure we drop any extra fields before rollup
@@ -231,7 +231,7 @@ func (p *metricsProcessor) updateMetrics(
 	if len(checkResponse.FluxMeters) > 0 {
 		// Update flux meter metrics
 		statusCodeStr := ""
-		statusCode, exists := attributes.Get(otelcollector.StatusCodeLabel)
+		statusCode, exists := attributes.Get(otelcollector.HTTPStatusCodeLabel)
 		if exists {
 			statusCodeStr = statusCode.StringVal()
 		}

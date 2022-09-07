@@ -448,7 +448,7 @@ func someLogs(
 			Expect(err).NotTo(HaveOccurred())
 			logRecord.Attributes().InsertString(otelcollector.MarshalledCheckResponseLabel, string(marshalledCheckResponse))
 			logRecord.Attributes().InsertString(otelcollector.MarshalledAuthzResponseLabel, string(marshalledAuthzResponse))
-			logRecord.Attributes().InsertString(otelcollector.StatusCodeLabel, "201")
+			logRecord.Attributes().InsertString(otelcollector.HTTPStatusCodeLabel, "201")
 			logRecord.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
 			logRecord.Attributes().InsertString(otelcollector.DurationLabel, "5")
 			for i, fm := range checkResponse.FluxMeters {

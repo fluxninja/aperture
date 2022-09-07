@@ -57,7 +57,8 @@ func (ep *enrichmentProcessor) ConsumeLogs(ctx context.Context, origLd plog.Logs
 	}
 	ld := origLd.Clone()
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		ep.enrichAttributes(logRecord.Attributes(), []string{otelcollector.MissingAttributeSourceValue})
+		whitelistLogAttributes(logRecord.Attributes())
+		ep.enrichAttributes(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
 		return nil
 	})
 	return ld, err
@@ -70,6 +71,7 @@ func (ep *enrichmentProcessor) ConsumeTraces(ctx context.Context, origTd ptrace.
 	}
 	td := origTd.Clone()
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
+		whitelistSpanAttributes(span.Attributes())
 		ep.enrichAttributes(span.Attributes(), []string{})
 		return nil
 	})
@@ -137,7 +139,7 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsM
 			return
 		}
 		hostAddress := rawHostAddress.StringVal()
-		if len(hostAddress) == 0 || hostAddress == otelcollector.MissingAttributeSourceValue {
+		if len(hostAddress) == 0 || hostAddress == otelcollector.EnvoyMissingAttributeSourceValue {
 			otelcollector.LogSampled.Warn().Msg("Skipping because 'otelcollector.HostAddressLabel' is empty")
 			return
 		}
@@ -191,7 +193,11 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 		log.Trace().Str("name", hostName).Msg("Skipping because entity not found in cache")
 		return
 	}
-	attributes.UpsertString(otelcollector.ServicesLabel, strings.Join(hostEntity.Services, ","))
+	servicesValue := pcommon.NewValueSlice()
+	for _, service := range hostEntity.Services {
+		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
+	}
+	attributes.Upsert(otelcollector.ServicesLabel, servicesValue)
 }
 
 // unpackFlowLabels tries to parse `LabelsLabel` attribute as json, and adds
@@ -214,4 +220,57 @@ func unpackFlowLabels(attributes pcommon.Map, treatAsMissing []string) {
 
 func ipFromAddress(ip string) string {
 	return strings.Split(ip, ":")[0]
+}
+
+/*
+ * Whitelist: This whitelist is applied to logs and spans at the beginning of enrichment process.
+ */
+var (
+	commonAttributes = map[string]bool{
+		otelcollector.MarshalledLabelsLabel:        true,
+		otelcollector.ControlPointLabel:            true,
+		otelcollector.MarshalledCheckResponseLabel: true,
+	}
+
+	logAttributes = map[string]bool{
+		otelcollector.DurationLabel:                true,
+		otelcollector.MarshalledAuthzResponseLabel: true,
+		otelcollector.HTTPStatusCodeLabel:          true,
+		otelcollector.HTTPRequestContentLength:     true,
+		otelcollector.HTTPResponseContentLength:    true,
+		otelcollector.HostAddressLabel:             true,
+		otelcollector.PeerAddressLabel:             true,
+		otelcollector.HostIPLabel:                  true,
+		otelcollector.PeerIPLabel:                  true,
+		otelcollector.EnvoyDurationLabel:           true,
+		otelcollector.EnvoyRequestDurationLabel:    true,
+		otelcollector.EnvoyRequestTxDurationLabel:  true,
+		otelcollector.EnvoyResponseDurationLabel:   true,
+		otelcollector.EnvoyResponseTxDurationLabel: true,
+	}
+
+	spanAttributes = map[string]bool{
+		otelcollector.FeatureAddressLabel: true,
+		otelcollector.FeatureIDLabel:      true,
+		otelcollector.FeatureStatusLabel:  true,
+	}
+)
+
+func whitelistLogAttributes(attributes pcommon.Map) {
+	_whitelistAttributes(attributes, commonAttributes)
+	_whitelistAttributes(attributes, logAttributes)
+}
+
+func whitelistSpanAttributes(attributes pcommon.Map) {
+	_whitelistAttributes(attributes, commonAttributes)
+	_whitelistAttributes(attributes, spanAttributes)
+}
+
+func _whitelistAttributes(attributes pcommon.Map, whitelist map[string]bool) {
+	attributes.Range(func(key string, _ pcommon.Value) bool {
+		if !whitelist[key] {
+			attributes.Remove(key)
+		}
+		return true
+	})
 }

@@ -30,7 +30,7 @@ func initRollupsLog() []*Rollup {
 	rollupsInit := []*Rollup{
 		{
 			FromField:   otelcollector.DurationLabel,
-			TreatAsZero: []string{otelcollector.MissingAttributeSourceValue},
+			TreatAsZero: []string{otelcollector.EnvoyMissingAttributeSourceValue},
 		},
 		{
 			FromField: otelcollector.HTTPRequestContentLength,
@@ -184,6 +184,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 }
 
 func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.HeapDoublesSketch, baseAttributes, attributes pcommon.Map, rollups []*Rollup) {
+	// TODO tgill: need to track latest timestamp from attributes as the timestamp in baseAttributes
 	for _, rollup := range rollups {
 		switch rollup.Type {
 		case RollupSum:
@@ -271,6 +272,7 @@ func (rp *rollupProcessor) exportLogs(ctx context.Context, rollupData map[string
 	logs := ld.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords()
 	for _, v := range rollupData {
 		logRecord := logs.AppendEmpty()
+		// TODO tgill: need to get timestamp from v
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(time.Now()))
 		v.CopyTo(logRecord.Attributes())
 	}
@@ -282,6 +284,7 @@ func (rp *rollupProcessor) exportTraces(ctx context.Context, rollupData map[stri
 	spans := ld.ResourceSpans().AppendEmpty().ScopeSpans().AppendEmpty().Spans()
 	for _, v := range rollupData {
 		spanRecord := spans.AppendEmpty()
+		// TODO tgill: need to get timestamp from v
 		spanRecord.SetStartTimestamp(pcommon.NewTimestampFromTime(time.Now()))
 		v.CopyTo(spanRecord.Attributes())
 	}
