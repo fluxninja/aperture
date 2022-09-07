@@ -964,7 +964,7 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>proxy_connect_header</dt>
 <dd>
 
-([Header](#header))
+([Header](#header), `omitempty`)
 
 </dd>
 <dt>tls</dt>
@@ -1345,13 +1345,13 @@ PluginsConfig holds configuration for plugins.
 <dt>disabled_plugins</dt>
 <dd>
 
-([]string) Specific plugins to disable
+([]string, `omitempty`) Specific plugins to disable
 
 </dd>
 <dt>disabled_symbols</dt>
 <dd>
 
-([]string) Specific plugin types to disable
+([]string, `omitempty`) Specific plugin types to disable
 
 </dd>
 <dt>plugins_path</dt>
@@ -1428,7 +1428,7 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 <dt>no_proxy</dt>
 <dd>
 
-([]string, `dive,ip|cidr|fqdn|hostname_port`)
+([]string, `omitempty,dive,ip|cidr|fqdn|hostname_port`)
 
 </dd>
 </dl>

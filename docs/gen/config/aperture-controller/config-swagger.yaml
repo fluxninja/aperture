@@ -264,6 +264,7 @@ definitions:
         x-go-validate: gte=0s
       proxy_connect_header:
         $ref: '#/definitions/Header'
+        x-go-validate: omitempty
       read_buffer_size:
         description: Read Buffer Size. 0 = 4KB
         format: int64
@@ -663,12 +664,14 @@ definitions:
           type: string
         type: array
         x-go-name: DisabledPlugins
+        x-go-validate: omitempty
       disabled_symbols:
         description: Specific plugin types to disable
         items:
           type: string
         type: array
         x-go-name: DisabledSymbols
+        x-go-validate: omitempty
       plugins_path:
         description: Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
         type: string
@@ -737,7 +740,7 @@ definitions:
           type: string
         type: array
         x-go-name: NoProxy
-        x-go-validate: dive,ip|cidr|fqdn|hostname_port
+        x-go-validate: omitempty,dive,ip|cidr|fqdn|hostname_port
     title: ProxyConfig holds proxy configuration.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/http
