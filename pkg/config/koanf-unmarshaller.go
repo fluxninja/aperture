@@ -411,42 +411,36 @@ func jsonOverrideHookFunc(replaceSlice bool) mapstructure.DecodeHookFunc {
 }
 
 func merge(a, b map[string]interface{}, replaceSlice bool) {
+	log.Trace().Bool("ReplaceSlice", replaceSlice).Interface("a", a).Interface("b", b).Msg("MERGE")
 	for key, val := range a {
 		// Does the key exist in the target map?
 		// If no, add it and move on.
 		bVal, ok := b[key]
 		if !ok {
-			log.Trace().Str("key", key).Msg("override")
+			log.Trace().Str("key", key).Interface("Value", val).Msg("override")
 			b[key] = val
 			continue
 		}
 
 		if !replaceSlice {
+			// merge slice B into slice A values
 			if sliceA, ok := val.([]interface{}); ok {
-				if sliceB, ok := val.([]interface{}); ok {
-					sliceMapA := []map[string]interface{}{}
-					sliceMapB := []map[string]interface{}{}
-					for _, v := range sliceA {
+				if sliceB, ok := bVal.([]interface{}); ok {
+					// iterate slices and merge their map[string]interface{}
+					for i, v := range sliceA {
 						if m, ok := v.(map[string]interface{}); ok {
-							sliceMapA = append(sliceMapA, m)
+							if len(sliceB) > i {
+								if m2, ok := sliceB[i].(map[string]interface{}); ok {
+									merge(m, m2, replaceSlice)
+								} else {
+									log.Warn().Str("key", key).Interface("Value", val).Msg("unable to merge slice")
+								}
+							} else {
+								sliceB = append(sliceB, m)
+							}
 						}
 					}
-					for _, v := range sliceB {
-						if m, ok := v.(map[string]interface{}); ok {
-							sliceMapB = append(sliceMapB, m)
-						}
-					}
-					for i, sliceValA := range sliceMapA {
-						if i < len(sliceB) {
-							log.Trace().Str("key", key).Int("index", i).Msg("merging")
-							// merge
-							merge(sliceValA, sliceMapB[i], replaceSlice)
-						} else {
-							log.Trace().Str("key", key).Int("index", i).Msg("overriding")
-							// append
-							sliceMapB = append(sliceMapB, sliceValA)
-						}
-					}
+					b[key] = sliceB
 					continue
 				}
 			}
@@ -454,8 +448,8 @@ func merge(a, b map[string]interface{}, replaceSlice bool) {
 
 		// If the incoming val is not a map, do a direct merge.
 		if _, ok := val.(map[string]interface{}); !ok {
-			log.Trace().Str("key", key).Msg("override")
 			b[key] = val
+			log.Trace().Str("key", key).Interface("Value", val).Interface("b[key]", b[key]).Msg("override")
 			continue
 		}
 
@@ -465,10 +459,11 @@ func merge(a, b map[string]interface{}, replaceSlice bool) {
 			log.Trace().Str("key", key).Msg("merge")
 			merge(val.(map[string]interface{}), v, replaceSlice)
 		default:
-			log.Trace().Str("key", key).Msg("override")
+			log.Trace().Str("key", key).Interface("Value", val).Msg("override")
 			b[key] = val
 		}
 	}
+	log.Trace().Bool("ReplaceSlice", replaceSlice).Interface("a", a).Interface("b", b).Msg("MERGE DONE")
 }
 
 var json = jsoniter.Config{

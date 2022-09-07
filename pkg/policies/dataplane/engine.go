@@ -130,7 +130,7 @@ func runLimiters(limiters []iface.Limiter, labels selectors.Labels) ([]*flowcont
 	execLimiter := func(limiter iface.Limiter, decision *flowcontrolv1.LimiterDecision) func() {
 		return func() {
 			defer wg.Done()
-			decision = limiter.RunLimiter(labels)
+			limiter.RunLimiter(labels, decision)
 			if decision.Dropped {
 				once.Do(setDecisionRejected)
 			}

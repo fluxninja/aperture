@@ -41,7 +41,7 @@ definitions:
         description: TODO document what happens when lazy sync is disabled
         type: boolean
         title: Enables lazy sync
-        x-go-default: true
+        x-go-default: false
         x-order: 0
       num_sync:
         description: Number of times to lazy sync within the _limit\_reset\_interval_.

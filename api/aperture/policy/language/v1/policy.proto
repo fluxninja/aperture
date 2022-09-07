@@ -514,10 +514,10 @@ message RateLimiter {
       extensions: {
         key: "x-go-default"
         value: {
-          bool_value: true
+          bool_value: false
         }
       }
-    }]; // @gotags: default:"true"
+    }]; // @gotags: default:"false"
 
     // Number of times to lazy sync within the _limit\_reset\_interval_.
     uint32 num_sync = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
