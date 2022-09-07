@@ -227,7 +227,7 @@ func agentEnv(instance *v1alpha1.Agent, agentGroup string) []corev1.EnvVar {
 		})
 	}
 
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create {
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create || instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name != "" {
 		envs = append(envs, corev1.EnvVar{
 			Name: "APERTURE_AGENT_FLUXNINJA_PLUGIN_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
@@ -292,7 +292,7 @@ func controllerEnv(instance *v1alpha1.Controller) []corev1.EnvVar {
 		},
 	}
 
-	if spec.Secrets.FluxNinjaPlugin.Create {
+	if spec.Secrets.FluxNinjaPlugin.Create || instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name != "" {
 		envs = append(envs, corev1.EnvVar{
 			Name: "APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
