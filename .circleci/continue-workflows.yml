@@ -491,6 +491,17 @@ workflows:
     jobs:
       - publish-aperture-docs
 
+  build-aperture-docs:
+    when:
+      and:
+        - not:
+            equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-aperture-docs >>
+    jobs:
+      - publish-aperture-docs:
+          name: build-aperture-docs
+          dry-run: true
+
   push-deployment-changes:
     when:
       and:
