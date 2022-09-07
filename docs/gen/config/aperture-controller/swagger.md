@@ -64,7 +64,7 @@
 
 ## Reference
 
-### <span id="agent-info"></span> _AgentInfo_
+### _AgentInfo_ {#agent-info}
 
 Key: `agent_info`
 
@@ -81,7 +81,7 @@ Type: [AgentInfoConfig](#agent-info-config)
 
 </dl>
 
-### <span id="client"></span> _Client_
+### _Client_ {#client}
 
 Key: `client`
 
@@ -101,7 +101,7 @@ Type: [ProxyConfig](#proxy-config)
 
 </dl>
 
-### <span id="etcd"></span> _Etcd_
+### _Etcd_ {#etcd}
 
 Key: `etcd`
 
@@ -121,7 +121,7 @@ Type: [EtcdConfig](#etcd-config)
 
 </dl>
 
-### <span id="flux-ninja-plugin"></span> _FluxNinjaPlugin_
+### _FluxNinjaPlugin_ {#flux-ninja-plugin}
 
 Key: `fluxninja_plugin`
 
@@ -141,7 +141,7 @@ Type: [FluxNinjaPluginConfig](#flux-ninja-plugin-config)
 
 </dl>
 
-### <span id="liveness"></span> _Liveness_
+### _Liveness_ {#liveness}
 
 Key: `liveness`
 
@@ -169,7 +169,7 @@ Type: [JobConfig](#job-config)
 
 </dl>
 
-### <span id="log"></span> _Log_
+### _Log_ {#log}
 
 Key: `log`
 
@@ -189,7 +189,7 @@ Type: [LogConfig](#log-config)
 
 </dl>
 
-### <span id="metrics"></span> _Metrics_
+### _Metrics_ {#metrics}
 
 Key: `metrics`
 
@@ -209,7 +209,7 @@ Type: [MetricsConfig](#metrics-config)
 
 </dl>
 
-### <span id="otel"></span> _Otel_
+### _Otel_ {#otel}
 
 Key: `otel`
 
@@ -229,7 +229,7 @@ Type: [OtelConfig](#otel-config)
 
 </dl>
 
-### <span id="plugins"></span> _Plugins_
+### _Plugins_ {#plugins}
 
 Key: `plugins`
 
@@ -249,7 +249,7 @@ Type: [PluginsConfig](#plugins-config)
 
 </dl>
 
-### <span id="policies-config"></span> _PoliciesConfig_
+### _PoliciesConfig_ {#policies-config}
 
 Key: `policies`
 
@@ -275,7 +275,7 @@ Type: [JobGroupConfig](#job-group-config)
 
 </dl>
 
-### <span id="profilers"></span> _Profilers_
+### _Profilers_ {#profilers}
 
 Key: `profilers`
 
@@ -295,7 +295,7 @@ Type: [ProfilersConfig](#profilers-config)
 
 </dl>
 
-### <span id="prometheus"></span> _Prometheus_
+### _Prometheus_ {#prometheus}
 
 Key: `prometheus`
 
@@ -323,7 +323,7 @@ Type: [HTTPClientConfig](#http-client-config)
 
 </dl>
 
-### <span id="readiness"></span> _Readiness_
+### _Readiness_ {#readiness}
 
 Key: `readiness`
 
@@ -351,7 +351,7 @@ Type: [JobConfig](#job-config)
 
 </dl>
 
-### <span id="sentry-plugin"></span> _SentryPlugin_
+### _SentryPlugin_ {#sentry-plugin}
 
 Key: `sentry_plugin`
 
@@ -371,7 +371,7 @@ Type: [SentryConfig](#sentry-config)
 
 </dl>
 
-### <span id="server"></span> _Server_
+### _Server_ {#server}
 
 Key: `server`
 
@@ -423,7 +423,7 @@ Type: [ServerTLSConfig](#server-tls-config)
 
 </dl>
 
-### <span id="watchdog"></span> _Watchdog_
+### _Watchdog_ {#watchdog}
 
 Key: `watchdog`
 
@@ -445,7 +445,7 @@ Type: [WatchdogConfig](#watchdog-config)
 
 ## Objects
 
-### <span id="adaptive-policy"></span> AdaptivePolicy
+### AdaptivePolicy {#adaptive-policy}
 
 AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
 
@@ -466,7 +466,7 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 </dd>
 </dl>
 
-### <span id="agent-info-config"></span> AgentInfoConfig
+### AgentInfoConfig {#agent-info-config}
 
 AgentInfoConfig is the configuration for the agent group etc.
 
@@ -481,7 +481,7 @@ AgentInfoConfig is the configuration for the agent group etc.
 </dd>
 </dl>
 
-### <span id="backoff-config"></span> BackoffConfig
+### BackoffConfig {#backoff-config}
 
 BackoffConfig holds configuration for GRPC Client Backoff.
 
@@ -514,7 +514,7 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 </dd>
 </dl>
 
-### <span id="batch-config"></span> BatchConfig
+### BatchConfig {#batch-config}
 
 BatchConfig defines configuration for OTEL batch processor.
 
@@ -535,7 +535,7 @@ BatchConfig defines configuration for OTEL batch processor.
 </dd>
 </dl>
 
-### <span id="client-config"></span> ClientConfig
+### ClientConfig {#client-config}
 
 ClientConfig is the client configuration.
 
@@ -556,7 +556,7 @@ ClientConfig is the client configuration.
 </dd>
 </dl>
 
-### <span id="client-tls-config"></span> ClientTLSConfig
+### ClientTLSConfig {#client-tls-config}
 
 ClientTLSConfig is the config for client TLS.
 
@@ -595,7 +595,7 @@ ClientTLSConfig is the config for client TLS.
 </dd>
 </dl>
 
-### <span id="etcd-config"></span> EtcdConfig
+### EtcdConfig {#etcd-config}
 
 EtcdConfig holds configuration for etcd client.
 
@@ -616,7 +616,7 @@ EtcdConfig holds configuration for etcd client.
 </dd>
 </dl>
 
-### <span id="flux-ninja-plugin-config"></span> FluxNinjaPluginConfig
+### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
 
 FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugin.
 
@@ -649,7 +649,7 @@ FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugi
 </dd>
 </dl>
 
-### <span id="g-rpc-client-config"></span> GRPCClientConfig
+### GRPCClientConfig {#g-rpc-client-config}
 
 GRPCClientConfig holds configuration for GRPC Client.
 
@@ -688,7 +688,7 @@ GRPCClientConfig holds configuration for GRPC Client.
 </dd>
 </dl>
 
-### <span id="g-rpc-gateway-config"></span> GRPCGatewayConfig
+### GRPCGatewayConfig {#g-rpc-gateway-config}
 
 GRPCGatewayConfig holds configuration for grpc-http gateway
 
@@ -703,7 +703,7 @@ GRPCGatewayConfig holds configuration for grpc-http gateway
 </dd>
 </dl>
 
-### <span id="g-rpc-server-config"></span> GRPCServerConfig
+### GRPCServerConfig {#g-rpc-server-config}
 
 GRPCServerConfig holds configuration for GRPC Server.
 
@@ -724,7 +724,7 @@ GRPCServerConfig holds configuration for GRPC Server.
 </dd>
 </dl>
 
-### <span id="http-client-config"></span> HTTPClientConfig
+### HTTPClientConfig {#http-client-config}
 
 HTTPClientConfig holds configuration for HTTP Client.
 
@@ -847,7 +847,7 @@ HTTPClientConfig holds configuration for HTTP Client.
 </dd>
 </dl>
 
-### <span id="http-server-config"></span> HTTPServerConfig
+### HTTPServerConfig {#http-server-config}
 
 HTTPServerConfig holds configuration for HTTP Server.
 
@@ -910,7 +910,7 @@ HTTPServerConfig holds configuration for HTTP Server.
 </dd>
 </dl>
 
-### <span id="header"></span> Header
+### Header {#header}
 
 A Header represents the key-value pairs in an HTTP header.
 
@@ -919,7 +919,7 @@ CanonicalHeaderKey.
 
 [Header](#header)
 
-### <span id="heap-config"></span> HeapConfig
+### HeapConfig {#heap-config}
 
 HeapConfig holds configuration for heap Watchdog.
 
@@ -952,7 +952,7 @@ HeapConfig holds configuration for heap Watchdog.
 </dd>
 </dl>
 
-### <span id="job-config"></span> JobConfig
+### JobConfig {#job-config}
 
 JobConfig is config for Job
 
@@ -985,7 +985,7 @@ JobConfig is config for Job
 </dd>
 </dl>
 
-### <span id="job-group-config"></span> JobGroupConfig
+### JobGroupConfig {#job-group-config}
 
 JobGroupConfig holds configuration for JobGroup.
 
@@ -1000,7 +1000,7 @@ JobGroupConfig holds configuration for JobGroup.
 </dd>
 </dl>
 
-### <span id="listener-config"></span> ListenerConfig
+### ListenerConfig {#listener-config}
 
 ListenerConfig holds configuration for socket listeners.
 
@@ -1027,7 +1027,7 @@ ListenerConfig holds configuration for socket listeners.
 </dd>
 </dl>
 
-### <span id="log-config"></span> LogConfig
+### LogConfig {#log-config}
 
 LogConfig holds configuration for a logger and log writers.
 
@@ -1090,7 +1090,7 @@ LogConfig holds configuration for a logger and log writers.
 </dd>
 </dl>
 
-### <span id="log-writer-config"></span> LogWriterConfig
+### LogWriterConfig {#log-writer-config}
 
 LogWriterConfig holds configuration for a log writer.
 
@@ -1129,7 +1129,7 @@ LogWriterConfig holds configuration for a log writer.
 </dd>
 </dl>
 
-### <span id="metrics-config"></span> MetricsConfig
+### MetricsConfig {#metrics-config}
 
 MetricsConfig holds configuration for service metrics.
 
@@ -1156,7 +1156,7 @@ MetricsConfig holds configuration for service metrics.
 </dd>
 </dl>
 
-### <span id="otel-config"></span> OtelConfig
+### OtelConfig {#otel-config}
 
 OtelConfig is the configuration for the OTEL collector.
 
@@ -1189,7 +1189,7 @@ OtelConfig is the configuration for the OTEL collector.
 </dd>
 </dl>
 
-### <span id="plugins-config"></span> PluginsConfig
+### PluginsConfig {#plugins-config}
 
 PluginsConfig holds configuration for plugins.
 
@@ -1222,7 +1222,7 @@ PluginsConfig holds configuration for plugins.
 </dd>
 </dl>
 
-### <span id="profilers-config"></span> ProfilersConfig
+### ProfilersConfig {#profilers-config}
 
 ProfilersConfig holds configuration for profilers.
 
@@ -1249,7 +1249,7 @@ ProfilersConfig holds configuration for profilers.
 </dd>
 </dl>
 
-### <span id="prometheus-config"></span> PrometheusConfig
+### PrometheusConfig {#prometheus-config}
 
 PrometheusConfig holds configuration for Prometheus Server.
 
@@ -1264,7 +1264,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 </dd>
 </dl>
 
-### <span id="proxy-config"></span> ProxyConfig
+### ProxyConfig {#proxy-config}
 
 ProxyConfig holds proxy configuration.
 
@@ -1293,7 +1293,7 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 </dd>
 </dl>
 
-### <span id="sentry-config"></span> SentryConfig
+### SentryConfig {#sentry-config}
 
 SentryConfig holds configuration for Sentry.
 
@@ -1346,7 +1346,7 @@ oss-aperture project dsn is set as default.
 </dd>
 </dl>
 
-### <span id="server-tls-config"></span> ServerTLSConfig
+### ServerTLSConfig {#server-tls-config}
 
 ServerTLSConfig holds configuration for setting up server TLS support.
 
@@ -1391,7 +1391,7 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 </dd>
 </dl>
 
-### <span id="watchdog-config"></span> WatchdogConfig
+### WatchdogConfig {#watchdog-config}
 
 WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
 
@@ -1424,7 +1424,7 @@ WatchdogConfig holds configuration for Watchdog Policy. For each policy, either 
 </dd>
 </dl>
 
-### <span id="watchdog-policy-type"></span> WatchdogPolicyType
+### WatchdogPolicyType {#watchdog-policy-type}
 
 WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
 
@@ -1445,7 +1445,7 @@ WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algor
 </dd>
 </dl>
 
-### <span id="watermarks-policy"></span> WatermarksPolicy
+### WatermarksPolicy {#watermarks-policy}
 
 WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
 

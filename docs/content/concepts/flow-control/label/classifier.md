@@ -111,9 +111,9 @@ See [full example in reference][reference]
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
 [baggage]: label.md#baggage
-[reference]: /reference/configuration/policies.md#-v1classifier
-[rule]: /reference/configuration/policies.md#-v1rule
-[extractor]: /reference/configuration/policies.md#-v1extractor
+[reference]: /reference/configuration/policies.md#v1-classifier
+[rule]: /reference/configuration/policies.md#v1-rule
+[extractor]: /reference/configuration/policies.md#v1-extractor
 [rego-rule]: /reference/configuration/policies.md#rule-rego
 [plugin]: /cloud/plugin.md
 [label-matcher]: ../selector.md#label-matcher
