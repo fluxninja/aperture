@@ -7,13 +7,31 @@ executors:
 
 jobs:
   publish-protobuf-files:
+    parameters:
+      tag:
+        type: string
+        description: What git tag to use when tagging remote repository
     executor: base-cimg-executor
     steps:
       - checkout
       - run:
-          name: Publish protobuf to buf.build
+          name: Install buf binary
           command: |
-            echo "Will publish protobuf to buf.build"
+            BIN="$HOME/bin" && \
+            mkdir -p ${BIN} && \
+            VERSION="1.7.0" && \
+              curl -sSL \
+                "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m)" \
+                -o "${BIN}/buf" && \
+              chmod +x "${BIN}/buf"
+      - run:
+          name: Login to buf.build
+          command: |
+            echo ${BUF_BUILD_TOKEN} | ${HOME}/bin/buf registry login --username kklimonda-fn --token-stdin
+      - run:
+          name: Push protobuf to buf.build
+          command: |
+            echo "cd api && ${HOME}/bin/buf push --tag << parameters.tag >>"
 
   tag-github-repository:
     executor: base-cimg-executor
@@ -89,4 +107,10 @@ workflows:
   publish-protobuf-files:
     when: *job-when-clause
     jobs:
-      - publish-protobuf-files
+      - publish-protobuf-files:
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^v.*/
+          tag: << pipeline.git.tag >>
