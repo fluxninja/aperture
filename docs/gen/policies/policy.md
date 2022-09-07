@@ -123,7 +123,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>enabled</dt>
 <dd>
 
-(bool, default: `true`) Enables lazy sync
+(bool) Enables lazy sync
 
 TODO document what happens when lazy sync is disabled
 

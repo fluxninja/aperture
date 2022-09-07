@@ -425,7 +425,7 @@ func (conLimiter *concurrencyLimiter) GetSelector() *selectorv1.Selector {
 }
 
 // RunLimiter .
-func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
+func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels, decision *flowcontrolv1.LimiterDecision) {
 	var matchedWorkloadProto *policylangv1.Scheduler_Workload
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
@@ -489,16 +489,13 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowc
 	if accepted {
 		conLimiter.acceptedConcurrencyCounter.Add(float64(reqContext.Tokens))
 	}
-
-	return &flowcontrolv1.LimiterDecision{
-		PolicyName:     conLimiter.GetPolicyName(),
-		PolicyHash:     conLimiter.GetPolicyHash(),
-		ComponentIndex: conLimiter.GetComponentIndex(),
-		Dropped:        !accepted,
-		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-			ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-				WorkloadIndex: matchedWorkloadIndex,
-			},
+	decision.PolicyName = conLimiter.GetPolicyName()
+	decision.PolicyHash = conLimiter.GetPolicyHash()
+	decision.ComponentIndex = conLimiter.GetComponentIndex()
+	decision.Dropped = !accepted
+	decision.Details = &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+		ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+			WorkloadIndex: matchedWorkloadIndex,
 		},
 	}
 }
