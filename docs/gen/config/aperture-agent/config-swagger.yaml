@@ -111,8 +111,8 @@ definitions:
   DistCacheConfig:
     properties:
       bind_addr:
-        description: BindAddr denotes the address that Olric will bind to for communication
-          with other Olric nodes.
+        description: BindAddr denotes the address that DistCache will bind to for
+          communication with other peer nodes.
         type: string
         x-go-default: :3320
         x-go-name: BindAddr

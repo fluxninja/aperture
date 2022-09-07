@@ -40,6 +40,7 @@ type ControllerSpec struct {
 
 	// Controller Configuration
 	//+kubebuilder:validation:Optional
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	ConfigSpec ControllerConfigSpec `json:"config"`
 }
 
@@ -51,16 +52,16 @@ type ControllerConfigSpec struct {
 
 	// Policies configuration.
 	//+kubebuilder:validation:Optional
-	Policies PoliciesConfig `json:"policies,omitempty"`
+	Policies PoliciesConfig `json:"policies"`
 }
 
 // PoliciesConfig for policy engine.
 type PoliciesConfig struct {
 	// Policies path configuration.
-	PoliciesPath string `json:"policies_path,omitempty"`
+	PoliciesPath string `json:"policies_path"`
 
 	// Scheduler for PromQL jobs.
-	PromQLJobsScheduler jobs.JobGroupConfig `json:"promql_jobs_scheduler,omitempty"`
+	PromQLJobsScheduler jobs.JobGroupConfig `json:"promql_jobs_scheduler"`
 }
 
 // ControllerStatus defines the observed state of Controller.

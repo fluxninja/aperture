@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package distcache
 
 import (
@@ -43,24 +44,17 @@ func Module() fx.Option {
 // swagger:model
 // +kubebuilder:object:generate=true
 type DistCacheConfig struct {
-	// BindAddr denotes the address that Olric will bind to for communication with other Olric nodes.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=":3320"
-	BindAddr string `json:"bind_addr,omitempty" default:":3320" validate:"hostname_port"`
+	// BindAddr denotes the address that DistCache will bind to for communication with other peer nodes.
+	BindAddr string `json:"bind_addr" default:":3320" validate:"hostname_port"`
 	// ReplicaCount is 1 by default.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=1
-	ReplicaCount int `json:"replica_count,omitempty" default:"1"`
+	ReplicaCount int `json:"replica_count" default:"1"`
 	// Address to bind mememberlist server to.
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=":3322"
-	MemberlistBindAddr string `json:"memberlist_bind_addr,omitempty" default:":3322" validate:"hostname_port"`
+	MemberlistBindAddr string `json:"memberlist_bind_addr" default:":3322" validate:"hostname_port"`
 	// Address of memberlist to advertise to other cluster members. Used for nat traversal if provided.
-	//+kubebuilder:validation:Optional
-	MemberlistAdvertiseAddr string `json:"memberlist_advertise_addr,omitempty" validate:"omitempty,hostname_port"`
+	MemberlistAdvertiseAddr string `json:"memberlist_advertise_addr" validate:"omitempty,hostname_port"`
 }
 
-// DistCache wraps an Olric instance along with its config for further reference.
+// DistCache is a peer to peer distributed cache.
 type DistCache struct {
 	sync.Mutex
 	Config *olricconfig.Config
@@ -93,7 +87,7 @@ type DistCacheConstructor struct {
 	DefaultConfig DistCacheConfig
 }
 
-// ProvideDistCache creates a new instance of Olric distributed cache in embded mode.
+// ProvideDistCache creates a new instance of distributed cache.
 // It also hooks in the service discovery plugin.
 func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructorIn) (*DistCache, error) {
 	config := constructor.DefaultConfig
@@ -161,7 +155,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	startChan := make(chan struct{})
 	oc.Started = func() {
-		log.Info().Msg("Olric started")
+		log.Info().Msg("DistCache started")
 		startChan <- struct{}{}
 	}
 

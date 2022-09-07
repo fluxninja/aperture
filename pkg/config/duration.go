@@ -16,7 +16,6 @@ import (
 // +kubebuilder:validation:Type=string
 type Duration struct {
 	// swagger:ignore
-	//+kubebuilder:validation:Schemaless
 	duration *durationpb.Duration
 }
 

@@ -43,6 +43,7 @@ type AgentSpec struct {
 
 	// Agent Configuration
 	//+kubebuilder:validation:Optional
+	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	ConfigSpec AgentConfigSpec `json:"config"`
 }
 
@@ -54,21 +55,19 @@ type AgentConfigSpec struct {
 
 	// AgentInfo configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={agent_group:"default"}
-	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info,omitempty"`
+	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info"`
 
 	// DistCache configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={bind_addr:":3320","memberlist_bind_addr": ":3322"}
 	DistCache distcache.DistCacheConfig `json:"dist_cache"`
 
 	// Kubernetes client configuration.
 	//+kubebuilder:validation:Optional
-	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client,omitempty"`
+	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client"`
 
 	// Peer discovery configuration.
 	//+kubebuilder:validation:Optional
-	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery,omitempty"`
+	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery"`
 }
 
 // AgentStatus defines the observed state of Agent.

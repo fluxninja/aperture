@@ -314,7 +314,7 @@ type APIKeySecretSpec struct {
 type CommonConfigSpec struct {
 	// Client configuration such as proxy settings.
 	//+kubebuilder:validation:Optional
-	Client ClientConfigSpec `json:"client,omitempty"`
+	Client ClientConfigSpec `json:"client"`
 
 	// Etcd configuration.
 	//+kubebuilder:validation:Required
@@ -322,32 +322,31 @@ type CommonConfigSpec struct {
 
 	// Liveness probe configuration.
 	//+kubebuilder:validation:Optional
-	Liveness ProbeConfigSpec `json:"liveness,omitempty"`
+	Liveness ProbeConfigSpec `json:"liveness"`
 
 	// Readiness probe configuration.
 	//+kubebuilder:validation:Optional
-	Readiness ProbeConfigSpec `json:"readiness,omitempty"`
+	Readiness ProbeConfigSpec `json:"readiness"`
 
 	// Log configuration.
 	//+kubebuilder:validation:Optional
-	Log config.LogConfig `json:"log,omitempty"`
+	Log config.LogConfig `json:"log"`
 
 	// Metrics configuration.
 	//+kubebuilder:validation:Optional
-	Metrics metrics.MetricsConfig `json:"metrics,omitempty"`
+	Metrics metrics.MetricsConfig `json:"metrics"`
 
 	// OTEL configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={grpc_addr:":4317",http_addr:":4318"}
 	Otel otel.OtelConfig `json:"otel"`
 
 	// Plugins configuration.
 	//+kubebuilder:validation:Optional
-	Plugins plugins.PluginsConfig `json:"plugins,omitempty"`
+	Plugins plugins.PluginsConfig `json:"plugins"`
 
 	// Profilers configuration.
 	//+kubebuilder:validation:Optional
-	Profilers profilers.ProfilersConfig `json:"profilers,omitempty"`
+	Profilers profilers.ProfilersConfig `json:"profilers"`
 
 	// Prometheus configuration.
 	//+kubebuilder:validation:Required
@@ -355,17 +354,15 @@ type CommonConfigSpec struct {
 
 	// Server configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={addr:":8080"}
 	Server ServerConfigSpec `json:"server"`
 
 	// Watchdog configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={heap:{min_gogc:25,limit:268435456}}
-	Watchdog watchdog.WatchdogConfig `json:"watchdog,omitempty"`
+	Watchdog watchdog.WatchdogConfig `json:"watchdog"`
 
 	// BundledPluginsSpec defines configuration for bundled plugins.
 	//+kubebuilder:validation:Optional
-	BundledPluginsSpec `json:",inline,omitempty"`
+	BundledPluginsSpec `json:",inline"`
 }
 
 // ServerConfigSpec configures main server.
@@ -376,46 +373,46 @@ type ServerConfigSpec struct {
 
 	// GRPC server configuration.
 	//+kubebuilder:validation:Optional
-	Grpc grpc.GRPCServerConfig `json:"grpc,omitempty"`
+	Grpc grpc.GRPCServerConfig `json:"grpc"`
 
 	// GRPC Gateway configuration.
 	//+kubebuilder:validation:Optional
-	GrpcGateway grpcgateway.GRPCGatewayConfig `json:"grpc_gateway,omitempty"`
+	GrpcGateway grpcgateway.GRPCGatewayConfig `json:"grpc_gateway"`
 
 	// HTTP server configuration.
 	//+kubebuilder:validation:Optional
-	HTTP http.HTTPServerConfig `json:"http,omitempty"`
+	HTTP http.HTTPServerConfig `json:"http"`
 
 	// TLS configuration.
 	//+kubebuilder:validation:Optional
-	TLS tlsconfig.ServerTLSConfig `json:"tls,omitempty"`
+	TLS tlsconfig.ServerTLSConfig `json:"tls"`
 }
 
 // ProbeConfigSpec defines liveness and readiness probe configuration.
 type ProbeConfigSpec struct {
 	// Scheduler settings.
 	//+kubebuilder:validation:Optional
-	Scheduler jobs.JobGroupConfig `json:"scheduler,omitempty"`
+	Scheduler jobs.JobGroupConfig `json:"scheduler"`
 
 	// Service settings.
 	//+kubebuilder:validation:Optional
-	Service jobs.JobConfig `json:"service,omitempty"`
+	Service jobs.JobConfig `json:"service"`
 }
 
 // ClientConfigSpec defines client configuration.
 type ClientConfigSpec struct {
 	// Proxy settings for the client.
 	//+kubebuilder:validation:Optional
-	Proxy http.ProxyConfig `json:"proxy,omitempty"`
+	Proxy http.ProxyConfig `json:"proxy"`
 }
 
 // BundledPluginsSpec defines configuration for bundled plugins.
 type BundledPluginsSpec struct {
 	// FluxNinja Cloud plugin configuration.
 	//+kubebuilder:validation:Optional
-	FluxNinjaPlugin pluginconfig.FluxNinjaPluginConfig `json:"fluxninja_plugin,omitempty"`
+	FluxNinjaPlugin pluginconfig.FluxNinjaPluginConfig `json:"fluxninja_plugin"`
 
 	// Sentry plugin configuration.
 	//+kubebuilder:validation:Optional
-	SentryPlugin sentry.SentryConfig `json:"sentry_plugin,omitempty"`
+	SentryPlugin sentry.SentryConfig `json:"sentry_plugin"`
 }
