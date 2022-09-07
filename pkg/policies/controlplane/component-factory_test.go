@@ -42,7 +42,7 @@ var _ = Describe("Component factory", func() {
 	Context("Gradient", func() {
 		Context("With correct gradient", func() {
 			gradientControllerProto := &policylangv1.GradientController{
-				Tolerance: 0.5,
+				Slope: -0.5,
 			}
 			It("Creates Gradient controller", func() {
 				controllerComponent := &controller.ControllerComponent{}

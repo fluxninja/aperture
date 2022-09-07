@@ -1069,24 +1069,55 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1GradientControllerOuts'
         description: Output ports of the Gradient Controller.
-      tolerance:
+      slope:
         type: number
         format: double
         description: |-
-          Tolerance is a way to pre-multiply a setpoint by given value.
+          Slope controls the aggressiveness and direction of the Gradient Controller.
 
-          Value of tolerance should be close or equal to 1, eg. 1.1.
+          Slope is used as exponent on the signal to setpoint ratio in computation
+          of the gradient (see the [main description](#v1-gradient-controller) for
+          exact equation). Good intuition for this parameter is "What should the
+          Gradient Controller do to the control variable when signal is too high",
+          eg.:
+          * $\text{slope} = 1$: when signal is too high, increase control variable,
+          * $\text{slope} = -1$: when signal is too high, decrease control variable,
+          * $\text{slope} = -0.5$: when signal is to high, decrease control variable more slowly.
 
-          :::caution
-          [This is going to be deprecated](https://github.com/fluxninja/aperture/issues/182).
+          The sign of slope depends on correlation between the signal and control variable:
+          * Use $\text{slope} < 0$ if signal and control variable are _positively_
+          correlated (eg. Per-pod CPU usage and total concurrency).
+          * Use $\text{slope} > 0$ if signal and control variable are _negatively_
+          correlated (eg. Per-pod CPU usage and number of pods).
+
+          :::note
+          You need to set _negative_ slope for a _positive_ correlation, as you're
+          describing the _action_ which controller should make when the signal
+          increases.
           :::
-        x-go-validate: gte=0.0
+
+          The magnitude of slope describes how aggresively should the controller
+          react to a deviation of signal.
+          With $|\text{slope}| = 1$, the controller will aim to bring the signal to
+          the setpoint in one tick (assuming linear correlation with signal and setpoint).
+          Smaller magnitudes of slope will make the controller adjust the control
+          variable more slowly.
+
+          We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
+          If you experience overshooting, consider lowering the magnitude even more.
+          Values of $|\text{slope}| > 1$ are not recommended.
+
+          :::note
+          Remember that the gradient and output signal can be (optionally) clamped,
+          so the _slope_ might not fully describe aggressiveness of the controller.
+          :::
+        x-go-validate: required
     description: |-
       The `gradient` describes a corrective factor that should be applied to the
       control variable to get the signal closer to the setpoint. It is computed as follows:
 
       $$
-      \text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}
+      \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
       $$
 
       `gradient` is then clamped to [min_gradient, max_gradient] range.
@@ -1101,11 +1132,6 @@ definitions:
 
       The output can be _optionally_ clamped to desired range using `max` and
       `min` input.
-
-      :::caution
-      Some changes are expected in the near future:
-      [#182](https://github.com/fluxninja/aperture/issues/182)
-      :::
     title: |-
       Gradient controller is a type of controller which tries to adjust the
       control variable proportionally to the relative difference between setpoint

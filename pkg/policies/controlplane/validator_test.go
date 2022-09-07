@@ -126,15 +126,30 @@ data:
             out_ports:
               output:
                 signal_name: "LATENCY_EMA"
+        - constant:
+            value: "1.1"
+            out_ports:
+              output:
+                signal_name: "EMA_SETPOINT_MULTIPLIER"
+        - arithmetic_combinator:
+            operator: "mul"
+            in_ports:
+              lhs:
+                signal_name: "LATENCY_EMA"
+              rhs:
+                signal_name: "EMA_SETPOINT_MULTIPLIER"
+            out_ports:
+              output:
+                signal_name: "LATENCY_SETPOINT"
         - gradient_controller:
-            tolerance: "1.1"
+            slope: -1
             min_gradient: "0.1"
             max_gradient: "1.0"
             in_ports:
               signal:
                 signal_name: "LATENCY"
               setpoint:
-                signal_name: "LATENCY_EMA"
+                signal_name: "LATENCY_SETPOINT"
               max:
                 signal_name: "MAX_CONCURRENCY"
               control_variable:
