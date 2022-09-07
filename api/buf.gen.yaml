@@ -21,8 +21,7 @@ plugins:
     opt:
       - paths=source_relative
       - orig_name=true
-      # must be disabled as operator marshals the config structs
-      - emit_defaults=false
+      - emit_defaults=true
   - remote: buf.build/fluxninja/plugins/protoc-gen-go-deepcopy:v1.15.0
     out: gen/proto/go
     opt:
