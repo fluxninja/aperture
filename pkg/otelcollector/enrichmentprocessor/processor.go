@@ -126,7 +126,7 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsM
 	var hostIP string
 	controlPoint, exists := attributes.Get(otelcollector.ControlPointLabel)
 	if !exists {
-		log.Warn().Msg("Skipping because 'otelcollector.ControlPointLabel' attribute not found")
+		otelcollector.LogSampled.Warn().Msg("Skipping because 'otelcollector.ControlPointLabel' attribute not found")
 		return
 	}
 	switch controlPoint.AsString() {
@@ -138,7 +138,7 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsM
 		}
 		hostAddress := rawHostAddress.StringVal()
 		if len(hostAddress) == 0 || hostAddress == otelcollector.MissingAttributeSourceValue {
-			log.Warn().Msg("Skipping because 'otelcollector.HostAddressLabel' is empty")
+			otelcollector.LogSampled.Warn().Msg("Skipping because 'otelcollector.HostAddressLabel' is empty")
 			return
 		}
 		hostIP = ipFromAddress(rawHostAddress.StringVal())
@@ -147,7 +147,7 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsM
 	case otelcollector.ControlPointIngress:
 		rawHostIP, exists := attributes.Get(otelcollector.HostIPLabel)
 		if !exists {
-			log.Warn().Msg("Skipping because 'otelcollector.HostIPLabel' attribute not found")
+			otelcollector.LogSampled.Warn().Msg("Skipping because 'otelcollector.HostIPLabel' attribute not found")
 			return
 		}
 		hostIP = rawHostIP.StringVal()
@@ -156,22 +156,26 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsM
 	case otelcollector.ControlPointFeature:
 		featureAddress, exists := attributes.Get(otelcollector.FeatureAddressLabel)
 		if !exists {
-			log.Warn().Msg("Skipping because 'otelcollector.FeatureAddressLabel' attribute not found")
+			otelcollector.LogSampled.Warn().Msg("Skipping because 'otelcollector.FeatureAddressLabel' attribute not found")
 			return
 		}
 		hostIP = featureAddress.StringVal()
 		attributes.Remove(otelcollector.FeatureAddressLabel)
 	default:
-		log.Warn().Str(otelcollector.ControlPointLabel, controlPoint.AsString()).Msg("Unknown control point")
+		otelcollector.LogSampled.Warn().Str(otelcollector.ControlPointLabel, controlPoint.AsString()).Msg("Unknown control point")
 		return
 	}
 
 	hostEntity := ep.cache.GetByIP(hostIP)
 	if hostEntity == nil {
-		log.Trace().Str("ip", hostIP).Msg("Skipping because entity not found in cache")
+		otelcollector.LogSampled.Trace().Str("ip", hostIP).Msg("Skipping because entity not found in cache")
 		return
 	}
-	attributes.UpsertString(otelcollector.ServicesLabel, strings.Join(hostEntity.Services, ","))
+	servicesValue := pcommon.NewValueSlice()
+	for _, service := range hostEntity.Services {
+		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
+	}
+	attributes.Upsert(otelcollector.ServicesLabel, servicesValue)
 }
 
 func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {

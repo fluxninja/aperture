@@ -7,9 +7,6 @@ import (
 // Config defines configuration for rollup processor.
 type Config struct {
 	config.ProcessorSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct
-
-	RollupsLog  []*Rollup `mapstructure:"rollups"`
-	RollupsSpan []*Rollup `mapstructure:"rollups"`
 }
 
 var _ config.Processor = (*Config)(nil)

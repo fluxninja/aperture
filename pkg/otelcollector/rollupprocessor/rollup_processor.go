@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/fluxninja/datasketches-go/sketches"
@@ -17,9 +18,60 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
-const (
-	rollupCountKey = "rollup_count"
-)
+var rollupTypes = []RollupType{
+	RollupSum,
+	RollupDatasketch,
+	RollupMax,
+	RollupMin,
+	RollupSumOfSquares,
+}
+
+func initRollupsLog() []*Rollup {
+	rollupsInit := []*Rollup{
+		{
+			FromField:   otelcollector.DurationLabel,
+			TreatAsZero: []string{otelcollector.MissingAttributeSourceValue},
+		},
+		{
+			FromField: otelcollector.HTTPRequestContentLength,
+		},
+		{
+			FromField: otelcollector.HTTPResponseContentLength,
+		},
+	}
+
+	return _initRollupsPerType(rollupsInit, rollupTypes)
+}
+
+func initRollupsSpan() []*Rollup {
+	rollupsInit := []*Rollup{
+		{
+			FromField: otelcollector.DurationLabel,
+		},
+	}
+
+	return _initRollupsPerType(rollupsInit, rollupTypes)
+}
+
+// AggregateField returns the aggregate field name for the given field and rollup type.
+func AggregateField(field string, rollupType RollupType) string {
+	return fmt.Sprintf("%s_%s", field, rollupType)
+}
+
+func _initRollupsPerType(rollupsInit []*Rollup, rollupTypes []RollupType) []*Rollup {
+	var rollups []*Rollup
+	for _, rollupInit := range rollupsInit {
+		for _, rollupType := range rollupTypes {
+			rollups = append(rollups, &Rollup{
+				FromField:   rollupInit.FromField,
+				ToField:     AggregateField(rollupInit.FromField, rollupType),
+				Type:        rollupType,
+				TreatAsZero: rollupInit.TreatAsZero,
+			})
+		}
+	}
+	return rollups
+}
 
 type rollupProcessor struct {
 	cfg *Config
@@ -31,6 +83,9 @@ type rollupProcessor struct {
 var (
 	_ consumer.Traces = (*rollupProcessor)(nil)
 	_ consumer.Logs   = (*rollupProcessor)(nil)
+
+	rollupsLog  = initRollupsLog()
+	rollupsSpan = initRollupsSpan()
 )
 
 func newRollupProcessor(set component.ProcessorCreateSettings, cfg *Config) (*rollupProcessor, error) {
@@ -59,19 +114,19 @@ func (rp *rollupProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 	rollupData := make(map[string]pcommon.Map)
 	datasketches := make(map[string]map[string]*sketches.HeapDoublesSketch)
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		key := rp.key(span.Attributes())
+		key := rp.key(span.Attributes(), rollupsSpan)
 		_, exists := rollupData[key]
 		if !exists {
 			rollupData[key] = span.Attributes()
-			rollupData[key].InsertInt(rollupCountKey, 0)
+			rollupData[key].UpsertInt(RollupCountKey, 0)
 		}
 		_, exists = datasketches[key]
 		if !exists {
 			datasketches[key] = make(map[string]*sketches.HeapDoublesSketch)
 		}
-		rawCount, _ := rollupData[key].Get(rollupCountKey)
-		rollupData[key].UpdateInt(rollupCountKey, rawCount.IntVal()+1)
-		rp.rollupAttributes(datasketches[key], rollupData[key], span.Attributes(), rp.cfg.RollupsSpan)
+		rawCount, _ := rollupData[key].Get(RollupCountKey)
+		rollupData[key].UpdateInt(RollupCountKey, rawCount.IntVal()+1)
+		rp.rollupAttributes(datasketches[key], rollupData[key], span.Attributes(), rollupsSpan)
 		return nil
 	})
 	if err != nil {
@@ -96,19 +151,19 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 	rollupData := make(map[string]pcommon.Map)
 	datasketches := make(map[string]map[string]*sketches.HeapDoublesSketch)
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		key := rp.key(logRecord.Attributes())
+		key := rp.key(logRecord.Attributes(), rollupsLog)
 		_, exists := rollupData[key]
 		if !exists {
 			rollupData[key] = logRecord.Attributes()
-			rollupData[key].InsertInt(rollupCountKey, 0)
+			rollupData[key].UpsertInt(RollupCountKey, 0)
 		}
 		_, exists = datasketches[key]
 		if !exists {
 			datasketches[key] = make(map[string]*sketches.HeapDoublesSketch)
 		}
-		rawCount, _ := rollupData[key].Get(rollupCountKey)
-		rollupData[key].UpdateInt(rollupCountKey, rawCount.IntVal()+1)
-		rp.rollupAttributes(datasketches[key], rollupData[key], logRecord.Attributes(), rp.cfg.RollupsLog)
+		rawCount, _ := rollupData[key].Get(RollupCountKey)
+		rollupData[key].UpdateInt(RollupCountKey, rawCount.IntVal()+1)
+		rp.rollupAttributes(datasketches[key], rollupData[key], logRecord.Attributes(), rollupsLog)
 		return nil
 	})
 	if err != nil {
@@ -198,7 +253,7 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 			}
 		}
 	}
-	for _, rollup := range rp.cfg.RollupsLog {
+	for _, rollup := range rollups {
 		baseAttributes.Remove(rollup.FromField)
 	}
 }
@@ -235,9 +290,9 @@ func (rp *rollupProcessor) exportTraces(ctx context.Context, rollupData map[stri
 
 // key returns string key used in the hashmap. Current implementations marshals
 // the map to JSON. This might be suboptimal.
-func (rp *rollupProcessor) key(am pcommon.Map) string {
+func (rp *rollupProcessor) key(am pcommon.Map, rollups []*Rollup) string {
 	raw := am.AsRaw()
-	for _, rollup := range rp.cfg.RollupsLog {
+	for _, rollup := range rollups {
 		// Removing all fields from which we will get rolled up values, as those
 		// are dimensions not to be considered as "key".
 		delete(raw, rollup.FromField)

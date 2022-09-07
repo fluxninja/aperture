@@ -3,7 +3,6 @@ package otel
 
 import (
 	"crypto/tls"
-	"fmt"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/config/configgrpc"
@@ -47,56 +46,6 @@ const (
 )
 
 var baseFxTag = config.NameTag("base")
-
-var rollupTypes = []rollupprocessor.RollupType{
-	rollupprocessor.RollupSum,
-	rollupprocessor.RollupDatasketch,
-	rollupprocessor.RollupMax,
-	rollupprocessor.RollupMin,
-	rollupprocessor.RollupSumOfSquares,
-}
-
-func initRollupsLog() []*rollupprocessor.Rollup {
-	rollupsInit := []*rollupprocessor.Rollup{
-		{
-			FromField:   otelcollector.DurationLabel,
-			TreatAsZero: []string{otelcollector.MissingAttributeSourceValue},
-		},
-		{
-			FromField: otelcollector.HTTPRequestContentLength,
-		},
-		{
-			FromField: otelcollector.HTTPResponseContentLength,
-		},
-	}
-
-	return _initRollupsPerType(rollupsInit, rollupTypes)
-}
-
-func initRollupsSpan() []*rollupprocessor.Rollup {
-	rollupsInit := []*rollupprocessor.Rollup{
-		{
-			FromField: otelcollector.DurationLabel,
-		},
-	}
-
-	return _initRollupsPerType(rollupsInit, rollupTypes)
-}
-
-func _initRollupsPerType(rollupsInit []*rollupprocessor.Rollup, rollupTypes []rollupprocessor.RollupType) []*rollupprocessor.Rollup {
-	var rollups []*rollupprocessor.Rollup
-	for _, rollupInit := range rollupsInit {
-		for _, t := range rollupTypes {
-			rollups = append(rollups, &rollupprocessor.Rollup{
-				FromField:   rollupInit.FromField,
-				ToField:     fmt.Sprintf("%s_%s", rollupInit.FromField, t),
-				Type:        t,
-				TreatAsZero: rollupInit.TreatAsZero,
-			})
-		}
-	}
-	return rollups
-}
 
 type otelParams struct {
 	promClient promapi.Client
@@ -284,10 +233,7 @@ func addMetricsProcessor(config *otelcollector.OTELConfig) {
 }
 
 func addRollupProcessor(config *otelcollector.OTELConfig) {
-	config.AddProcessor(ProcessorRollup, rollupprocessor.Config{
-		RollupsLog:  initRollupsLog(),
-		RollupsSpan: initRollupsSpan(),
-	})
+	config.AddProcessor(ProcessorRollup, rollupprocessor.Config{})
 }
 
 func addPrometheusReceiver(cfg *otelParams) {

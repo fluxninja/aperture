@@ -104,7 +104,7 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 		endTimestamp := span.EndTimestamp()
 		startTimeStamp := span.StartTimestamp()
 		latency := float64(endTimestamp.AsTime().Sub(startTimeStamp.AsTime())) / float64(time.Millisecond)
-		span.Attributes().InsertDouble(otelcollector.DurationLabel, latency)
+		span.Attributes().UpsertDouble(otelcollector.DurationLabel, latency)
 
 		return p.updateMetrics(span.Attributes(), checkResponse)
 		// TODO tgill: Pass attributes through white list to ensure we drop any extra fields before rollup
@@ -120,7 +120,7 @@ func (p *metricsProcessor) addAuthzResponseBasedLabels(attributes pcommon.Map, t
 		otelcollector.AuthzStatusLabel: pcommon.NewValueString(authzResponse.GetStatus().String()),
 	}
 	for key, value := range labels {
-		attributes.Insert(key, value)
+		attributes.Upsert(key, value)
 	}
 	attributes.Remove(otelcollector.MarshalledAuthzResponseLabel)
 }
@@ -194,7 +194,7 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, t
 	}
 
 	for key, value := range labels {
-		attributes.Insert(key, value)
+		attributes.Upsert(key, value)
 	}
 	attributes.Remove(otelcollector.MarshalledCheckResponseLabel)
 	return &checkResponse

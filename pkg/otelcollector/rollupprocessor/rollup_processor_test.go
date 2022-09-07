@@ -14,25 +14,18 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
-	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
+	. "github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
 )
 
 var _ = Describe("Rollup processor", func() {
 	var (
-		config       *rollupprocessor.Config
+		config       *Config
 		testConsumer *fakeConsumer
 	)
 
 	BeforeEach(func() {
-		config = &rollupprocessor.Config{
-			RollupsLog: []*rollupprocessor.Rollup{
-				{FromField: "foo", ToField: "foo_datasketch", Type: "datasketch"},
-				{FromField: "foo", ToField: "foo_sum", Type: "sum"},
-				{FromField: "foo", ToField: "foo_min", Type: "min"},
-				{FromField: "foo", ToField: "foo_max", Type: "max"},
-				{FromField: "foo", ToField: "foo_sumOfSquares", Type: "sumOfSquares"},
-			},
-		}
+		config = &Config{}
 		testConsumer = &fakeConsumer{
 			receivedLogs:    []plog.Logs{},
 			receivedMetrics: []pmetric.Metrics{},
@@ -45,7 +38,7 @@ var _ = Describe("Rollup processor", func() {
 
 		JustBeforeEach(func() {
 			var err error
-			logsProcessor, err = rollupprocessor.CreateLogsProcessor(
+			logsProcessor, err = CreateLogsProcessor(
 				context.TODO(), component.ProcessorCreateSettings{}, config, testConsumer)
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -69,12 +62,12 @@ var _ = Describe("Rollup processor", func() {
 			Expect(testConsumer.receivedLogs).To(HaveLen(1))
 			attributes := testConsumer.receivedLogs[0].ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0).Attributes().AsRaw()
 			Expect(attributes).To(HaveLen(7))
-			Expect(attributes).To(HaveKeyWithValue("rollup_count", int64(1)))
-			Expect(attributes).To(HaveKeyWithValue("foo_datasketch", expectedSerializedDatasketch))
-			Expect(attributes).To(HaveKeyWithValue("foo_sum", float64(5)))
-			Expect(attributes).To(HaveKeyWithValue("foo_min", float64(5)))
-			Expect(attributes).To(HaveKeyWithValue("foo_max", float64(5)))
-			Expect(attributes).To(HaveKeyWithValue("foo_sumOfSquares", float64(25)))
+			Expect(attributes).To(HaveKeyWithValue(RollupCountKey, int64(1)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupDatasketch), expectedSerializedDatasketch))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupSum), float64(5)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupMin), float64(5)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupMax), float64(5)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupSumOfSquares), float64(25)))
 			Expect(attributes).To(HaveKeyWithValue("fizz", "buzz"))
 		})
 
@@ -100,12 +93,12 @@ var _ = Describe("Rollup processor", func() {
 			Expect(testConsumer.receivedLogs).To(HaveLen(1))
 			attributes := testConsumer.receivedLogs[0].ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0).Attributes().AsRaw()
 			Expect(attributes).To(HaveLen(6))
-			Expect(attributes).To(HaveKeyWithValue("rollup_count", int64(3)))
-			Expect(attributes).To(HaveKeyWithValue("foo_datasketch", expectedSerializedDatasketch))
-			Expect(attributes).To(HaveKeyWithValue("foo_sum", float64(18)))
-			Expect(attributes).To(HaveKeyWithValue("foo_min", float64(5)))
-			Expect(attributes).To(HaveKeyWithValue("foo_max", float64(7)))
-			Expect(attributes).To(HaveKeyWithValue("foo_sumOfSquares", float64(110)))
+			Expect(attributes).To(HaveKeyWithValue(RollupCountKey, int64(3)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupDatasketch), expectedSerializedDatasketch))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupSum), float64(18)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupMin), float64(5)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupMax), float64(7)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupSumOfSquares), float64(110)))
 		})
 	})
 
@@ -114,7 +107,7 @@ var _ = Describe("Rollup processor", func() {
 
 		JustBeforeEach(func() {
 			var err error
-			tracesProcessor, err = rollupprocessor.CreateTracesProcessor(
+			tracesProcessor, err = CreateTracesProcessor(
 				context.TODO(), component.ProcessorCreateSettings{}, config, testConsumer)
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -130,7 +123,7 @@ var _ = Describe("Rollup processor", func() {
 				Spans()
 			spanRecord := spans.AppendEmpty()
 			spanRecord.Attributes().InsertString("fizz", "buzz")
-			spanRecord.Attributes().InsertString("foo", strconv.Itoa(attributeValues[0]))
+			spanRecord.Attributes().InsertString(otelcollector.DurationLabel, strconv.Itoa(attributeValues[0]))
 
 			err = tracesProcessor.ConsumeTraces(context.TODO(), input)
 			Expect(err).NotTo(HaveOccurred())
@@ -139,12 +132,12 @@ var _ = Describe("Rollup processor", func() {
 			attributes := testConsumer.receivedTraces[0].ResourceSpans().At(0).
 				ScopeSpans().At(0).Spans().At(0).Attributes().AsRaw()
 			Expect(attributes).To(HaveLen(7))
-			Expect(attributes).To(HaveKeyWithValue("rollup_count", int64(1)))
-			Expect(attributes).To(HaveKeyWithValue("foo_datasketch", expectedSerializedDatasketch))
-			Expect(attributes).To(HaveKeyWithValue("foo_sum", float64(5)))
-			Expect(attributes).To(HaveKeyWithValue("foo_min", float64(5)))
-			Expect(attributes).To(HaveKeyWithValue("foo_max", float64(5)))
-			Expect(attributes).To(HaveKeyWithValue("foo_sumOfSquares", float64(25)))
+			Expect(attributes).To(HaveKeyWithValue(RollupCountKey, int64(1)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupDatasketch), expectedSerializedDatasketch))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupSum), float64(5)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupMin), float64(5)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupMax), float64(5)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupSumOfSquares), float64(25)))
 			Expect(attributes).To(HaveKeyWithValue("fizz", "buzz"))
 		})
 
@@ -171,12 +164,12 @@ var _ = Describe("Rollup processor", func() {
 			attributes := testConsumer.receivedTraces[0].ResourceSpans().At(0).
 				ScopeSpans().At(0).Spans().At(0).Attributes().AsRaw()
 			Expect(attributes).To(HaveLen(6))
-			Expect(attributes).To(HaveKeyWithValue("rollup_count", int64(3)))
-			Expect(attributes).To(HaveKeyWithValue("foo_datasketch", expectedSerializedDatasketch))
-			Expect(attributes).To(HaveKeyWithValue("foo_sum", float64(18)))
-			Expect(attributes).To(HaveKeyWithValue("foo_min", float64(5)))
-			Expect(attributes).To(HaveKeyWithValue("foo_max", float64(7)))
-			Expect(attributes).To(HaveKeyWithValue("foo_sumOfSquares", float64(110)))
+			Expect(attributes).To(HaveKeyWithValue(RollupCountKey, int64(3)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupDatasketch), expectedSerializedDatasketch))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupSum), float64(18)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupMin), float64(5)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupMax), float64(7)))
+			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.DurationLabel, RollupSumOfSquares), float64(110)))
 		})
 	})
 })

@@ -40,3 +40,8 @@ const (
 	// RollupDatasketch rolls up fields by creating datasketch from them.
 	RollupDatasketch RollupType = "datasketch"
 )
+
+const (
+	// RollupCountKey is the key used to store the count of the rollup.
+	RollupCountKey = "rollup_count"
+)
