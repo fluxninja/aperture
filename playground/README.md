@@ -115,8 +115,8 @@ start a cluster with built-in local registry for Docker images:
 ctlptl apply -f ctlptl-kind-config.yaml
 ```
 
-There is a another options which can be use to setup 3 node kind cluster which
-will also setup internal `docker-registry` base on the requirement.
+There is another option which can be used to set up a 3 node kind cluster which
+will also set up internal `docker-registry` based on the requirement.
 
 - Run a script available in `aperture/scripts` directory
   `aperture_dev_cluster.sh`.
