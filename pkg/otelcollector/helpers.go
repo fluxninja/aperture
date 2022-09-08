@@ -10,6 +10,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/rs/zerolog"
 )
 
@@ -209,4 +210,46 @@ func Min(a, b float64) float64 {
 		return b
 	}
 	return a
+}
+
+// FormIncludeList returns a map of all the keys in the given list with a value of true.
+func FormIncludeList(attributes []string) map[string]bool {
+	return utils.SliceToMap(attributes)
+}
+
+// FormExcludeList returns a map of all the keys in the given list with a value of false.
+func FormExcludeList(attributes []string) map[string]bool {
+	return utils.SliceToMap(attributes)
+}
+
+type enforceCriteria uint8
+
+const (
+	include enforceCriteria = iota
+	exclude
+)
+
+// EnforceIncludeList enforces the given include list on the given attributes.
+func EnforceIncludeList(attributes pcommon.Map, includeList map[string]bool) {
+	enforceList(attributes, includeList, include)
+}
+
+// EnforceExcludeList enforces the given exclude list on the given attributes.
+func EnforceExcludeList(attributes pcommon.Map, excludeList map[string]bool) {
+	enforceList(attributes, excludeList, exclude)
+}
+
+func enforceList(attributes pcommon.Map, list map[string]bool, enforceCriteria enforceCriteria) {
+	keysToRemove := make([]string, 0)
+	attributes.Range(func(key string, _ pcommon.Value) bool {
+		if enforceCriteria == include && !list[key] {
+			keysToRemove = append(keysToRemove, key)
+		} else if enforceCriteria == exclude && list[key] {
+			keysToRemove = append(keysToRemove, key)
+		}
+		return true
+	})
+	for _, key := range keysToRemove {
+		attributes.Remove(key)
+	}
 }

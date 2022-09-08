@@ -254,6 +254,7 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 			}
 		}
 	}
+	// Exclude list
 	for _, rollup := range rollups {
 		baseAttributes.Remove(rollup.FromField)
 	}

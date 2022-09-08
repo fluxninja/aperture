@@ -84,13 +84,16 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		checkResponse := p.addCheckResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
+		checkResponse := addCheckResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
 
-		p.addAuthzResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
+		addAuthzResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
 
-		return p.updateMetrics(logRecord.Attributes(), checkResponse, []string{otelcollector.EnvoyMissingAttributeSourceValue})
-		// TODO tgill: Pass attributes through white list to ensure we drop any extra fields before rollup
-		// p.whitelistLogAttributes(logRecord.Attributes())
+		p.updateMetrics(logRecord.Attributes(), checkResponse, []string{otelcollector.EnvoyMissingAttributeSourceValue})
+
+		// Pass attributes through exclude list to drop keys that got flattened in this stage
+		enforceExcludeListLog(logRecord.Attributes())
+
+		return nil
 	})
 	return ld, err
 }
@@ -98,22 +101,21 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 // ConsumeTraces receives ptrace.Traces for consumption then returns updated traces with policy labels and metrics.
 func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) (ptrace.Traces, error) {
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		checkResponse := p.addCheckResponseBasedLabels(span.Attributes(), []string{})
+		checkResponse := addCheckResponseBasedLabels(span.Attributes(), []string{})
 
-		// TODO tgill: move span latency addition to its own function
-		endTimestamp := span.EndTimestamp()
-		startTimeStamp := span.StartTimestamp()
-		latency := float64(endTimestamp.AsTime().Sub(startTimeStamp.AsTime())) / float64(time.Millisecond)
-		span.Attributes().UpsertDouble(otelcollector.DurationLabel, latency)
+		addSpanBasedLabels(span)
 
-		return p.updateMetrics(span.Attributes(), checkResponse, []string{})
-		// TODO tgill: Pass attributes through white list to ensure we drop any extra fields before rollup
-		// p.whitelistSpanAttributes(span.Attributes())
+		p.updateMetrics(span.Attributes(), checkResponse, []string{})
+
+		// Pass attributes through exclude list to drop keys that got flattened in this stage
+		enforceExcludeListSpan(span.Attributes())
+
+		return nil
 	})
 	return td, err
 }
 
-func (p *metricsProcessor) addAuthzResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string) {
+func addAuthzResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string) {
 	var authzResponse flowcontrolv1.AuthzResponse
 	otelcollector.GetStruct(attributes, otelcollector.MarshalledAuthzResponseLabel, &authzResponse, treatAsMissing)
 	labels := map[string]pcommon.Value{
@@ -122,7 +124,6 @@ func (p *metricsProcessor) addAuthzResponseBasedLabels(attributes pcommon.Map, t
 	for key, value := range labels {
 		attributes.Upsert(key, value)
 	}
-	attributes.Remove(otelcollector.MarshalledAuthzResponseLabel)
 }
 
 // addCheckResponseBasedLabels adds the following labels:
@@ -133,7 +134,7 @@ func (p *metricsProcessor) addAuthzResponseBasedLabels(attributes pcommon.Map, t
 // * `concurrency_limiters`
 // * `dropping_concurrency_limiters`
 // * `flux_meters`.
-func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string) *flowcontrolv1.CheckResponse {
+func addCheckResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string) *flowcontrolv1.CheckResponse {
 	var checkResponse flowcontrolv1.CheckResponse
 	success := otelcollector.GetStruct(attributes, otelcollector.MarshalledCheckResponseLabel, &checkResponse, treatAsMissing)
 	if !success {
@@ -196,17 +197,23 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, t
 	for key, value := range labels {
 		attributes.Upsert(key, value)
 	}
-	attributes.Remove(otelcollector.MarshalledCheckResponseLabel)
 	return &checkResponse
+}
+
+func addSpanBasedLabels(span ptrace.Span) {
+	endTimestamp := span.EndTimestamp()
+	startTimeStamp := span.StartTimestamp()
+	latency := float64(endTimestamp.AsTime().Sub(startTimeStamp.AsTime())) / float64(time.Millisecond)
+	span.Attributes().UpsertDouble(otelcollector.DurationLabel, latency)
 }
 
 func (p *metricsProcessor) updateMetrics(
 	attributes pcommon.Map,
 	checkResponse *flowcontrolv1.CheckResponse,
 	treatAsZero []string,
-) error {
+) {
 	if checkResponse == nil {
-		return nil
+		return
 	}
 	if len(checkResponse.LimiterDecisions) > 0 {
 		// Update workload metrics
@@ -221,10 +228,7 @@ func (p *metricsProcessor) updateMetrics(
 					metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
 				}
 
-				err := p.updateMetricsForWorkload(labels, latency)
-				if err != nil {
-					return err
-				}
+				p.updateMetricsForWorkload(labels, latency)
 			} // TODO: add rate limiter metrics
 		}
 	}
@@ -245,19 +249,15 @@ func (p *metricsProcessor) updateMetrics(
 			p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, attributes)
 		}
 	}
-
-	return nil
 }
 
-func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64) error {
+func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64) {
 	latencyHistogram, err := p.workloadLatencySummary.GetMetricWith(labels)
 	if err != nil {
-		log.Warn().Err(err).Msg("Getting latency histogram")
-		return err
+		otelcollector.LogSampled.Warn().Err(err).Msg("Getting latency histogram")
+		return
 	}
 	latencyHistogram.Observe(latency)
-
-	return nil
 }
 
 func (p *metricsProcessor) updateMetricsForFluxMeters(
@@ -267,12 +267,9 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	featureStatus string,
 	attributes pcommon.Map,
 ) {
-	// TODO tgill: Remove additional metric keys from attributes map. User can refer to additional metrics using attribute_key in flux meter. The extra metrics need to be discarded to prevent cardinality blow up in rollup processor
-	// defer
-
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
-		log.Debug().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
+		otelcollector.LogSampled.Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
 			Str(metrics.FeatureStatusLabel, featureStatus).
@@ -289,16 +286,29 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	}
 }
 
-// TODO tgill
-/*func (p *metricsProcessor) whitelistLogAttributes(attributes pcommon.Map) {
-	p._whitelistCommonAttributes(attributes)
-	p._whitelistLogAttributes(attributes)
+var (
+	_attributesCommon = []string{
+		otelcollector.MarshalledCheckResponseLabel,
+	}
+
+	_attributesLog = []string{
+		otelcollector.MarshalledAuthzResponseLabel,
+		otelcollector.EnvoyRequestDurationLabel,
+		otelcollector.EnvoyRequestTxDurationLabel,
+		otelcollector.EnvoyResponseDurationLabel,
+		otelcollector.EnvoyResponseTxDurationLabel,
+	}
+
+	_attributesSpan = []string{}
+
+	excludeListLog  = otelcollector.FormExcludeList(append(_attributesCommon, _attributesLog...))
+	excludeListSpan = otelcollector.FormExcludeList(append(_attributesCommon, _attributesSpan...))
+)
+
+func enforceExcludeListLog(attributes pcommon.Map) {
+	otelcollector.EnforceExcludeList(attributes, excludeListLog)
 }
 
-func (p *metricsProcessor) _whitelistCommonAttributes(attributes pcommon.Map) {
-	for key := range attributes {
-		if !p.cfg.whitelistedLogAttributes[key] {
-			attributes.Delete(key)
-		}
-	}
-}*/
+func enforceExcludeListSpan(attributes pcommon.Map) {
+	otelcollector.EnforceExcludeList(attributes, excludeListSpan)
+}
