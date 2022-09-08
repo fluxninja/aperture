@@ -28,7 +28,7 @@ const (
 // Module provides a new DistCache FX module.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(DistCacheConstructor{Key: defaultKey}.ProvideDistCache),
+		fx.Provide(DistCacheConstructor{ConfigKey: defaultKey}.ProvideDistCache),
 	)
 }
 
@@ -83,7 +83,7 @@ type DistCacheConstructorIn struct {
 
 // DistCacheConstructor holds fields to create an instance of *DistCache.
 type DistCacheConstructor struct {
-	Key           string
+	ConfigKey     string
 	DefaultConfig DistCacheConfig
 }
 
@@ -91,7 +91,7 @@ type DistCacheConstructor struct {
 // It also hooks in the service discovery plugin.
 func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructorIn) (*DistCache, error) {
 	config := constructor.DefaultConfig
-	if err := in.Unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := in.Unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize configuration of DistCache")
 		return nil, err
 	}

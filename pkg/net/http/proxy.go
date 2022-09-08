@@ -23,7 +23,7 @@ func ProxyModule() fx.Option {
 
 // ProxyConstructor holds fields used to configure Proxy.
 type ProxyConstructor struct {
-	Key           string
+	ConfigKey     string
 	DefaultConfig ProxyConfig
 }
 
@@ -40,14 +40,14 @@ type ProxyConfig struct {
 }
 
 func (constructor ProxyConstructor) applyProxyConfig(unmarshaller config.Unmarshaller) error {
-	if constructor.Key == "" {
-		constructor.Key = defaultProxyKey
+	if constructor.ConfigKey == "" {
+		constructor.ConfigKey = defaultProxyKey
 	}
 
 	var err error
 
 	config := constructor.DefaultConfig
-	if err = unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err = unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize client proxy configuration!")
 		return err
 	}

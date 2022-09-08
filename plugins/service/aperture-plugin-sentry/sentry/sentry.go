@@ -45,7 +45,7 @@ type SentryWriterConstructor struct {
 	// Name of sentry instance
 	Name string
 	// Config key
-	Key string
+	ConfigKey string
 	// Default Config
 	DefaultConfig SentryConfig
 }
@@ -71,7 +71,7 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusRegistry status.Registry, lifecycle fx.Lifecycle) (io.Writer, error) {
 	config := constructor.DefaultConfig
 
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Panic().Err(err).Msg("Unable to deserialize sentry config")
 	}
 

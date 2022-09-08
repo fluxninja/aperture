@@ -5,7 +5,6 @@ import (
 	"path"
 
 	"github.com/ghodss/yaml"
-	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
@@ -36,7 +35,7 @@ import (
 
 var (
 	policiesDefaultPath = path.Join(config.DefaultAssetsDirectory, "policies")
-	policiesPathKey     = iface.PoliciesRoot + ".policies_path"
+	policiesConfigKey   = iface.PoliciesRoot + ".policies_path"
 	policiesFxTag       = "Policies"
 )
 
@@ -45,8 +44,7 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(provideCMFileValidator),
 		// Syncing policies config to etcd
-		fx.Provide(providePoliciesPathFlag),
-		filesystemwatcher.Constructor{Name: policiesFxTag, PathKey: policiesPathKey, Path: policiesDefaultPath}.Annotate(), // Create a new watcher
+		filesystemwatcher.Constructor{Name: policiesFxTag, ConfigKey: policiesConfigKey, Path: policiesDefaultPath}.Annotate(), // Create a new watcher
 		fx.Invoke(
 			fx.Annotate(
 				setupPoliciesNotifier,
@@ -57,17 +55,6 @@ func Module() fx.Option {
 		policyFactoryModule(),
 		fx.Invoke(registerCMFileValidator),
 	)
-}
-
-// providePoliciesPathFlag registers a command line flag builder function.
-func providePoliciesPathFlag() config.FlagSetBuilderOut {
-	return config.FlagSetBuilderOut{Builder: setPoliciesPathFlag}
-}
-
-// setPoliciesPathFlag registers command line flags.
-func setPoliciesPathFlag(fs *pflag.FlagSet) error {
-	fs.String(policiesPathKey, policiesDefaultPath, "path to Policies directory")
-	return nil
 }
 
 // Sync policies config directory with etcd.
