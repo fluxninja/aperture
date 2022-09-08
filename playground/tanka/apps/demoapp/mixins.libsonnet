@@ -44,11 +44,11 @@ local policy = latencyGradientPolicy({
     workloads: [
       WorkloadWithLabelMatcher.new(
         workload=Workload.withPriority(50),
-        label_matcher=LabelMatcher.withMatchLabels({ 'request_header_user-type': 'guest' })
+        label_matcher=LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'guest' })
       ),
       WorkloadWithLabelMatcher.new(
         workload=Workload.withPriority(200),
-        label_matcher=LabelMatcher.withMatchLabels({ 'request_header_user-type': 'subscriber' })
+        label_matcher=LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })
       ),
     ],
   },

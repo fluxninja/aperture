@@ -197,7 +197,7 @@ data:
                     priority: 200
                   label_matcher:
                     match_labels:
-                      request_header_user-type: "subscriber"
+                      http.request.header.user_type: "subscriber"
               out_ports:
                 accepted_concurrency:
                   signal_name: "ACCEPTED_CONCURRENCY"
@@ -345,6 +345,6 @@ const rateLimitPolicy = `
               service: "service1-demo-app.demoapp.svc.cluster.local"
               control_point:
                 traffic: "ingress"
-            label_key: "request_header_user-type"
+            label_key: "http.request.header.user_type"
             limit_reset_interval: "1s"
 `

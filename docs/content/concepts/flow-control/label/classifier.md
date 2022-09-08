@@ -90,9 +90,9 @@ Aperture aims to expand the set of extractors to cover most-common usecases.
 
 Extracting value from header may seem not useful, as the value is already
 available as flow label
-([as `request_header_<header>`](label.md#request-labels)), but adding flow label
-explicitly may still be userful, as it enables baggage propagation and telemetry
-for this flow label.
+([as `http.request.header.<header>`](label.md#request-labels)), but adding flow
+label explicitly may still be userful, as it enables baggage propagation and
+telemetry for this flow label.
 
 :::
 
