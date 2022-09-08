@@ -19,7 +19,7 @@ package v1alpha1
 // ServiceAccountSpec defines the the configuration for Service account for Agent and Controller.
 type ServiceAccountSpec struct {
 	// Specifies whether a ServiceAccount should be created
-	Create bool `json:"create"`
+	Create bool `json:"create" default:"true"`
 
 	// Additional Service Account annotations
 	//+kubebuilder:validation:Optional
@@ -27,6 +27,5 @@ type ServiceAccountSpec struct {
 
 	// Automount service account token for the server service account
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=true
-	AutomountServiceAccountToken bool `json:"automountServiceAccountToken"`
+	AutomountServiceAccountToken bool `json:"automountServiceAccountToken" default:"true"`
 }

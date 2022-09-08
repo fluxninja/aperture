@@ -197,6 +197,7 @@ definitions:
         x-go-validate: gte=0s
       proxy_connect_header:
         $ref: '#/definitions/Header'
+        x-go-validate: omitempty
       read_buffer_size:
         description: Read Buffer Size. 0 = 4KB
         format: int64
