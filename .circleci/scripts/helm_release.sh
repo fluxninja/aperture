@@ -30,8 +30,12 @@ locate() {
   dirs=$(find manifests/charts -name 'values.yaml' -exec dirname {} \;)
   for dir in ${dirs}; do
     if [[ -f "${dir}/Chart.yaml" ]]; then
+      tag_name=$(echo "${CIRCLE_TAG}" | cut -d "/" -f 3)
+      dir_name=$(echo "${dir}" | cut -d "/" -f 3)
+      if [[ $tag_name == "${dir_name}" ]]; then
       CHARTS+=("${dir}")
       echo "Found chart directory ${dir}"
+      fi
     else
       echo "Ignoring non-chart directory ${dir}"
     fi

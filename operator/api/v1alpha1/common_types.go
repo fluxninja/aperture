@@ -41,98 +41,91 @@ import (
 type Image struct {
 	// The registry of the image
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="docker.io/fluxninja"
-	Registry string `json:"registry"`
-
-	// The repository of the image
-	Repository string `json:"repository"`
+	Registry string `json:"registry" default:"docker.io/fluxninja"`
 
 	// The tag (version) of the image
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=latest
-	Tag string `json:"tag"`
+	Tag string `json:"tag" default:"latest"`
 
 	// The ImagePullPolicy of the image
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Enum=Never;Always;IfNotPresent
-	//+kubebuilder:default:="IfNotPresent"
-	PullPolicy string `json:"pullPolicy"`
+	PullPolicy string `json:"pullPolicy" default:"IfNotPresent" validate:"oneof=Never Always IfNotPresent"`
 
 	// The PullSecrets for the image
 	//+kubebuilder:validation:Optional
 	PullSecrets []string `json:"pullSecrets,omitempty"`
 }
 
+// AgentImage defines Image spec for Aperture Agent.
+type AgentImage struct {
+	// Image specs for Agent
+	Image `json:",inline"`
+
+	// The repository of the image
+	Repository string `json:"repository" default:"aperture-agent"`
+}
+
+// ControllerImage defines Image spec for Aperture Controller.
+type ControllerImage struct {
+	// Image specs for Controller
+	Image `json:",inline"`
+
+	// The repository of the image
+	Repository string `json:"repository" default:"aperture-controller"`
+}
+
 // Probe defines Enabled, InitialDelaySeconds, PeriodSeconds, TimeoutSeconds, FailureThreshold and SuccessThreshold for probes like livenessProbe.
 type Probe struct {
 	// Enable probe on agent containers
-	Enabled bool `json:"enabled"`
+	Enabled bool `json:"enabled" default:"true"`
 
 	// Initial delay seconds for probe
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Minimum:=0
-	//+kubebuilder:default:=15
-	InitialDelaySeconds int32 `json:"initialDelaySeconds"`
+	InitialDelaySeconds int32 `json:"initialDelaySeconds" default:"15" validate:"gte=0"`
 
 	// Period delay seconds for probe
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Minimum:=1
-	//+kubebuilder:default:=15
-	PeriodSeconds int32 `json:"periodSeconds"`
+	PeriodSeconds int32 `json:"periodSeconds" default:"15" validate:"gte=1"`
 
 	// Timeout delay seconds for probe
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Minimum:=1
-	//+kubebuilder:default:=5
-	TimeoutSeconds int32 `json:"timeoutSeconds"`
+	TimeoutSeconds int32 `json:"timeoutSeconds" default:"5" validate:"gte=1"`
 
 	// Failure threshold for probe
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Minimum:=1
-	//+kubebuilder:default:=6
-	FailureThreshold int32 `json:"failureThreshold"`
+	FailureThreshold int32 `json:"failureThreshold" default:"6" validate:"gte=1"`
 
 	// Success threshold for probe
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Minimum:=1
-	//+kubebuilder:default:=1
-	SuccessThreshold int32 `json:"successThreshold"`
+	SuccessThreshold int32 `json:"successThreshold" default:"1" validate:"gte=1"`
 }
 
 // PodSecurityContext defines Enabled and FsGroup for the Pods' security context.
 type PodSecurityContext struct {
 	// Enable PodSecurityContext on Pod
-	Enabled bool `json:"enabled"`
+	Enabled bool `json:"enabled" default:"false"`
 
 	// fsGroup to define the Group ID for the Pod
-	//+kubebuilder:validation:minimum=0
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=1001
-	FsGroup *int64 `json:"fsGroup"`
+	FsGroup int64 `json:"fsGroup" default:"1001" validate:"gte=0"`
 }
 
 // ContainerSecurityContext defines Enabled, RunAsUser, RunAsNonRootUser and ReadOnlyRootFilesystem for the containers' security context.
 type ContainerSecurityContext struct {
 	// Enable ContainerSecurityContext on containers
-	//+kubebuilder:validation:Optional
-	Enabled bool `json:"enabled"`
+	Enabled bool `json:"enabled" default:"false"`
 
 	// Set containers' Security Context runAsUser
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:minimum:=0
-	//+kubebuilder:default:=1001
-	RunAsUser *int64 `json:"runAsUser"`
+	RunAsUser int64 `json:"runAsUser" default:"1001" validate:"gte=0"`
 
 	// Set containers' Security Context runAsNonRoot
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
-	RunAsNonRootUser *bool `json:"runAsNonRoot"`
+	RunAsNonRootUser bool `json:"runAsNonRoot" default:"false"`
 
 	// Set agent containers' Security Context runAsNonRoot
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
-	ReadOnlyRootFilesystem *bool `json:"readOnlyRootFilesystem"`
+	ReadOnlyRootFilesystem bool `json:"readOnlyRootFilesystem" default:"false"`
 }
 
 // CommonSpec defines the desired the common state of Agent and Controller.
@@ -140,12 +133,10 @@ type CommonSpec struct {
 	// Labels to add to all deployed objects
 	//+mapType=atomic
 	//+kubebuilder:validation:Optional
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	Labels map[string]string `json:"labels,omitempty"`
 
 	// Annotations to add to all deployed objects
 	//+kubebuilder:validation:Optional
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	Annotations map[string]string `json:"annotations,omitempty"`
 
 	// Configuration for Agent or Controller service
@@ -154,17 +145,14 @@ type CommonSpec struct {
 
 	// ServiceAccountSpec defines the the configuration pf Service account for Agent or Controller
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={create:true,automountServiceAccountToken:true}
 	ServiceAccountSpec ServiceAccountSpec `json:"serviceAccount"`
 
 	// livenessProbe related configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={enabled:true,initialDelaySeconds:15,periodSeconds:15,timeoutSeconds:5,failureThreshold:6,successThreshold:1}
 	LivenessProbe Probe `json:"livenessProbe"`
 
 	// readinessProbe related configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={enabled:true,initialDelaySeconds:15,periodSeconds:15,timeoutSeconds:5,failureThreshold:6,successThreshold:1}
 	ReadinessProbe Probe `json:"readinessProbe"`
 
 	// Custom livenessProbe that overrides the default one
@@ -181,12 +169,10 @@ type CommonSpec struct {
 
 	// Configure Pods' Security Context
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={enabled:false,fsGroup:1001}
 	PodSecurityContext PodSecurityContext `json:"podSecurityContext"`
 
 	// Configure Containers' Security Context
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={enabled:false,runAsUser:1001,runAsNonRoot:false,readOnlyRootFilesystem:false}
 	ContainerSecurityContext ContainerSecurityContext `json:"containerSecurityContext"`
 
 	// Override default container command
@@ -211,7 +197,6 @@ type CommonSpec struct {
 	Affinity *corev1.Affinity `json:"affinity,omitempty"`
 
 	// Node labels for pods assignment
-	//+mapType=atomic
 	//+kubebuilder:validation:Optional
 	//+mapType=atomic
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
@@ -221,13 +206,12 @@ type CommonSpec struct {
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 
 	// Seconds Redmine pod needs to terminate gracefully
-	//+kubebuilder:validation:Minimum:=0
 	//+kubebuilder:validation:Optional
-	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds"`
+	TerminationGracePeriodSeconds int64 `json:"terminationGracePeriodSeconds" validate:"gte=0"`
 
 	// For the container(s) to automate configuration before or after startup
 	//+kubebuilder:validation:Optional
-	LifecycleHooks *corev1.Lifecycle `json:"lifecycleHooks"`
+	LifecycleHooks *corev1.Lifecycle `json:"lifecycleHooks,omitempty" validate:"omitempty"`
 
 	// Array with extra environment variables to add
 	//+kubebuilder:validation:Optional
@@ -266,37 +250,29 @@ type CommonSpec struct {
 type Secrets struct {
 	// FluxNinja plugin.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={create:false}
 	FluxNinjaPlugin APIKeySecret `json:"fluxNinjaPlugin"`
 }
 
 // APIKeySecret defines fields required for creation/usage of secret for the ApiKey of Agent and Controller.
 type APIKeySecret struct {
 	// Create new secret or not
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
-	Create bool `json:"create"`
+	Create bool `json:"create" defalut:"false"`
 
 	// Secret details
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={key:"apiKey"}
 	SecretKeyRef SecretKeyRef `json:"secretKeyRef"`
 
 	// Value for the ApiKey
-	//+kubebuilder:validation:Optional
 	Value string `json:"value"`
 }
 
 // SecretKeyRef defines fields for details of the ApiKey secret.
 type SecretKeyRef struct {
 	// Name of the secret
-	//+kubebuilder:validation:Optional
 	Name string `json:"name"`
 
 	// Key of the secret in Data
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=apiKey
-	Key string `json:"key"`
+	Key string `json:"key" defalut:"apiKey"`
 }
 
 // APIKeySecretSpec defines API Key secret details for Agent and Controller.
