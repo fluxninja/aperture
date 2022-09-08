@@ -71,6 +71,8 @@ const (
 	FluxMetersLabel = "flux_meters"
 	// FlowLabelKeysLabel describes keys of flow labels matched to the traffic.
 	FlowLabelKeysLabel = "flow_label_keys"
+	// ClassifiersLabel describes classifiers matched to the traffic.
+	ClassifiersLabel = "classifiers"
 	// HostAddressLabel describes host address of the request.
 	HostAddressLabel = "net.host.address"
 	// PeerAddressLabel describes peer address of the request.

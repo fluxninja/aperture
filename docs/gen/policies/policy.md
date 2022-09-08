@@ -18,6 +18,7 @@
 - [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 - [languagev1RateLimiter](#languagev1-rate-limiter) – Limits the traffic on a control point to specified rate
+- [policylanguagev1Classifier](#policylanguagev1-classifier) – Set of classification rules sharing a common selector
 - [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 
 Example of…
@@ -27,7 +28,6 @@ Example of…
 - [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
 - [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the Arithmetic Combinator component.
 - [v1Circuit](#v1-circuit) – Circuit is defined as a dataflow graph of inter-connected components
-- [v1Classifier](#v1-classifier) – Set of classification rules sharing a common selector
 - [v1Component](#v1-component) – Computational block that form the circuit
 - [v1Constant](#v1-constant) – Component that emits a constant value as an output signal
 - [v1ConstantOuts](#v1-constant-outs) – Outputs for the Constant component.
@@ -331,6 +331,46 @@ TODO make it possible for this field to be optional – to achieve global rateli
 </dd>
 </dl>
 
+### policylanguagev1Classifier {#policylanguagev1-classifier}
+
+Set of classification rules sharing a common selector
+
+:::info
+See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+:::
+
+Example:
+
+```yaml
+selector:
+  service: service1.default.svc.cluster.local
+  control_point:
+    traffic: ingress
+rules:
+  user:
+    extractor:
+      from: request.http.headers.user
+```
+
+#### Properties
+
+<dl>
+<dt>rules</dt>
+<dd>
+
+(map of [V1Rule](#v1-rule)) A map of {key, value} pairs mapping from
+[flow label](/concepts/flow-control/label/label.md) keys to rules that define
+how to extract and propagate flow labels with that key.
+
+</dd>
+<dt>selector</dt>
+<dd>
+
+([V1Selector](#v1-selector)) Defines where to apply the flow classification rule.
+
+</dd>
+</dl>
+
 ### policylanguagev1FluxMeter {#policylanguagev1-flux-meter}
 
 FluxMeter gathers metrics for the traffic that matches its selector.
@@ -501,46 +541,6 @@ docs on how exactly it handles invalid inputs.
 
 (string, default: `0.5s`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
 This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-
-</dd>
-</dl>
-
-### v1Classifier {#v1-classifier}
-
-Set of classification rules sharing a common selector
-
-:::info
-See also [Classifier overview](/concepts/flow-control/label/classifier.md).
-:::
-
-Example:
-
-```yaml
-selector:
-  service: service1.default.svc.cluster.local
-  control_point:
-    traffic: ingress
-rules:
-  user:
-    extractor:
-      from: request.http.headers.user
-```
-
-#### Properties
-
-<dl>
-<dt>rules</dt>
-<dd>
-
-(map of [V1Rule](#v1-rule)) A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/label/label.md) keys to rules that define
-how to extract and propagate flow labels with that key.
-
-</dd>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector)) Defines where to apply the flow classification rule.
 
 </dd>
 </dl>
@@ -1767,7 +1767,7 @@ Resources are typically FluxMeters, Classifiers, etc. that can be used to create
 <dt>classifiers</dt>
 <dd>
 
-([[]V1Classifier](#v1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+([[]Policylanguagev1Classifier](#policylanguagev1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
 
