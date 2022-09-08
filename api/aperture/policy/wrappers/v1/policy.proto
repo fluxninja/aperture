@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package aperture.policy.wrappers.v1;
 
+import "aperture/policy/language/v1/classifier.proto";
 import "aperture/policy/language/v1/fluxmeter.proto";
 import "aperture/policy/language/v1/policy.proto";
 
@@ -19,6 +20,17 @@ message FluxMeterWrapper {
   policy.language.v1.FluxMeter flux_meter = 1;
   // Name of fluxmeter metric.
   string fluxmeter_name = 4;
+}
+
+message ClassifierWrapper {
+  // Classifier
+  policy.language.v1.Classifier classifier = 1;
+  // Name of the Policy.
+  string policy_name = 2;
+  // Hash of the entire Policy spec.
+  string policy_hash = 3;
+  // Index of the classifier within Policy.
+  int64 classifier_index = 4;
 }
 
 message ConcurrencyLimiterWrapper {

@@ -263,6 +263,17 @@ definitions:
       workload:
         $ref: '#/definitions/SchedulerWorkload'
         description: Workload associated with flows matching the label matcher.
+  apertureflowcontrolv1Classifier:
+    type: object
+    properties:
+      classifier_index:
+        type: string
+        format: int64
+      policy_hash:
+        type: string
+      policy_name:
+        type: string
+    description: Classifier describes details for each Classifier.
   apertureflowcontrolv1FluxMeter:
     type: object
     properties:
@@ -351,6 +362,37 @@ definitions:
       Ratelimiting is done separately on per-label-value basis. Use _label\_key_
       to select which label should be used as key.
     title: Limits the traffic on a control point to specified rate
+  policylanguagev1Classifier:
+    type: object
+    properties:
+      rules:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Rule'
+        description: |-
+          A map of {key, value} pairs mapping from
+          [flow label](/concepts/flow-control/label/label.md) keys to rules that define
+          how to extract and propagate flow labels with that key.
+      selector:
+        $ref: '#/definitions/v1Selector'
+        description: Defines where to apply the flow classification rule.
+    description: |-
+      :::info
+      See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+      :::
+
+      Example:
+      ```yaml
+      selector:
+        service: service1.default.svc.cluster.local
+        control_point:
+          traffic: ingress
+      rules:
+        user:
+          extractor:
+            from: request.http.headers.user
+      ```
+    title: Set of classification rules sharing a common selector
   policylanguagev1FluxMeter:
     type: object
     properties:
@@ -593,6 +635,11 @@ definitions:
   v1CheckResponse:
     type: object
     properties:
+      classifiers:
+        type: array
+        items:
+          $ref: '#/definitions/apertureflowcontrolv1Classifier'
+        description: classifiers that were matched for this request.
       decision_reason:
         $ref: '#/definitions/v1DecisionReason'
         description: reason contains information in the case of an error or rejection.
@@ -650,37 +697,6 @@ definitions:
       docs on how exactly it handles invalid inputs.
       :::
     title: Circuit is defined as a dataflow graph of inter-connected components
-  v1Classifier:
-    type: object
-    properties:
-      rules:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Rule'
-        description: |-
-          A map of {key, value} pairs mapping from
-          [flow label](/concepts/flow-control/label/label.md) keys to rules that define
-          how to extract and propagate flow labels with that key.
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Defines where to apply the flow classification rule.
-    description: |-
-      :::info
-      See also [Classifier overview](/concepts/flow-control/label/classifier.md).
-      :::
-
-      Example:
-      ```yaml
-      selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress
-      rules:
-        user:
-          extractor:
-            from: request.http.headers.user
-      ```
-    title: Set of classification rules sharing a common selector
   v1Component:
     type: object
     properties:
@@ -1605,7 +1621,7 @@ definitions:
       classifiers:
         type: array
         items:
-          $ref: '#/definitions/v1Classifier'
+          $ref: '#/definitions/policylanguagev1Classifier'
         description: |-
           Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 

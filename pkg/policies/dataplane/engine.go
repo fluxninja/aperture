@@ -22,6 +22,7 @@ type multiMatchResult struct {
 	concurrencyLimiters []iface.Limiter
 	fluxMeters          []iface.FluxMeter
 	rateLimiters        []iface.RateLimiter
+	classifiers         []iface.Classifier
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -33,6 +34,7 @@ func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiM
 	result.concurrencyLimiters = append(result.concurrencyLimiters, resultCollection.concurrencyLimiters...)
 	result.fluxMeters = append(result.fluxMeters, resultCollection.fluxMeters...)
 	result.rateLimiters = append(result.rateLimiters, resultCollection.rateLimiters...)
+	result.classifiers = append(result.classifiers, resultCollection.classifiers...)
 }
 
 // ProvideEngineAPI Main fx app.
@@ -74,6 +76,17 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 		}
 	}
 	response.FluxMeters = fluxMeterProtos
+
+	classifiers := mmr.classifiers
+	classifierProtos := make([]*flowcontrolv1.Classifier, len(classifiers))
+	for i, classifier := range classifiers {
+		classifierProtos[i] = &flowcontrolv1.Classifier{
+			PolicyName:      classifier.GetClassifierID().PolicyName,
+			PolicyHash:      classifier.GetClassifierID().PolicyHash,
+			ClassifierIndex: classifier.GetClassifierID().ClassifierIndex,
+		}
+	}
+	response.Classifiers = classifierProtos
 
 	// execute rate limiters first
 	rateLimiters := make([]iface.Limiter, len(mmr.rateLimiters))
@@ -167,10 +180,7 @@ func returnExtraTokens(
 // RegisterConcurrencyLimiter adds concurrency limiter to multimatcher.
 func (e *Engine) RegisterConcurrencyLimiter(cl iface.Limiter) error {
 	concurrencyLimiterMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.concurrencyLimiters = append(
-			mmr.concurrencyLimiters,
-			cl,
-		)
+		mmr.concurrencyLimiters = append(mmr.concurrencyLimiters, cl)
 		return mmr
 	}
 	return e.register("ConcurrencyLimiter:"+cl.GetLimiterID().String(), cl.GetSelector(), concurrencyLimiterMatchedCB)
@@ -195,10 +205,7 @@ func (e *Engine) RegisterFluxMeter(fm iface.FluxMeter) error {
 
 	// Save the fluxMeterAPI in multiMatchers
 	fluxMeterMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.fluxMeters = append(
-			mmr.fluxMeters,
-			fm,
-		)
+		mmr.fluxMeters = append(mmr.fluxMeters, fm)
 		return mmr
 	}
 
@@ -249,6 +256,21 @@ func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
 func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 	selectorProto := rl.GetSelector()
 	return e.unregister("RateLimiter:"+rl.GetLimiterID().String(), selectorProto)
+}
+
+// RegisterClassifier adds classifier to multimatcher.
+func (e *Engine) RegisterClassifier(c iface.Classifier) error {
+	classifierMatchedCB := func(mmr multiMatchResult) multiMatchResult {
+		mmr.classifiers = append(mmr.classifiers, c)
+		return mmr
+	}
+	return e.register("Classifier:"+c.GetClassifierID().String(), c.GetSelector(), classifierMatchedCB)
+}
+
+// UnregisterClassifier removes classifier from multimatcher.
+func (e *Engine) UnregisterClassifier(c iface.Classifier) error {
+	selectorProto := c.GetSelector()
+	return e.unregister("Classifier:"+c.GetClassifierID().String(), selectorProto)
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.
