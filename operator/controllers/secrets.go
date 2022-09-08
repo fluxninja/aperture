@@ -39,10 +39,6 @@ import (
 func secretForAgentAPIKey(instance *v1alpha1.Agent, scheme *runtime.Scheme) (*corev1.Secret, error) {
 	spec := &instance.Spec.Secrets.FluxNinjaPlugin
 
-	if spec.Value == "" {
-		return nil, fmt.Errorf("value for the ApiKey of Agent cannot be empty")
-	}
-
 	secret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        secretName(instance.GetName(), "agent", spec),
@@ -67,10 +63,6 @@ func secretForAgentAPIKey(instance *v1alpha1.Agent, scheme *runtime.Scheme) (*co
 // secretForControllerAPIKey prepares the Secret object for the ApiKey of Agent.
 func secretForControllerAPIKey(instance *v1alpha1.Controller, scheme *runtime.Scheme) (*corev1.Secret, error) {
 	spec := &instance.Spec.Secrets.FluxNinjaPlugin
-
-	if spec.Value == "" {
-		return nil, fmt.Errorf("value for the ApiKey of Controller cannot be empty")
-	}
 
 	secret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{

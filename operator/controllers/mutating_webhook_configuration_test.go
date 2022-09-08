@@ -66,7 +66,7 @@ var _ = Describe("MutatingWebhookConfiguration for Controller", func() {
 
 			expected := &admissionregistrationv1.MutatingWebhookConfiguration{
 				ObjectMeta: v1.ObjectMeta{
-					Name: mutatingWebhookName,
+					Name: podMutatingWebhookName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       appName,
 						"app.kubernetes.io/instance":   appName,
@@ -121,7 +121,143 @@ var _ = Describe("MutatingWebhookConfiguration for Controller", func() {
 				},
 			}
 
-			result, err := mutatingWebhookConfiguration(instance.DeepCopy())
+			result, err := podMutatingWebhookConfiguration(instance.DeepCopy())
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result).To(Equal(expected))
+
+			os.Remove(certPath)
+		})
+	})
+})
+
+var _ = Describe("MutatingWebhookConfiguration for Agent CR", func() {
+	Context("Instance with all parameters", func() {
+		It("returns correct MutatingWebhookConfiguration", func() {
+			os.Setenv("APERTURE_OPERATOR_CERT_DIR", certDir)
+			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls10.crt")
+			os.Setenv("APERTURE_OPERATOR_NAMESPACE", appName)
+			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", appName)
+			certPath := fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), webhookClientCertName)
+			serverCertPEM := new(bytes.Buffer)
+			_ = pem.Encode(serverCertPEM, &pem.Block{
+				Type:  "CERTIFICATE",
+				Bytes: []byte(test),
+			})
+			err := writeFile(certPath, serverCertPEM)
+			Expect(err).NotTo(HaveOccurred())
+
+			expected := &admissionregistrationv1.MutatingWebhookConfiguration{
+				ObjectMeta: v1.ObjectMeta{
+					Name: agentMutatingWebhookName,
+					Labels: map[string]string{
+						"app.kubernetes.io/name":       appName,
+						"app.kubernetes.io/instance":   operatorName,
+						"app.kubernetes.io/managed-by": operatorName,
+						"app.kubernetes.io/component":  operatorName,
+					},
+				},
+				Webhooks: []admissionregistrationv1.MutatingWebhook{
+					{
+						Name: "agent-defaulter.fluxninja.com",
+						ClientConfig: admissionregistrationv1.WebhookClientConfig{
+							Service: &admissionregistrationv1.ServiceReference{
+								Name:      appName,
+								Namespace: appName,
+								Path:      pointer.StringPtr("/agent-defaulter"),
+								Port:      pointer.Int32(443),
+							},
+							CABundle: serverCertPEM.Bytes(),
+						},
+						NamespaceSelector: &v1.LabelSelector{},
+						Rules: []admissionregistrationv1.RuleWithOperations{
+							{
+								Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},
+								Rule: admissionregistrationv1.Rule{
+									APIGroups:   []string{"fluxninja.com"},
+									APIVersions: []string{v1Alpha1Version},
+									Resources:   []string{"agents"},
+									Scope:       &[]admissionregistrationv1.ScopeType{admissionregistrationv1.NamespacedScope}[0],
+								},
+							},
+						},
+						AdmissionReviewVersions: []string{v1Version},
+						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
+						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
+						TimeoutSeconds:          pointer.Int32Ptr(10),
+					},
+				},
+			}
+
+			result, err := agentMutatingWebhookConfiguration()
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result).To(Equal(expected))
+
+			os.Remove(certPath)
+		})
+	})
+})
+
+var _ = Describe("MutatingWebhookConfiguration for Controller CR", func() {
+	Context("Instance with all parameters", func() {
+		It("returns correct MutatingWebhookConfiguration", func() {
+			os.Setenv("APERTURE_OPERATOR_CERT_DIR", certDir)
+			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls11.crt")
+			os.Setenv("APERTURE_OPERATOR_NAMESPACE", appName)
+			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", appName)
+			certPath := fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), webhookClientCertName)
+			serverCertPEM := new(bytes.Buffer)
+			_ = pem.Encode(serverCertPEM, &pem.Block{
+				Type:  "CERTIFICATE",
+				Bytes: []byte(test),
+			})
+			err := writeFile(certPath, serverCertPEM)
+			Expect(err).NotTo(HaveOccurred())
+
+			expected := &admissionregistrationv1.MutatingWebhookConfiguration{
+				ObjectMeta: v1.ObjectMeta{
+					Name: controllerMutatingWebhookName,
+					Labels: map[string]string{
+						"app.kubernetes.io/name":       appName,
+						"app.kubernetes.io/instance":   operatorName,
+						"app.kubernetes.io/managed-by": operatorName,
+						"app.kubernetes.io/component":  operatorName,
+					},
+				},
+				Webhooks: []admissionregistrationv1.MutatingWebhook{
+					{
+						Name: "controller-defaulter.fluxninja.com",
+						ClientConfig: admissionregistrationv1.WebhookClientConfig{
+							Service: &admissionregistrationv1.ServiceReference{
+								Name:      appName,
+								Namespace: appName,
+								Path:      pointer.StringPtr("/controller-defaulter"),
+								Port:      pointer.Int32(443),
+							},
+							CABundle: serverCertPEM.Bytes(),
+						},
+						NamespaceSelector: &v1.LabelSelector{},
+						Rules: []admissionregistrationv1.RuleWithOperations{
+							{
+								Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},
+								Rule: admissionregistrationv1.Rule{
+									APIGroups:   []string{"fluxninja.com"},
+									APIVersions: []string{v1Alpha1Version},
+									Resources:   []string{"controllers"},
+									Scope:       &[]admissionregistrationv1.ScopeType{admissionregistrationv1.NamespacedScope}[0],
+								},
+							},
+						},
+						AdmissionReviewVersions: []string{v1Version},
+						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
+						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
+						TimeoutSeconds:          pointer.Int32Ptr(10),
+					},
+				},
+			}
+
+			result, err := controllerMutatingWebhookConfiguration()
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))

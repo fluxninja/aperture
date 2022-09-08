@@ -429,79 +429,80 @@ var _ = Describe("Namespace controller", func() {
 			Expect(pred.Update(secretEventInvalid1)).To(Equal(false))
 			Expect(pred.Update(secretEventInvalid2)).To(Equal(false))
 		})
-	})
 
-	It("should not allow namespace Events in delete", func() {
-		nsEvent := event.DeleteEvent{
-			Object: &corev1.Namespace{},
-		}
+		It("should not allow namespace Events in delete", func() {
+			nsEvent := event.DeleteEvent{
+				Object: &corev1.Namespace{},
+			}
 
-		pred := namespaceEventFilters()
+			pred := namespaceEventFilters()
 
-		Expect(pred.Delete(nsEvent)).To(Equal(false))
-	})
+			Expect(pred.Delete(nsEvent)).To(Equal(false))
+		})
 
-	It("should allow ConfigMap Events in delete when proper labels are present", func() {
-		cmEventValid := event.DeleteEvent{
-			Object: &corev1.ConfigMap{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{
-						"app.kubernetes.io/component": agentServiceName,
+		It("should allow ConfigMap Events in delete when proper labels are present", func() {
+			cmEventValid := event.DeleteEvent{
+				Object: &corev1.ConfigMap{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{
+							"app.kubernetes.io/component": agentServiceName,
+						},
 					},
 				},
-			},
-		}
+			}
 
-		cmEventInvalid1 := event.DeleteEvent{
-			Object: &corev1.ConfigMap{},
-		}
+			cmEventInvalid1 := event.DeleteEvent{
+				Object: &corev1.ConfigMap{},
+			}
 
-		cmEventInvalid2 := event.DeleteEvent{
-			Object: &corev1.ConfigMap{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{
-						"app.kubernetes.io/component": controllerServiceName,
+			cmEventInvalid2 := event.DeleteEvent{
+				Object: &corev1.ConfigMap{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{
+							"app.kubernetes.io/component": controllerServiceName,
+						},
 					},
 				},
-			},
-		}
+			}
 
-		pred := namespaceEventFilters()
+			pred := namespaceEventFilters()
 
-		Expect(pred.Delete(cmEventValid)).To(Equal(true))
-		Expect(pred.Delete(cmEventInvalid1)).To(Equal(false))
-		Expect(pred.Delete(cmEventInvalid2)).To(Equal(false))
-	})
+			Expect(pred.Delete(cmEventValid)).To(Equal(true))
+			Expect(pred.Delete(cmEventInvalid1)).To(Equal(false))
+			Expect(pred.Delete(cmEventInvalid2)).To(Equal(false))
+		})
 
-	It("should allow Secret Events in delete when proper labels are present", func() {
-		secretEventValid := event.DeleteEvent{
-			Object: &corev1.Secret{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{
-						"app.kubernetes.io/component": agentServiceName,
+		It("should allow Secret Events in delete when proper labels are present", func() {
+			secretEventValid := event.DeleteEvent{
+				Object: &corev1.Secret{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{
+							"app.kubernetes.io/component": agentServiceName,
+						},
 					},
 				},
-			},
-		}
+			}
 
-		secretEventInvalid1 := event.DeleteEvent{
-			Object: &corev1.Secret{},
-		}
+			secretEventInvalid1 := event.DeleteEvent{
+				Object: &corev1.Secret{},
+			}
 
-		secretEventInvalid2 := event.DeleteEvent{
-			Object: &corev1.Secret{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{
-						"app.kubernetes.io/component": controllerServiceName,
+			secretEventInvalid2 := event.DeleteEvent{
+				Object: &corev1.Secret{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{
+							"app.kubernetes.io/component": controllerServiceName,
+						},
 					},
 				},
-			},
-		}
+			}
 
-		pred := namespaceEventFilters()
+			pred := namespaceEventFilters()
 
-		Expect(pred.Delete(secretEventValid)).To(Equal(true))
-		Expect(pred.Delete(secretEventInvalid1)).To(Equal(false))
-		Expect(pred.Delete(secretEventInvalid2)).To(Equal(false))
+			Expect(pred.Delete(secretEventValid)).To(Equal(true))
+			Expect(pred.Delete(secretEventInvalid1)).To(Equal(false))
+			Expect(pred.Delete(secretEventInvalid2)).To(Equal(false))
+		})
+
 	})
 })

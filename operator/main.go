@@ -18,6 +18,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -103,6 +104,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = controllers.CheckAndGenerateCertForOperator(); err != nil {
+		setupLog.Error(err, "unable to manage webhook certificates")
+		os.Exit(1)
+	}
+
+	server := mgr.GetWebhookServer()
+	server.CertDir = os.Getenv("APERTURE_OPERATOR_CERT_DIR")
+	server.CertName = os.Getenv("APERTURE_OPERATOR_CERT_NAME")
+	server.KeyName = os.Getenv("APERTURE_OPERATOR_KEY_NAME")
+
 	if agentManager {
 		reconciler := &controllers.AgentReconciler{
 			Client:   mgr.GetClient(),
@@ -128,11 +139,8 @@ func main() {
 		}
 		reconciler.ApertureInjector = apertureInjector
 
-		server := mgr.GetWebhookServer()
-		server.CertDir = os.Getenv("APERTURE_OPERATOR_CERT_DIR")
-		server.CertName = os.Getenv("APERTURE_OPERATOR_CERT_NAME")
-		server.KeyName = os.Getenv("APERTURE_OPERATOR_KEY_NAME")
 		server.Register(controllers.MutatingWebhookURI, &webhook.Admission{Handler: apertureInjector})
+		server.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &controllers.AgentHooks{}})
 	}
 
 	if controllerManager {
@@ -144,6 +152,18 @@ func main() {
 			setupLog.Error(err, "unable to create controller", "controller", "Controller")
 			os.Exit(1)
 		}
+
+		server.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controllers.ControllerHooks{}})
+	}
+
+	if err = (&controllers.MutatingWebhookReconciler{
+		Client:            mgr.GetClient(),
+		Scheme:            mgr.GetScheme(),
+		AgentManager:      agentManager,
+		ControllerManager: controllerManager,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "MutatingWebhook")
+		os.Exit(1)
 	}
 
 	//+kubebuilder:scaffold:builder
@@ -154,11 +174,6 @@ func main() {
 	}
 	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up ready check")
-		os.Exit(1)
-	}
-
-	if err := controllers.CheckAndGenerateCertForOperator(); err != nil {
-		setupLog.Error(err, "unable to manage webhook certificates")
 		os.Exit(1)
 	}
 

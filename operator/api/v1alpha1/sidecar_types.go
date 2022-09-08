@@ -24,5 +24,5 @@ type SidecarSpec struct {
 
 	// Enabled per namespace injection by default
 	//+kubebuilder:validation:Optional
-	EnableNamespaceByDefault []string `json:"enableNamespacesByDefault"`
+	EnableNamespaceByDefault []string `json:"enableNamespacesByDefault,omitempty" validate:"omitempty"`
 }

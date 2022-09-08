@@ -108,7 +108,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentDaemonsetKey := types.NamespacedName{Name: agentServiceName, Namespace: namespace}
 
 			createdMWC := &admissionregistrationv1.MutatingWebhookConfiguration{}
-			mwcKey := types.NamespacedName{Name: mutatingWebhookName}
+			mwcKey := types.NamespacedName{Name: podMutatingWebhookName}
 
 			createdAgentSecret := &corev1.Secret{}
 			agentSecretKey := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
@@ -196,7 +196,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentDaemonsetKey := types.NamespacedName{Name: agentServiceName, Namespace: namespace}
 
 			createdMWC := &admissionregistrationv1.MutatingWebhookConfiguration{}
-			mwcKey := types.NamespacedName{Name: mutatingWebhookName}
+			mwcKey := types.NamespacedName{Name: podMutatingWebhookName}
 
 			createdAgentSecret := &corev1.Secret{}
 			agentSecretKey := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
@@ -321,7 +321,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentDaemonsetKey := types.NamespacedName{Name: agentServiceName, Namespace: namespace}
 
 			createdMWC := &admissionregistrationv1.MutatingWebhookConfiguration{}
-			mwcKey := types.NamespacedName{Name: mutatingWebhookName}
+			mwcKey := types.NamespacedName{Name: podMutatingWebhookName}
 
 			createdAgentSecret := &corev1.Secret{}
 			agentSecretKey := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}

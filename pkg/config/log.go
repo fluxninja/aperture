@@ -54,7 +54,7 @@ type LogConfig struct {
 	LogLevel string `json:"level" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
 
 	// Log writers
-	Writers []LogWriterConfig `json:"writers" validate:"omitempty,dive,omitempty"`
+	Writers []LogWriterConfig `json:"writers,omitempty" validate:"omitempty,dive,omitempty"`
 
 	// Use non-blocking log writer (can lose logs at high throughput)
 	NonBlocking bool `json:"non_blocking" default:"true"`

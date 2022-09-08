@@ -19,5 +19,9 @@ spec:
       port: 8443
       protocol: TCP
       targetPort: https
+    - name: webhook-server
+      port: 443
+      protocol: TCP
+      targetPort: webhook-server
   selector: {{- include "common.labels.matchLabels" . | nindent 4 }}
     app.kubernetes.io/component: aperture-controller-manager

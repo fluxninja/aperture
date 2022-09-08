@@ -38,7 +38,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/go-logr/logr"
 )
 
@@ -232,7 +231,7 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 	}
 
 	if instance.Spec.Sidecar.Enabled {
-		mwc, err := mutatingWebhookConfiguration(instance)
+		mwc, err := podMutatingWebhookConfiguration(instance)
 		if err != nil {
 			return err
 		}
@@ -253,27 +252,25 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 			}
 
 			configMap, err := configMapForAgentConfig(instance, nil)
-			if err != nil && !errors.IsNotFound(err) {
-				log.Error(err, fmt.Sprintf("failed to fetch object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+			if err != nil {
+				log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 
 			configMap.Namespace = ns.GetName()
 			configMap.Annotations = getAgentAnnotationsWithOwnerRef(instance)
-			if err := r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+			if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
 				log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 
-			if instance.Spec.Secrets.FluxNinjaPlugin.Create {
-				secret, err := secretForAgentAPIKey(instance, nil)
-				if err != nil && !errors.IsNotFound(err) {
-					log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-				}
+			secret, err := secretForAgentAPIKey(instance, nil)
+			if err != nil {
+				log.Error(err, fmt.Sprintf("failed to create object of Secret '%s' in namespace %s", secret.GetName(), ns.GetName()))
+			}
 
-				secret.Namespace = ns.GetName()
-				secret.Annotations = getAgentAnnotationsWithOwnerRef(instance)
-				if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
-					log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-				}
+			secret.Namespace = ns.GetName()
+			secret.Annotations = getAgentAnnotationsWithOwnerRef(instance)
+			if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 		}
 	}
@@ -309,15 +306,6 @@ func (r *AgentReconciler) updateAgent(ctx context.Context, instance *v1alpha1.Ag
 
 // manageResources creates/updates required resources.
 func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Agent) error {
-	spec := &instance.Spec.ConfigSpec
-
-	// fill defaults
-	config.SetDefaults(spec)
-	// validate
-	if err := config.ValidateStruct(spec); err != nil {
-		return err
-	}
-
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
@@ -359,13 +347,12 @@ func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, 
 // reconcileConfigMap prepares the desired states for Agent configmaps and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileConfigMap(ctx context.Context, instance *v1alpha1.Agent) error {
-	logger := log.FromContext(ctx)
 	if !instance.Spec.Sidecar.Enabled {
 		configMap, err := configMapForAgentConfig(instance.DeepCopy(), r.Scheme)
 		if err != nil {
 			return err
 		}
-		logger.Info("reconciling ConfigMap", "config", configMap)
+
 		if _, err = createConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}
@@ -506,7 +493,7 @@ func (r *AgentReconciler) reconcileMutatingWebhookConfiguration(ctx context.Cont
 		return nil
 	}
 
-	mwc, err := mutatingWebhookConfiguration(instance.DeepCopy())
+	mwc, err := podMutatingWebhookConfiguration(instance.DeepCopy())
 	if err != nil {
 		return err
 	}

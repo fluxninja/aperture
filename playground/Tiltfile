@@ -116,7 +116,8 @@ DEP_TREE = {
                     "new_name": "aperture-controller-operator-bootstrap",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
-                        "controllers.fluxninja.com:customresourcedefinition"
+                        "controllers.fluxninja.com:customresourcedefinition",
+                        "aperture-controller-defaulter:mutatingwebhookconfiguration",
                     ]
                 },
                 {
@@ -195,6 +196,7 @@ DEP_TREE = {
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "agents.fluxninja.com:customresourcedefinition",
+                         "aperture-agent-defaulter:mutatingwebhookconfiguration",
                     ]
                 },
                 {
