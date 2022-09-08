@@ -90,14 +90,15 @@ liveness:
     initial_delay: 0s
     initially_healthy: false
 log:
-  compress: false
-  file: stderr
   level: info
-  max_age: 7
-  max_backups: 3
-  max_size: 50
   non_blocking: true
   pretty_console: false
+  writers:
+  - compress: false
+    file: stderr
+    max_age: 7
+    max_backups: 3
+    max_size: 50
 metrics:
   enable_go_metrics: false
   enable_process_collector: false
@@ -117,10 +118,10 @@ plugins:
   disable_plugins: false
   disabled_plugins:
   - aperture-plugin-fluxninja
-  plugins_path: ""
+  plugins_path: default
 profilers:
   cpu_profiler: false
-  profiles_path: ""
+  profiles_path: default
   register_http_routes: true
 prometheus:
   address: http://aperture-prometheus-server:80

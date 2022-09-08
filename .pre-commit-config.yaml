@@ -138,3 +138,8 @@ repos:
         description: Run helm lint, a linter for helm charts
         entry: ./scripts/precommit/helmlint.sh
         language: script
+      - id: check-operator-spec-changes
+        name: "Check Operator Spec Changes"
+        description: Checking if the Operator spec is changed
+        entry: ./scripts/precommit/check-operator-spec.sh
+        language: script

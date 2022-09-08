@@ -31,7 +31,7 @@ type ControllerSpec struct {
 
 	// Image configuration
 	//+kubebuilder:validation:Optional
-	Image Image `json:"image"`
+	Image ControllerImage `json:"image"`
 
 	// Pod's host aliases
 	//+kubebuilder:validation:Optional

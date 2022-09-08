@@ -55,6 +55,7 @@ var (
 	defaultAgentInstance      *v1alpha1.Agent
 	defaultControllerInstance *v1alpha1.Controller
 	namespaceReconciler       *NamespaceReconciler
+	mutatingWebhookReconciler *MutatingWebhookReconciler
 	certDir                   = filepath.Join(".", "certs")
 	test                      = "test"
 	testTwo                   = "test2"
@@ -109,6 +110,13 @@ var _ = BeforeSuite(func() {
 		Scheme: k8sClient.Scheme(),
 	}
 
+	mutatingWebhookReconciler = &MutatingWebhookReconciler{
+		Client:            k8sClient,
+		Scheme:            k8sClient.Scheme(),
+		AgentManager:      true,
+		ControllerManager: true,
+	}
+
 	k8sManager, err = ctrl.NewManager(cfg, ctrl.Options{
 		Scheme: scheme.Scheme,
 	})
@@ -160,8 +168,10 @@ var _ = BeforeSuite(func() {
 					Create: true,
 				},
 			},
-			Image: v1alpha1.Image{
-				PullPolicy: string(corev1.PullAlways),
+			Image: v1alpha1.ControllerImage{
+				Image: v1alpha1.Image{
+					PullPolicy: string(corev1.PullAlways),
+				},
 			},
 		},
 	}
@@ -200,8 +210,10 @@ var _ = BeforeSuite(func() {
 					Create: true,
 				},
 			},
-			Image: v1alpha1.Image{
-				PullPolicy: string(corev1.PullAlways),
+			Image: v1alpha1.AgentImage{
+				Image: v1alpha1.Image{
+					PullPolicy: string(corev1.PullAlways),
+				},
 			},
 		},
 	}

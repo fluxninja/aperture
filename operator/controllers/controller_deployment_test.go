@@ -116,11 +116,13 @@ var _ = Describe("Controller Deployment", func() {
 							},
 						},
 					},
-					Image: v1alpha1.Image{
-						Registry:   "docker.io/fluxninja",
+					Image: v1alpha1.ControllerImage{
+						Image: v1alpha1.Image{
+							Registry:   "docker.io/fluxninja",
+							Tag:        "latest",
+							PullPolicy: "IfNotPresent",
+						},
 						Repository: "aperture-controller",
-						Tag:        "latest",
-						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -386,12 +388,14 @@ var _ = Describe("Controller Deployment", func() {
 						},
 						Affinity: affinity,
 					},
-					Image: v1alpha1.Image{
-						Registry:    "docker.io/fluxninja",
-						Repository:  "aperture-controller",
-						Tag:         "latest",
-						PullPolicy:  "IfNotPresent",
-						PullSecrets: testArray,
+					Image: v1alpha1.ControllerImage{
+						Image: v1alpha1.Image{
+							Registry:    "docker.io/fluxninja",
+							Tag:         "latest",
+							PullPolicy:  "IfNotPresent",
+							PullSecrets: testArray,
+						},
+						Repository: "aperture-controller",
 					},
 					HostAliases: hostAliases,
 				},

@@ -19,9 +19,9 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
+	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -35,7 +35,9 @@ import (
 // MutatingWebhookReconciler reconciles a Namespace object.
 type MutatingWebhookReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme            *runtime.Scheme
+	AgentManager      bool
+	ControllerManager bool
 }
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -52,6 +54,11 @@ func (r *MutatingWebhookReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	err := r.Get(ctx, req.NamespacedName, mwc)
 	if (err != nil && errors.IsNotFound(err)) || mwc.DeletionTimestamp != nil {
 		// MutatingWebhookConfiguration is deleted so no need to reconcile.
+		return ctrl.Result{}, nil
+	}
+
+	if r.AgentManager && !r.ControllerManager && mwc.GetName() == controllerMutatingWebhookName ||
+		!r.AgentManager && r.ControllerManager && mwc.GetName() == agentMutatingWebhookName {
 		return ctrl.Result{}, nil
 	}
 
@@ -124,7 +131,7 @@ func mwcEventFilters() predicate.Predicate {
 				return false
 			}
 
-			return !reflect.DeepEqual(old.Webhooks, new.Webhooks)
+			return !equality.Semantic.DeepEqual(old.Webhooks, new.Webhooks)
 		},
 		DeleteFunc: func(delete event.DeleteEvent) bool {
 			return !delete.DeleteStateUnknown
