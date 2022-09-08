@@ -177,7 +177,7 @@ message Port {
 // control variable to get the signal closer to the setpoint. It is computed as follows:
 //
 // $$
-// \text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}
+// \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
 // $$
 //
 // `gradient` is then clamped to [min_gradient, max_gradient] range.
@@ -192,11 +192,6 @@ message Port {
 //
 // The output can be _optionally_ clamped to desired range using `max` and
 // `min` input.
-//
-// :::caution
-// Some changes are expected in the near future:
-// [#182](https://github.com/fluxninja/aperture/issues/182)
-// :::
 message GradientController {
   // Inputs for the Gradient Controller component.
   message Ins {
@@ -233,21 +228,52 @@ message GradientController {
   // Output ports of the Gradient Controller.
   Outs out_ports = 2;
 
-  // Tolerance is a way to pre-multiply a setpoint by given value.
+  // Slope controls the aggressiveness and direction of the Gradient Controller.
   //
-  // Value of tolerance should be close or equal to 1, eg. 1.1.
+  // Slope is used as exponent on the signal to setpoint ratio in computation
+  // of the gradient (see the [main description](#v1-gradient-controller) for
+  // exact equation). Good intuition for this parameter is "What should the
+  // Gradient Controller do to the control variable when signal is too high",
+  // eg.:
+  // * $\text{slope} = 1$: when signal is too high, increase control variable,
+  // * $\text{slope} = -1$: when signal is too high, decrease control variable,
+  // * $\text{slope} = -0.5$: when signal is to high, decrease control variable more slowly.
   //
-  // :::caution
-  // [This is going to be deprecated](https://github.com/fluxninja/aperture/issues/182).
+  // The sign of slope depends on correlation between the signal and control variable:
+  // * Use $\text{slope} < 0$ if signal and control variable are _positively_
+  // correlated (eg. Per-pod CPU usage and total concurrency).
+  // * Use $\text{slope} > 0$ if signal and control variable are _negatively_
+  // correlated (eg. Per-pod CPU usage and number of pods).
+  //
+  // :::note
+  // You need to set _negative_ slope for a _positive_ correlation, as you're
+  // describing the _action_ which controller should make when the signal
+  // increases.
   // :::
-  double tolerance = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  //
+  // The magnitude of slope describes how aggresively should the controller
+  // react to a deviation of signal.
+  // With $|\text{slope}| = 1$, the controller will aim to bring the signal to
+  // the setpoint in one tick (assuming linear correlation with signal and setpoint).
+  // Smaller magnitudes of slope will make the controller adjust the control
+  // variable more slowly.
+  //
+  // We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
+  // If you experience overshooting, consider lowering the magnitude even more.
+  // Values of $|\text{slope}| > 1$ are not recommended.
+  //
+  // :::note
+  // Remember that the gradient and output signal can be (optionally) clamped,
+  // so the _slope_ might not fully describe aggressiveness of the controller.
+  // :::
+  double slope = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {
-        string_value: "gte=0.0"
+        string_value: "required"
       }
     }
-  }]; // @gotags: validate:"gte=0.0"
+  }]; // @gotags: validate:"required"
 
   // Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
   double min_gradient = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

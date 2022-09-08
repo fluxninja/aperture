@@ -98,6 +98,9 @@ var _ = Describe("Metrics Processor", func() {
 						FluxMeterName: "bar",
 					},
 				},
+				FlowLabelKeys: []string{
+					"someLabel",
+				},
 			},
 			&flowcontrolv1.AuthzResponse{
 				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
@@ -117,11 +120,14 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionErrorReasonLabel:         "",
 				otelcollector.DecisionRejectReasonLabel:        "",
-				otelcollector.FluxMetersLabel:                  []interface{}{"flux_meter_name:bar"},
+				otelcollector.FluxMetersLabel:                  []interface{}{"bar"},
+				otelcollector.FlowLabelKeysLabel:               []interface{}{"someLabel"},
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
-				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+				otelcollector.WorkloadsLabel:                   []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.DroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
 			},
 		),
 
@@ -145,7 +151,8 @@ var _ = Describe("Metrics Processor", func() {
 						},
 					},
 				},
-				FluxMeters: []*flowcontrolv1.FluxMeter{},
+				FluxMeters:    []*flowcontrolv1.FluxMeter{},
+				FlowLabelKeys: []string{},
 			},
 			&flowcontrolv1.AuthzResponse{
 				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
@@ -166,8 +173,10 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.DecisionRejectReasonLabel:        "REJECT_REASON_RATE_LIMITED",
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
-				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+				otelcollector.WorkloadsLabel:                   []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.DroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
 			},
 		),
 
@@ -213,7 +222,8 @@ var _ = Describe("Metrics Processor", func() {
 						},
 					},
 				},
-				FluxMeters: []*flowcontrolv1.FluxMeter{},
+				FluxMeters:    []*flowcontrolv1.FluxMeter{},
+				FlowLabelKeys: []string{},
 			},
 			&flowcontrolv1.AuthzResponse{
 				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
@@ -247,11 +257,20 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.RateLimitersLabel:         []interface{}{},
 				otelcollector.DroppingRateLimitersLabel: []interface{}{},
 				otelcollector.ConcurrencyLimitersLabel: []interface{}{
+					"policy_name:foo,component_index:1,policy_hash:foo-hash",
+					"policy_name:fizz,component_index:1,policy_hash:fizz-hash",
+					"policy_name:fizz,component_index:2,policy_hash:fizz-hash",
+				},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
+					"policy_name:foo,component_index:1,policy_hash:foo-hash",
+					"policy_name:fizz,component_index:1,policy_hash:fizz-hash",
+				},
+				otelcollector.WorkloadsLabel: []interface{}{
 					"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash",
 					"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
 					"policy_name:fizz,component_index:2,workload_index:2,policy_hash:fizz-hash",
 				},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
+				otelcollector.DroppingWorkloadsLabel: []interface{}{
 					"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash",
 					"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
 				},
@@ -314,6 +333,9 @@ var _ = Describe("Metrics Processor", func() {
 						FluxMeterName: "bar",
 					},
 				},
+				FlowLabelKeys: []string{
+					"someLabel",
+				},
 			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
@@ -329,11 +351,14 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
 				otelcollector.DecisionErrorReasonLabel:         "",
 				otelcollector.DecisionRejectReasonLabel:        "",
-				otelcollector.FluxMetersLabel:                  []interface{}{"flux_meter_name:bar"},
+				otelcollector.FluxMetersLabel:                  []interface{}{"bar"},
+				otelcollector.FlowLabelKeysLabel:               []interface{}{"someLabel"},
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
-				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+				otelcollector.WorkloadsLabel:                   []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.DroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
 			},
 		),
 
@@ -357,7 +382,8 @@ var _ = Describe("Metrics Processor", func() {
 						},
 					},
 				},
-				FluxMeters: []*flowcontrolv1.FluxMeter{},
+				FluxMeters:    []*flowcontrolv1.FluxMeter{},
+				FlowLabelKeys: []string{},
 			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
@@ -374,8 +400,10 @@ var _ = Describe("Metrics Processor", func() {
 				otelcollector.DecisionRejectReasonLabel:        "REJECT_REASON_RATE_LIMITED",
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
-				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+				otelcollector.WorkloadsLabel:                   []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+				otelcollector.DroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
 			},
 		),
 
@@ -423,7 +451,8 @@ var _ = Describe("Metrics Processor", func() {
 						},
 					},
 				},
-				FluxMeters: []*flowcontrolv1.FluxMeter{},
+				FluxMeters:    []*flowcontrolv1.FluxMeter{},
+				FlowLabelKeys: []string{},
 			},
 			nil,
 			`# HELP workload_latency_ms Latency histogram of workload
@@ -457,10 +486,18 @@ var _ = Describe("Metrics Processor", func() {
 					"policy_name:foo,component_index:1,policy_hash:foo-hash",
 				},
 				otelcollector.ConcurrencyLimitersLabel: []interface{}{
+					"policy_name:fizz,component_index:1,policy_hash:fizz-hash",
+					"policy_name:fizz,component_index:2,policy_hash:fizz-hash",
+				},
+				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
+					"policy_name:fizz,component_index:1,policy_hash:fizz-hash",
+					"policy_name:fizz,component_index:2,policy_hash:fizz-hash",
+				},
+				otelcollector.WorkloadsLabel: []interface{}{
 					"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
 					"policy_name:fizz,component_index:2,workload_index:2,policy_hash:fizz-hash",
 				},
-				otelcollector.DroppingConcurrencyLimitersLabel: []interface{}{
+				otelcollector.DroppingWorkloadsLabel: []interface{}{
 					"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
 					"policy_name:fizz,component_index:2,workload_index:2,policy_hash:fizz-hash",
 				},
