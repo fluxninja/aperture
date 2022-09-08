@@ -250,12 +250,12 @@ workflows:
 
   post-release:
     when:
-      matches: { value: << pipeline.git.tag >>, pattern: "^kklimonda/v.*$" }
+      matches: { value: << pipeline.git.tag >>, pattern: "^v.*$" }
     jobs:
       - continuation/continue:
           filters:
             branches:
               ignore: /.+/
             tags:
-              only: /^kklimonda\/v.*$/
+              only: /^v.*$/
           configuration_path: .circleci/post-release.yaml
