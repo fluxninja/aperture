@@ -107,7 +107,7 @@ func (cfg Config) Module() fx.Option {
 		fx.Provide(provideFlagSetBuilder),
 		config.ModuleConfig{MergeConfig: cfg.MergeConfig, UnknownFlags: false, ExitOnHelp: true}.Module(),
 		config.LogModule(),
-		health.HealthModule(),
+		health.Module(),
 		http.ProxyModule(),
 		metrics.Module(),
 		watchdog.Module(),

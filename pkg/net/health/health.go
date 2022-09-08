@@ -13,21 +13,21 @@ import (
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 )
 
-// HealthModule is a module that provides grpc health server for checking services status.
-func HealthModule() fx.Option {
+// Module is a module that provides grpc health server for checking services status.
+func Module() fx.Option {
 	return fx.Options(
 		grpcclient.ClientConstructor{Name: "health-grpc-client", ConfigKey: "health.client.grpc"}.Annotate(),
-		fx.Provide(ProvideHealthServer),
+		fx.Provide(provideHealthServer),
 		fx.Provide(fx.Annotate(
-			ProvideHealthClient,
+			provideHealthClient,
 			fx.ParamTags(config.NameTag("health-grpc-client")),
 		)),
 		fx.Invoke(RegisterHealthServer),
 	)
 }
 
-// ProvideHealthServer creates instance of health server.
-func ProvideHealthServer(lifecycle fx.Lifecycle) *health.Server {
+// provideHealthServer creates instance of health server.
+func provideHealthServer(lifecycle fx.Lifecycle) *health.Server {
 	server := health.NewServer()
 
 	lifecycle.Append(fx.Hook{
@@ -40,8 +40,8 @@ func ProvideHealthServer(lifecycle fx.Lifecycle) *health.Server {
 	return server
 }
 
-// ProvideHealthClient creates instance of client to health server.
-func ProvideHealthClient(GRPClientConnectionBuilder grpcclient.ClientConnectionBuilder) (grpc_health_v1.HealthClient, error) {
+// provideHealthClient creates instance of client to health server.
+func provideHealthClient(GRPClientConnectionBuilder grpcclient.ClientConnectionBuilder) (grpc_health_v1.HealthClient, error) {
 	// Setup connection to health service
 	connWrapper := GRPClientConnectionBuilder.Build()
 	conn, err := connWrapper.Dial(context.Background(), "localhost:80")
