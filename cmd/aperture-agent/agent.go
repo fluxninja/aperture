@@ -43,13 +43,16 @@ func main() {
 			otel.AgentOTELComponents,
 			agent.ProvidePeersPrefix,
 		),
+		fx.Invoke(
+			agent.AddAgentInfoAttribute,
+		),
 		entitycache.Module(),
 		flowcontrol.Module,
-		otelcollector.Module(),
 		distcache.Module(),
 		dataplane.PolicyModule(),
 		discovery.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
+		otelcollector.Module(),
 	)
 
 	if err := app.Err(); err != nil {

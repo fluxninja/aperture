@@ -8,21 +8,20 @@ import (
 // Module provides fx module for configmap validator.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(provideCMValidator),
 		fx.Invoke(registerCMValidator),
 	)
 }
 
-// provideCMValidator provides config map validator
-//
-// Note: This validator must be registered to be accessible.
-func provideCMValidator() *CMValidator {
-	return NewCMValidator()
+// FxIn is a struct that contains all dependencies for configmap validator.
+type FxIn struct {
+	fx.In
+	Webhooks   *webhooks.K8sRegistry
+	Validators []CMFileValidator `group:"cm-file-validators"`
 }
 
 // registerCMValidator registers configmap validator as k8s webhook.
-func registerCMValidator(validator *CMValidator, webhooks *webhooks.K8sRegistry) {
+func registerCMValidator(in FxIn) {
 	// The path is not configurable – if one doesn't want default path, one
 	// could just write their own Register function
-	webhooks.RegisterValidator("/validate/configmap", validator)
+	in.Webhooks.RegisterValidator("/validate/configmap", NewCMValidator(in.Validators))
 }

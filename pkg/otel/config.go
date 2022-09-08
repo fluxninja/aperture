@@ -38,6 +38,8 @@ const (
 	ProcessorBatchPostrollup = "batch/postrollup"
 	// ProcessorRollup rolls up data to decrease cardinality.
 	ProcessorRollup = "rollup"
+	// ProcessorAgentGroup adds `agent_group` attribute.
+	ProcessorAgentGroup = "attributes/agent_group"
 
 	// ExporterLogging exports telemetry using Aperture logger.
 	ExporterLogging = "aperturelogging"
@@ -167,6 +169,7 @@ func addLogsAndTracesPipelines(cfg *otelParams) {
 
 	processors := []string{
 		ProcessorEnrichment,
+		ProcessorAgentGroup,
 		ProcessorMetrics,
 		ProcessorBatchPrerollup,
 		ProcessorRollup,
@@ -195,6 +198,7 @@ func addMetricsPipeline(cfg *otelParams) {
 		Receivers: []string{ReceiverPrometheus},
 		Processors: []string{
 			ProcessorEnrichment,
+			ProcessorAgentGroup,
 		},
 		Exporters: []string{ExporterPrometheusRemoteWrite},
 	})
