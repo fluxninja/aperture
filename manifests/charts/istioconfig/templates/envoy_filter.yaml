@@ -16,7 +16,7 @@
     string_value: "%REQ(USER-AGENT)%"
 - key: duration_millis
   value:
-    string_value: "%DURATION%"
+    string_value: "%RESPONSE_DURATION%"
 - key: http.request_content_length
   value:
     string_value: "%BYTES_RECEIVED%"
@@ -35,6 +35,21 @@
 - key: aperture.authz_response
   value:
     string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.authz_response)%"
+- key: DURATION
+  value:
+    string_value: "%DURATION%"
+- key: REQUEST_DURATION
+  value:
+    string_value: "%REQUEST_DURATION%"
+- key: REQUEST_TX_DURATION
+  value:
+    string_value: "%REQUEST_TX_DURATION%"
+- key: RESPONSE_DURATION
+  value:
+    string_value: "%RESPONSE_DURATION%"
+- key: RESPONSE_TX_DURATION
+  value:
+    string_value: "%RESPONSE_TX_DURATION%"
 {{- end -}}
 
 apiVersion: networking.istio.io/v1alpha3

@@ -22,6 +22,22 @@ func assertAttributesEqual(act, exp pcommon.Map) {
 	Expect(act.Sort()).To(Equal(exp.Sort()))
 }
 
+func populateAttrsFromLabels(attr pcommon.Map, labels map[string]interface{}) {
+	for k, v := range labels {
+		// cast v to string or []string
+		if str, ok := v.(string); ok {
+			attr.InsertString(k, str)
+		} else if slice, ok := v.([]string); ok {
+			val := pcommon.NewValueSlice()
+			sliceVal := val.SliceVal()
+			for _, s := range slice {
+				sliceVal.AppendEmpty().SetStringVal(s)
+			}
+			attr.Insert(k, val)
+		}
+	}
+}
+
 var l *utils.GoLeakDetector
 
 var _ = BeforeSuite(func() {

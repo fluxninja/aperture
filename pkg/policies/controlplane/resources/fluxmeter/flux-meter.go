@@ -22,7 +22,7 @@ type fluxMeterConfigSync struct {
 	fluxMeterProto *policylangv1.FluxMeter
 	etcdPath       string
 	agentGroupName string
-	fluxmeterName  string
+	fluxMeterName  string
 }
 
 // NewFluxMeterOptions creates fx options for FluxMeter.
@@ -45,7 +45,7 @@ func NewFluxMeterOptions(
 		policyBaseAPI:  policyBaseAPI,
 		agentGroupName: agentGroup,
 		etcdPath:       etcdPath,
-		fluxmeterName:  name,
+		fluxMeterName:  name,
 	}
 
 	return fx.Options(
@@ -59,7 +59,7 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			wrapper := &wrappersv1.FluxMeterWrapper{
-				FluxmeterName: configSync.fluxmeterName,
+				FluxMeterName: configSync.fluxMeterName,
 				FluxMeter:     configSync.fluxMeterProto,
 			}
 			dat, err := proto.Marshal(wrapper)

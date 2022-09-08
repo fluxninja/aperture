@@ -57,7 +57,9 @@ func (ep *enrichmentProcessor) ConsumeLogs(ctx context.Context, origLd plog.Logs
 	}
 	ld := origLd.Clone()
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		ep.enrichAttributes(logRecord.Attributes())
+		enforceIncludeListLog(logRecord.Attributes())
+		ep.enrichAttributes(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
+		enforceExcludeListLog(logRecord.Attributes())
 		return nil
 	})
 	return ld, err
@@ -70,7 +72,9 @@ func (ep *enrichmentProcessor) ConsumeTraces(ctx context.Context, origTd ptrace.
 	}
 	td := origTd.Clone()
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		ep.enrichAttributes(span.Attributes())
+		enforceIncludeListSpan(span.Attributes())
+		ep.enrichAttributes(span.Attributes(), []string{})
+		enforceExcludeListSpan(span.Attributes())
 		return nil
 	})
 	return td, err
@@ -120,13 +124,14 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 	return md, err
 }
 
-func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map) {
-	unpackFlowLabels(attributes)
+func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsMissing []string) {
+	// TODO tgill: split this into multiple functions, one for each source
+	unpackFlowLabels(attributes, treatAsMissing)
 	attributes.UpsertString(otelcollector.AgentGroupLabel, ep.agentGroup)
 	var hostIP string
 	controlPoint, exists := attributes.Get(otelcollector.ControlPointLabel)
 	if !exists {
-		log.Warn().Msg("Skipping because 'otelcollector.ControlPointLabel' attribute not found")
+		otelcollector.LogSampled.Warn().Msg("Skipping because 'otelcollector.ControlPointLabel' attribute not found")
 		return
 	}
 	switch controlPoint.AsString() {
@@ -137,41 +142,40 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map) {
 			return
 		}
 		hostAddress := rawHostAddress.StringVal()
-		if len(hostAddress) == 0 || hostAddress == otelcollector.MissingAttributeSourceValue {
-			log.Warn().Msg("Skipping because 'otelcollector.HostAddressLabel' is empty")
+		if len(hostAddress) == 0 || hostAddress == otelcollector.EnvoyMissingAttributeSourceValue {
+			otelcollector.LogSampled.Warn().Msg("Skipping because 'otelcollector.HostAddressLabel' is empty")
 			return
 		}
 		hostIP = ipFromAddress(rawHostAddress.StringVal())
-		attributes.Remove(otelcollector.HostAddressLabel)
-		attributes.Remove(otelcollector.PeerAddressLabel)
 	case otelcollector.ControlPointIngress:
 		rawHostIP, exists := attributes.Get(otelcollector.HostIPLabel)
 		if !exists {
-			log.Warn().Msg("Skipping because 'otelcollector.HostIPLabel' attribute not found")
+			otelcollector.LogSampled.Warn().Msg("Skipping because 'otelcollector.HostIPLabel' attribute not found")
 			return
 		}
 		hostIP = rawHostIP.StringVal()
-		attributes.Remove(otelcollector.HostIPLabel)
-		attributes.Remove(otelcollector.PeerIPLabel)
 	case otelcollector.ControlPointFeature:
 		featureAddress, exists := attributes.Get(otelcollector.FeatureAddressLabel)
 		if !exists {
-			log.Warn().Msg("Skipping because 'otelcollector.FeatureAddressLabel' attribute not found")
+			otelcollector.LogSampled.Warn().Msg("Skipping because 'otelcollector.FeatureAddressLabel' attribute not found")
 			return
 		}
 		hostIP = featureAddress.StringVal()
-		attributes.Remove(otelcollector.FeatureAddressLabel)
 	default:
-		log.Warn().Str(otelcollector.ControlPointLabel, controlPoint.AsString()).Msg("Unknown control point")
+		otelcollector.LogSampled.Warn().Str(otelcollector.ControlPointLabel, controlPoint.AsString()).Msg("Unknown control point")
 		return
 	}
 
 	hostEntity := ep.cache.GetByIP(hostIP)
 	if hostEntity == nil {
-		log.Trace().Str("ip", hostIP).Msg("Skipping because entity not found in cache")
+		otelcollector.LogSampled.Trace().Str("ip", hostIP).Msg("Skipping because entity not found in cache")
 		return
 	}
-	attributes.UpsertString(otelcollector.ServicesLabel, strings.Join(hostEntity.Services, ","))
+	servicesValue := pcommon.NewValueSlice()
+	for _, service := range hostEntity.Services {
+		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
+	}
+	attributes.Upsert(otelcollector.ServicesLabel, servicesValue)
 }
 
 func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
@@ -187,24 +191,23 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 		log.Trace().Str("name", hostName).Msg("Skipping because entity not found in cache")
 		return
 	}
-	attributes.UpsertString(otelcollector.ServicesLabel, strings.Join(hostEntity.Services, ","))
+	servicesValue := pcommon.NewValueSlice()
+	for _, service := range hostEntity.Services {
+		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
+	}
+	attributes.Upsert(otelcollector.ServicesLabel, servicesValue)
 }
 
 // unpackFlowLabels tries to parse `LabelsLabel` attribute as json, and adds
 // unmarshalled attributes to given map.
-func unpackFlowLabels(attributes pcommon.Map) {
+func unpackFlowLabels(attributes pcommon.Map, treatAsMissing []string) {
 	labeled := "false"
 	defer func() {
 		attributes.UpsertString(otelcollector.LabeledLabel, labeled)
 	}()
-	rawFlow, exists := attributes.Get(otelcollector.MarshalledLabelsLabel)
-	if !exists {
-		return
-	}
-	defer attributes.Remove(otelcollector.MarshalledLabelsLabel)
 
 	var flowAttributes map[string]string
-	otelcollector.UnmarshalStringVal(rawFlow, otelcollector.MarshalledLabelsLabel, &flowAttributes)
+	otelcollector.GetStruct(attributes, otelcollector.MarshalledLabelsLabel, &flowAttributes, treatAsMissing)
 	for k, v := range flowAttributes {
 		labeled = "true"
 		// FIXME – this is quadratic (every upsert iterates to search whether label already exists)
@@ -214,4 +217,84 @@ func unpackFlowLabels(attributes pcommon.Map) {
 
 func ipFromAddress(ip string) string {
 	return strings.Split(ip, ":")[0]
+}
+
+/*
+ * IncludeList: This IncludeList is applied to logs and spans at the beginning of enrichment process.
+ */
+var (
+	_includeAttributesCommon = []string{
+		otelcollector.MarshalledLabelsLabel,
+		otelcollector.ControlPointLabel,
+		otelcollector.MarshalledCheckResponseLabel,
+	}
+
+	_includeAttributesLog = []string{
+		otelcollector.DurationLabel,
+		otelcollector.MarshalledAuthzResponseLabel,
+		otelcollector.HTTPStatusCodeLabel,
+		otelcollector.HTTPRequestContentLength,
+		otelcollector.HTTPResponseContentLength,
+		otelcollector.HTTPMethodLabel,
+		otelcollector.HTTPTargetLabel,
+		otelcollector.HTTPFlavorLabel,
+		otelcollector.HTTPUserAgentLabel,
+		otelcollector.HTTPHostLabel,
+		otelcollector.HostAddressLabel,
+		otelcollector.PeerAddressLabel,
+		otelcollector.HostIPLabel,
+		otelcollector.PeerIPLabel,
+		otelcollector.EnvoyDurationLabel,
+		otelcollector.EnvoyRequestDurationLabel,
+		otelcollector.EnvoyRequestTxDurationLabel,
+		otelcollector.EnvoyResponseDurationLabel,
+		otelcollector.EnvoyResponseTxDurationLabel,
+		otelcollector.EnvoyCallerLabel,
+	}
+
+	_includeAttributesSpan = []string{
+		otelcollector.FeatureAddressLabel,
+		otelcollector.FeatureIDLabel,
+		otelcollector.FeatureStatusLabel,
+	}
+
+	includeListLog  = otelcollector.FormIncludeList(append(_includeAttributesCommon, _includeAttributesLog...))
+	includeListSpan = otelcollector.FormIncludeList(append(_includeAttributesCommon, _includeAttributesSpan...))
+)
+
+func enforceIncludeListLog(attributes pcommon.Map) {
+	otelcollector.EnforceIncludeList(attributes, includeListLog)
+}
+
+func enforceIncludeListSpan(attributes pcommon.Map) {
+	otelcollector.EnforceIncludeList(attributes, includeListSpan)
+}
+
+var (
+	_excludeAttributesCommon = []string{
+		otelcollector.MarshalledLabelsLabel,
+	}
+
+	_excludeAttributesLog = []string{
+		otelcollector.HostAddressLabel,
+		otelcollector.PeerAddressLabel,
+		otelcollector.HostIPLabel,
+		otelcollector.PeerIPLabel,
+		otelcollector.EnvoyCallerLabel,
+	}
+
+	_excludeAttributesSpan = []string{
+		otelcollector.FeatureAddressLabel,
+	}
+
+	excludeListLog  = otelcollector.FormExcludeList(append(_excludeAttributesCommon, _excludeAttributesLog...))
+	excludeListSpan = otelcollector.FormExcludeList(append(_excludeAttributesCommon, _excludeAttributesSpan...))
+)
+
+func enforceExcludeListLog(attributes pcommon.Map) {
+	otelcollector.EnforceExcludeList(attributes, excludeListLog)
+}
+
+func enforceExcludeListSpan(attributes pcommon.Map) {
+	otelcollector.EnforceExcludeList(attributes, excludeListSpan)
 }

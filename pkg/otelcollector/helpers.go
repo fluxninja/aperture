@@ -2,15 +2,20 @@ package otelcollector
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/utils"
+	"github.com/rs/zerolog"
 )
+
+// LogSampled provides log sampling for OTEL collector.
+var LogSampled log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
 
 // IterateLogRecords calls given function for each logRecord. If the function
 // returns error further logRecords will not be processed and the error will be returned.
@@ -126,61 +131,125 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 	return nil
 }
 
-// UnmarshalStringVal is a helper for cases we're sending more complex
-// structure json-encoded in a string label
+// GetStruct is a helper for decoding complex structs encoded into an attribute
+// as a json-encoded string.
+// Takes:
+// attributes to read from
+// label key to read in attributes
+// output interface that is filled via json unmarshal
+// treatAsMissing is a list of values that are treated as attribute missing from source
 //
-// Returns whether label was actually a string and unmarshaling was attempted.
-func UnmarshalStringVal(value pcommon.Value, labelName string, output interface{}) bool {
+// Returns true is label was decoded successfully, false otherwise.
+func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAsMissing []string) bool {
+	value, ok := attributes.Get(label)
+	if !ok {
+		LogSampled.Warn().Str("label", label).Msg("Label does not exist in attributes map")
+		return false
+	}
 	if value.Type() != pcommon.ValueTypeString {
+		LogSampled.Warn().Str("label", label).Msg("Label is not a string")
 		return false
 	}
 
 	stringVal := value.StringVal()
 
-	if stringVal == MissingAttributeSourceValue {
-		log.Trace().Str("label", labelName).Msg("Missing attribute source")
-		return true
+	for _, markerForMissing := range treatAsMissing {
+		if stringVal == markerForMissing {
+			LogSampled.Info().Str("label", label).Msg("Missing attribute from source")
+			return false
+		}
 	}
 
 	err := json.Unmarshal([]byte(stringVal), output)
 	if err != nil {
-		log.Error().Err(err).Str("label", labelName).Msg("Failed to unmarshal")
-		// This is almost impossible to happen (eg. broken sdk), so ignoring error is ok
+		LogSampled.Error().Err(err).Str("label", label).Msg("Failed to unmarshal")
 	}
 
 	return true
 }
 
-// GetCheckResponse unmarshalls flowcontrol CheckResponse from string label.
-func GetCheckResponse(attributes pcommon.Map) *flowcontrolv1.CheckResponse {
-	checkResponse := &flowcontrolv1.CheckResponse{}
-	ok := unmarshalAttributesMap(attributes, MarshalledCheckResponseLabel, &checkResponse)
-	if !ok {
-		log.Debug().Str("label", MarshalledCheckResponseLabel).Msg("Failed to unmarshal attributes into AuthzResponse")
+// GetFloat64 returns float64 value from given attribute map at given key.
+func GetFloat64(attributes pcommon.Map, key string, treatAsZero []string) (float64, bool) {
+	rawNewValue, exists := attributes.Get(key)
+	if !exists {
+		log.Trace().Msg("key not found")
+		return 0, false
 	}
-	return checkResponse
+	if rawNewValue.Type() == pcommon.ValueTypeDouble {
+		return rawNewValue.DoubleVal(), true
+	} else if rawNewValue.Type() == pcommon.ValueTypeInt {
+		return float64(rawNewValue.IntVal()), true
+	} else if rawNewValue.Type() == pcommon.ValueTypeString {
+		newValue, err := strconv.ParseFloat(rawNewValue.StringVal(), 64)
+		if err != nil {
+			for _, treatAsZeroValue := range treatAsZero {
+				if rawNewValue.StringVal() == treatAsZeroValue {
+					return 0, true
+				}
+			}
+			LogSampled.Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Failed parsing value as float")
+			return 0, false
+		}
+		return newValue, true
+	}
+	LogSampled.Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Unsupported value type")
+	return 0, false
 }
 
-// GetAuthzResponse unmarshalls authz response from string label.
-func GetAuthzResponse(attributes pcommon.Map) *flowcontrolv1.AuthzResponse {
-	authzResponse := &flowcontrolv1.AuthzResponse{}
-	ok := unmarshalAttributesMap(attributes, MarshalledAuthzResponseLabel, &authzResponse)
-	if !ok {
-		log.Debug().Str("label", MarshalledAuthzResponseLabel).Msg("Failed to unmarshal attributes into AuthzResponse")
+// Max returns the maximum value of the given values.
+func Max(a, b float64) float64 {
+	if a > b {
+		return a
 	}
-	return authzResponse
+	return b
 }
 
-func unmarshalAttributesMap(attributes pcommon.Map, label string, output interface{}) bool {
-	value, ok := attributes.Get(label)
-	if !ok {
-		log.Error().Str("label", label).Msg("Label does not exist in attributes map")
-		return false
+// Min returns the minimum value of the given values.
+func Min(a, b float64) float64 {
+	if a > b {
+		return b
 	}
-	ok = UnmarshalStringVal(value, label, &output)
-	if !ok {
-		log.Debug().Str("label", label).Msg("Label is not a string")
-		return false
+	return a
+}
+
+// FormIncludeList returns a map of all the keys in the given list with a value of true.
+func FormIncludeList(attributes []string) map[string]bool {
+	return utils.SliceToMap(attributes)
+}
+
+// FormExcludeList returns a map of all the keys in the given list with a value of false.
+func FormExcludeList(attributes []string) map[string]bool {
+	return utils.SliceToMap(attributes)
+}
+
+type enforceCriteria uint8
+
+const (
+	include enforceCriteria = iota
+	exclude
+)
+
+// EnforceIncludeList enforces the given include list on the given attributes.
+func EnforceIncludeList(attributes pcommon.Map, includeList map[string]bool) {
+	enforceList(attributes, includeList, include)
+}
+
+// EnforceExcludeList enforces the given exclude list on the given attributes.
+func EnforceExcludeList(attributes pcommon.Map, excludeList map[string]bool) {
+	enforceList(attributes, excludeList, exclude)
+}
+
+func enforceList(attributes pcommon.Map, list map[string]bool, enforceCriteria enforceCriteria) {
+	keysToRemove := make([]string, 0)
+	attributes.Range(func(key string, _ pcommon.Value) bool {
+		if enforceCriteria == include && !list[key] {
+			keysToRemove = append(keysToRemove, key)
+		} else if enforceCriteria == exclude && list[key] {
+			keysToRemove = append(keysToRemove, key)
+		}
+		return true
+	})
+	for _, key := range keysToRemove {
+		attributes.Remove(key)
 	}
-	return true
 }

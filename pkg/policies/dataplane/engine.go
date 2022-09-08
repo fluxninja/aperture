@@ -6,8 +6,6 @@ import (
 
 	"golang.org/x/exp/maps"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
@@ -225,18 +223,14 @@ func (e *Engine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 	return e.unregister("FluxMeter:"+fm.GetFluxMeterID().String(), selectorProto)
 }
 
-// GetFluxMeterHist Lookup function for getting histogram.
-func (e *Engine) GetFluxMeterHist(fluxMeterName, statusCode string, featureStatus string, decisionType flowcontrolv1.DecisionType) prometheus.Observer {
+// GetFluxMeter Lookup function for getting flux meter.
+func (e *Engine) GetFluxMeter(fluxMeterName string) iface.FluxMeter {
 	e.fluxMeterMapMutex.RLock()
 	defer e.fluxMeterMapMutex.RUnlock()
 	fmID := iface.FluxMeterID{
 		FluxMeterName: fluxMeterName,
 	}
-	fluxMeter := e.fluxMetersMap[fmID]
-	if fluxMeter != nil {
-		return fluxMeter.GetHistogram(decisionType, statusCode, featureStatus)
-	}
-	return nil
+	return e.fluxMetersMap[fmID]
 }
 
 // RegisterRateLimiter adds limiter actuator to multimatcher.

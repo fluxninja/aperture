@@ -396,6 +396,15 @@ definitions:
   policylanguagev1FluxMeter:
     type: object
     properties:
+      attribute_key:
+        type: string
+        description: |-
+          Key of the attribute in accesss log or span from which the metric for this flux meter is read.
+
+          :::info
+          For list of available attributes in Envoy access logs, refer [Envoy Filter](/setup/istio.md#envoy-filter)
+          :::
+        x-go-default: duration_millis
       histogram_buckets:
         type: array
         items:
