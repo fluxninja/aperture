@@ -10,9 +10,9 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -67,7 +67,7 @@ func NewRateLimiterAndOptions(
 func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &configv1.RateLimiterWrapper{
+			wrapper := &wrappersv1.RateLimiterWrapper{
 				RateLimiter:    limiterSync.rateLimiterProto,
 				ComponentIndex: int64(limiterSync.componentIndex),
 				PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
@@ -134,7 +134,7 @@ func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
 		limiterSync.decision.Limit = limitValue
 		// Publish decision
 		log.Debug().Float64("limit", limitValue).Msg("publishing rate limiter decision")
-		wrapper := &configv1.RateLimiterDecisionWrapper{
+		wrapper := &wrappersv1.RateLimiterDecisionWrapper{
 			RateLimiterDecision: limiterSync.decision,
 			ComponentIndex:      int64(limiterSync.componentIndex),
 			PolicyName:          limiterSync.policyReadAPI.GetPolicyName(),
