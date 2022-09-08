@@ -3,5 +3,5 @@
 
 ```
 helm repo add aperture https://fluxninja.github.io/aperture/
-helm install aperture --namespace aperture-system aperture/aperture --create-namespace
+helm install aperture --namespace aperture-system aperture/aperture-agent --create-namespace
 ```
