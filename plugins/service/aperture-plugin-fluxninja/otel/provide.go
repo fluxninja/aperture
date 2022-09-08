@@ -22,7 +22,7 @@ import (
 const (
 	processorBatchMetricsSlow = "batch/metrics-slow"
 	processorRollup           = "rollup"
-	processorAttributes       = "attributes/insert"
+	processorAttributes       = "attributes/fluxninja"
 
 	exporterFluxninja = "otlp/fluxninja"
 )
@@ -31,59 +31,49 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			fx.Annotate(
-				Provide,
-				fx.ParamTags(config.NameTag("base"), config.NameTag("heartbeats-grpc-client-config"), config.NameTag("heartbeats-http-client-config")),
-				fx.ResultTags(config.GroupTag("plugin")),
+				provideOtelConfig,
+				fx.ParamTags(config.NameTag("base"),
+					config.NameTag("heartbeats-grpc-client-config"),
+					config.NameTag("heartbeats-http-client-config")),
+				fx.ResultTags(config.GroupTag("plugin-config")),
 			),
 		),
-		fx.Invoke(Invoke),
 	)
 }
 
-func Provide(baseConfig *otelcollector.OTELConfig,
+func provideOtelConfig(baseConfig *otelcollector.OTELConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
+	lifecycle fx.Lifecycle,
+	heartbeats heartbeats.Heartbeats,
 	unmarshaller config.Unmarshaller,
 ) (*otelcollector.OTELConfig, error) {
 	var pluginConfig pluginconfig.FluxNinjaPluginConfig
 	if err := unmarshaller.UnmarshalKey(pluginconfig.PluginConfigKey, &pluginConfig); err != nil {
 		return nil, err
 	}
+
 	config := otelcollector.NewOTELConfig()
 	config.AddDebugExtensions()
 	addFluxninjaExporter(config, &pluginConfig, grpcClientConfig, httpClientConfig)
 
-	return config, nil
-}
+	lifecycle.Append(fx.Hook{
+		OnStart: func(context.Context) error {
+			controllerID := heartbeats.GetControllerInfo().Id
 
-type ConstructorIn struct {
-	fx.In
-	Lifecycle     fx.Lifecycle
-	BaseConfig    *otelcollector.OTELConfig   `name:"base"`
-	PluginConfigs []*otelcollector.OTELConfig `group:"plugin"`
-	Heartbeats    *heartbeats.Heartbeats
-}
+			addAttributesProcessor(config, controllerID)
 
-func Invoke(in ConstructorIn) {
-	in.Lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			controllerID := in.Heartbeats.GetControllerInfo().Id
-
-			for _, config := range in.PluginConfigs {
-				addAttributesProcessor(config, controllerID)
-
-				if logsPipeline, exists := in.BaseConfig.Service.Pipeline("logs"); exists {
-					addFNToPipeline("logs", config, logsPipeline)
-				}
-				if tracesPipeline, exists := in.BaseConfig.Service.Pipeline("traces"); exists {
-					addFNToPipeline("traces", config, tracesPipeline)
-				}
-				if _, exists := in.BaseConfig.Service.Pipeline("metrics/fast"); exists {
-					addMetricsSlowPipeline(config)
-				}
-				if _, exists := in.BaseConfig.Service.Pipeline("metrics/controller-fast"); exists {
-					addMetricsControllerSlowPipeline(config)
-				}
+			if logsPipeline, exists := baseConfig.Service.Pipeline("logs"); exists {
+				addFNToPipeline("logs", config, logsPipeline)
+			}
+			if tracesPipeline, exists := baseConfig.Service.Pipeline("traces"); exists {
+				addFNToPipeline("traces", config, tracesPipeline)
+			}
+			if _, exists := baseConfig.Service.Pipeline("metrics/fast"); exists {
+				addMetricsSlowPipeline(config)
+			}
+			if _, exists := baseConfig.Service.Pipeline("metrics/controller-fast"); exists {
+				addMetricsControllerSlowPipeline(config)
 			}
 			return nil
 		},
@@ -91,6 +81,8 @@ func Invoke(in ConstructorIn) {
 			return nil
 		},
 	})
+
+	return config, nil
 }
 
 func addAttributesProcessor(config *otelcollector.OTELConfig, controllerID string) {

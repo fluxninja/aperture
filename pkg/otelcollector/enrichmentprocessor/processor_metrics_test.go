@@ -21,7 +21,7 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 			Services:   []string{"fooSvc1", "fooSvc2"},
 			EntityName: "someName",
 		})
-		processor := newProcessor(entityCache, "fooGroup")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		md := metricsFromLabels(map[string]interface{}{
@@ -32,15 +32,14 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		assertMetricsEqual(md, metricsFromLabels(map[string]interface{}{
-			"preserve":    "this",
-			"agent_group": "fooGroup",
-			"services":    []string{"fooSvc1", "fooSvc2"},
+			"preserve": "this",
+			"services": []string{"fooSvc1", "fooSvc2"},
 		}))
 	})
 
 	It("Does not enrich when there are no labels in entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "fooGroup")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		md := metricsFromLabels(map[string]interface{}{
@@ -51,8 +50,7 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		assertMetricsEqual(md, metricsFromLabels(map[string]interface{}{
-			"preserve":    "this",
-			"agent_group": "fooGroup",
+			"preserve": "this",
 		}))
 	})
 })

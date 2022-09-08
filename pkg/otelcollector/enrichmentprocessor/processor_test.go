@@ -5,7 +5,6 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/config"
 
-	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 )
 
@@ -15,10 +14,8 @@ var _ = Describe("Enrichment Processor", func() {
 		expected := &Config{
 			ProcessorSettings: config.NewProcessorSettings(config.NewComponentID("enrichment")),
 			entityCache:       entityCache,
-			agentGroup:        "defaultAG",
 		}
-		agentInfo := agentinfo.NewAgentInfo("defaultAG")
-		actual := createDefaultConfig(entityCache, agentInfo)()
+		actual := createDefaultConfig(entityCache)()
 
 		Expect(actual).To(Equal(expected))
 	})
