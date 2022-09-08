@@ -1,6 +1,7 @@
 package selectors
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -21,8 +22,8 @@ type LabelSources struct {
 }
 
 const (
-	requestLabelPrefix       = "request_"
-	requestLabelHeaderPrefix = "request_header_"
+	requestLabelPrefix       = "http"
+	requestLabelHeaderPrefix = "http.request.header"
 	numRequestLabels         = 7 // used only for capacity estimation
 )
 
@@ -57,13 +58,17 @@ func (l Labels) CombinedWith(newLabels LabelSources) Labels {
 
 	if newLabels.Request != nil {
 		if http := newLabels.Request.GetHttp(); http != nil {
-			labels[requestLabelPrefix+"id"] = http.Id
-			labels[requestLabelPrefix+"method"] = http.Method
-			labels[requestLabelPrefix+"path"] = http.Path
-			labels[requestLabelPrefix+"host"] = http.Host
-			labels[requestLabelPrefix+"scheme"] = http.Scheme
-			labels[requestLabelPrefix+"size"] = strconv.FormatInt(http.Size, 10)
-			labels[requestLabelPrefix+"protocol"] = http.Protocol
+			var contentLength int64
+			if http.Size < 0 {
+				contentLength = http.Size
+			} else {
+				// TODO: compute if unknown
+			}
+			labels[fmt.Sprintf("%s.method", requestLabelPrefix)] = http.Method
+			labels[fmt.Sprintf("%s.target", requestLabelPrefix)] = http.Path
+			labels[fmt.Sprintf("%s.scheme", requestLabelPrefix)] = http.Scheme
+			labels[fmt.Sprintf("%s.request_content_length", requestLabelPrefix)] = strconv.FormatInt(contentLength, 10)
+			labels[fmt.Sprintf("%s.flavor", requestLabelPrefix)] = convertProtocol(http.Protocol)
 		}
 		for k, v := range newLabels.Request.GetHttp().GetHeaders() {
 			if strings.HasPrefix(k, ":") {
@@ -73,9 +78,28 @@ func (l Labels) CombinedWith(newLabels LabelSources) Labels {
 				// Request.Http.
 				continue
 			}
-			labels[requestLabelHeaderPrefix+k] = v
+			labels[fmt.Sprintf("%s.%s", requestLabelHeaderPrefix, k)] = v
 		}
 	}
 
 	return Labels(labels)
+}
+
+func convertHeaderKey(key string) string {
+	return strings.ReplaceAll(key, "-", ".")
+}
+
+// convertProtocol converts envoy's protocol to OTEL kind of HTTP protocol.
+func convertProtocol(protocolName string) string {
+	protocols := map[string]string{
+		"HTTP/1.0": "1.0",
+		"HTTP/1.1": "1.1",
+		"HTTP/2.0": "2.0",
+		"HTTP/3.0": "3.0",
+	}
+	flavor, ok := protocols[protocolName]
+	if !ok {
+		return protocolName
+	}
+	return flavor
 }
