@@ -18,6 +18,7 @@ jobs:
           cache_name: release-protobuf
           tools: &tools_list |-
             buf
+            python
       - opsninja_install
       - run:
           name: Login to buf.build
