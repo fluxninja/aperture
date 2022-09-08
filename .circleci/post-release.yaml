@@ -14,19 +14,20 @@ jobs:
     executor: base-cimg-executor
     steps:
       - checkout
-      - jq/install
       - asdf_install:
           cache_name: release-protobuf
           tools: &tools_list |-
             buf
+            python
       - opsninja_install:
           branch: kklimonda/opsninja-buf-release-cmd
       - run:
           name: Publish protobuf to buf.build
           command: |
+            tag=<<parameters.tag>>
             fn release publish-aperture-protobuf --dry-run \
             --path /home/circleci/project/api/ \
-            --tag << parameters.tag >>
+            --tag ${tag#kklimonda/*}
       - asdf_save_cache:
           tools: *tools_list
           cache_name: release-protobuf
@@ -78,42 +79,17 @@ jobs:
 workflows:
   version: 2
 
-  tag-aperture-blueprints:
-    when: &job-when-clause
-      matches: { value: << pipeline.git.tag >>, pattern: ^v.*$ }
-    jobs:
-      - tag-github-repository: &tag-github-repository
-          # both this and workflow's when is needed
-          filters:
-            branches:
-              ignore: /.+/
-            tags:
-              only: /^v.*/
-          name: tag-aperture-blueprints
-          repository: fluxninja/aperture-blueprints
-          tag: << pipeline.git.tag >>
-          deployment-key: f5:19:15:04:d3:5d:f4:66:3e:24:4f:7f:c6:e8:82:68
-
-  tag-aperture-go-sdk:
-    when: *job-when-clause
-    jobs:
-      - tag-github-repository:
-          <<: *tag-github-repository
-          name: tag-aperture-go-sdk
-          repository: fluxninja/aperture-go
-          deployment-key: af:55:26:47:84:7f:0e:36:6b:74:25:19:64:4a:f2:41
-
   publish-protobuf-files:
-    when: *job-when-clause
+    when:
+      matches: { value: << pipeline.git.tag >>, pattern: ^kklimonda/v.*$ }
     jobs:
       - publish-protobuf-files:
           filters:
             branches:
               ignore: /.+/
             tags:
-              only: /^v.*/
+              only: /^kklimonda\/v.*/
           tag: << pipeline.git.tag >>
-
 
 commands:
   asdf_install:
