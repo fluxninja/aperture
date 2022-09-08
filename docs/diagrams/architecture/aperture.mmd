@@ -1,31 +1,27 @@
-graph LR
+flowchart LR
     subgraph agent["Aperture Agent"]
-        subgraph Metrics decision
-            id1[service discovery]
-            id2[ metrics collection]
-            style id1 fill:#f9f,stroke:#333,stroke-width:4px;
-            style id2 fill:#ccf,stroke:#f66,stroke-width:2px,stroke-dasharray: 5, 5;
+        subgraph sd["Service discovery"]
         end
-        subgraph fcs["Flow Control Service"]
-            id3[Actuator]
-            id4[API Quotas/Scheduler]
-            id5[Concurrency Control]
-            style id3 fill:#f9f,stroke:#333,stroke-width:4px;
-            style id4 fill:#ccf,stroke:#f66,stroke-width:2px,stroke-dasharray: 5, 5;
+        subgraph metrics["Metrics Service"]
+        end
+        subgraph fcs["Dataplane Service"]
+            classifiers["Classifiers"]
+            actuators["Actuators"]
+            fluxmeters["FluxMeters"]
         end
     end
     subgraph controller["Aperture Controller"]
-        id6[Classification Rule and Policy Management]
-        id7[Acutator - LSF]
-        id8[Policy Control Loop]
-        style id6 fill:#f9f,stroke:#333,stroke-width:4px;
-        style id7 fill:#ccf,stroke:#f66,stroke-width:2px,stroke-dasharray: 5, 5;
+        mgmt[Policy Management]
+        loop[Policy Control Loop]
     end
     subgraph mesh["Service Mesh"]
-        id9[service Mesh]
     end
-    id3-->|Load Shed Factor|id4
-    id7-->|Decision Message|id3
-    id9 -->|decision metrics| id2
-    id9 -->|servie discovery| id1
-    id9 -->|metadata and flow| id1
+    db[("Metrics DB")]
+    mgmt-->|configs| fcs
+    loop-->|decisions| actuators
+    mesh -->|metrics| metrics
+    mesh -->|service metadata| sd
+    mesh <-->|flows| fcs
+    actuators -->|metrics| db
+    metrics -->|metrics| db
+    db --> loop
