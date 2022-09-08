@@ -23,10 +23,10 @@ baggage, flow classifiers and explicit labels from the Aperture library call.
 
 ### Request labels
 
-For each _traffic_ control point (where flows are http or grpc requests), some
-basic metadata is available as _request labels_. These are `request_id` ,
-`request_method`, `request_path`, `request_host`, `request_scheme`,
-`request_size`, `request_protocol` (mapped from fields of
+For each _traffic_ [control point][control-point] (where flows are http or grpc
+requests), some basic metadata is available as _request labels_. These are
+`request_id` , `request_method`, `request_path`, `request_host`,
+`request_scheme`, `request_size`, `request_protocol` (mapped from fields of
 [HttpRequest][authz-request-http]). Also, (non-pseudo) headers are available as
 `request_header_<headername>`, where `<headername>` is a headername normalised
 to lowercase, eg. `request_header_user-agent`.
@@ -36,7 +36,8 @@ to lowercase, eg. `request_header_user-agent`.
 Baggage propagation is a powerful concept that allows attaching metadata to a
 whole request chain or to a whole [trace][traces]. If you already have baggage
 propagation configured in your system, you can access the baggage as flow
-labels. This is supported on both _traffic_ and _feature_ control points.
+labels. This is supported on both _traffic_ and _feature_ [control
+points][control-point].
 
 - _traffic_: Baggage is pulled from the [_baggage_][baggage] header,
 - _feature_: Baggage is automatically pulled from context on each `Check()`
@@ -101,3 +102,4 @@ TODO perhaps we should invert the default?
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
+[control-point]: ../flow-control.md#control-point
