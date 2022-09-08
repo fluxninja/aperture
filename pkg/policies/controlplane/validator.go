@@ -9,20 +9,22 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
+	"go.uber.org/fx"
 )
+
+// FxOut is the output of the controlplane module.
+type FxOut struct {
+	fx.Out
+	Validator validation.CMFileValidator `group:"cm-file-validators"`
+}
 
 // provideCMFileValidator provides classification config map file validator
 //
 // Note: This validator must be registered to be accessible.
-func provideCMFileValidator() *CMFileValidator {
-	return &CMFileValidator{}
-}
-
-// registerCMFileValidator registers classification configmap validator as configmap file validator.
-func registerCMFileValidator(validator *CMFileValidator, configMapValidator *validation.CMValidator) {
-	// The path is not configurable – if one doesn't want default path, one
-	// could just write their own Register function
-	configMapValidator.RegisterCMFileValidator(validator)
+func provideCMFileValidator() FxOut {
+	return FxOut{
+		Validator: &CMFileValidator{},
+	}
 }
 
 // CMFileValidator Policy implementation of CMFileValidator interface.

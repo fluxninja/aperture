@@ -25,8 +25,7 @@ var _ = Describe("Validator", func() {
 		Expect(ok).To(BeFalse())
 	})
 
-	cmVatidator := validation.NewCMValidator()
-	cmVatidator.RegisterCMFileValidator(cmFileValidator)
+	cmVatidator := validation.NewCMValidator([]validation.CMFileValidator{cmFileValidator})
 
 	validateExample := func(contents string) {
 		var cm corev1.ConfigMap

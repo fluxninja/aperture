@@ -53,7 +53,6 @@ func Module() fx.Option {
 		),
 		// Policy factory
 		policyFactoryModule(),
-		fx.Invoke(registerCMFileValidator),
 	)
 }
 
