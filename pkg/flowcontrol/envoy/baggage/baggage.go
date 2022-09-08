@@ -10,6 +10,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/log"
 	class "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 )
 
 // Headers is a header map in authz convention – keys are lowercase.
@@ -57,7 +58,7 @@ func (p Prefixed) Extract(headers Headers) class.FlowLabels {
 			} else {
 				flowLabels[metaKey] = class.FlowLabelValue{
 					Value: metaVal,
-					Flags: class.LabelFlags{
+					Flags: compiler.LabelFlags{
 						Propagate: true,
 					},
 				}
@@ -129,7 +130,7 @@ func (b W3Baggage) Extract(headers Headers) class.FlowLabels {
 		}
 		flowLabels[member.Key()] = class.FlowLabelValue{
 			Value: value,
-			Flags: class.LabelFlags{
+			Flags: compiler.LabelFlags{
 				Hidden:    isHidden,
 				Propagate: true,
 			},

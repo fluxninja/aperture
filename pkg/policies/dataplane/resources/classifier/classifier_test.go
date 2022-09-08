@@ -14,6 +14,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 
 	. "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/services"
 )
@@ -108,19 +109,19 @@ var _ = Describe("Classifier", func() {
 
 		It("returns active rules", func() {
 			Expect(classifier.ActiveRules()).To(ConsistOf(
-				ReportedRule{
+				compiler.ReportedRule{
 					RulesetName: "one",
 					LabelName:   "foo",
 					Rule:        rs1.Rules["foo"],
 					Selector:    rs1.Selector,
 				},
-				ReportedRule{
+				compiler.ReportedRule{
 					RulesetName: "two",
 					LabelName:   "bar-twice",
 					Rule:        rs2.Rules["bar-twice"],
 					Selector:    rs2.Selector,
 				},
-				ReportedRule{
+				compiler.ReportedRule{
 					RulesetName: "three",
 					LabelName:   "fuu",
 					Rule:        rs3.Rules["fuu"],
@@ -276,8 +277,8 @@ var _ = Describe("Classifier", func() {
 			)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(Equal(FlowLabels{
-				"foo": FlowLabelValue{"hello", LabelFlags{Propagate: false}},
-				"bar": FlowLabelValue{"21", LabelFlags{Hidden: true, Propagate: true}},
+				"foo": FlowLabelValue{"hello", compiler.LabelFlags{Propagate: false}},
+				"bar": FlowLabelValue{"21", compiler.LabelFlags{Hidden: true, Propagate: true}},
 			}))
 		})
 	})
@@ -402,7 +403,7 @@ var _ = Describe("Classifier", func() {
 		It("fails to compile rego", func() {
 			err := setRulesForMyService(rules)
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(BadRego))
+			Expect(err).To(MatchError(compiler.BadRego))
 		})
 	})
 
@@ -448,7 +449,7 @@ var _ = Describe("Classifier", func() {
 func fl(s string) FlowLabelValue {
 	return FlowLabelValue{
 		Value: s,
-		Flags: LabelFlags{Propagate: true},
+		Flags: compiler.LabelFlags{Propagate: true},
 	}
 }
 
