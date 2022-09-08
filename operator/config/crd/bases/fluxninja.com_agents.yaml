@@ -1201,25 +1201,9 @@ spec:
                   log:
                     description: Log configuration.
                     properties:
-                      compress:
-                        description: Compress
-                        type: boolean
-                      file:
-                        description: Output file for logs. Keywords allowed - ["stderr",
-                          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-                        type: string
                       level:
                         description: Log level
                         type: string
-                      max_age:
-                        description: Max age in days for log files
-                        type: integer
-                      max_backups:
-                        description: Max log file backups
-                        type: integer
-                      max_size:
-                        description: Log file max size in MB
-                        type: integer
                       non_blocking:
                         description: Use non-blocking log writer (can lose logs at
                           high throughput)
@@ -1331,8 +1315,8 @@ spec:
                           type: string
                         type: array
                       plugins_path:
-                        description: Path to plugins directory. This can be set via
-                          command line arguments as well.
+                        description: Path to plugins directory. "default" points to
+                          `/var/lib/aperture/<service>/plugins`.
                         type: string
                     type: object
                   profilers:
@@ -1344,9 +1328,8 @@ spec:
                           is enabled as CPU profile will always be running.
                         type: boolean
                       profiles_path:
-                        description: Path to save performance profiles. This can be
-                          set via command line arguments as well. E.g. default path
-                          for aperture-agent is /var/log/aperture/aperture-agent/profiles.
+                        description: Path to save performance profiles. "default"
+                          path is `/var/log/aperture/<service>/profiles`.
                         type: string
                       register_http_routes:
                         description: Register routes. Profile types profile, symbol

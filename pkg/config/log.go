@@ -53,11 +53,8 @@ type LogConfig struct {
 	// Log level
 	LogLevel string `json:"level" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
 
-	// Additional log writers
+	// Log writers
 	Writers []LogWriterConfig `json:"writers" validate:"omitempty,dive,omitempty"`
-
-	// Base LogWriterConfig
-	LogWriterConfig `json:",inline"`
 
 	// Use non-blocking log writer (can lose logs at high throughput)
 	NonBlocking bool `json:"non_blocking" default:"true"`
@@ -122,7 +119,7 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
 	}
 	logger, writers := NewLogger(config)
-	// append additional writers provided via Fx
+	// append writers provided via Fx
 	writers = append(writers, w...)
 
 	lifecycle.Append(fx.Hook{
@@ -152,7 +149,7 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	// append file writers
 	for _, writerConfig := range config.Writers {
 		var writer io.Writer
-		if config.File != "" {
+		if writerConfig.File != "" {
 			switch writerConfig.File {
 			case stdErrFile:
 				writer = os.Stderr
@@ -187,8 +184,6 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	multi := zerolog.MultiLevelWriter(writers...)
 
 	logger := log.NewLogger(multi, config.NonBlocking, strings.ToLower(config.LogLevel))
-
-	logger.Info().Msg("Configured logger")
 
 	return logger, writers
 }
