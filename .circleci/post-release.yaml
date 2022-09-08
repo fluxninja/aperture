@@ -14,7 +14,6 @@ jobs:
     executor: base-cimg-executor
     steps:
       - checkout
-      - jq/install
       - asdf_install:
           cache_name: release-protobuf
           tools: &tools_list |-
