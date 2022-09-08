@@ -10,6 +10,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/flowcontrol/envoy/baggage"
 	class "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 
@@ -21,7 +22,7 @@ func TestBaggage(t *testing.T) {
 func fl(s string) class.FlowLabelValue {
 	return class.FlowLabelValue{
 		Value: s,
-		Flags: class.LabelFlags{Propagate: true},
+		Flags: compiler.LabelFlags{Propagate: true},
 	}
 }
 
@@ -132,7 +133,7 @@ var _ = Describe("W3 Baggage propagator", func() {
 			})).To(Equal(class.FlowLabels{
 				"foo": class.FlowLabelValue{
 					Value: "bar",
-					Flags: class.LabelFlags{Hidden: true, Propagate: true},
+					Flags: compiler.LabelFlags{Hidden: true, Propagate: true},
 				},
 			}))
 		})
@@ -141,7 +142,7 @@ var _ = Describe("W3 Baggage propagator", func() {
 			newHeaders, err := propagator.Inject(class.FlowLabels{
 				"foo": class.FlowLabelValue{
 					Value: "bar",
-					Flags: class.LabelFlags{Hidden: true, Propagate: true},
+					Flags: compiler.LabelFlags{Hidden: true, Propagate: true},
 				},
 			}, nil)
 			Expect(err).NotTo(HaveOccurred())
