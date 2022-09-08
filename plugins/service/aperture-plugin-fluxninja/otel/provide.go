@@ -45,7 +45,7 @@ func provideOtelConfig(baseConfig *otelcollector.OTELConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 	lifecycle fx.Lifecycle,
-	heartbeats heartbeats.Heartbeats,
+	heartbeats *heartbeats.Heartbeats,
 	unmarshaller config.Unmarshaller,
 ) (*otelcollector.OTELConfig, error) {
 	var pluginConfig pluginconfig.FluxNinjaPluginConfig
