@@ -69,7 +69,7 @@ type PluginTrackers map[string]*PluginTracker
 // swagger:model
 // +kubebuilder:object:generate=true
 type PluginsConfig struct {
-	// Path to plugins directory. "default" points to /var/lib/aperture/<service>/plugins.
+	// Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
 	PluginsPath string `json:"plugins_path" default:"default"`
 	// Specific plugin types to disable
 	DisabledSymbols []string `json:"disabled_symbols"`

@@ -702,7 +702,7 @@ definitions:
         type: array
         x-go-name: DisabledSymbols
       plugins_path:
-        description: Path to plugins directory. "default" points to /var/lib/aperture/<service>/plugins.
+        description: Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
         type: string
         x-go-default: default
         x-go-name: PluginsPath
@@ -729,7 +729,7 @@ definitions:
         x-go-default: "false"
         x-go-name: CPUProfile
       profiles_path:
-        description: Path to save performance profiles. "default" path is /var/log/aperture/<service>/profiles.
+        description: Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
         type: string
         x-go-default: default
         x-go-name: ProfilesPath
