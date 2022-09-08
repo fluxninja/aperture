@@ -120,7 +120,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	bindPort, _ := strconv.Atoi(port)
 
 	if bindAddr == "" {
-		bindAddr = info.Hostname
+		bindAddr = info.LocalIP
 	}
 	oc.BindAddr = bindAddr
 	oc.BindPort = bindPort
@@ -133,7 +133,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	memberlistBindPort, _ := strconv.Atoi(p)
 
 	if memberlistBindAddr == "" {
-		memberlistBindAddr = info.Hostname
+		memberlistBindAddr = info.LocalIP
 	}
 	oc.MemberlistConfig.BindAddr = memberlistBindAddr
 	oc.MemberlistConfig.BindPort = memberlistBindPort
