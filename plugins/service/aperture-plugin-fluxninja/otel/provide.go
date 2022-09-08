@@ -22,7 +22,7 @@ import (
 const (
 	processorBatchMetricsSlow = "batch/metrics-slow"
 	processorRollup           = "rollup"
-	processorAttributes       = "attributes/insert"
+	processorAttributes       = "attributes/fluxninja"
 
 	exporterFluxninja = "otlp/fluxninja"
 )

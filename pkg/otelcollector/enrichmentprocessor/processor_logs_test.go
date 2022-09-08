@@ -18,7 +18,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			IPAddress: "192.0.2.0",
 			Services:  []string{"svc1", "svc2"},
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
@@ -32,7 +32,6 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]string{
 			"control_point": "egress",
 			"labeled":       "false",
-			"agent_group":   "defaultAG",
 			"services":      "svc1,svc2",
 		}))
 	})
@@ -43,7 +42,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			ID:        entitycache.EntityID{},
 			IPAddress: "192.0.2.0",
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
@@ -59,7 +58,6 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			"labeled":          "false",
 			"net.host.address": "-",
 			"net.peer.address": "192.0.2.1:80",
-			"agent_group":      "defaultAG",
 		}))
 	})
 
@@ -69,7 +67,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			ID:        entitycache.EntityID{},
 			IPAddress: "192.0.2.0",
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
@@ -83,7 +81,6 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]string{
 			"control_point": "egress",
 			"labeled":       "false",
-			"agent_group":   "defaultAG",
 		}))
 	})
 
@@ -94,7 +91,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			IPAddress: "192.0.2.0",
 			Services:  []string{"svc1", "svc2"},
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
@@ -108,14 +105,13 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]string{
 			"control_point": "ingress",
 			"labeled":       "false",
-			"agent_group":   "defaultAG",
 			"services":      "svc1,svc2",
 		}))
 	})
 
 	It("Does not enrich when there are no labels in entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
@@ -129,13 +125,12 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]string{
 			"control_point": "egress",
 			"labeled":       "false",
-			"agent_group":   "defaultAG",
 		}))
 	})
 
 	It("Unpacks aperture.labels properly", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
@@ -150,13 +145,12 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			"foo":           "bar",
 			"fizz":          "buzz",
 			"labeled":       "true",
-			"agent_group":   "defaultAG",
 		}))
 	})
 
 	It("Ignores empty aperture.labels", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
@@ -169,13 +163,12 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]string{
 			"control_point": "egress",
 			"labeled":       "false",
-			"agent_group":   "defaultAG",
 		}))
 	})
 
 	It("Ignores minus as aperture.labels", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]string{
@@ -188,7 +181,6 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]string{
 			"control_point": "feature",
 			"labeled":       "false",
-			"agent_group":   "defaultAG",
 		}))
 	})
 })
