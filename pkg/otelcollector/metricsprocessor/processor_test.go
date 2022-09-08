@@ -63,7 +63,7 @@ var _ = Describe("Metrics Processor", func() {
 
 			By("sending proper metrics")
 			expected := strings.NewReader(expectedMetrics)
-			err = testutil.CollectAndCompare(processor.workloadLatencySummary, expected, "workload_latency_ms")
+			err = testutil.CollectAndCompare(processor.workloadLatencySummary, expected, "workload_latency_seconds")
 			Expect(err).NotTo(HaveOccurred())
 
 			By("adding proper labels")
@@ -112,10 +112,10 @@ var _ = Describe("Metrics Processor", func() {
 				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
 			},
 			nil,
-			`# HELP workload_latency_ms Latency summary of workload
-			# TYPE workload_latency_ms summary
-			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			`# HELP workload_latency_seconds Latency summary of workload
+			# TYPE workload_latency_seconds summary
+			workload_latency_seconds_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_seconds_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
@@ -161,10 +161,10 @@ var _ = Describe("Metrics Processor", func() {
 				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
 			},
 			nil,
-			`# HELP workload_latency_ms Latency summary of workload
-			# TYPE workload_latency_ms summary
-			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			`# HELP workload_latency_seconds Latency summary of workload
+			# TYPE workload_latency_seconds summary
+			workload_latency_seconds_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_seconds_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
@@ -228,14 +228,14 @@ var _ = Describe("Metrics Processor", func() {
 				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
 			},
 			nil,
-			`# HELP workload_latency_ms Latency summary of workload
-			# TYPE workload_latency_ms summary
-			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
-			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
-			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
-			workload_latency_ms_sum{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
-			workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
+			`# HELP workload_latency_seconds Latency summary of workload
+			# TYPE workload_latency_seconds summary
+			workload_latency_seconds_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
+			workload_latency_seconds_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
+			workload_latency_seconds_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_seconds_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			workload_latency_seconds_sum{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
+			workload_latency_seconds_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.AuthzStatusLabel:          "STATUS_NO_ERROR",
@@ -286,7 +286,7 @@ var _ = Describe("Metrics Processor", func() {
 
 			By("sending proper metrics")
 			expected := strings.NewReader(expectedMetrics)
-			err = testutil.CollectAndCompare(processor.workloadLatencySummary, expected, "workload_latency_ms")
+			err = testutil.CollectAndCompare(processor.workloadLatencySummary, expected, "workload_latency_seconds")
 			Expect(err).NotTo(HaveOccurred())
 
 			By("adding proper labels")
@@ -332,10 +332,10 @@ var _ = Describe("Metrics Processor", func() {
 				},
 			},
 			nil,
-			`# HELP workload_latency_ms Latency summary of workload
-			# TYPE workload_latency_ms summary
-			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			`# HELP workload_latency_seconds Latency summary of workload
+			# TYPE workload_latency_seconds summary
+			workload_latency_seconds_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_seconds_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
@@ -377,10 +377,10 @@ var _ = Describe("Metrics Processor", func() {
 				FlowLabelKeys: []string{},
 			},
 			nil,
-			`# HELP workload_latency_ms Latency summary of workload
-			# TYPE workload_latency_ms summary
-			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+			`# HELP workload_latency_seconds Latency summary of workload
+			# TYPE workload_latency_seconds summary
+			workload_latency_seconds_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+			workload_latency_seconds_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
@@ -442,12 +442,12 @@ var _ = Describe("Metrics Processor", func() {
 				FlowLabelKeys: []string{},
 			},
 			nil,
-			`# HELP workload_latency_ms Latency summary of workload
-			# TYPE workload_latency_ms summary
-			workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
-			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
-			workload_latency_ms_sum{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
-			workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
+			`# HELP workload_latency_seconds Latency summary of workload
+			# TYPE workload_latency_seconds summary
+			workload_latency_seconds_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
+			workload_latency_seconds_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
+			workload_latency_seconds_sum{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
+			workload_latency_seconds_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 			`,
 			map[string]interface{}{
 				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_REJECTED",
