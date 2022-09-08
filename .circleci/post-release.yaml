@@ -20,6 +20,10 @@ jobs:
             buf
       - opsninja_install
       - run:
+          name: Login to buf.build
+          command: |
+            echo ${BUF_BUILD_TOKEN} | buf registry login --username kklimonda-fn --token-stdin
+      - run:
           name: Publish protobuf to buf.build
           command: |
             fn release publish-aperture-protobuf \
