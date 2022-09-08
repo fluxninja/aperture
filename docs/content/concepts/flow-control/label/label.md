@@ -84,8 +84,8 @@ For classifier-created labels, you can disable this behaviour by setting
 
 This means that by default the already-present-in-baggage labels are sent to the
 cloud. If this is not what you want,
-[we'll be providing a way](https://github.com/fluxninja/aperture/issues/376)
-to select which labels to include in telemetry.
+[we'll be providing a way](https://github.com/fluxninja/aperture/issues/376) to
+select which labels to include in telemetry.
 
 :::
 
