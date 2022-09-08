@@ -25,11 +25,14 @@ baggage, flow classifiers and explicit labels from the Aperture library call.
 
 For each _traffic_ [control point][control-point] (where flows are http or grpc
 requests), some basic metadata is available as _request labels_. These are
-`request_id` , `request_method`, `request_path`, `request_host`,
-`request_scheme`, `request_size`, `request_protocol` (mapped from fields of
-[HttpRequest][authz-request-http]). Also, (non-pseudo) headers are available as
-`request_header_<headername>`, where `<headername>` is a headername normalised
-to lowercase, eg. `request_header_user-agent`.
+`http.method` , `http.target`, `http.host`, `http.scheme`,
+`http.request_content_length` and `http.flavor`. Additionally all (non-pseudo)
+headers are available as `http.request.header.header_name`, eg.
+`http.request.header.user_agent` (note the snake_case!). Values of these labels
+are described by [OpenTelemetry semantic conventions for HTTP
+spans][otel-conventions]. The only exception is `http.host` attribute, which is
+equal to Host/Authority header. This is thus similar to `net.peer.name` OTEL
+attribute, but is provided for both ingress and egress control points.
 
 ### Baggage
 
@@ -66,9 +69,8 @@ also takes an explicit `labels` map in the `Check()` call.
 
 ## Interaction with FluxNinja Cloud plugin {#plugin}
 
-All the flow labels except the request labels are used as labels of flow events.
-These events are rolled up and sent to the analytics database in the cloud. This
-allows:
+All the flow labels are used as labels of flow events. These events are rolled
+up and sent to the analytics database in the cloud. This allows:
 
 - for the flow labels to be used as filters,
 - to see analytics for each flow label, eg. distribution of its values.
@@ -97,9 +99,9 @@ select which labels to include in telemetry.
 [workload]: /concepts/flow-control/actuators/scheduler.md#workload
 [ratelimiter]: /concepts/flow-control/actuators/rate-limiter.md
 [fluxmeter]: /concepts/flow-control/fluxmeter.md
-[authz-request-http]:
-  https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
 [control-point]: ../flow-control.md#control-point
+[otel-conventions]:
+  https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
