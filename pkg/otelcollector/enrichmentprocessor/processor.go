@@ -57,7 +57,7 @@ func (ep *enrichmentProcessor) ConsumeLogs(ctx context.Context, origLd plog.Logs
 	}
 	ld := origLd.Clone()
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		whitelistLogAttributes(logRecord.Attributes())
+		acceptListLogAttributes(logRecord.Attributes())
 		ep.enrichAttributes(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
 		return nil
 	})
@@ -71,7 +71,7 @@ func (ep *enrichmentProcessor) ConsumeTraces(ctx context.Context, origTd ptrace.
 	}
 	td := origTd.Clone()
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		whitelistSpanAttributes(span.Attributes())
+		acceptListSpanAttributes(span.Attributes())
 		ep.enrichAttributes(span.Attributes(), []string{})
 		return nil
 	})
@@ -123,6 +123,7 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 }
 
 func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsMissing []string) {
+	// TODO tgill: split this into multiple functions, one for each source
 	unpackFlowLabels(attributes, treatAsMissing)
 	attributes.UpsertString(otelcollector.AgentGroupLabel, ep.agentGroup)
 	var hostIP string
@@ -223,7 +224,7 @@ func ipFromAddress(ip string) string {
 }
 
 /*
- * Whitelist: This whitelist is applied to logs and spans at the beginning of enrichment process.
+ * AcceptList: This acceptList is applied to logs and spans at the beginning of enrichment process.
  */
 var (
 	commonAttributes = map[string]bool{
@@ -256,20 +257,20 @@ var (
 	}
 )
 
-func whitelistLogAttributes(attributes pcommon.Map) {
-	_whitelistAttributes(attributes, commonAttributes)
-	_whitelistAttributes(attributes, logAttributes)
+func acceptListLogAttributes(attributes pcommon.Map) {
+	_acceptListAttributes(attributes, commonAttributes)
+	_acceptListAttributes(attributes, logAttributes)
 }
 
-func whitelistSpanAttributes(attributes pcommon.Map) {
-	_whitelistAttributes(attributes, commonAttributes)
-	_whitelistAttributes(attributes, spanAttributes)
+func acceptListSpanAttributes(attributes pcommon.Map) {
+	_acceptListAttributes(attributes, commonAttributes)
+	_acceptListAttributes(attributes, spanAttributes)
 }
 
-func _whitelistAttributes(attributes pcommon.Map, whitelist map[string]bool) {
+func _acceptListAttributes(attributes pcommon.Map, acceptList map[string]bool) {
 	keysToRemove := make([]string, 0)
 	attributes.Range(func(key string, _ pcommon.Value) bool {
-		if !whitelist[key] {
+		if !acceptList[key] {
 			keysToRemove = append(keysToRemove, key)
 		}
 		return true
