@@ -16,9 +16,10 @@ flowchart LR
     end
     subgraph mesh["Service Mesh"]
     end
-    db[("Metrics DB")]
-    mgmt-->|configs| fcs
-    loop-->|decisions| actuators
+    etcd[("etcd")]
+    db[("Prometheus")]
+    mgmt-->|configs| etcd-->|configs| fcs
+    loop-->|decisions| etcd -->|configs| actuators
     mesh -->|metrics| metrics
     mesh -->|service metadata| sd
     mesh <-->|flows| fcs
