@@ -137,7 +137,7 @@ commands:
             printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
             date +%m > ~/month
             date +%d > ~/day
-            echo <<parameters.tools>> > ~/installed-tools
+            echo "<<parameters.tools>>" > ~/installed-tools
       # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
       - restore_cache:
           name: Restore ASDF cache
