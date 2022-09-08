@@ -1,7 +1,6 @@
 package selectors
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -12,26 +11,30 @@ import (
 // used in LabelMatchers in Selectors.
 //
 // Canonical form implies appropriate prefixes for different types of labels,
-// see docs on policy/language/v1.Selector.
+// see https://docs.fluxninja.com/docs/development/concepts/flow-control/label/#sources
 type Labels map[string]string
 
-// LabelSources describes all the sources of labels (flow and request).
+// LabelSources describes all the sources of labels.
 type LabelSources struct {
-	Flow    map[string]string
+	// Baggage, classifier and explicit labels
+	Flow map[string]string
+	// Request labels
 	Request *ext_authz.AttributeContext_Request
 }
 
 const (
-	requestLabelPrefix       = "http"
-	requestLabelHeaderPrefix = "http.request.header"
-	numRequestLabels         = 7 // used only for capacity estimation
+	requestLabelPrefix       = "http."
+	requestLabelHeaderPrefix = "http.request.header."
+	// Number of always-added request labels (this value is used only for
+	// capacity estimation).
+	numRequestLabels = 5
 )
 
 // ToPlainMap extracts the underlying map of labels.
 func (l Labels) ToPlainMap() map[string]string { return map[string]string(l) }
 
 // NewLabels maps all available labels into a flat namespace, as documented in
-// policy/language/v1.Selector.
+// https://docs.fluxninja.com/docs/development/concepts/flow-control/label/#sources
 func NewLabels(ls LabelSources) Labels {
 	return Labels(nil).CombinedWith(ls)
 }
@@ -58,17 +61,12 @@ func (l Labels) CombinedWith(newLabels LabelSources) Labels {
 
 	if newLabels.Request != nil {
 		if http := newLabels.Request.GetHttp(); http != nil {
-			var contentLength int64
-			if http.Size < 0 {
-				contentLength = http.Size
-			} else {
-				// TODO: compute if unknown
-			}
-			labels[fmt.Sprintf("%s.method", requestLabelPrefix)] = http.Method
-			labels[fmt.Sprintf("%s.target", requestLabelPrefix)] = http.Path
-			labels[fmt.Sprintf("%s.scheme", requestLabelPrefix)] = http.Scheme
-			labels[fmt.Sprintf("%s.request_content_length", requestLabelPrefix)] = strconv.FormatInt(contentLength, 10)
-			labels[fmt.Sprintf("%s.flavor", requestLabelPrefix)] = convertProtocol(http.Protocol)
+			labels[requestLabelPrefix+"method"] = http.Method
+			labels[requestLabelPrefix+"target"] = http.Path
+			labels[requestLabelPrefix+"host"] = http.Host
+			labels[requestLabelPrefix+"scheme"] = http.Scheme
+			labels[requestLabelPrefix+"request_content_length"] = strconv.FormatInt(http.Size, 10)
+			labels[requestLabelPrefix+"flavor"] = convertProtocol(http.Protocol)
 		}
 		for k, v := range newLabels.Request.GetHttp().GetHeaders() {
 			if strings.HasPrefix(k, ":") {
@@ -78,28 +76,30 @@ func (l Labels) CombinedWith(newLabels LabelSources) Labels {
 				// Request.Http.
 				continue
 			}
-			labels[fmt.Sprintf("%s.%s", requestLabelHeaderPrefix, k)] = v
+			labels[requestLabelHeaderPrefix+convertHeaderKey(k)] = v
 		}
 	}
 
 	return Labels(labels)
 }
 
+// convertHeaderKey converts envoy's header naming convention to OTEL's one.
 func convertHeaderKey(key string) string {
-	return strings.ReplaceAll(key, "-", ".")
+	return strings.ReplaceAll(key, "-", "_")
 }
 
 // convertProtocol converts envoy's protocol to OTEL kind of HTTP protocol.
 func convertProtocol(protocolName string) string {
-	protocols := map[string]string{
-		"HTTP/1.0": "1.0",
-		"HTTP/1.1": "1.1",
-		"HTTP/2.0": "2.0",
-		"HTTP/3.0": "3.0",
-	}
-	flavor, ok := protocols[protocolName]
-	if !ok {
+	switch protocolName {
+	case "HTTP/1.0":
+		return "1.0"
+	case "HTTP/1.1":
+		return "1.1"
+	case "HTTP/2":
+		return "2.0"
+	case "HTTP/3":
+		return "3.0"
+	default:
 		return protocolName
 	}
-	return flavor
 }
