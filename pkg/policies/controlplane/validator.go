@@ -7,7 +7,7 @@ import (
 	policiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 	"go.uber.org/fx"
 )
@@ -74,10 +74,10 @@ func (v *CMFileValidator) ValidateFile(
 
 	if policy.GetResources() != nil {
 		for _, c := range policy.GetResources().Classifiers {
-			_, err = classifier.CompileRuleset(ctx, name, c)
+			_, err = compiler.CompileRuleset(ctx, name, c)
 			if err != nil {
-				if errors.Is(err, classifier.BadExtractor) || errors.Is(err, classifier.BadSelector) ||
-					errors.Is(err, classifier.BadRego) || errors.Is(err, classifier.BadLabelName) {
+				if errors.Is(err, compiler.BadExtractor) || errors.Is(err, compiler.BadSelector) ||
+					errors.Is(err, compiler.BadRego) || errors.Is(err, compiler.BadLabelName) {
 					return false, err.Error(), nil
 				} else {
 					return false, "", err

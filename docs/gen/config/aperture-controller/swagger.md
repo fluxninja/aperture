@@ -6,7 +6,6 @@
 
 | Key          | Reference                          |
 | ------------ | ---------------------------------- |
-| `agent_info` | [AgentInfo](#agent-info)           |
 | `client`     | [Client](#client)                  |
 | `etcd`       | [Etcd](#etcd)                      |
 | `liveness`   | [Liveness](#liveness)              |
@@ -31,7 +30,6 @@
 ### Object Index
 
 - [AdaptivePolicy](#adaptive-policy) – AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
-- [AgentInfoConfig](#agent-info-config) – AgentInfoConfig is the configuration for the agent group etc.
 - [BackoffConfig](#backoff-config) – BackoffConfig holds configuration for GRPC Client Backoff.
 - [BatchConfig](#batch-config) – BatchConfig defines configuration for OTEL batch processor.
 - [ClientConfig](#client-config) – ClientConfig is the client configuration.
@@ -63,23 +61,6 @@
 - [WatermarksPolicy](#watermarks-policy) – WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
 
 ## Reference
-
-### _AgentInfo_ {#agent-info}
-
-Key: `agent_info`
-
-#### Members
-
-<dl>
-
-<dt></dt>
-<dd>
-
-Type: [AgentInfoConfig](#agent-info-config)
-
-</dd>
-
-</dl>
 
 ### _Client_ {#client}
 
@@ -462,21 +443,6 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 <dd>
 
 (float64, `gte=0,lte=1`, default: `0.50`) Factor sets user-configured limit of available memory
-
-</dd>
-</dl>
-
-### AgentInfoConfig {#agent-info-config}
-
-AgentInfoConfig is the configuration for the agent group etc.
-
-#### Properties
-
-<dl>
-<dt>agent_group</dt>
-<dd>
-
-(string, default: `default`) All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
 
 </dd>
 </dl>
