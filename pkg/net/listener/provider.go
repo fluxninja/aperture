@@ -45,15 +45,15 @@ func Module() fx.Option {
 
 // Constructor holds fields to create an annotated Listener.
 type Constructor struct {
-	Key           string
+	ConfigKey     string
 	Name          string
 	DefaultConfig ListenerConfig
 }
 
 // ProvideAnnotated provides an annotated instance of Listener.
 func (constructor Constructor) ProvideAnnotated() fx.Annotated {
-	if constructor.Key == "" {
-		constructor.Key = defaultKey
+	if constructor.ConfigKey == "" {
+		constructor.ConfigKey = defaultKey
 	}
 	return fx.Annotated{
 		Name:   constructor.Name,
@@ -72,7 +72,7 @@ type ListenerIn struct {
 func (constructor Constructor) provideListener(in ListenerIn) (*Listener, error) {
 	config := constructor.DefaultConfig
 
-	if err := in.Unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := in.Unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize listener configuration!")
 		return nil, err
 	}

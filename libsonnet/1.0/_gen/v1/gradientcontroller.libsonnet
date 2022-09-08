@@ -40,10 +40,10 @@ local gradientcontrollerouts = import './gradientcontrollerouts.libsonnet';
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
   },
-  withTolerance(tolerance):: {
-    tolerance: tolerance,
+  withSlope(slope):: {
+    slope: slope,
   },
-  withToleranceMixin(tolerance):: {
-    tolerance+: tolerance,
+  withSlopeMixin(slope):: {
+    slope+: slope,
   },
 }

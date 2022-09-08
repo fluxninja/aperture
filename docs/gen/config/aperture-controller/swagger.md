@@ -64,7 +64,7 @@
 
 ## Reference
 
-### <span id="agent-info"></span> _AgentInfo_
+### _AgentInfo_ {#agent-info}
 
 Key: `agent_info`
 
@@ -78,9 +78,10 @@ Key: `agent_info`
 Type: [AgentInfoConfig](#agent-info-config)
 
 </dd>
+
 </dl>
 
-### <span id="client"></span> _Client_
+### _Client_ {#client}
 
 Key: `client`
 
@@ -97,9 +98,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_CLIENT_PROXY_`
 Type: [ProxyConfig](#proxy-config)
 
 </dd>
+
 </dl>
 
-### <span id="etcd"></span> _Etcd_
+### _Etcd_ {#etcd}
 
 Key: `etcd`
 
@@ -116,9 +118,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_ETCD_`
 Type: [EtcdConfig](#etcd-config)
 
 </dd>
+
 </dl>
 
-### <span id="flux-ninja-plugin"></span> _FluxNinjaPlugin_
+### _FluxNinjaPlugin_ {#flux-ninja-plugin}
 
 Key: `fluxninja_plugin`
 
@@ -135,9 +138,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_`
 Type: [FluxNinjaPluginConfig](#flux-ninja-plugin-config)
 
 </dd>
+
 </dl>
 
-### <span id="liveness"></span> _Liveness_
+### _Liveness_ {#liveness}
 
 Key: `liveness`
 
@@ -162,9 +166,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_LIVENESS_SERVICE_`
 Type: [JobConfig](#job-config)
 
 </dd>
+
 </dl>
 
-### <span id="log"></span> _Log_
+### _Log_ {#log}
 
 Key: `log`
 
@@ -181,9 +186,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_LOG_`
 Type: [LogConfig](#log-config)
 
 </dd>
+
 </dl>
 
-### <span id="metrics"></span> _Metrics_
+### _Metrics_ {#metrics}
 
 Key: `metrics`
 
@@ -200,9 +206,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_METRICS_`
 Type: [MetricsConfig](#metrics-config)
 
 </dd>
+
 </dl>
 
-### <span id="otel"></span> _Otel_
+### _Otel_ {#otel}
 
 Key: `otel`
 
@@ -219,9 +226,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_PROXY_`
 Type: [OtelConfig](#otel-config)
 
 </dd>
+
 </dl>
 
-### <span id="plugins"></span> _Plugins_
+### _Plugins_ {#plugins}
 
 Key: `plugins`
 
@@ -238,9 +246,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_PLUGINS_`
 Type: [PluginsConfig](#plugins-config)
 
 </dd>
+
 </dl>
 
-### <span id="policies-config"></span> _PoliciesConfig_
+### _PoliciesConfig_ {#policies-config}
 
 Key: `policies`
 
@@ -255,10 +264,6 @@ Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_`
 (string, default: `/etc/aperture/aperture-controller/policies`, env-var: `APERTURE_CONTROLLER_POLICIES_POLICIES_PATH`) Directory containing policies rules
 
 </dd>
-</dl>
-
-<dl>
-</dd>
 
 <dt>promql_jobs_scheduler</dt>
 <dd>
@@ -267,9 +272,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_PROMQL_JOBS_SCHEDULER_`
 Type: [JobGroupConfig](#job-group-config)
 
 </dd>
+
 </dl>
 
-### <span id="profilers"></span> _Profilers_
+### _Profilers_ {#profilers}
 
 Key: `profilers`
 
@@ -286,9 +292,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_PROFILERS_`
 Type: [ProfilersConfig](#profilers-config)
 
 </dd>
+
 </dl>
 
-### <span id="prometheus"></span> _Prometheus_
+### _Prometheus_ {#prometheus}
 
 Key: `prometheus`
 
@@ -313,9 +320,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_PROMETHEUS_HTTP_CLIENT_`
 Type: [HTTPClientConfig](#http-client-config)
 
 </dd>
+
 </dl>
 
-### <span id="readiness"></span> _Readiness_
+### _Readiness_ {#readiness}
 
 Key: `readiness`
 
@@ -340,9 +348,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_SERVICE_`
 Type: [JobConfig](#job-config)
 
 </dd>
+
 </dl>
 
-### <span id="sentry-plugin"></span> _SentryPlugin_
+### _SentryPlugin_ {#sentry-plugin}
 
 Key: `sentry_plugin`
 
@@ -359,9 +368,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SENTRY_PLUGIN_SENTRY_`
 Type: [SentryConfig](#sentry-config)
 
 </dd>
+
 </dl>
 
-### <span id="server"></span> _Server_
+### _Server_ {#server}
 
 Key: `server`
 
@@ -410,9 +420,10 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_TLS_`
 Type: [ServerTLSConfig](#server-tls-config)
 
 </dd>
+
 </dl>
 
-### <span id="watchdog"></span> _Watchdog_
+### _Watchdog_ {#watchdog}
 
 Key: `watchdog`
 
@@ -429,11 +440,12 @@ Env-Var Prefix: `APERTURE_CONTROLLER_WATCHDOG_MEMORY_`
 Type: [WatchdogConfig](#watchdog-config)
 
 </dd>
+
 </dl>
 
 ## Objects
 
-### <span id="adaptive-policy"></span> AdaptivePolicy
+### AdaptivePolicy {#adaptive-policy}
 
 AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
 
@@ -446,8 +458,6 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 (bool, default: `false`) Flag to enable the policy
 
 </dd>
-</dl>
-<dl>
 <dt>factor</dt>
 <dd>
 
@@ -456,7 +466,7 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 </dd>
 </dl>
 
-### <span id="agent-info-config"></span> AgentInfoConfig
+### AgentInfoConfig {#agent-info-config}
 
 AgentInfoConfig is the configuration for the agent group etc.
 
@@ -471,7 +481,7 @@ AgentInfoConfig is the configuration for the agent group etc.
 </dd>
 </dl>
 
-### <span id="backoff-config"></span> BackoffConfig
+### BackoffConfig {#backoff-config}
 
 BackoffConfig holds configuration for GRPC Client Backoff.
 
@@ -484,24 +494,18 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 (string, `gte=0`, default: `1s`) Base Delay
 
 </dd>
-</dl>
-<dl>
 <dt>jitter</dt>
 <dd>
 
 (float64, `gte=0`, default: `0.2`) Jitter
 
 </dd>
-</dl>
-<dl>
 <dt>max_delay</dt>
 <dd>
 
 (string, `gte=0`, default: `120s`) Max Delay
 
 </dd>
-</dl>
-<dl>
 <dt>multiplier</dt>
 <dd>
 
@@ -510,7 +514,7 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 </dd>
 </dl>
 
-### <span id="batch-config"></span> BatchConfig
+### BatchConfig {#batch-config}
 
 BatchConfig defines configuration for OTEL batch processor.
 
@@ -523,8 +527,6 @@ BatchConfig defines configuration for OTEL batch processor.
 (uint32, `gt=0`, default: `10000`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 
 </dd>
-</dl>
-<dl>
 <dt>timeout</dt>
 <dd>
 
@@ -533,7 +535,7 @@ BatchConfig defines configuration for OTEL batch processor.
 </dd>
 </dl>
 
-### <span id="client-config"></span> ClientConfig
+### ClientConfig {#client-config}
 
 ClientConfig is the client configuration.
 
@@ -546,8 +548,6 @@ ClientConfig is the client configuration.
 ([GRPCClientConfig](#g-rpc-client-config))
 
 </dd>
-</dl>
-<dl>
 <dt>http</dt>
 <dd>
 
@@ -556,7 +556,7 @@ ClientConfig is the client configuration.
 </dd>
 </dl>
 
-### <span id="client-tls-config"></span> ClientTLSConfig
+### ClientTLSConfig {#client-tls-config}
 
 ClientTLSConfig is the config for client TLS.
 
@@ -569,32 +569,24 @@ ClientTLSConfig is the config for client TLS.
 (string, `omitempty,file`)
 
 </dd>
-</dl>
-<dl>
 <dt>cert_file</dt>
 <dd>
 
 (string, `omitempty,file`)
 
 </dd>
-</dl>
-<dl>
 <dt>insecure_skip_verify</dt>
 <dd>
 
 (bool)
 
 </dd>
-</dl>
-<dl>
 <dt>key_file</dt>
 <dd>
 
 (string, `omitempty,file`)
 
 </dd>
-</dl>
-<dl>
 <dt>key_log_file</dt>
 <dd>
 
@@ -603,7 +595,7 @@ ClientTLSConfig is the config for client TLS.
 </dd>
 </dl>
 
-### <span id="etcd-config"></span> EtcdConfig
+### EtcdConfig {#etcd-config}
 
 EtcdConfig holds configuration for etcd client.
 
@@ -616,8 +608,6 @@ EtcdConfig holds configuration for etcd client.
 ([]string, `gt=0,dive,hostname_port|url|fqdn`) List of Etcd server endpoints
 
 </dd>
-</dl>
-<dl>
 <dt>lease_ttl</dt>
 <dd>
 
@@ -626,7 +616,7 @@ EtcdConfig holds configuration for etcd client.
 </dd>
 </dl>
 
-### <span id="flux-ninja-plugin-config"></span> FluxNinjaPluginConfig
+### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
 
 FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugin.
 
@@ -639,24 +629,18 @@ FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugi
 (string) API Key for this agent.
 
 </dd>
-</dl>
-<dl>
 <dt>fluxninja_endpoint</dt>
 <dd>
 
 (string, `omitempty,hostname_port|url|fqdn`) Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
 
 </dd>
-</dl>
-<dl>
 <dt>heartbeat_interval</dt>
 <dd>
 
 (string, `gte=0s`, default: `5s`) Interval between each heartbeat.
 
 </dd>
-</dl>
-<dl>
 <dt>client</dt>
 <dd>
 
@@ -665,7 +649,7 @@ FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugi
 </dd>
 </dl>
 
-### <span id="g-rpc-client-config"></span> GRPCClientConfig
+### GRPCClientConfig {#g-rpc-client-config}
 
 GRPCClientConfig holds configuration for GRPC Client.
 
@@ -678,32 +662,24 @@ GRPCClientConfig holds configuration for GRPC Client.
 (bool, default: `false`) Disable ClientTLS
 
 </dd>
-</dl>
-<dl>
 <dt>min_connection_timeout</dt>
 <dd>
 
 (string, `gte=0`, default: `20s`) Minimum connection timeout
 
 </dd>
-</dl>
-<dl>
 <dt>use_proxy</dt>
 <dd>
 
 (bool, default: `false`) Use HTTP CONNECT Proxy
 
 </dd>
-</dl>
-<dl>
 <dt>backoff</dt>
 <dd>
 
 ([BackoffConfig](#backoff-config))
 
 </dd>
-</dl>
-<dl>
 <dt>tls</dt>
 <dd>
 
@@ -712,7 +688,7 @@ GRPCClientConfig holds configuration for GRPC Client.
 </dd>
 </dl>
 
-### <span id="g-rpc-gateway-config"></span> GRPCGatewayConfig
+### GRPCGatewayConfig {#g-rpc-gateway-config}
 
 GRPCGatewayConfig holds configuration for grpc-http gateway
 
@@ -727,7 +703,7 @@ GRPCGatewayConfig holds configuration for grpc-http gateway
 </dd>
 </dl>
 
-### <span id="g-rpc-server-config"></span> GRPCServerConfig
+### GRPCServerConfig {#g-rpc-server-config}
 
 GRPCServerConfig holds configuration for GRPC Server.
 
@@ -740,8 +716,6 @@ GRPCServerConfig holds configuration for GRPC Server.
 (string, `gte=0s`, default: `120s`) Connection timeout
 
 </dd>
-</dl>
-<dl>
 <dt>enable_reflection</dt>
 <dd>
 
@@ -750,7 +724,7 @@ GRPCServerConfig holds configuration for GRPC Server.
 </dd>
 </dl>
 
-### <span id="http-client-config"></span> HTTPClientConfig
+### HTTPClientConfig {#http-client-config}
 
 HTTPClientConfig holds configuration for HTTP Client.
 
@@ -763,144 +737,108 @@ HTTPClientConfig holds configuration for HTTP Client.
 (bool, default: `false`) Disable Compression
 
 </dd>
-</dl>
-<dl>
 <dt>disable_keep_alives</dt>
 <dd>
 
 (bool, default: `false`) Disable HTTP Keep Alives
 
 </dd>
-</dl>
-<dl>
 <dt>expect_continue_timeout</dt>
 <dd>
 
 (string, `gte=0s`, default: `1s`) Expect Continue Timeout. 0 = no timeout.
 
 </dd>
-</dl>
-<dl>
 <dt>idle_connection_timeout</dt>
 <dd>
 
 (string, `gte=0s`, default: `90s`) Idle Connection Timeout. 0 = no timeout.
 
 </dd>
-</dl>
-<dl>
 <dt>key_log_file</dt>
 <dd>
 
 (string, `omitempty,file`) SSL key log file (useful for debugging with wireshark)
 
 </dd>
-</dl>
-<dl>
 <dt>max_conns_per_host</dt>
 <dd>
 
 (int64, `gte=0`, default: `0`) Max Connections Per Host. 0 = no limit.
 
 </dd>
-</dl>
-<dl>
 <dt>max_idle_connections</dt>
 <dd>
 
 (int64, `gte=0`, default: `100`) Max Idle Connections. 0 = no limit.
 
 </dd>
-</dl>
-<dl>
 <dt>max_idle_connections_per_host</dt>
 <dd>
 
 (int64, `gte=0`, default: `5`) Max Idle Connections per host. 0 = no limit.
 
 </dd>
-</dl>
-<dl>
 <dt>max_response_header_bytes</dt>
 <dd>
 
 (int64, `gte=0`, default: `0`) Max Response Header Bytes. 0 = no limit.
 
 </dd>
-</dl>
-<dl>
 <dt>network_keep_alive</dt>
 <dd>
 
 (string, `gte=0s`, default: `30s`) Network level keep-alive duration
 
 </dd>
-</dl>
-<dl>
 <dt>network_timeout</dt>
 <dd>
 
 (string, `gte=0s`, default: `30s`) Timeout for making network connection
 
 </dd>
-</dl>
-<dl>
 <dt>read_buffer_size</dt>
 <dd>
 
 (int64, `gte=0`, default: `0`) Read Buffer Size. 0 = 4KB
 
 </dd>
-</dl>
-<dl>
 <dt>response_header_timeout</dt>
 <dd>
 
 (string, `gte=0s`, default: `0s`) Response Header Timeout. 0 = no timeout.
 
 </dd>
-</dl>
-<dl>
 <dt>tls_handshake_timeout</dt>
 <dd>
 
 (string, `gte=0s`, default: `10s`) TLS Handshake Timeout. 0 = no timeout
 
 </dd>
-</dl>
-<dl>
 <dt>timeout</dt>
 <dd>
 
 (string, `gte=0s`, default: `60s`) HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
 
 </dd>
-</dl>
-<dl>
 <dt>use_proxy</dt>
 <dd>
 
 (bool, default: `false`) Use Proxy
 
 </dd>
-</dl>
-<dl>
 <dt>write_buffer_size</dt>
 <dd>
 
 (int64, `gte=0`, default: `0`) Write Buffer Size. 0 = 4KB.
 
 </dd>
-</dl>
-<dl>
 <dt>proxy_connect_header</dt>
 <dd>
 
 ([Header](#header))
 
 </dd>
-</dl>
-<dl>
 <dt>tls</dt>
 <dd>
 
@@ -909,7 +847,7 @@ HTTPClientConfig holds configuration for HTTP Client.
 </dd>
 </dl>
 
-### <span id="http-server-config"></span> HTTPServerConfig
+### HTTPServerConfig {#http-server-config}
 
 HTTPServerConfig holds configuration for HTTP Server.
 
@@ -922,64 +860,48 @@ HTTPServerConfig holds configuration for HTTP Server.
 (bool, default: `false`) Disable HTTP Keep Alives
 
 </dd>
-</dl>
-<dl>
 <dt>idle_timeout</dt>
 <dd>
 
 (string, `gte=0s`, default: `30s`) Idle timeout
 
 </dd>
-</dl>
-<dl>
 <dt>latency_bucket_count</dt>
 <dd>
 
 (int64, `gte=0`, default: `100`) The number of buckets in latency histogram
 
 </dd>
-</dl>
-<dl>
 <dt>latency_bucket_start_ms</dt>
 <dd>
 
 (float64, `gte=0`, default: `20`) The lowest bucket in latency histogram
 
 </dd>
-</dl>
-<dl>
 <dt>latency_bucket_width_ms</dt>
 <dd>
 
 (float64, `gte=0`, default: `20`) The bucket width in latency histogram
 
 </dd>
-</dl>
-<dl>
 <dt>max_header_bytes</dt>
 <dd>
 
 (int64, `gte=0`, default: `1048576`) Max header size in bytes
 
 </dd>
-</dl>
-<dl>
 <dt>read_header_timeout</dt>
 <dd>
 
 (string, `gte=0s`, default: `10s`) Read header timeout
 
 </dd>
-</dl>
-<dl>
 <dt>read_timeout</dt>
 <dd>
 
 (string, `gte=0s`, default: `10s`) Read timeout
 
 </dd>
-</dl>
-<dl>
 <dt>write_timeout</dt>
 <dd>
 
@@ -988,7 +910,7 @@ HTTPServerConfig holds configuration for HTTP Server.
 </dd>
 </dl>
 
-### <span id="header"></span> Header
+### Header {#header}
 
 A Header represents the key-value pairs in an HTTP header.
 
@@ -997,7 +919,7 @@ CanonicalHeaderKey.
 
 [Header](#header)
 
-### <span id="heap-config"></span> HeapConfig
+### HeapConfig {#heap-config}
 
 HeapConfig holds configuration for heap Watchdog.
 
@@ -1010,24 +932,18 @@ HeapConfig holds configuration for heap Watchdog.
 (uint64, `gt=0`, default: `268435456`) Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
 
 </dd>
-</dl>
-<dl>
 <dt>min_gogc</dt>
 <dd>
 
 (int64, `gt=0,lte=100`, default: `25`) Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
 
 </dd>
-</dl>
-<dl>
 <dt>adaptive_policy</dt>
 <dd>
 
 ([AdaptivePolicy](#adaptive-policy))
 
 </dd>
-</dl>
-<dl>
 <dt>watermarks_policy</dt>
 <dd>
 
@@ -1036,7 +952,7 @@ HeapConfig holds configuration for heap Watchdog.
 </dd>
 </dl>
 
-### <span id="job-config"></span> JobConfig
+### JobConfig {#job-config}
 
 JobConfig is config for Job
 
@@ -1049,24 +965,18 @@ JobConfig is config for Job
 (string, default: `10s`) Time period between job executions. Zero or negative value means that the job will never execute periodically.
 
 </dd>
-</dl>
-<dl>
 <dt>execution_timeout</dt>
 <dd>
 
 (string, `gte=0s`, default: `5s`) Execution timeout
 
 </dd>
-</dl>
-<dl>
 <dt>initial_delay</dt>
 <dd>
 
 (string, default: `0s`) Initial delay to start the job. Zero value will schedule the job immediately. Negative value will wait for next scheduled interval.
 
 </dd>
-</dl>
-<dl>
 <dt>initially_healthy</dt>
 <dd>
 
@@ -1075,7 +985,7 @@ JobConfig is config for Job
 </dd>
 </dl>
 
-### <span id="job-group-config"></span> JobGroupConfig
+### JobGroupConfig {#job-group-config}
 
 JobGroupConfig holds configuration for JobGroup.
 
@@ -1090,7 +1000,7 @@ JobGroupConfig holds configuration for JobGroup.
 </dd>
 </dl>
 
-### <span id="listener-config"></span> ListenerConfig
+### ListenerConfig {#listener-config}
 
 ListenerConfig holds configuration for socket listeners.
 
@@ -1103,16 +1013,12 @@ ListenerConfig holds configuration for socket listeners.
 (string, `hostname_port`, default: `:8080`) Address to bind to in the form of [host%zone]:port
 
 </dd>
-</dl>
-<dl>
 <dt>keep_alive</dt>
 <dd>
 
 (string, `gte=0s`, default: `180s`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alives are disabled.
 
 </dd>
-</dl>
-<dl>
 <dt>network</dt>
 <dd>
 
@@ -1121,28 +1027,12 @@ ListenerConfig holds configuration for socket listeners.
 </dd>
 </dl>
 
-### <span id="log-config"></span> LogConfig
+### LogConfig {#log-config}
 
 LogConfig holds configuration for a logger and log writers.
 
 #### Properties
 
-<dl>
-<dt>compress</dt>
-<dd>
-
-(bool, default: `false`) Compress
-
-</dd>
-</dl>
-<dl>
-<dt>file</dt>
-<dd>
-
-(string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-
-</dd>
-</dl>
 <dl>
 <dt>level</dt>
 <dd>
@@ -1150,57 +1040,27 @@ LogConfig holds configuration for a logger and log writers.
 (string, `oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED`, default: `info`) Log level
 
 </dd>
-</dl>
-<dl>
-<dt>max_age</dt>
-<dd>
-
-(int64, `gte=0`, default: `7`) Max age in days for log files
-
-</dd>
-</dl>
-<dl>
-<dt>max_backups</dt>
-<dd>
-
-(int64, `gte=0`, default: `3`) Max log file backups
-
-</dd>
-</dl>
-<dl>
-<dt>max_size</dt>
-<dd>
-
-(int64, `gte=0`, default: `50`) Log file max size in MB
-
-</dd>
-</dl>
-<dl>
 <dt>non_blocking</dt>
 <dd>
 
 (bool, default: `true`) Use non-blocking log writer (can lose logs at high throughput)
 
 </dd>
-</dl>
-<dl>
 <dt>pretty_console</dt>
 <dd>
 
 (bool, default: `false`) Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
 
 </dd>
-</dl>
-<dl>
 <dt>writers</dt>
 <dd>
 
-([[]LogWriterConfig](#log-writer-config), `omitempty,dive,omitempty`) Additional log writers
+([[]LogWriterConfig](#log-writer-config), `omitempty,dive,omitempty`) Log writers
 
 </dd>
 </dl>
 
-### <span id="log-writer-config"></span> LogWriterConfig
+### LogWriterConfig {#log-writer-config}
 
 LogWriterConfig holds configuration for a log writer.
 
@@ -1213,32 +1073,24 @@ LogWriterConfig holds configuration for a log writer.
 (bool, default: `false`) Compress
 
 </dd>
-</dl>
-<dl>
 <dt>file</dt>
 <dd>
 
 (string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
 
 </dd>
-</dl>
-<dl>
 <dt>max_age</dt>
 <dd>
 
 (int64, `gte=0`, default: `7`) Max age in days for log files
 
 </dd>
-</dl>
-<dl>
 <dt>max_backups</dt>
 <dd>
 
 (int64, `gte=0`, default: `3`) Max log file backups
 
 </dd>
-</dl>
-<dl>
 <dt>max_size</dt>
 <dd>
 
@@ -1247,7 +1099,7 @@ LogWriterConfig holds configuration for a log writer.
 </dd>
 </dl>
 
-### <span id="metrics-config"></span> MetricsConfig
+### MetricsConfig {#metrics-config}
 
 MetricsConfig holds configuration for service metrics.
 
@@ -1260,16 +1112,12 @@ MetricsConfig holds configuration for service metrics.
 (bool, default: `false`) EnableGoCollector controls whether the go collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
 
 </dd>
-</dl>
-<dl>
 <dt>enable_process_collector</dt>
 <dd>
 
 (bool, default: `false`) EnableProcessCollector controls whether the process collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
 
 </dd>
-</dl>
-<dl>
 <dt>pedantic</dt>
 <dd>
 
@@ -1278,7 +1126,7 @@ MetricsConfig holds configuration for service metrics.
 </dd>
 </dl>
 
-### <span id="otel-config"></span> OtelConfig
+### OtelConfig {#otel-config}
 
 OtelConfig is the configuration for the OTEL collector.
 
@@ -1291,24 +1139,18 @@ OtelConfig is the configuration for the OTEL collector.
 (string, `hostname_port`, default: `:4317`) GRPC listener addr for OTEL Collector.
 
 </dd>
-</dl>
-<dl>
 <dt>http_addr</dt>
 <dd>
 
 (string, `hostname_port`, default: `:4318`) HTTP listener addr for OTEL Collector.
 
 </dd>
-</dl>
-<dl>
 <dt>batch_postrollup</dt>
 <dd>
 
 ([BatchConfig](#batch-config))
 
 </dd>
-</dl>
-<dl>
 <dt>batch_prerollup</dt>
 <dd>
 
@@ -1317,7 +1159,7 @@ OtelConfig is the configuration for the OTEL collector.
 </dd>
 </dl>
 
-### <span id="plugins-config"></span> PluginsConfig
+### PluginsConfig {#plugins-config}
 
 PluginsConfig holds configuration for plugins.
 
@@ -1330,33 +1172,27 @@ PluginsConfig holds configuration for plugins.
 (bool, default: `false`) Disables all plugins
 
 </dd>
-</dl>
-<dl>
 <dt>disabled_plugins</dt>
 <dd>
 
 ([]string) Specific plugins to disable
 
 </dd>
-</dl>
-<dl>
 <dt>disabled_symbols</dt>
 <dd>
 
 ([]string) Specific plugin types to disable
 
 </dd>
-</dl>
-<dl>
 <dt>plugins_path</dt>
 <dd>
 
-(string) Path to plugins directory. This can be set via command line arguments as well.
+(string, default: `default`) Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
 
 </dd>
 </dl>
 
-### <span id="profilers-config"></span> ProfilersConfig
+### ProfilersConfig {#profilers-config}
 
 ProfilersConfig holds configuration for profilers.
 
@@ -1369,16 +1205,12 @@ ProfilersConfig holds configuration for profilers.
 (bool, default: `false`) Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
 
 </dd>
-</dl>
-<dl>
 <dt>profiles_path</dt>
 <dd>
 
-(string) Path to save performance profiles. This can be set via command line arguments as well. E.g. default path for aperture-agent is /var/log/aperture/aperture-agent/profiles.
+(string, default: `default`) Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
 
 </dd>
-</dl>
-<dl>
 <dt>register_http_routes</dt>
 <dd>
 
@@ -1387,7 +1219,7 @@ ProfilersConfig holds configuration for profilers.
 </dd>
 </dl>
 
-### <span id="prometheus-config"></span> PrometheusConfig
+### PrometheusConfig {#prometheus-config}
 
 PrometheusConfig holds configuration for Prometheus Server.
 
@@ -1402,7 +1234,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 </dd>
 </dl>
 
-### <span id="proxy-config"></span> ProxyConfig
+### ProxyConfig {#proxy-config}
 
 ProxyConfig holds proxy configuration.
 
@@ -1417,16 +1249,12 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 (string, `omitempty,url|hostname_port`)
 
 </dd>
-</dl>
-<dl>
 <dt>https</dt>
 <dd>
 
 (string, `omitempty,url|hostname_port`)
 
 </dd>
-</dl>
-<dl>
 <dt>no_proxy</dt>
 <dd>
 
@@ -1435,7 +1263,7 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 </dd>
 </dl>
 
-### <span id="sentry-config"></span> SentryConfig
+### SentryConfig {#sentry-config}
 
 SentryConfig holds configuration for Sentry.
 
@@ -1448,24 +1276,18 @@ SentryConfig holds configuration for Sentry.
 (bool, default: `true`) Configure to generate and attach stacktraces to capturing message calls
 
 </dd>
-</dl>
-<dl>
 <dt>debug</dt>
 <dd>
 
 (bool, default: `true`) Debug enables printing of Sentry SDK debug messages
 
 </dd>
-</dl>
-<dl>
 <dt>disabled</dt>
 <dd>
 
 (bool, default: `false`) Sentry crash report disabled
 
 </dd>
-</dl>
-<dl>
 <dt>dsn</dt>
 <dd>
 
@@ -1474,24 +1296,18 @@ You can set test project's dsn to send log events.
 oss-aperture project dsn is set as default.
 
 </dd>
-</dl>
-<dl>
 <dt>environment</dt>
 <dd>
 
 (string, default: `production`) Environment
 
 </dd>
-</dl>
-<dl>
 <dt>sample_rate</dt>
 <dd>
 
 (float64, default: `1.0`) Sample rate for event submission i.e. 0.0 to 1.0
 
 </dd>
-</dl>
-<dl>
 <dt>traces_sample_rate</dt>
 <dd>
 
@@ -1500,7 +1316,7 @@ oss-aperture project dsn is set as default.
 </dd>
 </dl>
 
-### <span id="server-tls-config"></span> ServerTLSConfig
+### ServerTLSConfig {#server-tls-config}
 
 ServerTLSConfig holds configuration for setting up server TLS support.
 
@@ -1513,40 +1329,30 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 (string, `omitempty,fqdn`) Allowed CN
 
 </dd>
-</dl>
-<dl>
 <dt>certs_path</dt>
 <dd>
 
 (string) Path to credentials. This can be set via command line arguments as well.
 
 </dd>
-</dl>
-<dl>
 <dt>client_ca</dt>
 <dd>
 
 (string, `omitempty`) Client CA file
 
 </dd>
-</dl>
-<dl>
 <dt>enabled</dt>
 <dd>
 
 (bool, default: `false`) Enabled TLS
 
 </dd>
-</dl>
-<dl>
 <dt>server_cert</dt>
 <dd>
 
 (string, default: `ca.crt`) Server Cert file
 
 </dd>
-</dl>
-<dl>
 <dt>server_key</dt>
 <dd>
 
@@ -1555,7 +1361,7 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 </dd>
 </dl>
 
-### <span id="watchdog-config"></span> WatchdogConfig
+### WatchdogConfig {#watchdog-config}
 
 WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
 
@@ -1568,24 +1374,18 @@ WatchdogConfig holds configuration for Watchdog Policy. For each policy, either 
 ([WatchdogPolicyType](#watchdog-policy-type))
 
 </dd>
-</dl>
-<dl>
 <dt>heap</dt>
 <dd>
 
 ([HeapConfig](#heap-config))
 
 </dd>
-</dl>
-<dl>
 <dt>job</dt>
 <dd>
 
 ([JobConfig](#job-config))
 
 </dd>
-</dl>
-<dl>
 <dt>system</dt>
 <dd>
 
@@ -1594,7 +1394,7 @@ WatchdogConfig holds configuration for Watchdog Policy. For each policy, either 
 </dd>
 </dl>
 
-### <span id="watchdog-policy-type"></span> WatchdogPolicyType
+### WatchdogPolicyType {#watchdog-policy-type}
 
 WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
 
@@ -1607,8 +1407,6 @@ WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algor
 ([AdaptivePolicy](#adaptive-policy))
 
 </dd>
-</dl>
-<dl>
 <dt>watermarks_policy</dt>
 <dd>
 
@@ -1617,7 +1415,7 @@ WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algor
 </dd>
 </dl>
 
-### <span id="watermarks-policy"></span> WatermarksPolicy
+### WatermarksPolicy {#watermarks-policy}
 
 WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
 
@@ -1630,8 +1428,6 @@ WatermarksPolicy creates a Watchdog policy that schedules GC at concrete waterma
 (bool, default: `false`) Flag to enable the policy
 
 </dd>
-</dl>
-<dl>
 <dt>watermarks</dt>
 <dd>
 

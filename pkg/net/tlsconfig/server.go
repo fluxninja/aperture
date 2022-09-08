@@ -20,7 +20,7 @@ const (
 
 // Module is a fx module that constructs annotated instance of *tls.Config.
 func Module() fx.Option {
-	constructor := Constructor{Key: defaultKey}
+	constructor := Constructor{ConfigKey: defaultKey}
 	return fx.Options(
 		constructor.Annotate(),
 	)
@@ -47,7 +47,7 @@ type ServerTLSConfig struct {
 // Constructor holds fields to create an annotated instance of *tls.Config.
 type Constructor struct {
 	Name          string
-	Key           string
+	ConfigKey     string
 	DefaultConfig ServerTLSConfig
 }
 
@@ -64,7 +64,7 @@ func (constructor Constructor) Annotate() fx.Option {
 
 func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller) (*tls.Config, error) {
 	config := constructor.DefaultConfig
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize tls configuration!")
 		return nil, err
 	}

@@ -22,7 +22,7 @@ func ClientModule() fx.Option {
 // ClientConstructor holds fields to create an annotated instance of HTTP client.
 type ClientConstructor struct {
 	Name          string
-	Key           string
+	ConfigKey     string
 	DefaultConfig HTTPClientConfig
 }
 
@@ -72,7 +72,7 @@ type HTTPClientConfig struct {
 
 // Annotate creates an annotated instance of HTTP Client.
 func (constructor ClientConstructor) Annotate() fx.Option {
-	if constructor.Key == "" {
+	if constructor.ConfigKey == "" {
 		log.Panic().Msg("config key not provided")
 	}
 
@@ -91,7 +91,7 @@ func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmar
 	var err error
 
 	config := constructor.DefaultConfig
-	if err = unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err = unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize httpclient configuration!")
 		return nil, nil, nil, err
 	}

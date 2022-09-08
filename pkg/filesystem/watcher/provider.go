@@ -15,7 +15,7 @@ import (
 // Module is a fx module that provides filesystem watcher.
 func Module() fx.Option {
 	return fx.Options(
-		Constructor{PathKey: config.ConfigPathFlag, Path: config.DefaultConfigDirectory}.Annotate(),
+		Constructor{ConfigKey: config.ConfigPathFlag, Path: config.DefaultConfigDirectory}.Annotate(),
 	)
 }
 
@@ -25,7 +25,7 @@ type Constructor struct {
 	Name string
 	// Config key from which to read directory path from.
 	// If the pathkey is empty or is not set then fallback to Path.
-	PathKey string
+	ConfigKey string
 	// Directory path to fall back to.
 	Path string
 	// File types to watch. The extension needs to include leading dot.
@@ -52,9 +52,9 @@ func (constructor Constructor) Annotate() fx.Option {
 func (constructor Constructor) provideWatcher(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (notifiers.Watcher, error) {
 	var directory string
 
-	if constructor.PathKey != "" {
+	if constructor.ConfigKey != "" {
 		// Get directory from config
-		directory = cast.ToString(unmarshaller.Get(constructor.PathKey))
+		directory = cast.ToString(unmarshaller.Get(constructor.ConfigKey))
 	}
 
 	if directory == "" {

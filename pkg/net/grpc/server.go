@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	defaultServerKey = "server.grpc"
+	defaultServerConfigKey = "server.grpc"
 	// Name of gmux based listener.
 	defaultGMuxListener = "grpc-gmux-listener"
 )
@@ -57,7 +57,7 @@ type ServerConstructor struct {
 	// Name of listener instance
 	ListenerName string
 	// Viper config key/server name
-	Key string
+	ConfigKey string
 	// Default Server Config
 	DefaultConfig GRPCServerConfig
 	// Additional server Options
@@ -66,8 +66,8 @@ type ServerConstructor struct {
 
 // Annotate creates an annotated instance of GRPC Server.
 func (constructor ServerConstructor) Annotate() fx.Option {
-	if constructor.Key == "" {
-		constructor.Key = defaultServerKey
+	if constructor.ConfigKey == "" {
+		constructor.ConfigKey = defaultServerConfigKey
 	}
 
 	return fx.Options(
@@ -88,7 +88,7 @@ func (constructor ServerConstructor) provideServer(
 	shutdowner fx.Shutdowner,
 ) (*grpc.Server, *grpc_prometheus.ServerMetrics, error) {
 	config := constructor.DefaultConfig
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize grpcserver configuration!")
 		return nil, nil, err
 	}
@@ -118,7 +118,7 @@ func (constructor ServerConstructor) provideServer(
 				// request shutdown if this server exits
 				defer func() { _ = shutdowner.Shutdown() }()
 				listener := listener.GetListener()
-				log.Info().Str("constructor", constructor.Key).Str("addr", listener.Addr().String()).Msg("Starting GRPC server")
+				log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Starting GRPC server")
 
 				grpcServerMetrics.InitializeMetrics(server)
 
@@ -134,7 +134,7 @@ func (constructor ServerConstructor) provideServer(
 		},
 		OnStop: func(context.Context) error {
 			listener := listener.GetListener()
-			log.Info().Str("constructor", constructor.Key).Str("addr", listener.Addr().String()).Msg("Stopping GRPC server")
+			log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Stopping GRPC server")
 			server.GracefulStop()
 			return nil
 		},

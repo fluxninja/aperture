@@ -76,7 +76,7 @@ allows:
 
 For classifier-created labels, you can disable this behaviour by setting
 `hidden: true` in
-[the classification rule](/reference/configuration/policies.md#-v1rule).
+[the classification rule](/reference/configuration/policies.md#v1-rule).
 
 :::
 

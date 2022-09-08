@@ -48,7 +48,7 @@ var _ = BeforeEach(func() {
 		fx.Provide(common.ProvideNopMetrics),
 		fx.Provide(common.ProvideHandler),
 		fx.Provide(dataplane.ProvideEngineAPI),
-		grpcclient.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),
+		grpcclient.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 		fx.Populate(&svc),
 	)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)

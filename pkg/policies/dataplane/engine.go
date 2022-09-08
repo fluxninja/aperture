@@ -97,7 +97,7 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 		return
 	}
 
-	// execute rate limiters first
+	// execute concurrency limiters
 	concurrencyLimiters := make([]iface.Limiter, len(mmr.concurrencyLimiters))
 	copy(concurrencyLimiters, mmr.concurrencyLimiters)
 
@@ -116,22 +116,38 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 }
 
 func runLimiters(limiters []iface.Limiter, labels selectors.Labels) ([]*flowcontrolv1.LimiterDecision, flowcontrolv1.DecisionType) {
-	decisionType := flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED
 	var wg sync.WaitGroup
-	limiterDecisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))
+	var once sync.Once
+	decisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))
+
+	decisionType := flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED
+
+	setDecisionRejected := func() {
+		decisionType = flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED
+	}
+
+	execLimiter := func(limiter iface.Limiter, i int) func() {
+		return func() {
+			defer wg.Done()
+			decisions[i] = limiter.RunLimiter(labels)
+			if decisions[i].Dropped {
+				once.Do(setDecisionRejected)
+			}
+		}
+	}
+
+	// execute limiters
 	for i, limiter := range limiters {
 		wg.Add(1)
-		panichandler.Go(func() {
-			defer wg.Done()
-			decision := limiter.RunLimiter(labels)
-			if decision.Dropped {
-				decisionType = flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED
-			}
-			limiterDecisions[i] = decision
-		})
+		if i == len(limiters)-1 {
+			execLimiter(limiter, i)()
+		} else {
+			panichandler.Go(execLimiter(limiter, i))
+		}
 	}
 	wg.Wait()
-	return limiterDecisions, decisionType
+
+	return decisions, decisionType
 }
 
 func returnExtraTokens(

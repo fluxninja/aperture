@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package aperture.policy.wrappers.v1;
+
+import "aperture/policy/decisions/v1/decisions.proto";
+
+message LoadShedDecsisionWrapper {
+  // Load Shed Decision
+  policy.decisions.v1.LoadShedDecision load_shed_decision = 1;
+  // The index of Component in the Circuit.
+  int64 component_index = 2;
+  // Name of the Policy.
+  string policy_name = 3;
+  // Hash of the entire Policy spec.
+  string policy_hash = 4;
+}
+
+message TokensDecisionWrapper {
+  // Tokens Decision
+  policy.decisions.v1.TokensDecision tokens_decision = 1;
+  // The index of Component in the Circuit.
+  int64 component_index = 2;
+  // Name of the Policy.
+  string policy_name = 3;
+  // Hash of the entire Policy spec.
+  string policy_hash = 4;
+}
+
+message RateLimiterDecisionWrapper {
+  // Rate Limiter Decision
+  policy.decisions.v1.RateLimiterDecision rate_limiter_decision = 1;
+  // The index of Component in the Circuit.
+  int64 component_index = 2;
+  // Name of the Policy.
+  string policy_name = 3;
+  // Hash of the entire Policy spec.
+  string policy_hash = 4;
+}

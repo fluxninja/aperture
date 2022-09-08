@@ -54,7 +54,7 @@ func (h *Handler) CheckWithValues(
 	serviceIDs []services.ServiceID,
 	labels selectors.Labels,
 ) *flowcontrolv1.CheckResponse {
-	log.Trace().Msg("FlowControl.CheckWithValues()")
+	log.Trace().Interface("labels", labels.ToPlainMap()).Interface("serviceIDs", serviceIDs).Str("controlPoint", controlPoint.String()).Msg("FlowControl.CheckWithValues()")
 
 	checkResponse := h.engine.ProcessRequest(controlPoint, serviceIDs, labels)
 	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetDecisionReason())

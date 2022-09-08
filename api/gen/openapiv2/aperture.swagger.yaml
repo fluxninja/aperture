@@ -3,12 +3,12 @@ info:
   title: Aperture API
   version: "1.0"
 tags:
-  - name: PolicyService
   - name: EntityCacheService
   - name: InfoService
   - name: StatusService
   - name: FlowControlService
   - name: FluxNinjaService
+  - name: PolicyService
 consumes:
   - application/json
 produces:
@@ -190,7 +190,7 @@ definitions:
         type: boolean
         description: TODO document what happens when lazy sync is disabled
         title: Enables lazy sync
-        x-go-default: true
+        x-go-default: false
       num_sync:
         type: integer
         format: int64
@@ -650,12 +650,12 @@ definitions:
 
       A signal also have a special **Invalid** value. It's usually used to
       communicate that signal doesn't have a meaningful value at the moment, eg.
-      [PromQL](#-v1promql) emits such a value if it cannot execute a query.
+      [PromQL](#v1-prom-q-l) emits such a value if it cannot execute a query.
       Components know when their input signals are invalid and can act
       accordingly. They can either propagate the invalidness, by making their
       output itself invalid (like eg.
-      [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
-      logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+      [ArithmeticCombinator](#v1-arithmetic-combinator)) or use some different
+      logic, like eg. [Extrapolator](#v1-extrapolator). Refer to a component's
       docs on how exactly it handles invalid inputs.
       :::
     title: Circuit is defined as a dataflow graph of inter-connected components
@@ -742,16 +742,16 @@ definitions:
 
       There are three categories of components:
       * "source" components – they take some sort of input from "the real world" and output
-        a signal based on this input. Example: [PromQL](#-v1promql). In the UI
+        a signal based on this input. Example: [PromQL](#v1-prom-q-l). In the UI
         they're represented by green color.
       * internal components – "pure" components that don't interact with the "real world".
-        Examples: [GradientController](#-v1gradientcontroller), [Max](#-v1max).
+        Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
         :::note
         Internal components's output can depend on their internal state, in addition to the inputs.
-        Eg. see the [Exponential Moving Average filter](#-v1ema).
+        Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
         :::
       * "sink" components – they affect the real world.
-        [ConcurrencyLimiter](#-languagev1concurrencylimiter) and [RateLimiter](#-languagev1ratelimiter).
+        [ConcurrencyLimiter](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
         Also sometimes called [_actuators_](/concepts/flow-control/actuators/actuators.md).
         In the UI, represented by orange color.  Sink components are usually also
         "sources" too, they usually emit a feedback signal, like
@@ -759,10 +759,10 @@ definitions:
 
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
-      You can use the [Constant](#-constant) component for this.
+      You can use the [Constant](#v1-constant) component for this.
       :::
 
-      See also [Policy](#-v1policy) for a higher-level explanation of circuits.
+      See also [Policy](#v1-policy) for a higher-level explanation of circuits.
     title: Computational block that form the circuit
   v1Constant:
     type: object
@@ -939,7 +939,7 @@ definitions:
       \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
       $$
 
-      The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#-v1emains).
+      The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
     title: Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
   v1EMAIns:
     type: object
@@ -1078,24 +1078,55 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1GradientControllerOuts'
         description: Output ports of the Gradient Controller.
-      tolerance:
+      slope:
         type: number
         format: double
         description: |-
-          Tolerance is a way to pre-multiply a setpoint by given value.
+          Slope controls the aggressiveness and direction of the Gradient Controller.
 
-          Value of tolerance should be close or equal to 1, eg. 1.1.
+          Slope is used as exponent on the signal to setpoint ratio in computation
+          of the gradient (see the [main description](#v1-gradient-controller) for
+          exact equation). Good intuition for this parameter is "What should the
+          Gradient Controller do to the control variable when signal is too high",
+          eg.:
+          * $\text{slope} = 1$: when signal is too high, increase control variable,
+          * $\text{slope} = -1$: when signal is too high, decrease control variable,
+          * $\text{slope} = -0.5$: when signal is to high, decrease control variable more slowly.
 
-          :::caution
-          [This is going to be deprecated](https://github.com/fluxninja/aperture/issues/182).
+          The sign of slope depends on correlation between the signal and control variable:
+          * Use $\text{slope} < 0$ if signal and control variable are _positively_
+          correlated (eg. Per-pod CPU usage and total concurrency).
+          * Use $\text{slope} > 0$ if signal and control variable are _negatively_
+          correlated (eg. Per-pod CPU usage and number of pods).
+
+          :::note
+          You need to set _negative_ slope for a _positive_ correlation, as you're
+          describing the _action_ which controller should make when the signal
+          increases.
           :::
-        x-go-validate: gte=0.0
+
+          The magnitude of slope describes how aggresively should the controller
+          react to a deviation of signal.
+          With $|\text{slope}| = 1$, the controller will aim to bring the signal to
+          the setpoint in one tick (assuming linear correlation with signal and setpoint).
+          Smaller magnitudes of slope will make the controller adjust the control
+          variable more slowly.
+
+          We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
+          If you experience overshooting, consider lowering the magnitude even more.
+          Values of $|\text{slope}| > 1$ are not recommended.
+
+          :::note
+          Remember that the gradient and output signal can be (optionally) clamped,
+          so the _slope_ might not fully describe aggressiveness of the controller.
+          :::
+        x-go-validate: required
     description: |-
       The `gradient` describes a corrective factor that should be applied to the
       control variable to get the signal closer to the setpoint. It is computed as follows:
 
       $$
-      \text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}
+      \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
       $$
 
       `gradient` is then clamped to [min_gradient, max_gradient] range.
@@ -1110,11 +1141,6 @@ definitions:
 
       The output can be _optionally_ clamped to desired range using `max` and
       `min` input.
-
-      :::caution
-      Some changes are expected in the near future:
-      [#182](https://github.com/fluxninja/aperture/issues/182)
-      :::
     title: |-
       Gradient controller is a type of controller which tries to adjust the
       control variable proportionally to the relative difference between setpoint
@@ -1167,6 +1193,8 @@ definitions:
     type: object
     properties:
       hostname:
+        type: string
+      local_ip:
         type: string
       uuid:
         type: string
@@ -1323,7 +1351,7 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: |-
           Load shedding factor is a fraction of [incoming
-          concurrency](#-v1schedulerouts) that needs to be dropped.
+          concurrency](#v1-scheduler-outs) that needs to be dropped.
     description: Input for the Load Shed Actuator component.
   v1MatchExpression:
     type: object
@@ -1554,7 +1582,7 @@ definitions:
 
           :::tip
           Negative limit can be useful to _conditionally_ enable the ratelimiter
-          under certain circumstances. [Decider](#-v1decider) might be helpful.
+          under certain circumstances. [Decider](#v1-decider) might be helpful.
           :::
         x-go-validate: required
     title: Inputs for the RateLimiter component
@@ -1747,7 +1775,7 @@ definitions:
       signal are aggregated across all agents.
       :::
 
-      See [ConcurrencyLimiter](#-languagev1concurrencylimiter) for more context.
+      See [ConcurrencyLimiter](#languagev1-concurrency-limiter) for more context.
     title: Weighted Fair Queuing-based workload scheduler
   v1SchedulerOuts:
     type: object
@@ -1761,7 +1789,7 @@ definitions:
           **Accepted tokens** are tokens associated with
           [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
           this scheduler. Number of tokens for a flow is determined by a
-          [workload](#-schedulerworkload) that the flow was assigned to (either
+          [workload](#scheduler-workload) that the flow was assigned to (either
           via `auto_tokens` or explicitly by `Workload.tokens`).
           :::
 
@@ -1788,7 +1816,7 @@ definitions:
         $ref: '#/definitions/v1LabelMatcher'
         description: |-
           :::note
-          [Classifiers](#-v1classifier) _can_ use flow labels created by some other
+          [Classifiers](#v1-classifier) _can_ use flow labels created by some other
           classifier, but only if they were created at some previous control point
           (and propagated in baggage).
 

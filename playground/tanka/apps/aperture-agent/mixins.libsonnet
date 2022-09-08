@@ -24,7 +24,6 @@ local apertureAgentMixin =
             pretty_console: true,
             non_blocking: true,
             level: 'debug',
-            file: 'default',
           },
           etcd+: {
             endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
