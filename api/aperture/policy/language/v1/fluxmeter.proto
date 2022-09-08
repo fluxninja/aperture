@@ -39,7 +39,8 @@ message FluxMeter {
   // Key of the attribute in accesss log or span from which the metric for this flux meter is read.
   //
   // :::info
-  // For list of available attributes in Envoy access logs, refer [Envoy Filter](/setup/istio.md#envoy-filter)
+  // For list of available attributes in Envoy access logs, refer
+  // [Envoy Filter](/get-started/istio.md#envoy-filter)
   // :::
   //
   string attribute_key = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

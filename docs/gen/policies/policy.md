@@ -394,7 +394,8 @@ selector:
 (string, default: `duration_millis`) Key of the attribute in accesss log or span from which the metric for this flux meter is read.
 
 :::info
-For list of available attributes in Envoy access logs, refer [Envoy Filter](/setup/istio.md#envoy-filter)
+For list of available attributes in Envoy access logs, refer
+[Envoy Filter](/get-started/istio.md#envoy-filter)
 :::
 
 </dd>
