@@ -1217,7 +1217,7 @@ PluginsConfig holds configuration for plugins.
 <dt>plugins_path</dt>
 <dd>
 
-(string) Path to plugins directory. This can be set via command line arguments as well.
+(string, default: `default`) Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
 
 </dd>
 </dl>
@@ -1238,7 +1238,7 @@ ProfilersConfig holds configuration for profilers.
 <dt>profiles_path</dt>
 <dd>
 
-(string) Path to save performance profiles. This can be set via command line arguments as well. E.g. default path for aperture-agent is /var/log/aperture/aperture-agent/profiles.
+(string, default: `default`) Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
 
 </dd>
 <dt>register_http_routes</dt>

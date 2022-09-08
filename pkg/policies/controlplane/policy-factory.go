@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/fx"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -108,7 +108,7 @@ func (factory *policyFactory) provideControllerPolicyFxOptions(
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
-	var wrapperMessage configv1.PolicyWrapper
+	var wrapperMessage wrappersv1.PolicyWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.Policy == nil {
 		reg.SetStatus(status.NewStatus(nil, err))

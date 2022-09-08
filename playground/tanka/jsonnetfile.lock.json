@@ -8,8 +8,8 @@
           "subdir": ""
         }
       },
-      "version": "c986ab02105fe80ab7604721c00b036e64ae6fb2",
-      "sum": "ntOIyy4QRSQwlBwabsAFSztfFHGb2JcdVYuUiHZjdkI="
+      "version": "f81b5bbb37a3ae789a87896c4d1e2de3ac94cf63",
+      "sum": "w2YOBMzLjwii/kf4/xysTYzvT3efqxMqm5WvnRMbjUQ="
     },
     {
       "source": {
@@ -18,8 +18,8 @@
           "subdir": "lib/1.0"
         }
       },
-      "version": "c986ab02105fe80ab7604721c00b036e64ae6fb2",
-      "sum": "uaIkLQIC6uxxY5NnZf/tVeGDEGNv7SQHRQpXzWCSAXI="
+      "version": "f81b5bbb37a3ae789a87896c4d1e2de3ac94cf63",
+      "sum": "spRIhQpaIUIEtRnY7SXB6k1EpNtAh7rMdyyrBMGJv/U="
     },
     {
       "source": {
@@ -28,8 +28,8 @@
           "subdir": "libsonnet/1.0"
         }
       },
-      "version": "84ac1fa9a5231d92ea918d64b201cc00a2fcca19",
-      "sum": "HrvDOYR6sNNrN3qEzqMgydb+xnfKEEKyG1uBo5aAobw="
+      "version": "e5698fd9338940caa846a4da73c38b3951c1d8c4",
+      "sum": "gujVBgM4VMJlYrNJ76dsarpZGux8/G5upXtD4c35sRs="
     },
     {
       "source": {
@@ -48,7 +48,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "c132c4afcf17491718539db4c2d94c0ea4346120",
+      "version": "302be6e9e28d7641089c5d829470446d966d8b2e",
       "sum": "tDR6yT2GVfw0wTU12iZH+m01HrbIr6g/xN+/8nzNkU0="
     },
     {
@@ -58,7 +58,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "c132c4afcf17491718539db4c2d94c0ea4346120",
+      "version": "302be6e9e28d7641089c5d829470446d966d8b2e",
       "sum": "2++XoPslyz02LRgsxREWxjLgYgiCIqhAtXCyVSvYcoE="
     },
     {
@@ -68,7 +68,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "c132c4afcf17491718539db4c2d94c0ea4346120",
+      "version": "302be6e9e28d7641089c5d829470446d966d8b2e",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {

@@ -49,7 +49,7 @@ func main() {
 		distcache.Module(),
 		dataplane.PolicyModule(),
 		discovery.Module(),
-		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),
+		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 	)
 
 	if err := app.Err(); err != nil {

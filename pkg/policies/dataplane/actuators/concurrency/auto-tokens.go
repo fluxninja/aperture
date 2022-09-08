@@ -9,8 +9,8 @@ import (
 
 	"go.uber.org/fx"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -121,7 +121,7 @@ func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller co
 		return
 	}
 
-	var wrapperMessage configv1.TokensDecisionWrapper
+	var wrapperMessage wrappersv1.TokensDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.TokensDecision == nil {
 		log.Error().Err(err).Msg("Failed to unmarshal config wrapper")

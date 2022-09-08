@@ -33,8 +33,8 @@ const (
 	// - in: body
 	//   schema:
 	//     "$ref": "#/definitions/PeerDiscoveryConfig"
-	defaultKey   = "peer_discovery"
-	watcherFxTag = "peer-discovery-watcher"
+	defaultConfigKey = "peer_discovery"
+	watcherFxTag     = "peer-discovery-watcher"
 )
 
 var (
@@ -52,7 +52,7 @@ type PeerDiscoveryConfig struct {
 
 // Constructor holds fields to create and configure PeerDiscovery.
 type Constructor struct {
-	Key           string
+	ConfigKey     string
 	DefaultConfig PeerDiscoveryConfig
 	Service       string
 }
@@ -82,10 +82,10 @@ type PeerDiscoveryIn struct {
 
 func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDiscovery, error) {
 	var configKey string
-	if constructor.Key == "" {
-		configKey = defaultKey
+	if constructor.ConfigKey == "" {
+		configKey = defaultConfigKey
 	} else {
-		configKey = constructor.Key
+		configKey = constructor.ConfigKey
 	}
 
 	var cfg PeerDiscoveryConfig
