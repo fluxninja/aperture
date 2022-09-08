@@ -115,11 +115,11 @@ start a cluster with built-in local registry for Docker images:
 ctlptl apply -f ctlptl-kind-config.yaml
 ```
 
-There is another option which can be used to set up a 3 node kind cluster which
-will also set up internal `docker-registry` based on the requirement.
+Once done, you can delete the cluster and registry with following command:
 
-- Run a script available in `aperture/scripts` directory
-  `aperture_dev_cluster.sh`.
+```sh
+ctlptl delete -f ctlptl-kind-config.yaml
+```
 
 ### Services deployment
 

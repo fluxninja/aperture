@@ -3,7 +3,6 @@ package otel
 
 import (
 	"crypto/tls"
-	"fmt"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/config/configgrpc"
@@ -230,32 +229,11 @@ func addOTLPReceiver(cfg *otelParams) {
 }
 
 func addMetricsProcessor(config *otelcollector.OTELConfig) {
-	config.AddProcessor(ProcessorMetrics, metricsprocessor.Config{
-		LatencyBucketStartMS: 20,
-		LatencyBucketWidthMS: 20,
-		LatencyBucketCount:   100,
-	})
+	config.AddProcessor(ProcessorMetrics, metricsprocessor.Config{})
 }
 
 func addRollupProcessor(config *otelcollector.OTELConfig) {
-	rollupFields := []string{
-		otelcollector.DurationLabel,
-		otelcollector.HTTPRequestContentLength,
-		otelcollector.HTTPResponseContentLength,
-	}
-	rollups := []rollupprocessor.Rollup{}
-	for _, field := range rollupFields {
-		for _, t := range rollupprocessor.RollupTypes {
-			rollups = append(rollups, rollupprocessor.Rollup{
-				FromField: field,
-				ToField:   fmt.Sprintf("%s_%s", field, t),
-				Type:      t,
-			})
-		}
-	}
-	config.AddProcessor(ProcessorRollup, rollupprocessor.Config{
-		Rollups: rollups,
-	})
+	config.AddProcessor(ProcessorRollup, rollupprocessor.Config{})
 }
 
 func addPrometheusReceiver(cfg *otelParams) {

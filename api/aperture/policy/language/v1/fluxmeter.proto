@@ -35,4 +35,19 @@ message FluxMeter {
       }
     }
   }]; // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+
+  // Key of the attribute in accesss log or span from which the metric for this flux meter is read.
+  //
+  // :::info
+  // For list of available attributes in Envoy access logs, refer [Envoy Filter](/setup/istio.md#envoy-filter)
+  // :::
+  //
+  string attribute_key = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {
+        string_value: "duration_millis"
+      }
+    }
+  }]; // @gotags: default:"duration_millis"
 }

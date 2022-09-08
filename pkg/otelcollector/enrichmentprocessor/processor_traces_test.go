@@ -8,10 +8,11 @@ import (
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
 	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 var _ = Describe("Enrichment Processor - Traces", func() {
-	It("Enriches egress traces attributes with data from entity cache", func() {
+	It("Enriches feature trace attributes with data from entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
 		entityCache.Put(&entitycache.Entity{
 			ID:        entitycache.EntityID{},
@@ -21,49 +22,22 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		td := tracesFromLabels(map[string]string{
-			"control_point":    "egress",
-			"net.host.address": "192.0.2.0:80",
-			"net.peer.address": "192.0.2.1:80",
+		td := tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel:   otelcollector.ControlPointFeature,
+			otelcollector.FeatureAddressLabel: "192.0.2.0",
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertTracesEqual(td, tracesFromLabels(map[string]string{
-			"control_point": "egress",
-			"labeled":       "false",
-			"agent_group":   "defaultAG",
-			"services":      "svc1,svc2",
+		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
+			otelcollector.LabeledLabel:      "false",
+			otelcollector.AgentGroupLabel:   "defaultAG",
+			otelcollector.ServicesLabel:     []string{"svc1", "svc2"},
 		}))
 	})
 
-	It("Does not panic when egress metrics net.host.address attribute empty", func() {
-		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(&entitycache.Entity{
-			ID:        entitycache.EntityID{},
-			IPAddress: "192.0.2.0",
-		})
-		processor := newProcessor(entityCache, "defaultAG")
-		Expect(processor).NotTo(BeNil())
-
-		td := tracesFromLabels(map[string]string{
-			"control_point":    "egress",
-			"net.host.address": "",
-			"net.peer.address": "192.0.2.1:80",
-		})
-		td, err := processor.ConsumeTraces(context.TODO(), td)
-		Expect(err).NotTo(HaveOccurred())
-
-		assertTracesEqual(td, tracesFromLabels(map[string]string{
-			"control_point":    "egress",
-			"labeled":          "false",
-			"net.host.address": "",
-			"net.peer.address": "192.0.2.1:80",
-			"agent_group":      "defaultAG",
-		}))
-	})
-
-	It("Enriches ingress traces attributes with data from entity cache", func() {
+	It("Does not panic when egress metrics FeatureAddressLabel attribute empty", func() {
 		entityCache := entitycache.NewEntityCache()
 		entityCache.Put(&entitycache.Entity{
 			ID:        entitycache.EntityID{},
@@ -73,39 +47,41 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		td := tracesFromLabels(map[string]string{
-			"control_point": "ingress",
-			"net.host.ip":   "192.0.2.0",
-			"net.peer.ip":   "192.0.2.1",
+		td := tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel:   otelcollector.ControlPointFeature,
+			otelcollector.FeatureAddressLabel: "",
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertTracesEqual(td, tracesFromLabels(map[string]string{
-			"control_point": "ingress",
-			"labeled":       "false",
-			"agent_group":   "defaultAG",
-			"services":      "svc1,svc2",
+		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
+			otelcollector.LabeledLabel:      "false",
+			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
-	It("Does not enrich when there are no labels in entity cache", func() {
+	It("Does not enrich when there is no matching entries in entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
+		entityCache.Put(&entitycache.Entity{
+			ID:        entitycache.EntityID{},
+			IPAddress: "192.0.2.3",
+			Services:  []string{"svc1", "svc2"},
+		})
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		td := tracesFromLabels(map[string]string{
-			"control_point":    "egress",
-			"net.host.address": "192.0.2.0:80",
-			"net.peer.address": "192.0.2.1:80",
+		td := tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel:   otelcollector.ControlPointFeature,
+			otelcollector.FeatureAddressLabel: "192.0.2.0",
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertTracesEqual(td, tracesFromLabels(map[string]string{
-			"control_point": "egress",
-			"labeled":       "false",
-			"agent_group":   "defaultAG",
+		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
+			otelcollector.LabeledLabel:      "false",
+			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
@@ -114,19 +90,19 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		td := tracesFromLabels(map[string]string{
-			"control_point":   "egress",
-			"aperture.labels": `{"foo": "bar", "fizz": "buzz"}`,
+		td := tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel:     otelcollector.ControlPointFeature,
+			otelcollector.MarshalledLabelsLabel: `{"foo": "bar", "fizz": "buzz"}`,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertTracesEqual(td, tracesFromLabels(map[string]string{
-			"control_point": "egress",
-			"foo":           "bar",
-			"fizz":          "buzz",
-			"labeled":       "true",
-			"agent_group":   "defaultAG",
+		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
+			"foo":                           "bar",
+			"fizz":                          "buzz",
+			otelcollector.LabeledLabel:      "true",
+			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
@@ -135,17 +111,17 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		td := tracesFromLabels(map[string]string{
-			"control_point":   "egress",
-			"aperture.labels": ``,
+		td := tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel:     otelcollector.ControlPointFeature,
+			otelcollector.MarshalledLabelsLabel: ``,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertTracesEqual(td, tracesFromLabels(map[string]string{
-			"control_point": "egress",
-			"labeled":       "false",
-			"agent_group":   "defaultAG",
+		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
+			otelcollector.LabeledLabel:      "false",
+			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
@@ -154,31 +130,28 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		processor := newProcessor(entityCache, "defaultAG")
 		Expect(processor).NotTo(BeNil())
 
-		td := tracesFromLabels(map[string]string{
-			"control_point":   "feature",
-			"aperture.labels": `-`,
+		td := tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel:     otelcollector.ControlPointFeature,
+			otelcollector.MarshalledLabelsLabel: `-`,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertTracesEqual(td, tracesFromLabels(map[string]string{
-			"control_point": "feature",
-			"labeled":       "false",
-			"agent_group":   "defaultAG",
+		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
+			otelcollector.LabeledLabel:      "false",
+			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 })
 
-func tracesFromLabels(labels map[string]string) ptrace.Traces {
+func tracesFromLabels(labels map[string]interface{}) ptrace.Traces {
 	td := ptrace.NewTraces()
 	traces := td.ResourceSpans().AppendEmpty().
 		ScopeSpans().AppendEmpty().
 		Spans()
 	spanRecord := traces.AppendEmpty()
-	attr := spanRecord.Attributes()
-	for k, v := range labels {
-		attr.InsertString(k, v)
-	}
+	populateAttrsFromLabels(spanRecord.Attributes(), labels)
 	return td
 }
 
