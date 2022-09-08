@@ -1,5 +1,5 @@
 version: v1
-name: buf.build/fluxninja/aperture
+name: buf.build/kklimonda-fn/test-repository
 deps:
   - buf.build/googleapis/googleapis
   - buf.build/grpc-ecosystem/grpc-gateway

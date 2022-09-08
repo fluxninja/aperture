@@ -14,18 +14,19 @@ jobs:
     executor: base-cimg-executor
     steps:
       - checkout
+      - jq/install
       - asdf_install:
           cache_name: release-protobuf
           tools: |-
             buf
+      - opsninja_install:
+          branch: kklimonda/opsninja-buf-release-cmd
       - run:
-          name: Login to buf.build
+          name: Publish protobuf to buf.build
           command: |
-            echo ${BUF_BUILD_TOKEN} | buf registry login --username kklimonda-fn --token-stdin
-      - run:
-          name: Push protobuf to buf.build
-          command: |
-            cd api && buf push --tag << parameters.tag >>
+            fn release publish-aperture-protobuf --dry-run \
+            --path /home/circleci/project/api/ \
+            --tag << parameters.tag >>
       - asdf_save_cache:
           cache_name: release-protobuf
 
@@ -158,3 +159,26 @@ commands:
           key: aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
           paths:
             - ~/.asdf
+  opsninja_install:
+    parameters:
+      branch:
+        type: string
+        description: opsninja branch to install tools from
+        default: main
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
+      - run:
+          name: Install opsninja and its dependencies
+          command: |
+            # We need R/O access to cloud repository to be able to fetch opsninja library
+            # FIXME: make "releases" of opsninja library somehow, even as a separate repository
+            # to limit exposure.
+            export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
+            export SSH_AUTH_SOCK=""
+            # Bust asdf cache as our opsninja version is always 0.0.0
+            pip uninstall -y opsninja
+            pip install 'git+ssh://git@github.com/fluxninja/cloud@<<parameters.branch>>#egg=opsninja&subdirectory=ops/apps/opsninja/'
+            asdf reshim
