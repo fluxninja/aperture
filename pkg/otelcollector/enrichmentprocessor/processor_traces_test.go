@@ -19,7 +19,7 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			IPAddress: "192.0.2.0",
 			Services:  []string{"svc1", "svc2"},
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
@@ -32,7 +32,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 			otelcollector.ServicesLabel:     []string{"svc1", "svc2"},
 		}))
 	})
@@ -44,7 +43,7 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			IPAddress: "192.0.2.0",
 			Services:  []string{"svc1", "svc2"},
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
@@ -57,7 +56,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
@@ -68,7 +66,7 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			IPAddress: "192.0.2.3",
 			Services:  []string{"svc1", "svc2"},
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
@@ -81,13 +79,12 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
 	It("Unpacks aperture.labels properly", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
@@ -102,13 +99,12 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 			"foo":                           "bar",
 			"fizz":                          "buzz",
 			otelcollector.LabeledLabel:      "true",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
 	It("Ignores empty aperture.labels", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
@@ -121,13 +117,12 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
 	It("Ignores minus as aperture.labels", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
@@ -140,7 +135,6 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 })

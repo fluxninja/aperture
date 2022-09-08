@@ -18,16 +18,12 @@ import (
 )
 
 type enrichmentProcessor struct {
-	cache      *entitycache.EntityCache
-	agentGroup string
+	cache *entitycache.EntityCache
 }
 
-func newProcessor(cache *entitycache.EntityCache,
-	agentGroup string,
-) *enrichmentProcessor {
+func newProcessor(cache *entitycache.EntityCache) *enrichmentProcessor {
 	return &enrichmentProcessor{
-		cache:      cache,
-		agentGroup: agentGroup,
+		cache: cache,
 	}
 }
 
@@ -127,7 +123,6 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsMissing []string) {
 	// TODO tgill: split this into multiple functions, one for each source
 	unpackFlowLabels(attributes, treatAsMissing)
-	attributes.UpsertString(otelcollector.AgentGroupLabel, ep.agentGroup)
 	var hostIP string
 	controlPoint, exists := attributes.Get(otelcollector.ControlPointLabel)
 	if !exists {
@@ -179,7 +174,6 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsM
 }
 
 func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
-	attributes.UpsertString(otelcollector.AgentGroupLabel, ep.agentGroup)
 	hostNamex, ok := attributes.Get(otelcollector.EntityNameLabel)
 	if !ok {
 		return

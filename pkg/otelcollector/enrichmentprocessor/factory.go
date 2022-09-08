@@ -8,7 +8,6 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/processor/processorhelper"
 
-	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 )
 
@@ -18,26 +17,21 @@ const (
 )
 
 // NewFactory returns a new factory for the enrichment processor.
-func NewFactory(cache *entitycache.EntityCache,
-	agentInfo *agentinfo.AgentInfo,
-) component.ProcessorFactory {
+func NewFactory(cache *entitycache.EntityCache) component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
-		createDefaultConfig(cache, agentInfo),
+		createDefaultConfig(cache),
 		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
 		component.WithTracesProcessor(createTracesProcessor, component.StabilityLevelInDevelopment),
 		component.WithMetricsProcessor(createMetricsProcessor, component.StabilityLevelInDevelopment),
 	)
 }
 
-func createDefaultConfig(cache *entitycache.EntityCache,
-	agentInfo *agentinfo.AgentInfo,
-) component.ProcessorCreateDefaultConfigFunc {
+func createDefaultConfig(cache *entitycache.EntityCache) component.ProcessorCreateDefaultConfigFunc {
 	return func() config.Processor {
 		return &Config{
 			ProcessorSettings: config.NewProcessorSettings(config.NewComponentID(typeStr)),
 			entityCache:       cache,
-			agentGroup:        agentInfo.GetAgentGroup(),
 		}
 	}
 }
@@ -49,7 +43,7 @@ func createLogsProcessor(
 	nextLogsConsumer consumer.Logs,
 ) (component.LogsProcessor, error) {
 	cfgTyped := cfg.(*Config)
-	proc := newProcessor(cfgTyped.entityCache, cfgTyped.agentGroup)
+	proc := newProcessor(cfgTyped.entityCache)
 	return processorhelper.NewLogsProcessorWithCreateSettings(
 		ctx,
 		params,
@@ -69,7 +63,7 @@ func createTracesProcessor(
 	nextTracesConsumer consumer.Traces,
 ) (component.TracesProcessor, error) {
 	cfgTyped := cfg.(*Config)
-	proc := newProcessor(cfgTyped.entityCache, cfgTyped.agentGroup)
+	proc := newProcessor(cfgTyped.entityCache)
 	return processorhelper.NewTracesProcessorWithCreateSettings(
 		ctx,
 		params,
@@ -89,7 +83,7 @@ func createMetricsProcessor(
 	nextMetricsConsumer consumer.Metrics,
 ) (component.MetricsProcessor, error) {
 	cfgTyped := cfg.(*Config)
-	proc := newProcessor(cfgTyped.entityCache, cfgTyped.agentGroup)
+	proc := newProcessor(cfgTyped.entityCache)
 	return processorhelper.NewMetricsProcessorWithCreateSettings(
 		ctx,
 		params,

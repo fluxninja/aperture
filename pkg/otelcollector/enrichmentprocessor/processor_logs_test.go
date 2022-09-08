@@ -19,7 +19,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			IPAddress: "192.0.2.0",
 			Services:  []string{"svc1", "svc2"},
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]interface{}{
@@ -33,7 +33,6 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 			"services":                      []string{"svc1", "svc2"},
 		}))
 	})
@@ -44,7 +43,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			ID:        entitycache.EntityID{},
 			IPAddress: "192.0.2.0",
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]interface{}{
@@ -58,7 +57,6 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
@@ -68,7 +66,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			ID:        entitycache.EntityID{},
 			IPAddress: "192.0.2.0",
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]interface{}{
@@ -82,7 +80,6 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
@@ -93,7 +90,7 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			IPAddress: "192.0.2.0",
 			Services:  []string{"svc1", "svc2"},
 		})
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]interface{}{
@@ -107,14 +104,13 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointIngress,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 			"services":                      []string{"svc1", "svc2"},
 		}))
 	})
 
 	It("Does not enrich when there are no labels in entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]interface{}{
@@ -128,13 +124,12 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
 	It("Unpacks aperture.labels properly", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]interface{}{
@@ -149,13 +144,12 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 			"foo":                           "bar",
 			"fizz":                          "buzz",
 			otelcollector.LabeledLabel:      "true",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
 	It("Ignores empty aperture.labels", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]interface{}{
@@ -168,13 +162,12 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 
 	It("Ignores minus as aperture.labels", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "defaultAG")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
 		ld := logsFromLabels(map[string]interface{}{
@@ -187,7 +180,6 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
 			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 			otelcollector.LabeledLabel:      "false",
-			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
 	})
 })

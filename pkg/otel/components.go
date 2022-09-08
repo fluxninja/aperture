@@ -18,7 +18,6 @@ import (
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/multierr"
 
-	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
@@ -29,7 +28,6 @@ import (
 
 // AgentOTELComponents constructs OTEL Collector Factories for Agent.
 func AgentOTELComponents(cache *entitycache.EntityCache,
-	agentInfo *agentinfo.AgentInfo,
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
 ) (component.Factories, error) {
@@ -61,7 +59,7 @@ func AgentOTELComponents(cache *entitycache.EntityCache,
 	processors, err := component.MakeProcessorFactoryMap(
 		batchprocessor.NewFactory(),
 		memorylimiterprocessor.NewFactory(),
-		enrichmentprocessor.NewFactory(cache, agentInfo),
+		enrichmentprocessor.NewFactory(cache),
 		rollupprocessor.NewFactory(),
 		metricsprocessor.NewFactory(promRegistry, engine),
 		attributesprocessor.NewFactory(),
