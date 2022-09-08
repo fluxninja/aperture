@@ -8,12 +8,12 @@ import (
 	"sync"
 	"time"
 
+	guuid "github.com/google/uuid"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/info/v1"
-	guuid "github.com/google/uuid"
 )
 
 // Default build-time variables. These values are overridden via ldflags.
@@ -36,6 +36,8 @@ var (
 	Prefix = "aperture"
 	// Hostname is the hostname of the machine that is running the process.
 	Hostname = "unknown"
+	// LocalIP is the IP of the service.
+	LocalIP = "unknown"
 	// UUID is the unique identifier for the process.
 	UUID = "unknown"
 )
@@ -71,6 +73,9 @@ func init() {
 	if hostname != "" {
 		Hostname = hostname
 	}
+
+	LocalIP = getLocalIP()
+
 	// generate UUID
 	UUID = guuid.NewString()
 }
@@ -98,6 +103,7 @@ func GetHostInfo() *infov1.HostInfo {
 	return &infov1.HostInfo{
 		Hostname: Hostname,
 		Uuid:     UUID,
+		LocalIp:  LocalIP,
 	}
 }
 
