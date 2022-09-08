@@ -63,15 +63,15 @@ type ServerConstructor struct {
 	// Name of tls config instance
 	TLSConfigName string
 	// Viper config key/server name
-	Key string
+	ConfigKey string
 	// Default Server Config
 	DefaultConfig HTTPServerConfig
 }
 
 // Annotate creates an annotated instance of HTTP Server.
 func (constructor ServerConstructor) Annotate() fx.Option {
-	if constructor.Key == "" {
-		constructor.Key = defaultServerKey
+	if constructor.ConfigKey == "" {
+		constructor.ConfigKey = defaultServerKey
 	}
 	tlsName := config.NameTag(constructor.TLSConfigName) + ` optional:"true"`
 	name := config.NameTag(constructor.Name)
@@ -108,7 +108,7 @@ func (constructor ServerConstructor) provideServer(
 	pr *prometheus.Registry,
 ) (*mux.Router, *http.Server, *Server, error) {
 	config := constructor.DefaultConfig
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize httpserver configuration!")
 		return nil, nil, nil, err
 	}
@@ -175,7 +175,7 @@ func (constructor ServerConstructor) provideServer(
 					listener = tls.NewListener(listener, tlsConfig)
 				}
 
-				log.Info().Str("constructor", constructor.Key).Str("addr", listener.Addr().String()).Msg("Starting HTTP server")
+				log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Starting HTTP server")
 				// check if RootHandler is set
 				if httpServer.RootHandler != nil {
 					log.Info().Msg("Registering RootHandlerFunc!")
@@ -189,7 +189,7 @@ func (constructor ServerConstructor) provideServer(
 		},
 		OnStop: func(ctx context.Context) error {
 			listener := listener.GetListener()
-			log.Info().Str("constructor", constructor.Key).Str("addr", listener.Addr().String()).Msg("Stopping HTTP server")
+			log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Stopping HTTP server")
 			return server.Shutdown(ctx)
 		},
 	})

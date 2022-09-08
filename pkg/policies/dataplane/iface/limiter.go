@@ -27,6 +27,6 @@ func (limiterID LimiterID) String() string {
 type Limiter interface {
 	GetPolicyName() string
 	GetSelector() *selectorv1.Selector
-	RunLimiter(labels selectors.Labels, decision *flowcontrolv1.LimiterDecision)
+	RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
 }

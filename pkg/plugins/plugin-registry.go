@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"plugin"
 
-	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
@@ -28,10 +27,9 @@ const (
 )
 
 var (
-	pluginPrefix    = info.Prefix + "-plugin-"
-	pluginGlob      = pluginPrefix + "*.so"
-	defaultPath     = path.Join(config.DefaultArtifactsDirectory, "plugins")
-	defaultPathFlag = defaultKey + ".plugins_path"
+	pluginPrefix = info.Prefix + "-plugin-"
+	pluginGlob   = pluginPrefix + "*.so"
+	defaultPath  = path.Join(config.DefaultArtifactsDirectory, "plugins")
 )
 
 // PluginRegistry holds fields used for internal tracking of plugin symbols and disabled symbols or plugins of the service.
@@ -71,8 +69,8 @@ type PluginTrackers map[string]*PluginTracker
 // swagger:model
 // +kubebuilder:object:generate=true
 type PluginsConfig struct {
-	// Path to plugins directory. This can be set via command line arguments as well.
-	PluginsPath string `json:"plugins_path"`
+	// Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
+	PluginsPath string `json:"plugins_path" default:"default"`
 	// Specific plugin types to disable
 	DisabledSymbols []string `json:"disabled_symbols"`
 	// Specific plugins to disable
@@ -84,53 +82,34 @@ type PluginsConfig struct {
 // Constructor holds fields for constructing a PluginRegistry.
 type Constructor struct {
 	// Config key
-	Key string
-	// Path key
-	PathKey string
+	ConfigKey string
 	// Plugin Symbols to look for
 	PluginSymbols []string
 	// default config
 	DefaultConfig PluginsConfig
 }
 
-func (constructor Constructor) setFlags(fs *pflag.FlagSet) error {
-	fs.String(constructor.PathKey, defaultPath, "path to plugins")
-	return nil
-}
-
-func (constructor Constructor) provideFlagSetBuilder() config.FlagSetBuilderOut {
-	return config.FlagSetBuilderOut{Builder: constructor.setFlags}
-}
-
 // ModuleConfig holds configuration for the plugin module.
 type ModuleConfig struct {
-	PluginSymbols        []string
-	OnlyCommandLineFlags bool
+	PluginSymbols []string
 }
 
-// Module is a fx module that provides flag set builder and new plugin registry.
+// Module is a fx module that provides new plugin registry.
 func (config ModuleConfig) Module() fx.Option {
 	constructor := Constructor{
-		Key:           defaultKey,
-		PathKey:       defaultPathFlag,
+		ConfigKey:     defaultKey,
 		PluginSymbols: config.PluginSymbols,
 	}
 	options := fx.Options(
-		fx.Provide(constructor.provideFlagSetBuilder),
+		fx.Provide(constructor.newPluginRegistry),
 	)
-	if !config.OnlyCommandLineFlags {
-		options = fx.Options(
-			options,
-			fx.Provide(constructor.newPluginRegistry),
-		)
-	}
 	return options
 }
 
 func (constructor Constructor) newPluginRegistry(unmarshaller config.Unmarshaller) (*PluginRegistry, fx.Option, error) {
 	var pluginOptions fx.Option
 	config := constructor.DefaultConfig
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize plugin configuration")
 		return nil, nil, err
 	}
@@ -152,6 +131,9 @@ func (constructor Constructor) newPluginRegistry(unmarshaller config.Unmarshalle
 		// Discover Plugins
 		var pluginPaths []string
 		var err error
+		if config.PluginsPath == "default" {
+			config.PluginsPath = defaultPath
+		}
 		// Make the directory absolute if it isn't already
 		if !filepath.IsAbs(config.PluginsPath) {
 			config.PluginsPath, err = filepath.Abs(config.PluginsPath)

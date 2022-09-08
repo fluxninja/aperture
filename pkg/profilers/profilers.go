@@ -10,8 +10,6 @@ import (
 
 	"github.com/fluxninja/lumberjack"
 	"github.com/gorilla/mux"
-	"github.com/spf13/cast"
-	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
@@ -26,29 +24,15 @@ const (
 	defaultCPUFile = "cpu.prof"
 )
 
-var (
-	// DefaultPath is the default path that is used to store profiles.
-	DefaultPath = path.Join(config.DefaultLogDirectory, "profiles")
-	// DefaultPathFlag is the default path flag for the profiler.
-	DefaultPathFlag = defaultKey + ".profiles_path"
-)
-
-func (constructor Constructor) setFlags(fs *pflag.FlagSet) error {
-	fs.String(constructor.PathKey, DefaultPath, "path to performance profiles")
-	return nil
-}
-
-func (constructor Constructor) provideFlagSetBuilder() config.FlagSetBuilderOut {
-	return config.FlagSetBuilderOut{Builder: constructor.setFlags}
-}
+// defaultPath is the default path that is used to store profiles.
+var defaultPath = path.Join(config.DefaultLogDirectory, "profiles")
 
 // Module is a fx module that provides the profilers.
 func Module() fx.Option {
-	constructor := Constructor{Key: defaultKey, PathKey: DefaultPathFlag}
+	constructor := Constructor{ConfigKey: defaultKey}
 
 	return fx.Options(
 		fx.Invoke(constructor.setupProfilers),
-		fx.Provide(constructor.provideFlagSetBuilder),
 	)
 }
 
@@ -66,16 +50,15 @@ func Module() fx.Option {
 type ProfilersConfig struct {
 	// Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
 	RegisterHTTPRoutes bool `json:"register_http_routes" default:"true"`
-	// Path to save performance profiles. This can be set via command line arguments as well. E.g. default path for aperture-agent is /var/log/aperture/aperture-agent/profiles.
-	ProfilesPath string `json:"profiles_path"`
+	// Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
+	ProfilesPath string `json:"profiles_path" default:"default"`
 	// Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
 	CPUProfile bool `json:"cpu_profiler" default:"false"`
 }
 
 // Constructor holds fields to create an instance of profilers.
 type Constructor struct {
-	Key           string
-	PathKey       string
+	ConfigKey     string
 	DefaultConfig ProfilersConfig
 }
 
@@ -83,20 +66,21 @@ func (constructor Constructor) setupProfilers(unmarshaller config.Unmarshaller,
 	router *mux.Router,
 	lc fx.Lifecycle,
 ) error {
-	profilesPath := cast.ToString(unmarshaller.Get(constructor.PathKey))
-
 	config := constructor.DefaultConfig
 
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err)
 		return err
+	}
+	if config.ProfilesPath == "default" {
+		config.ProfilesPath = defaultPath
 	}
 
 	var cpuProfileFile *lumberjack.Logger
 	var err error
 
 	if config.CPUProfile {
-		filename := path.Join(profilesPath, defaultCPUFile)
+		filename := path.Join(config.ProfilesPath, defaultCPUFile)
 		log.Debug().Str("filename", filename).Msg("opening cpu profile writer")
 		cpuProfileFile = newProfileWriter(filename)
 	}
@@ -109,7 +93,7 @@ func (constructor Constructor) setupProfilers(unmarshaller config.Unmarshaller,
 	}
 
 	lc.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
 			log.Info().Interface("config", config).Msg("profiler config")
 
 			if config.CPUProfile {
@@ -122,7 +106,7 @@ func (constructor Constructor) setupProfilers(unmarshaller config.Unmarshaller,
 
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(context.Context) error {
 			if config.CPUProfile {
 				log.Debug().Msg("stopping cpu profile")
 				pprof.StopCPUProfile()

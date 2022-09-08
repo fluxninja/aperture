@@ -119,7 +119,6 @@ func (cfg Config) Module() fx.Option {
 		status.Module(),
 		fx.Populate(&platform.statusRegistry),
 		platformStatusModule(),
-		plugins.ModuleConfig{OnlyCommandLineFlags: true}.Module(),
 		fx.Supply(registry),
 		fx.Populate(&platform.unmarshaller),
 		fx.Populate(&platform.dotgraph),

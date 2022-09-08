@@ -3,12 +3,12 @@ info:
   title: Aperture API
   version: "1.0"
 tags:
-  - name: PolicyService
   - name: EntityCacheService
   - name: InfoService
   - name: StatusService
   - name: FlowControlService
   - name: FluxNinjaService
+  - name: PolicyService
 consumes:
   - application/json
 produces:

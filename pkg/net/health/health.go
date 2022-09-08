@@ -16,7 +16,7 @@ import (
 // HealthModule is a module that provides grpc health server for checking services status.
 func HealthModule() fx.Option {
 	return fx.Options(
-		grpcclient.ClientConstructor{Name: "health-grpc-client", Key: "health.client.grpc"}.Annotate(),
+		grpcclient.ClientConstructor{Name: "health-grpc-client", ConfigKey: "health.client.grpc"}.Annotate(),
 		fx.Provide(ProvideHealthServer),
 		fx.Provide(fx.Annotate(
 			ProvideHealthClient,
