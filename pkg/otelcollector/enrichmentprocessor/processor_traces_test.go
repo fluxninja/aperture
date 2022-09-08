@@ -91,14 +91,14 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
-			otelcollector.ControlPointLabel: "egress",
-			"aperture.labels":               `{"foo": "bar", "fizz": "buzz"}`,
+			otelcollector.ControlPointLabel:     otelcollector.ControlPointFeature,
+			otelcollector.MarshalledLabelsLabel: `{"foo": "bar", "fizz": "buzz"}`,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
 
 		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
-			otelcollector.ControlPointLabel: "egress",
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 			"foo":                           "bar",
 			"fizz":                          "buzz",
 			otelcollector.LabeledLabel:      "true",
@@ -112,14 +112,14 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
-			otelcollector.ControlPointLabel: "egress",
-			"aperture.labels":               ``,
+			otelcollector.ControlPointLabel:     otelcollector.ControlPointFeature,
+			otelcollector.MarshalledLabelsLabel: ``,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
 
 		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
-			otelcollector.ControlPointLabel: "egress",
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 			otelcollector.LabeledLabel:      "false",
 			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
@@ -131,14 +131,14 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
-			otelcollector.ControlPointLabel: "feature",
-			"aperture.labels":               `-`,
+			otelcollector.ControlPointLabel:     otelcollector.ControlPointFeature,
+			otelcollector.MarshalledLabelsLabel: `-`,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
 
 		assertTracesEqual(td, tracesFromLabels(map[string]interface{}{
-			otelcollector.ControlPointLabel: "feature",
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 			otelcollector.LabeledLabel:      "false",
 			otelcollector.AgentGroupLabel:   "defaultAG",
 		}))
