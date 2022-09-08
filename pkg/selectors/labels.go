@@ -66,7 +66,7 @@ func (l Labels) CombinedWith(newLabels LabelSources) Labels {
 			labels[requestLabelPrefix+"host"] = http.Host
 			labels[requestLabelPrefix+"scheme"] = http.Scheme
 			labels[requestLabelPrefix+"request_content_length"] = strconv.FormatInt(http.Size, 10)
-			labels[requestLabelPrefix+"flavor"] = convertProtocol(http.Protocol)
+			labels[requestLabelPrefix+"flavor"] = CanonicalizeOtelHTTPFlavor(http.Protocol)
 		}
 		for k, v := range newLabels.Request.GetHttp().GetHeaders() {
 			if strings.HasPrefix(k, ":") {
@@ -76,20 +76,20 @@ func (l Labels) CombinedWith(newLabels LabelSources) Labels {
 				// Request.Http.
 				continue
 			}
-			labels[requestLabelHeaderPrefix+convertHeaderKey(k)] = v
+			labels[requestLabelHeaderPrefix+canonicalizeOtelHeaderKey(k)] = v
 		}
 	}
 
 	return Labels(labels)
 }
 
-// convertHeaderKey converts envoy's header naming convention to OTEL's one.
-func convertHeaderKey(key string) string {
+// canonicalizeOtelHeaderKey converts envoy's header naming convention to Otel's one.
+func canonicalizeOtelHeaderKey(key string) string {
 	return strings.ReplaceAll(key, "-", "_")
 }
 
-// convertProtocol converts envoy's protocol to OTEL kind of HTTP protocol.
-func convertProtocol(protocolName string) string {
+// CanonicalizeOtelHTTPFlavor converts envoy's protocol to Otel kind of HTTP protocol.
+func CanonicalizeOtelHTTPFlavor(protocolName string) string {
 	switch protocolName {
 	case "HTTP/1.0":
 		return "1.0"
