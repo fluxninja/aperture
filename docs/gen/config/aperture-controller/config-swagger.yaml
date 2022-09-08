@@ -19,17 +19,6 @@ definitions:
       as usage+(limit-usage)*factor.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
-  AgentInfoConfig:
-    properties:
-      agent_group:
-        description: All agents within an agent_group receive the same data-plane
-          configuration (e.g. schedulers, FluxMeters, rate limiter).
-        type: string
-        x-go-default: default
-        x-go-name: AgentGroup
-    title: AgentInfoConfig is the configuration for the agent group etc.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
   BackoffConfig:
     properties:
       base_delay:
@@ -842,15 +831,6 @@ definitions:
 info:
   description: Aperture Controller
 paths:
-  /agent_info:
-    post:
-      operationId: AgentInfo
-      parameters:
-      - in: body
-        schema:
-          $ref: '#/definitions/AgentInfoConfig'
-      tags:
-      - common-configuration
   /client:
     post:
       operationId: Client
