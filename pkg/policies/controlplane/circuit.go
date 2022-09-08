@@ -49,7 +49,7 @@ func ComponentDTO(circuit CompiledCircuit) ([]languagev1.ComponentView, []langua
 		}
 		componentMap, err := structpb.NewStruct(c.CompiledComponent.MapStruct)
 		if err != nil {
-			log.Trace().Msgf("converting component map: %w", err)
+			log.Trace().Msgf("converting component map: %v", err)
 		}
 		componentsDTO = append(componentsDTO, languagev1.ComponentView{
 			ComponentId:       c.ComponentID,
@@ -84,8 +84,8 @@ func ComponentDTO(circuit CompiledCircuit) ([]languagev1.ComponentView, []langua
 
 func convertPortViews(ports []languagev1.PortView) []*languagev1.PortView {
 	converted := make([]*languagev1.PortView, len(ports))
-	for _, p := range ports {
-		converted = append(converted, &p)
+	for i := range ports {
+		converted = append(converted, &ports[i])
 	}
 	return converted
 }
@@ -98,28 +98,26 @@ func DOT(components []languagev1.ComponentView, links []languagev1.Link) string 
 
 	// indexed by component id
 	clusters := make(map[string]*dot.Graph)
-	for _, c := range components {
-		cluster := g.Subgraph(fmt.Sprintf("%s (%s)", c.ComponentName, strings.SplitN(c.ComponentId, ".", 1)[0]), dot.ClusterOption{})
+	for i := range components {
+		cluster := g.Subgraph(fmt.Sprintf("%s (%s)", components[i].ComponentName, strings.SplitN(components[i].ComponentId, ".", 1)[0]), dot.ClusterOption{})
 		cluster.AttributesMap.Attr("margin", "50.0")
-		clusters[c.ComponentId] = cluster
+		clusters[components[i].ComponentId] = cluster
 		var anyIn, anyOut dot.Node
-		for _, p := range c.InPorts {
-			anyIn = cluster.Node(p.PortName)
+		for j := range components[i].InPorts {
+			anyIn = cluster.Node(components[i].InPorts[j].PortName)
 			cluster.AddToSameRank("input", anyIn)
 		}
-		for _, p := range c.OutPorts {
-			anyOut = cluster.Node(p.PortName)
+		for j := range components[i].OutPorts {
+			anyOut = cluster.Node(components[i].OutPorts[j].PortName)
 			cluster.AddToSameRank("output", anyOut)
 		}
-		if len(c.InPorts) > 0 && len(c.OutPorts) > 0 {
+		if len(components[i].InPorts) > 0 && len(components[i].OutPorts) > 0 {
 			cluster.Edge(anyIn, anyOut).Attr("style", "invis")
 		}
 	}
-	for _, l := range links {
-		g.Edge(clusters[l.Source.ComponentId].Node(l.Source.PortName),
-			clusters[l.Target.ComponentId].Node(l.Target.PortName)).Attr("label", l.SignalName)
+	for i := range links {
+		g.Edge(clusters[links[i].Source.ComponentId].Node(links[i].Source.PortName),
+			clusters[links[i].Target.ComponentId].Node(links[i].Target.PortName)).Attr("label", links[i].SignalName)
 	}
 	return g.String()
 }
-
-type jsonb map[string]any
