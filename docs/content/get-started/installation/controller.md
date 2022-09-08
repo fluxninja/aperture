@@ -30,11 +30,11 @@ The Aperture Controller related configurations are stored in a configmap which
 is created during the installation using Helm.
 
 All the configuration parameters for Aperture Controller are listed
-[here](reference/configuration/controller.md).
+[here](/reference/configuration/controller.md).
 
 ## Installation {#controller-installation}
 
-(Consult [Supported Platforms](get-started/supported-platforms.md) before
+(Consult [Supported Platforms](/get-started/supported-platforms.md) before
 installing.)
 
 The Aperture Controller will be installed using the
@@ -130,8 +130,8 @@ into your cluster.
    ```
 
    A list of all the configurable parameters for Etcd are available
-   [here](reference/configuration/controller.md#etcd) and Prometheus are
-   available [here](reference/configuration/controller.md#prometheus).
+   [here](/reference/configuration/controller.md#etcd) and Prometheus are
+   available [here](/reference/configuration/controller.md#prometheus).
 
    **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
    is enabled on your existing Prometheus instance as it is required by the
