@@ -36,4 +36,15 @@ entries:
     urls:
     - https://fluxninja.github.io/aperture/aperture-controller-v0.0.1.tgz
     version: v0.0.1
-generated: "2022-09-08T14:35:11.276376214Z"
+  istioconfig:
+  - apiVersion: v2
+    appVersion: v0.1.0
+    created: "2022-09-08T14:36:40.01221529Z"
+    description: A Helm chart that deploys Aperture Envoy Filter via Istio
+    digest: 2fab44e5cdb38fd2c8f1b08b6503ea20957b5268f698f89fed75fae81561e87f
+    name: istioconfig
+    type: application
+    urls:
+    - https://fluxninja.github.io/aperture/istioconfig-v0.0.1.tgz
+    version: v0.0.1
+generated: "2022-09-08T14:36:40.011584763Z"
