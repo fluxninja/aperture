@@ -570,17 +570,6 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/net/listener
   LogConfig:
     properties:
-      compress:
-        description: Compress
-        type: boolean
-        x-go-default: "false"
-        x-go-name: Compress
-      file:
-        description: Output file for logs. Keywords allowed - ["stderr", "default"].
-          "default" maps to `/var/log/fluxninja/<service>.log`
-        type: string
-        x-go-default: stderr
-        x-go-name: File
       level:
         description: Log level
         type: string
@@ -588,27 +577,6 @@ definitions:
         x-go-name: LogLevel
         x-go-validate: oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL
           panic PANIC trace TRACE disabled DISABLED
-      max_age:
-        description: Max age in days for log files
-        format: int64
-        type: integer
-        x-go-default: "7"
-        x-go-name: MaxAge
-        x-go-validate: gte=0
-      max_backups:
-        description: Max log file backups
-        format: int64
-        type: integer
-        x-go-default: "3"
-        x-go-name: MaxBackups
-        x-go-validate: gte=0
-      max_size:
-        description: Log file max size in MB
-        format: int64
-        type: integer
-        x-go-default: "50"
-        x-go-name: MaxSize
-        x-go-validate: gte=0
       non_blocking:
         description: Use non-blocking log writer (can lose logs at high throughput)
         type: boolean
@@ -621,7 +589,7 @@ definitions:
         x-go-default: "false"
         x-go-name: PrettyConsole
       writers:
-        description: Additional log writers
+        description: Log writers
         items:
           $ref: '#/definitions/LogWriterConfig'
         type: array
