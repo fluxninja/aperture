@@ -35,17 +35,12 @@ type ControllerHooks struct {
 func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admission.Request) admission.Response {
 	controller := &v1alpha1.Controller{}
 
-	err := controllerHooks.decoder.Decode(req, controller)
-	if err != nil {
-		return admission.Errored(http.StatusBadRequest, err)
-	}
-
-	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
+	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(req.Object.Raw)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
-	err = unmarshaller.Unmarshal(&controller.Spec)
+	err = unmarshaller.Unmarshal(controller)
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}

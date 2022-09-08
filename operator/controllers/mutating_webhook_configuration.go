@@ -115,6 +115,7 @@ func agentMutatingWebhookConfiguration() (*admissionregistrationv1.MutatingWebho
 						Port:      pointer.Int32(443),
 					},
 				},
+				NamespaceSelector: &v1.LabelSelector{},
 				Rules: []admissionregistrationv1.RuleWithOperations{
 					{
 						Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},
@@ -167,6 +168,7 @@ func controllerMutatingWebhookConfiguration() (*admissionregistrationv1.Mutating
 						Port:      pointer.Int32(443),
 					},
 				},
+				NamespaceSelector: &v1.LabelSelector{},
 				Rules: []admissionregistrationv1.RuleWithOperations{
 					{
 						Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},

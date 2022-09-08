@@ -146,15 +146,17 @@ var _ = Describe("Tests for imageString", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.Image{
-						Registry:   test,
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry: test,
+							Tag:      test,
+						},
 						Repository: test,
-						Tag:        test,
 					},
 				},
 			}
 
-			result := imageString(instance.Spec.Image)
+			result := imageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
 			Expect(result).To(Equal("test/test:test"))
 		})
 	})
@@ -167,14 +169,16 @@ var _ = Describe("Tests for imageString", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.Image{
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Tag: test,
+						},
 						Repository: test,
-						Tag:        test,
 					},
 				},
 			}
 
-			result := imageString(instance.Spec.Image)
+			result := imageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
 			Expect(result).To(Equal("test:test"))
 		})
 	})
@@ -189,8 +193,10 @@ var _ = Describe("Tests for imagePullSecrets", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.Image{
-						PullSecrets: testArray,
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							PullSecrets: testArray,
+						},
 					},
 				},
 			}
@@ -201,7 +207,7 @@ var _ = Describe("Tests for imagePullSecrets", func() {
 				},
 			}
 
-			result := imagePullSecrets(instance.Spec.Image)
+			result := imagePullSecrets(instance.Spec.Image.Image)
 			Expect(result).To(Equal(expected))
 		})
 	})

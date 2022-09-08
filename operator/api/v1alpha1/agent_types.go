@@ -33,7 +33,7 @@ type AgentSpec struct {
 
 	// Image configuration
 	//+kubebuilder:validation:Optional
-	Image Image `json:"image"`
+	Image AgentImage `json:"image"`
 
 	// Sidecar defines the desired state of Sidecar setup for Agent
 	//+kubebuilder:validation:Optional

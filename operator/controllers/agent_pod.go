@@ -35,7 +35,7 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 	container.Name = agentServiceName
 
 	if container.Image == "" || container.Image == "auto" {
-		container.Image = imageString(spec.Image)
+		container.Image = imageString(spec.Image.Image, spec.Image.Repository)
 	}
 
 	if container.ImagePullPolicy == "" {
@@ -136,7 +136,7 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 
 // agentPod updates the received Pod spec to add Sidecar for the Agent.
 func agentPod(instance *v1alpha1.Agent, pod *corev1.Pod) error {
-	apec := instance.Spec
+	spec := instance.Spec
 	agentGroup := ""
 	if pod.Annotations != nil {
 		agentGroup = pod.Annotations[agentGroupKey]
@@ -163,9 +163,9 @@ func agentPod(instance *v1alpha1.Agent, pod *corev1.Pod) error {
 		pod.Spec.Containers[containerIndex] = container
 	}
 
-	pod.Spec.ImagePullSecrets = mergeImagePullSecrets(imagePullSecrets(apec.Image), pod.Spec.ImagePullSecrets)
-	pod.Spec.InitContainers = mergeContainers(apec.InitContainers, pod.Spec.InitContainers)
-	pod.Spec.Volumes = mergeVolumes(agentVolumes(apec), pod.Spec.Volumes)
+	pod.Spec.ImagePullSecrets = mergeImagePullSecrets(imagePullSecrets(spec.Image.Image), pod.Spec.ImagePullSecrets)
+	pod.Spec.InitContainers = mergeContainers(spec.InitContainers, pod.Spec.InitContainers)
+	pod.Spec.Volumes = mergeVolumes(agentVolumes(spec), pod.Spec.Volumes)
 
 	return nil
 }

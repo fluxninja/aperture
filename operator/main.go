@@ -157,8 +157,10 @@ func main() {
 	}
 
 	if err = (&controllers.MutatingWebhookReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:            mgr.GetClient(),
+		Scheme:            mgr.GetScheme(),
+		AgentManager:      agentManager,
+		ControllerManager: controllerManager,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MutatingWebhook")
 		os.Exit(1)

@@ -43,9 +43,6 @@ type Image struct {
 	//+kubebuilder:validation:Optional
 	Registry string `json:"registry" default:"docker.io/fluxninja"`
 
-	// The repository of the image
-	Repository string `json:"repository"`
-
 	// The tag (version) of the image
 	//+kubebuilder:validation:Optional
 	Tag string `json:"tag" default:"latest"`
@@ -57,6 +54,24 @@ type Image struct {
 	// The PullSecrets for the image
 	//+kubebuilder:validation:Optional
 	PullSecrets []string `json:"pullSecrets,omitempty"`
+}
+
+// AgentImage defines Image spec for Aperture Agent.
+type AgentImage struct {
+	// Image specs for Agent
+	Image `json:",inline"`
+
+	// The repository of the image
+	Repository string `json:"repository" default:"aperture-agent"`
+}
+
+// ControllerImage defines Image spec for Aperture Controller.
+type ControllerImage struct {
+	// Image specs for Controller
+	Image `json:",inline"`
+
+	// The repository of the image
+	Repository string `json:"repository" default:"aperture-controller"`
 }
 
 // Probe defines Enabled, InitialDelaySeconds, PeriodSeconds, TimeoutSeconds, FailureThreshold and SuccessThreshold for probes like livenessProbe.

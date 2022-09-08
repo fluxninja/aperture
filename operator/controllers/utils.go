@@ -76,12 +76,12 @@ func podSecurityContext(podSecurityContext v1alpha1.PodSecurityContext) *corev1.
 }
 
 // imageString prepares image string from the provided Image struct.
-func imageString(image v1alpha1.Image) string {
+func imageString(image v1alpha1.Image, repository string) string {
 	var imageStr string
 	if image.Registry != "" {
-		imageStr = fmt.Sprintf("%s/%s:%s", image.Registry, image.Repository, image.Tag)
+		imageStr = fmt.Sprintf("%s/%s:%s", image.Registry, repository, image.Tag)
 	} else {
-		imageStr = fmt.Sprintf("%s:%s", image.Repository, image.Tag)
+		imageStr = fmt.Sprintf("%s:%s", repository, image.Tag)
 	}
 	return imageStr
 }

@@ -35,17 +35,12 @@ type AgentHooks struct {
 func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request) admission.Response {
 	agent := &v1alpha1.Agent{}
 
-	err := agentHooks.decoder.Decode(req, agent)
-	if err != nil {
-		return admission.Errored(http.StatusBadRequest, err)
-	}
-
-	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
+	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(req.Object.Raw)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
-	err = unmarshaller.Unmarshal(&agent.Spec)
+	err = unmarshaller.Unmarshal(agent)
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}

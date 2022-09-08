@@ -169,6 +169,7 @@ var _ = Describe("MutatingWebhookConfiguration for Agent CR", func() {
 							},
 							CABundle: serverCertPEM.Bytes(),
 						},
+						NamespaceSelector: &v1.LabelSelector{},
 						Rules: []admissionregistrationv1.RuleWithOperations{
 							{
 								Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},
@@ -236,6 +237,7 @@ var _ = Describe("MutatingWebhookConfiguration for Controller CR", func() {
 							},
 							CABundle: serverCertPEM.Bytes(),
 						},
+						NamespaceSelector: &v1.LabelSelector{},
 						Rules: []admissionregistrationv1.RuleWithOperations{
 							{
 								Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},

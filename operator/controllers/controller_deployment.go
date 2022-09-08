@@ -95,7 +95,7 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 				Spec: corev1.PodSpec{
 					ServiceAccountName:            controllerServiceName,
 					HostAliases:                   spec.HostAliases,
-					ImagePullSecrets:              imagePullSecrets(spec.Image),
+					ImagePullSecrets:              imagePullSecrets(spec.Image.Image),
 					NodeSelector:                  spec.NodeSelector,
 					Affinity:                      spec.Affinity,
 					Tolerations:                   spec.Tolerations,
@@ -105,7 +105,7 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 					Containers: []corev1.Container{
 						{
 							Name:            controllerServiceName,
-							Image:           imageString(spec.Image),
+							Image:           imageString(spec.Image.Image, spec.Image.Repository),
 							ImagePullPolicy: corev1.PullPolicy(spec.Image.PullPolicy),
 							SecurityContext: containerSecurityContext(spec.ContainerSecurityContext),
 							Command:         spec.Command,

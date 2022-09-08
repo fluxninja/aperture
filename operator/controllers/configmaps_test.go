@@ -40,10 +40,10 @@ import (
 	"k8s.io/utils/pointer"
 )
 
-//go:embed agent_config.tpl
+//go:embed agent_config_test.tpl
 var agentConfigYAML string
 
-//go:embed controller_config.tpl
+//go:embed controller_config_test.tpl
 var controllerConfigYAML string
 
 var _ = Describe("ConfigMap for Agent", func() {
@@ -66,8 +66,10 @@ var _ = Describe("ConfigMap for Agent", func() {
 								PrettyConsole: false,
 								NonBlocking:   true,
 								LogLevel:      "info",
-								LogWriterConfig: config.LogWriterConfig{
-									File: "stderr",
+								Writers: []config.LogWriterConfig{
+									{
+										File: "stderr",
+									},
 								},
 							},
 							Plugins: plugins.PluginsConfig{
@@ -172,8 +174,10 @@ var _ = Describe("ConfigMap for Controller", func() {
 								PrettyConsole: false,
 								NonBlocking:   true,
 								LogLevel:      "info",
-								LogWriterConfig: config.LogWriterConfig{
-									File: "stderr",
+								Writers: []config.LogWriterConfig{
+									{
+										File: "stderr",
+									},
 								},
 							},
 							Plugins: plugins.PluginsConfig{
