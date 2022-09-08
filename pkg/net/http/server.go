@@ -116,16 +116,16 @@ func (constructor ServerConstructor) provideServer(
 	// Register metrics
 	defaultLabels := []string{metrics.MethodLabel, metrics.ResponseStatusCodeLabel}
 	errorCounters := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: metrics.ErrorCountMetricName,
+		Name: metrics.HTTPErrorMetricName,
 		Help: "The total number of errors that occurred",
 	}, defaultLabels)
 	requestCounters := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: metrics.RequestCounterMetricName,
+		Name: metrics.HTTPRequestMetricName,
 		Help: "The total number of requests that occurred",
 	}, defaultLabels)
 	// We record latency milliseconds
 	latencyHistograms := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    metrics.LatencyHistogramMetricName,
+		Name:    metrics.HTTPRequestLatencyMetricName,
 		Help:    "Latency of the requests processed by the server",
 		Buckets: prometheus.LinearBuckets(config.LatencyBucketStartMS, config.LatencyBucketWidthMS, config.LatencyBucketCount),
 	}, defaultLabels)

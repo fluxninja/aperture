@@ -60,13 +60,13 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 		),
 		errorReason: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: metrics.FlowControlErrorReasonMetricName,
+				Name: metrics.FlowControlErrorReasonsMetricName,
 				Help: "Number of error reasons other than unspecified",
 			}, []string{metrics.FlowControlCheckErrorReasonLabel},
 		),
 		rejectReason: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: metrics.FlowControlRejectReasonMetricName,
+				Name: metrics.FlowControlRejectReasonsMetricName,
 				Help: "Number of reject reasons other than unspecified",
 			}, []string{metrics.FlowControlCheckRejectReasonLabel},
 		),

@@ -3,38 +3,40 @@ package metrics
 const (
 	// METRIC NAMES.
 
-	// SignalReadingMetricName - used in circuit metrics.
-	SignalReadingMetricName = "signal_reading"
+	// HTTP metrics.
+
+	// HTTPRequestMetricName - metric from http server.
+	HTTPRequestMetricName = "http_requests_total"
+	// HTTPRequestLatencyMetricName - metric from http server.
+	HTTPRequestLatencyMetricName = "http_requests_latency_seconds"
+	// HTTPErrorMetricName - metric from http server.
+	HTTPErrorMetricName = "http_errors_total"
+
+	// Circuit metrics.
+
+	// CircuitSignalReadingMetricName - used in circuit metrics.
+	CircuitSignalReadingMetricName = "circuit_signal_reading"
 	// FluxMeterMetricName name of fluxmeter metrics.
-	FluxMeterMetricName = "flux_meter"
+	FluxMeterMetricName = "flux_meter_info"
+
+	// Workload metrics.
+
 	// WorkloadLatencyMetricName - metric used for grouping latencies per workload.
-	WorkloadLatencyMetricName = "workload_latency_ms"
-	// RequestCounterMetricName - metric from http server.
-	RequestCounterMetricName = "http_server_request_counter"
-	// ErrorCountMetricName - metric from http server.
-	ErrorCountMetricName = "http_server_error_counter"
-	// LatencyHistogramMetricName - metric from http server.
-	LatencyHistogramMetricName = "http_server_request_latency_seconds"
-	// AcceptedConcurrencyMetricName - metric for measuring latencies of accepted requests.
-	AcceptedConcurrencyMetricName = "accepted_concurrency"
-	// IncomingConcurrencyMetricName - metric for measuring latencies of all incoming requests.
-	IncomingConcurrencyMetricName = "incoming_concurrency"
+	WorkloadLatencyMetricName = "workload_latency_seconds"
 	// WorkloadLatencySumMetricName - metric from workload histogram.
-	WorkloadLatencySumMetricName = "workload_latency_ms_sum"
+	WorkloadLatencySumMetricName = "workload_latency_seconds_sum"
 	// WorkloadLatencyCountMetricName - metric from workload histogram.
-	WorkloadLatencyCountMetricName = "workload_latency_ms_count"
+	WorkloadLatencyCountMetricName = "workload_latency_seconds_count"
+
+	// AcceptedConcurrencyMetricName - metric for measuring latencies of accepted requests.
+	AcceptedConcurrencyMetricName = "accepted_concurrency_total"
+	// IncomingConcurrencyMetricName - metric for measuring latencies of all incoming requests.
+	IncomingConcurrencyMetricName = "incoming_concurrency_total"
+
 	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
-	WFQFlowsMetricName = "wfq_flows"
+	WFQFlowsMetricName = "wfq_flows_total"
 	// WFQRequestsMetricName - weighted fair queuing number of requests gauge.
-	WFQRequestsMetricName = "wfq_requests"
-	// FlowControlRequestsMetricName - counter for Check requests for flowcontrol.
-	FlowControlRequestsMetricName = "flowcontrol_requests_count"
-	// FlowControlDecisionsMetricName - counter for Check requests per decision type.
-	FlowControlDecisionsMetricName = "flowcontrol_decisions_count"
-	// FlowControlErrorReasonMetricName - metric for error reason on FCS Check requests.
-	FlowControlErrorReasonMetricName = "flowcontrol_error_reason_count"
-	// FlowControlRejectReasonMetricName - metric for reject reason on FCS Check requests.
-	FlowControlRejectReasonMetricName = "flowcontrol_reject_reason_count"
+	WFQRequestsMetricName = "wfq_requests_total"
 	// TokenBucketMetricName - a gauge that tracks the load shed factor.
 	TokenBucketMetricName = "token_bucket_lsf"
 	// TokenBucketFillRateMetricName - a gauge that tracks the fill rate of token bucket.
@@ -43,6 +45,15 @@ const (
 	TokenBucketCapacityMetricName = "token_bucket_capacity"
 	// TokenBucketAvailableMetricName - a gauge that tracks the number of tokens available in token bucket.
 	TokenBucketAvailableMetricName = "token_bucket_available_tokens"
+
+	// FlowControlRequestsMetricName - counter for Check requests for flowcontrol.
+	FlowControlRequestsMetricName = "flowcontrol_requests_total"
+	// FlowControlDecisionsMetricName - counter for Check requests per decision type.
+	FlowControlDecisionsMetricName = "flowcontrol_decisions_total"
+	// FlowControlErrorReasonsMetricName - metric for error reason on FCS Check requests.
+	FlowControlErrorReasonsMetricName = "flowcontrol_error_reasons_total"
+	// FlowControlRejectReasonsMetricName - metric for reject reason on FCS Check requests.
+	FlowControlRejectReasonsMetricName = "flowcontrol_reject_reasons_total"
 
 	// PROMETHEUS LABELS.
 
