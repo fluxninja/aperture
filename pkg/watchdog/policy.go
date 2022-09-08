@@ -81,7 +81,7 @@ type policyInterface interface {
 // +kubebuilder:object:generate=true
 type WatermarksPolicy struct {
 	// Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
-	Watermarks []float64 `json:"watermarks" validate:"omitempty,dive,gte=0,lte=1" default:"[0.50,0.75,0.80,0.85,0.90,0.95,0.99]"`
+	Watermarks []float64 `json:"watermarks,omitempty" validate:"omitempty,dive,gte=0,lte=1" default:"[0.50,0.75,0.80,0.85,0.90,0.95,0.99]"`
 
 	// internal fields
 	// swagger:ignore

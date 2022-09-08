@@ -68,9 +68,9 @@ var _ = Describe("Tests for containerSecurityContext", func() {
 					CommonSpec: v1alpha1.CommonSpec{
 						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
 							Enabled:                true,
-							RunAsUser:              pointer.Int64Ptr(0),
-							RunAsNonRootUser:       pointer.BoolPtr(false),
-							ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+							RunAsUser:              0,
+							RunAsNonRootUser:       false,
+							ReadOnlyRootFilesystem: false,
 						},
 					},
 				},
@@ -121,7 +121,7 @@ var _ = Describe("Tests for podSecurityContext", func() {
 					CommonSpec: v1alpha1.CommonSpec{
 						PodSecurityContext: v1alpha1.PodSecurityContext{
 							Enabled: true,
-							FsGroup: pointer.Int64Ptr(1001),
+							FsGroup: 1001,
 						},
 					},
 				},
@@ -146,15 +146,17 @@ var _ = Describe("Tests for imageString", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.Image{
-						Registry:   test,
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry: test,
+							Tag:      test,
+						},
 						Repository: test,
-						Tag:        test,
 					},
 				},
 			}
 
-			result := imageString(instance.Spec.Image)
+			result := imageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
 			Expect(result).To(Equal("test/test:test"))
 		})
 	})
@@ -167,14 +169,16 @@ var _ = Describe("Tests for imageString", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.Image{
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Tag: test,
+						},
 						Repository: test,
-						Tag:        test,
 					},
 				},
 			}
 
-			result := imageString(instance.Spec.Image)
+			result := imageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
 			Expect(result).To(Equal("test:test"))
 		})
 	})
@@ -189,8 +193,10 @@ var _ = Describe("Tests for imagePullSecrets", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.Image{
-						PullSecrets: testArray,
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							PullSecrets: testArray,
+						},
 					},
 				},
 			}
@@ -201,7 +207,7 @@ var _ = Describe("Tests for imagePullSecrets", func() {
 				},
 			}
 
-			result := imagePullSecrets(instance.Spec.Image)
+			result := imagePullSecrets(instance.Spec.Image.Image)
 			Expect(result).To(Equal(expected))
 		})
 	})

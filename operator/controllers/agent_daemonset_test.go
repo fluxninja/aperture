@@ -114,11 +114,13 @@ var _ = Describe("Agent Daemonset", func() {
 							MemberlistBindAddr: ":3322",
 						},
 					},
-					Image: v1alpha1.Image{
-						Registry:   "docker.io/fluxninja",
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry:   "docker.io/fluxninja",
+							Tag:        "latest",
+							PullPolicy: "IfNotPresent",
+						},
 						Repository: "aperture-agent",
-						Tag:        "latest",
-						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -163,7 +165,7 @@ var _ = Describe("Agent Daemonset", func() {
 							NodeSelector:                  nil,
 							Tolerations:                   nil,
 							SecurityContext:               &corev1.PodSecurityContext{},
-							TerminationGracePeriodSeconds: nil,
+							TerminationGracePeriodSeconds: pointer.Int64(0),
 							InitContainers:                nil,
 							Containers: []corev1.Container{
 								{
@@ -304,13 +306,13 @@ var _ = Describe("Agent Daemonset", func() {
 						Resources:      resourceRequirement,
 						PodSecurityContext: v1alpha1.PodSecurityContext{
 							Enabled: true,
-							FsGroup: pointer.Int64Ptr(1001),
+							FsGroup: 1001,
 						},
 						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
 							Enabled:                true,
-							RunAsUser:              pointer.Int64Ptr(0),
-							RunAsNonRootUser:       pointer.BoolPtr(false),
-							ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+							RunAsUser:              0,
+							RunAsNonRootUser:       false,
+							ReadOnlyRootFilesystem: false,
 						},
 						Command:                       testArray,
 						Args:                          testArray,
@@ -318,7 +320,7 @@ var _ = Describe("Agent Daemonset", func() {
 						PodAnnotations:                testMap,
 						NodeSelector:                  testMap,
 						Tolerations:                   tolerations,
-						TerminationGracePeriodSeconds: pointer.Int64Ptr(10),
+						TerminationGracePeriodSeconds: 10,
 						LifecycleHooks:                lifecycle,
 						ExtraEnvVars: []corev1.EnvVar{
 							{
@@ -357,12 +359,14 @@ var _ = Describe("Agent Daemonset", func() {
 						},
 						Affinity: affinity,
 					},
-					Image: v1alpha1.Image{
-						Registry:    "docker.io/fluxninja",
-						Repository:  "aperture-agent",
-						Tag:         "latest",
-						PullPolicy:  "IfNotPresent",
-						PullSecrets: testArray,
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry:    "docker.io/fluxninja",
+							Tag:         "latest",
+							PullPolicy:  "IfNotPresent",
+							PullSecrets: testArray,
+						},
+						Repository: "aperture-agent",
 					},
 				},
 			}
