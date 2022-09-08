@@ -34,7 +34,7 @@ type ConstructorIn struct {
 	Factories     component.Factories
 	Unmarshaller  config.Unmarshaller
 	BaseConfig    *OTELConfig   `name:"base"`
-	PluginConfigs []*OTELConfig `group:"plugin"`
+	PluginConfigs []*OTELConfig `group:"plugin-config"`
 }
 
 // Invoke creates and runs a new instance of OTEL Collector with the passed configuration.
