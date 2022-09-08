@@ -34,7 +34,8 @@ The injector is configured with the following logic:
 
 ## Installation {#agent-sidecar-installation}
 
-(Consult [Supported Platforms](setup/supported-platforms.md) before installing.)
+(Consult [Supported Platforms](/get-started/supported-platforms.md) before
+installing.)
 
 The Aperture Agent in the Sidecar mode will be installed using the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
@@ -173,8 +174,8 @@ your cluster.
    You should see pod for Aperture Agent Manager in `RUNNING` state and `Agent`
    Custom Resource in `created` state.
 
-7. Refer steps on the [Istio Configuration](setup/istio.md) if you don't have
-   the
+7. Refer steps on the [Istio Configuration](/get-started/istio.md) if you don't
+   have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 

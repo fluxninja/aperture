@@ -27,14 +27,15 @@ these process variables and maintain their values within the optimal range.
 ## Configuration
 
 The Aperture Controller related configurations are stored in a configmap which
-is created during the installation using Helm. All the configuration parameters
-are listed in the
-[README](https://artifacthub.io/packages/helm/aperture/aperture-controller#controller-custom-resource-parameters)
-file of the Helm chart.
+is created during the installation using Helm.
+
+All the configuration parameters for Aperture Controller are listed
+[here](/reference/configuration/controller.md).
 
 ## Installation {#controller-installation}
 
-(Consult [Supported Platforms](setup/supported-platforms.md) before installing.)
+(Consult [Supported Platforms](/get-started/supported-platforms.md) before
+installing.)
 
 The Aperture Controller will be installed using the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
@@ -129,9 +130,8 @@ into your cluster.
    ```
 
    A list of all the configurable parameters for Etcd are available
-   [here](https://github.com/fluxninja/aperture/blob/main/docs/gen/config/aperture-controller/swagger.md#-etcd)
-   and Prometheus are available
-   [here](https://github.com/fluxninja/aperture/blob/main/docs/gen/config/aperture-controller/swagger.md#-prometheus).
+   [here](/reference/configuration/controller.md#etcd) and Prometheus are
+   available [here](/reference/configuration/controller.md#prometheus).
 
    **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
    is enabled on your existing Prometheus instance as it is required by the
