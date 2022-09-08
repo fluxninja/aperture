@@ -18,12 +18,11 @@ jobs:
           cache_name: release-protobuf
           tools: &tools_list |-
             buf
-      - opsninja_install:
-          branch: kklimonda/opsninja-buf-release-cmd
+      - opsninja_install
       - run:
           name: Publish protobuf to buf.build
           command: |
-            fn release publish-aperture-protobuf --dry-run \
+            fn release publish-aperture-protobuf \
             --path /home/circleci/project/api/ \
             --tag << parameters.tag >>
       - asdf_save_cache:
