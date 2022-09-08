@@ -63,6 +63,10 @@ const (
 	ConcurrencyLimitersLabel = "concurrency_limiters"
 	// DroppingConcurrencyLimitersLabel describes rate limiters dropping the traffic.
 	DroppingConcurrencyLimitersLabel = "dropping_concurrency_limiters"
+	// WorkloadsLabel describes workloads matched to the traffic.
+	WorkloadsLabel = "workloads"
+	// DroppingWorkloadsLabel describes workloads dropping the traffic.
+	DroppingWorkloadsLabel = "dropping_workloads"
 	// FluxMetersLabel describes flux meters matched to the traffic.
 	FluxMetersLabel = "flux_meters"
 	// FlowLabelKeysLabel describes keys of flow labels matched to the traffic.
