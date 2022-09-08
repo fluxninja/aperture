@@ -15,6 +15,7 @@ import (
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/extractors"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/services"
@@ -64,10 +65,14 @@ type labeler struct {
 // Classifier receives classification policies and provides Classify method.
 type Classifier struct {
 	// storing activeRules underneath
-	mu             sync.Mutex
-	activeRules    atomic.Value
-	activeRulesets map[rulesetID]CompiledRuleset // protected by mu
-	nextRulesetID  rulesetID                     // protected by mu
+	mu              sync.Mutex
+	activeRules     atomic.Value
+	activeRulesets  map[rulesetID]CompiledRuleset // protected by mu
+	nextRulesetID   rulesetID                     // protected by mu
+	classifierProto *classificationv1.Classifier
+	policyName      string
+	policyHash      string
+	classifierIndex int64
 }
 
 type rulesetID = uint64
@@ -264,6 +269,23 @@ func (c *Classifier) AddRules(
 	c.activeRulesets[id] = compiled
 	c.activateRulesets()
 	return ActiveRuleset{id: id, classifier: c}, nil
+}
+
+// GetSelector returns the selector.
+func (c *Classifier) GetSelector() *selectorv1.Selector {
+	if c.classifierProto != nil {
+		return c.classifierProto.GetSelector()
+	}
+	return nil
+}
+
+// GetClassifierID returns ClassifierID object that should uniquely identify classifier.
+func (c *Classifier) GetClassifierID() iface.ClassifierID {
+	return iface.ClassifierID{
+		PolicyName:      c.policyName,
+		PolicyHash:      c.policyHash,
+		ClassifierIndex: c.classifierIndex,
+	}
 }
 
 // ActiveRuleset represents one of currently active set of rules.

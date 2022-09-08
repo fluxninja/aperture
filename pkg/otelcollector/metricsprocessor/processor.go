@@ -134,6 +134,8 @@ func addAuthzResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string
 // * `concurrency_limiters`
 // * `dropping_concurrency_limiters`
 // * `flux_meters`.
+// * `flow_label_keys`.
+// * `classifiers`.
 func addCheckResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string) *flowcontrolv1.CheckResponse {
 	var checkResponse flowcontrolv1.CheckResponse
 	success := otelcollector.GetStruct(attributes, otelcollector.MarshalledCheckResponseLabel, &checkResponse, treatAsMissing)
@@ -149,6 +151,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string
 		otelcollector.DroppingWorkloadsLabel:           pcommon.NewValueSlice(),
 		otelcollector.FluxMetersLabel:                  pcommon.NewValueSlice(),
 		otelcollector.FlowLabelKeysLabel:               pcommon.NewValueSlice(),
+		otelcollector.ClassifiersLabel:                 pcommon.NewValueSlice(),
 		otelcollector.DecisionTypeLabel:                pcommon.NewValueString(checkResponse.DecisionType.String()),
 		otelcollector.DecisionRejectReasonLabel:        pcommon.NewValueString(""),
 		otelcollector.DecisionErrorReasonLabel:         pcommon.NewValueString(""),
@@ -202,6 +205,15 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string
 
 	for _, flowLabelKey := range checkResponse.GetFlowLabelKeys() {
 		labels[otelcollector.FlowLabelKeysLabel].SliceVal().AppendEmpty().SetStringVal(flowLabelKey)
+	}
+
+	for _, classifier := range checkResponse.Classifiers {
+		rawValue := []string{
+			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
+			fmt.Sprintf("%s:%v", metrics.ClassifierIndexLabel, classifier.ClassifierIndex),
+		}
+		value := strings.Join(rawValue, ",")
+		labels[otelcollector.ClassifiersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 	}
 
 	for key, value := range labels {
