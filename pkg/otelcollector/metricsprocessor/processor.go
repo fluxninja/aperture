@@ -88,7 +88,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 
 		p.addAuthzResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
 
-		return p.updateMetrics(logRecord.Attributes(), checkResponse)
+		return p.updateMetrics(logRecord.Attributes(), checkResponse, []string{otelcollector.EnvoyMissingAttributeSourceValue})
 		// TODO tgill: Pass attributes through white list to ensure we drop any extra fields before rollup
 		// p.whitelistLogAttributes(logRecord.Attributes())
 	})
@@ -106,7 +106,7 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 		latency := float64(endTimestamp.AsTime().Sub(startTimeStamp.AsTime())) / float64(time.Millisecond)
 		span.Attributes().UpsertDouble(otelcollector.DurationLabel, latency)
 
-		return p.updateMetrics(span.Attributes(), checkResponse)
+		return p.updateMetrics(span.Attributes(), checkResponse, []string{})
 		// TODO tgill: Pass attributes through white list to ensure we drop any extra fields before rollup
 		// p.whitelistSpanAttributes(span.Attributes())
 	})
@@ -203,13 +203,14 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, t
 func (p *metricsProcessor) updateMetrics(
 	attributes pcommon.Map,
 	checkResponse *flowcontrolv1.CheckResponse,
+	treatAsZero []string,
 ) error {
 	if checkResponse == nil {
 		return nil
 	}
 	if len(checkResponse.LimiterDecisions) > 0 {
 		// Update workload metrics
-		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.DurationLabel, []string{})
+		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.DurationLabel, treatAsZero)
 		for _, decision := range checkResponse.LimiterDecisions {
 			if cl := decision.GetConcurrencyLimiter(); cl != nil {
 				labels := map[string]string{

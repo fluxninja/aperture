@@ -15,7 +15,7 @@ const (
 	//   "fizz": "buzz"
 	// }.
 	MarshalledLabelsLabel = "aperture.labels"
-	// DurationLabel describes duration of the HTTP request in milliseconds.
+	// DurationLabel describes duration of the flow in milliseconds.
 	// NOTE: not available on spans because the span timestamps are encoded natively.
 	DurationLabel = "duration_millis"
 	// MarshalledCheckResponseLabel contains JSON encoded check response struct.
@@ -60,6 +60,16 @@ const (
 	HTTPRequestContentLength = "http.request_content_length"
 	// HTTPResponseContentLength describes length of the HTTP response content in bytes.
 	HTTPResponseContentLength = "http.response_content_length"
+	// HTTPMethodLabel describes HTTP method of the request.
+	HTTPMethodLabel = "http.method"
+	// HTTPTargetLabel describes HTTP target of the request.
+	HTTPTargetLabel = "http.target"
+	// HTTPFlavorLabel describes HTTP flavor of the request.
+	HTTPFlavorLabel = "http.flavor"
+	// HTTPUserAgentLabel describes HTTP user agent of the request.
+	HTTPUserAgentLabel = "http.user_agent"
+	// HTTPHostLabel describes HTTP host of the request.
+	HTTPHostLabel = "http.host"
 
 	/* Labels specific to Envoy. */
 
@@ -73,6 +83,8 @@ const (
 	EnvoyResponseDurationLabel = "RESPONSE_DURATION"
 	// EnvoyResponseTxDurationLabel from envoy access logs.
 	EnvoyResponseTxDurationLabel = "RESPONSE_TX_DURATION"
+	// EnvoyCallerLabel from envoy access logs.
+	EnvoyCallerLabel = "caller"
 
 	/* The following are derived labels that are applied based on contents of check response. */
 

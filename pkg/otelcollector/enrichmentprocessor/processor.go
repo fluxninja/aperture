@@ -57,7 +57,7 @@ func (ep *enrichmentProcessor) ConsumeLogs(ctx context.Context, origLd plog.Logs
 	}
 	ld := origLd.Clone()
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		acceptListLogAttributes(logRecord.Attributes())
+		enforceIncludeListLog(logRecord.Attributes())
 		ep.enrichAttributes(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
 		return nil
 	})
@@ -71,7 +71,7 @@ func (ep *enrichmentProcessor) ConsumeTraces(ctx context.Context, origTd ptrace.
 	}
 	td := origTd.Clone()
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		acceptListSpanAttributes(span.Attributes())
+		enforceIncludeListSpan(span.Attributes())
 		ep.enrichAttributes(span.Attributes(), []string{})
 		return nil
 	})
@@ -227,51 +227,67 @@ func ipFromAddress(ip string) string {
  * AcceptList: This acceptList is applied to logs and spans at the beginning of enrichment process.
  */
 var (
-	commonAttributes = map[string]bool{
-		otelcollector.MarshalledLabelsLabel:        true,
-		otelcollector.ControlPointLabel:            true,
-		otelcollector.MarshalledCheckResponseLabel: true,
+	_attributesCommon = []string{
+		otelcollector.MarshalledLabelsLabel,
+		otelcollector.ControlPointLabel,
+		otelcollector.MarshalledCheckResponseLabel,
 	}
 
-	logAttributes = map[string]bool{
-		otelcollector.DurationLabel:                true,
-		otelcollector.MarshalledAuthzResponseLabel: true,
-		otelcollector.HTTPStatusCodeLabel:          true,
-		otelcollector.HTTPRequestContentLength:     true,
-		otelcollector.HTTPResponseContentLength:    true,
-		otelcollector.HostAddressLabel:             true,
-		otelcollector.PeerAddressLabel:             true,
-		otelcollector.HostIPLabel:                  true,
-		otelcollector.PeerIPLabel:                  true,
-		otelcollector.EnvoyDurationLabel:           true,
-		otelcollector.EnvoyRequestDurationLabel:    true,
-		otelcollector.EnvoyRequestTxDurationLabel:  true,
-		otelcollector.EnvoyResponseDurationLabel:   true,
-		otelcollector.EnvoyResponseTxDurationLabel: true,
+	_attributesLog = []string{
+		otelcollector.DurationLabel,
+		otelcollector.MarshalledAuthzResponseLabel,
+		otelcollector.HTTPStatusCodeLabel,
+		otelcollector.HTTPRequestContentLength,
+		otelcollector.HTTPResponseContentLength,
+		otelcollector.HTTPMethodLabel,
+		otelcollector.HTTPTargetLabel,
+		otelcollector.HTTPFlavorLabel,
+		otelcollector.HTTPUserAgentLabel,
+		otelcollector.HTTPHostLabel,
+		otelcollector.HostAddressLabel,
+		otelcollector.PeerAddressLabel,
+		otelcollector.HostIPLabel,
+		otelcollector.PeerIPLabel,
+		otelcollector.EnvoyDurationLabel,
+		otelcollector.EnvoyRequestDurationLabel,
+		otelcollector.EnvoyRequestTxDurationLabel,
+		otelcollector.EnvoyResponseDurationLabel,
+		otelcollector.EnvoyResponseTxDurationLabel,
+		otelcollector.EnvoyCallerLabel,
 	}
 
-	spanAttributes = map[string]bool{
-		otelcollector.FeatureAddressLabel: true,
-		otelcollector.FeatureIDLabel:      true,
-		otelcollector.FeatureStatusLabel:  true,
+	_attributesSpan = []string{
+		otelcollector.FeatureAddressLabel,
+		otelcollector.FeatureIDLabel,
+		otelcollector.FeatureStatusLabel,
 	}
+
+	includeListLog  = _formIncludeList(append(_attributesCommon, _attributesLog...))
+	includeListSpan = _formIncludeList(append(_attributesCommon, _attributesSpan...))
 )
 
-func acceptListLogAttributes(attributes pcommon.Map) {
-	_acceptListAttributes(attributes, commonAttributes)
-	_acceptListAttributes(attributes, logAttributes)
+func _formIncludeList(attributes []string) map[string]bool {
+	includeList := make(map[string]bool)
+	for _, attribute := range attributes {
+		includeList[attribute] = true
+	}
+	return includeList
 }
 
-func acceptListSpanAttributes(attributes pcommon.Map) {
-	_acceptListAttributes(attributes, commonAttributes)
-	_acceptListAttributes(attributes, spanAttributes)
+func enforceIncludeListLog(attributes pcommon.Map) {
+	_enforceIncludeList(attributes, includeListLog)
 }
 
-func _acceptListAttributes(attributes pcommon.Map, acceptList map[string]bool) {
+func enforceIncludeListSpan(attributes pcommon.Map) {
+	_enforceIncludeList(attributes, includeListSpan)
+}
+
+func _enforceIncludeList(attributes pcommon.Map, includeList map[string]bool) {
 	keysToRemove := make([]string, 0)
-	attributes.Range(func(key string, _ pcommon.Value) bool {
-		if !acceptList[key] {
+	attributes.Range(func(key string, value pcommon.Value) bool {
+		if !includeList[key] {
 			keysToRemove = append(keysToRemove, key)
+			otelcollector.LogSampled.Info().Str("key", key).Msgf("Removing key, value: %s", value.AsString())
 		}
 		return true
 	})
