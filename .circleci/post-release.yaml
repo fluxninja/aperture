@@ -16,17 +16,22 @@ jobs:
       - checkout
       - asdf_install:
           cache_name: release-protobuf
-          tools: |-
+          tools: &tools_list |-
             buf
+            python
+      - opsninja_install
       - run:
           name: Login to buf.build
           command: |
             echo ${BUF_BUILD_TOKEN} | buf registry login --username kklimonda-fn --token-stdin
       - run:
-          name: Push protobuf to buf.build
+          name: Publish protobuf to buf.build
           command: |
-            cd api && buf push --tag << parameters.tag >>
+            fn release publish-aperture-protobuf \
+            --path /home/circleci/project/api/ \
+            --tag << parameters.tag >>
       - asdf_save_cache:
+          tools: *tools_list
           cache_name: release-protobuf
 
   tag-github-repository:
@@ -135,11 +140,12 @@ commands:
             printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
             date +%m > ~/month
             date +%d > ~/day
+            echo "<<parameters.tools>>" > ~/installed-tools
       # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
+            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}-{{ checksum "~/installed-tools" }}
             - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -152,9 +158,36 @@ commands:
         type: string
         description: "Name of asdf cache"
         default: "default"
+      tools:
+        type: string
+        description: Newline separated list of tools that has been installed
+        default: ""
     steps:
       - save_cache:
           name: Save ASDF cache
-          key: aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}
+          key: aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}-{{ checksum "~/installed-tools" }}
           paths:
             - ~/.asdf
+  opsninja_install:
+    parameters:
+      branch:
+        type: string
+        description: opsninja branch to install tools from
+        default: main
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
+      - run:
+          name: Install opsninja and its dependencies
+          command: |
+            # We need R/O access to cloud repository to be able to fetch opsninja library
+            # FIXME: make "releases" of opsninja library somehow, even as a separate repository
+            # to limit exposure.
+            export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
+            export SSH_AUTH_SOCK=""
+            # Bust asdf cache as our opsninja version is always 0.0.0
+            pip uninstall -y opsninja
+            pip install 'git+ssh://git@github.com/fluxninja/cloud@<<parameters.branch>>#egg=opsninja&subdirectory=ops/apps/opsninja/'
+            asdf reshim
