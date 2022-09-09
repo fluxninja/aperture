@@ -116,7 +116,7 @@ your cluster.
    `default`, use the `-n` flag:
 
    ```bash
-   helm upgrade --install agent aperture/aperture-agent -n "aperture-controller" --create-namespace
+   helm upgrade --install agent aperture/aperture-agent -n "aperture-agent" --create-namespace
    ```
 
 6. Once you have successfully deployed the resources, confirm that the Aperture
