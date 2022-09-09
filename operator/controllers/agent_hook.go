@@ -45,6 +45,15 @@ func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request)
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	if agent.Spec.Secrets.FluxNinjaPlugin.Create && agent.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+		return admission.Denied("The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+	}
+
+	if agent.ObjectMeta.Annotations == nil {
+		agent.ObjectMeta.Annotations = map[string]string{}
+	}
+
+	agent.ObjectMeta.Annotations[defaulterAnnotationKey] = "true"
 	updatedAgent, err := json.Marshal(agent)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)

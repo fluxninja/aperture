@@ -51,9 +51,10 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			instance.Name = test
 			instance.Namespace = test
 			reconciler = &ControllerReconciler{
-				Client:   k8sClient,
-				Scheme:   scheme.Scheme,
-				Recorder: k8sManager.GetEventRecorderFor(appName),
+				Client:        k8sClient,
+				DynamicClient: k8sDynamicClient,
+				Scheme:        scheme.Scheme,
+				Recorder:      k8sManager.GetEventRecorderFor(appName),
 			}
 		})
 

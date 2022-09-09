@@ -52,7 +52,7 @@ Follow the below steps to deploy the operator on the local cluster:
   ```bash
   kubectl delete -f config/samples/fluxninja.com_v1alpha1_agent.yaml
   kubectl delete -f config/samples/fluxninja.com_v1alpha1_controller.yaml
-  make undeploy
+  make operator-undeploy
   ```
 
 ## Deploying the operator using `helm`
@@ -72,10 +72,11 @@ below steps.
 
   ```yaml
   agent:
-    etcd:
-      endpoints: ["http://controller-etcd:2379"]
-    prometheus:
-      address: "http://controller-prometheus-server:80"
+    config:
+      etcd:
+        endpoints: ["http://controller-etcd:2379"]
+      prometheus:
+        address: "http://controller-prometheus-server:80"
   ```
 
 - Install or upgrade the chart:
@@ -115,10 +116,11 @@ below steps.
 
   ```yaml
   controller:
-    etcd:
-      endpoints: ["ETCD_ENDPOINT"]
-    prometheus:
-      address: "PROMETHEUS_ENDPOINT"
+    config:
+      etcd:
+        endpoints: ["ETCD_ENDPOINT"]
+      prometheus:
+        address: "PROMETHEUS_ENDPOINT"
 
   etcd:
     enabled: false
@@ -129,10 +131,11 @@ below steps.
 
   ```yaml
   agent:
-    etcd:
-      endpoints: ["ETCD_ENDPOINT"]
-    prometheus:
-      address: "PROMETHEUS_ENDPOINT"
+    config:
+      etcd:
+        endpoints: ["ETCD_ENDPOINT"]
+      prometheus:
+        address: "PROMETHEUS_ENDPOINT"
   ```
 
 - To uninstall the operator, run below commands:
