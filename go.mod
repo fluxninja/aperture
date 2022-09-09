@@ -6,7 +6,7 @@ require (
 	github.com/Henry-Sarabia/sliceconv v1.0.2
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/buger/jsonparser v1.1.1
-	github.com/buraksezer/olric v0.4.5
+	github.com/buraksezer/olric v0.4.7
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cenkalti/backoff/v4 v4.1.3
 	github.com/clarketm/json v1.17.1
@@ -68,7 +68,7 @@ require (
 	go.uber.org/multierr v1.8.0
 	go.uber.org/zap v1.23.0
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
-	golang.org/x/net v0.0.0-20220728030405-41545e8bf201
+	golang.org/x/net v0.0.0-20220907135653-1e95f45603a7
 	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
@@ -126,11 +126,11 @@ require (
 	github.com/OneOfOne/xxhash v1.2.8 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
-	github.com/armon/go-metrics v0.4.0 // indirect
+	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/aws/aws-sdk-go v1.44.72 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/buraksezer/connpool v0.5.0 // indirect
+	github.com/buraksezer/connpool v0.6.0 // indirect
 	github.com/buraksezer/consistent v0.9.0 // indirect
 	github.com/bytecodealliance/wasmtime-go v0.38.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
@@ -287,8 +287,8 @@ require (
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094 // indirect
-	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
-	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
+	golang.org/x/sync v0.0.0-20220907140024-f12130a52804 // indirect
+	golang.org/x/sys v0.0.0-20220908164124-27713097b956 // indirect
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
@@ -307,7 +307,6 @@ exclude github.com/prometheus/prometheus v1.8.2
 
 replace (
 	cloud.google.com/go => cloud.google.com/go v0.100.2
-	github.com/buraksezer/olric => github.com/fluxninja/olric v0.4.5-fn-patch.3
 	github.com/go-openapi/analysis => github.com/fluxninja/analysis v0.21.2-fn.patch.1
 	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.8
 )
