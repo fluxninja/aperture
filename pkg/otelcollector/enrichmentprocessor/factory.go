@@ -44,7 +44,7 @@ func createLogsProcessor(
 ) (component.LogsProcessor, error) {
 	cfgTyped := cfg.(*Config)
 	proc := newProcessor(cfgTyped.entityCache)
-	return processorhelper.NewLogsProcessorWithCreateSettings(
+	return processorhelper.NewLogsProcessor(
 		ctx,
 		params,
 		cfg,
@@ -64,7 +64,7 @@ func createTracesProcessor(
 ) (component.TracesProcessor, error) {
 	cfgTyped := cfg.(*Config)
 	proc := newProcessor(cfgTyped.entityCache)
-	return processorhelper.NewTracesProcessorWithCreateSettings(
+	return processorhelper.NewTracesProcessor(
 		ctx,
 		params,
 		cfg,
@@ -84,7 +84,7 @@ func createMetricsProcessor(
 ) (component.MetricsProcessor, error) {
 	cfgTyped := cfg.(*Config)
 	proc := newProcessor(cfgTyped.entityCache)
-	return processorhelper.NewMetricsProcessorWithCreateSettings(
+	return processorhelper.NewMetricsProcessor(
 		ctx,
 		params,
 		cfg,

@@ -39,25 +39,27 @@ type ConstructorIn struct {
 
 // setup creates and runs a new instance of OTEL Collector with the passed configuration.
 func setup(in ConstructorIn) error {
-	locations := []string{"file:main"}
+	uris := []string{"file:main"}
 	var otelService *service.Collector
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			mapProviders := map[string]confmap.Provider{
+			providers := map[string]confmap.Provider{
 				"file": NewOTELConfigUnmarshaler(in.BaseConfig.AsMap()),
 			}
 			for i, pluginConfig := range in.PluginConfigs {
 				scheme := fmt.Sprintf("plugin-%v", i)
-				locations = append(locations, fmt.Sprintf("%v:%v", scheme, scheme))
-				mapProviders[scheme] = NewOTELConfigUnmarshaler(pluginConfig.AsMap())
+				uris = append(uris, fmt.Sprintf("%v:%v", scheme, scheme))
+				providers[scheme] = NewOTELConfigUnmarshaler(pluginConfig.AsMap())
 			}
 
 			configProvider, err := service.NewConfigProvider(service.ConfigProviderSettings{
-				Locations:    locations,
-				MapProviders: mapProviders,
-				MapConverters: []confmap.Converter{
-					overwritepropertiesconverter.New([]string{}),
-					expandconverter.New(),
+				ResolverSettings: confmap.ResolverSettings{
+					URIs:      uris,
+					Providers: providers,
+					Converters: []confmap.Converter{
+						overwritepropertiesconverter.New([]string{}),
+						expandconverter.New(),
+					},
 				},
 			})
 			if err != nil {
