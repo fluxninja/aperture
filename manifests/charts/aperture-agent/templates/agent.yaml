@@ -19,7 +19,7 @@ spec:
   {{- end }}
   {{- if .Values.agent.service.annotations }}
   service:
-    annotations: {{ .Values.agent.service.annotations }}
+    annotations: {{ .Values.agent.service.annotations | toYaml | indent 6 }}
   {{- end }}
   serviceAccount:
     create: {{ .Values.agent.serviceAccount.create }}
@@ -145,7 +145,7 @@ spec:
   sidecar:
     enabled: {{ .Values.agent.sidecar.enabled }}
     {{- if .Values.agent.sidecar.enableNamespacesByDefault }}
-    enableNamespacesByDefault: {{ .Values.agent.sidecar.enableNamespacesByDefault }}
+    enableNamespacesByDefault: {{ .Values.agent.sidecar.enableNamespacesByDefault | toYaml | nindent 6 }}
     {{- end }}
   {{- end }}
   config:
