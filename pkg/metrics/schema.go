@@ -42,9 +42,9 @@ const (
 	// TokenBucketFillRateMetricName - a gauge that tracks the fill rate of token bucket.
 	TokenBucketFillRateMetricName = "token_bucket_fill_rate"
 	// TokenBucketCapacityMetricName - a gauge that tracks the capacity of token bucket.
-	TokenBucketCapacityMetricName = "token_bucket_capacity"
+	TokenBucketCapacityMetricName = "token_bucket_capacity_total"
 	// TokenBucketAvailableMetricName - a gauge that tracks the number of tokens available in token bucket.
-	TokenBucketAvailableMetricName = "token_bucket_available_tokens"
+	TokenBucketAvailableMetricName = "token_bucket_available_tokens_total"
 
 	// FlowControlRequestsMetricName - counter for Check requests for flowcontrol.
 	FlowControlRequestsMetricName = "flowcontrol_requests_total"

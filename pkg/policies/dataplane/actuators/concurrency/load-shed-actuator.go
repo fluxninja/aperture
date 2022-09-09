@@ -60,7 +60,7 @@ func newLoadShedActuatorFactory(
 	f.tokenBucketFillRateGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: metrics.TokenBucketFillRateMetricName,
-			Help: "A gauge that tracks the fill rate of token bucket",
+			Help: "A gauge that tracks the fill rate of token bucket in tokens/sec",
 		},
 		metricLabelKeys,
 	)
