@@ -17,7 +17,22 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"time"
+	"github.com/fluxninja/aperture/pkg/config"
+	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/jobs"
+	"github.com/fluxninja/aperture/pkg/metrics"
+	"github.com/fluxninja/aperture/pkg/net/grpc"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
+	"github.com/fluxninja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
+	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/plugins"
+	"github.com/fluxninja/aperture/pkg/profilers"
+	"github.com/fluxninja/aperture/pkg/prometheus"
+	"github.com/fluxninja/aperture/pkg/watchdog"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
+	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/sentry"
 
 	corev1 "k8s.io/api/core/v1"
 )
@@ -26,166 +41,91 @@ import (
 type Image struct {
 	// The registry of the image
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="docker.io/fluxninja"
-	Registry string `json:"registry"`
-
-	// The repository of the image
-	Repository string `json:"repository"`
+	Registry string `json:"registry" default:"docker.io/fluxninja"`
 
 	// The tag (version) of the image
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=latest
-	Tag string `json:"tag"`
+	Tag string `json:"tag" default:"latest"`
 
 	// The ImagePullPolicy of the image
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Enum=Never;Always;IfNotPresent
-	//+kubebuilder:default:="IfNotPresent"
-	PullPolicy string `json:"pullPolicy"`
+	PullPolicy string `json:"pullPolicy" default:"IfNotPresent" validate:"oneof=Never Always IfNotPresent"`
 
 	// The PullSecrets for the image
 	//+kubebuilder:validation:Optional
 	PullSecrets []string `json:"pullSecrets,omitempty"`
 }
 
-// Log defines logger configuration.
-type Log struct {
-	// Log level
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="info"
-	Level string `json:"level"`
+// AgentImage defines Image spec for Aperture Agent.
+type AgentImage struct {
+	// Image specs for Agent
+	Image `json:",inline"`
 
-	// Log filename
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="stderr"
-	File string `json:"file"`
+	// The repository of the image
+	Repository string `json:"repository" default:"aperture-agent"`
+}
 
-	// Flag for non-blocking
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=true
-	NonBlocking bool `json:"nonBlocking"`
+// ControllerImage defines Image spec for Aperture Controller.
+type ControllerImage struct {
+	// Image specs for Controller
+	Image `json:",inline"`
 
-	// Flag for pretty console
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
-	PrettyConsole bool `json:"prettyConsole"`
+	// The repository of the image
+	Repository string `json:"repository" default:"aperture-controller"`
 }
 
 // Probe defines Enabled, InitialDelaySeconds, PeriodSeconds, TimeoutSeconds, FailureThreshold and SuccessThreshold for probes like livenessProbe.
 type Probe struct {
 	// Enable probe on agent containers
-	Enabled bool `json:"enabled"`
+	Enabled bool `json:"enabled" default:"true"`
 
 	// Initial delay seconds for probe
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Minimum:=0
-	//+kubebuilder:default:=15
-	InitialDelaySeconds int32 `json:"initialDelaySeconds"`
+	InitialDelaySeconds int32 `json:"initialDelaySeconds" default:"15" validate:"gte=0"`
 
 	// Period delay seconds for probe
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Minimum:=1
-	//+kubebuilder:default:=15
-	PeriodSeconds int32 `json:"periodSeconds"`
+	PeriodSeconds int32 `json:"periodSeconds" default:"15" validate:"gte=1"`
 
 	// Timeout delay seconds for probe
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Minimum:=1
-	//+kubebuilder:default:=5
-	TimeoutSeconds int32 `json:"timeoutSeconds"`
+	TimeoutSeconds int32 `json:"timeoutSeconds" default:"5" validate:"gte=1"`
 
 	// Failure threshold for probe
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Minimum:=1
-	//+kubebuilder:default:=6
-	FailureThreshold int32 `json:"failureThreshold"`
+	FailureThreshold int32 `json:"failureThreshold" default:"6" validate:"gte=1"`
 
 	// Success threshold for probe
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Minimum:=1
-	//+kubebuilder:default:=1
-	SuccessThreshold int32 `json:"successThreshold"`
-}
-
-// EtcdSpec defines Endpoints and LeaseTtl of etcd.
-type EtcdSpec struct {
-	// Etcd endpoints
-	//+kubebuilder:validation:Optional
-	Endpoints []string `json:"endpoints,omitempty"`
-
-	// Etcd leaseTtl
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="60s"
-	LeaseTTL string `json:"leaseTtl"`
-}
-
-// PrometheusSpec defines parameters required for Prometheus connection.
-type PrometheusSpec struct {
-	// Address for Prometheus
-	//+kubebuilder:validation:Optional
-	Address string `json:"address"`
+	SuccessThreshold int32 `json:"successThreshold" default:"1" validate:"gte=1"`
 }
 
 // PodSecurityContext defines Enabled and FsGroup for the Pods' security context.
 type PodSecurityContext struct {
 	// Enable PodSecurityContext on Pod
-	Enabled bool `json:"enabled"`
+	Enabled bool `json:"enabled" default:"false"`
 
 	// fsGroup to define the Group ID for the Pod
-	//+kubebuilder:validation:minimum=0
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=1001
-	FsGroup *int64 `json:"fsGroup"`
+	FsGroup int64 `json:"fsGroup" default:"1001" validate:"gte=0"`
 }
 
 // ContainerSecurityContext defines Enabled, RunAsUser, RunAsNonRootUser and ReadOnlyRootFilesystem for the containers' security context.
 type ContainerSecurityContext struct {
 	// Enable ContainerSecurityContext on containers
-	//+kubebuilder:validation:Optional
-	Enabled bool `json:"enabled"`
+	Enabled bool `json:"enabled" default:"false"`
 
 	// Set containers' Security Context runAsUser
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:minimum:=0
-	//+kubebuilder:default:=1001
-	RunAsUser *int64 `json:"runAsUser"`
+	RunAsUser int64 `json:"runAsUser" default:"1001" validate:"gte=0"`
 
 	// Set containers' Security Context runAsNonRoot
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
-	RunAsNonRootUser *bool `json:"runAsNonRoot"`
+	RunAsNonRootUser bool `json:"runAsNonRoot" default:"false"`
 
 	// Set agent containers' Security Context runAsNonRoot
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=false
-	ReadOnlyRootFilesystem *bool `json:"readOnlyRootFilesystem"`
-}
-
-// FluxNinjaPluginSpec defines the parameters for FluxNinja Plugin.
-type FluxNinjaPluginSpec struct {
-	// Enabled the FluxNinja plugin with Aperture
-	//+kubebuilder:validation:Optional
-	Enabled bool `json:"enabled"`
-
-	// FluxNinja cloud instance address
-	//+kubebuilder:validation:Optional
-	Endpoint string `json:"endpoint"`
-
-	// Specifies how often to send heartbeats to the FluxNinja cloud
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:="30s"
-	HeartbeatsInterval string `json:"heartbeatsInterval"`
-
-	// tls configuration to communicate with FluxNinja cloud
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={insecure:false,insecureSkipVerify:false}
-	TLS TLSSpec `json:"tls"`
-
-	// API Key secret references for Agent or Controller
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={create:true}
-	APIKeySecret APIKeySecret `json:"apiKeySecret"`
+	ReadOnlyRootFilesystem bool `json:"readOnlyRootFilesystem" default:"false"`
 }
 
 // CommonSpec defines the desired the common state of Agent and Controller.
@@ -193,58 +133,26 @@ type CommonSpec struct {
 	// Labels to add to all deployed objects
 	//+mapType=atomic
 	//+kubebuilder:validation:Optional
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	Labels map[string]string `json:"labels,omitempty"`
 
 	// Annotations to add to all deployed objects
 	//+kubebuilder:validation:Optional
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	Annotations map[string]string `json:"annotations,omitempty"`
-
-	// FluxNinjaPlugin defines the parameters for FluxNinja plugin with Agent or Controller
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={enabled:false,heartbeatsInterval:"30s"}
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
-	FluxNinjaPlugin FluxNinjaPluginSpec `json:"fluxninjaPlugin"`
 
 	// Configuration for Agent or Controller service
 	//+kubebuilder:validation:Optional
 	Service Service `json:"service"`
 
-	// Etcd parameters for Agent or Controller
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={leaseTtl:"60s"}
-	Etcd EtcdSpec `json:"etcd"`
-
-	// Prometheus parameters for Agent or Controller
-	//+kubebuilder:validation:Optional
-	Prometheus PrometheusSpec `json:"prometheus"`
-
-	// Server port for the Agent
-	//+kubebuilder:default:=80
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Maximum:=65535
-	//+kubebuilder:validation:Minimum:=1
-	ServerPort int32 `json:"serverPort"`
-
-	// Log related configurations
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={prettyConsole:false,nonBlocking:true,level:"info",file:"stderr"}
-	Log Log `json:"log"`
-
 	// ServiceAccountSpec defines the the configuration pf Service account for Agent or Controller
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={create:true,automountServiceAccountToken:true}
 	ServiceAccountSpec ServiceAccountSpec `json:"serviceAccount"`
 
 	// livenessProbe related configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={enabled:true,initialDelaySeconds:15,periodSeconds:15,timeoutSeconds:5,failureThreshold:6,successThreshold:1}
 	LivenessProbe Probe `json:"livenessProbe"`
 
 	// readinessProbe related configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={enabled:true,initialDelaySeconds:15,periodSeconds:15,timeoutSeconds:5,failureThreshold:6,successThreshold:1}
 	ReadinessProbe Probe `json:"readinessProbe"`
 
 	// Custom livenessProbe that overrides the default one
@@ -261,12 +169,10 @@ type CommonSpec struct {
 
 	// Configure Pods' Security Context
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={enabled:false,fsGroup:1001}
 	PodSecurityContext PodSecurityContext `json:"podSecurityContext"`
 
 	// Configure Containers' Security Context
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={enabled:false,runAsUser:1001,runAsNonRoot:false,readOnlyRootFilesystem:false}
 	ContainerSecurityContext ContainerSecurityContext `json:"containerSecurityContext"`
 
 	// Override default container command
@@ -291,7 +197,6 @@ type CommonSpec struct {
 	Affinity *corev1.Affinity `json:"affinity,omitempty"`
 
 	// Node labels for pods assignment
-	//+mapType=atomic
 	//+kubebuilder:validation:Optional
 	//+mapType=atomic
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
@@ -301,13 +206,12 @@ type CommonSpec struct {
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 
 	// Seconds Redmine pod needs to terminate gracefully
-	//+kubebuilder:validation:Minimum:=0
 	//+kubebuilder:validation:Optional
-	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds"`
+	TerminationGracePeriodSeconds int64 `json:"terminationGracePeriodSeconds" validate:"gte=0"`
 
 	// For the container(s) to automate configuration before or after startup
 	//+kubebuilder:validation:Optional
-	LifecycleHooks *corev1.Lifecycle `json:"lifecycleHooks"`
+	LifecycleHooks *corev1.Lifecycle `json:"lifecycleHooks,omitempty" validate:"omitempty"`
 
 	// Array with extra environment variables to add
 	//+kubebuilder:validation:Optional
@@ -336,72 +240,39 @@ type CommonSpec struct {
 	// Add additional init containers
 	//+kubebuilder:validation:Optional
 	InitContainers []corev1.Container `json:"initContainers,omitempty"`
+
+	// Secrets
+	//+kubebuilder:validation:Optional
+	Secrets Secrets `json:"secrets"`
 }
 
-// Ingestion defines the fields required for configuring the FluxNinja cloud connection details.
-type Ingestion struct {
-	// Specifies address of FluxNinja cloud instance to connect to
+// Secrets for Agent or Controller.
+type Secrets struct {
+	// FluxNinja plugin.
 	//+kubebuilder:validation:Optional
-	Address string `json:"address"`
-
-	// Specifies port of FluxNinja cloud instance to connect to
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Maximum:=65535
-	//+kubebuilder:validation:Minimum:=1
-	//+kubebuilder:default:=443
-	Port int `json:"port"`
-
-	// Specifies whether to connect to the FluxNinja cloud over TLS or in plain text
-	//+kubebuilder:validation:Optional
-	Insecure bool `json:"insecure"`
-
-	// Specifies whether to verify FluxNinja cloud server certificate
-	//+kubebuilder:validation:Optional
-	InsecureSkipVerify bool `json:"insecureSkipVerify"`
+	FluxNinjaPlugin APIKeySecret `json:"fluxNinjaPlugin"`
 }
 
 // APIKeySecret defines fields required for creation/usage of secret for the ApiKey of Agent and Controller.
 type APIKeySecret struct {
 	// Create new secret or not
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=true
-	Create bool `json:"create"`
+	Create bool `json:"create" defalut:"false"`
 
 	// Secret details
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={key:"apiKey"}
 	SecretKeyRef SecretKeyRef `json:"secretKeyRef"`
 
 	// Value for the ApiKey
-	//+kubebuilder:validation:Optional
 	Value string `json:"value"`
 }
 
 // SecretKeyRef defines fields for details of the ApiKey secret.
 type SecretKeyRef struct {
 	// Name of the secret
-	//+kubebuilder:validation:Optional
 	Name string `json:"name"`
 
 	// Key of the secret in Data
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=apiKey
-	Key string `json:"key"`
-}
-
-// TLSSpec defines fields for TLS configuration for FluxNinja Plugin.
-type TLSSpec struct {
-	// Specifies whether to communicate with FluxNinja cloud over TLS or in plain text
-	//+kubebuilder:validation:Optional
-	Insecure bool `json:"insecure"`
-
-	// Specifies whether to verify FluxNinja cloud certificate
-	//+kubebuilder:validation:Optional
-	InsecureSkipVerify bool `json:"insecureSkipVerify"`
-
-	// Alternative CA certificates bundle to use to validate FluxNinja cloud certificate
-	//+kubebuilder:validation:Optional
-	CAFile string `json:"caFile"`
+	Key string `json:"key" defalut:"apiKey"`
 }
 
 // APIKeySecretSpec defines API Key secret details for Agent and Controller.
@@ -415,15 +286,109 @@ type APIKeySecretSpec struct {
 	Controller APIKeySecret `json:"controller"`
 }
 
-// Batch defines configuration for OTEL batch processor.
-type Batch struct {
-	// Timeout sets the time after which a batch will be sent regardless of size.
+// CommonConfigSpec defines common configuration for agent and controller.
+type CommonConfigSpec struct {
+	// Client configuration such as proxy settings.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=1000000000
-	Timeout time.Duration `json:"timeout"`
+	Client ClientConfigSpec `json:"client"`
 
-	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	// Etcd configuration.
+	//+kubebuilder:validation:Required
+	Etcd etcd.EtcdConfig `json:"etcd"`
+
+	// Liveness probe configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:=10000
-	SendBatchSize uint32 `json:"sendBatchSize"`
+	Liveness ProbeConfigSpec `json:"liveness"`
+
+	// Readiness probe configuration.
+	//+kubebuilder:validation:Optional
+	Readiness ProbeConfigSpec `json:"readiness"`
+
+	// Log configuration.
+	//+kubebuilder:validation:Optional
+	Log config.LogConfig `json:"log"`
+
+	// Metrics configuration.
+	//+kubebuilder:validation:Optional
+	Metrics metrics.MetricsConfig `json:"metrics"`
+
+	// OTEL configuration.
+	//+kubebuilder:validation:Optional
+	Otel otel.OtelConfig `json:"otel"`
+
+	// Plugins configuration.
+	//+kubebuilder:validation:Optional
+	Plugins plugins.PluginsConfig `json:"plugins"`
+
+	// Profilers configuration.
+	//+kubebuilder:validation:Optional
+	Profilers profilers.ProfilersConfig `json:"profilers"`
+
+	// Prometheus configuration.
+	//+kubebuilder:validation:Required
+	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
+
+	// Server configuration.
+	//+kubebuilder:validation:Optional
+	Server ServerConfigSpec `json:"server"`
+
+	// Watchdog configuration.
+	//+kubebuilder:validation:Optional
+	Watchdog watchdog.WatchdogConfig `json:"watchdog"`
+
+	// BundledPluginsSpec defines configuration for bundled plugins.
+	//+kubebuilder:validation:Optional
+	BundledPluginsSpec `json:",inline"`
+}
+
+// ServerConfigSpec configures main server.
+type ServerConfigSpec struct {
+	// Listener configuration.
+	//+kubebuilder:validation:Optional
+	listener.ListenerConfig `json:",inline"`
+
+	// GRPC server configuration.
+	//+kubebuilder:validation:Optional
+	Grpc grpc.GRPCServerConfig `json:"grpc"`
+
+	// GRPC Gateway configuration.
+	//+kubebuilder:validation:Optional
+	GrpcGateway grpcgateway.GRPCGatewayConfig `json:"grpc_gateway"`
+
+	// HTTP server configuration.
+	//+kubebuilder:validation:Optional
+	HTTP http.HTTPServerConfig `json:"http"`
+
+	// TLS configuration.
+	//+kubebuilder:validation:Optional
+	TLS tlsconfig.ServerTLSConfig `json:"tls"`
+}
+
+// ProbeConfigSpec defines liveness and readiness probe configuration.
+type ProbeConfigSpec struct {
+	// Scheduler settings.
+	//+kubebuilder:validation:Optional
+	Scheduler jobs.JobGroupConfig `json:"scheduler"`
+
+	// Service settings.
+	//+kubebuilder:validation:Optional
+	Service jobs.JobConfig `json:"service"`
+}
+
+// ClientConfigSpec defines client configuration.
+type ClientConfigSpec struct {
+	// Proxy settings for the client.
+	//+kubebuilder:validation:Optional
+	Proxy http.ProxyConfig `json:"proxy"`
+}
+
+// BundledPluginsSpec defines configuration for bundled plugins.
+type BundledPluginsSpec struct {
+	// FluxNinja Cloud plugin configuration.
+	//+kubebuilder:validation:Optional
+	FluxNinjaPlugin pluginconfig.FluxNinjaPluginConfig `json:"fluxninja_plugin"`
+
+	// Sentry plugin configuration.
+	//+kubebuilder:validation:Optional
+	SentryPlugin sentry.SentryConfig `json:"sentry_plugin"`
 }

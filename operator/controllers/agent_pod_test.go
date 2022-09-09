@@ -26,6 +26,10 @@ import (
 	"k8s.io/utils/pointer"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/distcache"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/otel"
 )
 
 var _ = Describe("Sidecar container for Agent", func() {
@@ -66,14 +70,30 @@ var _ = Describe("Sidecar container for Agent", func() {
 					Sidecar: v1alpha1.SidecarSpec{
 						Enabled: true,
 					},
-					CommonSpec: v1alpha1.CommonSpec{
-						ServerPort: 80,
+					ConfigSpec: v1alpha1.AgentConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":80",
+								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
 					},
-					Image: v1alpha1.Image{
-						Registry:   "docker.io/fluxninja",
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry:   "docker.io/fluxninja",
+							Tag:        "latest",
+							PullPolicy: "IfNotPresent",
+						},
 						Repository: "aperture-agent",
-						Tag:        "latest",
-						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -90,12 +110,29 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Resources:       corev1.ResourceRequirements{},
 				Ports: []corev1.ContainerPort{
 					{
-						Name:          "grpc",
+						Name:          server,
 						ContainerPort: 80,
+						Protocol:      corev1.ProtocolTCP,
 					},
 					{
-						Name:          "grpc-otel",
+						Name:          grpcOtel,
 						ContainerPort: 4317,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          httpOtel,
+						ContainerPort: 4318,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          distCache,
+						ContainerPort: 3320,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          memberList,
+						ContainerPort: 3322,
+						Protocol:      corev1.ProtocolTCP,
 					},
 				},
 				LivenessProbe:  nil,
@@ -134,7 +171,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 				},
 			}
 
-			agentContainer(instance.DeepCopy(), &container, "")
+			err := agentContainer(instance.DeepCopy(), &container, "")
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(container).To(Equal(expected))
 		})
 	})
@@ -150,14 +189,30 @@ var _ = Describe("Sidecar container for Agent", func() {
 					Sidecar: v1alpha1.SidecarSpec{
 						Enabled: true,
 					},
-					CommonSpec: v1alpha1.CommonSpec{
-						ServerPort: 80,
+					ConfigSpec: v1alpha1.AgentConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":80",
+								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
 					},
-					Image: v1alpha1.Image{
-						Registry:   "docker.io/fluxninja",
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry:   "docker.io/fluxninja",
+							Tag:        "latest",
+							PullPolicy: "IfNotPresent",
+						},
 						Repository: "aperture-agent",
-						Tag:        "latest",
-						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -207,12 +262,29 @@ var _ = Describe("Sidecar container for Agent", func() {
 				},
 				Ports: []corev1.ContainerPort{
 					{
-						Name:          "grpc",
+						Name:          server,
 						ContainerPort: 80,
+						Protocol:      corev1.ProtocolTCP,
 					},
 					{
-						Name:          "grpc-otel",
+						Name:          grpcOtel,
 						ContainerPort: 4317,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          httpOtel,
+						ContainerPort: 4318,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          distCache,
+						ContainerPort: 3320,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          memberList,
+						ContainerPort: 3322,
+						Protocol:      corev1.ProtocolTCP,
 					},
 				},
 				LivenessProbe: &corev1.Probe{
@@ -260,7 +332,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 				},
 			}
 
-			agentContainer(instance.DeepCopy(), &container, "")
+			err := agentContainer(instance.DeepCopy(), &container, "")
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(container).To(Equal(expected))
 		})
 	})
@@ -276,17 +350,35 @@ var _ = Describe("Sidecar container for Agent", func() {
 					Sidecar: v1alpha1.SidecarSpec{
 						Enabled: true,
 					},
-					AgentGroup: test,
+					ConfigSpec: v1alpha1.AgentConfigSpec{
+						AgentInfo: agentinfo.AgentInfoConfig{
+							AgentGroup: "test",
+						},
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":8000",
+								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+					},
 					CommonSpec: v1alpha1.CommonSpec{
-						ServerPort:     8000,
 						LivenessProbe:  probe,
 						ReadinessProbe: probe,
 						Resources:      resourceRequirement,
 						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
 							Enabled:                true,
-							RunAsUser:              pointer.Int64Ptr(0),
-							RunAsNonRootUser:       pointer.BoolPtr(false),
-							ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+							RunAsUser:              0,
+							RunAsNonRootUser:       false,
+							ReadOnlyRootFilesystem: false,
 						},
 						Command:        testArray,
 						Args:           testArray,
@@ -306,12 +398,14 @@ var _ = Describe("Sidecar container for Agent", func() {
 							},
 						},
 					},
-					Image: v1alpha1.Image{
-						Registry:    "docker.io/fluxninja",
-						Repository:  "aperture-agent",
-						Tag:         "latest",
-						PullPolicy:  "IfNotPresent",
-						PullSecrets: testArray,
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry:    "docker.io/fluxninja",
+							Tag:         "latest",
+							PullPolicy:  "IfNotPresent",
+							PullSecrets: testArray,
+						},
+						Repository: "aperture-agent",
 					},
 				},
 			}
@@ -349,19 +443,36 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Resources: resourceRequirement,
 				Ports: []corev1.ContainerPort{
 					{
-						Name:          "grpc",
+						Name:          server,
 						ContainerPort: 8000,
+						Protocol:      corev1.ProtocolTCP,
 					},
 					{
-						Name:          "grpc-otel",
+						Name:          grpcOtel,
 						ContainerPort: 4317,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          httpOtel,
+						ContainerPort: 4318,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          distCache,
+						ContainerPort: 3320,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          memberList,
+						ContainerPort: 3322,
+						Protocol:      corev1.ProtocolTCP,
 					},
 				},
 				LivenessProbe: &corev1.Probe{
 					ProbeHandler: corev1.ProbeHandler{
 						HTTPGet: &corev1.HTTPGetAction{
 							Path:   "/v1/status/liveness",
-							Port:   intstr.FromString("grpc"),
+							Port:   intstr.FromString(server),
 							Scheme: corev1.URISchemeHTTP,
 						},
 					},
@@ -375,7 +486,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 					ProbeHandler: corev1.ProbeHandler{
 						HTTPGet: &corev1.HTTPGetAction{
 							Path:   "/v1/status/readiness",
-							Port:   intstr.FromString("grpc"),
+							Port:   intstr.FromString(server),
 							Scheme: corev1.URISchemeHTTP,
 						},
 					},
@@ -460,7 +571,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 				},
 			}
 
-			agentContainer(instance.DeepCopy(), &container, "")
+			err := agentContainer(instance.DeepCopy(), &container, "")
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(container).To(Equal(expected))
 		})
 	})
@@ -478,14 +591,30 @@ var _ = Describe("Pod modification for Agent", func() {
 					Sidecar: v1alpha1.SidecarSpec{
 						Enabled: true,
 					},
-					CommonSpec: v1alpha1.CommonSpec{
-						ServerPort: 80,
+					ConfigSpec: v1alpha1.AgentConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":80",
+								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
 					},
-					Image: v1alpha1.Image{
-						Registry:   "docker.io/fluxninja",
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry:   "docker.io/fluxninja",
+							Tag:        "latest",
+							PullPolicy: "IfNotPresent",
+						},
 						Repository: "aperture-agent",
-						Tag:        "latest",
-						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -506,12 +635,29 @@ var _ = Describe("Pod modification for Agent", func() {
 							Resources:       corev1.ResourceRequirements{},
 							Ports: []corev1.ContainerPort{
 								{
-									Name:          "grpc",
+									Name:          server,
 									ContainerPort: 80,
+									Protocol:      corev1.ProtocolTCP,
 								},
 								{
-									Name:          "grpc-otel",
+									Name:          grpcOtel,
 									ContainerPort: 4317,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          httpOtel,
+									ContainerPort: 4318,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          distCache,
+									ContainerPort: 3320,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          memberList,
+									ContainerPort: 3322,
+									Protocol:      corev1.ProtocolTCP,
 								},
 							},
 							LivenessProbe:  nil,
@@ -566,7 +712,9 @@ var _ = Describe("Pod modification for Agent", func() {
 				},
 			}
 
-			agentPod(instance, pod)
+			err := agentPod(instance, pod)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(&pod).To(Equal(&expected))
 		})
 	})
@@ -582,8 +730,24 @@ var _ = Describe("Pod modification for Agent", func() {
 					Sidecar: v1alpha1.SidecarSpec{
 						Enabled: true,
 					},
+					ConfigSpec: v1alpha1.AgentConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":80",
+								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+					},
 					CommonSpec: v1alpha1.CommonSpec{
-						ServerPort: 80,
 						InitContainers: []corev1.Container{
 							{
 								Name: test,
@@ -598,12 +762,14 @@ var _ = Describe("Pod modification for Agent", func() {
 							},
 						},
 					},
-					Image: v1alpha1.Image{
-						Registry:    "docker.io/fluxninja",
-						Repository:  "aperture-agent",
-						Tag:         "latest",
-						PullPolicy:  "IfNotPresent",
-						PullSecrets: testArrayTwo,
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry:    "docker.io/fluxninja",
+							Tag:         "latest",
+							PullPolicy:  "IfNotPresent",
+							PullSecrets: testArrayTwo,
+						},
+						Repository: "aperture-agent",
 					},
 				},
 			}
@@ -664,12 +830,29 @@ var _ = Describe("Pod modification for Agent", func() {
 							Resources:       corev1.ResourceRequirements{},
 							Ports: []corev1.ContainerPort{
 								{
-									Name:          "grpc",
+									Name:          server,
 									ContainerPort: 80,
+									Protocol:      corev1.ProtocolTCP,
 								},
 								{
-									Name:          "grpc-otel",
+									Name:          grpcOtel,
 									ContainerPort: 4317,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          httpOtel,
+									ContainerPort: 4318,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          distCache,
+									ContainerPort: 3320,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          memberList,
+									ContainerPort: 3322,
+									Protocol:      corev1.ProtocolTCP,
 								},
 							},
 							LivenessProbe:  nil,
@@ -734,7 +917,9 @@ var _ = Describe("Pod modification for Agent", func() {
 				},
 			}
 
-			agentPod(instance, pod)
+			err := agentPod(instance, pod)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(&pod).To(Equal(&expected))
 		})
 	})

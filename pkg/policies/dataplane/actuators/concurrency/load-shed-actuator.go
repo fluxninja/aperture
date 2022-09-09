@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -117,11 +117,11 @@ func newLoadShedActuatorFactory(
 				errMulti = multierr.Append(errMulti, err)
 			}
 			if !prometheusRegistry.Unregister(f.tokenBucketFillRateGaugeVec) {
-				err := fmt.Errorf("failed to unregister token_bucket_bucket_fill_rate metric")
+				err := fmt.Errorf("failed to unregister token_bucket_fill_rate metric")
 				errMulti = multierr.Append(errMulti, err)
 			}
 			if !prometheusRegistry.Unregister(f.tokenBucketBucketCapacityGaugeVec) {
-				err := fmt.Errorf("failed to unregister token_bucket_bucket_capacity metric")
+				err := fmt.Errorf("failed to unregister token_bucket_capacity metric")
 				errMulti = multierr.Append(errMulti, err)
 			}
 			if !prometheusRegistry.Unregister(f.tokenBucketAvailableTokensGaugeVec) {
@@ -135,12 +135,18 @@ func newLoadShedActuatorFactory(
 }
 
 // newLoadShedActuator creates a new load shed actuator based on proto spec.
-func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath string, conLimiter *concurrencyLimiter, registry *status.Registry, clock clockwork.Clock, lifecycle fx.Lifecycle, metricLabels prometheus.Labels) (*loadShedActuator, error) {
+func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concurrencyLimiter,
+	registry status.Registry,
+	clock clockwork.Clock,
+	lifecycle fx.Lifecycle,
+	metricLabels prometheus.Labels,
+) (*loadShedActuator, error) {
+	reg := registry.Child("load_shed_actuator")
+
 	lsa := &loadShedActuator{
 		conLimiter:     conLimiter,
 		clock:          clock,
-		statusRegistry: registry,
-		registryPath:   fmt.Sprintf("%s.load_shed", registryPath),
+		statusRegistry: reg,
 	}
 
 	unmarshaller, err := config.NewProtobufUnmarshaller(nil)
@@ -157,12 +163,7 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath stri
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			retErr := func(err error) error {
-				s := status.NewStatus(nil, err)
-				errStatus := lsa.statusRegistry.Push(lsa.registryPath, s)
-				if errStatus != nil {
-					errStatus = errors.Wrap(errStatus, "failed to push status")
-					return multierr.Append(err, errStatus)
-				}
+				lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
 				return err
 			}
 
@@ -217,22 +218,18 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(registryPath stri
 			}
 			deleted = lsaFactory.tokenBucketFillRateGaugeVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_bucket_fill_rate gauge from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_fill_rate gauge from its metric vector"))
 			}
 			deleted = lsaFactory.tokenBucketBucketCapacityGaugeVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_bucket_capacity gauge from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_capacity gauge from its metric vector"))
 			}
 			deleted = lsaFactory.tokenBucketAvailableTokensGaugeVec.Delete(metricLabels)
 			if !deleted {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_available_tokens gauge from its metric vector"))
 			}
 
-			s := status.NewStatus(nil, errMulti)
-			err = lsa.statusRegistry.Push(lsa.registryPath, s)
-			if err != nil {
-				errMulti = multierr.Append(errMulti, err)
-			}
+			lsa.statusRegistry.SetStatus(status.NewStatus(nil, errMulti))
 			return errMulti
 		},
 	})
@@ -244,8 +241,7 @@ type loadShedActuator struct {
 	conLimiter          *concurrencyLimiter
 	clock               clockwork.Clock
 	tokenBucketLoadShed *scheduler.TokenBucketLoadShed
-	statusRegistry      *status.Registry
-	registryPath        string
+	statusRegistry      status.Registry
 }
 
 func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
@@ -254,17 +250,13 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		return
 	}
 
-	var wrapperMessage configv1.LoadShedDecsisionWrapper
+	var wrapperMessage wrappersv1.LoadShedDecsisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	loadShedDecision := wrapperMessage.LoadShedDecision
 	if err != nil || loadShedDecision == nil {
 		statusMsg := "Failed to unmarshal config wrapper"
 		log.Warn().Err(err).Msg(statusMsg)
-		s := status.NewStatus(nil, err)
-		rPErr := lsa.statusRegistry.Push(lsa.registryPath, s)
-		if rPErr != nil {
-			log.Error().Err(rPErr).Msg("Failed to push status")
-		}
+		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
 	// check if this decision is for the same policy id as what we have
@@ -272,11 +264,7 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		err = errors.New("policy id mismatch")
 		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", lsa.conLimiter.GetPolicyHash(), wrapperMessage.PolicyHash)
 		log.Warn().Err(err).Msg(statusMsg)
-		s := status.NewStatus(nil, err)
-		rPErr := lsa.statusRegistry.Push(lsa.registryPath, s)
-		if rPErr != nil {
-			log.Error().Err(rPErr).Msg("Failed to push status")
-		}
+		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
 

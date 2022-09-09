@@ -2,10 +2,12 @@
 
 Supported pipeline types: traces, logs.
 
-The rollup processor accepts traces or logs and rolls them up, based on attributes.
+The rollup processor accepts traces or logs and rolls them up, based on
+attributes.
 
-It is highly recommended to configure batch processor just before rollup processor.
-Rollup processor rolls up traces or logs which are a part of one message.
+It is highly recommended to configure batch processor just before rollup
+processor. Rollup processor rolls up traces or logs which are a part of one
+message.
 
 ## Configuration
 
@@ -44,20 +46,21 @@ processors:
 
 ## Design
 
-Rollup processor is basically merging maps. In order to merge two maps, they need
-to have the same _key attribues_. Key attribute is an attribute which was not specified
-as rollup attribute in the configuration i.e. was not specified in any of `rollups.from`
-fields.
+Rollup processor is basically merging maps. In order to merge two maps, they
+need to have the same _key attribues_. Key attribute is an attribute which was
+not specified as rollup attribute in the configuration i.e. was not specified in
+any of `rollups.from` fields.
 
-Merging of such maps results with a map with key attributes and rollup result attributes.
-In addition, there is `rollup_count` attribute, which describes how many maps were
-rolled up into this single result.
-Please refer to the example below to fully understand.
+Merging of such maps results with a map with key attributes and rollup result
+attributes. In addition, there is `rollup_count` attribute, which describes how
+many maps were rolled up into this single result. Please refer to the example
+below to fully understand.
 
 ### Example
 
-Assume the rollup processor is configured with config given in the previous section.
-On the input we have following maps (they are parts of either Traces of Logs).
+Assume the rollup processor is configured with config given in the previous
+section. On the input we have following maps (they are parts of either Traces of
+Logs).
 
 ```json
 [

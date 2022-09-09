@@ -10,7 +10,10 @@ COPY go.sum go.sum
 RUN go mod download
 
 # Copy the go source
+COPY api/ api/
 COPY operator/ operator/
+COPY pkg/ pkg/
+COPY plugins/ plugins/
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o aperture-operator operator/main.go

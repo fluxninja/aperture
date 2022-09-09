@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package etcd
 
 import (
@@ -33,11 +34,12 @@ const (
 
 // EtcdConfig holds configuration for etcd client.
 // swagger:model
+// +kubebuilder:object:generate=true
 type EtcdConfig struct {
 	// Lease time-to-live
 	LeaseTTL config.Duration `json:"lease_ttl" validate:"gte=1s" default:"60s"`
 	// List of Etcd server endpoints
-	Endpoints []string `json:"endpoints" validate:"dive,hostname_port|url|fqdn"`
+	Endpoints []string `json:"endpoints" validate:"gt=0,dive,hostname_port|url|fqdn"`
 	// TODO: add auth params
 }
 
@@ -94,7 +96,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			etcdClient.Watcher = namespacev3.NewWatcher(etcdClient.Client, namespace)
 
 			// Create a lease with etcd for this client, exit app if lease maintenance fails
-			resp, err := etcdClient.Lease.Grant(ctx, (int64)(config.LeaseTTL.Duration.AsDuration().Seconds()))
+			resp, err := etcdClient.Lease.Grant(ctx, (int64)(config.LeaseTTL.AsDuration().Seconds()))
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to grant a lease")
 				cancel()

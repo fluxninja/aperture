@@ -3,10 +3,13 @@ syntax = "proto3";
 package aperture.policy.language.v1;
 
 import "aperture/common/selector/v1/selector.proto";
-import "google/protobuf/wrappers.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 // Set of classification rules sharing a common selector
+//
+// :::info
+// See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+// :::
 //
 // Example:
 // ```yaml
@@ -21,10 +24,26 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // ```
 message Classifier {
   // Defines where to apply the flow classification rule.
-  common.selector.v1.Selector selector = 1;
+  common.selector.v1.Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
 
-  // A map of {key, value} pairs mapping from flow label names to rules that define how to extract and propagate them.
-  map<string, Rule> rules = 2;
+  // A map of {key, value} pairs mapping from
+  // [flow label](/concepts/flow-control/label/label.md) keys to rules that define
+  // how to extract and propagate flow labels with that key.
+  map<string, Rule> rules = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required,gt=0,dive,keys,required,endkeys,required"
+      }
+    }
+  }]; // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
 }
 
 // Rule describes a single Flow Classification Rule
@@ -39,31 +58,28 @@ message Classifier {
 // Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
 // [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
 //
-// Example:
-// ```yaml
 // Example of Declarative JSON extractor:
-//   yaml:
-//     extractor:
-//       json:
-//         from: request.http.body
-//         pointer: /user/name
-//     propagate: true
-//     hidden: false
-// Example of Rego module:
-//   yaml:
-//     rego:
-//       query: data.user_from_cookie.user
-//       source:
-//         package: user_from_cookie
-//         cookies: "split(input.attributes.request.http.headers.cookie, ';')"
-//         cookie: "cookies[_]"
-//         cookie.startswith: "('session=')"
-//         session: "substring(cookie, count('session='), -1)"
-//         parts: "split(session, '.')"
-//         object: "json.unmarshal(base64url.decode(parts[0]))"
-//         user: object.user
-//     propagate: false
-//     hidden: true
+// ```yaml
+// extractor:
+//   json:
+//     from: request.http.body
+//     pointer: /user/name
+// ```
+//
+// Example of Rego module which also disables propagation of a label:
+// ```yaml
+// rego:
+//   query: data.user_from_cookie.user
+//   source: |
+//     package: user_from_cookie
+//     cookies: split(input.attributes.request.http.headers.cookie, ';')
+//     cookie: cookies[_]
+//     cookie.startswith: ('session=')
+//     session: substring(cookie, count('session='), -1)
+//     parts: split(session, '.')
+//     object: json.unmarshal(base64url.decode(parts[0]))
+//     user: object.user
+// propagate: false
 // ```
 message Rule {
   // Raw rego rules are compiled 1:1 to rego queries
@@ -73,36 +89,71 @@ message Rule {
     // Source code of the rego module.
     //
     // Note: Must include a "package" declaration.
-    string source = 1;
+    string source = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
+        }
+      }
+    }]; // @gotags: validate:"required"
 
     // Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
     //
     // Note: The module name must match the package name from the "source".
-    string query = 2;
+    string query = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
+        }
+      }
+    }]; // @gotags: validate:"required"
   }
 
   oneof source {
-    // High-level flow label declarative extractor.
-    // Rego extractor extracts a value from the rego module.
+    // High-level declarative extractor.
     Extractor extractor = 1;
 
     // Rego module to extract a value from the rego module.
     Rego rego = 2;
-  }
+  } // @gotags: validate:"required"
 
-  // Decides if the created label should be applied to the whole flow (propagated in baggage) (default=true).
-  google.protobuf.BoolValue propagate = 3;
+  // Decides if the created label should be applied to the whole request chain
+  // (propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
+  bool propagate = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: default:"true"
 
   // Decides if the created flow label should be hidden from the telemetry.
-  bool hidden = 4;
+  // A hidden flow label is still accessible in policies and can be used as eg.
+  // fairness key.
+  //
+  // :::caution
+  // When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
+  // labels are sent to cloud for observability. We thus recommend to set this
+  // _hidden_ flag for high-cardinality labels, such as usernames or ids, to
+  // avoid bloating analytics database. _Hidden_ flag should also be set for
+  // sensitive labels.
+  // :::
+  bool hidden = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: default:"false"
 }
 
-// Defines a high-level way to specify how to extract a flow label given http request metadata, without a need to write rego code
+// Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
 //
-// There are multiple variants of extractor, specify exactly one:
-// - JSON Extractor
-// - Address Extractor
-// - JWT Extractor
+// There are multiple variants of extractor, specify exactly one.
 message Extractor {
   oneof variant {
     // Use an attribute with no convertion
@@ -245,5 +296,12 @@ message PathTemplateMatcher {
   // "/user/{userId}": user
   // /static/*: other
   // ```
-  map<string, string> template_values = 1;
+  map<string, string> template_values = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"gt=0,dive,keys,required,endkeys,required"
 }

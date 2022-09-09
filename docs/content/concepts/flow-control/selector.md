@@ -1,5 +1,5 @@
 ---
-title: Selector
+title: Flow Selector
 sidebar_position: 1
 keywords:
   - flows
@@ -8,43 +8,84 @@ keywords:
   - labels
 ---
 
-# Selector
+:::info
 
-Flow observability and control components are instantiated on Aperture Agents
-and select flows based on scoping rules defined in the Selectors.
+See also [Selector reference](/reference/configuration/policies.md#v1-selector)
 
-A Selector consists of following fields:
+:::
 
-## Agent Group
+Flow Selectors are used by all flow observability and control components
+instantiated on Aperture Agents ([classifiers][classifier],
+[fluxmeters][fluxmeter] and [acturators][actuators]). Flow Selectors define
+scoping rules – how these components should select [flows][flow] for their
+operations.
 
-Agent Group is a flexible label that defines a collection of agents that operate
-as peers. For example, an Agent Group can be a Kubernetes cluster name in case
-of DaemonSet deployment or it can be a service name for sidecar deployments.
+A Selector consists of:
 
-All the agents within a Agent Group instantiate the same set of policies,
-published by Aperture Controller.
+- [agent group][agent-group] name,
+- [service][service] name,
+- [control point][control-point], and
+- optional [flow label matcher](#label-matcher).
 
-Agents within an Agent Group form a peer-to-peer network. Agents synchronize
-fine-grained state such as per label global counters that are used for rate
-limiting purposes.
+### Service
 
-## Service
+_Agent group_ name together with _service_ name determine the [service][service]
+to select flows from.
 
-Service in Aperture is similar to services tracked in Kubernetes, Consul etc. A
-Service is a collection of entities delivering a common functionality, such as,
-checkout, billing etc. Aperture maintains a mapping of entity IP addresses to
-Service names. For each flow control decision request sent by an entity,
-Aperture looks up the service name and then decides which flow control
-components to execute.
+:::tip Default Agent Group
 
-Aperture Agents perform automated discovery of services and entities in
-environments such as Kubernetes and watch for any changes. Service and entity
-entries can also be created manually via configuration.
+The default Agent Group is called `default`. If you're using this group, you can
+skip the _agent group_ field.
 
-In addition, Aperture also has a concept of a `*` catch-all service. When the
-Selector contains a catch-all service, it matches for all discovered entities
-within a Agent Group.
+:::
 
-## Control Point
+:::tip Catch-all service
 
-## Label Matcher
+If the agent group is already logically a single service or you simply want to
+select all services within the agent group, you can skip the service name.
+
+:::
+
+### Control point
+
+Flow Selector selects flows from only one [control point][control-point] within
+a service.
+
+### Label Matcher
+
+Label matcher allows to optionally narrow down the selected flow based on
+conditions on [flow labels][label].
+
+There are multiple ways to define a label matcher. The simplest way is to
+provide a map of labels for exact-match:
+
+```yaml
+label_matcher:
+  match_labels:
+    http.method: GET
+```
+
+You can also provide a matching-expression-tree, which allows for arbitrary
+conditions, including regex matching. See more details in [LabelMatcher
+reference][label-matcher].
+
+### Example
+
+```yaml
+service: checkout.myns.svc.cluster.local
+control_point:
+  traffic: ingress
+label_matcher:
+  match_labels:
+    user_tier: gold
+```
+
+[flow]: flow-control.md#flow
+[label]: label/label.md
+[control-point]: flow-control.md#control-point
+[service]: service.md
+[agent-group]: service.md#agent-group
+[actuators]: ./actuators/actuators.md
+[fluxmeter]: ./fluxmeter.md
+[classifier]: ./label/classifier.md
+[label-matcher]: /reference/configuration/policies.md#v1-label-matcher

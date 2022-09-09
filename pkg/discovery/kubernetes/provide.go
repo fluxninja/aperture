@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package kubernetes
 
 import (
@@ -17,6 +18,7 @@ var configKey = common.DiscoveryConfigKey + ".kubernetes"
 
 // KubernetesDiscoveryConfig for Kubernetes service discovery.
 // swagger:model
+// +kubebuilder:object:generate=true
 type KubernetesDiscoveryConfig struct {
 	// NodeName is the name of the k8s node the agent should be monitoring
 	NodeName         string `json:"node_name"`
@@ -29,7 +31,7 @@ type FxIn struct {
 	fx.In
 	Unmarshaller     config.Unmarshaller
 	Lifecycle        fx.Lifecycle
-	StatusRegistry   *status.Registry
+	StatusRegistry   status.Registry
 	KubernetesClient k8s.K8sClient
 	EntityTrackers   notifiers.Trackers `name:"entity_trackers"`
 }

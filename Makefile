@@ -16,8 +16,7 @@ go-mod-tidy:
 go-test:
 	@echo Running go tests
 	@{ \
-		envtest_path=$(make operator-setup_envtest -s); \
-		KUBEBUILDER_ASSETS="${envtest_path}"; \
+		export KUBEBUILDER_ASSETS=$(shell make operator-setup_envtest -s); \
 		gotestsum --format=pkgname; \
 	}
 
@@ -50,11 +49,19 @@ go-generate-swagger:
 	@echo Generating swagger specs from go code
 	@./scripts/go_generate_swagger.sh
 
-generate-docs: generate-config-markdown generate-mermaid
+generate-docs: generate-config-markdown generate-mermaid generate-helm-readme
 	@echo Generating docs
 
 generate-config-markdown: go-generate-swagger generate-api
 	@cd ./docs && $(MAKE) generate-config-markdown
+
+generate-helm-readme:
+	@echo Generating helm readme
+	@cd ./manifests/charts && $(MAKE) generate-helm-readme
+
+helm-lint:
+	@echo helm lint
+	@cd ./manifests/charts && $(MAKE) helm-lint
 
 generate-libsonnet: generate-config-markdown
 	@cd ./libsonnet && $(MAKE) gen-lib
@@ -68,10 +75,10 @@ coverage_profile:
 show_coverage_in_browser: profile.coverprofile
 	go tool cover -html profile.coverprofile
 
-all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs
+all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-libsonnet helm-lint
 	@echo "Done"
 
-.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser
+.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint
 
 #####################################
 ###### OPERATOR section starts ######
@@ -130,10 +137,11 @@ operator-help: ## Display this help.
 
 .PHONY: operator-manifests
 operator-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./operator/..." output:crd:artifacts:config=operator/config/crd/bases output:rbac:artifacts:config=operator/config/rbac
+	$(CONTROLLER_GEN) rbac:roleName=manager-role crd:ignoreUnexportedFields=true,allowDangerousTypes=true webhook paths="./operator/..." output:crd:artifacts:config=operator/config/crd/bases output:rbac:artifacts:config=operator/config/rbac output:webhook:artifacts:config=operator/config/webhook
 
 .PHONY: operator-generate
 operator-generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./pkg/..."
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./operator/..."
 
 .PHONY: operator-fmt
@@ -202,8 +210,8 @@ CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
 
 ## Tool Versions
-KUSTOMIZE_VERSION ?= v3.8.7
-CONTROLLER_TOOLS_VERSION ?= v0.8.0
+KUSTOMIZE_VERSION ?= v4.5.7
+CONTROLLER_TOOLS_VERSION ?= v0.9.2
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize

@@ -21,6 +21,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"os"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -30,6 +31,8 @@ import (
 	"k8s.io/utils/pointer"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
 var _ = Describe("Tests for containerSecurityContext", func() {
@@ -65,9 +68,9 @@ var _ = Describe("Tests for containerSecurityContext", func() {
 					CommonSpec: v1alpha1.CommonSpec{
 						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
 							Enabled:                true,
-							RunAsUser:              pointer.Int64Ptr(0),
-							RunAsNonRootUser:       pointer.BoolPtr(false),
-							ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+							RunAsUser:              0,
+							RunAsNonRootUser:       false,
+							ReadOnlyRootFilesystem: false,
 						},
 					},
 				},
@@ -118,7 +121,7 @@ var _ = Describe("Tests for podSecurityContext", func() {
 					CommonSpec: v1alpha1.CommonSpec{
 						PodSecurityContext: v1alpha1.PodSecurityContext{
 							Enabled: true,
-							FsGroup: pointer.Int64Ptr(1001),
+							FsGroup: 1001,
 						},
 					},
 				},
@@ -135,7 +138,6 @@ var _ = Describe("Tests for podSecurityContext", func() {
 })
 
 var _ = Describe("Tests for imageString", func() {
-
 	Context("When local image registry is provided", func() {
 		It("returns correct image string", func() {
 			instance := &v1alpha1.Agent{
@@ -144,15 +146,17 @@ var _ = Describe("Tests for imageString", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.Image{
-						Registry:   test,
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry: test,
+							Tag:      test,
+						},
 						Repository: test,
-						Tag:        test,
 					},
 				},
 			}
 
-			result := imageString(instance.Spec.Image)
+			result := imageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
 			Expect(result).To(Equal("test/test:test"))
 		})
 	})
@@ -165,14 +169,16 @@ var _ = Describe("Tests for imageString", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.Image{
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Tag: test,
+						},
 						Repository: test,
-						Tag:        test,
 					},
 				},
 			}
 
-			result := imageString(instance.Spec.Image)
+			result := imageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
 			Expect(result).To(Equal("test:test"))
 		})
 	})
@@ -187,8 +193,10 @@ var _ = Describe("Tests for imagePullSecrets", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.Image{
-						PullSecrets: testArray,
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							PullSecrets: testArray,
+						},
 					},
 				},
 			}
@@ -199,11 +207,10 @@ var _ = Describe("Tests for imagePullSecrets", func() {
 				},
 			}
 
-			result := imagePullSecrets(instance.Spec.Image)
+			result := imagePullSecrets(instance.Spec.Image.Image)
 			Expect(result).To(Equal(expected))
 		})
 	})
-
 })
 
 var _ = Describe("Tests for containerEnvFrom", func() {
@@ -329,7 +336,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/liveness",
-						Port:   intstr.FromString("grpc"),
+						Port:   intstr.FromString(server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -340,11 +347,11 @@ var _ = Describe("Tests for containerProbes", func() {
 				SuccessThreshold:    1,
 			}
 
-			var expectedRediness *corev1.Probe
+			var expectedReadiness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -354,7 +361,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path: "/v1/status/liveness",
-						Port: intstr.FromString("grpc"),
+						Port: intstr.FromString(server),
 					},
 				},
 				InitialDelaySeconds: 10,
@@ -378,11 +385,11 @@ var _ = Describe("Tests for containerProbes", func() {
 
 			expectedLiveness := probe
 
-			var expectedRediness *corev1.Probe
+			var expectedReadiness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -407,11 +414,11 @@ var _ = Describe("Tests for containerProbes", func() {
 				},
 			}
 
-			expectedRediness := &corev1.Probe{
+			expectedReadiness := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/readiness",
-						Port:   intstr.FromString("grpc"),
+						Port:   intstr.FromString(server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -424,9 +431,9 @@ var _ = Describe("Tests for containerProbes", func() {
 
 			var expectedLiveness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -436,7 +443,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path: "/v1/status/readiness",
-						Port: intstr.FromString("grpc"),
+						Port: intstr.FromString(server),
 					},
 				},
 				InitialDelaySeconds: 10,
@@ -458,13 +465,13 @@ var _ = Describe("Tests for containerProbes", func() {
 				},
 			}
 
-			expectedRediness := probe
+			expectedReadiness := probe
 
 			var expectedLiveness *corev1.Probe
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 
@@ -497,11 +504,11 @@ var _ = Describe("Tests for containerProbes", func() {
 				},
 			}
 
-			expectedRediness := &corev1.Probe{
+			expectedReadiness := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/readiness",
-						Port:   intstr.FromString("grpc"),
+						Port:   intstr.FromString(server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -516,7 +523,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/liveness",
-						Port:   intstr.FromString("grpc"),
+						Port:   intstr.FromString(server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -527,9 +534,9 @@ var _ = Describe("Tests for containerProbes", func() {
 				SuccessThreshold:    1,
 			}
 
-			liveness, rediness := containerProbes(instance.Spec.CommonSpec)
+			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
-			Expect(rediness).To(Equal(expectedRediness))
+			Expect(readiness).To(Equal(expectedReadiness))
 		})
 	})
 })
@@ -544,9 +551,9 @@ var _ = Describe("Tests for agentEnv", func() {
 				},
 				Spec: v1alpha1.AgentSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							Enabled: true,
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
+								Create: true,
 								SecretKeyRef: v1alpha1.SecretKeyRef{
 									Name: test,
 									Key:  test,
@@ -799,9 +806,8 @@ var _ = Describe("Tests for controllerEnv", func() {
 				},
 				Spec: v1alpha1.ControllerSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							Enabled: true,
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								Create: true,
 								SecretKeyRef: v1alpha1.SecretKeyRef{
 									Name: test,
@@ -910,7 +916,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 					ReadOnly:  true,
 				},
 				{
-					Name:      "webhook-cert",
+					Name:      "server-cert",
 					MountPath: "/etc/aperture/aperture-controller/certs",
 					ReadOnly:  true,
 				},
@@ -960,7 +966,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 					ReadOnly:  true,
 				},
 				{
-					Name:      "webhook-cert",
+					Name:      "server-cert",
 					MountPath: "/etc/aperture/aperture-controller/certs",
 					ReadOnly:  true,
 				},
@@ -1020,7 +1026,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 					},
 				},
 				{
-					Name: "webhook-cert",
+					Name: "server-cert",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							DefaultMode: pointer.Int32Ptr(420),
@@ -1099,7 +1105,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 					},
 				},
 				{
-					Name: "webhook-cert",
+					Name: "server-cert",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							DefaultMode: pointer.Int32Ptr(420),
@@ -1169,73 +1175,77 @@ var _ = Describe("Tests for commonLabels", func() {
 var _ = Describe("Tests for checkEtcdEndpoints", func() {
 	Context("When Etcd endpoints are not provided", func() {
 		It("returns correct etcd config", func() {
-			instance := &v1alpha1.Agent{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.AgentSpec{},
+				Spec: v1alpha1.ControllerSpec{},
 			}
 
-			expected := v1alpha1.EtcdSpec{
+			expected := etcd.EtcdConfig{
 				Endpoints: []string{
 					fmt.Sprintf("http://%s-etcd.%s:2379", appName, appName),
 				},
 			}
 
-			result := checkEtcdEndpoints(instance.Spec.Etcd, instance.Name, instance.Namespace)
+			result := checkEtcdEndpoints(instance.Spec.ConfigSpec.Etcd, instance.Name, instance.Namespace)
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When Etcd endpoints are provided", func() {
 		It("returns correct etcd config", func() {
-			instance := &v1alpha1.Agent{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Etcd: v1alpha1.EtcdSpec{
-							Endpoints: testArray,
+				Spec: v1alpha1.ControllerSpec{
+					ConfigSpec: v1alpha1.ControllerConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Etcd: etcd.EtcdConfig{
+								Endpoints: testArray,
+							},
 						},
 					},
 				},
 			}
 
-			expected := v1alpha1.EtcdSpec{
+			expected := etcd.EtcdConfig{
 				Endpoints: testArray,
 			}
 
-			result := checkEtcdEndpoints(instance.Spec.Etcd, instance.Name, instance.Namespace)
+			result := checkEtcdEndpoints(instance.Spec.ConfigSpec.Etcd, instance.Name, instance.Namespace)
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When Etcd endpoints are provided with empty string", func() {
 		It("returns correct etcd config", func() {
-			instance := &v1alpha1.Agent{
+			instance := &v1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      appName,
 					Namespace: appName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Etcd: v1alpha1.EtcdSpec{
-							Endpoints: []string{""},
+				Spec: v1alpha1.ControllerSpec{
+					ConfigSpec: v1alpha1.ControllerConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Etcd: etcd.EtcdConfig{
+								Endpoints: []string{""},
+							},
 						},
 					},
 				},
 			}
 
-			expected := v1alpha1.EtcdSpec{
+			expected := etcd.EtcdConfig{
 				Endpoints: []string{
 					fmt.Sprintf("http://%s-etcd.%s:2379", appName, appName),
 				},
 			}
 
-			result := checkEtcdEndpoints(instance.Spec.Etcd, instance.Name, instance.Namespace)
+			result := checkEtcdEndpoints(instance.Spec.ConfigSpec.Etcd, instance.Name, instance.Namespace)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1254,7 +1264,7 @@ var _ = Describe("Tests for checkPrometheusAddress", func() {
 
 			expected := fmt.Sprintf("http://%s-prometheus-server.%s:80", appName, appName)
 
-			result := checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.Name, instance.Namespace)
+			result := checkPrometheusAddress(instance.Spec.ConfigSpec.Prometheus.Address, instance.Name, instance.Namespace)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1267,15 +1277,17 @@ var _ = Describe("Tests for checkPrometheusAddress", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Prometheus: v1alpha1.PrometheusSpec{
-							Address: test,
+					ConfigSpec: v1alpha1.AgentConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Prometheus: prometheus.PrometheusConfig{
+								Address: test,
+							},
 						},
 					},
 				},
 			}
 
-			result := checkPrometheusAddress(instance.Spec.Prometheus.Address, instance.Name, instance.Namespace)
+			result := checkPrometheusAddress(instance.Spec.ConfigSpec.Prometheus.Address, instance.Name, instance.Namespace)
 			Expect(result).To(Equal(test))
 		})
 	})
@@ -1291,8 +1303,8 @@ var _ = Describe("Tests for secretName", func() {
 				},
 				Spec: v1alpha1.AgentSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{
 									Name: test,
 								},
@@ -1302,7 +1314,7 @@ var _ = Describe("Tests for secretName", func() {
 				},
 			}
 
-			result := secretName(appName, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret)
+			result := secretName(appName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
 			Expect(result).To(Equal(test))
 		})
 	})
@@ -1316,8 +1328,8 @@ var _ = Describe("Tests for secretName", func() {
 				},
 				Spec: v1alpha1.AgentSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{},
 							},
 						},
@@ -1327,7 +1339,7 @@ var _ = Describe("Tests for secretName", func() {
 
 			expected := fmt.Sprintf("%s-agent-apikey", appName)
 
-			result := secretName(appName, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret)
+			result := secretName(appName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1341,8 +1353,8 @@ var _ = Describe("Tests for secretName", func() {
 				},
 				Spec: v1alpha1.AgentSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{},
 							},
 						},
@@ -1352,7 +1364,7 @@ var _ = Describe("Tests for secretName", func() {
 
 			expected := fmt.Sprintf("%s-controller-apikey", appName)
 
-			result := secretName(appName, "controller", &instance.Spec.FluxNinjaPlugin.APIKeySecret)
+			result := secretName(appName, "controller", &instance.Spec.Secrets.FluxNinjaPlugin)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1368,8 +1380,8 @@ var _ = Describe("Tests for secretDataKey", func() {
 				},
 				Spec: v1alpha1.AgentSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{
 									Key: test,
 								},
@@ -1379,7 +1391,7 @@ var _ = Describe("Tests for secretDataKey", func() {
 				},
 			}
 
-			result := secretDataKey(&instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef)
+			result := secretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef)
 			Expect(result).To(Equal(test))
 		})
 	})
@@ -1393,8 +1405,8 @@ var _ = Describe("Tests for secretDataKey", func() {
 				},
 				Spec: v1alpha1.AgentSpec{
 					CommonSpec: v1alpha1.CommonSpec{
-						FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-							APIKeySecret: v1alpha1.APIKeySecret{
+						Secrets: v1alpha1.Secrets{
+							FluxNinjaPlugin: v1alpha1.APIKeySecret{
 								SecretKeyRef: v1alpha1.SecretKeyRef{},
 							},
 						},
@@ -1402,7 +1414,7 @@ var _ = Describe("Tests for secretDataKey", func() {
 				},
 			}
 
-			result := secretDataKey(&instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef)
+			result := secretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef)
 			Expect(result).To(Equal(secretKey))
 		})
 	})
@@ -1504,3 +1516,30 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 		})
 	})
 })
+
+// checkEtcdEndpoints generates endpoints list based on the release name if that is not provided else returns the provided values.
+func checkEtcdEndpoints(etcd etcd.EtcdConfig, name, namespace string) etcd.EtcdConfig {
+	endpoints := []string{}
+	if etcd.Endpoints != nil {
+		for _, endpoint := range etcd.Endpoints {
+			if endpoint != "" {
+				endpoints = append(endpoints, endpoint)
+			}
+		}
+	}
+
+	if len(endpoints) == 0 {
+		endpoints = append(endpoints, fmt.Sprintf("http://%s-etcd.%s:2379", name, namespace))
+	}
+
+	etcd.Endpoints = endpoints
+	return etcd
+}
+
+// checkPrometheusAddress generates prometheus address based on the release name if that is not provided else returns the provided value.
+func checkPrometheusAddress(address, name, namespace string) string {
+	if address == "" {
+		address = fmt.Sprintf("http://%s-prometheus-server.%s:80", name, namespace)
+	}
+	return strings.TrimRight(address, "/")
+}

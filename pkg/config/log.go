@@ -18,20 +18,20 @@ import (
 	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
-// DefaultLogFilePath is the default path for the log files to be stored.
-var DefaultLogFilePath = path.Join(DefaultLogDirectory, info.Service+".log")
+// defaultLogFilePath is the default path for the log files to be stored.
+var defaultLogFilePath = path.Join(DefaultLogDirectory, info.Service+".log")
 
 const (
-	configKey  = "log"
-	stdOutFile = "stdout"
-	stdErrFile = "stderr"
-	emptyFile  = ""
+	configKey   = "log"
+	stdOutFile  = "stdout"
+	stdErrFile  = "stderr"
+	defaultFile = "default"
 )
 
 // LogModule is a fx module that provides a logger and invokes setting global and standard loggers.
 func LogModule() fx.Option {
 	return fx.Options(
-		LoggerConstructor{Key: configKey}.Annotate(),
+		LoggerConstructor{ConfigKey: configKey}.Annotate(),
 		fx.Invoke(log.SetGlobalLogger),
 		fx.Invoke(log.SetStdLogger),
 		fx.WithLogger(WithApertureLogger()),
@@ -48,24 +48,26 @@ func LogModule() fx.Option {
 
 // LogConfig holds configuration for a logger and log writers.
 // swagger:model
+// +kubebuilder:object:generate=true
 type LogConfig struct {
 	// Log level
 	LogLevel string `json:"level" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
-	// Additional log writers
-	Writers []LogWriterConfig `json:"writers" validate:"omitempty,dive,omitempty"`
-	// internal fields
-	writers []io.Writer
-	LogWriterConfig
+
+	// Log writers
+	Writers []LogWriterConfig `json:"writers,omitempty" validate:"omitempty,dive,omitempty"`
+
 	// Use non-blocking log writer (can lose logs at high throughput)
 	NonBlocking bool `json:"non_blocking" default:"true"`
+
 	// Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
 	PrettyConsole bool `json:"pretty_console" default:"false"`
 }
 
 // LogWriterConfig holds configuration for a log writer.
 // swagger:model
+// +kubebuilder:object:generate=true
 type LogWriterConfig struct {
-	// Output file for logs. Keywords allowed - ["stderr", "stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+	// Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
 	File string `json:"file" default:"stderr"`
 	// Log file max size in MB
 	MaxSize int `json:"max_size" validate:"gte=0" default:"50"`
@@ -81,8 +83,8 @@ type LogWriterConfig struct {
 type LoggerConstructor struct {
 	// Name of logger instance
 	Name string
-	// Viper config key
-	Key string
+	// Config key
+	ConfigKey string
 	// Default Config
 	DefaultConfig LogConfig
 }
@@ -107,24 +109,24 @@ func (constructor LoggerConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor LoggerConstructor) provideLogger(writers []io.Writer,
+func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 	unmarshaller Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (log.Logger, error) {
 	config := constructor.DefaultConfig
 
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
 	}
-	config.writers = writers
-
 	logger, writers := NewLogger(config)
+	// append writers provided via Fx
+	writers = append(writers, w...)
 
 	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
 			return nil
 		},
-		OnStop: func(c context.Context) error {
+		OnStop: func(context.Context) error {
 			panichandler.Go(func() {
 				logger.Close()
 				log.WaitFlush()
@@ -144,36 +146,36 @@ func (constructor LoggerConstructor) provideLogger(writers []io.Writer,
 // NewLogger creates a new instance of logger and writers with the given configuration.
 func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	var writers []io.Writer
-
-	if !config.PrettyConsole {
-		if config.File == stdErrFile {
-			writers = append(writers, os.Stderr)
-		} else if config.File == stdOutFile {
-			writers = append(writers, os.Stdout)
-		}
-	}
-	if config.File == "default" {
-		config.Writers = append(config.Writers, config.LogWriterConfig)
-	}
 	// append file writers
 	for _, writerConfig := range config.Writers {
-		lj := &lumberjack.Logger{
-			Filename:   writerConfig.File,
-			MaxSize:    writerConfig.MaxSize,
-			MaxBackups: writerConfig.MaxBackups,
-			MaxAge:     writerConfig.MaxAge,
-			Compress:   writerConfig.Compress,
+		var writer io.Writer
+		if writerConfig.File != "" {
+			switch writerConfig.File {
+			case stdErrFile:
+				writer = os.Stderr
+			case stdOutFile:
+				writer = os.Stdout
+			default:
+				if writerConfig.File == defaultFile {
+					writerConfig.File = defaultLogFilePath
+				}
+				lj := &lumberjack.Logger{
+					Filename:   writerConfig.File,
+					MaxSize:    writerConfig.MaxSize,
+					MaxBackups: writerConfig.MaxBackups,
+					MaxAge:     writerConfig.MaxAge,
+					Compress:   writerConfig.Compress,
+				}
+				// Set finalizer to automatically close file writers
+				runtime.SetFinalizer(lj, func(lj *lumberjack.Logger) {
+					log.Debug().Msg("Closing lumberjack file writer")
+					_ = lj.Close()
+				})
+				writer = lj
+			}
+			writers = append(writers, writer)
 		}
-		writers = append(writers, lj)
-		// Set finalizer to automatically close file writers
-		runtime.SetFinalizer(lj, func(lj *lumberjack.Logger) {
-			log.Debug().Msg("Closing lumberjack file writer")
-			_ = lj.Close()
-		})
 	}
-
-	// append additional writers provided via Fx
-	writers = append(writers, config.writers...)
 
 	if config.PrettyConsole {
 		writers = append(writers, zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})
@@ -182,8 +184,6 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	multi := zerolog.MultiLevelWriter(writers...)
 
 	logger := log.NewLogger(multi, config.NonBlocking, strings.ToLower(config.LogLevel))
-
-	logger.Info().Msg("Configured logger")
 
 	return logger, writers
 }

@@ -54,7 +54,7 @@ var (
 type JobGroupIn struct {
 	fx.In
 	JobGroup *jobs.JobGroup `name:"job-group"`
-	Registry *status.Registry
+	Registry status.Registry
 }
 
 func TestCore(t *testing.T) {
@@ -143,7 +143,7 @@ var _ = BeforeSuite(func() {
 		flowcontrol.Module,
 		classifier.Module,
 		otelcollector.Module(),
-		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),
+		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 		jobs.JobGroupConstructor{Name: jobGroupName}.Annotate(),
 		fx.Populate(jgIn),
 	)

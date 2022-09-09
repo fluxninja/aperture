@@ -293,7 +293,7 @@ func testDefaultTypes(foo *ExampleBasic) {
 	Expect(foo.IntSlice).To(Equal([]int{1, 2, 3, 4}))
 	Expect(foo.IntSliceSlice).To(Equal([][]int{{1}, {2}, {3}, {4}}))
 	Expect(foo.StringSliceSlice).To(Equal([][]string{{"1"}, {}}))
-	Expect(foo.ConfigDuration.Duration.AsDuration()).To(Equal(time.Second * 10))
+	Expect(foo.ConfigDuration.AsDuration()).To(Equal(time.Second * 10))
 	Expect(foo.PBDuration.AsDuration()).To(Equal(time.Second * 3))
 	Expect(foo.ExamplePtr).NotTo(BeNil())
 	Expect(foo.ExamplePtr.Integer).To(Equal(33))

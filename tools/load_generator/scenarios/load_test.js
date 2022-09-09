@@ -1,31 +1,27 @@
 import http from "k6/http";
-import { check } from "k6";
+import { check, sleep } from "k6";
+import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
+
+export let vuStages = [
+  { duration: "1s", target: 5 },
+  { duration: "2m", target: 5 },
+  { duration: "1m", target: 30 },
+  { duration: "2m", target: 30 },
+  { duration: "1s", target: 5 },
+  { duration: "5m", target: 5 },
+];
 
 export let options = {
   discardResponseBodies: true,
   scenarios: {
     guests: {
       executor: "ramping-vus",
-      stages: [
-        { duration: "30s", target: 5 }, // simulate ramp-up of traffic from 0 to 5 users over 30 seconds
-        { duration: "30s", target: 5 }, // stay at 5 users for 30s minutes
-        { duration: "1m", target: 10 }, // ramp-up to 10 users over 1 minutes
-        { duration: "2m", target: 10 }, // stay at 10 users for 2 minutes (peak hour)
-        { duration: "10s", target: 5 }, // ramp-down to 5 users in 10 seconds
-        { duration: "30s", target: 5 }, // stay at to 5 users in 30 seconds
-      ],
+      stages: vuStages,
       env: { USER_TYPE: "guest" },
     },
     subscribers: {
       executor: "ramping-vus",
-      stages: [
-        { duration: "30s", target: 5 }, // simulate ramp-up of traffic from 0 to 5 users over 30 seconds
-        { duration: "30s", target: 5 }, // stay at 5 users for 30s minutes
-        { duration: "1m", target: 10 }, // ramp-up to 10 users over 1 minutes
-        { duration: "2m", target: 10 }, // stay at 10 users for 2 minutes (peak hour)
-        { duration: "10s", target: 5 }, // ramp-down to 5 users in 10 seconds
-        { duration: "30s", target: 5 }, // stay at to 5 users in 30 seconds
-      ],
+      stages: vuStages,
       env: { USER_TYPE: "subscriber" },
     },
   },
@@ -33,7 +29,7 @@ export let options = {
 
 export default function () {
   let userType = __ENV.USER_TYPE;
-  const url = "http://demo1-demo-app.demoapp.svc.cluster.local/request";
+  const url = "http://service1-demo-app.demoapp.svc.cluster.local/request";
   const headers = {
     "Content-Type": "application/json",
     Cookie:
@@ -44,7 +40,11 @@ export default function () {
   let res = http.request("POST", url, JSON.stringify(body), {
     headers: headers,
   });
-  check(res, {
+  const ret = check(res, {
     "http status was 200": res.status === 200,
   });
+  if (!ret) {
+    // sleep for 10ms to 25ms
+    sleep(randomIntBetween(0.01, 0.025));
+  }
 }

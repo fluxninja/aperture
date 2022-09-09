@@ -48,25 +48,25 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 		registry: registry,
 		checkReceivedTotal: prometheus.NewCounter(
 			prometheus.CounterOpts{
-				Name: metrics.FlowControlCheckRequestsMetricName,
+				Name: metrics.FlowControlRequestsMetricName,
 				Help: "Total number of aperture check requests handled",
 			},
 		),
 		checkDecision: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: metrics.FlowControlCheckDecisionsMetricName,
+				Name: metrics.FlowControlDecisionsMetricName,
 				Help: "Number of aperture check decisions",
 			}, []string{metrics.FlowControlCheckDecisionTypeLabel},
 		),
 		errorReason: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: metrics.FlowControlCheckErrorReasonMetricName,
+				Name: metrics.FlowControlErrorReasonMetricName,
 				Help: "Number of error reasons other than unspecified",
 			}, []string{metrics.FlowControlCheckErrorReasonLabel},
 		),
 		rejectReason: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: metrics.FlowControlCheckRejectReasonMetricName,
+				Name: metrics.FlowControlRejectReasonMetricName,
 				Help: "Number of reject reasons other than unspecified",
 			}, []string{metrics.FlowControlCheckRejectReasonLabel},
 		),

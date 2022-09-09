@@ -9,10 +9,10 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/distcache"
@@ -66,6 +66,7 @@ func provideWatchers(
 
 type rateLimiterFactory struct {
 	engineAPI                 iface.Engine
+	statusRegistry            status.Registry
 	distCache                 *distcache.DistCache
 	lazySyncJobGroup          *jobs.JobGroup
 	rateLimitDecisionsWatcher notifiers.Watcher
@@ -78,18 +79,21 @@ func setupRateLimiterFactory(
 	lifecycle fx.Lifecycle,
 	e iface.Engine,
 	distCache *distcache.DistCache,
-	statusRegistry *status.Registry,
+	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
-	rateLimitDecisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient,
-		path.Join(paths.RateLimiterDecisionsPath, paths.AgentGroupPrefix(agentGroupName)))
+	etcdPath := path.Join(paths.RateLimiterDecisionsPath)
+	rateLimitDecisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return err
 	}
-	lazySyncJobGroup, err := jobs.NewJobGroup(rateLimiterStatusRoot+".lazy_sync_jobs", statusRegistry, 0, jobs.RescheduleMode, nil)
+
+	reg := statusRegistry.Child(rateLimiterStatusRoot)
+
+	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("lazy_sync_jobs"), 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create lazy sync job group")
 		return err
@@ -101,16 +105,18 @@ func setupRateLimiterFactory(
 		lazySyncJobGroup:          lazySyncJobGroup,
 		rateLimitDecisionsWatcher: rateLimitDecisionsWatcher,
 		agentGroupName:            agentGroupName,
+		statusRegistry:            reg,
 	}
 
 	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{rateLimiterFactory.newRateLimiterOptions},
+		FxOptionsFuncs: []notifiers.FxOptionsFunc{
+			rateLimiterFactory.newRateLimiterOptions,
+		},
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
 		},
-		StatusRegistry:     statusRegistry,
+		StatusRegistry:     reg,
 		PrometheusRegistry: prometheusRegistry,
-		StatusPath:         rateLimiterStatusRoot,
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -148,26 +154,23 @@ func setupRateLimiterFactory(
 func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	registry *status.Registry,
+	reg status.Registry,
 ) (fx.Option, error) {
-	registryPath := path.Join(rateLimiterStatusRoot, key.String())
-
-	wrapperMessage := &configv1.RateLimiterWrapper{}
+	wrapperMessage := &wrappersv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiter == nil {
-		s := status.NewStatus(nil, err)
-		_ = registry.Push(registryPath, s)
+		reg.SetStatus(status.NewStatus(nil, err))
 		log.Warn().Err(err).Msg("Failed to unmarshal rate limiter config")
 		return fx.Options(), err
 	}
 
-	rateLimiterMessage := wrapperMessage.RateLimiter
+	rateLimiterProto := wrapperMessage.RateLimiter
 
 	rateLimiter := &rateLimiter{
 		Component:          wrapperMessage,
-		rateLimiterProto:   rateLimiterMessage,
-		registryPath:       registryPath,
+		rateLimiterProto:   rateLimiterProto,
 		rateLimiterFactory: rateLimiterFactory,
+		statusRegistry:     reg,
 	}
 	rateLimiter.name = iface.ComponentID(rateLimiter)
 
@@ -181,10 +184,10 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 // rateLimiter implements rate limiter on the data plane side.
 type rateLimiter struct {
 	iface.Component
+	statusRegistry     status.Registry
 	rateLimiterFactory *rateLimiterFactory
 	rateTracker        ratetracker.RateTracker
 	rateLimitChecker   *ratetracker.BasicRateLimitChecker
-	registryPath       string
 	rateLimiterProto   *policylangv1.RateLimiter
 	name               string
 }
@@ -192,16 +195,15 @@ type rateLimiter struct {
 // Make sure rateLimiter implements iface.Limiter.
 var _ iface.RateLimiter = (*rateLimiter)(nil)
 
-func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *status.Registry) error {
+func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	// decision notifier
 	unmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
 		return err
 	}
+	decisionKey := paths.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName, rateLimiter.GetPolicyName(), rateLimiter.GetComponentIndex())
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
-			rateLimiter.GetPolicyName(),
-			rateLimiter.GetComponentIndex())),
+		notifiers.Key(decisionKey),
 		unmarshaller,
 		rateLimiter.decisionUpdateCallback,
 	)
@@ -215,7 +217,8 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 				label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
 				rateLimiter.rateLimitChecker.AddOverride(label, override.GetLimitScaleFactor())
 			}
-			rateLimiter.rateTracker, err = ratetracker.NewOlricRateTracker(rateLimiter.rateLimitChecker,
+			rateLimiter.rateTracker, err = ratetracker.NewDistCacheRateTracker(
+				rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
 				rateLimiter.name,
 				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())
@@ -267,12 +270,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, statusRegistry *st
 				merr = multierr.Append(merr, err)
 			}
 			rateLimiter.rateTracker.Close()
-			s := status.NewStatus(nil, merr)
-			err = statusRegistry.Push(rateLimiter.registryPath, s)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to push status")
-				merr = multierr.Append(merr, err)
-			}
+			rateLimiter.statusRegistry.SetStatus(status.NewStatus(nil, merr))
 
 			return merr
 		},
@@ -324,7 +322,6 @@ func (rateLimiter *rateLimiter) TakeN(labels selectors.Labels, n int) (label str
 	label = labelKey + ":" + labelValue
 
 	ok, remaining, current = rateLimiter.rateTracker.TakeN(label, n)
-
 	return
 }
 
@@ -335,7 +332,7 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 		return
 	}
 
-	var wrapperMessage configv1.RateLimiterDecisionWrapper
+	var wrapperMessage wrappersv1.RateLimiterDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiterDecision == nil {
 		return

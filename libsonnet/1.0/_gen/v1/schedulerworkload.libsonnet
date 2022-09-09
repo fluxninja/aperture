@@ -13,12 +13,6 @@
   withPriorityMixin(priority):: {
     priority+: priority,
   },
-  withTimeout(timeout):: {
-    timeout: timeout,
-  },
-  withTimeoutMixin(timeout):: {
-    timeout+: timeout,
-  },
   withTokens(tokens):: {
     tokens: tokens,
   },

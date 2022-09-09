@@ -12,9 +12,10 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(provideRegistry),
 		grpcgateway.RegisterHandler{Handler: statusv1.RegisterStatusServiceHandlerFromEndpoint}.Annotate(),
+		fx.Invoke(RegisterStatusService),
 	)
 }
 
-func provideRegistry() *Registry {
-	return NewRegistry(".")
+func provideRegistry() Registry {
+	return NewRegistry()
 }

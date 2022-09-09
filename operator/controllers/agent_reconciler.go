@@ -26,8 +26,10 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/utils/strings/slices"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -38,12 +40,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/go-logr/logr"
 )
 
 // AgentReconciler reconciles a Agent object.
 type AgentReconciler struct {
 	client.Client
+	DynamicClient    dynamic.Interface
 	Scheme           *runtime.Scheme
 	Recorder         record.EventRecorder
 	ApertureInjector *ApertureInjector
@@ -142,12 +146,21 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 					"The required resources are already deployed. Skipping resource creation as currently, the Agent doesn't require multiple replicas.")
 
 				instance.Status.Resources = "skipped"
-				if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
 					return ctrl.Result{}, err
 				}
 
 				return ctrl.Result{}, nil
 			}
+		}
+	}
+
+	if instance.Annotations == nil || instance.Annotations[defaulterAnnotationKey] != "true" {
+		err = r.checkDefaults(ctx, instance)
+		if err != nil {
+			return ctrl.Result{}, err
+		} else if instance.Status.Resources == failedStatus {
+			return ctrl.Result{}, nil
 		}
 	}
 
@@ -207,7 +220,7 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 	deleteClusterRole := true
 	instances := &v1alpha1.ControllerList{}
 	err := r.List(ctx, instances)
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "failed to list Controller")
 		return err
 	}
@@ -219,19 +232,19 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 		}
 	}
 	if deleteClusterRole {
-		if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil {
+		if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil && !errors.IsNotFound(err) {
 			log.Error(err, "failed to delete object of ClusterRole")
 			return err
 		}
 	}
 
-	if err := r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil {
+	if err := r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "failed to delete object of ClusterRoleBinding")
 		return err
 	}
 
 	if instance.Spec.Sidecar.Enabled {
-		mwc, err := mutatingWebhookConfiguration(instance)
+		mwc, err := podMutatingWebhookConfiguration(instance)
 		if err != nil {
 			return err
 		}
@@ -252,27 +265,25 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 			}
 
 			configMap, err := configMapForAgentConfig(instance, nil)
-			if err != nil && !errors.IsNotFound(err) {
-				log.Error(err, fmt.Sprintf("failed to fetch object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+			if err != nil {
+				log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 
 			configMap.Namespace = ns.GetName()
 			configMap.Annotations = getAgentAnnotationsWithOwnerRef(instance)
-			if err := r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+			if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
 				log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 
-			if instance.Spec.FluxNinjaPlugin.APIKeySecret.Create && instance.Spec.FluxNinjaPlugin.Enabled {
-				secret, err := secretForAgentAPIKey(instance, nil)
-				if err != nil && !errors.IsNotFound(err) {
-					log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-				}
+			secret, err := secretForAgentAPIKey(instance, nil)
+			if err != nil {
+				log.Error(err, fmt.Sprintf("failed to create object of Secret '%s' in namespace %s", secret.GetName(), ns.GetName()))
+			}
 
-				secret.Namespace = ns.GetName()
-				secret.Annotations = getAgentAnnotationsWithOwnerRef(instance)
-				if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
-					log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-				}
+			secret.Namespace = ns.GetName()
+			secret.Annotations = getAgentAnnotationsWithOwnerRef(instance)
+			if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 		}
 	}
@@ -284,6 +295,7 @@ func (r *AgentReconciler) updateAgent(ctx context.Context, instance *v1alpha1.Ag
 	attempt := 5
 	finalizers := instance.DeepCopy().Finalizers
 	spec := instance.DeepCopy().Spec
+	annotations := instance.DeepCopy().Annotations
 	for attempt > 0 {
 		attempt -= 1
 		if err := r.Update(ctx, instance); err != nil {
@@ -297,12 +309,75 @@ func (r *AgentReconciler) updateAgent(ctx context.Context, instance *v1alpha1.Ag
 				}
 				instance.Finalizers = finalizers
 				instance.Spec = spec
+				instance.Annotations = annotations
 				continue
 			}
 			return err
 		}
 	}
 
+	return nil
+}
+
+// checkDefaults checks and sets defaults when the Defaulter webhook is not triggered.
+func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *v1alpha1.Agent) error {
+	resource, err := r.DynamicClient.Resource(v1alpha1.GroupVersion.WithResource("agents")).Namespace(instance.GetNamespace()).Get(ctx, instance.GetName(), v1.GetOptions{})
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToFetch", "Failed to fetch Resource. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	resourceBytes, err := resource.MarshalJSON()
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToMarshal", "Failed to marshal Resource. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(resourceBytes)
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefauls", "Failed to set defaults. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	err = unmarshaller.Unmarshal(instance)
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "Failed to set defaults. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create && instance.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	if instance.Status.Resources == failedStatus {
+		instance.Status.Resources = ""
+	}
 	return nil
 }
 
@@ -354,6 +429,7 @@ func (r *AgentReconciler) reconcileConfigMap(ctx context.Context, instance *v1al
 		if err != nil {
 			return err
 		}
+
 		if _, err = createConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}
@@ -494,7 +570,7 @@ func (r *AgentReconciler) reconcileMutatingWebhookConfiguration(ctx context.Cont
 		return nil
 	}
 
-	mwc, err := mutatingWebhookConfiguration(instance.DeepCopy())
+	mwc, err := podMutatingWebhookConfiguration(instance.DeepCopy())
 	if err != nil {
 		return err
 	}
@@ -528,7 +604,7 @@ func (r *AgentReconciler) reconcileMutatingWebhookConfiguration(ctx context.Cont
 // reconcileSecret prepares the desired states for Agent ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileSecret(ctx context.Context, instance *v1alpha1.Agent) error {
-	if instance.Spec.FluxNinjaPlugin.APIKeySecret.Create && instance.Spec.FluxNinjaPlugin.Enabled {
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create {
 		if !instance.Spec.Sidecar.Enabled {
 			secret, err := secretForAgentAPIKey(instance.DeepCopy(), r.Scheme)
 			if err != nil {
@@ -537,15 +613,15 @@ func (r *AgentReconciler) reconcileSecret(ctx context.Context, instance *v1alpha
 			if _, err = createSecretForAgent(r.Client, r.Recorder, secret, ctx, instance); err != nil {
 				return err
 			}
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = false
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = ""
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef.Name = secretName(
-				instance.GetName(), "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret)
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = false
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = ""
+			instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name = secretName(
+				instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
 		} else {
-			value := instance.Spec.FluxNinjaPlugin.APIKeySecret.Value
+			value := instance.Spec.Secrets.FluxNinjaPlugin.Value
 			if !strings.HasPrefix(value, "enc::") && !strings.HasSuffix(value, "::enc") {
-				instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = fmt.Sprintf(
-					"enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(instance.Spec.FluxNinjaPlugin.APIKeySecret.Value)))
+				instance.Spec.Secrets.FluxNinjaPlugin.Value = fmt.Sprintf(
+					"enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(instance.Spec.Secrets.FluxNinjaPlugin.Value)))
 			}
 		}
 	}
@@ -591,7 +667,7 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 			return err
 		}
 
-		if instance.Spec.FluxNinjaPlugin.APIKeySecret.Create && instance.Spec.FluxNinjaPlugin.Enabled {
+		if instance.Spec.Secrets.FluxNinjaPlugin.Create {
 			secret, err := createAgentSecretInNamespace(instance.DeepCopy(), ns.GetName())
 			if err != nil {
 				return err
@@ -631,8 +707,8 @@ func eventFiltersForAgent() predicate.Predicate {
 
 			diffObjects := !reflect.DeepEqual(old.Spec, new.Spec)
 			// Skipping update events for Secret updates
-			if diffObjects && old.Spec.FluxNinjaPlugin.APIKeySecret.Value != "" &&
-				(new.Spec.FluxNinjaPlugin.APIKeySecret.Value == "" || strings.HasPrefix(new.Spec.FluxNinjaPlugin.APIKeySecret.Value, "enc::")) {
+			if diffObjects && old.Spec.Secrets.FluxNinjaPlugin.Value != "" &&
+				(new.Spec.Secrets.FluxNinjaPlugin.Value == "" || strings.HasPrefix(new.Spec.Secrets.FluxNinjaPlugin.Value, "enc::")) {
 				return false
 			}
 

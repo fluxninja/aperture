@@ -66,11 +66,26 @@ type Signal struct {
 // PortToSignal is a map from port name to a slice of Signals.
 type PortToSignal map[string][]Signal
 
+// ComponentType describes the type of a component based on its connectivity in the circuit.
+type ComponentType string
+
+const (
+	// ComponentTypeStandAlone is a component that is not connected to any other component.
+	ComponentTypeStandAlone ComponentType = "StandAlone"
+	// ComponentTypeSource is a component that emits output signal(s) but does not accept an input signal.
+	ComponentTypeSource ComponentType = "Source"
+	// ComponentTypeSink is a component that accepts input signal(s) but does not emit an output signal.
+	ComponentTypeSink ComponentType = "Sink"
+	// ComponentTypeSignalProcessor is a component that accepts input signal(s) and emits output signal(s).
+	ComponentTypeSignalProcessor ComponentType = "SignalProcessor"
+)
+
 // CompiledComponent consists of a Component, its MapStruct and Name.
 type CompiledComponent struct {
-	Component Component
-	MapStruct map[string]any
-	Name      string
+	Component     Component
+	MapStruct     map[string]any
+	Name          string
+	ComponentType ComponentType
 }
 
 // CompiledComponentAndPorts consists of a CompiledComponent and its In and Out ports.

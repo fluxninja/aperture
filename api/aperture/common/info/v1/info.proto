@@ -42,5 +42,7 @@ message ProcessInfo {
 }
 
 message HostInfo {
-  string hostname = 1;
+  string uuid = 1;
+  string hostname = 2;
+  string local_ip = 3;
 }

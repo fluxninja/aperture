@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	guuid "github.com/google/uuid"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -35,6 +36,10 @@ var (
 	Prefix = "aperture"
 	// Hostname is the hostname of the machine that is running the process.
 	Hostname = "unknown"
+	// LocalIP is the IP of the service.
+	LocalIP = "unknown"
+	// UUID is the unique identifier for the process.
+	UUID = "unknown"
 )
 
 var (
@@ -68,6 +73,11 @@ func init() {
 	if hostname != "" {
 		Hostname = hostname
 	}
+
+	LocalIP = getLocalIP()
+
+	// generate UUID
+	UUID = guuid.NewString()
 }
 
 // GetVersionInfo returns the version info for the application.
@@ -92,6 +102,8 @@ func GetHostInfo() *infov1.HostInfo {
 	defer mutex.Unlock()
 	return &infov1.HostInfo{
 		Hostname: Hostname,
+		Uuid:     UUID,
+		LocalIp:  LocalIP,
 	}
 }
 

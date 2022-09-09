@@ -29,6 +29,9 @@ import (
 	"k8s.io/utils/pointer"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/distcache"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/otel"
 )
 
 var _ = Describe("Agent Daemonset", func() {
@@ -94,16 +97,30 @@ var _ = Describe("Agent Daemonset", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						ServerPort: 80,
+					ConfigSpec: v1alpha1.AgentConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":80",
+								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							BindAddr:           ":3320",
+							MemberlistBindAddr: ":3322",
+						},
 					},
-					DistributedCachePort: 3320,
-					MemberListPort:       3322,
-					Image: v1alpha1.Image{
-						Registry:   "docker.io/fluxninja",
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry:   "docker.io/fluxninja",
+							Tag:        "latest",
+							PullPolicy: "IfNotPresent",
+						},
 						Repository: "aperture-agent",
-						Tag:        "latest",
-						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -148,7 +165,7 @@ var _ = Describe("Agent Daemonset", func() {
 							NodeSelector:                  nil,
 							Tolerations:                   nil,
 							SecurityContext:               &corev1.PodSecurityContext{},
-							TerminationGracePeriodSeconds: nil,
+							TerminationGracePeriodSeconds: pointer.Int64(0),
 							InitContainers:                nil,
 							Containers: []corev1.Container{
 								{
@@ -186,22 +203,27 @@ var _ = Describe("Agent Daemonset", func() {
 									Resources: corev1.ResourceRequirements{},
 									Ports: []corev1.ContainerPort{
 										{
-											Name:          "grpc",
+											Name:          server,
 											ContainerPort: 80,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "grpc-otel",
+											Name:          grpcOtel,
 											ContainerPort: 4317,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "dist-cache",
+											Name:          httpOtel,
+											ContainerPort: 4318,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          distCache,
 											ContainerPort: 3320,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "memberlist",
+											Name:          memberList,
 											ContainerPort: 3322,
 											Protocol:      corev1.ProtocolTCP,
 										},
@@ -237,7 +259,9 @@ var _ = Describe("Agent Daemonset", func() {
 				},
 			}
 
-			result, _ := daemonsetForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := daemonsetForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -257,24 +281,38 @@ var _ = Describe("Agent Daemonset", func() {
 					Namespace: appName,
 				},
 				Spec: v1alpha1.AgentSpec{
-					DistributedCachePort: 3320,
-					MemberListPort:       3322,
+					ConfigSpec: v1alpha1.AgentConfigSpec{
+						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+							Server: v1alpha1.ServerConfigSpec{
+								ListenerConfig: listener.ListenerConfig{
+									Addr: ":80",
+								},
+							},
+							Otel: otel.OtelConfig{
+								GRPCAddr: ":4317",
+								HTTPAddr: ":4318",
+							},
+						},
+						DistCache: distcache.DistCacheConfig{
+							BindAddr:           ":3320",
+							MemberlistBindAddr: ":3322",
+						},
+					},
 					CommonSpec: v1alpha1.CommonSpec{
 						Labels:         testMap,
 						Annotations:    testMap,
-						ServerPort:     80,
 						LivenessProbe:  probe,
 						ReadinessProbe: probe,
 						Resources:      resourceRequirement,
 						PodSecurityContext: v1alpha1.PodSecurityContext{
 							Enabled: true,
-							FsGroup: pointer.Int64Ptr(1001),
+							FsGroup: 1001,
 						},
 						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
 							Enabled:                true,
-							RunAsUser:              pointer.Int64Ptr(0),
-							RunAsNonRootUser:       pointer.BoolPtr(false),
-							ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+							RunAsUser:              0,
+							RunAsNonRootUser:       false,
+							ReadOnlyRootFilesystem: false,
 						},
 						Command:                       testArray,
 						Args:                          testArray,
@@ -282,7 +320,7 @@ var _ = Describe("Agent Daemonset", func() {
 						PodAnnotations:                testMap,
 						NodeSelector:                  testMap,
 						Tolerations:                   tolerations,
-						TerminationGracePeriodSeconds: pointer.Int64Ptr(10),
+						TerminationGracePeriodSeconds: 10,
 						LifecycleHooks:                lifecycle,
 						ExtraEnvVars: []corev1.EnvVar{
 							{
@@ -321,12 +359,14 @@ var _ = Describe("Agent Daemonset", func() {
 						},
 						Affinity: affinity,
 					},
-					Image: v1alpha1.Image{
-						Registry:    "docker.io/fluxninja",
-						Repository:  "aperture-agent",
-						Tag:         "latest",
-						PullPolicy:  "IfNotPresent",
-						PullSecrets: testArray,
+					Image: v1alpha1.AgentImage{
+						Image: v1alpha1.Image{
+							Registry:    "docker.io/fluxninja",
+							Tag:         "latest",
+							PullPolicy:  "IfNotPresent",
+							PullSecrets: testArray,
+						},
+						Repository: "aperture-agent",
 					},
 				},
 			}
@@ -447,22 +487,27 @@ var _ = Describe("Agent Daemonset", func() {
 									Resources: resourceRequirement,
 									Ports: []corev1.ContainerPort{
 										{
-											Name:          "grpc",
+											Name:          server,
 											ContainerPort: 80,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "grpc-otel",
+											Name:          grpcOtel,
 											ContainerPort: 4317,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "dist-cache",
+											Name:          httpOtel,
+											ContainerPort: 4318,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          distCache,
 											ContainerPort: 3320,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          "memberlist",
+											Name:          memberList,
 											ContainerPort: 3322,
 											Protocol:      corev1.ProtocolTCP,
 										},
@@ -473,7 +518,7 @@ var _ = Describe("Agent Daemonset", func() {
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
 												Path:   "/v1/status/liveness",
-												Port:   intstr.FromString("grpc"),
+												Port:   intstr.FromString(server),
 												Scheme: corev1.URISchemeHTTP,
 											},
 										},
@@ -487,7 +532,7 @@ var _ = Describe("Agent Daemonset", func() {
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
 												Path:   "/v1/status/readiness",
-												Port:   intstr.FromString("grpc"),
+												Port:   intstr.FromString(server),
 												Scheme: corev1.URISchemeHTTP,
 											},
 										},
@@ -537,7 +582,9 @@ var _ = Describe("Agent Daemonset", func() {
 				},
 			}
 
-			result, _ := daemonsetForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := daemonsetForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+
+			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -578,6 +625,7 @@ var _ = Describe("Test Daemonset Mutate", func() {
 
 		dms := &appsv1.DaemonSet{}
 		err := daemonsetMutate(dms, expected.Spec)()
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(dms).To(Equal(expected))
 	})

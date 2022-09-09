@@ -1,8 +1,8 @@
+// +kubebuilder:validation:Optional
 package otel
 
 import (
-	"fmt"
-	"time"
+	"crypto/tls"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/config/configgrpc"
@@ -12,6 +12,8 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
@@ -34,11 +36,10 @@ const (
 	// ProcessorBatchPostrollup batches data after rolling up, as roll up process
 	// shrinks number of data points significantly.
 	ProcessorBatchPostrollup = "batch/postrollup"
-	// ProcessorBatchMetricsFast batches metrics in small and fast packages. Used
-	// in flow control policy.
-	ProcessorBatchMetricsFast = "batch/metrics-fast"
 	// ProcessorRollup rolls up data to decrease cardinality.
 	ProcessorRollup = "rollup"
+	// ProcessorAgentGroup adds `agent_group` attribute.
+	ProcessorAgentGroup = "attributes/agent_group"
 
 	// ExporterLogging exports telemetry using Aperture logger.
 	ExporterLogging = "aperturelogging"
@@ -46,74 +47,129 @@ const (
 	ExporterPrometheusRemoteWrite = "prometheusremotewrite"
 )
 
-type otelConfig struct {
-	// NodeName is name of the node from which OTEL should collect metrics.
-	NodeName string `json:"node_name"`
-	// Addr is an address on which this app is serving metrics.
-	// TODO this should be inherited from the listener.Listener config, but it's
-	// not initialized at the provide state of app.
-	Addr string `json:"addr" validate:"hostname_port" default:":8080"`
+var baseFxTag = config.NameTag("base")
+
+type otelParams struct {
+	promClient promapi.Client
+	config     *otelcollector.OTELConfig
+	listener   *listener.Listener
+	tlsConfig  *tls.Config
+	OtelConfig
 }
 
-// ProvideAnnotatedAgentConfig provides annotated OTEL config for agent.
-func ProvideAnnotatedAgentConfig() fx.Option {
-	return fx.Option(
-		fx.Provide(
-			fx.Annotate(
-				newAgentOTELConfig,
-				fx.ResultTags(`name:"base"`),
-			),
-		),
-	)
+// swagger:operation POST /otel common-configuration Otel
+// ---
+// x-fn-config-env: true
+// parameters:
+// - name: proxy
+//   in: body
+//   schema:
+//     "$ref": "#/definitions/OtelConfig"
+
+// OtelConfig is the configuration for the OTEL collector.
+// swagger:model
+// +kubebuilder:object:generate=true
+type OtelConfig struct {
+	// GRPC listener addr for OTEL Collector.
+	GRPCAddr string `json:"grpc_addr" validate:"hostname_port" default:":4317"`
+	// HTTP listener addr for OTEL Collector.
+	HTTPAddr string `json:"http_addr" validate:"hostname_port" default:":4318"`
+	// BatchPrerollup configures batch prerollup processor.
+	BatchPrerollup BatchConfig `json:"batch_prerollup"`
+	// BatchPostrollup configures batch postrollup processor.
+	BatchPostrollup BatchConfig `json:"batch_postrollup"`
 }
 
-// ProvideAnnotatedControllerConfig provides annotated OTEL config for controller.
-func ProvideAnnotatedControllerConfig() fx.Option {
-	return fx.Option(
-		fx.Provide(
-			fx.Annotate(
-				newControllerOTELConfig,
-				fx.ResultTags(`name:"base"`),
-			),
-		),
-	)
+// BatchConfig defines configuration for OTEL batch processor.
+// swagger:model
+// +kubebuilder:object:generate=true
+type BatchConfig struct {
+	// Timeout sets the time after which a batch will be sent regardless of size.
+	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
+
+	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"10000"`
 }
 
-func newAgentOTELConfig(unmarshaller config.Unmarshaller, promClient promapi.Client) (*otelcollector.OTELConfig, error) {
-	var cfg otelConfig
-	if err := unmarshaller.UnmarshalKey("otel", &cfg); err != nil {
-		return nil, err
+// Type decides which configuration to use.
+type Type int
+
+const (
+	// AgentType instantiates agent pipeline.
+	AgentType Type = iota
+	// ControllerType instantiates controller pipeline.
+	ControllerType
+)
+
+// OTELConfigConstructor is the constructor for the OTEL collector configuration.
+type OTELConfigConstructor struct {
+	Type Type
+}
+
+// Annotate provides fx options.
+func (c OTELConfigConstructor) Annotate() fx.Option {
+	options := fx.Provide(newOtelConfig)
+	switch c.Type {
+	case AgentType:
+		options = fx.Options(options, fx.Provide(fx.Annotate(provideAgent, fx.ResultTags(baseFxTag))))
+	case ControllerType:
+		options = fx.Options(options, fx.Provide(fx.Annotate(provideController, fx.ResultTags(baseFxTag))))
 	}
+	return options
+}
+
+// FxIn consumes parameters via Fx.
+type FxIn struct {
+	fx.In
+	Unmarshaller config.Unmarshaller
+	Listener     *listener.Listener
+	PromClient   promapi.Client
+	TLSConfig    *tls.Config `optional:"true"`
+}
+
+func newOtelConfig(in FxIn) (*otelParams, error) {
 	config := otelcollector.NewOTELConfig()
 	config.AddDebugExtensions()
-	addLogsAndTracesPipelines(config)
-	addMetricsPipeline(config, promClient, cfg)
-	return config, nil
-}
 
-func newControllerOTELConfig(unmarshaller config.Unmarshaller, promClient promapi.Client) (*otelcollector.OTELConfig, error) {
-	var cfg otelConfig
-	if err := unmarshaller.UnmarshalKey("otel", &cfg); err != nil {
+	var userCfg OtelConfig
+	if err := in.Unmarshaller.UnmarshalKey("otel", &userCfg); err != nil {
 		return nil, err
 	}
-	config := otelcollector.NewOTELConfig()
-	config.AddDebugExtensions()
-	addControllerMetricsPipeline(config, promClient, cfg)
-	return config, nil
+	cfg := &otelParams{
+		OtelConfig: userCfg,
+		listener:   in.Listener,
+		promClient: in.PromClient,
+		tlsConfig:  in.TLSConfig,
+		config:     config,
+	}
+	return cfg, nil
 }
 
-func addLogsAndTracesPipelines(config *otelcollector.OTELConfig) {
+func provideAgent(cfg *otelParams) *otelcollector.OTELConfig {
+	addLogsAndTracesPipelines(cfg)
+	addMetricsPipeline(cfg)
+	return cfg.config
+}
+
+func provideController(cfg *otelParams) *otelcollector.OTELConfig {
+	addControllerMetricsPipeline(cfg)
+	return cfg.config
+}
+
+func addLogsAndTracesPipelines(cfg *otelParams) {
+	config := cfg.config
 	// Common dependencies for pipelines
-	addOTLPReceiver(config)
+	addOTLPReceiver(cfg)
 	config.AddProcessor(ProcessorEnrichment, nil)
 	addMetricsProcessor(config)
-	config.AddBatchProcessor(ProcessorBatchPrerollup, 1*time.Second, 10000)
+	config.AddBatchProcessor(ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPrerollup.SendBatchSize)
 	addRollupProcessor(config)
-	config.AddBatchProcessor(ProcessorBatchPostrollup, 1*time.Second, 10000)
+	config.AddBatchProcessor(ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
 	config.AddExporter(ExporterLogging, nil)
 
 	processors := []string{
 		ProcessorEnrichment,
+		ProcessorAgentGroup,
 		ProcessorMetrics,
 		ProcessorBatchPrerollup,
 		ProcessorRollup,
@@ -133,78 +189,59 @@ func addLogsAndTracesPipelines(config *otelcollector.OTELConfig) {
 	})
 }
 
-func addMetricsPipeline(config *otelcollector.OTELConfig, promClient promapi.Client, cfg otelConfig) {
-	addPrometheusReceiver(config, cfg)
+func addMetricsPipeline(cfg *otelParams) {
+	config := cfg.config
+	addPrometheusReceiver(cfg)
 	config.AddProcessor(ProcessorEnrichment, nil)
-	config.AddBatchProcessor(ProcessorBatchMetricsFast, 1*time.Second, 1000)
-	addPrometheusRemoteWriteExporter(config, promClient)
+	addPrometheusRemoteWriteExporter(config, cfg.promClient)
 	config.Service.AddPipeline("metrics/fast", otelcollector.Pipeline{
 		Receivers: []string{ReceiverPrometheus},
 		Processors: []string{
 			ProcessorEnrichment,
-			ProcessorBatchMetricsFast,
+			ProcessorAgentGroup,
 		},
 		Exporters: []string{ExporterPrometheusRemoteWrite},
 	})
 }
 
-func addControllerMetricsPipeline(config *otelcollector.OTELConfig, promClient promapi.Client, cfg otelConfig) {
+func addControllerMetricsPipeline(cfg *otelParams) {
+	config := cfg.config
 	addControllerPrometheusReceiver(config, cfg)
-	config.AddBatchProcessor(ProcessorBatchMetricsFast, 1*time.Second, 1000)
-	addPrometheusRemoteWriteExporter(config, promClient)
+	addPrometheusRemoteWriteExporter(config, cfg.promClient)
 	config.Service.AddPipeline("metrics/controller-fast", otelcollector.Pipeline{
 		Receivers:  []string{ReceiverPrometheus},
-		Processors: []string{ProcessorBatchMetricsFast},
+		Processors: []string{},
 		Exporters:  []string{ExporterPrometheusRemoteWrite},
 	})
 }
 
-func addOTLPReceiver(config *otelcollector.OTELConfig) {
+func addOTLPReceiver(cfg *otelParams) {
+	config := cfg.config
 	config.AddReceiver(ReceiverOTLP, otlpreceiver.Config{
 		Protocols: otlpreceiver.Protocols{
 			GRPC: &configgrpc.GRPCServerSettings{
 				NetAddr: confignet.NetAddr{
-					Endpoint:  "0.0.0.0:4317",
+					Endpoint:  cfg.GRPCAddr,
 					Transport: "tcp",
 				},
 			},
 			HTTP: &confighttp.HTTPServerSettings{
-				Endpoint: "0.0.0.0:4318",
+				Endpoint: cfg.HTTPAddr,
 			},
 		},
 	})
 }
 
 func addMetricsProcessor(config *otelcollector.OTELConfig) {
-	config.AddProcessor(ProcessorMetrics, metricsprocessor.Config{
-		LatencyBucketStartMS: 20,
-		LatencyBucketWidthMS: 20,
-		LatencyBucketCount:   100,
-	})
+	config.AddProcessor(ProcessorMetrics, metricsprocessor.Config{})
 }
 
 func addRollupProcessor(config *otelcollector.OTELConfig) {
-	rollupFields := []string{
-		otelcollector.HTTPDurationLabel,
-		otelcollector.HTTPRequestContentLength,
-		otelcollector.HTTPResponseContentLength,
-	}
-	rollups := []rollupprocessor.Rollup{}
-	for _, field := range rollupFields {
-		for _, t := range rollupprocessor.RollupTypes {
-			rollups = append(rollups, rollupprocessor.Rollup{
-				FromField: field,
-				ToField:   fmt.Sprintf("%s_%s", field, t),
-				Type:      t,
-			})
-		}
-	}
-	config.AddProcessor(ProcessorRollup, rollupprocessor.Config{
-		Rollups: rollups,
-	})
+	config.AddProcessor(ProcessorRollup, rollupprocessor.Config{})
 }
 
-func addPrometheusReceiver(config *otelcollector.OTELConfig, cfg otelConfig) {
+func addPrometheusReceiver(cfg *otelParams) {
+	config := cfg.config
 	scrapeConfigs := []map[string]interface{}{
 		buildApertureSelfScrapeConfig("aperture-self", cfg),
 		buildKubernetesNodesScrapeConfig(cfg),
@@ -224,7 +261,7 @@ func addPrometheusReceiver(config *otelcollector.OTELConfig, cfg otelConfig) {
 	})
 }
 
-func addControllerPrometheusReceiver(config *otelcollector.OTELConfig, cfg otelConfig) {
+func addControllerPrometheusReceiver(config *otelcollector.OTELConfig, cfg *otelParams) {
 	scrapeConfigs := []map[string]interface{}{
 		buildApertureSelfScrapeConfig("aperture-controller-self", cfg),
 	}
@@ -251,25 +288,33 @@ func addPrometheusRemoteWriteExporter(config *otelcollector.OTELConfig, promClie
 	})
 }
 
-func buildApertureSelfScrapeConfig(name string, cfg otelConfig) map[string]interface{} {
+func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]interface{} {
+	scheme := "http"
+	if cfg.tlsConfig != nil {
+		scheme = "https"
+	}
 	return map[string]interface{}{
-		"job_name":        name,
-		"scheme":          "http",
+		"job_name": name,
+		"scheme":   scheme,
+		"tls_config": map[string]interface{}{
+			"insecure_skip_verify": true,
+		},
 		"scrape_interval": "1s",
 		"scrape_timeout":  "900ms",
 		"metrics_path":    "/metrics",
 		"static_configs": []map[string]interface{}{
 			{
-				"targets": []string{cfg.Addr},
+				"targets": []string{cfg.listener.GetAddr()},
 				"labels": map[string]interface{}{
-					"instance": cfg.NodeName,
+					"instance":     info.Hostname,
+					"process_uuid": info.UUID,
 				},
 			},
 		},
 	}
 }
 
-func buildKubernetesNodesScrapeConfig(cfg otelConfig) map[string]interface{} {
+func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]interface{} {
 	return map[string]interface{}{
 		"job_name":        "kubernetes-nodes",
 		"scheme":          "https",
@@ -290,7 +335,7 @@ func buildKubernetesNodesScrapeConfig(cfg otelConfig) map[string]interface{} {
 			{
 				"source_labels": []string{"__meta_kubernetes_node_name"},
 				"action":        "keep",
-				"regex":         cfg.NodeName,
+				"regex":         info.Hostname,
 			},
 		},
 		"metric_relabel_configs": []map[string]interface{}{
@@ -308,7 +353,7 @@ func buildKubernetesNodesScrapeConfig(cfg otelConfig) map[string]interface{} {
 	}
 }
 
-func buildKubernetesPodsScrapeConfig(cfg otelConfig) map[string]interface{} {
+func buildKubernetesPodsScrapeConfig(cfg *otelParams) map[string]interface{} {
 	return map[string]interface{}{
 		"job_name":        "kubernetes-pods",
 		"scheme":          "http",
@@ -323,7 +368,7 @@ func buildKubernetesPodsScrapeConfig(cfg otelConfig) map[string]interface{} {
 			{
 				"source_labels": []string{"__meta_kubernetes_pod_node_name"},
 				"action":        "keep",
-				"regex":         cfg.NodeName,
+				"regex":         info.Hostname,
 			},
 			// Scrape only pods which have github.com/fluxninja/scrape=true annotation.
 			{

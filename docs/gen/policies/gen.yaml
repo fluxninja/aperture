@@ -38,11 +38,13 @@ definitions:
     type: object
     properties:
       enabled:
+        description: TODO document what happens when lazy sync is disabled
         type: boolean
-        x-go-default: true
+        title: Enables lazy sync
+        x-go-default: false
         x-order: 0
       num_sync:
-        description: Number of times to lazy sync within the limit_reset_interval.
+        description: Number of times to lazy sync within the _limit\_reset\_interval_.
         type: integer
         format: int64
         x-go-default: 5
@@ -52,10 +54,13 @@ definitions:
     type: object
     properties:
       label_value:
+        description: Value of the label for which the override should be applied.
         type: string
         x-go-validate: required
         x-order: 0
       limit_scale_factor:
+        description: Amount by which the _in\_ports.limit_ should be multiplied for
+          this label value.
         type: number
         format: double
         x-go-default: 1
@@ -72,6 +77,7 @@ definitions:
 
           Note: The module name must match the package name from the "source".
         type: string
+        x-go-validate: required
         x-order: 0
       source:
         description: |-
@@ -79,13 +85,19 @@ definitions:
 
           Note: Must include a "package" declaration.
         type: string
+        x-go-validate: required
         x-order: 1
   SchedulerWorkload:
     description: Workload defines a class of requests that preferably have similar
-      properties such as response latency.
+      properties such as response latency or desired priority.
     type: object
     properties:
       fairness_key:
+        description: |-
+          Fairness key is a label key that can be used to provide fairness within a workload.
+          Any [flow label](/concepts/flow-control/label/label.md) can be used here. Eg. if
+          you have a classifier that sets `user` flow label, you might want to set
+          `fairness_key = "user"`.
         type: string
         x-order: 0
       priority:
@@ -97,74 +109,140 @@ definitions:
         format: int64
         x-go-validate: gte=0,lte=255
         x-order: 1
-      timeout:
-        description: |-
-          Timeout override decides how long a request in the workload can wait for tokens.
-          This value impacts the fairness because the larger the timeout the higher the chance a request has to get scheduled.
-        type: string
-        x-go-default: 0.005s
-        x-order: 2
       tokens:
         description: |-
           Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-          This override is applicable only if auto_tokens is set to false.
+          This override is applicable only if `auto_tokens` is set to false.
         type: string
         format: uint64
         x-go-default: 1
-        x-order: 3
+        x-order: 2
   SchedulerWorkloadAndLabelMatcher:
     type: object
     properties:
       label_matcher:
-        description: Label Matcher to select a Workload.
+        description: |-
+          Label Matcher to select a Workload based on
+          [flow labels](/concepts/flow-control/label/label.md).
         x-order: 0
         $ref: '#/definitions/v1LabelMatcher'
       workload:
-        description: Workload associated with requests matching the label matcher.
+        description: Workload associated with flows matching the label matcher.
         x-order: 1
         $ref: '#/definitions/SchedulerWorkload'
   languagev1ConcurrencyLimiter:
     description: |-
-      Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection.
+      :::info
+      See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
+      :::
+
       It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
       Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+
+      ConcurrencyLimiter configuration is split into two parts: An actuation
+      strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
     type: object
+    title: Concurrency Limiter is an actuator component that regulates flows in order
+      to provide active service protection
     properties:
       load_shed_actuator:
-        description: Actuator based on load shedding a portion of requests.
+        description: |-
+          Actuator based on load shedding a portion of requests.
+
+          Actuation strategy defines the input signal that will drive the scheduler.
         x-order: 0
         $ref: '#/definitions/v1LoadShedActuator'
       scheduler:
-        description: Weighted Fair Queuing based workfload scheduler.
+        description: |-
+          Configuration of Weighted Fair Queuing-based workload scheduler.
+
+          Contains configuration of per-agent scheduler, and also defines some
+          output signals.
         x-go-validate: required
         x-order: 1
         $ref: '#/definitions/v1Scheduler'
   languagev1RateLimiter:
+    description: |-
+      :::info
+      See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+      :::
+
+      Ratelimiting is done separately on per-label-value basis. Use _label\_key_
+      to select which label should be used as key.
     type: object
+    title: Limits the traffic on a control point to specified rate
     properties:
       in_ports:
         x-go-validate: required
         x-order: 0
         $ref: '#/definitions/v1RateLimiterIns'
       label_key:
+        description: |-
+          Specifies which label the ratelimiter should be keyed by.
+
+          Rate limiting is done independently for each value of the
+          [label](/concepts/flow-control/label/label.md) with given key.
+          Eg., to give each user a separate limit, assuming you have a _user_ flow
+          label set up, set `label_key: "user"`.
+
+          TODO make it possible for this field to be optional – to achieve global ratelimit.
         type: string
         x-go-validate: required
         x-order: 1
       lazy_sync:
+        title: Configuration of lazy-syncing behaviour of ratelimiter
         x-order: 2
         $ref: '#/definitions/RateLimiterLazySync'
       limit_reset_interval:
+        description: Time after which the limit for a given label value will be reset.
         type: string
         x-go-default: 60s
         x-order: 3
       overrides:
+        description: Allows to specify different limits for particular label values.
         type: array
         items:
           $ref: '#/definitions/RateLimiterOverride'
         x-order: 4
       selector:
+        description: Which control point to apply this ratelimiter to.
         x-go-validate: required
         x-order: 5
+        $ref: '#/definitions/v1Selector'
+  policylanguagev1Classifier:
+    description: |-
+      :::info
+      See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+      :::
+
+      Example:
+      ```yaml
+      selector:
+        service: service1.default.svc.cluster.local
+        control_point:
+          traffic: ingress
+      rules:
+        user:
+          extractor:
+            from: request.http.headers.user
+      ```
+    type: object
+    title: Set of classification rules sharing a common selector
+    properties:
+      rules:
+        description: |-
+          A map of {key, value} pairs mapping from
+          [flow label](/concepts/flow-control/label/label.md) keys to rules that define
+          how to extract and propagate flow labels with that key.
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Rule'
+        x-go-validate: required,gt=0,dive,keys,required,endkeys,required
+        x-order: 0
+      selector:
+        description: Defines where to apply the flow classification rule.
+        x-go-validate: required
+        x-order: 1
         $ref: '#/definitions/v1Selector'
   policylanguagev1FluxMeter:
     description: |-
@@ -180,6 +258,17 @@ definitions:
       ```
     type: object
     properties:
+      attribute_key:
+        description: |-
+          Key of the attribute in accesss log or span from which the metric for this flux meter is read.
+
+          :::info
+          For list of available attributes in Envoy access logs, refer
+          [Envoy Filter](/get-started/istio.md#envoy-filter)
+          :::
+        type: string
+        x-go-default: duration_millis
+        x-order: 0
       histogram_buckets:
         description: Latency histogram buckets (in ms) for this FluxMeter.
         type: array
@@ -187,7 +276,7 @@ definitions:
           type: number
           format: double
         x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
-        x-order: 0
+        x-order: 1
       selector:
         description: |-
           What latency should we measure in the histogram created by this FluxMeter.
@@ -198,7 +287,7 @@ definitions:
           * For feature control points, fluxmeter will measure execution of the span
             associated with particular feature. What contributes to the span's
             duration is entirely up to the user code that uses Aperture library.
-        x-order: 1
+        x-order: 2
         $ref: '#/definitions/v1Selector'
   v1AddressExtractor:
     description: |-
@@ -222,9 +311,9 @@ definitions:
         x-go-validate: required
         x-order: 0
   v1ArithmeticCombinator:
-    description: Type of combinator that computes the arithmetic operation on the
-      operand signals.
     type: object
+    title: Type of combinator that computes the arithmetic operation on the operand
+      signals
     properties:
       in_ports:
         description: Input ports for the Arithmetic Combinator component.
@@ -265,8 +354,6 @@ definitions:
         $ref: '#/definitions/v1Port'
   v1Circuit:
     description: |-
-      Circuit is defined as a dataflow graph of inter-connected components.
-
       Signals flow between components via ports.
       As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
       Circuit evaluated periodically in order to respond to changes in signal readings.
@@ -278,15 +365,16 @@ definitions:
 
       A signal also have a special **Invalid** value. It's usually used to
       communicate that signal doesn't have a meaningful value at the moment, eg.
-      [PromQL](#-v1promql) emits such a value if it cannot execute a query.
+      [PromQL](#v1-prom-q-l) emits such a value if it cannot execute a query.
       Components know when their input signals are invalid and can act
       accordingly. They can either propagate the invalidness, by making their
       output itself invalid (like eg.
-      [ArithmeticCombinator](#-v1arithmeticcombinator)) or use some different
-      logic, like eg. [Extrapolator](#-v1extrapolator). Refer to a component's
+      [ArithmeticCombinator](#v1-arithmetic-combinator)) or use some different
+      logic, like eg. [Extrapolator](#v1-extrapolator). Refer to a component's
       docs on how exactly it handles invalid inputs.
       :::
     type: object
+    title: Circuit is defined as a dataflow graph of inter-connected components
     properties:
       components:
         description: Defines a signal processing graph as a list of components.
@@ -301,33 +389,6 @@ definitions:
         type: string
         x-go-default: 0.5s
         x-order: 1
-  v1Classifier:
-    description: |-
-      Example:
-      ```yaml
-      selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress
-      rules:
-        user:
-          extractor:
-            from: request.http.headers.user
-      ```
-    type: object
-    title: Set of classification rules sharing a common selector
-    properties:
-      rules:
-        description: A map of {key, value} pairs mapping from flow label names to
-          rules that define how to extract and propagate them.
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Rule'
-        x-order: 0
-      selector:
-        description: Defines where to apply the flow classification rule.
-        x-order: 1
-        $ref: '#/definitions/v1Selector'
   v1Component:
     description: |-
       Signals flow into the components via input ports and results are emitted on output ports.
@@ -340,26 +401,27 @@ definitions:
 
       There are three categories of components:
       * "source" components – they take some sort of input from "the real world" and output
-        a signal based on this input. Example: [PromQL](#-v1promql). In the UI
+        a signal based on this input. Example: [PromQL](#v1-prom-q-l). In the UI
         they're represented by green color.
       * internal components – "pure" components that don't interact with the "real world".
-        Examples: [GradientController](#-v1gradientcontroller), [Max](#-v1max).
+        Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
         :::note
         Internal components's output can depend on their internal state, in addition to the inputs.
-        Eg. see the [Exponential Moving Average filter](#-v1ema).
+        Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
         :::
       * "sink" components – they affect the real world.
-        [Scheduler](#-v1scheduler) and [RateLimiter](#-languagev1ratelimiter).
-        Also sometimes called _actuators_. In the UI, represented by orange color.
-        Sink components are usually also "sources" too, they usually emit a
-        feedback signal, like `accepted_concurrency` in case of ConcurrencyLimiter.
+        [ConcurrencyLimiter](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
+        Also sometimes called [_actuators_](/concepts/flow-control/actuators/actuators.md).
+        In the UI, represented by orange color.  Sink components are usually also
+        "sources" too, they usually emit a feedback signal, like
+        `accepted_concurrency` in case of ConcurrencyLimiter.
 
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
-      You can use the [Constant](#-constant) component for this.
+      You can use the [Constant](#v1-constant) component for this.
       :::
 
-      See also [Policy](#-v1policy) for a higher-level explanation of circuits.
+      See also [Policy](#v1-policy) for a higher-level explanation of circuits.
     type: object
     title: Computational block that form the circuit
     properties:
@@ -421,8 +483,8 @@ definitions:
         x-order: 11
         $ref: '#/definitions/v1Sqrt'
   v1Constant:
-    description: Component that emits a constant value as an output signal.
     type: object
+    title: Component that emits a constant value as an output signal
     properties:
       out_ports:
         description: Output ports for the Constant component.
@@ -469,8 +531,6 @@ definitions:
         x-order: 1
   v1Decider:
     description: |-
-      Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison.
-
       The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
       This component also supports time-based response, i.e. the output
@@ -479,6 +539,9 @@ definitions:
       `true_for` and `false_for` durations are zero then the transitions are
       instantaneous.
     type: object
+    title: Type of combinator that computes the comparison operation on lhs and rhs
+      signals and switches between `on_true` and `on_false` signals based on the result
+      of the comparison
     properties:
       false_for:
         description: |-
@@ -561,7 +624,7 @@ definitions:
       \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
       $$
 
-      The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#-v1emains).
+      The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
     type: object
     title: Exponential Moving Average (EMA) is a type of moving average that applies
       exponenially more weight to recent signal readings
@@ -658,14 +721,10 @@ definitions:
         type: string
         x-order: 1
   v1Extractor:
-    description: |-
-      There are multiple variants of extractor, specify exactly one:
-      - JSON Extractor
-      - Address Extractor
-      - JWT Extractor
+    description: There are multiple variants of extractor, specify exactly one.
     type: object
-    title: Defines a high-level way to specify how to extract a flow label given http
-      request metadata, without a need to write rego code
+    title: Defines a high-level way to specify how to extract a flow label value given
+      http request metadata, without a need to write rego code
     properties:
       address:
         description: Display an address as a single string - `<ip>:<port>`.
@@ -704,10 +763,11 @@ definitions:
         x-order: 4
         $ref: '#/definitions/v1PathTemplateMatcher'
   v1Extrapolator:
-    description: |-
-      Extrapolates the input signal by repeating the last valid value during the period in which it is invalid.
-      It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+    description: It does so until `maximum_extrapolation_interval` is reached, beyond
+      which it emits invalid signal unless input signal becomes valid again.
     type: object
+    title: Extrapolates the input signal by repeating the last valid value during
+      the period in which it is invalid
     properties:
       in_ports:
         description: Input ports for the Extrapolator component.
@@ -741,15 +801,11 @@ definitions:
         $ref: '#/definitions/v1Port'
   v1GradientController:
     description: |-
-      Gradient controller is a type of controller which tries to adjust the
-      control variable proportionally to the relative difference between setpoint
-      and actual value of the signal.
-
       The `gradient` describes a corrective factor that should be applied to the
       control variable to get the signal closer to the setpoint. It is computed as follows:
 
       $$
-      \text{gradient} = \frac{\text{setpoint}}{\text{signal}} \cdot \text{tolerance}
+      \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
       $$
 
       `gradient` is then clamped to [min_gradient, max_gradient] range.
@@ -764,12 +820,11 @@ definitions:
 
       The output can be _optionally_ clamped to desired range using `max` and
       `min` input.
-
-      :::caution
-      Some changes are expected in the near future:
-      [#182](https://github.com/fluxninja/aperture/issues/182)
-      :::
     type: object
+    title: |-
+      Gradient controller is a type of controller which tries to adjust the
+      control variable proportionally to the relative difference between setpoint
+      and actual value of the signal
     properties:
       in_ports:
         description: Input ports of the Gradient Controller.
@@ -793,18 +848,49 @@ definitions:
         description: Output ports of the Gradient Controller.
         x-order: 3
         $ref: '#/definitions/v1GradientControllerOuts'
-      tolerance:
+      slope:
         description: |-
-          Tolerance is a way to pre-multiply a setpoint by given value.
+          Slope controls the aggressiveness and direction of the Gradient Controller.
 
-          Value of tolerance should be close or equal to 1, eg. 1.1.
+          Slope is used as exponent on the signal to setpoint ratio in computation
+          of the gradient (see the [main description](#v1-gradient-controller) for
+          exact equation). Good intuition for this parameter is "What should the
+          Gradient Controller do to the control variable when signal is too high",
+          eg.:
+          * $\text{slope} = 1$: when signal is too high, increase control variable,
+          * $\text{slope} = -1$: when signal is too high, decrease control variable,
+          * $\text{slope} = -0.5$: when signal is to high, decrease control variable more slowly.
 
-          :::caution
-          [This is going to be deprecated](https://github.com/fluxninja/aperture/issues/182).
+          The sign of slope depends on correlation between the signal and control variable:
+          * Use $\text{slope} < 0$ if signal and control variable are _positively_
+          correlated (eg. Per-pod CPU usage and total concurrency).
+          * Use $\text{slope} > 0$ if signal and control variable are _negatively_
+          correlated (eg. Per-pod CPU usage and number of pods).
+
+          :::note
+          You need to set _negative_ slope for a _positive_ correlation, as you're
+          describing the _action_ which controller should make when the signal
+          increases.
+          :::
+
+          The magnitude of slope describes how aggresively should the controller
+          react to a deviation of signal.
+          With $|\text{slope}| = 1$, the controller will aim to bring the signal to
+          the setpoint in one tick (assuming linear correlation with signal and setpoint).
+          Smaller magnitudes of slope will make the controller adjust the control
+          variable more slowly.
+
+          We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
+          If you experience overshooting, consider lowering the magnitude even more.
+          Values of $|\text{slope}| > 1$ are not recommended.
+
+          :::note
+          Remember that the gradient and output signal can be (optionally) clamped,
+          so the _slope_ might not fully describe aggressiveness of the controller.
           :::
         type: number
         format: double
-        x-go-validate: gte=0.0
+        x-go-validate: required
         x-order: 4
   v1GradientControllerIns:
     description: Inputs for the Gradient Controller component.
@@ -933,8 +1019,10 @@ definitions:
       If multiple requirements are set, they are all ANDed.
       An empty label matcher always matches.
     type: object
-    title: Allows to define rules whether a map of labels should be considered a match
-      or not
+    title: |-
+      Allows to define rules whether a map of
+      [labels](/concepts/flow-control/label/label.md)
+      should be considered a match or not
     properties:
       expression:
         description: An arbitrary expression to be evaluated on the labels.
@@ -960,9 +1048,9 @@ definitions:
           type: string
         x-order: 2
   v1LoadShedActuator:
-    description: Takes the load shed factor input signal and publishes it to the schedulers
-      in the data-plane.
     type: object
+    title: Takes the load shed factor input signal and publishes it to the schedulers
+      in the data-plane
     properties:
       in_ports:
         description: Input ports for the Load Shed Actuator component.
@@ -973,8 +1061,9 @@ definitions:
     type: object
     properties:
       load_shed_factor:
-        description: Load shedding factor is a fraction of incoming concurrency (tokens
-          \* requests) that needs to be dropped.
+        description: |-
+          Load shedding factor is a fraction of [incoming
+          concurrency](#v1-scheduler-outs) that needs to be dropped.
         x-order: 0
         $ref: '#/definitions/v1Port'
   v1MatchExpression:
@@ -1033,10 +1122,9 @@ definitions:
         x-go-validate: required
         x-order: 1
   v1Max:
-    description: |-
-      Takes a list of input signals and emits the signal with the maximum value.
-      Max: output = max([]inputs).
+    description: 'Max: output = max([]inputs).'
     type: object
+    title: Takes a list of input signals and emits the signal with the maximum value
     properties:
       in_ports:
         description: Input ports for the Max component.
@@ -1066,7 +1154,7 @@ definitions:
         $ref: '#/definitions/v1Port'
   v1Min:
     description: |-
-      Takes an array of input signals and emits the signal with the minimum value.
+      Takes an array of input signals and emits the signal with the minimum value
       Min: output = min([]inputs).
     type: object
     properties:
@@ -1130,13 +1218,14 @@ definitions:
         type: object
         additionalProperties:
           type: string
+        x-go-validate: required
         x-order: 0
   v1Policy:
-    description: |-
-      Policy expresses reliability automation workflow that automatically protects services.
-
-      Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
+    description: Policy specification contains a circuit that defines the controller
+      logic and resources that need to be setup.
     type: object
+    title: Policy expresses reliability automation workflow that automatically protects
+      services
     properties:
       circuit:
         description: Defines the control-loop logic of the policy.
@@ -1147,17 +1236,17 @@ definitions:
         x-order: 1
         $ref: '#/definitions/v1Resources'
   v1Port:
-    description: Components are interconnected with each other via Ports.
     type: object
+    title: Components are interconnected with each other via Ports
     properties:
       signal_name:
         description: Name of the incoming or outgoing Signal on the Port.
         type: string
         x-order: 0
   v1PromQL:
-    description: Component that runs a Prometheus query periodically and returns the
-      result as an output signal.
     type: object
+    title: Component that runs a Prometheus query periodically and returns the result
+      as an output signal
     properties:
       evaluation_interval:
         description: Describes the interval between successive evaluations of the
@@ -1189,19 +1278,25 @@ definitions:
         $ref: '#/definitions/v1Port'
   v1RateLimiterIns:
     type: object
+    title: Inputs for the RateLimiter component
     properties:
       limit:
-        description: negative limit means no limit is applied.
-        x-go-default: -1
+        description: |-
+          Number of flows allowed per _limit\_reset\_interval_ per each label.
+          Negative values disable the ratelimiter.
+
+          :::tip
+          Negative limit can be useful to _conditionally_ enable the ratelimiter
+          under certain circumstances. [Decider](#v1-decider) might be helpful.
+          :::
         x-go-validate: required
         x-order: 0
         $ref: '#/definitions/v1Port'
   v1Resources:
-    description: |-
-      Resources that need to be setup for the policy to function.
-
-      Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+    description: Resources are typically FluxMeters, Classifiers, etc. that can be
+      used to create on-demand metrics or label the flows.
     type: object
+    title: Resources that need to be setup for the policy to function
     properties:
       classifiers:
         description: |-
@@ -1210,7 +1305,7 @@ definitions:
           The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
         type: array
         items:
-          $ref: '#/definitions/v1Classifier'
+          $ref: '#/definitions/policylanguagev1Classifier'
         x-order: 0
       flux_meters:
         description: |-
@@ -1233,166 +1328,272 @@ definitions:
       Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
       [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
 
-      Example:
-      ```yaml
       Example of Declarative JSON extractor:
-        yaml:
-          extractor:
-            json:
-              from: request.http.body
-              pointer: /user/name
-          propagate: true
-          hidden: false
-      Example of Rego module:
-        yaml:
-          rego:
-            query: data.user_from_cookie.user
-            source:
-              package: user_from_cookie
-              cookies: "split(input.attributes.request.http.headers.cookie, ';')"
-              cookie: "cookies[_]"
-              cookie.startswith: "('session=')"
-              session: "substring(cookie, count('session='), -1)"
-              parts: "split(session, '.')"
-              object: "json.unmarshal(base64url.decode(parts[0]))"
-              user: object.user
-          propagate: false
-          hidden: true
+      ```yaml
+      extractor:
+        json:
+          from: request.http.body
+          pointer: /user/name
+      ```
+
+      Example of Rego module which also disables propagation of a label:
+      ```yaml
+      rego:
+        query: data.user_from_cookie.user
+        source: |
+          package: user_from_cookie
+          cookies: split(input.attributes.request.http.headers.cookie, ';')
+          cookie: cookies[_]
+          cookie.startswith: ('session=')
+          session: substring(cookie, count('session='), -1)
+          parts: split(session, '.')
+          object: json.unmarshal(base64url.decode(parts[0]))
+          user: object.user
+      propagate: false
       ```
     type: object
     title: Rule describes a single Flow Classification Rule
     properties:
       extractor:
-        description: |-
-          High-level flow label declarative extractor.
-          Rego extractor extracts a value from the rego module.
+        description: High-level declarative extractor.
         x-order: 0
         $ref: '#/definitions/v1Extractor'
       hidden:
-        description: Decides if the created flow label should be hidden from the telemetry.
+        description: |-
+          Decides if the created flow label should be hidden from the telemetry.
+          A hidden flow label is still accessible in policies and can be used as eg.
+          fairness key.
+
+          :::caution
+          When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
+          labels are sent to cloud for observability. We thus recommend to set this
+          _hidden_ flag for high-cardinality labels, such as usernames or ids, to
+          avoid bloating analytics database. _Hidden_ flag should also be set for
+          sensitive labels.
+          :::
         type: boolean
+        x-go-validate: required
         x-order: 1
       propagate:
-        description: Decides if the created label should be applied to the whole flow
-          (propagated in baggage) (default=true).
         type: boolean
+        title: |-
+          Decides if the created label should be applied to the whole request chain
+          (propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
+        x-go-validate: required
         x-order: 2
       rego:
         description: Rego module to extract a value from the rego module.
         x-order: 3
         $ref: '#/definitions/RuleRego'
   v1Scheduler:
-    description: Weighted Fair Queuing based workload scheduler.
+    description: |-
+      :::note
+      Each Agent instantiates an independent copy of the scheduler, but output
+      signal are aggregated across all agents.
+      :::
+
+      See [ConcurrencyLimiter](#languagev1-concurrency-limiter) for more context.
     type: object
+    title: Weighted Fair Queuing-based workload scheduler
     properties:
       auto_tokens:
+        description: |-
+          Automatically estimate weight of flows in each workload, based on
+          historical latency. Each workload's `tokens` will be set to average
+          latency of flows in that workload during last few seconds (exact duration
+          of this average can change).
         type: boolean
         x-go-default: "true"
         x-order: 0
       default_workload:
+        description: Workload to be used if none of workloads specified in `workloads`
+          match.
         x-order: 1
         $ref: '#/definitions/SchedulerWorkload'
+      max_timeout:
+        description: |-
+          :::caution
+          This timeout needs to be strictly less than the timeout set on the
+          client for the whole GRPC call:
+          * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
+          * in case of libraries, timeout configured... TODO.
+
+          We're using fail-open logic in integrations, so if the GRPC timeout
+          fires first, the flow will end up being unconditionally allowed while
+          it're still waiting on the scheduler.
+
+          To avoid such cases, the end-to-end GRPC timeout should also contain
+          some headroom for constant overhead like serialization, etc. Default
+          value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+          tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+          :::
+        type: string
+        title: Max Timeout is the value with which the flow timeout calculated by
+          `timeout_factor` is capped
+        x-go-default: 0.45s
+        x-order: 2
       out_ports:
         description: Output ports for the Scheduler component.
-        x-order: 2
+        x-order: 3
         $ref: '#/definitions/v1SchedulerOuts'
       selector:
         description: Selector decides for which service or flows the scheduler will
           be applied.
-        x-order: 3
+        x-go-validate: required
+        x-order: 4
         $ref: '#/definitions/v1Selector'
+      timeout_factor:
+        description: |-
+          If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+          it will be rejected.
+
+          This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
+        type: number
+        format: double
+        title: Timeout as a factor of tokens for a flow in a workload
+        x-go-default: 0.5
+        x-go-validate: gte=0.0
+        x-order: 5
       workloads:
+        description: |-
+          List of workloads to be used in scheduler.
+
+          Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+          allows for load-shedding to be "smarter" than just "randomly deny 50% of
+          requests". There are two aspects of this "smartness":
+          * Scheduler can more precisely calculate concurrency if it understands
+            that flows belonging to different classes have different weights (eg.
+            inserts vs lookups).
+          * Setting different priorities to different workloads lets the scheduler
+            avoid dropping important traffic during overload.
+
+          Each workload in this list specifies also a matcher that's used to
+          determine which flow will be categorized into which workload.
+          In case of multiple matching workloads, the first matching one will be used.
+          If none of workloads match, `default_workload` will be used.
+
+          :::info
+          See also [workload definition in the concepts
+          section](/concepts/flow-control/actuators/scheduler.md#workload).
+          :::
         type: array
-        title: |-
-          list of workloads
-          workload can describe priority, tokens (if auto_tokens are set to false) and timeout
         items:
           $ref: '#/definitions/SchedulerWorkloadAndLabelMatcher'
-        x-order: 4
+        x-order: 6
   v1SchedulerOuts:
     description: Output for the Scheduler component.
     type: object
     properties:
       accepted_concurrency:
-        description: Accepted concurrency is the number of accepted tokens/sec.
+        description: |-
+          Accepted concurrency is the number of accepted tokens per second.
+
+          :::info
+          **Accepted tokens** are tokens associated with
+          [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+          this scheduler. Number of tokens for a flow is determined by a
+          [workload](#scheduler-workload) that the flow was assigned to (either
+          via `auto_tokens` or explicitly by `Workload.tokens`).
+          :::
+
+          Value of this signal is the sum across all the relevant schedulers.
         x-order: 0
         $ref: '#/definitions/v1Port'
       incoming_concurrency:
-        description: Incoming concurrency is the number of incoming tokens/sec.
+        description: |-
+          Incoming concurrency is the number of incoming tokens/sec.
+          This is the same as `accepted_concurrency`, but across all the flows
+          entering scheduler, including rejected ones.
         x-order: 1
         $ref: '#/definitions/v1Port'
   v1Selector:
     description: |-
+      :::info
+      See also [Selector overview](/concepts/flow-control/selector.md).
+      :::
+
       Example:
       ```yaml
-      selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress # Allowed values are `ingress` and `egress`.
-        label_matcher:
-          match_labels:
-            user_tier: gold
-          match_expressions:
-            - key: query
-              operator: In
-              values:
-                - insert
-                - delete
-            - label: user_agent
-              regex: ^(?!.*Chrome).*Safari
+      service: service1.default.svc.cluster.local
+      control_point:
+        traffic: ingress # Allowed values are `ingress` and `egress`.
+      label_matcher:
+        match_labels:
+          user_tier: gold
+        match_expressions:
+          - key: query
+            operator: In
+            values:
+              - insert
+              - delete
+          - label: user_agent
+            regex: ^(?!.*Chrome).*Safari
       ```
     type: object
-    title: Describes where a rule or actuation component should apply to
+    title: |-
+      Describes which flows a [dataplane
+      component](/concepts/flow-control/flow-control.md#components) should apply
+      to
     properties:
       agent_group:
-        description: Describes where this selector applies to.
+        description: |-
+          Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+          selector applies to.
         type: string
         x-go-default: default
         x-order: 0
       control_point:
-        description: Describes control point within the entity where the policy should
-          apply to.
+        description: |-
+          Describes
+          [control point](/concepts/flow-control/flow-control.md#control-point)
+          within the entity where the policy should apply to.
         x-go-validate: required
         x-order: 1
         $ref: '#/definitions/v1ControlPoint'
       label_matcher:
         description: |-
-          This matcher allows to match on flow labels and request labels.
-          (Note: For classification we can only match flow labels that were created at
-          some **previous** control point).
+          :::info
+          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+          :::
 
-          Flow labels are available with the same label key as defined in
-          classification rule.
+          :::note
+          [Classifiers](#v1-classifier) _can_ use flow labels created by some other
+          classifier, but only if they were created at some previous control point
+          (and propagated in baggage).
 
-          Request labels are always prefixed with `request_`. Available request
-          labels are `id` (available as `request_id`), `method`, `path`, `host`,
-          `scheme`, `size`, `protocol` (mapped from fields of
-          [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
-          Also, (non-pseudo) headers are available as `request_header_<headername>`, where
-          `<headername>` is a headername normalised to lowercase, eg. `request_header_user-agent`.
-
-          Note: Request headers are only available for `traffic` control points.
+          This limitation doesn't apply to selectors of other entities, like
+          FluxMeters or actuators. It's valid to create a flow label on a control
+          point using classifier, and immediately use it for matching on the same
+          control point.
+          :::
         title: |-
-          Label matcher allows to add _additional_ condition on labels that must
-          also be satisfied (in addition to service+control point matching)
+          Label matcher allows to add _additional_ condition on
+          [flow labels](/concepts/flow-control/label/label.md)
+          must also be satisfied (in addition to service+control point matching)
         x-order: 2
         $ref: '#/definitions/v1LabelMatcher'
       service:
         description: |-
-          The service (name) of the entities.
-          In k8s, this is the FQDN of the Service object.
+          The Fully Qualified Domain Name of the
+          [service](/concepts/flow-control/service.md) to select.
 
-          Note: Entity may belong to multiple services.
+          In kubernetes, this is the FQDN of the Service object.
+
+          Empty string means all services within an agent group (catch-all).
+
+          :::note
+          One entity may belong to multiple services.
+          :::
         type: string
         x-order: 3
   v1Sqrt:
     description: |-
-      Takes an input signal and emits the square root of it multiplied by scale as an output.
-
       $$
       \text{output} = \text{scale} \sqrt{\text{input}}
       $$
     type: object
+    title: Takes an input signal and emits the square root of it multiplied by scale
+      as an output
     properties:
       in_ports:
         description: Input ports for the Sqrt component.
@@ -1426,8 +1627,9 @@ definitions:
         x-order: 0
         $ref: '#/definitions/v1Port'
 tags:
-- name: PolicyService
+- name: EntityCacheService
 - name: InfoService
 - name: StatusService
 - name: FlowControlService
 - name: FluxNinjaService
+- name: PolicyService

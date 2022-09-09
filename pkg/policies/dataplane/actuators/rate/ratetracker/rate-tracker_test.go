@@ -3,6 +3,7 @@ package ratetracker
 import (
 	"context"
 	"fmt"
+	stdlog "log"
 	"math"
 	"math/rand"
 	"net"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/jobs"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -27,9 +29,9 @@ func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit int, ttl
 	for label, limit := range overrides {
 		limitCheck.AddOverride(label, limit)
 	}
-	limiter, err := NewOlricRateTracker(limitCheck, distCache, "Limiter", ttl)
+	limiter, err := NewDistCacheRateTracker(limitCheck, distCache, "Limiter", ttl)
 	if err != nil {
-		t.Logf("Failed to create OlricLimiter: %v", err)
+		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
 	}
 
@@ -71,7 +73,7 @@ func newTestDistCacheWithConfig(t *testing.T, c *olricconfig.Config) (*distcache
 	distCache.Olric = o
 
 	go func() {
-		t.Log("Starting OlricLimiter")
+		t.Log("Starting DistCacheLimiter")
 		err = distCache.Olric.Start()
 		if err != nil {
 			t.Errorf("Failed to start olric: %v", err)
@@ -80,7 +82,7 @@ func newTestDistCacheWithConfig(t *testing.T, c *olricconfig.Config) (*distcache
 
 	select {
 	case <-time.After(time.Second):
-		t.Fatal("Olric cannot be started in one second")
+		t.Fatal("DistCache cannot be started in one second")
 	case <-ctx.Done():
 		// everything is fine
 	}
@@ -99,6 +101,7 @@ func newTestOlricConfig() *olricconfig.Config {
 	mc.BindAddr = "127.0.0.1"
 	mc.BindPort = 0
 	c.MemberlistConfig = mc
+	c.Logger = stdlog.New(&distcache.OlricLogWriter{Logger: log.GetGlobalLogger()}, "", 0)
 
 	port, err := getFreePort()
 	if err != nil {
@@ -246,9 +249,9 @@ func TestLimitSetGetAndOverrides(t *testing.T) {
 func createJobGroup(limiter RateTracker) *jobs.JobGroup {
 	var gws jobs.GroupWatchers
 
-	reg := *status.NewRegistry(".")
+	reg := status.NewRegistry().Child("jobs")
 
-	group, err := jobs.NewJobGroup("Sync", &reg, 0, jobs.RescheduleMode, gws)
+	group, err := jobs.NewJobGroup(reg, 0, jobs.RescheduleMode, gws)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to create job group: %v", err))
 	}

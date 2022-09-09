@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package prometheus
 
 import (
@@ -35,16 +36,17 @@ var (
 
 // PrometheusConfig holds configuration for Prometheus Server.
 // swagger:model
+// +kubebuilder:object:generate=true
 type PrometheusConfig struct {
 	// Address of the prometheus server
-	Address string `json:"address" validate:"hostname_port|url|fqdn"`
+	Address string `json:"address" validate:"required,hostname_port|url|fqdn"`
 }
 
 // Module provides a singleton pointer to prometheusv1.API via FX.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(providePrometheusClient),
-		commonhttp.ClientConstructor{Name: "prometheus.http-client", Key: httpConfigKey}.Annotate(),
+		commonhttp.ClientConstructor{Name: "prometheus.http-client", ConfigKey: httpConfigKey}.Annotate(),
 	)
 }
 

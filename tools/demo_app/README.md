@@ -99,6 +99,7 @@ Let's assume three services with hostnames A, B and C.
 
 The app reads the following env variables:
 
+- `SIMPLE_SERVICE_LATENCY` - duration in milliseconds of latency.
 - `SIMPLE_SERVICE_CONCURRENCY` - number of concurrent requests to process.
 - `SIMPLE_SERVICE_PORT` – port to listen on.
 - `ENVOY_EGRESS_PORT` – port to be used as http proxy for egress traffic.

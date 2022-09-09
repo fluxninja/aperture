@@ -6,6 +6,13 @@ default_stages:
 repos:
   - repo: local
     hooks:
+      - id: tools
+        name: "Install tools"
+        entry: "./scripts/precommit/install_tools.sh"
+        language: script
+        always_run: true
+        pass_filenames: false
+        description: "Install tools"
       - id: proto
         name: "Proto"
         entry: "./scripts/precommit/generate_api.sh"
@@ -21,7 +28,7 @@ repos:
       - id: end-of-file-fixer
         exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$
       - id: check-yaml
-        exclude: ^(manifests/charts/.*/(templates|files)/.*)
+        exclude: ^(manifests/charts/.*/(templates|files)/.*|playground/tanka/charts/.*)
         args:
           - "--allow-multiple-documents"
       - id: check-added-large-files
@@ -38,6 +45,10 @@ repos:
     rev: v0.1.17
     hooks:
       - id: shellcheck
+  - repo: https://github.com/syntaqx/git-hooks
+    rev: v0.0.17
+    hooks:
+      - id: circleci-config-validate
   - repo: https://github.com/fluxninja/pre-commit-golang
     rev: v1.0.0-fn
     hooks:
@@ -52,7 +63,7 @@ repos:
     rev: "v2.7.1"
     hooks:
       - id: prettier
-        exclude: ^(docs/gen/.*.yaml|manifests/charts/.*/README*)
+        exclude: ^(docs/gen/.*|manifests/charts/.*/README*|.github/.*/.*.md)
         types_or:
           [
             sh,
@@ -82,12 +93,18 @@ repos:
           - commit
         args:
           - --fix
+      - id: generate-helm-readme
+        name: "Helm Readme"
+        entry: "./scripts/precommit/generate_helm_readme.sh"
+        language: script
+        files: "values.yaml$"
+        pass_filenames: false
+        description: "Generate docs"
       - id: generate-docs
         name: "Docs"
         entry: "./scripts/precommit/generate_docs.sh"
         language: script
         files: '\.proto$|\.go$|\.md$|\.mmd$'
-        exclude: ^ops/.*
         pass_filenames: false
         description: "Generate docs"
       - id: generate-libsonnet
@@ -102,17 +119,27 @@ repos:
         language: script
         entry: ./scripts/precommit/check_tanka_show.sh
         pass_filenames: false
-        files: ^manifests/k8s/tanka/
+        files: ^playground/tanka/
         types_or:
           - jsonnet
           - json
           - yaml
       - id: tanka-fmt
         name: "Tanka fmt"
-        exclude: ^(manifests/k8s/tanka/lib/apps/aperture-grafana/.*)
+        exclude: ^(playground/tanka/lib/apps/aperture-grafana/.*)
         language: system
         entry: tk
         args:
           - fmt
         types:
           - jsonnet
+      - id: helmlint
+        name: "Helm Lint"
+        description: Run helm lint, a linter for helm charts
+        entry: ./scripts/precommit/helmlint.sh
+        language: script
+      - id: check-operator-spec-changes
+        name: "Check Operator Spec Changes"
+        description: Checking if the Operator spec is changed
+        entry: ./scripts/precommit/check-operator-spec.sh
+        language: script

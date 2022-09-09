@@ -25,8 +25,10 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -36,12 +38,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/go-logr/logr"
 )
 
 // ControllerReconciler reconciles a Controller object.
 type ControllerReconciler struct {
 	client.Client
+	DynamicClient    dynamic.Interface
 	Scheme           *runtime.Scheme
 	Recorder         record.EventRecorder
 	resourcesDeleted bool
@@ -146,12 +151,21 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 					"The required resources are already deployed. Skipping resource creation as currently, the Controller doesn't support multiple replicas.")
 
 				instance.Status.Resources = "skipped"
-				if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
 					return ctrl.Result{}, err
 				}
 
 				return ctrl.Result{}, nil
 			}
+		}
+	}
+
+	if instance.Annotations == nil || instance.Annotations[defaulterAnnotationKey] != "true" {
+		err = r.checkDefaults(ctx, instance)
+		if err != nil {
+			return ctrl.Result{}, err
+		} else if instance.Status.Resources == failedStatus {
+			return ctrl.Result{}, nil
 		}
 	}
 
@@ -186,6 +200,7 @@ func (r *ControllerReconciler) updateController(ctx context.Context, instance *v
 	attempt := 5
 	finalizers := instance.DeepCopy().Finalizers
 	spec := instance.DeepCopy().Spec
+	annotations := instance.DeepCopy().Annotations
 	for attempt > 0 {
 		attempt -= 1
 		if err := r.Update(ctx, instance); err != nil {
@@ -199,6 +214,7 @@ func (r *ControllerReconciler) updateController(ctx context.Context, instance *v
 				}
 				instance.Finalizers = finalizers
 				instance.Spec = spec
+				instance.Annotations = annotations
 				continue
 			}
 			return err
@@ -237,7 +253,7 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 	deleteClusterRole := true
 	instances := &v1alpha1.AgentList{}
 	err := r.List(ctx, instances)
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "failed to list Agents")
 		return err
 	}
@@ -249,18 +265,18 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 		}
 	}
 	if deleteClusterRole {
-		if err := r.Delete(ctx, clusterRoleForController(instance)); err != nil {
+		if err := r.Delete(ctx, clusterRoleForController(instance)); err != nil && !errors.IsNotFound(err) {
 			log.Error(err, "failed to delete object of ClusterRole")
 			return err
 		}
 	}
 
-	if err := r.Delete(ctx, clusterRoleBindingForController(instance)); err != nil {
+	if err := r.Delete(ctx, clusterRoleBindingForController(instance)); err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "failed to delete object of ClusterRoleBinding")
 		return err
 	}
 
-	if err := r.Delete(ctx, validatingWebhookConfiguration(instance, nil)); err != nil {
+	if err := r.Delete(ctx, validatingWebhookConfiguration(instance, nil)); err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "failed to delete object of ValidatingWebhookConfiguration")
 		return err
 	}
@@ -268,8 +284,78 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 	return nil
 }
 
+// checkDefaults checks and sets defaults when the Defaulter webhook is not triggered.
+func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *v1alpha1.Controller) error {
+	resource, err := r.DynamicClient.Resource(v1alpha1.GroupVersion.WithResource("controllers")).Namespace(instance.GetNamespace()).Get(ctx, instance.GetName(), v1.GetOptions{})
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToFetch", "Failed to fetch Resource. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	resourceBytes, err := resource.MarshalJSON()
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToMarshal", "Failed to marshal Resource into JSON. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(resourceBytes)
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefauls", "Failed to set defaults. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	err = unmarshaller.Unmarshal(instance)
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefauls", "Failed to set defaults. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create && instance.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	if instance.Status.Resources == failedStatus {
+		instance.Status.Resources = ""
+	}
+	return nil
+}
+
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
+	// Always enable TLS on the controller
+	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
+		CertsPath:  controllerCertPath,
+		ServerCert: controllerCertName,
+		ServerKey:  controllerCertKeyName,
+		Enabled:    true,
+	}
+
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
@@ -312,6 +398,7 @@ func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance 
 	if err != nil {
 		return err
 	}
+
 	if _, err = createConfigMapForController(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 		return err
 	}
@@ -322,15 +409,7 @@ func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance 
 // reconcileService prepares the desired states for Controller services and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileService(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
-	service, err := serviceForControllerWebhook(instance.DeepCopy(), log, r.Scheme)
-	if err != nil {
-		return err
-	}
-	if err = r.createService(service, ctx, instance); err != nil {
-		return err
-	}
-
-	service, err = serviceForController(instance.DeepCopy(), log, r.Scheme)
+	service, err := serviceForController(instance.DeepCopy(), log, r.Scheme)
 	if err != nil {
 		return err
 	}
@@ -451,7 +530,7 @@ func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr
 func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSecret(ctx context.Context, instance *v1alpha1.Controller) error {
 	var err error
 	if controllerCert == nil || controllerKey == nil || controllerClientCert == nil {
-		controllerCert, controllerKey, controllerClientCert, err = generateCertificate(validatingWebhookSvcName, instance.GetNamespace())
+		controllerCert, controllerKey, controllerClientCert, err = generateCertificate(controllerServiceName, instance.GetNamespace())
 		if err != nil {
 			return err
 		}
@@ -495,7 +574,7 @@ func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSec
 // reconcileSecret prepares the desired states for Controller ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *v1alpha1.Controller) error {
-	if !instance.Spec.FluxNinjaPlugin.APIKeySecret.Create || !instance.Spec.FluxNinjaPlugin.Enabled {
+	if !instance.Spec.Secrets.FluxNinjaPlugin.Create {
 		return nil
 	}
 	secret, err := secretForControllerAPIKey(instance.DeepCopy(), r.Scheme)
@@ -506,10 +585,10 @@ func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *v1
 		return err
 	}
 
-	instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = false
-	instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = ""
-	instance.Spec.FluxNinjaPlugin.APIKeySecret.SecretKeyRef.Name = secretName(
-		instance.GetName(), "controller", &instance.Spec.FluxNinjaPlugin.APIKeySecret)
+	instance.Spec.Secrets.FluxNinjaPlugin.Create = false
+	instance.Spec.Secrets.FluxNinjaPlugin.Value = ""
+	instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name = secretName(
+		instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin)
 
 	return nil
 }
@@ -534,8 +613,8 @@ func eventFiltersForController() predicate.Predicate {
 
 			diffObjects := !reflect.DeepEqual(old.Spec, new.Spec)
 			// Skipping update events for Secret updates
-			if diffObjects && old.Spec.FluxNinjaPlugin.APIKeySecret.Value != "" &&
-				new.Spec.FluxNinjaPlugin.APIKeySecret.Value == "" {
+			if diffObjects && old.Spec.Secrets.FluxNinjaPlugin.Value != "" &&
+				new.Spec.Secrets.FluxNinjaPlugin.Value == "" {
 				return false
 			}
 

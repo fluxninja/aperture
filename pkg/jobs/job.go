@@ -1,9 +1,9 @@
+// +kubebuilder:validation:Optional
 package jobs
 
 import (
 	"context"
 	"math"
-	"strings"
 	"sync"
 	"time"
 
@@ -55,13 +55,17 @@ func (job JobBase) JobWatchers() JobWatchers {
 
 // JobConfig is config for Job
 // swagger:model
+// +kubebuilder:object:generate=true
 type JobConfig struct {
 	// Initial delay to start the job. Zero value will schedule the job immediately. Negative value will wait for next scheduled interval.
 	InitialDelay config.Duration `json:"initial_delay" default:"0s"`
+
 	// Time period between job executions. Zero or negative value means that the job will never execute periodically.
 	ExecutionPeriod config.Duration `json:"execution_period" default:"10s"`
+
 	// Execution timeout
 	ExecutionTimeout config.Duration `json:"execution_timeout" validate:"gte=0s" default:"5s"`
+
 	// Sets whether the job is initially healthy
 	InitiallyHealthy bool `json:"initially_healthy" default:"false"`
 }
@@ -69,11 +73,12 @@ type JobConfig struct {
 type jobExecutor struct {
 	execLock sync.Mutex
 	Job
-	jg      *JobGroup
-	job     *gocron.Job
-	config  JobConfig
-	jobTag  string
-	stopped bool
+	jg               *JobGroup
+	job              *gocron.Job
+	config           JobConfig
+	jobTag           string
+	livenessRegistry status.Registry
+	stopped          bool
 }
 
 // Make sure jobExecutor complies with Job interface.
@@ -85,7 +90,12 @@ func newJobExecutor(job Job, jg *JobGroup, config JobConfig) *jobExecutor {
 		jg:     jg,
 		job:    &gocron.Job{},
 		config: config,
-		jobTag: jg.name + "." + job.Name(),
+		jobTag: job.Name(),
+		livenessRegistry: jg.gt.statusRegistry.Root().
+			Child("liveness").
+			Child("job_groups").
+			Child(jg.gt.statusRegistry.Key()).
+			Child(job.Name()),
 	}
 	return executor
 }
@@ -105,11 +115,6 @@ func (executor *jobExecutor) Execute(ctx context.Context) (proto.Message, error)
 	return executor.Job.Execute(ctx)
 }
 
-func (executor *jobExecutor) getLivenessStatusPath() string {
-	// "liveness.job_groups.<jobGroupName>.<jobName>"
-	return strings.Join([]string{"liveness", "job_groups", executor.jg.GroupName(), executor.Name()}, executor.jg.gt.registry.Delim())
-}
-
 func (executor *jobExecutor) doJob() {
 	executor.execLock.Lock()
 	defer executor.execLock.Unlock()
@@ -118,7 +123,7 @@ func (executor *jobExecutor) doJob() {
 		return
 	}
 
-	executionTimeout := executor.config.ExecutionTimeout.Duration.AsDuration()
+	executionTimeout := executor.config.ExecutionTimeout.AsDuration()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	if executionTimeout > 0 {
@@ -148,22 +153,15 @@ func (executor *jobExecutor) doJob() {
 		timerCh <- true
 	})
 
-	regPath := executor.getLivenessStatusPath()
 	for {
 		select {
 		case <-timerCh:
 			s := status.NewStatus(wrapperspb.String("Timeout"), nil)
-			err := executor.jg.gt.registry.Push(regPath, s)
-			if err != nil {
-				log.Error().Err(err).Str("job", executor.Name()).Msg("Unable to push status to registry")
-			}
+			executor.livenessRegistry.SetStatus(s)
 			timer.Reset(time.Second * 1)
 		case <-jobCh:
 			s := status.NewStatus(wrapperspb.String("OK"), nil)
-			err := executor.jg.gt.registry.Push(regPath, s)
-			if err != nil {
-				log.Error().Err(err).Str("job", executor.Name()).Msg("Unable to push status to registry")
-			}
+			executor.livenessRegistry.SetStatus(s)
 			timer.Stop()
 			return
 		}
@@ -175,9 +173,9 @@ func (executor *jobExecutor) start() {
 	defer executor.execLock.Unlock()
 
 	var scheduler *gocron.Scheduler
-	if executor.config.ExecutionPeriod.Duration.AsDuration() > 0 {
+	if executor.config.ExecutionPeriod.AsDuration() > 0 {
 		scheduler = executor.jg.scheduler.
-			Every(executor.config.ExecutionPeriod.Duration.AsDuration())
+			Every(executor.config.ExecutionPeriod.AsDuration())
 	} else {
 		scheduler = executor.jg.scheduler.
 			Every(time.Duration(math.MaxInt64))
@@ -187,7 +185,7 @@ func (executor *jobExecutor) start() {
 		Tag(executor.jobTag).
 		SingletonMode()
 
-	initialDelay := executor.config.InitialDelay.Duration.AsDuration()
+	initialDelay := executor.config.InitialDelay.AsDuration()
 
 	if initialDelay > 0 {
 		scheduler = scheduler.StartAt(time.Now().Add(initialDelay))
@@ -210,8 +208,7 @@ func (executor *jobExecutor) stop() {
 	executor.execLock.Lock()
 	defer executor.execLock.Unlock()
 
-	regPath := executor.getLivenessStatusPath()
-	executor.jg.gt.registry.Delete(regPath)
+	executor.livenessRegistry.Detach()
 	err := executor.jg.scheduler.RemoveByTag(executor.jobTag)
 	if err != nil {
 		log.Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job")

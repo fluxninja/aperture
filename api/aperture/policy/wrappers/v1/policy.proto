@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package aperture.policy.wrappers.v1;
+
+import "aperture/policy/language/v1/classifier.proto";
+import "aperture/policy/language/v1/fluxmeter.proto";
+import "aperture/policy/language/v1/policy.proto";
+
+message PolicyWrapper {
+  // Policy
+  policy.language.v1.Policy policy = 1;
+  // Name of the Policy.
+  string policy_name = 2;
+  // Hash of the entire Policy spec.
+  string policy_hash = 3;
+}
+
+message FluxMeterWrapper {
+  // Flux Meter
+  policy.language.v1.FluxMeter flux_meter = 1;
+  // Name of Flux Meter metric.
+  string flux_meter_name = 4;
+}
+
+message ClassifierWrapper {
+  // Classifier
+  policy.language.v1.Classifier classifier = 1;
+  // Name of the Policy.
+  string policy_name = 2;
+  // Hash of the entire Policy spec.
+  string policy_hash = 3;
+  // Index of the classifier within Policy.
+  int64 classifier_index = 4;
+}
+
+message ConcurrencyLimiterWrapper {
+  // Concurrency Limiter
+  policy.language.v1.ConcurrencyLimiter concurrency_limiter = 1;
+  // The index of Component in the Circuit.
+  int64 component_index = 2;
+  // Name of the Policy.
+  string policy_name = 3;
+  // Hash of the entire Policy spec.
+  string policy_hash = 4;
+}
+
+message RateLimiterWrapper {
+  // Rate Limiter
+  policy.language.v1.RateLimiter rate_limiter = 1;
+  // The index of Component in the Circuit.
+  int64 component_index = 2;
+  // Name of the Policy.
+  string policy_name = 3;
+  // Hash of the entire Policy spec.
+  string policy_hash = 4;
+}

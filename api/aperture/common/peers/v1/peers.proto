@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package aperture.common.peers.v1;
 
+message Peers {
+  repeated PeerInfo peer_infos = 1;
+}
+
 message PeerInfo {
   string address = 1;
   string hostname = 2;

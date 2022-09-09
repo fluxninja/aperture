@@ -22,8 +22,10 @@ definitions:
   AgentInfoConfig:
     properties:
       agent_group:
-        description: All agents within an agent_group receive the same data-plane
-          configuration (e.g. schedulers, FluxMeters, rate limiter).
+        description: |-
+          All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
+
+          [Read more about agent groups here](/concepts/flow-control/service.md#agent-group).
         type: string
         x-go-default: default
         x-go-name: AgentGroup
@@ -63,6 +65,27 @@ definitions:
     title: BackoffConfig holds configuration for GRPC Client Backoff.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
+  BatchConfig:
+    properties:
+      send_batch_size:
+        description: SendBatchSize is the size of a batch which after hit, will trigger
+          it to be sent.
+        format: uint32
+        type: integer
+        x-go-default: "10000"
+        x-go-name: SendBatchSize
+        x-go-validate: gt=0
+      timeout:
+        description: Timeout sets the time after which a batch will be sent regardless
+          of size.
+        format: string
+        type: string
+        x-go-default: 1s
+        x-go-name: Timeout
+        x-go-validate: gt=0
+    title: BatchConfig defines configuration for OTEL batch processor.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otel
   ClientTLSConfig:
     properties:
       ca_file:
@@ -90,23 +113,23 @@ definitions:
   DistCacheConfig:
     properties:
       bind_addr:
-        description: BindAddr denotes the address that Olric will bind to for communication
-          with other Olric nodes.
+        description: BindAddr denotes the address that DistCache will bind to for
+          communication with other peer nodes.
         type: string
         x-go-default: :3320
         x-go-name: BindAddr
         x-go-validate: hostname_port
-      memberlist_config_advertise_addr:
+      memberlist_advertise_addr:
         description: Address of memberlist to advertise to other cluster members.
           Used for nat traversal if provided.
         type: string
-        x-go-name: MemberlistConfigAdvertiseAddr
+        x-go-name: MemberlistAdvertiseAddr
         x-go-validate: omitempty,hostname_port
-      memberlist_config_bind_addr:
+      memberlist_bind_addr:
         description: Address to bind mememberlist server to.
         type: string
         x-go-default: :3322
-        x-go-name: MemberlistConfigBindAddr
+        x-go-name: MemberlistBindAddr
         x-go-validate: hostname_port
       replica_count:
         description: ReplicaCount is 1 by default.
@@ -150,7 +173,7 @@ definitions:
           type: string
         type: array
         x-go-name: Endpoints
-        x-go-validate: dive,hostname_port|url|fqdn
+        x-go-validate: gt=0,dive,hostname_port|url|fqdn
       lease_ttl:
         description: Lease time-to-live
         format: string
@@ -292,6 +315,7 @@ definitions:
         x-go-validate: gte=0s
       proxy_connect_header:
         $ref: '#/definitions/Header'
+        x-go-validate: omitempty
       read_buffer_size:
         description: Read Buffer Size. 0 = 4KB
         format: int64
@@ -398,7 +422,7 @@ definitions:
         description: Write timeout
         format: string
         type: string
-        x-go-default: 10s
+        x-go-default: 45s
         x-go-name: WriteTimeout
         x-go-validate: gte=0s
     title: HTTPServerConfig holds configuration for HTTP Server.
@@ -549,17 +573,6 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/net/listener
   LogConfig:
     properties:
-      compress:
-        description: Compress
-        type: boolean
-        x-go-default: "false"
-        x-go-name: Compress
-      file:
-        description: Output file for logs. Keywords allowed - ["stderr", "stderr",
-          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-        type: string
-        x-go-default: stderr
-        x-go-name: File
       level:
         description: Log level
         type: string
@@ -567,27 +580,6 @@ definitions:
         x-go-name: LogLevel
         x-go-validate: oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL
           panic PANIC trace TRACE disabled DISABLED
-      max_age:
-        description: Max age in days for log files
-        format: int64
-        type: integer
-        x-go-default: "7"
-        x-go-name: MaxAge
-        x-go-validate: gte=0
-      max_backups:
-        description: Max log file backups
-        format: int64
-        type: integer
-        x-go-default: "3"
-        x-go-name: MaxBackups
-        x-go-validate: gte=0
-      max_size:
-        description: Log file max size in MB
-        format: int64
-        type: integer
-        x-go-default: "50"
-        x-go-name: MaxSize
-        x-go-validate: gte=0
       non_blocking:
         description: Use non-blocking log writer (can lose logs at high throughput)
         type: boolean
@@ -600,7 +592,7 @@ definitions:
         x-go-default: "false"
         x-go-name: PrettyConsole
       writers:
-        description: Additional log writers
+        description: Log writers
         items:
           $ref: '#/definitions/LogWriterConfig'
         type: array
@@ -617,8 +609,8 @@ definitions:
         x-go-default: "false"
         x-go-name: Compress
       file:
-        description: Output file for logs. Keywords allowed - ["stderr", "stderr",
-          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+        description: Output file for logs. Keywords allowed - ["stderr", "default"].
+          "default" maps to `/var/log/fluxninja/<service>.log`
         type: string
         x-go-default: stderr
         x-go-name: File
@@ -705,6 +697,27 @@ definitions:
     title: MultiJobConfig holds configuration for MultiJob.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
+  OtelConfig:
+    properties:
+      batch_postrollup:
+        $ref: '#/definitions/BatchConfig'
+      batch_prerollup:
+        $ref: '#/definitions/BatchConfig'
+      grpc_addr:
+        description: GRPC listener addr for OTEL Collector.
+        type: string
+        x-go-default: :4317
+        x-go-name: GRPCAddr
+        x-go-validate: hostname_port
+      http_addr:
+        description: HTTP listener addr for OTEL Collector.
+        type: string
+        x-go-default: :4318
+        x-go-name: HTTPAddr
+        x-go-validate: hostname_port
+    title: OtelConfig is the configuration for the OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otel
   PeerDiscoveryConfig:
     properties:
       advertisement_addr:
@@ -730,16 +743,18 @@ definitions:
           type: string
         type: array
         x-go-name: DisabledPlugins
+        x-go-validate: omitempty
       disabled_symbols:
         description: Specific plugin types to disable
         items:
           type: string
         type: array
         x-go-name: DisabledSymbols
+        x-go-validate: omitempty
       plugins_path:
-        description: Path to plugins directory. This can be set via command line arguments
-          as well.
+        description: Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
         type: string
+        x-go-default: default
         x-go-name: PluginsPath
     title: PluginsConfig holds configuration for plugins.
     type: object
@@ -757,15 +772,23 @@ definitions:
   ProfilersConfig:
     properties:
       cpu_profiler:
-        description: Flag to enable cpu profiling
+        description: Flag to enable cpu profiling on process start and save it to
+          a file. HTTP interface will not work if this is enabled as CPU profile will
+          always be running.
         type: boolean
         x-go-default: "false"
         x-go-name: CPUProfile
       profiles_path:
-        description: Path to save performance profiles. This can be set via command
-          line arguments as well.
+        description: Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
         type: string
+        x-go-default: default
         x-go-name: ProfilesPath
+      register_http_routes:
+        description: Register routes. Profile types profile, symbol and cmdline will
+          be registered at /debug/pprof/{profile,symbol,cmdline}.
+        type: boolean
+        x-go-default: "true"
+        x-go-name: RegisterHTTPRoutes
     title: ProfilersConfig holds configuration for profilers.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/profilers
@@ -775,7 +798,7 @@ definitions:
         description: Address of the prometheus server
         type: string
         x-go-name: Address
-        x-go-validate: hostname_port|url|fqdn
+        x-go-validate: required,hostname_port|url|fqdn
     title: PrometheusConfig holds configuration for Prometheus Server.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/prometheus
@@ -796,7 +819,7 @@ definitions:
           type: string
         type: array
         x-go-name: NoProxy
-        x-go-validate: dive,ip|cidr|fqdn|hostname_port
+        x-go-validate: omitempty,dive,ip|cidr|fqdn|hostname_port
     title: ProxyConfig holds proxy configuration.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/http
@@ -831,11 +854,11 @@ definitions:
         type: string
         x-go-name: ClientCA
         x-go-validate: omitempty
-      enable:
-        description: Enable TLS
+      enabled:
+        description: Enabled TLS
         type: boolean
         x-go-default: "false"
-        x-go-name: Enable
+        x-go-name: Enabled
       server_cert:
         description: Server Cert file
         type: string
@@ -899,28 +922,6 @@ definitions:
     title: WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both
       algorithms are configured then only watermark algorithm is used.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/watchdog
-  WatchdogResult:
-    properties:
-      force_gc_took:
-        format: string
-        type: string
-        x-go-name: ForceGCTook
-      threshold:
-        format: uint64
-        type: integer
-        x-go-name: Threshold
-      total:
-        format: uint64
-        type: integer
-        x-go-name: Total
-      used:
-        format: uint64
-        type: integer
-        x-go-name: Used
-    title: Result holds the result of the Watchdog check.
-    type: object
-    x-go-name: Result
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
   WatermarksPolicy:
     properties:
@@ -1030,6 +1031,17 @@ paths:
       - in: body
         schema:
           $ref: '#/definitions/MetricsConfig'
+      tags:
+      - common-configuration
+      x-fn-config-env: true
+  /otel:
+    post:
+      operationId: Otel
+      parameters:
+      - in: body
+        name: proxy
+        schema:
+          $ref: '#/definitions/OtelConfig'
       tags:
       - common-configuration
       x-fn-config-env: true

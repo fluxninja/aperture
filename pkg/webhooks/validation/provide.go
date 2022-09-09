@@ -1,17 +1,27 @@
 package validation
 
-import "github.com/fluxninja/aperture/pkg/webhooks"
+import (
+	"github.com/fluxninja/aperture/pkg/webhooks"
+	"go.uber.org/fx"
+)
 
-// ProvideCMValidator provides config map validator
-//
-// Note: This validator must be registered to be accessible.
-func ProvideCMValidator() *CMValidator {
-	return NewCMValidator()
+// Module provides fx module for configmap validator.
+func Module() fx.Option {
+	return fx.Options(
+		fx.Invoke(registerCMValidator),
+	)
 }
 
-// RegisterCMValidator registers configmap validator as k8s webhook.
-func RegisterCMValidator(validator *CMValidator, webhooks *webhooks.K8sRegistry) {
+// FxIn is a struct that contains all dependencies for configmap validator.
+type FxIn struct {
+	fx.In
+	Webhooks   *webhooks.K8sRegistry
+	Validators []CMFileValidator `group:"cm-file-validators"`
+}
+
+// registerCMValidator registers configmap validator as k8s webhook.
+func registerCMValidator(in FxIn) {
 	// The path is not configurable – if one doesn't want default path, one
 	// could just write their own Register function
-	webhooks.RegisterValidator("/validate/configmap", validator)
+	in.Webhooks.RegisterValidator("/validate/configmap", NewCMValidator(in.Validators))
 }

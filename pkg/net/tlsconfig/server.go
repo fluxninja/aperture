@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package tlsconfig
 
 import (
@@ -19,7 +20,7 @@ const (
 
 // Module is a fx module that constructs annotated instance of *tls.Config.
 func Module() fx.Option {
-	constructor := Constructor{Key: defaultKey}
+	constructor := Constructor{ConfigKey: defaultKey}
 	return fx.Options(
 		constructor.Annotate(),
 	)
@@ -27,6 +28,7 @@ func Module() fx.Option {
 
 // ServerTLSConfig holds configuration for setting up server TLS support.
 // swagger:model
+// +kubebuilder:object:generate=true
 type ServerTLSConfig struct {
 	// Path to credentials. This can be set via command line arguments as well.
 	CertsPath string `json:"certs_path"`
@@ -38,14 +40,14 @@ type ServerTLSConfig struct {
 	ClientCA string `json:"client_ca" validate:"omitempty"`
 	// Allowed CN
 	AllowedCN string `json:"allowed_cn" validate:"omitempty,fqdn"`
-	// Enable TLS
-	Enable bool `json:"enable" default:"false"`
+	// Enabled TLS
+	Enabled bool `json:"enabled" default:"false"`
 }
 
 // Constructor holds fields to create an annotated instance of *tls.Config.
 type Constructor struct {
 	Name          string
-	Key           string
+	ConfigKey     string
 	DefaultConfig ServerTLSConfig
 }
 
@@ -62,12 +64,12 @@ func (constructor Constructor) Annotate() fx.Option {
 
 func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller) (*tls.Config, error) {
 	config := constructor.DefaultConfig
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize tls configuration!")
 		return nil, err
 	}
 
-	if config.Enable {
+	if config.Enabled {
 		certPath := config.CertsPath
 		serverCertKeyPair, err := tls.LoadX509KeyPair(
 			path.Join(certPath, config.ServerCert),

@@ -3,7 +3,6 @@ package notifiers
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
@@ -15,15 +14,15 @@ import (
 )
 
 // FxOptionsFunc is a function that returns fx.Option.
-type FxOptionsFunc func(Key, config.Unmarshaller, *status.Registry) (fx.Option, error)
+type FxOptionsFunc func(Key, config.Unmarshaller, status.Registry) (fx.Option, error)
 
 type fxRunner struct {
+	statusRegistry         status.Registry
+	fxRunnerStatusRegistry status.Registry
+	app                    *fx.App
+	prometheusRegistry     *prometheus.Registry
 	UnmarshalKeyNotifier
-	app                *fx.App
-	fxOptionsFuncs     []FxOptionsFunc
-	statusRegistry     *status.Registry
-	prometheusRegistry *prometheus.Registry
-	registryPath       string
+	fxOptionsFuncs []FxOptionsFunc
 }
 
 // Make sure fxRunner implements KeyNotifier.
@@ -58,16 +57,12 @@ func (fr *fxRunner) processEvent(event Event) {
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to deinit app")
 		}
-		fr.statusRegistry.Delete(fr.registryPath)
+		fr.statusRegistry.Detach()
 	}
 }
 
 func (fr *fxRunner) initApp(key Key) error {
-	s := status.NewStatus(nil, errors.New("policy runner initializing"))
-	err := fr.statusRegistry.Push(fr.registryPath, s)
-	if err != nil {
-		log.Error().Err(err).Str("path", fr.registryPath).Msg("Failed to push status to registry")
-	}
+	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, errors.New("policy runner initializing")))
 
 	if fr.app == nil && fr.Unmarshaller != nil {
 		var options []fx.Option
@@ -87,47 +82,34 @@ func (fr *fxRunner) initApp(key Key) error {
 			fx.Provide(func() config.Unmarshaller { return fr.Unmarshaller }),
 			// Supply keyinfo
 			fx.Supply(key),
-			// Supply status registry
+			// Supply status registry for the key
 			fx.Supply(fr.statusRegistry),
 			// Supply prometheus registry
 			fx.Supply(fr.prometheusRegistry),
 			option,
 		)
 
+		var err error
 		if err = fr.app.Err(); err != nil {
 			visualize, _ := fx.VisualizeError(err)
 			log.Error().Err(err).Str("visualize", visualize).Msg("fx.New failed")
-			s := status.NewStatus(nil, err)
-			_ = fr.statusRegistry.Push(fr.registryPath, s)
+			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err))
 			_ = fr.deinitApp()
 			return err
 		}
 
-		s := status.NewStatus(nil, errors.New("policy runner starting"))
-		err = fr.statusRegistry.Push(fr.registryPath, s)
-		if err != nil {
-			log.Error().Err(err).Str("path", fr.registryPath).Msg("Failed to push status to registry")
-		}
+		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, errors.New("policy runner starting")))
 
 		ctx, cancel := context.WithTimeout(context.Background(), fr.app.StartTimeout())
 		defer cancel()
 		if err = fr.app.Start(ctx); err != nil {
 			log.Error().Str("key", string(key)).Err(err).Msg("Could not start application")
-			s = status.NewStatus(nil, err)
-			_ = fr.statusRegistry.Push(fr.registryPath, s)
+			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err))
 			return err
 		}
-		s = status.NewStatus(wrapperspb.String("policy runner started"), nil)
-		err = fr.statusRegistry.Push(fr.registryPath, s)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to push status to registry")
-		}
+		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner started"), nil))
 	} else {
-		s := status.NewStatus(nil, fr.err)
-		err = fr.statusRegistry.Push(fr.registryPath, s)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to push status to registry")
-		}
+		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, fr.err))
 	}
 	return nil
 }
@@ -157,10 +139,8 @@ type FxDriver struct {
 	// Note that when key's contents change the previous App will be stopped
 	// and a fresh one will be created.
 	FxOptionsFuncs     []FxOptionsFunc
-	StatusRegistry     *status.Registry
+	StatusRegistry     status.Registry
 	PrometheusRegistry *prometheus.Registry
-	// Registry path prefix to push status updates to
-	StatusPath string
 }
 
 // Make sure FxDriver implements PrefixNotifier.
@@ -170,14 +150,13 @@ var _ PrefixNotifier = (*FxDriver)(nil)
 func (fxDriver *FxDriver) GetKeyNotifier(key Key) KeyNotifier {
 	log.Info().Str("key", key.String()).Msg("GetKeyNotifier")
 
-	statusPath := fmt.Sprintf("%s.%s.driver", fxDriver.StatusPath, key)
-
+	statusRegistry := fxDriver.StatusRegistry.Child(key.String())
 	fr := &fxRunner{
-		UnmarshalKeyNotifier: fxDriver.getUnmarshalKeyNotifier(key),
-		fxOptionsFuncs:       fxDriver.FxOptionsFuncs,
-		registryPath:         statusPath,
-		statusRegistry:       fxDriver.StatusRegistry,
-		prometheusRegistry:   fxDriver.PrometheusRegistry,
+		UnmarshalKeyNotifier:   fxDriver.getUnmarshalKeyNotifier(key),
+		fxOptionsFuncs:         fxDriver.FxOptionsFuncs,
+		statusRegistry:         statusRegistry,
+		fxRunnerStatusRegistry: statusRegistry.Child("fx_runner"),
+		prometheusRegistry:     fxDriver.PrometheusRegistry,
 	}
 
 	return fr

@@ -4,7 +4,6 @@ package aperture.common.status.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
-import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 //
@@ -15,12 +14,7 @@ import "google/protobuf/timestamp.proto";
 service StatusService {
   rpc GetGroupStatus(GroupStatusRequest) returns (GroupStatus) {
     option (google.api.http) = {
-      get: "/v1/status/{group}"
-    };
-  }
-  rpc GetGroups(google.protobuf.Empty) returns (Groups) {
-    option (google.api.http) = {
-      get: "/v1/statusgroups"
+      get: "/v1/status/{keys}"
     };
   }
 }
@@ -30,11 +24,7 @@ service StatusService {
 //
 
 message GroupStatusRequest {
-  string group = 1;
-}
-
-message Groups {
-  repeated string groups = 1;
+  repeated string keys = 1;
 }
 
 //

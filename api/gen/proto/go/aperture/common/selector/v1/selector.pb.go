@@ -22,58 +22,72 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Describes where a rule or actuation component should apply to
+// Describes which flows a [dataplane
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
 //
 // Example:
 // ```yaml
-// selector:
-//   service: service1.default.svc.cluster.local
-//   control_point:
-//     traffic: ingress # Allowed values are `ingress` and `egress`.
-//   label_matcher:
-//     match_labels:
-//       user_tier: gold
-//     match_expressions:
-//       - key: query
-//         operator: In
-//         values:
-//           - insert
-//           - delete
-//       - label: user_agent
-//         regex: ^(?!.*Chrome).*Safari
+// service: service1.default.svc.cluster.local
+// control_point:
+//   traffic: ingress # Allowed values are `ingress` and `egress`.
+// label_matcher:
+//   match_labels:
+//     user_tier: gold
+//   match_expressions:
+//     - key: query
+//       operator: In
+//       values:
+//         - insert
+//         - delete
+//     - label: user_agent
+//       regex: ^(?!.*Chrome).*Safari
 // ```
 type Selector struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Describes where this selector applies to.
+	// Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
-	// The service (name) of the entities.
-	// In k8s, this is the FQDN of the Service object.
+	// The Fully Qualified Domain Name of the
+	// [service](/concepts/flow-control/service.md) to select.
 	//
-	// Note: Entity may belong to multiple services.
+	// In kubernetes, this is the FQDN of the Service object.
+	//
+	// Empty string means all services within an agent group (catch-all).
+	//
+	// :::note
+	// One entity may belong to multiple services.
+	// :::
 	Service string `protobuf:"bytes,2,opt,name=service,proto3" json:"service,omitempty"`
-	// Describes control point within the entity where the policy should apply to.
+	// Describes
+	// [control point](/concepts/flow-control/flow-control.md#control-point)
+	// within the entity where the policy should apply to.
 	ControlPoint *ControlPoint `protobuf:"bytes,3,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Label matcher allows to add _additional_ condition on labels that must
-	// also be satisfied (in addition to service+control point matching)
+	// Label matcher allows to add _additional_ condition on
+	// [flow labels](/concepts/flow-control/label/label.md)
+	// must also be satisfied (in addition to service+control point matching)
 	//
-	// This matcher allows to match on flow labels and request labels.
-	// (Note: For classification we can only match flow labels that were created at
-	// some **previous** control point).
+	// :::info
+	// See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+	// :::
 	//
-	// Flow labels are available with the same label key as defined in
-	// classification rule.
+	// :::note
+	// [Classifiers](#v1-classifier) _can_ use flow labels created by some other
+	// classifier, but only if they were created at some previous control point
+	// (and propagated in baggage).
 	//
-	// Request labels are always prefixed with `request_`. Available request
-	// labels are `id` (available as `request_id`), `method`, `path`, `host`,
-	// `scheme`, `size`, `protocol` (mapped from fields of
-	// [HttpRequest](https://github.com/envoyproxy/envoy/blob/637a92a56e2739b5f78441c337171968f18b46ee/api/envoy/service/auth/v3/attribute_context.proto#L102)).
-	// Also, (non-pseudo) headers are available as `request_header_<headername>`, where
-	// `<headername>` is a headername normalised to lowercase, eg. `request_header_user-agent`.
-	//
-	// Note: Request headers are only available for `traffic` control points.
+	// This limitation doesn't apply to selectors of other entities, like
+	// FluxMeters or actuators. It's valid to create a flow label on a control
+	// point using classifier, and immediately use it for matching on the same
+	// control point.
+	// :::
 	LabelMatcher *v1.LabelMatcher `protobuf:"bytes,4,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty"`
 }
 

@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -414,13 +413,9 @@ var _ = Describe("TimeStamp", func() {
 
 var _ = Describe("Duration", func() {
 	Context("when marshalling 2 durations", func() {
-		dur := &Duration{
-			Duration: durationpb.New(time.Second * 1),
-		}
+		dur := MakeDuration(1 * time.Second)
 		b, err := dur.MarshalJSON()
-		dur2 := &Duration{
-			Duration: durationpb.New(time.Second * 1),
-		}
+		dur2 := MakeDuration(1 * time.Second)
 		b2, err2 := dur2.MarshalJSON()
 		It("should return nil error and match both durations", func() {
 			Expect(err).NotTo(HaveOccurred())
@@ -428,7 +423,7 @@ var _ = Describe("Duration", func() {
 			Expect(b).To(Equal(b2))
 		})
 		It("should throw error for two different durations", func() {
-			dur2.Duration = durationpb.New(time.Second * 2)
+			dur2 = MakeDuration(2 * time.Second)
 			b2, err2 = dur2.MarshalJSON()
 			Expect(err2).NotTo(HaveOccurred())
 			Expect(b).NotTo(Equal(b2))
@@ -436,17 +431,15 @@ var _ = Describe("Duration", func() {
 	})
 
 	Context("when unmarshalling a duration", func() {
-		dur := &Duration{
-			Duration: durationpb.New(time.Second * 1),
-		}
-		dur2 := &Duration{}
+		dur := MakeDuration(1 * time.Second)
+		dur2 := MakeDuration(0)
 		b, err := dur.MarshalJSON()
-		errBytes := []byte(`{"duration":"` + dur.Duration.String() + `"}`)
+		errBytes := []byte(`{"duration":"` + dur.String() + `"}`)
 		It("should return nil error, match both durations and their string values", func() {
 			Expect(err).NotTo(HaveOccurred())
 			err := dur2.UnmarshalJSON(b)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(dur2.Duration).To(Equal(dur.Duration))
+			Expect(dur2.AsDuration()).To(Equal(dur.AsDuration()))
 			Expect(dur2.String()).To(Equal(dur.String()))
 		})
 		It("should return error when trying to parse an unsupported duration", func() {

@@ -26,6 +26,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -49,7 +50,27 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 	}
 	annotations[sidecarAnnotationKey] = "false"
 
-	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec)
+	probeScheme := corev1.URISchemeHTTP
+	if instance.Spec.ConfigSpec.Server.TLS.Enabled {
+		probeScheme = corev1.URISchemeHTTPS
+	}
+
+	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec, probeScheme)
+
+	serverPort, err := getPort(spec.ConfigSpec.Server.Addr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelGRPCPort, err := getPort(spec.ConfigSpec.Otel.GRPCAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelHTTPPort, err := getPort(spec.ConfigSpec.Otel.HTTPAddr)
+	if err != nil {
+		return nil, err
+	}
 
 	dep := &appsv1.Deployment{
 		ObjectMeta: v1.ObjectMeta{
@@ -74,17 +95,17 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 				Spec: corev1.PodSpec{
 					ServiceAccountName:            controllerServiceName,
 					HostAliases:                   spec.HostAliases,
-					ImagePullSecrets:              imagePullSecrets(spec.Image),
+					ImagePullSecrets:              imagePullSecrets(spec.Image.Image),
 					NodeSelector:                  spec.NodeSelector,
 					Affinity:                      spec.Affinity,
 					Tolerations:                   spec.Tolerations,
 					SecurityContext:               podSecurityContext(spec.PodSecurityContext),
-					TerminationGracePeriodSeconds: spec.TerminationGracePeriodSeconds,
+					TerminationGracePeriodSeconds: pointer.Int64(spec.TerminationGracePeriodSeconds),
 					InitContainers:                spec.InitContainers,
 					Containers: []corev1.Container{
 						{
 							Name:            controllerServiceName,
-							Image:           imageString(spec.Image),
+							Image:           imageString(spec.Image.Image, spec.Image.Repository),
 							ImagePullPolicy: corev1.PullPolicy(spec.Image.PullPolicy),
 							SecurityContext: containerSecurityContext(spec.ContainerSecurityContext),
 							Command:         spec.Command,
@@ -94,14 +115,19 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 							Resources:       spec.Resources,
 							Ports: []corev1.ContainerPort{
 								{
-									Name:          "grpc",
-									ContainerPort: spec.ServerPort,
-									Protocol:      "TCP",
+									Name:          server,
+									ContainerPort: serverPort,
+									Protocol:      tcp,
 								},
 								{
-									Name:          "webhooks-port",
-									ContainerPort: 8086,
-									Protocol:      "TCP",
+									Name:          grpcOtel,
+									ContainerPort: otelGRPCPort,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          httpOtel,
+									ContainerPort: otelHTTPPort,
+									Protocol:      corev1.ProtocolTCP,
 								},
 							},
 							TerminationMessagePath:   "/dev/termination-log",

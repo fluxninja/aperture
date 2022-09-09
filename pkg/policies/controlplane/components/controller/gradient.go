@@ -16,7 +16,7 @@ import (
 type GradientController struct {
 	minGradient float64
 	maxGradient float64
-	tolerance   float64
+	slope       float64
 }
 
 // Make sure Gradient complies with Controller interface.
@@ -30,7 +30,7 @@ func NewGradientControllerAndOptions(gradientControllerProto *policylangv1.Gradi
 	}
 
 	gradient := &GradientController{
-		tolerance:   gradientControllerProto.Tolerance,
+		slope:       gradientControllerProto.Slope,
 		minGradient: gradientControllerProto.MinGradient,
 		maxGradient: gradientControllerProto.MaxGradient,
 	}
@@ -45,7 +45,7 @@ func (g *GradientController) ComputeOutput(signal, setpoint, controlVariable rea
 	var output reading.Reading
 	if setpoint.Valid && signal.Valid && controlVariable.Valid {
 		var gradient float64
-		gradient = setpoint.Value / signal.Value * g.tolerance
+		gradient = math.Pow(signal.Value/setpoint.Value, g.slope)
 		// clamp to min/max
 		if gradient < g.minGradient {
 			gradient = g.minGradient

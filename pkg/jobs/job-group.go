@@ -39,12 +39,14 @@ const (
 
 // JobGroupConfig holds configuration for JobGroup.
 // swagger:model
+// +kubebuilder:object:generate=true
 type JobGroupConfig struct {
-	SchedulerConfig
+	SchedulerConfig `json:",inline"`
 }
 
 // SchedulerConfig holds configuration for job Scheduler.
 // swagger:model
+// +kubebuilder:object:generate=true
 type SchedulerConfig struct {
 	// Limits how many jobs can be running at the same time. This is useful when running resource intensive jobs and a precise start time is not critical. 0 = no limit.
 	MaxConcurrentJobs int `json:"max_concurrent_jobs" validate:"gte=0" default:"0"`
@@ -61,17 +63,11 @@ type JobGroupConstructor struct {
 	SchedulerMode SchedulerMode
 }
 
-// Annotate provides annotated instances of GroupWatcherMetrics and JobGroup.
+// Annotate provides annotated instances of JobGroup.
 func (jgc JobGroupConstructor) Annotate() fx.Option {
 	groupTag := config.GroupTag(jgc.Name)
 	nameTag := config.NameTag(jgc.Name)
 	return fx.Options(
-		fx.Provide(
-			fx.Annotate(
-				provideGroupWatcherMetrics,
-				fx.ResultTags(groupTag),
-			),
-		),
 		fx.Provide(
 			fx.Annotate(
 				jgc.provideJobGroup,
@@ -84,7 +80,7 @@ func (jgc JobGroupConstructor) Annotate() fx.Option {
 
 func (jgc JobGroupConstructor) provideJobGroup(
 	gw GroupWatchers,
-	registry *status.Registry,
+	registry status.Registry,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (*JobGroup, error) {
@@ -99,30 +95,13 @@ func (jgc JobGroupConstructor) provideJobGroup(
 		log.Panic().Err(err).Msg("Unable to deserialize JobGroup configuration!")
 	}
 
-	scheduler := gocron.NewScheduler(time.Local)
-
-	scheduler.TagsUnique()
-
-	if config.MaxConcurrentJobs > 0 {
-		switch jgc.SchedulerMode {
-		case RescheduleMode:
-			scheduler.SetMaxConcurrentJobs(config.MaxConcurrentJobs, gocron.RescheduleMode)
-		case WaitMode:
-			scheduler.SetMaxConcurrentJobs(config.MaxConcurrentJobs, gocron.WaitMode)
-		}
-	}
-
-	// always singleton
-	scheduler.SingletonModeAll()
-
 	gwAll := GroupWatchers{}
-
 	if len(jgc.GW) > 0 || len(gw) > 0 {
 		gwAll = append(gwAll, jgc.GW...)
 		gwAll = append(gwAll, gw...)
 	}
 
-	jg, err := NewJobGroup(jgc.Name, registry, config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
+	jg, err := NewJobGroup(registry.Child(jgc.Name), config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
 	if err != nil {
 		return nil, err
 	}
@@ -144,23 +123,19 @@ var errInitialResult = errors.New("job hasn't been scheduled yet")
 // JobGroup tracks a group of jobs.
 // It is responsible for scheduling jobs and keeping track of their statuses.
 type JobGroup struct {
-	registry  *status.Registry
 	scheduler *gocron.Scheduler
 	gt        *groupTracker
-	name      string
 }
 
 // NewJobGroup creates a new JobGroup.
-func NewJobGroup(name string,
-	registry *status.Registry,
+func NewJobGroup(
+	statusRegistry status.Registry,
 	maxConcurrentJobs int,
 	schedulerMode SchedulerMode,
 	gws GroupWatchers,
 ) (*JobGroup, error) {
 	scheduler := gocron.NewScheduler(time.UTC)
-
 	scheduler.TagsUnique()
-
 	if maxConcurrentJobs > 0 {
 		switch schedulerMode {
 		case RescheduleMode:
@@ -169,14 +144,12 @@ func NewJobGroup(name string,
 			scheduler.SetMaxConcurrentJobs(maxConcurrentJobs, gocron.WaitMode)
 		}
 	}
-
 	// always singleton
 	scheduler.SingletonModeAll()
+
 	jg := &JobGroup{
-		name:      name,
-		registry:  registry,
 		scheduler: scheduler,
-		gt:        newGroupTracker(gws, registry, name),
+		gt:        newGroupTracker(gws, statusRegistry),
 	}
 
 	return jg, nil
@@ -193,11 +166,6 @@ func (jg *JobGroup) Stop() error {
 	jg.DeregisterAll()
 	jg.scheduler.Stop()
 	return nil
-}
-
-// GroupName returns the name of the JobGroup.
-func (jg *JobGroup) GroupName() string {
-	return jg.name
 }
 
 // RegisterJob registers a new Job in a JobGroup.
@@ -219,7 +187,7 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 	// set initial status
 	err = jg.gt.updateStatus(executor, status.NewStatus(nil, initialErr))
 	if err != nil {
-		log.Error().Err(err).Str("job", job.Name()).Str("jgName", jg.name).Msg("Unable to update status of job")
+		log.Error().Err(err).Str("job", job.Name()).Msg("Unable to update status of job")
 		return err
 	}
 
@@ -288,4 +256,9 @@ func (jg *JobGroup) IsHealthy() bool {
 // Results returns the results of all jobs in the JobGroup.
 func (jg *JobGroup) Results() (*statusv1.GroupStatus, bool) {
 	return jg.gt.results()
+}
+
+// GetRegistry returns the registry of the JobGroup.
+func (jg *JobGroup) GetRegistry() status.Registry {
+	return jg.gt.statusRegistry
 }

@@ -30,6 +30,12 @@ func CompileToRego(
 	fmt.Fprintf(&out, "package %s\n", packageName)
 	needs := needs{}
 	for _, label := range sortedLabels {
+		if !isRegoIdent(label) {
+			return "", fmt.Errorf(
+				"%w: %s (allowed chars are alphanumeric and underscore, cannot be Rego keyword)",
+				BadLabelName, label,
+			)
+		}
 		compiledExtractor, err := emitExtractor(label, labelExtractors[label], &needs)
 		if err != nil {
 			return "", fmt.Errorf("%w for label %s: %v", BadExtractor, label, err)
@@ -51,6 +57,13 @@ var BadExtractor = badExtractor{}
 func (b badExtractor) Error() string { return "invalid extractor" }
 
 type badExtractor struct{}
+
+// BadLabelName is an error occurring when label name is invalid.
+var BadLabelName = badLabelName{}
+
+type badLabelName struct{}
+
+func (b badLabelName) Error() string { return "invalid label name" }
 
 // BadPackageName occurs when package name is invalid.
 var BadPackageName = badPackageName{}

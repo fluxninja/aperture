@@ -17,10 +17,13 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/distcache"
+	"github.com/fluxninja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/pkg/peers"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // AgentSpec defines the desired state for the Agent.
@@ -28,48 +31,40 @@ type AgentSpec struct {
 	// CommonSpec defines the common state between Agent and Controller
 	CommonSpec `json:",inline"`
 
-	// Port for the Agent's distributed cache service
-	//+kubebuilder:default:=3320
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Maximum:=65535
-	//+kubebuilder:validation:Minimum:=1
-	DistributedCachePort int32 `json:"distributedCachePort"`
-
-	// Port for the Agent's member list service
-	//+kubebuilder:default:=3322
-	//+kubebuilder:validation:Optional
-	//+kubebuilder:validation:Maximum:=65535
-	//+kubebuilder:validation:Minimum:=1
-	MemberListPort int32 `json:"memberListPort"`
-
 	// Image configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={tag:"latest",pullPolicy:"IfNotPresent",registry:"docker.io/fluxninja",repository:"aperture-agent"}
-	Image Image `json:"image"`
-
-	// AgentGroup name for the Agent
-	//+kubebuilder:validation:Optional
-	AgentGroup string `json:"agentGroup"`
+	Image AgentImage `json:"image"`
 
 	// Sidecar defines the desired state of Sidecar setup for Agent
 	//+kubebuilder:validation:Optional
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	Sidecar SidecarSpec `json:"sidecar"`
 
-	// Batch prerollup processor configuration.
+	// Agent Configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={timeout:1000000000,sendBatchSize:10000}
-	BatchPrerollup Batch `json:"batchPrerollup"`
+	ConfigSpec AgentConfigSpec `json:"config"`
+}
 
-	// Batch postrollup processor configuration.
+// AgentConfigSpec holds agent configuration.
+type AgentConfigSpec struct {
+	// CommonConfigSpec
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={timeout:1000000000,sendBatchSize:10000}
-	BatchPostrollup Batch `json:"batchPostrollup"`
+	CommonConfigSpec `json:",inline"`
 
-	// Batch metrics/fast processor configuration.
+	// AgentInfo configuration.
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={timeout:1000000000,sendBatchSize:1000}
-	BatchMetricsFast Batch `json:"batchMetricsFast"`
+	AgentInfo agentinfo.AgentInfoConfig `json:"agent_info"`
+
+	// DistCache configuration.
+	//+kubebuilder:validation:Optional
+	DistCache distcache.DistCacheConfig `json:"dist_cache"`
+
+	// Kubernetes client configuration.
+	//+kubebuilder:validation:Optional
+	KubernetesClient http.HTTPClientConfig `json:"kubernetes_client"`
+
+	// Peer discovery configuration.
+	//+kubebuilder:validation:Optional
+	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery"`
 }
 
 // AgentStatus defines the observed state of Agent.
@@ -87,7 +82,6 @@ type Agent struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	//+kubebuilder:default:={serverPort:80}
 	Spec   AgentSpec   `json:"spec,omitempty"`
 	Status AgentStatus `json:"status,omitempty"`
 }

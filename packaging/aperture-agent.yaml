@@ -1,0 +1,17 @@
+## The address to promethus instance connected to the controller
+# prometheus:
+#   address: http://myprometheus:9090
+
+## The endpoints to etcd connected to the controller
+# etcd:
+#   endpoints:
+#     - http://myetcd:2379
+
+log:
+  level: info
+  file: stderr
+
+plugins:
+  disable_plugins: false
+  disabled_plugins:
+    - aperture-plugin-fluxninja

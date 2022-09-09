@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package agentinfo
 
 import "github.com/fluxninja/aperture/pkg/config"
@@ -15,8 +16,11 @@ const (
 
 // AgentInfoConfig is the configuration for the agent group etc.
 // swagger:model
+// +kubebuilder:object:generate=true
 type AgentInfoConfig struct {
 	// All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
+	//
+	// [Read more about agent groups here](/concepts/flow-control/service.md#agent-group).
 	AgentGroup string `json:"agent_group" default:"default"`
 }
 
@@ -31,9 +35,14 @@ func ProvideAgentInfo(unmarshaller config.Unmarshaller) (*AgentInfo, error) {
 	if err := unmarshaller.UnmarshalKey(configKey, &config); err != nil {
 		return nil, err
 	}
+	return NewAgentInfo(config.AgentGroup), nil
+}
+
+// NewAgentInfo creates a new agent info.
+func NewAgentInfo(agentGroup string) *AgentInfo {
 	return &AgentInfo{
-		agentGroup: config.AgentGroup,
-	}, nil
+		agentGroup: agentGroup,
+	}
 }
 
 // GetAgentGroup returns the agent group.

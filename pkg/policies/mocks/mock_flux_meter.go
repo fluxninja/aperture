@@ -9,7 +9,6 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	gomock "github.com/golang/mock/gomock"
 	prometheus "github.com/prometheus/client_golang/prometheus"
@@ -38,18 +37,18 @@ func (m *MockFluxMeter) EXPECT() *MockFluxMeterMockRecorder {
 	return m.recorder
 }
 
-// GetBuckets mocks base method.
-func (m *MockFluxMeter) GetBuckets() []float64 {
+// GetAttributeKey mocks base method.
+func (m *MockFluxMeter) GetAttributeKey() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetBuckets")
-	ret0, _ := ret[0].([]float64)
+	ret := m.ctrl.Call(m, "GetAttributeKey")
+	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetBuckets indicates an expected call of GetBuckets.
-func (mr *MockFluxMeterMockRecorder) GetBuckets() *gomock.Call {
+// GetAttributeKey indicates an expected call of GetAttributeKey.
+func (mr *MockFluxMeterMockRecorder) GetAttributeKey() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBuckets", reflect.TypeOf((*MockFluxMeter)(nil).GetBuckets))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAttributeKey", reflect.TypeOf((*MockFluxMeter)(nil).GetAttributeKey))
 }
 
 // GetFluxMeterID mocks base method.
@@ -80,60 +79,18 @@ func (mr *MockFluxMeterMockRecorder) GetFluxMeterName() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeterName", reflect.TypeOf((*MockFluxMeter)(nil).GetFluxMeterName))
 }
 
-// GetFluxMeterProto mocks base method.
-func (m *MockFluxMeter) GetFluxMeterProto() *languagev1.FluxMeter {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFluxMeterProto")
-	ret0, _ := ret[0].(*languagev1.FluxMeter)
-	return ret0
-}
-
-// GetFluxMeterProto indicates an expected call of GetFluxMeterProto.
-func (mr *MockFluxMeterMockRecorder) GetFluxMeterProto() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeterProto", reflect.TypeOf((*MockFluxMeter)(nil).GetFluxMeterProto))
-}
-
 // GetHistogram mocks base method.
-func (m *MockFluxMeter) GetHistogram(arg0 flowcontrolv1.DecisionType, arg1 string) prometheus.Observer {
+func (m *MockFluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode, featureStatus string) prometheus.Observer {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetHistogram", arg0, arg1)
+	ret := m.ctrl.Call(m, "GetHistogram", decisionType, statusCode, featureStatus)
 	ret0, _ := ret[0].(prometheus.Observer)
 	return ret0
 }
 
 // GetHistogram indicates an expected call of GetHistogram.
-func (mr *MockFluxMeterMockRecorder) GetHistogram(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockFluxMeterMockRecorder) GetHistogram(decisionType, statusCode, featureStatus interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram), arg0, arg1)
-}
-
-// GetPolicyHash mocks base method.
-func (m *MockFluxMeter) GetPolicyHash() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPolicyHash")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// GetPolicyHash indicates an expected call of GetPolicyHash.
-func (mr *MockFluxMeterMockRecorder) GetPolicyHash() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyHash", reflect.TypeOf((*MockFluxMeter)(nil).GetPolicyHash))
-}
-
-// GetPolicyName mocks base method.
-func (m *MockFluxMeter) GetPolicyName() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPolicyName")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// GetPolicyName indicates an expected call of GetPolicyName.
-func (mr *MockFluxMeterMockRecorder) GetPolicyName() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockFluxMeter)(nil).GetPolicyName))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram), decisionType, statusCode, featureStatus)
 }
 
 // GetSelector mocks base method.

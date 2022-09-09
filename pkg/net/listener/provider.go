@@ -16,7 +16,10 @@ const (
 
 // Listener wraps net.Listener, that can be potentially not-yet-started.
 type Listener struct {
+	// This will be available in the Start stage.
 	lis net.Listener
+	// This will be available in the Provide stage.
+	addr string
 }
 
 // GetListener returns wrapped Listener
@@ -30,6 +33,11 @@ func (l *Listener) GetListener() net.Listener {
 	return l.lis
 }
 
+// GetAddr returns the address of the listener.
+func (l *Listener) GetAddr() string {
+	return l.addr
+}
+
 // Module is an fx module that provides annotated Listener.
 func Module() fx.Option {
 	return fx.Options(fx.Provide(Constructor{}.ProvideAnnotated()))
@@ -37,15 +45,15 @@ func Module() fx.Option {
 
 // Constructor holds fields to create an annotated Listener.
 type Constructor struct {
-	Key           string
+	ConfigKey     string
 	Name          string
 	DefaultConfig ListenerConfig
 }
 
 // ProvideAnnotated provides an annotated instance of Listener.
 func (constructor Constructor) ProvideAnnotated() fx.Annotated {
-	if constructor.Key == "" {
-		constructor.Key = defaultKey
+	if constructor.ConfigKey == "" {
+		constructor.ConfigKey = defaultKey
 	}
 	return fx.Annotated{
 		Name:   constructor.Name,
@@ -64,7 +72,7 @@ type ListenerIn struct {
 func (constructor Constructor) provideListener(in ListenerIn) (*Listener, error) {
 	config := constructor.DefaultConfig
 
-	if err := in.Unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := in.Unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize listener configuration!")
 		return nil, err
 	}
@@ -75,9 +83,10 @@ func (constructor Constructor) provideListener(in ListenerIn) (*Listener, error)
 // provideListenerFromConfig provides listener using an already-parsed config.
 func provideListenerFromConfig(lc fx.Lifecycle, config ListenerConfig) *Listener {
 	listener := Listener{}
+	listener.addr = config.Addr
 
 	lc.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
 			var err error
 			listener.lis, err = newListener(config)
 			if err != nil {
@@ -86,7 +95,7 @@ func provideListenerFromConfig(lc fx.Lifecycle, config ListenerConfig) *Listener
 			}
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(context.Context) error {
 			_ = listener.lis.Close()
 			return nil
 		},

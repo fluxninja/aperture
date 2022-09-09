@@ -26,6 +26,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -43,7 +44,37 @@ func daemonsetForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtim
 		}
 	}
 
-	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec)
+	probeScheme := corev1.URISchemeHTTP
+	if instance.Spec.ConfigSpec.Server.TLS.Enabled {
+		probeScheme = corev1.URISchemeHTTPS
+	}
+
+	livenessProbe, readinessProbe := containerProbes(spec.CommonSpec, probeScheme)
+
+	serverPort, err := getPort(spec.ConfigSpec.Server.Addr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelGRPCPort, err := getPort(spec.ConfigSpec.Otel.GRPCAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	otelHTTPPort, err := getPort(spec.ConfigSpec.Otel.HTTPAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	distCachePort, err := getPort(spec.ConfigSpec.DistCache.BindAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	memberListPort, err := getPort(spec.ConfigSpec.DistCache.MemberlistBindAddr)
+	if err != nil {
+		return nil, err
+	}
 
 	daemonset := &appsv1.DaemonSet{
 		ObjectMeta: v1.ObjectMeta{
@@ -63,17 +94,17 @@ func daemonsetForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtim
 				},
 				Spec: corev1.PodSpec{
 					ServiceAccountName:            agentServiceName,
-					ImagePullSecrets:              imagePullSecrets(spec.Image),
+					ImagePullSecrets:              imagePullSecrets(spec.Image.Image),
 					NodeSelector:                  spec.NodeSelector,
 					Affinity:                      spec.Affinity,
 					Tolerations:                   spec.Tolerations,
 					SecurityContext:               podSecurityContext(spec.PodSecurityContext),
-					TerminationGracePeriodSeconds: spec.TerminationGracePeriodSeconds,
+					TerminationGracePeriodSeconds: pointer.Int64(spec.TerminationGracePeriodSeconds),
 					InitContainers:                spec.InitContainers,
 					Containers: []corev1.Container{
 						{
 							Name:            agentServiceName,
-							Image:           imageString(spec.Image),
+							Image:           imageString(spec.Image.Image, spec.Image.Repository),
 							ImagePullPolicy: corev1.PullPolicy(spec.Image.PullPolicy),
 							SecurityContext: containerSecurityContext(spec.ContainerSecurityContext),
 							Command:         spec.Command,
@@ -83,23 +114,28 @@ func daemonsetForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtim
 							Resources:       spec.Resources,
 							Ports: []corev1.ContainerPort{
 								{
-									Name:          "grpc",
-									ContainerPort: spec.ServerPort,
+									Name:          server,
+									ContainerPort: serverPort,
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{
-									Name:          "grpc-otel",
-									ContainerPort: 4317,
+									Name:          grpcOtel,
+									ContainerPort: otelGRPCPort,
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{
-									Name:          "dist-cache",
-									ContainerPort: spec.DistributedCachePort,
+									Name:          httpOtel,
+									ContainerPort: otelHTTPPort,
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{
-									Name:          "memberlist",
-									ContainerPort: spec.MemberListPort,
+									Name:          distCache,
+									ContainerPort: distCachePort,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          memberList,
+									ContainerPort: memberListPort,
 									Protocol:      corev1.ProtocolTCP,
 								},
 							},

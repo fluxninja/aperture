@@ -2,10 +2,9 @@ package metricsprocessor
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"strconv"
 	"strings"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/component"
@@ -18,11 +17,12 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/selectors"
 )
 
 type metricsProcessor struct {
-	cfg                      *Config
-	workloadLatencyHistogram *prometheus.HistogramVec
+	cfg                    *Config
+	workloadLatencySummary *prometheus.SummaryVec
 }
 
 func newProcessor(cfg *Config) (*metricsProcessor, error) {
@@ -38,14 +38,9 @@ func newProcessor(cfg *Config) (*metricsProcessor, error) {
 }
 
 func (p *metricsProcessor) registerRequestLatencyHistogram() error {
-	p.workloadLatencyHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	p.workloadLatencySummary = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadLatencyMetricName,
-		Help: "Latency histogram of workload",
-		Buckets: prometheus.LinearBuckets(
-			p.cfg.LatencyBucketStartMS,
-			p.cfg.LatencyBucketWidthMS,
-			p.cfg.LatencyBucketCount,
-		),
+		Help: "Latency summary of workload",
 	}, []string{
 		metrics.PolicyNameLabel,
 		metrics.PolicyHashLabel,
@@ -53,11 +48,15 @@ func (p *metricsProcessor) registerRequestLatencyHistogram() error {
 		metrics.DecisionTypeLabel,
 		metrics.WorkloadIndexLabel,
 	})
-	err := p.cfg.promRegistry.Register(p.workloadLatencyHistogram)
+	err := p.cfg.promRegistry.Register(p.workloadLatencySummary)
 	if err != nil {
 		if are, ok := err.(prometheus.AlreadyRegisteredError); ok {
-			// A histogram for that metric has been registered before. Use the old histogram from now on.
-			p.workloadLatencyHistogram = are.ExistingCollector.(*prometheus.HistogramVec)
+			// We're registering this histogram vec from multiple processors
+			// (logs processor and traces processor), so if both processors are
+			// enabled, it's expected that whichever processor is created
+			// second, it will see that the histogram vec was already
+			// registered. Use the existing histogram vec from now on.
+			p.workloadLatencySummary = are.ExistingCollector.(*prometheus.SummaryVec)
 			return nil
 		}
 	}
@@ -86,17 +85,18 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		checkResponse := otelcollector.GetCheckResponse(logRecord.Attributes())
-		if checkResponse == nil {
-			return errors.New("failed to get check_response from attributes")
-		}
-		p.addCheckResponseBasedLabels(logRecord.Attributes(), checkResponse)
+		checkResponse := addCheckResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
 
-		authzResponse := otelcollector.GetAuthzResponse(logRecord.Attributes())
-		p.addAuthzResponseBasedLabels(logRecord.Attributes(), authzResponse)
+		fixupEnvoyLogs(logRecord.Attributes())
 
-		log.Trace().Msgf("CheckResponse: %v", checkResponse)
-		return p.updateMetrics(logRecord.Attributes(), checkResponse)
+		addAuthzResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
+
+		p.updateMetrics(logRecord.Attributes(), checkResponse, []string{otelcollector.EnvoyMissingAttributeSourceValue})
+
+		// Pass attributes through exclude list to drop keys that got flattened in this stage
+		enforceExcludeListLog(logRecord.Attributes())
+
+		return nil
 	})
 	return ld, err
 }
@@ -104,24 +104,39 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 // ConsumeTraces receives ptrace.Traces for consumption then returns updated traces with policy labels and metrics.
 func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) (ptrace.Traces, error) {
 	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		checkResponse := otelcollector.GetCheckResponse(span.Attributes())
-		if checkResponse == nil {
-			return errors.New("failed getting check response from attributes")
-		}
-		p.addCheckResponseBasedLabels(span.Attributes(), checkResponse)
-		return p.updateMetrics(span.Attributes(), checkResponse)
+		checkResponse := addCheckResponseBasedLabels(span.Attributes(), []string{})
+
+		addSpanBasedLabels(span)
+
+		p.updateMetrics(span.Attributes(), checkResponse, []string{})
+
+		// Pass attributes through exclude list to drop keys that got flattened in this stage
+		enforceExcludeListSpan(span.Attributes())
+
+		return nil
 	})
 	return td, err
 }
 
-func (p *metricsProcessor) addAuthzResponseBasedLabels(attributes pcommon.Map, authzResponse *flowcontrolv1.AuthzResponse) {
+// HACK We cannot configure envoy to send some attributes according to OTEL's
+// conventions, so we let envoy send them its way and fix up here.
+func fixupEnvoyLogs(attributes pcommon.Map) {
+	if flavorVal, exists := attributes.Get("http.flavor"); exists {
+		if flavor := flavorVal.StringVal(); flavor != "" {
+			flavorVal.SetStringVal(selectors.CanonicalizeOtelHTTPFlavor(flavor))
+		}
+	}
+}
+
+func addAuthzResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string) {
+	var authzResponse flowcontrolv1.AuthzResponse
+	otelcollector.GetStruct(attributes, otelcollector.MarshalledAuthzResponseLabel, &authzResponse, treatAsMissing)
 	labels := map[string]pcommon.Value{
 		otelcollector.AuthzStatusLabel: pcommon.NewValueString(authzResponse.GetStatus().String()),
 	}
 	for key, value := range labels {
-		attributes.Insert(key, value)
+		attributes.Upsert(key, value)
 	}
-	attributes.Remove(otelcollector.MarshalledAuthzResponseLabel)
 }
 
 // addCheckResponseBasedLabels adds the following labels:
@@ -132,14 +147,24 @@ func (p *metricsProcessor) addAuthzResponseBasedLabels(attributes pcommon.Map, a
 // * `concurrency_limiters`
 // * `dropping_concurrency_limiters`
 // * `flux_meters`.
-func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse) {
+// * `flow_label_keys`.
+// * `classifiers`.
+func addCheckResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string) *flowcontrolv1.CheckResponse {
+	var checkResponse flowcontrolv1.CheckResponse
+	success := otelcollector.GetStruct(attributes, otelcollector.MarshalledCheckResponseLabel, &checkResponse, treatAsMissing)
+	if !success {
+		return nil
+	}
 	labels := map[string]pcommon.Value{
 		otelcollector.RateLimitersLabel:                pcommon.NewValueSlice(),
 		otelcollector.DroppingRateLimitersLabel:        pcommon.NewValueSlice(),
 		otelcollector.ConcurrencyLimitersLabel:         pcommon.NewValueSlice(),
 		otelcollector.DroppingConcurrencyLimitersLabel: pcommon.NewValueSlice(),
+		otelcollector.WorkloadsLabel:                   pcommon.NewValueSlice(),
+		otelcollector.DroppingWorkloadsLabel:           pcommon.NewValueSlice(),
 		otelcollector.FluxMetersLabel:                  pcommon.NewValueSlice(),
 		otelcollector.FlowLabelKeysLabel:               pcommon.NewValueSlice(),
+		otelcollector.ClassifiersLabel:                 pcommon.NewValueSlice(),
 		otelcollector.DecisionTypeLabel:                pcommon.NewValueString(checkResponse.DecisionType.String()),
 		otelcollector.DecisionRejectReasonLabel:        pcommon.NewValueString(""),
 		otelcollector.DecisionErrorReasonLabel:         pcommon.NewValueString(""),
@@ -165,7 +190,6 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 			rawValue := []string{
 				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
 				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
-				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.GetWorkloadIndex()),
 				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
 			}
 			value := strings.Join(rawValue, ",")
@@ -173,14 +197,22 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 			if decision.Dropped {
 				labels[otelcollector.DroppingConcurrencyLimitersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 			}
+
+			workloadsRawValue := []string{
+				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
+				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
+				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.GetWorkloadIndex()),
+				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
+			}
+			value = strings.Join(workloadsRawValue, ",")
+			labels[otelcollector.WorkloadsLabel].SliceVal().AppendEmpty().SetStringVal(value)
+			if decision.Dropped {
+				labels[otelcollector.DroppingWorkloadsLabel].SliceVal().AppendEmpty().SetStringVal(value)
+			}
 		}
 	}
 	for _, fluxMeter := range checkResponse.FluxMeters {
-		rawValue := []string{
-			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, fluxMeter.GetPolicyName()),
-			fmt.Sprintf("%s:%v", metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()),
-		}
-		value := strings.Join(rawValue, ",")
+		value := fluxMeter.GetFluxMeterName()
 		labels[otelcollector.FluxMetersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 	}
 
@@ -188,112 +220,130 @@ func (p *metricsProcessor) addCheckResponseBasedLabels(attributes pcommon.Map, c
 		labels[otelcollector.FlowLabelKeysLabel].SliceVal().AppendEmpty().SetStringVal(flowLabelKey)
 	}
 
-	for key, value := range labels {
-		attributes.Insert(key, value)
+	for _, classifier := range checkResponse.Classifiers {
+		rawValue := []string{
+			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
+			fmt.Sprintf("%s:%v", metrics.ClassifierIndexLabel, classifier.ClassifierIndex),
+		}
+		value := strings.Join(rawValue, ",")
+		labels[otelcollector.ClassifiersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 	}
-	attributes.Remove(otelcollector.MarshalledCheckResponseLabel)
+
+	for key, value := range labels {
+		attributes.Upsert(key, value)
+	}
+	return &checkResponse
+}
+
+func addSpanBasedLabels(span ptrace.Span) {
+	endTimestamp := span.EndTimestamp()
+	startTimeStamp := span.StartTimestamp()
+	latency := float64(endTimestamp.AsTime().Sub(startTimeStamp.AsTime())) / float64(time.Millisecond)
+	span.Attributes().UpsertDouble(otelcollector.DurationLabel, latency)
 }
 
 func (p *metricsProcessor) updateMetrics(
 	attributes pcommon.Map,
 	checkResponse *flowcontrolv1.CheckResponse,
-) error {
-	latencyLabel := getLatencyLabel(attributes)
+	treatAsZero []string,
+) {
+	if checkResponse == nil {
+		return
+	}
+	if len(checkResponse.LimiterDecisions) > 0 {
+		// Update workload metrics
+		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.DurationLabel, treatAsZero)
+		for _, decision := range checkResponse.LimiterDecisions {
+			if cl := decision.GetConcurrencyLimiter(); cl != nil {
+				labels := map[string]string{
+					metrics.PolicyNameLabel:     decision.PolicyName,
+					metrics.PolicyHashLabel:     decision.PolicyHash,
+					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
+					metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
+					metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
+				}
 
-	if latencyLabel == "" {
-		log.Debug().Msg("Failed determining latency label")
-		return nil
-	}
-	rawLatency, exists := attributes.Get(latencyLabel)
-	if !exists {
-		log.Debug().Str("label", latencyLabel).Msg("Label does not exist")
-		return nil
-	}
-	latency, err := strconv.ParseFloat(rawLatency.StringVal(), 64)
-	if err != nil {
-		log.Debug().Str("rawLatency", rawLatency.AsString()).Msg("Could not parse raw latency to float")
-		return nil
-	}
-	statusCode, exists := attributes.Get(otelcollector.StatusCodeLabel)
-	if !exists {
-		log.Debug().Str("label", otelcollector.StatusCodeLabel).Msg("Label does not exist")
-		return nil
-	}
-	statusCodeStr := statusCode.StringVal()
-
-	for _, decision := range checkResponse.LimiterDecisions {
-		labels := map[string]string{
-			metrics.PolicyNameLabel:     decision.PolicyName,
-			metrics.PolicyHashLabel:     decision.PolicyHash,
-			metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
-			metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
-		}
-		log.Trace().Msgf("labels: %v", labels)
-
-		workload := ""
-		if cl := decision.GetConcurrencyLimiter(); cl != nil {
-			workload = cl.GetWorkloadIndex()
-		}
-		err = p.updateMetricsForWorkload(labels, latency, workload)
-		if err != nil {
-			return err
+				p.updateMetricsForWorkload(labels, latency)
+			} // TODO: add rate limiter metrics
 		}
 	}
 
-	for _, fluxMeter := range checkResponse.FluxMeters {
-		p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, latency)
+	if len(checkResponse.FluxMeters) > 0 {
+		// Update flux meter metrics
+		statusCodeStr := ""
+		statusCode, exists := attributes.Get(otelcollector.HTTPStatusCodeLabel)
+		if exists {
+			statusCodeStr = statusCode.StringVal()
+		}
+		featureStatusStr := ""
+		featureStatus, exists := attributes.Get(otelcollector.FeatureStatusLabel)
+		if exists {
+			featureStatusStr = featureStatus.StringVal()
+		}
+		for _, fluxMeter := range checkResponse.FluxMeters {
+			p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, attributes)
+		}
 	}
-
-	return nil
 }
 
-func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64, workload string) error {
-	labels[metrics.WorkloadIndexLabel] = workload
-	latencyHistogram, err := p.workloadLatencyHistogram.GetMetricWith(labels)
+func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64) {
+	latencyHistogram, err := p.workloadLatencySummary.GetMetricWith(labels)
 	if err != nil {
-		log.Warn().Err(err).Msg("Getting latency histogram")
-		return err
+		otelcollector.LogSampled.Warn().Err(err).Msg("Getting latency histogram")
+		return
 	}
 	latencyHistogram.Observe(latency)
-
-	return nil
 }
 
 func (p *metricsProcessor) updateMetricsForFluxMeters(
-	fluxMeter *flowcontrolv1.FluxMeter,
+	fluxMeterMessage *flowcontrolv1.FluxMeter,
 	decisionType flowcontrolv1.DecisionType,
 	statusCode string,
-	latency float64,
+	featureStatus string,
+	attributes pcommon.Map,
 ) {
-	fluxmeterHistogram := p.cfg.engine.GetFluxMeterHist(
-		fluxMeter.GetPolicyName(),
-		fluxMeter.GetFluxMeterName(),
-		statusCode,
-		decisionType,
-	)
-	if fluxmeterHistogram == nil {
-		log.Debug().Str(metrics.PolicyNameLabel, fluxMeter.GetPolicyName()).
-			Str(metrics.FluxMeterNameLabel, fluxMeter.GetFluxMeterName()).
+	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
+	if fluxMeter == nil {
+		otelcollector.LogSampled.Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
-			Msg("Fluxmeter not found")
+			Str(metrics.FeatureStatusLabel, featureStatus).
+			Msg("FluxMeter not found")
 		return
 	}
-	fluxmeterHistogram.Observe(latency)
+
+	// metricValue is the value at fluxMeter's AttributeKey
+	metricValue, _ := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), []string{})
+
+	fluxMeterHistogram := fluxMeter.GetHistogram(decisionType, statusCode, featureStatus)
+	if fluxMeterHistogram != nil {
+		fluxMeterHistogram.Observe(metricValue)
+	}
 }
 
-func getLatencyLabel(attributes pcommon.Map) string {
-	controlPoint, exists := attributes.Get(otelcollector.ControlPointLabel)
-	if !exists {
-		log.Debug().Str("label", otelcollector.ControlPointLabel).Msg("Label does not exist")
-		// This should not happen
-		return ""
+var (
+	_attributesCommon = []string{
+		otelcollector.MarshalledCheckResponseLabel,
 	}
-	switch controlPoint.AsString() {
-	case otelcollector.ControlPointFeature:
-		return otelcollector.FeatureDurationLabel
-	case otelcollector.ControlPointIngress, otelcollector.ControlPointEgress:
-		return otelcollector.HTTPDurationLabel
+
+	_attributesLog = []string{
+		otelcollector.MarshalledAuthzResponseLabel,
+		otelcollector.EnvoyRequestDurationLabel,
+		otelcollector.EnvoyRequestTxDurationLabel,
+		otelcollector.EnvoyResponseDurationLabel,
+		otelcollector.EnvoyResponseTxDurationLabel,
 	}
-	return ""
+
+	_attributesSpan = []string{}
+
+	excludeListLog  = otelcollector.FormExcludeList(append(_attributesCommon, _attributesLog...))
+	excludeListSpan = otelcollector.FormExcludeList(append(_attributesCommon, _attributesSpan...))
+)
+
+func enforceExcludeListLog(attributes pcommon.Map) {
+	otelcollector.EnforceExcludeList(attributes, excludeListLog)
+}
+
+func enforceExcludeListSpan(attributes pcommon.Map) {
+	otelcollector.EnforceExcludeList(attributes, excludeListSpan)
 }

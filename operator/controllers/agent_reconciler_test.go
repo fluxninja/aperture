@@ -53,6 +53,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Namespace = test
 			reconciler = &AgentReconciler{
 				Client:           k8sClient,
+				DynamicClient:    k8sDynamicClient,
 				Scheme:           scheme.Scheme,
 				Recorder:         k8sManager.GetEventRecorderFor(appName),
 				ApertureInjector: &ApertureInjector{Client: k8sClient},
@@ -108,10 +109,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentDaemonsetKey := types.NamespacedName{Name: agentServiceName, Namespace: namespace}
 
 			createdMWC := &admissionregistrationv1.MutatingWebhookConfiguration{}
-			mwcKey := types.NamespacedName{Name: mutatingWebhookName}
+			mwcKey := types.NamespacedName{Name: podMutatingWebhookName}
 
 			createdAgentSecret := &corev1.Secret{}
-			agentSecretKey := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace}
+			agentSecretKey := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
 
 			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
 			Expect(err).ToNot(HaveOccurred())
@@ -149,9 +150,8 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Namespace = namespace
 			instance.Spec.Sidecar.Enabled = false
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
-			instance.Spec.FluxNinjaPlugin.Enabled = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = test
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = test
 			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
 
 			ns1 := &corev1.Namespace{
@@ -197,10 +197,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentDaemonsetKey := types.NamespacedName{Name: agentServiceName, Namespace: namespace}
 
 			createdMWC := &admissionregistrationv1.MutatingWebhookConfiguration{}
-			mwcKey := types.NamespacedName{Name: mutatingWebhookName}
+			mwcKey := types.NamespacedName{Name: podMutatingWebhookName}
 
 			createdAgentSecret := &corev1.Secret{}
-			agentSecretKey := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace}
+			agentSecretKey := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
 
 			createdAgentConfigMapNs1 := &corev1.ConfigMap{}
 			agentConfigKeyNs1 := types.NamespacedName{Name: agentServiceName, Namespace: namespace1}
@@ -209,10 +209,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentConfigKeyNs2 := types.NamespacedName{Name: agentServiceName, Namespace: namespace2}
 
 			createdAgentSecretNs1 := &corev1.Secret{}
-			agentSecretKeyNs1 := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace1}
+			agentSecretKeyNs1 := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace1}
 
 			createdAgentSecretNs2 := &corev1.Secret{}
-			agentSecretKeyNs2 := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace2}
+			agentSecretKeyNs2 := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace2}
 
 			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
 			Expect(err).ToNot(HaveOccurred())
@@ -238,8 +238,8 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: test, Namespace: namespace}, instance)).To(BeNil())
 			Expect(instance.Status.Resources).To(Equal("created"))
 			Expect(instance.Finalizers).To(Equal([]string{finalizerName}))
-			Expect(instance.Spec.FluxNinjaPlugin.APIKeySecret.Create).To(BeFalse())
-			Expect(instance.Spec.FluxNinjaPlugin.APIKeySecret.Value).To(Equal(""))
+			Expect(instance.Spec.Secrets.FluxNinjaPlugin.Create).To(BeFalse())
+			Expect(instance.Spec.Secrets.FluxNinjaPlugin.Value).To(Equal(""))
 
 			Expect(k8sClient.Delete(ctx, ns)).To(BeNil())
 			Expect(k8sClient.Delete(ctx, ns1)).To(BeNil())
@@ -260,11 +260,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Namespace = namespace
 			instance.Spec.Sidecar.Enabled = true
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
-			instance.Spec.FluxNinjaPlugin.Enabled = true
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
 			encodedString := fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(test)))
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = test
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = test
 			Expect(k8sClient.Create(ctx, instance)).To(BeNil())
 
 			ns1 := &corev1.Namespace{
@@ -323,10 +322,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentDaemonsetKey := types.NamespacedName{Name: agentServiceName, Namespace: namespace}
 
 			createdMWC := &admissionregistrationv1.MutatingWebhookConfiguration{}
-			mwcKey := types.NamespacedName{Name: mutatingWebhookName}
+			mwcKey := types.NamespacedName{Name: podMutatingWebhookName}
 
 			createdAgentSecret := &corev1.Secret{}
-			agentSecretKey := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace}
+			agentSecretKey := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
 
 			createdAgentConfigMapNs1 := &corev1.ConfigMap{}
 			agentConfigKeyNs1 := types.NamespacedName{Name: agentServiceName, Namespace: namespace1}
@@ -335,10 +334,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentConfigKeyNs2 := types.NamespacedName{Name: agentServiceName, Namespace: namespace2}
 
 			createdAgentSecretNs1 := &corev1.Secret{}
-			agentSecretKeyNs1 := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace1}
+			agentSecretKeyNs1 := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace1}
 
 			createdAgentSecretNs2 := &corev1.Secret{}
-			agentSecretKeyNs2 := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace2}
+			agentSecretKeyNs2 := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace2}
 
 			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
 			Expect(err).ToNot(HaveOccurred())
@@ -364,7 +363,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: test, Namespace: namespace}, instance)).To(BeNil())
 			Expect(instance.Status.Resources).To(Equal("created"))
 			Expect(instance.Finalizers).To(Equal([]string{finalizerName}))
-			Expect(instance.Spec.FluxNinjaPlugin.APIKeySecret.Value).To(Equal(encodedString))
+			Expect(instance.Spec.Secrets.FluxNinjaPlugin.Value).To(Equal(encodedString))
 
 			Expect(k8sClient.Delete(ctx, ns)).To(BeNil())
 			Expect(k8sClient.Delete(ctx, ns1)).To(BeNil())
@@ -437,10 +436,9 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Namespace = namespace
 			instance.Spec.Sidecar.Enabled = true
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
-			instance.Spec.FluxNinjaPlugin.Enabled = true
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Create = true
-			instance.Spec.FluxNinjaPlugin.APIKeySecret.Value = test
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = test
 
 			ns1 := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -491,7 +489,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentConfigKeyNs1 := types.NamespacedName{Name: agentServiceName, Namespace: namespace1}
 
 			createdAgentSecretNs2 := &corev1.Secret{}
-			agentSecretKeyNs2 := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.FluxNinjaPlugin.APIKeySecret), Namespace: namespace2}
+			agentSecretKeyNs2 := types.NamespacedName{Name: secretName(test, "agent", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace2}
 
 			Eventually(func() bool {
 				return k8sClient.Get(ctx, clusterRoleBindingKey, createdClusterRoleBinding) == nil &&
@@ -555,9 +553,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 				ObjectNew: &v1alpha1.Agent{
 					Spec: v1alpha1.AgentSpec{
 						CommonSpec: v1alpha1.CommonSpec{
-							FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-								Enabled: true,
-							},
+							Command: testArray,
 						},
 					},
 				},
@@ -595,8 +591,8 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 				ObjectOld: &v1alpha1.Agent{
 					Spec: v1alpha1.AgentSpec{
 						CommonSpec: v1alpha1.CommonSpec{
-							FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-								APIKeySecret: v1alpha1.APIKeySecret{
+							Secrets: v1alpha1.Secrets{
+								FluxNinjaPlugin: v1alpha1.APIKeySecret{
 									Value: test,
 								},
 							},
@@ -606,8 +602,8 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 				ObjectNew: &v1alpha1.Agent{
 					Spec: v1alpha1.AgentSpec{
 						CommonSpec: v1alpha1.CommonSpec{
-							FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-								APIKeySecret: v1alpha1.APIKeySecret{
+							Secrets: v1alpha1.Secrets{
+								FluxNinjaPlugin: v1alpha1.APIKeySecret{
 									Value: "",
 								},
 							},
@@ -620,8 +616,8 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 				ObjectOld: &v1alpha1.Agent{
 					Spec: v1alpha1.AgentSpec{
 						CommonSpec: v1alpha1.CommonSpec{
-							FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-								APIKeySecret: v1alpha1.APIKeySecret{
+							Secrets: v1alpha1.Secrets{
+								FluxNinjaPlugin: v1alpha1.APIKeySecret{
 									Value: test,
 								},
 							},
@@ -631,8 +627,8 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 				ObjectNew: &v1alpha1.Agent{
 					Spec: v1alpha1.AgentSpec{
 						CommonSpec: v1alpha1.CommonSpec{
-							FluxNinjaPlugin: v1alpha1.FluxNinjaPluginSpec{
-								APIKeySecret: v1alpha1.APIKeySecret{
+							Secrets: v1alpha1.Secrets{
+								FluxNinjaPlugin: v1alpha1.APIKeySecret{
 									Value: fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(test))),
 								},
 							},

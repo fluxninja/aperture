@@ -8,33 +8,32 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 var _ = Describe("Enrichment Processor - Logs", func() {
 	It("Enriches egress logs attributes with data from entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
 		entityCache.Put(&entitycache.Entity{
-			ID:         entitycache.EntityID{},
-			IPAddress:  "192.0.2.0",
-			AgentGroup: "defaultAG",
-			Services:   []string{"svc1", "svc2"},
+			ID:        entitycache.EntityID{},
+			IPAddress: "192.0.2.0",
+			Services:  []string{"svc1", "svc2"},
 		})
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
-			"control_point":    "egress",
-			"net.host.address": "192.0.2.0:80",
-			"net.peer.address": "192.0.2.1:80",
+		ld := logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			otelcollector.HostAddressLabel:  "192.0.2.0:80",
+			otelcollector.PeerAddressLabel:  "192.0.2.1:80",
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
-			"control_point": "egress",
-			"labeled":       "false",
-			"agent_group":   "defaultAG",
-			"services":      "svc1,svc2",
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			otelcollector.LabeledLabel:      "false",
+			"services":                      []string{"svc1", "svc2"},
 		}))
 	})
 
@@ -47,19 +46,17 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
-			"control_point":    "egress",
-			"net.host.address": "-",
-			"net.peer.address": "192.0.2.1:80",
+		ld := logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			otelcollector.HostAddressLabel:  "-",
+			otelcollector.PeerAddressLabel:  "192.0.2.1:80",
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
-			"control_point":    "egress",
-			"labeled":          "false",
-			"net.host.address": "-",
-			"net.peer.address": "192.0.2.1:80",
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			otelcollector.LabeledLabel:      "false",
 		}))
 	})
 
@@ -72,44 +69,42 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
-			"control_point":    "egress",
-			"net.host.address": "this is :: definitely not an IP ::::",
-			"net.peer.address": "192.0.2.1:80",
+		ld := logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			otelcollector.HostAddressLabel:  "this is :: definitely not an IP ::::",
+			otelcollector.PeerAddressLabel:  "192.0.2.1:80",
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
-			"control_point": "egress",
-			"labeled":       "false",
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			otelcollector.LabeledLabel:      "false",
 		}))
 	})
 
 	It("Enriches ingress logs attributes with data from entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
 		entityCache.Put(&entitycache.Entity{
-			ID:         entitycache.EntityID{},
-			IPAddress:  "192.0.2.0",
-			AgentGroup: "defaultAG",
-			Services:   []string{"svc1", "svc2"},
+			ID:        entitycache.EntityID{},
+			IPAddress: "192.0.2.0",
+			Services:  []string{"svc1", "svc2"},
 		})
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
-			"control_point": "ingress",
-			"net.host.ip":   "192.0.2.0",
-			"net.peer.ip":   "192.0.2.1",
+		ld := logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointIngress,
+			"net.host.ip":                   "192.0.2.0",
+			"net.peer.ip":                   "192.0.2.1",
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
-			"control_point": "ingress",
-			"labeled":       "false",
-			"agent_group":   "defaultAG",
-			"services":      "svc1,svc2",
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointIngress,
+			otelcollector.LabeledLabel:      "false",
+			"services":                      []string{"svc1", "svc2"},
 		}))
 	})
 
@@ -118,17 +113,17 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
-			"control_point":    "egress",
-			"net.host.address": "192.0.2.0:80",
-			"net.peer.address": "192.0.2.1:80",
+		ld := logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			otelcollector.HostAddressLabel:  "192.0.2.0:80",
+			otelcollector.PeerAddressLabel:  "192.0.2.1:80",
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
-			"control_point": "egress",
-			"labeled":       "false",
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			otelcollector.LabeledLabel:      "false",
 		}))
 	})
 
@@ -137,18 +132,18 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
-			"control_point":   "egress",
-			"aperture.labels": `{"foo": "bar", "fizz": "buzz"}`,
+		ld := logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			"aperture.labels":               `{"foo": "bar", "fizz": "buzz"}`,
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
-			"control_point": "egress",
-			"foo":           "bar",
-			"fizz":          "buzz",
-			"labeled":       "true",
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			"foo":                           "bar",
+			"fizz":                          "buzz",
+			otelcollector.LabeledLabel:      "true",
 		}))
 	})
 
@@ -157,16 +152,16 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
-			"control_point":   "egress",
-			"aperture.labels": ``,
+		ld := logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			"aperture.labels":               ``,
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
-			"control_point": "egress",
-			"labeled":       "false",
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointEgress,
+			otelcollector.LabeledLabel:      "false",
 		}))
 	})
 
@@ -175,30 +170,27 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
-		ld := logsFromLabels(map[string]string{
-			"control_point":   "feature",
-			"aperture.labels": `-`,
+		ld := logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
+			"aperture.labels":               `-`,
 		})
 		ld, err := processor.ConsumeLogs(context.TODO(), ld)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertLogsEqual(ld, logsFromLabels(map[string]string{
-			"control_point": "feature",
-			"labeled":       "false",
+		assertLogsEqual(ld, logsFromLabels(map[string]interface{}{
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
+			otelcollector.LabeledLabel:      "false",
 		}))
 	})
 })
 
-func logsFromLabels(labels map[string]string) plog.Logs {
+func logsFromLabels(labels map[string]interface{}) plog.Logs {
 	ld := plog.NewLogs()
 	logs := ld.ResourceLogs().AppendEmpty().
 		ScopeLogs().AppendEmpty().
 		LogRecords()
 	logRecord := logs.AppendEmpty()
-	attr := logRecord.Attributes()
-	for k, v := range labels {
-		attr.InsertString(k, v)
-	}
+	populateAttrsFromLabels(logRecord.Attributes(), labels)
 	return ld
 }
 

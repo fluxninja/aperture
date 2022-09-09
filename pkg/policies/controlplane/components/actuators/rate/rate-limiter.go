@@ -5,19 +5,20 @@ import (
 	"errors"
 	"path"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.uber.org/fx"
+	"go.uber.org/multierr"
+	"google.golang.org/protobuf/proto"
+
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
-	clientv3 "go.etcd.io/etcd/client/v3"
-	"go.uber.org/fx"
-	"go.uber.org/multierr"
-	"google.golang.org/protobuf/proto"
 )
 
 type rateLimiterSync struct {
@@ -66,7 +67,7 @@ func NewRateLimiterAndOptions(
 func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &configv1.RateLimiterWrapper{
+			wrapper := &wrappersv1.RateLimiterWrapper{
 				RateLimiter:    limiterSync.rateLimiterProto,
 				ComponentIndex: int64(limiterSync.componentIndex),
 				PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
@@ -133,11 +134,11 @@ func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
 		limiterSync.decision.Limit = limitValue
 		// Publish decision
 		log.Debug().Float64("limit", limitValue).Msg("publishing rate limiter decision")
-		wrapper := &configv1.RateLimiterWrapper{
-			RateLimiter:    limiterSync.rateLimiterProto,
-			ComponentIndex: int64(limiterSync.componentIndex),
-			PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
-			PolicyHash:     limiterSync.policyReadAPI.GetPolicyHash(),
+		wrapper := &wrappersv1.RateLimiterDecisionWrapper{
+			RateLimiterDecision: limiterSync.decision,
+			ComponentIndex:      int64(limiterSync.componentIndex),
+			PolicyName:          limiterSync.policyReadAPI.GetPolicyName(),
+			PolicyHash:          limiterSync.policyReadAPI.GetPolicyHash(),
 		}
 		dat, err := proto.Marshal(wrapper)
 		if err != nil {

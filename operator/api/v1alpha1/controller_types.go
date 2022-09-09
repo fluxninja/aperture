@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/fluxninja/aperture/pkg/jobs"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -30,12 +31,35 @@ type ControllerSpec struct {
 
 	// Image configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={tag:"latest",pullPolicy:"IfNotPresent",registry:"docker.io/fluxninja",repository:"aperture-controller"}
-	Image Image `json:"image"`
+	Image ControllerImage `json:"image"`
 
 	// Pod's host aliases
 	//+kubebuilder:validation:Optional
-	HostAliases []corev1.HostAlias `json:"hostAliases"`
+	HostAliases []corev1.HostAlias `json:"hostAliases,omitempty"`
+
+	// Controller Configuration
+	//+kubebuilder:validation:Optional
+	ConfigSpec ControllerConfigSpec `json:"config"`
+}
+
+// ControllerConfigSpec holds controller configuration.
+type ControllerConfigSpec struct {
+	// CommonSpec
+	//+kubebuilder:validation:Optional
+	CommonConfigSpec `json:",inline"`
+
+	// Policies configuration.
+	//+kubebuilder:validation:Optional
+	Policies PoliciesConfig `json:"policies"`
+}
+
+// PoliciesConfig for policy engine.
+type PoliciesConfig struct {
+	// Policies path configuration.
+	PoliciesPath string `json:"policies_path"`
+
+	// Scheduler for PromQL jobs.
+	PromQLJobsScheduler jobs.JobGroupConfig `json:"promql_jobs_scheduler"`
 }
 
 // ControllerStatus defines the observed state of Controller.
@@ -53,7 +77,6 @@ type Controller struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	//+kubebuilder:default:={serverPort:80}
 	Spec   ControllerSpec   `json:"spec,omitempty"`
 	Status ControllerStatus `json:"status,omitempty"`
 }

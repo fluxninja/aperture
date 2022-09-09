@@ -23,28 +23,31 @@ func ProxyModule() fx.Option {
 
 // ProxyConstructor holds fields used to configure Proxy.
 type ProxyConstructor struct {
-	Key           string
+	ConfigKey     string
 	DefaultConfig ProxyConfig
 }
 
 // ProxyConfig holds proxy configuration.
 // This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
 // swagger:model
+// +kubebuilder:object:generate=true
 type ProxyConfig struct {
-	HTTPProxy  string   `json:"http" validate:"omitempty,url|hostname_port"`
-	HTTPSProxy string   `json:"https" validate:"omitempty,url|hostname_port"`
-	NoProxy    []string `json:"no_proxy" validate:"dive,ip|cidr|fqdn|hostname_port"`
+	HTTPProxy string `json:"http" validate:"omitempty,url|hostname_port"`
+
+	HTTPSProxy string `json:"https" validate:"omitempty,url|hostname_port"`
+
+	NoProxy []string `json:"no_proxy,omitempty" validate:"omitempty,dive,ip|cidr|fqdn|hostname_port"`
 }
 
 func (constructor ProxyConstructor) applyProxyConfig(unmarshaller config.Unmarshaller) error {
-	if constructor.Key == "" {
-		constructor.Key = defaultProxyKey
+	if constructor.ConfigKey == "" {
+		constructor.ConfigKey = defaultProxyKey
 	}
 
 	var err error
 
 	config := constructor.DefaultConfig
-	if err = unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err = unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize client proxy configuration!")
 		return err
 	}

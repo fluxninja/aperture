@@ -23,12 +23,13 @@ func ClientModule() fx.Option {
 // ClientConstructor holds fields to create an annotated instance of ClientConnectionBuilder.
 type ClientConstructor struct {
 	Name          string
-	Key           string
+	ConfigKey     string
 	DefaultConfig GRPCClientConfig
 }
 
 // GRPCClientConfig holds configuration for GRPC Client.
 // swagger:model
+// +kubebuilder:object:generate=true
 type GRPCClientConfig struct {
 	// Minimum connection timeout
 	MinConnectionTimeout config.Duration `json:"min_connection_timeout" validate:"gte=0" default:"20s"`
@@ -44,6 +45,7 @@ type GRPCClientConfig struct {
 
 // BackoffConfig holds configuration for GRPC Client Backoff.
 // swagger:model
+// +kubebuilder:object:generate=true
 type BackoffConfig struct {
 	// Base Delay
 	BaseDelay config.Duration `json:"base_delay" validate:"gte=0" default:"1s"`
@@ -57,7 +59,7 @@ type BackoffConfig struct {
 
 // Annotate creates an annotated instance of GRPC ClientConnectionBuilder.
 func (c ClientConstructor) Annotate() fx.Option {
-	if c.Key == "" {
+	if c.ConfigKey == "" {
 		log.Panic().Msg("config key not provided")
 	}
 
@@ -73,7 +75,7 @@ func (c ClientConstructor) Annotate() fx.Option {
 
 func (c ClientConstructor) provideClientConnectionBuilder(unmarshaller config.Unmarshaller) (ClientConnectionBuilder, *GRPCClientConfig, error) {
 	config := c.DefaultConfig
-	err := unmarshaller.UnmarshalKey(c.Key, &config)
+	err := unmarshaller.UnmarshalKey(c.ConfigKey, &config)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -95,12 +97,12 @@ func (c ClientConstructor) provideClientConnectionBuilder(unmarshaller config.Un
 	))
 	dialOptions = append(dialOptions, grpc.WithConnectParams(grpc.ConnectParams{
 		Backoff: backoff.Config{
-			BaseDelay:  config.Backoff.BaseDelay.Duration.AsDuration(),
+			BaseDelay:  config.Backoff.BaseDelay.AsDuration(),
 			Multiplier: config.Backoff.Multiplier,
 			Jitter:     config.Backoff.Jitter,
-			MaxDelay:   config.Backoff.MaxDelay.Duration.AsDuration(),
+			MaxDelay:   config.Backoff.MaxDelay.AsDuration(),
 		},
-		MinConnectTimeout: config.MinConnectionTimeout.Duration.AsDuration(),
+		MinConnectTimeout: config.MinConnectionTimeout.AsDuration(),
 	}))
 
 	if !config.UseProxy {

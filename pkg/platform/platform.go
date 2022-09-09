@@ -2,6 +2,7 @@ package platform
 
 import (
 	"context"
+	"errors"
 	"os"
 	"time"
 
@@ -25,7 +26,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -48,7 +48,7 @@ var platform = initPlatform()
 
 // Platform holds the state of the platform.
 type Platform struct {
-	statusRegistry *status.Registry
+	statusRegistry status.Registry
 	unmarshaller   config.Unmarshaller
 	dotgraph       fx.DotGraph
 }
@@ -107,21 +107,18 @@ func (cfg Config) Module() fx.Option {
 		fx.Provide(provideFlagSetBuilder),
 		config.ModuleConfig{MergeConfig: cfg.MergeConfig, UnknownFlags: false, ExitOnHelp: true}.Module(),
 		config.LogModule(),
-		health.HealthModule(),
+		health.Module(),
 		http.ProxyModule(),
 		metrics.Module(),
 		watchdog.Module(),
 		fswatcher.Module(),
-		peers.Constructor{}.Module(),
 		profilers.Module(),
 		ServerModule(false),
 		etcdclient.Module(),
 		jobs.Module(),
 		status.Module(),
-		fx.Invoke(grpc.RegisterStatusService),
 		fx.Populate(&platform.statusRegistry),
 		platformStatusModule(),
-		plugins.ModuleConfig{OnlyCommandLineFlags: true}.Module(),
 		fx.Supply(registry),
 		fx.Populate(&platform.unmarshaller),
 		fx.Populate(&platform.dotgraph),
@@ -132,7 +129,6 @@ func (cfg Config) Module() fx.Option {
 			pluginOptions,
 		)
 	}
-
 	return options
 }
 
@@ -161,6 +157,7 @@ func ServerModule(testMode bool) fx.Option {
 
 // Run is an fx helper function to gracefully start and stop an app container.
 func Run(app *fx.App) {
+	platform.statusRegistry = platform.statusRegistry.Child(platformStatusPath)
 	// Check for dotflag
 	if platform.unmarshaller != nil {
 		dotfile := config.GetStringValue(platform.unmarshaller, dotFileKey, "")
@@ -174,7 +171,7 @@ func Run(app *fx.App) {
 	}
 
 	log.Info().Msg("Starting application")
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	if err := app.Start(ctx); err != nil {
@@ -184,15 +181,11 @@ func Run(app *fx.App) {
 
 	defer stop(app)
 
-	s := status.NewStatus(wrapperspb.String("platform running"), nil)
-	err := platform.statusRegistry.Push(platformReadinessStatusName, s)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to push platform readiness status")
-		return
-	}
+	platform.statusRegistry.SetStatus(status.NewStatus(wrapperspb.String("platform running"), nil))
 
 	// Wait for os.Signal
 	<-app.Done()
+	platform.statusRegistry.SetStatus(status.NewStatus(nil, errors.New("platform stopping")))
 }
 
 func stop(app *fx.App) {
@@ -205,6 +198,7 @@ func stop(app *fx.App) {
 	log.WaitFlush()
 	// cleanup temp
 	_ = os.RemoveAll(config.DefaultTempBase)
+	platform.statusRegistry.Detach()
 	os.Exit(0)
 }
 

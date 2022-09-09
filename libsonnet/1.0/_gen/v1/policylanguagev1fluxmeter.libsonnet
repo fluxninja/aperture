@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withAttributeKey(attribute_key):: {
+    attribute_key: attribute_key,
+  },
+  withAttributeKeyMixin(attribute_key):: {
+    attribute_key+: attribute_key,
+  },
   withHistogramBuckets(histogram_buckets):: {
     histogram_buckets:
       if std.isArray(histogram_buckets)

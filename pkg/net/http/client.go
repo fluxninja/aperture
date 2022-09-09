@@ -22,12 +22,13 @@ func ClientModule() fx.Option {
 // ClientConstructor holds fields to create an annotated instance of HTTP client.
 type ClientConstructor struct {
 	Name          string
-	Key           string
+	ConfigKey     string
 	DefaultConfig HTTPClientConfig
 }
 
 // HTTPClientConfig holds configuration for HTTP Client.
 // swagger:model
+// +kubebuilder:object:generate=true
 type HTTPClientConfig struct {
 	// Network level keep-alive duration
 	NetworkKeepAlive config.Duration `json:"network_keep_alive" validate:"gte=0s" default:"30s"`
@@ -36,7 +37,7 @@ type HTTPClientConfig struct {
 	// HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
 	Timeout config.Duration `json:"timeout" validate:"gte=0s" default:"60s"`
 	// Proxy Connect Header - map[string][]string
-	ProxyConnectHeader http.Header `json:"proxy_connect_header"`
+	ProxyConnectHeader http.Header `json:"proxy_connect_header,omitempty" validate:"omitempty"`
 	// TLS Handshake Timeout. 0 = no timeout
 	TLSHandshakeTimeout config.Duration `json:"tls_handshake_timeout" validate:"gte=0s" default:"10s"`
 	// Expect Continue Timeout. 0 = no timeout.
@@ -71,7 +72,7 @@ type HTTPClientConfig struct {
 
 // Annotate creates an annotated instance of HTTP Client.
 func (constructor ClientConstructor) Annotate() fx.Option {
-	if constructor.Key == "" {
+	if constructor.ConfigKey == "" {
 		log.Panic().Msg("config key not provided")
 	}
 
@@ -90,7 +91,7 @@ func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmar
 	var err error
 
 	config := constructor.DefaultConfig
-	if err = unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err = unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize httpclient configuration!")
 		return nil, nil, nil, err
 	}
@@ -103,18 +104,18 @@ func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmar
 	transport := &http.Transport{
 		TLSClientConfig: tlsConfig,
 		DialContext: (&net.Dialer{
-			Timeout:   config.NetworkTimeout.Duration.AsDuration(),
-			KeepAlive: config.NetworkKeepAlive.Duration.AsDuration(),
+			Timeout:   config.NetworkTimeout.AsDuration(),
+			KeepAlive: config.NetworkKeepAlive.AsDuration(),
 		}).DialContext,
-		TLSHandshakeTimeout:    config.TLSHandshakeTimeout.Duration.AsDuration(),
+		TLSHandshakeTimeout:    config.TLSHandshakeTimeout.AsDuration(),
 		DisableKeepAlives:      config.DisableKeepAlives,
 		DisableCompression:     config.DisableCompression,
 		MaxIdleConns:           config.MaxIdleConns,
 		MaxIdleConnsPerHost:    config.MaxIdleConnsPerHost,
 		MaxConnsPerHost:        config.MaxConnsPerHost,
-		IdleConnTimeout:        config.IdleConnTimeout.Duration.AsDuration(),
-		ResponseHeaderTimeout:  config.ResponseHeaderTimeout.Duration.AsDuration(),
-		ExpectContinueTimeout:  config.ExpectContinueTimeout.Duration.AsDuration(),
+		IdleConnTimeout:        config.IdleConnTimeout.AsDuration(),
+		ResponseHeaderTimeout:  config.ResponseHeaderTimeout.AsDuration(),
+		ExpectContinueTimeout:  config.ExpectContinueTimeout.AsDuration(),
 		ProxyConnectHeader:     config.ProxyConnectHeader,
 		MaxResponseHeaderBytes: config.MaxResponseHeaderBytes,
 		WriteBufferSize:        config.WriteBufferSize,
@@ -127,7 +128,7 @@ func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmar
 
 	client := &http.Client{
 		Transport: transport,
-		Timeout:   config.Timeout.Duration.AsDuration(),
+		Timeout:   config.Timeout.AsDuration(),
 	}
 
 	// return a middleware chain -- call invokes on this object to chain middleware functions

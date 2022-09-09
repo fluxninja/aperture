@@ -27,7 +27,10 @@ import (
 )
 
 // AgentOTELComponents constructs OTEL Collector Factories for Agent.
-func AgentOTELComponents(cache *entitycache.EntityCache, promRegistry *prometheus.Registry, engine iface.Engine) (component.Factories, error) {
+func AgentOTELComponents(cache *entitycache.EntityCache,
+	promRegistry *prometheus.Registry,
+	engine iface.Engine,
+) (component.Factories, error) {
 	var errs error
 
 	extensions, err := component.MakeExtensionFactoryMap(

@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package grpcgateway
 
 import (
@@ -38,7 +39,7 @@ type Constructor struct {
 	// Name of http server instance -- empty for main server. Gateway name will be the same as HTTP server name
 	Name string
 	// Config key
-	Key string
+	ConfigKey string
 	// Default gateway config
 	DefaultConfig GRPCGatewayConfig
 }
@@ -68,8 +69,8 @@ func (gw *GRPCGateway) registerGW(fn RegisterHandlerFunc) error {
 
 // Annotate returns fx options that set up grpc-http gateway.
 func (constructor Constructor) Annotate() fx.Option {
-	if constructor.Key == "" {
-		constructor.Key = defaultKey
+	if constructor.ConfigKey == "" {
+		constructor.ConfigKey = defaultKey
 	}
 	var group, name string
 
@@ -128,7 +129,7 @@ func (constructor Constructor) setupGRPCGateway(
 ) error {
 	config := constructor.DefaultConfig
 
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize grpc gateway configuration!")
 		return err
 	}
@@ -198,7 +199,7 @@ func (constructor Constructor) setupGRPCGateway(
 	return nil
 }
 
-func httpResponseModifier(ctx context.Context, w http.ResponseWriter, p proto.Message) error {
+func httpResponseModifier(ctx context.Context, w http.ResponseWriter, _ proto.Message) error {
 	md, ok := runtime.ServerMetadataFromContext(ctx)
 	if !ok {
 		return nil

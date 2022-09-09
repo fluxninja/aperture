@@ -15,7 +15,6 @@ var _ = Describe("Enrichment Processor", func() {
 			ProcessorSettings: config.NewProcessorSettings(config.NewComponentID("enrichment")),
 			entityCache:       entityCache,
 		}
-
 		actual := createDefaultConfig(entityCache)()
 
 		Expect(actual).To(Equal(expected))

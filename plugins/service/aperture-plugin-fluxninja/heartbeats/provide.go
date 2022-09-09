@@ -23,8 +23,8 @@ import (
 func Module() fx.Option {
 	log.Info().Msg("Loading Heartbeats plugin")
 	return fx.Options(
-		grpcclient.ClientConstructor{Name: "heartbeats-grpc-client", Key: pluginconfig.PluginConfigKey + ".client_grpc"}.Annotate(),
-		httpclient.ClientConstructor{Name: "heartbeats-http-client", Key: pluginconfig.PluginConfigKey + ".client_http"}.Annotate(),
+		grpcclient.ClientConstructor{Name: "heartbeats-grpc-client", ConfigKey: pluginconfig.PluginConfigKey + ".client.grpc"}.Annotate(),
+		httpclient.ClientConstructor{Name: "heartbeats-http-client", ConfigKey: pluginconfig.PluginConfigKey + ".client.http"}.Annotate(),
 		fx.Provide(Provide),
 		PeersWatcherModule(),
 		jobs.JobGroupConstructor{Name: heartbeatsGroup}.Annotate(),
@@ -41,7 +41,7 @@ type ConstructorIn struct {
 	JobGroup                   *jobs.JobGroup                     `name:"heartbeats-job-group"`
 	GRPClientConnectionBuilder grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
 	HTTPClient                 *http.Client                       `name:"heartbeats-http-client"`
-	StatusRegistry             *status.Registry
+	StatusRegistry             status.Registry
 	EntityCache                *entitycache.EntityCache `optional:"true"`
 	AgentInfo                  *agentinfo.AgentInfo     `optional:"true"`
 	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`

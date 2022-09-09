@@ -1,0 +1,162 @@
+{{- if .Values.agent.create }}
+apiVersion: fluxninja.com/v1alpha1
+kind: Agent
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-agent-manager
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if or .Values.agent.image.registry .Values.agent.image.repository .Values.agent.image.tag .Values.agent.image.pullPolicy .Values.agent.image.pullSecrets }}
+  image: {{ .Values.agent.image | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.service.annotations }}
+  service:
+    annotations: {{ .Values.agent.service.annotations | toYaml | indent 6 }}
+  {{- end }}
+  serviceAccount:
+    create: {{ .Values.agent.serviceAccount.create }}
+    {{- if .Values.agent.serviceAccount.annotations }}
+    annotations: {{ .Values.agent.serviceAccount.annotations | toYaml | indent 6 }}
+    {{- end }}
+    {{- if .Values.agent.serviceAccount.automountServiceAccountToken }}
+    automountServiceAccountToken: {{ .Values.agent.serviceAccount.automountServiceAccountToken }}
+    {{- end }}
+  livenessProbe:
+    enabled: {{ .Values.agent.livenessProbe.enabled }}
+    {{- if  .Values.agent.livenessProbe.initialDelaySeconds }}
+    initialDelaySeconds: {{ .Values.agent.livenessProbe.initialDelaySeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.periodSeconds }}
+    periodSeconds: {{ .Values.agent.livenessProbe.periodSeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.timeoutSeconds }}
+    timeoutSeconds: {{ .Values.agent.livenessProbe.timeoutSeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.failureThreshold }}
+    failureThreshold: {{ .Values.agent.livenessProbe.failureThreshold }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.successThreshold }}
+    successThreshold: {{ .Values.agent.livenessProbe.successThreshold }}
+    {{- end }}
+  readinessProbe:
+    enabled: {{ .Values.agent.readinessProbe.enabled }}
+    {{- if  .Values.agent.livenessProbe.initialDelaySeconds }}
+    initialDelaySeconds: {{ .Values.agent.readinessProbe.initialDelaySeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.periodSeconds }}
+    periodSeconds: {{ .Values.agent.readinessProbe.periodSeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.timeoutSeconds }}
+    timeoutSeconds: {{ .Values.agent.readinessProbe.timeoutSeconds }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.failureThreshold }}
+    failureThreshold: {{ .Values.agent.readinessProbe.failureThreshold }}
+    {{- end }}
+    {{- if  .Values.agent.livenessProbe.successThreshold }}
+    successThreshold: {{ .Values.agent.readinessProbe.successThreshold }}
+    {{- end }}
+  {{- if .Values.agent.customLivenessProbe }}
+  customLivenessProbe: {{ .Values.agent.customLivenessProbe | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.customReadinessProbe }}
+  customReadinessProbe: {{ .Values.agent.customReadinessProbe | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if or .Values.agent.resources.limits .Values.agent.resources.requests }}
+  resources: {{ .Values.agent.resources | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.podSecurityContext.enabled }}
+  podSecurityContext: {{- .Values.agent.podSecurityContext | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.podSecurityContext.enabled }}
+  containerSecurityContext: {{- .Values.agent.containerSecurityContext | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.command }}
+  command: {{ .Values.agent.command | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.args }}
+  args: {{ .Values.agent.args | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.podLabels }}
+  podLabels: {{ .Values.agent.podLabels | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.podAnnotations }}
+  podAnnotations: {{ .Values.agent.podAnnotations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.affinity }}
+  affinity: {{ .Values.agent.affinity | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.nodeSelector }}
+  nodeSelector: {{ .Values.agent.nodeSelector | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.tolerations }}
+  tolerations: {{ .Values.agent.tolerations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.terminationGracePeriodSeconds }}
+  terminationGracePeriodSeconds: {{ .Values.agent.terminationGracePeriodSeconds | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.lifecycleHooks }}
+  lifecycleHooks: {{ .Values.agent.lifecycleHooks | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.extraEnvVars }}
+  extraEnvVars: {{ .Values.agent.extraEnvVars | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.extraVolumes }}
+  extraVolumes: {{ .Values.agent.extraVolumes | toYaml | nindent 4}}
+  {{- end }}
+  {{- if .Values.agent.extraVolumeMounts }}
+  extraVolumeMounts: {{ .Values.agent.extraVolumeMounts | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.sidecars }}
+  sidecars: {{ .Values.agent.sidecars | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agent.initContainers }}
+  initContainers: {{ .Values.agent.initContainers | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.commonLabels }}
+  labels: {{ .Values.commonLabels | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{ .Values.commonAnnotations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if and .Values.agent.secrets .Values.agent.secrets.fluxNinjaPlugin .Values.agent.secrets.fluxNinjaPlugin.create }}
+  secrets:
+    fluxNinjaPlugin:
+      create: {{ .Values.agent.secrets.fluxNinjaPlugin.create }}
+      {{- if or .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.name .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.key }}
+      secretKeyRef:
+        {{- if .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.name }}
+        name: {{ .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.name }}
+        {{- end }}
+        {{- if .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.key }}
+        key: {{ .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.key }}
+        {{- end }}
+      {{- end }}
+      value: {{ include "agent.apisecret.value" ( dict "agent" .Values.agent $) }}
+  {{- end }}
+  {{- if .Values.agent.sidecar.enabled }}
+  sidecar:
+    enabled: {{ .Values.agent.sidecar.enabled }}
+    {{- if .Values.agent.sidecar.enableNamespacesByDefault }}
+    enableNamespacesByDefault: {{ .Values.agent.sidecar.enableNamespacesByDefault | toYaml | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  config:
+    {{- if (omit .Values.agent.config "etcd" "prometheus") }}
+    {{- omit .Values.agent.config "etcd" "prometheus" | toYaml | nindent 4 }}
+    {{- end }}
+    etcd:
+      {{- if (omit .Values.agent.config.etcd "endpoints")}}
+      {{- omit .Values.agent.config.etcd "endpoints" | toYaml | nindent 6 }}
+      {{- end }}
+      endpoints: {{ include "agent.etcd.endpoints" (dict "etcd" .Values.agent.config.etcd "context" . $) }}
+    prometheus:
+      address: {{ include "agent.prometheus.address" (dict "prometheus" .Values.agent.config.prometheus "context" . $) }}
+{{- end }}

@@ -23,6 +23,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane"
 	"github.com/fluxninja/aperture/pkg/prometheus"
@@ -34,20 +35,24 @@ func main() {
 		notifiers.TrackersConstructor{Name: "entity_trackers"}.Annotate(),
 		prometheus.Module(),
 		k8s.Module(),
-		otel.ProvideAnnotatedAgentConfig(),
+		otel.OTELConfigConstructor{Type: otel.AgentType}.Annotate(),
+		peers.Constructor{}.Module(),
 		fx.Provide(
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
-			entitycache.ProvideEntityCache,
 			otel.AgentOTELComponents,
 			agent.ProvidePeersPrefix,
 		),
+		fx.Invoke(
+			agent.AddAgentInfoAttribute,
+		),
+		entitycache.Module(),
 		flowcontrol.Module,
-		otelcollector.Module(),
 		distcache.Module(),
 		dataplane.PolicyModule(),
 		discovery.Module(),
-		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", Key: "flowcontrol.client.grpc"}.Annotate(),
+		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
+		otelcollector.Module(),
 	)
 
 	if err := app.Err(); err != nil {

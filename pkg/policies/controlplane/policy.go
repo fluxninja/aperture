@@ -3,17 +3,17 @@ package controlplane
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"time"
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
-	"gopkg.in/yaml.v2"
+	"sigs.k8s.io/yaml"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -52,11 +52,11 @@ var _ iface.Policy = (*Policy)(nil)
 
 // newPolicyOptions creates a new Policy object and returns its Fx options for the per Policy App.
 func newPolicyOptions(
-	wrapperMessage *configv1.PolicyWrapper,
+	wrapperMessage *wrappersv1.PolicyWrapper,
 ) (fx.Option, error) {
 	// List of options for the policy.
 	policyOptions := []fx.Option{}
-	policy, compWithPortsList, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage)
+	policy, compiledCircuit, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage)
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +64,14 @@ func newPolicyOptions(
 	policyOptions = append(policyOptions, fx.Supply(
 		fx.Annotate(policy, fx.As(new(iface.Policy))),
 	))
+
+	compWithPortsList := make([]runtime.CompiledComponentAndPorts, 0, len(compiledCircuit))
+	for _, compiledComponent := range compiledCircuit {
+		// Skip nil component
+		if compiledComponent.CompiledComponent.Component != nil {
+			compWithPortsList = append(compWithPortsList, compiledComponent.CompiledComponentAndPorts)
+		}
+	}
 
 	// Create circuit
 	circuit, circuitOption := runtime.NewCircuitAndOptions(compWithPortsList, policy)
@@ -78,8 +86,8 @@ func newPolicyOptions(
 }
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
-func CompilePolicy(policyMessage *policylangv1.Policy) ([]runtime.CompiledComponentAndPorts, error) {
-	wrapperMessage, err := HashAndPolicyWrap(policyMessage, "DoesNotMatter")
+func CompilePolicy(policyMessage *policylangv1.Policy) (CompiledCircuit, error) {
+	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter")
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +99,7 @@ func CompilePolicy(policyMessage *policylangv1.Policy) ([]runtime.CompiledCompon
 }
 
 // compilePolicyWrapper takes policyProto and returns a compiled policy.
-func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []runtime.CompiledComponentAndPorts, fx.Option, error) {
+func compilePolicyWrapper(wrapperMessage *wrappersv1.PolicyWrapper) (*Policy, CompiledCircuit, fx.Option, error) {
 	if wrapperMessage == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy wrapper message")
 	}
@@ -125,7 +133,7 @@ func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []ru
 			resourceOptions = append(resourceOptions, classifierOption)
 		}
 	}
-	var compWithPortsList []runtime.CompiledComponentAndPorts
+	var compiledCircuit CompiledCircuit
 	partialCircuitOption := fx.Options()
 	var err error
 
@@ -133,13 +141,13 @@ func compilePolicyWrapper(wrapperMessage *configv1.PolicyWrapper) (*Policy, []ru
 		// Read evaluation interval
 		policy.evaluationInterval = policyProto.GetCircuit().GetEvaluationInterval().AsDuration()
 
-		compWithPortsList, partialCircuitOption, err = compileCircuit(policyProto.GetCircuit().Components, policy)
+		compiledCircuit, partialCircuitOption, err = compileCircuit(policyProto.GetCircuit().Components, policy)
 		if err != nil {
 			return nil, nil, nil, err
 		}
 	}
 
-	return policy, compWithPortsList, fx.Options(
+	return policy, compiledCircuit, fx.Options(
 		fx.Options(resourceOptions...),
 		partialCircuitOption,
 		fx.Invoke(policy.setupCircuitJob),
@@ -168,9 +176,9 @@ func (policy *Policy) setupCircuitJob(
 					JobFunc: policy.executeTick,
 				}
 				job.JobName = policy.jobName
-				initialDelay := config.Duration{Duration: durationpb.New(time.Duration(0))}
-				executionPeriod := config.Duration{Duration: durationpb.New(policy.evaluationInterval)}
-				executionTimeout := config.Duration{Duration: durationpb.New(time.Millisecond * 100)}
+				initialDelay := config.MakeDuration(0)
+				executionPeriod := config.MakeDuration(policy.evaluationInterval)
+				executionTimeout := config.MakeDuration(time.Millisecond * 100)
 				jobConfig := jobs.JobConfig{
 					InitiallyHealthy: true,
 					InitialDelay:     initialDelay,
@@ -214,13 +222,20 @@ func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error
 	return nil, err
 }
 
-// HashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
-func HashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*configv1.PolicyWrapper, error) {
-	dat, marshalErr := yaml.Marshal(policyMessage)
+// hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
+func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*wrappersv1.PolicyWrapper, error) {
+	jsonDat, marshalErr := json.Marshal(policyMessage)
 	if marshalErr != nil {
 		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
 		return nil, marshalErr
 	}
+	// convert dat to yaml format
+	dat, marshalErr := yaml.JSONToYAML(jsonDat)
+	if marshalErr != nil {
+		log.Error().Err(marshalErr).Msgf("Failed to convert json to yaml %+v", jsonDat)
+		return nil, marshalErr
+	}
+	log.Debug().Msgf("Policy message: %s", string(dat))
 	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
 	if hashErr != nil {
 		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))
@@ -228,7 +243,7 @@ func HashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 	}
 	hash := base64.StdEncoding.EncodeToString(hashBytes[:])
 
-	return &configv1.PolicyWrapper{
+	return &wrappersv1.PolicyWrapper{
 		Policy:     policyMessage,
 		PolicyName: policyName,
 		PolicyHash: hash,

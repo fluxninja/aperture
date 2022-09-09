@@ -14,9 +14,9 @@ The following settings are optional:
 - `sampling_initial` (default = `2`): number of messages initially logged each
   second.
 - `sampling_thereafter` (default = `500`): sampling rate after the initial
-  messages are logged (every Mth message is logged). Refer to [Zap
-  docs](https://godoc.org/go.uber.org/zap/zapcore#NewSampler) for more details.
-  on how sampling parameters impact number of messages.
+  messages are logged (every Mth message is logged). Refer to
+  [Zap docs](https://godoc.org/go.uber.org/zap/zapcore#NewSampler) for more
+  details. on how sampling parameters impact number of messages.
 
 Example:
 

@@ -19,17 +19,6 @@ definitions:
       as usage+(limit-usage)*factor.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
-  AgentInfoConfig:
-    properties:
-      agent_group:
-        description: All agents within an agent_group receive the same data-plane
-          configuration (e.g. schedulers, FluxMeters, rate limiter).
-        type: string
-        x-go-default: default
-        x-go-name: AgentGroup
-    title: AgentInfoConfig is the configuration for the agent group etc.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
   BackoffConfig:
     properties:
       base_delay:
@@ -63,6 +52,27 @@ definitions:
     title: BackoffConfig holds configuration for GRPC Client Backoff.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
+  BatchConfig:
+    properties:
+      send_batch_size:
+        description: SendBatchSize is the size of a batch which after hit, will trigger
+          it to be sent.
+        format: uint32
+        type: integer
+        x-go-default: "10000"
+        x-go-name: SendBatchSize
+        x-go-validate: gt=0
+      timeout:
+        description: Timeout sets the time after which a batch will be sent regardless
+          of size.
+        format: string
+        type: string
+        x-go-default: 1s
+        x-go-name: Timeout
+        x-go-validate: gt=0
+    title: BatchConfig defines configuration for OTEL batch processor.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otel
   ClientTLSConfig:
     properties:
       ca_file:
@@ -101,7 +111,7 @@ definitions:
           type: string
         type: array
         x-go-name: Endpoints
-        x-go-validate: dive,hostname_port|url|fqdn
+        x-go-validate: gt=0,dive,hostname_port|url|fqdn
       lease_ttl:
         description: Lease time-to-live
         format: string
@@ -243,6 +253,7 @@ definitions:
         x-go-validate: gte=0s
       proxy_connect_header:
         $ref: '#/definitions/Header'
+        x-go-validate: omitempty
       read_buffer_size:
         description: Read Buffer Size. 0 = 4KB
         format: int64
@@ -349,7 +360,7 @@ definitions:
         description: Write timeout
         format: string
         type: string
-        x-go-default: 10s
+        x-go-default: 45s
         x-go-name: WriteTimeout
         x-go-validate: gte=0s
     title: HTTPServerConfig holds configuration for HTTP Server.
@@ -484,17 +495,6 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/net/listener
   LogConfig:
     properties:
-      compress:
-        description: Compress
-        type: boolean
-        x-go-default: "false"
-        x-go-name: Compress
-      file:
-        description: Output file for logs. Keywords allowed - ["stderr", "stderr",
-          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-        type: string
-        x-go-default: stderr
-        x-go-name: File
       level:
         description: Log level
         type: string
@@ -502,27 +502,6 @@ definitions:
         x-go-name: LogLevel
         x-go-validate: oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL
           panic PANIC trace TRACE disabled DISABLED
-      max_age:
-        description: Max age in days for log files
-        format: int64
-        type: integer
-        x-go-default: "7"
-        x-go-name: MaxAge
-        x-go-validate: gte=0
-      max_backups:
-        description: Max log file backups
-        format: int64
-        type: integer
-        x-go-default: "3"
-        x-go-name: MaxBackups
-        x-go-validate: gte=0
-      max_size:
-        description: Log file max size in MB
-        format: int64
-        type: integer
-        x-go-default: "50"
-        x-go-name: MaxSize
-        x-go-validate: gte=0
       non_blocking:
         description: Use non-blocking log writer (can lose logs at high throughput)
         type: boolean
@@ -535,7 +514,7 @@ definitions:
         x-go-default: "false"
         x-go-name: PrettyConsole
       writers:
-        description: Additional log writers
+        description: Log writers
         items:
           $ref: '#/definitions/LogWriterConfig'
         type: array
@@ -552,8 +531,8 @@ definitions:
         x-go-default: "false"
         x-go-name: Compress
       file:
-        description: Output file for logs. Keywords allowed - ["stderr", "stderr",
-          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+        description: Output file for logs. Keywords allowed - ["stderr", "default"].
+          "default" maps to `/var/log/fluxninja/<service>.log`
         type: string
         x-go-default: stderr
         x-go-name: File
@@ -640,18 +619,27 @@ definitions:
     title: MultiJobConfig holds configuration for MultiJob.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
-  PeerDiscoveryConfig:
+  OtelConfig:
     properties:
-      advertisement_addr:
-        description: Network address of aperture server to advertise to peers - this
-          address should be reachable from other agents. Used for nat traversal when
-          provided.
+      batch_postrollup:
+        $ref: '#/definitions/BatchConfig'
+      batch_prerollup:
+        $ref: '#/definitions/BatchConfig'
+      grpc_addr:
+        description: GRPC listener addr for OTEL Collector.
         type: string
-        x-go-name: AdvertisementAddr
-        x-go-validate: omitempty,hostname_port
-    title: PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
+        x-go-default: :4317
+        x-go-name: GRPCAddr
+        x-go-validate: hostname_port
+      http_addr:
+        description: HTTP listener addr for OTEL Collector.
+        type: string
+        x-go-default: :4318
+        x-go-name: HTTPAddr
+        x-go-validate: hostname_port
+    title: OtelConfig is the configuration for the OTEL collector.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/peers
+    x-go-package: github.com/fluxninja/aperture/pkg/otel
   PluginsConfig:
     properties:
       disable_plugins:
@@ -665,16 +653,18 @@ definitions:
           type: string
         type: array
         x-go-name: DisabledPlugins
+        x-go-validate: omitempty
       disabled_symbols:
         description: Specific plugin types to disable
         items:
           type: string
         type: array
         x-go-name: DisabledSymbols
+        x-go-validate: omitempty
       plugins_path:
-        description: Path to plugins directory. This can be set via command line arguments
-          as well.
+        description: Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
         type: string
+        x-go-default: default
         x-go-name: PluginsPath
     title: PluginsConfig holds configuration for plugins.
     type: object
@@ -692,15 +682,23 @@ definitions:
   ProfilersConfig:
     properties:
       cpu_profiler:
-        description: Flag to enable cpu profiling
+        description: Flag to enable cpu profiling on process start and save it to
+          a file. HTTP interface will not work if this is enabled as CPU profile will
+          always be running.
         type: boolean
         x-go-default: "false"
         x-go-name: CPUProfile
       profiles_path:
-        description: Path to save performance profiles. This can be set via command
-          line arguments as well.
+        description: Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
         type: string
+        x-go-default: default
         x-go-name: ProfilesPath
+      register_http_routes:
+        description: Register routes. Profile types profile, symbol and cmdline will
+          be registered at /debug/pprof/{profile,symbol,cmdline}.
+        type: boolean
+        x-go-default: "true"
+        x-go-name: RegisterHTTPRoutes
     title: ProfilersConfig holds configuration for profilers.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/profilers
@@ -710,7 +708,7 @@ definitions:
         description: Address of the prometheus server
         type: string
         x-go-name: Address
-        x-go-validate: hostname_port|url|fqdn
+        x-go-validate: required,hostname_port|url|fqdn
     title: PrometheusConfig holds configuration for Prometheus Server.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/prometheus
@@ -731,7 +729,7 @@ definitions:
           type: string
         type: array
         x-go-name: NoProxy
-        x-go-validate: dive,ip|cidr|fqdn|hostname_port
+        x-go-validate: omitempty,dive,ip|cidr|fqdn|hostname_port
     title: ProxyConfig holds proxy configuration.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/http
@@ -766,11 +764,11 @@ definitions:
         type: string
         x-go-name: ClientCA
         x-go-validate: omitempty
-      enable:
-        description: Enable TLS
+      enabled:
+        description: Enabled TLS
         type: boolean
         x-go-default: "false"
-        x-go-name: Enable
+        x-go-name: Enabled
       server_cert:
         description: Server Cert file
         type: string
@@ -808,28 +806,6 @@ definitions:
       algorithms are configured then only watermark algorithm is used.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
-  WatchdogResult:
-    properties:
-      force_gc_took:
-        format: string
-        type: string
-        x-go-name: ForceGCTook
-      threshold:
-        format: uint64
-        type: integer
-        x-go-name: Threshold
-      total:
-        format: uint64
-        type: integer
-        x-go-name: Total
-      used:
-        format: uint64
-        type: integer
-        x-go-name: Used
-    title: Result holds the result of the Watchdog check.
-    type: object
-    x-go-name: Result
-    x-go-package: github.com/fluxninja/aperture/pkg/watchdog
   WatermarksPolicy:
     properties:
       enabled:
@@ -855,15 +831,6 @@ definitions:
 info:
   description: Aperture Controller
 paths:
-  /agent_info:
-    post:
-      operationId: AgentInfo
-      parameters:
-      - in: body
-        schema:
-          $ref: '#/definitions/AgentInfoConfig'
-      tags:
-      - common-configuration
   /client:
     post:
       operationId: Client
@@ -872,18 +839,6 @@ paths:
         name: proxy
         schema:
           $ref: '#/definitions/ProxyConfig'
-      tags:
-      - common-configuration
-      x-fn-config-env: true
-  /controller:
-    post:
-      operationId: Controller
-      parameters:
-      - description: Directory containing policies rules
-        in: query
-        name: policies_path
-        type: string
-        x-go-default: /etc/aperture/aperture-controller/policies
       tags:
       - common-configuration
       x-fn-config-env: true
@@ -932,15 +887,17 @@ paths:
       tags:
       - common-configuration
       x-fn-config-env: true
-  /peer_discovery:
+  /otel:
     post:
-      operationId: PeerDiscovery
+      operationId: Otel
       parameters:
       - in: body
+        name: proxy
         schema:
-          $ref: '#/definitions/PeerDiscoveryConfig'
+          $ref: '#/definitions/OtelConfig'
       tags:
       - common-configuration
+      x-fn-config-env: true
   /plugins:
     post:
       operationId: Plugins
@@ -959,6 +916,11 @@ paths:
         name: promql_jobs_scheduler
         schema:
           $ref: '#/definitions/JobGroupConfig'
+      - description: Directory containing policies rules
+        in: query
+        name: policies_path
+        type: string
+        x-go-default: /etc/aperture/aperture-controller/policies
       tags:
       - common-configuration
       x-fn-config-env: true

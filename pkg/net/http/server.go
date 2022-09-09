@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package http
 
 import (
@@ -31,6 +32,7 @@ func ServerModule() fx.Option {
 
 // HTTPServerConfig holds configuration for HTTP Server.
 // swagger:model
+// +kubebuilder:object:generate=true
 type HTTPServerConfig struct {
 	// Idle timeout
 	IdleTimeout config.Duration `json:"idle_timeout" validate:"gte=0s" default:"30s"`
@@ -39,7 +41,7 @@ type HTTPServerConfig struct {
 	// Read timeout
 	ReadTimeout config.Duration `json:"read_timeout" validate:"gte=0s" default:"10s"`
 	// Write timeout
-	WriteTimeout config.Duration `json:"write_timeout" validate:"gte=0s" default:"10s"`
+	WriteTimeout config.Duration `json:"write_timeout" validate:"gte=0s" default:"45s"`
 	// The lowest bucket in latency histogram
 	LatencyBucketStartMS float64 `json:"latency_bucket_start_ms" validate:"gte=0" default:"20"`
 	// Max header size in bytes
@@ -61,15 +63,15 @@ type ServerConstructor struct {
 	// Name of tls config instance
 	TLSConfigName string
 	// Viper config key/server name
-	Key string
+	ConfigKey string
 	// Default Server Config
 	DefaultConfig HTTPServerConfig
 }
 
 // Annotate creates an annotated instance of HTTP Server.
 func (constructor ServerConstructor) Annotate() fx.Option {
-	if constructor.Key == "" {
-		constructor.Key = defaultServerKey
+	if constructor.ConfigKey == "" {
+		constructor.ConfigKey = defaultServerKey
 	}
 	tlsName := config.NameTag(constructor.TLSConfigName) + ` optional:"true"`
 	name := config.NameTag(constructor.Name)
@@ -106,7 +108,7 @@ func (constructor ServerConstructor) provideServer(
 	pr *prometheus.Registry,
 ) (*mux.Router, *http.Server, *Server, error) {
 	config := constructor.DefaultConfig
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize httpserver configuration!")
 		return nil, nil, nil, err
 	}
@@ -143,10 +145,10 @@ func (constructor ServerConstructor) provideServer(
 	server := &http.Server{
 		Handler:           router,
 		MaxHeaderBytes:    config.MaxHeaderBytes,
-		IdleTimeout:       config.IdleTimeout.Duration.AsDuration(),
-		ReadHeaderTimeout: config.ReadHeaderTimeout.Duration.AsDuration(),
-		ReadTimeout:       config.ReadTimeout.Duration.AsDuration(),
-		WriteTimeout:      config.WriteTimeout.Duration.AsDuration(),
+		IdleTimeout:       config.IdleTimeout.AsDuration(),
+		ReadHeaderTimeout: config.ReadHeaderTimeout.AsDuration(),
+		ReadTimeout:       config.ReadTimeout.AsDuration(),
+		WriteTimeout:      config.WriteTimeout.AsDuration(),
 		TLSConfig:         tlsConfig,
 	}
 
@@ -162,7 +164,7 @@ func (constructor ServerConstructor) provideServer(
 	router.Use(httpServer.monitoringMiddleware)
 
 	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(_ context.Context) error {
 			panichandler.Go(func() {
 				// request shutdown if this server exits
 				defer func() { _ = shutdowner.Shutdown() }()
@@ -173,7 +175,7 @@ func (constructor ServerConstructor) provideServer(
 					listener = tls.NewListener(listener, tlsConfig)
 				}
 
-				log.Info().Str("constructor", constructor.Key).Str("addr", listener.Addr().String()).Msg("Starting HTTP server")
+				log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Starting HTTP server")
 				// check if RootHandler is set
 				if httpServer.RootHandler != nil {
 					log.Info().Msg("Registering RootHandlerFunc!")
@@ -187,7 +189,7 @@ func (constructor ServerConstructor) provideServer(
 		},
 		OnStop: func(ctx context.Context) error {
 			listener := listener.GetListener()
-			log.Info().Str("constructor", constructor.Key).Str("addr", listener.Addr().String()).Msg("Stopping HTTP server")
+			log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Stopping HTTP server")
 			return server.Shutdown(ctx)
 		},
 	})

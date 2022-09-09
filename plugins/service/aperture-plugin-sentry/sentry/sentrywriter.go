@@ -37,7 +37,7 @@ type SentryWriter struct {
 	Client         *sentry.Client
 	Levels         map[zerolog.Level]struct{}
 	CrashWriter    *CrashWriter
-	StatusRegistry *status.Registry
+	StatusRegistry status.Registry
 }
 
 // Write implements io.Writer and forwards the data to CrashWriter buffer.
@@ -155,34 +155,30 @@ func (s *SentryWriter) SentryPanicHandler(e interface{}, stacktrace panichandler
 	}
 
 	// Dump Status Registry
-	status, err := s.StatusRegistry.GetAllFlat()
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to dump status registry")
-	} else {
-		if status != nil {
-			groupStatus, err := json.Marshal(status)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to marshal status registry")
-			}
-
-			statusData := make(map[string]interface{})
-			err = json.Unmarshal(groupStatus, &statusData)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to unmarshal status registry")
-			}
-
-			sentry.AddBreadcrumb(&sentry.Breadcrumb{
-				Category: "Status Registry",
-				Level:    sentry.LevelInfo,
-				Data:     statusData,
-			})
-		} else {
-			sentry.AddBreadcrumb(&sentry.Breadcrumb{
-				Category: "Status Registry",
-				Level:    sentry.LevelInfo,
-				Message:  "No Status Registry found",
-			})
+	status := s.StatusRegistry.GetGroupStatus()
+	if status != nil {
+		groupStatus, err := json.Marshal(status)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to marshal status registry")
 		}
+
+		statusData := make(map[string]interface{})
+		err = json.Unmarshal(groupStatus, &statusData)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to unmarshal status registry")
+		}
+
+		sentry.AddBreadcrumb(&sentry.Breadcrumb{
+			Category: "Status Registry",
+			Level:    sentry.LevelInfo,
+			Data:     statusData,
+		})
+	} else {
+		sentry.AddBreadcrumb(&sentry.Breadcrumb{
+			Category: "Status Registry",
+			Level:    sentry.LevelInfo,
+			Message:  "No Status Registry found",
+		})
 	}
 
 	// Service Version Information

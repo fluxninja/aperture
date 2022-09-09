@@ -25,8 +25,7 @@ var _ = Describe("Validator", func() {
 		Expect(ok).To(BeFalse())
 	})
 
-	cmVatidator := validation.NewCMValidator()
-	cmVatidator.RegisterCMFileValidator(cmFileValidator)
+	cmVatidator := validation.NewCMValidator([]validation.CMFileValidator{cmFileValidator})
 
 	validateExample := func(contents string) {
 		var cm corev1.ConfigMap
@@ -57,7 +56,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: policies
-  namespace: aperture-system
+  namespace: aperture-controller
   labels:
     fluxninja.com/validate: "true"
 data:
@@ -66,12 +65,12 @@ data:
       flux_meters:
         "service_latency":
           selector:
-            service: "demo1-demo-app.demoapp.svc.cluster.local"
+            service: "service1-demo-app.demoapp.svc.cluster.local"
             control_point:
               traffic: "ingress"
       classifiers:
         - selector:
-            service: demo1-demo-app.demoapp.svc.cluster.local
+            service: service1-demo-app.demoapp.svc.cluster.local
             control_point: { traffic: ingress }
           rules:
             # An example rule using extractor.
@@ -87,9 +86,9 @@ data:
                   import input.attributes.request.http
                   ua = http.headers["user-agent"]
                 query: data.my.rego.pkg.ua
-            user-type:
+            user_type:
               extractor:
-                from: request.http.headers.user-type
+                from: request.http.headers.user_type
     circuit:
       evaluation_interval: "0.5s"
       components:
@@ -126,15 +125,30 @@ data:
             out_ports:
               output:
                 signal_name: "LATENCY_EMA"
+        - constant:
+            value: "1.1"
+            out_ports:
+              output:
+                signal_name: "EMA_SETPOINT_MULTIPLIER"
+        - arithmetic_combinator:
+            operator: "mul"
+            in_ports:
+              lhs:
+                signal_name: "LATENCY_EMA"
+              rhs:
+                signal_name: "EMA_SETPOINT_MULTIPLIER"
+            out_ports:
+              output:
+                signal_name: "LATENCY_SETPOINT"
         - gradient_controller:
-            tolerance: "1.1"
+            slope: -1
             min_gradient: "0.1"
             max_gradient: "1.0"
             in_ports:
               signal:
                 signal_name: "LATENCY"
               setpoint:
-                signal_name: "LATENCY_EMA"
+                signal_name: "LATENCY_SETPOINT"
               max:
                 signal_name: "MAX_CONCURRENCY"
               control_variable:
@@ -167,26 +181,23 @@ data:
         - concurrency_limiter:
             scheduler:
               selector:
-                service: "demo1-demo-app.demoapp.svc.cluster.local"
+                service: "service1-demo-app.demoapp.svc.cluster.local"
                 control_point:
                   traffic: "ingress"
               auto_tokens: true
               default_workload:
                 priority: 20
-                timeout: "0.005s"
               workloads:
                 - workload:
                     priority: 50
-                    timeout: "0.005s"
                   label_matcher:
                     match_labels:
-                      user-type: "guest"
+                      user_type: "guest"
                 - workload:
                     priority: 200
-                    timeout: "0.005s"
                   label_matcher:
                     match_labels:
-                      request_header_user-type: "subscriber"
+                      http.request.header.user_type: "subscriber"
               out_ports:
                 accepted_concurrency:
                   signal_name: "ACCEPTED_CONCURRENCY"
@@ -288,7 +299,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: policies
-  namespace: aperture-system
+  namespace: aperture-controller
   labels:
     fluxninja.com/validate: "true"
 data:
@@ -331,9 +342,9 @@ const rateLimitPolicy = `
               limit:
                 signal_name: "RATE_LIMIT"
             selector:
-              service: "demo1-demo-app.demoapp.svc.cluster.local"
+              service: "service1-demo-app.demoapp.svc.cluster.local"
               control_point:
                 traffic: "ingress"
-            label_key: "request_header_user-type"
+            label_key: "http.request.header.user_type"
             limit_reset_interval: "1s"
 `

@@ -112,14 +112,6 @@ func (flow *flowTracker) String() string {
 	)
 }
 
-func (flow *flowTracker) prettyString() {
-	fmt.Printf(
-		"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n"+
-			"%v\n",
-		flow,
-	)
-}
-
 type flowTrackers []*flowTracker
 
 // // // Ensures clock is updated periodically
@@ -195,7 +187,6 @@ func printPrettyFlowTracker(t *testing.T, flows flowTrackers) {
 	var totalAccepted uint64
 
 	for _, flow := range flows {
-		flow.prettyString()
 		totalRequests += flow.totalRequests
 		totalAccepted += flow.acceptedRequests
 	}
@@ -302,8 +293,6 @@ func totalSentTokens(flows flowTrackers) []uint64 {
 		totalTokens[i] = flow.totalRequests * flow.requestTokens
 		total += totalTokens[i]
 	}
-	fmt.Printf("Tokens sent per flow: %v\n", totalTokens)
-	fmt.Printf("Tokens sent in total: %d\n", total)
 	return totalTokens
 }
 
