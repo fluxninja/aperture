@@ -13,14 +13,13 @@ local classifier = aperture.v1.policylanguagev1Classifier;
 local extractor = aperture.v1.Extractor;
 local rule = aperture.v1.Rule;
 local selector = aperture.v1.Selector;
+local controlPoint = aperture.v1.ControlPoint;
 
-local svcSelector = {
-  service: 'service1-demo-app.demoapp.svc.cluster.local',
-  controlPoint: {
-    traffic: 'ingress',
-  },
-};
-
+local svcSelector = selector.new()
+                    + selector.withAgentGroup('default')
+                    + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                    + selector.withControlPoint(controlPoint.new()
+                                                + controlPoint.withTraffic('ingress'));
 
 local demoappMixin =
   demoApp {
@@ -47,13 +46,11 @@ local demoappMixin =
 
 local policy = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  fluxMeterSelector+: svcSelector,
-  concurrencyLimiterSelector+: svcSelector,
-  classifiers+: [
+  fluxMeterSelector: svcSelector,
+  concurrencyLimiterSelector: svcSelector,
+  classifiers: [
     classifier.new()
-    + classifier.withSelector(selector.new()
-                              + selector.withService(svcSelector.service)
-                              + selector.withControlPoint({ traffic: svcSelector.controlPoint.traffic }))
+    + classifier.withSelector(svcSelector)
     + classifier.withRules({
       'user-type': rule.new()
                    + rule.withExtractor(extractor.new()
