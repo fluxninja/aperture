@@ -92,23 +92,24 @@ func (p *ControlPoint) String() string {
 //
 // The controlPoint is assumed to be already validated and nonnil.
 func ControlPointFromProto(controlPoint *selectorv1.ControlPoint) ControlPoint {
-	switch cp := controlPoint.Controlpoint.(type) {
-	case *selectorv1.ControlPoint_Feature:
-		return ControlPoint{Feature: cp.Feature}
-	case *selectorv1.ControlPoint_Traffic:
-		switch cp.Traffic {
-		case "ingress":
-			return ControlPoint{Traffic: Ingress}
-		case "egress":
-			return ControlPoint{Traffic: Egress}
-		default:
-			log.Error().Msg("invalid traffic direction")
-			return ControlPoint{}
+	if controlPoint != nil && controlPoint.Controlpoint != nil {
+		switch cp := controlPoint.Controlpoint.(type) {
+		case *selectorv1.ControlPoint_Feature:
+			return ControlPoint{Feature: cp.Feature}
+		case *selectorv1.ControlPoint_Traffic:
+			switch cp.Traffic {
+			case "ingress":
+				return ControlPoint{Traffic: Ingress}
+			case "egress":
+				return ControlPoint{Traffic: Egress}
+			default:
+				log.Error().Msg("invalid traffic direction")
+				return ControlPoint{}
+			}
 		}
-	default:
-		log.Error().Msg("unknown/missing control point")
-		return ControlPoint{}
 	}
+	log.Error().Msg("unknown/missing control point")
+	return ControlPoint{}
 }
 
 // ControlPointID uniquely identifies the control point within a cluster – so

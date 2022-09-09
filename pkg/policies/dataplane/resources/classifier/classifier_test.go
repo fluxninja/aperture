@@ -6,7 +6,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/open-policy-agent/opa/ast"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	labelmatcherv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/labelmatcher/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -242,7 +241,7 @@ var _ = Describe("Classifier", func() {
 		rules := map[string]*classificationv1.Rule{
 			"foo": {
 				Source:    headerExtractor("foo"),
-				Propagate: &wrapperspb.BoolValue{Value: false},
+				Propagate: false,
 			},
 			"bar": {
 				Source: &classificationv1.Rule_Rego_{
