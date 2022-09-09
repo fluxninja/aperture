@@ -892,9 +892,9 @@ spec:
                     description: AgentInfo configuration.
                     properties:
                       agent_group:
-                        description: All agents within an agent_group receive the
+                        description: "All agents within an agent_group receive the
                           same data-plane configuration (e.g. schedulers, FluxMeters,
-                          rate limiter).
+                          rate limiter). \n [Read more about agent groups here](/concepts/flow-control/service.md#agent-group)."
                         type: string
                     type: object
                   client:
@@ -1201,25 +1201,9 @@ spec:
                   log:
                     description: Log configuration.
                     properties:
-                      compress:
-                        description: Compress
-                        type: boolean
-                      file:
-                        description: Output file for logs. Keywords allowed - ["stderr",
-                          "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-                        type: string
                       level:
                         description: Log level
                         type: string
-                      max_age:
-                        description: Max age in days for log files
-                        type: integer
-                      max_backups:
-                        description: Max log file backups
-                        type: integer
-                      max_size:
-                        description: Log file max size in MB
-                        type: integer
                       non_blocking:
                         description: Use non-blocking log writer (can lose logs at
                           high throughput)
@@ -1229,7 +1213,7 @@ spec:
                           logging (not recommended for prod environments)'
                         type: boolean
                       writers:
-                        description: Additional log writers
+                        description: Log writers
                         items:
                           description: LogWriterConfig holds configuration for a log
                             writer. swagger:model
@@ -1331,8 +1315,8 @@ spec:
                           type: string
                         type: array
                       plugins_path:
-                        description: Path to plugins directory. This can be set via
-                          command line arguments as well.
+                        description: Path to plugins directory. "default" points to
+                          `/var/lib/aperture/<service>/plugins`.
                         type: string
                     type: object
                   profilers:
@@ -1344,9 +1328,8 @@ spec:
                           is enabled as CPU profile will always be running.
                         type: boolean
                       profiles_path:
-                        description: Path to save performance profiles. This can be
-                          set via command line arguments as well. E.g. default path
-                          for aperture-agent is /var/log/aperture/aperture-agent/profiles.
+                        description: Path to save performance profiles. "default"
+                          path is `/var/log/aperture/<service>/profiles`.
                         type: string
                       register_http_routes:
                         description: Register routes. Profile types profile, symbol
@@ -1657,29 +1640,23 @@ spec:
                 - prometheus
                 type: object
               containerSecurityContext:
-                default:
-                  enabled: false
-                  readOnlyRootFilesystem: false
-                  runAsNonRoot: false
-                  runAsUser: 1001
                 description: Configure Containers' Security Context
                 properties:
                   enabled:
                     description: Enable ContainerSecurityContext on containers
                     type: boolean
                   readOnlyRootFilesystem:
-                    default: false
                     description: Set agent containers' Security Context runAsNonRoot
                     type: boolean
                   runAsNonRoot:
-                    default: false
                     description: Set containers' Security Context runAsNonRoot
                     type: boolean
                   runAsUser:
-                    default: 1001
                     description: Set containers' Security Context runAsUser
                     format: int64
                     type: integer
+                required:
+                - enabled
                 type: object
               customLivenessProbe:
                 description: Custom livenessProbe that overrides the default one
@@ -3634,20 +3611,10 @@ spec:
                   type: object
                 type: array
               image:
-                default:
-                  pullPolicy: IfNotPresent
-                  registry: docker.io/fluxninja
-                  repository: aperture-agent
-                  tag: latest
                 description: Image configuration
                 properties:
                   pullPolicy:
-                    default: IfNotPresent
                     description: The ImagePullPolicy of the image
-                    enum:
-                    - Never
-                    - Always
-                    - IfNotPresent
                     type: string
                   pullSecrets:
                     description: The PullSecrets for the image
@@ -3655,14 +3622,12 @@ spec:
                       type: string
                     type: array
                   registry:
-                    default: docker.io/fluxninja
                     description: The registry of the image
                     type: string
                   repository:
                     description: The repository of the image
                     type: string
                   tag:
-                    default: latest
                     description: The tag (version) of the image
                     type: string
                 required:
@@ -5087,47 +5052,30 @@ spec:
                     type: object
                 type: object
               livenessProbe:
-                default:
-                  enabled: true
-                  failureThreshold: 6
-                  initialDelaySeconds: 15
-                  periodSeconds: 15
-                  successThreshold: 1
-                  timeoutSeconds: 5
                 description: livenessProbe related configuration
                 properties:
                   enabled:
                     description: Enable probe on agent containers
                     type: boolean
                   failureThreshold:
-                    default: 6
                     description: Failure threshold for probe
                     format: int32
-                    minimum: 1
                     type: integer
                   initialDelaySeconds:
-                    default: 15
                     description: Initial delay seconds for probe
                     format: int32
-                    minimum: 0
                     type: integer
                   periodSeconds:
-                    default: 15
                     description: Period delay seconds for probe
                     format: int32
-                    minimum: 1
                     type: integer
                   successThreshold:
-                    default: 1
                     description: Success threshold for probe
                     format: int32
-                    minimum: 1
                     type: integer
                   timeoutSeconds:
-                    default: 5
                     description: Timeout delay seconds for probe
                     format: int32
-                    minimum: 1
                     type: integer
                 required:
                 - enabled
@@ -5150,16 +5098,12 @@ spec:
                 type: object
                 x-kubernetes-map-type: atomic
               podSecurityContext:
-                default:
-                  enabled: false
-                  fsGroup: 1001
                 description: Configure Pods' Security Context
                 properties:
                   enabled:
                     description: Enable PodSecurityContext on Pod
                     type: boolean
                   fsGroup:
-                    default: 1001
                     description: fsGroup to define the Group ID for the Pod
                     format: int64
                     type: integer
@@ -5167,47 +5111,30 @@ spec:
                 - enabled
                 type: object
               readinessProbe:
-                default:
-                  enabled: true
-                  failureThreshold: 6
-                  initialDelaySeconds: 15
-                  periodSeconds: 15
-                  successThreshold: 1
-                  timeoutSeconds: 5
                 description: readinessProbe related configuration
                 properties:
                   enabled:
                     description: Enable probe on agent containers
                     type: boolean
                   failureThreshold:
-                    default: 6
                     description: Failure threshold for probe
                     format: int32
-                    minimum: 1
                     type: integer
                   initialDelaySeconds:
-                    default: 15
                     description: Initial delay seconds for probe
                     format: int32
-                    minimum: 0
                     type: integer
                   periodSeconds:
-                    default: 15
                     description: Period delay seconds for probe
                     format: int32
-                    minimum: 1
                     type: integer
                   successThreshold:
-                    default: 1
                     description: Success threshold for probe
                     format: int32
-                    minimum: 1
                     type: integer
                   timeoutSeconds:
-                    default: 5
                     description: Timeout delay seconds for probe
                     format: int32
-                    minimum: 1
                     type: integer
                 required:
                 - enabled
@@ -5242,30 +5169,30 @@ spec:
                 description: Secrets
                 properties:
                   fluxNinjaPlugin:
-                    default:
-                      create: false
                     description: FluxNinja plugin.
                     properties:
                       create:
-                        default: false
                         description: Create new secret or not
                         type: boolean
                       secretKeyRef:
-                        default:
-                          key: apiKey
                         description: Secret details
                         properties:
                           key:
-                            default: apiKey
                             description: Key of the secret in Data
                             type: string
                           name:
                             description: Name of the secret
                             type: string
+                        required:
+                        - key
+                        - name
                         type: object
                       value:
                         description: Value for the ApiKey
                         type: string
+                    required:
+                    - create
+                    - value
                     type: object
                 type: object
               service:
@@ -5279,9 +5206,6 @@ spec:
                     x-kubernetes-preserve-unknown-fields: true
                 type: object
               serviceAccount:
-                default:
-                  automountServiceAccountToken: true
-                  create: true
                 description: ServiceAccountSpec defines the the configuration pf Service
                   account for Agent or Controller
                 properties:
@@ -5291,7 +5215,6 @@ spec:
                     description: Additional Service Account annotations
                     type: object
                   automountServiceAccountToken:
-                    default: true
                     description: Automount service account token for the server service
                       account
                     type: boolean
@@ -6541,7 +6464,6 @@ spec:
               terminationGracePeriodSeconds:
                 description: Seconds Redmine pod needs to terminate gracefully
                 format: int64
-                minimum: 0
                 type: integer
               tolerations:
                 description: Tolerations for pods assignment

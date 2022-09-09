@@ -8,8 +8,8 @@
           "subdir": ""
         }
       },
-      "version": "c986ab02105fe80ab7604721c00b036e64ae6fb2",
-      "sum": "ntOIyy4QRSQwlBwabsAFSztfFHGb2JcdVYuUiHZjdkI="
+      "version": "52b76b186a6fec62fbf4929a4a71d90caaa1efd8",
+      "sum": "uk6EpEDqUxUDMveDjS0R/5hU8inSVSQVA16G50fqK7Y="
     },
     {
       "source": {
@@ -18,8 +18,8 @@
           "subdir": "lib/1.0"
         }
       },
-      "version": "c986ab02105fe80ab7604721c00b036e64ae6fb2",
-      "sum": "uaIkLQIC6uxxY5NnZf/tVeGDEGNv7SQHRQpXzWCSAXI="
+      "version": "52b76b186a6fec62fbf4929a4a71d90caaa1efd8",
+      "sum": "fatDjTb+pmaIoCCeiLCtDABaKeNgslNq/rFWA0aDm9A="
     },
     {
       "source": {
@@ -28,8 +28,8 @@
           "subdir": "libsonnet/1.0"
         }
       },
-      "version": "84ac1fa9a5231d92ea918d64b201cc00a2fcca19",
-      "sum": "HrvDOYR6sNNrN3qEzqMgydb+xnfKEEKyG1uBo5aAobw="
+      "version": "e3ad439e62f7ca4f668b3636fb9bcadcd0424fc1",
+      "sum": "LiUNRWyIlGwdkKpAIfgSpSLCYN4qzz06wsDrOiZgWxA="
     },
     {
       "source": {
@@ -48,7 +48,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "c132c4afcf17491718539db4c2d94c0ea4346120",
+      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
       "sum": "tDR6yT2GVfw0wTU12iZH+m01HrbIr6g/xN+/8nzNkU0="
     },
     {
@@ -58,7 +58,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "c132c4afcf17491718539db4c2d94c0ea4346120",
+      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
       "sum": "2++XoPslyz02LRgsxREWxjLgYgiCIqhAtXCyVSvYcoE="
     },
     {
@@ -68,7 +68,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "c132c4afcf17491718539db4c2d94c0ea4346120",
+      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {
@@ -98,7 +98,7 @@
           "subdir": "1.22"
         }
       },
-      "version": "e22027656445547ff5e757c10a3cb7d8c933a441",
+      "version": "610803705e9ec295ef2e4eeaa6b2f8fc1419e5b1",
       "sum": "QKsc62wl5Wc+uxxP4NJCF1NidiPi9zjngbzIszFvesc="
     },
     {
@@ -108,7 +108,7 @@
           "subdir": "1.24"
         }
       },
-      "version": "e22027656445547ff5e757c10a3cb7d8c933a441",
+      "version": "610803705e9ec295ef2e4eeaa6b2f8fc1419e5b1",
       "sum": "OcNQsWgCXnMSoWZNS7u9P9yn6d7HZk6/d/7++sgIc6Q="
     },
     {

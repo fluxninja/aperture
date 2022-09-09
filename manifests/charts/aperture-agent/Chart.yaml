@@ -1,8 +1,8 @@
 apiVersion: v2
 name: aperture-agent
 description: A Helm chart to deploy Aperture Agent
-version: v0.0.1
-appVersion: v0.1.1
+version: v0.1.3
+appVersion: v0.1.3
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami

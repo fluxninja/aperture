@@ -2,12 +2,12 @@ package controlplane
 
 import (
 	"context"
+	"encoding/json"
 	"path"
 
-	"github.com/ghodss/yaml"
-	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
+	"sigs.k8s.io/yaml"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -36,7 +36,7 @@ import (
 
 var (
 	policiesDefaultPath = path.Join(config.DefaultAssetsDirectory, "policies")
-	policiesPathKey     = iface.PoliciesRoot + ".policies_path"
+	policiesConfigKey   = iface.PoliciesRoot + ".policies_path"
 	policiesFxTag       = "Policies"
 )
 
@@ -45,8 +45,7 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(provideCMFileValidator),
 		// Syncing policies config to etcd
-		fx.Provide(providePoliciesPathFlag),
-		filesystemwatcher.Constructor{Name: policiesFxTag, PathKey: policiesPathKey, Path: policiesDefaultPath}.Annotate(), // Create a new watcher
+		filesystemwatcher.Constructor{Name: policiesFxTag, ConfigKey: policiesConfigKey, Path: policiesDefaultPath}.Annotate(), // Create a new watcher
 		fx.Invoke(
 			fx.Annotate(
 				setupPoliciesNotifier,
@@ -55,19 +54,7 @@ func Module() fx.Option {
 		),
 		// Policy factory
 		policyFactoryModule(),
-		fx.Invoke(registerCMFileValidator),
 	)
-}
-
-// providePoliciesPathFlag registers a command line flag builder function.
-func providePoliciesPathFlag() config.FlagSetBuilderOut {
-	return config.FlagSetBuilderOut{Builder: setPoliciesPathFlag}
-}
-
-// setPoliciesPathFlag registers command line flags.
-func setPoliciesPathFlag(fs *pflag.FlagSet) error {
-	fs.String(policiesPathKey, policiesDefaultPath, "path to Policies directory")
-	return nil
 }
 
 // Sync policies config directory with etcd.
@@ -90,7 +77,13 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 				return key, nil, wrapErr
 			}
 			var marshalWrapErr error
-			dat, marshalWrapErr = yaml.Marshal(wrapper)
+			jsonDat, marshalWrapErr := json.Marshal(wrapper)
+			if marshalWrapErr != nil {
+				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
+				return key, nil, marshalWrapErr
+			}
+			// convert to yaml
+			dat, marshalWrapErr = yaml.JSONToYAML(jsonDat)
 			if marshalWrapErr != nil {
 				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
 				return key, nil, marshalWrapErr

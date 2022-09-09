@@ -43,14 +43,14 @@ const (
 // Module is a fx module that provides annotated Watchdog jobs and triggers Watchdog checks.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Invoke(Constructor{Key: watchdogConfigKey}.setupWatchdog),
+		fx.Invoke(Constructor{ConfigKey: watchdogConfigKey}.setupWatchdog),
 	)
 }
 
 // Constructor holds fields to set up the Watchdog.
 type Constructor struct {
-	// Key for config
-	Key string
+	// ConfigKey for config
+	ConfigKey string
 	// Default config
 	DefaultConfig WatchdogConfig
 }
@@ -76,7 +76,7 @@ type watchdog struct {
 func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 	config := constructor.DefaultConfig
 
-	if err := in.Unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := in.Unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize watchdog policy!")
 		return err
 	}

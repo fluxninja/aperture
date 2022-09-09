@@ -3,12 +3,12 @@ info:
   title: Aperture API
   version: "1.0"
 tags:
-  - name: PolicyService
   - name: EntityCacheService
   - name: InfoService
   - name: StatusService
   - name: FlowControlService
   - name: FluxNinjaService
+  - name: PolicyService
 consumes:
   - application/json
 produces:
@@ -260,12 +260,14 @@ definitions:
           Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
           Note: The module name must match the package name from the "source".
+        x-go-validate: required
       source:
         type: string
         description: |-
           Source code of the rego module.
 
           Note: Must include a "package" declaration.
+        x-go-validate: required
     description: High-level extractor-based rules are compiled into a single rego query.
     title: Raw rego rules are compiled 1:1 to rego queries
   SchedulerWorkload:
@@ -305,6 +307,17 @@ definitions:
       workload:
         $ref: '#/definitions/SchedulerWorkload'
         description: Workload associated with flows matching the label matcher.
+  apertureflowcontrolv1Classifier:
+    type: object
+    properties:
+      classifier_index:
+        type: string
+        format: int64
+      policy_hash:
+        type: string
+      policy_name:
+        type: string
+    description: Classifier describes details for each Classifier.
   apertureflowcontrolv1FluxMeter:
     type: object
     properties:
@@ -393,9 +406,52 @@ definitions:
       Ratelimiting is done separately on per-label-value basis. Use _label\_key_
       to select which label should be used as key.
     title: Limits the traffic on a control point to specified rate
+  policylanguagev1Classifier:
+    type: object
+    properties:
+      rules:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Rule'
+        description: |-
+          A map of {key, value} pairs mapping from
+          [flow label](/concepts/flow-control/label/label.md) keys to rules that define
+          how to extract and propagate flow labels with that key.
+        x-go-validate: required,gt=0,dive,keys,required,endkeys,required
+      selector:
+        $ref: '#/definitions/v1Selector'
+        description: Defines where to apply the flow classification rule.
+        x-go-validate: required
+    description: |-
+      :::info
+      See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+      :::
+
+      Example:
+      ```yaml
+      selector:
+        service: service1.default.svc.cluster.local
+        control_point:
+          traffic: ingress
+      rules:
+        user:
+          extractor:
+            from: request.http.headers.user
+      ```
+    title: Set of classification rules sharing a common selector
   policylanguagev1FluxMeter:
     type: object
     properties:
+      attribute_key:
+        type: string
+        description: |-
+          Key of the attribute in accesss log or span from which the metric for this flux meter is read.
+
+          :::info
+          For list of available attributes in Envoy access logs, refer
+          [Envoy Filter](/get-started/istio.md#envoy-filter)
+          :::
+        x-go-default: duration_millis
       histogram_buckets:
         type: array
         items:
@@ -635,6 +691,11 @@ definitions:
   v1CheckResponse:
     type: object
     properties:
+      classifiers:
+        type: array
+        items:
+          $ref: '#/definitions/apertureflowcontrolv1Classifier'
+        description: classifiers that were matched for this request.
       decision_reason:
         $ref: '#/definitions/v1DecisionReason'
         description: reason contains information in the case of an error or rejection.
@@ -692,37 +753,6 @@ definitions:
       docs on how exactly it handles invalid inputs.
       :::
     title: Circuit is defined as a dataflow graph of inter-connected components
-  v1Classifier:
-    type: object
-    properties:
-      rules:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Rule'
-        description: |-
-          A map of {key, value} pairs mapping from
-          [flow label](/concepts/flow-control/label/label.md) keys to rules that define
-          how to extract and propagate flow labels with that key.
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Defines where to apply the flow classification rule.
-    description: |-
-      :::info
-      See also [Classifier overview](/concepts/flow-control/label/classifier.md).
-      :::
-
-      Example:
-      ```yaml
-      selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress
-      rules:
-        user:
-          extractor:
-            from: request.http.headers.user
-      ```
-    title: Set of classification rules sharing a common selector
   v1Component:
     type: object
     properties:
@@ -1564,6 +1594,7 @@ definitions:
           "/user/{userId}": user
           /static/*: other
           ```
+        x-go-validate: required
     description: |-
       HTTP path will be matched against given path templates.
       If a match occurs, the value associated with the path template will be treated as a result.
@@ -1683,7 +1714,7 @@ definitions:
       classifiers:
         type: array
         items:
-          $ref: '#/definitions/v1Classifier'
+          $ref: '#/definitions/policylanguagev1Classifier'
         description: |-
           Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
@@ -1718,12 +1749,13 @@ definitions:
           avoid bloating analytics database. _Hidden_ flag should also be set for
           sensitive labels.
           :::
+        x-go-validate: required
       propagate:
         type: boolean
-        description: |-
+        title: |-
           Decides if the created label should be applied to the whole request chain
           (propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
-          (default=true).
+        x-go-validate: required
       rego:
         $ref: '#/definitions/RuleRego'
         description: Rego module to extract a value from the rego module.
@@ -1802,6 +1834,7 @@ definitions:
       selector:
         $ref: '#/definitions/v1Selector'
         description: Selector decides for which service or flows the scheduler will be applied.
+        x-go-validate: required
       timeout_factor:
         type: number
         format: double
@@ -1875,15 +1908,24 @@ definitions:
     properties:
       agent_group:
         type: string
-        description: Describes where this selector applies to.
+        description: |-
+          Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+          selector applies to.
         x-go-default: default
       control_point:
         $ref: '#/definitions/v1ControlPoint'
-        description: Describes control point within the entity where the policy should apply to.
+        description: |-
+          Describes
+          [control point](/concepts/flow-control/flow-control.md#control-point)
+          within the entity where the policy should apply to.
         x-go-validate: required
       label_matcher:
         $ref: '#/definitions/v1LabelMatcher'
         description: |-
+          :::info
+          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+          :::
+
           :::note
           [Classifiers](#v1-classifier) _can_ use flow labels created by some other
           classifier, but only if they were created at some previous control point
@@ -1901,30 +1943,42 @@ definitions:
       service:
         type: string
         description: |-
-          The service (name) of the entities.
-          In k8s, this is the FQDN of the Service object.
+          The Fully Qualified Domain Name of the
+          [service](/concepts/flow-control/service.md) to select.
 
-          Note: Entity may belong to multiple services.
+          In kubernetes, this is the FQDN of the Service object.
+
+          Empty string means all services within an agent group (catch-all).
+
+          :::note
+          One entity may belong to multiple services.
+          :::
     description: |-
+      :::info
+      See also [Selector overview](/concepts/flow-control/selector.md).
+      :::
+
       Example:
       ```yaml
-      selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress # Allowed values are `ingress` and `egress`.
-        label_matcher:
-          match_labels:
-            user_tier: gold
-          match_expressions:
-            - key: query
-              operator: In
-              values:
-                - insert
-                - delete
-            - label: user_agent
-              regex: ^(?!.*Chrome).*Safari
+      service: service1.default.svc.cluster.local
+      control_point:
+        traffic: ingress # Allowed values are `ingress` and `egress`.
+      label_matcher:
+        match_labels:
+          user_tier: gold
+        match_expressions:
+          - key: query
+            operator: In
+            values:
+              - insert
+              - delete
+          - label: user_agent
+            regex: ^(?!.*Chrome).*Safari
       ```
-    title: Describes where a rule or actuation component should apply to
+    title: |-
+      Describes which flows a [dataplane
+      component](/concepts/flow-control/flow-control.md#components) should apply
+      to
   v1Service:
     type: object
     properties:

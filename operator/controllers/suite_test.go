@@ -25,6 +25,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
@@ -37,6 +38,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/config"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	//+kubebuilder:scaffold:imports
@@ -47,6 +49,7 @@ import (
 
 var (
 	k8sClient                 client.Client
+	k8sDynamicClient          dynamic.Interface
 	k8sManager                ctrl.Manager
 	testEnv                   *envtest.Environment
 	ctx                       context.Context
@@ -54,6 +57,7 @@ var (
 	defaultAgentInstance      *v1alpha1.Agent
 	defaultControllerInstance *v1alpha1.Controller
 	namespaceReconciler       *NamespaceReconciler
+	mutatingWebhookReconciler *MutatingWebhookReconciler
 	certDir                   = filepath.Join(".", "certs")
 	test                      = "test"
 	testTwo                   = "test2"
@@ -103,9 +107,20 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
+	k8sDynamicClient, err = dynamic.NewForConfig(cfg)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(k8sDynamicClient).NotTo(BeNil())
+
 	namespaceReconciler = &NamespaceReconciler{
 		Client: k8sClient,
 		Scheme: k8sClient.Scheme(),
+	}
+
+	mutatingWebhookReconciler = &MutatingWebhookReconciler{
+		Client:            k8sClient,
+		Scheme:            k8sClient.Scheme(),
+		AgentManager:      true,
+		ControllerManager: true,
 	}
 
 	k8sManager, err = ctrl.NewManager(cfg, ctrl.Options{
@@ -122,6 +137,9 @@ var _ = BeforeSuite(func() {
 		},
 	}
 	Expect(k8sClient.Create(ctx, ns)).To(BeNil())
+
+	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
+	Expect(err).NotTo(HaveOccurred())
 
 	defaultControllerInstance = &v1alpha1.Controller{
 		ObjectMeta: metav1.ObjectMeta{
@@ -156,11 +174,14 @@ var _ = BeforeSuite(func() {
 					Create: true,
 				},
 			},
-			Image: v1alpha1.Image{
-				PullPolicy: string(corev1.PullAlways),
+			Image: v1alpha1.ControllerImage{
+				Image: v1alpha1.Image{
+					PullPolicy: string(corev1.PullAlways),
+				},
 			},
 		},
 	}
+	unmarshaller.Unmarshal(&defaultControllerInstance.Spec)
 
 	defaultAgentInstance = &v1alpha1.Agent{
 		ObjectMeta: metav1.ObjectMeta{
@@ -195,11 +216,14 @@ var _ = BeforeSuite(func() {
 					Create: true,
 				},
 			},
-			Image: v1alpha1.Image{
-				PullPolicy: string(corev1.PullAlways),
+			Image: v1alpha1.AgentImage{
+				Image: v1alpha1.Image{
+					PullPolicy: string(corev1.PullAlways),
+				},
 			},
 		},
 	}
+	unmarshaller.Unmarshal(&defaultAgentInstance.Spec)
 })
 
 var _ = AfterSuite(func() {

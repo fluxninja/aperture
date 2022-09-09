@@ -46,7 +46,7 @@ type PrometheusConfig struct {
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(providePrometheusClient),
-		commonhttp.ClientConstructor{Name: "prometheus.http-client", Key: httpConfigKey}.Annotate(),
+		commonhttp.ClientConstructor{Name: "prometheus.http-client", ConfigKey: httpConfigKey}.Annotate(),
 	)
 }
 

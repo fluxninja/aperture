@@ -9,10 +9,10 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/distcache"
@@ -156,7 +156,7 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
-	wrapperMessage := &configv1.RateLimiterWrapper{}
+	wrapperMessage := &wrappersv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiter == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
@@ -284,7 +284,7 @@ func (rateLimiter *rateLimiter) GetSelector() *selectorv1.Selector {
 }
 
 // RunLimiter runs the limiter.
-func (rateLimiter *rateLimiter) RunLimiter(labels selectors.Labels, decision *flowcontrolv1.LimiterDecision) {
+func (rateLimiter *rateLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
 	label, ok, remaining, current := rateLimiter.TakeN(labels, 1)
@@ -293,16 +293,18 @@ func (rateLimiter *rateLimiter) RunLimiter(labels selectors.Labels, decision *fl
 		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND
 	}
 
-	decision.PolicyName = rateLimiter.GetPolicyName()
-	decision.PolicyHash = rateLimiter.GetPolicyHash()
-	decision.ComponentIndex = rateLimiter.GetComponentIndex()
-	decision.Dropped = !ok
-	decision.Reason = reason
-	decision.Details = &flowcontrolv1.LimiterDecision_RateLimiter_{
-		RateLimiter: &flowcontrolv1.LimiterDecision_RateLimiter{
-			Label:     label,
-			Remaining: int64(remaining),
-			Current:   int64(current),
+	return &flowcontrolv1.LimiterDecision{
+		PolicyName:     rateLimiter.GetPolicyName(),
+		PolicyHash:     rateLimiter.GetPolicyHash(),
+		ComponentIndex: rateLimiter.GetComponentIndex(),
+		Dropped:        !ok,
+		Reason:         reason,
+		Details: &flowcontrolv1.LimiterDecision_RateLimiter_{
+			RateLimiter: &flowcontrolv1.LimiterDecision_RateLimiter{
+				Label:     label,
+				Remaining: int64(remaining),
+				Current:   int64(current),
+			},
 		},
 	}
 }
@@ -330,7 +332,7 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 		return
 	}
 
-	var wrapperMessage configv1.RateLimiterDecisionWrapper
+	var wrapperMessage wrappersv1.RateLimiterDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiterDecision == nil {
 		return

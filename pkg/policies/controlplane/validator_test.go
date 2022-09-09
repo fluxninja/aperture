@@ -25,8 +25,7 @@ var _ = Describe("Validator", func() {
 		Expect(ok).To(BeFalse())
 	})
 
-	cmVatidator := validation.NewCMValidator()
-	cmVatidator.RegisterCMFileValidator(cmFileValidator)
+	cmVatidator := validation.NewCMValidator([]validation.CMFileValidator{cmFileValidator})
 
 	validateExample := func(contents string) {
 		var cm corev1.ConfigMap
@@ -87,9 +86,9 @@ data:
                   import input.attributes.request.http
                   ua = http.headers["user-agent"]
                 query: data.my.rego.pkg.ua
-            user-type:
+            user_type:
               extractor:
-                from: request.http.headers.user-type
+                from: request.http.headers.user_type
     circuit:
       evaluation_interval: "0.5s"
       components:
@@ -193,12 +192,12 @@ data:
                     priority: 50
                   label_matcher:
                     match_labels:
-                      user-type: "guest"
+                      user_type: "guest"
                 - workload:
                     priority: 200
                   label_matcher:
                     match_labels:
-                      request_header_user-type: "subscriber"
+                      http.request.header.user_type: "subscriber"
               out_ports:
                 accepted_concurrency:
                   signal_name: "ACCEPTED_CONCURRENCY"
@@ -346,6 +345,6 @@ const rateLimitPolicy = `
               service: "service1-demo-app.demoapp.svc.cluster.local"
               control_point:
                 traffic: "ingress"
-            label_key: "request_header_user-type"
+            label_key: "http.request.header.user_type"
             limit_reset_interval: "1s"
 `

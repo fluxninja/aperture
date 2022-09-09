@@ -18,20 +18,20 @@ import (
 	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
-// DefaultLogFilePath is the default path for the log files to be stored.
-var DefaultLogFilePath = path.Join(DefaultLogDirectory, info.Service+".log")
+// defaultLogFilePath is the default path for the log files to be stored.
+var defaultLogFilePath = path.Join(DefaultLogDirectory, info.Service+".log")
 
 const (
-	configKey  = "log"
-	stdOutFile = "stdout"
-	stdErrFile = "stderr"
-	emptyFile  = ""
+	configKey   = "log"
+	stdOutFile  = "stdout"
+	stdErrFile  = "stderr"
+	defaultFile = "default"
 )
 
 // LogModule is a fx module that provides a logger and invokes setting global and standard loggers.
 func LogModule() fx.Option {
 	return fx.Options(
-		LoggerConstructor{Key: configKey}.Annotate(),
+		LoggerConstructor{ConfigKey: configKey}.Annotate(),
 		fx.Invoke(log.SetGlobalLogger),
 		fx.Invoke(log.SetStdLogger),
 		fx.WithLogger(WithApertureLogger()),
@@ -53,11 +53,8 @@ type LogConfig struct {
 	// Log level
 	LogLevel string `json:"level" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
 
-	// Additional log writers
-	Writers []LogWriterConfig `json:"writers" validate:"omitempty,dive,omitempty"`
-
-	// Base LogWriterConfig
-	LogWriterConfig `json:",inline"`
+	// Log writers
+	Writers []LogWriterConfig `json:"writers,omitempty" validate:"omitempty,dive,omitempty"`
 
 	// Use non-blocking log writer (can lose logs at high throughput)
 	NonBlocking bool `json:"non_blocking" default:"true"`
@@ -86,8 +83,8 @@ type LogWriterConfig struct {
 type LoggerConstructor struct {
 	// Name of logger instance
 	Name string
-	// Viper config key
-	Key string
+	// Config key
+	ConfigKey string
 	// Default Config
 	DefaultConfig LogConfig
 }
@@ -118,11 +115,11 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 ) (log.Logger, error) {
 	config := constructor.DefaultConfig
 
-	if err := unmarshaller.UnmarshalKey(constructor.Key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
 	}
 	logger, writers := NewLogger(config)
-	// append additional writers provided via Fx
+	// append writers provided via Fx
 	writers = append(writers, w...)
 
 	lifecycle.Append(fx.Hook{
@@ -149,32 +146,35 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 // NewLogger creates a new instance of logger and writers with the given configuration.
 func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	var writers []io.Writer
-
-	if !config.PrettyConsole {
-		if config.File == stdErrFile {
-			writers = append(writers, os.Stderr)
-		} else if config.File == stdOutFile {
-			writers = append(writers, os.Stdout)
-		}
-	}
-	if config.File == "default" {
-		config.Writers = append(config.Writers, config.LogWriterConfig)
-	}
 	// append file writers
 	for _, writerConfig := range config.Writers {
-		lj := &lumberjack.Logger{
-			Filename:   writerConfig.File,
-			MaxSize:    writerConfig.MaxSize,
-			MaxBackups: writerConfig.MaxBackups,
-			MaxAge:     writerConfig.MaxAge,
-			Compress:   writerConfig.Compress,
+		var writer io.Writer
+		if writerConfig.File != "" {
+			switch writerConfig.File {
+			case stdErrFile:
+				writer = os.Stderr
+			case stdOutFile:
+				writer = os.Stdout
+			default:
+				if writerConfig.File == defaultFile {
+					writerConfig.File = defaultLogFilePath
+				}
+				lj := &lumberjack.Logger{
+					Filename:   writerConfig.File,
+					MaxSize:    writerConfig.MaxSize,
+					MaxBackups: writerConfig.MaxBackups,
+					MaxAge:     writerConfig.MaxAge,
+					Compress:   writerConfig.Compress,
+				}
+				// Set finalizer to automatically close file writers
+				runtime.SetFinalizer(lj, func(lj *lumberjack.Logger) {
+					log.Debug().Msg("Closing lumberjack file writer")
+					_ = lj.Close()
+				})
+				writer = lj
+			}
+			writers = append(writers, writer)
 		}
-		writers = append(writers, lj)
-		// Set finalizer to automatically close file writers
-		runtime.SetFinalizer(lj, func(lj *lumberjack.Logger) {
-			log.Debug().Msg("Closing lumberjack file writer")
-			_ = lj.Close()
-		})
 	}
 
 	if config.PrettyConsole {
@@ -184,8 +184,6 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	multi := zerolog.MultiLevelWriter(writers...)
 
 	logger := log.NewLogger(multi, config.NonBlocking, strings.ToLower(config.LogLevel))
-
-	logger.Info().Msg("Configured logger")
 
 	return logger, writers
 }

@@ -25,8 +25,10 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -44,6 +46,7 @@ import (
 // ControllerReconciler reconciles a Controller object.
 type ControllerReconciler struct {
 	client.Client
+	DynamicClient    dynamic.Interface
 	Scheme           *runtime.Scheme
 	Recorder         record.EventRecorder
 	resourcesDeleted bool
@@ -148,12 +151,21 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 					"The required resources are already deployed. Skipping resource creation as currently, the Controller doesn't support multiple replicas.")
 
 				instance.Status.Resources = "skipped"
-				if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
 					return ctrl.Result{}, err
 				}
 
 				return ctrl.Result{}, nil
 			}
+		}
+	}
+
+	if instance.Annotations == nil || instance.Annotations[defaulterAnnotationKey] != "true" {
+		err = r.checkDefaults(ctx, instance)
+		if err != nil {
+			return ctrl.Result{}, err
+		} else if instance.Status.Resources == failedStatus {
+			return ctrl.Result{}, nil
 		}
 	}
 
@@ -188,6 +200,7 @@ func (r *ControllerReconciler) updateController(ctx context.Context, instance *v
 	attempt := 5
 	finalizers := instance.DeepCopy().Finalizers
 	spec := instance.DeepCopy().Spec
+	annotations := instance.DeepCopy().Annotations
 	for attempt > 0 {
 		attempt -= 1
 		if err := r.Update(ctx, instance); err != nil {
@@ -201,6 +214,7 @@ func (r *ControllerReconciler) updateController(ctx context.Context, instance *v
 				}
 				instance.Finalizers = finalizers
 				instance.Spec = spec
+				instance.Annotations = annotations
 				continue
 			}
 			return err
@@ -270,17 +284,70 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 	return nil
 }
 
-// manageResources creates/updates required resources.
-func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
-	spec := &instance.Spec.ConfigSpec
-
-	// fill defaults
-	config.SetDefaults(spec)
-	// validate
-	if err := config.ValidateStruct(spec); err != nil {
-		return err
+// checkDefaults checks and sets defaults when the Defaulter webhook is not triggered.
+func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *v1alpha1.Controller) error {
+	resource, err := r.DynamicClient.Resource(v1alpha1.GroupVersion.WithResource("controllers")).Namespace(instance.GetNamespace()).Get(ctx, instance.GetName(), v1.GetOptions{})
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToFetch", "Failed to fetch Resource. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
 	}
 
+	resourceBytes, err := resource.MarshalJSON()
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToMarshal", "Failed to marshal Resource into JSON. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(resourceBytes)
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefauls", "Failed to set defaults. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	err = unmarshaller.Unmarshal(instance)
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefauls", "Failed to set defaults. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create && instance.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	if instance.Status.Resources == failedStatus {
+		instance.Status.Resources = ""
+	}
+	return nil
+}
+
+// manageResources creates/updates required resources.
+func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
 	// Always enable TLS on the controller
 	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
 		CertsPath:  controllerCertPath,
@@ -327,12 +394,10 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 // reconcileConfigMap prepares the desired states for Controller configmaps and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance *v1alpha1.Controller) error {
-	logger := log.FromContext(ctx)
 	configMap, err := configMapForControllerConfig(instance.DeepCopy(), r.Scheme)
 	if err != nil {
 		return err
 	}
-	logger.Info("reconcileConfigMap", "configMap", configMap)
 
 	if _, err = createConfigMapForController(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 		return err

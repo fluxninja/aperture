@@ -36,7 +36,7 @@ spec:
         name: manager
         env:
           - name: APERTURE_OPERATOR_SERVICE_NAME
-            value: "aperture-operator-service"
+            value: "service"
         securityContext:
           allowPrivilegeEscalation: false
         livenessProbe:

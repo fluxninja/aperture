@@ -12,10 +12,4 @@ type Config struct {
 	promRegistry             *prometheus.Registry
 	engine                   iface.Engine
 	config.ProcessorSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct
-	// The lowest bucket in latency histogram
-	LatencyBucketStartMS float64 `mapstructure:"latency_bucket_start_ms" validate:"gte=0" default:"20"`
-	// The bucket width in latency histogram
-	LatencyBucketWidthMS float64 `mapstructure:"latency_bucket_width_ms" validate:"gte=0" default:"20"`
-	// The number of buckets in latency histogram
-	LatencyBucketCount int `mapstructure:"latency_bucket_count" validate:"gte=0" default:"100"`
 }

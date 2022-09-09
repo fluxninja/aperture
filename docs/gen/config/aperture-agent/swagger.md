@@ -546,6 +546,8 @@ AgentInfoConfig is the configuration for the agent group etc.
 
 (string, default: `default`) All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
 
+[Read more about agent groups here](/concepts/flow-control/service.md#agent-group).
+
 </dd>
 </dl>
 
@@ -964,7 +966,7 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>proxy_connect_header</dt>
 <dd>
 
-([Header](#header))
+([Header](#header), `omitempty`)
 
 </dd>
 <dt>tls</dt>
@@ -1189,40 +1191,10 @@ LogConfig holds configuration for a logger and log writers.
 #### Properties
 
 <dl>
-<dt>compress</dt>
-<dd>
-
-(bool, default: `false`) Compress
-
-</dd>
-<dt>file</dt>
-<dd>
-
-(string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-
-</dd>
 <dt>level</dt>
 <dd>
 
 (string, `oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED`, default: `info`) Log level
-
-</dd>
-<dt>max_age</dt>
-<dd>
-
-(int64, `gte=0`, default: `7`) Max age in days for log files
-
-</dd>
-<dt>max_backups</dt>
-<dd>
-
-(int64, `gte=0`, default: `3`) Max log file backups
-
-</dd>
-<dt>max_size</dt>
-<dd>
-
-(int64, `gte=0`, default: `50`) Log file max size in MB
 
 </dd>
 <dt>non_blocking</dt>
@@ -1240,7 +1212,7 @@ LogConfig holds configuration for a logger and log writers.
 <dt>writers</dt>
 <dd>
 
-([[]LogWriterConfig](#log-writer-config), `omitempty,dive,omitempty`) Additional log writers
+([[]LogWriterConfig](#log-writer-config), `omitempty,dive,omitempty`) Log writers
 
 </dd>
 </dl>
@@ -1375,19 +1347,19 @@ PluginsConfig holds configuration for plugins.
 <dt>disabled_plugins</dt>
 <dd>
 
-([]string) Specific plugins to disable
+([]string, `omitempty`) Specific plugins to disable
 
 </dd>
 <dt>disabled_symbols</dt>
 <dd>
 
-([]string) Specific plugin types to disable
+([]string, `omitempty`) Specific plugin types to disable
 
 </dd>
 <dt>plugins_path</dt>
 <dd>
 
-(string) Path to plugins directory. This can be set via command line arguments as well.
+(string, default: `default`) Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
 
 </dd>
 </dl>
@@ -1408,7 +1380,7 @@ ProfilersConfig holds configuration for profilers.
 <dt>profiles_path</dt>
 <dd>
 
-(string) Path to save performance profiles. This can be set via command line arguments as well. E.g. default path for aperture-agent is /var/log/aperture/aperture-agent/profiles.
+(string, default: `default`) Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
 
 </dd>
 <dt>register_http_routes</dt>
@@ -1458,7 +1430,7 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 <dt>no_proxy</dt>
 <dd>
 
-([]string, `dive,ip|cidr|fqdn|hostname_port`)
+([]string, `omitempty,dive,ip|cidr|fqdn|hostname_port`)
 
 </dd>
 </dl>

@@ -1,0 +1,52 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: aperture-agent-defaulter
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: service
+      namespace: system
+      path: /agent-defaulter
+  failurePolicy: Fail
+  name: agent-defaulter.fluxninja.com
+  rules:
+  - apiGroups:
+    - fluxninja.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - agents
+  sideEffects: None
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: aperture-controller-defaulter
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: service
+      namespace: system
+      path: /controller-defaulter
+  failurePolicy: Fail
+  name: controller-defaulter.fluxninja.com
+  rules:
+  - apiGroups:
+    - fluxninja.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - controllers
+  sideEffects: None

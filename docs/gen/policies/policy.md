@@ -18,6 +18,7 @@
 - [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 - [languagev1RateLimiter](#languagev1-rate-limiter) – Limits the traffic on a control point to specified rate
+- [policylanguagev1Classifier](#policylanguagev1-classifier) – Set of classification rules sharing a common selector
 - [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 
 Example of…
@@ -27,7 +28,6 @@ Example of…
 - [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
 - [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the Arithmetic Combinator component.
 - [v1Circuit](#v1-circuit) – Circuit is defined as a dataflow graph of inter-connected components
-- [v1Classifier](#v1-classifier) – Set of classification rules sharing a common selector
 - [v1Component](#v1-component) – Computational block that form the circuit
 - [v1Constant](#v1-constant) – Component that emits a constant value as an output signal
 - [v1ConstantOuts](#v1-constant-outs) – Outputs for the Constant component.
@@ -75,7 +75,9 @@ Example of…
 - [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule
 - [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing-based workload scheduler
 - [v1SchedulerOuts](#v1-scheduler-outs) – Output for the Scheduler component.
-- [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to
+- [v1Selector](#v1-selector) – Describes which flows a [dataplane
+  component](/concepts/flow-control/flow-control.md#components) should apply
+  to
 - [v1Sqrt](#v1-sqrt) – Takes an input signal and emits the square root of it multiplied by scale as an output
 - [v1SqrtIns](#v1-sqrt-ins) – Inputs for the Sqrt component.
 - [v1SqrtOuts](#v1-sqrt-outs) – Outputs for the Sqrt component.
@@ -168,7 +170,7 @@ High-level extractor-based rules are compiled into a single rego query.
 <dt>query</dt>
 <dd>
 
-(string) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+(string, `required`) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
 Note: The module name must match the package name from the "source".
 
@@ -176,7 +178,7 @@ Note: The module name must match the package name from the "source".
 <dt>source</dt>
 <dd>
 
-(string) Source code of the rego module.
+(string, `required`) Source code of the rego module.
 
 Note: Must include a "package" declaration.
 
@@ -331,6 +333,46 @@ TODO make it possible for this field to be optional – to achieve global rateli
 </dd>
 </dl>
 
+### policylanguagev1Classifier {#policylanguagev1-classifier}
+
+Set of classification rules sharing a common selector
+
+:::info
+See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+:::
+
+Example:
+
+```yaml
+selector:
+  service: service1.default.svc.cluster.local
+  control_point:
+    traffic: ingress
+rules:
+  user:
+    extractor:
+      from: request.http.headers.user
+```
+
+#### Properties
+
+<dl>
+<dt>rules</dt>
+<dd>
+
+(map of [V1Rule](#v1-rule), `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
+[flow label](/concepts/flow-control/label/label.md) keys to rules that define
+how to extract and propagate flow labels with that key.
+
+</dd>
+<dt>selector</dt>
+<dd>
+
+([V1Selector](#v1-selector), `required`) Defines where to apply the flow classification rule.
+
+</dd>
+</dl>
+
 ### policylanguagev1FluxMeter {#policylanguagev1-flux-meter}
 
 FluxMeter gathers metrics for the traffic that matches its selector.
@@ -348,6 +390,17 @@ selector:
 #### Properties
 
 <dl>
+<dt>attribute_key</dt>
+<dd>
+
+(string, default: `duration_millis`) Key of the attribute in accesss log or span from which the metric for this flux meter is read.
+
+:::info
+For list of available attributes in Envoy access logs, refer
+[Envoy Filter](/get-started/istio.md#envoy-filter)
+:::
+
+</dd>
 <dt>histogram_buckets</dt>
 <dd>
 
@@ -501,46 +554,6 @@ docs on how exactly it handles invalid inputs.
 
 (string, default: `0.5s`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
 This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-
-</dd>
-</dl>
-
-### v1Classifier {#v1-classifier}
-
-Set of classification rules sharing a common selector
-
-:::info
-See also [Classifier overview](/concepts/flow-control/label/classifier.md).
-:::
-
-Example:
-
-```yaml
-selector:
-  service: service1.default.svc.cluster.local
-  control_point:
-    traffic: ingress
-rules:
-  user:
-    extractor:
-      from: request.http.headers.user
-```
-
-#### Properties
-
-<dl>
-<dt>rules</dt>
-<dd>
-
-(map of [V1Rule](#v1-rule)) A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/label/label.md) keys to rules that define
-how to extract and propagate flow labels with that key.
-
-</dd>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector)) Defines where to apply the flow classification rule.
 
 </dd>
 </dl>
@@ -1623,7 +1636,7 @@ In case of multiple path templates matching, the most specific one will be chose
 <dt>template_values</dt>
 <dd>
 
-(map of string) Template value keys are OpenAPI-inspired path templates.
+(map of string, `required`) Template value keys are OpenAPI-inspired path templates.
 
 - Static path segment `/foo` matches a path segment exactly
 - `/{param}` matches arbitrary path segment.
@@ -1767,7 +1780,7 @@ Resources are typically FluxMeters, Classifiers, etc. that can be used to create
 <dt>classifiers</dt>
 <dd>
 
-([[]V1Classifier](#v1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+([[]Policylanguagev1Classifier](#policylanguagev1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
 
@@ -1835,7 +1848,7 @@ propagate: false
 <dt>hidden</dt>
 <dd>
 
-(bool) Decides if the created flow label should be hidden from the telemetry.
+(bool, `required`) Decides if the created flow label should be hidden from the telemetry.
 A hidden flow label is still accessible in policies and can be used as eg.
 fairness key.
 
@@ -1851,9 +1864,8 @@ sensitive labels.
 <dt>propagate</dt>
 <dd>
 
-(bool) Decides if the created label should be applied to the whole request chain
+(bool, `required`) Decides if the created label should be applied to the whole request chain
 (propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
-(default=true).
 
 </dd>
 <dt>rego</dt>
@@ -1925,7 +1937,7 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector)) Selector decides for which service or flows the scheduler will be applied.
+([V1Selector](#v1-selector), `required`) Selector decides for which service or flows the scheduler will be applied.
 
 </dd>
 <dt>timeout_factor</dt>
@@ -2002,26 +2014,31 @@ entering scheduler, including rejected ones.
 
 ### v1Selector {#v1-selector}
 
-Describes where a rule or actuation component should apply to
+Describes which flows a [dataplane
+component](/concepts/flow-control/flow-control.md#components) should apply
+to
+
+:::info
+See also [Selector overview](/concepts/flow-control/selector.md).
+:::
 
 Example:
 
 ```yaml
-selector:
-  service: service1.default.svc.cluster.local
-  control_point:
-    traffic: ingress # Allowed values are `ingress` and `egress`.
-  label_matcher:
-    match_labels:
-      user_tier: gold
-    match_expressions:
-      - key: query
-        operator: In
-        values:
-          - insert
-          - delete
-      - label: user_agent
-        regex: ^(?!.*Chrome).*Safari
+service: service1.default.svc.cluster.local
+control_point:
+  traffic: ingress # Allowed values are `ingress` and `egress`.
+label_matcher:
+  match_labels:
+    user_tier: gold
+  match_expressions:
+    - key: query
+      operator: In
+      values:
+        - insert
+        - delete
+    - label: user_agent
+      regex: ^(?!.*Chrome).*Safari
 ```
 
 #### Properties
@@ -2030,13 +2047,16 @@ selector:
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Describes where this selector applies to.
+(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+selector applies to.
 
 </dd>
 <dt>control_point</dt>
 <dd>
 
-([V1ControlPoint](#v1-control-point), `required`) Describes control point within the entity where the policy should apply to.
+([V1ControlPoint](#v1-control-point), `required`) Describes
+[control point](/concepts/flow-control/flow-control.md#control-point)
+within the entity where the policy should apply to.
 
 </dd>
 <dt>label_matcher</dt>
@@ -2045,6 +2065,10 @@ selector:
 ([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
 [flow labels](/concepts/flow-control/label/label.md)
 must also be satisfied (in addition to service+control point matching)
+
+:::info
+See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+:::
 
 :::note
 [Classifiers](#v1-classifier) _can_ use flow labels created by some other
@@ -2061,10 +2085,16 @@ control point.
 <dt>service</dt>
 <dd>
 
-(string) The service (name) of the entities.
-In k8s, this is the FQDN of the Service object.
+(string) The Fully Qualified Domain Name of the
+[service](/concepts/flow-control/service.md) to select.
 
-Note: Entity may belong to multiple services.
+In kubernetes, this is the FQDN of the Service object.
+
+Empty string means all services within an agent group (catch-all).
+
+:::note
+One entity may belong to multiple services.
+:::
 
 </dd>
 </dl>

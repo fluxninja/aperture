@@ -13,9 +13,9 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -74,7 +74,7 @@ func NewSchedulerAndOptions(
 	}
 
 	// Prepare parameters for prometheus queries
-	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%d\"",
+	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%d\",decision_type!=\"DECISION_TYPE_REJECTED\"",
 		metrics.PolicyNameLabel,
 		policyReadAPI.GetPolicyName(),
 		metrics.PolicyHashLabel,
@@ -236,7 +236,7 @@ func (s *Scheduler) publishQueryTokens(tokens *policydecisionsv1.TokensDecision)
 	policyName := s.policyReadAPI.GetPolicyName()
 	policyHash := s.policyReadAPI.GetPolicyHash()
 
-	wrapper := &configv1.TokensDecisionWrapper{
+	wrapper := &wrappersv1.TokensDecisionWrapper{
 		TokensDecision: tokens,
 		ComponentIndex: int64(s.componentIndex),
 		PolicyName:     policyName,

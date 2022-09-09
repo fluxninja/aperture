@@ -3,6 +3,7 @@ package peers
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io/fs"
 	"net"
@@ -13,7 +14,7 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
-	"gopkg.in/yaml.v2"
+	"sigs.k8s.io/yaml"
 
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -33,8 +34,8 @@ const (
 	// - in: body
 	//   schema:
 	//     "$ref": "#/definitions/PeerDiscoveryConfig"
-	defaultKey   = "peer_discovery"
-	watcherFxTag = "peer-discovery-watcher"
+	defaultConfigKey = "peer_discovery"
+	watcherFxTag     = "peer-discovery-watcher"
 )
 
 var (
@@ -52,7 +53,7 @@ type PeerDiscoveryConfig struct {
 
 // Constructor holds fields to create and configure PeerDiscovery.
 type Constructor struct {
-	Key           string
+	ConfigKey     string
 	DefaultConfig PeerDiscoveryConfig
 	Service       string
 }
@@ -82,10 +83,10 @@ type PeerDiscoveryIn struct {
 
 func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDiscovery, error) {
 	var configKey string
-	if constructor.Key == "" {
-		configKey = defaultKey
+	if constructor.ConfigKey == "" {
+		configKey = defaultConfigKey
 	} else {
-		configKey = constructor.Key
+		configKey = constructor.ConfigKey
 	}
 
 	var cfg PeerDiscoveryConfig
@@ -199,12 +200,17 @@ func (pd *PeerDiscovery) registerSelf(ctx context.Context, advertiseAddr string)
 
 	// register
 	log.Debug().Str("key", pd.selfKey).Msg("self registering in peer discovery table")
-	b, err := yaml.Marshal(pd.selfPeer)
+	bjson, err := json.Marshal(pd.selfPeer)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to marshal peer info")
 		return err
 	}
-
+	// convert to yaml
+	b, err := yaml.JSONToYAML(bjson)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to convert json to yaml")
+		return err
+	}
 	_, err = pd.client.KV.Put(clientv3.WithRequireLeader(ctx),
 		pd.selfKey, string(b), clientv3.WithLease(pd.client.LeaseID))
 

@@ -35,26 +35,18 @@ type CMValidator struct {
 }
 
 // NewCMValidator creates a NewCMValidator.
-func NewCMValidator() *CMValidator {
+func NewCMValidator(validators []CMFileValidator) *CMValidator {
 	tokens := make(chan concurrencyToken, maxValidationConcurrency)
 	for i := 0; i < maxValidationConcurrency; i++ {
 		tokens <- concurrencyToken{}
 	}
 	return &CMValidator{
 		tokens:         tokens,
-		fileValidators: make([]CMFileValidator, 0),
+		fileValidators: validators,
 	}
 }
 
 type concurrencyToken struct{}
-
-// RegisterCMFileValidator adds a configmap file validator to be handled on validator
-//
-// This function should be only called before Start phase.
-// TODO: Use Fx Value Groups here.
-func (v *CMValidator) RegisterCMFileValidator(validator CMFileValidator) {
-	v.fileValidators = append(v.fileValidators, validator)
-}
 
 // ValidateObject checks the validity of a object as a k8s object.
 func (v *CMValidator) ValidateObject(

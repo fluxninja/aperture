@@ -23,7 +23,7 @@ const schemeName = "file"
 
 // Module is a fx module that invokes OTEL Collector.
 func Module() fx.Option {
-	return fx.Invoke(Invoke)
+	return fx.Invoke(setup)
 }
 
 // ConstructorIn describes parameters passed to create OTEL Collector, server providing the OpenTelemetry Collector service.
@@ -34,19 +34,18 @@ type ConstructorIn struct {
 	Factories     component.Factories
 	Unmarshaller  config.Unmarshaller
 	BaseConfig    *OTELConfig   `name:"base"`
-	PluginConfigs []*OTELConfig `group:"plugin"`
+	PluginConfigs []*OTELConfig `group:"plugin-config"`
 }
 
-// Invoke creates and runs a new instance of OTEL Collector with the passed configuration.
-func Invoke(in ConstructorIn) (*service.Collector, error) {
+// setup creates and runs a new instance of OTEL Collector with the passed configuration.
+func setup(in ConstructorIn) error {
 	locations := []string{"file:main"}
-	mapProviders := map[string]confmap.Provider{
-		"file": NewOTELConfigUnmarshaler(in.BaseConfig.AsMap()),
-	}
-
 	var otelService *service.Collector
 	in.Lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
+			mapProviders := map[string]confmap.Provider{
+				"file": NewOTELConfigUnmarshaler(in.BaseConfig.AsMap()),
+			}
 			for i, pluginConfig := range in.PluginConfigs {
 				scheme := fmt.Sprintf("plugin-%v", i)
 				locations = append(locations, fmt.Sprintf("%v:%v", scheme, scheme))
@@ -98,5 +97,5 @@ func Invoke(in ConstructorIn) (*service.Collector, error) {
 		},
 	})
 
-	return otelService, nil
+	return nil
 }

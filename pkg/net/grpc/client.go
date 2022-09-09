@@ -23,7 +23,7 @@ func ClientModule() fx.Option {
 // ClientConstructor holds fields to create an annotated instance of ClientConnectionBuilder.
 type ClientConstructor struct {
 	Name          string
-	Key           string
+	ConfigKey     string
 	DefaultConfig GRPCClientConfig
 }
 
@@ -59,7 +59,7 @@ type BackoffConfig struct {
 
 // Annotate creates an annotated instance of GRPC ClientConnectionBuilder.
 func (c ClientConstructor) Annotate() fx.Option {
-	if c.Key == "" {
+	if c.ConfigKey == "" {
 		log.Panic().Msg("config key not provided")
 	}
 
@@ -75,7 +75,7 @@ func (c ClientConstructor) Annotate() fx.Option {
 
 func (c ClientConstructor) provideClientConnectionBuilder(unmarshaller config.Unmarshaller) (ClientConnectionBuilder, *GRPCClientConfig, error) {
 	config := c.DefaultConfig
-	err := unmarshaller.UnmarshalKey(c.Key, &config)
+	err := unmarshaller.UnmarshalKey(c.ConfigKey, &config)
 	if err != nil {
 		return nil, nil, err
 	}

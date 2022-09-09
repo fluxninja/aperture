@@ -6,7 +6,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/open-policy-agent/opa/ast"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	labelmatcherv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/labelmatcher/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -14,6 +13,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 
 	. "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/services"
 )
@@ -46,7 +46,8 @@ var _ = Describe("Classifier", func() {
 			},
 			Rules: map[string]*classificationv1.Rule{
 				"foo": {
-					Source: headerExtractor("foo"),
+					Source:    headerExtractor("foo"),
+					Propagate: true,
 				},
 			},
 		}
@@ -75,6 +76,7 @@ var _ = Describe("Classifier", func() {
 							Query: "data.my.pkg.answer",
 						},
 					},
+					Propagate: true,
 				},
 			},
 		}
@@ -90,7 +92,8 @@ var _ = Describe("Classifier", func() {
 			},
 			Rules: map[string]*classificationv1.Rule{
 				"fuu": {
-					Source: headerExtractor("fuu"),
+					Source:    headerExtractor("fuu"),
+					Propagate: true,
 				},
 			},
 		}
@@ -108,19 +111,19 @@ var _ = Describe("Classifier", func() {
 
 		It("returns active rules", func() {
 			Expect(classifier.ActiveRules()).To(ConsistOf(
-				ReportedRule{
+				compiler.ReportedRule{
 					RulesetName: "one",
 					LabelName:   "foo",
 					Rule:        rs1.Rules["foo"],
 					Selector:    rs1.Selector,
 				},
-				ReportedRule{
+				compiler.ReportedRule{
 					RulesetName: "two",
 					LabelName:   "bar-twice",
 					Rule:        rs2.Rules["bar-twice"],
 					Selector:    rs2.Selector,
 				},
-				ReportedRule{
+				compiler.ReportedRule{
 					RulesetName: "three",
 					LabelName:   "fuu",
 					Rule:        rs3.Rules["fuu"],
@@ -241,7 +244,7 @@ var _ = Describe("Classifier", func() {
 		rules := map[string]*classificationv1.Rule{
 			"foo": {
 				Source:    headerExtractor("foo"),
-				Propagate: &wrapperspb.BoolValue{Value: false},
+				Propagate: false,
 			},
 			"bar": {
 				Source: &classificationv1.Rule_Rego_{
@@ -253,7 +256,8 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
-				Hidden: true,
+				Propagate: true,
+				Hidden:    true,
 			},
 		}
 
@@ -276,8 +280,8 @@ var _ = Describe("Classifier", func() {
 			)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(Equal(FlowLabels{
-				"foo": FlowLabelValue{"hello", LabelFlags{Propagate: false}},
-				"bar": FlowLabelValue{"21", LabelFlags{Hidden: true, Propagate: true}},
+				"foo": FlowLabelValue{"hello", compiler.LabelFlags{Propagate: false}},
+				"bar": FlowLabelValue{"21", compiler.LabelFlags{Hidden: true, Propagate: true}},
 			}))
 		})
 	})
@@ -289,12 +293,14 @@ var _ = Describe("Classifier", func() {
 		// "foo/2": ...
 		rules1 := map[string]*classificationv1.Rule{
 			"foo": {
-				Source: headerExtractor("foo"),
+				Source:    headerExtractor("foo"),
+				Propagate: true,
 			},
 		}
 		rules2 := map[string]*classificationv1.Rule{
 			"foo": {
-				Source: headerExtractor("xyz"),
+				Source:    headerExtractor("xyz"),
+				Propagate: true,
 			},
 		}
 
@@ -339,6 +345,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
+				Propagate: true,
 			},
 		}
 		rules2 := map[string]*classificationv1.Rule{
@@ -352,6 +359,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer2",
 					},
 				},
+				Propagate: true,
 			},
 		}
 
@@ -396,13 +404,14 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.bar",
 					},
 				},
+				Propagate: true,
 			},
 		}
 
 		It("fails to compile rego", func() {
 			err := setRulesForMyService(rules)
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(BadRego))
+			Expect(err).To(MatchError(compiler.BadRego))
 		})
 	})
 
@@ -419,6 +428,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
+				Propagate: true,
 			},
 		}
 
@@ -443,12 +453,38 @@ var _ = Describe("Classifier", func() {
 			Expect(labels).To(Equal(FlowLabels{}))
 		})
 	})
+
+	Context("configured with invalid label name", func() {
+		// Classifier with a simple extractor-based rule
+		rs := &classificationv1.Classifier{
+			Selector: &selectorv1.Selector{
+				Service: "my-service.default.svc.cluster.local",
+				ControlPoint: &selectorv1.ControlPoint{
+					Controlpoint: &selectorv1.ControlPoint_Traffic{
+						Traffic: "ingress",
+					},
+				},
+			},
+			Rules: map[string]*classificationv1.Rule{
+				"user-agent": {
+					Source:    headerExtractor("foo"),
+					Propagate: true,
+				},
+			},
+		}
+
+		It("should reject the ruleset", func() {
+			_, err := classifier.AddRules(context.TODO(), "one", rs)
+			Expect(err).To(HaveOccurred())
+		})
+
+	})
 })
 
 func fl(s string) FlowLabelValue {
 	return FlowLabelValue{
 		Value: s,
-		Flags: LabelFlags{Propagate: true},
+		Flags: compiler.LabelFlags{Propagate: true},
 	}
 }
 

@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -250,7 +250,7 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		return
 	}
 
-	var wrapperMessage configv1.LoadShedDecsisionWrapper
+	var wrapperMessage wrappersv1.LoadShedDecsisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	loadShedDecision := wrapperMessage.LoadShedDecision
 	if err != nil || loadShedDecision == nil {
