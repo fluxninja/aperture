@@ -6,7 +6,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/open-policy-agent/opa/ast"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	labelmatcherv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/labelmatcher/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -47,7 +46,8 @@ var _ = Describe("Classifier", func() {
 			},
 			Rules: map[string]*classificationv1.Rule{
 				"foo": {
-					Source: headerExtractor("foo"),
+					Source:    headerExtractor("foo"),
+					Propagate: true,
 				},
 			},
 		}
@@ -76,6 +76,7 @@ var _ = Describe("Classifier", func() {
 							Query: "data.my.pkg.answer",
 						},
 					},
+					Propagate: true,
 				},
 			},
 		}
@@ -91,7 +92,8 @@ var _ = Describe("Classifier", func() {
 			},
 			Rules: map[string]*classificationv1.Rule{
 				"fuu": {
-					Source: headerExtractor("fuu"),
+					Source:    headerExtractor("fuu"),
+					Propagate: true,
 				},
 			},
 		}
@@ -242,7 +244,7 @@ var _ = Describe("Classifier", func() {
 		rules := map[string]*classificationv1.Rule{
 			"foo": {
 				Source:    headerExtractor("foo"),
-				Propagate: &wrapperspb.BoolValue{Value: false},
+				Propagate: false,
 			},
 			"bar": {
 				Source: &classificationv1.Rule_Rego_{
@@ -254,7 +256,8 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
-				Hidden: true,
+				Propagate: true,
+				Hidden:    true,
 			},
 		}
 
@@ -290,12 +293,14 @@ var _ = Describe("Classifier", func() {
 		// "foo/2": ...
 		rules1 := map[string]*classificationv1.Rule{
 			"foo": {
-				Source: headerExtractor("foo"),
+				Source:    headerExtractor("foo"),
+				Propagate: true,
 			},
 		}
 		rules2 := map[string]*classificationv1.Rule{
 			"foo": {
-				Source: headerExtractor("xyz"),
+				Source:    headerExtractor("xyz"),
+				Propagate: true,
 			},
 		}
 
@@ -340,6 +345,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
+				Propagate: true,
 			},
 		}
 		rules2 := map[string]*classificationv1.Rule{
@@ -353,6 +359,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer2",
 					},
 				},
+				Propagate: true,
 			},
 		}
 
@@ -397,6 +404,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.bar",
 					},
 				},
+				Propagate: true,
 			},
 		}
 
@@ -420,6 +428,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
+				Propagate: true,
 			},
 		}
 

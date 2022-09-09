@@ -2,11 +2,12 @@ package controlplane
 
 import (
 	"context"
+	"encoding/json"
 	"path"
 
-	"github.com/ghodss/yaml"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
+	"sigs.k8s.io/yaml"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -76,7 +77,13 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 				return key, nil, wrapErr
 			}
 			var marshalWrapErr error
-			dat, marshalWrapErr = yaml.Marshal(wrapper)
+			jsonDat, marshalWrapErr := json.Marshal(wrapper)
+			if marshalWrapErr != nil {
+				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
+				return key, nil, marshalWrapErr
+			}
+			// convert to yaml
+			dat, marshalWrapErr = yaml.JSONToYAML(jsonDat)
 			if marshalWrapErr != nil {
 				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
 				return key, nil, marshalWrapErr
