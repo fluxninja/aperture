@@ -115,7 +115,7 @@ your cluster.
 
       All the configuration parameters for the Agent Custom Resource are listed
       on the
-      [README](https://artifacthub.io/packages/helm/aperture/aperture-operator#aperture-custom-resource-parameters)
+      [README](https://artifacthub.io/packages/helm/aperture/aperture-agent#agent-custom-resource-parameters)
       file of the Helm chart.
 
    3. Apply the YAML file to Kubernetes cluster using `kubectl`

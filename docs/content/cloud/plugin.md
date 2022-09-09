@@ -55,8 +55,8 @@ plugins:
 
 For more details, see plugin configuration reference:
 
-- [Agent](/reference/configuration/agent#plugin-configuration)
-- [Controller](/reference/configuration/controller#plugin-configuration)
+- [Agent](/reference/configuration/agent.md#plugins)
+- [Controller](/reference/configuration/controller.md#plugins)
 
 ## See also
 
