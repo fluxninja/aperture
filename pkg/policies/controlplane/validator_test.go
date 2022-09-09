@@ -86,9 +86,9 @@ data:
                   import input.attributes.request.http
                   ua = http.headers["user-agent"]
                 query: data.my.rego.pkg.ua
-            user-type:
+            user_type:
               extractor:
-                from: request.http.headers.user-type
+                from: request.http.headers.user_type
     circuit:
       evaluation_interval: "0.5s"
       components:
@@ -192,7 +192,7 @@ data:
                     priority: 50
                   label_matcher:
                     match_labels:
-                      user-type: "guest"
+                      user_type: "guest"
                 - workload:
                     priority: 200
                   label_matcher:
