@@ -74,6 +74,21 @@ your cluster.
    the actual values of Etcd and Prometheus, which is also being used by the
    Aperture Controller you want these Agents to connect with.
 
+   If you have installed the
+   [Aperture Controller](/get-started/installation/controller.md) on the same
+   cluster in `default` namespace, with Etcd and Prometheus using `controller`
+   as release name, the values for the values for `ETCD_ENDPOINT_HERE` and
+   `PROMETHEUS_ADDRESS_HERE` would be as below:
+
+   ```yaml
+   agent:
+     config:
+       etcd:
+         endpoints: ['http://controller-etcd.default.svc.cluster.local:2379'],
+       prometheus:
+         address: 'http://controller-prometheus-server.default.svc.cluster.local:80',
+   ```
+
    ```bash
    helm upgrade --install agent aperture/aperture-agent -f values.yaml
    ```
@@ -162,33 +177,42 @@ your cluster.
    A list of configurable parameters can be found in the
    [README](https://artifacthub.io/packages/helm/aperture/aperture-agent#parameters).
 
-6. Once you have successfully deployed the resources, confirm that the Aperture
-   Agent is up and running:
+6. If you want to deploy the Aperture Agent into a namespace other than
+   `default`, use the `-n` flag:
 
    ```bash
-   kubectl get pod -A
-
-   kubectl get agent -A
+   helm upgrade --install agent aperture/aperture-agent -n aperture-agent --create-namespace
    ```
-
-   You should see pod for Aperture Agent Manager in `RUNNING` state and `Agent`
-   Custom Resource in `created` state.
 
 7. Refer steps on the [Istio Configuration](/get-started/istio.md) if you don't
    have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 
-8. Now, when you create a new pod in the above listed namespaces, you will be
-   able to see the Aperture Agent container attached with the existing pod
-   containers. Confirm that the container is injected:
+## Verifying the Installation
 
-   ```bash
-   kubectl describe po <POD_ID>
-   ```
+Once you have successfully deployed the resources, confirm that the Aperture
+Agent is up and running:
 
-   Replace the `POD_ID` with the actual pod ID and check the containers section
-   in the output. There should be a container with name `aperture-agent`.
+```bash
+kubectl get pod -A
+
+kubectl get agent -A
+```
+
+You should see pod for Aperture Agent Manager in `RUNNING` state and `Agent`
+Custom Resource in `created` state.
+
+Now, when you create a new pod in the above listed namespaces, you will be able
+to see the Aperture Agent container attached with the existing pod containers.
+Confirm that the container is injected:
+
+```bash
+kubectl describe po <POD_ID>
+```
+
+Replace the `POD_ID` with the actual pod ID and check the containers section in
+the output. There should be a container with name `aperture-agent`.
 
 ## Customizing injection
 
@@ -247,3 +271,67 @@ certain fields:
 Additionally, `agent-group` field can be configured using the annotation like:
 
 `sidecar.fluxninja.com/agent-group=group1`
+
+## Uninstall
+
+You can uninstall the Aperture Agent and it's components by uninstalling the
+charts installed above:
+
+1. Delete th Aperture Agent chart:
+
+   ```bash
+   helm uninstall agent
+   ```
+
+2. Alternativey, if you have installed the Aperture Agent Custom Resource
+   separately, follow below steps:
+
+   1. Delete the Aperture Agent Custom Resource:
+
+      ```bash
+      kubectl delete -f agent.yaml
+      ```
+
+   2. Delete the Aperture Agent chart to uninstall the Aperture Operator:
+
+      ```bash
+      helm uninstall agent
+      ```
+
+3. If you have installed the chart in some other namespace than `default`,
+   execute below commands:
+
+   ```bash
+   helm uninstall agent -n aperture-agent
+   kubectl delete namespace aperture-agent
+   ```
+
+   > Note: By design, deleting a chart via Helm doesn’t delete the Custom
+   > Resource Definitions (CRDs) installed via the chart.
+
+4. Restarts all the Pods which were injected with the Sidecar:
+
+5. If pods are running as part of a Kubernetes Deployment:
+
+   ```bash
+   kubectl rollout restart deployment <DEPLOYMENT_NAME> -n <NAMESPACE>
+   ```
+
+6. If pods are running as part of a Kubernetes Daemonset:
+
+   ```bash
+   kubectl rollout restart daemonset <DAEMONSET_NAME> -n <NAMESPACE>
+   ```
+
+7. If pod is running standalone (not part of a deployment or replica set):
+
+   ```bash
+   kubectl delete pod <POD_ID> -n <NAMESPACE>
+   k apply -f pod.yaml
+   ```
+
+8. **Optional**: Delete the CRD installed by the chart:
+
+   ```bash
+   kubectl delete crd agents.fluxninja.com
+   ```
