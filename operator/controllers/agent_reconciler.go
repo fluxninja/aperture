@@ -357,7 +357,17 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *v1alpha1.
 	err = unmarshaller.Unmarshal(instance)
 	if err != nil {
 		instance.Status.Resources = failedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefauls", "Failed to set defaults. Error: '%s'", err.Error())
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "Failed to set defaults. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create && instance.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
 		errUpdate := r.updateStatus(ctx, instance)
 		if errUpdate != nil {
 			return errUpdate

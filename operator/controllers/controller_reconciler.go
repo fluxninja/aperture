@@ -330,6 +330,16 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *v1al
 		return nil
 	}
 
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create && instance.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
 	if instance.Status.Resources == failedStatus {
 		instance.Status.Resources = ""
 	}

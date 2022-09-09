@@ -45,6 +45,10 @@ func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admissio
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	if controller.Spec.Secrets.FluxNinjaPlugin.Create && controller.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+		return admission.Denied("The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+	}
+
 	if controller.ObjectMeta.Annotations == nil {
 		controller.ObjectMeta.Annotations = map[string]string{}
 	}
