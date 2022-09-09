@@ -39,6 +39,7 @@ message Selector {
   // The service (name) of the entities.
   // In k8s, this is the FQDN of the Service object.
   //
+  // Empty string means all services (catch-all).
   // Note: Entity may belong to multiple services.
   string service = 2;
 

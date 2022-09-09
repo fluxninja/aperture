@@ -77,6 +77,7 @@ definitions:
 
           Note: The module name must match the package name from the "source".
         type: string
+        x-go-validate: required
         x-order: 0
       source:
         description: |-
@@ -84,6 +85,7 @@ definitions:
 
           Note: Must include a "package" declaration.
         type: string
+        x-go-validate: required
         x-order: 1
   SchedulerWorkload:
     description: Workload defines a class of requests that preferably have similar
@@ -235,9 +237,11 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/v1Rule'
+        x-go-validate: required,gt=0,dive,keys,required,endkeys,required
         x-order: 0
       selector:
         description: Defines where to apply the flow classification rule.
+        x-go-validate: required
         x-order: 1
         $ref: '#/definitions/v1Selector'
   policylanguagev1FluxMeter:
@@ -1214,6 +1218,7 @@ definitions:
         type: object
         additionalProperties:
           type: string
+        x-go-validate: required
         x-order: 0
   v1Policy:
     description: Policy specification contains a circuit that defines the controller
@@ -1367,13 +1372,14 @@ definitions:
           sensitive labels.
           :::
         type: boolean
+        x-go-validate: required
         x-order: 1
       propagate:
-        description: |-
+        type: boolean
+        title: |-
           Decides if the created label should be applied to the whole request chain
           (propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
-          (default=true).
-        type: boolean
+        x-go-validate: required
         x-order: 2
       rego:
         description: Rego module to extract a value from the rego module.
@@ -1433,6 +1439,7 @@ definitions:
       selector:
         description: Selector decides for which service or flows the scheduler will
           be applied.
+        x-go-validate: required
         x-order: 4
         $ref: '#/definitions/v1Selector'
       timeout_factor:
@@ -1556,6 +1563,7 @@ definitions:
           The service (name) of the entities.
           In k8s, this is the FQDN of the Service object.
 
+          Empty string means all services (catch-all).
           Note: Entity may belong to multiple services.
         type: string
         x-order: 3
