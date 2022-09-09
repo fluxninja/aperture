@@ -86,6 +86,15 @@ Provided extractors include:
 
 Aperture aims to expand the set of extractors to cover most-common usecases.
 
+:::caution
+
+Keys of flow labels created by extractors must be valid [Rego][rego] identifiers
+(allowed are alphanumeric characters and underscore; also label name cannot be a
+[Rego keyword][rego-kw], like `if` or `default`). This limitation may be lifted
+in future.
+
+:::
+
 :::note
 
 Extracting value from header may seem not useful, as the value is already
@@ -119,4 +128,6 @@ See [full example in reference][reference]
 [label-matcher]: ../selector.md#label-matcher
 [policies]: /concepts/policies/policies.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
+[rego-kw]:
+  https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: ../flow-control.md#control-point

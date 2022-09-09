@@ -19,7 +19,7 @@ spec:
   {{- end }}
   {{- if .Values.controller.service.annotations }}
   service:
-    annotations: {{ .Values.controller.service.annotations }}
+    annotations: {{ .Values.controller.service.annotations | toYaml | nindent 6 }}
   {{- end }}
   serviceAccount:
     create: {{ .Values.controller.serviceAccount.create }}
@@ -30,7 +30,7 @@ spec:
     automountServiceAccountToken: {{ .Values.controller.serviceAccount.automountServiceAccountToken }}
     {{- end }}
   {{- if .Values.controller.hostAliases }}
-  hostAliases: {{ .Values.controller.hostAliases }}
+  hostAliases: {{ .Values.controller.hostAliases | toYaml | nindent 6 }}
   {{- end }}
   livenessProbe:
     enabled: {{ .Values.controller.livenessProbe.enabled }}

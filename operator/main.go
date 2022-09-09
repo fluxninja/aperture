@@ -23,6 +23,7 @@ import (
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
+	"k8s.io/client-go/dynamic"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -114,11 +115,18 @@ func main() {
 	server.CertName = os.Getenv("APERTURE_OPERATOR_CERT_NAME")
 	server.KeyName = os.Getenv("APERTURE_OPERATOR_KEY_NAME")
 
+	dynamicClient, err := dynamic.NewForConfig(ctrl.GetConfigOrDie())
+	if err != nil {
+		setupLog.Error(err, "unable to create Dynamic Client")
+		os.Exit(1)
+	}
+
 	if agentManager {
 		reconciler := &controllers.AgentReconciler{
-			Client:   mgr.GetClient(),
-			Scheme:   mgr.GetScheme(),
-			Recorder: mgr.GetEventRecorderFor("aperture-agent"),
+			Client:        mgr.GetClient(),
+			DynamicClient: dynamicClient,
+			Scheme:        mgr.GetScheme(),
+			Recorder:      mgr.GetEventRecorderFor("aperture-agent"),
 		}
 
 		if err = reconciler.SetupWithManager(mgr); err != nil {
@@ -145,9 +153,10 @@ func main() {
 
 	if controllerManager {
 		if err = (&controllers.ControllerReconciler{
-			Client:   mgr.GetClient(),
-			Scheme:   mgr.GetScheme(),
-			Recorder: mgr.GetEventRecorderFor("aperture-controller"),
+			Client:        mgr.GetClient(),
+			DynamicClient: dynamicClient,
+			Scheme:        mgr.GetScheme(),
+			Recorder:      mgr.GetEventRecorderFor("aperture-controller"),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Controller")
 			os.Exit(1)

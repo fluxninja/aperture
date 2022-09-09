@@ -56,8 +56,8 @@ Read more about baggage propagation on:
 ### Flow classifiers
 
 When the labels you need are not already present in baggage, nor as request
-labels, you can create a [classifier](classifier) to inject new labels into the
-system. Since the classifier also injects the label into baggage by default,
+labels, you can create a [classifier](classifier.md) to inject new labels into
+the system. Since the classifier also injects the label into baggage by default,
 this means you can set or extract the label in a different place than where it
 is consumed (assuming you have baggage propagation configured throughout your
 system).

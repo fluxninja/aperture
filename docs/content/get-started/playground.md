@@ -11,15 +11,15 @@ sidebar_position: 2
 
 # Playground
 
-Playground is a Kubernetes-based environment for exploring the capabilities of
-Aperture. Additionally, it is used as a development environment for Aperture.
-The playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments
-in Kubernetes. Tilt watches for changes to local files and auto-deploys any
+Playground is a Kubernetes based environment for exploring the capabilities of
+Aperture. Additionally it is used as a development environment for Aperture.
+Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in
+Kubernetes. Tilt watches for changes to local files and auto-deploys any
 resources that change. This is very convenient for getting quick feedback during
 development of Aperture.
 
 Playground deploys resources to the Kubernetes cluster that `kubectl` on your
-machine points at. For convience, this README includes instructions for
+machine points at. For convenience, this README includes instructions for
 deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
 
 ## Tools
@@ -28,32 +28,36 @@ Described hereafter deployment methods assume usage of specific deployment and
 configuration/management tools (which must be installed beforehand).
 
 To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install
-manually (check [Tools used for k8s deployment](#tools-used-for-k8s-deployment)
-).
+manually (check
+[Tools required for Kubernetes deployment](#tools-required-for-kubernetes-deployment)).
 
 When using `asdf`:
 
-- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
-  and [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
+- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)and
+  [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
   `asdf`
-- Add intended plugins (tools/applications which will be managed by `asdf`) e.g.
-  `asdf plugin-add terraform`
+- Run the below command to add all the required plugins.
+
+```
+cat .tool-versions | cut -d' ' -f1 | grep "^[^\#]" | xargs -i asdf plugin add  {}
+```
+
 - Install tools: `asdf install`
 
 > Note: Last command will install tools which have been added as plugins and
 > which are defined/versioned in `.tool-versions` file
 
-### Tools required for k8s deployment
+### Tools required for Kubernetes deployment
 
-Tools which are required for local k8s deployment:
+Tools which are required for local Kubernetes deployment:
 
-#### _Helm_
+#### helm
 
-Helm is a package manager for k8s.
+Helm is a package manager for Kubernetes.
 
 To install manually, follow instructions: <https://helm.sh/docs/intro/install/>
 
-#### _Tanka and Jsonnet Bundler_
+#### tanka and Jsonnet Bundler
 
 Grafana Tanka is the robust configuration utility for your Kubernetes cluster,
 powered by the unique Jsonnet language.
@@ -62,16 +66,16 @@ Jsonnet Bundler is used to manage Jsonnet dependencies.
 
 To install manually, follow instructions: <https://tanka.dev/install>
 
-#### _Local k8s cluster_
+#### Local Kubernetes cluster
 
 May use [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/).
 
-#### _kubectl_
+#### kubectl
 
 The Kubernetes command line tool. Follow the instructions:
 <https://kubernetes.io/docs/tasks/tools/#kubectl>
 
-#### _Alpha features_
+#### Alpha features
 
 Agent core service uses feature gate for managing node-local traffic:
 <https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/>
@@ -99,7 +103,10 @@ This can be achieved by using `tilt`.
 Tilt can be installed with `asdf install` or manually
 <https://docs.tilt.dev/install.html>.
 
-### Prerequisites - k8s cluster bootstrap
+### Prerequisites - Kubernetes cluster bootstrap
+
+> Note: You can skip this section if you already have a running cluster which is
+> being pointed by the `kubectl`.
 
 Create a K8s cluster using Kind with configuration file:
 
@@ -120,6 +127,12 @@ start a cluster with built-in local registry for Docker images:
 
 ```sh
 ctlptl apply -f ctlptl-kind-config.yaml
+```
+
+Once done, you can delete the cluster and registry with following command:
+
+```sh
+ctlptl delete -f ctlptl-kind-config.yaml
 ```
 
 ### Services deployment
@@ -209,8 +222,6 @@ Below is the mapping of the ports being forwarded by Tilt:
 
 | Component  | Container Port | Local Port |
 | ---------- | -------------- | ---------- |
-| Agent      | 80             | 8089       |
-| Controller | 80             | 8087       |
 | Prometheus | 9090           | 9090       |
 | Etcd       | 2379           | 2379       |
 | Grafana    | 3000           | 3000       |

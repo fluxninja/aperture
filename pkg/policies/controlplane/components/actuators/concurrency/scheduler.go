@@ -74,7 +74,7 @@ func NewSchedulerAndOptions(
 	}
 
 	// Prepare parameters for prometheus queries
-	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%d\"",
+	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%d\",decision_type!=\"DECISION_TYPE_REJECTED\"",
 		metrics.PolicyNameLabel,
 		policyReadAPI.GetPolicyName(),
 		metrics.PolicyHashLabel,

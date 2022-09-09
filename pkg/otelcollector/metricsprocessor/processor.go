@@ -135,7 +135,7 @@ func addAuthzResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string
 		otelcollector.AuthzStatusLabel: pcommon.NewValueString(authzResponse.GetStatus().String()),
 	}
 	for key, value := range labels {
-		attributes.Upsert(key, value)
+		value.CopyTo(attributes.UpsertEmpty(key))
 	}
 }
 
@@ -230,7 +230,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string
 	}
 
 	for key, value := range labels {
-		attributes.Upsert(key, value)
+		value.CopyTo(attributes.UpsertEmpty(key))
 	}
 	return &checkResponse
 }

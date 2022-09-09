@@ -55,7 +55,7 @@ operator:
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
     ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
     ##
-    pullPolicy: Never
+    pullPolicy: Always
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
     ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -520,14 +520,14 @@ agent:
   ##
   config:
     ## Etcd parameters for Agent
-    ## @param agent.config.etcd.endpoints List of Etcd server endpoints. Example, ["https://etcd:2379"]. This must not be empty.
+    ## @param agent.config.etcd.endpoints List of Etcd server endpoints. Example, ["http://etcd:2379"]. This must not be empty.
     ## @param agent.config.etcd.lease_ttl Lease time-to-live.
     ##
     etcd:
       endpoints: []
       lease_ttl: 60s
     ## Prometheus parameters for Agent
-    ## @param agent.config.prometheus.address specifies the address of the Prometheus server. This must not be empty.
+    ## @param agent.config.prometheus.address specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty.
     ##
     prometheus:
       address: ~

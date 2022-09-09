@@ -100,11 +100,7 @@ type badSelector struct{}
 func (b badSelector) Error() string { return "invalid ruleset selector" }
 
 // BadLabelName is an error occurring when label name is invalid.
-var BadLabelName = badLabelName{}
-
-type badLabelName struct{}
-
-func (b badLabelName) Error() string { return "invalid label name" }
+var BadLabelName = extractors.BadLabelName
 
 // CompileRuleset parses ruleset's selector and compiles its rules.
 func CompileRuleset(ctx context.Context, name string, classifier *classificationv1.Classifier) (CompiledRuleset, error) {

@@ -84,7 +84,7 @@ func newTracesExporter(
 	config config.Exporter,
 ) (component.TracesExporter, error) {
 	s := newLoggingExporter()
-	return exporterhelper.NewTracesExporterWithContext(
+	return exporterhelper.NewTracesExporter(
 		ctx,
 		set,
 		config,
@@ -105,7 +105,7 @@ func newMetricsExporter(
 	config config.Exporter,
 ) (component.MetricsExporter, error) {
 	s := newLoggingExporter()
-	return exporterhelper.NewMetricsExporterWithContext(
+	return exporterhelper.NewMetricsExporter(
 		ctx,
 		set,
 		config,
@@ -126,7 +126,7 @@ func newLogsExporter(
 	config config.Exporter,
 ) (component.LogsExporter, error) {
 	s := newLoggingExporter()
-	return exporterhelper.NewLogsExporterWithContext(
+	return exporterhelper.NewLogsExporter(
 		ctx,
 		set,
 		config,

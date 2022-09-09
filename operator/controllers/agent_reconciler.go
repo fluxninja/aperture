@@ -26,8 +26,10 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/utils/strings/slices"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -38,12 +40,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/go-logr/logr"
 )
 
 // AgentReconciler reconciles a Agent object.
 type AgentReconciler struct {
 	client.Client
+	DynamicClient    dynamic.Interface
 	Scheme           *runtime.Scheme
 	Recorder         record.EventRecorder
 	ApertureInjector *ApertureInjector
@@ -142,12 +146,21 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 					"The required resources are already deployed. Skipping resource creation as currently, the Agent doesn't require multiple replicas.")
 
 				instance.Status.Resources = "skipped"
-				if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
 					return ctrl.Result{}, err
 				}
 
 				return ctrl.Result{}, nil
 			}
+		}
+	}
+
+	if instance.Annotations == nil || instance.Annotations[defaulterAnnotationKey] != "true" {
+		err = r.checkDefaults(ctx, instance)
+		if err != nil {
+			return ctrl.Result{}, err
+		} else if instance.Status.Resources == failedStatus {
+			return ctrl.Result{}, nil
 		}
 	}
 
@@ -282,6 +295,7 @@ func (r *AgentReconciler) updateAgent(ctx context.Context, instance *v1alpha1.Ag
 	attempt := 5
 	finalizers := instance.DeepCopy().Finalizers
 	spec := instance.DeepCopy().Spec
+	annotations := instance.DeepCopy().Annotations
 	for attempt > 0 {
 		attempt -= 1
 		if err := r.Update(ctx, instance); err != nil {
@@ -295,12 +309,75 @@ func (r *AgentReconciler) updateAgent(ctx context.Context, instance *v1alpha1.Ag
 				}
 				instance.Finalizers = finalizers
 				instance.Spec = spec
+				instance.Annotations = annotations
 				continue
 			}
 			return err
 		}
 	}
 
+	return nil
+}
+
+// checkDefaults checks and sets defaults when the Defaulter webhook is not triggered.
+func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *v1alpha1.Agent) error {
+	resource, err := r.DynamicClient.Resource(v1alpha1.GroupVersion.WithResource("agents")).Namespace(instance.GetNamespace()).Get(ctx, instance.GetName(), v1.GetOptions{})
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToFetch", "Failed to fetch Resource. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	resourceBytes, err := resource.MarshalJSON()
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToMarshal", "Failed to marshal Resource. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(resourceBytes)
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefauls", "Failed to set defaults. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	err = unmarshaller.Unmarshal(instance)
+	if err != nil {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "Failed to set defaults. Error: '%s'", err.Error())
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	if instance.Spec.Secrets.FluxNinjaPlugin.Create && instance.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+		instance.Status.Resources = failedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
+	if instance.Status.Resources == failedStatus {
+		instance.Status.Resources = ""
+	}
 	return nil
 }
 

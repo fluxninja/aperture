@@ -54,10 +54,11 @@ local policy = latencyGradientPolicy({
     + classifier.withRules({
       user_type: rule.new()
                  + rule.withExtractor(extractor.new()
-                                      + extractor.withFrom('request.http.headers.user-type')),
+                                      + extractor.withFrom('request.http.headers.user_type')),
     }),
   ],
   concurrencyLimiter+: {
+    timeoutFactor: 0.1,
     defaultWorkload: {
       priority: 20,
     },
