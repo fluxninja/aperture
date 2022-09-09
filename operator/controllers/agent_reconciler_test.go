@@ -53,6 +53,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Namespace = test
 			reconciler = &AgentReconciler{
 				Client:           k8sClient,
+				DynamicClient:    k8sDynamicClient,
 				Scheme:           scheme.Scheme,
 				Recorder:         k8sManager.GetEventRecorderFor(appName),
 				ApertureInjector: &ApertureInjector{Client: k8sClient},
