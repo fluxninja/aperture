@@ -546,6 +546,8 @@ AgentInfoConfig is the configuration for the agent group etc.
 
 (string, default: `default`) All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
 
+[Read more about agent groups here](/concepts/flow-control/service.md#agent-group).
+
 </dd>
 </dl>
 

@@ -22,44 +22,61 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Describes where a rule or actuation component should apply to
+// Describes which flows a [dataplane
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
 //
 // Example:
 // ```yaml
-// selector:
-//   service: service1.default.svc.cluster.local
-//   control_point:
-//     traffic: ingress # Allowed values are `ingress` and `egress`.
-//   label_matcher:
-//     match_labels:
-//       user_tier: gold
-//     match_expressions:
-//       - key: query
-//         operator: In
-//         values:
-//           - insert
-//           - delete
-//       - label: user_agent
-//         regex: ^(?!.*Chrome).*Safari
+// service: service1.default.svc.cluster.local
+// control_point:
+//   traffic: ingress # Allowed values are `ingress` and `egress`.
+// label_matcher:
+//   match_labels:
+//     user_tier: gold
+//   match_expressions:
+//     - key: query
+//       operator: In
+//       values:
+//         - insert
+//         - delete
+//     - label: user_agent
+//       regex: ^(?!.*Chrome).*Safari
 // ```
 type Selector struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Describes where this selector applies to.
+	// Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
-	// The service (name) of the entities.
-	// In k8s, this is the FQDN of the Service object.
+	// The Fully Qualified Domain Name of the
+	// [service](/concepts/flow-control/service.md) to select.
 	//
-	// Empty string means all services (catch-all).
-	// Note: Entity may belong to multiple services.
+	// In kubernetes, this is the FQDN of the Service object.
+	//
+	// Empty string means all services within an agent group (catch-all).
+	//
+	// :::note
+	// One entity may belong to multiple services.
+	// :::
 	Service string `protobuf:"bytes,2,opt,name=service,proto3" json:"service,omitempty"`
-	// Describes control point within the entity where the policy should apply to.
+	// Describes
+	// [control point](/concepts/flow-control/flow-control.md#control-point)
+	// within the entity where the policy should apply to.
 	ControlPoint *ControlPoint `protobuf:"bytes,3,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Label matcher allows to add _additional_ condition on
 	// [flow labels](/concepts/flow-control/label/label.md)
 	// must also be satisfied (in addition to service+control point matching)
+	//
+	// :::info
+	// See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+	// :::
 	//
 	// :::note
 	// [Classifiers](#v1-classifier) _can_ use flow labels created by some other

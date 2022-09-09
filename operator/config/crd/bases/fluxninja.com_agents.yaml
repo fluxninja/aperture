@@ -892,9 +892,9 @@ spec:
                     description: AgentInfo configuration.
                     properties:
                       agent_group:
-                        description: All agents within an agent_group receive the
+                        description: "All agents within an agent_group receive the
                           same data-plane configuration (e.g. schedulers, FluxMeters,
-                          rate limiter).
+                          rate limiter). \n [Read more about agent groups here](/concepts/flow-control/service.md#agent-group)."
                         type: string
                     type: object
                   client:
