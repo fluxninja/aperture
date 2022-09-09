@@ -89,8 +89,6 @@ func (s *SentryWriter) parseLogEvent(data []byte) (*sentry.Event, bool) {
 		case zerolog.ErrorFieldName:
 			event.Exception = append(event.Exception, sentry.Exception{
 				Value: bytesToStrUnsafe(value),
-				// TODO: Create stacktrace which holds information about the frames of the stack if needed
-				Stacktrace: nil,
 			})
 		}
 		return nil
