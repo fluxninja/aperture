@@ -18,8 +18,8 @@ Aperture splits the process of flow control in two layers:
   about them in [the next chapter][policies].
 - Actual execution of flow control, performed by Aperture Agent via
   [actuators][actuators]. The Agent also handles other flow-control related
-  tasks, like gathering metrics and classifying traffic. This will be the focus
-  of this chapter.
+  tasks, like gathering metrics and classifying traffic via
+  [dataplane components](#components). This will be the focus of this chapter.
 
 ## What is a flow? {#flow}
 
@@ -114,8 +114,21 @@ will be added in the future.
 
 :::
 
+## Dataplane components {#components}
+
+Agent uses the following observability and control components:
+
+- [classifiers][classifier],
+- [fluxmeters][fluxmeter],
+- [actuators][actuators].
+
+You can learn about their purposes in subsequent pages, but we recommend to
+start by first reading on concepts like services and flow labels.
+
 [policies]: ../policies/policies.md
 [actuators]: ./actuators/actuators.md
+[fluxmeter]: ./fluxmeter.md
+[classifier]: ./label/classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [istio]: /get-started/istio.md
 [ext-authz]:
