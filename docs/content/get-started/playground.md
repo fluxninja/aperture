@@ -29,7 +29,7 @@ configuration/management tools (which must be installed beforehand).
 
 To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install
 manually (check
-[Tools used for Kubernetes deployment](#tools-used-for-Kubernetes-deployment)).
+[Tools required for Kubernetes deployment](#tools-required-for-kubernetes-deployment)).
 
 When using `asdf`:
 
