@@ -45,6 +45,11 @@ func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admissio
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	if controller.ObjectMeta.Annotations == nil {
+		controller.ObjectMeta.Annotations = map[string]string{}
+	}
+
+	controller.ObjectMeta.Annotations[defaulterAnnotationKey] = "true"
 	updatedAgent, err := json.Marshal(controller)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)

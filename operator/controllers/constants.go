@@ -53,4 +53,6 @@ const (
 	distCache                     = "dist-cache"
 	memberList                    = "memberlist"
 	apertureFluxNinjaPlugin       = "aperture-plugin-fluxninja"
+	defaulterAnnotationKey        = "fluxninja.com/set-defaults"
+	failedStatus                  = "failed"
 )
