@@ -29,16 +29,16 @@ const (
 	WorkloadLatencyCountMetricName = "workload_latency_ms_count"
 
 	// AcceptedConcurrencyMetricName - metric for measuring latencies of accepted requests.
-	AcceptedConcurrencyMetricName = "accepted_concurrency_total"
+	AcceptedConcurrencyMetricName = "accepted_concurrency_ms"
 	// IncomingConcurrencyMetricName - metric for measuring latencies of all incoming requests.
-	IncomingConcurrencyMetricName = "incoming_concurrency_total"
+	IncomingConcurrencyMetricName = "incoming_concurrency_ms"
 
 	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
 	WFQFlowsMetricName = "wfq_flows_total"
 	// WFQRequestsMetricName - weighted fair queuing number of requests gauge.
 	WFQRequestsMetricName = "wfq_requests_total"
 	// TokenBucketMetricName - a gauge that tracks the load shed factor.
-	TokenBucketMetricName = "token_bucket_lsf"
+	TokenBucketMetricName = "token_bucket_lsf_ratio"
 	// TokenBucketFillRateMetricName - a gauge that tracks the fill rate of token bucket.
 	TokenBucketFillRateMetricName = "token_bucket_fill_rate"
 	// TokenBucketCapacityMetricName - a gauge that tracks the capacity of token bucket.
