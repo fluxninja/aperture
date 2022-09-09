@@ -256,7 +256,8 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
-				Hidden: true,
+				Propagate: true,
+				Hidden:    true,
 			},
 		}
 

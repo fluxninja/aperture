@@ -52,9 +52,9 @@ local policy = latencyGradientPolicy({
     classifier.new()
     + classifier.withSelector(svcSelector)
     + classifier.withRules({
-      'user-type': rule.new()
-                   + rule.withExtractor(extractor.new()
-                                        + extractor.withFrom('request.http.headers.user-type')),
+      user_type: rule.new()
+                 + rule.withExtractor(extractor.new()
+                                      + extractor.withFrom('request.http.headers.user-type')),
     }),
   ],
   concurrencyLimiter+: {
@@ -64,11 +64,11 @@ local policy = latencyGradientPolicy({
     workloads: [
       WorkloadWithLabelMatcher.new(
         workload=Workload.withPriority(50),
-        label_matcher=LabelMatcher.withMatchLabels({ 'user-type': 'guest' })
+        label_matcher=LabelMatcher.withMatchLabels({ user_type: 'guest' })
       ),
       WorkloadWithLabelMatcher.new(
         workload=Workload.withPriority(200),
-        label_matcher=LabelMatcher.withMatchLabels({ 'user-type': 'subscriber' })
+        label_matcher=LabelMatcher.withMatchLabels({ user_type: 'subscriber' })
       ),
     ],
   },
