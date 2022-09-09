@@ -44,7 +44,7 @@ export default function () {
     "http status was 200": res.status === 200,
   });
   if (!ret) {
-    // sleep for 5ms to 25ms
-    sleep(randomIntBetween(0.005, 0.025));
+    // sleep for 10ms to 25ms
+    sleep(randomIntBetween(0.01, 0.025));
   }
 }

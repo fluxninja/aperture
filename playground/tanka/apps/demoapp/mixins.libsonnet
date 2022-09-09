@@ -58,6 +58,7 @@ local policy = latencyGradientPolicy({
     }),
   ],
   concurrencyLimiter+: {
+    timeoutFactor: 0.1,
     defaultWorkload: {
       priority: 20,
     },
