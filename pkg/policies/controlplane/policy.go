@@ -3,13 +3,14 @@ package controlplane
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"time"
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v2"
+	"sigs.k8s.io/yaml"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
@@ -223,11 +224,18 @@ func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error
 
 // hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
 func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*wrappersv1.PolicyWrapper, error) {
-	dat, marshalErr := yaml.Marshal(policyMessage)
+	jsonDat, marshalErr := json.Marshal(policyMessage)
 	if marshalErr != nil {
 		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
 		return nil, marshalErr
 	}
+	// convert dat to yaml format
+	dat, marshalErr := yaml.JSONToYAML(jsonDat)
+	if marshalErr != nil {
+		log.Error().Err(marshalErr).Msgf("Failed to convert json to yaml %+v", jsonDat)
+		return nil, marshalErr
+	}
+	log.Debug().Msgf("Policy message: %s", string(dat))
 	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
 	if hashErr != nil {
 		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))

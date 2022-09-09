@@ -9,6 +9,18 @@ local Workload = aperture.v1.SchedulerWorkload;
 local LabelMatcher = aperture.v1.LabelMatcher;
 local WorkloadWithLabelMatcher = aperture.v1.SchedulerWorkloadAndLabelMatcher;
 
+local classifier = aperture.v1.policylanguagev1Classifier;
+local extractor = aperture.v1.Extractor;
+local rule = aperture.v1.Rule;
+local selector = aperture.v1.Selector;
+local controlPoint = aperture.v1.ControlPoint;
+
+local svcSelector = selector.new()
+                    + selector.withAgentGroup('default')
+                    + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                    + selector.withControlPoint(controlPoint.new()
+                                                + controlPoint.withTraffic('ingress'));
+
 local demoappMixin =
   demoApp {
     values+: {
@@ -34,9 +46,17 @@ local demoappMixin =
 
 local policy = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  serviceSelector+: {
-    service: 'service1-demo-app.demoapp.svc.cluster.local',
-  },
+  fluxMeterSelector: svcSelector,
+  concurrencyLimiterSelector: svcSelector,
+  classifiers: [
+    classifier.new()
+    + classifier.withSelector(svcSelector)
+    + classifier.withRules({
+      user_type: rule.new()
+                 + rule.withExtractor(extractor.new()
+                                      + extractor.withFrom('request.http.headers.user-type')),
+    }),
+  ],
   concurrencyLimiter+: {
     defaultWorkload: {
       priority: 20,
@@ -44,10 +64,12 @@ local policy = latencyGradientPolicy({
     workloads: [
       WorkloadWithLabelMatcher.new(
         workload=Workload.withPriority(50),
-        label_matcher=LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'guest' })
+        // match the label extracted by classifier
+        label_matcher=LabelMatcher.withMatchLabels({ user_type: 'guest' })
       ),
       WorkloadWithLabelMatcher.new(
         workload=Workload.withPriority(200),
+        // match the http header directly
         label_matcher=LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })
       ),
     ],

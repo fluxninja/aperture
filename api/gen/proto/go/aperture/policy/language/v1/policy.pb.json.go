@@ -11,7 +11,7 @@ import (
 func (msg *AllPoliciesResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -27,7 +27,7 @@ func (msg *AllPoliciesResponse) UnmarshalJSON(b []byte) error {
 func (msg *AllPolicies) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -43,7 +43,7 @@ func (msg *AllPolicies) UnmarshalJSON(b []byte) error {
 func (msg *Policy) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -59,7 +59,7 @@ func (msg *Policy) UnmarshalJSON(b []byte) error {
 func (msg *Circuit) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -75,7 +75,7 @@ func (msg *Circuit) UnmarshalJSON(b []byte) error {
 func (msg *Resources) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -91,7 +91,7 @@ func (msg *Resources) UnmarshalJSON(b []byte) error {
 func (msg *Component) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -107,7 +107,7 @@ func (msg *Component) UnmarshalJSON(b []byte) error {
 func (msg *Port) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -123,7 +123,7 @@ func (msg *Port) UnmarshalJSON(b []byte) error {
 func (msg *GradientController) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -139,7 +139,7 @@ func (msg *GradientController) UnmarshalJSON(b []byte) error {
 func (msg *GradientController_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -155,7 +155,7 @@ func (msg *GradientController_Ins) UnmarshalJSON(b []byte) error {
 func (msg *GradientController_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -171,7 +171,7 @@ func (msg *GradientController_Outs) UnmarshalJSON(b []byte) error {
 func (msg *EMA) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -187,7 +187,7 @@ func (msg *EMA) UnmarshalJSON(b []byte) error {
 func (msg *EMA_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -203,7 +203,7 @@ func (msg *EMA_Ins) UnmarshalJSON(b []byte) error {
 func (msg *EMA_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -219,7 +219,7 @@ func (msg *EMA_Outs) UnmarshalJSON(b []byte) error {
 func (msg *ArithmeticCombinator) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -235,7 +235,7 @@ func (msg *ArithmeticCombinator) UnmarshalJSON(b []byte) error {
 func (msg *ArithmeticCombinator_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -251,7 +251,7 @@ func (msg *ArithmeticCombinator_Ins) UnmarshalJSON(b []byte) error {
 func (msg *ArithmeticCombinator_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -267,7 +267,7 @@ func (msg *ArithmeticCombinator_Outs) UnmarshalJSON(b []byte) error {
 func (msg *Decider) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -283,7 +283,7 @@ func (msg *Decider) UnmarshalJSON(b []byte) error {
 func (msg *Decider_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -299,7 +299,7 @@ func (msg *Decider_Ins) UnmarshalJSON(b []byte) error {
 func (msg *Decider_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -315,7 +315,7 @@ func (msg *Decider_Outs) UnmarshalJSON(b []byte) error {
 func (msg *RateLimiter) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -331,7 +331,7 @@ func (msg *RateLimiter) UnmarshalJSON(b []byte) error {
 func (msg *RateLimiter_LazySync) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -347,7 +347,7 @@ func (msg *RateLimiter_LazySync) UnmarshalJSON(b []byte) error {
 func (msg *RateLimiter_Override) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -363,7 +363,7 @@ func (msg *RateLimiter_Override) UnmarshalJSON(b []byte) error {
 func (msg *RateLimiter_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -379,7 +379,7 @@ func (msg *RateLimiter_Ins) UnmarshalJSON(b []byte) error {
 func (msg *ConcurrencyLimiter) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -395,7 +395,7 @@ func (msg *ConcurrencyLimiter) UnmarshalJSON(b []byte) error {
 func (msg *Scheduler) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -411,7 +411,7 @@ func (msg *Scheduler) UnmarshalJSON(b []byte) error {
 func (msg *Scheduler_Workload) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -427,7 +427,7 @@ func (msg *Scheduler_Workload) UnmarshalJSON(b []byte) error {
 func (msg *Scheduler_WorkloadAndLabelMatcher) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -443,7 +443,7 @@ func (msg *Scheduler_WorkloadAndLabelMatcher) UnmarshalJSON(b []byte) error {
 func (msg *Scheduler_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -459,7 +459,7 @@ func (msg *Scheduler_Outs) UnmarshalJSON(b []byte) error {
 func (msg *LoadShedActuator) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -475,7 +475,7 @@ func (msg *LoadShedActuator) UnmarshalJSON(b []byte) error {
 func (msg *LoadShedActuator_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -491,7 +491,7 @@ func (msg *LoadShedActuator_Ins) UnmarshalJSON(b []byte) error {
 func (msg *PromQL) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -507,7 +507,7 @@ func (msg *PromQL) UnmarshalJSON(b []byte) error {
 func (msg *PromQL_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -523,7 +523,7 @@ func (msg *PromQL_Outs) UnmarshalJSON(b []byte) error {
 func (msg *Constant) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -539,7 +539,7 @@ func (msg *Constant) UnmarshalJSON(b []byte) error {
 func (msg *Constant_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -555,7 +555,7 @@ func (msg *Constant_Outs) UnmarshalJSON(b []byte) error {
 func (msg *Sqrt) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -571,7 +571,7 @@ func (msg *Sqrt) UnmarshalJSON(b []byte) error {
 func (msg *Sqrt_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -587,7 +587,7 @@ func (msg *Sqrt_Ins) UnmarshalJSON(b []byte) error {
 func (msg *Sqrt_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -603,7 +603,7 @@ func (msg *Sqrt_Outs) UnmarshalJSON(b []byte) error {
 func (msg *Extrapolator) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -619,7 +619,7 @@ func (msg *Extrapolator) UnmarshalJSON(b []byte) error {
 func (msg *Extrapolator_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -635,7 +635,7 @@ func (msg *Extrapolator_Ins) UnmarshalJSON(b []byte) error {
 func (msg *Extrapolator_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -651,7 +651,7 @@ func (msg *Extrapolator_Outs) UnmarshalJSON(b []byte) error {
 func (msg *Max) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -667,7 +667,7 @@ func (msg *Max) UnmarshalJSON(b []byte) error {
 func (msg *Max_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -683,7 +683,7 @@ func (msg *Max_Ins) UnmarshalJSON(b []byte) error {
 func (msg *Max_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -699,7 +699,7 @@ func (msg *Max_Outs) UnmarshalJSON(b []byte) error {
 func (msg *Min) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -715,7 +715,7 @@ func (msg *Min) UnmarshalJSON(b []byte) error {
 func (msg *Min_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -731,7 +731,7 @@ func (msg *Min_Ins) UnmarshalJSON(b []byte) error {
 func (msg *Min_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: true,
+		EmitUnpopulated: false,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }

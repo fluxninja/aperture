@@ -168,7 +168,7 @@ High-level extractor-based rules are compiled into a single rego query.
 <dt>query</dt>
 <dd>
 
-(string) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+(string, `required`) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
 Note: The module name must match the package name from the "source".
 
@@ -176,7 +176,7 @@ Note: The module name must match the package name from the "source".
 <dt>source</dt>
 <dd>
 
-(string) Source code of the rego module.
+(string, `required`) Source code of the rego module.
 
 Note: Must include a "package" declaration.
 
@@ -358,7 +358,7 @@ rules:
 <dt>rules</dt>
 <dd>
 
-(map of [V1Rule](#v1-rule)) A map of {key, value} pairs mapping from
+(map of [V1Rule](#v1-rule), `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
 [flow label](/concepts/flow-control/label/label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
 
@@ -366,7 +366,7 @@ how to extract and propagate flow labels with that key.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector)) Defines where to apply the flow classification rule.
+([V1Selector](#v1-selector), `required`) Defines where to apply the flow classification rule.
 
 </dd>
 </dl>
@@ -1634,7 +1634,7 @@ In case of multiple path templates matching, the most specific one will be chose
 <dt>template_values</dt>
 <dd>
 
-(map of string) Template value keys are OpenAPI-inspired path templates.
+(map of string, `required`) Template value keys are OpenAPI-inspired path templates.
 
 - Static path segment `/foo` matches a path segment exactly
 - `/{param}` matches arbitrary path segment.
@@ -1846,7 +1846,7 @@ propagate: false
 <dt>hidden</dt>
 <dd>
 
-(bool) Decides if the created flow label should be hidden from the telemetry.
+(bool, `required`) Decides if the created flow label should be hidden from the telemetry.
 A hidden flow label is still accessible in policies and can be used as eg.
 fairness key.
 
@@ -1862,9 +1862,8 @@ sensitive labels.
 <dt>propagate</dt>
 <dd>
 
-(bool) Decides if the created label should be applied to the whole request chain
+(bool, `required`) Decides if the created label should be applied to the whole request chain
 (propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
-(default=true).
 
 </dd>
 <dt>rego</dt>
@@ -1936,7 +1935,7 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector)) Selector decides for which service or flows the scheduler will be applied.
+([V1Selector](#v1-selector), `required`) Selector decides for which service or flows the scheduler will be applied.
 
 </dd>
 <dt>timeout_factor</dt>
@@ -2075,6 +2074,7 @@ control point.
 (string) The service (name) of the entities.
 In k8s, this is the FQDN of the Service object.
 
+Empty string means all services (catch-all).
 Note: Entity may belong to multiple services.
 
 </dd>

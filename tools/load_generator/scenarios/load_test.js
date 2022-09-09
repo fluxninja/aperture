@@ -5,8 +5,8 @@ import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 export let vuStages = [
   { duration: "1s", target: 5 },
   { duration: "2m", target: 5 },
-  { duration: "1m", target: 25 },
-  { duration: "2m", target: 25 },
+  { duration: "1m", target: 30 },
+  { duration: "2m", target: 30 },
   { duration: "1s", target: 5 },
   { duration: "5m", target: 5 },
 ];
@@ -44,7 +44,7 @@ export default function () {
     "http status was 200": res.status === 200,
   });
   if (!ret) {
-    // sleep for 100ms to 150ms
-    sleep(randomIntBetween(0.1, 0.15));
+    // sleep for 5ms to 25ms
+    sleep(randomIntBetween(0.005, 0.025));
   }
 }

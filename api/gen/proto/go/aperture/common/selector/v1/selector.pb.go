@@ -52,6 +52,7 @@ type Selector struct {
 	// The service (name) of the entities.
 	// In k8s, this is the FQDN of the Service object.
 	//
+	// Empty string means all services (catch-all).
 	// Note: Entity may belong to multiple services.
 	Service string `protobuf:"bytes,2,opt,name=service,proto3" json:"service,omitempty"`
 	// Describes control point within the entity where the policy should apply to.
