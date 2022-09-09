@@ -42,11 +42,16 @@ type SentryWriter struct {
 
 // Write implements io.Writer and forwards the data to CrashWriter buffer.
 func (s *SentryWriter) Write(data []byte) (int, error) {
-	event, ok := s.parseLogEvent(data)
+	level, ok := s.parseLogLevel(data)
 
 	if ok {
-		if event.Level == sentry.LevelFatal {
-			s.Client.CaptureEvent(event, nil, nil)
+		if level == sentry.LevelFatal {
+			event, err := s.parseLogEvent(level, data)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to parse log event")
+			} else {
+				s.Client.CaptureEvent(event, nil, nil)
+			}
 			_ = s.Close()
 		} else {
 			_, _ = s.CrashWriter.Write(data)
@@ -55,34 +60,38 @@ func (s *SentryWriter) Write(data []byte) (int, error) {
 	return len(data), nil
 }
 
-func (s *SentryWriter) parseLogEvent(data []byte) (*sentry.Event, bool) {
+func (s *SentryWriter) parseLogLevel(data []byte) (sentry.Level, bool) {
 	levelStr, err := jsonparser.GetUnsafeString(data, zerolog.LevelFieldName)
 	if err != nil {
-		return nil, false
+		return "", false
 	}
 
 	level, err := zerolog.ParseLevel(levelStr)
 	if err != nil {
-		return nil, false
+		return "", false
 	}
 
 	_, enabled := s.Levels[level]
 	if !enabled {
-		return nil, false
+		return "", false
 	}
 
 	sentryLevel, ok := zerologToSentryLevel[level]
 	if !ok {
-		return nil, false
+		return "", false
 	}
 
+	return sentryLevel, true
+}
+
+func (s *SentryWriter) parseLogEvent(level sentry.Level, data []byte) (*sentry.Event, error) {
 	event := sentry.Event{
 		Timestamp: time.Now(),
-		Level:     sentryLevel,
+		Level:     level,
 		Logger:    "zerolog",
 	}
 
-	err = jsonparser.ObjectEach(data, func(key, value []byte, _ jsonparser.ValueType, _ int) error {
+	err := jsonparser.ObjectEach(data, func(key, value []byte, _ jsonparser.ValueType, _ int) error {
 		switch string(key) {
 		case zerolog.MessageFieldName:
 			event.Message = bytesToStrUnsafe(value)
@@ -93,12 +102,11 @@ func (s *SentryWriter) parseLogEvent(data []byte) (*sentry.Event, bool) {
 		}
 		return nil
 	})
-
 	if err != nil {
-		return nil, false
+		return nil, err
 	}
 
-	return &event, true
+	return &event, nil
 }
 
 // Close implements io.Closer and wait for the sentry client to flush its queue.
