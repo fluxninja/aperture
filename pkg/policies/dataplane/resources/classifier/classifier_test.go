@@ -46,7 +46,8 @@ var _ = Describe("Classifier", func() {
 			},
 			Rules: map[string]*classificationv1.Rule{
 				"foo": {
-					Source: headerExtractor("foo"),
+					Source:    headerExtractor("foo"),
+					Propagate: true,
 				},
 			},
 		}
@@ -75,6 +76,7 @@ var _ = Describe("Classifier", func() {
 							Query: "data.my.pkg.answer",
 						},
 					},
+					Propagate: true,
 				},
 			},
 		}
@@ -90,7 +92,8 @@ var _ = Describe("Classifier", func() {
 			},
 			Rules: map[string]*classificationv1.Rule{
 				"fuu": {
-					Source: headerExtractor("fuu"),
+					Source:    headerExtractor("fuu"),
+					Propagate: true,
 				},
 			},
 		}
@@ -289,12 +292,14 @@ var _ = Describe("Classifier", func() {
 		// "foo/2": ...
 		rules1 := map[string]*classificationv1.Rule{
 			"foo": {
-				Source: headerExtractor("foo"),
+				Source:    headerExtractor("foo"),
+				Propagate: true,
 			},
 		}
 		rules2 := map[string]*classificationv1.Rule{
 			"foo": {
-				Source: headerExtractor("xyz"),
+				Source:    headerExtractor("xyz"),
+				Propagate: true,
 			},
 		}
 
@@ -339,6 +344,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
+				Propagate: true,
 			},
 		}
 		rules2 := map[string]*classificationv1.Rule{
@@ -352,6 +358,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer2",
 					},
 				},
+				Propagate: true,
 			},
 		}
 
@@ -396,6 +403,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.bar",
 					},
 				},
+				Propagate: true,
 			},
 		}
 
@@ -419,6 +427,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
+				Propagate: true,
 			},
 		}
 
