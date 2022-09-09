@@ -317,7 +317,7 @@ DEP_TREE = {
                 },
                 {
                     "new_name": "policies",
-                    "resource_deps": ["cluster-bootstrap", "aperture-controller-port-forward"],
+                    "resource_deps": ["cluster-bootstrap", "controller-service"],
                     "extra_objects": [
                         ("policies$", "ConfigMap", APERTURE_CONTROLLER_NS),
                     ]
@@ -867,12 +867,15 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
             },
         )
 
-    if "agent" in resources:
-        forward_port_delayed(workload="aperture-agent-port-forward", namespace=APERTURE_AGENT_NS, labels=["ApertureAgent"],
-                        resource_deps=["aperture-agent"], service="aperture-agent", local_port=8089, remote_port=8080)
-    if "controller" in resources:
-        forward_port_delayed(workload="aperture-controller-port-forward", namespace=APERTURE_CONTROLLER_NS, labels=["ApertureController"],
-                        resource_deps=["aperture-controller"], service="aperture-controller", local_port=8087, remote_port=8080)
+    if "demo-app" in resources:
+        readiness_probe=probe(initial_delay_secs=5, exec=exec_action(['kubectl', 'get', "svc", "aperture-controller", "-n", APERTURE_CONTROLLER_NS])) # Treat as success if servie is available
+        local_resource(
+            name="controller-service",
+            labels="ApertureController",
+            resource_deps=["aperture-controller"],
+            serve_cmd=['./scripts/check-controller-service.sh'],
+            readiness_probe=readiness_probe,
+        )
 
     if config.tilt_subcommand == "down":
         if "agent" in resources:

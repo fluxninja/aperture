@@ -222,8 +222,6 @@ Below is the mapping of the ports being forwarded by Tilt:
 
 | Component  | Container Port | Local Port |
 | ---------- | -------------- | ---------- |
-| Agent      | 80             | 8089       |
-| Controller | 80             | 8087       |
 | Prometheus | 9090           | 9090       |
 | Etcd       | 2379           | 2379       |
 | Grafana    | 3000           | 3000       |
