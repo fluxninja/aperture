@@ -21,53 +21,48 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 			Services:   []string{"fooSvc1", "fooSvc2"},
 			EntityName: "someName",
 		})
-		processor := newProcessor(entityCache, "fooGroup")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
-		md := metricsFromLabels(map[string]string{
+		md := metricsFromLabels(map[string]interface{}{
 			"preserve":    "this",
 			"entity_name": "someName",
 		})
 		md, err := processor.ConsumeMetrics(context.TODO(), md)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertMetricsEqual(md, metricsFromLabels(map[string]string{
-			"preserve":    "this",
-			"agent_group": "fooGroup",
-			"services":    "fooSvc1,fooSvc2",
+		assertMetricsEqual(md, metricsFromLabels(map[string]interface{}{
+			"preserve": "this",
+			"services": []string{"fooSvc1", "fooSvc2"},
 		}))
 	})
 
 	It("Does not enrich when there are no labels in entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		processor := newProcessor(entityCache, "fooGroup")
+		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
-		md := metricsFromLabels(map[string]string{
+		md := metricsFromLabels(map[string]interface{}{
 			"preserve":    "this",
 			"entity_name": "bar",
 		})
 		md, err := processor.ConsumeMetrics(context.TODO(), md)
 		Expect(err).NotTo(HaveOccurred())
 
-		assertMetricsEqual(md, metricsFromLabels(map[string]string{
-			"preserve":    "this",
-			"agent_group": "fooGroup",
+		assertMetricsEqual(md, metricsFromLabels(map[string]interface{}{
+			"preserve": "this",
 		}))
 	})
 })
 
-func metricsFromLabels(labels map[string]string) pmetric.Metrics {
+func metricsFromLabels(labels map[string]interface{}) pmetric.Metrics {
 	td := pmetric.NewMetrics()
 	metrics := td.ResourceMetrics().AppendEmpty().
 		ScopeMetrics().AppendEmpty().Metrics()
 	metric := metrics.AppendEmpty()
 	metric.SetDataType(pmetric.MetricDataTypeGauge)
 	spanRecord := metric.Gauge()
-	attr := spanRecord.DataPoints().AppendEmpty().Attributes()
-	for k, v := range labels {
-		attr.InsertString(k, v)
-	}
+	populateAttrsFromLabels(spanRecord.DataPoints().AppendEmpty().Attributes(), labels)
 	return td
 }
 

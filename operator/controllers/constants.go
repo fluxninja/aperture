@@ -17,33 +17,40 @@ limitations under the License.
 package controllers
 
 const (
-	// MutatingWebhookURI defines the URI for the Mutating Webhook.
+	// MutatingWebhookURI defines the URI for the Mutating Webhook for Pods.
 	MutatingWebhookURI = "/mutate-pod"
+	// AgentMutatingWebhookURI defines the URI for the Mutating Webhook for Agents.
+	AgentMutatingWebhookURI = "agent-defaulter"
+	// ControllerMutatingWebhookURI defines the URI for the Mutating Webhook for Controllers.
+	ControllerMutatingWebhookURI = "controller-defaulter"
 
-	secretKey                    = "apiKey"
-	appName                      = "aperture"
-	operatorName                 = appName + "-operator"
-	controllerServiceName        = appName + "-controller"
-	agentServiceName             = appName + "-agent"
-	mutatingWebhookName          = appName + "-injector"
-	validatingWebhookServiceName = controllerServiceName + "-webhook"
-	finalizerName                = "fluxninja.com/finalizer"
-	sidecarKey                   = "sidecar.fluxninja.com"
-	sidecarAnnotationKey         = sidecarKey + "/injection"
-	sidecarLabelKey              = appName + "-injection"
-	agentGroupKey                = sidecarKey + "/agent-group"
-	v1Version                    = "v1"
-	enabled                      = "enabled"
-	validatingWebhookSvcName     = validatingWebhookServiceName
-	webhookClientCertName        = "client.pem"
-	controllerCertKeyName        = "key.pem"
-	controllerCertName           = "crt.pem"
-	controllerCertPath           = "/etc/aperture/aperture-controller/certs"
-	server                       = "server"
-	grpcOtel                     = "grpc-otel"
-	httpOtel                     = "http-otel"
-	tcp                          = "TCP"
-	distCache                    = "dist-cache"
-	memberList                   = "memberlist"
-	apertureFluxNinjaPlugin      = "aperture-plugin-fluxninja"
+	secretKey                     = "apiKey"
+	appName                       = "aperture"
+	operatorName                  = appName + "-operator"
+	controllerServiceName         = appName + "-controller"
+	agentServiceName              = appName + "-agent"
+	podMutatingWebhookName        = appName + "-injector"
+	agentMutatingWebhookName      = appName + "-" + AgentMutatingWebhookURI
+	controllerMutatingWebhookName = appName + "-" + ControllerMutatingWebhookURI
+	validatingWebhookServiceName  = controllerServiceName + "-webhook"
+	finalizerName                 = "fluxninja.com/finalizer"
+	sidecarKey                    = "sidecar.fluxninja.com"
+	sidecarAnnotationKey          = sidecarKey + "/injection"
+	sidecarLabelKey               = appName + "-injection"
+	agentGroupKey                 = sidecarKey + "/agent-group"
+	v1Version                     = "v1"
+	v1Alpha1Version               = "v1alpha1"
+	enabled                       = "enabled"
+	validatingWebhookSvcName      = validatingWebhookServiceName
+	webhookClientCertName         = "client.pem"
+	controllerCertKeyName         = "key.pem"
+	controllerCertName            = "crt.pem"
+	controllerCertPath            = "/etc/aperture/aperture-controller/certs"
+	server                        = "server"
+	grpcOtel                      = "grpc-otel"
+	httpOtel                      = "http-otel"
+	tcp                           = "TCP"
+	distCache                     = "dist-cache"
+	memberList                    = "memberlist"
+	apertureFluxNinjaPlugin       = "aperture-plugin-fluxninja"
 )

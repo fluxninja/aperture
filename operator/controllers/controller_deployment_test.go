@@ -116,11 +116,13 @@ var _ = Describe("Controller Deployment", func() {
 							},
 						},
 					},
-					Image: v1alpha1.Image{
-						Registry:   "docker.io/fluxninja",
+					Image: v1alpha1.ControllerImage{
+						Image: v1alpha1.Image{
+							Registry:   "docker.io/fluxninja",
+							Tag:        "latest",
+							PullPolicy: "IfNotPresent",
+						},
 						Repository: "aperture-controller",
-						Tag:        "latest",
-						PullPolicy: "IfNotPresent",
 					},
 				},
 			}
@@ -333,13 +335,13 @@ var _ = Describe("Controller Deployment", func() {
 						Resources:      resourceRequirement,
 						PodSecurityContext: v1alpha1.PodSecurityContext{
 							Enabled: true,
-							FsGroup: pointer.Int64Ptr(1001),
+							FsGroup: 1001,
 						},
 						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
 							Enabled:                true,
-							RunAsUser:              pointer.Int64Ptr(0),
-							RunAsNonRootUser:       pointer.BoolPtr(false),
-							ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+							RunAsUser:              0,
+							RunAsNonRootUser:       false,
+							ReadOnlyRootFilesystem: false,
 						},
 						Command:                       testArray,
 						Args:                          testArray,
@@ -347,7 +349,7 @@ var _ = Describe("Controller Deployment", func() {
 						PodAnnotations:                testMap,
 						NodeSelector:                  testMap,
 						Tolerations:                   tolerations,
-						TerminationGracePeriodSeconds: pointer.Int64Ptr(10),
+						TerminationGracePeriodSeconds: 10,
 						LifecycleHooks:                lifecycle,
 						ExtraEnvVars: []corev1.EnvVar{
 							{
@@ -386,12 +388,14 @@ var _ = Describe("Controller Deployment", func() {
 						},
 						Affinity: affinity,
 					},
-					Image: v1alpha1.Image{
-						Registry:    "docker.io/fluxninja",
-						Repository:  "aperture-controller",
-						Tag:         "latest",
-						PullPolicy:  "IfNotPresent",
-						PullSecrets: testArray,
+					Image: v1alpha1.ControllerImage{
+						Image: v1alpha1.Image{
+							Registry:    "docker.io/fluxninja",
+							Tag:         "latest",
+							PullPolicy:  "IfNotPresent",
+							PullSecrets: testArray,
+						},
+						Repository: "aperture-controller",
 					},
 					HostAliases: hostAliases,
 				},

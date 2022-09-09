@@ -9,8 +9,8 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
@@ -22,7 +22,7 @@ type fluxMeterConfigSync struct {
 	fluxMeterProto *policylangv1.FluxMeter
 	etcdPath       string
 	agentGroupName string
-	fluxmeterName  string
+	fluxMeterName  string
 }
 
 // NewFluxMeterOptions creates fx options for FluxMeter.
@@ -45,7 +45,7 @@ func NewFluxMeterOptions(
 		policyBaseAPI:  policyBaseAPI,
 		agentGroupName: agentGroup,
 		etcdPath:       etcdPath,
-		fluxmeterName:  name,
+		fluxMeterName:  name,
 	}
 
 	return fx.Options(
@@ -58,8 +58,8 @@ func NewFluxMeterOptions(
 func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &configv1.FluxMeterWrapper{
-				FluxmeterName: configSync.fluxmeterName,
+			wrapper := &wrappersv1.FluxMeterWrapper{
+				FluxMeterName: configSync.fluxMeterName,
 				FluxMeter:     configSync.fluxMeterProto,
 			}
 			dat, err := proto.Marshal(wrapper)

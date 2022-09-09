@@ -23,10 +23,10 @@ One Agent is deployed per node.
 ## Configuration
 
 The Aperture Agent related configurations are stored in a configmap which is
-created during the installation using Helm. All the configuration parameters are
-listed on the
-[README](https://artifacthub.io/packages/helm/aperture/aperture-operator#aperture-custom-resource-parameters)
-file of the Helm chart.
+created during the installation using Helm.
+
+All the configuration parameters for Aperture Agent are listed
+[here](/reference/configuration/agent.md).
 
 ## Installation Modes {#agent-installation-modes}
 

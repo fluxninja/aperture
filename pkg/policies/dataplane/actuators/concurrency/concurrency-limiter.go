@@ -14,10 +14,10 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -228,7 +228,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
-	wrapperMessage := &configv1.ConcurrencyLimiterWrapper{}
+	wrapperMessage := &wrappersv1.ConcurrencyLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	concurrencyLimiterMessage := wrapperMessage.ConcurrencyLimiter
 	if err != nil || concurrencyLimiterMessage == nil {
@@ -425,7 +425,7 @@ func (conLimiter *concurrencyLimiter) GetSelector() *selectorv1.Selector {
 }
 
 // RunLimiter .
-func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels, decision *flowcontrolv1.LimiterDecision) {
+func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadProto *policylangv1.Scheduler_Workload
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
@@ -489,13 +489,16 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels, decisi
 	if accepted {
 		conLimiter.acceptedConcurrencyCounter.Add(float64(reqContext.Tokens))
 	}
-	decision.PolicyName = conLimiter.GetPolicyName()
-	decision.PolicyHash = conLimiter.GetPolicyHash()
-	decision.ComponentIndex = conLimiter.GetComponentIndex()
-	decision.Dropped = !accepted
-	decision.Details = &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-		ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
-			WorkloadIndex: matchedWorkloadIndex,
+
+	return &flowcontrolv1.LimiterDecision{
+		PolicyName:     conLimiter.GetPolicyName(),
+		PolicyHash:     conLimiter.GetPolicyHash(),
+		ComponentIndex: conLimiter.GetComponentIndex(),
+		Dropped:        !accepted,
+		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
+			ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+				WorkloadIndex: matchedWorkloadIndex,
+			},
 		},
 	}
 }

@@ -26,6 +26,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -93,17 +94,17 @@ func daemonsetForAgent(instance *v1alpha1.Agent, log logr.Logger, scheme *runtim
 				},
 				Spec: corev1.PodSpec{
 					ServiceAccountName:            agentServiceName,
-					ImagePullSecrets:              imagePullSecrets(spec.Image),
+					ImagePullSecrets:              imagePullSecrets(spec.Image.Image),
 					NodeSelector:                  spec.NodeSelector,
 					Affinity:                      spec.Affinity,
 					Tolerations:                   spec.Tolerations,
 					SecurityContext:               podSecurityContext(spec.PodSecurityContext),
-					TerminationGracePeriodSeconds: spec.TerminationGracePeriodSeconds,
+					TerminationGracePeriodSeconds: pointer.Int64(spec.TerminationGracePeriodSeconds),
 					InitContainers:                spec.InitContainers,
 					Containers: []corev1.Container{
 						{
 							Name:            agentServiceName,
-							Image:           imageString(spec.Image),
+							Image:           imageString(spec.Image.Image, spec.Image.Repository),
 							ImagePullPolicy: corev1.PullPolicy(spec.Image.PullPolicy),
 							SecurityContext: containerSecurityContext(spec.ContainerSecurityContext),
 							Command:         spec.Command,

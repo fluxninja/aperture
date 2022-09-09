@@ -33,17 +33,14 @@ type AgentSpec struct {
 
 	// Image configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={tag:"latest",pullPolicy:"IfNotPresent",registry:"docker.io/fluxninja",repository:"aperture-agent"}
-	Image Image `json:"image"`
+	Image AgentImage `json:"image"`
 
 	// Sidecar defines the desired state of Sidecar setup for Agent
 	//+kubebuilder:validation:Optional
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	Sidecar SidecarSpec `json:"sidecar"`
 
 	// Agent Configuration
 	//+kubebuilder:validation:Optional
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	ConfigSpec AgentConfigSpec `json:"config"`
 }
 

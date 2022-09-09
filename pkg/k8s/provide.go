@@ -43,7 +43,7 @@ type K8sClientConstructorIn struct {
 // Module provides a K8sClient.
 func Module() fx.Option {
 	return fx.Options(
-		commonhttp.ClientConstructor{Name: "k8s-http-client", Key: httpConfigKey}.Annotate(),
+		commonhttp.ClientConstructor{Name: "k8s-http-client", ConfigKey: httpConfigKey}.Annotate(),
 		fx.Provide(Providek8sClient),
 	)
 }

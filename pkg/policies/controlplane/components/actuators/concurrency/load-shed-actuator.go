@@ -8,9 +8,9 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -101,7 +101,7 @@ func (lsa *LoadShedActuator) publishLoadShedFactor(loadShedFactor float64) error
 		lsa.decision.LoadShedFactor = loadShedFactor
 		// Publish decision
 		log.Debug().Float64("loadShedFactor", loadShedFactor).Msg("Publish load shed decision")
-		wrapper := &configv1.LoadShedDecsisionWrapper{
+		wrapper := &wrappersv1.LoadShedDecsisionWrapper{
 			LoadShedDecision: lsa.decision,
 			ComponentIndex:   int64(lsa.componentIndex),
 			PolicyName:       lsa.policyReadAPI.GetPolicyName(),

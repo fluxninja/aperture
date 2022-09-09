@@ -20,19 +20,19 @@ the request attributes may look like.
 
 :::note
 
-At _feature_ control points developers already can provide arbitrary flow labels
-– either by setting baggage, or directly as arguments to the `Check()` call.
-Since at feature control points flow labels can be easily controlled,
-classifiers are available only on at _traffic_ control points.
+At _feature_ [control points][control-point] developers already can provide
+arbitrary flow labels – either by setting baggage, or directly as arguments to
+the `Check()` call. Since at feature control points flow labels can be easily
+controlled, classifiers are available only on at _traffic_ control points.
 
 :::
 
 Classifier-created flow label is immediately available for usage in other
-components at the same control point. The flow-label is also injected as
-baggage, so it will be available on every subsequent control point too (assuming
-you have [baggage propagation][baggage] configured in your system). If you're a
-[FluxNinja Cloud plugin][plugin] user, such flow label will also be available in
-the Cloud for analytics.
+components at the same [control point][control-point]. The flow-label is also
+injected as baggage, so it will be available on every subsequent control point
+too (assuming you have [baggage propagation][baggage] configured in your
+system). If you're a [FluxNinja Cloud plugin][plugin] user, such flow label will
+also be available in the Cloud for analytics.
 
 :::note
 
@@ -90,9 +90,9 @@ Aperture aims to expand the set of extractors to cover most-common usecases.
 
 Extracting value from header may seem not useful, as the value is already
 available as flow label
-([as `request_header_<header>`](label.md#request-labels)), but adding flow label
-explicitly may still be userful, as it enables baggage propagation and telemetry
-for this flow label.
+([as `http.request.header.<header>`](label.md#request-labels)), but adding flow
+label explicitly may still be userful, as it enables baggage propagation and
+telemetry for this flow label.
 
 :::
 
@@ -119,3 +119,4 @@ See [full example in reference][reference]
 [label-matcher]: ../selector.md#label-matcher
 [policies]: /concepts/policies/policies.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
+[control-point]: ../flow-control.md#control-point

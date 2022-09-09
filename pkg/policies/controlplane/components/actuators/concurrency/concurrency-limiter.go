@@ -8,8 +8,8 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
-	configv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/config/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/paths"
@@ -61,7 +61,7 @@ func (configSync *concurrencyLimiterConfigSync) doSync(etcdClient *etcdclient.Cl
 	// Add/remove file in lifecycle hooks in order to sync with etcd.
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &configv1.ConcurrencyLimiterWrapper{
+			wrapper := &wrappersv1.ConcurrencyLimiterWrapper{
 				ConcurrencyLimiter: configSync.concurrencyLimiterProto,
 				ComponentIndex:     int64(configSync.componentIndex),
 				PolicyName:         configSync.policyBaseAPI.GetPolicyName(),

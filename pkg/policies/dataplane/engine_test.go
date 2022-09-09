@@ -128,14 +128,15 @@ var _ = Describe("Dataplane Engine", func() {
 		})
 
 		It("Tries to get unregistered fluxmeter hist", func() {
-			hist := engine.GetFluxMeterHist("test", "200", "", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED)
-			Expect(hist).To(BeNil())
+			fluxMeter := engine.GetFluxMeter("test")
+			Expect(fluxMeter).To(BeNil())
 		})
 
 		It("Returns registered fluxmeter hist", func() {
 			err := engine.RegisterFluxMeter(mockFluxmeter)
-			hist := engine.GetFluxMeterHist("test", "200", "", flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED)
 			Expect(err).NotTo(HaveOccurred())
+			fluxMeter := engine.GetFluxMeter("test")
+			hist := fluxMeter.GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED, "200", "")
 			Expect(hist).To(Equal(histogram))
 		})
 	})

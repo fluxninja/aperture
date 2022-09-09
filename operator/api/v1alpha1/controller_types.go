@@ -31,16 +31,14 @@ type ControllerSpec struct {
 
 	// Image configuration
 	//+kubebuilder:validation:Optional
-	//+kubebuilder:default:={tag:"latest",pullPolicy:"IfNotPresent",registry:"docker.io/fluxninja",repository:"aperture-controller"}
-	Image Image `json:"image"`
+	Image ControllerImage `json:"image"`
 
 	// Pod's host aliases
 	//+kubebuilder:validation:Optional
-	HostAliases []corev1.HostAlias `json:"hostAliases"`
+	HostAliases []corev1.HostAlias `json:"hostAliases,omitempty"`
 
 	// Controller Configuration
 	//+kubebuilder:validation:Optional
-	//+operator-sdk:csv:customresourcedefinitions:type=spec
 	ConfigSpec ControllerConfigSpec `json:"config"`
 }
 

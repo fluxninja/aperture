@@ -28,8 +28,8 @@ import (
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 )
 
-// MutatingWebhookConfiguration prepares the MutatingWebhookConfiguration object for the Operator, based on the provided parameter.
-func mutatingWebhookConfiguration(instance *v1alpha1.Agent) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
+// podMutatingWebhookConfiguration prepares the MutatingWebhookConfiguration object for the Operator to mutate Pods, based on the provided parameter.
+func podMutatingWebhookConfiguration(instance *v1alpha1.Agent) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
 	certPath := fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), webhookClientCertName)
 	cert, err := os.ReadFile(certPath)
 	if err != nil {
@@ -38,7 +38,7 @@ func mutatingWebhookConfiguration(instance *v1alpha1.Agent) (*admissionregistrat
 
 	mutatingWebhookConfiguration := &admissionregistrationv1.MutatingWebhookConfiguration{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        mutatingWebhookName,
+			Name:        podMutatingWebhookName,
 			Labels:      commonLabels(instance.Spec.Labels, instance.GetName(), operatorName),
 			Annotations: getAgentAnnotationsWithOwnerRef(instance),
 		},
@@ -70,6 +70,112 @@ func mutatingWebhookConfiguration(instance *v1alpha1.Agent) (*admissionregistrat
 							APIGroups:   []string{""},
 							APIVersions: []string{v1Version},
 							Resources:   []string{"pods"},
+							Scope:       &[]admissionregistrationv1.ScopeType{admissionregistrationv1.NamespacedScope}[0],
+						},
+					},
+				},
+				AdmissionReviewVersions: []string{v1Version},
+				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
+				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
+				TimeoutSeconds:          pointer.Int32Ptr(10),
+			},
+		},
+	}
+
+	return mutatingWebhookConfiguration, nil
+}
+
+// agentMutatingWebhookConfiguration prepares the MutatingWebhookConfiguration object for the Operator to mutate Agents, based on the provided parameter.
+func agentMutatingWebhookConfiguration() (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
+	certPath := fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), webhookClientCertName)
+	cert, err := os.ReadFile(certPath)
+	if err != nil {
+		return nil, err
+	}
+
+	mutatingWebhookConfiguration := &admissionregistrationv1.MutatingWebhookConfiguration{
+		ObjectMeta: v1.ObjectMeta{
+			Name: agentMutatingWebhookName,
+			Labels: map[string]string{
+				"app.kubernetes.io/name":       appName,
+				"app.kubernetes.io/instance":   operatorName,
+				"app.kubernetes.io/managed-by": operatorName,
+				"app.kubernetes.io/component":  operatorName,
+			},
+		},
+		Webhooks: []admissionregistrationv1.MutatingWebhook{
+			{
+				Name: fmt.Sprintf("%s.fluxninja.com", AgentMutatingWebhookURI),
+				ClientConfig: admissionregistrationv1.WebhookClientConfig{
+					CABundle: cert,
+					Service: &admissionregistrationv1.ServiceReference{
+						Name:      os.Getenv("APERTURE_OPERATOR_SERVICE_NAME"),
+						Namespace: os.Getenv("APERTURE_OPERATOR_NAMESPACE"),
+						Path:      pointer.StringPtr(fmt.Sprintf("/%s", AgentMutatingWebhookURI)),
+						Port:      pointer.Int32(443),
+					},
+				},
+				NamespaceSelector: &v1.LabelSelector{},
+				Rules: []admissionregistrationv1.RuleWithOperations{
+					{
+						Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},
+						Rule: admissionregistrationv1.Rule{
+							APIGroups:   []string{"fluxninja.com"},
+							APIVersions: []string{v1Alpha1Version},
+							Resources:   []string{"agents"},
+							Scope:       &[]admissionregistrationv1.ScopeType{admissionregistrationv1.NamespacedScope}[0],
+						},
+					},
+				},
+				AdmissionReviewVersions: []string{v1Version},
+				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
+				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
+				TimeoutSeconds:          pointer.Int32Ptr(10),
+			},
+		},
+	}
+
+	return mutatingWebhookConfiguration, nil
+}
+
+// controllerMutatingWebhookConfiguration prepares the MutatingWebhookConfiguration object for the Operator to mutate Controllers, based on the provided parameter.
+func controllerMutatingWebhookConfiguration() (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
+	certPath := fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), webhookClientCertName)
+	cert, err := os.ReadFile(certPath)
+	if err != nil {
+		return nil, err
+	}
+
+	mutatingWebhookConfiguration := &admissionregistrationv1.MutatingWebhookConfiguration{
+		ObjectMeta: v1.ObjectMeta{
+			Name: controllerMutatingWebhookName,
+			Labels: map[string]string{
+				"app.kubernetes.io/name":       appName,
+				"app.kubernetes.io/instance":   operatorName,
+				"app.kubernetes.io/managed-by": operatorName,
+				"app.kubernetes.io/component":  operatorName,
+			},
+		},
+		Webhooks: []admissionregistrationv1.MutatingWebhook{
+			{
+				Name: fmt.Sprintf("%s.fluxninja.com", ControllerMutatingWebhookURI),
+				ClientConfig: admissionregistrationv1.WebhookClientConfig{
+					CABundle: cert,
+					Service: &admissionregistrationv1.ServiceReference{
+						Name:      os.Getenv("APERTURE_OPERATOR_SERVICE_NAME"),
+						Namespace: os.Getenv("APERTURE_OPERATOR_NAMESPACE"),
+						Path:      pointer.StringPtr(fmt.Sprintf("/%s", ControllerMutatingWebhookURI)),
+						Port:      pointer.Int32(443),
+					},
+				},
+				NamespaceSelector: &v1.LabelSelector{},
+				Rules: []admissionregistrationv1.RuleWithOperations{
+					{
+						Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},
+						Rule: admissionregistrationv1.Rule{
+							APIGroups:   []string{"fluxninja.com"},
+							APIVersions: []string{v1Alpha1Version},
+							Resources:   []string{"controllers"},
 							Scope:       &[]admissionregistrationv1.ScopeType{admissionregistrationv1.NamespacedScope}[0],
 						},
 					},

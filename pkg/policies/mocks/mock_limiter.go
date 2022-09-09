@@ -80,13 +80,15 @@ func (mr *MockLimiterMockRecorder) GetSelector() *gomock.Call {
 }
 
 // RunLimiter mocks base method.
-func (m *MockLimiter) RunLimiter(labels selectors.Labels, decision *flowcontrolv1.LimiterDecision) {
+func (m *MockLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "RunLimiter", labels, decision)
+	ret := m.ctrl.Call(m, "RunLimiter", labels)
+	ret0, _ := ret[0].(*flowcontrolv1.LimiterDecision)
+	return ret0
 }
 
 // RunLimiter indicates an expected call of RunLimiter.
-func (mr *MockLimiterMockRecorder) RunLimiter(labels, decision interface{}) *gomock.Call {
+func (mr *MockLimiterMockRecorder) RunLimiter(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockLimiter)(nil).RunLimiter), labels, decision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockLimiter)(nil).RunLimiter), labels)
 }

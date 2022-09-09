@@ -25,6 +25,15 @@ func SliceContains(a []string, x string) bool {
 	return false
 }
 
+// SliceToMap converts a slice of string to a map[string]bool.
+func SliceToMap(a []string) map[string]bool {
+	m := make(map[string]bool)
+	for _, n := range a {
+		m[n] = true
+	}
+	return m
+}
+
 // IsHTTPUrl returns true if the given string is an HTTP(S) URL.
 func IsHTTPUrl(url string) bool {
 	prefixHTTPRegex := "~^(?:f|ht)tps?://~i"
