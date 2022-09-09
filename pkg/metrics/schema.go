@@ -8,14 +8,14 @@ const (
 	// HTTPRequestMetricName - metric from http server.
 	HTTPRequestMetricName = "http_requests_total"
 	// HTTPRequestLatencyMetricName - metric from http server.
-	HTTPRequestLatencyMetricName = "http_requests_latency_seconds"
+	HTTPRequestLatencyMetricName = "http_requests_latency_ms"
 	// HTTPErrorMetricName - metric from http server.
 	HTTPErrorMetricName = "http_errors_total"
 
 	// Circuit metrics.
 
-	// CircuitSignalReadingMetricName - used in circuit metrics.
-	CircuitSignalReadingMetricName = "circuit_signal_reading"
+	// SignalReadingMetricName - used in circuit metrics.
+	SignalReadingMetricName = "signal_reading"
 	// FluxMeterMetricName name of fluxmeter metrics.
 	FluxMeterMetricName = "flux_meter"
 

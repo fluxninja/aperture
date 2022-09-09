@@ -33,7 +33,7 @@ var circuitMetrics = &CircuitMetrics{}
 func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.Lifecycle) {
 	circuitMetricsLabels := []string{metrics.SignalNameLabel, metrics.PolicyNameLabel}
 	circuitMetrics.SignalSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Name:       metrics.CircuitSignalReadingMetricName,
+		Name:       metrics.SignalReadingMetricName,
 		Help:       "The reading from a signal",
 		Objectives: map[float64]float64{0: 0, 0.01: 0.001, 0.05: 0.01, 0.5: 0.05, 0.9: 0.01, 0.99: 0.001, 1: 0},
 	}, circuitMetricsLabels)
@@ -49,7 +49,7 @@ func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.L
 		OnStop: func(context.Context) error {
 			unregistered := prometheusRegistry.Unregister(circuitMetrics.SignalSummaryVec)
 			if !unregistered {
-				err := fmt.Errorf("failed to unregister metric %s", metrics.CircuitSignalReadingMetricName)
+				err := fmt.Errorf("failed to unregister metric %s", metrics.SignalReadingMetricName)
 				return err
 			}
 			return nil
