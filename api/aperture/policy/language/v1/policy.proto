@@ -764,7 +764,14 @@ message Scheduler {
   Outs out_ports = 1;
 
   // Selector decides for which service or flows the scheduler will be applied.
-  common.selector.v1.Selector selector = 2;
+  common.selector.v1.Selector selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
 
   // List of workloads to be used in scheduler.
   //

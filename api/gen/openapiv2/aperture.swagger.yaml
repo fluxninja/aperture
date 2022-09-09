@@ -218,12 +218,14 @@ definitions:
           Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
           Note: The module name must match the package name from the "source".
+        x-go-validate: required
       source:
         type: string
         description: |-
           Source code of the rego module.
 
           Note: Must include a "package" declaration.
+        x-go-validate: required
     description: High-level extractor-based rules are compiled into a single rego query.
     title: Raw rego rules are compiled 1:1 to rego queries
   SchedulerWorkload:
@@ -373,9 +375,11 @@ definitions:
           A map of {key, value} pairs mapping from
           [flow label](/concepts/flow-control/label/label.md) keys to rules that define
           how to extract and propagate flow labels with that key.
+        x-go-validate: required,gt=0,dive,keys,required,endkeys,required
       selector:
         $ref: '#/definitions/v1Selector'
         description: Defines where to apply the flow classification rule.
+        x-go-validate: required
     description: |-
       :::info
       See also [Classifier overview](/concepts/flow-control/label/classifier.md).
@@ -1512,6 +1516,7 @@ definitions:
           "/user/{userId}": user
           /static/*: other
           ```
+        x-go-validate: required
     description: |-
       HTTP path will be matched against given path templates.
       If a match occurs, the value associated with the path template will be treated as a result.
@@ -1666,12 +1671,13 @@ definitions:
           avoid bloating analytics database. _Hidden_ flag should also be set for
           sensitive labels.
           :::
+        x-go-validate: required
       propagate:
         type: boolean
-        description: |-
+        title: |-
           Decides if the created label should be applied to the whole request chain
           (propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
-          (default=true).
+        x-go-validate: required
       rego:
         $ref: '#/definitions/RuleRego'
         description: Rego module to extract a value from the rego module.
@@ -1750,6 +1756,7 @@ definitions:
       selector:
         $ref: '#/definitions/v1Selector'
         description: Selector decides for which service or flows the scheduler will be applied.
+        x-go-validate: required
       timeout_factor:
         type: number
         format: double
@@ -1852,6 +1859,7 @@ definitions:
           The service (name) of the entities.
           In k8s, this is the FQDN of the Service object.
 
+          Empty string means all services (catch-all).
           Note: Entity may belong to multiple services.
     description: |-
       Example:

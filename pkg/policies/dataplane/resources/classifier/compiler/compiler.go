@@ -12,7 +12,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/extractors"
 	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/open-policy-agent/opa/rego"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const defaultPackageName = "fluxninja.classification.extractors"
@@ -78,12 +77,10 @@ func rulesetToReportedRules(rs *classificationv1.Classifier, rulesetName string)
 
 func labelFlagsFromRule(rule *classificationv1.Rule) LabelFlags {
 	return LabelFlags{
-		Propagate: boolValueOrTrue(rule.GetPropagate()),
-		Hidden:    rule.GetHidden(),
+		Propagate: rule.Propagate,
+		Hidden:    rule.Hidden,
 	}
 }
-
-func boolValueOrTrue(bv *wrapperspb.BoolValue) bool { return bv == nil || bv.Value }
 
 // BadExtractor is an error occurring when extractor is invalid.
 var BadExtractor = extractors.BadExtractor
