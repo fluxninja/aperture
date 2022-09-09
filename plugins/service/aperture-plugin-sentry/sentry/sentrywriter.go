@@ -46,7 +46,8 @@ func (s *SentryWriter) Write(data []byte) (int, error) {
 
 	if ok {
 		if level == sentry.LevelFatal {
-			event, err := s.parseLogEvent(data)
+			// Parse log event only when it is fatal level and the event needs to be captured.
+			event, err := s.parseLogEvent(level, data)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to parse log event")
 			} else {
@@ -84,10 +85,10 @@ func (s *SentryWriter) parseLogLevel(data []byte) (sentry.Level, bool) {
 	return sentryLevel, true
 }
 
-func (s *SentryWriter) parseLogEvent(data []byte) (*sentry.Event, error) {
+func (s *SentryWriter) parseLogEvent(level sentry.Level, data []byte) (*sentry.Event, error) {
 	event := sentry.Event{
 		Timestamp: time.Now(),
-		Level:     sentry.LevelFatal,
+		Level:     level,
 		Logger:    "zerolog",
 	}
 
