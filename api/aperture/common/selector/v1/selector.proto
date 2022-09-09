@@ -5,28 +5,34 @@ package aperture.common.selector.v1;
 import "aperture/common/labelmatcher/v1/labelmatcher.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-// Describes where a rule or actuation component should apply to
+// Describes which flows a [dataplane
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
 //
 // Example:
 // ```yaml
-// selector:
-//   service: service1.default.svc.cluster.local
-//   control_point:
-//     traffic: ingress # Allowed values are `ingress` and `egress`.
-//   label_matcher:
-//     match_labels:
-//       user_tier: gold
-//     match_expressions:
-//       - key: query
-//         operator: In
-//         values:
-//           - insert
-//           - delete
-//       - label: user_agent
-//         regex: ^(?!.*Chrome).*Safari
+// service: service1.default.svc.cluster.local
+// control_point:
+//   traffic: ingress # Allowed values are `ingress` and `egress`.
+// label_matcher:
+//   match_labels:
+//     user_tier: gold
+//   match_expressions:
+//     - key: query
+//       operator: In
+//       values:
+//         - insert
+//         - delete
+//     - label: user_agent
+//       regex: ^(?!.*Chrome).*Safari
 // ```
 message Selector {
-  // Describes where this selector applies to.
+  // Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+  // selector applies to.
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
@@ -36,14 +42,21 @@ message Selector {
     }
   }]; // @gotags: default:"default"
 
-  // The service (name) of the entities.
-  // In k8s, this is the FQDN of the Service object.
+  // The Fully Qualified Domain Name of the
+  // [service](/concepts/flow-control/service.md) to select.
   //
-  // Empty string means all services (catch-all).
-  // Note: Entity may belong to multiple services.
+  // In kubernetes, this is the FQDN of the Service object.
+  //
+  // Empty string means all services within an agent group (catch-all).
+  //
+  // :::note
+  // One entity may belong to multiple services.
+  // :::
   string service = 2;
 
-  // Describes control point within the entity where the policy should apply to.
+  // Describes
+  // [control point](/concepts/flow-control/flow-control.md#control-point)
+  // within the entity where the policy should apply to.
   ControlPoint control_point = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
@@ -56,6 +69,10 @@ message Selector {
   // Label matcher allows to add _additional_ condition on
   // [flow labels](/concepts/flow-control/label/label.md)
   // must also be satisfied (in addition to service+control point matching)
+  //
+  // :::info
+  // See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+  // :::
   //
   // :::note
   // [Classifiers](#v1-classifier) _can_ use flow labels created by some other

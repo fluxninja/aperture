@@ -1830,15 +1830,24 @@ definitions:
     properties:
       agent_group:
         type: string
-        description: Describes where this selector applies to.
+        description: |-
+          Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+          selector applies to.
         x-go-default: default
       control_point:
         $ref: '#/definitions/v1ControlPoint'
-        description: Describes control point within the entity where the policy should apply to.
+        description: |-
+          Describes
+          [control point](/concepts/flow-control/flow-control.md#control-point)
+          within the entity where the policy should apply to.
         x-go-validate: required
       label_matcher:
         $ref: '#/definitions/v1LabelMatcher'
         description: |-
+          :::info
+          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+          :::
+
           :::note
           [Classifiers](#v1-classifier) _can_ use flow labels created by some other
           classifier, but only if they were created at some previous control point
@@ -1856,31 +1865,42 @@ definitions:
       service:
         type: string
         description: |-
-          The service (name) of the entities.
-          In k8s, this is the FQDN of the Service object.
+          The Fully Qualified Domain Name of the
+          [service](/concepts/flow-control/service.md) to select.
 
-          Empty string means all services (catch-all).
-          Note: Entity may belong to multiple services.
+          In kubernetes, this is the FQDN of the Service object.
+
+          Empty string means all services within an agent group (catch-all).
+
+          :::note
+          One entity may belong to multiple services.
+          :::
     description: |-
+      :::info
+      See also [Selector overview](/concepts/flow-control/selector.md).
+      :::
+
       Example:
       ```yaml
-      selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress # Allowed values are `ingress` and `egress`.
-        label_matcher:
-          match_labels:
-            user_tier: gold
-          match_expressions:
-            - key: query
-              operator: In
-              values:
-                - insert
-                - delete
-            - label: user_agent
-              regex: ^(?!.*Chrome).*Safari
+      service: service1.default.svc.cluster.local
+      control_point:
+        traffic: ingress # Allowed values are `ingress` and `egress`.
+      label_matcher:
+        match_labels:
+          user_tier: gold
+        match_expressions:
+          - key: query
+            operator: In
+            values:
+              - insert
+              - delete
+          - label: user_agent
+            regex: ^(?!.*Chrome).*Safari
       ```
-    title: Describes where a rule or actuation component should apply to
+    title: |-
+      Describes which flows a [dataplane
+      component](/concepts/flow-control/flow-control.md#components) should apply
+      to
   v1Service:
     type: object
     properties:

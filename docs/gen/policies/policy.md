@@ -75,7 +75,9 @@ Example of…
 - [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule
 - [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing-based workload scheduler
 - [v1SchedulerOuts](#v1-scheduler-outs) – Output for the Scheduler component.
-- [v1Selector](#v1-selector) – Describes where a rule or actuation component should apply to
+- [v1Selector](#v1-selector) – Describes which flows a [dataplane
+  component](/concepts/flow-control/flow-control.md#components) should apply
+  to
 - [v1Sqrt](#v1-sqrt) – Takes an input signal and emits the square root of it multiplied by scale as an output
 - [v1SqrtIns](#v1-sqrt-ins) – Inputs for the Sqrt component.
 - [v1SqrtOuts](#v1-sqrt-outs) – Outputs for the Sqrt component.
@@ -2012,26 +2014,31 @@ entering scheduler, including rejected ones.
 
 ### v1Selector {#v1-selector}
 
-Describes where a rule or actuation component should apply to
+Describes which flows a [dataplane
+component](/concepts/flow-control/flow-control.md#components) should apply
+to
+
+:::info
+See also [Selector overview](/concepts/flow-control/selector.md).
+:::
 
 Example:
 
 ```yaml
-selector:
-  service: service1.default.svc.cluster.local
-  control_point:
-    traffic: ingress # Allowed values are `ingress` and `egress`.
-  label_matcher:
-    match_labels:
-      user_tier: gold
-    match_expressions:
-      - key: query
-        operator: In
-        values:
-          - insert
-          - delete
-      - label: user_agent
-        regex: ^(?!.*Chrome).*Safari
+service: service1.default.svc.cluster.local
+control_point:
+  traffic: ingress # Allowed values are `ingress` and `egress`.
+label_matcher:
+  match_labels:
+    user_tier: gold
+  match_expressions:
+    - key: query
+      operator: In
+      values:
+        - insert
+        - delete
+    - label: user_agent
+      regex: ^(?!.*Chrome).*Safari
 ```
 
 #### Properties
@@ -2040,13 +2047,16 @@ selector:
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Describes where this selector applies to.
+(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+selector applies to.
 
 </dd>
 <dt>control_point</dt>
 <dd>
 
-([V1ControlPoint](#v1-control-point), `required`) Describes control point within the entity where the policy should apply to.
+([V1ControlPoint](#v1-control-point), `required`) Describes
+[control point](/concepts/flow-control/flow-control.md#control-point)
+within the entity where the policy should apply to.
 
 </dd>
 <dt>label_matcher</dt>
@@ -2055,6 +2065,10 @@ selector:
 ([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
 [flow labels](/concepts/flow-control/label/label.md)
 must also be satisfied (in addition to service+control point matching)
+
+:::info
+See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+:::
 
 :::note
 [Classifiers](#v1-classifier) _can_ use flow labels created by some other
@@ -2071,11 +2085,16 @@ control point.
 <dt>service</dt>
 <dd>
 
-(string) The service (name) of the entities.
-In k8s, this is the FQDN of the Service object.
+(string) The Fully Qualified Domain Name of the
+[service](/concepts/flow-control/service.md) to select.
 
-Empty string means all services (catch-all).
-Note: Entity may belong to multiple services.
+In kubernetes, this is the FQDN of the Service object.
+
+Empty string means all services within an agent group (catch-all).
+
+:::note
+One entity may belong to multiple services.
+:::
 
 </dd>
 </dl>
