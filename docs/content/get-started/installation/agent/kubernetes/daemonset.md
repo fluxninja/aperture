@@ -53,6 +53,21 @@ your cluster.
    the actual values of Etcd and Prometheus, which is also being used by the
    Aperture Controller you want these Agents to connect with.
 
+   If you have installed the
+   [Aperture Controller](/get-started/installation/controller.md) on the same
+   cluster in `default` namespace, with Etcd and Prometheus using `controller`
+   as release name, the values for the values for `ETCD_ENDPOINT_HERE` and
+   `PROMETHEUS_ADDRESS_HERE` would be as below:
+
+   ```yaml
+   agent:
+     config:
+       etcd:
+         endpoints: ['http://controller-etcd.default.svc.cluster.local:2379'],
+       prometheus:
+         address: 'http://controller-prometheus-server.default.svc.cluster.local:80',
+   ```
+
    ```bash
    helm upgrade --install agent aperture/aperture-agent -f values.yaml
    ```
@@ -116,22 +131,67 @@ your cluster.
    `default`, use the `-n` flag:
 
    ```bash
-   helm upgrade --install agent aperture/aperture-agent -n "aperture-agent" --create-namespace
+   helm upgrade --install agent aperture/aperture-agent -n aperture-agent --create-namespace
    ```
 
-6. Once you have successfully deployed the resources, confirm that the Aperture
-   Agent is up and running:
+6. Refer steps on the [Istio Configuration](/get-started/istio.md) if you don't
+   have the
+   [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
+   configured on your cluster.
 
-   ```bash
-   kubectl get pod -A
+## Verifying the Installation
 
-   kubectl get agent -A
-   ```
+Once you have successfully deployed the resources, confirm that the Aperture
+Agent is up and running:
+
+```bash
+kubectl get pod -A
+
+kubectl get agent -A
+```
 
 You should see pods for Aperture Agent and Agent Manager in `RUNNING` state and
 `Agent` Custom Resource in `created` state.
 
-7. Refer steps on the [Istio Configuration](/get-started/istio.md) if you don't
-   have the
-   [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
-   configured on your cluster.
+## Uninstall
+
+You can uninstall the Aperture Agent and it's components by uninstalling the
+charts installed above:
+
+1. Delete th Aperture Agent chart:
+
+   ```bash
+   helm uninstall agent
+   ```
+
+2. Alternativey, if you have installed the Aperture Agent Custom Resource
+   separately, follow below steps:
+
+   1. Delete the Aperture Agent Custom Resource:
+
+      ```bash
+      kubectl delete -f agent.yaml
+      ```
+
+   2. Delete the Aperture Agent chart to uninstall the Aperture Operator:
+
+      ```bash
+      helm uninstall agent
+      ```
+
+3. If you have installed the chart in some other namespace than `default`,
+   execute below commands:
+
+   ```bash
+   helm uninstall agent -n aperture-agent
+   kubectl delete namespace aperture-agent
+   ```
+
+   > Note: By design, deleting a chart via Helm doesn’t delete the Custom
+   > Resource Definitions (CRDs) installed via the chart.
+
+4. **Optional**: Delete the CRD installed by the chart:
+
+   ```bash
+   kubectl delete crd agents.fluxninja.com
+   ```

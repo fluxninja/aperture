@@ -4,7 +4,7 @@ keywords:
   - supported
   - platforms
   - kubernetes
-sidebar_position: 5
+sidebar_position: 4
 ---
 
 Below are the platforms supported for the Aperture Agent and Controller:

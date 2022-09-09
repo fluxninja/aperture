@@ -29,7 +29,7 @@ configuration/management tools (which must be installed beforehand).
 
 To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install
 manually (check
-[Tools used for k8s deployment](#tools-used-for-k8s-deployment)).
+[Tools required for Kubernetes deployment](#tools-required-for-kubernetes-deployment)).
 
 When using `asdf`:
 
@@ -47,13 +47,13 @@ cat .tool-versions | cut -d' ' -f1 | grep "^[^\#]" | xargs -i asdf plugin add  {
 > Note: Last command will install tools which have been added as plugins and
 > which are defined/versioned in `.tool-versions` file
 
-### Tools required for k8s deployment
+### Tools required for Kubernetes deployment
 
-Tools which are required for local k8s deployment:
+Tools which are required for local Kubernetes deployment:
 
 #### helm
 
-Helm is a package manager for k8s.
+Helm is a package manager for Kubernetes.
 
 To install manually, follow instructions: <https://helm.sh/docs/intro/install/>
 
@@ -66,7 +66,7 @@ Jsonnet Bundler is used to manage Jsonnet dependencies.
 
 To install manually, follow instructions: <https://tanka.dev/install>
 
-#### Local k8s cluster
+#### Local Kubernetes cluster
 
 May use [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/).
 
@@ -103,7 +103,10 @@ This can be achieved by using `tilt`.
 Tilt can be installed with `asdf install` or manually
 <https://docs.tilt.dev/install.html>.
 
-### Prerequisites - k8s cluster bootstrap
+### Prerequisites - Kubernetes cluster bootstrap
+
+> Note: You can skip this section if you already have a running cluster which is
+> being pointed by the `kubectl`.
 
 Create a K8s cluster using Kind with configuration file:
 

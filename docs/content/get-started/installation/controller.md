@@ -151,17 +151,62 @@ into your cluster.
    `default`, use the `-n` flag:
 
    ```bash
-   helm upgrade --install controller aperture/aperture-controller -n "aperture-controller" --create-namespace
+   helm upgrade --install controller aperture/aperture-controller -n aperture-controller --create-namespace
    ```
 
-7. Once you have successfully deployed the resources, confirm that the Aperture
-   Controller is up and running:
+## Verifying the Installation
 
-   ```bash
-   kubectl get pod -A
+Once you have successfully deployed the resources, confirm that the Aperture
+Controller is up and running:
 
-   kubectl get controller -A
-   ```
+```bash
+kubectl get pod -A
+
+kubectl get controller -A
+```
 
 You should see pods for Aperture Controller and Controller Manager in `RUNNING`
 state and `Controller` Custom Resource in `created` state.
+
+## Uninstall
+
+You can uninstall the Aperture Controller and it's components by uninstalling
+the charts installed above:
+
+1. Delete th Aperture Controller chart:
+
+   ```bash
+   helm uninstall controller
+   ```
+
+2. Alternativey, if you have installed the Aperture Controller Custom Resource
+   separately, follow below steps:
+
+   1. Delete the Aperture Controller Custom Resource:
+
+      ```bash
+      kubectl delete -f controller.yaml
+      ```
+
+   2. Delete the Aperture Controller chart to uninstall the Aperture Operator:
+
+      ```bash
+      helm uninstall controller
+      ```
+
+3. If you have installed the chart in some other namespace than `default`,
+   execute below commands:
+
+   ```bash
+   helm uninstall controller -n aperture-controller
+   kubectl delete namespace aperture-controller
+   ```
+
+   > Note: By design, deleting a chart via Helm doesn’t delete the Custom
+   > Resource Definitions (CRDs) installed via the chart.
+
+4. **Optional**: Delete the CRD installed by the chart:
+
+   ```bash
+   kubectl delete crd controllers.fluxninja.com
+   ```
