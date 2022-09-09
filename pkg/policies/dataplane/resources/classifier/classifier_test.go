@@ -453,6 +453,32 @@ var _ = Describe("Classifier", func() {
 			Expect(labels).To(Equal(FlowLabels{}))
 		})
 	})
+
+	Context("configured with invalid label name", func() {
+		// Classifier with a simple extractor-based rule
+		rs := &classificationv1.Classifier{
+			Selector: &selectorv1.Selector{
+				Service: "my-service.default.svc.cluster.local",
+				ControlPoint: &selectorv1.ControlPoint{
+					Controlpoint: &selectorv1.ControlPoint_Traffic{
+						Traffic: "ingress",
+					},
+				},
+			},
+			Rules: map[string]*classificationv1.Rule{
+				"user-agent": {
+					Source:    headerExtractor("foo"),
+					Propagate: true,
+				},
+			},
+		}
+
+		It("should reject the ruleset", func() {
+			_, err := classifier.AddRules(context.TODO(), "one", rs)
+			Expect(err).To(HaveOccurred())
+		})
+
+	})
 })
 
 func fl(s string) FlowLabelValue {
