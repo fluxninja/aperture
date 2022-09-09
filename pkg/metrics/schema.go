@@ -17,16 +17,16 @@ const (
 	// CircuitSignalReadingMetricName - used in circuit metrics.
 	CircuitSignalReadingMetricName = "circuit_signal_reading"
 	// FluxMeterMetricName name of fluxmeter metrics.
-	FluxMeterMetricName = "flux_meter_info"
+	FluxMeterMetricName = "flux_meter"
 
 	// Workload metrics.
 
 	// WorkloadLatencyMetricName - metric used for grouping latencies per workload.
-	WorkloadLatencyMetricName = "workload_latency_seconds"
+	WorkloadLatencyMetricName = "workload_latency_ms"
 	// WorkloadLatencySumMetricName - metric from workload histogram.
-	WorkloadLatencySumMetricName = "workload_latency_seconds_sum"
+	WorkloadLatencySumMetricName = "workload_latency_ms_sum"
 	// WorkloadLatencyCountMetricName - metric from workload histogram.
-	WorkloadLatencyCountMetricName = "workload_latency_seconds_count"
+	WorkloadLatencyCountMetricName = "workload_latency_ms_count"
 
 	// AcceptedConcurrencyMetricName - metric for measuring latencies of accepted requests.
 	AcceptedConcurrencyMetricName = "accepted_concurrency_total"
