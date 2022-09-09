@@ -75,10 +75,10 @@ your cluster.
    Aperture Controller you want these Agents to connect with.
 
    If you have installed the
-   [Aperture Controller](/getting-started/installation/controller.md) on the
-   same cluster in `default` namespace, with Etcd and Prometheus using
-   `controller` as release name, the values for the values for
-   `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` would be as below:
+   [Aperture Controller](/get-started/installation/controller.md) on the same
+   cluster in `default` namespace, with Etcd and Prometheus using `controller`
+   as release name, the values for the values for `ETCD_ENDPOINT_HERE` and
+   `PROMETHEUS_ADDRESS_HERE` would be as below:
 
    ```yaml
    agent:
