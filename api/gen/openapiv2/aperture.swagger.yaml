@@ -188,7 +188,6 @@ definitions:
     properties:
       enabled:
         type: boolean
-        description: TODO document what happens when lazy sync is disabled
         title: Enables lazy sync
         x-go-default: false
       num_sync:
@@ -313,7 +312,7 @@ definitions:
         x-go-validate: required
     description: |-
       :::info
-      See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
+      See also [Concurrency Limiter overview](/concepts/flow-control/actuators/concurrency-limiter.md).
       :::
 
       It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -337,8 +336,6 @@ definitions:
           [label](/concepts/flow-control/label/label.md) with given key.
           Eg., to give each user a separate limit, assuming you have a _user_ flow
           label set up, set `label_key: "user"`.
-
-          TODO make it possible for this field to be optional – to achieve global ratelimit.
         x-go-validate: required
       lazy_sync:
         $ref: '#/definitions/RateLimiterLazySync'
@@ -1791,7 +1788,7 @@ definitions:
 
           :::info
           See also [workload definition in the concepts
-          section](/concepts/flow-control/actuators/scheduler.md#workload).
+          section](/concepts/flow-control/actuators/concurrency-limiter.md#workload).
           :::
     description: |-
       :::note
