@@ -534,8 +534,6 @@ message Decider {
 message RateLimiter {
   message LazySync {
     // Enables lazy sync
-    //
-    // TODO document what happens when lazy sync is disabled
     bool enabled = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
@@ -638,8 +636,6 @@ message RateLimiter {
   // [label](/concepts/flow-control/label/label.md) with given key.
   // Eg., to give each user a separate limit, assuming you have a _user_ flow
   // label set up, set `label_key: "user"`.
-  //
-  // TODO make it possible for this field to be optional – to achieve global ratelimit.
   string label_key = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
@@ -659,7 +655,7 @@ message RateLimiter {
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
-// See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
+// See also [Concurrency Limiter overview](/concepts/flow-control/actuators/concurrency-limiter.md).
 // :::
 //
 // It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -791,7 +787,7 @@ message Scheduler {
   //
   // :::info
   // See also [workload definition in the concepts
-  // section](/concepts/flow-control/actuators/scheduler.md#workload).
+  // section](/concepts/flow-control/actuators/concurrency-limiter.md#workload).
   // :::
   repeated WorkloadAndLabelMatcher workloads = 3;
 

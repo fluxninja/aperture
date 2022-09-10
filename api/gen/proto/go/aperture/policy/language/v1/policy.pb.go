@@ -1092,8 +1092,6 @@ type RateLimiter struct {
 	// [label](/concepts/flow-control/label/label.md) with given key.
 	// Eg., to give each user a separate limit, assuming you have a _user_ flow
 	// label set up, set `label_key: "user"`.
-	//
-	// TODO make it possible for this field to be optional – to achieve global ratelimit.
 	LabelKey string `protobuf:"bytes,4,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Allows to specify different limits for particular label values.
 	Overrides []*RateLimiter_Override `protobuf:"bytes,5,rep,name=overrides,proto3" json:"overrides,omitempty"`
@@ -1178,7 +1176,7 @@ func (x *RateLimiter) GetLazySync() *RateLimiter_LazySync {
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
-// See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
+// See also [Concurrency Limiter overview](/concepts/flow-control/actuators/concurrency-limiter.md).
 // :::
 //
 // It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1302,7 +1300,7 @@ type Scheduler struct {
 	//
 	// :::info
 	// See also [workload definition in the concepts
-	// section](/concepts/flow-control/actuators/scheduler.md#workload).
+	// section](/concepts/flow-control/actuators/concurrency-limiter.md#workload).
 	// :::
 	Workloads []*Scheduler_WorkloadAndLabelMatcher `protobuf:"bytes,3,rep,name=workloads,proto3" json:"workloads,omitempty"`
 	// Workload to be used if none of workloads specified in `workloads` match.
@@ -2371,8 +2369,6 @@ type RateLimiter_LazySync struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Enables lazy sync
-	//
-	// TODO document what happens when lazy sync is disabled
 	Enabled bool `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty" default:"false"` // @gotags: default:"false"
 	// Number of times to lazy sync within the _limit\_reset\_interval_.
 	NumSync uint32 `protobuf:"varint,2,opt,name=num_sync,json=numSync,proto3" json:"num_sync,omitempty" default:"5" validate:"gt=0"` // @gotags: default:"5" validate:"gt=0"

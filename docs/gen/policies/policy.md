@@ -128,8 +128,6 @@ eg. {any: {of: [expr1, expr2]}}.
 
 (bool) Enables lazy sync
 
-TODO document what happens when lazy sync is disabled
-
 </dd>
 <dt>num_sync</dt>
 <dd>
@@ -243,7 +241,7 @@ This override is applicable only if `auto_tokens` is set to false.
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
 :::info
-See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
+See also [Concurrency Limiter overview](/concepts/flow-control/actuators/concurrency-limiter.md).
 :::
 
 It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -303,8 +301,6 @@ Rate limiting is done independently for each value of the
 [label](/concepts/flow-control/label/label.md) with given key.
 Eg., to give each user a separate limit, assuming you have a _user_ flow
 label set up, set `label_key: "user"`.
-
-TODO make it possible for this field to be optional – to achieve global ratelimit.
 
 </dd>
 <dt>lazy_sync</dt>
@@ -1973,7 +1969,7 @@ If none of workloads match, `default_workload` will be used.
 
 :::info
 See also [workload definition in the concepts
-section](/concepts/flow-control/actuators/scheduler.md#workload).
+section](/concepts/flow-control/actuators/concurrency-limiter.md#workload).
 :::
 
 </dd>
