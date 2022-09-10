@@ -31,7 +31,7 @@ service, kick-starting a positive feedback loop and causing
 The application stops serving responses in a timely manner and critical end-user
 transactions are interrupted.
 
-![Absence of flow control](./assets/img/no-flow-control.jpg)
+![Absence of flow control](./assets/img/no-flow-control.png#gh-light-mode-only)![Absence of flow control](./assets/img/no-flow-control-dark.png#gh-dark-mode-only)
 
 Applications are governed by
 [Little’s Law](https://en.wikipedia.org/wiki/Little%27s_law), which describes
@@ -44,7 +44,7 @@ users are insufficient in protecting services. Autoscaling is slow to respond
 and can be cost-prohibitive. As the number of services scales, these techniques
 get harder to deploy.
 
-![Reliability with flow control](./assets/img/active-flow-control.jpg)
+![Reliability with flow control](./assets/img/active-flow-control.png#gh-light-mode-only)![Reliability with flow control](./assets/img/active-flow-control-dark.png#gh-dark-mode-only)
 
 This is where flow control comes in. Applications can degrade gracefully in
 real-time when using flow control techniques with Aperture, by prioritizing
@@ -55,7 +55,7 @@ high-importance features over others.
 At the fundamental level, Aperture enables flow control through observing,
 analyzing, and actuating, facilitated by agents and a controller.
 
-![Aperture Control Loop](./assets/img/control-loop.svg)
+![Aperture Control Loop](./assets/img/oaalight.png#gh-light-mode-only)![Aperture Control Loop](./assets/img/oaadark.png#gh-dark-mode-only)
 
 ### Aperture Agents
 
