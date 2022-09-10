@@ -4,8 +4,8 @@ produces:
 - application/json
 swagger: "2.0"
 info:
-  description: Policy
-  title: Policy
+  description: Policies
+  title: Policies
 basePath: /aperture-controller
 paths:
   /:

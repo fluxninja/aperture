@@ -1,4 +1,4 @@
-basePath: /aperture-agent
+basePath: /aperture-controller
 definitions:
   AdaptivePolicy:
     properties:
@@ -19,19 +19,6 @@ definitions:
       as usage+(limit-usage)*factor.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
-  AgentInfoConfig:
-    properties:
-      agent_group:
-        description: |-
-          All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
-
-          [Read more about agent groups here](/concepts/flow-control/service.md#agent-group).
-        type: string
-        x-go-default: default
-        x-go-name: AgentGroup
-    title: AgentInfoConfig is the configuration for the agent group etc.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
   BackoffConfig:
     properties:
       base_delay:
@@ -110,61 +97,12 @@ definitions:
     title: ClientTLSConfig is the config for client TLS.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
-  DistCacheConfig:
-    properties:
-      bind_addr:
-        description: BindAddr denotes the address that DistCache will bind to for
-          communication with other peer nodes.
-        type: string
-        x-go-default: :3320
-        x-go-name: BindAddr
-        x-go-validate: hostname_port
-      memberlist_advertise_addr:
-        description: Address of memberlist to advertise to other cluster members.
-          Used for nat traversal if provided.
-        type: string
-        x-go-name: MemberlistAdvertiseAddr
-        x-go-validate: omitempty,hostname_port
-      memberlist_bind_addr:
-        description: Address to bind mememberlist server to.
-        type: string
-        x-go-default: :3322
-        x-go-name: MemberlistBindAddr
-        x-go-validate: hostname_port
-      replica_count:
-        description: ReplicaCount is 1 by default.
-        format: int64
-        type: integer
-        x-go-default: "1"
-        x-go-name: ReplicaCount
-    title: DistCacheConfig configures distributed cache that holds per-label counters
-      in distributed rate limiters.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/distcache
   Duration:
     description: It holds *durationpb.Duration which is generated types for google/protobuf/duration.proto.
     title: Duration is encoded as a string message which represents a signed span
       of time.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/config
-  EntityConfig:
-    properties:
-      ip_address:
-        description: IP address of the entity.
-        type: string
-        x-go-name: IPAddress
-        x-go-validate: required,ip
-      name:
-        description: Name of the entity.
-        type: string
-        x-go-name: Name
-      uid:
-        description: UID of the entity.
-        type: string
-        x-go-name: UID
-    title: EntityConfig describes a single entity.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
   EtcdConfig:
     properties:
       endpoints:
@@ -530,22 +468,6 @@ definitions:
     title: JobGroupConfig holds configuration for JobGroup.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
-  KubernetesDiscoveryConfig:
-    properties:
-      discovery_enabled:
-        type: boolean
-        x-go-default: "true"
-        x-go-name: DiscoveryEnabled
-      node_name:
-        description: NodeName is the name of the k8s node the agent should be monitoring
-        type: string
-        x-go-name: NodeName
-      pod_name:
-        type: string
-        x-go-name: PodName
-    title: KubernetesDiscoveryConfig for Kubernetes service discovery.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes
   ListenerConfig:
     properties:
       addr:
@@ -718,18 +640,6 @@ definitions:
     title: OtelConfig is the configuration for the OTEL collector.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otel
-  PeerDiscoveryConfig:
-    properties:
-      advertisement_addr:
-        description: Network address of aperture server to advertise to peers - this
-          address should be reachable from other agents. Used for nat traversal when
-          provided.
-        type: string
-        x-go-name: AdvertisementAddr
-        x-go-validate: omitempty,hostname_port
-    title: PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/peers
   PluginsConfig:
     properties:
       disable_plugins:
@@ -872,33 +782,6 @@ definitions:
     title: ServerTLSConfig holds configuration for setting up server TLS support.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
-  ServiceConfig:
-    properties:
-      entities:
-        description: Entities of the service.
-        items:
-          $ref: '#/definitions/EntityConfig'
-        type: array
-        x-go-name: Entities
-      name:
-        description: Name of the service.
-        type: string
-        x-go-name: Name
-        x-go-validate: required
-    title: ServiceConfig describes a service and its entities.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
-  StaticDiscoveryConfig:
-    properties:
-      services:
-        description: Services list.
-        items:
-          $ref: '#/definitions/ServiceConfig'
-        type: array
-        x-go-name: Services
-    title: StaticDiscoveryConfig for pre-determined list of services.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
   WatchdogConfig:
     properties:
       cgroup:
@@ -946,17 +829,9 @@ definitions:
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
 info:
-  description: Aperture Agent
+  description: Aperture Controller
+  title: Controller
 paths:
-  /agent_info:
-    post:
-      operationId: AgentInfo
-      parameters:
-      - in: body
-        schema:
-          $ref: '#/definitions/AgentInfoConfig'
-      tags:
-      - common-configuration
   /client:
     post:
       operationId: Client
@@ -968,16 +843,6 @@ paths:
       tags:
       - common-configuration
       x-fn-config-env: true
-  /dist_cache:
-    post:
-      operationId: DistCache
-      parameters:
-      - in: body
-        schema:
-          $ref: '#/definitions/DistCacheConfig'
-      tags:
-      - common-configuration
-      x-fn-config-env: true
   /etcd:
     post:
       operationId: Etcd
@@ -985,17 +850,6 @@ paths:
       - in: body
         schema:
           $ref: '#/definitions/EtcdConfig'
-      tags:
-      - common-configuration
-      x-fn-config-env: true
-  /kubernetes_client:
-    post:
-      operationId: KubernetesClient
-      parameters:
-      - in: body
-        name: http_client
-        schema:
-          $ref: '#/definitions/HTTPClientConfig'
       tags:
       - common-configuration
       x-fn-config-env: true
@@ -1045,15 +899,6 @@ paths:
       tags:
       - common-configuration
       x-fn-config-env: true
-  /peer_discovery:
-    post:
-      operationId: PeerDiscovery
-      parameters:
-      - in: body
-        schema:
-          $ref: '#/definitions/PeerDiscoveryConfig'
-      tags:
-      - common-configuration
   /plugins:
     post:
       operationId: Plugins
@@ -1061,6 +906,22 @@ paths:
       - in: body
         schema:
           $ref: '#/definitions/PluginsConfig'
+      tags:
+      - common-configuration
+      x-fn-config-env: true
+  /policies:
+    post:
+      operationId: PoliciesConfig
+      parameters:
+      - in: body
+        name: promql_jobs_scheduler
+        schema:
+          $ref: '#/definitions/JobGroupConfig'
+      - description: Directory containing policies rules
+        in: query
+        name: policies_path
+        type: string
+        x-go-default: /etc/aperture/aperture-controller/policies
       tags:
       - common-configuration
       x-fn-config-env: true
@@ -1126,21 +987,6 @@ paths:
         name: tls
         schema:
           $ref: '#/definitions/ServerTLSConfig'
-      tags:
-      - common-configuration
-      x-fn-config-env: true
-  /service_discovery:
-    post:
-      operationId: ServiceDiscovery
-      parameters:
-      - in: body
-        name: static
-        schema:
-          $ref: '#/definitions/StaticDiscoveryConfig'
-      - in: body
-        name: kubernetes
-        schema:
-          $ref: '#/definitions/KubernetesDiscoveryConfig'
       tags:
       - common-configuration
       x-fn-config-env: true
