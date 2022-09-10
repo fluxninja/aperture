@@ -95,8 +95,8 @@ select which labels to include in telemetry.
 [flow]: /concepts/flow-control/flow-control.md#flow
 [selector]: /concepts/flow-control/selector.md
 [actuators]: /concepts/flow-control/actuators/actuators.md
-[scheduler]: /concepts/flow-control/actuators/scheduler.md
-[workload]: /concepts/flow-control/actuators/scheduler.md#workload
+[scheduler]: /concepts/flow-control/actuators/concurrency-limiter.md
+[workload]: /concepts/flow-control/actuators/concurrency-limiter.md#workload
 [ratelimiter]: /concepts/flow-control/actuators/rate-limiter.md
 [fluxmeter]: /concepts/flow-control/fluxmeter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
