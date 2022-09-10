@@ -1,3 +1,10 @@
+---
+title: Aperture Controller configuration
+sidebar_position: 10
+sidebar_label: Controller
+description: Aperture Controller configuration
+---
+
 # Aperture Controller Configuration Reference
 
 ## Table of contents

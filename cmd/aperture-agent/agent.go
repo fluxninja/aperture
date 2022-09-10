@@ -1,5 +1,7 @@
-//go:generate swagger generate spec --scan-models --include="github.com/fluxninja*" --include-tag=common-configuration -o ../../docs/gen/config/aperture-agent/config-swagger.yaml
+//go:generate swagger generate spec --scan-models --include="github.com/fluxninja*" --include-tag=common-configuration -o ../../docs/gen/config/agent/config-swagger.yaml
 
+// Package main Agent
+//
 // Aperture Agent
 //
 //	BasePath: /aperture-agent
