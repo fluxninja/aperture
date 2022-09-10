@@ -1,3 +1,10 @@
+---
+title: Aperture Agent configuration
+sidebar_position: 11
+sidebar_label: Agent
+description: Aperture Agent configuration
+---
+
 # Aperture Agent Configuration Reference
 
 ## Table of contents

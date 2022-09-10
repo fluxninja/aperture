@@ -1,12 +1,13 @@
-# Policy Configuration Reference
+---
+title: Policies reference
+sidebar_position: 1
+sidebar_label: Policies
+description: Policies reference
+---
+
+# Policies Configuration Reference
 
 ## Table of contents
-
-### POLICIES CONFIGURATION
-
-| Key | Reference         |
-| --- | ----------------- |
-|     | [Policy](#policy) |
 
 ### Object Index
 
@@ -83,21 +84,6 @@ Example of…
 - [v1SqrtOuts](#v1-sqrt-outs) – Outputs for the Sqrt component.
 
 ## Reference
-
-### _Policy_ {#policy}
-
-#### Members
-
-<dl>
-
-<dt>body</dt>
-<dd>
-
-Type: [V1Policy](#v1-policy)
-
-</dd>
-
-</dl>
 
 ## Objects
 
