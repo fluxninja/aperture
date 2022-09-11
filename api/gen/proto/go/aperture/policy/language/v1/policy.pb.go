@@ -337,18 +337,17 @@ func (x *Resources) GetClassifiers() []*Classifier {
 // * "source" components – they take some sort of input from "the real world" and output
 //   a signal based on this input. Example: [PromQL](#v1-prom-q-l). In the UI
 //   they're represented by green color.
-// * internal components – "pure" components that don't interact with the "real world".
+// * signal processor components – "pure" components that don't interact with the "real world".
 //   Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
 //   :::note
-//   Internal components's output can depend on their internal state, in addition to the inputs.
+//   Signal processor components's output can depend on their internal state, in addition to the inputs.
 //   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
 //   :::
 // * "sink" components – they affect the real world.
-//   [ConcurrencyLimiter](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
-//   Also sometimes called [_actuators_](/concepts/flow-control/actuators/actuators.md).
-//   In the UI, represented by orange color.  Sink components are usually also
-//   "sources" too, they usually emit a feedback signal, like
-//   `accepted_concurrency` in case of ConcurrencyLimiter.
+//   [ConcurrencyLimiter.LoadShedActuator](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
+//   In the UI, represented by orange color.  Sink components usually come in pairs with a
+//   "sources" component which emits a feedback signal, like
+//   `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
 //
 // :::tip
 // Sometimes you may want to use a constant value as one of component's inputs.
@@ -1071,7 +1070,7 @@ func (x *Decider) GetFalseFor() *durationpb.Duration {
 // Limits the traffic on a control point to specified rate
 //
 // :::info
-// See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+// See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
 // :::
 //
 // Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -1089,7 +1088,7 @@ type RateLimiter struct {
 	// Specifies which label the ratelimiter should be keyed by.
 	//
 	// Rate limiting is done independently for each value of the
-	// [label](/concepts/flow-control/label/label.md) with given key.
+	// [label](/concepts/flow-control/selector/flow-label.md) with given key.
 	// Eg., to give each user a separate limit, assuming you have a _user_ flow
 	// label set up, set `label_key: "user"`.
 	LabelKey string `protobuf:"bytes,4,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -1176,7 +1175,7 @@ func (x *RateLimiter) GetLazySync() *RateLimiter_LazySync {
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
-// See also [Concurrency Limiter overview](/concepts/flow-control/actuators/concurrency-limiter.md).
+// See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
 // :::
 //
 // It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1300,7 +1299,7 @@ type Scheduler struct {
 	//
 	// :::info
 	// See also [workload definition in the concepts
-	// section](/concepts/flow-control/actuators/concurrency-limiter.md#workload).
+	// section](/concepts/flow-control/concurrency-limiter.md#workload).
 	// :::
 	Workloads []*Scheduler_WorkloadAndLabelMatcher `protobuf:"bytes,3,rep,name=workloads,proto3" json:"workloads,omitempty"`
 	// Workload to be used if none of workloads specified in `workloads` match.
@@ -2546,7 +2545,7 @@ type Scheduler_Workload struct {
 	// This override is applicable only if `auto_tokens` is set to false.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" default:"1"` // @gotags: default:"1"
 	// Fairness key is a label key that can be used to provide fairness within a workload.
-	// Any [flow label](/concepts/flow-control/label/label.md) can be used here. Eg. if
+	// Any [flow label](/concepts/flow-control/selector/flow-label.md) can be used here. Eg. if
 	// you have a classifier that sets `user` flow label, you might want to set
 	// `fairness_key = "user"`.
 	FairnessKey string `protobuf:"bytes,3,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`
@@ -2613,7 +2612,7 @@ type Scheduler_WorkloadAndLabelMatcher struct {
 	// Workload associated with flows matching the label matcher.
 	Workload *Scheduler_Workload `protobuf:"bytes,1,opt,name=workload,proto3" json:"workload,omitempty"`
 	// Label Matcher to select a Workload based on
-	// [flow labels](/concepts/flow-control/label/label.md).
+	// [flow labels](/concepts/flow-control/selector/flow-label.md).
 	LabelMatcher *v11.LabelMatcher `protobuf:"bytes,2,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty"`
 }
 
