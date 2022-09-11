@@ -70,7 +70,7 @@ type PortToSignal map[string][]Signal
 type ComponentType string
 
 const (
-	// ComponentTypeStandAlone is a component that is not connected to any other component.
+	// ComponentTypeStandAlone is a component that does not accept or emit any signals.
 	ComponentTypeStandAlone ComponentType = "StandAlone"
 	// ComponentTypeSource is a component that emits output signal(s) but does not accept an input signal.
 	ComponentTypeSource ComponentType = "Source"

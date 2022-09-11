@@ -74,7 +74,7 @@ func NewSchedulerAndOptions(
 	}
 
 	// Prepare parameters for prometheus queries
-	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%d\",decision_type!=\"DECISION_TYPE_REJECTED\"",
+	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%d\"",
 		metrics.PolicyNameLabel,
 		policyReadAPI.GetPolicyName(),
 		metrics.PolicyHashLabel,
@@ -111,15 +111,17 @@ func NewSchedulerAndOptions(
 	}
 	scheduler.incomingQuery = incomingQuery
 
+	// add decision_type filter to the params
+	autoTokensPolicyParams := policyParams + ",decision_type!=\"DECISION_TYPE_REJECTED\""
 	if schedulerProto.AutoTokens {
 		tokensQuery, tokensQueryOptions, tokensQueryErr := components.NewTaggedQueryAndOptions(
 			fmt.Sprintf("sum by (%s) (increase(%s{%s}[30m])) / sum by (%s) (increase(%s{%s}[30m]))",
 				metrics.WorkloadIndexLabel,
 				metrics.WorkloadLatencySumMetricName,
-				policyParams,
+				autoTokensPolicyParams,
 				metrics.WorkloadIndexLabel,
 				metrics.WorkloadLatencyCountMetricName,
-				policyParams),
+				autoTokensPolicyParams),
 			tokensQueryInterval,
 			componentIndex,
 			policyReadAPI,

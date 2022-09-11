@@ -41,7 +41,7 @@ To try aperture in local K8s environment, refer to
 
 ## Contributing
 
-We would really appreciate you help!
+We would really appreciate your help!
 
 [![Slack](https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen)](https://join.slack.com/t/aperturetech/shared_invite/zt-1ewkfjfy9-~wF4EryoDyJ6kaPRTNZPyA)
 

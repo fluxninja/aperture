@@ -14,7 +14,7 @@ TILT_OBJECTS = []
 APERTURE_AGENT_NS = "aperture-agent"
 APERTURE_CONTROLLER_NS = "aperture-controller"
 APERTURE_DEMOAPP_NS = "demoapp"
-APERTURE_BOOKINFO_NS = "bookinfo"
+# APERTURE_BOOKINFO_NS = "bookinfo"
 APERTURE_ISTIO_NS = "istio-system"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
@@ -325,37 +325,37 @@ DEP_TREE = {
             ]
         },
     },
-    APERTURE_BOOKINFO_NS: {
-        "bookinfo": {
-            "labels": ["DemoApplications"],
-            "needs": ["istio"],
-            "tkenv": TANKA_ROOT + "/apps/bookinfo",
-            "child_resources": [
-                {
-                    "new_name": "bookinfo-common",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
-                    "extra_objects": [
-                        ("^bookinfo", None, APERTURE_BOOKINFO_NS)
-                    ],
-                },
-                { "workload": "details-v1", "resource_deps": ["bookinfo-common"] },
-                { "workload": "ratings-v1", "resource_deps": ["bookinfo-common"] },
-                { "workload": "productpage-v1", "resource_deps": ["bookinfo-common"] },
-                { "workload": "reviews-v1", "resource_deps": ["bookinfo-common"] },
-                { "workload": "reviews-v2", "resource_deps": ["bookinfo-common"] },
-                { "workload": "reviews-v3", "resource_deps": ["bookinfo-common"] },
-            ],
-        },
-    }
+    # APERTURE_BOOKINFO_NS: {
+    #     "bookinfo": {
+    #         "labels": ["DemoApplications"],
+    #         "needs": ["istio"],
+    #         "tkenv": TANKA_ROOT + "/apps/bookinfo",
+    #         "child_resources": [
+    #             {
+    #                 "new_name": "bookinfo-common",
+    #                 "resource_deps": ["cluster-bootstrap", "istiod"],
+    #                 "extra_objects": [
+    #                     ("^bookinfo", None, APERTURE_BOOKINFO_NS)
+    #                 ],
+    #             },
+    #             { "workload": "details-v1", "resource_deps": ["bookinfo-common"] },
+    #             { "workload": "ratings-v1", "resource_deps": ["bookinfo-common"] },
+    #             { "workload": "productpage-v1", "resource_deps": ["bookinfo-common"] },
+    #             { "workload": "reviews-v1", "resource_deps": ["bookinfo-common"] },
+    #             { "workload": "reviews-v2", "resource_deps": ["bookinfo-common"] },
+    #             { "workload": "reviews-v3", "resource_deps": ["bookinfo-common"] },
+    #         ],
+    #     },
+    # }
 }
 
 NS_CONFIG = {
     APERTURE_DEMOAPP_NS: {
         "labels": ["istio-injection: enabled"],
     },
-    APERTURE_BOOKINFO_NS: {
-        "labels": ["istio-injection: enabled"]
-    },
+    # APERTURE_BOOKINFO_NS: {
+    #     "labels": ["istio-injection: enabled"]
+    # },
 }
 
 ###############
