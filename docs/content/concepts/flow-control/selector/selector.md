@@ -1,5 +1,5 @@
 ---
-title: Flow Selector
+title: Selector
 sidebar_position: 1
 keywords:
   - flows
@@ -15,10 +15,9 @@ See also [Selector reference](/reference/configuration/policies.md#v1-selector)
 :::
 
 Flow Selectors are used by all flow observability and control components
-instantiated on Aperture Agents ([classifiers][classifier],
-[fluxmeters][fluxmeter] and [acturators][actuators]). Flow Selectors define
-scoping rules – how these components should select [flows][flow] for their
-operations.
+instantiated on Aperture Agents ([Classifiers][classifier], [Flux
+Meters][flux-meter] and Limiters). Flow Selectors define scoping rules – how
+these components should select [flows][flow] for their operations.
 
 A Selector consists of:
 
@@ -80,12 +79,11 @@ label_matcher:
     user_tier: gold
 ```
 
-[flow]: flow-control.md#flow
-[label]: label/label.md
-[control-point]: flow-control.md#control-point
+[flow]: ../flow-control.md#flow
+[label]: ./flow-label.md
+[control-point]: ../flow-control.md#control-point
 [service]: service.md
 [agent-group]: service.md#agent-group
-[actuators]: ./actuators/actuators.md
-[fluxmeter]: ./fluxmeter.md
-[classifier]: ./label/classifier.md
+[flux-meter]: ../flux-meter.md
+[classifier]: ../flow-classifier.md
 [label-matcher]: /reference/configuration/policies.md#v1-label-matcher

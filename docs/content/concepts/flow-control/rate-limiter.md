@@ -1,6 +1,6 @@
 ---
 title: Rate Limiter
-sidebar_position: 1
+sidebar_position: 4
 ---
 
 :::info
@@ -55,6 +55,6 @@ mechanisms. Eg. you might want to increase the limit for the admin user. See
 [reference][reference] for more details.
 
 [reference]: /reference/configuration/policies.md#languagev1-rate-limiter
-[agent-group]: /concepts/flow-control/service.md#agent-group
-[policies]: /concepts/policies/policies.md
-[flow-label]: /concepts/flow-control/label/label.md
+[agent-group]: ./selector/service.md#agent-group
+[policies]: /concepts/policy/policy.md
+[flow-label]: ./selector/flow-label.md

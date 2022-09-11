@@ -10,8 +10,8 @@ then `user_tier` is a label key and `gold` is a label value.
 Flow labels are used used in different ways in Aperture:
 
 - [Flow selector][selector] can select flows based on flow labels, thus flow
-  labels can be used to narrow the scope of [_Actuators_][actuators] or
-  [_FluxMeters_][fluxmeter]
+  labels can be used to narrow the scope of [Classifiers][classifier], Limiters
+  or [_Flux Meters_][flux-meter]
 - Flow labels are used to classify a flow to a [_workload_][workload]
 - Fairness within a scheduler's workload and [rate-limiting][ratelimiter] keys
   are also based on flow labels
@@ -42,10 +42,10 @@ propagation configured in your system, you can access the baggage as flow
 labels. This is supported on both _traffic_ and _feature_ [control
 points][control-point].
 
-- _traffic_: Baggage is pulled from the [_baggage_][baggage] header,
+- _traffic_: Baggage is pulled from the [_baggage_][baggage] header
 - _feature_: Baggage is automatically pulled from context on each `Check()`
   call. This is assuming you're using the OpenTelemetry library to manage the
-  baggage.
+  baggage
 
 Baggage members are mapped to flow labels 1:1 – keys become label keys, values
 become label values (properties are ignored).
@@ -56,8 +56,8 @@ Read more about baggage propagation on:
 ### Flow classifiers
 
 When the labels you need are not already present in baggage, nor as request
-labels, you can create a [classifier](classifier.md) to inject new labels into
-the system. Since the classifier also injects the label into baggage by default,
+labels, you can create a [classifier][classifier] to inject new labels into the
+system. Since the classifier also injects the label into baggage by default,
 this means you can set or extract the label in a different place than where it
 is consumed (assuming you have baggage propagation configured throughout your
 system).
@@ -72,8 +72,8 @@ also takes an explicit `labels` map in the `Check()` call.
 All the flow labels are used as labels of flow events. These events are rolled
 up and sent to the analytics database in the cloud. This allows:
 
-- for the flow labels to be used as filters,
-- to see analytics for each flow label, eg. distribution of its values.
+- For the flow labels to be used as filters or group bys
+- To see analytics for each flow label, eg. distribution of its values
 
 :::note
 
@@ -93,12 +93,11 @@ select which labels to include in telemetry.
 :::
 
 [flow]: /concepts/flow-control/flow-control.md#flow
-[selector]: /concepts/flow-control/selector.md
-[actuators]: /concepts/flow-control/actuators/actuators.md
-[scheduler]: /concepts/flow-control/actuators/concurrency-limiter.md
-[workload]: /concepts/flow-control/actuators/concurrency-limiter.md#workload
-[ratelimiter]: /concepts/flow-control/actuators/rate-limiter.md
-[fluxmeter]: /concepts/flow-control/fluxmeter.md
+[selector]: /concepts/flow-control/selector/selector.md
+[classifier]: /concepts/flow-control/flow-classifier.md
+[workload]: /concepts/flow-control/concurrency-limiter.md#workload
+[ratelimiter]: /concepts/flow-control/rate-limiter.md
+[flux-meter]: /concepts/flow-control/flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces

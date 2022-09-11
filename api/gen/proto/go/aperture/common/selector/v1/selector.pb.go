@@ -27,7 +27,7 @@ const (
 // to
 //
 // :::info
-// See also [Selector overview](/concepts/flow-control/selector.md).
+// See also [Selector overview](/concepts/flow-control/selector/selector.md).
 // :::
 //
 // Example:
@@ -52,11 +52,11 @@ type Selector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+	// Which [agent-group](/concepts/flow-control/selector/service.md#agent-group) this
 	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// The Fully Qualified Domain Name of the
-	// [service](/concepts/flow-control/service.md) to select.
+	// [service](/concepts/flow-control/selector/service.md) to select.
 	//
 	// In kubernetes, this is the FQDN of the Service object.
 	//
@@ -71,11 +71,11 @@ type Selector struct {
 	// within the entity where the policy should apply to.
 	ControlPoint *ControlPoint `protobuf:"bytes,3,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Label matcher allows to add _additional_ condition on
-	// [flow labels](/concepts/flow-control/label/label.md)
+	// [flow labels](/concepts/flow-control/selector/flow-label.md)
 	// must also be satisfied (in addition to service+control point matching)
 	//
 	// :::info
-	// See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+	// See also [Label Matcher overview](/concepts/flow-control/selector/selector.md#label-matcher).
 	// :::
 	//
 	// :::note
