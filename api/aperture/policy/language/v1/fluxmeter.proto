@@ -5,7 +5,7 @@ package aperture.policy.language.v1;
 import "aperture/common/selector/v1/selector.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-// FluxMeter gathers metrics for the traffic that matches its selector.
+// FluxMeter gathers metrics for the traffic that matches its selector
 //
 // :::info
 // See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
