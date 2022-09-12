@@ -10,7 +10,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // to
 //
 // :::info
-// See also [Selector overview](/concepts/flow-control/selector/selector.md).
+// See also [Selector overview](/concepts/flow-control/selector.md).
 // :::
 //
 // Example:
@@ -31,7 +31,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 //       regex: ^(?!.*Chrome).*Safari
 // ```
 message Selector {
-  // Which [agent-group](/concepts/flow-control/selector/service.md#agent-group) this
+  // Which [agent-group](/concepts/service.md#agent-group) this
   // selector applies to.
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
@@ -43,7 +43,7 @@ message Selector {
   }]; // @gotags: default:"default"
 
   // The Fully Qualified Domain Name of the
-  // [service](/concepts/flow-control/selector/service.md) to select.
+  // [service](/concepts/service.md) to select.
   //
   // In kubernetes, this is the FQDN of the Service object.
   //
@@ -71,7 +71,7 @@ message Selector {
   // must also be satisfied (in addition to service+control point matching)
   //
   // :::info
-  // See also [Label Matcher overview](/concepts/flow-control/selector/selector.md#label-matcher).
+  // See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
   // :::
   //
   // :::note

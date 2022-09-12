@@ -125,7 +125,7 @@ See [full example in reference][reference]
 [extractor]: /reference/configuration/policies.md#v1-extractor
 [rego-rule]: /reference/configuration/policies.md#rule-rego
 [plugin]: /cloud/plugin.md
-[label-matcher]: /concepts/flow-control/selector/selector.md#label-matcher
+[label-matcher]: /concepts/flow-control/selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]: https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
