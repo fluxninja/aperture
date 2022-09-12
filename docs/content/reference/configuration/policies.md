@@ -2021,7 +2021,7 @@ component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
 :::info
-See also [Selector overview](/concepts/flow-control/selector/selector.md).
+See also [Selector overview](/concepts/flow-control/selector.md).
 :::
 
 Example:
@@ -2049,7 +2049,7 @@ label_matcher:
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/flow-control/selector/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
 selector applies to.
 
 </dd>
@@ -2069,7 +2069,7 @@ within the entity where the policy should apply to.
 must also be satisfied (in addition to service+control point matching)
 
 :::info
-See also [Label Matcher overview](/concepts/flow-control/selector/selector.md#label-matcher).
+See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
 :::
 
 :::note
@@ -2088,7 +2088,7 @@ control point.
 <dd>
 
 (string) The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/selector/service.md) to select.
+[service](/concepts/service.md) to select.
 
 In kubernetes, this is the FQDN of the Service object.
 
