@@ -69,10 +69,10 @@ There are two types of control points:
   at its **ingress** control point. Likewise every outgoing request from a
   service is a flow at its **egress** control point.
 
-- **Feature** control points. When using Aperture SDK, you can define
-  arbitrary piece of code as a feature and give it a name. In the example above,
-  frontend service defines two features: _recommendations_ and _live-update_.
-  Let's imagine that…
+- **Feature** control points. When using Aperture SDK, you can define arbitrary
+  piece of code as a feature and give it a name. In the example above, frontend
+  service defines two features: _recommendations_ and _live-update_. Let's
+  imagine that…
   <!-- TODO tgill: move this example elsewhere like policy tutorial -->
   - …recommendations processing is heavyweight and slows down the frontend
     service (or some other downstream service), thus we want to track its
@@ -104,8 +104,8 @@ integrations that will communicate with the Aperture Agent.
   in this way. Envoy integration uses [Envoy's External Authorization
   API][ext-authz].
 
-- _Feature_ control points: We provide [Aperture SDK][aperture-go] for the
-  Go programming language.
+- _Feature_ control points: We provide [Aperture SDK][aperture-go] for the Go
+  programming language.
 
   The library provides API to begin a flow which translates to a
   [flowcontrol.v1.Check](https://github.com/fluxninja/aperture/blob/main/api/aperture/flowcontrol/v1/flowcontrol.proto)
