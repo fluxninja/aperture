@@ -156,7 +156,7 @@ message Rule {
 // There are multiple variants of extractor, specify exactly one.
 message Extractor {
   oneof variant {
-    // Use an attribute with no convertion
+    // Use an attribute with no conversion
     //
     // Attribute path is a dot-separated path to attribute.
     //
@@ -225,7 +225,7 @@ message JSONExtractor {
 //
 // Example:
 // ```yaml
-// from: "source.address # or dstination.address"
+// from: "source.address # or destination.address"
 // ```
 message AddressExtractor {
   // Attribute path pointing to some string - eg. "source.address".

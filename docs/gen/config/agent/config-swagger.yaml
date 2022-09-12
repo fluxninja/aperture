@@ -556,7 +556,7 @@ definitions:
         x-go-validate: hostname_port
       keep_alive:
         description: Keep-alive period - 0 = enabled if supported by protocol or OS.
-          If negative then keep-alives are disabled.
+          If negative then keep-alive is disabled.
         format: string
         type: string
         x-go-default: 180s
