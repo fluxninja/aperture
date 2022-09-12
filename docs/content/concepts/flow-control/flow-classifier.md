@@ -114,10 +114,8 @@ language][rego].
 
 See [full example in reference][reference]
 
-[ext-authz]:
-  https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
-[attr-context]:
-  https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
+[ext-authz]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
+[attr-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
 [label]: /concepts/flow-control/flow-label.md
 [baggage]: /concepts/flow-control/flow-label.md#baggage
@@ -130,6 +128,5 @@ See [full example in reference][reference]
 [label-matcher]: /concepts/flow-control/selector/selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
-[rego-kw]:
-  https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
+[rego-kw]: https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: /concepts/flow-control/flow-control.md#control-point
