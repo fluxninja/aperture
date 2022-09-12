@@ -76,9 +76,8 @@ func (constructor Constructor) provideServerTLSConfig(unmarshaller config.Unmars
 }
 
 func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller) (*tls.Config, error) {
-	config := constructor.DefaultConfig
-	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
-		log.Error().Err(err).Msg("Unable to deserialize tls configuration!")
+	config, err := constructor.provideServerTLSConfig(unmarshaller)
+	if err != nil {
 		return nil, err
 	}
 
