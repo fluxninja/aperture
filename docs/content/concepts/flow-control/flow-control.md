@@ -93,7 +93,7 @@ belonging to the same service.
 
 :::
 
-## Flow Control Integrations
+## Flow Control Integrations {#integrations}
 
 For Aperture to be able to act at any of the control points, you need to install
 integrations that will communicate with the Aperture Agent.
