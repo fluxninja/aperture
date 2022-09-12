@@ -79,7 +79,7 @@ Components are divided into following functional categories to aid exploration:
     representing incoming and accepted Flow concurrencies observed by the
     specified [Flow Control Scheduler][flow-control-scheduler] at Aperture
     Agents.
-- **Signal Processors**: These Components tranform input Signal(s) into output
+- **Signal Processors**: These Components transform input Signal(s) into output
   Signal(s).
   - **Arithmetic**: These Components perform basic Arithmetic operations on
     Signal(s).
@@ -119,7 +119,6 @@ Components are divided into following functional categories to aid exploration:
     that Rate Limiter.
 
 [control-system]: https://en.wikipedia.org/wiki/Control_system
-[component-types]: /reference/configuration/policies.md#v1-component
 [tick]: #runtime
 [signal]: #signal
 [looping-signals]: #looping-signals

@@ -340,7 +340,7 @@ type isExtractor_Variant interface {
 }
 
 type Extractor_From struct {
-	// Use an attribute with no convertion
+	// Use an attribute with no conversion
 	//
 	// Attribute path is a dot-separated path to attribute.
 	//
@@ -468,7 +468,7 @@ func (x *JSONExtractor) GetPointer() string {
 //
 // Example:
 // ```yaml
-// from: "source.address # or dstination.address"
+// from: "source.address # or destination.address"
 // ```
 type AddressExtractor struct {
 	state         protoimpl.MessageState
