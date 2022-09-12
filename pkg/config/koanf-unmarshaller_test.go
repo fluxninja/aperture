@@ -301,7 +301,7 @@ var _ = Describe("Koanf-unmarshaller", func() {
 		bytes := []byte("Val: 0")
 		unmarshaller, err := KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
 		Expect(err).NotTo(HaveOccurred())
-		It("returns the overriden value", func() {
+		It("returns the overridden value", func() {
 			err = unmarshaller.Unmarshal(&defaultConfig)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(defaultConfig.Val).To(Equal(int(0)))
