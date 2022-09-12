@@ -143,3 +143,8 @@ repos:
         description: Checking if the Operator spec is changed
         entry: ./scripts/precommit/check-operator-spec.sh
         language: script
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.1.0
+    hooks:
+      - id: codespell
+        exclude: ^(.*\.svg|yarn.lock)$
