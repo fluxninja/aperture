@@ -252,7 +252,7 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 		err = r.List(ctx, nsList)
 		if err != nil {
 			log.Error(err, "failed to list Namespaces")
-		} else if nsList != nil && nsList.Items != nil {
+		} else if nsList.Items != nil && len(nsList.Items) != 0 {
 			for _, ns := range nsList.Items {
 				if ns.Labels == nil || ns.Labels[sidecarLabelKey] != enabled {
 					continue
