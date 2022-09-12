@@ -182,7 +182,7 @@ charts installed above:
    helm uninstall agent
    ```
 
-2. Alternativey, if you have installed the Aperture Agent Custom Resource
+2. Alternatively, if you have installed the Aperture Agent Custom Resource
    separately, follow below steps:
 
    1. Delete the Aperture Agent Custom Resource:
