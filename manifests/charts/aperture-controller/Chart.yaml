@@ -3,6 +3,7 @@ name: aperture-controller
 description: A Helm chart to deploy Aperture Controller
 version: v0.2.0-rc.1
 appVersion: v0.2.0-rc.1
+icon: https://raw.githubusercontent.com/fluxninja/aperture/0d47f372b993d3ec375e14a711e62b5bcb80[…]/docs/content/assets/img/FluxNinja--main--logo--ICON.svg
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami
