@@ -1180,7 +1180,7 @@ ListenerConfig holds configuration for socket listeners.
 <dt>keep_alive</dt>
 <dd>
 
-(string, `gte=0s`, default: `180s`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alives are disabled.
+(string, `gte=0s`, default: `180s`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
 
 </dd>
 <dt>network</dt>

@@ -9,7 +9,7 @@ See also [Classifier reference][reference]
 
 :::
 
-If existing [flow labels][label] are not sufficent, Flow Classifier can be used
+If existing [flow labels][label] are not sufficient, Flow Classifier can be used
 to inject additional ones without any changes to your service.
 
 A classifier is defined as a resource in a [policy][policies] and describes a
@@ -100,7 +100,7 @@ in future.
 
 Extracting value from header may seem not useful, as the value is already
 available as flow label ([as `http.request.header.<header>`][request-labels]),
-but adding flow label explicitly may still be userful, as it enables baggage
+but adding flow label explicitly may still be useful, as it enables baggage
 propagation and telemetry for this flow label.
 
 :::
