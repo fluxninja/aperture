@@ -67,7 +67,7 @@ message Selector {
   }]; // @gotags: validate:"required"
 
   // Label matcher allows to add _additional_ condition on
-  // [flow labels](/concepts/flow-control/selector/flow-label.md)
+  // [flow labels](/concepts/flow-control/flow-label.md)
   // must also be satisfied (in addition to service+control point matching)
   //
   // :::info

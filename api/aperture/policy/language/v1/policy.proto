@@ -632,7 +632,7 @@ message RateLimiter {
   // Specifies which label the ratelimiter should be keyed by.
   //
   // Rate limiting is done independently for each value of the
-  // [label](/concepts/flow-control/selector/flow-label.md) with given key.
+  // [label](/concepts/flow-control/flow-label.md) with given key.
   // Eg., to give each user a separate limit, assuming you have a _user_ flow
   // label set up, set `label_key: "user"`.
   string label_key = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -719,7 +719,7 @@ message Scheduler {
     }]; // @gotags: default:"1"
 
     // Fairness key is a label key that can be used to provide fairness within a workload.
-    // Any [flow label](/concepts/flow-control/selector/flow-label.md) can be used here. Eg. if
+    // Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
     // you have a classifier that sets `user` flow label, you might want to set
     // `fairness_key = "user"`.
     string fairness_key = 3;
@@ -730,7 +730,7 @@ message Scheduler {
     Workload workload = 1;
 
     // Label Matcher to select a Workload based on
-    // [flow labels](/concepts/flow-control/selector/flow-label.md).
+    // [flow labels](/concepts/flow-control/flow-label.md).
     common.labelmatcher.v1.LabelMatcher label_matcher = 2;
   }
 
