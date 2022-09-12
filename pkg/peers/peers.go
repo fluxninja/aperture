@@ -321,8 +321,8 @@ func (pd *PeerDiscovery) GetPeer(ctx context.Context, req *peersv1.PeerRequest) 
 	return pd.Peer(req.Address)
 }
 
-// GetPeerKeys returns all the peer keys that are added to PeerDiscovery.
-func (pd *PeerDiscovery) GetPeerKeys() []string {
+// PeerKeys returns all the peer keys that are added to PeerDiscovery.
+func (pd *PeerDiscovery) PeerKeys() []string {
 	pd.lock.RLock()
 	defer pd.lock.RUnlock()
 
@@ -332,6 +332,14 @@ func (pd *PeerDiscovery) GetPeerKeys() []string {
 	}
 
 	return keys
+}
+
+// GetPeerKeys returns all the peer keys that are added to PeerDiscovery.
+func (pd *PeerDiscovery) GetPeerKeys(ctx context.Context, _ *emptypb.Empty) (*peersv1.PeerKeysResponse, error) {
+	keys := pd.PeerKeys()
+	return &peersv1.PeerKeysResponse{
+		Keys: keys,
+	}, nil
 }
 
 func (pd *PeerDiscovery) removePeer(address string) {

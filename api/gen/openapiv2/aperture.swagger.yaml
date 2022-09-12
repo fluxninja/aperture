@@ -78,6 +78,27 @@ paths:
             $ref: '#/definitions/v1PeerInfo'
       tags:
         - PeerDiscoveryService
+  /aperture.common.peers.v1.PeerDiscoveryService/GetPeerKeys:
+    post:
+      operationId: PeerDiscoveryService_GetPeerKeys
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PeerKeysResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties: {}
+      tags:
+        - PeerDiscoveryService
   /aperture.common.peers.v1.PeerDiscoveryService/RemovePeer:
     post:
       operationId: PeerDiscoveryService_RemovePeer
@@ -1694,6 +1715,13 @@ definitions:
       services:
         type: object
         additionalProperties:
+          type: string
+  v1PeerKeysResponse:
+    type: object
+    properties:
+      keys:
+        type: array
+        items:
           type: string
   v1PeerRequest:
     type: object
