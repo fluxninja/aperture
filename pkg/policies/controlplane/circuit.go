@@ -83,7 +83,7 @@ func ComponentDTO(circuit CompiledCircuit) ([]languagev1.ComponentView, []langua
 }
 
 func convertPortViews(ports []languagev1.PortView) []*languagev1.PortView {
-	converted := make([]*languagev1.PortView, len(ports))
+	var converted []*languagev1.PortView
 	for i := range ports {
 		converted = append(converted, &ports[i])
 	}
@@ -99,7 +99,13 @@ func DOT(components []languagev1.ComponentView, links []languagev1.Link) string 
 	// indexed by component id
 	clusters := make(map[string]*dot.Graph)
 	for i := range components {
-		cluster := g.Subgraph(fmt.Sprintf("%s (%s)", components[i].ComponentName, strings.SplitN(components[i].ComponentId, ".", 1)[0]), dot.ClusterOption{})
+		var sg *dot.Graph
+		if components[i].ParentComponentId == "" {
+			sg = g
+		} else {
+			sg = clusters[components[i].ParentComponentId]
+		}
+		cluster := sg.Subgraph(fmt.Sprintf("%s (%s)", components[i].ComponentName, strings.SplitN(components[i].ComponentId, ".", 1)[0]), dot.ClusterOption{})
 		cluster.AttributesMap.Attr("margin", "50.0")
 		clusters[components[i].ComponentId] = cluster
 		var anyIn, anyOut dot.Node
