@@ -1,0 +1,6 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  name: policy-sample
+spec:
+  # TODO(user): Add fields here

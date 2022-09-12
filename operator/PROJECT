@@ -30,4 +30,13 @@ resources:
   kind: Controller
   path: github.com/fluxninja/aperture-operator/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: fluxninja.com
+  group: fluxninja.com
+  kind: Policy
+  path: github.com/fluxninja/aperture-operator/api/v1alpha1
+  version: v1alpha1
 version: "3"
