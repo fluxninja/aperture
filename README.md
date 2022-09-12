@@ -47,7 +47,7 @@ To try aperture in local K8s environment, refer to
 
 ## Slack Community
 
-[![Slack](https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen)](https://join.slack.com/t/aperturetech/shared_invite/zt-1ewkfjfy9-~wF4EryoDyJ6kaPRTNZPyA)
+[![Slack](https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen)](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1eunlrkhh-10P1HUkmBfVJX3qrSLRk~g)
 
 ### Reporting bugs or requesting features
 
