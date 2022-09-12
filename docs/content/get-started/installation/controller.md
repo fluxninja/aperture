@@ -168,6 +168,15 @@ kubectl get controller -A
 You should see pods for Aperture Controller and Controller Manager in `RUNNING`
 state and `Controller` Custom Resource in `created` state.
 
+## Applying Policies
+
+Follow the information on [Policy](/concepts/policy/circuit/sources.md) to
+understand and design the policy circuits.
+
+Once the design is ready, follow the steps on the
+[Blueprints](/get-started/blueprints.md) to generate the Policy ConfigMap and
+apply it on the Kubernetes.
+
 ## Uninstall
 
 You can uninstall the Aperture Controller and it's components by uninstalling
