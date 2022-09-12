@@ -6,7 +6,7 @@ keywords:
   - service mesh
   - istio
   - envoy filter
-sidebar_position: 3
+sidebar_position: 1
 ---
 
 ## Envoy Filter
@@ -68,7 +68,7 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
                  string_value: "%REQ(:METHOD)%"
                attributes:
                  values:
-                   - key: http.method
+                   - key: aperture.source
                      value:
                        string_value: "%REQ(:METHOD)%"
                    - key: http.target

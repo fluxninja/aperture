@@ -379,7 +379,7 @@ selector:
 
 :::info
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/get-started/istio.md#envoy-filter)
+[Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
 :::
 
 </dd>
@@ -504,7 +504,7 @@ Circuit is defined as a dataflow graph of inter-connected components
 
 Signals flow between components via ports.
 As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
-Circuit evaluated periodically in order to respond to changes in signal readings.
+Circuit is evaluated periodically in order to respond to changes in signal readings.
 
 :::info
 **Signal**

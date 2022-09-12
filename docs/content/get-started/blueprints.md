@@ -4,6 +4,7 @@ description: Policies and dashboard pre-packaged as reusable blueprints
 keywords:
   - jsonnet
   - grafana
+sidebar_position: 3
 ---
 
 # Policy Blueprints

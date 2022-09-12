@@ -184,7 +184,7 @@ func (x *Policy) GetResources() *Resources {
 //
 // Signals flow between components via ports.
 // As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
-// Circuit evaluated periodically in order to respond to changes in signal readings.
+// Circuit is evaluated periodically in order to respond to changes in signal readings.
 //
 // :::info
 // **Signal**

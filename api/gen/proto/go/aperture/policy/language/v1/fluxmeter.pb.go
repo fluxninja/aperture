@@ -52,7 +52,7 @@ type FluxMeter struct {
 	//
 	// :::info
 	// For list of available attributes in Envoy access logs, refer
-	// [Envoy Filter](/get-started/istio.md#envoy-filter)
+	// [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
 	// :::
 	//
 	AttributeKey string `protobuf:"bytes,3,opt,name=attribute_key,json=attributeKey,proto3" json:"attribute_key,omitempty" default:"duration_millis"` // @gotags: default:"duration_millis"
