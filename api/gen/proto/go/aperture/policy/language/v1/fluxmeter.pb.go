@@ -24,6 +24,10 @@ const (
 
 // FluxMeter gathers metrics for the traffic that matches its selector.
 //
+// :::info
+// See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+// :::
+//
 // Example of a selector that creates a histogram metric for all HTTP requests
 // to particular service:
 // ```yaml

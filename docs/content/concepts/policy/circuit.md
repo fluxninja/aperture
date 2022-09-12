@@ -20,7 +20,7 @@ respond to changes in Signal readings.
 
 Building blocks of a Circuit are Components. Each Component has Input Ports
 (`in_ports`) and Output Ports (`out_ports`). The exact Ports available are
-determined by the [type of Component][exploring-components]. Each Port can be
+determined by the [type of Component][components]. Each Port can be
 associated with a [Signal][signal]. Components get chained to one another based
 on name of the Signal.
 
@@ -68,7 +68,7 @@ Component with the smallest index (in list of Components). The un-linked
 Component Ports consume Looping Signals. A Looping Signal has the value of the
 un-linked Signal from the previous Tick.
 
-## Exploring Components
+## Exploring Components {#components}
 
 Components are divided into following functional categories to aid exploration:
 
@@ -123,7 +123,7 @@ Components are divided into following functional categories to aid exploration:
 [tick]: #runtime
 [signal]: #signal
 [looping-signals]: #looping-signals
-[exploring-components]: #exploring-components
+[components]: #components
 [policy-reference]: /reference/configuration/policies.md#v1-policy
 [circuit-reference]: /reference/configuration/policies.md#v1-circuit
 [promql-reference]: /reference/configuration/policies.md#v1-prom-q-l

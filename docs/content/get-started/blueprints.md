@@ -32,8 +32,7 @@ depends on Python 3.8+ and [jsonnet][go-jsonnet].
 
 [k8s-libsonnet]: https://github.com/jsonnet-libs/k8s-libsonnet
 [aperture-blueprints]: https://github.com/fluxninja/aperture-blueprints
-[blueprints-readme]:
-  https://github.com/fluxninja/aperture-blueprints/blob/main/README.md
+[blueprints-readme]: https://github.com/fluxninja/aperture-blueprints/blob/main/README.md
 [jb]: https://github.com/jsonnet-bundler/jsonnet-bundler
 [go-jsonnet]: https://github.com/google/go-jsonnet
 

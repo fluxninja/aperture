@@ -245,6 +245,10 @@ definitions:
     description: |-
       FluxMeter gathers metrics for the traffic that matches its selector.
 
+      :::info
+      See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+      :::
+
       Example of a selector that creates a histogram metric for all HTTP requests
       to particular service:
       ```yaml
@@ -351,6 +355,10 @@ definitions:
         $ref: '#/definitions/v1Port'
   v1Circuit:
     description: |-
+      :::info
+      See also [Circuit overview](/concepts/policy/circuit.md).
+      :::
+
       Signals flow between components via ports.
       As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
       Circuit is evaluated periodically in order to respond to changes in signal readings.
@@ -388,6 +396,10 @@ definitions:
         x-order: 1
   v1Component:
     description: |-
+      :::info
+      See also [Components overview](/concepts/policy/circuit.md#components).
+      :::
+
       Signals flow into the components via input ports and results are emitted on output ports.
       Components are wired to each other based on signal names forming an execution graph of the circuit.
 
@@ -1217,8 +1229,12 @@ definitions:
         x-go-validate: required
         x-order: 0
   v1Policy:
-    description: Policy specification contains a circuit that defines the controller
-      logic and resources that need to be setup.
+    description: |-
+      :::info
+      See also [Policy overview](/concepts/policy/policy.md).
+      :::
+
+      Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
     type: object
     title: Policy expresses reliability automation workflow that automatically protects
       services
@@ -1289,8 +1305,12 @@ definitions:
         x-order: 0
         $ref: '#/definitions/v1Port'
   v1Resources:
-    description: Resources are typically FluxMeters, Classifiers, etc. that can be
-      used to create on-demand metrics or label the flows.
+    description: |-
+      :::info
+      See also [Resources overview](/concepts/policy/resources.md).
+      :::
+
+      Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
     type: object
     title: Resources that need to be setup for the policy to function
     properties:
