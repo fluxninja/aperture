@@ -148,13 +148,3 @@ repos:
     hooks:
       - id: codespell
         exclude: ^(.*\.svg|yarn.lock)$
-  - repo: https://github.com/hcodes/yaspeller.git
-    rev: v8.0.0
-    hooks:
-      - id: yaspeller
-        types_or:
-          - markdown
-        args:
-          - --lang
-          - en
-          - --ignore-urls
