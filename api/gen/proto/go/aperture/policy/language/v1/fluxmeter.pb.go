@@ -24,6 +24,10 @@ const (
 
 // FluxMeter gathers metrics for the traffic that matches its selector.
 //
+// :::info
+// See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+// :::
+//
 // Example of a selector that creates a histogram metric for all HTTP requests
 // to particular service:
 // ```yaml
@@ -44,15 +48,15 @@ type FluxMeter struct {
 	//   response).
 	// * For feature control points, fluxmeter will measure execution of the span
 	//   associated with particular feature. What contributes to the span's
-	//   duration is entirely up to the user code that uses Aperture library.
+	//   duration is entirely up to the user code that uses Aperture SDK.
 	Selector *v1.Selector `protobuf:"bytes,1,opt,name=selector,proto3" json:"selector,omitempty"`
 	// Latency histogram buckets (in ms) for this FluxMeter.
 	HistogramBuckets []float64 `protobuf:"fixed64,2,rep,packed,name=histogram_buckets,json=histogramBuckets,proto3" json:"histogram_buckets,omitempty" default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"` // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
-	// Key of the attribute in accesss log or span from which the metric for this flux meter is read.
+	// Key of the attribute in access log or span from which the metric for this flux meter is read.
 	//
 	// :::info
 	// For list of available attributes in Envoy access logs, refer
-	// [Envoy Filter](/get-started/istio.md#envoy-filter)
+	// [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
 	// :::
 	//
 	AttributeKey string `protobuf:"bytes,3,opt,name=attribute_key,json=attributeKey,proto3" json:"attribute_key,omitempty" default:"duration_millis"` // @gotags: default:"duration_millis"

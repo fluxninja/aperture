@@ -11,7 +11,7 @@ import (
 // used in LabelMatchers in Selectors.
 //
 // Canonical form implies appropriate prefixes for different types of labels,
-// see https://docs.fluxninja.com/docs/development/concepts/flow-control/label/#sources
+// see https://docs.fluxninja.com/docs/development/concepts/flow-control/flow-label#sources
 type Labels map[string]string
 
 // LabelSources describes all the sources of labels.
@@ -34,7 +34,7 @@ const (
 func (l Labels) ToPlainMap() map[string]string { return map[string]string(l) }
 
 // NewLabels maps all available labels into a flat namespace, as documented in
-// https://docs.fluxninja.com/docs/development/concepts/flow-control/label/#sources
+// https://docs.fluxninja.com/docs/development/concepts/flow-control/flow-label#sources
 func NewLabels(ls LabelSources) Labels {
 	return Labels(nil).CombinedWith(ls)
 }

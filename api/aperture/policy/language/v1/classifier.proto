@@ -8,7 +8,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // Set of classification rules sharing a common selector
 //
 // :::info
-// See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+// See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
 // :::
 //
 // Example:
@@ -34,7 +34,7 @@ message Classifier {
   }]; // @gotags: validate:"required"
 
   // A map of {key, value} pairs mapping from
-  // [flow label](/concepts/flow-control/label/label.md) keys to rules that define
+  // [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
   // how to extract and propagate flow labels with that key.
   map<string, Rule> rules = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
@@ -120,7 +120,7 @@ message Rule {
   } // @gotags: validate:"required"
 
   // Decides if the created label should be applied to the whole request chain
-  // (propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
+  // (propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
   bool propagate = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
@@ -156,7 +156,7 @@ message Rule {
 // There are multiple variants of extractor, specify exactly one.
 message Extractor {
   oneof variant {
-    // Use an attribute with no convertion
+    // Use an attribute with no conversion
     //
     // Attribute path is a dot-separated path to attribute.
     //
@@ -225,7 +225,7 @@ message JSONExtractor {
 //
 // Example:
 // ```yaml
-// from: "source.address # or dstination.address"
+// from: "source.address # or destination.address"
 // ```
 message AddressExtractor {
   // Attribute path pointing to some string - eg. "source.address".

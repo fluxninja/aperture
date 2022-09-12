@@ -3,12 +3,12 @@ import { check, sleep } from "k6";
 import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 
 export let vuStages = [
-  { duration: "1s", target: 5 },
+  { duration: "10s", target: 5 },
   { duration: "2m", target: 5 },
   { duration: "1m", target: 30 },
   { duration: "2m", target: 30 },
-  { duration: "1s", target: 5 },
-  { duration: "5m", target: 5 },
+  { duration: "10s", target: 5 },
+  { duration: "2m", target: 5 },
 ];
 
 export let options = {

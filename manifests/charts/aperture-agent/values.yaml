@@ -516,7 +516,7 @@ agent:
     ## @param agent.sidecar.enableNamespacesByDefault List of namespaces in which sidecar injection will be enabled when Sidecar mode is enabled.
     ##
     enableNamespacesByDefault: []
-  ## Agent Configuration: All the available configuration parameters can be found at https://github.com/fluxninja/aperture/blob/main/docs/gen/config/aperture-agent/swagger.md.
+  ## Agent Configuration: All the available configuration parameters can be found at https://docs.fluxninja.com/docs/reference/configuration/agent.
   ##
   config:
     ## Etcd parameters for Agent

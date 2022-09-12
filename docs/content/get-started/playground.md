@@ -22,6 +22,28 @@ Playground deploys resources to the Kubernetes cluster that `kubectl` on your
 machine points at. For convenience, this README includes instructions for
 deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
 
+## How to Run
+
+Once [requirements](#tools) are installed, simply run:
+
+```
+tilt up
+```
+
+Can press (Space) to open the Tilt UI.
+
+The above command starts Aperture Controller and an Aperture Agent on each
+worker in the Kubernetes cluster. Additionally, it starts a demo application
+with an Istio and Envoy based service mesh configured to integrate with
+Aperture. There is a Grafana installation as well for viewing metrics from
+experiments. Aperture is loaded with a Latency Gradient Control Policy which
+protects the demo application against sudden surges in traffic load. To run the
+traffic load, navigate to K6 resource in the Tilt UI and press the "Run load
+test" button. Once finished, press the "Delete load test" button. To view
+results from the experiment navigate to the "FluxNinja" dashboard in Grafana
+under "aperture-system" folder. Grafana runs at
+[localhost:3000](http://localhost:3000).
+
 ## Tools
 
 Described hereafter deployment methods assume usage of specific deployment and
@@ -39,13 +61,8 @@ When using `asdf`:
 - Run the below command to add all the required plugins.
 
 ```
-cat .tool-versions | cut -d' ' -f1 | grep "^[^\#]" | xargs -i asdf plugin add  {}
+make install-asdf-tools
 ```
-
-- Install tools: `asdf install`
-
-> Note: Last command will install tools which have been added as plugins and
-> which are defined/versioned in `.tool-versions` file
 
 ### Tools required for Kubernetes deployment
 
@@ -57,7 +74,7 @@ Helm is a package manager for Kubernetes.
 
 To install manually, follow instructions: <https://helm.sh/docs/intro/install/>
 
-#### tanka and Jsonnet Bundler
+#### Tanka and Jsonnet Bundler
 
 Grafana Tanka is the robust configuration utility for your Kubernetes cluster,
 powered by the unique Jsonnet language.
@@ -74,19 +91,6 @@ May use [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/).
 
 The Kubernetes command line tool. Follow the instructions:
 <https://kubernetes.io/docs/tasks/tools/#kubectl>
-
-#### Alpha features
-
-Agent core service uses feature gate for managing node-local traffic:
-<https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/>
-
-For kubernetes 1.21 it requires a feature gate activation. For kubernetes 1.22
-it's in beta so nothing needs to be added to cluster config.
-
-```yaml
-featureGates:
-  ServiceInternalTrafficPolicy: true
-```
 
 ## Deploying with Tilt
 

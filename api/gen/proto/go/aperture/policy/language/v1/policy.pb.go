@@ -122,6 +122,10 @@ func (x *AllPolicies) GetAllPolicies() map[string]*Policy {
 
 // Policy expresses reliability automation workflow that automatically protects services
 //
+// :::info
+// See also [Policy overview](/concepts/policy/policy.md).
+// :::
+//
 // Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 type Policy struct {
 	state         protoimpl.MessageState
@@ -182,9 +186,13 @@ func (x *Policy) GetResources() *Resources {
 
 // Circuit is defined as a dataflow graph of inter-connected components
 //
+// :::info
+// See also [Circuit overview](/concepts/policy/circuit.md).
+// :::
+//
 // Signals flow between components via ports.
-// As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
-// Circuit evaluated periodically in order to respond to changes in signal readings.
+// As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
+// Circuit is evaluated periodically in order to respond to changes in signal readings.
 //
 // :::info
 // **Signal**
@@ -261,6 +269,10 @@ func (x *Circuit) GetComponents() []*Component {
 
 // Resources that need to be setup for the policy to function
 //
+// :::info
+// See also [Resources overview](/concepts/policy/resources.md).
+// :::
+//
 // Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 type Resources struct {
 	state         protoimpl.MessageState
@@ -325,6 +337,10 @@ func (x *Resources) GetClassifiers() []*Classifier {
 
 // Computational block that form the circuit
 //
+// :::info
+// See also [Components overview](/concepts/policy/circuit.md#components).
+// :::
+//
 // Signals flow into the components via input ports and results are emitted on output ports.
 // Components are wired to each other based on signal names forming an execution graph of the circuit.
 //
@@ -337,18 +353,17 @@ func (x *Resources) GetClassifiers() []*Classifier {
 // * "source" components – they take some sort of input from "the real world" and output
 //   a signal based on this input. Example: [PromQL](#v1-prom-q-l). In the UI
 //   they're represented by green color.
-// * internal components – "pure" components that don't interact with the "real world".
+// * signal processor components – "pure" components that don't interact with the "real world".
 //   Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
 //   :::note
-//   Internal components's output can depend on their internal state, in addition to the inputs.
+//   Signal processor components's output can depend on their internal state, in addition to the inputs.
 //   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
 //   :::
 // * "sink" components – they affect the real world.
-//   [ConcurrencyLimiter](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
-//   Also sometimes called [_actuators_](/concepts/flow-control/actuators/actuators.md).
-//   In the UI, represented by orange color.  Sink components are usually also
-//   "sources" too, they usually emit a feedback signal, like
-//   `accepted_concurrency` in case of ConcurrencyLimiter.
+//   [ConcurrencyLimiter.LoadShedActuator](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
+//   In the UI, represented by orange color.  Sink components usually come in pairs with a
+//   "sources" component which emits a feedback signal, like
+//   `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
 //
 // :::tip
 // Sometimes you may want to use a constant value as one of component's inputs.
@@ -693,7 +708,7 @@ type GradientController struct {
 	// increases.
 	// :::
 	//
-	// The magnitude of slope describes how aggresively should the controller
+	// The magnitude of slope describes how aggressively should the controller
 	// react to a deviation of signal.
 	// With $|\text{slope}| = 1$, the controller will aim to bring the signal to
 	// the setpoint in one tick (assuming linear correlation with signal and setpoint).
@@ -804,7 +819,7 @@ func (x *GradientController) GetMaxGradient() float64 {
 // The $\alpha$ is computed using ema\_window:
 //
 // $$
-// \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
+// \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 // $$
 //
 // The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
@@ -1071,7 +1086,7 @@ func (x *Decider) GetFalseFor() *durationpb.Duration {
 // Limits the traffic on a control point to specified rate
 //
 // :::info
-// See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+// See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
 // :::
 //
 // Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -1089,11 +1104,9 @@ type RateLimiter struct {
 	// Specifies which label the ratelimiter should be keyed by.
 	//
 	// Rate limiting is done independently for each value of the
-	// [label](/concepts/flow-control/label/label.md) with given key.
+	// [label](/concepts/flow-control/flow-label.md) with given key.
 	// Eg., to give each user a separate limit, assuming you have a _user_ flow
 	// label set up, set `label_key: "user"`.
-	//
-	// TODO make it possible for this field to be optional – to achieve global ratelimit.
 	LabelKey string `protobuf:"bytes,4,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Allows to specify different limits for particular label values.
 	Overrides []*RateLimiter_Override `protobuf:"bytes,5,rep,name=overrides,proto3" json:"overrides,omitempty"`
@@ -1178,7 +1191,7 @@ func (x *RateLimiter) GetLazySync() *RateLimiter_LazySync {
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
-// See also [Scheduler overview](/concepts/flow-control/actuators/scheduler.md).
+// See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
 // :::
 //
 // It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1302,7 +1315,7 @@ type Scheduler struct {
 	//
 	// :::info
 	// See also [workload definition in the concepts
-	// section](/concepts/flow-control/actuators/scheduler.md#workload).
+	// section](/concepts/flow-control/concurrency-limiter.md#workload).
 	// :::
 	Workloads []*Scheduler_WorkloadAndLabelMatcher `protobuf:"bytes,3,rep,name=workloads,proto3" json:"workloads,omitempty"`
 	// Workload to be used if none of workloads specified in `workloads` match.
@@ -2027,7 +2040,7 @@ type EMA_Ins struct {
 	MaxEnvelope *Port `protobuf:"bytes,2,opt,name=max_envelope,json=maxEnvelope,proto3" json:"max_envelope,omitempty"`
 	// Lower bound of the moving average.
 	//
-	// Used during the warm-up stage analoguously to `max_envelope`.
+	// Used during the warm-up stage analogously to `max_envelope`.
 	MinEnvelope *Port `protobuf:"bytes,3,opt,name=min_envelope,json=minEnvelope,proto3" json:"min_envelope,omitempty"`
 }
 
@@ -2371,8 +2384,6 @@ type RateLimiter_LazySync struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Enables lazy sync
-	//
-	// TODO document what happens when lazy sync is disabled
 	Enabled bool `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty" default:"false"` // @gotags: default:"false"
 	// Number of times to lazy sync within the _limit\_reset\_interval_.
 	NumSync uint32 `protobuf:"varint,2,opt,name=num_sync,json=numSync,proto3" json:"num_sync,omitempty" default:"5" validate:"gt=0"` // @gotags: default:"5" validate:"gt=0"
@@ -2550,7 +2561,7 @@ type Scheduler_Workload struct {
 	// This override is applicable only if `auto_tokens` is set to false.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" default:"1"` // @gotags: default:"1"
 	// Fairness key is a label key that can be used to provide fairness within a workload.
-	// Any [flow label](/concepts/flow-control/label/label.md) can be used here. Eg. if
+	// Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
 	// you have a classifier that sets `user` flow label, you might want to set
 	// `fairness_key = "user"`.
 	FairnessKey string `protobuf:"bytes,3,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`
@@ -2617,7 +2628,7 @@ type Scheduler_WorkloadAndLabelMatcher struct {
 	// Workload associated with flows matching the label matcher.
 	Workload *Scheduler_Workload `protobuf:"bytes,1,opt,name=workload,proto3" json:"workload,omitempty"`
 	// Label Matcher to select a Workload based on
-	// [flow labels](/concepts/flow-control/label/label.md).
+	// [flow labels](/concepts/flow-control/flow-label.md).
 	LabelMatcher *v11.LabelMatcher `protobuf:"bytes,2,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty"`
 }
 
