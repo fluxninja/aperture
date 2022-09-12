@@ -14,8 +14,7 @@ The Aperture Controller functions as the brain of the Aperture system.
 Leveraging an advanced control loop, the Controller routinely analyzes polled
 metrics and indicators to determine how traffic should be shaped as defined by
 set policies. Once determined, these decisions are then exported to all Aperture
-Agents to effectively handle workloads. Only one Controller is needed to manage
-each cluster.
+Agents to effectively handle workloads.
 
 The closed feedback loop functions primarily by monitoring the variables
 reflecting stability conditions (i.e. process variables) and compares them
