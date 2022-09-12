@@ -39,13 +39,8 @@ When using `asdf`:
 - Run the below command to add all the required plugins.
 
 ```
-cat .tool-versions | cut -d' ' -f1 | grep "^[^\#]" | xargs -i asdf plugin add  {}
+make install-asdf-tools
 ```
-
-- Install tools: `asdf install`
-
-> Note: Last command will install tools which have been added as plugins and
-> which are defined/versioned in `.tool-versions` file
 
 ### Tools required for Kubernetes deployment
 
@@ -57,7 +52,7 @@ Helm is a package manager for Kubernetes.
 
 To install manually, follow instructions: <https://helm.sh/docs/intro/install/>
 
-#### tanka and Jsonnet Bundler
+#### Tanka and Jsonnet Bundler
 
 Grafana Tanka is the robust configuration utility for your Kubernetes cluster,
 powered by the unique Jsonnet language.
@@ -74,19 +69,6 @@ May use [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/).
 
 The Kubernetes command line tool. Follow the instructions:
 <https://kubernetes.io/docs/tasks/tools/#kubectl>
-
-#### Alpha features
-
-Agent core service uses feature gate for managing node-local traffic:
-<https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/>
-
-For kubernetes 1.21 it requires a feature gate activation. For kubernetes 1.22
-it's in beta so nothing needs to be added to cluster config.
-
-```yaml
-featureGates:
-  ServiceInternalTrafficPolicy: true
-```
 
 ## Deploying with Tilt
 
