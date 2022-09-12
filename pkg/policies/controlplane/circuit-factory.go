@@ -56,16 +56,14 @@ func compileCircuit(
 
 		compID := strconv.Itoa(compIndex)
 		// Add Component to compiledCircuit
-		if compiledComp.Component != nil {
-			compiledCircuit = append(compiledCircuit, &CompiledComponent{
-				CompiledComponentAndPorts: runtime.CompiledComponentAndPorts{
-					CompiledComponent:   compiledComp,
-					InPortToSignalsMap:  make(runtime.PortToSignal),
-					OutPortToSignalsMap: make(runtime.PortToSignal),
-				},
-				ComponentID: compID,
-			})
-		}
+		compiledCircuit = append(compiledCircuit, &CompiledComponent{
+			CompiledComponentAndPorts: runtime.CompiledComponentAndPorts{
+				CompiledComponent:   compiledComp,
+				InPortToSignalsMap:  make(runtime.PortToSignal),
+				OutPortToSignalsMap: make(runtime.PortToSignal),
+			},
+			ComponentID: compID,
+		})
 
 		// Add SubComponents to compiledCircuit
 		for _, subComp := range compiledSubComps {
