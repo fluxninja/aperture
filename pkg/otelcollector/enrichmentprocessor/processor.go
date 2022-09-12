@@ -170,7 +170,7 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsM
 	for _, service := range hostEntity.Services {
 		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
 	}
-	attributes.Upsert(otelcollector.ServicesLabel, servicesValue)
+	servicesValue.CopyTo(attributes.UpsertEmpty(otelcollector.ServicesLabel))
 }
 
 func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
@@ -189,7 +189,7 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 	for _, service := range hostEntity.Services {
 		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
 	}
-	attributes.Upsert(otelcollector.ServicesLabel, servicesValue)
+	servicesValue.CopyTo(attributes.UpsertEmpty(otelcollector.ServicesLabel))
 }
 
 // unpackFlowLabels tries to parse `LabelsLabel` attribute as json, and adds

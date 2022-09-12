@@ -115,9 +115,8 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	if instance.GetDeletionTimestamp() != nil {
 		logger.Info(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", instance.GetName(), instance.GetNamespace()))
 		if controllerutil.ContainsFinalizer(instance, finalizerName) {
-			if err = r.deleteResources(ctx, logger, instance.DeepCopy()); err != nil {
-				return ctrl.Result{}, err
-			}
+			r.deleteResources(ctx, logger, instance.DeepCopy())
+
 			controllerutil.RemoveFinalizer(instance, finalizerName)
 			if err = r.updateAgent(ctx, instance); err != nil && !errors.IsNotFound(err) {
 				return ctrl.Result{}, err
@@ -216,15 +215,13 @@ func (r *AgentReconciler) updateStatus(ctx context.Context, instance *v1alpha1.A
 }
 
 // deleteResources deletes cluster-scoped resources for which owner-reference is not added.
-func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Agent) error {
+func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Agent) {
 	deleteClusterRole := true
 	instances := &v1alpha1.ControllerList{}
 	err := r.List(ctx, instances)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil {
 		log.Error(err, "failed to list Controller")
-		return err
-	}
-	if instances.Items != nil && len(instances.Items) != 0 {
+	} else if instances.Items != nil && len(instances.Items) != 0 {
 		for _, ins := range instances.Items {
 			if ins.Status.Resources == "created" {
 				deleteClusterRole = false
@@ -232,62 +229,59 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 		}
 	}
 	if deleteClusterRole {
-		if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil && !errors.IsNotFound(err) {
+		if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil {
 			log.Error(err, "failed to delete object of ClusterRole")
-			return err
 		}
 	}
 
-	if err := r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil && !errors.IsNotFound(err) {
+	if err := r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil {
 		log.Error(err, "failed to delete object of ClusterRoleBinding")
-		return err
 	}
 
 	if instance.Spec.Sidecar.Enabled {
 		mwc, err := podMutatingWebhookConfiguration(instance)
 		if err != nil {
-			return err
-		}
-		if err = r.Delete(ctx, mwc); err != nil {
-			log.Error(err, "failed to delete object of MutatingWebhookConfiguration")
-			return err
+			log.Error(err, "failed to create object of MutatingWebhookConfiguration")
+		} else {
+			if err = r.Delete(ctx, mwc); err != nil {
+				log.Error(err, "failed to delete object of MutatingWebhookConfiguration")
+			}
 		}
 
 		nsList := &corev1.NamespaceList{}
 		err = r.List(ctx, nsList)
 		if err != nil {
-			return fmt.Errorf("failed to list Namespaces. Error: %+v", err)
-		}
+			log.Error(err, "failed to list Namespaces")
+		} else if nsList.Items != nil && len(nsList.Items) != 0 {
+			for _, ns := range nsList.Items {
+				if ns.Labels == nil || ns.Labels[sidecarLabelKey] != enabled {
+					continue
+				}
 
-		for _, ns := range nsList.Items {
-			if ns.Labels == nil || ns.Labels[sidecarLabelKey] != enabled {
-				continue
-			}
+				configMap, err := configMapForAgentConfig(instance, nil)
+				if err != nil {
+					log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+				}
 
-			configMap, err := configMapForAgentConfig(instance, nil)
-			if err != nil {
-				log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-			}
+				configMap.Namespace = ns.GetName()
+				configMap.Annotations = getAgentAnnotationsWithOwnerRef(instance)
+				if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+					log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+				}
 
-			configMap.Namespace = ns.GetName()
-			configMap.Annotations = getAgentAnnotationsWithOwnerRef(instance)
-			if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
-				log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-			}
+				secret, err := secretForAgentAPIKey(instance, nil)
+				if err != nil {
+					log.Error(err, fmt.Sprintf("failed to create object of Secret '%s' in namespace %s", secret.GetName(), ns.GetName()))
+				}
 
-			secret, err := secretForAgentAPIKey(instance, nil)
-			if err != nil {
-				log.Error(err, fmt.Sprintf("failed to create object of Secret '%s' in namespace %s", secret.GetName(), ns.GetName()))
-			}
-
-			secret.Namespace = ns.GetName()
-			secret.Annotations = getAgentAnnotationsWithOwnerRef(instance)
-			if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
-				log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+				secret.Namespace = ns.GetName()
+				secret.Annotations = getAgentAnnotationsWithOwnerRef(instance)
+				if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
+					log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+				}
 			}
 		}
 	}
-	return nil
 }
 
 // updateAgent updates the Agent resource in Kubernetes.
