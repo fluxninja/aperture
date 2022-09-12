@@ -269,6 +269,7 @@ DEP_TREE = {
             "child_resources": [
                 {
                     "workload": "k6-operator-controller-manager",
+                    "resource_deps": ["cluster-bootstrap", "controller-service"],
                     "extra_objects": [
                         ("^k6-operator", "Namespace"),
                         ("k6.io$", "CustomResourceDefinition"),
