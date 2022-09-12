@@ -183,7 +183,7 @@ func (x *Policy) GetResources() *Resources {
 // Circuit is defined as a dataflow graph of inter-connected components
 //
 // Signals flow between components via ports.
-// As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
+// As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
 // Circuit is evaluated periodically in order to respond to changes in signal readings.
 //
 // :::info
