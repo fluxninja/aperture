@@ -1849,7 +1849,7 @@ definitions:
       agent_group:
         type: string
         description: |-
-          Which [agent-group](/concepts/flow-control/selector/service.md#agent-group) this
+          Which [agent-group](/concepts/service.md#agent-group) this
           selector applies to.
         x-go-default: default
       control_point:
@@ -1863,7 +1863,7 @@ definitions:
         $ref: '#/definitions/v1LabelMatcher'
         description: |-
           :::info
-          See also [Label Matcher overview](/concepts/flow-control/selector/selector.md#label-matcher).
+          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
           :::
 
           :::note
@@ -1884,7 +1884,7 @@ definitions:
         type: string
         description: |-
           The Fully Qualified Domain Name of the
-          [service](/concepts/flow-control/selector/service.md) to select.
+          [service](/concepts/service.md) to select.
 
           In kubernetes, this is the FQDN of the Service object.
 
@@ -1895,7 +1895,7 @@ definitions:
           :::
     description: |-
       :::info
-      See also [Selector overview](/concepts/flow-control/selector/selector.md).
+      See also [Selector overview](/concepts/flow-control/selector.md).
       :::
 
       Example:

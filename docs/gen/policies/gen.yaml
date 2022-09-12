@@ -1525,7 +1525,7 @@ definitions:
   v1Selector:
     description: |-
       :::info
-      See also [Selector overview](/concepts/flow-control/selector/selector.md).
+      See also [Selector overview](/concepts/flow-control/selector.md).
       :::
 
       Example:
@@ -1553,7 +1553,7 @@ definitions:
     properties:
       agent_group:
         description: |-
-          Which [agent-group](/concepts/flow-control/selector/service.md#agent-group) this
+          Which [agent-group](/concepts/service.md#agent-group) this
           selector applies to.
         type: string
         x-go-default: default
@@ -1569,7 +1569,7 @@ definitions:
       label_matcher:
         description: |-
           :::info
-          See also [Label Matcher overview](/concepts/flow-control/selector/selector.md#label-matcher).
+          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
           :::
 
           :::note
@@ -1591,7 +1591,7 @@ definitions:
       service:
         description: |-
           The Fully Qualified Domain Name of the
-          [service](/concepts/flow-control/selector/service.md) to select.
+          [service](/concepts/service.md) to select.
 
           In kubernetes, this is the FQDN of the Service object.
 

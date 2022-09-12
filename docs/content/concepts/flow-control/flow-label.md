@@ -144,7 +144,7 @@ select which labels to include in telemetry.
 :::
 
 [flow]: /concepts/flow-control/flow-control.md#flow
-[selector]: /concepts/flow-control/selector/selector.md
+[selector]: /concepts/flow-control/selector.md
 [classifier]: /concepts/flow-control/flow-classifier.md
 [workload]: /concepts/flow-control/concurrency-limiter.md#workload
 [ratelimiter]: /concepts/flow-control/rate-limiter.md
