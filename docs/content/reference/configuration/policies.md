@@ -53,7 +53,7 @@ Example of…
 - [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload
 - [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
 - [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of
-  [labels](/concepts/flow-control/label/label.md)
+  [labels](/concepts/flow-control/selector/flow-label.md)
   should be considered a match or not
 - [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
 - [v1LoadShedActuatorIns](#v1-load-shed-actuator-ins) – Input for the Load Shed Actuator component.
@@ -180,7 +180,7 @@ Workload defines a class of requests that preferably have similar properties suc
 <dd>
 
 (string) Fairness key is a label key that can be used to provide fairness within a workload.
-Any [flow label](/concepts/flow-control/label/label.md) can be used here. Eg. if
+Any [flow label](/concepts/flow-control/selector/flow-label.md) can be used here. Eg. if
 you have a classifier that sets `user` flow label, you might want to set
 `fairness_key = "user"`.
 
@@ -211,7 +211,7 @@ This override is applicable only if `auto_tokens` is set to false.
 <dd>
 
 ([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based on
-[flow labels](/concepts/flow-control/label/label.md).
+[flow labels](/concepts/flow-control/selector/flow-label.md).
 
 </dd>
 <dt>workload</dt>
@@ -227,7 +227,7 @@ This override is applicable only if `auto_tokens` is set to false.
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
 :::info
-See also [Concurrency Limiter overview](/concepts/flow-control/actuators/concurrency-limiter.md).
+See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
 :::
 
 It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -263,7 +263,7 @@ output signals.
 Limits the traffic on a control point to specified rate
 
 :::info
-See also [Rate Limiter overview](/concepts/flow-control/actuators/rate-limiter.md).
+See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
 :::
 
 Ratelimiting is done separately on per-label-value basis. Use _label_key_
@@ -284,7 +284,7 @@ to select which label should be used as key.
 (string, `required`) Specifies which label the ratelimiter should be keyed by.
 
 Rate limiting is done independently for each value of the
-[label](/concepts/flow-control/label/label.md) with given key.
+[label](/concepts/flow-control/selector/flow-label.md) with given key.
 Eg., to give each user a separate limit, assuming you have a _user_ flow
 label set up, set `label_key: "user"`.
 
@@ -320,7 +320,7 @@ label set up, set `label_key: "user"`.
 Set of classification rules sharing a common selector
 
 :::info
-See also [Classifier overview](/concepts/flow-control/label/classifier.md).
+See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
 :::
 
 Example:
@@ -343,7 +343,7 @@ rules:
 <dd>
 
 (map of [V1Rule](#v1-rule), `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/label/label.md) keys to rules that define
+[flow label](/concepts/flow-control/selector/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
 
 </dd>
@@ -557,18 +557,17 @@ There are three categories of components:
 - "source" components – they take some sort of input from "the real world" and output
   a signal based on this input. Example: [PromQL](#v1-prom-q-l). In the UI
   they're represented by green color.
-- internal components – "pure" components that don't interact with the "real world".
+- signal processor components – "pure" components that don't interact with the "real world".
   Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
   :::note
-  Internal components's output can depend on their internal state, in addition to the inputs.
+  Signal processor components's output can depend on their internal state, in addition to the inputs.
   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
   :::
 - "sink" components – they affect the real world.
-  [ConcurrencyLimiter](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
-  Also sometimes called [_actuators_](/concepts/flow-control/actuators/actuators.md).
-  In the UI, represented by orange color. Sink components are usually also
-  "sources" too, they usually emit a feedback signal, like
-  `accepted_concurrency` in case of ConcurrencyLimiter.
+  [ConcurrencyLimiter.LoadShedActuator](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
+  In the UI, represented by orange color. Sink components usually come in pairs with a
+  "sources" component which emits a feedback signal, like
+  `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
 
 :::tip
 Sometimes you may want to use a constant value as one of component's inputs.
@@ -1350,7 +1349,7 @@ If the operator is Exists or DoesNotExist, the values array must be empty.
 ### v1LabelMatcher {#v1-label-matcher}
 
 Allows to define rules whether a map of
-[labels](/concepts/flow-control/label/label.md)
+[labels](/concepts/flow-control/selector/flow-label.md)
 should be considered a match or not
 
 It provides three ways to define requirements:
@@ -1847,7 +1846,7 @@ sensitive labels.
 <dd>
 
 (bool, `required`) Decides if the created label should be applied to the whole request chain
-(propagated in [baggage](/concepts/flow-control/label/label.md#baggage))
+(propagated in [baggage](/concepts/flow-control/selector/flow-label.md#baggage))
 
 </dd>
 <dt>rego</dt>
@@ -1955,7 +1954,7 @@ If none of workloads match, `default_workload` will be used.
 
 :::info
 See also [workload definition in the concepts
-section](/concepts/flow-control/actuators/concurrency-limiter.md#workload).
+section](/concepts/flow-control/concurrency-limiter.md#workload).
 :::
 
 </dd>
@@ -2001,7 +2000,7 @@ component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
 :::info
-See also [Selector overview](/concepts/flow-control/selector.md).
+See also [Selector overview](/concepts/flow-control/selector/selector.md).
 :::
 
 Example:
@@ -2029,7 +2028,7 @@ label_matcher:
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/flow-control/selector/service.md#agent-group) this
 selector applies to.
 
 </dd>
@@ -2045,11 +2044,11 @@ within the entity where the policy should apply to.
 <dd>
 
 ([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
-[flow labels](/concepts/flow-control/label/label.md)
+[flow labels](/concepts/flow-control/selector/flow-label.md)
 must also be satisfied (in addition to service+control point matching)
 
 :::info
-See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+See also [Label Matcher overview](/concepts/flow-control/selector/selector.md#label-matcher).
 :::
 
 :::note
@@ -2068,7 +2067,7 @@ control point.
 <dd>
 
 (string) The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/service.md) to select.
+[service](/concepts/flow-control/selector/service.md) to select.
 
 In kubernetes, this is the FQDN of the Service object.
 

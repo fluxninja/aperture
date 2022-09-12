@@ -1,5 +1,6 @@
 ---
 title: Flow Classifier
+sidebar_position: 5
 ---
 
 :::info
@@ -8,8 +9,8 @@ See also [Classifier reference][reference]
 
 :::
 
-If existing [flow labels](label.md) are not sufficent, Flow Classifier can be
-used to inject additional ones without any changes to your service.
+If existing [flow labels][label] are not sufficent, Flow Classifier can be used
+to inject additional ones without any changes to your service.
 
 A classifier is defined as a resource in a [policy][policies] and describes a
 set of _rules_ on how to create new flow labels based on request metadata.
@@ -98,10 +99,9 @@ in future.
 :::note
 
 Extracting value from header may seem not useful, as the value is already
-available as flow label
-([as `http.request.header.<header>`](label.md#request-labels)), but adding flow
-label explicitly may still be userful, as it enables baggage propagation and
-telemetry for this flow label.
+available as flow label ([as `http.request.header.<header>`][request-labels]),
+but adding flow label explicitly may still be userful, as it enables baggage
+propagation and telemetry for this flow label.
 
 :::
 
@@ -119,15 +119,17 @@ See [full example in reference][reference]
 [attr-context]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
-[baggage]: label.md#baggage
+[label]: ./selector/flow-label.md
+[baggage]: ./selector/flow-label.md#baggage
+[request-labels]: ./selector/flow-label.md#request-labels
 [reference]: /reference/configuration/policies.md#v1-classifier
 [rule]: /reference/configuration/policies.md#v1-rule
 [extractor]: /reference/configuration/policies.md#v1-extractor
 [rego-rule]: /reference/configuration/policies.md#rule-rego
 [plugin]: /cloud/plugin.md
-[label-matcher]: ../selector.md#label-matcher
-[policies]: /concepts/policies/policies.md
+[label-matcher]: ./selector/selector.md#label-matcher
+[policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
-[control-point]: ../flow-control.md#control-point
+[control-point]: ./flow-control.md#control-point

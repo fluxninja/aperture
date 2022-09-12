@@ -1,6 +1,6 @@
 ---
-title: Policies
-sidebar_position: 2
+title: Policy
+sidebar_position: 1
 ---
 
 Aperture comes with a pre-packaged list of policies that can be used both as a

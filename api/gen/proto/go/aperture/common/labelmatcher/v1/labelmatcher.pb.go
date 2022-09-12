@@ -22,7 +22,7 @@ const (
 )
 
 // Allows to define rules whether a map of
-// [labels](/concepts/flow-control/label/label.md)
+// [labels](/concepts/flow-control/selector/flow-label.md)
 // should be considered a match or not
 //
 // It provides three ways to define requirements:

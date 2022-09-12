@@ -1,5 +1,5 @@
 ---
-title: Policy Blueprints
+title: Blueprints
 description: Policies and dashboard pre-packaged as reusable blueprints
 keywords:
   - jsonnet
