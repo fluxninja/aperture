@@ -1629,6 +1629,7 @@ definitions:
 tags:
 - name: EntityCacheService
 - name: InfoService
+- name: PeerDiscoveryService
 - name: StatusService
 - name: FlowControlService
 - name: FluxNinjaService

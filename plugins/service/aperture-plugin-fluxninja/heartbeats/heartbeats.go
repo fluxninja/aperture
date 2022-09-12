@@ -200,7 +200,7 @@ func (h *Heartbeats) newHeartbeat(
 
 	var peers *peersv1.Peers
 	if h.peersWatcher != nil {
-		peers = h.peersWatcher.GetPeers()
+		peers = h.peersWatcher.Peers()
 	}
 
 	return &heartbeatv1.ReportRequest{
