@@ -7,7 +7,7 @@ flowchart TD
   end
   SDK["FluxNinja Library"]
   SDK --> FlowControl
-  Classification -- "matadata\n& flow labels" --> FlowControl
+  Classification -- "metadata\n& flow labels" --> FlowControl
 
   subgraph Controller["Controller (constantly looping)\n"]
     MetricsDB --> Circuit --> Vars

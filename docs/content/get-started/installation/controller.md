@@ -215,7 +215,7 @@ the charts installed above:
    helm uninstall controller
    ```
 
-2. Alternativey, if you have installed the Aperture Controller Custom Resource
+2. Alternatively, if you have installed the Aperture Controller Custom Resource
    separately, follow below steps:
 
    1. Delete the Aperture Controller Custom Resource:

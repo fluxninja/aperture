@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// FileInfo holds fileds used for internal tracking of files, events in notifications and so on.
+// FileInfo holds fields used for internal tracking of files, events in notifications and so on.
 type FileInfo struct {
 	directory string
 	name      string

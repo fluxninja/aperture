@@ -44,16 +44,16 @@ func TestCreateTracesExporter(t *testing.T) {
 	factory := NewFactory()
 	cfg := factory.CreateDefaultConfig()
 
-	te, err := factory.CreateTracesExporter(context.Background(), componenttest.NewNopExporterCreateSettings(), cfg)
+	tracesExporter, err := factory.CreateTracesExporter(context.Background(), componenttest.NewNopExporterCreateSettings(), cfg)
 	assert.NoError(t, err)
-	assert.NotNil(t, te)
+	assert.NotNil(t, tracesExporter)
 }
 
 func TestCreateLogsExporter(t *testing.T) {
 	factory := NewFactory()
 	cfg := factory.CreateDefaultConfig()
 
-	te, err := factory.CreateLogsExporter(context.Background(), componenttest.NewNopExporterCreateSettings(), cfg)
+	logsExporter, err := factory.CreateLogsExporter(context.Background(), componenttest.NewNopExporterCreateSettings(), cfg)
 	assert.NoError(t, err)
-	assert.NotNil(t, te)
+	assert.NotNil(t, logsExporter)
 }
