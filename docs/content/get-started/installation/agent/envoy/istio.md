@@ -70,6 +70,9 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
                  values:
                    - key: aperture.source
                      value:
+                       string_value: "envoy"
+                   - key: http.method
+                     value:
                        string_value: "%REQ(:METHOD)%"
                    - key: http.target
                      value:
@@ -157,6 +160,9 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
                  string_value: "%REQ(:METHOD)%"
                attributes:
                  values:
+                   - key: aperture.source
+                     value:
+                       string_value: "envoy"
                    - key: http.method
                      value:
                        string_value: "%REQ(:METHOD)%"
