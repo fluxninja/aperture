@@ -107,9 +107,9 @@ into your cluster.
           tag: latest
         config:
           etcd:
-            endpoints: ['http://controller-etcd.default.svc.cluster.local:2379'],
+            endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
           prometheus:
-            address: 'http://controller-prometheus-server.default.svc.cluster.local:80',
+            address: "http://controller-prometheus-server.default.svc.cluster.local:80"
           plugins:
             disabled_plugins:
               - aperture-plugin-fluxninja
