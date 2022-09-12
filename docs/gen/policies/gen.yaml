@@ -243,8 +243,6 @@ definitions:
         $ref: '#/definitions/v1Selector'
   policylanguagev1FluxMeter:
     description: |-
-      FluxMeter gathers metrics for the traffic that matches its selector.
-
       :::info
       See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
       :::
@@ -258,10 +256,11 @@ definitions:
           traffic: ingress
       ```
     type: object
+    title: FluxMeter gathers metrics for the traffic that matches its selector
     properties:
       attribute_key:
         description: |-
-          Key of the attribute in accesss log or span from which the metric for this flux meter is read.
+          Key of the attribute in access log or span from which the metric for this flux meter is read.
 
           :::info
           For list of available attributes in Envoy access logs, refer
@@ -301,7 +300,7 @@ definitions:
 
       Example:
       ```yaml
-      from: "source.address # or dstination.address"
+      from: "source.address # or destination.address"
       ```
     type: object
     title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
@@ -629,7 +628,7 @@ definitions:
       The $\alpha$ is computed using ema\_window:
 
       $$
-      \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
+      \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
       $$
 
       The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
@@ -703,7 +702,7 @@ definitions:
         description: |-
           Lower bound of the moving average.
 
-          Used during the warm-up stage analoguously to `max_envelope`.
+          Used during the warm-up stage analogously to `max_envelope`.
         x-order: 2
         $ref: '#/definitions/v1Port'
   v1EMAOuts:
@@ -756,7 +755,7 @@ definitions:
           ```
           [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto"
         type: string
-        title: Use an attribute with no convertion
+        title: Use an attribute with no conversion
         x-order: 1
       json:
         description: Deserialize a json, and extract one of the fields.
@@ -881,7 +880,7 @@ definitions:
           increases.
           :::
 
-          The magnitude of slope describes how aggresively should the controller
+          The magnitude of slope describes how aggressively should the controller
           react to a deviation of signal.
           With $|\text{slope}| = 1$, the controller will aim to bring the signal to
           the setpoint in one tick (assuming linear correlation with signal and setpoint).
@@ -1525,7 +1524,7 @@ definitions:
   v1Selector:
     description: |-
       :::info
-      See also [Selector overview](/concepts/flow-control/selector/selector.md).
+      See also [Selector overview](/concepts/flow-control/selector.md).
       :::
 
       Example:
@@ -1553,7 +1552,7 @@ definitions:
     properties:
       agent_group:
         description: |-
-          Which [agent-group](/concepts/flow-control/selector/service.md#agent-group) this
+          Which [agent-group](/concepts/service.md#agent-group) this
           selector applies to.
         type: string
         x-go-default: default
@@ -1569,7 +1568,7 @@ definitions:
       label_matcher:
         description: |-
           :::info
-          See also [Label Matcher overview](/concepts/flow-control/selector/selector.md#label-matcher).
+          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
           :::
 
           :::note
@@ -1591,7 +1590,7 @@ definitions:
       service:
         description: |-
           The Fully Qualified Domain Name of the
-          [service](/concepts/flow-control/selector/service.md) to select.
+          [service](/concepts/service.md) to select.
 
           In kubernetes, this is the FQDN of the Service object.
 

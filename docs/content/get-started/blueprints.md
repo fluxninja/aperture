@@ -30,7 +30,6 @@ bundler][jb].
 The Blueprint Generator (used to generate JSON files from blueprints) also
 depends on Python 3.8+ and [jsonnet][go-jsonnet].
 
-[k8s-libsonnet]: https://github.com/jsonnet-libs/k8s-libsonnet
 [aperture-blueprints]: https://github.com/fluxninja/aperture-blueprints
 [blueprints-readme]: https://github.com/fluxninja/aperture-blueprints/blob/main/README.md
 [jb]: https://github.com/jsonnet-bundler/jsonnet-bundler
@@ -71,7 +70,7 @@ Under the `blueprints/` directory, the currently available blueprints can be
 found. Each blueprint consists of at least two files: `config.libsonnet` and
 `main.libsonnet`. `main.libsonnet` bundles actual policy and dashboard code
 (available under `lib/1.0`) into blueprints, and `config.libsonnet` comes with
-the default configuration for the given policy. This can be overriden by the
+the default configuration for the given policy. This can be overridden by the
 `--config` option passed to the `aperture-generate.py` script.
 
 Custom configurations will be merged with blueprints' `config.libsonnet`
@@ -123,10 +122,10 @@ local policy = latencyGradientPolicy({
 
 [
     k.core.v1.configMap.new("policies")
-	+ k.core.v1.configMap.metadata.withLabels({ "fluxninja.com/validate": "true"})
-	+ k.core.v1.configMap.withData({
-	  "service1-demo-app.yaml": std.manifestYamlDoc(policy, quote_keys=false)
-	})
+ + k.core.v1.configMap.metadata.withLabels({ "fluxninja.com/validate": "true"})
+ + k.core.v1.configMap.withData({
+   "service1-demo-app.yaml": std.manifestYamlDoc(policy, quote_keys=false)
+ })
 ]
 ```
 

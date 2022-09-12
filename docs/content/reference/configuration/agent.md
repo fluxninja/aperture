@@ -553,7 +553,7 @@ AgentInfoConfig is the configuration for the agent group etc.
 
 (string, default: `default`) All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
 
-[Read more about agent groups here](/concepts/flow-control/selector/service.md#agent-group).
+[Read more about agent groups here](/concepts/service.md#agent-group).
 
 </dd>
 </dl>
@@ -1180,7 +1180,7 @@ ListenerConfig holds configuration for socket listeners.
 <dt>keep_alive</dt>
 <dd>
 
-(string, `gte=0s`, default: `180s`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alives are disabled.
+(string, `gte=0s`, default: `180s`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
 
 </dd>
 <dt>network</dt>

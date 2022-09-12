@@ -44,11 +44,6 @@ results from the experiment navigate to the "FluxNinja" dashboard in Grafana
 under "aperture-system" folder. Grafana runs at
 [localhost:3000](http://localhost:3000).
 
-###
-
-Navigate to K6 resource in the Tilt UI and press the start traffic button to
-start traffic
-
 ## Tools
 
 Described hereafter deployment methods assume usage of specific deployment and

@@ -103,7 +103,7 @@ down to fine-grained APIs.
 
 [reference]: /reference/configuration/policies.md#policylanguagev1-flux-meter
 [flow]: /concepts/flow-control/flow-control.md#flow
-[selector]: /concepts/flow-control/selector/selector.md
+[selector]: /concepts/flow-control/selector.md
 [flow-control-integration]: /concepts/flow-control/flow-control.md#integrations
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles

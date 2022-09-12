@@ -36,7 +36,7 @@ graph TB
         s4[db.mynamespace.svc.cluster.local]
     end
     subgraph group1
-        s1[frontent.mynamespace.svc.cluster.local]
+        s1[frontend.mynamespace.svc.cluster.local]
         s2[db.mynamespace.svc.cluster.local]
     end
 ```
@@ -64,7 +64,7 @@ For single-cluster deployments, a single `default` Agent Group can be used:
 ```mermaid
 graph TB
     subgraph default
-        s1[frontent.mynamespace.svc.cluster.local]
+        s1[frontend.mynamespace.svc.cluster.local]
         s3[search.mynamespace.svc.cluster.local]
         s2[db.mynamespace.svc.cluster.local]
     end
@@ -89,4 +89,4 @@ graph TB
 
 [distributed-counters]: /concepts/flow-control/rate-limiter.md#distributed-counters
 [components]: /concepts/flow-control/flow-control.md#components
-[catch-all-service]: /concepts/flow-control/selector/selector.md#service
+[catch-all-service]: /concepts/flow-control/selector.md#service

@@ -9,7 +9,7 @@ See also [Classifier reference][reference]
 
 :::
 
-If existing [flow labels][label] are not sufficent, Flow Classifier can be used
+If existing [flow labels][label] are not sufficient, Flow Classifier can be used
 to inject additional ones without any changes to your service.
 
 A classifier is defined as a resource in a [policy][policies] and describes a
@@ -100,7 +100,7 @@ in future.
 
 Extracting value from header may seem not useful, as the value is already
 available as flow label ([as `http.request.header.<header>`][request-labels]),
-but adding flow label explicitly may still be userful, as it enables baggage
+but adding flow label explicitly may still be useful, as it enables baggage
 propagation and telemetry for this flow label.
 
 :::
@@ -125,7 +125,7 @@ See [full example in reference][reference]
 [extractor]: /reference/configuration/policies.md#v1-extractor
 [rego-rule]: /reference/configuration/policies.md#rule-rego
 [plugin]: /cloud/plugin.md
-[label-matcher]: /concepts/flow-control/selector/selector.md#label-matcher
+[label-matcher]: /concepts/flow-control/selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]: https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names

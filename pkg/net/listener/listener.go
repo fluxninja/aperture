@@ -13,7 +13,7 @@ import (
 // swagger:model
 // +kubebuilder:object:generate=true
 type ListenerConfig struct {
-	// Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alives are disabled.
+	// Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
 	KeepAlive config.Duration `json:"keep_alive" validate:"gte=0s" default:"180s"`
 
 	// Address to bind to in the form of [host%zone]:port

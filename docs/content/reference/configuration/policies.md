@@ -20,11 +20,7 @@ description: Policies reference
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 - [languagev1RateLimiter](#languagev1-rate-limiter) – Limits the traffic on a control point to specified rate
 - [policylanguagev1Classifier](#policylanguagev1-classifier) – Set of classification rules sharing a common selector
-- [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
-
-:::info
-Se…
-
+- [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector
 - [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
 - [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals
 - [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
@@ -358,7 +354,7 @@ how to extract and propagate flow labels with that key.
 
 ### policylanguagev1FluxMeter {#policylanguagev1-flux-meter}
 
-FluxMeter gathers metrics for the traffic that matches its selector.
+FluxMeter gathers metrics for the traffic that matches its selector
 
 :::info
 See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
@@ -380,7 +376,7 @@ selector:
 <dt>attribute_key</dt>
 <dd>
 
-(string, default: `duration_millis`) Key of the attribute in accesss log or span from which the metric for this flux meter is read.
+(string, default: `duration_millis`) Key of the attribute in access log or span from which the metric for this flux meter is read.
 
 :::info
 For list of available attributes in Envoy access logs, refer
@@ -423,7 +419,7 @@ Note: Use with care, as it might accidentally introduce a high-cardinality flow 
 Example:
 
 ```yaml
-from: "source.address # or dstination.address"
+from: "source.address # or destination.address"
 ```
 
 #### Properties
@@ -855,7 +851,7 @@ A higher $\alpha$ discounts older observations faster.
 The $\alpha$ is computed using ema_window:
 
 $$
-\alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
+\alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 $$
 
 The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
@@ -939,7 +935,7 @@ The envelope logic is **not** used outside the warm-up stage!
 
 ([V1Port](#v1-port)) Lower bound of the moving average.
 
-Used during the warm-up stage analoguously to `max_envelope`.
+Used during the warm-up stage analogously to `max_envelope`.
 
 </dd>
 </dl>
@@ -998,7 +994,7 @@ There are multiple variants of extractor, specify exactly one.
 <dt>from</dt>
 <dd>
 
-(string) Use an attribute with no convertion
+(string) Use an attribute with no conversion
 
 Attribute path is a dot-separated path to attribute.
 
@@ -1181,7 +1177,7 @@ describing the _action_ which controller should make when the signal
 increases.
 :::
 
-The magnitude of slope describes how aggresively should the controller
+The magnitude of slope describes how aggressively should the controller
 react to a deviation of signal.
 With $|\text{slope}| = 1$, the controller will aim to bring the signal to
 the setpoint in one tick (assuming linear correlation with signal and setpoint).
@@ -2021,7 +2017,7 @@ component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
 :::info
-See also [Selector overview](/concepts/flow-control/selector/selector.md).
+See also [Selector overview](/concepts/flow-control/selector.md).
 :::
 
 Example:
@@ -2049,7 +2045,7 @@ label_matcher:
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/flow-control/selector/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
 selector applies to.
 
 </dd>
@@ -2069,7 +2065,7 @@ within the entity where the policy should apply to.
 must also be satisfied (in addition to service+control point matching)
 
 :::info
-See also [Label Matcher overview](/concepts/flow-control/selector/selector.md#label-matcher).
+See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
 :::
 
 :::note
@@ -2088,7 +2084,7 @@ control point.
 <dd>
 
 (string) The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/selector/service.md) to select.
+[service](/concepts/service.md) to select.
 
 In kubernetes, this is the FQDN of the Service object.
 

@@ -708,7 +708,7 @@ type GradientController struct {
 	// increases.
 	// :::
 	//
-	// The magnitude of slope describes how aggresively should the controller
+	// The magnitude of slope describes how aggressively should the controller
 	// react to a deviation of signal.
 	// With $|\text{slope}| = 1$, the controller will aim to bring the signal to
 	// the setpoint in one tick (assuming linear correlation with signal and setpoint).
@@ -819,7 +819,7 @@ func (x *GradientController) GetMaxGradient() float64 {
 // The $\alpha$ is computed using ema\_window:
 //
 // $$
-// \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
+// \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 // $$
 //
 // The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
@@ -2040,7 +2040,7 @@ type EMA_Ins struct {
 	MaxEnvelope *Port `protobuf:"bytes,2,opt,name=max_envelope,json=maxEnvelope,proto3" json:"max_envelope,omitempty"`
 	// Lower bound of the moving average.
 	//
-	// Used during the warm-up stage analoguously to `max_envelope`.
+	// Used during the warm-up stage analogously to `max_envelope`.
 	MinEnvelope *Port `protobuf:"bytes,3,opt,name=min_envelope,json=minEnvelope,proto3" json:"min_envelope,omitempty"`
 }
 
