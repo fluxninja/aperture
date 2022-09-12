@@ -15,7 +15,7 @@ Aperture splits the process of flow control in two layers:
 
 - Governing the flow control process and making high-level decisions. This is
   done by Aperture Controller through _policies_. You can read more about
-  policies in [the next chapter][policies].
+  policies in [Policies chapter][policies].
 - Actual execution of flow control is performed by Aperture Agent via
   [Concurrency Limiters][concurrency-limiter] or [Rate Limiters][rate-limiter].
   Additionally the Agent handles other flow-control related tasks, like

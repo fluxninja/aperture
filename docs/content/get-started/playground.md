@@ -22,6 +22,33 @@ Playground deploys resources to the Kubernetes cluster that `kubectl` on your
 machine points at. For convenience, this README includes instructions for
 deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
 
+## How to Run
+
+Once [requirements](#tools) are installed, simply run:
+
+```
+tilt up
+```
+
+Can press (Space) to open the Tilt UI.
+
+The above command starts Aperture Controller and an Aperture Agent on each
+worker in the Kubernetes cluster. Additionally, it starts a demo application
+with an Istio and Envoy based service mesh configured to integrate with
+Aperture. There is a Grafana installation as well for viewing metrics from
+experiments. Aperture is loaded with a Latency Gradient Control Policy which
+protects the demo application against sudden surges in traffic load. To run the
+traffic load, navigate to K6 resource in the Tilt UI and press the "Run load
+test" button. Once finished, press the "Delete load test" button. To view
+results from the experiment navigate to the "FluxNinja" dashboard in Grafana
+under "aperture-system" folder. Grafana runs at
+[localhost:3000](http://localhost:3000).
+
+###
+
+Navigate to K6 resource in the Tilt UI and press the start traffic button to
+start traffic
+
 ## Tools
 
 Described hereafter deployment methods assume usage of specific deployment and
