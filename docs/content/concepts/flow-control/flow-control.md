@@ -28,7 +28,7 @@ Aperture splits the process of flow control in two layers:
 A Flow is the fundamental unit of work from the perspective of an Aperture
 Agent. It could be an API call, a feature, or even a database query. A Flow in
 Aperture is similar to [OpenTelemetry span][span] and contains
-[flow labels](label).
+[flow labels][flow-label].
 
 ## Control points and services {#control-point}
 
@@ -39,7 +39,7 @@ control points, located in services:
 
 Aperture defines a service as a collection of entities delivering a common
 functionality, such as checkout, billing etc. Read more about
-[Service](service).
+[Service][service].
 
 :::
 
