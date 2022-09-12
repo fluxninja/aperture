@@ -44,7 +44,7 @@ type FluxMeter struct {
 	//   response).
 	// * For feature control points, fluxmeter will measure execution of the span
 	//   associated with particular feature. What contributes to the span's
-	//   duration is entirely up to the user code that uses Aperture library.
+	//   duration is entirely up to the user code that uses Aperture SDK.
 	Selector *v1.Selector `protobuf:"bytes,1,opt,name=selector,proto3" json:"selector,omitempty"`
 	// Latency histogram buckets (in ms) for this FluxMeter.
 	HistogramBuckets []float64 `protobuf:"fixed64,2,rep,packed,name=histogram_buckets,json=histogramBuckets,proto3" json:"histogram_buckets,omitempty" default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"` // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
