@@ -281,7 +281,7 @@ func (p *metricsProcessor) updateMetrics(
 			featureStatusStr = featureStatus.StringVal()
 		}
 		for _, fluxMeter := range checkResponse.FluxMeters {
-			p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, attributes)
+			p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, attributes, treatAsZero)
 		}
 	}
 }
@@ -301,6 +301,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	statusCode string,
 	featureStatus string,
 	attributes pcommon.Map,
+	treatAsZero []string,
 ) {
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
@@ -313,7 +314,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	}
 
 	// metricValue is the value at fluxMeter's AttributeKey
-	metricValue, _ := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), []string{})
+	metricValue, _ := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsZero)
 
 	fluxMeterHistogram := fluxMeter.GetHistogram(decisionType, statusCode, featureStatus)
 	if fluxMeterHistogram != nil {
