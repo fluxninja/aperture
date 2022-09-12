@@ -32,18 +32,18 @@ facilitated by agents and a controller.
   </picture>
 </p>
 
-<p align="center">
-  <picture>
-    <img alt="Latency Gradient Policy Dashboard" src="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/grafana_dashboard.png">
-  </picture>
-</p>
-
 For more detailed description, refer to [the docs](https://docs.fluxninja.com/).
 
 ## Playground
 
 To try aperture in local K8s environment, refer to
 [Playground docs](playground/README.md).
+
+<p align="center">
+  <picture>
+    <img alt="Latency Gradient Policy Dashboard" src="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/grafana_dashboard.png">
+  </picture>
+</p>
 
 ## Slack Community
 
