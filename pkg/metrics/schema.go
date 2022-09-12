@@ -74,13 +74,11 @@ const (
 	// ClassifierIndexLabel - prometheus label specifying clasiffier index.
 	ClassifierIndexLabel = "classifier_index"
 	// StatusCodeLabel - http status code.
-	StatusCodeLabel = "status_code"
+	StatusCodeLabel = "http.status_code"
+	// MethodLabel - label from http method.
+	MethodLabel = "http.method"
 	// FeatureStatusLabel - feature status.
 	FeatureStatusLabel = "feature_status"
-	// MethodLabel - label from http method.
-	MethodLabel = "method"
-	// ResponseStatusCodeLabel - label from response status code.
-	ResponseStatusCodeLabel = "response_status_code"
 	// FlowControlCheckDecisionTypeLabel - label for decision type dropped or accepted.
 	FlowControlCheckDecisionTypeLabel = "decision_type"
 	// FlowControlCheckErrorReasonLabel - label for error reason on FCS Check request.

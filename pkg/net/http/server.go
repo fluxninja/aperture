@@ -114,7 +114,7 @@ func (constructor ServerConstructor) provideServer(
 	}
 
 	// Register metrics
-	defaultLabels := []string{metrics.MethodLabel, metrics.ResponseStatusCodeLabel}
+	defaultLabels := []string{metrics.MethodLabel, metrics.StatusCodeLabel}
 	errorCounters := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.HTTPErrorMetricName,
 		Help: "The total number of errors that occurred",
@@ -206,8 +206,8 @@ func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 		duration := time.Since(startTime)
 
 		labels := map[string]string{
-			metrics.MethodLabel:             r.Method,
-			metrics.ResponseStatusCodeLabel: fmt.Sprintf("%d", rec.status),
+			metrics.MethodLabel:     r.Method,
+			metrics.StatusCodeLabel: fmt.Sprintf("%d", rec.status),
 		}
 
 		requestCounter, err := s.RequestCounters.GetMetricWith(labels)
