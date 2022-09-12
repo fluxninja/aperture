@@ -170,8 +170,8 @@ state and `Controller` Custom Resource in `created` state.
 
 ## Applying Policies
 
-Follow the information on [Policy](/concepts/policy/circuit/sources.md) to
-understand and design the policy circuits.
+Follow the information on [Policy](/concepts/policy/policy.md) to understand and
+design the policy circuits.
 
 Once the design is ready, follow the steps on the
 [Blueprints](/get-started/blueprints.md) to generate the Policy ConfigMap and
