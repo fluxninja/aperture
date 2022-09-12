@@ -119,17 +119,17 @@ See [full example in reference][reference]
 [attr-context]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
-[label]: ./flow-label.md
-[baggage]: ./flow-label.md#baggage
-[request-labels]: ./flow-label.md#request-labels
+[label]: /concepts/flow-control/flow-label.md
+[baggage]: /concepts/flow-control/flow-label.md#baggage
+[request-labels]: /concepts/flow-control/flow-label.md#request-labels
 [reference]: /reference/configuration/policies.md#v1-classifier
 [rule]: /reference/configuration/policies.md#v1-rule
 [extractor]: /reference/configuration/policies.md#v1-extractor
 [rego-rule]: /reference/configuration/policies.md#rule-rego
 [plugin]: /cloud/plugin.md
-[label-matcher]: ./selector/selector.md#label-matcher
+[label-matcher]: /concepts/flow-control/selector/selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
-[control-point]: ./flow-control.md#control-point
+[control-point]: /concepts/flow-control/flow-control.md#control-point

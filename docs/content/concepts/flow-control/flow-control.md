@@ -135,20 +135,20 @@ execution):
 apply after the [Flow](#flow) has ended.
 
 You can learn more about each of the components in the subsequent sections, but
-we recommend to start with concepts like [services][service] and [labels][label]
-first.
+we recommend to start with concepts like [services][service] and
+[labels][flow-label] first.
 
-[policies]: ../policy/policy.md
-[concurrency-limiter]: ./concurrency-limiter.md
-[rate-limiter]: ./rate-limiter.md
-[flux-meter]: ./flux-meter.md
-[classifier]: ./flow-classifier.md
+[policies]: /concepts/policy/policy.md
+[concurrency-limiter]: /concepts/flow-control/concurrency-limiter.md
+[rate-limiter]: /concepts/flow-control/rate-limiter.md
+[flux-meter]: /concepts/flow-control/flux-meter.md
+[classifier]: /concepts/flow-control/flow-classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [istio]: /get-started/istio.md
 [ext-authz]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [aperture-go]: https://github.com/FluxNinja/aperture-go
-[service]: ./selector/service.md
-[label]: ./flow-label.md
+[service]: /concepts/flow-control/selector/service.md
+[flow-label]: /concepts/flow-control/flow-label.md
 [flowcontrol-proto]:
   https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.v1
