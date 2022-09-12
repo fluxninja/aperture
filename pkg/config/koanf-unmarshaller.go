@@ -295,14 +295,14 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 			case reflect.Slice:
 				sliceType := fv.Type().Elem()
 				reg := regexp.MustCompile(`^\[(.*)\]$`)
-				matchs := reg.FindStringSubmatch(val)
-				if len(matchs) != 2 {
+				matches := reg.FindStringSubmatch(val)
+				if len(matches) != 2 {
 					return
 				}
-				if matchs[1] == "" {
+				if matches[1] == "" {
 					v, err = nil, errors.New("empty slice provided in env var")
 				} else {
-					sliceValues := strings.Split(matchs[1], ",")
+					sliceValues := strings.Split(matches[1], ",")
 					switch sliceType.Kind() {
 					case reflect.Bool:
 						v, err = sliceconv.Atob(sliceValues)

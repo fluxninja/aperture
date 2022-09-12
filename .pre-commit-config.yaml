@@ -147,4 +147,4 @@ repos:
     rev: v2.1.0
     hooks:
       - id: codespell
-        exclude: ^(.*\.svg|yarn.lock)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum)$

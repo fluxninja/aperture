@@ -78,7 +78,7 @@ type Labels map[string]string
 // results from Match, e.g. slice. Zero value of the ResultCollection should
 // represent an empty one.
 type MultiMatcher[Key comparable, ResultCollection any] struct {
-	// Read/Write mutex to protext the maps and id
+	// Read/Write mutex to protect the maps and id
 	mutex sync.RWMutex
 	// Map from arbitrary key to entry
 	entries map[Key]*matchEntry[ResultCollection]
