@@ -6,11 +6,17 @@ keywords:
   - enterprise
 ---
 
-FluxNinja Cloud provides premium flow control and reliability analytics for easy
-management of your Aperture deployment. Some of the key features are as follows:
+:::info Join the Cloud Waitlist
 
-- Visualize your flow control policies and get alerts when a rate limit or
-  concurrency control is applied
-- Gain high-cardinality analytics on user experience and application reliability
+FluxNinja Cloud is inviting beta users. Please join the wait list
+[here](https://cloud.fluxninja.com/)
+
+:::
+
+FluxNinja Cloud provides:
+
+- Visualize your control policies
+- Get alerts when policies take action
+- High-cardinality analytics on user experience and application reliability
   metrics
-- Map out your services and view active policies and agents for each service
+- Monitor your Aperture installation
