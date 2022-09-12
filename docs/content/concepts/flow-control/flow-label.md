@@ -74,7 +74,7 @@ collected from the following sources:
 
 - Stream of access logs from service mesh (refer to [Istio
   Configuration][istio])
-- Traces from [Apeture SDK][aperture-go]
+- Traces from [Aperture SDK][aperture-go]
 
 Aperture uses OpenTelemetry's robust pipelining for receiving the telemetry data
 and produce other streams of data from it.

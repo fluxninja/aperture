@@ -380,7 +380,7 @@ selector:
 <dt>attribute_key</dt>
 <dd>
 
-(string, default: `duration_millis`) Key of the attribute in accesss log or span from which the metric for this flux meter is read.
+(string, default: `duration_millis`) Key of the attribute in access log or span from which the metric for this flux meter is read.
 
 :::info
 For list of available attributes in Envoy access logs, refer
@@ -423,7 +423,7 @@ Note: Use with care, as it might accidentally introduce a high-cardinality flow 
 Example:
 
 ```yaml
-from: "source.address # or dstination.address"
+from: "source.address # or destination.address"
 ```
 
 #### Properties
@@ -855,7 +855,7 @@ A higher $\alpha$ discounts older observations faster.
 The $\alpha$ is computed using ema_window:
 
 $$
-\alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evalutation\_period}}
+\alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 $$
 
 The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
@@ -939,7 +939,7 @@ The envelope logic is **not** used outside the warm-up stage!
 
 ([V1Port](#v1-port)) Lower bound of the moving average.
 
-Used during the warm-up stage analoguously to `max_envelope`.
+Used during the warm-up stage analogously to `max_envelope`.
 
 </dd>
 </dl>
@@ -998,7 +998,7 @@ There are multiple variants of extractor, specify exactly one.
 <dt>from</dt>
 <dd>
 
-(string) Use an attribute with no convertion
+(string) Use an attribute with no conversion
 
 Attribute path is a dot-separated path to attribute.
 
@@ -1181,7 +1181,7 @@ describing the _action_ which controller should make when the signal
 increases.
 :::
 
-The magnitude of slope describes how aggresively should the controller
+The magnitude of slope describes how aggressively should the controller
 react to a deviation of signal.
 With $|\text{slope}| = 1$, the controller will aim to bring the signal to
 the setpoint in one tick (assuming linear correlation with signal and setpoint).
