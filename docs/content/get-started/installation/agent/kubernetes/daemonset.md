@@ -36,9 +36,17 @@ your cluster.
    helm repo update
    ```
 
-2. Configure the required parameters of Etcd and Prometheus for the Agent Custom
-   Resource by creating a `values.yaml` with below parameters and pass it with
-   `helm upgrade`:
+2. Configure the below parameters of Plugins, Etcd and Prometheus for the Agent
+   Custom Resource by creating a `values.yaml` with below parameters and pass it
+   with `helm upgrade`:
+
+   :::info
+
+   The below parameters disable the FluxNinja Cloud Plugin for the Aperture
+   Agent. If you want to keep it enabled, add parameters provided
+   [here](/cloud/plugin.md#configuration) under the `agent.config` section.
+
+   :::
 
    ```yaml
    agent:
@@ -47,6 +55,9 @@ your cluster.
          endpoints: ["ETCD_ENDPOINT_HERE"]
        prometheus:
          address: "PROMETHEUS_ADDRESS_HERE"
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
    ```
 
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
@@ -63,9 +74,12 @@ your cluster.
    agent:
      config:
        etcd:
-         endpoints: ['http://controller-etcd.default.svc.cluster.local:2379'],
+         endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
        prometheus:
-         address: 'http://controller-prometheus-server.default.svc.cluster.local:80',
+         address: "http://controller-prometheus-server.default.svc.cluster.local:80"
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
    ```
 
    ```bash
@@ -100,6 +114,9 @@ your cluster.
             endpoints: ["ETCD_ENDPOINT_HERE"]
           prometheus:
             address: "PROMETHEUS_ADDRESS_HERE"
+          plugins:
+            disabled_plugins:
+              - aperture-plugin-fluxninja
       ```
 
       Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE`

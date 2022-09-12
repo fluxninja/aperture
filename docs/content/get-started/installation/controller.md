@@ -55,7 +55,24 @@ into your cluster.
    helm repo update
    ```
 
-2. The Aperture Controller can be installed using the default `values.yaml`:
+2. Configure the below parameters for the Controller Custom Resource by creating
+   a `values.yaml` with below parameters and pass it with `helm upgrade`:
+
+   :::info
+
+   The below parameters disable the FluxNinja Cloud Plugin for the Aperture
+   Controller. If you want to keep it enabled, add parameters provided
+   [here](/cloud/plugin.md#configuration) under the `controller.config` section.
+
+   :::
+
+   ```yaml
+   controller:
+     config:
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
+   ```
 
    ```bash
    helm upgrade --install controller aperture/aperture-controller
@@ -88,6 +105,14 @@ into your cluster.
           registry: docker.io/fluxninja
           repository: aperture-controller
           tag: latest
+        config:
+          etcd:
+            endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
+          prometheus:
+            address: "http://controller-prometheus-server.default.svc.cluster.local:80"
+          plugins:
+            disabled_plugins:
+              - aperture-plugin-fluxninja
       ```
 
       All the configuration parameters for the Controller Custom Resource are
@@ -108,6 +133,9 @@ into your cluster.
 
    ```yaml
    controller:
+     plugins:
+       disabled_plugins:
+         - aperture-plugin-fluxninja
      config:
        etcd:
          endpoints: ["ETCD_ENDPOINT_HERE"]
