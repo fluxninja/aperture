@@ -426,8 +426,6 @@ definitions:
             associated with particular feature. What contributes to the span's
             duration is entirely up to the user code that uses Aperture SDK.
     description: |-
-      FluxMeter gathers metrics for the traffic that matches its selector.
-
       :::info
       See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
       :::
@@ -440,6 +438,7 @@ definitions:
         control_point:
           traffic: ingress
       ```
+    title: FluxMeter gathers metrics for the traffic that matches its selector
   protobufAny:
     type: object
     properties:

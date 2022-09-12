@@ -20,11 +20,7 @@ description: Policies reference
 - [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 - [languagev1RateLimiter](#languagev1-rate-limiter) – Limits the traffic on a control point to specified rate
 - [policylanguagev1Classifier](#policylanguagev1-classifier) – Set of classification rules sharing a common selector
-- [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
-
-:::info
-Se…
-
+- [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector
 - [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
 - [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals
 - [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
@@ -358,7 +354,7 @@ how to extract and propagate flow labels with that key.
 
 ### policylanguagev1FluxMeter {#policylanguagev1-flux-meter}
 
-FluxMeter gathers metrics for the traffic that matches its selector.
+FluxMeter gathers metrics for the traffic that matches its selector
 
 :::info
 See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
