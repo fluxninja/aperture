@@ -23,7 +23,7 @@ message FluxMeter {
   //   response).
   // * For feature control points, fluxmeter will measure execution of the span
   //   associated with particular feature. What contributes to the span's
-  //   duration is entirely up to the user code that uses Aperture library.
+  //   duration is entirely up to the user code that uses Aperture SDK.
   common.selector.v1.Selector selector = 1;
 
   // Latency histogram buckets (in ms) for this FluxMeter.
@@ -40,7 +40,7 @@ message FluxMeter {
   //
   // :::info
   // For list of available attributes in Envoy access logs, refer
-  // [Envoy Filter](/get-started/istio.md#envoy-filter)
+  // [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
   // :::
   //
   string attribute_key = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

@@ -15,7 +15,7 @@ Aperture splits the process of flow control in two layers:
 
 - Governing the flow control process and making high-level decisions. This is
   done by Aperture Controller through _policies_. You can read more about
-  policies in [the next chapter][policies].
+  policies in [Policies chapter][policies].
 - Actual execution of flow control is performed by Aperture Agent via
   [Concurrency Limiters][concurrency-limiter] or [Rate Limiters][rate-limiter].
   Additionally the Agent handles other flow-control related tasks, like
@@ -69,10 +69,10 @@ There are two types of control points:
   at its **ingress** control point. Likewise every outgoing request from a
   service is a flow at its **egress** control point.
 
-- **Feature** control points. When using Aperture library, you can define
-  arbitrary piece of code as a feature and give it a name. In the example above,
-  frontend service defines two features: _recommendations_ and _live-update_.
-  Let's imagine that…
+- **Feature** control points. When using Aperture SDK, you can define arbitrary
+  piece of code as a feature and give it a name. In the example above, frontend
+  service defines two features: _recommendations_ and _live-update_. Let's
+  imagine that…
   <!-- TODO tgill: move this example elsewhere like policy tutorial -->
   - …recommendations processing is heavyweight and slows down the frontend
     service (or some other downstream service), thus we want to track its
@@ -104,8 +104,8 @@ integrations that will communicate with the Aperture Agent.
   in this way. Envoy integration uses [Envoy's External Authorization
   API][ext-authz].
 
-- _Feature_ control points: We provide [Aperture library][aperture-go] for the
-  Go programming language.
+- _Feature_ control points: We provide [Aperture SDK][aperture-go] for the Go
+  programming language.
 
   The library provides API to begin a flow which translates to a
   [flowcontrol.v1.Check](https://github.com/fluxninja/aperture/blob/main/api/aperture/flowcontrol/v1/flowcontrol.proto)
@@ -139,7 +139,7 @@ start by first reading on concepts like [services][service] and [labels][label].
 [flux-meter]: ./flux-meter.md
 [classifier]: ./flow-classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
-[istio]: /get-started/istio.md
+[istio]: /get-started/installation/agent/envoy/istio.md
 [ext-authz]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [aperture-go]: https://github.com/FluxNinja/aperture-go

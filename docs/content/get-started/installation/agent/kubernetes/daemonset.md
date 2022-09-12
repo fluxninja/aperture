@@ -151,8 +151,9 @@ your cluster.
    helm upgrade --install agent aperture/aperture-agent -n aperture-agent --create-namespace
    ```
 
-6. Refer steps on the [Istio Configuration](/get-started/istio.md) if you don't
-   have the
+6. Refer steps on the
+   [Istio Configuration](/get-started/installation/agent/envoy/istio.md) if you
+   don't have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 
