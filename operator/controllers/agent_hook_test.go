@@ -37,7 +37,7 @@ var agentInvalidSampleYAML string
 
 var _ = Describe("Agent Hook Tests", Ordered, func() {
 	Context("testing Handle", func() {
-		It("should add defauls in spec when valid instance is provided", func() {
+		It("should add defaults in spec when valid instance is provided", func() {
 			agentHook := AgentHooks{}
 
 			res := agentHook.Handle(context.Background(), admission.Request{
@@ -50,7 +50,7 @@ var _ = Describe("Agent Hook Tests", Ordered, func() {
 			Expect(len(res.Patches) > 0).To(Equal(true))
 		})
 
-		It("should not add defauls in spec when invalid instance is provided", func() {
+		It("should not add defaults in spec when invalid instance is provided", func() {
 			agentHook := AgentHooks{}
 
 			res := agentHook.Handle(context.Background(), admission.Request{

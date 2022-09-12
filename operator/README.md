@@ -9,7 +9,7 @@ resources on the Kubernetes.
 
 ## Custom Resources
 
-The operator has below custome resources:
+The operator has below custom resources:
 
 - Agent
 - Controller

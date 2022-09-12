@@ -306,7 +306,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 						log.Error().Msg(errMsg)
 						return errors.New(errMsg)
 					}
-					// check precense of index in readings
+					// check presence of index in readings
 					if index >= len(readings) {
 						// Create error message
 						errMsg := fmt.Sprintf("unexpected state: index %d is out of range in port %s. abort circuit execution", index, port)

@@ -169,7 +169,7 @@ operator:
   ## @param operator.containerSecurityContext.runAsGroup User ID for the operator container
   ## @param operator.containerSecurityContext.runAsNonRoot Force the container to be run as non-root
   ## @param operator.containerSecurityContext.privileged Decide if the container runs privileged.
-  ## @param operator.containerSecurityContext.readOnlyRootFilesystem ReadOnlyRootFilesystem fot the operator container
+  ## @param operator.containerSecurityContext.readOnlyRootFilesystem ReadOnlyRootFilesystem for the operator container
   ## @param operator.containerSecurityContext.allowPrivilegeEscalation Allow Privilege Escalation for the operator container
   ##
   containerSecurityContext:

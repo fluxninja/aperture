@@ -534,7 +534,7 @@ def invert_dep_tree(dep_tree):
 
 def get_resource_list_to_deploy(names, run_only_listed, dep_tree, inv_dep_tree):
     """
-    Resursively convert list of NS and service names to set of required services
+    Recursively convert list of NS and service names to set of required services
     If a given name is both a name of resource and namespace, it is assumed to be resource
     """
     if "all" in names:
@@ -869,7 +869,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
         )
 
     if "demo-app" in resources:
-        readiness_probe=probe(initial_delay_secs=5, exec=exec_action(['kubectl', 'get', "svc", "aperture-controller", "-n", APERTURE_CONTROLLER_NS])) # Treat as success if servie is available
+        readiness_probe=probe(initial_delay_secs=5, exec=exec_action(['kubectl', 'get', "svc", "aperture-controller", "-n", APERTURE_CONTROLLER_NS])) # Treat as success if service is available
         local_resource(
             name="controller-service",
             labels="ApertureController",
