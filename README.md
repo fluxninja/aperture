@@ -32,6 +32,12 @@ facilitated by agents and a controller.
   </picture>
 </p>
 
+<p align="center">
+  <picture>
+    <img alt="Latency Gradient Policy Dashboard" src="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/grafana_dashboard.png">
+  </picture>
+</p>
+
 For more detailed description, refer to [the docs](https://docs.fluxninja.com/).
 
 ## Playground
@@ -39,13 +45,9 @@ For more detailed description, refer to [the docs](https://docs.fluxninja.com/).
 To try aperture in local K8s environment, refer to
 [Playground docs](playground/README.md).
 
-## Contributing
-
-We would really appreciate your help!
+## Slack Community
 
 [![Slack](https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen)](https://join.slack.com/t/aperturetech/shared_invite/zt-1ewkfjfy9-~wF4EryoDyJ6kaPRTNZPyA)
-
-See our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ### Reporting bugs or requesting features
 
@@ -58,27 +60,6 @@ Follow helper questions in bug report template to make it easier.
 If you see a way to improve Aperture, use the feature request template to create
 an issue. Make sure to explain the problem you are trying to solve and what is
 the expected behavior.
-
-### Creating Pull Requests
-
-When you are ready to contribute, pick an issue you'd like to solve. Try
-starting with:
-
-- [Good First Issue](https://github.com/fluxninja/aperture/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-
-For your convenience, all the needed development tools can be installed with
-[`asdf`](playground/README.md#tools).
-
-Before committing, install `pre-commit` hooks, which will automatically check if
-your code meets our standards.
-
-```
-pre-commit install --hook-type={pre-commit,commit-msg,prepare-commit-msg}
-pre-commit install-hooks
-```
-
-After your first PR is created you would be asked to sign our
-[Contributor License Agreement](https://cla-assistant.io/fluxninja/aperture).
 
 ## Resources
 
