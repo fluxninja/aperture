@@ -47,7 +47,7 @@ type Classifier struct {
 	// Defines where to apply the flow classification rule.
 	Selector *v1.Selector `protobuf:"bytes,1,opt,name=selector,proto3" json:"selector,omitempty" validate:"required"` // @gotags: validate:"required"
 	// A map of {key, value} pairs mapping from
-	// [flow label](/concepts/flow-control/selector/flow-label.md) keys to rules that define
+	// [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
 	// how to extract and propagate flow labels with that key.
 	Rules map[string]*Rule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"required,gt=0,dive,keys,required,endkeys,required"` // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
 }
@@ -143,7 +143,7 @@ type Rule struct {
 	//	*Rule_Rego_
 	Source isRule_Source `protobuf_oneof:"source"`
 	// Decides if the created label should be applied to the whole request chain
-	// (propagated in [baggage](/concepts/flow-control/selector/flow-label.md#baggage))
+	// (propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
 	Propagate bool `protobuf:"varint,3,opt,name=propagate,proto3" json:"propagate,omitempty" default:"true"` // @gotags: default:"true"
 	// Decides if the created flow label should be hidden from the telemetry.
 	// A hidden flow label is still accessible in policies and can be used as eg.

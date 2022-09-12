@@ -22,7 +22,8 @@ description: Policies reference
 - [policylanguagev1Classifier](#policylanguagev1-classifier) – Set of classification rules sharing a common selector
 - [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 
-Example of…
+:::info
+Se…
 
 - [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
 - [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals
@@ -53,7 +54,7 @@ Example of…
 - [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload
 - [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
 - [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of
-  [labels](/concepts/flow-control/selector/flow-label.md)
+  [labels](/concepts/flow-control/flow-label.md)
   should be considered a match or not
 - [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
 - [v1LoadShedActuatorIns](#v1-load-shed-actuator-ins) – Input for the Load Shed Actuator component.
@@ -180,7 +181,7 @@ Workload defines a class of requests that preferably have similar properties suc
 <dd>
 
 (string) Fairness key is a label key that can be used to provide fairness within a workload.
-Any [flow label](/concepts/flow-control/selector/flow-label.md) can be used here. Eg. if
+Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
 you have a classifier that sets `user` flow label, you might want to set
 `fairness_key = "user"`.
 
@@ -211,7 +212,7 @@ This override is applicable only if `auto_tokens` is set to false.
 <dd>
 
 ([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based on
-[flow labels](/concepts/flow-control/selector/flow-label.md).
+[flow labels](/concepts/flow-control/flow-label.md).
 
 </dd>
 <dt>workload</dt>
@@ -284,7 +285,7 @@ to select which label should be used as key.
 (string, `required`) Specifies which label the ratelimiter should be keyed by.
 
 Rate limiting is done independently for each value of the
-[label](/concepts/flow-control/selector/flow-label.md) with given key.
+[label](/concepts/flow-control/flow-label.md) with given key.
 Eg., to give each user a separate limit, assuming you have a _user_ flow
 label set up, set `label_key: "user"`.
 
@@ -343,7 +344,7 @@ rules:
 <dd>
 
 (map of [V1Rule](#v1-rule), `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/selector/flow-label.md) keys to rules that define
+[flow label](/concepts/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
 
 </dd>
@@ -358,6 +359,10 @@ how to extract and propagate flow labels with that key.
 ### policylanguagev1FluxMeter {#policylanguagev1-flux-meter}
 
 FluxMeter gathers metrics for the traffic that matches its selector.
+
+:::info
+See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+:::
 
 Example of a selector that creates a histogram metric for all HTTP requests
 to particular service:
@@ -379,7 +384,7 @@ selector:
 
 :::info
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/get-started/istio.md#envoy-filter)
+[Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
 :::
 
 </dd>
@@ -399,7 +404,7 @@ For list of available attributes in Envoy access logs, refer
   response).
 - For feature control points, fluxmeter will measure execution of the span
   associated with particular feature. What contributes to the span's
-  duration is entirely up to the user code that uses Aperture library.
+  duration is entirely up to the user code that uses Aperture SDK.
 
 </dd>
 </dl>
@@ -502,9 +507,13 @@ Outputs for the Arithmetic Combinator component.
 
 Circuit is defined as a dataflow graph of inter-connected components
 
+:::info
+See also [Circuit overview](/concepts/policy/circuit.md).
+:::
+
 Signals flow between components via ports.
-As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
-Circuit evaluated periodically in order to respond to changes in signal readings.
+As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
+Circuit is evaluated periodically in order to respond to changes in signal readings.
 
 :::info
 **Signal**
@@ -543,6 +552,10 @@ This interval is typically aligned with how often the corrective action (actuati
 ### v1Component {#v1-component}
 
 Computational block that form the circuit
+
+:::info
+See also [Components overview](/concepts/policy/circuit.md#components).
+:::
 
 Signals flow into the components via input ports and results are emitted on output ports.
 Components are wired to each other based on signal names forming an execution graph of the circuit.
@@ -701,7 +714,7 @@ Controlpoint is either a library feature name or one of ingress/egress traffic c
 <dt>feature</dt>
 <dd>
 
-(string, `required`) Name of FlunxNinja library's feature.
+(string, `required`) Name of Aperture SDK's feature.
 Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
 
 Note: Flowcontrol only.
@@ -1349,7 +1362,7 @@ If the operator is Exists or DoesNotExist, the values array must be empty.
 ### v1LabelMatcher {#v1-label-matcher}
 
 Allows to define rules whether a map of
-[labels](/concepts/flow-control/selector/flow-label.md)
+[labels](/concepts/flow-control/flow-label.md)
 should be considered a match or not
 
 It provides three ways to define requirements:
@@ -1647,6 +1660,10 @@ Example:
 
 Policy expresses reliability automation workflow that automatically protects services
 
+:::info
+See also [Policy overview](/concepts/policy/policy.md).
+:::
+
 Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 
 #### Properties
@@ -1753,6 +1770,10 @@ under certain circumstances. [Decider](#v1-decider) might be helpful.
 
 Resources that need to be setup for the policy to function
 
+:::info
+See also [Resources overview](/concepts/policy/resources.md).
+:::
+
 Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 
 #### Properties
@@ -1846,7 +1867,7 @@ sensitive labels.
 <dd>
 
 (bool, `required`) Decides if the created label should be applied to the whole request chain
-(propagated in [baggage](/concepts/flow-control/selector/flow-label.md#baggage))
+(propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
 
 </dd>
 <dt>rego</dt>
@@ -2044,7 +2065,7 @@ within the entity where the policy should apply to.
 <dd>
 
 ([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
-[flow labels](/concepts/flow-control/selector/flow-label.md)
+[flow labels](/concepts/flow-control/flow-label.md)
 must also be satisfied (in addition to service+control point matching)
 
 :::info

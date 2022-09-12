@@ -7,7 +7,7 @@ keywords:
   - fairness
   - queuing
   - actuators
-sidebar_position: 3
+sidebar_position: 5
 ---
 
 :::info
@@ -69,5 +69,5 @@ The timeout parameter decides how long a request in the workload can wait for
 tokens. This value impacts fairness because the larger the timeout the higher
 the chance a request has to get scheduled.
 
-[label-matcher]: ./selector/selector.md#label-matcher
+[label-matcher]: /concepts/flow-control/selector/selector.md#label-matcher
 [policies]: /concepts/policy/policy.md

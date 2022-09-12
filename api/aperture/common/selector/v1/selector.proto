@@ -67,7 +67,7 @@ message Selector {
   }]; // @gotags: validate:"required"
 
   // Label matcher allows to add _additional_ condition on
-  // [flow labels](/concepts/flow-control/selector/flow-label.md)
+  // [flow labels](/concepts/flow-control/flow-label.md)
   // must also be satisfied (in addition to service+control point matching)
   //
   // :::info
@@ -92,7 +92,7 @@ message Selector {
 message ControlPoint {
   // @gotags: validate:"required"
   oneof controlpoint {
-    // Name of FlunxNinja library's feature.
+    // Name of Aperture SDK's feature.
     // Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
     //
     // Note: Flowcontrol only.

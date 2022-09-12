@@ -62,4 +62,4 @@ For more details, see plugin configuration reference:
 
 How various components interact with the plugin:
 
-- [Flow labels](/concepts/flow-control/selector/flow-label.md#plugin)
+- [Flow labels](/concepts/flow-control/flow-label.md#plugin)

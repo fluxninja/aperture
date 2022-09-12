@@ -122,6 +122,10 @@ func (x *AllPolicies) GetAllPolicies() map[string]*Policy {
 
 // Policy expresses reliability automation workflow that automatically protects services
 //
+// :::info
+// See also [Policy overview](/concepts/policy/policy.md).
+// :::
+//
 // Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 type Policy struct {
 	state         protoimpl.MessageState
@@ -182,9 +186,13 @@ func (x *Policy) GetResources() *Resources {
 
 // Circuit is defined as a dataflow graph of inter-connected components
 //
+// :::info
+// See also [Circuit overview](/concepts/policy/circuit.md).
+// :::
+//
 // Signals flow between components via ports.
-// As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
-// Circuit evaluated periodically in order to respond to changes in signal readings.
+// As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
+// Circuit is evaluated periodically in order to respond to changes in signal readings.
 //
 // :::info
 // **Signal**
@@ -261,6 +269,10 @@ func (x *Circuit) GetComponents() []*Component {
 
 // Resources that need to be setup for the policy to function
 //
+// :::info
+// See also [Resources overview](/concepts/policy/resources.md).
+// :::
+//
 // Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 type Resources struct {
 	state         protoimpl.MessageState
@@ -324,6 +336,10 @@ func (x *Resources) GetClassifiers() []*Classifier {
 }
 
 // Computational block that form the circuit
+//
+// :::info
+// See also [Components overview](/concepts/policy/circuit.md#components).
+// :::
 //
 // Signals flow into the components via input ports and results are emitted on output ports.
 // Components are wired to each other based on signal names forming an execution graph of the circuit.
@@ -1088,7 +1104,7 @@ type RateLimiter struct {
 	// Specifies which label the ratelimiter should be keyed by.
 	//
 	// Rate limiting is done independently for each value of the
-	// [label](/concepts/flow-control/selector/flow-label.md) with given key.
+	// [label](/concepts/flow-control/flow-label.md) with given key.
 	// Eg., to give each user a separate limit, assuming you have a _user_ flow
 	// label set up, set `label_key: "user"`.
 	LabelKey string `protobuf:"bytes,4,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -2545,7 +2561,7 @@ type Scheduler_Workload struct {
 	// This override is applicable only if `auto_tokens` is set to false.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" default:"1"` // @gotags: default:"1"
 	// Fairness key is a label key that can be used to provide fairness within a workload.
-	// Any [flow label](/concepts/flow-control/selector/flow-label.md) can be used here. Eg. if
+	// Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
 	// you have a classifier that sets `user` flow label, you might want to set
 	// `fairness_key = "user"`.
 	FairnessKey string `protobuf:"bytes,3,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`
@@ -2612,7 +2628,7 @@ type Scheduler_WorkloadAndLabelMatcher struct {
 	// Workload associated with flows matching the label matcher.
 	Workload *Scheduler_Workload `protobuf:"bytes,1,opt,name=workload,proto3" json:"workload,omitempty"`
 	// Label Matcher to select a Workload based on
-	// [flow labels](/concepts/flow-control/selector/flow-label.md).
+	// [flow labels](/concepts/flow-control/flow-label.md).
 	LabelMatcher *v11.LabelMatcher `protobuf:"bytes,2,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty"`
 }
 

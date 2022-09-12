@@ -1,4 +1,7 @@
 {{- define "common-otlp-attributes" -}}
+- key: aperture.source
+  value:
+    string_value: "envoy"
 - key: http.method
   value:
     string_value: "%REQ(:METHOD)%"
