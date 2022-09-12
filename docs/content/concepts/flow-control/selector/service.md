@@ -87,7 +87,6 @@ graph TB
     end
 ```
 
-[distributed-counters]:
-  /concepts/flow-control/rate-limiter.md#distributed-counters
+[distributed-counters]: /concepts/flow-control/rate-limiter.md#distributed-counters
 [components]: /concepts/flow-control/flow-control.md#components
 [catch-all-service]: /concepts/flow-control/selector/selector.md#service
