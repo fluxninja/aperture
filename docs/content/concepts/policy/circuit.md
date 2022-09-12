@@ -128,5 +128,4 @@ Components are divided into following functional categories to aid exploration:
 [circuit-reference]: /reference/configuration/policies.md#v1-circuit
 [promql-reference]: /reference/configuration/policies.md#v1-prom-q-l
 [scheduler-reference]: /reference/configuration/policies.md#v1-scheduler
-[flow-control-scheduler]:
-  /concepts/flow-control/concurrency-limiter.md#scheduler
+[flow-control-scheduler]: ../flow-control/concurrency-limiter.md#scheduler
