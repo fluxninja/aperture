@@ -1,6 +1,6 @@
 ---
 title: Flow Classifier
-sidebar_position: 5
+sidebar_position: 3
 ---
 
 :::info
@@ -119,9 +119,9 @@ See [full example in reference][reference]
 [attr-context]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
-[label]: ./selector/flow-label.md
-[baggage]: ./selector/flow-label.md#baggage
-[request-labels]: ./selector/flow-label.md#request-labels
+[label]: ./flow-label.md
+[baggage]: ./flow-label.md#baggage
+[request-labels]: ./flow-label.md#request-labels
 [reference]: /reference/configuration/policies.md#v1-classifier
 [rule]: /reference/configuration/policies.md#v1-rule
 [extractor]: /reference/configuration/policies.md#v1-extractor

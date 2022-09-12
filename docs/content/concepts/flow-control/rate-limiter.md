@@ -57,4 +57,4 @@ mechanisms. Eg. you might want to increase the limit for the admin user. See
 [reference]: /reference/configuration/policies.md#languagev1-rate-limiter
 [agent-group]: ./selector/service.md#agent-group
 [policies]: /concepts/policy/policy.md
-[flow-label]: ./selector/flow-label.md
+[flow-label]: ./flow-label.md

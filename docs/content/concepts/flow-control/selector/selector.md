@@ -80,7 +80,7 @@ label_matcher:
 ```
 
 [flow]: ../flow-control.md#flow
-[label]: ./flow-label.md
+[label]: ../flow-label.md
 [control-point]: ../flow-control.md#control-point
 [service]: service.md
 [agent-group]: service.md#agent-group
