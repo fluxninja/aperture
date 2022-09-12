@@ -264,6 +264,32 @@ rules:
   - patch
   - update
 - apiGroups:
+  - fluxninja.com
+  resources:
+  - policies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - fluxninja.com
+  resources:
+  - policies/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - fluxninja.com
+  resources:
+  - policies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - policy
   resources:
   - podsecuritypolicies
