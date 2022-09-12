@@ -379,7 +379,7 @@ selector:
 
 :::info
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/get-started/istio.md#envoy-filter)
+[Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
 :::
 
 </dd>
@@ -399,7 +399,7 @@ For list of available attributes in Envoy access logs, refer
   response).
 - For feature control points, fluxmeter will measure execution of the span
   associated with particular feature. What contributes to the span's
-  duration is entirely up to the user code that uses Aperture library.
+  duration is entirely up to the user code that uses Aperture SDK.
 
 </dd>
 </dl>
@@ -503,8 +503,8 @@ Outputs for the Arithmetic Combinator component.
 Circuit is defined as a dataflow graph of inter-connected components
 
 Signals flow between components via ports.
-As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load shed, rate-limit, auto-scale etc.).
-Circuit evaluated periodically in order to respond to changes in signal readings.
+As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
+Circuit is evaluated periodically in order to respond to changes in signal readings.
 
 :::info
 **Signal**
@@ -701,7 +701,7 @@ Controlpoint is either a library feature name or one of ingress/egress traffic c
 <dt>feature</dt>
 <dd>
 
-(string, `required`) Name of FlunxNinja library's feature.
+(string, `required`) Name of Aperture SDK's feature.
 Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
 
 Note: Flowcontrol only.

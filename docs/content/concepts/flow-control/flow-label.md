@@ -19,7 +19,7 @@ Flow labels are used in different ways in Aperture:
 ## Sources
 
 Flows are annotated with flow labels based on four sources: request labels,
-baggage, flow classifiers, and explicit labels from the Aperture library call.
+baggage, flow classifiers, and explicit labels from the Aperture SDK call.
 
 ### Request labels
 
@@ -62,9 +62,9 @@ this means you can set or extract the label in a different place than where it
 is consumed (assuming you have baggage propagation configured throughout your
 system).
 
-### Aperture library
+### Aperture SDK
 
-The Aperture library, in addition to automatically pulling baggage from context,
+The Aperture SDK, in addition to automatically pulling baggage from context,
 also takes an explicit `labels` map in the `Check()` call.
 
 ## Telemetry
@@ -154,4 +154,4 @@ select which labels to include in telemetry.
 [control-point]: /concepts/flow-control/flow-control.md#control-point
 [otel-conventions]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
 [aperture-go]: https://github.com/FluxNinja/aperture-go
-[istio]: /get-started/istio.md
+[istio]: /get-started/installation/agent/envoy/istio.md

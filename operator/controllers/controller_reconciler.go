@@ -120,9 +120,8 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	if instance.GetDeletionTimestamp() != nil {
 		logger.Info(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", instance.GetName(), instance.GetNamespace()))
 		if controllerutil.ContainsFinalizer(instance, finalizerName) {
-			if err = r.deleteResources(ctx, logger, instance.DeepCopy()); err != nil {
-				return ctrl.Result{}, err
-			}
+			r.deleteResources(ctx, logger, instance.DeepCopy())
+
 			controllerutil.RemoveFinalizer(instance, finalizerName)
 			if err = r.updateController(ctx, instance); err != nil && !errors.IsNotFound(err) {
 				return ctrl.Result{}, err
@@ -249,15 +248,13 @@ func (r *ControllerReconciler) updateStatus(ctx context.Context, instance *v1alp
 }
 
 // deleteResources deletes cluster-scoped resources for which owner-reference is not added.
-func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
+func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) {
 	deleteClusterRole := true
 	instances := &v1alpha1.AgentList{}
 	err := r.List(ctx, instances)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil {
 		log.Error(err, "failed to list Agents")
-		return err
-	}
-	if instances.Items != nil && len(instances.Items) != 0 {
+	} else if instances.Items != nil && len(instances.Items) != 0 {
 		for _, ins := range instances.Items {
 			if ins.Status.Resources == "created" {
 				deleteClusterRole = false
@@ -265,23 +262,18 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 		}
 	}
 	if deleteClusterRole {
-		if err := r.Delete(ctx, clusterRoleForController(instance)); err != nil && !errors.IsNotFound(err) {
+		if err := r.Delete(ctx, clusterRoleForController(instance)); err != nil {
 			log.Error(err, "failed to delete object of ClusterRole")
-			return err
 		}
 	}
 
-	if err := r.Delete(ctx, clusterRoleBindingForController(instance)); err != nil && !errors.IsNotFound(err) {
+	if err := r.Delete(ctx, clusterRoleBindingForController(instance)); err != nil {
 		log.Error(err, "failed to delete object of ClusterRoleBinding")
-		return err
 	}
 
-	if err := r.Delete(ctx, validatingWebhookConfiguration(instance, nil)); err != nil && !errors.IsNotFound(err) {
+	if err := r.Delete(ctx, validatingWebhookConfiguration(instance, nil)); err != nil {
 		log.Error(err, "failed to delete object of ValidatingWebhookConfiguration")
-		return err
 	}
-
-	return nil
 }
 
 // checkDefaults checks and sets defaults when the Defaulter webhook is not triggered.
