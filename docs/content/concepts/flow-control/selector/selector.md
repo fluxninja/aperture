@@ -79,11 +79,11 @@ label_matcher:
     user_tier: gold
 ```
 
-[flow]: ../flow-control.md#flow
-[label]: ./flow-label.md
-[control-point]: ../flow-control.md#control-point
-[service]: service.md
-[agent-group]: service.md#agent-group
-[flux-meter]: ../flux-meter.md
-[classifier]: ../flow-classifier.md
+[flow]: /concepts/flow-control/flow-control.md#flow
+[label]: /concepts/flow-control/flow-label.md
+[control-point]: /concepts/flow-control/flow-control.md#control-point
+[service]: /concepts/flow-control/selector/service.md
+[agent-group]: /concepts/flow-control/selector/service.md#agent-group
+[flux-meter]: /concepts/flow-control/flux-meter.md
+[classifier]: /concepts/flow-control/flow-classifier.md
 [label-matcher]: /reference/configuration/policies.md#v1-label-matcher

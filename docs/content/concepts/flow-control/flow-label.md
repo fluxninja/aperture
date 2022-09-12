@@ -1,13 +1,13 @@
 ---
 title: Flow Label
-sidebar_position: 0.75
+sidebar_position: 2
 ---
 
-Every [flow][flow] is annotated with a set of **flow labels**. Each flow label
-is a key:value pair. Eg. if a flow is annotated with `user_tier:gold` label,
-then `user_tier` is a label key and `gold` is a label value.
+Every [Flow][flow] is annotated with a set of **flow labels**. Each flow label
+is a key:value pair. If a Flow is annotated with `user_tier:gold` label, then
+`user_tier` is a label key and `gold` is a label value.
 
-Flow labels are used used in different ways in Aperture:
+Flow labels are used in different ways in Aperture:
 
 - [Flow selector][selector] can select flows based on flow labels, thus flow
   labels can be used to narrow the scope of [Classifiers][classifier], Limiters
@@ -19,7 +19,7 @@ Flow labels are used used in different ways in Aperture:
 ## Sources
 
 Flows are annotated with flow labels based on four sources: request labels,
-baggage, flow classifiers and explicit labels from the Aperture SDK call.
+baggage, flow classifiers, and explicit labels from the Aperture SDK call.
 
 ### Request labels
 
@@ -34,7 +34,7 @@ spans][otel-conventions]. The only exception is `http.host` attribute, which is
 equal to Host/Authority header. This is thus similar to `net.peer.name` OTEL
 attribute, but is provided for both ingress and egress control points.
 
-### Baggage
+### Baggage {#baggage}
 
 Baggage propagation is a powerful concept that allows attaching metadata to a
 whole request chain or to a whole [trace][traces]. If you already have baggage
@@ -66,6 +66,57 @@ system).
 
 The Aperture SDK, in addition to automatically pulling baggage from context,
 also takes an explicit `labels` map in the `Check()` call.
+
+## Telemetry
+
+Telemetry data is extracted out of flows for further processing. This data is
+collected from the following sources:
+
+- Stream of access logs from service mesh (refer to [Istio
+  Configuration][istio])
+- Traces from [Apeture SDK][aperture-go]
+
+Aperture uses OpenTelemetry's robust pipelining for receiving the telemetry data
+and produce other streams of data from it.
+
+### Metrics
+
+Prometheus metrics are generated from the telemetry data that is received. Along
+the path of the [Flows][flow], telemetry data is tagged by the [flux
+meters][flux-meter] and [workloads][workload] that matched.
+
+### OLAP-style Telemetry
+
+OLAP-style telemetry data is generated as OpenTelemetry logs and is saved in an
+OLAP database. This is done by creating multi-dimensional rollups from flow
+labels.
+
+#### Default labels
+
+These are protocol-level labels (e.g. http, network) extracted by the
+configurated service mesh/middleware and are available to be referenced in
+selectors, execept for a few high-cardinality ones.
+
+#### Labels extracted from baggage
+
+These are flow labels mapped from [baggage](#baggage).
+
+#### Labels defined by user
+
+These are labels provided via classifiers in case of service mesh/middleware
+integration, or explicitly at [Flow][flow] creation in [Aperture
+SDK][aperture-go].
+
+:::note
+
+In the case of a clash, the flow label generated from the source takes
+predendence over the source below it:
+
+1. User-defined
+2. Baggage
+3. Default
+
+:::
 
 ## Interaction with FluxNinja Cloud plugin {#plugin}
 
@@ -99,8 +150,8 @@ select which labels to include in telemetry.
 [ratelimiter]: /concepts/flow-control/rate-limiter.md
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
-[traces]:
-  https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
-[control-point]: ../flow-control.md#control-point
-[otel-conventions]:
-  https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
+[traces]: https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
+[control-point]: /concepts/flow-control/flow-control.md#control-point
+[otel-conventions]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
+[aperture-go]: https://github.com/FluxNinja/aperture-go
+[istio]: /get-started/installation/agent/envoy/istio.md

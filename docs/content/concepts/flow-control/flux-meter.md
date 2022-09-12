@@ -1,6 +1,6 @@
 ---
 title: Flux Meter
-sidebar_position: 2
+sidebar_position: 6
 keywords:
   - fluxmeter
   - histograms
@@ -107,8 +107,7 @@ down to fine-grained APIs.
 [flow-control-integration]: /concepts/flow-control/flow-control.md#integrations
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles
-[envoy-access-log-spec]:
-  https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators
+[envoy-access-log-spec]: https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators
 [promql-reference]: /reference/configuration/policies.md#v1-prom-q-l
 [signal]: /concepts/policy/circuit.md#signal
 [google-sre-slo]: https://sre.google/workbook/implementing-slos/

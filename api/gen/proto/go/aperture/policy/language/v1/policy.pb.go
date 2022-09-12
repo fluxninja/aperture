@@ -1088,7 +1088,7 @@ type RateLimiter struct {
 	// Specifies which label the ratelimiter should be keyed by.
 	//
 	// Rate limiting is done independently for each value of the
-	// [label](/concepts/flow-control/selector/flow-label.md) with given key.
+	// [label](/concepts/flow-control/flow-label.md) with given key.
 	// Eg., to give each user a separate limit, assuming you have a _user_ flow
 	// label set up, set `label_key: "user"`.
 	LabelKey string `protobuf:"bytes,4,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -2545,7 +2545,7 @@ type Scheduler_Workload struct {
 	// This override is applicable only if `auto_tokens` is set to false.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" default:"1"` // @gotags: default:"1"
 	// Fairness key is a label key that can be used to provide fairness within a workload.
-	// Any [flow label](/concepts/flow-control/selector/flow-label.md) can be used here. Eg. if
+	// Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
 	// you have a classifier that sets `user` flow label, you might want to set
 	// `fairness_key = "user"`.
 	FairnessKey string `protobuf:"bytes,3,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`
@@ -2612,7 +2612,7 @@ type Scheduler_WorkloadAndLabelMatcher struct {
 	// Workload associated with flows matching the label matcher.
 	Workload *Scheduler_Workload `protobuf:"bytes,1,opt,name=workload,proto3" json:"workload,omitempty"`
 	// Label Matcher to select a Workload based on
-	// [flow labels](/concepts/flow-control/selector/flow-label.md).
+	// [flow labels](/concepts/flow-control/flow-label.md).
 	LabelMatcher *v11.LabelMatcher `protobuf:"bytes,2,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty"`
 }
 

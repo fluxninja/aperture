@@ -41,7 +41,7 @@ generate-config-markdown:
 			# append $$dir/metadata on top of $$dir/$$basename.md \
 			cat $$dir/metadata $$dir/$$basename.md > $$dir/$$basename.md.tmp; \
 			mv $$dir/$$basename.md.tmp $$dir/$$basename.md; \
-			npx prettier --no-config --write $$dir/$$basename.md; \
+			npx prettier --write $$dir/$$basename.md; \
 			mv $$dir/$$basename.md ./content/reference/configuration; \
 		done; \
 	}
@@ -67,7 +67,7 @@ generate-config-markdown:
 	@# append gen/policies/metadata on top of gen/policies/policies.md
 	@cat gen/policies/metadata gen/policies/policies.md > gen/policies/policies.md.tmp
 	@mv gen/policies/policies.md.tmp gen/policies/policies.md
-	@npx prettier --no-config --write gen/policies/policies.md
+	@npx prettier --write gen/policies/policies.md
 	@mv gen/policies/policies.md content/reference/configuration
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update

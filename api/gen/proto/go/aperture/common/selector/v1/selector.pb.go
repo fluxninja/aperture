@@ -71,7 +71,7 @@ type Selector struct {
 	// within the entity where the policy should apply to.
 	ControlPoint *ControlPoint `protobuf:"bytes,3,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Label matcher allows to add _additional_ condition on
-	// [flow labels](/concepts/flow-control/selector/flow-label.md)
+	// [flow labels](/concepts/flow-control/flow-label.md)
 	// must also be satisfied (in addition to service+control point matching)
 	//
 	// :::info

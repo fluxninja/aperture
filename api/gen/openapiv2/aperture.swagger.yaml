@@ -234,7 +234,7 @@ definitions:
         type: string
         description: |-
           Fairness key is a label key that can be used to provide fairness within a workload.
-          Any [flow label](/concepts/flow-control/selector/flow-label.md) can be used here. Eg. if
+          Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
           you have a classifier that sets `user` flow label, you might want to set
           `fairness_key = "user"`.
       priority:
@@ -260,7 +260,7 @@ definitions:
         $ref: '#/definitions/v1LabelMatcher'
         description: |-
           Label Matcher to select a Workload based on
-          [flow labels](/concepts/flow-control/selector/flow-label.md).
+          [flow labels](/concepts/flow-control/flow-label.md).
       workload:
         $ref: '#/definitions/SchedulerWorkload'
         description: Workload associated with flows matching the label matcher.
@@ -333,7 +333,7 @@ definitions:
           Specifies which label the ratelimiter should be keyed by.
 
           Rate limiting is done independently for each value of the
-          [label](/concepts/flow-control/selector/flow-label.md) with given key.
+          [label](/concepts/flow-control/flow-label.md) with given key.
           Eg., to give each user a separate limit, assuming you have a _user_ flow
           label set up, set `label_key: "user"`.
         x-go-validate: required
@@ -370,7 +370,7 @@ definitions:
           $ref: '#/definitions/v1Rule'
         description: |-
           A map of {key, value} pairs mapping from
-          [flow label](/concepts/flow-control/selector/flow-label.md) keys to rules that define
+          [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
           how to extract and propagate flow labels with that key.
         x-go-validate: required,gt=0,dive,keys,required,endkeys,required
       selector:
@@ -1317,7 +1317,7 @@ definitions:
       An empty label matcher always matches.
     title: |-
       Allows to define rules whether a map of
-      [labels](/concepts/flow-control/selector/flow-label.md)
+      [labels](/concepts/flow-control/flow-label.md)
       should be considered a match or not
   v1LimiterDecision:
     type: object
@@ -1672,7 +1672,7 @@ definitions:
         type: boolean
         title: |-
           Decides if the created label should be applied to the whole request chain
-          (propagated in [baggage](/concepts/flow-control/selector/flow-label.md#baggage))
+          (propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
         x-go-validate: required
       rego:
         $ref: '#/definitions/RuleRego'
@@ -1856,7 +1856,7 @@ definitions:
           :::
         title: |-
           Label matcher allows to add _additional_ condition on
-          [flow labels](/concepts/flow-control/selector/flow-label.md)
+          [flow labels](/concepts/flow-control/flow-label.md)
           must also be satisfied (in addition to service+control point matching)
       service:
         type: string
