@@ -7,11 +7,11 @@ sidebar_position: 2
 
 :::info
 
-See also [Resourcs reference](/reference/configuration/policies.md#v1-resources)
+See also [Resources reference](/reference/configuration/policies.md#v1-resources)
 
 :::
 
-Resources section in Policy describes resources needed to set up a Circuit. Its
+Resources section in Policy describes resources needed to set up a Circuit. It's
 possible but not recommended to share Resources across Policies since Resources
 are always defined in the global scope. Resources may be referenced inside the
 Circuit, the exact reference mechanism depends on the type of Resource.

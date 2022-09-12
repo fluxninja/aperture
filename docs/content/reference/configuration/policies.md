@@ -22,7 +22,8 @@ description: Policies reference
 - [policylanguagev1Classifier](#policylanguagev1-classifier) – Set of classification rules sharing a common selector
 - [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector.
 
-Example of…
+:::info
+Se…
 
 - [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
 - [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals
@@ -359,6 +360,10 @@ how to extract and propagate flow labels with that key.
 
 FluxMeter gathers metrics for the traffic that matches its selector.
 
+:::info
+See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+:::
+
 Example of a selector that creates a histogram metric for all HTTP requests
 to particular service:
 
@@ -502,6 +507,10 @@ Outputs for the Arithmetic Combinator component.
 
 Circuit is defined as a dataflow graph of inter-connected components
 
+:::info
+See also [Circuit overview](/concepts/policy/circuit.md).
+:::
+
 Signals flow between components via ports.
 As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
 Circuit is evaluated periodically in order to respond to changes in signal readings.
@@ -543,6 +552,10 @@ This interval is typically aligned with how often the corrective action (actuati
 ### v1Component {#v1-component}
 
 Computational block that form the circuit
+
+:::info
+See also [Components overview](/concepts/policy/circuit.md#components).
+:::
 
 Signals flow into the components via input ports and results are emitted on output ports.
 Components are wired to each other based on signal names forming an execution graph of the circuit.
@@ -1647,6 +1660,10 @@ Example:
 
 Policy expresses reliability automation workflow that automatically protects services
 
+:::info
+See also [Policy overview](/concepts/policy/policy.md).
+:::
+
 Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 
 #### Properties
@@ -1752,6 +1769,10 @@ under certain circumstances. [Decider](#v1-decider) might be helpful.
 ### v1Resources {#v1-resources}
 
 Resources that need to be setup for the policy to function
+
+:::info
+See also [Resources overview](/concepts/policy/resources.md).
+:::
 
 Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 

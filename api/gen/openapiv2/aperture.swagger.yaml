@@ -428,6 +428,10 @@ definitions:
     description: |-
       FluxMeter gathers metrics for the traffic that matches its selector.
 
+      :::info
+      See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+      :::
+
       Example of a selector that creates a histogram metric for all HTTP requests
       to particular service:
       ```yaml
@@ -688,6 +692,10 @@ definitions:
           This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
         x-go-default: 0.5s
     description: |-
+      :::info
+      See also [Circuit overview](/concepts/policy/circuit.md).
+      :::
+
       Signals flow between components via ports.
       As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
       Circuit is evaluated periodically in order to respond to changes in signal readings.
@@ -750,6 +758,10 @@ definitions:
         $ref: '#/definitions/v1Sqrt'
         description: Takes an input signal and emits the square root of the input signal.
     description: |-
+      :::info
+      See also [Components overview](/concepts/policy/circuit.md#components).
+      :::
+
       Signals flow into the components via input ports and results are emitted on output ports.
       Components are wired to each other based on signal names forming an execution graph of the circuit.
 
@@ -1545,7 +1557,12 @@ definitions:
       resources:
         $ref: '#/definitions/v1Resources'
         description: Resources (FluxMeters, Classifiers etc.) to setup.
-    description: Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
+    description: |-
+      :::info
+      See also [Policy overview](/concepts/policy/policy.md).
+      :::
+
+      Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
     title: Policy expresses reliability automation workflow that automatically protects services
   v1Port:
     type: object
@@ -1645,7 +1662,12 @@ definitions:
           FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
 
           FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
-    description: Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+    description: |-
+      :::info
+      See also [Resources overview](/concepts/policy/resources.md).
+      :::
+
+      Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
     title: Resources that need to be setup for the policy to function
   v1Rule:
     type: object

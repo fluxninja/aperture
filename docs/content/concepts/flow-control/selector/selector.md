@@ -1,5 +1,6 @@
 ---
-title: Selector
+title: Flow Selector
+sidebar_label: Selector
 sidebar_position: 1
 keywords:
   - flows

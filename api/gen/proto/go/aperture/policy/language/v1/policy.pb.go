@@ -122,6 +122,10 @@ func (x *AllPolicies) GetAllPolicies() map[string]*Policy {
 
 // Policy expresses reliability automation workflow that automatically protects services
 //
+// :::info
+// See also [Policy overview](/concepts/policy/policy.md).
+// :::
+//
 // Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 type Policy struct {
 	state         protoimpl.MessageState
@@ -181,6 +185,10 @@ func (x *Policy) GetResources() *Resources {
 }
 
 // Circuit is defined as a dataflow graph of inter-connected components
+//
+// :::info
+// See also [Circuit overview](/concepts/policy/circuit.md).
+// :::
 //
 // Signals flow between components via ports.
 // As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
@@ -261,6 +269,10 @@ func (x *Circuit) GetComponents() []*Component {
 
 // Resources that need to be setup for the policy to function
 //
+// :::info
+// See also [Resources overview](/concepts/policy/resources.md).
+// :::
+//
 // Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 type Resources struct {
 	state         protoimpl.MessageState
@@ -324,6 +336,10 @@ func (x *Resources) GetClassifiers() []*Classifier {
 }
 
 // Computational block that form the circuit
+//
+// :::info
+// See also [Components overview](/concepts/policy/circuit.md#components).
+// :::
 //
 // Signals flow into the components via input ports and results are emitted on output ports.
 // Components are wired to each other based on signal names forming an execution graph of the circuit.

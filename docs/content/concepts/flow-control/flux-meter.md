@@ -17,20 +17,20 @@ See also [Flux Meter reference][reference]
 Flux Meter provides a way to translate a Flux of [Flows][flow] matching a
 [Selector][selector] to a Prometheus [Histogram Metric][histogram-metric].
 
-### Naming
+## Naming
 
 Flux Meter is referred by its name. It is strongly recommended to assign
 globally unique names to Flux Meters. A good practice is to prefix the Flux
 Meter name with the Policy name.
 
-:::warning
+:::caution warning
 
 Flux Meters with repeated names within the same Agent Group will fail to load at
 Agents.
 
 :::
 
-### Metric
+## Metric
 
 The default metric tracked by Flux Meter is the Flow's workload duration in
 milliseconds. The FluxMeter may be configured to track any arbitrary metric
@@ -39,7 +39,7 @@ coming via OpenTelemetry attributes on log or span telemetry streams from a
 metrics defined in the Envoy [access log specification][envoy-access-log-spec]
 may be used by Flux Meter.
 
-### Buckets
+## Buckets
 
 The buckets used by Histogram metric can be provided as configuration to Flux
 Meter. Buckets effect the accuracy of [quantile][quantiles] calculations at
@@ -101,7 +101,7 @@ signal to a Controller which determines the desired Concurrency of a Service.
 Flux Meters are a great way to measure [SLOs][google-sre-slo] of your Service
 down to fine-grained APIs.
 
-[reference]: /reference/configuration/policies.md#languagev1-flux-meter
+[reference]: /reference/configuration/policies.md#policylanguagev1-flux-meter
 [flow]: /concepts/flow-control/flow-control.md#flow
 [selector]: /concepts/flow-control/selector/selector.md
 [flow-control-integration]: /concepts/flow-control/flow-control.md#integrations
