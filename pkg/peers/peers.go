@@ -281,7 +281,8 @@ func (pd *PeerDiscovery) RegisterService(name string, address string) {
 	pd.selfPeer.Services[name] = address
 }
 
-func (pd *PeerDiscovery) addPeer(peer *peersv1.PeerInfo) {
+// AddPeer adds a peer info to the PeerDiscovery peers map.
+func (pd *PeerDiscovery) AddPeer(peer *peersv1.PeerInfo) {
 	defer pd.watchers.OnPeerAdded(peer)
 	pd.lock.Lock()
 	defer pd.lock.Unlock()
@@ -338,7 +339,7 @@ func (pd *PeerDiscovery) updatePeer(event notifiers.Event, unmarshaller config.U
 			log.Error().Err(err).Msg("failed to unmarshal peer info")
 			return
 		}
-		pd.addPeer(&peer)
+		pd.AddPeer(&peer)
 	} else if event.Type == notifiers.Remove {
 		key := string(event.Key)
 		addr := path.Base(key)
