@@ -1,6 +1,6 @@
 ---
 title: Blueprints
-description: Policies and dashboards pre-packaged as reusable blueprints
+description: Policies and dashboards pre-packaged as reusable Blueprints
 keywords:
   - jsonnet
   - grafana
@@ -11,23 +11,23 @@ sidebar_position: 3
 
 ## Introduction
 
-Aperture comes with a pre-packaged list of [Aperture policies][policies] and Grafana dashboards that
+Aperture comes with a pre-packaged list of [Aperture Policies][policies] and Grafana Dashboards that
 can be used both as a guide for creating new policies, and as ready-to-use
-blueprints for generating Aperture policies customized to a [Service][service].
+Blueprints for generating Aperture policies customized to a [Service][service].
 
 All dashboards and policies are written using the [Jsonnet][jsonnet-lang]
-language, and can be used both as jsonnet mixins or as standalone blueprints.
+language, and can be used both as jsonnet mixins or as standalone Blueprints.
 
 [jsonnet-lang]: https://jsonnet.org
 
 ## Initial Setup
 
-All blueprints are available from a separate [repository][aperture-blueprints].
+All Blueprints are available from a separate [repository][aperture-blueprints].
 See the repository [README.md][blueprints-readme] for the list of required tools
 and instructions on installing jsonnet dependencies with the help of a [jsonnet
 bundler][jb].
 
-The Blueprint Generator (used to generate JSON files from blueprints) also
+The Blueprint Generator (used to generate policy files from Blueprints) also
 depends on Python 3.8+ and [jsonnet][go-jsonnet].
 
 [aperture-blueprints]: https://github.com/fluxninja/aperture-blueprints
@@ -37,10 +37,10 @@ depends on Python 3.8+ and [jsonnet][go-jsonnet].
 
 ## Generating Aperture Policies and Grafana Dashboards
 
-The simplest way to use the blueprints repository is to render blueprints into
-JSON policy and dashboard files.
+The simplest way to use the Blueprints repository is to render Blueprints into
+policy and dashboard files.
 
-To generate JSON files, `scripts/aperture-generate.py` can be used:
+To generate files, `scripts/aperture-generate.py` can be used:
 
 ```sh
 $ ./scripts/aperture-generate.py --help
@@ -61,19 +61,19 @@ options:
   --config CONFIG  jsonnet file with blueprint configuration
 ```
 
-This script takes as options an output directory path where JSON files will be
+This script takes as options an output directory path where files will be
 saved and a path to a `config.libsonnet` file with local blueprint
 configuration. It also takes the BLUEPRINT argument, which is a path to the
 blueprint under the `blueprints/` directory.
 
-Under the `blueprints/` directory, the currently available blueprints can be
+Under the `blueprints/` directory, the currently available Blueprints can be
 found. Each blueprint consists of at least two files: `config.libsonnet` and
 `main.libsonnet`. `main.libsonnet` bundles actual policy and dashboard code
-(available under `lib/1.0`) into blueprints, and `config.libsonnet` comes with
+(available under `lib/1.0`) into Blueprints, and `config.libsonnet` comes with
 the default configuration for the given policy. This can be overridden by the
 `--config` option passed to the `aperture-generate.py` script.
 
-Custom configurations will be merged with blueprints' `config.libsonnet`
+Custom configurations will be merged with Blueprints' `config.libsonnet`
 resulting in the final configuration, according to jsonnet language rules: keys
 can be overwritten by reusing them in the custom configuration and nested
 objects can be merged by using `+:` operator. Check the `examples/` directory
@@ -83,7 +83,7 @@ The full command using the demoapp-latency-grand example looks like this:
 
 ```sh
 jb install
-./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet blueprints/latency-gradient
+./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet Blueprints/latency-gradient
 ```
 
 ## Using aperture-blueprints as a jsonnet mixins library
