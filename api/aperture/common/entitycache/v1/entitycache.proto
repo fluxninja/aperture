@@ -16,8 +16,7 @@ service EntityCacheService {
       get: "/v1/entity-cache/services-list"
     };
   }
-  rpc GetEntityByIp(GetEntityByIpRequest) returns (Entity) {}
-  rpc GetEntityByName(GetEntityByNameRequest) returns (Entity) {}
+  rpc GetEntity(GetEntityRequest) returns (Entity) {}
 }
 
 //
@@ -43,17 +42,7 @@ message OverlappingService {
   int32 entities_count = 3;
 }
 
-// GetEntityByIpRequest contains fields required to perform GetEntityByIpRequest call.
-message GetEntityByIpRequest {
-  string ip_address = 1;
-}
-
-// GetEntityByNameRequest contains fields required to perform GetEntityByNameRequest call.
-message GetEntityByNameRequest {
-  string entity_name = 1;
-}
-
-// Entities defines mappings of ip address to entity and entity name to entity.
+// Entities defines mapping of entities.
 message Entities {
   map<string, Entity> entities = 1;
 }
@@ -70,4 +59,12 @@ message Entity {
   string ip_address = 2;
   repeated string services = 3;
   string entity_name = 4;
+}
+
+// GetEntityRequest contains one of the required info fields to perform GetEntity call.
+message GetEntityRequest {
+  oneof by {
+    string ip_address = 1;
+    string entity_name = 2;
+  }
 }

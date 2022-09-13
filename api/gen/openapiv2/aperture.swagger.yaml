@@ -15,9 +15,9 @@ consumes:
 produces:
   - application/json
 paths:
-  /aperture.common.entitycache.v1.EntityCacheService/GetEntityByIp:
+  /aperture.common.entitycache.v1.EntityCacheService/GetEntity:
     post:
-      operationId: EntityCacheService_GetEntityByIp
+      operationId: EntityCacheService_GetEntity
       responses:
         "200":
           description: A successful response.
@@ -29,32 +29,11 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: body
-          description: GetEntityByIpRequest contains fields required to perform GetEntityByIpRequest call.
+          description: GetEntityRequest contains one of the required info fields to perform GetEntity call.
           in: body
           required: true
           schema:
-            $ref: '#/definitions/v1GetEntityByIpRequest'
-      tags:
-        - EntityCacheService
-  /aperture.common.entitycache.v1.EntityCacheService/GetEntityByName:
-    post:
-      operationId: EntityCacheService_GetEntityByName
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1Entity'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          description: GetEntityByNameRequest contains fields required to perform GetEntityByNameRequest call.
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1GetEntityByNameRequest'
+            $ref: '#/definitions/v1GetEntityRequest'
       tags:
         - EntityCacheService
   /aperture.flowcontrol.v1.FlowControlService/Check:
@@ -1185,18 +1164,14 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Extrapolated signal.
     description: Outputs for the Extrapolator component.
-  v1GetEntityByIpRequest:
-    type: object
-    properties:
-      ip_address:
-        type: string
-    description: GetEntityByIpRequest contains fields required to perform GetEntityByIpRequest call.
-  v1GetEntityByNameRequest:
+  v1GetEntityRequest:
     type: object
     properties:
       entity_name:
         type: string
-    description: GetEntityByNameRequest contains fields required to perform GetEntityByNameRequest call.
+      ip_address:
+        type: string
+    description: GetEntityRequest contains one of the required info fields to perform GetEntity call.
   v1GradientController:
     type: object
     properties:
