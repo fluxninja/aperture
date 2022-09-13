@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -66,7 +67,7 @@ func (h *Handler) CheckWithValues(
 func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*flowcontrolv1.CheckResponse, error) {
 	log.Trace().Msg("FlowControl.Check()")
 
-	var entity *entitycache.Entity
+	var entity *entitycachev1.Entity
 
 	rpcPeer, peerExists := peer.FromContext(ctx)
 	if peerExists {

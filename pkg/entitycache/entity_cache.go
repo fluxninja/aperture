@@ -92,8 +92,8 @@ func NewEntity(id EntityID, ipAddress, name string, services []string) *Entity {
 // EntityCache maps IP addresses and Entity names to entities.
 type EntityCache struct {
 	sync.RWMutex
-	entitiesByIP   map[string]*Entity
-	entitiesByName map[string]*Entity
+	entitiesByIP   map[string]*entitycachev1.Entity
+	entitiesByName map[string]*entitycachev1.Entity
 }
 
 // FxIn are the parameters for ProvideEntityCache.
@@ -143,30 +143,34 @@ func (c *EntityCache) processUpdate(event notifiers.Event, unmarshaller config.U
 		return
 	}
 	entity := discoveryEntityToCacheEntity(&rawEntity)
-	ip := entity.IP()
-	name := entity.Name()
+	ip := entity.IpAddress
+	name := entity.EntityName
 
 	switch event.Type {
 	case notifiers.Write:
-		log.Trace().Str("entity", entity.ID.Prefix+entity.ID.UID).Str("ip", ip).Str("name", name).Msg("new entity")
+		log.Trace().Str("entity", entity.EntityId.Prefix+entity.EntityId.Uid).Str("ip", ip).Str("name", name).Msg("new entity")
 		c.Put(entity)
 	case notifiers.Remove:
-		log.Trace().Str("entity", entity.ID.Prefix+entity.ID.UID).Str("ip", ip).Str("name", name).Msg("removing entity")
+		log.Trace().Str("entity", entity.EntityId.Prefix+entity.EntityId.Uid).Str("ip", ip).Str("name", name).Msg("removing entity")
 		c.Remove(entity)
 	}
 }
 
-func discoveryEntityToCacheEntity(entity *common.Entity) *Entity {
-	return NewEntity(EntityID{
-		Prefix: entity.Prefix,
-		UID:    entity.UID,
-	}, entity.IPAddress, entity.Name, entity.Services)
+func discoveryEntityToCacheEntity(entity *common.Entity) *entitycachev1.Entity {
+	return &entitycachev1.Entity{
+		EntityId: &entitycachev1.EntityID{
+			Prefix: entity.Prefix,
+			Uid:    entity.UID,
+		},
+		EntityName: entity.Name,
+		Services:   entity.Services,
+	}
 }
 
 // NewEntityCache creates a new, empty EntityCache.
 func NewEntityCache() *EntityCache {
-	entitiesByIP := make(map[string]*Entity)
-	entitiesByName := make(map[string]*Entity)
+	entitiesByIP := make(map[string]*entitycachev1.Entity)
+	entitiesByName := make(map[string]*entitycachev1.Entity)
 	return &EntityCache{
 		entitiesByIP:   entitiesByIP,
 		entitiesByName: entitiesByName,
@@ -174,23 +178,23 @@ func NewEntityCache() *EntityCache {
 }
 
 // Put maps given IP address and name to the entity it currently represents.
-func (c *EntityCache) Put(entity *Entity) {
+func (c *EntityCache) Put(entity *entitycachev1.Entity) {
 	c.Lock()
 	defer c.Unlock()
 
-	entityIP := entity.IP()
+	entityIP := entity.IpAddress
 	if entityIP != "" {
 		c.entitiesByIP[entityIP] = entity
 	}
 
-	entityName := entity.Name()
+	entityName := entity.EntityName
 	if entityName != "" {
 		c.entitiesByName[entityName] = entity
 	}
 }
 
 // GetByIP retrieves entity with a given IP address.
-func (c *EntityCache) GetByIP(entityIP string) *Entity {
+func (c *EntityCache) GetByIP(entityIP string) *entitycachev1.Entity {
 	c.RLock()
 	defer c.RUnlock()
 
@@ -202,7 +206,7 @@ func (c *EntityCache) GetByIP(entityIP string) *Entity {
 }
 
 // GetByName retrieves entity with a given name.
-func (c *EntityCache) GetByName(entityName string) *Entity {
+func (c *EntityCache) GetByName(entityName string) *entitycachev1.Entity {
 	c.RLock()
 	defer c.RUnlock()
 
@@ -217,23 +221,23 @@ func (c *EntityCache) GetByName(entityName string) *Entity {
 func (c *EntityCache) Clear() {
 	c.RLock()
 	defer c.RUnlock()
-	c.entitiesByIP = make(map[string]*Entity)
-	c.entitiesByName = make(map[string]*Entity)
+	c.entitiesByIP = make(map[string]*entitycachev1.Entity)
+	c.entitiesByName = make(map[string]*entitycachev1.Entity)
 }
 
 // Remove removes entity from the cache and returns `true` if any of IP address
 // or name mapping exists.
 // If no such entity was found, returns `false`.
-func (c *EntityCache) Remove(entity *Entity) bool {
+func (c *EntityCache) Remove(entity *entitycachev1.Entity) bool {
 	c.Lock()
 	defer c.Unlock()
 
-	entityIP := entity.IP()
+	entityIP := entity.IpAddress
 	_, okByIP := c.entitiesByIP[entityIP]
 	if okByIP {
 		delete(c.entitiesByIP, entityIP)
 	}
-	entityName := entity.Name()
+	entityName := entity.EntityName
 	_, okByName := c.entitiesByName[entityName]
 	if okByName {
 		delete(c.entitiesByName, entityName)
@@ -261,7 +265,7 @@ func (c *EntityCache) Services() *entitycachev1.ServicesList {
 	for _, entity := range c.entitiesByIP {
 		entityServices, err := servicesFromEntity(entity)
 		if err != nil {
-			log.Trace().Err(err).Str("entity", entity.ID.UID).Msg("Failed getting services from entity. Skipping")
+			log.Trace().Err(err).Str("entity", entity.EntityId.Uid).Msg("Failed getting services from entity. Skipping")
 			continue
 		}
 		var serviceKeys []ServiceKey
@@ -327,7 +331,7 @@ func eachPair(services []ServiceKey) []pair {
 }
 
 // ServiceIDsFromEntity returns a list of services the entity is a part of.
-func ServiceIDsFromEntity(entity *Entity) []services.ServiceID {
+func ServiceIDsFromEntity(entity *entitycachev1.Entity) []services.ServiceID {
 	var svcs []services.ServiceID
 	if entity != nil {
 		svcs = make([]services.ServiceID, 0, len(entity.Services))
@@ -340,7 +344,7 @@ func ServiceIDsFromEntity(entity *Entity) []services.ServiceID {
 	return svcs
 }
 
-func servicesFromEntity(entity *Entity) ([]*entitycachev1.Service, error) {
+func servicesFromEntity(entity *entitycachev1.Entity) ([]*entitycachev1.Service, error) {
 	svcIDs := ServiceIDsFromEntity(entity)
 	svcs := make([]*entitycachev1.Service, 0, len(svcIDs))
 	for _, svc := range svcIDs {

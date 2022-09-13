@@ -29,42 +29,10 @@ func (c *EntityCacheService) GetServicesList(ctx context.Context, _ *emptypb.Emp
 
 // GetEntityByIP returns an entity found with given ip address.
 func (c *EntityCacheService) GetEntityByIP(ctx context.Context, req *entitycachev1.GetEntityByIpRequest) (*entitycachev1.Entity, error) {
-	v := c.entityCache.GetByIP(req.IpAddress)
-	services := make([]string, len(v.Services))
-	for _, serviceName := range ServiceIDsFromEntity(v) {
-		services = append(services, serviceName.Service)
-	}
-
-	entity := &entitycachev1.Entity{
-		EntityId: &entitycachev1.EntityID{
-			Prefix: v.ID.Prefix,
-			Uid:    v.ID.UID,
-		},
-		IpAddress:  v.IPAddress,
-		Services:   services,
-		EntityName: v.EntityName,
-	}
-
-	return entity, nil
+	return c.entityCache.GetByIP(req.IpAddress), nil
 }
 
 // GetEntityByName returns an entity found with given entity name.
 func (c *EntityCacheService) GetEntityByName(ctx context.Context, req *entitycachev1.GetEntityByNameRequest) (*entitycachev1.Entity, error) {
-	v := c.entityCache.GetByIP(req.EntityName)
-	services := make([]string, len(v.Services))
-	for _, serviceName := range ServiceIDsFromEntity(v) {
-		services = append(services, serviceName.Service)
-	}
-
-	entity := &entitycachev1.Entity{
-		EntityId: &entitycachev1.EntityID{
-			Prefix: v.ID.Prefix,
-			Uid:    v.ID.UID,
-		},
-		IpAddress:  v.IPAddress,
-		Services:   services,
-		EntityName: v.EntityName,
-	}
-
-	return entity, nil
+	return c.entityCache.GetByName(req.EntityName), nil
 }
