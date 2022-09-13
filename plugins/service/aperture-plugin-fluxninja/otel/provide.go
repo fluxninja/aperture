@@ -59,7 +59,7 @@ func provideOtelConfig(baseConfig *otelcollector.OTELConfig,
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			controllerID := heartbeats.GetControllerInfo().Id
+			controllerID := heartbeats.ControllerInfo.Id
 
 			addAttributesProcessor(config, controllerID)
 
