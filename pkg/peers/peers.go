@@ -22,6 +22,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -63,6 +64,7 @@ func (constructor Constructor) Module() fx.Option {
 	_ = os.MkdirAll(peerDiscoverySyncPath, fs.ModePerm)
 	return fx.Options(
 		fx.Provide(constructor.providePeerDiscovery),
+		grpcgateway.RegisterHandler{Handler: peersv1.RegisterPeerDiscoveryServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(RegisterPeerDiscoveryService),
 	)
 }
@@ -80,6 +82,14 @@ type PeerDiscoveryIn struct {
 	StatusRegistry status.Registry
 	Prefix         PeerDiscoveryPrefix
 	Watchers       PeerWatchers `group:"peer-watchers"`
+}
+
+// ProvideDummyPeerDiscoveryService provides Peer Discovery Service for the testing.
+func ProvideDummyPeerDiscoveryService() (peersv1.PeerDiscoveryServiceServer, error) {
+	pd, _ := NewPeerDiscovery("", nil, nil)
+	return &PeerDiscoveryService{
+		peerDiscovery: pd,
+	}, nil
 }
 
 func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDiscovery, error) {
