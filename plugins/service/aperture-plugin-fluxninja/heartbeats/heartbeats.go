@@ -52,14 +52,10 @@ type Heartbeats struct {
 	clientConn       *grpc.ClientConn
 	statusRegistry   status.Registry
 	entityCache      *entitycache.EntityCache
-	controllerInfo   *heartbeatv1.ControllerInfo
+	ControllerInfo   *heartbeatv1.ControllerInfo
 	heartbeatsAddr   string
 	APIKey           string
 	jobName          string
-}
-
-func (h *Heartbeats) GetControllerInfo() *heartbeatv1.ControllerInfo {
-	return h.controllerInfo
 }
 
 func newHeartbeats(
@@ -123,7 +119,7 @@ func (h *Heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdcl
 		}
 	}
 
-	h.controllerInfo = &heartbeatv1.ControllerInfo{
+	h.ControllerInfo = &heartbeatv1.ControllerInfo{
 		Id: controllerID,
 	}
 
@@ -208,7 +204,7 @@ func (h *Heartbeats) newHeartbeat(
 		ProcessInfo:    info.GetProcessInfo(),
 		HostInfo:       info.GetHostInfo(),
 		AgentGroup:     agentGroup,
-		ControllerInfo: h.controllerInfo,
+		ControllerInfo: h.ControllerInfo,
 		Peers:          peers,
 		ServicesList:   servicesList,
 		AllStatuses:    h.statusRegistry.GetGroupStatus(),
