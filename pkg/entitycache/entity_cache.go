@@ -95,8 +95,7 @@ func NewEntity(id EntityID, ipAddress, name string, services []string) *entityca
 // EntityCache maps IP addresses and Entity names to entities.
 type EntityCache struct {
 	sync.RWMutex
-	entitiesByIP   *entitycachev1.Entities
-	entitiesByName *entitycachev1.Entities
+	entities *entitycachev1.EntityCache
 }
 
 // FxIn are the parameters for ProvideEntityCache.
@@ -168,15 +167,16 @@ func discoveryEntityToCacheEntity(entity *common.Entity) *entitycachev1.Entity {
 
 // NewEntityCache creates a new, empty EntityCache.
 func NewEntityCache() *EntityCache {
-	entitiesByIP := &entitycachev1.Entities{
-		Entities: make(map[string]*entitycachev1.Entity),
-	}
-	entitiesByName := &entitycachev1.Entities{
-		Entities: make(map[string]*entitycachev1.Entity),
+	entities := &entitycachev1.EntityCache{
+		EntitiesByIpAddress: &entitycachev1.EntityCache_Entities{
+			Entities: make(map[string]*entitycachev1.Entity),
+		},
+		EntitiesByEntityName: &entitycachev1.EntityCache_Entities{
+			Entities: make(map[string]*entitycachev1.Entity),
+		},
 	}
 	return &EntityCache{
-		entitiesByIP:   entitiesByIP,
-		entitiesByName: entitiesByName,
+		entities: entities,
 	}
 }
 
@@ -187,12 +187,12 @@ func (c *EntityCache) Put(entity *entitycachev1.Entity) {
 
 	entityIP := entity.IpAddress
 	if entityIP != "" {
-		c.entitiesByIP.Entities[entityIP] = entity
+		c.entities.EntitiesByIpAddress.Entities[entityIP] = entity
 	}
 
 	entityName := entity.EntityName
 	if entityName != "" {
-		c.entitiesByName.Entities[entityName] = entity
+		c.entities.EntitiesByEntityName.Entities[entityName] = entity
 	}
 }
 
@@ -201,7 +201,7 @@ func (c *EntityCache) GetByIP(entityIP string) *entitycachev1.Entity {
 	c.RLock()
 	defer c.RUnlock()
 
-	v, ok := c.entitiesByIP.Entities[entityIP]
+	v, ok := c.entities.EntitiesByIpAddress.Entities[entityIP]
 	if !ok {
 		return nil
 	}
@@ -213,7 +213,7 @@ func (c *EntityCache) GetByName(entityName string) *entitycachev1.Entity {
 	c.RLock()
 	defer c.RUnlock()
 
-	v, ok := c.entitiesByName.Entities[entityName]
+	v, ok := c.entities.EntitiesByEntityName.Entities[entityName]
 	if !ok {
 		return nil
 	}
@@ -224,10 +224,10 @@ func (c *EntityCache) GetByName(entityName string) *entitycachev1.Entity {
 func (c *EntityCache) Clear() {
 	c.RLock()
 	defer c.RUnlock()
-	c.entitiesByIP = &entitycachev1.Entities{
+	c.entities.EntitiesByIpAddress = &entitycachev1.EntityCache_Entities{
 		Entities: make(map[string]*entitycachev1.Entity),
 	}
-	c.entitiesByName = &entitycachev1.Entities{
+	c.entities.EntitiesByEntityName = &entitycachev1.EntityCache_Entities{
 		Entities: make(map[string]*entitycachev1.Entity),
 	}
 }
@@ -240,16 +240,24 @@ func (c *EntityCache) Remove(entity *entitycachev1.Entity) bool {
 	defer c.Unlock()
 
 	entityIP := entity.IpAddress
-	_, okByIP := c.entitiesByIP.Entities[entityIP]
+	_, okByIP := c.entities.EntitiesByIpAddress.Entities[entityIP]
 	if okByIP {
-		delete(c.entitiesByIP.Entities, entityIP)
+		delete(c.entities.EntitiesByIpAddress.Entities, entityIP)
 	}
 	entityName := entity.EntityName
-	_, okByName := c.entitiesByName.Entities[entityName]
+	_, okByName := c.entities.EntitiesByEntityName.Entities[entityName]
 	if okByName {
-		delete(c.entitiesByName.Entities, entityName)
+		delete(c.entities.EntitiesByEntityName.Entities, entityName)
 	}
 	return okByIP || okByName
+}
+
+// Entities returns *entitycachev1.EntitiyCache entities.
+func (c *EntityCache) Entities() *entitycachev1.EntityCache {
+	c.RLock()
+	defer c.RUnlock()
+
+	return c.entities
 }
 
 // Services returns a list of services based on entities in cache.
@@ -269,7 +277,7 @@ func (c *EntityCache) Services() *entitycachev1.ServicesList {
 	services := map[ServiceKey]*entitycachev1.Service{}
 	overlapping := make(map[pair]int)
 
-	for _, entity := range c.entitiesByIP.Entities {
+	for _, entity := range c.entities.EntitiesByIpAddress.Entities {
 		entityServices, err := servicesFromEntity(entity)
 		if err != nil {
 			log.Trace().Err(err).Str("entity", entity.EntityId.Uid).Msg("Failed getting services from entity. Skipping")

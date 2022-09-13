@@ -29,6 +29,15 @@ func (c *EntityCacheService) GetServicesList(ctx context.Context, _ *emptypb.Emp
 	return c.entityCache.Services(), nil
 }
 
+// GetEntities returns *entitycachev1.EntityCache which contains mappings of ip address to entity and entity name to entity.
+func (c *EntityCacheService) GetEntities(ctx context.Context, _ *emptypb.Empty) (*entitycachev1.EntityCache, error) {
+	ec := c.entityCache.Entities()
+	return &entitycachev1.EntityCache{
+		EntitiesByIpAddress:  ec.EntitiesByIpAddress,
+		EntitiesByEntityName: ec.EntitiesByEntityName,
+	}, nil
+}
+
 // GetEntity returns matching entity in cache based on request field type.
 func (c *EntityCacheService) GetEntity(ctx context.Context, req *entitycachev1.GetEntityRequest) (*entitycachev1.Entity, error) {
 	switch by := req.By.(type) {

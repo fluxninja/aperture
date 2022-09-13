@@ -83,6 +83,20 @@ paths:
             $ref: '#/definitions/v1ReportRequest'
       tags:
         - FluxNinjaService
+  /v1/entity-cache/entity-cache:
+    get:
+      operationId: EntityCacheService_GetEntities
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1EntityCache'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - EntityCacheService
   /v1/entity-cache/services-list:
     get:
       operationId: EntityCacheService_GetServicesList
@@ -222,6 +236,14 @@ definitions:
       - REJECT_REASON_RATE_LIMITED
       - REJECT_REASON_CONCURRENCY_LIMITED
     default: REJECT_REASON_UNSPECIFIED
+  EntityCacheEntities:
+    type: object
+    properties:
+      entities:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Entity'
+    description: Entities defines mapping of entities.
   EntityEntityID:
     type: object
     properties:
@@ -1082,6 +1104,14 @@ definitions:
         items:
           type: string
     description: Entity represents a pod, vm, etc.
+  v1EntityCache:
+    type: object
+    properties:
+      entities_by_entity_name:
+        $ref: '#/definitions/EntityCacheEntities'
+      entities_by_ip_address:
+        $ref: '#/definitions/EntityCacheEntities'
+    description: EntityCache contains both mappings of ip address to entity and entity name to entity.
   v1EqualsMatchExpression:
     type: object
     properties:

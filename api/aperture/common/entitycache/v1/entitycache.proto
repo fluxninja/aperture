@@ -16,6 +16,11 @@ service EntityCacheService {
       get: "/v1/entity-cache/services-list"
     };
   }
+  rpc GetEntities(google.protobuf.Empty) returns (EntityCache) {
+    option (google.api.http) = {
+      get: "/v1/entity-cache/entity-cache"
+    };
+  }
   rpc GetEntity(GetEntityRequest) returns (Entity) {}
 }
 
@@ -42,9 +47,15 @@ message OverlappingService {
   int32 entities_count = 3;
 }
 
-// Entities defines mapping of entities.
-message Entities {
-  map<string, Entity> entities = 1;
+// EntityCache contains both mappings of ip address to entity and entity name to entity.
+message EntityCache {
+  // Entities defines mapping of entities.
+  message Entities {
+    map<string, Entity> entities = 1;
+  }
+
+  Entities entities_by_ip_address = 1;
+  Entities entities_by_entity_name = 2;
 }
 
 // Entity represents a pod, vm, etc.
