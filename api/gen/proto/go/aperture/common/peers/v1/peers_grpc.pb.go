@@ -21,9 +21,6 @@ const _ = grpc.SupportPackageIsVersion7
 type PeerDiscoveryServiceClient interface {
 	GetPeers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Peers, error)
 	GetPeer(ctx context.Context, in *PeerRequest, opts ...grpc.CallOption) (*PeerInfo, error)
-	GetPeerKeys(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PeerKeysResponse, error)
-	AddPeer(ctx context.Context, in *PeerInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	RemovePeer(ctx context.Context, in *PeerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type peerDiscoveryServiceClient struct {
@@ -52,42 +49,12 @@ func (c *peerDiscoveryServiceClient) GetPeer(ctx context.Context, in *PeerReques
 	return out, nil
 }
 
-func (c *peerDiscoveryServiceClient) GetPeerKeys(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PeerKeysResponse, error) {
-	out := new(PeerKeysResponse)
-	err := c.cc.Invoke(ctx, "/aperture.common.peers.v1.PeerDiscoveryService/GetPeerKeys", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *peerDiscoveryServiceClient) AddPeer(ctx context.Context, in *PeerInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/aperture.common.peers.v1.PeerDiscoveryService/AddPeer", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *peerDiscoveryServiceClient) RemovePeer(ctx context.Context, in *PeerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/aperture.common.peers.v1.PeerDiscoveryService/RemovePeer", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // PeerDiscoveryServiceServer is the server API for PeerDiscoveryService service.
 // All implementations should embed UnimplementedPeerDiscoveryServiceServer
 // for forward compatibility
 type PeerDiscoveryServiceServer interface {
 	GetPeers(context.Context, *emptypb.Empty) (*Peers, error)
 	GetPeer(context.Context, *PeerRequest) (*PeerInfo, error)
-	GetPeerKeys(context.Context, *emptypb.Empty) (*PeerKeysResponse, error)
-	AddPeer(context.Context, *PeerInfo) (*emptypb.Empty, error)
-	RemovePeer(context.Context, *PeerRequest) (*emptypb.Empty, error)
 }
 
 // UnimplementedPeerDiscoveryServiceServer should be embedded to have forward compatible implementations.
@@ -99,15 +66,6 @@ func (UnimplementedPeerDiscoveryServiceServer) GetPeers(context.Context, *emptyp
 }
 func (UnimplementedPeerDiscoveryServiceServer) GetPeer(context.Context, *PeerRequest) (*PeerInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPeer not implemented")
-}
-func (UnimplementedPeerDiscoveryServiceServer) GetPeerKeys(context.Context, *emptypb.Empty) (*PeerKeysResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPeerKeys not implemented")
-}
-func (UnimplementedPeerDiscoveryServiceServer) AddPeer(context.Context, *PeerInfo) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddPeer not implemented")
-}
-func (UnimplementedPeerDiscoveryServiceServer) RemovePeer(context.Context, *PeerRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemovePeer not implemented")
 }
 
 // UnsafePeerDiscoveryServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -157,60 +115,6 @@ func _PeerDiscoveryService_GetPeer_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PeerDiscoveryService_GetPeerKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PeerDiscoveryServiceServer).GetPeerKeys(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/aperture.common.peers.v1.PeerDiscoveryService/GetPeerKeys",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PeerDiscoveryServiceServer).GetPeerKeys(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PeerDiscoveryService_AddPeer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PeerInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PeerDiscoveryServiceServer).AddPeer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/aperture.common.peers.v1.PeerDiscoveryService/AddPeer",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PeerDiscoveryServiceServer).AddPeer(ctx, req.(*PeerInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PeerDiscoveryService_RemovePeer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PeerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PeerDiscoveryServiceServer).RemovePeer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/aperture.common.peers.v1.PeerDiscoveryService/RemovePeer",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PeerDiscoveryServiceServer).RemovePeer(ctx, req.(*PeerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // PeerDiscoveryService_ServiceDesc is the grpc.ServiceDesc for PeerDiscoveryService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -225,18 +129,6 @@ var PeerDiscoveryService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPeer",
 			Handler:    _PeerDiscoveryService_GetPeer_Handler,
-		},
-		{
-			MethodName: "GetPeerKeys",
-			Handler:    _PeerDiscoveryService_GetPeerKeys_Handler,
-		},
-		{
-			MethodName: "AddPeer",
-			Handler:    _PeerDiscoveryService_AddPeer_Handler,
-		},
-		{
-			MethodName: "RemovePeer",
-			Handler:    _PeerDiscoveryService_RemovePeer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

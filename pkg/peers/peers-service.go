@@ -31,23 +31,3 @@ func (pd *PeerDiscoveryService) GetPeers(ctx context.Context, _ *emptypb.Empty) 
 func (pd *PeerDiscoveryService) GetPeer(ctx context.Context, req *peersv1.PeerRequest) (*peersv1.PeerInfo, error) {
 	return pd.peerDiscovery.GetPeer(req.Address)
 }
-
-// GetPeerKeys returns all the peer keys that are added to PeerDiscovery.
-func (pd *PeerDiscoveryService) GetPeerKeys(ctx context.Context, _ *emptypb.Empty) (*peersv1.PeerKeysResponse, error) {
-	keys := pd.peerDiscovery.GetPeerKeys()
-	return &peersv1.PeerKeysResponse{
-		Keys: keys,
-	}, nil
-}
-
-// AddPeer adds given peer to the PeerDiscovery.
-func (pd *PeerDiscoveryService) AddPeer(ctx context.Context, req *peersv1.PeerInfo) (*emptypb.Empty, error) {
-	pd.peerDiscovery.addPeer(req)
-	return nil, nil
-}
-
-// RemovePeer removes the peer with the given address in the PeerDiscovery.
-func (pd *PeerDiscoveryService) RemovePeer(ctx context.Context, req *peersv1.PeerRequest) (*emptypb.Empty, error) {
-	pd.peerDiscovery.removePeer(req.Address)
-	return nil, nil
-}

@@ -57,69 +57,6 @@ paths:
             $ref: '#/definitions/v1GetEntityByNameRequest'
       tags:
         - EntityCacheService
-  /aperture.common.peers.v1.PeerDiscoveryService/AddPeer:
-    post:
-      operationId: PeerDiscoveryService_AddPeer
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            type: object
-            properties: {}
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1PeerInfo'
-      tags:
-        - PeerDiscoveryService
-  /aperture.common.peers.v1.PeerDiscoveryService/GetPeerKeys:
-    post:
-      operationId: PeerDiscoveryService_GetPeerKeys
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1PeerKeysResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            type: object
-            properties: {}
-      tags:
-        - PeerDiscoveryService
-  /aperture.common.peers.v1.PeerDiscoveryService/RemovePeer:
-    post:
-      operationId: PeerDiscoveryService_RemovePeer
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            type: object
-            properties: {}
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1PeerRequest'
-      tags:
-        - PeerDiscoveryService
   /aperture.flowcontrol.v1.FlowControlService/Check:
     post:
       summary: |-
@@ -1716,18 +1653,6 @@ definitions:
         type: object
         additionalProperties:
           type: string
-  v1PeerKeysResponse:
-    type: object
-    properties:
-      keys:
-        type: array
-        items:
-          type: string
-  v1PeerRequest:
-    type: object
-    properties:
-      address:
-        type: string
   v1Peers:
     type: object
     properties:

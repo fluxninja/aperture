@@ -21,9 +21,6 @@ service PeerDiscoveryService {
       get: "/v1/peers/peers/peer_infos/{address}"
     };
   }
-  rpc GetPeerKeys(google.protobuf.Empty) returns (PeerKeysResponse) {}
-  rpc AddPeer(PeerInfo) returns (google.protobuf.Empty) {}
-  rpc RemovePeer(PeerRequest) returns (google.protobuf.Empty) {}
 }
 
 //
@@ -42,8 +39,4 @@ message PeerInfo {
 
 message PeerRequest {
   string address = 1;
-}
-
-message PeerKeysResponse {
-  repeated string keys = 1;
 }
