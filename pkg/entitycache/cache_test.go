@@ -157,7 +157,7 @@ var _ = Describe("Cache", func() {
 	})
 })
 
-func testEntity(uid, ipAddress, name string, services []string) *entitycache.Entity {
+func testEntity(uid, ipAddress, name string, services []string) *entitycachev1.Entity {
 	entity := entitycache.NewEntity(entitycache.EntityID{
 		Prefix: "test",
 		UID:    uid,

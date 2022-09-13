@@ -80,10 +80,13 @@ type EntityID struct {
 }
 
 // NewEntity creates a new entity from ID and IP address from the tagger.
-func NewEntity(id EntityID, ipAddress, name string, services []string) *Entity {
-	return &Entity{
-		ID:         id,
-		IPAddress:  ipAddress,
+func NewEntity(id EntityID, ipAddress, name string, services []string) *entitycachev1.Entity {
+	return &entitycachev1.Entity{
+		EntityId: &entitycachev1.EntityID{
+			Prefix: id.Prefix,
+			Uid:    id.UID,
+		},
+		IpAddress:  ipAddress,
 		Services:   services,
 		EntityName: name,
 	}
