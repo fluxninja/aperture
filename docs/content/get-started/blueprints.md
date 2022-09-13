@@ -1,6 +1,6 @@
 ---
 title: Blueprints
-description: Policies and dashboard pre-packaged as reusable blueprints
+description: Policies and dashboards pre-packaged as reusable blueprints
 keywords:
   - jsonnet
   - grafana
@@ -11,9 +11,9 @@ sidebar_position: 3
 
 ## Introduction
 
-Aperture comes with a pre-packaged list of policies and Grafana dashboards that
+Aperture comes with a pre-packaged list of [Aperture policies][policies] and Grafana dashboards that
 can be used both as a guide for creating new policies, and as ready-to-use
-blueprints for configuring Aperture Agent behaviour.
+blueprints for generating Aperture policies customized to a [Service][service].
 
 All dashboards and policies are written using the [Jsonnet][jsonnet-lang]
 language, and can be used both as jsonnet mixins or as standalone blueprints.
@@ -35,7 +35,7 @@ depends on Python 3.8+ and [jsonnet][go-jsonnet].
 [jb]: https://github.com/jsonnet-bundler/jsonnet-bundler
 [go-jsonnet]: https://github.com/google/go-jsonnet
 
-## Generating JSON Grafana Dashboards and Aperture Policies
+## Generating Aperture Policies and Grafana Dashboards
 
 The simplest way to use the blueprints repository is to render blueprints into
 JSON policy and dashboard files.
@@ -140,3 +140,5 @@ This can be also integrated with other Kubernetes deployment tools like
 
 [jsonnet]: https://github.com/google/go-jsonnet
 [tk]: https://grafana.com/oss/tanka/
+[policies]: /concepts/policy/policy.md
+[service]: /concepts/service.md
