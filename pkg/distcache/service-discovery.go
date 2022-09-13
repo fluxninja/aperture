@@ -33,7 +33,7 @@ func (s *ServiceDiscovery) SetConfig(cfg map[string]interface{}) error {
 func (s *ServiceDiscovery) DiscoverPeers() ([]string, error) {
 	peers := []string{}
 
-	peerInfos := s.discovery.Peers()
+	peerInfos := s.discovery.GetPeers()
 	for _, peerInfo := range peerInfos.PeerInfos {
 		if olricMemberlistAddr, ok := peerInfo.Services[olricMemberlistServiceName]; ok {
 			peers = append(peers, olricMemberlistAddr)

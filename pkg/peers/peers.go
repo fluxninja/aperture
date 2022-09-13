@@ -257,8 +257,8 @@ func (pd *PeerDiscovery) Stop() error {
 	return merr
 }
 
-// Peers returns all the peer info that are added to PeerDiscovery.
-func (pd *PeerDiscovery) Peers() *peersv1.Peers {
+// GetPeers returns all the peer info that are added to PeerDiscovery.
+func (pd *PeerDiscovery) GetPeers() *peersv1.Peers {
 	pd.lock.RLock()
 	defer pd.lock.RUnlock()
 
@@ -289,8 +289,8 @@ func (pd *PeerDiscovery) addPeer(peer *peersv1.PeerInfo) {
 	pd.peers[peer.Address] = peer
 }
 
-// Peer returns the peer info in the PeerDiscovery with the given address.
-func (pd *PeerDiscovery) Peer(address string) (*peersv1.PeerInfo, error) {
+// GetPeer returns the peer info in the PeerDiscovery with the given address.
+func (pd *PeerDiscovery) GetPeer(address string) (*peersv1.PeerInfo, error) {
 	pd.lock.RLock()
 	defer pd.lock.RUnlock()
 
@@ -302,8 +302,8 @@ func (pd *PeerDiscovery) Peer(address string) (*peersv1.PeerInfo, error) {
 	return peer, nil
 }
 
-// PeerKeys returns all the peer keys that are added to PeerDiscovery.
-func (pd *PeerDiscovery) PeerKeys() []string {
+// GetPeerKeys returns all the peer keys that are added to PeerDiscovery.
+func (pd *PeerDiscovery) GetPeerKeys() []string {
 	pd.lock.RLock()
 	defer pd.lock.RUnlock()
 

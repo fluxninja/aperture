@@ -24,17 +24,17 @@ func RegisterPeerDiscoveryService(server *grpc.Server, pd *PeerDiscovery) {
 
 // GetPeers returns all the peer info that are added to PeerDiscovery.
 func (pd *PeerDiscoveryService) GetPeers(ctx context.Context, _ *emptypb.Empty) (*peersv1.Peers, error) {
-	return pd.peerDiscovery.Peers(), nil
+	return pd.peerDiscovery.GetPeers(), nil
 }
 
 // GetPeer returns the peer info in the PeerDiscovery with the given address.
 func (pd *PeerDiscoveryService) GetPeer(ctx context.Context, req *peersv1.PeerRequest) (*peersv1.PeerInfo, error) {
-	return pd.peerDiscovery.Peer(req.Address)
+	return pd.peerDiscovery.GetPeer(req.Address)
 }
 
 // GetPeerKeys returns all the peer keys that are added to PeerDiscovery.
 func (pd *PeerDiscoveryService) GetPeerKeys(ctx context.Context, _ *emptypb.Empty) (*peersv1.PeerKeysResponse, error) {
-	keys := pd.peerDiscovery.PeerKeys()
+	keys := pd.peerDiscovery.GetPeerKeys()
 	return &peersv1.PeerKeysResponse{
 		Keys: keys,
 	}, nil
