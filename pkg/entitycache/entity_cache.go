@@ -256,8 +256,7 @@ func (c *EntityCache) Remove(entity *entitycachev1.Entity) bool {
 func (c *EntityCache) Entities() *entitycachev1.EntityCache {
 	c.RLock()
 	defer c.RUnlock()
-
-	return c.entities
+	return c.entities.DeepCopy()
 }
 
 // Services returns a list of services based on entities in cache.
