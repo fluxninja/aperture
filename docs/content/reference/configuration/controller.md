@@ -1,11 +1,18 @@
 ---
-title: Aperture Controller configuration
+title: Aperture Controller Configuration Reference
 sidebar_position: 10
 sidebar_label: Controller
-description: Aperture Controller configuration
 ---
 
-# Aperture Controller Configuration Reference
+:::info
+See also [Aperture Controller installation](/get-started/installation/controller.md).
+:::
+
+List of all config parameters for Aperture Agent.
+
+<!---
+Generated File Starts
+-->
 
 ## Table of contents
 
@@ -33,39 +40,6 @@ description: Aperture Controller configuration
 | ------------------ | ------------------------------------- |
 | `fluxninja_plugin` | [FluxNinjaPlugin](#flux-ninja-plugin) |
 | `sentry_plugin`    | [SentryPlugin](#sentry-plugin)        |
-
-### Object Index
-
-- [AdaptivePolicy](#adaptive-policy) – AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
-- [BackoffConfig](#backoff-config) – BackoffConfig holds configuration for GRPC Client Backoff.
-- [BatchConfig](#batch-config) – BatchConfig defines configuration for OTEL batch processor.
-- [ClientConfig](#client-config) – ClientConfig is the client configuration.
-- [ClientTLSConfig](#client-tls-config) – ClientTLSConfig is the config for client TLS.
-- [EtcdConfig](#etcd-config) – EtcdConfig holds configuration for etcd client.
-- [FluxNinjaPluginConfig](#flux-ninja-plugin-config) – FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugin.
-- [GRPCClientConfig](#g-rpc-client-config) – GRPCClientConfig holds configuration for GRPC Client.
-- [GRPCGatewayConfig](#g-rpc-gateway-config) – GRPCGatewayConfig holds configuration for grpc-http gateway
-- [GRPCServerConfig](#g-rpc-server-config) – GRPCServerConfig holds configuration for GRPC Server.
-- [HTTPClientConfig](#http-client-config) – HTTPClientConfig holds configuration for HTTP Client.
-- [HTTPServerConfig](#http-server-config) – HTTPServerConfig holds configuration for HTTP Server.
-- [Header](#header) – A Header represents the key-value pairs in an HTTP header.
-- [HeapConfig](#heap-config) – HeapConfig holds configuration for heap Watchdog.
-- [JobConfig](#job-config) – JobConfig is config for Job
-- [JobGroupConfig](#job-group-config) – JobGroupConfig holds configuration for JobGroup.
-- [ListenerConfig](#listener-config) – ListenerConfig holds configuration for socket listeners.
-- [LogConfig](#log-config) – LogConfig holds configuration for a logger and log writers.
-- [LogWriterConfig](#log-writer-config) – LogWriterConfig holds configuration for a log writer.
-- [MetricsConfig](#metrics-config) – MetricsConfig holds configuration for service metrics.
-- [OtelConfig](#otel-config) – OtelConfig is the configuration for the OTEL collector.
-- [PluginsConfig](#plugins-config) – PluginsConfig holds configuration for plugins.
-- [ProfilersConfig](#profilers-config) – ProfilersConfig holds configuration for profilers.
-- [PrometheusConfig](#prometheus-config) – PrometheusConfig holds configuration for Prometheus Server.
-- [ProxyConfig](#proxy-config) – ProxyConfig holds proxy configuration.
-- [SentryConfig](#sentry-config) – SentryConfig holds configuration for Sentry.
-- [ServerTLSConfig](#server-tls-config) – ServerTLSConfig holds configuration for setting up server TLS support.
-- [WatchdogConfig](#watchdog-config) – WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
-- [WatchdogPolicyType](#watchdog-policy-type) – WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
-- [WatermarksPolicy](#watermarks-policy) – WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
 
 ## Reference
 
