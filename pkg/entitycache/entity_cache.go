@@ -82,7 +82,7 @@ type EntityID struct {
 // NewEntity creates a new entity from ID and IP address from the tagger.
 func NewEntity(id EntityID, ipAddress, name string, services []string) *entitycachev1.Entity {
 	return &entitycachev1.Entity{
-		EntityId: &entitycachev1.EntityID{
+		EntityId: &entitycachev1.Entity_EntityID{
 			Prefix: id.Prefix,
 			Uid:    id.UID,
 		},

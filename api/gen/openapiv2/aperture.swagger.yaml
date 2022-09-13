@@ -243,6 +243,14 @@ definitions:
       - REJECT_REASON_RATE_LIMITED
       - REJECT_REASON_CONCURRENCY_LIMITED
     default: REJECT_REASON_UNSPECIFIED
+  EntityEntityID:
+    type: object
+    properties:
+      prefix:
+        type: string
+      uid:
+        type: string
+    description: EntityID is a unique Entity identifier.
   LimiterDecisionLimiterReason:
     type: string
     enum:
@@ -1085,7 +1093,7 @@ definitions:
     type: object
     properties:
       entity_id:
-        $ref: '#/definitions/v1EntityID'
+        $ref: '#/definitions/EntityEntityID'
       entity_name:
         type: string
       ip_address:
@@ -1095,14 +1103,6 @@ definitions:
         items:
           type: string
     description: Entity represents a pod, vm, etc.
-  v1EntityID:
-    type: object
-    properties:
-      prefix:
-        type: string
-      uid:
-        type: string
-    description: EntityID is a unique Entity identifier.
   v1EqualsMatchExpression:
     type: object
     properties:
