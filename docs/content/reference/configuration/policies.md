@@ -1,86 +1,16 @@
 ---
-title: Policies reference
+title: Policies Configuration Reference
 sidebar_position: 1
 sidebar_label: Policies
-description: Policies reference
 ---
 
-# Policies Configuration Reference
+Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
 
-## Table of contents
+The top-level object representing a policy is [v1Policy](#v1-policy).
 
-### Object Index
-
-- [MatchExpressionList](#match-expression-list) – List of MatchExpressions that is used for all/any matching
-- [RateLimiterLazySync](#rate-limiter-lazy-sync)
-- [RateLimiterOverride](#rate-limiter-override)
-- [RuleRego](#rule-rego) – Raw rego rules are compiled 1:1 to rego queries
-- [SchedulerWorkload](#scheduler-workload) – Workload defines a class of requests that preferably have similar properties suc…
-- [SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)
-- [languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter) – Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-- [languagev1RateLimiter](#languagev1-rate-limiter) – Limits the traffic on a control point to specified rate
-- [policylanguagev1Classifier](#policylanguagev1-classifier) – Set of classification rules sharing a common selector
-- [policylanguagev1FluxMeter](#policylanguagev1-flux-meter) – FluxMeter gathers metrics for the traffic that matches its selector
-- [v1AddressExtractor](#v1-address-extractor) – Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
-- [v1ArithmeticCombinator](#v1-arithmetic-combinator) – Type of combinator that computes the arithmetic operation on the operand signals
-- [v1ArithmeticCombinatorIns](#v1-arithmetic-combinator-ins) – Inputs for the Arithmetic Combinator component.
-- [v1ArithmeticCombinatorOuts](#v1-arithmetic-combinator-outs) – Outputs for the Arithmetic Combinator component.
-- [v1Circuit](#v1-circuit) – Circuit is defined as a dataflow graph of inter-connected components
-- [v1Component](#v1-component) – Computational block that form the circuit
-- [v1Constant](#v1-constant) – Component that emits a constant value as an output signal
-- [v1ConstantOuts](#v1-constant-outs) – Outputs for the Constant component.
-- [v1ControlPoint](#v1-control-point) – Identifies control point within a service that the rule or policy should apply t…
-- [v1Decider](#v1-decider) – Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
-- [v1DeciderIns](#v1-decider-ins) – Inputs for the Decider component.
-- [v1DeciderOuts](#v1-decider-outs) – Outputs for the Decider component.
-- [v1EMA](#v1-e-m-a) – Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
-- [v1EMAIns](#v1-e-m-a-ins) – Inputs for the EMA component.
-- [v1EMAOuts](#v1-e-m-a-outs) – Outputs for the EMA component.
-- [v1EqualsMatchExpression](#v1-equals-match-expression) – Label selector expression of the equal form "label == value".
-- [v1Extractor](#v1-extractor) – Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
-- [v1Extrapolator](#v1-extrapolator) – Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
-- [v1ExtrapolatorIns](#v1-extrapolator-ins) – Inputs for the Extrapolator component.
-- [v1ExtrapolatorOuts](#v1-extrapolator-outs) – Outputs for the Extrapolator component.
-- [v1GradientController](#v1-gradient-controller) – Gradient controller is a type of controller which tries to adjust the
-  control variable proportionally to the relative difference between setpoint
-  and actual value of the signal
-- [v1GradientControllerIns](#v1-gradient-controller-ins) – Inputs for the Gradient Controller component.
-- [v1GradientControllerOuts](#v1-gradient-controller-outs) – Outputs for the Gradient Controller component.
-- [v1JSONExtractor](#v1-json-extractor) – Deserialize a json, and extract one of the fields
-- [v1JWTExtractor](#v1-j-w-t-extractor) – Parse the attribute as JWT and read the payload
-- [v1K8sLabelMatcherRequirement](#v1-k8s-label-matcher-requirement) – Label selector requirement which is a selector that contains values, a key, and …
-- [v1LabelMatcher](#v1-label-matcher) – Allows to define rules whether a map of
-  [labels](/concepts/flow-control/flow-label.md)
-  should be considered a match or not
-- [v1LoadShedActuator](#v1-load-shed-actuator) – Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
-- [v1LoadShedActuatorIns](#v1-load-shed-actuator-ins) – Input for the Load Shed Actuator component.
-- [v1MatchExpression](#v1-match-expression) – Defines a [map<string, string> → bool] expression to be evaluated on labels
-- [v1MatchesMatchExpression](#v1-matches-match-expression) – Label selector expression of the matches form "label matches regex".
-- [v1Max](#v1-max) – Takes a list of input signals and emits the signal with the maximum value
-- [v1MaxIns](#v1-max-ins) – Inputs for the Max component.
-- [v1MaxOuts](#v1-max-outs) – Output for the Max component.
-- [v1Min](#v1-min) – Takes an array of input signals and emits the signal with the minimum value
-  Min:…
-- [v1MinIns](#v1-min-ins) – Inputs for the Min component.
-- [v1MinOuts](#v1-min-outs) – Output ports for the Min component.
-- [v1PathTemplateMatcher](#v1-path-template-matcher) – Matches HTTP Path to given path templates
-- [v1Policy](#v1-policy) – Policy expresses reliability automation workflow that automatically protects services
-- [v1Port](#v1-port) – Components are interconnected with each other via Ports
-- [v1PromQL](#v1-prom-q-l) – Component that runs a Prometheus query periodically and returns the result as an output signal
-- [v1PromQLOuts](#v1-prom-q-l-outs) – Output for the PromQL component.
-- [v1RateLimiterIns](#v1-rate-limiter-ins) – Inputs for the RateLimiter component
-- [v1Resources](#v1-resources) – Resources that need to be setup for the policy to function
-- [v1Rule](#v1-rule) – Rule describes a single Flow Classification Rule
-- [v1Scheduler](#v1-scheduler) – Weighted Fair Queuing-based workload scheduler
-- [v1SchedulerOuts](#v1-scheduler-outs) – Output for the Scheduler component.
-- [v1Selector](#v1-selector) – Describes which flows a [dataplane
-  component](/concepts/flow-control/flow-control.md#components) should apply
-  to
-- [v1Sqrt](#v1-sqrt) – Takes an input signal and emits the square root of it multiplied by scale as an output
-- [v1SqrtIns](#v1-sqrt-ins) – Inputs for the Sqrt component.
-- [v1SqrtOuts](#v1-sqrt-outs) – Outputs for the Sqrt component.
-
-## Reference
+<!---
+Generated File Starts
+-->
 
 ## Objects
 
