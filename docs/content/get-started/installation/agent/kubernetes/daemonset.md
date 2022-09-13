@@ -176,13 +176,13 @@ You should see pods for Aperture Agent and Agent Manager in `RUNNING` state and
 You can uninstall the Aperture Agent and it's components by uninstalling the
 charts installed above:
 
-1. Delete th Aperture Agent chart:
+1. Delete the Aperture Agent chart:
 
    ```bash
    helm uninstall agent
    ```
 
-2. Alternativey, if you have installed the Aperture Agent Custom Resource
+2. Alternatively, if you have installed the Aperture Agent Custom Resource
    separately, follow below steps:
 
    1. Delete the Aperture Agent Custom Resource:

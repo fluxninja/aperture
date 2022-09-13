@@ -378,7 +378,7 @@ func (sched *WFQScheduler) leave(rContext RequestContext, qRequest *queuedReques
 		}
 	}()
 
-	// incase we need to sleep
+	// in case we need to sleep
 	waitTime := time.Duration(0)
 
 	// wait for tokens if needed

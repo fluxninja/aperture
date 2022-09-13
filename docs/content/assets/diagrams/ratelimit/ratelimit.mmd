@@ -16,7 +16,7 @@ sequenceDiagram
     Quotas-->>Agent: decision
     Quotas-->>Proxy: decision
 
-    alt If counter successfuly incremented
+    alt If counter successfully incremented
         Proxy->>Destination: forward request
     else
         Proxy-->>Source: 429 Too many requests
