@@ -1,6 +1,6 @@
 ---
 title: Blueprints
-description: Policies and dashboards pre-packaged as reusable Blueprints
+description: Policies and Dashboards pre-packaged as reusable Blueprints
 keywords:
   - jsonnet
   - grafana
@@ -12,10 +12,10 @@ sidebar_position: 3
 ## Introduction
 
 Aperture comes with a pre-packaged list of [Aperture Policies][policies] and Grafana Dashboards that
-can be used both as a guide for creating new policies, and as ready-to-use
-Blueprints for generating Aperture policies customized to a [Service][service].
+can be used both as a guide for creating new Policies, and as ready-to-use
+Blueprints for generating Aperture Policies customized to a [Service][service].
 
-All dashboards and policies are written using the [Jsonnet][jsonnet-lang]
+All Dashboards and Policies are written using the [Jsonnet][jsonnet-lang]
 language, and can be used both as jsonnet mixins or as standalone Blueprints.
 
 [jsonnet-lang]: https://jsonnet.org
@@ -46,9 +46,9 @@ To generate files, `scripts/aperture-generate.py` can be used:
 $ ./scripts/aperture-generate.py --help
 usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG] BLUEPRINT
 
-Aperture policies & dashboards generator utility.
+Aperture Policies & Dashboards generator utility.
 
-This utility can be used to generate Aperture policies and Grafana dashboards "in-place". Check [aperture-blueprint's README.md](https://github.com/fluxninja/aperture-blueprints/blob/main/README.md) for more
+This utility can be used to generate Aperture Policies and Grafana Dashboards "in-place". Check [aperture-blueprint's README.md](https://github.com/fluxninja/aperture-blueprints/blob/main/README.md) for more
 details.
 
 positional arguments:
@@ -89,10 +89,10 @@ jb install
 ## Using aperture-blueprints as a jsonnet mixins library
 
 An alternate way of using the aperture-blueprints repository is to import it
-from another jsonnet project and render policies or dashboards directly in
+from another jsonnet project and render Policies or Dashboards directly in
 jsonnet.
 
-For example, to create a ConfigMap with Aperture policies that can be loaded by
+For example, to create a ConfigMap with Aperture Policies that can be loaded by
 the controller, you need to install aperture-blueprints with the jsonnet
 bundler:
 
