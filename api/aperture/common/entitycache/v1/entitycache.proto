@@ -30,28 +30,31 @@ message ServicesList {
 }
 
 // Service contains information about single service discovered in agent group by a
-// particular agent
+// particular agent.
 message Service {
   string name = 1;
   int32 entities_count = 2;
 }
 
-// OverlappingService contains info about a service that overlaps with another one
+// OverlappingService contains info about a service that overlaps with another one.
 message OverlappingService {
   string service1 = 1;
   string service2 = 2;
   int32 entities_count = 3;
 }
 
+// Entities defines mappings of ip address to entity and entity name to entity.
+message Entities {
+  map<string, Entity> entities = 1;
+}
+
 // GetEntityByIpRequest contains fields required to perform GetEntityByIpRequest call.
 message GetEntityByIpRequest {
-  // IP Address of this entity.
   string ip_address = 1;
 }
 
 // GetEntityByNameRequest contains fields required to perform GetEntityByNameRequest call.
 message GetEntityByNameRequest {
-  // Name of this entity.
   string entity_name = 1;
 }
 

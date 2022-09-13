@@ -1190,14 +1190,12 @@ definitions:
     properties:
       ip_address:
         type: string
-        description: IP Address of this entity.
     description: GetEntityByIpRequest contains fields required to perform GetEntityByIpRequest call.
   v1GetEntityByNameRequest:
     type: object
     properties:
       entity_name:
         type: string
-        description: Name of this entity.
     description: GetEntityByNameRequest contains fields required to perform GetEntityByNameRequest call.
   v1GradientController:
     type: object
@@ -1605,7 +1603,7 @@ definitions:
         type: string
       service2:
         type: string
-    title: OverlappingService contains info about a service that overlaps with another one
+    description: OverlappingService contains info about a service that overlaps with another one.
   v1PathTemplateMatcher:
     type: object
     properties:
@@ -2038,9 +2036,9 @@ definitions:
         format: int32
       name:
         type: string
-    title: |-
+    description: |-
       Service contains information about single service discovered in agent group by a
-      particular agent
+      particular agent.
   v1ServicesList:
     type: object
     properties:
