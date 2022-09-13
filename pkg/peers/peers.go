@@ -84,11 +84,13 @@ type PeerDiscoveryIn struct {
 	Watchers       PeerWatchers `group:"peer-watchers"`
 }
 
-// ProvideDummyPeerDiscoveryService provides Peer Discovery Service for the testing.
-func ProvideDummyPeerDiscoveryService() (peersv1.PeerDiscoveryServiceServer, error) {
-	pd, _ := NewPeerDiscovery("", nil, nil)
-	return &PeerDiscoveryService{
-		peerDiscovery: pd,
+// ProvideDummyPeerDiscoveryService provides empty Peer Discovery Service for the testing.
+func ProvideDummyPeerDiscoveryService(pd *PeerDiscovery) (PeerDiscoveryService, error) {
+	if pd == nil {
+		pd, _ = NewPeerDiscovery("test", nil, nil)
+	}
+	return PeerDiscoveryService{
+		PeerDiscovery: pd,
 	}, nil
 }
 

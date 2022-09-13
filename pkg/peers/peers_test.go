@@ -20,10 +20,16 @@ import (
 
 var (
 	app *fx.App
-	svc peersv1.PeerDiscoveryServiceServer
+	svc peers.PeerDiscoveryService
 )
 
 var _ = BeforeEach(func() {
+	pd, err := peers.NewPeerDiscovery("test", nil, nil)
+	Expect(err).ToNot(HaveOccurred())
+	for _, peerinfo := range hardCodedPeers.PeerInfos {
+		pd.AddPeer(peerinfo)
+	}
+
 	app = platform.New(
 		config.ModuleConfig{
 			MergeConfig: map[string]interface{}{
@@ -32,31 +38,26 @@ var _ = BeforeEach(func() {
 				},
 			},
 		}.Module(),
+		fx.Supply(pd),
 		fx.Provide(agent.ProvidePeersPrefix),
 		fx.Provide(peers.ProvideDummyPeerDiscoveryService),
 		grpcclient.ClientConstructor{Name: "peers-grpc-client", ConfigKey: "peer_discovery.client.grpc"}.Annotate(),
 		fx.Populate(&svc),
 	)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	err := app.Start(ctx)
+	err = app.Start(ctx)
 	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterEach(func() {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	err := app.Stop(ctx)
 	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = Describe("Peers GetPeers", func() {
-	pd, err := peers.NewPeerDiscovery("peers", nil, peers.PeerWatchers{})
-	Expect(err).NotTo(HaveOccurred())
-	for _, peerinfo := range hardCodedPeers.PeerInfos {
-		pd.AddPeer(peerinfo)
-	}
-
 	When("client request comes in", func() {
 		It("returns all the peer info that are added to peer discovery", func() {
 			ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
@@ -68,21 +69,12 @@ var _ = Describe("Peers GetPeers", func() {
 })
 
 var _ = Describe("Peers GetPeer", func() {
-	pd, err := peers.NewPeerDiscovery("peers", nil, peers.PeerWatchers{})
-	Expect(err).NotTo(HaveOccurred())
-	peerInfo := &peersv1.PeerInfo{
-		Address:  hardCodedIPAddress,
-		Hostname: hardCodedHostName,
-		Services: hardCodedServices,
-	}
-	pd.AddPeer(peerInfo)
-
 	When("client request with peer address comes in", func() {
 		It("returns the peer info that matches the provided peer address", func() {
 			ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
 			resp, err := svc.GetPeer(ctx, &peersv1.PeerRequest{Address: "1.2.3.4:54321"})
 			Expect(err).NotTo(HaveOccurred())
-			Expect(resp).To(Equal(peerInfo))
+			Expect(resp).To(Equal(hardCodedPeerInfo))
 		})
 	})
 
@@ -115,11 +107,16 @@ var (
 		"service2": "peers2",
 		"service3": "peers3",
 	}
+	hardCodedPeerInfo = &peersv1.PeerInfo{
+		Address:  hardCodedIPAddress,
+		Hostname: hardCodedHostName,
+		Services: hardCodedServices,
+	}
 	hardCodedPeers = &peersv1.Peers{
 		PeerInfos: []*peersv1.PeerInfo{
 			{
-				Address:  "1.2.3.4:54321",
-				Hostname: hardCodedHostName + "1",
+				Address:  hardCodedIPAddress,
+				Hostname: hardCodedHostName,
 				Services: hardCodedServices,
 			},
 			{
