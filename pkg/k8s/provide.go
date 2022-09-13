@@ -128,7 +128,7 @@ func (r *RealK8sClient) GetErrNotInCluster() bool {
 func Providek8sClient(in K8sClientConstructorIn) K8sClient {
 	k8sClientSet, err := newk8sClientSetAndErr(in.K8sClient)
 	if err != nil {
-		log.Error().Err(err).Msg("Unable to create new client set!")
+		log.Debug().Err(err).Msg("K8s clientset could not be created")
 	}
 	zerolog := in.Logger.Zerolog()
 	klog.SetLogger(zerologr.New(zerolog))
