@@ -1,6 +1,11 @@
 ---
-title: Aperture Agent configuration
+title: Aperture Agent Configuration Reference
 sidebar_position: 11
 sidebar_label: Agent
-description: Aperture Agent configuration
 ---
+
+:::info
+See also [Aperture Agent installation](/get-started/installation/agent/agent.md).
+:::
+
+List of all config parameters for Aperture Agent.

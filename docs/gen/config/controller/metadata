@@ -1,6 +1,11 @@
 ---
-title: Aperture Controller configuration
+title: Aperture Controller Configuration Reference
 sidebar_position: 10
 sidebar_label: Controller
-description: Aperture Controller configuration
 ---
+
+:::info
+See also [Aperture Controller installation](/get-started/installation/controller.md).
+:::
+
+List of all config parameters for Aperture Agent.
