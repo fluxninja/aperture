@@ -27,7 +27,7 @@ See the repository [README.md][blueprints-readme] for the list of required tools
 and instructions on installing jsonnet dependencies with the help of a [jsonnet
 bundler][jb].
 
-The Blueprint Generator (used to generate policy files from Blueprints) also
+The Blueprint Generator (used to generate Policy files from Blueprints) also
 depends on Python 3.8+ and [jsonnet][go-jsonnet].
 
 [aperture-blueprints]: https://github.com/fluxninja/aperture-blueprints
@@ -38,7 +38,7 @@ depends on Python 3.8+ and [jsonnet][go-jsonnet].
 ## Generating Aperture Policies and Grafana Dashboards
 
 The simplest way to use the Blueprints repository is to render Blueprints into
-policy and dashboard files.
+Policy and dashboard files.
 
 To generate files, `scripts/aperture-generate.py` can be used:
 
@@ -68,9 +68,9 @@ blueprint under the `blueprints/` directory.
 
 Under the `blueprints/` directory, the currently available Blueprints can be
 found. Each blueprint consists of at least two files: `config.libsonnet` and
-`main.libsonnet`. `main.libsonnet` bundles actual policy and dashboard code
+`main.libsonnet`. `main.libsonnet` bundles actual Policy and dashboard code
 (available under `lib/1.0`) into Blueprints, and `config.libsonnet` comes with
-the default configuration for the given policy. This can be overridden by the
+the default configuration for the given Policy. This can be overridden by the
 `--config` option passed to the `aperture-generate.py` script.
 
 Custom configurations will be merged with Blueprints' `config.libsonnet`
@@ -83,7 +83,7 @@ The full command using the demoapp-latency-grand example looks like this:
 
 ```sh
 jb install
-./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet Blueprints/latency-gradient
+./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet blueprints/latency-gradient
 ```
 
 ## Using aperture-blueprints as a jsonnet mixins library
@@ -106,7 +106,7 @@ Additionally, for this example to work install the k8s-libsonnet dependency:
 jb install github.com/jsonnet-libs/k8s-libsonnet/1.24@main
 ```
 
-Finally, you can create a ConfigMap resource with policy like this:
+Finally, you can create a ConfigMap resource with Policy like this:
 
 ```jsonnet
 local k = import "github.com/jsonnet-libs/k8s-libsonnet/1.24/main.libsonnet";
