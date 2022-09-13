@@ -1,6 +1,6 @@
 ---
 title: Blueprints
-description: Policies and dashboards pre-packaged as reusable Blueprints
+description: Policies and Dashboards pre-packaged as reusable Blueprints
 keywords:
   - jsonnet
   - grafana
@@ -12,10 +12,10 @@ sidebar_position: 3
 ## Introduction
 
 Aperture comes with a pre-packaged list of [Aperture Policies][policies] and Grafana Dashboards that
-can be used both as a guide for creating new policies, and as ready-to-use
-Blueprints for generating Aperture policies customized to a [Service][service].
+can be used both as a guide for creating new Policies, and as ready-to-use
+Blueprints for generating Aperture Policies customized to a [Service][service].
 
-All dashboards and policies are written using the [Jsonnet][jsonnet-lang]
+All Dashboards and Policies are written using the [Jsonnet][jsonnet-lang]
 language, and can be used both as jsonnet mixins or as standalone Blueprints.
 
 [jsonnet-lang]: https://jsonnet.org
@@ -27,7 +27,7 @@ See the repository [README.md][blueprints-readme] for the list of required tools
 and instructions on installing jsonnet dependencies with the help of a [jsonnet
 bundler][jb].
 
-The Blueprint Generator (used to generate policy files from Blueprints) also
+The Blueprint Generator (used to generate Policy files from Blueprints) also
 depends on Python 3.8+ and [jsonnet][go-jsonnet].
 
 [aperture-blueprints]: https://github.com/fluxninja/aperture-blueprints
@@ -38,7 +38,7 @@ depends on Python 3.8+ and [jsonnet][go-jsonnet].
 ## Generating Aperture Policies and Grafana Dashboards
 
 The simplest way to use the Blueprints repository is to render Blueprints into
-policy and dashboard files.
+Policy and dashboard files.
 
 To generate files, `scripts/aperture-generate.py` can be used:
 
@@ -46,9 +46,9 @@ To generate files, `scripts/aperture-generate.py` can be used:
 $ ./scripts/aperture-generate.py --help
 usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG] BLUEPRINT
 
-Aperture policies & dashboards generator utility.
+Aperture Policies & Dashboards generator utility.
 
-This utility can be used to generate Aperture policies and Grafana dashboards "in-place". Check [aperture-blueprint's README.md](https://github.com/fluxninja/aperture-blueprints/blob/main/README.md) for more
+This utility can be used to generate Aperture Policies and Grafana Dashboards "in-place". Check [aperture-blueprint's README.md](https://github.com/fluxninja/aperture-blueprints/blob/main/README.md) for more
 details.
 
 positional arguments:
@@ -68,9 +68,9 @@ blueprint under the `blueprints/` directory.
 
 Under the `blueprints/` directory, the currently available Blueprints can be
 found. Each blueprint consists of at least two files: `config.libsonnet` and
-`main.libsonnet`. `main.libsonnet` bundles actual policy and dashboard code
+`main.libsonnet`. `main.libsonnet` bundles actual Policy and dashboard code
 (available under `lib/1.0`) into Blueprints, and `config.libsonnet` comes with
-the default configuration for the given policy. This can be overridden by the
+the default configuration for the given Policy. This can be overridden by the
 `--config` option passed to the `aperture-generate.py` script.
 
 Custom configurations will be merged with Blueprints' `config.libsonnet`
@@ -89,10 +89,10 @@ jb install
 ## Using aperture-blueprints as a jsonnet mixins library
 
 An alternate way of using the aperture-blueprints repository is to import it
-from another jsonnet project and render policies or dashboards directly in
+from another jsonnet project and render Policies or Dashboards directly in
 jsonnet.
 
-For example, to create a ConfigMap with Aperture policies that can be loaded by
+For example, to create a ConfigMap with Aperture Policies that can be loaded by
 the controller, you need to install aperture-blueprints with the jsonnet
 bundler:
 
@@ -106,7 +106,7 @@ Additionally, for this example to work install the k8s-libsonnet dependency:
 jb install github.com/jsonnet-libs/k8s-libsonnet/1.24@main
 ```
 
-Finally, you can create a ConfigMap resource with policy like this:
+Finally, you can create a ConfigMap resource with Policy like this:
 
 ```jsonnet
 local k = import "github.com/jsonnet-libs/k8s-libsonnet/1.24/main.libsonnet";
