@@ -146,7 +146,7 @@ func (lo *logger) LogEvent(event fxevent.Event) {
 	}
 }
 
-// WithApertureLogger overrrides fx default logger.
+// WithApertureLogger overrides fx default logger.
 func WithApertureLogger() func(lg log.Logger) fxevent.Logger {
 	return func(lg log.Logger) fxevent.Logger {
 		return &logger{Logger: lg}

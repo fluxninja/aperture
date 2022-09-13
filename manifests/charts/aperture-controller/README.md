@@ -60,7 +60,7 @@
 | `operator.containerSecurityContext.runAsGroup`               | User ID for the operator container                                                                                     | `1001`                |
 | `operator.containerSecurityContext.runAsNonRoot`             | Force the container to be run as non-root                                                                              | `true`                |
 | `operator.containerSecurityContext.privileged`               | Decide if the container runs privileged.                                                                               | `false`               |
-| `operator.containerSecurityContext.readOnlyRootFilesystem`   | ReadOnlyRootFilesystem fot the operator container                                                                      | `false`               |
+| `operator.containerSecurityContext.readOnlyRootFilesystem`   | ReadOnlyRootFilesystem for the operator container                                                                      | `false`               |
 | `operator.containerSecurityContext.allowPrivilegeEscalation` | Allow Privilege Escalation for the operator container                                                                  | `false`               |
 | `operator.terminationGracePeriodSeconds`                     | In seconds, time the given to the pod needs to terminate gracefully                                                    | `10`                  |
 | `operator.initContainers`                                    | Add additional init containers to the etcd pods                                                                        | `[]`                  |

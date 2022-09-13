@@ -1,5 +1,5 @@
 // Companion package for github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1
-// containing convertions of proto-generated struct into golang ones and other helpers.
+// containing conversions of proto-generated struct into golang ones and other helpers.
 package selectors
 
 import (

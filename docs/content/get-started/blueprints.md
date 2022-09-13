@@ -1,6 +1,6 @@
 ---
 title: Blueprints
-description: Policies and dashboard pre-packaged as reusable blueprints
+description: Policies and Dashboards pre-packaged as reusable Blueprints
 keywords:
   - jsonnet
   - grafana
@@ -11,23 +11,23 @@ sidebar_position: 3
 
 ## Introduction
 
-Aperture comes with a pre-packaged list of policies and Grafana dashboards that
-can be used both as a guide for creating new policies, and as ready-to-use
-blueprints for configuring Aperture Agent behaviour.
+Aperture comes with a pre-packaged list of [Aperture Policies][policies] and Grafana Dashboards that
+can be used both as a guide for creating new Policies, and as ready-to-use
+Blueprints for generating Aperture Policies customized to a [Service][service].
 
-All dashboards and policies are written using the [Jsonnet][jsonnet-lang]
-language, and can be used both as jsonnet mixins or as standalone blueprints.
+All Dashboards and Policies are written using the [Jsonnet][jsonnet-lang]
+language, and can be used both as jsonnet mixins or as standalone Blueprints.
 
 [jsonnet-lang]: https://jsonnet.org
 
 ## Initial Setup
 
-All blueprints are available from a separate [repository][aperture-blueprints].
+All Blueprints are available from a separate [repository][aperture-blueprints].
 See the repository [README.md][blueprints-readme] for the list of required tools
 and instructions on installing jsonnet dependencies with the help of a [jsonnet
 bundler][jb].
 
-The Blueprint Generator (used to generate JSON files from blueprints) also
+The Blueprint Generator (used to generate Policy files from Blueprints) also
 depends on Python 3.8+ and [jsonnet][go-jsonnet].
 
 [aperture-blueprints]: https://github.com/fluxninja/aperture-blueprints
@@ -35,20 +35,20 @@ depends on Python 3.8+ and [jsonnet][go-jsonnet].
 [jb]: https://github.com/jsonnet-bundler/jsonnet-bundler
 [go-jsonnet]: https://github.com/google/go-jsonnet
 
-## Generating JSON Grafana Dashboards and Aperture Policies
+## Generating Aperture Policies and Grafana Dashboards
 
-The simplest way to use the blueprints repository is to render blueprints into
-JSON policy and dashboard files.
+The simplest way to use the Blueprints repository is to render Blueprints into
+Policy and dashboard files.
 
-To generate JSON files, `scripts/aperture-generate.py` can be used:
+To generate files, `scripts/aperture-generate.py` can be used:
 
 ```sh
 $ ./scripts/aperture-generate.py --help
 usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG] BLUEPRINT
 
-Aperture policies & dashboards generator utility.
+Aperture Policies & Dashboards generator utility.
 
-This utility can be used to generate Aperture policies and Grafana dashboards "in-place". Check [aperture-blueprint's README.md](https://github.com/fluxninja/aperture-blueprints/blob/main/README.md) for more
+This utility can be used to generate Aperture Policies and Grafana Dashboards "in-place". Check [aperture-blueprint's README.md](https://github.com/fluxninja/aperture-blueprints/blob/main/README.md) for more
 details.
 
 positional arguments:
@@ -61,19 +61,19 @@ options:
   --config CONFIG  jsonnet file with blueprint configuration
 ```
 
-This script takes as options an output directory path where JSON files will be
+This script takes as options an output directory path where files will be
 saved and a path to a `config.libsonnet` file with local blueprint
 configuration. It also takes the BLUEPRINT argument, which is a path to the
 blueprint under the `blueprints/` directory.
 
-Under the `blueprints/` directory, the currently available blueprints can be
+Under the `blueprints/` directory, the currently available Blueprints can be
 found. Each blueprint consists of at least two files: `config.libsonnet` and
-`main.libsonnet`. `main.libsonnet` bundles actual policy and dashboard code
-(available under `lib/1.0`) into blueprints, and `config.libsonnet` comes with
-the default configuration for the given policy. This can be overridden by the
+`main.libsonnet`. `main.libsonnet` bundles actual Policy and dashboard code
+(available under `lib/1.0`) into Blueprints, and `config.libsonnet` comes with
+the default configuration for the given Policy. This can be overridden by the
 `--config` option passed to the `aperture-generate.py` script.
 
-Custom configurations will be merged with blueprints' `config.libsonnet`
+Custom configurations will be merged with Blueprints' `config.libsonnet`
 resulting in the final configuration, according to jsonnet language rules: keys
 can be overwritten by reusing them in the custom configuration and nested
 objects can be merged by using `+:` operator. Check the `examples/` directory
@@ -83,16 +83,16 @@ The full command using the demoapp-latency-grand example looks like this:
 
 ```sh
 jb install
-./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet blueprints/latency-gradient
+./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet Blueprints/latency-gradient
 ```
 
 ## Using aperture-blueprints as a jsonnet mixins library
 
 An alternate way of using the aperture-blueprints repository is to import it
-from another jsonnet project and render policies or dashboards directly in
+from another jsonnet project and render Policies or Dashboards directly in
 jsonnet.
 
-For example, to create a ConfigMap with Aperture policies that can be loaded by
+For example, to create a ConfigMap with Aperture Policies that can be loaded by
 the controller, you need to install aperture-blueprints with the jsonnet
 bundler:
 
@@ -106,7 +106,7 @@ Additionally, for this example to work install the k8s-libsonnet dependency:
 jb install github.com/jsonnet-libs/k8s-libsonnet/1.24@main
 ```
 
-Finally, you can create a ConfigMap resource with policy like this:
+Finally, you can create a ConfigMap resource with Policy like this:
 
 ```jsonnet
 local k = import "github.com/jsonnet-libs/k8s-libsonnet/1.24/main.libsonnet";
@@ -140,3 +140,5 @@ This can be also integrated with other Kubernetes deployment tools like
 
 [jsonnet]: https://github.com/google/go-jsonnet
 [tk]: https://grafana.com/oss/tanka/
+[policies]: /concepts/policy/policy.md
+[service]: /concepts/service.md

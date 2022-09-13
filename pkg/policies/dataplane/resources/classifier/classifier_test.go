@@ -415,7 +415,7 @@ var _ = Describe("Classifier", func() {
 		})
 	})
 
-	Context("configured with ambigous rules in rego", func() {
+	Context("configured with ambiguous rules in rego", func() {
 		rules := map[string]*classificationv1.Rule{
 			"bar": {
 				Source: &classificationv1.Rule_Rego_{
@@ -477,7 +477,6 @@ var _ = Describe("Classifier", func() {
 			_, err := classifier.AddRules(context.TODO(), "one", rs)
 			Expect(err).To(HaveOccurred())
 		})
-
 	})
 })
 

@@ -35,7 +35,7 @@ type ApertureInjector struct {
 	Instance *v1alpha1.Agent
 }
 
-// Handle receives incomming requests from MutatingWebhook for newly created Pods and injects Agent container in them.
+// Handle receives incoming requests from MutatingWebhook for newly created Pods and injects Agent container in them.
 func (apertureInjector *ApertureInjector) Handle(ctx context.Context, req admission.Request) admission.Response {
 	pod := &corev1.Pod{}
 
