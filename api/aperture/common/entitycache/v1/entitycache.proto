@@ -16,7 +16,7 @@ service EntityCacheService {
       get: "/v1/entity-cache/services-list"
     };
   }
-  rpc GetEntities(google.protobuf.Empty) returns (EntityCache) {
+  rpc GetEntityCache(google.protobuf.Empty) returns (EntityCache) {
     option (google.api.http) = {
       get: "/v1/entity-cache/entity-cache"
     };

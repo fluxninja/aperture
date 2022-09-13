@@ -85,7 +85,7 @@ paths:
         - FluxNinjaService
   /v1/entity-cache/entity-cache:
     get:
-      operationId: EntityCacheService_GetEntities
+      operationId: EntityCacheService_GetEntityCache
       responses:
         "200":
           description: A successful response.
@@ -153,21 +153,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - InfoService
-  /v1/peers/peers:
-    get:
-      operationId: PeerDiscoveryService_GetPeers
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1Peers'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      tags:
-        - PeerDiscoveryService
-  /v1/peers/peers/peer_infos/{address}:
+  /v1/peers/peer-info/{address}:
     get:
       operationId: PeerDiscoveryService_GetPeer
       responses:
@@ -184,6 +170,20 @@ paths:
           in: path
           required: true
           type: string
+      tags:
+        - PeerDiscoveryService
+  /v1/peers/peers:
+    get:
+      operationId: PeerDiscoveryService_GetPeers
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Peers'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
       tags:
         - PeerDiscoveryService
   /v1/policies:

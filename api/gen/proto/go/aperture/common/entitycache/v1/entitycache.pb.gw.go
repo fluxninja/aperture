@@ -50,20 +50,20 @@ func local_request_EntityCacheService_GetServicesList_0(ctx context.Context, mar
 
 }
 
-func request_EntityCacheService_GetEntities_0(ctx context.Context, marshaler runtime.Marshaler, client EntityCacheServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_EntityCacheService_GetEntityCache_0(ctx context.Context, marshaler runtime.Marshaler, client EntityCacheServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.GetEntities(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetEntityCache(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_EntityCacheService_GetEntities_0(ctx context.Context, marshaler runtime.Marshaler, server EntityCacheServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_EntityCacheService_GetEntityCache_0(ctx context.Context, marshaler runtime.Marshaler, server EntityCacheServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := server.GetEntities(ctx, &protoReq)
+	msg, err := server.GetEntityCache(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -99,7 +99,7 @@ func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.S
 
 	})
 
-	mux.Handle("GET", pattern_EntityCacheService_GetEntities_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EntityCacheService_GetEntityCache_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -107,12 +107,12 @@ func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntities", runtime.WithHTTPPathPattern("/v1/entity-cache/entity-cache"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", runtime.WithHTTPPathPattern("/v1/entity-cache/entity-cache"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_EntityCacheService_GetEntities_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_EntityCacheService_GetEntityCache_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -120,7 +120,7 @@ func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 
-		forward_EntityCacheService_GetEntities_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EntityCacheService_GetEntityCache_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -187,25 +187,25 @@ func RegisterEntityCacheServiceHandlerClient(ctx context.Context, mux *runtime.S
 
 	})
 
-	mux.Handle("GET", pattern_EntityCacheService_GetEntities_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EntityCacheService_GetEntityCache_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntities", runtime.WithHTTPPathPattern("/v1/entity-cache/entity-cache"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", runtime.WithHTTPPathPattern("/v1/entity-cache/entity-cache"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_EntityCacheService_GetEntities_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_EntityCacheService_GetEntityCache_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EntityCacheService_GetEntities_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EntityCacheService_GetEntityCache_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -215,11 +215,11 @@ func RegisterEntityCacheServiceHandlerClient(ctx context.Context, mux *runtime.S
 var (
 	pattern_EntityCacheService_GetServicesList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "entity-cache", "services-list"}, ""))
 
-	pattern_EntityCacheService_GetEntities_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1}, []string{"v1", "entity-cache"}, ""))
+	pattern_EntityCacheService_GetEntityCache_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1}, []string{"v1", "entity-cache"}, ""))
 )
 
 var (
 	forward_EntityCacheService_GetServicesList_0 = runtime.ForwardResponseMessage
 
-	forward_EntityCacheService_GetEntities_0 = runtime.ForwardResponseMessage
+	forward_EntityCacheService_GetEntityCache_0 = runtime.ForwardResponseMessage
 )

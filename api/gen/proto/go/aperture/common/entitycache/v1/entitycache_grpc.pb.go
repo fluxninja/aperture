@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EntityCacheServiceClient interface {
 	GetServicesList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ServicesList, error)
-	GetEntities(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*EntityCache, error)
+	GetEntityCache(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*EntityCache, error)
 	GetEntity(ctx context.Context, in *GetEntityRequest, opts ...grpc.CallOption) (*Entity, error)
 }
 
@@ -41,9 +41,9 @@ func (c *entityCacheServiceClient) GetServicesList(ctx context.Context, in *empt
 	return out, nil
 }
 
-func (c *entityCacheServiceClient) GetEntities(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*EntityCache, error) {
+func (c *entityCacheServiceClient) GetEntityCache(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*EntityCache, error) {
 	out := new(EntityCache)
-	err := c.cc.Invoke(ctx, "/aperture.common.entitycache.v1.EntityCacheService/GetEntities", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *entityCacheServiceClient) GetEntity(ctx context.Context, in *GetEntityR
 // for forward compatibility
 type EntityCacheServiceServer interface {
 	GetServicesList(context.Context, *emptypb.Empty) (*ServicesList, error)
-	GetEntities(context.Context, *emptypb.Empty) (*EntityCache, error)
+	GetEntityCache(context.Context, *emptypb.Empty) (*EntityCache, error)
 	GetEntity(context.Context, *GetEntityRequest) (*Entity, error)
 }
 
@@ -75,8 +75,8 @@ type UnimplementedEntityCacheServiceServer struct {
 func (UnimplementedEntityCacheServiceServer) GetServicesList(context.Context, *emptypb.Empty) (*ServicesList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetServicesList not implemented")
 }
-func (UnimplementedEntityCacheServiceServer) GetEntities(context.Context, *emptypb.Empty) (*EntityCache, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetEntities not implemented")
+func (UnimplementedEntityCacheServiceServer) GetEntityCache(context.Context, *emptypb.Empty) (*EntityCache, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEntityCache not implemented")
 }
 func (UnimplementedEntityCacheServiceServer) GetEntity(context.Context, *GetEntityRequest) (*Entity, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEntity not implemented")
@@ -111,20 +111,20 @@ func _EntityCacheService_GetServicesList_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _EntityCacheService_GetEntities_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EntityCacheService_GetEntityCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EntityCacheServiceServer).GetEntities(ctx, in)
+		return srv.(EntityCacheServiceServer).GetEntityCache(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.common.entitycache.v1.EntityCacheService/GetEntities",
+		FullMethod: "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EntityCacheServiceServer).GetEntities(ctx, req.(*emptypb.Empty))
+		return srv.(EntityCacheServiceServer).GetEntityCache(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -159,8 +159,8 @@ var EntityCacheService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EntityCacheService_GetServicesList_Handler,
 		},
 		{
-			MethodName: "GetEntities",
-			Handler:    _EntityCacheService_GetEntities_Handler,
+			MethodName: "GetEntityCache",
+			Handler:    _EntityCacheService_GetEntityCache_Handler,
 		},
 		{
 			MethodName: "GetEntity",

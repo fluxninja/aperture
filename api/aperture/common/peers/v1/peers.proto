@@ -18,7 +18,7 @@ service PeerDiscoveryService {
   }
   rpc GetPeer(PeerRequest) returns (PeerInfo) {
     option (google.api.http) = {
-      get: "/v1/peers/peers/peer_infos/{address}"
+      get: "/v1/peers/peer-info/{address}"
     };
   }
 }
