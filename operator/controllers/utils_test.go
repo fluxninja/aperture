@@ -1488,7 +1488,7 @@ var _ = Describe("Tests for checkCertificate", func() {
 })
 
 var _ = Describe("Tests for CheckAndGenerateCert", func() {
-	Context("When service name is not provided in envrionment variable", func() {
+	Context("When service name is not provided in environment variable", func() {
 		It("it should not create cert", func() {
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", certDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls3.crt")

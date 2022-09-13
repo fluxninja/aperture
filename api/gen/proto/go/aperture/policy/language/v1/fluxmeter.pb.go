@@ -22,7 +22,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// FluxMeter gathers metrics for the traffic that matches its selector.
+// FluxMeter gathers metrics for the traffic that matches its selector
 //
 // :::info
 // See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).

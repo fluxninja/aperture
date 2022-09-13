@@ -39,11 +39,7 @@ For more detailed description, refer to [the docs](https://docs.fluxninja.com/).
 To try aperture in local K8s environment, refer to
 [Playground docs](playground/README.md).
 
-<p align="center">
-  <picture>
-    <img alt="Latency Gradient Policy Dashboard" src="./docs/content/assets/img/grafana_dashboard.png">
-  </picture>
-</p>
+![Latency Gradient Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
 
 ## Slack Community
 

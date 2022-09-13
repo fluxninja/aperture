@@ -256,7 +256,7 @@ type Secrets struct {
 // APIKeySecret defines fields required for creation/usage of secret for the ApiKey of Agent and Controller.
 type APIKeySecret struct {
 	// Create new secret or not
-	Create bool `json:"create" defalut:"false"`
+	Create bool `json:"create" default:"false"`
 
 	// Secret details
 	//+kubebuilder:validation:Optional
@@ -272,7 +272,7 @@ type SecretKeyRef struct {
 	Name string `json:"name"`
 
 	// Key of the secret in Data
-	Key string `json:"key" defalut:"apiKey"`
+	Key string `json:"key" default:"apiKey"`
 }
 
 // APIKeySecretSpec defines API Key secret details for Agent and Controller.

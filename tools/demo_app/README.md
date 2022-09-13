@@ -19,7 +19,7 @@ for responses and if all services responded, returns 200 OK.
 
 ### Request chain spec
 
-The request chain description should satisfy the folllowing
+The request chain description should satisfy the following
 [json schema](https://json-schema.org/):
 
 ```json

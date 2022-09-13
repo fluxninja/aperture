@@ -4,7 +4,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 )
 
-// Rollup represents singe rollup operation. It describes Type of operation to be
+// Rollup represents single rollup operation. It describes Type of operation to be
 // done on all `FromField`s from logs/traces. Result of operation is stored in
 // `ToField`.
 type Rollup struct {
