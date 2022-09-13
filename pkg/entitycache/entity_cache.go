@@ -201,7 +201,7 @@ func (c *EntityCache) GetByIP(entityIP string) *entitycachev1.Entity {
 	c.RLock()
 	defer c.RUnlock()
 
-	v, ok := c.entities.EntitiesByIpAddress.Entities[entityIP]
+	v, ok := c.entities.EntitiesByIpAddress.DeepCopy().Entities[entityIP]
 	if !ok {
 		return nil
 	}
@@ -213,7 +213,7 @@ func (c *EntityCache) GetByName(entityName string) *entitycachev1.Entity {
 	c.RLock()
 	defer c.RUnlock()
 
-	v, ok := c.entities.EntitiesByEntityName.Entities[entityName]
+	v, ok := c.entities.EntitiesByEntityName.DeepCopy().Entities[entityName]
 	if !ok {
 		return nil
 	}
