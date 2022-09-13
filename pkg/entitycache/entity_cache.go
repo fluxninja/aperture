@@ -160,14 +160,10 @@ func (c *EntityCache) processUpdate(event notifiers.Event, unmarshaller config.U
 }
 
 func discoveryEntityToCacheEntity(entity *common.Entity) *entitycachev1.Entity {
-	return &entitycachev1.Entity{
-		EntityId: &entitycachev1.EntityID{
-			Prefix: entity.Prefix,
-			Uid:    entity.UID,
-		},
-		EntityName: entity.Name,
-		Services:   entity.Services,
-	}
+	return NewEntity(EntityID{
+		Prefix: entity.Prefix,
+		UID:    entity.UID,
+	}, entity.IPAddress, entity.Name, entity.Services)
 }
 
 // NewEntityCache creates a new, empty EntityCache.
