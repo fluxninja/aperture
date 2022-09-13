@@ -62,6 +62,10 @@ func (h *Heartbeats) GetControllerInfo() *heartbeatv1.ControllerInfo {
 	return h.controllerInfo
 }
 
+func (h *Heartbeats) SetControllerInfo(controllerInfo *heartbeatv1.ControllerInfo) {
+	h.controllerInfo = controllerInfo
+}
+
 func newHeartbeats(
 	jobGroup *jobs.JobGroup,
 	p pluginconfig.FluxNinjaPluginConfig,
@@ -123,9 +127,9 @@ func (h *Heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdcl
 		}
 	}
 
-	h.controllerInfo = &heartbeatv1.ControllerInfo{
+	h.SetControllerInfo(&heartbeatv1.ControllerInfo{
 		Id: controllerID,
-	}
+	})
 
 	return nil
 }
