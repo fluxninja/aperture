@@ -83,7 +83,7 @@ The full command using the demoapp-latency-grand example looks like this:
 
 ```sh
 jb install
-./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet blueprints/latency-gradient
+./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet Blueprints/latency-gradient
 ```
 
 ## Using aperture-blueprints as a jsonnet mixins library
