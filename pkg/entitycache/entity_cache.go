@@ -5,8 +5,6 @@ import (
 	"sync"
 
 	"go.uber.org/fx"
-	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
 
 	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -93,7 +91,6 @@ func NewEntity(id EntityID, ipAddress, name string, services []string) *Entity {
 
 // EntityCache maps IP addresses and Entity names to entities.
 type EntityCache struct {
-	entitycachev1.UnimplementedEntityCacheServiceServer
 	sync.RWMutex
 	entitiesByIP   map[string]*Entity
 	entitiesByName map[string]*Entity
@@ -204,27 +201,6 @@ func (c *EntityCache) GetByIP(entityIP string) *Entity {
 	return v
 }
 
-// GetEntityByIP returns an entity found with given ip address.
-func (c *EntityCache) GetEntityByIP(ctx context.Context, req *entitycachev1.GetEntityByIpRequest) (*entitycachev1.Entity, error) {
-	v := c.GetByIP(req.IpAddress)
-	services := make([]string, len(v.Services))
-	for _, serviceName := range ServiceIDsFromEntity(v) {
-		services = append(services, serviceName.Service)
-	}
-
-	entity := &entitycachev1.Entity{
-		EntityId: &entitycachev1.EntityID{
-			Prefix: v.ID.Prefix,
-			Uid:    v.ID.UID,
-		},
-		IpAddress:  v.IPAddress,
-		Services:   services,
-		EntityName: v.EntityName,
-	}
-
-	return entity, nil
-}
-
 // GetByName retrieves entity with a given name.
 func (c *EntityCache) GetByName(entityName string) *Entity {
 	c.RLock()
@@ -235,27 +211,6 @@ func (c *EntityCache) GetByName(entityName string) *Entity {
 		return nil
 	}
 	return v
-}
-
-// GetEntityByName returns an entity found with given entity name.
-func (c *EntityCache) GetEntityByName(ctx context.Context, req *entitycachev1.GetEntityByNameRequest) (*entitycachev1.Entity, error) {
-	v := c.GetByIP(req.EntityName)
-	services := make([]string, len(v.Services))
-	for _, serviceName := range ServiceIDsFromEntity(v) {
-		services = append(services, serviceName.Service)
-	}
-
-	entity := &entitycachev1.Entity{
-		EntityId: &entitycachev1.EntityID{
-			Prefix: v.ID.Prefix,
-			Uid:    v.ID.UID,
-		},
-		IpAddress:  v.IPAddress,
-		Services:   services,
-		EntityName: v.EntityName,
-	}
-
-	return entity, nil
 }
 
 // Clear removes all entities from the cache.
@@ -348,11 +303,6 @@ type pair struct {
 	x, y ServiceKey
 }
 
-// GetServicesList returns a list of services based on entities in cache.
-func (c *EntityCache) GetServicesList(ctx context.Context, _ *emptypb.Empty) (*entitycachev1.ServicesList, error) {
-	return c.Services(), nil
-}
-
 // eachPair returns each pair of elements in a slice. Elements in the pair are sorted so that
 // x < y.
 func eachPair(services []ServiceKey) []pair {
@@ -400,9 +350,4 @@ func servicesFromEntity(entity *Entity) ([]*entitycachev1.Service, error) {
 		})
 	}
 	return svcs, nil
-}
-
-// RegisterEntityCacheService registers a service for entity cache.
-func RegisterEntityCacheService(server *grpc.Server, cache *EntityCache) {
-	entitycachev1.RegisterEntityCacheServiceServer(server, cache)
 }

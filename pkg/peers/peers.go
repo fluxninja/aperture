@@ -14,8 +14,6 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
-	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"sigs.k8s.io/yaml"
 
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
@@ -149,7 +147,6 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 
 // PeerDiscovery holds fields to manage peer discovery.
 type PeerDiscovery struct {
-	peersv1.UnimplementedPeerDiscoveryServiceServer
 	lock         sync.RWMutex
 	peers        map[string]*peersv1.PeerInfo
 	selfPeer     *peersv1.PeerInfo
@@ -276,11 +273,6 @@ func (pd *PeerDiscovery) Peers() *peersv1.Peers {
 	return peers
 }
 
-// GetPeers returns all the peer info that are added to PeerDiscovery.
-func (pd *PeerDiscovery) GetPeers(ctx context.Context, _ *emptypb.Empty) (*peersv1.Peers, error) {
-	return pd.Peers(), nil
-}
-
 // RegisterService accepts a name, full address (host:port) and adds to the list of services in PeerDiscovery.
 func (pd *PeerDiscovery) RegisterService(name string, address string) {
 	pd.lock.Lock()
@@ -297,12 +289,6 @@ func (pd *PeerDiscovery) addPeer(peer *peersv1.PeerInfo) {
 	pd.peers[peer.Address] = peer
 }
 
-// AddPeer adds given peer to the PeerDiscovery.
-func (pd *PeerDiscovery) AddPeer(ctx context.Context, req *peersv1.PeerInfo) (*emptypb.Empty, error) {
-	pd.addPeer(req)
-	return nil, nil
-}
-
 // Peer returns the peer info in the PeerDiscovery with the given address.
 func (pd *PeerDiscovery) Peer(address string) (*peersv1.PeerInfo, error) {
 	pd.lock.RLock()
@@ -316,11 +302,6 @@ func (pd *PeerDiscovery) Peer(address string) (*peersv1.PeerInfo, error) {
 	return peer, nil
 }
 
-// GetPeer returns the peer info in the PeerDiscovery with the given address.
-func (pd *PeerDiscovery) GetPeer(ctx context.Context, req *peersv1.PeerRequest) (*peersv1.PeerInfo, error) {
-	return pd.Peer(req.Address)
-}
-
 // PeerKeys returns all the peer keys that are added to PeerDiscovery.
 func (pd *PeerDiscovery) PeerKeys() []string {
 	pd.lock.RLock()
@@ -332,14 +313,6 @@ func (pd *PeerDiscovery) PeerKeys() []string {
 	}
 
 	return keys
-}
-
-// GetPeerKeys returns all the peer keys that are added to PeerDiscovery.
-func (pd *PeerDiscovery) GetPeerKeys(ctx context.Context, _ *emptypb.Empty) (*peersv1.PeerKeysResponse, error) {
-	keys := pd.PeerKeys()
-	return &peersv1.PeerKeysResponse{
-		Keys: keys,
-	}, nil
 }
 
 func (pd *PeerDiscovery) removePeer(address string) {
@@ -357,12 +330,6 @@ func (pd *PeerDiscovery) removePeer(address string) {
 	delete(pd.peers, address)
 }
 
-// RemovePeer removes the peer with the given address in the PeerDiscovery.
-func (pd *PeerDiscovery) RemovePeer(ctx context.Context, req *peersv1.PeerRequest) (*emptypb.Empty, error) {
-	pd.removePeer(req.Address)
-	return nil, nil
-}
-
 func (pd *PeerDiscovery) updatePeer(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	log.Debug().Str("event", event.String()).Msg("Updating peer")
 	if event.Type == notifiers.Write {
@@ -377,9 +344,4 @@ func (pd *PeerDiscovery) updatePeer(event notifiers.Event, unmarshaller config.U
 		addr := path.Base(key)
 		pd.removePeer(addr)
 	}
-}
-
-// RegisterPeerDiscoveryService registers a service for peer discovery.
-func RegisterPeerDiscoveryService(server *grpc.Server, pd *PeerDiscovery) {
-	peersv1.RegisterPeerDiscoveryServiceServer(server, pd)
 }
