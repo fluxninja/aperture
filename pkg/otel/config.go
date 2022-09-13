@@ -7,9 +7,11 @@ import (
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/fx"
+	"k8s.io/client-go/rest"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
@@ -219,9 +221,18 @@ func addPrometheusReceiver(cfg *otelParams) {
 	config := cfg.config
 	scrapeConfigs := []map[string]any{
 		buildApertureSelfScrapeConfig("aperture-self", cfg),
-		buildKubernetesNodesScrapeConfig(cfg),
-		buildKubernetesPodsScrapeConfig(cfg),
 	}
+
+	_, err := rest.InClusterConfig()
+	if err == rest.ErrNotInCluster {
+		log.Debug().Msg("K8s environment not detected. Skipping K8s scrape configurations.")
+	} else if err != nil {
+		log.Warn().Err(err).Msg("Error when discovering k8s environment")
+	} else {
+		log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
+		scrapeConfigs = append(scrapeConfigs, buildKubernetesNodesScrapeConfig(cfg), buildKubernetesPodsScrapeConfig(cfg))
+	}
+
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
 	config.AddReceiver(ReceiverPrometheus, map[string]any{
