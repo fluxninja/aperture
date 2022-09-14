@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ghodss/yaml"
 	"github.com/lithammer/dedent"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/extractors"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
@@ -25,7 +25,11 @@ func checkOk(yamlString string, expectedRego string) {
 	// helpful to test multiple extractors in a single test
 	var labelExtractors map[string]*classificationv1.Extractor
 	yamlString = dedent.Dedent(yamlString)
-	Expect(yaml.Unmarshal([]byte(yamlString), &labelExtractors)).To(Succeed())
+
+	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte(yamlString))
+	Expect(err).ToNot(HaveOccurred())
+	err = unmarshaller.Unmarshal(&labelExtractors)
+	Expect(err).ToNot(HaveOccurred())
 
 	rego, err := extractors.CompileToRego("pkgname", labelExtractors)
 	Expect(err).NotTo(HaveOccurred())
