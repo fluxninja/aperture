@@ -55,8 +55,8 @@ manually (check
 
 When using `asdf`:
 
-- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)and
-  [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
+- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and
+  [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf) 
   `asdf`
 - Run the below command to add all the required plugins.
 
