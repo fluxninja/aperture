@@ -58,7 +58,7 @@ When using `asdf`:
 - [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and
   [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf) 
   `asdf`
-- Run the below command to add all the required plugins.
+- Run the below command in aperture home directory to install all the required tools.
 
 ```
 make install-asdf-tools
