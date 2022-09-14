@@ -3,75 +3,30 @@ package peers_test
 import (
 	"context"
 	"errors"
-	"time"
 
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
-	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
-	"github.com/fluxninja/aperture/pkg/config"
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
-	"github.com/fluxninja/aperture/pkg/peers"
-	"github.com/fluxninja/aperture/pkg/platform"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"go.uber.org/fx"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var (
-	app *fx.App
-	svc peers.PeerDiscoveryService
-)
-
-var _ = BeforeEach(func() {
-	pd, err := peers.NewPeerDiscovery("test", nil, nil)
-	Expect(err).ToNot(HaveOccurred())
-	for _, peerinfo := range hardCodedPeers.PeerInfos {
-		pd.AddPeer(peerinfo)
-	}
-
-	app = platform.New(
-		config.ModuleConfig{
-			MergeConfig: map[string]interface{}{
-				"sentrywriter": map[string]interface{}{
-					"disabled": true,
-				},
-			},
-		}.Module(),
-		fx.Supply(pd),
-		fx.Provide(agent.ProvidePeersPrefix),
-		fx.Provide(peers.ProvideDummyPeerDiscoveryService),
-		grpcclient.ClientConstructor{Name: "peers-grpc-client", ConfigKey: "peer_discovery.client.grpc"}.Annotate(),
-		fx.Populate(&svc),
-	)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	err = app.Start(ctx)
-	Expect(err).NotTo(HaveOccurred())
-})
-
-var _ = AfterEach(func() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	err := app.Stop(ctx)
-	Expect(err).NotTo(HaveOccurred())
-})
-
 var _ = Describe("Peers GetPeers", func() {
+	ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
 	When("client request comes in", func() {
 		It("returns all the peer info that are added to peer discovery", func() {
-			ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
 			resp, err := svc.GetPeers(ctx, &emptypb.Empty{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).To(Equal(hardCodedPeers))
 		})
 	})
+
 })
 
 var _ = Describe("Peers GetPeer", func() {
+	ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
 	When("client request with peer address comes in", func() {
 		It("returns the peer info that matches the provided peer address", func() {
-			ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
 			resp, err := svc.GetPeer(ctx, &peersv1.PeerRequest{Address: "1.2.3.4:54321"})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).To(Equal(hardCodedPeerInfo))
@@ -80,7 +35,6 @@ var _ = Describe("Peers GetPeer", func() {
 
 	When("empty client request comes in", func() {
 		It("returns a peer not found error", func() {
-			ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
 			resp, err := svc.GetPeer(ctx, &peersv1.PeerRequest{})
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(errors.New("peer not found")))
@@ -90,8 +44,7 @@ var _ = Describe("Peers GetPeer", func() {
 
 	When("client request with non matching peer address comes in", func() {
 		It("returns a peer not found error", func() {
-			ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
-			resp, err := svc.GetPeer(ctx, &peersv1.PeerRequest{Address: "1.2.3.4:50000"})
+			resp, err := svc.GetPeer(ctx, &peersv1.PeerRequest{Address: "1.2.3.4:12345"})
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(errors.New("peer not found")))
 			Expect(resp).To(BeNil())
