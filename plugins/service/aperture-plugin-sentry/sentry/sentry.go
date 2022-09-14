@@ -108,12 +108,6 @@ func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 		AttachStacktrace: config.AttachStacktrace,
 		SampleRate:       config.SampleRate,
 		TracesSampleRate: config.TracesSampleRate,
-		// TODO: Customize sampler if needed
-		// TracesSampler enables to customize the sampling of traces, overrides TracesSampleRate
-		//
-		// TracesSampler: sentry.TracesSamplerFunc(func(ctx sentry.SamplingContext) sentry.Sampled {
-		// 	return sentry.SampledTrue
-		// }),
 	})
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create sentry client")
