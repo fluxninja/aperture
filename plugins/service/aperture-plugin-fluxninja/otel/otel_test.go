@@ -2,6 +2,7 @@ package otel_test
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -36,13 +37,19 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 			"fluxninja_endpoint": "http://localhost:1234",
 		},
 	}
+	marshalledCfg, err := json.Marshal(cfg)
+	Expect(err).NotTo(HaveOccurred())
+	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(marshalledCfg)
+	Expect(err).NotTo(HaveOccurred())
 
 	var in inStruct
 	opts := fx.Options(
-		platform.Config{MergeConfig: cfg}.Module(),
 		grpcclient.ClientConstructor{Name: "heartbeats-grpc-client", ConfigKey: pluginconfig.PluginConfigKey + ".client.grpc"}.Annotate(),
 		httpclient.ClientConstructor{Name: "heartbeats-http-client", ConfigKey: pluginconfig.PluginConfigKey + ".client.http"}.Annotate(),
 		fx.Provide(
+			func() config.Unmarshaller {
+				return unmarshaller
+			},
 			func() *heartbeats.Heartbeats {
 				return &heartbeats.Heartbeats{
 					ControllerInfo: &heartbeatv1.ControllerInfo{
@@ -62,7 +69,7 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 	)
 	app := platform.New(opts)
 
-	err := app.Err()
+	err = app.Err()
 	if err != nil {
 		visualize, _ := fx.VisualizeError(err)
 		log.Error().Err(err).Msg("fx.New failed: " + visualize)
