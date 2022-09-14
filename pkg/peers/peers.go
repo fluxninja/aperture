@@ -90,7 +90,7 @@ func ProvideDummyPeerDiscoveryService(pd *PeerDiscovery) (PeerDiscoveryService, 
 		pd, _ = NewPeerDiscovery("test", nil, nil)
 	}
 	return PeerDiscoveryService{
-		PeerDiscovery: pd,
+		peerDiscovery: pd,
 	}, nil
 }
 
