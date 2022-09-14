@@ -53,6 +53,8 @@ To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install
 manually (check
 [Tools required for Kubernetes deployment](#tools-required-for-kubernetes-deployment)).
 
+### Install via asdf
+
 When using `asdf`:
 
 - [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and
@@ -65,6 +67,8 @@ make install-asdf-tools
 ```
 
 ### Tools required for Kubernetes deployment
+
+Please skip this section in case you used [asdf to install](install-via-asdf).
 
 Tools which are required for local Kubernetes deployment:
 
