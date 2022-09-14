@@ -3,11 +3,11 @@ package controlplane_test
 import (
 	"context"
 
+	"github.com/ghodss/yaml"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
@@ -29,10 +29,8 @@ var _ = Describe("Validator", func() {
 
 	validateExample := func(contents string) {
 		var cm corev1.ConfigMap
-		unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte(contents))
-		Expect(err).ToNot(HaveOccurred())
-		err = unmarshaller.Unmarshal(&cm)
-		Expect(err).ToNot(HaveOccurred())
+		err := yaml.Unmarshal([]byte(contents), &cm)
+		Expect(err).NotTo(HaveOccurred())
 
 		ok, msg, err := cmVatidator.ValidateConfigMap(context.TODO(), cm)
 		Expect(err).NotTo(HaveOccurred())

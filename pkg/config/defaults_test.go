@@ -72,7 +72,7 @@ type FixtureTypeInt int
 
 type ExampleStruct struct {
 	X int
-	T Timestamp
+	T Time
 	D Duration
 }
 
