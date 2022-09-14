@@ -19,7 +19,7 @@ var _ = Describe("Status Registry", func() {
 		rootRegistry = status.NewRegistry()
 	})
 
-	Context("there is single level root registry", func() {
+	Context("there is a single level root registry", func() {
 		It("returns the root registry itself", func() {
 			Expect(rootRegistry.Parent()).To(BeNil())
 			Expect(rootRegistry.Root()).To(Equal(rootRegistry))
@@ -62,7 +62,7 @@ var _ = Describe("Status Registry", func() {
 		grandChild1 status.Registry
 		grandChild2 status.Registry
 	)
-	Context("there multiple registries in hierarchy", func() {
+	Context("there are multiple registries in hierarchy", func() {
 		BeforeEach(func() {
 			child1 = rootRegistry.Child("child1")
 			child2 = rootRegistry.Child("child2")
@@ -88,38 +88,21 @@ var _ = Describe("Status Registry", func() {
 			Expect(rootRegistry.ChildIfExists("child1")).To(Equal(child1))
 			Expect(rootRegistry.ChildIfExists("child2")).To(Equal(child2))
 		})
-		It("returns status information", func() {
+		It("returns updated status information", func() {
 			test_status1 := status.NewStatus(nil, errors.New("test status1"))
 			rootRegistry.SetStatus(test_status1)
 			Expect(rootRegistry.GetStatus()).To(Equal(test_status1))
 			Expect(rootRegistry.HasError()).To(BeTrue())
 
-			// multiple_groupstatus := &statusv1.GroupStatus{
-			// 	Status: rootRegistry.GetStatus(),
-			// 	Groups: map[string]*statusv1.GroupStatus{
-			// 		"child1": {
-			// 			Status: child1.GetStatus(),
-			// 			Groups: map[string]*statusv1.GroupStatus{
-			// 				"grandChild1": {
-			// 					Status: grandChild1.GetStatus(),
-			// 					Groups: make(map[string]*statusv1.GroupStatus),
-			// 				},
-			// 			},
-			// 		},
-			// 		"child2": {
-			// 			Status: child2.GetStatus(),
-			// 			Groups: map[string]*statusv1.GroupStatus{
-			// 				"grandChild2": {
-			// 					Status: grandChild2.GetStatus(),
-			// 					Groups: make(map[string]*statusv1.GroupStatus),
-			// 				},
-			// 			},
-			// 		},
-			// 	},
-			// }
-			// rootRegistry.SetGroupStatus(multiple_groupstatus)
-			// Expect(rootRegistry.GetGroupStatus()).To(Equal(multiple_groupstatus))
-			// Expect(rootRegistry.GetGroupStatus()).To(Equal(nil))
+			test_status2 := status.NewStatus(nil, errors.New("test status2"))
+			test_groupstatus1 := &statusv1.GroupStatus{
+				Status: test_status2,
+				Groups: make(map[string]*statusv1.GroupStatus),
+			}
+			child1.SetStatus(test_status1)
+			child1.SetGroupStatus(test_groupstatus1)
+			Expect(child1.GetStatus()).To(Equal(test_status2))
+			Expect(grandChild1.GetStatus()).To(Equal(&statusv1.Status{}))
 		})
 		It("creates multiple child registries then detaches them", func() {
 			grandChild3 := child1.Child("grandChild3")
