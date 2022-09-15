@@ -14,11 +14,10 @@ import (
 var _ = Describe("Enrichment Processor - Traces", func() {
 	It("Enriches feature trace attributes with data from entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(&entitycache.Entity{
-			ID:        entitycache.EntityID{},
-			IPAddress: "192.0.2.0",
-			Services:  []string{"svc1", "svc2"},
-		})
+		entityCache.Put(entitycache.NewEntity(
+			entitycache.EntityID{},
+			hardCodedIPAddress, hardCodedEntityName, hardCodedServices,
+		))
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
@@ -38,11 +37,10 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 
 	It("Does not panic when egress metrics FeatureAddressLabel attribute empty", func() {
 		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(&entitycache.Entity{
-			ID:        entitycache.EntityID{},
-			IPAddress: "192.0.2.0",
-			Services:  []string{"svc1", "svc2"},
-		})
+		entityCache.Put(entitycache.NewEntity(
+			entitycache.EntityID{},
+			hardCodedIPAddress, hardCodedEntityName, hardCodedServices,
+		))
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
@@ -61,11 +59,10 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 
 	It("Does not enrich when there is no matching entries in entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(&entitycache.Entity{
-			ID:        entitycache.EntityID{},
-			IPAddress: "192.0.2.3",
-			Services:  []string{"svc1", "svc2"},
-		})
+		entityCache.Put(entitycache.NewEntity(
+			entitycache.EntityID{},
+			"192.0.2.3", hardCodedEntityName, hardCodedServices,
+		))
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 

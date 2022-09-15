@@ -14,11 +14,10 @@ import (
 var _ = Describe("Enrichment Processor - Logs", func() {
 	It("Enriches egress logs attributes with data from entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(&entitycache.Entity{
-			ID:        entitycache.EntityID{},
-			IPAddress: "192.0.2.0",
-			Services:  []string{"svc1", "svc2"},
-		})
+		entityCache.Put(entitycache.NewEntity(
+			entitycache.EntityID{},
+			hardCodedIPAddress, hardCodedEntityName, hardCodedServices,
+		))
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
@@ -39,10 +38,10 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 
 	It("Does not panic when egress logs net.host.address attribute empty", func() {
 		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(&entitycache.Entity{
-			ID:        entitycache.EntityID{},
-			IPAddress: "192.0.2.0",
-		})
+		entityCache.Put(entitycache.NewEntity(
+			entitycache.EntityID{},
+			hardCodedIPAddress, hardCodedEntityName, nil,
+		))
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
@@ -62,10 +61,10 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 
 	It("Does not panic when egress logs net.host.address attribute is garbage", func() {
 		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(&entitycache.Entity{
-			ID:        entitycache.EntityID{},
-			IPAddress: "192.0.2.0",
-		})
+		entityCache.Put(entitycache.NewEntity(
+			entitycache.EntityID{},
+			hardCodedIPAddress, hardCodedEntityName, nil,
+		))
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
@@ -85,11 +84,10 @@ var _ = Describe("Enrichment Processor - Logs", func() {
 
 	It("Enriches ingress logs attributes with data from entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(&entitycache.Entity{
-			ID:        entitycache.EntityID{},
-			IPAddress: "192.0.2.0",
-			Services:  []string{"svc1", "svc2"},
-		})
+		entityCache.Put(entitycache.NewEntity(
+			entitycache.EntityID{},
+			hardCodedIPAddress, hardCodedEntityName, hardCodedServices,
+		))
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 

@@ -26,11 +26,10 @@ var (
 
 var _ = BeforeEach(func() {
 	entities := entitycache.NewEntityCache()
-	entities.Put(&entitycache.Entity{
-		ID:        entitycache.EntityID{},
-		Services:  hardCodedServices,
-		IPAddress: hardCodedIPAddress,
-	})
+	entities.Put(entitycache.NewEntity(
+		entitycache.EntityID{},
+		hardCodedIPAddress, hardCodedEntityName, hardCodedServices,
+	))
 	app = platform.New(
 		config.ModuleConfig{
 			MergeConfig: map[string]interface{}{
@@ -75,8 +74,9 @@ var _ = Describe("FlowControl Check", func() {
 })
 
 var (
-	hardCodedServices  = []string{"service1", "service2"}
-	hardCodedIPAddress = "1.2.3.4"
+	hardCodedIPAddress  = "1.2.3.4"
+	hardCodedEntityName = "test-entity"
+	hardCodedServices   = []string{"service1", "service2"}
 )
 
 type fakeAddr string

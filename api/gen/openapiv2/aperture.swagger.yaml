@@ -5,6 +5,7 @@ info:
 tags:
   - name: EntityCacheService
   - name: InfoService
+  - name: PeerDiscoveryService
   - name: StatusService
   - name: FlowControlService
   - name: FluxNinjaService
@@ -14,6 +15,27 @@ consumes:
 produces:
   - application/json
 paths:
+  /aperture.common.entitycache.v1.EntityCacheService/GetEntity:
+    post:
+      operationId: EntityCacheService_GetEntity
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Entity'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: body
+          description: GetEntityRequest contains one of the required info fields to perform GetEntity call.
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetEntityRequest'
+      tags:
+        - EntityCacheService
   /aperture.flowcontrol.v1.FlowControlService/Check:
     post:
       summary: |-
@@ -61,6 +83,20 @@ paths:
             $ref: '#/definitions/v1ReportRequest'
       tags:
         - FluxNinjaService
+  /v1/entity-cache/entity-cache:
+    get:
+      operationId: EntityCacheService_GetEntityCache
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1EntityCache'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - EntityCacheService
   /v1/entity-cache/services-list:
     get:
       operationId: EntityCacheService_GetServicesList
@@ -117,6 +153,29 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - InfoService
+  /v1/peers/{address}:
+    get:
+      operationId: PeerDiscoveryService_GetPeers
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Peers'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          minItems: 1
+      tags:
+        - PeerDiscoveryService
   /v1/policies:
     get:
       operationId: PolicyService_AllPolicies
@@ -167,6 +226,22 @@ definitions:
       - REJECT_REASON_RATE_LIMITED
       - REJECT_REASON_CONCURRENCY_LIMITED
     default: REJECT_REASON_UNSPECIFIED
+  EntityCacheEntities:
+    type: object
+    properties:
+      entities:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Entity'
+    description: Entities defines mapping of entities.
+  EntityEntityID:
+    type: object
+    properties:
+      prefix:
+        type: string
+      uid:
+        type: string
+    description: EntityID is a unique Entity identifier.
   LimiterDecisionLimiterReason:
     type: string
     enum:
@@ -1005,6 +1080,28 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Exponential moving average of the series of reading as an output signal.
     description: Outputs for the EMA component.
+  v1Entity:
+    type: object
+    properties:
+      entity_id:
+        $ref: '#/definitions/EntityEntityID'
+      entity_name:
+        type: string
+      ip_address:
+        type: string
+      services:
+        type: array
+        items:
+          type: string
+    description: Entity represents a pod, vm, etc.
+  v1EntityCache:
+    type: object
+    properties:
+      entities_by_entity_name:
+        $ref: '#/definitions/EntityCacheEntities'
+      entities_by_ip_address:
+        $ref: '#/definitions/EntityCacheEntities'
+    description: EntityCache contains both mappings of ip address to entity and entity name to entity.
   v1EqualsMatchExpression:
     type: object
     properties:
@@ -1087,6 +1184,14 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Extrapolated signal.
     description: Outputs for the Extrapolator component.
+  v1GetEntityRequest:
+    type: object
+    properties:
+      entity_name:
+        type: string
+      ip_address:
+        type: string
+    description: GetEntityRequest contains one of the required info fields to perform GetEntity call.
   v1GradientController:
     type: object
     properties:
@@ -1493,7 +1598,7 @@ definitions:
         type: string
       service2:
         type: string
-    title: OverlappingService contains info about a service that overlaps with another one
+    description: OverlappingService contains info about a service that overlaps with another one.
   v1PathTemplateMatcher:
     type: object
     properties:
@@ -1540,13 +1645,17 @@ definitions:
         type: object
         additionalProperties:
           type: string
+    description: PeerInfo holds peer info and services.
   v1Peers:
     type: object
     properties:
-      peer_infos:
-        type: array
-        items:
+      peer_info:
+        $ref: '#/definitions/v1PeerInfo'
+      peers:
+        type: object
+        additionalProperties:
           $ref: '#/definitions/v1PeerInfo'
+    description: Peers holds the peer info of this peer and a mapping of address to other peers.
   v1Policy:
     type: object
     properties:
@@ -1926,9 +2035,9 @@ definitions:
         format: int32
       name:
         type: string
-    title: |-
+    description: |-
       Service contains information about single service discovered in agent group by a
-      particular agent
+      particular agent.
   v1ServicesList:
     type: object
     properties:
