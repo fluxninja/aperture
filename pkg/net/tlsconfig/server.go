@@ -59,13 +59,25 @@ func (constructor Constructor) Annotate() fx.Option {
 			constructor.provideTLSConfig,
 			fx.ResultTags(name),
 		),
+		fx.Annotate(
+			constructor.provideServerTLSConfig,
+			fx.ResultTags(name),
+		),
 	)
 }
 
-func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller) (*tls.Config, error) {
+func (constructor Constructor) provideServerTLSConfig(unmarshaller config.Unmarshaller) (ServerTLSConfig, error) {
 	config := constructor.DefaultConfig
 	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize tls configuration!")
+		return ServerTLSConfig{}, err
+	}
+	return config, nil
+}
+
+func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller) (*tls.Config, error) {
+	config, err := constructor.provideServerTLSConfig(unmarshaller)
+	if err != nil {
 		return nil, err
 	}
 
