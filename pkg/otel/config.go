@@ -52,11 +52,10 @@ const (
 var baseFxTag = config.NameTag("base")
 
 type otelParams struct {
-	promClient      promapi.Client
-	config          *otelcollector.OTELConfig
-	listener        *listener.Listener
-	tlsConfig       *tls.Config
-	serverTLSConfig tlsconfig.ServerTLSConfig
+	promClient promapi.Client
+	config     *otelcollector.OTELConfig
+	listener   *listener.Listener
+	tlsConfig  *tls.Config
 	OtelConfig
 }
 
@@ -140,12 +139,11 @@ func newOtelConfig(in FxIn) (*otelParams, error) {
 		return nil, err
 	}
 	cfg := &otelParams{
-		OtelConfig:      userCfg,
-		listener:        in.Listener,
-		promClient:      in.PromClient,
-		tlsConfig:       in.TLSConfig,
-		config:          config,
-		serverTLSConfig: in.ServerTLSConfig,
+		OtelConfig: userCfg,
+		listener:   in.Listener,
+		promClient: in.PromClient,
+		tlsConfig:  in.TLSConfig,
+		config:     config,
 	}
 	return cfg, nil
 }
@@ -229,11 +227,9 @@ func addOTLPReceiver(cfg *otelParams) {
 					Endpoint:  cfg.GRPCAddr,
 					Transport: "tcp",
 				},
-				TLSSetting: toOTELTLSConfig(cfg.serverTLSConfig),
 			},
 			HTTP: &confighttp.HTTPServerSettings{
-				Endpoint:   cfg.HTTPAddr,
-				TLSSetting: toOTELTLSConfig(cfg.serverTLSConfig),
+				Endpoint: cfg.HTTPAddr,
 			},
 		},
 	})
@@ -315,9 +311,6 @@ func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]any 
 		"scheme":   scheme,
 		"tls_config": map[string]any{
 			"insecure_skip_verify": true,
-			"cert_file":            cfg.serverTLSConfig.ServerCert,
-			"key_file":             cfg.serverTLSConfig.ServerKey,
-			"ca_file":              cfg.serverTLSConfig.ClientCA,
 		},
 		"scrape_interval": "1s",
 		"scrape_timeout":  "900ms",
@@ -346,9 +339,6 @@ func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]any {
 		},
 		"tls_config": map[string]any{
 			"insecure_skip_verify": true,
-			"cert_file":            cfg.serverTLSConfig.ServerCert,
-			"key_file":             cfg.serverTLSConfig.ServerKey,
-			"ca_file":              cfg.serverTLSConfig.ClientCA,
 		},
 		"kubernetes_sd_configs": []map[string]any{
 			{"role": "node"},
@@ -386,11 +376,7 @@ func buildKubernetesPodsScrapeConfig(cfg *otelParams) map[string]any {
 		"kubernetes_sd_configs": []map[string]any{
 			{"role": "pod"},
 		},
-		"tls_config": map[string]any{
-			"cert_file": cfg.serverTLSConfig.ServerCert,
-			"key_file":  cfg.serverTLSConfig.ServerKey,
-			"ca_file":   cfg.serverTLSConfig.ClientCA,
-		},
+		"tls_config": map[string]any{},
 		"relabel_configs": []map[string]any{
 			// Scrape only the node on which this agent is running.
 			{
