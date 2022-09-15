@@ -138,9 +138,6 @@ var _ = BeforeSuite(func() {
 	}
 	Expect(k8sClient.Create(ctx, ns)).To(BeNil())
 
-	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
-	Expect(err).NotTo(HaveOccurred())
-
 	defaultControllerInstance = &v1alpha1.Controller{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      appName,
@@ -181,7 +178,9 @@ var _ = BeforeSuite(func() {
 			},
 		},
 	}
-	unmarshaller.Unmarshal(&defaultControllerInstance.Spec)
+
+	err = config.UnmarshalYAML([]byte{}, &defaultControllerInstance.Spec)
+	Expect(err).NotTo(HaveOccurred())
 
 	defaultAgentInstance = &v1alpha1.Agent{
 		ObjectMeta: metav1.ObjectMeta{
@@ -223,7 +222,8 @@ var _ = BeforeSuite(func() {
 			},
 		},
 	}
-	unmarshaller.Unmarshal(&defaultAgentInstance.Spec)
+	err = config.UnmarshalYAML([]byte{}, &defaultAgentInstance.Spec)
+	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterSuite(func() {

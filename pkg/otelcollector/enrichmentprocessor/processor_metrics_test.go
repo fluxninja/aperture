@@ -13,14 +13,13 @@ import (
 var _ = Describe("Enrichment Processor - Metrics", func() {
 	It("Enriches metrics attributes with data from entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(&entitycache.Entity{
-			ID: entitycache.EntityID{
+		entityCache.Put(entitycache.NewEntity(
+			entitycache.EntityID{
 				Prefix: "testPrefix",
 				UID:    "1",
 			},
-			Services:   []string{"fooSvc1", "fooSvc2"},
-			EntityName: "someName",
-		})
+			"", "someName", []string{"fooSvc1", "fooSvc2"},
+		))
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 

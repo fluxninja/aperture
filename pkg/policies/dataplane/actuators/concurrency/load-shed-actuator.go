@@ -250,7 +250,7 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		return
 	}
 
-	var wrapperMessage wrappersv1.LoadShedDecsisionWrapper
+	var wrapperMessage wrappersv1.LoadShedDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	loadShedDecision := wrapperMessage.LoadShedDecision
 	if err != nil || loadShedDecision == nil {

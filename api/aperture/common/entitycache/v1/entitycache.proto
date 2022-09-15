@@ -16,6 +16,12 @@ service EntityCacheService {
       get: "/v1/entity-cache/services-list"
     };
   }
+  rpc GetEntityCache(google.protobuf.Empty) returns (EntityCache) {
+    option (google.api.http) = {
+      get: "/v1/entity-cache/entity-cache"
+    };
+  }
+  rpc GetEntity(GetEntityRequest) returns (Entity) {}
 }
 
 //
@@ -28,15 +34,48 @@ message ServicesList {
 }
 
 // Service contains information about single service discovered in agent group by a
-// particular agent
+// particular agent.
 message Service {
   string name = 1;
   int32 entities_count = 2;
 }
 
-// OverlappingService contains info about a service that overlaps with another one
+// OverlappingService contains info about a service that overlaps with another one.
 message OverlappingService {
   string service1 = 1;
   string service2 = 2;
   int32 entities_count = 3;
+}
+
+// EntityCache contains both mappings of ip address to entity and entity name to entity.
+message EntityCache {
+  // Entities defines mapping of entities.
+  message Entities {
+    map<string, Entity> entities = 1;
+  }
+
+  Entities entities_by_ip_address = 1;
+  Entities entities_by_entity_name = 2;
+}
+
+// Entity represents a pod, vm, etc.
+message Entity {
+  // EntityID is a unique Entity identifier.
+  message EntityID {
+    string prefix = 1;
+    string uid = 2;
+  }
+
+  EntityID entity_id = 1;
+  string ip_address = 2;
+  repeated string services = 3;
+  string entity_name = 4;
+}
+
+// GetEntityRequest contains one of the required info fields to perform GetEntity call.
+message GetEntityRequest {
+  oneof by {
+    string ip_address = 1;
+    string entity_name = 2;
+  }
 }

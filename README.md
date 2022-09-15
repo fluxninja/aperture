@@ -37,7 +37,7 @@ For more detailed description, refer to [the docs](https://docs.fluxninja.com/).
 ## Playground
 
 To try aperture in local K8s environment, refer to
-[Playground docs](playground/README.md).
+[Playground docs](https://docs.fluxninja.com/docs/get-started/playground/).
 
 ![Latency Gradient Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
 
@@ -62,3 +62,7 @@ the expected behavior.
 For better understanding of Aperture, refer to the following resources.
 
 - [Documentation](https://docs.fluxninja.com/)
+
+## License
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffluxninja%2Faperture.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffluxninja%2Faperture?ref=badge_large)

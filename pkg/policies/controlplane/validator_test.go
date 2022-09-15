@@ -3,11 +3,11 @@ package controlplane_test
 import (
 	"context"
 
-	"github.com/ghodss/yaml"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
@@ -29,7 +29,7 @@ var _ = Describe("Validator", func() {
 
 	validateExample := func(contents string) {
 		var cm corev1.ConfigMap
-		err := yaml.Unmarshal([]byte(contents), &cm)
+		err := config.UnmarshalYAML([]byte(contents), &cm)
 		Expect(err).NotTo(HaveOccurred())
 
 		ok, msg, err := cmVatidator.ValidateConfigMap(context.TODO(), cm)

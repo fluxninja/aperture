@@ -22,6 +22,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -63,6 +64,8 @@ func (constructor Constructor) Module() fx.Option {
 	_ = os.MkdirAll(peerDiscoverySyncPath, fs.ModePerm)
 	return fx.Options(
 		fx.Provide(constructor.providePeerDiscovery),
+		grpcgateway.RegisterHandler{Handler: peersv1.RegisterPeerDiscoveryServiceHandlerFromEndpoint}.Annotate(),
+		fx.Invoke(RegisterPeerDiscoveryService),
 	)
 }
 
@@ -79,6 +82,16 @@ type PeerDiscoveryIn struct {
 	StatusRegistry status.Registry
 	Prefix         PeerDiscoveryPrefix
 	Watchers       PeerWatchers `group:"peer-watchers"`
+}
+
+// ProvideDummyPeerDiscoveryService provides empty Peer Discovery Service for the testing.
+func ProvideDummyPeerDiscoveryService(pd *PeerDiscovery) (PeerDiscoveryService, error) {
+	if pd == nil {
+		pd, _ = NewPeerDiscovery("test", nil, nil)
+	}
+	return PeerDiscoveryService{
+		peerDiscovery: pd,
+	}, nil
 }
 
 func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDiscovery, error) {
@@ -262,11 +275,11 @@ func (pd *PeerDiscovery) GetPeers() *peersv1.Peers {
 	defer pd.lock.RUnlock()
 
 	peers := &peersv1.Peers{
-		PeerInfos: make([]*peersv1.PeerInfo, 0, len(pd.peers)),
+		Peers: make(map[string]*peersv1.PeerInfo),
 	}
 
 	for _, peer := range pd.peers {
-		peers.PeerInfos = append(peers.PeerInfos, peer)
+		peers.Peers[peer.Address] = peer
 	}
 
 	return peers
@@ -280,7 +293,8 @@ func (pd *PeerDiscovery) RegisterService(name string, address string) {
 	pd.selfPeer.Services[name] = address
 }
 
-func (pd *PeerDiscovery) addPeer(peer *peersv1.PeerInfo) {
+// AddPeer adds a peer info to the PeerDiscovery peers map.
+func (pd *PeerDiscovery) AddPeer(peer *peersv1.PeerInfo) {
 	defer pd.watchers.OnPeerAdded(peer)
 	pd.lock.Lock()
 	defer pd.lock.Unlock()
@@ -337,7 +351,7 @@ func (pd *PeerDiscovery) updatePeer(event notifiers.Event, unmarshaller config.U
 			log.Error().Err(err).Msg("failed to unmarshal peer info")
 			return
 		}
-		pd.addPeer(&peer)
+		pd.AddPeer(&peer)
 	} else if event.Type == notifiers.Remove {
 		key := string(event.Key)
 		addr := path.Base(key)

@@ -2,10 +2,40 @@ syntax = "proto3";
 
 package aperture.common.peers.v1;
 
-message Peers {
-  repeated PeerInfo peer_infos = 1;
+import "google/api/annotations.proto";
+
+//
+// gRPC service
+//
+
+// PeerDiscoveryService is used to query Peers.
+service PeerDiscoveryService {
+  rpc GetPeers(PeersRequest) returns (Peers) {
+    option (google.api.http) = {
+      get: "/v1/peers/{address}"
+    };
+  }
 }
 
+//
+// Request/Response messages
+//
+
+message PeersRequest {
+  repeated string address = 1;
+}
+
+//
+// Data models
+//
+
+// Peers holds the peer info of this peer and a mapping of address to other peers.
+message Peers {
+  PeerInfo peer_info = 1;
+  map<string, PeerInfo> peers = 2;
+}
+
+// PeerInfo holds peer info and services.
 message PeerInfo {
   string address = 1;
   string hostname = 2;

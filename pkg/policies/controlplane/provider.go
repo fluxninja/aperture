@@ -63,9 +63,8 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 		var dat []byte
 		switch etype {
 		case notifiers.Write:
-			unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
 			policyMessage := &policylangv1.Policy{}
-			unmarshalErr := unmarshaller.Unmarshal(policyMessage)
+			unmarshalErr := config.UnmarshalYAML(bytes, policyMessage)
 			if unmarshalErr != nil {
 				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 				return key, nil, unmarshalErr
