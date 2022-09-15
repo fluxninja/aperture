@@ -65,11 +65,6 @@ just click "Start" button as shown below.
 Described hereafter deployment methods assume usage of specific deployment and
 configuration/management tools (which must be installed beforehand).
 
-### Docker Desktop
-
-If you intend to install this on your local desktop machine. Please install [docker desktop](https://www.docker.com/products/docker-desktop/). _We don't recommend running Tilt setup on your laptops_.
-
----
 
 To install other required tools, you can use [ASDF](https://asdf-vm.com/) OR install
 manually (check
