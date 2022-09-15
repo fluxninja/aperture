@@ -4,10 +4,10 @@ package etcd
 import (
 	"context"
 	"fmt"
+	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
-	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
@@ -105,7 +105,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			}
 			etcdClient.Client = cli
 
-			etcdClient.Lease = namespacev3.NewLease(etcdClient.Client, namespace)
+			etcdClient.Lease = namespacev3.NewLease(clientv3.NewLease(etcdClient.Client), namespace)
 			etcdClient.KV = namespacev3.NewKV(etcdClient.Client, namespace)
 			etcdClient.Watcher = namespacev3.NewWatcher(etcdClient.Client, namespace)
 
@@ -129,7 +129,19 @@ func ProvideClient(in ClientIn) (*Client, error) {
 					if err != nil || keepAlive == nil {
 						log.Error().Err(err).Msg("Unable to keep alive the lease")
 						attempt += 1
+
+						etcdClient.Lease = namespacev3.NewLease(clientv3.NewLease(etcdClient.Client), namespace)
+						// Create a lease with etcd for this client, exit app if lease maintenance fails
+						resp, err := etcdClient.Lease.Grant(ctx, (int64)(config.LeaseTTL.AsDuration().Seconds()))
+						if err != nil {
+							log.Error().Err(err).Msg("Unable to grant a lease")
+							cancel()
+							return
+						}
+						// save the lease id
+						etcdClient.LeaseID = resp.ID
 						continue
+
 					} else {
 						attempt = 1
 					}
