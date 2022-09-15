@@ -7,7 +7,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,8 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PeerDiscoveryServiceClient interface {
-	GetPeers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Peers, error)
-	GetPeer(ctx context.Context, in *PeerRequest, opts ...grpc.CallOption) (*PeerInfo, error)
+	GetPeers(ctx context.Context, in *PeersRequest, opts ...grpc.CallOption) (*Peers, error)
 }
 
 type peerDiscoveryServiceClient struct {
@@ -31,18 +29,9 @@ func NewPeerDiscoveryServiceClient(cc grpc.ClientConnInterface) PeerDiscoverySer
 	return &peerDiscoveryServiceClient{cc}
 }
 
-func (c *peerDiscoveryServiceClient) GetPeers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Peers, error) {
+func (c *peerDiscoveryServiceClient) GetPeers(ctx context.Context, in *PeersRequest, opts ...grpc.CallOption) (*Peers, error) {
 	out := new(Peers)
 	err := c.cc.Invoke(ctx, "/aperture.common.peers.v1.PeerDiscoveryService/GetPeers", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *peerDiscoveryServiceClient) GetPeer(ctx context.Context, in *PeerRequest, opts ...grpc.CallOption) (*PeerInfo, error) {
-	out := new(PeerInfo)
-	err := c.cc.Invoke(ctx, "/aperture.common.peers.v1.PeerDiscoveryService/GetPeer", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,19 +42,15 @@ func (c *peerDiscoveryServiceClient) GetPeer(ctx context.Context, in *PeerReques
 // All implementations should embed UnimplementedPeerDiscoveryServiceServer
 // for forward compatibility
 type PeerDiscoveryServiceServer interface {
-	GetPeers(context.Context, *emptypb.Empty) (*Peers, error)
-	GetPeer(context.Context, *PeerRequest) (*PeerInfo, error)
+	GetPeers(context.Context, *PeersRequest) (*Peers, error)
 }
 
 // UnimplementedPeerDiscoveryServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedPeerDiscoveryServiceServer struct {
 }
 
-func (UnimplementedPeerDiscoveryServiceServer) GetPeers(context.Context, *emptypb.Empty) (*Peers, error) {
+func (UnimplementedPeerDiscoveryServiceServer) GetPeers(context.Context, *PeersRequest) (*Peers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPeers not implemented")
-}
-func (UnimplementedPeerDiscoveryServiceServer) GetPeer(context.Context, *PeerRequest) (*PeerInfo, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPeer not implemented")
 }
 
 // UnsafePeerDiscoveryServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -80,7 +65,7 @@ func RegisterPeerDiscoveryServiceServer(s grpc.ServiceRegistrar, srv PeerDiscove
 }
 
 func _PeerDiscoveryService_GetPeers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(PeersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -92,25 +77,7 @@ func _PeerDiscoveryService_GetPeers_Handler(srv interface{}, ctx context.Context
 		FullMethod: "/aperture.common.peers.v1.PeerDiscoveryService/GetPeers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PeerDiscoveryServiceServer).GetPeers(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PeerDiscoveryService_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PeerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PeerDiscoveryServiceServer).GetPeer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/aperture.common.peers.v1.PeerDiscoveryService/GetPeer",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PeerDiscoveryServiceServer).GetPeer(ctx, req.(*PeerRequest))
+		return srv.(PeerDiscoveryServiceServer).GetPeers(ctx, req.(*PeersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -125,10 +92,6 @@ var PeerDiscoveryService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPeers",
 			Handler:    _PeerDiscoveryService_GetPeers_Handler,
-		},
-		{
-			MethodName: "GetPeer",
-			Handler:    _PeerDiscoveryService_GetPeer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

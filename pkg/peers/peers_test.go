@@ -2,86 +2,78 @@ package peers_test
 
 import (
 	"context"
-	"errors"
 
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/grpc/peer"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var _ = Describe("Peers GetPeers", func() {
 	ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
-	When("client request comes in", func() {
+	When("empty client request comes in", func() {
 		It("returns all the peer info that are added to peer discovery", func() {
-			resp, err := svc.GetPeers(ctx, &emptypb.Empty{})
+			resp, err := svc.GetPeers(ctx, &peersv1.PeersRequest{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).To(Equal(hardCodedPeers))
 		})
 	})
-
-})
-
-var _ = Describe("Peers GetPeer", func() {
-	ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
-	When("client request with peer address comes in", func() {
-		It("returns the peer info that matches the provided peer address", func() {
-			resp, err := svc.GetPeer(ctx, &peersv1.PeerRequest{Address: "1.2.3.4:54321"})
+	When("client request with address that does not exist in peer discovery comes in", func() {
+		It("returns all the peer info that are added to peer discovery", func() {
+			resp, err := svc.GetPeers(ctx, &peersv1.PeersRequest{Address: []string{"1.2.3.4:55555"}})
 			Expect(err).NotTo(HaveOccurred())
-			Expect(resp).To(Equal(hardCodedPeerInfo))
+			Expect(resp).To(Equal(hardCodedPeers))
 		})
 	})
-
-	When("empty client request comes in", func() {
-		It("returns a peer not found error", func() {
-			resp, err := svc.GetPeer(ctx, &peersv1.PeerRequest{})
-			Expect(err).To(HaveOccurred())
-			Expect(err).To(Equal(errors.New("peer not found")))
-			Expect(resp).To(BeNil())
+	When("client request with address that exists in peer discovery comes in", func() {
+		It("returns specific peer info matches with 1.2.3.4:54321", func() {
+			resp, err := svc.GetPeers(ctx, &peersv1.PeersRequest{Address: []string{"1.2.3.4:54321"}})
+			Expect(err).NotTo(HaveOccurred())
+			specificPeerInfo := hardCodedPeers
+			specificPeerInfo.PeerInfo = hardCodedPeerInfo1
+			Expect(resp).To(Equal(specificPeerInfo))
 		})
-	})
-
-	When("client request with non matching peer address comes in", func() {
-		It("returns a peer not found error", func() {
-			resp, err := svc.GetPeer(ctx, &peersv1.PeerRequest{Address: "1.2.3.4:12345"})
-			Expect(err).To(HaveOccurred())
-			Expect(err).To(Equal(errors.New("peer not found")))
-			Expect(resp).To(BeNil())
+		It("returns specific peer info matches with 3.4.5.6:54321", func() {
+			resp, err := svc.GetPeers(ctx, &peersv1.PeersRequest{Address: []string{"3.4.5.6:54321"}})
+			Expect(err).NotTo(HaveOccurred())
+			specificPeerInfo := hardCodedPeers
+			specificPeerInfo.PeerInfo = hardCodedPeerInfo3
+			Expect(resp).To(Equal(specificPeerInfo))
 		})
 	})
 })
 
 var (
+	// hardCodedPeerInfo
 	hardCodedIPAddress = "1.2.3.4:54321"
 	hardCodedHostName  = "peers-hostname-info"
 	hardCodedServices  = map[string]string{
-		"service1": "peers1",
-		"service2": "peers2",
-		"service3": "peers3",
+		"peers1": "service1",
+		"peers2": "service2",
+		"peers3": "service3",
 	}
-	hardCodedPeerInfo = &peersv1.PeerInfo{
+	hardCodedPeerInfo1 = &peersv1.PeerInfo{
 		Address:  hardCodedIPAddress,
-		Hostname: hardCodedHostName,
+		Hostname: hardCodedHostName + "1",
 		Services: hardCodedServices,
 	}
+	hardCodedPeerInfo2 = &peersv1.PeerInfo{
+		Address:  "2.3.4.5:54321",
+		Hostname: hardCodedHostName + "2",
+		Services: hardCodedServices,
+	}
+	hardCodedPeerInfo3 = &peersv1.PeerInfo{
+		Address:  "3.4.5.6:54321",
+		Hostname: hardCodedHostName + "3",
+		Services: hardCodedServices,
+	}
+
+	// hardCodedPeers
 	hardCodedPeers = &peersv1.Peers{
-		PeerInfos: []*peersv1.PeerInfo{
-			{
-				Address:  hardCodedIPAddress,
-				Hostname: hardCodedHostName,
-				Services: hardCodedServices,
-			},
-			{
-				Address:  "1.2.3.4:54322",
-				Hostname: hardCodedHostName + "2",
-				Services: hardCodedServices,
-			},
-			{
-				Address:  "1.2.3.4:54323",
-				Hostname: hardCodedHostName + "3",
-				Services: hardCodedServices,
-			},
+		Peers: map[string]*peersv1.PeerInfo{
+			"1.2.3.4:54321": hardCodedPeerInfo1,
+			"2.3.4.5:54321": hardCodedPeerInfo2,
+			"3.4.5.6:54321": hardCodedPeerInfo3,
 		},
 	}
 )

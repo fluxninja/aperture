@@ -275,11 +275,11 @@ func (pd *PeerDiscovery) GetPeers() *peersv1.Peers {
 	defer pd.lock.RUnlock()
 
 	peers := &peersv1.Peers{
-		PeerInfos: make([]*peersv1.PeerInfo, 0, len(pd.peers)),
+		Peers: make(map[string]*peersv1.PeerInfo),
 	}
 
 	for _, peer := range pd.peers {
-		peers.PeerInfos = append(peers.PeerInfos, peer)
+		peers.Peers[peer.Address] = peer
 	}
 
 	return peers

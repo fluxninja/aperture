@@ -153,26 +153,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - InfoService
-  /v1/peers/peer-info/{address}:
-    get:
-      operationId: PeerDiscoveryService_GetPeer
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1PeerInfo'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: address
-          in: path
-          required: true
-          type: string
-      tags:
-        - PeerDiscoveryService
-  /v1/peers/peers:
+  /v1/peers/{address}:
     get:
       operationId: PeerDiscoveryService_GetPeers
       responses:
@@ -184,6 +165,15 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          minItems: 1
       tags:
         - PeerDiscoveryService
   /v1/policies:
@@ -1655,13 +1645,17 @@ definitions:
         type: object
         additionalProperties:
           type: string
+    description: PeerInfo holds peer info and services.
   v1Peers:
     type: object
     properties:
-      peer_infos:
-        type: array
-        items:
+      peer_info:
+        $ref: '#/definitions/v1PeerInfo'
+      peers:
+        type: object
+        additionalProperties:
           $ref: '#/definitions/v1PeerInfo'
+    description: Peers holds the peer info of this peer and a mapping of address to other peers.
   v1Policy:
     type: object
     properties:

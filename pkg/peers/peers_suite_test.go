@@ -33,7 +33,7 @@ var _ = BeforeSuite(func() {
 
 	pd, err := peers.NewPeerDiscovery("test", nil, nil)
 	Expect(err).ToNot(HaveOccurred())
-	for _, peerinfo := range hardCodedPeers.PeerInfos {
+	for _, peerinfo := range hardCodedPeers.Peers {
 		pd.AddPeer(peerinfo)
 	}
 

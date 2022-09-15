@@ -5,7 +5,6 @@ import (
 
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // PeerDiscoveryService is the implementation of peersv1.PeerDiscoveryServiceServer interface.
@@ -22,12 +21,23 @@ func RegisterPeerDiscoveryService(server *grpc.Server, pd *PeerDiscovery) {
 	peersv1.RegisterPeerDiscoveryServiceServer(server, svc)
 }
 
-// GetPeers returns all the peer info that are added to PeerDiscovery.
-func (pd *PeerDiscoveryService) GetPeers(ctx context.Context, _ *emptypb.Empty) (*peersv1.Peers, error) {
-	return pd.peerDiscovery.GetPeers(), nil
-}
-
-// GetPeer returns the peer info in the PeerDiscovery with the given address.
-func (pd *PeerDiscoveryService) GetPeer(ctx context.Context, req *peersv1.PeerRequest) (*peersv1.PeerInfo, error) {
-	return pd.peerDiscovery.GetPeer(req.Address)
+// GetPeers returns a matching peer info and peers if provided address matches peer;
+// otherwise, it returns all the peer info that are added to PeerDiscovery.
+func (svc *PeerDiscoveryService) GetPeers(ctx context.Context, req *peersv1.PeersRequest) (*peersv1.Peers, error) {
+	pd := svc.peerDiscovery
+	for _, address := range req.Address {
+		if address == "" {
+			continue
+		}
+		peerInfo, _ := pd.GetPeer(address)
+		if peerInfo == nil {
+			break
+		} else {
+			return &peersv1.Peers{
+				PeerInfo: peerInfo,
+				Peers:    pd.peers,
+			}, nil
+		}
+	}
+	return pd.GetPeers(), nil
 }
