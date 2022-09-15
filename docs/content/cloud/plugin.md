@@ -7,7 +7,7 @@ keywords:
   - plugin
 ---
 
-# FluxNinja cloud plugin
+# FluxNinja Cloud Plugin
 
 If you are a FluxNinja Cloud customer you can enhance your Aperture experience
 by enabling FluxNinja plugins. Plugins provide us with the ability to enrich

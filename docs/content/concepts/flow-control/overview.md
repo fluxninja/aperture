@@ -1,6 +1,6 @@
 ---
-title: Flow Control
-sidebar_position: 3
+title: Overview
+sidebar_position: 1
 keywords:
   - flows
   - tracing

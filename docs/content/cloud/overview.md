@@ -1,10 +1,12 @@
 ---
-title: FluxNinja Cloud
+title: Overview
 sidebar_position: 1
 keywords:
   - cloud
   - enterprise
 ---
+
+# FluxNinja Cloud
 
 :::info Join the Cloud Waitlist
 

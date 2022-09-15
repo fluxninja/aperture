@@ -1,7 +1,7 @@
 ---
 title: Flow Selector
 sidebar_label: Selector
-sidebar_position: 1
+sidebar_position: 2
 keywords:
   - flows
   - services
@@ -18,7 +18,7 @@ See also [Selector reference](/reference/configuration/policies.md#v1-selector)
 Flow Selectors are used by all flow observability and control components
 instantiated on Aperture Agents ([Classifiers][classifier], [Flux
 Meters][flux-meter] and Limiters). Flow Selectors define scoping rules – how
-these components should select [flows][flow] for their operations.
+these components should select [Flows][flow] for their operations.
 
 A Selector consists of:
 
