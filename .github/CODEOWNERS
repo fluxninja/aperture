@@ -8,3 +8,7 @@
 /nfpm.yaml                                   @FluxNinja/devops
 /docs/content                                @FluxNinja/documentation
 /docs/diagrams                               @FluxNinja/documentation
+/pkg/policies                                @FluxNinja/aperturecore
+/pkg/multimatcher                            @FluxNinja/aperturecore
+/pkg/flowcontrol                             @FluxNinja/aperturecore
+/pkg/distcache                               @FluxNinja/aperturecore

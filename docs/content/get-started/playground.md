@@ -68,7 +68,7 @@ make install-asdf-tools
 
 ### Tools required for Kubernetes deployment
 
-Please skip this section in case you used [asdf to install](install-via-asdf).
+Please skip this section in case you used [asdf to install](#install-via-asdf).
 
 Tools which are required for local Kubernetes deployment:
 
