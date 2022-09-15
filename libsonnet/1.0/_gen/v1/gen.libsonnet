@@ -1,4 +1,8 @@
 {
+  FluxMeterBuckets: import 'fluxmeterbuckets.libsonnet',
+  FluxMeterExponentialBuckets: import 'fluxmeterexponentialbuckets.libsonnet',
+  FluxMeterExponentialBucketsRange: import 'fluxmeterexponentialbucketsrange.libsonnet',
+  FluxMeterLinearBuckets: import 'fluxmeterlinearbuckets.libsonnet',
   MatchExpressionList: import 'matchexpressionlist.libsonnet',
   RateLimiterLazySync: import 'ratelimiterlazysync.libsonnet',
   RateLimiterOverride: import 'ratelimiteroverride.libsonnet',

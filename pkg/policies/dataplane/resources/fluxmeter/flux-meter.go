@@ -10,6 +10,7 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	policylanguagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -24,7 +25,7 @@ import (
 )
 
 const (
-	// FxNameTag is Flux Meter Watcher's Fx Tag.
+	// FxNameTag is Flux Meter Watcher's Fx Tag.s.
 	FxNameTag = "name:\"flux_meter\""
 )
 
@@ -124,11 +125,29 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	}
 	fluxMeterProto := wrapperMessage.FluxMeter
 
+	var buckets []float64
+	switch fluxMeterProto.GetHistogramBuckets().(type) {
+	case *policylanguagev1.FluxMeter_LinearBuckets_:
+		linearBuckets := fluxMeterProto.GetLinearBuckets()
+		buckets = append(buckets, prometheus.LinearBuckets(
+			linearBuckets.GetStart(), linearBuckets.GetWidth(), int(linearBuckets.GetCount()))...)
+	case *policylanguagev1.FluxMeter_ExponentialBuckets_:
+		exponentialBuckets := fluxMeterProto.GetExponentialBuckets()
+		buckets = append(buckets, prometheus.ExponentialBuckets(
+			exponentialBuckets.GetStart(), exponentialBuckets.GetFactor(), int(exponentialBuckets.GetCount()))...)
+	case *policylanguagev1.FluxMeter_ExponentialBucketsRange_:
+		exponentialBucketsRange := fluxMeterProto.GetExponentialBucketsRange()
+		buckets = append(buckets, prometheus.ExponentialBucketsRange(
+			exponentialBucketsRange.GetMin(), exponentialBucketsRange.GetMax(), int(exponentialBucketsRange.GetCount()))...)
+	default:
+		buckets = append(buckets, fluxMeterProto.GetBuckets().Buckets...)
+	}
+
 	fluxMeter := &FluxMeter{
 		fluxMeterName: wrapperMessage.FluxMeterName,
 		attributeKey:  fluxMeterProto.AttributeKey,
 		selector:      fluxMeterProto.GetSelector(),
-		buckets:       fluxMeterProto.GetHistogramBuckets(),
+		buckets:       buckets,
 	}
 
 	return fx.Options(
