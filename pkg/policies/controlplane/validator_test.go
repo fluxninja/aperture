@@ -29,7 +29,7 @@ var _ = Describe("Validator", func() {
 
 	validateExample := func(contents string) {
 		var cm corev1.ConfigMap
-		err := config.Unmarshal([]byte(contents), &cm)
+		err := config.UnmarshalYAML([]byte(contents), &cm)
 		Expect(err).NotTo(HaveOccurred())
 
 		ok, msg, err := cmVatidator.ValidateConfigMap(context.TODO(), cm)

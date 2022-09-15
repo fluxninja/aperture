@@ -35,7 +35,7 @@ type AgentHooks struct {
 func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request) admission.Response {
 	agent := &v1alpha1.Agent{}
 
-	err := config.Unmarshal([]byte(req.Object.Raw), agent)
+	err := config.UnmarshalYAML([]byte(req.Object.Raw), agent)
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}

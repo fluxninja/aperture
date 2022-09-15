@@ -300,7 +300,7 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *v1al
 		return nil
 	}
 
-	err = config.Unmarshal(resourceBytes, instance)
+	err = config.UnmarshalYAML(resourceBytes, instance)
 	if err != nil {
 		instance.Status.Resources = failedStatus
 		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefaults", "Failed to set defaults. Error: '%s'", err.Error())

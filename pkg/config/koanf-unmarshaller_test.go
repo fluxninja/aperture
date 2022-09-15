@@ -287,7 +287,7 @@ var _ = Describe("Koanf-unmarshaller", func() {
 			"koanf-unmarshaller": "test",
 		}
 		It("returns an error when unmarshalling a map", func() {
-			err := Unmarshal(bytes, &mp)
+			err := UnmarshalYAML(bytes, &mp)
 			Expect(err).To(HaveOccurred())
 		})
 	})

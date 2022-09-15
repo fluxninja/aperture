@@ -29,7 +29,7 @@ func checkOk(yamlString string, expectedRego string) {
 	// helpful to test multiple extractors in a single test
 	var labelExtractors LabelExtractors
 	yamlString = dedent.Dedent(yamlString)
-	err := config.Unmarshal([]byte(yamlString), &labelExtractors)
+	err := config.UnmarshalYAML([]byte(yamlString), &labelExtractors)
 	Expect(err).ToNot(HaveOccurred())
 
 	rego, err := extractors.CompileToRego("pkgname", labelExtractors.Labels)

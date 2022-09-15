@@ -138,7 +138,7 @@ var _ = BeforeSuite(func() {
 	}
 	Expect(k8sClient.Create(ctx, ns)).To(BeNil())
 
-	err = config.Unmarshal([]byte{}, &defaultControllerInstance.Spec)
+	err = config.UnmarshalYAML([]byte{}, &defaultControllerInstance.Spec)
 	Expect(err).NotTo(HaveOccurred())
 
 	defaultControllerInstance = &v1alpha1.Controller{
@@ -222,7 +222,7 @@ var _ = BeforeSuite(func() {
 			},
 		},
 	}
-	err = config.Unmarshal([]byte{}, &defaultAgentInstance.Spec)
+	err = config.UnmarshalYAML([]byte{}, &defaultAgentInstance.Spec)
 	Expect(err).NotTo(HaveOccurred())
 })
 

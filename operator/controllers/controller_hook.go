@@ -35,7 +35,7 @@ type ControllerHooks struct {
 func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admission.Request) admission.Response {
 	controller := &v1alpha1.Controller{}
 
-	err := config.Unmarshal([]byte(req.Object.Raw), controller)
+	err := config.UnmarshalYAML([]byte(req.Object.Raw), controller)
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}

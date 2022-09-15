@@ -337,7 +337,7 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *v1alpha1.
 		return nil
 	}
 
-	err = config.Unmarshal(resourceBytes, instance)
+	err = config.UnmarshalYAML(resourceBytes, instance)
 	if err != nil {
 		instance.Status.Resources = failedStatus
 		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "Failed to set defaults. Error: '%s'", err.Error())

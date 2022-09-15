@@ -25,9 +25,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// Unmarshal unmarshals using _just_ bytes as source of truth (no env, no
+// UnmarshalYAML unmarshals using _just_ bytes as source of truth (no env, no
 // flags, no other overrides).
-func Unmarshal(bytes []byte, output interface{}) error {
+func UnmarshalYAML(bytes []byte, output interface{}) error {
 	un, err := KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
 	if err != nil {
 		return err
