@@ -58,18 +58,24 @@ func (v *CMFileValidator) ValidateFile(
 	name string,
 	yamlSrc []byte,
 ) (bool, string, error) {
+	_, valid, msg, err := ValidateAndCompile(ctx, name, yamlSrc)
+	return valid, msg, err
+}
+
+// ValidateAndCompile checks the validity of a single Policy and compiles it.
+func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (CompiledCircuit, bool, string, error) {
 	log.Info().Str("name", name).Msg("Validating CM policy yaml")
 	if len(yamlSrc) == 0 {
-		return false, "empty yaml", nil
+		return nil, false, "empty yaml", nil
 	}
-	var policy policiesv1.Policy
-	err := config.Unmarshal(yamlSrc, &policy)
+	policy := &policiesv1.Policy{}
+	err := config.UnmarshalYAML(yamlSrc, policy)
 	if err != nil {
-		return false, err.Error(), nil
+		return nil, false, err.Error(), nil
 	}
-	_, err = CompilePolicy(&policy)
+	circuit, err := CompilePolicy(policy)
 	if err != nil {
-		return false, err.Error(), nil
+		return nil, false, err.Error(), nil
 	}
 
 	if policy.GetResources() != nil {
@@ -78,12 +84,12 @@ func (v *CMFileValidator) ValidateFile(
 			if err != nil {
 				if errors.Is(err, compiler.BadExtractor) || errors.Is(err, compiler.BadSelector) ||
 					errors.Is(err, compiler.BadRego) || errors.Is(err, compiler.BadLabelName) {
-					return false, err.Error(), nil
+					return nil, false, err.Error(), nil
 				} else {
-					return false, "", err
+					return nil, false, "", err
 				}
 			}
 		}
 	}
-	return true, "", nil
+	return circuit, true, "", nil
 }

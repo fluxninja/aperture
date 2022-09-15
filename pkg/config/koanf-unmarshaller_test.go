@@ -287,7 +287,7 @@ var _ = Describe("Koanf-unmarshaller", func() {
 			"koanf-unmarshaller": "test",
 		}
 		It("returns an error when unmarshalling a map", func() {
-			err := Unmarshal(bytes, &mp)
+			err := UnmarshalYAML(bytes, &mp)
 			Expect(err).To(HaveOccurred())
 		})
 	})
@@ -379,8 +379,8 @@ var _ = Describe("Koanf-unmarshaller", func() {
 
 var _ = Describe("TimeStamp", func() {
 	Context("when marshalling same timeStamp twice", func() {
-		ts := &Timestamp{
-			Timestamp: timestamppb.Now(),
+		ts := &Time{
+			timestamp: timestamppb.Now(),
 		}
 		b, err := ts.MarshalJSON()
 		b2, err2 := ts.MarshalJSON()
@@ -391,17 +391,17 @@ var _ = Describe("TimeStamp", func() {
 		})
 	})
 	Context("when unmarshalling a timestamp", func() {
-		ts := &Timestamp{
-			Timestamp: timestamppb.Now(),
+		ts := &Time{
+			timestamp: timestamppb.Now(),
 		}
-		ts2 := &Timestamp{}
+		ts2 := &Time{}
 		b, err := ts.MarshalJSON()
-		errBytes := []byte(`{"timestamp":"` + ts.Timestamp.String() + `"}`)
+		errBytes := []byte(`{"timestamp":"` + ts.timestamp.String() + `"}`)
 		It("should return nil error, match both timestamps and their string values", func() {
 			Expect(err).NotTo(HaveOccurred())
 			err = ts2.UnmarshalJSON(b)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(ts2.Timestamp).To(Equal(ts.Timestamp))
+			Expect(ts2.timestamp).To(Equal(ts.timestamp))
 			Expect(ts2.String()).To(Equal(ts.String()))
 		})
 		It("should return error when trying to parse an unsupported timestamp", func() {

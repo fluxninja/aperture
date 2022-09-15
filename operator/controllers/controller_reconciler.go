@@ -300,21 +300,10 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *v1al
 		return nil
 	}
 
-	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(resourceBytes)
+	err = config.UnmarshalYAML(resourceBytes, instance)
 	if err != nil {
 		instance.Status.Resources = failedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefauls", "Failed to set defaults. Error: '%s'", err.Error())
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
-		}
-		return nil
-	}
-
-	err = unmarshaller.Unmarshal(instance)
-	if err != nil {
-		instance.Status.Resources = failedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefauls", "Failed to set defaults. Error: '%s'", err.Error())
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefaults", "Failed to set defaults. Error: '%s'", err.Error())
 		errUpdate := r.updateStatus(ctx, instance)
 		if errUpdate != nil {
 			return errUpdate

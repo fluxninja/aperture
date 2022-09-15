@@ -101,7 +101,7 @@ func (lsa *LoadShedActuator) publishLoadShedFactor(loadShedFactor float64) error
 		lsa.decision.LoadShedFactor = loadShedFactor
 		// Publish decision
 		log.Debug().Float64("loadShedFactor", loadShedFactor).Msg("Publish load shed decision")
-		wrapper := &wrappersv1.LoadShedDecsisionWrapper{
+		wrapper := &wrappersv1.LoadShedDecisionWrapper{
 			LoadShedDecision: lsa.decision,
 			ComponentIndex:   int64(lsa.componentIndex),
 			PolicyName:       lsa.policyReadAPI.GetPolicyName(),
