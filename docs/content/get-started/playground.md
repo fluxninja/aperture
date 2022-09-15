@@ -19,7 +19,7 @@ resources that change. This is very convenient for getting quick feedback during
 development of Aperture.
 
 Playground deploys resources to the Kubernetes cluster that `kubectl` on your
-machine points at. For convenience, this README includes instructions for
+machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s) includes instructions for
 deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
 
 ## How to Run
@@ -31,6 +31,8 @@ tilt up
 ```
 
 Can press (Space) to open the Tilt UI.
+
+_Note_: Nothing is running locally on port 3000, else you won't be able to access Grafana dashboard.
 
 The above command starts Aperture Controller and an Aperture Agent on each
 worker in the Kubernetes cluster. Additionally, it starts a demo application
@@ -44,12 +46,32 @@ results from the experiment navigate to the "FluxNinja" dashboard in Grafana
 under "aperture-system" folder. Grafana runs at
 [localhost:3000](http://localhost:3000).
 
+Now your _Aperture playground_ is ready. You will be able to see our Rate Limit policy in action.
+Subscribe vs Non Subsribed
+Priority
+
+**Note**: We need to talk about how to load grafana dashboard
+
+Now that you have your Grafana Dashboard ready, you can
+just click "Start" button as shown below.
+![Start Load Test](../assets/img/starttrafficbig.png)
+
+**Note**: How do we monitor the traffic and what is happening
+
+---
+
 ## Tools
 
 Described hereafter deployment methods assume usage of specific deployment and
 configuration/management tools (which must be installed beforehand).
 
-To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install
+### Docker Desktop
+
+If you intend to install this on your local desktop machine. Please install [docker desktop](https://www.docker.com/products/docker-desktop/). _We don't recommend running Tilt setup on your laptops_.
+
+---
+
+To install other required tools, you can use [ASDF](https://asdf-vm.com/) OR install
 manually (check
 [Tools required for Kubernetes deployment](#tools-required-for-kubernetes-deployment)).
 
@@ -111,7 +133,7 @@ This can be achieved by using `tilt`.
 Tilt can be installed with `asdf install` or manually
 <https://docs.tilt.dev/install.html>.
 
-### Prerequisites - Kubernetes cluster bootstrap
+### Prerequisites - Kubernetes cluster bootstrap {#prerequisites-k8s}
 
 > Note: You can skip this section if you already have a running cluster which is
 > being pointed by the `kubectl`.
