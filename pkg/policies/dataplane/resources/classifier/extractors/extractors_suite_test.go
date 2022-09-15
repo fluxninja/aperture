@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ghodss/yaml"
 	"github.com/lithammer/dedent"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/extractors"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
@@ -20,14 +20,19 @@ func TestExtractors(t *testing.T) {
 	RunSpecs(t, "Extractors Suite")
 }
 
+type LabelExtractors struct {
+	Labels map[string]*classificationv1.Extractor `json:"labels"`
+}
+
 func checkOk(yamlString string, expectedRego string) {
 	// Note: The map[string]Extractor format doesn't occur in policy, but is
 	// helpful to test multiple extractors in a single test
-	var labelExtractors map[string]*classificationv1.Extractor
+	var labelExtractors LabelExtractors
 	yamlString = dedent.Dedent(yamlString)
-	Expect(yaml.Unmarshal([]byte(yamlString), &labelExtractors)).To(Succeed())
+	err := config.UnmarshalYAML([]byte(yamlString), &labelExtractors)
+	Expect(err).ToNot(HaveOccurred())
 
-	rego, err := extractors.CompileToRego("pkgname", labelExtractors)
+	rego, err := extractors.CompileToRego("pkgname", labelExtractors.Labels)
 	Expect(err).NotTo(HaveOccurred())
 	regoMeat := strings.TrimPrefix(rego, "package pkgname")
 	expectedRego = dedent.Dedent(expectedRego)
@@ -37,7 +42,7 @@ func checkOk(yamlString string, expectedRego string) {
 	// marshal/unmarshal so it's worth checking)
 	jsonBytes, err := json.Marshal(labelExtractors)
 	Expect(err).NotTo(HaveOccurred())
-	var labelExtractors2 map[string]*classificationv1.Extractor
+	var labelExtractors2 LabelExtractors
 	Expect(json.Unmarshal(jsonBytes, &labelExtractors2)).To(Succeed())
 	Expect(labelExtractors2).To(Equal(labelExtractors))
 }
@@ -57,14 +62,15 @@ var _ = Describe("Extractor", func() {
 	It("parses and compiles simple extractors", func() {
 		checkOk(
 			`
-			method:
-			  from: request.http.method
+      labels:
+        method:
+          from: request.http.method
 
-			path:
-			  from: request.http.path
+        path:
+          from: request.http.path
 
-			protocol:
-			  from: request.http.protocol
+        protocol:
+          from: request.http.protocol
 			`,
 			`
 			method := input.attributes.request.http.method
@@ -78,34 +84,35 @@ var _ = Describe("Extractor", func() {
 		checkOk(
 			// Note: use spaces inside yaml!
 			`
-			source:
-			  address:
-			    from: source.address
+      labels:
+        source:
+          address:
+            from: source.address
 
-			destination:
-			  address:
-			    from: destination.address
+        destination:
+          address:
+            from: destination.address
 
-			endpoint:
-			  path_templates:
-			    template_values:
-			      /poultry/*: animals
-			      /pets/*: animals
-			      /cart-db/*: cart
-			      /cart-ui/*: cart
+        endpoint:
+          path_templates:
+            template_values:
+              /poultry/*: animals
+              /pets/*: animals
+              /cart-db/*: cart
+              /cart-ui/*: cart
 
-			query_type:
-			  json:
-			    from: request.http.body
-			    pointer: /query
+        query_type:
+          json:
+            from: request.http.body
+            pointer: /query
 
-			user_agent:
-			  from: request.http.headers.user-agent
+        user_agent:
+          from: request.http.headers.user-agent
 
-			user:
-			  jwt:
-			    from: request.http.bearer
-			    json_pointer: /name
+        user:
+          jwt:
+            from: request.http.bearer
+            json_pointer: /name
 			`,
 			`
 			destination = result {
@@ -153,10 +160,11 @@ var _ = Describe("Extractor", func() {
 	It("handles edge cases of json pointer", func() {
 		checkOk(
 			`
-			foo:
-			  json:
-			    from: request.http.body
-			    pointer: /foo/-bar-/~1etc/2
+      labels:
+        foo:
+          json:
+            from: request.http.body
+            pointer: /foo/-bar-/~1etc/2
 			`,
 			`
 			foo := json.unmarshal(input.attributes.request.http.body).foo["-bar-"]["/etc"][{"2", 2}[_]]
@@ -168,13 +176,14 @@ var _ = Describe("Extractor", func() {
 		It("parses and compiles", func() {
 			checkOk(
 				`
-				endpoint:
-				  path_templates:
-				    template_values:
-				      /users/{userId}: users
-				      /register: register
-				      /static/*: static
-				      /*: other
+        labels:
+          endpoint:
+            path_templates:
+              template_values:
+                /users/{userId}: users
+                /register: register
+                /static/*: static
+                /*: other
 				`,
 				`
 				endpoint = "users" {
@@ -200,15 +209,16 @@ var _ = Describe("Extractor", func() {
 		It("orders matches from most to least specific", func() {
 			checkOk(
 				`
-				endpoint:
-				  path_templates:
-				    template_values:
-				      /foo/bar/{}/{}: a
-				      /foo/bar/{}/{}/*: b
-				      /foo/bar/{}/*: c
-				      /foo/bar/*: d
-				      /foo: e
-				      /foo/*: f
+        labels:
+          endpoint:
+            path_templates:
+              template_values:
+                /foo/bar/{}/{}: a
+                /foo/bar/{}/{}/*: b
+                /foo/bar/{}/*: c
+                /foo/bar/*: d
+                /foo: e
+                /foo/*: f
 				`,
 				`
 				endpoint = "a" {
