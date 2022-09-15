@@ -311,16 +311,16 @@ func newDefaultFiller() *filler {
 		}
 	}
 
-	types[getTypeHash(reflect.TypeOf(Timestamp{}))] = func(field *fieldData) {
-		if value, ok := field.Value.Interface().(Timestamp); ok {
+	types[getTypeHash(reflect.TypeOf(Time{}))] = func(field *fieldData) {
+		if value, ok := field.Value.Interface().(Time); ok {
 			if field.TagValue != "" {
 				nullTime := time.Time{}
-				if value.Timestamp.AsTime() != nullTime {
+				if value.timestamp.AsTime() != nullTime {
 					return
 				}
 				timestampJSON, _ := json.Marshal(field.TagValue)
-				t := &Timestamp{
-					Timestamp: timestamppb.Now(),
+				t := &Time{
+					timestamp: timestamppb.Now(),
 				}
 				err := json.Unmarshal(timestampJSON, t)
 				if err != nil {
@@ -340,8 +340,8 @@ func newDefaultFiller() *filler {
 			}
 			if field.TagValue != "" {
 				timestampJSON, _ := json.Marshal(field.TagValue)
-				t := &Timestamp{
-					Timestamp: timestamppb.Now(),
+				t := &Time{
+					timestamp: timestamppb.Now(),
 				}
 				err := json.Unmarshal(timestampJSON, t)
 				if err != nil {

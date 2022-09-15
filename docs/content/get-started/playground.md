@@ -53,18 +53,22 @@ To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install
 manually (check
 [Tools required for Kubernetes deployment](#tools-required-for-kubernetes-deployment)).
 
+### Install via asdf
+
 When using `asdf`:
 
-- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)and
+- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and
   [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
   `asdf`
-- Run the below command to add all the required plugins.
+- Run the below command in aperture home directory to install all the required tools.
 
 ```
 make install-asdf-tools
 ```
 
 ### Tools required for Kubernetes deployment
+
+Please skip this section in case you used [asdf to install](#install-via-asdf).
 
 Tools which are required for local Kubernetes deployment:
 

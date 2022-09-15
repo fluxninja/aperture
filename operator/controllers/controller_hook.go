@@ -35,12 +35,7 @@ type ControllerHooks struct {
 func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admission.Request) admission.Response {
 	controller := &v1alpha1.Controller{}
 
-	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(req.Object.Raw)
-	if err != nil {
-		return admission.Errored(http.StatusInternalServerError, err)
-	}
-
-	err = unmarshaller.Unmarshal(controller)
+	err := config.UnmarshalYAML([]byte(req.Object.Raw), controller)
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
