@@ -46,15 +46,15 @@ select all services within the agent group, you can skip the service name.
 
 :::
 
-### Control point
+### Control Point
 
-Flow Selector selects flows from only one [control point][control-point] within
+Flow Selector selects flows from only one [Control Point][control-point] within
 a service.
 
 ### Label Matcher
 
 Label matcher allows to optionally narrow down the selected flow based on
-conditions on [flow labels][label].
+conditions on [Flow Labels][label].
 
 There are multiple ways to define a label matcher. The simplest way is to
 provide a map of labels for exact-match:
@@ -66,13 +66,13 @@ label_matcher:
 ```
 
 You can also provide a matching-expression-tree, which allows for arbitrary
-conditions, including regex matching. See more details in [LabelMatcher
-reference][label-matcher].
+conditions, including regex matching. Refer to [LabelMatcher][label-matcher] for further details.
 
 ### Example
 
 ```yaml
 service: checkout.myns.svc.cluster.local
+agent_group: default
 control_point:
   traffic: ingress
 label_matcher:
