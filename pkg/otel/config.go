@@ -8,7 +8,6 @@ import (
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/confighttp"
 	"go.opentelemetry.io/collector/config/confignet"
-	"go.opentelemetry.io/collector/config/configtls"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/fx"
 
@@ -229,24 +228,12 @@ func addOTLPReceiver(cfg *otelParams) {
 					Endpoint:  cfg.GRPCAddr,
 					Transport: "tcp",
 				},
-				TLSSetting: toOTELTLSConfig(cfg.serverTLSConfig),
 			},
 			HTTP: &confighttp.HTTPServerSettings{
-				Endpoint:   cfg.HTTPAddr,
-				TLSSetting: toOTELTLSConfig(cfg.serverTLSConfig),
+				Endpoint: cfg.HTTPAddr,
 			},
 		},
 	})
-}
-
-func toOTELTLSConfig(c tlsconfig.ServerTLSConfig) *configtls.TLSServerSetting {
-	return &configtls.TLSServerSetting{
-		TLSSetting: configtls.TLSSetting{
-			CertFile: c.ServerCert,
-			KeyFile:  c.ServerKey,
-		},
-		ClientCAFile: c.ClientCA,
-	}
 }
 
 func addMetricsProcessor(config *otelcollector.OTELConfig) {
@@ -315,9 +302,6 @@ func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]any 
 		"scheme":   scheme,
 		"tls_config": map[string]any{
 			"insecure_skip_verify": true,
-			"cert_file":            cfg.serverTLSConfig.ServerCert,
-			"key_file":             cfg.serverTLSConfig.ServerKey,
-			"ca_file":              cfg.serverTLSConfig.ClientCA,
 		},
 		"scrape_interval": "1s",
 		"scrape_timeout":  "900ms",
@@ -346,9 +330,6 @@ func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]any {
 		},
 		"tls_config": map[string]any{
 			"insecure_skip_verify": true,
-			"cert_file":            cfg.serverTLSConfig.ServerCert,
-			"key_file":             cfg.serverTLSConfig.ServerKey,
-			"ca_file":              cfg.serverTLSConfig.ClientCA,
 		},
 		"kubernetes_sd_configs": []map[string]any{
 			{"role": "node"},
@@ -385,11 +366,6 @@ func buildKubernetesPodsScrapeConfig(cfg *otelParams) map[string]any {
 		"metrics_path":    "/metrics",
 		"kubernetes_sd_configs": []map[string]any{
 			{"role": "pod"},
-		},
-		"tls_config": map[string]any{
-			"cert_file": cfg.serverTLSConfig.ServerCert,
-			"key_file":  cfg.serverTLSConfig.ServerKey,
-			"ca_file":   cfg.serverTLSConfig.ClientCA,
 		},
 		"relabel_configs": []map[string]any{
 			// Scrape only the node on which this agent is running.
