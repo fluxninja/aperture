@@ -939,6 +939,16 @@ spec:
                         items:
                           type: string
                         type: array
+                      keepalive:
+                        description: Lease KeepAlive
+                        properties:
+                          failure_threshold:
+                            description: KeepAlive failure threshold
+                            type: integer
+                          period:
+                            description: KeepAlive refresh period
+                            type: string
+                        type: object
                       lease_ttl:
                         description: Lease time-to-live
                         type: string
@@ -3630,8 +3640,6 @@ spec:
                   tag:
                     description: The tag (version) of the image
                     type: string
-                required:
-                - repository
                 type: object
               initContainers:
                 description: Add additional init containers
@@ -5185,7 +5193,6 @@ spec:
                             type: string
                         required:
                         - key
-                        - name
                         type: object
                       value:
                         description: Value for the ApiKey

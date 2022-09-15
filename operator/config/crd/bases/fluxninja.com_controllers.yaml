@@ -912,6 +912,16 @@ spec:
                         items:
                           type: string
                         type: array
+                      keepalive:
+                        description: Lease KeepAlive
+                        properties:
+                          failure_threshold:
+                            description: KeepAlive failure threshold
+                            type: integer
+                          period:
+                            description: KeepAlive refresh period
+                            type: string
+                        type: object
                       lease_ttl:
                         description: Lease time-to-live
                         type: string
@@ -5107,7 +5117,6 @@ spec:
                             type: string
                         required:
                         - key
-                        - name
                         type: object
                       value:
                         description: Value for the ApiKey

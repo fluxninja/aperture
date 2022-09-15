@@ -62,6 +62,7 @@ type AgentImage struct {
 	Image `json:",inline"`
 
 	// The repository of the image
+	//+kubebuilder:validation:Optional
 	Repository string `json:"repository" default:"aperture-agent"`
 }
 
@@ -269,6 +270,7 @@ type APIKeySecret struct {
 // SecretKeyRef defines fields for details of the ApiKey secret.
 type SecretKeyRef struct {
 	// Name of the secret
+	//+kubebuilder:validation:Optional
 	Name string `json:"name"`
 
 	// Key of the secret in Data

@@ -5,6 +5,9 @@ client:
 etcd:
   endpoints:
   - http://agent-etcd:2379
+  keepalive:
+    failure_threshold: 3
+    period: 5s
   lease_ttl: 60s
 fluxninja_plugin:
   api_key: ""

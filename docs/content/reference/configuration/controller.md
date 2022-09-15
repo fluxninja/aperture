@@ -561,6 +561,12 @@ EtcdConfig holds configuration for etcd client.
 (string, `gte=1s`, default: `60s`) Lease time-to-live
 
 </dd>
+<dt>keepalive</dt>
+<dd>
+
+([KeepAliveConfig](#keep-alive-config))
+
+</dd>
 </dl>
 
 ### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
@@ -943,6 +949,27 @@ JobGroupConfig holds configuration for JobGroup.
 <dd>
 
 (int64, `gte=0`, default: `0`) Limits how many jobs can be running at the same time. This is useful when running resource intensive jobs and a precise start time is not critical. 0 = no limit.
+
+</dd>
+</dl>
+
+### KeepAliveConfig {#keep-alive-config}
+
+KeepAliveConfig holds configuration for etcd lease keep alive.
+
+#### Properties
+
+<dl>
+<dt>failure_threshold</dt>
+<dd>
+
+(int64, `gte=1`, default: `3`) KeepAlive failure threshold
+
+</dd>
+<dt>period</dt>
+<dd>
+
+(string, `gte=1s`, default: `5s`) KeepAlive refresh period
 
 </dd>
 </dl>

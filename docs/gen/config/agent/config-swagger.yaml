@@ -174,6 +174,8 @@ definitions:
         type: array
         x-go-name: Endpoints
         x-go-validate: gt=0,dive,hostname_port|url|fqdn
+      keepalive:
+        $ref: '#/definitions/KeepAliveConfig'
       lease_ttl:
         description: Lease time-to-live
         format: string
@@ -530,6 +532,25 @@ definitions:
     title: JobGroupConfig holds configuration for JobGroup.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
+  KeepAliveConfig:
+    properties:
+      failure_threshold:
+        description: KeepAlive failure threshold
+        format: int64
+        type: integer
+        x-go-default: "3"
+        x-go-name: FailureThreshold
+        x-go-validate: gte=1
+      period:
+        description: KeepAlive refresh period
+        format: string
+        type: string
+        x-go-default: 5s
+        x-go-name: Period
+        x-go-validate: gte=1s
+    title: KeepAliveConfig holds configuration for etcd lease keep alive.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/etcd/client
   KubernetesDiscoveryConfig:
     properties:
       discovery_enabled:

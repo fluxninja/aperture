@@ -3,6 +3,8 @@ package etcd
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
@@ -40,7 +42,19 @@ type EtcdConfig struct {
 	LeaseTTL config.Duration `json:"lease_ttl" validate:"gte=1s" default:"60s"`
 	// List of Etcd server endpoints
 	Endpoints []string `json:"endpoints" validate:"gt=0,dive,hostname_port|url|fqdn"`
+	// Lease KeepAlive
+	KeepAliveConfig KeepAliveConfig `json:"keepalive"`
 	// TODO: add auth params
+}
+
+// KeepAliveConfig holds configuration for etcd lease keep alive.
+// swagger:model
+// +kubebuilder:object:generate=true
+type KeepAliveConfig struct {
+	// KeepAlive failure threshold
+	FailureThreshold int `json:"failure_threshold" validate:"gte=1" default:"3"`
+	// KeepAlive refresh period
+	Period config.Duration `json:"period" validate:"gte=1s" default:"5s"`
 }
 
 // ClientIn holds parameters for ProvideClient.
@@ -105,19 +119,20 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			// save the lease id
 			etcdClient.LeaseID = resp.ID
 
-			// try to keep the lease alive
-			keepAlive, err := etcdClient.Lease.KeepAlive(ctx, etcdClient.LeaseID)
-			if err != nil || keepAlive == nil {
-				log.Error().Err(err).Msg("Unable to keep alive the lease")
-			}
-
 			panichandler.Go(func() {
-				for ka := range keepAlive {
-					if ka != nil {
+				attempt := 1
+				for attempt <= config.KeepAliveConfig.FailureThreshold {
+					time.Sleep(config.KeepAliveConfig.Period.AsDuration())
+					log.Debug().Msg(fmt.Sprintf("Attempt %v to keep alive the etcd lease", attempt))
+					// try to keep the lease alive
+					keepAlive, err := etcdClient.Lease.KeepAliveOnce(ctx, etcdClient.LeaseID)
+					if err != nil || keepAlive == nil {
+						log.Error().Err(err).Msg("Unable to keep alive the lease")
+						attempt += 1
 						continue
+					} else {
+						attempt = 1
 					}
-					log.Error().Msg("Lease failed, TTL is null")
-					break
 				}
 				select {
 				case <-ctx.Done():
