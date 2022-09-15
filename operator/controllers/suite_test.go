@@ -138,9 +138,6 @@ var _ = BeforeSuite(func() {
 	}
 	Expect(k8sClient.Create(ctx, ns)).To(BeNil())
 
-	err = config.UnmarshalYAML([]byte{}, &defaultControllerInstance.Spec)
-	Expect(err).NotTo(HaveOccurred())
-
 	defaultControllerInstance = &v1alpha1.Controller{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      appName,
@@ -181,6 +178,9 @@ var _ = BeforeSuite(func() {
 			},
 		},
 	}
+
+	err = config.UnmarshalYAML([]byte{}, &defaultControllerInstance.Spec)
+	Expect(err).NotTo(HaveOccurred())
 
 	defaultAgentInstance = &v1alpha1.Agent{
 		ObjectMeta: metav1.ObjectMeta{
