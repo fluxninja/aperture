@@ -48,3 +48,9 @@ var _ = AfterSuite(func() {
 	err := l.FindLeaks()
 	Expect(err).NotTo(HaveOccurred())
 })
+
+var (
+	hardCodedIPAddress  = "192.0.2.0"
+	hardCodedEntityName = "test-entity"
+	hardCodedServices   = []string{"svc1", "svc2"}
+)

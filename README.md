@@ -44,7 +44,6 @@ To try aperture in local K8s environment, refer to
 ## Slack Community
 
 [![Slack](https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen)](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1eunlrkhh-10P1HUkmBfVJX3qrSLRk~g)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffluxninja%2Faperture.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffluxninja%2Faperture?ref=badge_shield)
 
 ### Reporting bugs or requesting features
 
@@ -64,6 +63,6 @@ For better understanding of Aperture, refer to the following resources.
 
 - [Documentation](https://docs.fluxninja.com/)
 
-
 ## License
+
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffluxninja%2Faperture.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffluxninja%2Faperture?ref=badge_large)
