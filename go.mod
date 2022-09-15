@@ -20,7 +20,6 @@ require (
 	github.com/fluxninja/datasketches-go v0.0.0-20220128132852-065685ae83e0
 	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
 	github.com/getsentry/sentry-go v0.13.0
-	github.com/ghodss/yaml v1.0.0
 	github.com/go-co-op/gocron v1.17.0
 	github.com/go-logr/zerologr v1.2.2
 	github.com/go-playground/validator/v10 v10.11.0
@@ -86,6 +85,7 @@ require (
 	github.com/dnephin/pflag v1.0.7 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
+	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/zapr v1.2.0 // indirect
 	github.com/go-openapi/errors v0.20.2 // indirect
 	github.com/go-openapi/runtime v0.23.3 // indirect

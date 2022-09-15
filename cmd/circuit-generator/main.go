@@ -1,23 +1,31 @@
 package main
 
 import (
+	"context"
+	"flag"
+	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
-	"github.com/ghodss/yaml"
-
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 )
 
 func main() {
-	if len(os.Args) != 3 {
-		log.Fatalf("expected 2 arguments (input and output file), received %d", len(os.Args))
+	// use flag to parse flags and args
+	// 2 args - input file and output file
+	fs := flag.NewFlagSet("circuit-generator", flag.ExitOnError)
+	err := fs.Parse(os.Args[1:])
+	if err != nil {
+		log.Fatal(err)
 	}
-	inFile := os.Args[1]
-	outFile := os.Args[2]
+	if fs.NArg() != 2 {
+		log.Fatal("Usage: circuit-generator <input-file> <output-file>")
+	}
+	inFile := fs.Arg(0)
+	outFile := fs.Arg(1)
 
-	circuit, err := readFromFile(inFile)
+	circuit, err := compile(inFile)
 	if err != nil {
 		log.Fatalf("error reading policy spec: %v", err)
 	}
@@ -36,20 +44,19 @@ func main() {
 	}
 }
 
-func readFromFile(path string) (controlplane.CompiledCircuit, error) {
+func compile(path string) (controlplane.CompiledCircuit, error) {
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	var policy policylangv1.Policy
-	err = yaml.Unmarshal(yamlFile, &policy)
-	if err != nil {
-		return nil, err
-	}
-	circuit, err := controlplane.CompilePolicy(&policy)
-	if err != nil {
-		return nil, err
-	}
+	ctx := context.Background()
 
+	circuit, valid, msg, err := controlplane.ValidateAndCompile(ctx, filepath.Base(path), yamlFile)
+	if err != nil {
+		return nil, err
+	}
+	if !valid {
+		return nil, fmt.Errorf("invalid circuit: %s", msg)
+	}
 	return circuit, nil
 }

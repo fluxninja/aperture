@@ -37,7 +37,7 @@ For more detailed description, refer to [the docs](https://docs.fluxninja.com/).
 ## Playground
 
 To try aperture in local K8s environment, refer to
-[Playground docs](playground/README.md).
+[Playground docs](https://docs.fluxninja.com/docs/get-started/playground/).
 
 ![Latency Gradient Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
 
