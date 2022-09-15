@@ -11,10 +11,6 @@ generate-config-markdown:
 			yq eval-all --inplace "select(fileIndex==0).definitions *= select(fileIndex==1).definitions | select(fileIndex==0)" merged-plugin-swagger.yaml $$dir/plugin-swagger.yaml; \
 			yq eval-all --inplace "select(fileIndex==0).paths *= select(fileIndex==1).paths | select(fileIndex==0)" merged-plugin-swagger.yaml $$dir/plugin-swagger.yaml; \
 		done; \
-	}
-	@# generate service config swagger
-	@{ \
-		set -e; \
 		dirs=$$(find ./gen/config -name 'config-swagger.yaml' -exec dirname {} \;); \
 		for dir in $$dirs; do \
 			echo generating markdown for $$dir/config-swagger.yaml; \
@@ -38,14 +34,13 @@ generate-config-markdown:
 				--config-file ./tools/swagger/markdown-config.yaml \
 				--output $$basename.md; \
 			rm $$dir/gen.yaml; \
-			# append $$dir/metadata on top of $$dir/$$basename.md \
 			cat $$dir/metadata $$dir/$$basename.md > $$dir/$$basename.md.tmp; \
 			mv $$dir/$$basename.md.tmp $$dir/$$basename.md; \
 			npx prettier --write $$dir/$$basename.md; \
 			mv $$dir/$$basename.md ./content/reference/configuration; \
 		done; \
+		rm merged-plugin-swagger.yaml; \
 	}
-	@rm merged-plugin-swagger.yaml
 	@# policies markdown
 	@echo generating policies markdown
 	@cp ../api/gen/openapiv2/aperture.swagger.yaml gen/policies/
