@@ -11,7 +11,7 @@ keywords:
 
 :::info
 
-See also [Selector reference](/reference/configuration/policies.md#v1-selector)
+See also [Selector reference](/references/configuration/policies.md#v1-selector)
 
 :::
 
@@ -87,4 +87,4 @@ label_matcher:
 [agent-group]: /concepts/service.md#agent-group
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [classifier]: /concepts/flow-control/flow-classifier.md
-[label-matcher]: /reference/configuration/policies.md#v1-label-matcher
+[label-matcher]: /references/configuration/policies.md#v1-label-matcher

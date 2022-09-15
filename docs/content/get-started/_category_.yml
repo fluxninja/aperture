@@ -1,2 +1,7 @@
 label: Get Started
 position: 2
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Get Started"

@@ -1,5 +1,5 @@
 ---
-title: Overview
+title: FluxNinja Cloud
 sidebar_position: 1
 keywords:
   - cloud
