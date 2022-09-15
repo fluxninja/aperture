@@ -62,3 +62,7 @@ the expected behavior.
 For better understanding of Aperture, refer to the following resources.
 
 - [Documentation](https://docs.fluxninja.com/)
+
+## FOSSA
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffluxninja%2Faperture.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffluxninja%2Faperture?ref=badge_small)
