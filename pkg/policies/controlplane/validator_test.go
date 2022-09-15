@@ -29,10 +29,8 @@ var _ = Describe("Validator", func() {
 
 	validateExample := func(contents string) {
 		var cm corev1.ConfigMap
-		unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte(contents))
-		Expect(err).ToNot(HaveOccurred())
-		err = unmarshaller.Unmarshal(&cm)
-		Expect(err).ToNot(HaveOccurred())
+		err := config.Unmarshal([]byte(contents), &cm)
+		Expect(err).NotTo(HaveOccurred())
 
 		ok, msg, err := cmVatidator.ValidateConfigMap(context.TODO(), cm)
 		Expect(err).NotTo(HaveOccurred())
