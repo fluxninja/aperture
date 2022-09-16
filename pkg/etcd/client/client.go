@@ -44,7 +44,7 @@ type EtcdConfig struct {
 	// Client TLS configuration
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
 	// Authentication
-	Username string `json:"username" default:"root"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
@@ -97,17 +97,39 @@ func ProvideClient(in ClientIn) (*Client, error) {
 				Username:  config.Username,
 				Password:  config.Password,
 			})
-			if cli.Username != "" && cli.Password != "" {
-				if _, authErr := cli.AuthEnable(ctx); authErr != nil {
-					log.Error().Err(authErr).Msg("Unable to enable auth of the etcd cluster")
-					cancel()
-					return authErr
-				}
-			}
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to initialize etcd client")
 				cancel()
 				return err
+			}
+			if cli.Username != "" {
+				// Root user must be created before activating the authentication.
+				if _, err = cli.RoleAdd(ctx, "root"); err != nil {
+					log.Error().Err(err).Msg("Unable to create root user")
+					cancel()
+					return err
+				}
+				if _, err = cli.UserAdd(ctx, "root", "root"); err != nil {
+					log.Error().Err(err).Msg("Unable to create root user")
+					cancel()
+					return err
+				}
+				if _, err = cli.UserGrantRole(ctx, "root", "root"); err != nil {
+					log.Error().Err(err).Msg("Unable to grant root user role")
+					cancel()
+					return err
+				}
+				// Add user
+				if _, err = cli.UserAdd(ctx, cli.Username, cli.Password); err != nil {
+					log.Error().Err(err).Msg("Unable to add user to the etcd cluster")
+					cancel()
+					return err
+				}
+				if _, err = cli.AuthEnable(ctx); err != nil {
+					log.Error().Err(err).Msg("Unable to enable auth of the etcd cluster")
+					cancel()
+					return err
+				}
 			}
 			etcdClient.Client = cli
 
