@@ -2,9 +2,14 @@ package harness
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"fmt"
 	"io"
+	"math/big"
 	"os"
 	"os/exec"
 	"time"
@@ -20,8 +25,8 @@ const (
 	EtcdUsername = "user"
 	// EtcdPassword is the password for the EtcdUsername.
 	EtcdPassword       = "password"
-	etcdServerCertPath = "./certs/server.crt"
-	etcdServerKeyPath  = "./certs/server.key"
+	etcdServerCertPath = "/tmp/etcd_testserver/server.crt"
+	etcdServerKeyPath  = "/tmp/etcd_testserver/server.key"
 )
 
 // EtcdHarness represents a running etcd server for an integration test environment.
@@ -58,6 +63,32 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 
 	h.etcdDir, err = os.MkdirTemp("/tmp", "etcd_testserver")
 	if err != nil {
+		return nil, err
+	}
+
+	// Generates the certificates and private keys and store temporary files into etcdDir directory.
+	cert, key, err := generateCertAndKey()
+	if err != nil {
+		return nil, err
+	}
+
+	certf, err := os.CreateTemp(h.etcdDir, "server.crt")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(certf.Name())
+
+	if _, err = certf.Write(cert); err != nil {
+		return nil, err
+	}
+
+	keyf, err := os.CreateTemp(h.etcdDir, "server.key")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(keyf.Name())
+
+	if _, err = keyf.Write(key); err != nil {
 		return nil, err
 	}
 
@@ -103,28 +134,28 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 	// Root user must be created before activating the authentication.
 	ctx := context.Background()
 	if _, err = h.Client.RoleAdd(ctx, "root"); err != nil {
-		h.Stop()
+		defer h.Stop()
 		return nil, err
 	}
 	if _, err = h.Client.UserAdd(ctx, "root", "root"); err != nil {
-		h.Stop()
+		defer h.Stop()
 		return nil, err
 	}
 	if _, err = h.Client.UserGrantRole(ctx, "root", "root"); err != nil {
-		h.Stop()
+		defer h.Stop()
 		return nil, err
 	}
 	// Add user and grant root role to the new user.
 	if _, err = h.Client.UserAdd(ctx, h.Client.Username, h.Client.Password); err != nil {
-		h.Stop()
+		defer h.Stop()
 		return nil, err
 	}
 	if _, err = h.Client.UserGrantRole(ctx, h.Client.Username, "root"); err != nil {
-		h.Stop()
+		defer h.Stop()
 		return nil, err
 	}
 	if _, err = h.Client.AuthEnable(ctx); err != nil {
-		h.Stop()
+		defer h.Stop()
 		return nil, err
 	}
 
@@ -164,4 +195,28 @@ func (h *EtcdHarness) Stop() {
 	if h.etcdDir != "" {
 		_ = os.RemoveAll(h.etcdDir)
 	}
+}
+
+func generateCertAndKey() ([]byte, []byte, error) {
+	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		return nil, nil, err
+	}
+	err = rsaPrivateKey.Validate()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	template := &x509.Certificate{
+		SerialNumber: big.NewInt(2022),
+		Subject: pkix.Name{
+			Organization: []string{"fluxninja.com"},
+		},
+	}
+	certBytes, err := x509.CreateCertificate(rand.Reader, template, template, &rsaPrivateKey.PublicKey, rsaPrivateKey)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return certBytes, x509.MarshalPKCS1PrivateKey(rsaPrivateKey), nil
 }
