@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"path"
 	"reflect"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -331,9 +332,8 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *v1al
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
 	// Always enable TLS on the controller
 	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
-		CertsPath:  controllerCertPath,
-		ServerCert: controllerCertName,
-		ServerKey:  controllerCertKeyName,
+		ServerCert: path.Join(controllerCertPath, controllerCertName),
+		ServerKey:  path.Join(controllerCertPath, controllerCertKeyName),
 		Enabled:    true,
 	}
 
