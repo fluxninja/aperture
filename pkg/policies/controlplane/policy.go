@@ -235,7 +235,7 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 		log.Error().Err(marshalErr).Msgf("Failed to convert json to yaml %+v", jsonDat)
 		return nil, marshalErr
 	}
-	log.Debug().Msgf("Policy message: %s", string(dat))
+	log.Trace().Msgf("Policy message: %s", string(dat))
 	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
 	if hashErr != nil {
 		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))

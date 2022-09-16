@@ -243,9 +243,6 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
        typed_config:
          "@type": "type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz"
          transport_api_version: V3
-         with_request_body:
-           max_request_bytes: 8192
-           allow_partial_message: true
          failure_mode_allow: true
          grpc_service:
            google_grpc:
@@ -290,9 +287,6 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
        typed_config:
          "@type": "type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz"
          transport_api_version: V3
-         with_request_body:
-           max_request_bytes: 8192
-           allow_partial_message: true
          failure_mode_allow: true
          grpc_service:
            google_grpc:
