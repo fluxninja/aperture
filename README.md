@@ -41,28 +41,25 @@ To try aperture in local K8s environment, refer to
 
 ![Latency Gradient Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
 
-## Slack Community
-
-[![Slack](https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen)](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1eunlrkhh-10P1HUkmBfVJX3qrSLRk~g)
-
-### Reporting bugs or requesting features
-
-Reporting bugs helps us improve Aperture to be more reliable and user friendly.
-Please make sure to include all the required information to reproduce and
-understand the bug you are reporting.
-
-Follow helper questions in bug report template to make it easier.
-
-If you see a way to improve Aperture, use the feature request template to create
-an issue. Make sure to explain the problem you are trying to solve and what is
-the expected behavior.
-
 ## Resources
 
 For better understanding of Aperture, refer to the following resources.
 
 - [Documentation](https://docs.fluxninja.com/)
+- [Blog](https://docs.fluxninja.com/blog)
+
+## Communities
+
+[![Slack](https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen)](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1eunlrkhh-10P1HUkmBfVJX3qrSLRk~g)
+
+## Contributing
+
+[Reporting bugs](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=bug&template=bug_report.md&title=) helps us improve Aperture to be more reliable and user friendly. Please make sure to include all the required information to reproduce and understand the bug you are reporting. Follow helper questions in bug report template to make it easier.
+
+If you see a way to improve Aperture, use the [feature request](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=feature+request&template=feature_request.md&title=) template to create
+an issue. Make sure to explain the problem you are trying to solve and what is
+the expected behavior.
 
 ## License
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffluxninja%2Faperture.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffluxninja%2Faperture?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B33466%2Fgit%40github.com%3Afluxninja%2Faperture.git.svg?type=large)](https://app.fossa.com/projects/custom%2B33466%2Fgit%40github.com%3Afluxninja%2Faperture.git?ref=badge_large)
