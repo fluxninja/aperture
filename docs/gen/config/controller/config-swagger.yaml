@@ -127,6 +127,7 @@ definitions:
       username:
         description: Authentication
         type: string
+        x-go-default: root
         x-go-name: Username
     title: EtcdConfig holds configuration for etcd client.
     type: object

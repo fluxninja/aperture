@@ -44,7 +44,7 @@ type EtcdConfig struct {
 	// Client TLS configuration
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
 	// Authentication
-	Username string `json:"username"`
+	Username string `json:"username" default:"root"`
 	Password string `json:"password"`
 }
 
@@ -86,6 +86,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			tlsConfig, tlsErr := config.ClientTLSConfig.GetTLSConfig()
 			if tlsErr != nil {
 				log.Error().Err(tlsErr).Msg("Failed to get TLS config")
+				cancel()
 				return tlsErr
 			}
 			log.Info().Msg("Initializing etcd client")

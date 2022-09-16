@@ -727,7 +727,7 @@ EtcdConfig holds configuration for etcd client.
 <dt>username</dt>
 <dd>
 
-(string) Authentication
+(string, default: `root`) Authentication
 
 </dd>
 <dt>tls</dt>
