@@ -54,8 +54,6 @@ For better understanding of Aperture, refer to the following resources.
 
 ## Contributing
 
-There are multiple ways to contriubute to this project.
-
 [Reporting bugs](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=bug&template=bug_report.md&title=) helps us improve Aperture to be more reliable and user friendly. Please make sure to include all the required information to reproduce and understand the bug you are reporting. Follow helper questions in bug report template to make it easier.
 
 If you see a way to improve Aperture, use the [feature request](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=feature+request&template=feature_request.md&title=) template to create
