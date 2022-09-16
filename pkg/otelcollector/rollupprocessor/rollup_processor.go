@@ -118,14 +118,14 @@ func (rp *rollupProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 		_, exists := rollupData[key]
 		if !exists {
 			rollupData[key] = span.Attributes()
-			rollupData[key].UpsertInt(RollupCountKey, 0)
+			rollupData[key].PutInt(RollupCountKey, 0)
 		}
 		_, exists = datasketches[key]
 		if !exists {
 			datasketches[key] = make(map[string]*sketches.HeapDoublesSketch)
 		}
 		rawCount, _ := rollupData[key].Get(RollupCountKey)
-		rollupData[key].UpdateInt(RollupCountKey, rawCount.IntVal()+1)
+		rollupData[key].PutInt(RollupCountKey, rawCount.IntVal()+1)
 		rp.rollupAttributes(datasketches[key], rollupData[key], span.Attributes(), rollupsSpan)
 		return nil
 	})
@@ -140,7 +140,7 @@ func (rp *rollupProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 				return err
 			}
 			serialized := base64.StdEncoding.EncodeToString(serializedBytes)
-			attributes.UpsertString(toField, serialized)
+			attributes.PutString(toField, serialized)
 		}
 	}
 	return rp.exportTraces(ctx, rollupData)
@@ -155,14 +155,14 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 		_, exists := rollupData[key]
 		if !exists {
 			rollupData[key] = logRecord.Attributes()
-			rollupData[key].UpsertInt(RollupCountKey, 0)
+			rollupData[key].PutInt(RollupCountKey, 0)
 		}
 		_, exists = datasketches[key]
 		if !exists {
 			datasketches[key] = make(map[string]*sketches.HeapDoublesSketch)
 		}
 		rawCount, _ := rollupData[key].Get(RollupCountKey)
-		rollupData[key].UpdateInt(RollupCountKey, rawCount.IntVal()+1)
+		rollupData[key].PutInt(RollupCountKey, rawCount.IntVal()+1)
 		rp.rollupAttributes(datasketches[key], rollupData[key], logRecord.Attributes(), rollupsLog)
 		return nil
 	})
@@ -177,7 +177,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 				return err
 			}
 			serialized := base64.StdEncoding.EncodeToString(serializedBytes)
-			attributes.UpsertString(toField, serialized)
+			attributes.PutString(toField, serialized)
 		}
 	}
 	return rp.exportLogs(ctx, rollupData)
@@ -195,9 +195,9 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 			rollupSum, exists := rollup.GetToFieldValue(baseAttributes)
 			if !exists {
 				rollupSum = 0
-				baseAttributes.UpsertDouble(rollup.ToField, rollupSum)
+				baseAttributes.PutDouble(rollup.ToField, rollupSum)
 			}
-			baseAttributes.UpdateDouble(rollup.ToField, rollupSum+newValue)
+			baseAttributes.PutDouble(rollup.ToField, rollupSum+newValue)
 		case RollupSumOfSquares:
 			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
@@ -206,9 +206,9 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 			rollupSos, exists := rollup.GetToFieldValue(baseAttributes)
 			if !exists {
 				rollupSos = 0
-				baseAttributes.UpsertDouble(rollup.ToField, rollupSos)
+				baseAttributes.PutDouble(rollup.ToField, rollupSos)
 			}
-			baseAttributes.UpdateDouble(rollup.ToField, rollupSos+newValue*newValue)
+			baseAttributes.PutDouble(rollup.ToField, rollupSos+newValue*newValue)
 		case RollupMin:
 			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
@@ -217,10 +217,10 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 			rollupMin, exists := rollup.GetToFieldValue(baseAttributes)
 			if !exists {
 				rollupMin = newValue
-				baseAttributes.UpsertDouble(rollup.ToField, rollupMin)
+				baseAttributes.PutDouble(rollup.ToField, rollupMin)
 			}
 			newMin := otelcollector.Min(rollupMin, newValue)
-			baseAttributes.UpdateDouble(rollup.ToField, newMin)
+			baseAttributes.PutDouble(rollup.ToField, newMin)
 		case RollupMax:
 			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
@@ -229,10 +229,10 @@ func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.He
 			rollupMax, exists := rollup.GetToFieldValue(baseAttributes)
 			if !exists {
 				rollupMax = newValue
-				baseAttributes.UpsertDouble(rollup.ToField, rollupMax)
+				baseAttributes.PutDouble(rollup.ToField, rollupMax)
 			}
 			newMax := otelcollector.Max(rollupMax, newValue)
-			baseAttributes.UpdateDouble(rollup.ToField, newMax)
+			baseAttributes.PutDouble(rollup.ToField, newMax)
 		case RollupDatasketch:
 			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
