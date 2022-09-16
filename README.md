@@ -62,4 +62,4 @@ the expected behavior.
 
 ## License
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffluxninja%2Faperture.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffluxninja%2Faperture?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B33466%2Fgit%40github.com%3Afluxninja%2Faperture.git.svg?type=large)](https://app.fossa.com/projects/custom%2B33466%2Fgit%40github.com%3Afluxninja%2Faperture.git?ref=badge_large)
