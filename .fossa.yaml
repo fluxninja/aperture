@@ -1,0 +1,16 @@
+version: 3
+
+project:
+  id: github.com/fluxninja/aperture
+  name: aperture
+  team: fluxninja
+  link: https://www.fluxninja.com/
+  url: https://github.com/fluxninja/aperture
+
+vendoredDependencies:
+  forceRescans: false
+  scanMethod: CLILicenseScan
+
+paths:
+  exclude:
+    - ./tools
