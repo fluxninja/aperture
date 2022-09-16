@@ -125,22 +125,27 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	}
 	fluxMeterProto := wrapperMessage.FluxMeter
 
-	var buckets []float64
+	buckets := make([]float64, 0)
 	switch fluxMeterProto.GetHistogramBuckets().(type) {
 	case *policylanguagev1.FluxMeter_LinearBuckets_:
-		linearBuckets := fluxMeterProto.GetLinearBuckets()
-		buckets = append(buckets, prometheus.LinearBuckets(
-			linearBuckets.GetStart(), linearBuckets.GetWidth(), int(linearBuckets.GetCount()))...)
+		if linearBuckets := fluxMeterProto.GetLinearBuckets(); linearBuckets != nil {
+			buckets = append(buckets, prometheus.LinearBuckets(
+				linearBuckets.GetStart(), linearBuckets.GetWidth(), int(linearBuckets.GetCount()))...)
+		}
 	case *policylanguagev1.FluxMeter_ExponentialBuckets_:
-		exponentialBuckets := fluxMeterProto.GetExponentialBuckets()
-		buckets = append(buckets, prometheus.ExponentialBuckets(
-			exponentialBuckets.GetStart(), exponentialBuckets.GetFactor(), int(exponentialBuckets.GetCount()))...)
+		if exponentialBuckets := fluxMeterProto.GetExponentialBuckets(); exponentialBuckets != nil {
+			buckets = append(buckets, prometheus.ExponentialBuckets(
+				exponentialBuckets.GetStart(), exponentialBuckets.GetFactor(), int(exponentialBuckets.GetCount()))...)
+		}
 	case *policylanguagev1.FluxMeter_ExponentialBucketsRange_:
-		exponentialBucketsRange := fluxMeterProto.GetExponentialBucketsRange()
-		buckets = append(buckets, prometheus.ExponentialBucketsRange(
-			exponentialBucketsRange.GetMin(), exponentialBucketsRange.GetMax(), int(exponentialBucketsRange.GetCount()))...)
+		if exponentialBucketsRange := fluxMeterProto.GetExponentialBucketsRange(); exponentialBucketsRange != nil {
+			buckets = append(buckets, prometheus.ExponentialBucketsRange(
+				exponentialBucketsRange.GetMin(), exponentialBucketsRange.GetMax(), int(exponentialBucketsRange.GetCount()))...)
+		}
 	default:
-		buckets = append(buckets, fluxMeterProto.GetBuckets().Buckets...)
+		if defaultBuckets := fluxMeterProto.GetBuckets(); defaultBuckets != nil {
+			buckets = append(buckets, defaultBuckets.Buckets...)
+		}
 	}
 
 	fluxMeter := &FluxMeter{
