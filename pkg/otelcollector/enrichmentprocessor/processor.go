@@ -170,7 +170,7 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsM
 	for _, service := range hostEntity.Services {
 		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
 	}
-	servicesValue.CopyTo(attributes.UpsertEmpty(otelcollector.ServicesLabel))
+	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ServicesLabel))
 }
 
 func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
@@ -189,7 +189,7 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 	for _, service := range hostEntity.Services {
 		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
 	}
-	servicesValue.CopyTo(attributes.UpsertEmpty(otelcollector.ServicesLabel))
+	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ServicesLabel))
 }
 
 // unpackFlowLabels tries to parse `LabelsLabel` attribute as json, and adds
@@ -197,7 +197,7 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 func unpackFlowLabels(attributes pcommon.Map, treatAsMissing []string) {
 	labeled := "false"
 	defer func() {
-		attributes.UpsertString(otelcollector.LabeledLabel, labeled)
+		attributes.PutString(otelcollector.LabeledLabel, labeled)
 	}()
 
 	var flowAttributes map[string]string
@@ -205,7 +205,7 @@ func unpackFlowLabels(attributes pcommon.Map, treatAsMissing []string) {
 	for k, v := range flowAttributes {
 		labeled = "true"
 		// FIXME – this is quadratic (every upsert iterates to search whether label already exists)
-		attributes.UpsertString(k, v)
+		attributes.PutString(k, v)
 	}
 }
 
