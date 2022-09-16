@@ -332,9 +332,9 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *v1al
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *v1alpha1.Controller) error {
 	// Always enable TLS on the controller
 	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
-		ServerCert: path.Join(controllerCertPath, controllerCertName),
-		ServerKey:  path.Join(controllerCertPath, controllerCertKeyName),
-		Enabled:    true,
+		CertFile: path.Join(controllerCertPath, controllerCertName),
+		KeyFile:  path.Join(controllerCertPath, controllerCertKeyName),
+		Enabled:  true,
 	}
 
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {

@@ -1476,16 +1476,16 @@ spec:
                           allowed_cn:
                             description: Allowed CN
                             type: string
-                          client_ca:
+                          cert_file:
+                            description: Server Cert file path
+                            type: string
+                          client_ca_file:
                             description: Client CA file
                             type: string
                           enabled:
                             description: Enabled TLS
                             type: boolean
-                          server_cert:
-                            description: Server Cert file path
-                            type: string
-                          server_key:
+                          key_file:
                             description: Server Key file path
                             type: string
                         type: object

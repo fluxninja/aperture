@@ -1475,7 +1475,13 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 (string, `omitempty,fqdn`) Allowed CN
 
 </dd>
-<dt>client_ca</dt>
+<dt>cert_file</dt>
+<dd>
+
+(string, `omitempty,file`) Server Cert file path
+
+</dd>
+<dt>client_ca_file</dt>
 <dd>
 
 (string, `omitempty,file`) Client CA file
@@ -1487,13 +1493,7 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 (bool, default: `false`) Enabled TLS
 
 </dd>
-<dt>server_cert</dt>
-<dd>
-
-(string, `omitempty,file`) Server Cert file path
-
-</dd>
-<dt>server_key</dt>
+<dt>key_file</dt>
 <dd>
 
 (string, `omitempty,file`) Server Key file path

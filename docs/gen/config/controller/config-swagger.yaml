@@ -754,25 +754,25 @@ definitions:
         type: string
         x-go-name: AllowedCN
         x-go-validate: omitempty,fqdn
-      client_ca:
+      cert_file:
+        description: Server Cert file path
+        type: string
+        x-go-name: CertFile
+        x-go-validate: omitempty,file
+      client_ca_file:
         description: Client CA file
         type: string
-        x-go-name: ClientCA
+        x-go-name: ClientCAFile
         x-go-validate: omitempty,file
       enabled:
         description: Enabled TLS
         type: boolean
         x-go-default: "false"
         x-go-name: Enabled
-      server_cert:
-        description: Server Cert file path
-        type: string
-        x-go-name: ServerCert
-        x-go-validate: omitempty,file
-      server_key:
+      key_file:
         description: Server Key file path
         type: string
-        x-go-name: ServerKey
+        x-go-name: KeyFile
         x-go-validate: omitempty,file
     title: ServerTLSConfig holds configuration for setting up server TLS support.
     type: object
