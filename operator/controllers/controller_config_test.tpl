@@ -133,11 +133,10 @@ server:
   network: tcp
   tls:
     allowed_cn: ""
-    certs_path: /etc/aperture/aperture-controller/certs
     client_ca: ""
     enabled: true
-    server_cert: crt.pem
-    server_key: key.pem
+    server_cert: /etc/aperture/aperture-controller/certs/crt.pem
+    server_key: /etc/aperture/aperture-controller/certs/key.pem
 watchdog:
   cgroup:
     adaptive_policy:

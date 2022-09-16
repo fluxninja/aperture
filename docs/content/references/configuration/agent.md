@@ -1475,16 +1475,10 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 (string, `omitempty,fqdn`) Allowed CN
 
 </dd>
-<dt>certs_path</dt>
-<dd>
-
-(string) Path to credentials. This can be set via command line arguments as well.
-
-</dd>
 <dt>client_ca</dt>
 <dd>
 
-(string, `omitempty`) Client CA file
+(string, `omitempty,file`) Client CA file
 
 </dd>
 <dt>enabled</dt>
@@ -1496,13 +1490,13 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dt>server_cert</dt>
 <dd>
 
-(string, default: `ca.crt`) Server Cert file
+(string, `omitempty,file`) Server Cert file path
 
 </dd>
 <dt>server_key</dt>
 <dd>
 
-(string, default: `ca.key`) Server Key file
+(string, `omitempty,file`) Server Key file path
 
 </dd>
 </dl>

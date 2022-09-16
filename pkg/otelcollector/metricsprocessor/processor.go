@@ -135,7 +135,7 @@ func addAuthzResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string
 		otelcollector.AuthzStatusLabel: pcommon.NewValueString(authzResponse.GetStatus().String()),
 	}
 	for key, value := range labels {
-		value.CopyTo(attributes.UpsertEmpty(key))
+		value.CopyTo(attributes.PutEmpty(key))
 	}
 }
 
@@ -230,7 +230,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string
 	}
 
 	for key, value := range labels {
-		value.CopyTo(attributes.UpsertEmpty(key))
+		value.CopyTo(attributes.PutEmpty(key))
 	}
 	return &checkResponse
 }
@@ -239,7 +239,7 @@ func addSpanBasedLabels(span ptrace.Span) {
 	endTimestamp := span.EndTimestamp()
 	startTimeStamp := span.StartTimestamp()
 	latency := float64(endTimestamp.AsTime().Sub(startTimeStamp.AsTime())) / float64(time.Millisecond)
-	span.Attributes().UpsertDouble(otelcollector.DurationLabel, latency)
+	span.Attributes().PutDouble(otelcollector.DurationLabel, latency)
 }
 
 func (p *metricsProcessor) updateMetrics(

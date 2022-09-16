@@ -754,31 +754,26 @@ definitions:
         type: string
         x-go-name: AllowedCN
         x-go-validate: omitempty,fqdn
-      certs_path:
-        description: Path to credentials. This can be set via command line arguments
-          as well.
-        type: string
-        x-go-name: CertsPath
       client_ca:
         description: Client CA file
         type: string
         x-go-name: ClientCA
-        x-go-validate: omitempty
+        x-go-validate: omitempty,file
       enabled:
         description: Enabled TLS
         type: boolean
         x-go-default: "false"
         x-go-name: Enabled
       server_cert:
-        description: Server Cert file
+        description: Server Cert file path
         type: string
-        x-go-default: ca.crt
         x-go-name: ServerCert
+        x-go-validate: omitempty,file
       server_key:
-        description: Server Key file
+        description: Server Key file path
         type: string
-        x-go-default: ca.key
         x-go-name: ServerKey
+        x-go-validate: omitempty,file
     title: ServerTLSConfig holds configuration for setting up server TLS support.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
