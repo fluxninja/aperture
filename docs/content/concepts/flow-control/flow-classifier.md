@@ -75,6 +75,15 @@ Each classification rule consists of:
 There are two ways to specify a classification rule: using declarative
 extractors and [rego][rego] modules. [See examples in reference][rule].
 
+:::caution Request body availability
+
+Possibility of extracting values from request body depends on how [External
+Authorization in Envoy][ext-authz-extension] was configured. Sample [Istio
+Configuration][install-istio] provided by FluxNinja doesn't enable request body
+buffering by default, as it _might_ break some streaming APIs.
+
+:::
+
 ### Extractors ([reference][extractor]) {#extractors}
 
 Extractors are declarative recipes how to extract flow label value fom metadata.
@@ -114,6 +123,7 @@ language][rego].
 
 See [full example in reference][reference]
 
+[ext-authz-extension]: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter#config-http-filters-ext-authz
 [ext-authz]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [attr-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
@@ -130,3 +140,4 @@ See [full example in reference][reference]
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]: https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: /concepts/flow-control/flow-control.md#control-point
+[install-istio]: /get-started/installation/agent/envoy/istio.md
