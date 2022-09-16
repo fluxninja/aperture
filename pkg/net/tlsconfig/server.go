@@ -30,11 +30,11 @@ func Module() fx.Option {
 // +kubebuilder:object:generate=true
 type ServerTLSConfig struct {
 	// Server Cert file path
-	ServerCert string `json:"server_cert" validate:"omitempty,file"`
+	CertFile string `json:"cert_file" validate:"omitempty,file"`
 	// Server Key file path
-	ServerKey string `json:"server_key" validate:"omitempty,file"`
+	KeyFile string `json:"key_file" validate:"omitempty,file"`
 	// Client CA file
-	ClientCA string `json:"client_ca" validate:"omitempty,file"`
+	ClientCAFile string `json:"client_ca_file" validate:"omitempty,file"`
 	// Allowed CN
 	AllowedCN string `json:"allowed_cn" validate:"omitempty,fqdn"`
 	// Enabled TLS
@@ -80,8 +80,8 @@ func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller
 
 	if config.Enabled {
 		serverCertKeyPair, err := tls.LoadX509KeyPair(
-			config.ServerCert,
-			config.ServerKey)
+			config.CertFile,
+			config.KeyFile)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to load server tls cert/key")
 			return nil, err
@@ -109,9 +109,9 @@ func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller
 		}
 
 		var clientCertPool *x509.CertPool
-		if config.ClientCA != "" {
+		if config.ClientCAFile != "" {
 
-			caCert, err := os.ReadFile(config.ClientCA)
+			caCert, err := os.ReadFile(config.ClientCAFile)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to load client CA")
 				return nil, err
