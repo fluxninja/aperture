@@ -2,6 +2,7 @@ package harness
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"os"
@@ -15,6 +16,12 @@ const (
 	// EtcdBinPath is the path to the etcd binary.
 	EtcdBinPath      = "etcd"
 	etcdLocalAddress = "127.0.0.1:0"
+	// EtcdUsername is the username to etcd cluster.
+	EtcdUsername = "user"
+	// EtcdPassword is the password for the EtcdUsername.
+	EtcdPassword       = "password"
+	etcdServerCertPath = "./certs/server.crt"
+	etcdServerKeyPath  = "./certs/server.key"
 )
 
 // EtcdHarness represents a running etcd server for an integration test environment.
@@ -54,6 +61,12 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return nil, err
 	}
 
+	cer, _ := tls.LoadX509KeyPair(etcdServerCertPath, etcdServerKeyPath)
+	etcdTLSConfig := &tls.Config{
+		Certificates: []tls.Certificate{cer},
+		MinVersion:   tls.VersionTLS12,
+	}
+
 	h.etcdServer = exec.Command(
 		etcdBin,
 		"--data-dir="+h.etcdDir,
@@ -62,6 +75,9 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		"--initial-advertise-peer-urls="+peer,
 		"--listen-client-urls="+endpoint,
 		"--advertise-client-urls="+endpoint,
+		"--client-cert-auth=true",
+		"--cert-file="+etcdServerCertPath,
+		"--key-file="+etcdServerKeyPath,
 	)
 	h.etcdServer.Stderr = h.errWriter
 	h.etcdServer.Stdout = io.Discard
@@ -75,10 +91,41 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 
 	h.Client, err = clientv3.New(clientv3.Config{
 		Endpoints: []string{endpoint},
+		TLS:       etcdTLSConfig,
+		Username:  EtcdUsername,
+		Password:  EtcdPassword,
 	})
 	if err != nil {
 		h.Stop()
 		return h, err
+	}
+
+	// Root user must be created before activating the authentication.
+	ctx := context.Background()
+	if _, err = h.Client.RoleAdd(ctx, "root"); err != nil {
+		h.Stop()
+		return nil, err
+	}
+	if _, err = h.Client.UserAdd(ctx, "root", "root"); err != nil {
+		h.Stop()
+		return nil, err
+	}
+	if _, err = h.Client.UserGrantRole(ctx, "root", "root"); err != nil {
+		h.Stop()
+		return nil, err
+	}
+	// Add user and grant root role to the new user.
+	if _, err = h.Client.UserAdd(ctx, h.Client.Username, h.Client.Password); err != nil {
+		h.Stop()
+		return nil, err
+	}
+	if _, err = h.Client.UserGrantRole(ctx, h.Client.Username, "root"); err != nil {
+		h.Stop()
+		return nil, err
+	}
+	if _, err = h.Client.AuthEnable(ctx); err != nil {
+		h.Stop()
+		return nil, err
 	}
 
 	err = h.pollEtcdForReadiness()
