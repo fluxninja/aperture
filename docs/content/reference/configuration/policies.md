@@ -506,7 +506,7 @@ There are three categories of components:
   [ConcurrencyLimiter.LoadShedActuator](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
   In the UI, represented by orange color. Sink components usually come in pairs with a
   "sources" component which emits a feedback signal, like
-  `accepted_concurrency_ms` emitted by ConcurrencyLimiter.Scheduler.
+  `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
 
 :::tip
 Sometimes you may want to use a constant value as one of component's inputs.
@@ -1914,7 +1914,7 @@ Output for the Scheduler component.
 #### Properties
 
 <dl>
-<dt>accepted_concurrency_ms</dt>
+<dt>accepted_concurrency</dt>
 <dd>
 
 ([V1Port](#v1-port)) Accepted concurrency is the number of accepted tokens per second.
@@ -1930,11 +1930,11 @@ via `auto_tokens` or explicitly by `Workload.tokens`).
 Value of this signal is the sum across all the relevant schedulers.
 
 </dd>
-<dt>incoming_concurrency_ms</dt>
+<dt>incoming_concurrency</dt>
 <dd>
 
 ([V1Port](#v1-port)) Incoming concurrency is the number of incoming tokens/sec.
-This is the same as `accepted_concurrency_ms`, but across all the flows
+This is the same as `accepted_concurrency`, but across all the flows
 entering scheduler, including rejected ones.
 
 </dd>

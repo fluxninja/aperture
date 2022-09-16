@@ -1,16 +1,16 @@
 {
   new():: {
   },
-  withAcceptedConcurrencyMs(accepted_concurrency_ms):: {
-    accepted_concurrency_ms: accepted_concurrency_ms,
+  withAcceptedConcurrency(accepted_concurrency):: {
+    accepted_concurrency: accepted_concurrency,
   },
-  withAcceptedConcurrencyMsMixin(accepted_concurrency_ms):: {
-    accepted_concurrency_ms+: accepted_concurrency_ms,
+  withAcceptedConcurrencyMixin(accepted_concurrency):: {
+    accepted_concurrency+: accepted_concurrency,
   },
-  withIncomingConcurrencyMs(incoming_concurrency_ms):: {
-    incoming_concurrency_ms: incoming_concurrency_ms,
+  withIncomingConcurrency(incoming_concurrency):: {
+    incoming_concurrency: incoming_concurrency,
   },
-  withIncomingConcurrencyMsMixin(incoming_concurrency_ms):: {
-    incoming_concurrency_ms+: incoming_concurrency_ms,
+  withIncomingConcurrencyMixin(incoming_concurrency):: {
+    incoming_concurrency+: incoming_concurrency,
   },
 }

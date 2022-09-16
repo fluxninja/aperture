@@ -218,7 +218,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	} else {
 		acceptedReading = reading.New(acceptedValue)
 	}
-	outPortReadings[metrics.AcceptedConcurrencyMetricName] = []reading.Reading{acceptedReading}
+	outPortReadings["accepted_concurrency"] = []reading.Reading{acceptedReading}
 
 	incomingValue, err := s.incomingQuery.ExecuteScalarQuery(tickInfo)
 	if err != nil {
@@ -227,7 +227,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	} else {
 		incomingReading = reading.New(incomingValue)
 	}
-	outPortReadings[metrics.IncomingConcurrencyMetricName] = []reading.Reading{incomingReading}
+	outPortReadings["incoming_concurrency"] = []reading.Reading{incomingReading}
 
 	return outPortReadings, errMulti
 }

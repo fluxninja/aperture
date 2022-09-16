@@ -2,8 +2,8 @@ local schedulerouts = import './schedulerouts.libsonnet';
 {
   new():: {
     out_ports: {
-      accepted_concurrency_ms: error 'Port accepted_concurrency_ms is missing',
-      incoming_concurrency_ms: error 'Port incoming_concurrency_ms is missing',
+      accepted_concurrency: error 'Port accepted_concurrency is missing',
+      incoming_concurrency: error 'Port incoming_concurrency is missing',
     },
   },
   outPorts:: schedulerouts,
