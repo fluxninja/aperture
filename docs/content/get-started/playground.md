@@ -19,33 +19,43 @@ resources that change. This is very convenient for getting quick feedback during
 development of Aperture.
 
 Playground deploys resources to the Kubernetes cluster that `kubectl` on your
-machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s)
-which includes instructions for deploying a local Kubernetes cluster using
+machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s) for deploying a local Kubernetes cluster using
 [Kind](https://kind.sigs.k8s.io/).
 
 ## How to Run
 
 Once [requirements](#tools) are installed, simply run below commands from the
-`playground` directory (present under the aperture home directory):
+`playground` directory (present under the aperture's root directory):
 
+```sh
+$ tilt up
+Tilt started on http://localhost:10350/
+v0.30.2, built 2022-06-06
+
+(space) to open the browser
+(s) to stream logs (--stream=true)
+(t) to open legacy terminal mode (--legacy=true)
+(ctrl-c) to exit
 ```
-tilt up
-```
 
-Can press (Space) to open the Tilt UI.
+Now, press Space to open the Tilt UI in your default browser.
 
-_Note_: Nothing is running locally on port 3000, else you won't be able to
-access Grafana dashboard.
+:::note
+
+Make sure nothing else is running on the [ports forwarded](#port-forwards) by Tilt.
+
+:::
 
 The above command starts Aperture Controller and an Aperture Agent on each
-worker in the Kubernetes cluster. Additionally, it starts a demo application
+worker node in the local Kubernetes cluster. Additionally, it starts a demo application
 with an Istio and Envoy based service mesh configured to integrate with
-Aperture. There is a Grafana installation as well for viewing metrics from
+Aperture. There is an instance of Grafana running on the cluster as well for viewing metrics from
 experiments.
 
-Aperture is loaded with a Latency Gradient Control Policy which protects the
-demo application against sudden surges in traffic load. To run the traffic load,
-navigate to K6 resource in the Tilt UI and press the `Run load test` button.
+The Aperture Playground is pre-loaded with a Latency Gradient Concurrency Control Policy which protects the
+demo application against sudden surges in traffic load.
+
+To run the traffic load, navigate to K6 resource in the Tilt UI and press the `Run load test` button.
 Once finished, press the `Delete load test` button. To view results from the
 experiment navigate to the "FluxNinja" dashboard in Grafana under
 "aperture-system" folder. Grafana runs at
@@ -82,7 +92,7 @@ When using `asdf`:
 - Run the below command in aperture home directory to install all the required
   tools.
 
-```
+```sh
 make install-asdf-tools
 ```
 
@@ -218,7 +228,7 @@ If you are getting following message in cluster container:
 If `sysctl fs.inotify.{max_queued_events,max_user_instances,max_user_watches}`
 less than:
 
-```bash
+```sh
 fs.inotify.max_queued_events = 16384
 fs.inotify.max_user_instances = 1024
 fs.inotify.max_user_watches = 524288
@@ -226,7 +236,7 @@ fs.inotify.max_user_watches = 524288
 
 change it, using (temporary method):
 
-```bash
+```sh
 sudo sysctl fs.inotify.max_queued_events = 16384
 sudo sysctl fs.inotify.max_user_instances = 1024
 sudo sysctl fs.inotify.max_user_watches = 524288
@@ -234,7 +244,7 @@ sudo sysctl fs.inotify.max_user_watches = 524288
 
 or add following lines to `/etc/sysctl.conf`:
 
-```bash
+```sh
 fs.inotify.max_queued_events = 16384
 fs.inotify.max_user_instances = 1024
 fs.inotify.max_user_watches = 524288
@@ -244,7 +254,7 @@ fs.inotify.max_user_watches = 524288
 
 Simply run `tilt down`. All created resources will be deleted.
 
-### Port forwards
+### Port Forwards {#port-forwards}
 
 Tilt will automatically setup forwarding for the services.
 
