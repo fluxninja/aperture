@@ -114,6 +114,8 @@ var _ = BeforeSuite(func() {
 	if ehStarted {
 		apertureConfig["etcd"] = map[string]interface{}{
 			"endpoints": []string{eh.Endpoint},
+			"username":  "aperture-user",
+			"password":  "aperture-password",
 		}
 	}
 

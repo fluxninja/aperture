@@ -105,12 +105,12 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			if cli.Username != "" {
 				// Root user must be created before activating the authentication.
 				if _, err = cli.RoleAdd(ctx, "root"); err != nil {
-					log.Error().Err(err).Msg("Unable to create root user")
+					log.Error().Err(err).Msg("Unable to add root role")
 					cancel()
 					return err
 				}
 				if _, err = cli.UserAdd(ctx, "root", "root"); err != nil {
-					log.Error().Err(err).Msg("Unable to create root user")
+					log.Error().Err(err).Msg("Unable to add root user")
 					cancel()
 					return err
 				}
@@ -119,9 +119,14 @@ func ProvideClient(in ClientIn) (*Client, error) {
 					cancel()
 					return err
 				}
-				// Add user
+				// Add user and grant root role to the new user.
 				if _, err = cli.UserAdd(ctx, cli.Username, cli.Password); err != nil {
 					log.Error().Err(err).Msg("Unable to add user to the etcd cluster")
+					cancel()
+					return err
+				}
+				if _, err = cli.UserGrantRole(ctx, cli.Username, "root"); err != nil {
+					log.Error().Err(err).Msg("Unable to grant root user role")
 					cancel()
 					return err
 				}
