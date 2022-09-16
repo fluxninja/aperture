@@ -7,7 +7,7 @@ project:
   url: github.com/fluxninja/aperture
 
 vendoredDependencies:
-  forceRescans: false
+  forceRescans: true
   scanMethod: CLILicenseScan
 
 paths:
