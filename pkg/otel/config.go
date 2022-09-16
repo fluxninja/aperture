@@ -256,7 +256,7 @@ func addPrometheusReceiver(cfg *otelParams) {
 	config.AddReceiver(ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
-				"scrape_interval":     "1m",
+				"scrape_interval":     "1s",
 				"scrape_timeout":      "10s",
 				"evaluation_interval": "1m",
 			},
@@ -274,7 +274,7 @@ func addControllerPrometheusReceiver(config *otelcollector.OTELConfig, cfg *otel
 	config.AddReceiver(ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
-				"scrape_interval":     "1m",
+				"scrape_interval":     "1s",
 				"scrape_timeout":      "10s",
 				"evaluation_interval": "1m",
 			},
@@ -303,9 +303,8 @@ func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]any 
 		"tls_config": map[string]any{
 			"insecure_skip_verify": true,
 		},
-		"scrape_interval": "1s",
-		"scrape_timeout":  "900ms",
-		"metrics_path":    "/metrics",
+		"scrape_timeout": "900ms",
+		"metrics_path":   "/metrics",
 		"static_configs": []map[string]any{
 			{
 				"targets": []string{cfg.listener.GetAddr()},
@@ -320,11 +319,10 @@ func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]any 
 
 func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]any {
 	return map[string]any{
-		"job_name":        "kubernetes-nodes",
-		"scheme":          "https",
-		"scrape_interval": "2s",
-		"scrape_timeout":  "1500ms",
-		"metrics_path":    "/metrics/cadvisor",
+		"job_name":       "kubernetes-nodes",
+		"scheme":         "https",
+		"scrape_timeout": "1500ms",
+		"metrics_path":   "/metrics/cadvisor",
 		"authorization": map[string]any{
 			"credentials_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
 		},
@@ -359,11 +357,10 @@ func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]any {
 
 func buildKubernetesPodsScrapeConfig(cfg *otelParams) map[string]any {
 	return map[string]any{
-		"job_name":        "kubernetes-pods",
-		"scheme":          "http",
-		"scrape_interval": "2s",
-		"scrape_timeout":  "1500ms",
-		"metrics_path":    "/metrics",
+		"job_name":       "kubernetes-pods",
+		"scheme":         "http",
+		"scrape_timeout": "1500ms",
+		"metrics_path":   "/metrics",
 		"kubernetes_sd_configs": []map[string]any{
 			{"role": "pod"},
 		},
