@@ -20,6 +20,7 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
+	"path"
 	"text/template"
 	"time"
 
@@ -164,10 +165,9 @@ var _ = Describe("ConfigMap for Controller", func() {
 									Addr: ":80",
 								},
 								TLS: tlsconfig.ServerTLSConfig{
-									CertsPath:  controllerCertPath,
-									ServerCert: controllerCertName,
-									ServerKey:  controllerCertKeyName,
-									Enabled:    true,
+									CertFile: path.Join(controllerCertPath, controllerCertName),
+									KeyFile:  path.Join(controllerCertPath, controllerCertKeyName),
+									Enabled:  true,
 								},
 							},
 							Log: config.LogConfig{
