@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	// FxNameTag is Flux Meter Watcher's Fx Tag.s.
+	// FxNameTag is Flux Meter Watcher's Fx Tag.
 	FxNameTag = "name:\"flux_meter\""
 )
 
