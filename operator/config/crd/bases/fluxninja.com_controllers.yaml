@@ -1382,10 +1382,6 @@ spec:
                           allowed_cn:
                             description: Allowed CN
                             type: string
-                          certs_path:
-                            description: Path to credentials. This can be set via
-                              command line arguments as well.
-                            type: string
                           client_ca:
                             description: Client CA file
                             type: string
@@ -1393,10 +1389,10 @@ spec:
                             description: Enabled TLS
                             type: boolean
                           server_cert:
-                            description: Server Cert file
+                            description: Server Cert file path
                             type: string
                           server_key:
-                            description: Server Key file
+                            description: Server Key file path
                             type: string
                         type: object
                     type: object
