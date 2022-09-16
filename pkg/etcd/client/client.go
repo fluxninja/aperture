@@ -10,6 +10,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
@@ -40,7 +41,11 @@ type EtcdConfig struct {
 	LeaseTTL config.Duration `json:"lease_ttl" validate:"gte=1s" default:"60s"`
 	// List of Etcd server endpoints
 	Endpoints []string `json:"endpoints" validate:"gt=0,dive,hostname_port|url|fqdn"`
-	// TODO: add auth params
+	// Client TLS configuration
+	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
+	// Authentication
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 // ClientIn holds parameters for ProvideClient.
@@ -78,12 +83,26 @@ func ProvideClient(in ClientIn) (*Client, error) {
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
+			tlsConfig, tlsErr := config.ClientTLSConfig.GetTLSConfig()
+			if tlsErr != nil {
+				log.Error().Err(tlsErr).Msg("Failed to get TLS config")
+				return tlsErr
+			}
 			log.Info().Msg("Initializing etcd client")
-
 			cli, err := clientv3.New(clientv3.Config{
 				Endpoints: config.Endpoints,
 				Context:   ctx,
+				TLS:       tlsConfig,
+				Username:  config.Username,
+				Password:  config.Password,
 			})
+			if cli.Username != "" && cli.Password != "" {
+				if _, authErr := cli.AuthEnable(ctx); authErr != nil {
+					log.Error().Err(authErr).Msg("Unable to enable auth of the etcd cluster")
+					cancel()
+					return authErr
+				}
+			}
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to initialize etcd client")
 				cancel()
