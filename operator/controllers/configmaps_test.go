@@ -165,9 +165,9 @@ var _ = Describe("ConfigMap for Controller", func() {
 									Addr: ":80",
 								},
 								TLS: tlsconfig.ServerTLSConfig{
-									ServerCert: path.Join(controllerCertPath, controllerCertName),
-									ServerKey:  path.Join(controllerCertPath, controllerCertKeyName),
-									Enabled:    true,
+									CertFile: path.Join(controllerCertPath, controllerCertName),
+									KeyFile:  path.Join(controllerCertPath, controllerCertKeyName),
+									Enabled:  true,
 								},
 							},
 							Log: config.LogConfig{

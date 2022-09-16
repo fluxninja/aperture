@@ -162,11 +162,10 @@ server:
   network: tcp
   tls:
     allowed_cn: ""
-    certs_path: ""
-    client_ca: ""
+    cert_file: ""
+    client_ca_file: ""
     enabled: false
-    server_cert: ca.crt
-    server_key: ca.key
+    key_file: ""
 watchdog:
   cgroup:
     adaptive_policy:
