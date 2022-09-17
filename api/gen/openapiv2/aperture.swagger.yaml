@@ -184,7 +184,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - PeerDiscoveryService
-  /v1/peers/{address}:
+  /v1/peers/address/{address}:
     get:
       operationId: PeerDiscoveryService_GetPeer
       responses:
