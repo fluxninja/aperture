@@ -5,7 +5,7 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"github.com/fluxninja/aperture/pkg/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 )
 
 //go:generate mockgen -source=limiter.go -destination=../../mocks/mock_limiter.go -package=mocks

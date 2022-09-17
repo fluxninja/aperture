@@ -24,7 +24,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/rate/ratetracker"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
-	"github.com/fluxninja/aperture/pkg/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 

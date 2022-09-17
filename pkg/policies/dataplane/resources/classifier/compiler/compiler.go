@@ -11,7 +11,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/extractors"
-	"github.com/fluxninja/aperture/pkg/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 	"github.com/open-policy-agent/opa/rego"
 )
 

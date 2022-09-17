@@ -49,7 +49,7 @@ message CheckResponse {
   // error information.
   Error error = 3;
   // services that matched
-  repeated Service services = 4;
+  repeated string services = 4;
   // flow label keys that were matched for this request.
   repeated string flow_label_keys = 5;
   // telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
@@ -64,11 +64,6 @@ message CheckResponse {
   repeated FluxMeter flux_meters = 10;
   // limiter_decisions contains information about decision made by each limiter.
   repeated LimiterDecision limiter_decisions = 11;
-}
-
-message Service {
-  string agent_group = 1;
-  string service = 2;
 }
 
 // Classifier describes details for each Classifier.

@@ -11,8 +11,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
-	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/services"
 )
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.

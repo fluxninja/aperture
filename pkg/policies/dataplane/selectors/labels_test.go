@@ -6,7 +6,7 @@ import (
 
 	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 
-	"github.com/fluxninja/aperture/pkg/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 )
 
 var _ = Describe("Flow labels", func() {

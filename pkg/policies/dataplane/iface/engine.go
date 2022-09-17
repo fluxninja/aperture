@@ -3,8 +3,8 @@ package iface
 import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
-	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/services"
 )
 
 //go:generate mockgen -source=engine.go -destination=../../mocks/mock_engine.go -package=mocks

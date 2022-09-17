@@ -12,7 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/services"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/services"
 )
 
 // Module sets up EntityCache with Fx.

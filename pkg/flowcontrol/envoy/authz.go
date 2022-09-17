@@ -29,8 +29,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	classification "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/services"
 )
 
 // NewHandler creates new authorization handler for authz api

@@ -13,8 +13,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
-	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/services"
 )
 
 // Handler implements the flowcontrol.v1 Service

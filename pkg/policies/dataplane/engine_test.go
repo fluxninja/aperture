@@ -11,8 +11,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
-	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/services"
 )
 
 var _ = Describe("Dataplane Engine", func() {

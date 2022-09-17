@@ -363,24 +363,6 @@ definitions:
       flux_meter_name:
         type: string
     description: FluxMeter describes detail for each FluxMeter.
-  apertureflowcontrolv1Service:
-    type: object
-    properties:
-      agent_group:
-        type: string
-      service:
-        type: string
-  commonentitycachev1Service:
-    type: object
-    properties:
-      entities_count:
-        type: integer
-        format: int32
-      name:
-        type: string
-    description: |-
-      Service contains information about single service discovered in agent group by a
-      particular agent.
   googlerpcStatus:
     type: object
     properties:
@@ -785,7 +767,7 @@ definitions:
       services:
         type: array
         items:
-          $ref: '#/definitions/apertureflowcontrolv1Service'
+          type: string
         title: services that matched
       start:
         type: string
@@ -2080,6 +2062,17 @@ definitions:
       Describes which flows a [dataplane
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
+  v1Service:
+    type: object
+    properties:
+      entities_count:
+        type: integer
+        format: int32
+      name:
+        type: string
+    description: |-
+      Service contains information about single service discovered in agent group by a
+      particular agent.
   v1ServicesList:
     type: object
     properties:
@@ -2090,7 +2083,7 @@ definitions:
       services:
         type: array
         items:
-          $ref: '#/definitions/commonentitycachev1Service'
+          $ref: '#/definitions/v1Service'
   v1Sqrt:
     type: object
     properties:

@@ -10,7 +10,7 @@ import (
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
-	selectors "github.com/fluxninja/aperture/pkg/selectors"
+	selectors "github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 	gomock "github.com/golang/mock/gomock"
 )
 
