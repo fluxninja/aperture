@@ -186,7 +186,7 @@ func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetServicesList", runtime.WithHTTPPathPattern("/v1/entities-cache/services"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetServicesList", runtime.WithHTTPPathPattern("/v1/entities/services"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -211,7 +211,7 @@ func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", runtime.WithHTTPPathPattern("/v1/entities-cache/entities"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", runtime.WithHTTPPathPattern("/v1/entities"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -236,7 +236,7 @@ func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByIPAddress", runtime.WithHTTPPathPattern("/v1/entities-cache/entities/ip-address/{ip_address}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByIPAddress", runtime.WithHTTPPathPattern("/v1/entities/ip-address/{ip_address}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -261,7 +261,7 @@ func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByName", runtime.WithHTTPPathPattern("/v1/entities-cache/entities/name/{name}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByName", runtime.WithHTTPPathPattern("/v1/entities/name/{name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -325,7 +325,7 @@ func RegisterEntityCacheServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetServicesList", runtime.WithHTTPPathPattern("/v1/entities-cache/services"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetServicesList", runtime.WithHTTPPathPattern("/v1/entities/services"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -347,7 +347,7 @@ func RegisterEntityCacheServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", runtime.WithHTTPPathPattern("/v1/entities-cache/entities"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", runtime.WithHTTPPathPattern("/v1/entities"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -369,7 +369,7 @@ func RegisterEntityCacheServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByIPAddress", runtime.WithHTTPPathPattern("/v1/entities-cache/entities/ip-address/{ip_address}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByIPAddress", runtime.WithHTTPPathPattern("/v1/entities/ip-address/{ip_address}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -391,7 +391,7 @@ func RegisterEntityCacheServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByName", runtime.WithHTTPPathPattern("/v1/entities-cache/entities/name/{name}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByName", runtime.WithHTTPPathPattern("/v1/entities/name/{name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -411,13 +411,13 @@ func RegisterEntityCacheServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_EntityCacheService_GetServicesList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "entities-cache", "services"}, ""))
+	pattern_EntityCacheService_GetServicesList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "entities", "services"}, ""))
 
-	pattern_EntityCacheService_GetEntityCache_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "entities-cache", "entities"}, ""))
+	pattern_EntityCacheService_GetEntityCache_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "entities"}, ""))
 
-	pattern_EntityCacheService_GetEntityByIPAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "entities-cache", "entities", "ip-address", "ip_address"}, ""))
+	pattern_EntityCacheService_GetEntityByIPAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "entities", "ip-address", "ip_address"}, ""))
 
-	pattern_EntityCacheService_GetEntityByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"v1", "entities-cache", "entities", "name"}, ""))
+	pattern_EntityCacheService_GetEntityByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"v1", "entities", "name"}, ""))
 )
 
 var (

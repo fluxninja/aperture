@@ -62,7 +62,7 @@ paths:
             $ref: '#/definitions/v1ReportRequest'
       tags:
         - FluxNinjaService
-  /v1/entities-cache/entities:
+  /v1/entities:
     get:
       operationId: EntityCacheService_GetEntityCache
       responses:
@@ -76,7 +76,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - EntityCacheService
-  /v1/entities-cache/entities/ip-address/{ip_address}:
+  /v1/entities/ip-address/{ip_address}:
     get:
       operationId: EntityCacheService_GetEntityByIPAddress
       responses:
@@ -95,7 +95,7 @@ paths:
           type: string
       tags:
         - EntityCacheService
-  /v1/entities-cache/entities/name/{name}:
+  /v1/entities/name/{name}:
     get:
       operationId: EntityCacheService_GetEntityByName
       responses:
@@ -114,7 +114,7 @@ paths:
           type: string
       tags:
         - EntityCacheService
-  /v1/entities-cache/services:
+  /v1/entities/services:
     get:
       operationId: EntityCacheService_GetServicesList
       responses:

@@ -13,22 +13,22 @@ import "google/protobuf/empty.proto";
 service EntityCacheService {
   rpc GetServicesList(google.protobuf.Empty) returns (ServicesList) {
     option (google.api.http) = {
-      get: "/v1/entities-cache/services"
+      get: "/v1/entities/services"
     };
   }
   rpc GetEntityCache(google.protobuf.Empty) returns (EntityCache) {
     option (google.api.http) = {
-      get: "/v1/entities-cache/entities"
+      get: "/v1/entities"
     };
   }
   rpc GetEntityByIPAddress(GetEntityByIPAddressRequest) returns (Entity) {
     option (google.api.http) = {
-      get: "/v1/entities-cache/entities/ip-address/{ip_address}"
+      get: "/v1/entities/ip-address/{ip_address}"
     };
   }
   rpc GetEntityByName(GetEntityByNameRequest) returns (Entity) {
     option (google.api.http) = {
-      get: "/v1/entities-cache/entities/name/{name}"
+      get: "/v1/entities/name/{name}"
     };
   }
 }
