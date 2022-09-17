@@ -13,7 +13,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 // Handler implements the flowcontrol.v1 Service
@@ -42,7 +41,7 @@ type HandlerWithValues interface {
 	CheckWithValues(
 		context.Context,
 		selectors.ControlPoint,
-		[]services.ServiceID,
+		[]string,
 		selectors.Labels,
 	) *flowcontrolv1.CheckResponse
 }
@@ -51,7 +50,7 @@ type HandlerWithValues interface {
 func (h *Handler) CheckWithValues(
 	ctx context.Context,
 	controlPoint selectors.ControlPoint,
-	serviceIDs []services.ServiceID,
+	serviceIDs []string,
 	labels selectors.Labels,
 ) *flowcontrolv1.CheckResponse {
 	log.Trace().Interface("labels", labels.ToPlainMap()).Interface("serviceIDs", serviceIDs).Str("controlPoint", controlPoint.String()).Msg("FlowControl.CheckWithValues()")
@@ -66,14 +65,16 @@ func (h *Handler) CheckWithValues(
 func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*flowcontrolv1.CheckResponse, error) {
 	log.Trace().Msg("FlowControl.Check()")
 
-	var serviceIDs []services.ServiceID
+	var serviceIDs []string
 
 	rpcPeer, peerExists := peer.FromContext(ctx)
 	if peerExists {
 		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
 		_ = grpc.SetHeader(ctx, metadata.Pairs("client-ip", clientIP))
-		entity := h.entityCache.GetByIP(clientIP)
-		serviceIDs = entitycache.ServiceIDsFromEntity(entity)
+		entity, err := h.entityCache.GetByIP(clientIP)
+		if err == nil {
+			serviceIDs = entity.Services
+		}
 	}
 
 	// CheckWithValues already pushes result to metrics

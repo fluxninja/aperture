@@ -2,7 +2,6 @@ package entitycache
 
 import (
 	"context"
-	"errors"
 
 	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"google.golang.org/grpc"
@@ -32,25 +31,17 @@ func (c *EntityCacheService) GetServicesList(ctx context.Context, _ *emptypb.Emp
 func (c *EntityCacheService) GetEntityCache(ctx context.Context, _ *emptypb.Empty) (*entitycachev1.EntityCache, error) {
 	ec := c.entityCache.Entities()
 	return &entitycachev1.EntityCache{
-		EntitiesByIpAddress:  ec.EntitiesByIpAddress,
-		EntitiesByEntityName: ec.EntitiesByEntityName,
+		EntitiesByIpAddress: ec.EntitiesByIpAddress,
+		EntitiesByName:      ec.EntitiesByName,
 	}, nil
 }
 
 // GetEntityByIPAddress returns an entity by IP address.
 func (c *EntityCacheService) GetEntityByIPAddress(ctx context.Context, req *entitycachev1.GetEntityByIPAddressRequest) (*entitycachev1.Entity, error) {
-	entity := c.entityCache.GetByIP(req.GetIpAddress())
-	if entity == nil {
-		return nil, errors.New("entity not found")
-	}
-	return entity, nil
+	return c.entityCache.GetByIP(req.GetIpAddress())
 }
 
 // GetEntityByName returns an entity by name.
 func (c *EntityCacheService) GetEntityByName(ctx context.Context, req *entitycachev1.GetEntityByNameRequest) (*entitycachev1.Entity, error) {
-	entity := c.entityCache.GetByName(req.GetName())
-	if entity == nil {
-		return nil, errors.New("entity not found")
-	}
-	return entity, nil
+	return c.entityCache.GetByName(req.GetName())
 }

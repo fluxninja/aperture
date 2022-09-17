@@ -275,14 +275,6 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/v1Entity'
     description: Entities defines mapping of entities.
-  EntityEntityID:
-    type: object
-    properties:
-      prefix:
-        type: string
-      uid:
-        type: string
-    description: EntityID is a unique Entity identifier.
   LimiterDecisionLimiterReason:
     type: string
     enum:
@@ -1124,23 +1116,25 @@ definitions:
   v1Entity:
     type: object
     properties:
-      entity_id:
-        $ref: '#/definitions/EntityEntityID'
-      entity_name:
-        type: string
       ip_address:
+        type: string
+      name:
+        type: string
+      prefix:
         type: string
       services:
         type: array
         items:
           type: string
+      uid:
+        type: string
     description: Entity represents a pod, vm, etc.
   v1EntityCache:
     type: object
     properties:
-      entities_by_entity_name:
-        $ref: '#/definitions/EntityCacheEntities'
       entities_by_ip_address:
+        $ref: '#/definitions/EntityCacheEntities'
+      entities_by_name:
         $ref: '#/definitions/EntityCacheEntities'
     description: EntityCache contains both mappings of ip address to entity and entity name to entity.
   v1EqualsMatchExpression:

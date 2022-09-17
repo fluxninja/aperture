@@ -12,7 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	mm "github.com/fluxninja/aperture/pkg/multimatcher"
-	"github.com/fluxninja/aperture/pkg/services"
 
 	labelmatcherv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/labelmatcher/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -113,17 +112,17 @@ func ControlPointFromProto(controlPoint *selectorv1.ControlPoint) ControlPoint {
 }
 
 // ControlPointID uniquely identifies the control point within a cluster – so
-// it's a ServiceID and ControlPoint combined
+// it's a ServiceName and ControlPoint combined
 //
 // Control Point.
 type ControlPointID struct {
-	ServiceID    services.ServiceID
+	ServiceName  string
 	ControlPoint ControlPoint
 }
 
 // String returns a string representation of control point and service.
 func (p ControlPointID) String() string {
-	return fmt.Sprintf("%v@%v", p.ControlPoint, p.ServiceID)
+	return fmt.Sprintf("%v@%v", p.ControlPoint, p.ServiceName)
 }
 
 // ControlPointIDFromProto extracts a ControlPointID from proto-based selector
@@ -132,9 +131,7 @@ func (p ControlPointID) String() string {
 // Selector is assumed to be validated and non-nil.
 func ControlPointIDFromProto(selector *selectorv1.Selector) ControlPointID {
 	return ControlPointID{
-		ServiceID: services.ServiceID{
-			Service: selector.Service,
-		},
+		ServiceName:  selector.Service,
 		ControlPoint: ControlPointFromProto(selector.ControlPoint),
 	}
 }

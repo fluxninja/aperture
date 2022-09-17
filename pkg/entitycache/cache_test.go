@@ -21,13 +21,15 @@ var _ = Describe("Cache", func() {
 			name := "entity_1234"
 			entity := testEntity("foo", ip, name, nil)
 			ec.Put(entity)
-			actual := ec.GetByIP(ip)
+			actual, err := ec.GetByIP(ip)
+			Expect(err).To(BeNil())
 			Expect(actual).To(Equal(entity))
 		})
 
 		It("returns nil when no entity found", func() {
 			ip := "1.2.3.4"
-			actual := ec.GetByIP(ip)
+			actual, err := ec.GetByIP(ip)
+			Expect(err).To(Not(BeNil()))
 			Expect(actual).To(BeNil())
 		})
 
@@ -40,7 +42,8 @@ var _ = Describe("Cache", func() {
 			removed := ec.Remove(entity)
 			Expect(removed).To(BeTrue())
 
-			found := ec.GetByIP(ip)
+			found, err := ec.GetByIP(ip)
+			Expect(err).To(Not(BeNil()))
 			Expect(found).To(BeNil())
 		})
 
@@ -56,7 +59,8 @@ var _ = Describe("Cache", func() {
 			removed := ec.Remove(otherEntity)
 			Expect(removed).To(BeFalse())
 
-			found := ec.GetByIP(ip)
+			found, err := ec.GetByIP(ip)
+			Expect(err).To(BeNil())
 			Expect(found).To(Equal(entity))
 		})
 	})
@@ -67,13 +71,15 @@ var _ = Describe("Cache", func() {
 			name := "some_name"
 			entity := testEntity(uid, "", name, nil)
 			ec.Put(entity)
-			actual := ec.GetByName(name)
+			actual, err := ec.GetByName(name)
+			Expect(err).To(BeNil())
 			Expect(actual).To(Equal(entity))
 		})
 
 		It("returns nil when no entity found", func() {
 			name := "some_name"
-			actual := ec.GetByName(name)
+			actual, err := ec.GetByName(name)
+			Expect(err).To(Not(BeNil()))
 			Expect(actual).To(BeNil())
 		})
 
@@ -86,7 +92,8 @@ var _ = Describe("Cache", func() {
 			removed := ec.Remove(entity)
 			Expect(removed).To(BeTrue())
 
-			found := ec.GetByName(name)
+			found, err := ec.GetByName(name)
+			Expect(err).To(Not(BeNil()))
 			Expect(found).To(BeNil())
 		})
 
@@ -102,7 +109,8 @@ var _ = Describe("Cache", func() {
 			removed := ec.Remove(otherEntity)
 			Expect(removed).To(BeFalse())
 
-			found := ec.GetByName(name)
+			found, err := ec.GetByName(name)
+			Expect(err).To(BeNil())
 			Expect(found).To(Equal(entity))
 		})
 	})
@@ -112,7 +120,8 @@ var _ = Describe("Cache", func() {
 		entity := testEntity("foo", "", "some_name", nil)
 		ec.Put(entity)
 		ec.Clear()
-		found := ec.GetByIP(ip)
+		found, err := ec.GetByIP(ip)
+		Expect(err).To(Not(BeNil()))
 		Expect(found).To(BeNil())
 	})
 
@@ -158,9 +167,11 @@ var _ = Describe("Cache", func() {
 })
 
 func testEntity(uid, ipAddress, name string, services []string) *entitycachev1.Entity {
-	entity := entitycache.NewEntity(entitycache.EntityID{
-		Prefix: "test",
-		UID:    uid,
-	}, ipAddress, name, services)
-	return entity
+	return &entitycachev1.Entity{
+		Prefix:    "test",
+		Uid:       uid,
+		IpAddress: ipAddress,
+		Name:      name,
+		Services:  services,
+	}
 }

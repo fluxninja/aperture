@@ -72,19 +72,14 @@ message EntityCache {
   }
 
   Entities entities_by_ip_address = 1;
-  Entities entities_by_entity_name = 2;
+  Entities entities_by_name = 2;
 }
 
 // Entity represents a pod, vm, etc.
 message Entity {
-  // EntityID is a unique Entity identifier.
-  message EntityID {
-    string prefix = 1;
-    string uid = 2;
-  }
-
-  EntityID entity_id = 1;
-  string ip_address = 2;
-  repeated string services = 3;
-  string entity_name = 4;
+  string prefix = 1;
+  string uid = 2;
+  string ip_address = 3;
+  string name = 4;
+  repeated string services = 5;
 }

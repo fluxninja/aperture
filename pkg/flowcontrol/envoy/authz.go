@@ -28,7 +28,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	classification "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 // NewHandler creates new authorization handler for authz api
@@ -150,19 +149,19 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		direction = selectors.Ingress
 	}
 
-	var svcs []services.ServiceID
-	var err error
-
+	var svcs []string
 	rpcPeer, peerExists := peer.FromContext(ctx)
 	if peerExists {
 		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
 		if h.entityCache != nil {
-			entity := h.entityCache.GetByIP(clientIP)
-			svcs = entitycache.ServiceIDsFromEntity(entity)
+			entity, err := h.entityCache.GetByIP(clientIP)
+			if err == nil {
+				svcs = entity.Services
+			}
 		} else {
 			// TODO: should not have a fallback, always expect entity for consistent experience
 			log.Warn().Msg("No entity cache, guessing ServiceID based on Host header")
-			svcs = []services.ServiceID{guessDstService(req)}
+			svcs = []string{guessDstService(req)}
 		}
 	}
 
@@ -256,12 +255,10 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	return resp, nil
 }
 
-func guessDstService(req *ext_authz.CheckRequest) services.ServiceID {
+func guessDstService(req *ext_authz.CheckRequest) string {
 	host := req.GetAttributes().GetRequest().GetHttp().GetHost()
 	host = strings.Split(host, ":")[0]
-	return services.ServiceID{
-		Service: host,
-	}
+	return host
 }
 
 // Functions below transform our classes/proto to structpb.Value required to be sent

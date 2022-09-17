@@ -12,7 +12,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 var _ = Describe("Dataplane Engine", func() {
@@ -160,9 +159,7 @@ var _ = Describe("Dataplane Engine", func() {
 			controlPoint := selectors.ControlPoint{
 				Traffic: selectors.Ingress,
 			}
-			svcs := []services.ServiceID{{
-				Service: "testService2.testNamespace2.svc.cluster.local",
-			}}
+			svcs := []string{"testService2.testNamespace2.svc.cluster.local"}
 			labels := selectors.NewLabels(selectors.LabelSources{
 				Flow: map[string]string{"service": "whatever"},
 			})
@@ -179,9 +176,7 @@ var _ = Describe("Dataplane Engine", func() {
 			controlPoint := selectors.ControlPoint{
 				Traffic: selectors.Ingress,
 			}
-			svcs := []services.ServiceID{{
-				Service: "testService.testNamespace.svc.cluster.local",
-			}}
+			svcs := []string{"testService.testNamespace.svc.cluster.local"}
 			labels := selectors.NewLabels(selectors.LabelSources{
 				Flow: map[string]string{"service": "testService.testNamespace.svc.cluster.local"},
 			})
