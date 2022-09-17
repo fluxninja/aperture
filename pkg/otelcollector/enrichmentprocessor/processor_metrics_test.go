@@ -7,19 +7,21 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 )
 
 var _ = Describe("Enrichment Processor - Metrics", func() {
 	It("Enriches metrics attributes with data from entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(entitycache.NewEntity(
-			entitycache.EntityID{
-				Prefix: "testPrefix",
-				UID:    "1",
-			},
-			"", "someName", []string{"fooSvc1", "fooSvc2"},
-		))
+		entityCache.Put(&entitycachev1.Entity{
+			Prefix:    "testPrefix",
+			Uid:       "1",
+			IpAddress: "",
+			Name:      "someName",
+			Services:  []string{"fooSvc1", "fooSvc2"},
+		})
+
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 

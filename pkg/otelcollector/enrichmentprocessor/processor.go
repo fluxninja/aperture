@@ -161,8 +161,8 @@ func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsM
 		return
 	}
 
-	hostEntity := ep.cache.GetByIP(hostIP)
-	if hostEntity == nil {
+	hostEntity, err := ep.cache.GetByIP(hostIP)
+	if err != nil {
 		otelcollector.LogSampled.Trace().Str("ip", hostIP).Msg("Skipping because entity not found in cache")
 		return
 	}
@@ -179,9 +179,9 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 		return
 	}
 	hostName := hostNamex.StringVal()
-	hostEntity := ep.cache.GetByName(hostName)
+	hostEntity, err := ep.cache.GetByName(hostName)
 	attributes.Remove(otelcollector.EntityNameLabel)
-	if hostEntity == nil {
+	if err != nil {
 		log.Trace().Str("name", hostName).Msg("Skipping because entity not found in cache")
 		return
 	}

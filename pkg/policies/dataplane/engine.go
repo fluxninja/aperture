@@ -12,7 +12,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
@@ -55,7 +54,7 @@ type Engine struct {
 }
 
 // ProcessRequest .
-func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
+func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
 		FlowLabelKeys: maps.Keys(labels),
@@ -268,7 +267,7 @@ func (e *Engine) UnregisterClassifier(c iface.Classifier) error {
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.
-func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *multiMatchResult {
+func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []string, labels selectors.Labels) *multiMatchResult {
 	e.multiMatchersMutex.RLock()
 	defer e.multiMatchersMutex.RUnlock()
 
@@ -277,9 +276,7 @@ func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []se
 	// Lookup catchall multi matchers for controlPoint
 	controlPointID := selectors.ControlPointID{
 		ControlPoint: controlPoint,
-		ServiceID: services.ServiceID{
-			Service: "",
-		},
+		ServiceName:  "",
 	}
 	camm, ok := e.multiMatchers[controlPointID]
 	if ok {
@@ -289,7 +286,7 @@ func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []se
 	for _, serviceID := range serviceIDs {
 		controlPointID := selectors.ControlPointID{
 			ControlPoint: controlPoint,
-			ServiceID:    serviceID,
+			ServiceName:  serviceID,
 		}
 		// Lookup multi matcher for controlPointID
 		mm, ok := e.multiMatchers[controlPointID]

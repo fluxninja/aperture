@@ -8,13 +8,11 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 // Handler implements the flowcontrol.v1 Service
@@ -43,7 +41,7 @@ type HandlerWithValues interface {
 	CheckWithValues(
 		context.Context,
 		selectors.ControlPoint,
-		[]services.ServiceID,
+		[]string,
 		selectors.Labels,
 	) *flowcontrolv1.CheckResponse
 }
@@ -52,7 +50,7 @@ type HandlerWithValues interface {
 func (h *Handler) CheckWithValues(
 	ctx context.Context,
 	controlPoint selectors.ControlPoint,
-	serviceIDs []services.ServiceID,
+	serviceIDs []string,
 	labels selectors.Labels,
 ) *flowcontrolv1.CheckResponse {
 	log.Trace().Interface("labels", labels.ToPlainMap()).Interface("serviceIDs", serviceIDs).Str("controlPoint", controlPoint.String()).Msg("FlowControl.CheckWithValues()")
@@ -67,16 +65,17 @@ func (h *Handler) CheckWithValues(
 func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*flowcontrolv1.CheckResponse, error) {
 	log.Trace().Msg("FlowControl.Check()")
 
-	var entity *entitycachev1.Entity
+	var serviceIDs []string
 
 	rpcPeer, peerExists := peer.FromContext(ctx)
 	if peerExists {
 		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
 		_ = grpc.SetHeader(ctx, metadata.Pairs("client-ip", clientIP))
-		entity = h.entityCache.GetByIP(clientIP)
+		entity, err := h.entityCache.GetByIP(clientIP)
+		if err == nil {
+			serviceIDs = entity.Services
+		}
 	}
-
-	serviceIDs := entitycache.ServiceIDsFromEntity(entity)
 
 	// CheckWithValues already pushes result to metrics
 	resp := h.CheckWithValues(

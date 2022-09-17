@@ -5,8 +5,6 @@ import (
 
 	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -24,28 +22,21 @@ func RegisterEntityCacheService(server *grpc.Server, cache *EntityCache) {
 	entitycachev1.RegisterEntityCacheServiceServer(server, svc)
 }
 
-// GetServicesList returns a list of services based on entities in cache.
-func (c *EntityCacheService) GetServicesList(ctx context.Context, _ *emptypb.Empty) (*entitycachev1.ServicesList, error) {
-	return c.entityCache.Services(), nil
-}
-
 // GetEntityCache returns *entitycachev1.EntityCache which contains mappings of ip address to entity and entity name to entity.
 func (c *EntityCacheService) GetEntityCache(ctx context.Context, _ *emptypb.Empty) (*entitycachev1.EntityCache, error) {
-	ec := c.entityCache.Entities()
+	ec := c.entityCache.GetEntities()
 	return &entitycachev1.EntityCache{
-		EntitiesByIpAddress:  ec.EntitiesByIpAddress,
-		EntitiesByEntityName: ec.EntitiesByEntityName,
+		EntitiesByIpAddress: ec.EntitiesByIpAddress,
+		EntitiesByName:      ec.EntitiesByName,
 	}, nil
 }
 
-// GetEntity returns matching entity in cache based on request field type.
-func (c *EntityCacheService) GetEntity(ctx context.Context, req *entitycachev1.GetEntityRequest) (*entitycachev1.Entity, error) {
-	switch by := req.By.(type) {
-	case *entitycachev1.GetEntityRequest_IpAddress:
-		return c.entityCache.GetByIP(req.GetIpAddress()), nil
-	case *entitycachev1.GetEntityRequest_EntityName:
-		return c.entityCache.GetByName(req.GetEntityName()), nil
-	default:
-		return nil, status.Errorf(codes.InvalidArgument, "unsupported by: %v", by)
-	}
+// GetEntityByIPAddress returns an entity by IP address.
+func (c *EntityCacheService) GetEntityByIPAddress(ctx context.Context, req *entitycachev1.GetEntityByIPAddressRequest) (*entitycachev1.Entity, error) {
+	return c.entityCache.GetByIP(req.GetIpAddress())
+}
+
+// GetEntityByName returns an entity by name.
+func (c *EntityCacheService) GetEntityByName(ctx context.Context, req *entitycachev1.GetEntityByNameRequest) (*entitycachev1.Entity, error) {
+	return c.entityCache.GetByName(req.GetName())
 }
