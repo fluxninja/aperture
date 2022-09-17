@@ -13,15 +13,32 @@ import "google/protobuf/empty.proto";
 service EntityCacheService {
   rpc GetServicesList(google.protobuf.Empty) returns (ServicesList) {
     option (google.api.http) = {
-      get: "/v1/entity-cache/services-list"
+      get: "/v1/entities-cache/services"
     };
   }
   rpc GetEntityCache(google.protobuf.Empty) returns (EntityCache) {
     option (google.api.http) = {
-      get: "/v1/entity-cache/entity-cache"
+      get: "/v1/entities-cache/entities"
     };
   }
-  rpc GetEntity(GetEntityRequest) returns (Entity) {}
+  rpc GetEntityByIPAddress(GetEntityByIPAddressRequest) returns (Entity) {
+    option (google.api.http) = {
+      get: "/v1/entities-cache/entities/ip-address/{ip_address}"
+    };
+  }
+  rpc GetEntityByName(GetEntityByNameRequest) returns (Entity) {
+    option (google.api.http) = {
+      get: "/v1/entities-cache/entities/name/{name}"
+    };
+  }
+}
+
+message GetEntityByIPAddressRequest {
+  string ip_address = 1;
+}
+
+message GetEntityByNameRequest {
+  string name = 1;
 }
 
 //
@@ -70,12 +87,4 @@ message Entity {
   string ip_address = 2;
   repeated string services = 3;
   string entity_name = 4;
-}
-
-// GetEntityRequest contains one of the required info fields to perform GetEntity call.
-message GetEntityRequest {
-  oneof by {
-    string ip_address = 1;
-    string entity_name = 2;
-  }
 }

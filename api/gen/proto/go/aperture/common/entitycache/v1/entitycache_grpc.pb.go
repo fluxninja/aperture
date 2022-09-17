@@ -21,7 +21,8 @@ const _ = grpc.SupportPackageIsVersion7
 type EntityCacheServiceClient interface {
 	GetServicesList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ServicesList, error)
 	GetEntityCache(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*EntityCache, error)
-	GetEntity(ctx context.Context, in *GetEntityRequest, opts ...grpc.CallOption) (*Entity, error)
+	GetEntityByIPAddress(ctx context.Context, in *GetEntityByIPAddressRequest, opts ...grpc.CallOption) (*Entity, error)
+	GetEntityByName(ctx context.Context, in *GetEntityByNameRequest, opts ...grpc.CallOption) (*Entity, error)
 }
 
 type entityCacheServiceClient struct {
@@ -50,9 +51,18 @@ func (c *entityCacheServiceClient) GetEntityCache(ctx context.Context, in *empty
 	return out, nil
 }
 
-func (c *entityCacheServiceClient) GetEntity(ctx context.Context, in *GetEntityRequest, opts ...grpc.CallOption) (*Entity, error) {
+func (c *entityCacheServiceClient) GetEntityByIPAddress(ctx context.Context, in *GetEntityByIPAddressRequest, opts ...grpc.CallOption) (*Entity, error) {
 	out := new(Entity)
-	err := c.cc.Invoke(ctx, "/aperture.common.entitycache.v1.EntityCacheService/GetEntity", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByIPAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *entityCacheServiceClient) GetEntityByName(ctx context.Context, in *GetEntityByNameRequest, opts ...grpc.CallOption) (*Entity, error) {
+	out := new(Entity)
+	err := c.cc.Invoke(ctx, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByName", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +75,8 @@ func (c *entityCacheServiceClient) GetEntity(ctx context.Context, in *GetEntityR
 type EntityCacheServiceServer interface {
 	GetServicesList(context.Context, *emptypb.Empty) (*ServicesList, error)
 	GetEntityCache(context.Context, *emptypb.Empty) (*EntityCache, error)
-	GetEntity(context.Context, *GetEntityRequest) (*Entity, error)
+	GetEntityByIPAddress(context.Context, *GetEntityByIPAddressRequest) (*Entity, error)
+	GetEntityByName(context.Context, *GetEntityByNameRequest) (*Entity, error)
 }
 
 // UnimplementedEntityCacheServiceServer should be embedded to have forward compatible implementations.
@@ -78,8 +89,11 @@ func (UnimplementedEntityCacheServiceServer) GetServicesList(context.Context, *e
 func (UnimplementedEntityCacheServiceServer) GetEntityCache(context.Context, *emptypb.Empty) (*EntityCache, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEntityCache not implemented")
 }
-func (UnimplementedEntityCacheServiceServer) GetEntity(context.Context, *GetEntityRequest) (*Entity, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetEntity not implemented")
+func (UnimplementedEntityCacheServiceServer) GetEntityByIPAddress(context.Context, *GetEntityByIPAddressRequest) (*Entity, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEntityByIPAddress not implemented")
+}
+func (UnimplementedEntityCacheServiceServer) GetEntityByName(context.Context, *GetEntityByNameRequest) (*Entity, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEntityByName not implemented")
 }
 
 // UnsafeEntityCacheServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -129,20 +143,38 @@ func _EntityCacheService_GetEntityCache_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _EntityCacheService_GetEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetEntityRequest)
+func _EntityCacheService_GetEntityByIPAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetEntityByIPAddressRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EntityCacheServiceServer).GetEntity(ctx, in)
+		return srv.(EntityCacheServiceServer).GetEntityByIPAddress(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.common.entitycache.v1.EntityCacheService/GetEntity",
+		FullMethod: "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByIPAddress",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EntityCacheServiceServer).GetEntity(ctx, req.(*GetEntityRequest))
+		return srv.(EntityCacheServiceServer).GetEntityByIPAddress(ctx, req.(*GetEntityByIPAddressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EntityCacheService_GetEntityByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetEntityByNameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EntityCacheServiceServer).GetEntityByName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EntityCacheServiceServer).GetEntityByName(ctx, req.(*GetEntityByNameRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -163,8 +195,12 @@ var EntityCacheService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EntityCacheService_GetEntityCache_Handler,
 		},
 		{
-			MethodName: "GetEntity",
-			Handler:    _EntityCacheService_GetEntity_Handler,
+			MethodName: "GetEntityByIPAddress",
+			Handler:    _EntityCacheService_GetEntityByIPAddress_Handler,
+		},
+		{
+			MethodName: "GetEntityByName",
+			Handler:    _EntityCacheService_GetEntityByName_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

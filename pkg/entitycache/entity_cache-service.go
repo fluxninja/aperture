@@ -2,11 +2,10 @@ package entitycache
 
 import (
 	"context"
+	"errors"
 
 	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -38,14 +37,20 @@ func (c *EntityCacheService) GetEntityCache(ctx context.Context, _ *emptypb.Empt
 	}, nil
 }
 
-// GetEntity returns matching entity in cache based on request field type.
-func (c *EntityCacheService) GetEntity(ctx context.Context, req *entitycachev1.GetEntityRequest) (*entitycachev1.Entity, error) {
-	switch by := req.By.(type) {
-	case *entitycachev1.GetEntityRequest_IpAddress:
-		return c.entityCache.GetByIP(req.GetIpAddress()), nil
-	case *entitycachev1.GetEntityRequest_EntityName:
-		return c.entityCache.GetByName(req.GetEntityName()), nil
-	default:
-		return nil, status.Errorf(codes.InvalidArgument, "unsupported by: %v", by)
+// GetEntityByIPAddress returns an entity by IP address.
+func (c *EntityCacheService) GetEntityByIPAddress(ctx context.Context, req *entitycachev1.GetEntityByIPAddressRequest) (*entitycachev1.Entity, error) {
+	entity := c.entityCache.GetByIP(req.GetIpAddress())
+	if entity == nil {
+		return nil, errors.New("entity not found")
 	}
+	return entity, nil
+}
+
+// GetEntityByName returns an entity by name.
+func (c *EntityCacheService) GetEntityByName(ctx context.Context, req *entitycachev1.GetEntityByNameRequest) (*entitycachev1.Entity, error) {
+	entity := c.entityCache.GetByName(req.GetName())
+	if entity == nil {
+		return nil, errors.New("entity not found")
+	}
+	return entity, nil
 }

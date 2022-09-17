@@ -45,34 +45,6 @@ func Merge(originalService, mergedService *entitycachev1.Service) {
 	originalService.EntitiesCount += mergedService.EntitiesCount
 }
 
-// Entity represents a pod, vm, etc.
-//
-// Entities can be created with NewEntity.
-type Entity struct {
-	// ID of the entity
-	ID EntityID `json:"id,omitempty"`
-
-	// IP Address of this entity
-	IPAddress string `json:"ip_address"`
-	// Services is a List of names of services this entity is a part of.
-	// We store "well-known-labels" (identifying a service) in a separate
-	// fields for easier access. Note: we could store `[]agent_core/services/ServiceID`
-	// here directly, but right now it'd cause cyclic dependency.
-	Services []string `json:"services"`
-	// EntityName is the name of this entity
-	EntityName string `json:"name"`
-}
-
-// IP returns IP of this entity.
-func (e *Entity) IP() string {
-	return e.IPAddress
-}
-
-// Name returns Name of this entity.
-func (e *Entity) Name() string {
-	return e.EntityName
-}
-
 // EntityID is a unique Entity identifier.
 type EntityID struct {
 	Prefix string `json:"prefix,omitempty"`
