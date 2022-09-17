@@ -610,13 +610,13 @@ ClientTLSConfig is the config for client TLS.
 <dt>ca_file</dt>
 <dd>
 
-(string, `omitempty,file`)
+(string)
 
 </dd>
 <dt>cert_file</dt>
 <dd>
 
-(string, `omitempty,file`)
+(string)
 
 </dd>
 <dt>insecure_skip_verify</dt>
@@ -628,13 +628,13 @@ ClientTLSConfig is the config for client TLS.
 <dt>key_file</dt>
 <dd>
 
-(string, `omitempty,file`)
+(string)
 
 </dd>
 <dt>key_log_file</dt>
 <dd>
 
-(string, `omitempty,file`)
+(string)
 
 </dd>
 </dl>
@@ -862,7 +862,7 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>key_log_file</dt>
 <dd>
 
-(string, `omitempty,file`) SSL key log file (useful for debugging with wireshark)
+(string) SSL key log file (useful for debugging with wireshark)
 
 </dd>
 <dt>max_conns_per_host</dt>
@@ -1478,13 +1478,13 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dt>cert_file</dt>
 <dd>
 
-(string, `omitempty,file`) Server Cert file path
+(string) Server Cert file path
 
 </dd>
 <dt>client_ca_file</dt>
 <dd>
 
-(string, `omitempty,file`) Client CA file
+(string) Client CA file path
 
 </dd>
 <dt>enabled</dt>
@@ -1496,7 +1496,7 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dt>key_file</dt>
 <dd>
 
-(string, `omitempty,file`) Server Key file path
+(string) Server Key file path
 
 </dd>
 </dl>

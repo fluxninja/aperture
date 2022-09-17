@@ -47,7 +47,7 @@ type HTTPClientConfig struct {
 	// Idle Connection Timeout. 0 = no timeout.
 	IdleConnTimeout config.Duration `json:"idle_connection_timeout" validate:"gte=0s" default:"90s"`
 	// SSL key log file (useful for debugging with wireshark)
-	KeyLogWriter string `json:"key_log_file" validate:"omitempty,file"`
+	KeyLogWriter string `json:"key_log_file"`
 	// Client TLS configuration
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
 	// Max Idle Connections per host. 0 = no limit.

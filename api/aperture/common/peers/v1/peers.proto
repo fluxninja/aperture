@@ -3,6 +3,7 @@ syntax = "proto3";
 package aperture.common.peers.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 //
 // gRPC service
@@ -10,9 +11,15 @@ import "google/api/annotations.proto";
 
 // PeerDiscoveryService is used to query Peers.
 service PeerDiscoveryService {
-  rpc GetPeers(PeersRequest) returns (Peers) {
+  rpc GetPeers(google.protobuf.Empty) returns (Peers) {
     option (google.api.http) = {
-      get: "/v1/peers/{address}"
+      get: "/v1/peers"
+    };
+  }
+
+  rpc GetPeer(PeerRequest) returns (Peer) {
+    option (google.api.http) = {
+      get: "/v1/peers/address/{address}"
     };
   }
 }
@@ -21,8 +28,8 @@ service PeerDiscoveryService {
 // Request/Response messages
 //
 
-message PeersRequest {
-  repeated string address = 1;
+message PeerRequest {
+  string address = 1;
 }
 
 //
@@ -31,12 +38,12 @@ message PeersRequest {
 
 // Peers holds the peer info of this peer and a mapping of address to other peers.
 message Peers {
-  PeerInfo peer_info = 1;
-  map<string, PeerInfo> peers = 2;
+  Peer self_peer = 1;
+  map<string, Peer> peers = 2;
 }
 
-// PeerInfo holds peer info and services.
-message PeerInfo {
+// Peer holds peer info and services.
+message Peer {
   string address = 1;
   string hostname = 2;
   map<string, string> services = 3;

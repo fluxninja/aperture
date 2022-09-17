@@ -30,11 +30,11 @@ func Module() fx.Option {
 // +kubebuilder:object:generate=true
 type ServerTLSConfig struct {
 	// Server Cert file path
-	CertFile string `json:"cert_file" validate:"omitempty,file"`
+	CertFile string `json:"cert_file"`
 	// Server Key file path
-	KeyFile string `json:"key_file" validate:"omitempty,file"`
-	// Client CA file
-	ClientCAFile string `json:"client_ca_file" validate:"omitempty,file"`
+	KeyFile string `json:"key_file"`
+	// Client CA file path
+	ClientCAFile string `json:"client_ca_file"`
 	// Allowed CN
 	AllowedCN string `json:"allowed_cn" validate:"omitempty,fqdn"`
 	// Enabled TLS
