@@ -7,8 +7,7 @@ package controller_test
 
 policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 cn "github.com/fluxninja/aperture/pkg/policies/controlloop/controller"
-"github.com/fluxninja/aperture/pkg/policies/mocks"
-"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"*/
+"github.com/fluxninja/aperture/pkg/policies/mocks"*/
 
 // TODO: Adapt this test to the new Circuit runtime
 /*var _ = Describe("Gradient", func() {
@@ -20,14 +19,14 @@ cn "github.com/fluxninja/aperture/pkg/policies/controlloop/controller"
 		t                      GinkgoTestReporter
 		mockCtrl               *gomock.Controller
 		mockControlLoopReadAPI *mocks.MockControlLoopReadAPI
-		previousSignal         reading.Reading
+		previousSignal         runtime.Reading
 	)
 
 	BeforeEach(func() {
 		t = GinkgoTestReporter{}
 		mockCtrl = gomock.NewController(t)
 		mockControlLoopReadAPI = mocks.NewMockControlLoopReadAPI(mockCtrl)
-		previousSignal = reading.NewInvalid()
+		previousSignal = runtime.InvalidReading()
 
 		controller := &policylangv1.Controller{
 			Controller: &policylangv1.Controller_Gradient{
@@ -50,18 +49,18 @@ cn "github.com/fluxninja/aperture/pkg/policies/controlloop/controller"
 
 	// Just for coverage
 	It("Maintains output", func() {
-		gradient.MaintainOutput(reading.NewInvalid(), reading.NewInvalid(), nil)
+		gradient.MaintainOutput(runtime.InvalidReading(), runtime.InvalidReading(), nil)
 	})
 
 	It("Winds output", func() {
-		currentOutput := reading.New(0.5)
-		targetOutput := reading.New(1.0)
+		currentOutput := runtime.NewReading(0.5)
+		targetOutput := runtime.NewReading(1.0)
 		output := gradient.WindOutput(currentOutput, targetOutput, nil)
 		Expect(output).To(Equal(targetOutput))
 	})
 
 	It("Compute output returns invalid if current reading is invalid", func() {
-		currentSignal := reading.NewInvalid()
+		currentSignal := runtime.InvalidReading()
 
 		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Times(1)
 		mockControlLoopReadAPI.EXPECT().GetLastOutput().Times(1)
@@ -72,9 +71,9 @@ cn "github.com/fluxninja/aperture/pkg/policies/controlloop/controller"
 	})
 
 	It("Compute output returns invalid if setpoint reading is invalid", func() {
-		currentSignal := reading.New(2.0)
+		currentSignal := runtime.NewReading(2.0)
 
-		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(reading.NewInvalid()).Times(1)
+		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(runtime.InvalidReading()).Times(1)
 		mockControlLoopReadAPI.EXPECT().GetLastOutput().Times(1)
 		mockControlLoopReadAPI.EXPECT().GetControlVariableReading().Times(1)
 
@@ -83,10 +82,10 @@ cn "github.com/fluxninja/aperture/pkg/policies/controlloop/controller"
 	})
 
 	It("Compute output returns invalid if last output reading is invalid", func() {
-		currentSignal := reading.New(2.0)
+		currentSignal := runtime.NewReading(2.0)
 
-		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(reading.New(1.0)).Times(1)
-		mockControlLoopReadAPI.EXPECT().GetLastOutput().Return(reading.NewInvalid()).Times(1)
+		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(runtime.NewReading(1.0)).Times(1)
+		mockControlLoopReadAPI.EXPECT().GetLastOutput().Return(runtime.InvalidReading()).Times(1)
 		mockControlLoopReadAPI.EXPECT().GetControlVariableReading().Times(1)
 
 		output := gradient.ComputeOutput(previousSignal, currentSignal, mockControlLoopReadAPI)
@@ -95,17 +94,17 @@ cn "github.com/fluxninja/aperture/pkg/policies/controlloop/controller"
 
 	Context("With non-inverted gradient", func() {
 		DescribeTable("Computes output",
-			func(currentSignal reading.Reading, desiredOutput float64) {
-				mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(reading.New(5.0)).Times(1)
-				mockControlLoopReadAPI.EXPECT().GetLastOutput().Return(reading.New(3.0)).Times(1)
+			func(currentSignal runtime.Reading, desiredOutput float64) {
+				mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(runtime.NewReading(5.0)).Times(1)
+				mockControlLoopReadAPI.EXPECT().GetLastOutput().Return(runtime.NewReading(3.0)).Times(1)
 
 				output := gradient.ComputeOutput(previousSignal, currentSignal, mockControlLoopReadAPI)
 				Expect(output.Valid).To(BeTrue())
 				Expect(output.Value).To(BeNumerically("~", desiredOutput))
 			},
-			Entry("normally", reading.New(4.0), 1.875),
-			Entry("clamps to max value", reading.New(25.0), 0.6),
-			Entry("clamps to min value", reading.New(0.1), 6.0),
+			Entry("normally", runtime.NewReading(4.0), 1.875),
+			Entry("clamps to max value", runtime.NewReading(25.0), 0.6),
+			Entry("clamps to min value", runtime.NewReading(0.1), 6.0),
 		)
 	})
 
@@ -127,17 +126,17 @@ cn "github.com/fluxninja/aperture/pkg/policies/controlloop/controller"
 		})
 
 		DescribeTable("Computes output",
-			func(currentSignal reading.Reading, desiredOutput float64) {
-				mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(reading.New(5.0)).Times(1)
-				mockControlLoopReadAPI.EXPECT().GetLastOutput().Return(reading.New(3.0)).Times(1)
+			func(currentSignal runtime.Reading, desiredOutput float64) {
+				mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(runtime.NewReading(5.0)).Times(1)
+				mockControlLoopReadAPI.EXPECT().GetLastOutput().Return(runtime.NewReading(3.0)).Times(1)
 
 				output := gradient.ComputeOutput(previousSignal, currentSignal, mockControlLoopReadAPI)
 				Expect(output.Valid).To(BeTrue())
 				Expect(output.Value).To(BeNumerically("~", desiredOutput))
 			},
-			Entry("normally", reading.New(4.0), 1.2),
-			Entry("clamps to max value", reading.New(1.0), 0.6),
-			Entry("clamps to min value", reading.New(25.0), 6.0),
+			Entry("normally", runtime.NewReading(4.0), 1.2),
+			Entry("clamps to max value", runtime.NewReading(1.0), 0.6),
+			Entry("clamps to min value", runtime.NewReading(25.0), 6.0),
 		)
 	})
 })*/

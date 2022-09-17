@@ -12,7 +12,6 @@ package components_test
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	cn "github.com/fluxninja/aperture/pkg/policies/controlloop/controller"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 )
 
 var _ = Describe("Timed", func() {
@@ -24,16 +23,16 @@ var _ = Describe("Timed", func() {
 		t                      GinkgoTestReporter
 		mockCtrl               *gomock.Controller
 		mockControlLoopReadAPI *mocks.MockControlLoopReadAPI
-		prev                   reading.Reading
-		curr                   reading.Reading
+		prev                   runtime.Reading
+		curr                   runtime.Reading
 	)
 
 	BeforeEach(func() {
 		t = GinkgoTestReporter{}
 		mockCtrl = gomock.NewController(t)
 		mockControlLoopReadAPI = mocks.NewMockControlLoopReadAPI(mockCtrl)
-		prev = reading.NewInvalid()
-		curr = reading.NewInvalid()
+		prev = runtime.InvalidReading()
+		curr = runtime.InvalidReading()
 
 		duration := 5 * time.Second
 		controller := &policylangv1.Controller{
@@ -55,19 +54,19 @@ var _ = Describe("Timed", func() {
 	})
 
 	It("Maintains output", func() {
-		timed.MaintainOutput(reading.NewInvalid(), reading.NewInvalid(), nil)
+		timed.MaintainOutput(runtime.InvalidReading(), runtime.InvalidReading(), nil)
 	})
 
 	It("Winds output", func() {
-		currentOutput := reading.New(0.5)
-		targetOutput := reading.New(1.0)
+		currentOutput := runtime.NewReading(0.5)
+		targetOutput := runtime.NewReading(1.0)
 		output := timed.WindOutput(currentOutput, targetOutput, nil)
 		Expect(output).To(Equal(targetOutput))
 	})
 
 	It("Cannot wind output if target output invalid", func() {
-		currentOutput := reading.New(1.0)
-		targetOutput := reading.NewInvalid()
+		currentOutput := runtime.NewReading(1.0)
+		targetOutput := runtime.InvalidReading()
 		output := timed.WindOutput(currentOutput, targetOutput, nil)
 		Expect(output.Valid).To(BeFalse())
 	})
@@ -75,32 +74,32 @@ var _ = Describe("Timed", func() {
 	// Timed is only using output from controlLoopReadAPI
 	// Therefore prev & curr are invalid readings
 
-	It("Cannot compute output if setpoint reading invalid", func() {
-		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(reading.NewInvalid()).Times(1)
+	It("Cannot compute output if setpoint runtime invalid", func() {
+		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(runtime.InvalidReading()).Times(1)
 
 		output := timed.ComputeOutput(prev, curr, mockControlLoopReadAPI)
 		Expect(output.Valid).To(BeFalse())
 	})
 
 	It("Cannot compute output if signal reading invalid", func() {
-		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(reading.New(0.1)).Times(1)
-		mockControlLoopReadAPI.EXPECT().GetSignalReading().Return(reading.NewInvalid()).Times(1)
+		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(runtime.NewReading(0.1)).Times(1)
+		mockControlLoopReadAPI.EXPECT().GetSignalReading().Return(runtime.InvalidReading()).Times(1)
 
 		output := timed.ComputeOutput(prev, curr, mockControlLoopReadAPI)
 		Expect(output.Valid).To(BeFalse())
 	})
 
 	It("Compute output if setpoint > signal", func() {
-		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(reading.New(5.0)).AnyTimes()
-		mockControlLoopReadAPI.EXPECT().GetSignalReading().Return(reading.New(2.0)).AnyTimes()
+		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(runtime.NewReading(5.0)).AnyTimes()
+		mockControlLoopReadAPI.EXPECT().GetSignalReading().Return(runtime.NewReading(2.0)).AnyTimes()
 
 		output := timed.ComputeOutput(prev, curr, mockControlLoopReadAPI)
 		Expect(output.Value).To(Equal(1.0))
 	})
 
 	It("Compute output if setpoint < signal", func() {
-		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(reading.New(2.0)).AnyTimes()
-		mockControlLoopReadAPI.EXPECT().GetSignalReading().Return(reading.New(5.0)).AnyTimes()
+		mockControlLoopReadAPI.EXPECT().GetSetpointReading().Return(runtime.NewReading(2.0)).AnyTimes()
+		mockControlLoopReadAPI.EXPECT().GetSignalReading().Return(runtime.NewReading(5.0)).AnyTimes()
 
 		output := timed.ComputeOutput(prev, curr, mockControlLoopReadAPI)
 		Expect(output.Value).To(Equal(2.0))

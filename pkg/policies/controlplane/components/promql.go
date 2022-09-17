@@ -22,7 +22,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -395,15 +394,15 @@ func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runti
 	}
 
 	// Create current reading based on err and value
-	var currentReading reading.Reading
+	var currentReading runtime.Reading
 	if promQL.err != nil {
-		currentReading = reading.InvalidReading()
+		currentReading = runtime.InvalidReading()
 	} else {
-		currentReading = reading.NewReading(promQL.value)
+		currentReading = runtime.NewReading(promQL.value)
 	}
 
 	return runtime.PortToValue{
-		"output": []reading.Reading{currentReading},
+		"output": []runtime.Reading{currentReading},
 	}, nil
 }
 

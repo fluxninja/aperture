@@ -8,7 +8,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -103,7 +102,7 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 
 	decisionType := dec.computeDecisionType(currentDecision, tickInfo)
 
-	var output reading.Reading
+	var output runtime.Reading
 
 	switch decisionType {
 	case currentDecided:
@@ -123,7 +122,7 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	}
 
 	return runtime.PortToValue{
-		"output": []reading.Reading{output},
+		"output": []runtime.Reading{output},
 	}, nil
 }
 

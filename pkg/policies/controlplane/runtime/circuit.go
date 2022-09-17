@@ -13,7 +13,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 )
 
 // CircuitModule returns fx options of Circuit for the main app.
@@ -95,7 +94,7 @@ type CompiledComponentAndPorts struct {
 	CompiledComponent   CompiledComponent
 }
 
-type signalToReading map[Signal]reading.Reading
+type signalToReading map[Signal]Reading
 
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
 type Circuit struct {
@@ -135,7 +134,7 @@ func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts, policyR
 			for _, outPort := range component.OutPortToSignalsMap {
 				for _, signal := range outPort {
 					if signal.Looped {
-						circuit.loopedSignals[signal] = reading.InvalidReading()
+						circuit.loopedSignals[signal] = InvalidReading()
 					}
 				}
 			}
@@ -253,7 +252,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			// Check readiness of cmp by checking in_ports
 			for port, sigs := range cmp.InPortToSignalsMap {
 				// Reading list for this port
-				readingList := make([]reading.Reading, len(sigs))
+				readingList := make([]Reading, len(sigs))
 				// Check if all the sig(s) in sigs are ready
 				for index, sig := range sigs {
 					if sigReading, ok := circuitSignalReadings[sig]; ok {
@@ -290,15 +289,15 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			for port, signals := range cmp.OutPortToSignalsMap {
 				if _, ok := componentOutPortReadings[port]; !ok {
 					// Fill with invalid readings
-					componentOutPortReadings[port] = make([]reading.Reading, len(signals))
+					componentOutPortReadings[port] = make([]Reading, len(signals))
 					for index := range signals {
-						componentOutPortReadings[port][index] = reading.InvalidReading()
+						componentOutPortReadings[port][index] = InvalidReading()
 					}
 				} else if len(componentOutPortReadings[port]) < len(signals) {
 					// The reading list has fewer readings compared to portOutsSpec
 					// Fill with invalid readings
 					for index := len(componentOutPortReadings[port]); index < len(signals); index++ {
-						componentOutPortReadings[port][index] = reading.InvalidReading()
+						componentOutPortReadings[port][index] = InvalidReading()
 					}
 				}
 			}

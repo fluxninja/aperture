@@ -7,7 +7,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -16,7 +15,7 @@ type Extrapolator struct {
 	// Maximum time interval for each extrapolation of signal is done; Reading becomes invalid after this interval.
 	maxExtrapolationInterval time.Duration
 	// The last output that was emitted as an output signal.
-	lastOutput reading.Reading
+	lastOutput runtime.Reading
 	// The last valid timestamp.
 	lastValidTimestamp time.Time
 }
@@ -28,7 +27,7 @@ var _ runtime.Component = (*Extrapolator)(nil)
 func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	exp := Extrapolator{
 		maxExtrapolationInterval: extrapolatorProto.MaxExtrapolationInterval.AsDuration(),
-		lastOutput:               reading.InvalidReading(),
+		lastOutput:               runtime.InvalidReading(),
 		lastValidTimestamp:       time.Time{},
 	}
 
@@ -38,7 +37,7 @@ func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, com
 // Execute implements runtime.Component.Execute.
 func (exp *Extrapolator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	input := inPortReadings.ReadSingleValuePort("input")
-	output := reading.InvalidReading()
+	output := runtime.InvalidReading()
 
 	if input.Valid() {
 		output = input
@@ -57,6 +56,6 @@ func (exp *Extrapolator) Execute(inPortReadings runtime.PortToValue, tickInfo ru
 
 	// If the signal returns, it resumes mirroring the input signal as output signal.
 	return runtime.PortToValue{
-		"output": []reading.Reading{output},
+		"output": []runtime.Reading{output},
 	}, nil
 }
