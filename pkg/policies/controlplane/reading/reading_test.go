@@ -13,18 +13,18 @@ var _ = Describe("Reading", func() {
 	It("Creates default invalid reading", func() {
 		reading := reading.NewInvalid()
 		Expect(reading).ToNot(BeNil())
-		Expect(reading.Valid).To(BeFalse())
+		Expect(reading.Valid()).To(BeFalse())
 	})
 
-	It("Sets invalid to true if NaN is passed", func() {
-		reading := reading.New(math.NaN())
-		Expect(reading.Valid).To(BeFalse())
-		Expect(math.IsNaN(reading.Value)).To(BeTrue())
+	It("Creates new reading with invalid value", func() {
+		reading := reading.NewReading((math.NaN()))
+		Expect(reading.Valid()).To(BeFalse())
+		Expect(math.IsNaN(reading.Value())).To(BeTrue())
 	})
 
 	It("Creates valid value", func() {
-		reading := reading.New(0.2)
-		Expect(reading.Valid).To(BeTrue())
-		Expect(reading.Value).To(Equal(0.2))
+		reading := reading.NewReading(0.2)
+		Expect(reading.Valid()).To(BeTrue())
+		Expect(reading.Value()).To(Equal(0.2))
 	})
 })

@@ -399,7 +399,7 @@ func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runti
 	if promQL.err != nil {
 		currentReading = reading.NewInvalid()
 	} else {
-		currentReading = reading.New(promQL.value)
+		currentReading = reading.NewReading(promQL.value)
 	}
 
 	return runtime.PortToValue{

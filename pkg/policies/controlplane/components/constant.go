@@ -27,6 +27,6 @@ func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, 
 func (con *Constant) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	// Always emit the value.
 	return runtime.PortToValue{
-		"output": []reading.Reading{reading.New(con.value)},
+		"output": []reading.Reading{reading.NewReading(con.value)},
 	}, nil
 }

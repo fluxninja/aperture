@@ -19,7 +19,7 @@ type tickInfo struct {
 	interval      time.Duration
 }
 
-// NewTickInfo returns a new instance of Tickinfo.
+// NewTickInfo returns a Tickinfo.
 func NewTickInfo(timestamp, nextTimestamp time.Time, tick int, interval time.Duration) TickInfo {
 	return &tickInfo{
 		timestamp:     timestamp,

@@ -216,7 +216,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 		acceptedReading = reading.NewInvalid()
 		errMulti = multierr.Append(errMulti, err)
 	} else {
-		acceptedReading = reading.New(acceptedValue)
+		acceptedReading = reading.NewReading(acceptedValue)
 	}
 	outPortReadings["accepted_concurrency"] = []reading.Reading{acceptedReading}
 
@@ -225,7 +225,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 		incomingReading = reading.NewInvalid()
 		errMulti = multierr.Append(errMulti, err)
 	} else {
-		incomingReading = reading.New(incomingValue)
+		incomingReading = reading.NewReading(incomingValue)
 	}
 	outPortReadings["incoming_concurrency"] = []reading.Reading{incomingReading}
 

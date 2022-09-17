@@ -83,8 +83,8 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	// Default currentDecision to False
 	currentDecision := false
 
-	if lhs.Valid && rhs.Valid {
-		lhsVal, rhsVal := lhs.Value, rhs.Value
+	if lhs.Valid() && rhs.Valid() {
+		lhsVal, rhsVal := lhs.Value(), rhs.Value()
 		switch dec.operator {
 		case gt:
 			currentDecision = (lhsVal > rhsVal)

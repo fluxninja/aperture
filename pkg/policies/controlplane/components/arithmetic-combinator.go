@@ -58,27 +58,27 @@ func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToValue, t
 	output := reading.NewInvalid()
 	var err error
 
-	if lhs.Valid && rhs.Valid {
-		lhsVal, rhsVal := lhs.Value, rhs.Value
+	if lhs.Valid() && rhs.Valid() {
+		lhsVal, rhsVal := lhs.Value(), rhs.Value()
 		switch arith.operator {
 		case add:
-			output = reading.New(lhsVal + rhsVal)
+			output = reading.NewReading(lhsVal + rhsVal)
 		case sub:
-			output = reading.New(lhsVal - rhsVal)
+			output = reading.NewReading(lhsVal - rhsVal)
 		case mul:
-			output = reading.New(lhsVal * rhsVal)
+			output = reading.NewReading(lhsVal * rhsVal)
 		case div:
 			if rhsVal == 0 {
 				err = fmt.Errorf("divide by zero")
 			} else {
-				output = reading.New(lhsVal / rhsVal)
+				output = reading.NewReading(lhsVal / rhsVal)
 			}
 		case xor:
-			output = reading.New(float64(int(lhsVal) ^ int(rhsVal)))
+			output = reading.NewReading(float64(int(lhsVal) ^ int(rhsVal)))
 		case lshift:
-			output = reading.New(float64(int(lhsVal) << int(rhsVal)))
+			output = reading.NewReading(float64(int(lhsVal) << int(rhsVal)))
 		case rshift:
-			output = reading.New(float64(int(lhsVal) >> int(rhsVal)))
+			output = reading.NewReading(float64(int(lhsVal) >> int(rhsVal)))
 		}
 	}
 

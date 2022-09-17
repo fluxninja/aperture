@@ -43,9 +43,9 @@ func NewGradientControllerAndOptions(gradientControllerProto *policylangv1.Gradi
 // ComputeOutput based on previous and current signal reading.
 func (g *GradientController) ComputeOutput(signal, setpoint, controlVariable reading.Reading, controllerStateReadAPI ControllerStateReadAPI, tickInfo runtime.TickInfo) (reading.Reading, error) {
 	var output reading.Reading
-	if setpoint.Valid && signal.Valid && controlVariable.Valid {
+	if setpoint.Valid() && signal.Valid() && controlVariable.Valid() {
 		var gradient float64
-		gradient = math.Pow(signal.Value/setpoint.Value, g.slope)
+		gradient = math.Pow(signal.Value()/setpoint.Value(), g.slope)
 		// clamp to min/max
 		if gradient < g.minGradient {
 			gradient = g.minGradient
@@ -56,7 +56,7 @@ func (g *GradientController) ComputeOutput(signal, setpoint, controlVariable rea
 		if math.IsNaN(gradient) {
 			output = reading.NewInvalid()
 		} else {
-			output = reading.New(controlVariable.Value * gradient)
+			output = reading.NewReading(controlVariable.Value() * gradient)
 		}
 	} else {
 		output = reading.NewInvalid()

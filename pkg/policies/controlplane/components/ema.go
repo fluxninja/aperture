@@ -93,8 +93,8 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 	switch ema.currentStage {
 	case warmUpStage:
 		ema.warmupCount++
-		if input.Valid {
-			ema.sum += input.Value
+		if input.Valid() {
+			ema.sum += input.Value()
 			ema.count++
 			// Emit the avg for the valid values in the warmup window.
 			avg, err := ema.computeAverage(minEnvelope, maxEnvelope)
@@ -117,15 +117,15 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 			ema.resetStages()
 		}
 	case emaStage:
-		if input.Valid {
-			if !ema.lastGoodOutput.Valid {
+		if input.Valid() {
+			if !ema.lastGoodOutput.Valid() {
 				err := errors.New("ema: last good output is invalid")
 				log.Error().Err(err).Msg("This is unexpected!")
 				return retErr(err)
 			}
 			// Compute the new outputValue.
-			outputValue := (ema.alpha * input.Value) + ((1 - ema.alpha) * ema.lastGoodOutput.Value)
-			output = reading.New(outputValue)
+			outputValue := (ema.alpha * input.Value()) + ((1 - ema.alpha) * ema.lastGoodOutput.Value())
+			output = reading.NewReading(outputValue)
 		} else {
 			ema.invalidCount++
 			// emit last good EMA value
@@ -140,7 +140,7 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 	}
 
 	// Set the last good output
-	if output.Valid {
+	if output.Valid() {
 		ema.lastGoodOutput = output
 	}
 	// Returns Exponential Moving Average of a series of readings.
@@ -156,7 +156,7 @@ func (ema *EMA) computeAverage(minEnvelope, maxEnvelope reading.Reading) (readin
 		if err != nil {
 			return reading.NewInvalid(), err
 		}
-		return reading.New(envelopedAvg), nil
+		return reading.NewReading(envelopedAvg), nil
 	} else {
 		return reading.NewInvalid(), nil
 	}
@@ -164,14 +164,14 @@ func (ema *EMA) computeAverage(minEnvelope, maxEnvelope reading.Reading) (readin
 
 func (ema *EMA) applyEnvelope(input float64, minEnvelope, maxEnvelope reading.Reading) (float64, error) {
 	minxMaxConstraints := constraints.NewMinMaxConstraints()
-	if maxEnvelope.Valid {
-		maxErr := minxMaxConstraints.SetMax(maxEnvelope.Value)
+	if maxEnvelope.Valid() {
+		maxErr := minxMaxConstraints.SetMax(maxEnvelope.Value())
 		if maxErr != nil {
 			return 0, maxErr
 		}
 	}
-	if minEnvelope.Valid {
-		minErr := minxMaxConstraints.SetMin(minEnvelope.Value)
+	if minEnvelope.Valid() {
+		minErr := minxMaxConstraints.SetMin(minEnvelope.Value())
 		if minErr != nil {
 			return 0, minErr
 		}

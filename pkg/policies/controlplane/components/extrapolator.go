@@ -40,7 +40,7 @@ func (exp *Extrapolator) Execute(inPortReadings runtime.PortToValue, tickInfo ru
 	input := inPortReadings.ReadSingleValuePort("input")
 	output := reading.NewInvalid()
 
-	if input.Valid {
+	if input.Valid() {
 		output = input
 		exp.lastOutput = output
 		exp.lastValidTimestamp = tickInfo.Timestamp()

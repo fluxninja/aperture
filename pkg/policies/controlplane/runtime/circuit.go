@@ -222,8 +222,8 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to initialize SummaryVec")
 			}
-			if reading.Valid {
-				signalSummaryVecMetric.Observe(reading.Value)
+			if reading.Valid() {
+				signalSummaryVecMetric.Observe(reading.Value())
 			}
 		}
 	}()

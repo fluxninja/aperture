@@ -31,16 +31,16 @@ func (max *Max) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 
 	if len(inputs) > 0 {
 		for _, singleInput := range inputs {
-			if !singleInput.Valid {
+			if !singleInput.Valid() {
 				return runtime.PortToValue{
 					"output": []reading.Reading{output},
 				}, nil
 			}
-			if singleInput.Value > maxValue {
-				maxValue = singleInput.Value
+			if singleInput.Value() > maxValue {
+				maxValue = singleInput.Value()
 			}
 		}
-		output = reading.New(maxValue)
+		output = reading.NewReading(maxValue)
 	} else {
 		output = reading.NewInvalid()
 	}

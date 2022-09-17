@@ -32,11 +32,11 @@ func (sqrt *Sqrt) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.T
 	input := inPortReadings.ReadSingleValuePort("input")
 	output := reading.NewInvalid()
 
-	if input.Valid {
+	if input.Valid() {
 		// Square root the input and scale it.
-		sqrtIn := math.Sqrt(input.Value)
+		sqrtIn := math.Sqrt(input.Value())
 		if !math.IsNaN(sqrtIn) {
-			output = reading.New(sqrt.scale * sqrtIn)
+			output = reading.NewReading(sqrt.scale * sqrtIn)
 		}
 	}
 
