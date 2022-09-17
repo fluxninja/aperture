@@ -16,7 +16,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 type multiMatcherByControlPoint map[selectors.ControlPointID]*multimatcher.MultiMatcher[int, []*compiler.Labeler]
@@ -118,7 +117,7 @@ func populateFlowLabels(ctx context.Context, flowLabels FlowLabels, mm *multimat
 // LabelsForMatching are additional labels to use for selector matching.
 func (c *Classifier) Classify(
 	ctx context.Context,
-	svcs []services.ServiceID,
+	svcs []string,
 	labelsForMatching selectors.Labels,
 	direction selectors.TrafficDirection,
 	input ast.Value,
@@ -135,9 +134,7 @@ func (c *Classifier) Classify(
 	}
 
 	cpID := selectors.ControlPointID{
-		ServiceID: services.ServiceID{
-			Service: "",
-		},
+		ServiceName:  "",
 		ControlPoint: cp,
 	}
 	camm, ok := r.MultiMatcherByControlPointID[cpID]
@@ -149,7 +146,7 @@ func (c *Classifier) Classify(
 
 	for _, svc := range svcs {
 		cpID := selectors.ControlPointID{
-			ServiceID:    svc,
+			ServiceName:  svc,
 			ControlPoint: cp,
 		}
 		mm, ok := r.MultiMatcherByControlPointID[cpID]

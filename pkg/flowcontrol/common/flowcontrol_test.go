@@ -9,6 +9,7 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc/peer"
 
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -26,10 +27,13 @@ var (
 
 var _ = BeforeEach(func() {
 	entities := entitycache.NewEntityCache()
-	entities.Put(entitycache.NewEntity(
-		entitycache.EntityID{},
-		hardCodedIPAddress, hardCodedEntityName, hardCodedServices,
-	))
+	entities.Put(&entitycachev1.Entity{
+		Prefix:    "",
+		Uid:       "",
+		IpAddress: hardCodedIPAddress,
+		Name:      hardCodedEntityName,
+		Services:  hardCodedServices,
+	})
 	app = platform.New(
 		config.ModuleConfig{
 			MergeConfig: map[string]interface{}{

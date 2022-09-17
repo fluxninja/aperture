@@ -4,14 +4,13 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
 )
 
 //go:generate mockgen -source=engine.go -destination=../../mocks/mock_engine.go -package=mocks
 
 // Engine is an interface for registering fluxmeters and schedulers.
 type Engine interface {
-	ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse
+	ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels selectors.Labels) *flowcontrolv1.CheckResponse
 
 	RegisterConcurrencyLimiter(sa Limiter) error
 	UnregisterConcurrencyLimiter(sa Limiter) error

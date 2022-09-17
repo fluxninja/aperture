@@ -1480,7 +1480,7 @@ spec:
                             description: Server Cert file path
                             type: string
                           client_ca_file:
-                            description: Client CA file
+                            description: Client CA file path
                             type: string
                           enabled:
                             description: Enabled TLS
