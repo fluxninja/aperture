@@ -1,8 +1,8 @@
-label: Installation
+label: Configuration
 position: 1
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "Installation"
-  keywords: ["install"]
+  title: "Configuration"
+  keywords: ["configuration"]
