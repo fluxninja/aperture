@@ -13,6 +13,7 @@ import (
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/flowlabel"
 	. "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
@@ -48,7 +49,7 @@ var _ = Describe("Classifier", func() {
 			Rules: map[string]*classificationv1.Rule{
 				"foo": {
 					Source:    headerExtractor("foo"),
-					Propagate: true,
+					Telemetry: true,
 				},
 			},
 		}
@@ -77,7 +78,7 @@ var _ = Describe("Classifier", func() {
 							Query: "data.my.pkg.answer",
 						},
 					},
-					Propagate: true,
+					Telemetry: true,
 				},
 			},
 		}
@@ -94,7 +95,7 @@ var _ = Describe("Classifier", func() {
 			Rules: map[string]*classificationv1.Rule{
 				"fuu": {
 					Source:    headerExtractor("fuu"),
-					Propagate: true,
+					Telemetry: true,
 				},
 			},
 		}
@@ -153,7 +154,7 @@ var _ = Describe("Classifier", func() {
 				}),
 			)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(labels).To(Equal(FlowLabels{
+			Expect(labels).To(Equal(flowlabel.FlowLabels{
 				"foo":       fl("hello"),
 				"bar-twice": fl("42"),
 			}))
@@ -190,7 +191,7 @@ var _ = Describe("Classifier", func() {
 				}),
 			)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(labels).To(Equal(FlowLabels{
+			Expect(labels).To(Equal(flowlabel.FlowLabels{
 				"foo": fl("hello"),
 			}))
 		})
@@ -212,7 +213,7 @@ var _ = Describe("Classifier", func() {
 					}),
 				)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(labels).To(Equal(FlowLabels{
+				Expect(labels).To(Equal(flowlabel.FlowLabels{
 					"bar-twice": fl("42"),
 				}))
 			})
@@ -253,7 +254,7 @@ var _ = Describe("Classifier", func() {
 		rules := map[string]*classificationv1.Rule{
 			"foo": {
 				Source:    headerExtractor("foo"),
-				Propagate: false,
+				Telemetry: false,
 			},
 			"bar": {
 				Source: &classificationv1.Rule_Rego_{
@@ -265,8 +266,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
-				Propagate: true,
-				Hidden:    true,
+				Telemetry: true,
 			},
 		}
 
@@ -288,9 +288,9 @@ var _ = Describe("Classifier", func() {
 				}),
 			)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(labels).To(Equal(FlowLabels{
-				"foo": FlowLabelValue{"hello", compiler.LabelFlags{Propagate: false}},
-				"bar": FlowLabelValue{"21", compiler.LabelFlags{Hidden: true, Propagate: true}},
+			Expect(labels).To(Equal(flowlabel.FlowLabels{
+				"foo": flowlabel.FlowLabelValue{Value: "hello", Telemetry: false},
+				"bar": flowlabel.FlowLabelValue{Value: "21", Telemetry: true},
 			}))
 		})
 	})
@@ -303,13 +303,13 @@ var _ = Describe("Classifier", func() {
 		rules1 := map[string]*classificationv1.Rule{
 			"foo": {
 				Source:    headerExtractor("foo"),
-				Propagate: true,
+				Telemetry: true,
 			},
 		}
 		rules2 := map[string]*classificationv1.Rule{
 			"foo": {
 				Source:    headerExtractor("xyz"),
-				Propagate: true,
+				Telemetry: true,
 			},
 		}
 
@@ -336,8 +336,8 @@ var _ = Describe("Classifier", func() {
 			)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(SatisfyAny(
-				Equal(FlowLabels{"foo": fl("cos")}),
-				Equal(FlowLabels{"foo": fl("hello")}),
+				Equal(flowlabel.FlowLabels{"foo": fl("cos")}),
+				Equal(flowlabel.FlowLabels{"foo": fl("hello")}),
 			))
 		})
 	})
@@ -354,7 +354,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
-				Propagate: true,
+				Telemetry: true,
 			},
 		}
 		rules2 := map[string]*classificationv1.Rule{
@@ -368,7 +368,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer2",
 					},
 				},
-				Propagate: true,
+				Telemetry: true,
 			},
 		}
 
@@ -394,8 +394,8 @@ var _ = Describe("Classifier", func() {
 			)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(SatisfyAny(
-				Equal(FlowLabels{"bar": fl("63")}),
-				Equal(FlowLabels{"bar": fl("42")}),
+				Equal(flowlabel.FlowLabels{"bar": fl("63")}),
+				Equal(flowlabel.FlowLabels{"bar": fl("42")}),
 			))
 		})
 	})
@@ -413,7 +413,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.bar",
 					},
 				},
-				Propagate: true,
+				Telemetry: true,
 			},
 		}
 
@@ -437,7 +437,7 @@ var _ = Describe("Classifier", func() {
 						Query: "data.my.pkg.answer",
 					},
 				},
-				Propagate: true,
+				Telemetry: true,
 			},
 		}
 
@@ -459,7 +459,7 @@ var _ = Describe("Classifier", func() {
 				}),
 			)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(labels).To(Equal(FlowLabels{}))
+			Expect(labels).To(Equal(flowlabel.FlowLabels{}))
 		})
 	})
 
@@ -477,7 +477,7 @@ var _ = Describe("Classifier", func() {
 			Rules: map[string]*classificationv1.Rule{
 				"user-agent": {
 					Source:    headerExtractor("foo"),
-					Propagate: true,
+					Telemetry: true,
 				},
 			},
 		}
@@ -491,10 +491,10 @@ var _ = Describe("Classifier", func() {
 	})
 })
 
-func fl(s string) FlowLabelValue {
-	return FlowLabelValue{
-		Value: s,
-		Flags: compiler.LabelFlags{Propagate: true},
+func fl(s string) flowlabel.FlowLabelValue {
+	return flowlabel.FlowLabelValue{
+		Value:     s,
+		Telemetry: true,
 	}
 }
 

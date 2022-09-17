@@ -44,18 +44,10 @@ type Labeler struct {
 	// map[string]interface{} otherwise.
 	Query rego.PreparedEvalQuery
 	// flags for created flow labels:
-	LabelsFlags map[string]LabelFlags // multi-label variant
+	LabelsTelemetry map[string]bool // multi-label variant
 	// flow label that the result should be assigned to (single-label variant)
-	LabelName  string
-	LabelFlags LabelFlags // single-label variant
-}
-
-// LabelFlags are flags for a flow label.
-type LabelFlags struct {
-	// Should the created label be applied to the whole flow (propagated in baggage)
-	Propagate bool
-	// Should the created flow label be hidden from telemetry
-	Hidden bool
+	LabelName string
+	Telemetry bool // single-label variant
 }
 
 // ReportedRule is a rule along with its selector and label name.
@@ -77,13 +69,6 @@ func rulesetToReportedRules(rs *classificationv1.Classifier, rulesetName string)
 		})
 	}
 	return out
-}
-
-func labelFlagsFromRule(rule *classificationv1.Rule) LabelFlags {
-	return LabelFlags{
-		Propagate: rule.Propagate,
-		Hidden:    rule.Hidden,
-	}
 }
 
 // BadExtractor is an error occurring when extractor is invalid.
@@ -144,7 +129,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 	// Group all the extractor-based rules so that we can compile them to a
 	// single rego query
 	labelExtractors := map[string]*classificationv1.Extractor{}
-	labelFlags := map[string]LabelFlags{} // flags for labels created by extractors
+	labelsTelemetry := map[string]bool{} // Telemetry flag for labels created by extractors
 
 	rawRegoCount := 0
 	var labelers []LabelerWithSelector
@@ -162,7 +147,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 		switch source := rule.GetSource().(type) {
 		case *classificationv1.Rule_Extractor:
 			labelExtractors[labelName] = source.Extractor
-			labelFlags[labelName] = labelFlagsFromRule(rule)
+			labelsTelemetry[labelName] = rule.GetTelemetry()
 		case *classificationv1.Rule_Rego_:
 			query, err := rego.New(
 				rego.Query(source.Rego.Query),
@@ -182,9 +167,9 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 			labelers = append(labelers, LabelerWithSelector{
 				LabelSelector: labelSelector,
 				Labeler: &Labeler{
-					Query:      query,
-					LabelName:  labelName,
-					LabelFlags: labelFlagsFromRule(rule),
+					Query:     query,
+					LabelName: labelName,
+					Telemetry: rule.GetTelemetry(),
 				},
 				PolicyName:      classifierWrapper.GetPolicyName(),
 				PolicyHash:      classifierWrapper.GetPolicyHash(),
@@ -214,8 +199,8 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 		labelers = append(labelers, LabelerWithSelector{
 			LabelSelector: labelSelector,
 			Labeler: &Labeler{
-				Query:       query,
-				LabelsFlags: labelFlags,
+				Query:           query,
+				LabelsTelemetry: labelsTelemetry,
 			},
 		})
 	}

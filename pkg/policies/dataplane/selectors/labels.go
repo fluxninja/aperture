@@ -83,12 +83,12 @@ func (l Labels) CombinedWith(newLabels LabelSources) Labels {
 	return Labels(labels)
 }
 
-// canonicalizeOtelHeaderKey converts envoy's header naming convention to Otel's one.
+// canonicalizeOtelHeaderKey converts header naming convention to Otel's one.
 func canonicalizeOtelHeaderKey(key string) string {
-	return strings.ReplaceAll(key, "-", "_")
+	return strings.ReplaceAll(strings.ToLower(key), "-", "_")
 }
 
-// CanonicalizeOtelHTTPFlavor converts envoy's protocol to Otel kind of HTTP protocol.
+// CanonicalizeOtelHTTPFlavor converts protocol to Otel kind of HTTP protocol.
 func CanonicalizeOtelHTTPFlavor(protocolName string) string {
 	switch protocolName {
 	case "HTTP/1.0":

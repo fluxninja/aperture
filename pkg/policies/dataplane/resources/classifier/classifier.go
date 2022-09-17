@@ -16,6 +16,7 @@ import (
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/flowlabel"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/services"
@@ -45,24 +46,6 @@ type ClassifierEngine struct {
 
 type rulesetID = uint64
 
-// FlowLabels is a map from flow labels to their values.
-type FlowLabels map[string]FlowLabelValue
-
-// FlowLabelValue is a value of a flow label with additional metadata.
-type FlowLabelValue struct {
-	Value string
-	Flags compiler.LabelFlags
-}
-
-// ToPlainMap returns flow labels as normal map[string]string.
-func (fl FlowLabels) ToPlainMap() map[string]string {
-	plainMap := make(map[string]string, len(fl))
-	for key, val := range fl {
-		plainMap[key] = val.Value
-	}
-	return plainMap
-}
-
 // New creates a new Flow Classifier.
 func New() *ClassifierEngine {
 	return &ClassifierEngine{
@@ -70,7 +53,7 @@ func New() *ClassifierEngine {
 	}
 }
 
-func populateFlowLabels(ctx context.Context, flowLabels FlowLabels, mm *multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector], labelsForMatching selectors.Labels, input ast.Value) (classifierMsgs []*flowcontrolv1.Classifier) {
+func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm *multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector], labelsForMatching selectors.Labels, input ast.Value) (classifierMsgs []*flowcontrolv1.Classifier) {
 	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.Classifier_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.Classifier{
 			PolicyName:      labelerWithSelector.PolicyName,
@@ -108,9 +91,9 @@ func populateFlowLabels(ctx context.Context, flowLabels FlowLabels, mm *multimat
 
 		if labeler.LabelName != "" {
 			// single-label-query
-			flowLabels[labeler.LabelName] = FlowLabelValue{
-				Value: resultSet[0].Expressions[0].String(),
-				Flags: labeler.LabelFlags,
+			flowLabels[labeler.LabelName] = flowlabel.FlowLabelValue{
+				Value:     resultSet[0].Expressions[0].String(),
+				Telemetry: labeler.Telemetry,
 			}
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.Classifier_ERROR_NONE)
 		} else {
@@ -124,9 +107,9 @@ func populateFlowLabels(ctx context.Context, flowLabels FlowLabels, mm *multimat
 
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.Classifier_ERROR_NONE)
 			for key, value := range variables {
-				flowLabels[key] = FlowLabelValue{
-					Value: fmt.Sprint(value),
-					Flags: labeler.LabelsFlags[key],
+				flowLabels[key] = flowlabel.FlowLabelValue{
+					Value:     fmt.Sprint(value),
+					Telemetry: labeler.LabelsTelemetry[key],
 				}
 			}
 		}
@@ -142,8 +125,8 @@ func (c *ClassifierEngine) Classify(
 	labelsForMatching selectors.Labels,
 	direction selectors.TrafficDirection,
 	input ast.Value,
-) ([]*flowcontrolv1.Classifier, FlowLabels, error) {
-	flowLabels := make(FlowLabels)
+) ([]*flowcontrolv1.Classifier, flowlabel.FlowLabels, error) {
+	flowLabels := make(flowlabel.FlowLabels)
 
 	r, ok := c.activeRules.Load().(rules)
 	if !ok {

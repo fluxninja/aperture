@@ -1818,30 +1818,25 @@ definitions:
       extractor:
         $ref: '#/definitions/v1Extractor'
         description: High-level declarative extractor.
-      hidden:
-        type: boolean
-        description: |-
-          Decides if the created flow label should be hidden from the telemetry.
-          A hidden flow label is still accessible in policies and can be used as eg.
-          fairness key.
-
-          :::caution
-          When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
-          labels are sent to cloud for observability. We thus recommend to set this
-          _hidden_ flag for high-cardinality labels, such as usernames or ids, to
-          avoid bloating analytics database. _Hidden_ flag should also be set for
-          sensitive labels.
-          :::
-        x-go-validate: required
-      propagate:
-        type: boolean
-        title: |-
-          Decides if the created label should be applied to the whole request chain
-          (propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
-        x-go-validate: required
       rego:
         $ref: '#/definitions/RuleRego'
         description: Rego module to extract a value from the rego module.
+      telemetry:
+        type: boolean
+        description: |-
+          :::note
+          The flow label is always accessible in Aperture Policies regardless of this setting.
+          :::
+
+          :::caution
+          When using [FluxNinja Cloud plugin](cloud/plugin.md), telemetry enabled
+          labels are sent to FluxNinha Cloud for observability. Telemetry should be disabled for
+          sensitive labels.
+          :::
+        title: |-
+          Decides if the created flow label should be available as an attribute in OLAP telemetry and
+          propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
+        x-go-validate: required
     description: |-
       Flow classification rule extracts a value from request metadata.
       More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].

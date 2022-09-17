@@ -9,8 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/pkg/flowcontrol/envoy/baggage"
-	class "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/flowlabel"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 
@@ -19,10 +18,10 @@ func TestBaggage(t *testing.T) {
 	RunSpecs(t, "Baggage Suite")
 }
 
-func fl(s string) class.FlowLabelValue {
-	return class.FlowLabelValue{
-		Value: s,
-		Flags: compiler.LabelFlags{Propagate: true},
+func fl(s string) flowlabel.FlowLabelValue {
+	return flowlabel.FlowLabelValue{
+		Value:     s,
+		Telemetry: true,
 	}
 }
 
@@ -45,7 +44,7 @@ var _ = Describe("Prefixed propagator", func() {
 			"myprefix-foo": "bar",
 			"myprefix-baz": "quux",
 			"content-type": "application/json",
-		})).To(Equal(class.FlowLabels{
+		})).To(Equal(flowlabel.FlowLabels{
 			"foo": fl("bar"),
 			"baz": fl("quux"),
 		}))
@@ -54,13 +53,13 @@ var _ = Describe("Prefixed propagator", func() {
 	It("handles urlencoded values", func() {
 		Expect(propagator.Extract(map[string]string{
 			"myprefix-foo": "%20",
-		})).To(Equal(class.FlowLabels{
+		})).To(Equal(flowlabel.FlowLabels{
 			"foo": fl(" "),
 		}))
 	})
 
 	It("creates injecting instructions for envoy", func() {
-		newHeaders, err := propagator.Inject(class.FlowLabels{
+		newHeaders, err := propagator.Inject(flowlabel.FlowLabels{
 			"foo": fl("bar"),
 			"baz": fl("quux"),
 		}, nil)
@@ -84,11 +83,11 @@ var _ = Describe("W3 Baggage propagator", func() {
 		It("reads no flow labels", func() {
 			Expect(propagator.Extract(map[string]string{
 				"content-type": "application/json",
-			})).To(Equal(class.FlowLabels{}))
+			})).To(Equal(flowlabel.FlowLabels{}))
 		})
 
 		It("creates injecting instructions for envoy", func() {
-			newHeaders, err := propagator.Inject(class.FlowLabels{
+			newHeaders, err := propagator.Inject(flowlabel.FlowLabels{
 				"foo": fl("bar"),
 			}, nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -104,14 +103,14 @@ var _ = Describe("W3 Baggage propagator", func() {
 			Expect(propagator.Extract(map[string]string{
 				"baggage":      "foo=bar,baz=quux",
 				"content-type": "application/json",
-			})).To(Equal(class.FlowLabels{
+			})).To(Equal(flowlabel.FlowLabels{
 				"foo": fl("bar"),
 				"baz": fl("quux"),
 			}))
 		})
 
 		It("creates injecting instructions for envoy", func() {
-			newHeaders, err := propagator.Inject(class.FlowLabels{
+			newHeaders, err := propagator.Inject(flowlabel.FlowLabels{
 				"hello": fl("world"),
 			}, baggage.Headers(map[string]string{
 				"baggage":      "foo=bar,baz=quux",
@@ -130,19 +129,19 @@ var _ = Describe("W3 Baggage propagator", func() {
 			Expect(propagator.Extract(map[string]string{
 				"baggage":      "foo=bar;hidden",
 				"content-type": "application/json",
-			})).To(Equal(class.FlowLabels{
-				"foo": class.FlowLabelValue{
-					Value: "bar",
-					Flags: compiler.LabelFlags{Hidden: true, Propagate: true},
+			})).To(Equal(flowlabel.FlowLabels{
+				"foo": flowlabel.FlowLabelValue{
+					Value:     "bar",
+					Telemetry: true,
 				},
 			}))
 		})
 
 		It("injects it correctly", func() {
-			newHeaders, err := propagator.Inject(class.FlowLabels{
-				"foo": class.FlowLabelValue{
-					Value: "bar",
-					Flags: compiler.LabelFlags{Hidden: true, Propagate: true},
+			newHeaders, err := propagator.Inject(flowlabel.FlowLabels{
+				"foo": flowlabel.FlowLabelValue{
+					Value:     "bar",
+					Telemetry: true,
 				},
 			}, nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -156,7 +155,7 @@ var _ = Describe("W3 Baggage propagator", func() {
 	It("ignores member properties", func() {
 		Expect(propagator.Extract(map[string]string{
 			"baggage": "foo=bar;props",
-		})).To(Equal(class.FlowLabels{
+		})).To(Equal(flowlabel.FlowLabels{
 			"foo": fl("bar"),
 		}))
 	})
@@ -165,7 +164,7 @@ var _ = Describe("W3 Baggage propagator", func() {
 		Expect(propagator.Extract(map[string]string{
 			// TODO make sure this is correct FLUX-1290
 			"baggage": "foo=%2520",
-		})).To(Equal(class.FlowLabels{
+		})).To(Equal(flowlabel.FlowLabels{
 			"foo": fl(" "),
 		}))
 	})

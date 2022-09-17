@@ -1773,33 +1773,27 @@ propagate: false
 ([V1Extractor](#v1-extractor)) High-level declarative extractor.
 
 </dd>
-<dt>hidden</dt>
-<dd>
-
-(bool, `required`) Decides if the created flow label should be hidden from the telemetry.
-A hidden flow label is still accessible in policies and can be used as eg.
-fairness key.
-
-:::caution
-When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
-labels are sent to cloud for observability. We thus recommend to set this
-_hidden_ flag for high-cardinality labels, such as usernames or ids, to
-avoid bloating analytics database. _Hidden_ flag should also be set for
-sensitive labels.
-:::
-
-</dd>
-<dt>propagate</dt>
-<dd>
-
-(bool, `required`) Decides if the created label should be applied to the whole request chain
-(propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
-
-</dd>
 <dt>rego</dt>
 <dd>
 
 ([RuleRego](#rule-rego)) Rego module to extract a value from the rego module.
+
+</dd>
+<dt>telemetry</dt>
+<dd>
+
+(bool, `required`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
+propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
+
+:::note
+The flow label is always accessible in Aperture Policies regardless of this setting.
+:::
+
+:::caution
+When using [FluxNinja Cloud plugin](cloud/plugin.md), telemetry enabled
+labels are sent to FluxNinha Cloud for observability. Telemetry should be disabled for
+sensitive labels.
+:::
 
 </dd>
 </dl>
