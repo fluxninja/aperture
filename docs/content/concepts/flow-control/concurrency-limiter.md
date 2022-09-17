@@ -7,13 +7,13 @@ keywords:
   - fairness
   - queuing
   - actuators
-sidebar_position: 5
+sidebar_position: 6
 ---
 
 :::info
 
 See also
-[Concurrency Limiter reference](/reference/configuration/policies.md#languagev1-concurrency-limiter).
+[Concurrency Limiter reference](/references/configuration/policies.md#languagev1-concurrency-limiter).
 
 :::
 

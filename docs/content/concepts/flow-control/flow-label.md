@@ -1,24 +1,24 @@
 ---
 title: Flow Label
-sidebar_position: 2
+sidebar_position: 3
 ---
 
-Every [Flow][flow] is annotated with a set of **flow labels**. Each flow label
+Every [Flow][flow] is annotated with a set of **Flow Labels**. Each Flow Label
 is a key:value pair. If a Flow is annotated with `user_tier:gold` label, then
 `user_tier` is a label key and `gold` is a label value.
 
-Flow labels are used in different ways in Aperture:
+Flow Labels are used in different ways in Aperture:
 
-- [Flow selector][selector] can select flows based on flow labels, thus flow
+- [Flow Selector][selector] can select flows based on Flow Labels, thus flow
   labels can be used to narrow the scope of [Classifiers][classifier], Limiters
   or [_Flux Meters_][flux-meter]
-- Flow labels are used to classify a flow to a [_workload_][workload]
+- Flow Labels are used to classify a flow to a [_workload_][workload]
 - Fairness within a scheduler's workload and [rate-limiting][ratelimiter] keys
-  are also based on flow labels
+  are also based on Flow Labels
 
 ## Sources
 
-Flows are annotated with flow labels based on four sources: request labels,
+Flows are annotated with Flow Labels based on four sources: request labels,
 baggage, flow classifiers, and explicit labels from the Aperture SDK call.
 
 ### Request labels
@@ -47,7 +47,7 @@ points][control-point].
   call. This is assuming you're using the OpenTelemetry library to manage the
   baggage
 
-Baggage members are mapped to flow labels 1:1 – keys become label keys, values
+Baggage members are mapped to Flow Labels 1:1 – keys become label keys, values
 become label values (properties are ignored).
 
 Read more about baggage propagation on:
@@ -95,11 +95,11 @@ labels.
 
 These are protocol-level labels (e.g. http, network) extracted by the
 configurated service mesh/middleware and are available to be referenced in
-selectors, execept for a few high-cardinality ones.
+[Selectors][selector], execept for a few high-cardinality ones.
 
 #### Labels extracted from baggage
 
-These are flow labels mapped from [baggage](#baggage).
+These are Flow Labels mapped from [baggage](#baggage).
 
 #### Labels defined by user
 
@@ -109,7 +109,7 @@ SDK][aperture-go].
 
 :::note
 
-In the case of a clash, the flow label generated from the source takes
+In the case of a clash, the Flow Label generated from the source takes
 predendence over the source below it:
 
 1. User-defined
@@ -120,17 +120,17 @@ predendence over the source below it:
 
 ## Interaction with FluxNinja Cloud plugin {#plugin}
 
-All the flow labels are used as labels of flow events. These events are rolled
+All the Flow Labels are used as labels of flow events. These events are rolled
 up and sent to the analytics database in the cloud. This allows:
 
-- For the flow labels to be used as filters or group bys
-- To see analytics for each flow label, eg. distribution of its values
+- For the Flow Labels to be used as filters or group bys
+- To see analytics for each Flow Label, eg. distribution of its values
 
 :::note
 
 For classifier-created labels, you can disable this behaviour by setting
 `hidden: true` in
-[the classification rule](/reference/configuration/policies.md#v1-rule).
+[the classification rule](/references/configuration/policies.md#v1-rule).
 
 :::
 
