@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package aperture.plugins.fluxninja.v1;
 
-import "aperture/common/entitycache/v1/entitycache.proto";
 import "aperture/common/info/v1/info.proto";
 import "aperture/common/peers/v1/peers.proto";
 import "aperture/common/status/v1/status.proto";
@@ -27,7 +26,7 @@ message ReportRequest {
   string agent_group = 4;
   ControllerInfo controller_info = 5;
   aperture.common.peers.v1.Peers peers = 6;
-  aperture.common.entitycache.v1.ServicesList services_list = 8;
+  ServicesList services_list = 8;
   aperture.common.status.v1.GroupStatus all_statuses = 9;
 }
 
@@ -36,4 +35,25 @@ message ReportResponse {}
 
 message ControllerInfo {
   string id = 1;
+}
+
+// EntityCache summary
+
+message ServicesList {
+  repeated Service services = 1;
+  repeated OverlappingService overlapping_services = 2;
+}
+
+// Service contains information about single service discovered in agent group by a
+// particular agent.
+message Service {
+  string name = 1;
+  int32 entities_count = 2;
+}
+
+// OverlappingService contains info about a service that overlaps with another one.
+message OverlappingService {
+  string service1 = 1;
+  string service2 = 2;
+  int32 entities_count = 3;
 }

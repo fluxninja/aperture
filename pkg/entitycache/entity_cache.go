@@ -23,27 +23,6 @@ func Module() fx.Option {
 	)
 }
 
-// ServiceKey holds key for service.
-type ServiceKey struct {
-	Name string `json:"name"`
-}
-
-func (sk ServiceKey) lessThan(sk2 ServiceKey) bool {
-	return sk.Name < sk2.Name
-}
-
-// keyFromService returns a service key for given service.
-func (c *EntityCache) keyFromService(service *entitycachev1.Service) *ServiceKey {
-	return &ServiceKey{
-		Name: service.Name,
-	}
-}
-
-// Merge merges `mergedService` into `originalService`. This sums `EntitiesCount`.
-func Merge(originalService, mergedService *entitycachev1.Service) {
-	originalService.EntitiesCount += mergedService.EntitiesCount
-}
-
 // EntityCache maps IP addresses and Entity names to entities.
 type EntityCache struct {
 	sync.RWMutex
@@ -196,106 +175,9 @@ func (c *EntityCache) Remove(entity *entitycachev1.Entity) bool {
 	return okByIP || okByName
 }
 
-// Entities returns *entitycachev1.EntitiyCache entities.
-func (c *EntityCache) Entities() *entitycachev1.EntityCache {
+// GetEntities returns *entitycachev1.EntitiyCache entities.
+func (c *EntityCache) GetEntities() *entitycachev1.EntityCache {
 	c.RLock()
 	defer c.RUnlock()
 	return c.entities.DeepCopy()
-}
-
-// Services returns a list of services based on entities in cache.
-//
-// Each service is identified by 2 values:
-// - agent group
-// - service name
-//
-// This shouldn't happen in real world, but entities which have multiple values
-// for an agent group is ignored.
-// Entities which have multiple values for service name will create one service
-// for each of them.
-func (c *EntityCache) Services() *entitycachev1.ServicesList {
-	c.RLock()
-	defer c.RUnlock()
-
-	services := map[ServiceKey]*entitycachev1.Service{}
-	overlapping := make(map[pair]int)
-
-	for _, entity := range c.entities.EntitiesByIpAddress.Entities {
-		entityServices, err := servicesFromEntity(entity)
-		if err != nil {
-			log.Trace().Err(err).Str("entity", entity.Uid).Msg("Failed getting services from entity. Skipping")
-			continue
-		}
-		var serviceKeys []ServiceKey
-		for _, es := range entityServices {
-			key := *c.keyFromService(es)
-			serviceKeys = append(serviceKeys, key)
-			if _, ok := services[key]; !ok {
-				services[key] = es
-				continue
-			}
-			Merge(services[key], es)
-		}
-		// for each pair in entityServices count number of overlapping entities
-		for _, pair := range eachPair(serviceKeys) {
-			overlapping[pair]++
-		}
-
-	}
-
-	entityCache := &entitycachev1.ServicesList{
-		Services:            make([]*entitycachev1.Service, 0, len(services)),
-		OverlappingServices: make([]*entitycachev1.OverlappingService, 0, len(overlapping)),
-	}
-
-	for _, svc := range services {
-		entityCache.Services = append(entityCache.Services, svc)
-	}
-	for k, v := range overlapping {
-		entityCache.OverlappingServices = append(entityCache.OverlappingServices, &entitycachev1.OverlappingService{
-			Service1:      k.x.Name,
-			Service2:      k.y.Name,
-			EntitiesCount: int32(v),
-		})
-	}
-	return entityCache
-}
-
-type pair struct {
-	x, y ServiceKey
-}
-
-// eachPair returns each pair of elements in a slice. Elements in the pair are sorted so that
-// x < y.
-func eachPair(services []ServiceKey) []pair {
-	n := len(services)
-	pairs := make([]pair, 0, n*n)
-	for i := 0; i < n; i++ {
-		for j := i + 1; j < n; j++ {
-			if services[i].lessThan(services[j]) {
-				pairs = append(pairs, pair{
-					x: services[i],
-					y: services[j],
-				})
-			} else {
-				pairs = append(pairs, pair{
-					x: services[j],
-					y: services[i],
-				})
-			}
-		}
-	}
-	return pairs
-}
-
-func servicesFromEntity(entity *entitycachev1.Entity) ([]*entitycachev1.Service, error) {
-	svcIDs := entity.Services
-	svcs := make([]*entitycachev1.Service, 0, len(svcIDs))
-	for _, svc := range svcIDs {
-		svcs = append(svcs, &entitycachev1.Service{
-			Name:          svc,
-			EntitiesCount: 1,
-		})
-	}
-	return svcs, nil
 }

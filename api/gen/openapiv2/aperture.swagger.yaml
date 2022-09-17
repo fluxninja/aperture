@@ -114,20 +114,6 @@ paths:
           type: string
       tags:
         - EntityCacheService
-  /v1/entities/services:
-    get:
-      operationId: EntityCacheService_GetServicesList
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1ServicesList'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      tags:
-        - EntityCacheService
   /v1/info/host:
     get:
       operationId: InfoService_Host

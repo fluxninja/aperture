@@ -124,46 +124,6 @@ var _ = Describe("Cache", func() {
 		Expect(err).To(Not(BeNil()))
 		Expect(found).To(BeNil())
 	})
-
-	Context("Services", func() {
-		It("reads same service from two entities", func() {
-			ec.Put(testEntity("1", "1.1.1.1", "some_name", []string{"baz"}))
-			ec.Put(testEntity("2", "1.1.1.2", "some_name", []string{"baz"}))
-			entityCache := ec.Services()
-			Expect(entityCache.Services).To(HaveLen(1))
-			Expect(entityCache.Services).To(ContainElement(&entitycachev1.Service{
-				Name:          "baz",
-				EntitiesCount: 2,
-			}))
-		})
-
-		It("reads two services from one entity", func() {
-			ip := "1.1.1.1"
-			serviceNames := []string{"baz1", "baz2"}
-			name := "entity_1234"
-			ec.Put(testEntity("1", ip, name, serviceNames))
-			entityCache := ec.Services()
-			Expect(entityCache.Services).To(HaveLen(2))
-			Expect(entityCache.Services).To(ContainElement(&entitycachev1.Service{
-				Name:          "baz1",
-				EntitiesCount: 1,
-			}))
-			Expect(entityCache.Services).To(ContainElement(&entitycachev1.Service{
-				Name:          "baz2",
-				EntitiesCount: 1,
-			}))
-		})
-
-		It("returns no service after being cleared", func() {
-			ip := "1.1.1.1"
-			serviceNames := []string{"baz"}
-			name := "entity_1234"
-			ec.Put(testEntity("1", ip, name, serviceNames))
-			ec.Clear()
-			entityCache := ec.Services()
-			Expect(entityCache.Services).To(HaveLen(0))
-		})
-	})
 })
 
 func testEntity(uid, ipAddress, name string, services []string) *entitycachev1.Entity {
