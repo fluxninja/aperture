@@ -16,13 +16,11 @@ check_var_set REMOTE_PORT
 : "${NAMESPACE:-}"
 : "${RESOURCE_TYPE:=svc}"
 : "${LOCAL_PORT:=${REMOTE_PORT}}"
-
+: "${INITIAL_DELAY:=5}"
 : "${REQUEST_PATH:=/}"
 : "${TIMEOUT:=1}"
+: "${PERIOD:=5}"
 : "${FAILURE_THRESHOLD:=1}"
-
-INITIAL_DELAY="${INITIAL_DELAY:-5}"
-PERIOD="${PERIOD:-5}"
 
 port_forward_args=()
 if [ -n "${NAMESPACE:-}" ]; then
