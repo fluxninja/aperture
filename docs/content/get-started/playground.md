@@ -22,6 +22,10 @@ Playground deploys resources to the Kubernetes cluster that `kubectl` on your
 machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s) for deploying a local Kubernetes cluster using
 [Kind](https://kind.sigs.k8s.io/).
 
+:::note
+Apple Silicon users: Playground currently is not supported on Apple Silicon (e.g. m1 processor) because of Istio iptables [issue](https://github.com/istio/istio/issues/36762). That issue will likely be resolved in the upcoming Istio 1.16.0 release.
+:::
+
 ## How to Run
 
 Once [requirements](#tools) are installed, simply run below commands from the
