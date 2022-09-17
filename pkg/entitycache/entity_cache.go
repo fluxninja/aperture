@@ -201,11 +201,11 @@ func (c *EntityCache) GetByIP(entityIP string) *entitycachev1.Entity {
 	c.RLock()
 	defer c.RUnlock()
 
-	v, ok := c.entities.EntitiesByIpAddress.DeepCopy().Entities[entityIP]
+	v, ok := c.entities.EntitiesByIpAddress.Entities[entityIP]
 	if !ok {
 		return nil
 	}
-	return v
+	return v.DeepCopy()
 }
 
 // GetByName retrieves entity with a given name.
@@ -213,11 +213,11 @@ func (c *EntityCache) GetByName(entityName string) *entitycachev1.Entity {
 	c.RLock()
 	defer c.RUnlock()
 
-	v, ok := c.entities.EntitiesByEntityName.DeepCopy().Entities[entityName]
+	v, ok := c.entities.EntitiesByEntityName.Entities[entityName]
 	if !ok {
 		return nil
 	}
-	return v
+	return v.DeepCopy()
 }
 
 // Clear removes all entities from the cache.
