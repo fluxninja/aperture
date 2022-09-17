@@ -19,50 +19,80 @@ resources that change. This is very convenient for getting quick feedback during
 development of Aperture.
 
 Playground deploys resources to the Kubernetes cluster that `kubectl` on your
-machine points at. For convenience, this README includes instructions for
-deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
+machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s) for deploying a local Kubernetes cluster using
+[Kind](https://kind.sigs.k8s.io/).
 
 ## How to Run
 
-Once [requirements](#tools) are installed, simply run:
+Once [requirements](#tools) are installed, simply run below commands from the
+`playground` directory (present under the aperture's root directory):
 
-```
-tilt up
+```sh
+$ tilt up
+Tilt started on http://localhost:10350/
+v0.30.2, built 2022-06-06
+
+(space) to open the browser
+(s) to stream logs (--stream=true)
+(t) to open legacy terminal mode (--legacy=true)
+(ctrl-c) to exit
 ```
 
-Can press (Space) to open the Tilt UI.
+Now, press Space to open the Tilt UI in your default browser.
+
+:::note
+
+Make sure nothing else is running on the [ports forwarded](#port-forwards) by Tilt.
+
+:::
 
 The above command starts Aperture Controller and an Aperture Agent on each
-worker in the Kubernetes cluster. Additionally, it starts a demo application
+worker node in the local Kubernetes cluster. Additionally, it starts a demo application
 with an Istio and Envoy based service mesh configured to integrate with
-Aperture. There is a Grafana installation as well for viewing metrics from
-experiments. Aperture is loaded with a Latency Gradient Control Policy which
-protects the demo application against sudden surges in traffic load. To run the
-traffic load, navigate to K6 resource in the Tilt UI and press the "Run load
-test" button. Once finished, press the "Delete load test" button. To view
-results from the experiment navigate to the "FluxNinja" dashboard in Grafana
-under "aperture-system" folder. Grafana runs at
+Aperture. There is an instance of Grafana running on the cluster as well for viewing metrics from
+experiments.
+
+The Aperture Playground is pre-loaded with a Latency Gradient Concurrency Control Policy which protects the
+demo application against sudden surges in traffic load.
+
+To run the traffic load, navigate to K6 resource in the Tilt UI and press the `Run load test` button.
+Once finished, press the `Delete load test` button. To view results from the
+experiment navigate to the "FluxNinja" dashboard in Grafana under
+"aperture-system" folder. Grafana runs at
 [localhost:3000](http://localhost:3000).
+
+Now your _Aperture playground_ is ready. You will be able to see our Rate Limit
+policy in action. Subscribe vs Non Subscribed Priority
+
+**Note**: We need to talk about how to load grafana dashboard
+
+Now that you have your Grafana Dashboard ready, you can just click "Start"
+button as shown below. ![Start Load Test](../assets/img/starttrafficbig.png)
+
+**Note**: How do we monitor the traffic and what is happening
+
+---
 
 ## Tools
 
-Described hereafter deployment methods assume usage of specific deployment and
+Described hereafter, deployment methods assume usage of specific deployment and
 configuration/management tools (which must be installed beforehand).
 
-To install required ones, you can use [ASDF](https://asdf-vm.com/) OR install
-manually (check
+To install other required tools, you can use [ASDF](https://asdf-vm.com/) OR
+install manually (check
 [Tools required for Kubernetes deployment](#tools-required-for-kubernetes-deployment)).
 
 ### Install via asdf
 
 When using `asdf`:
 
-- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and
-  [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
+- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
+  and [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
   `asdf`
-- Run the below command in aperture home directory to install all the required tools.
+- Run the below command in aperture home directory to install all the required
+  tools.
 
-```
+```sh
 make install-asdf-tools
 ```
 
@@ -111,15 +141,16 @@ This can be achieved by using `tilt`.
 Tilt can be installed with `asdf install` or manually
 <https://docs.tilt.dev/install.html>.
 
-### Prerequisites - Kubernetes cluster bootstrap
+### Prerequisites - Kubernetes cluster bootstrap {#prerequisites-k8s}
 
 > Note: You can skip this section if you already have a running cluster which is
 > being pointed by the `kubectl`.
 
-Create a K8s cluster using Kind with configuration file:
+Create a K8s cluster using Kind with configuration file by executing below
+command from aperture home directory:
 
 ```sh
-kind create cluster --config kind-config.yaml
+kind create cluster --config playground/kind-config.yaml
 ```
 
 This will start a cluster with the name `aperture-playground`.
@@ -145,7 +176,8 @@ ctlptl delete -f ctlptl-kind-config.yaml
 
 ### Services deployment
 
-Simply run `tilt up` - it'll automatically start building and deploying!
+Simply run `tilt up` from `playground` directory - it'll automatically start
+building and deploying!
 
 You can reach the WebUI by going to <http://localhost:10350> or pressing
 (Space).
@@ -196,7 +228,7 @@ If you are getting following message in cluster container:
 If `sysctl fs.inotify.{max_queued_events,max_user_instances,max_user_watches}`
 less than:
 
-```bash
+```sh
 fs.inotify.max_queued_events = 16384
 fs.inotify.max_user_instances = 1024
 fs.inotify.max_user_watches = 524288
@@ -204,7 +236,7 @@ fs.inotify.max_user_watches = 524288
 
 change it, using (temporary method):
 
-```bash
+```sh
 sudo sysctl fs.inotify.max_queued_events = 16384
 sudo sysctl fs.inotify.max_user_instances = 1024
 sudo sysctl fs.inotify.max_user_watches = 524288
@@ -212,7 +244,7 @@ sudo sysctl fs.inotify.max_user_watches = 524288
 
 or add following lines to `/etc/sysctl.conf`:
 
-```bash
+```sh
 fs.inotify.max_queued_events = 16384
 fs.inotify.max_user_instances = 1024
 fs.inotify.max_user_watches = 524288
@@ -222,7 +254,7 @@ fs.inotify.max_user_watches = 524288
 
 Simply run `tilt down`. All created resources will be deleted.
 
-### Port forwards
+### Port Forwards {#port-forwards}
 
 Tilt will automatically setup forwarding for the services.
 
