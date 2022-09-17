@@ -20,7 +20,6 @@ type multiMatchResult struct {
 	concurrencyLimiters []iface.Limiter
 	fluxMeters          []iface.FluxMeter
 	rateLimiters        []iface.RateLimiter
-	classifiers         []iface.Classifier
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -32,7 +31,6 @@ func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiM
 	result.concurrencyLimiters = append(result.concurrencyLimiters, resultCollection.concurrencyLimiters...)
 	result.fluxMeters = append(result.fluxMeters, resultCollection.fluxMeters...)
 	result.rateLimiters = append(result.rateLimiters, resultCollection.rateLimiters...)
-	result.classifiers = append(result.classifiers, resultCollection.classifiers...)
 }
 
 // ProvideEngineAPI Main fx app.
@@ -57,7 +55,7 @@ type Engine struct {
 // ProcessRequest .
 func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
-		DecisionType:  flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 		FlowLabelKeys: maps.Keys(labels),
 	}
 
@@ -75,17 +73,6 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	}
 	response.FluxMeters = fluxMeterProtos
 
-	classifiers := mmr.classifiers
-	classifierProtos := make([]*flowcontrolv1.Classifier, len(classifiers))
-	for i, classifier := range classifiers {
-		classifierProtos[i] = &flowcontrolv1.Classifier{
-			PolicyName:      classifier.GetClassifierID().PolicyName,
-			PolicyHash:      classifier.GetClassifierID().PolicyHash,
-			ClassifierIndex: classifier.GetClassifierID().ClassifierIndex,
-		}
-	}
-	response.Classifiers = classifierProtos
-
 	// execute rate limiters first
 	rateLimiters := make([]iface.Limiter, len(mmr.rateLimiters))
 	for i, rl := range mmr.rateLimiters {
@@ -95,18 +82,16 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	response.LimiterDecisions = rateLimiterDecisions
 
 	defer func() {
-		if response.DecisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
+		if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
 			returnExtraTokens(mmr.rateLimiters, rateLimiterDecisions, labels)
 		}
 	}()
 
 	// If any rate limiter dropped, then mark this as a decision reason and return.
 	// Do not execute concurrency limiters.
-	if rateLimitersDecisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
+	if rateLimitersDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
 		response.DecisionType = rateLimitersDecisionType
-		response.DecisionReason = &flowcontrolv1.DecisionReason{
-			RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_RATE_LIMITED,
-		}
+		response.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
 		return
 	}
 
@@ -117,26 +102,24 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	concurrencyLimiterDecisions, concurrencyLimitersDecisionType := runLimiters(concurrencyLimiters, labels)
 	response.LimiterDecisions = append(response.LimiterDecisions, concurrencyLimiterDecisions...)
 
-	if concurrencyLimitersDecisionType == flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED {
-		response.DecisionType = flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED
-		response.DecisionReason = &flowcontrolv1.DecisionReason{
-			RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_CONCURRENCY_LIMITED,
-		}
+	if concurrencyLimitersDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+		response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
+		response.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED
 		return
 	}
 
 	return
 }
 
-func runLimiters(limiters []iface.Limiter, labels selectors.Labels) ([]*flowcontrolv1.LimiterDecision, flowcontrolv1.DecisionType) {
+func runLimiters(limiters []iface.Limiter, labels selectors.Labels) ([]*flowcontrolv1.LimiterDecision, flowcontrolv1.CheckResponse_DecisionType) {
 	var wg sync.WaitGroup
 	var once sync.Once
 	decisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))
 
-	decisionType := flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED
+	decisionType := flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
 
 	setDecisionRejected := func() {
-		decisionType = flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED
+		decisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
 	}
 
 	execLimiter := func(limiter iface.Limiter, i int) func() {
@@ -250,21 +233,6 @@ func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
 func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 	selectorProto := rl.GetSelector()
 	return e.unregister("RateLimiter:"+rl.GetLimiterID().String(), selectorProto)
-}
-
-// RegisterClassifier adds classifier to multimatcher.
-func (e *Engine) RegisterClassifier(c iface.Classifier) error {
-	classifierMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.classifiers = append(mmr.classifiers, c)
-		return mmr
-	}
-	return e.register("Classifier:"+c.GetClassifierID().String(), c.GetSelector(), classifierMatchedCB)
-}
-
-// UnregisterClassifier removes classifier from multimatcher.
-func (e *Engine) UnregisterClassifier(c iface.Classifier) error {
-	selectorProto := c.GetSelector()
-	return e.unregister("Classifier:"+c.GetClassifierID().String(), selectorProto)
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.

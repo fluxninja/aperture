@@ -22,9 +22,6 @@ type Engine interface {
 
 	RegisterRateLimiter(l RateLimiter) error
 	UnregisterRateLimiter(l RateLimiter) error
-
-	RegisterClassifier(c Classifier) error
-	UnregisterClassifier(c Classifier) error
 }
 
 // MultiMatchResult is used as return value of PolicyConfigAPI.GetMatches.

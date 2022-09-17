@@ -45,14 +45,13 @@ var _ = Describe("Metrics Processor", func() {
 		func(
 			controlPoint string,
 			checkResponse *flowcontrolv1.CheckResponse,
-			authzResponse *flowcontrolv1.AuthzResponse,
 			expectedErr error,
 			expectedMetrics string,
 			expectedLabels map[string]interface{},
 		) {
 			ctx := context.Background()
 
-			logs := someLogs(engine, checkResponse, authzResponse, controlPoint)
+			logs := someLogs(engine, checkResponse, controlPoint)
 			modifiedLogs, err := processor.ConsumeLogs(ctx, logs)
 			if expectedErr != nil {
 				Expect(err).NotTo(MatchError(expectedErr))
@@ -78,7 +77,7 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with single policy - ingress",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
-				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
+				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -108,9 +107,6 @@ var _ = Describe("Metrics Processor", func() {
 					"someLabel",
 				},
 			},
-			&flowcontrolv1.AuthzResponse{
-				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
-			},
 			nil,
 			`# HELP workload_latency_ms Latency summary of workload
 			# TYPE workload_latency_ms summary
@@ -118,10 +114,9 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
-				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
-				otelcollector.DecisionErrorReasonLabel:         "",
-				otelcollector.DecisionRejectReasonLabel:        "",
+				otelcollector.ErrorReasonLabel:                 "",
+				otelcollector.RejectReasonLabel:                "",
 				otelcollector.ClassifiersLabel:                 []interface{}{"policy_name:foo,classifier_index:1"},
 				otelcollector.FluxMetersLabel:                  []interface{}{"bar"},
 				otelcollector.FlowLabelKeysLabel:               []interface{}{"someLabel"},
@@ -137,10 +132,8 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with single policy - feature",
 			otelcollector.ControlPointFeature,
 			&flowcontrolv1.CheckResponse{
-				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
-				DecisionReason: &flowcontrolv1.DecisionReason{
-					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_RATE_LIMITED,
-				},
+				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
+				RejectReason: flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -157,9 +150,6 @@ var _ = Describe("Metrics Processor", func() {
 				FluxMeters:    []*flowcontrolv1.FluxMeter{},
 				FlowLabelKeys: []string{},
 			},
-			&flowcontrolv1.AuthzResponse{
-				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
-			},
 			nil,
 			`# HELP workload_latency_ms Latency summary of workload
 			# TYPE workload_latency_ms summary
@@ -167,9 +157,8 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
-				otelcollector.AuthzStatusLabel:                 "STATUS_NO_ERROR",
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
-				otelcollector.DecisionRejectReasonLabel:        "REJECT_REASON_RATE_LIMITED",
+				otelcollector.RejectReasonLabel:                "REJECT_REASON_RATE_LIMITED",
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
 				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
@@ -182,10 +171,8 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with two policies",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
-				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
-				DecisionReason: &flowcontrolv1.DecisionReason{
-					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
-				},
+				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
+				RejectReason: flowcontrolv1.CheckResponse_REJECT_REASON_NONE,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -224,9 +211,6 @@ var _ = Describe("Metrics Processor", func() {
 				FluxMeters:    []*flowcontrolv1.FluxMeter{},
 				FlowLabelKeys: []string{},
 			},
-			&flowcontrolv1.AuthzResponse{
-				Status: flowcontrolv1.AuthzResponse_STATUS_NO_ERROR,
-			},
 			nil,
 			`# HELP workload_latency_ms Latency summary of workload
 			# TYPE workload_latency_ms summary
@@ -238,9 +222,8 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 			`,
 			map[string]interface{}{
-				otelcollector.AuthzStatusLabel:          "STATUS_NO_ERROR",
 				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_REJECTED",
-				otelcollector.DecisionErrorReasonLabel:  "ERROR_REASON_UNSPECIFIED",
+				otelcollector.ErrorReasonLabel:          "ERROR_REASON_UNSPECIFIED",
 				otelcollector.RateLimitersLabel:         []interface{}{},
 				otelcollector.DroppingRateLimitersLabel: []interface{}{},
 				otelcollector.ConcurrencyLimitersLabel: []interface{}{
@@ -301,7 +284,7 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with single policy - ingress",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
-				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
+				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -339,8 +322,8 @@ var _ = Describe("Metrics Processor", func() {
 			`,
 			map[string]interface{}{
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
-				otelcollector.DecisionErrorReasonLabel:         "",
-				otelcollector.DecisionRejectReasonLabel:        "",
+				otelcollector.ErrorReasonLabel:                 "",
+				otelcollector.RejectReasonLabel:                "",
 				otelcollector.ClassifiersLabel:                 []interface{}{"policy_name:foo,classifier_index:1"},
 				otelcollector.FluxMetersLabel:                  []interface{}{"bar"},
 				otelcollector.FlowLabelKeysLabel:               []interface{}{"someLabel"},
@@ -356,10 +339,8 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with single policy - feature",
 			otelcollector.ControlPointFeature,
 			&flowcontrolv1.CheckResponse{
-				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
-				DecisionReason: &flowcontrolv1.DecisionReason{
-					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_RATE_LIMITED,
-				},
+				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
+				RejectReason: flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -384,7 +365,7 @@ var _ = Describe("Metrics Processor", func() {
 			`,
 			map[string]interface{}{
 				otelcollector.DecisionTypeLabel:                "DECISION_TYPE_REJECTED",
-				otelcollector.DecisionRejectReasonLabel:        "REJECT_REASON_RATE_LIMITED",
+				otelcollector.RejectReasonLabel:                "REJECT_REASON_RATE_LIMITED",
 				otelcollector.RateLimitersLabel:                []interface{}{},
 				otelcollector.DroppingRateLimitersLabel:        []interface{}{},
 				otelcollector.ConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
@@ -397,10 +378,8 @@ var _ = Describe("Metrics Processor", func() {
 		Entry("record with two policies",
 			otelcollector.ControlPointIngress,
 			&flowcontrolv1.CheckResponse{
-				DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED,
-				DecisionReason: &flowcontrolv1.DecisionReason{
-					RejectReason: flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED,
-				},
+				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
+				RejectReason: flowcontrolv1.CheckResponse_REJECT_REASON_NONE,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 					{
 						PolicyName:     "foo",
@@ -450,8 +429,8 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 			`,
 			map[string]interface{}{
-				otelcollector.DecisionTypeLabel:         "DECISION_TYPE_REJECTED",
-				otelcollector.DecisionRejectReasonLabel: "REJECT_REASON_UNSPECIFIED",
+				otelcollector.DecisionTypeLabel: "DECISION_TYPE_REJECTED",
+				otelcollector.RejectReasonLabel: "REJECT_REASON_UNSPECIFIED",
 				otelcollector.RateLimitersLabel: []interface{}{
 					"policy_name:foo,component_index:1,policy_hash:foo-hash",
 				},
@@ -483,7 +462,6 @@ var _ = Describe("Metrics Processor", func() {
 func someLogs(
 	engine *mocks.MockEngine,
 	checkResponse *flowcontrolv1.CheckResponse,
-	authzResponse *flowcontrolv1.AuthzResponse,
 	controlPoint string,
 ) plog.Logs {
 	logs := plog.NewLogs()
@@ -499,13 +477,10 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
-			marshalledAuthzResponse, err := json.Marshal(authzResponse)
-			Expect(err).NotTo(HaveOccurred())
 			logRecord.Attributes().InsertString(otelcollector.MarshalledCheckResponseLabel, string(marshalledCheckResponse))
-			logRecord.Attributes().InsertString(otelcollector.MarshalledAuthzResponseLabel, string(marshalledAuthzResponse))
 			logRecord.Attributes().InsertString(otelcollector.HTTPStatusCodeLabel, "201")
 			logRecord.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
-			logRecord.Attributes().InsertString(otelcollector.DurationLabel, "5")
+			logRecord.Attributes().InsertString(otelcollector.WorkloadDurationLabel, "5")
 			for i, fm := range checkResponse.FluxMeters {
 				// TODO actually return some Histogram
 				expectedCalls[i] = engine.EXPECT().GetFluxMeter(fm.GetFluxMeterName()).Return(nil)
@@ -539,7 +514,7 @@ func someTraces(
 			span.Attributes().InsertString(otelcollector.MarshalledCheckResponseLabel, string(marshalledCheckResponse))
 			span.Attributes().InsertString(otelcollector.FeatureStatusLabel, "Ok")
 			span.Attributes().InsertString(otelcollector.ControlPointLabel, controlPoint)
-			span.Attributes().InsertString(otelcollector.DurationLabel, "5")
+			span.Attributes().InsertString(otelcollector.WorkloadDurationLabel, "5")
 			// Set a delta of 5ms between start and end timestamps on this span
 			spanEndTimestamp := time.Now()
 			spanStartTimestamp := spanEndTimestamp.Add(-5 * time.Millisecond)

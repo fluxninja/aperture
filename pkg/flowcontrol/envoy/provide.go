@@ -2,6 +2,7 @@ package envoy
 
 import (
 	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -10,6 +11,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 )
+
+// logSampled provides log sampling for envoy handler.
+var logSampled log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
 
 // Module provides authz handler
 //

@@ -10,6 +10,7 @@ import (
 	labelmatcherv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/labelmatcher/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 
 	. "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
@@ -21,7 +22,7 @@ import (
 type object = map[string]interface{}
 
 var _ = Describe("Classifier", func() {
-	var classifier *Classifier
+	var classifier *ClassifierEngine
 
 	BeforeEach(func() {
 		log.SetGlobalLevel(log.WarnLevel)
@@ -101,11 +102,17 @@ var _ = Describe("Classifier", func() {
 		var ars1, ars2, ars3 ActiveRuleset
 		BeforeEach(func() {
 			var err error
-			ars1, err = classifier.AddRules(context.TODO(), "one", rs1)
+			ars1, err = classifier.AddRules(context.TODO(), "one", &wrappersv1.ClassifierWrapper{
+				Classifier: rs1,
+			})
 			Expect(err).NotTo(HaveOccurred())
-			ars2, err = classifier.AddRules(context.TODO(), "two", rs2)
+			ars2, err = classifier.AddRules(context.TODO(), "two", &wrappersv1.ClassifierWrapper{
+				Classifier: rs2,
+			})
 			Expect(err).NotTo(HaveOccurred())
-			ars3, err = classifier.AddRules(context.TODO(), "three", rs3)
+			ars3, err = classifier.AddRules(context.TODO(), "three", &wrappersv1.ClassifierWrapper{
+				Classifier: rs3,
+			})
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -133,7 +140,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("classifies input by returning flow labels", func() {
-			labels, err := classifier.Classify(
+			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
 					Service: "my-service.default.svc.cluster.local",
@@ -153,7 +160,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("doesn't classify if direction doesn't match", func() {
-			labels, err := classifier.Classify(
+			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
 					Service: "my-service.default.svc.cluster.local",
@@ -170,7 +177,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("skips rules with non-matching labels", func() {
-			labels, err := classifier.Classify(
+			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
 					Service: "my-service.default.svc.cluster.local",
@@ -192,7 +199,7 @@ var _ = Describe("Classifier", func() {
 			BeforeEach(func() { ars1.Drop() })
 
 			It("removes removes subset of rules", func() {
-				labels, err := classifier.Classify(
+				_, labels, err := classifier.Classify(
 					context.TODO(),
 					[]services.ServiceID{{
 						Service: "my-service.default.svc.cluster.local",
@@ -226,16 +233,18 @@ var _ = Describe("Classifier", func() {
 
 	// helper for setting rules with a "default" selector
 	setRulesForMyService := func(labelRules map[string]*classificationv1.Rule) error {
-		_, err := classifier.AddRules(context.TODO(), "test", &classificationv1.Classifier{
-			Selector: &selectorv1.Selector{
-				Service: "my-service.default.svc.cluster.local",
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{
-						Traffic: "ingress",
+		_, err := classifier.AddRules(context.TODO(), "test", &wrappersv1.ClassifierWrapper{
+			Classifier: &classificationv1.Classifier{
+				Selector: &selectorv1.Selector{
+					Service: "my-service.default.svc.cluster.local",
+					ControlPoint: &selectorv1.ControlPoint{
+						Controlpoint: &selectorv1.ControlPoint_Traffic{
+							Traffic: "ingress",
+						},
 					},
 				},
+				Rules: labelRules,
 			},
-			Rules: labelRules,
 		})
 		return err
 	}
@@ -266,7 +275,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("marks the returned flow labels with those flags", func() {
-			labels, err := classifier.Classify(
+			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
 					Service: "my-service.default.svc.cluster.local",
@@ -312,7 +321,7 @@ var _ = Describe("Classifier", func() {
 		It("classifies and returns flow labels (overwrite order not specified)", func() {
 			// Perhaps we can specify order by sorting rulesets? (eg. giving
 			// them names from filenames)
-			labels, err := classifier.Classify(
+			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
 					Service: "my-service.default.svc.cluster.local",
@@ -371,7 +380,7 @@ var _ = Describe("Classifier", func() {
 		It("classifies and returns flow labels (overwrite order not specified)", func() {
 			// Perhaps we can specify order by sorting rulesets? (eg. giving
 			// them names from filenames)
-			labels, err := classifier.Classify(
+			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
 					Service: "my-service.default.svc.cluster.local",
@@ -437,7 +446,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("classifies and returns empty flow labels - could not decide which rego to use", func() {
-			labels, err := classifier.Classify(
+			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]services.ServiceID{{
 					Service: "my-service.default.svc.cluster.local",
@@ -474,7 +483,9 @@ var _ = Describe("Classifier", func() {
 		}
 
 		It("should reject the ruleset", func() {
-			_, err := classifier.AddRules(context.TODO(), "one", rs)
+			_, err := classifier.AddRules(context.TODO(), "one", &wrappersv1.ClassifierWrapper{
+				Classifier: rs,
+			})
 			Expect(err).To(HaveOccurred())
 		})
 	})

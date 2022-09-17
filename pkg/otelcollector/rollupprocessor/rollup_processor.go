@@ -29,7 +29,7 @@ var rollupTypes = []RollupType{
 func initRollupsLog() []*Rollup {
 	rollupsInit := []*Rollup{
 		{
-			FromField:   otelcollector.DurationLabel,
+			FromField:   otelcollector.WorkloadDurationLabel,
 			TreatAsZero: []string{otelcollector.EnvoyMissingAttributeSourceValue},
 		},
 		{
@@ -46,7 +46,7 @@ func initRollupsLog() []*Rollup {
 func initRollupsSpan() []*Rollup {
 	rollupsInit := []*Rollup{
 		{
-			FromField: otelcollector.DurationLabel,
+			FromField: otelcollector.WorkloadDurationLabel,
 		},
 	}
 

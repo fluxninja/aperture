@@ -121,8 +121,6 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 }
 
 func (ep *enrichmentProcessor) enrichAttributes(attributes pcommon.Map, treatAsMissing []string) {
-	// TODO tgill: split this into multiple functions, one for each source
-	unpackFlowLabels(attributes, treatAsMissing)
 	var hostIP string
 	controlPoint, exists := attributes.Get(otelcollector.ControlPointLabel)
 	if !exists {
@@ -192,23 +190,6 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ServicesLabel))
 }
 
-// unpackFlowLabels tries to parse `LabelsLabel` attribute as json, and adds
-// unmarshalled attributes to given map.
-func unpackFlowLabels(attributes pcommon.Map, treatAsMissing []string) {
-	labeled := "false"
-	defer func() {
-		attributes.PutString(otelcollector.LabeledLabel, labeled)
-	}()
-
-	var flowAttributes map[string]string
-	otelcollector.GetStruct(attributes, otelcollector.MarshalledLabelsLabel, &flowAttributes, treatAsMissing)
-	for k, v := range flowAttributes {
-		labeled = "true"
-		// FIXME – this is quadratic (every upsert iterates to search whether label already exists)
-		attributes.PutString(k, v)
-	}
-}
-
 func ipFromAddress(ip string) string {
 	return strings.Split(ip, ":")[0]
 }
@@ -218,14 +199,12 @@ func ipFromAddress(ip string) string {
  */
 var (
 	_includeAttributesCommon = []string{
-		otelcollector.MarshalledLabelsLabel,
 		otelcollector.ControlPointLabel,
 		otelcollector.MarshalledCheckResponseLabel,
 	}
 
 	_includeAttributesLog = []string{
-		otelcollector.DurationLabel,
-		otelcollector.MarshalledAuthzResponseLabel,
+		otelcollector.WorkloadDurationLabel,
 		otelcollector.HTTPStatusCodeLabel,
 		otelcollector.HTTPRequestContentLength,
 		otelcollector.HTTPResponseContentLength,
@@ -265,9 +244,7 @@ func enforceIncludeListSpan(attributes pcommon.Map) {
 }
 
 var (
-	_excludeAttributesCommon = []string{
-		otelcollector.MarshalledLabelsLabel,
-	}
+	_excludeAttributesCommon = []string{}
 
 	_excludeAttributesLog = []string{
 		otelcollector.HostAddressLabel,

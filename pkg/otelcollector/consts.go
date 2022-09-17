@@ -1,23 +1,8 @@
 package otelcollector
 
-// TODO: organize the constants by their usage.
-// example:
-// aperture.* are used in ext_authz.CheckResponse.DynamicMetadata
-// others are being used to get attributes from traces and logs
-
 const (
 	/* Common labels available on all check calls. */
 
-	// MarshalledLabelsLabel describes labels relevant to this traffic.
-	// This is JSON encoded field:
-	// {
-	//   "foo": "bar",
-	//   "fizz": "buzz"
-	// }.
-	MarshalledLabelsLabel = "aperture.labels"
-	// DurationLabel describes duration of the flow in milliseconds.
-	// NOTE: not available on spans because the span timestamps are encoded natively.
-	DurationLabel = "duration_millis"
 	// MarshalledCheckResponseLabel contains JSON encoded check response struct.
 	MarshalledCheckResponseLabel = "aperture.check_response"
 	// ControlPointLabel describes control point which reported traffic.
@@ -32,18 +17,15 @@ const (
 
 	/* Derived label that is applied based on content of labels. */
 
+	// WorkloadDurationLabel describes duration of the workload in milliseconds.
+	WorkloadDurationLabel = "workload_duration_ms"
+	// FlowDurationLabel describes duration of the flow in milliseconds.
+	FlowDurationLabel = "flow_duration_ms"
+	// ApertureProcessingDurationLabel describes Aperture's processing duration in milliseconds.
+	ApertureProcessingDurationLabel = "aperture_processing_duration_ms"
+
 	// LabeledLabel describes if there are any labels matched to traffic.
 	LabeledLabel = "labeled"
-
-	/* Envoy specific Authz label. */
-
-	// MarshalledAuthzResponseLabel contains JSON encoded response from authz.
-	MarshalledAuthzResponseLabel = "aperture.authz_response"
-
-	/* Derived label based on content of authz response label. */
-
-	// AuthzStatusLabel describes the status reported from authz processing.
-	AuthzStatusLabel = "authz_status"
 
 	// EnvoyMissingAttributeSourceValue is a special attribute value, which can
 	// happen when (eg. Envoy's) logger tries to send attribute value, but its
@@ -90,10 +72,10 @@ const (
 
 	// DecisionTypeLabel describes the decision type taken by policy.
 	DecisionTypeLabel = "decision_type"
-	// DecisionErrorReasonLabel describes the error reason of the decision taken by policy.
-	DecisionErrorReasonLabel = "decision_error_reason"
-	// DecisionRejectReasonLabel describes the reject reason of the decision taken by policy.
-	DecisionRejectReasonLabel = "decision_reject_reason"
+	// ErrorReasonLabel describes the error reason of the decision taken by policy.
+	ErrorReasonLabel = "decision_error_reason"
+	// RejectReasonLabel describes the reject reason of the decision taken by policy.
+	RejectReasonLabel = "decision_reject_reason"
 	// RateLimitersLabel describes rate limiters matched to the traffic.
 	RateLimitersLabel = "rate_limiters"
 	// DroppingRateLimitersLabel describes rate limiters dropping the traffic.

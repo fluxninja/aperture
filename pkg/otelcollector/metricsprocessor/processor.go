@@ -89,8 +89,6 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 
 		fixupEnvoyLogs(logRecord.Attributes())
 
-		addAuthzResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
-
 		p.updateMetrics(logRecord.Attributes(), checkResponse, []string{otelcollector.EnvoyMissingAttributeSourceValue})
 
 		// Pass attributes through exclude list to drop keys that got flattened in this stage
@@ -128,17 +126,6 @@ func fixupEnvoyLogs(attributes pcommon.Map) {
 	}
 }
 
-func addAuthzResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string) {
-	var authzResponse flowcontrolv1.AuthzResponse
-	otelcollector.GetStruct(attributes, otelcollector.MarshalledAuthzResponseLabel, &authzResponse, treatAsMissing)
-	labels := map[string]pcommon.Value{
-		otelcollector.AuthzStatusLabel: pcommon.NewValueString(authzResponse.GetStatus().String()),
-	}
-	for key, value := range labels {
-		value.CopyTo(attributes.PutEmpty(key))
-	}
-}
-
 // addCheckResponseBasedLabels adds the following labels:
 // * `decision_type`
 // * `decision_reason`
@@ -166,12 +153,8 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, treatAsMissing []string
 		otelcollector.FlowLabelKeysLabel:               pcommon.NewValueSlice(),
 		otelcollector.ClassifiersLabel:                 pcommon.NewValueSlice(),
 		otelcollector.DecisionTypeLabel:                pcommon.NewValueString(checkResponse.DecisionType.String()),
-		otelcollector.DecisionRejectReasonLabel:        pcommon.NewValueString(""),
-		otelcollector.DecisionErrorReasonLabel:         pcommon.NewValueString(""),
-	}
-	if checkResponse.DecisionReason != nil {
-		labels[otelcollector.DecisionErrorReasonLabel] = pcommon.NewValueString(checkResponse.DecisionReason.GetErrorReason().String())
-		labels[otelcollector.DecisionRejectReasonLabel] = pcommon.NewValueString(checkResponse.DecisionReason.GetRejectReason().String())
+		otelcollector.RejectReasonLabel:                pcommon.NewValueString(checkResponse.GetRejectReason().String()),
+		otelcollector.ErrorReasonLabel:                 pcommon.NewValueString(checkResponse.GetError().String()),
 	}
 	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiter() != nil {
@@ -239,7 +222,7 @@ func addSpanBasedLabels(span ptrace.Span) {
 	endTimestamp := span.EndTimestamp()
 	startTimeStamp := span.StartTimestamp()
 	latency := float64(endTimestamp.AsTime().Sub(startTimeStamp.AsTime())) / float64(time.Millisecond)
-	span.Attributes().PutDouble(otelcollector.DurationLabel, latency)
+	span.Attributes().PutDouble(otelcollector.WorkloadDurationLabel, latency)
 }
 
 func (p *metricsProcessor) updateMetrics(
@@ -252,7 +235,7 @@ func (p *metricsProcessor) updateMetrics(
 	}
 	if len(checkResponse.LimiterDecisions) > 0 {
 		// Update workload metrics
-		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.DurationLabel, treatAsZero)
+		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, treatAsZero)
 		for _, decision := range checkResponse.LimiterDecisions {
 			if cl := decision.GetConcurrencyLimiter(); cl != nil {
 				labels := map[string]string{
@@ -297,7 +280,7 @@ func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, la
 
 func (p *metricsProcessor) updateMetricsForFluxMeters(
 	fluxMeterMessage *flowcontrolv1.FluxMeter,
-	decisionType flowcontrolv1.DecisionType,
+	decisionType flowcontrolv1.CheckResponse_DecisionType,
 	statusCode string,
 	featureStatus string,
 	attributes pcommon.Map,
@@ -328,7 +311,6 @@ var (
 	}
 
 	_attributesLog = []string{
-		otelcollector.MarshalledAuthzResponseLabel,
 		otelcollector.EnvoyRequestDurationLabel,
 		otelcollector.EnvoyRequestTxDurationLabel,
 		otelcollector.EnvoyResponseDurationLabel,

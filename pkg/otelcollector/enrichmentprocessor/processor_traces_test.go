@@ -85,8 +85,7 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
-			otelcollector.ControlPointLabel:     otelcollector.ControlPointFeature,
-			otelcollector.MarshalledLabelsLabel: `{"foo": "bar", "fizz": "buzz"}`,
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
@@ -105,8 +104,7 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
-			otelcollector.ControlPointLabel:     otelcollector.ControlPointFeature,
-			otelcollector.MarshalledLabelsLabel: ``,
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())
@@ -123,8 +121,7 @@ var _ = Describe("Enrichment Processor - Traces", func() {
 		Expect(processor).NotTo(BeNil())
 
 		td := tracesFromLabels(map[string]interface{}{
-			otelcollector.ControlPointLabel:     otelcollector.ControlPointFeature,
-			otelcollector.MarshalledLabelsLabel: `-`,
+			otelcollector.ControlPointLabel: otelcollector.ControlPointFeature,
 		})
 		td, err := processor.ConsumeTraces(context.TODO(), td)
 		Expect(err).NotTo(HaveOccurred())

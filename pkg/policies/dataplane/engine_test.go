@@ -50,7 +50,7 @@ var _ = Describe("Dataplane Engine", func() {
 				metrics.PolicyNameLabel:    "test",
 				metrics.FluxMeterNameLabel: "test",
 				metrics.PolicyHashLabel:    "test",
-				metrics.DecisionTypeLabel:  flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED.String(),
+				metrics.DecisionTypeLabel:  flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
 			},
 		})
 		fluxMeterID = iface.FluxMeterID{
@@ -99,7 +99,7 @@ var _ = Describe("Dataplane Engine", func() {
 		BeforeEach(func() {
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED, "200", "").Return(histogram).AnyTimes()
+			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "200", "").Return(histogram).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 
@@ -136,7 +136,7 @@ var _ = Describe("Dataplane Engine", func() {
 			err := engine.RegisterFluxMeter(mockFluxmeter)
 			Expect(err).NotTo(HaveOccurred())
 			fluxMeter := engine.GetFluxMeter("test")
-			h := fluxMeter.GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED, "200", "")
+			h := fluxMeter.GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "200", "")
 			Expect(h).To(Equal(histogram))
 		})
 	})
@@ -149,7 +149,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED, "503", "").Return(histogram).AnyTimes()
+			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "503", "").Return(histogram).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 

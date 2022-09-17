@@ -214,18 +214,21 @@ paths:
       tags:
         - StatusService
 definitions:
-  DecisionReasonErrorReason:
+  CheckResponseDecisionType:
     type: string
     enum:
-      - ERROR_REASON_UNSPECIFIED
-    default: ERROR_REASON_UNSPECIFIED
-  DecisionReasonRejectReason:
+      - DECISION_TYPE_ACCEPTED
+      - DECISION_TYPE_REJECTED
+    default: DECISION_TYPE_ACCEPTED
+    description: DecisionType contains fields that represent decision made by Check call.
+  CheckResponseRejectReason:
     type: string
     enum:
-      - REJECT_REASON_UNSPECIFIED
+      - REJECT_REASON_NONE
       - REJECT_REASON_RATE_LIMITED
       - REJECT_REASON_CONCURRENCY_LIMITED
-    default: REJECT_REASON_UNSPECIFIED
+    default: REJECT_REASON_NONE
+    description: RejectReason contains fields that give further information about rejection.
   EntityCacheEntities:
     type: object
     properties:
@@ -345,6 +348,10 @@ definitions:
       classifier_index:
         type: string
         format: int64
+      error:
+        $ref: '#/definitions/v1ClassifierError'
+      label_key:
+        type: string
       policy_hash:
         type: string
       policy_name:
@@ -356,6 +363,24 @@ definitions:
       flux_meter_name:
         type: string
     description: FluxMeter describes detail for each FluxMeter.
+  apertureflowcontrolv1Service:
+    type: object
+    properties:
+      agent_group:
+        type: string
+      service:
+        type: string
+  commonentitycachev1Service:
+    type: object
+    properties:
+      entities_count:
+        type: integer
+        format: int32
+      name:
+        type: string
+    description: |-
+      Service contains information about single service discovered in agent group by a
+      particular agent.
   googlerpcStatus:
     type: object
     properties:
@@ -729,12 +754,16 @@ definitions:
         items:
           $ref: '#/definitions/apertureflowcontrolv1Classifier'
         description: classifiers that were matched for this request.
-      decision_reason:
-        $ref: '#/definitions/v1DecisionReason'
-        description: reason contains information in the case of an error or rejection.
       decision_type:
-        $ref: '#/definitions/v1DecisionType'
+        $ref: '#/definitions/CheckResponseDecisionType'
         description: decision_type contains what the decision was.
+      end:
+        type: string
+        format: date-time
+        title: end timestamp
+      error:
+        $ref: '#/definitions/v1CheckResponseError'
+        description: error information.
       flow_label_keys:
         type: array
         items:
@@ -750,7 +779,35 @@ definitions:
         items:
           $ref: '#/definitions/v1LimiterDecision'
         description: limiter_decisions contains information about decision made by each limiter.
+      reject_reason:
+        $ref: '#/definitions/CheckResponseRejectReason'
+        description: reject_reason contains the reason for the rejection.
+      services:
+        type: array
+        items:
+          $ref: '#/definitions/apertureflowcontrolv1Service'
+        title: services that matched
+      start:
+        type: string
+        format: date-time
+        title: start timestamp
+      telemetry_flow_labels:
+        type: object
+        additionalProperties:
+          type: string
+        description: telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
     description: CheckResponse contains fields that represent decision made by Check call.
+  v1CheckResponseError:
+    type: string
+    enum:
+      - ERROR_NONE
+      - ERROR_MISSING_TRAFFIC_DIRECTION
+      - ERROR_INVALID_TRAFFIC_DIRECTION
+      - ERROR_CONVERT_TO_MAP_STRUCT
+      - ERROR_CONVERT_TO_REGO_AST
+      - ERROR_CLASSIFY
+    default: ERROR_NONE
+    description: Error information.
   v1Circuit:
     type: object
     properties:
@@ -790,6 +847,17 @@ definitions:
       docs on how exactly it handles invalid inputs.
       :::
     title: Circuit is defined as a dataflow graph of inter-connected components
+  v1ClassifierError:
+    type: string
+    enum:
+      - ERROR_NONE
+      - ERROR_EVAL_FAILED
+      - ERROR_EMPTY_RESULTSET
+      - ERROR_AMBIGUOUS_RESULTSET
+      - ERROR_MULTI_EXPRESSION
+      - ERROR_EXPRESSION_NOT_MAP
+    default: ERROR_NONE
+    description: Error information.
   v1Component:
     type: object
     properties:
@@ -971,21 +1039,6 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Selected signal (on_true or on_false).
     description: Outputs for the Decider component.
-  v1DecisionReason:
-    type: object
-    properties:
-      error_reason:
-        $ref: '#/definitions/DecisionReasonErrorReason'
-      reject_reason:
-        $ref: '#/definitions/DecisionReasonRejectReason'
-    description: Reason contains fields that give further information about error or rejection.
-  v1DecisionType:
-    type: string
-    enum:
-      - DECISION_TYPE_UNSPECIFIED
-      - DECISION_TYPE_ACCEPTED
-      - DECISION_TYPE_REJECTED
-    default: DECISION_TYPE_UNSPECIFIED
   v1EMA:
     type: object
     properties:
@@ -2027,17 +2080,6 @@ definitions:
       Describes which flows a [dataplane
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
-  v1Service:
-    type: object
-    properties:
-      entities_count:
-        type: integer
-        format: int32
-      name:
-        type: string
-    description: |-
-      Service contains information about single service discovered in agent group by a
-      particular agent.
   v1ServicesList:
     type: object
     properties:
@@ -2048,7 +2090,7 @@ definitions:
       services:
         type: array
         items:
-          $ref: '#/definitions/v1Service'
+          $ref: '#/definitions/commonentitycachev1Service'
   v1Sqrt:
     type: object
     properties:

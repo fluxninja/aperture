@@ -12,6 +12,7 @@ import (
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/flowcontrol/common"
 	"github.com/fluxninja/aperture/pkg/flowcontrol/envoy"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -23,7 +24,7 @@ import (
 var (
 	ctx        context.Context
 	cancel     context.CancelFunc
-	classifier *classification.Classifier
+	classifier *classification.ClassifierEngine
 	handler    *envoy.Handler
 )
 
@@ -50,7 +51,7 @@ func (s *AcceptingHandler) CheckWithValues(
 	selectors.Labels,
 ) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
-		DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+		DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 	}
 	return resp
 }
@@ -91,32 +92,34 @@ var service1Selector = selectorv1.Selector{
 	},
 }
 
-var hardcodedRegoRules = classificationv1.Classifier{
-	Selector: &service1Selector,
-	Rules: map[string]*classificationv1.Rule{
-		"destination": {
-			Source: &classificationv1.Rule_Rego_{
-				Rego: &classificationv1.Rule_Rego{
-					Source: `
+var hardcodedRegoRules = wrappersv1.ClassifierWrapper{
+	Classifier: &classificationv1.Classifier{
+		Selector: &service1Selector,
+		Rules: map[string]*classificationv1.Rule{
+			"destination": {
+				Source: &classificationv1.Rule_Rego_{
+					Rego: &classificationv1.Rule_Rego{
+						Source: `
 						package envoy.authz
 						destination := v {
 							v := input.attributes.destination.address.socketAddress.address
 						}
 					`,
-					Query: "data.envoy.authz.destination",
+						Query: "data.envoy.authz.destination",
+					},
 				},
 			},
-		},
-		"source": {
-			Source: &classificationv1.Rule_Rego_{
-				Rego: &classificationv1.Rule_Rego{
-					Source: `
+			"source": {
+				Source: &classificationv1.Rule_Rego_{
+					Rego: &classificationv1.Rule_Rego{
+						Source: `
 						package envoy.authz
 						source := v {
 							v := input.attributes.destination.address.socketAddress.address
 						}
 					`,
-					Query: "data.envoy.authz.source",
+						Query: "data.envoy.authz.source",
+					},
 				},
 			},
 		},
