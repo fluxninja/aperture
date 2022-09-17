@@ -1,6 +1,6 @@
 ---
 title: Flux Meter
-sidebar_position: 6
+sidebar_position: 7
 keywords:
   - fluxmeter
   - histograms
@@ -101,13 +101,13 @@ signal to a Controller which determines the desired Concurrency of a Service.
 Flux Meters are a great way to measure [SLOs][google-sre-slo] of your Service
 down to fine-grained APIs.
 
-[reference]: /reference/configuration/policies.md#policylanguagev1-flux-meter
+[reference]: /references/configuration/policies.md#policylanguagev1-flux-meter
 [flow]: /concepts/flow-control/flow-control.md#flow
 [selector]: /concepts/flow-control/selector.md
 [flow-control-integration]: /concepts/flow-control/flow-control.md#integrations
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles
 [envoy-access-log-spec]: https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators
-[promql-reference]: /reference/configuration/policies.md#v1-prom-q-l
+[promql-reference]: /references/configuration/policies.md#v1-prom-q-l
 [signal]: /concepts/policy/circuit.md#signal
 [google-sre-slo]: https://sre.google/workbook/implementing-slos/

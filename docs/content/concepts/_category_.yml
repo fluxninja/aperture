@@ -1,2 +1,9 @@
 label: Concepts
 position: 3
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Concepts"
+  description: "Learn about the most important Aperture concepts"
+  keywords: ["concepts"]

@@ -7,7 +7,7 @@ keywords:
   - plugin
 ---
 
-# FluxNinja cloud plugin
+# FluxNinja Cloud Plugin
 
 If you are a FluxNinja Cloud customer you can enhance your Aperture experience
 by enabling FluxNinja plugins. Plugins provide us with the ability to enrich
@@ -55,8 +55,8 @@ plugins:
 
 For more details, see plugin configuration reference:
 
-- [Agent](/reference/configuration/agent.md#plugins)
-- [Controller](/reference/configuration/controller.md#plugins)
+- [Agent](/references/configuration/agent.md#plugins)
+- [Controller](/references/configuration/controller.md#plugins)
 
 ## See also
 
