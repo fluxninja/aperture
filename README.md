@@ -24,7 +24,7 @@
 ## What is Aperture?
 
 Aperture is the first open-source flow control and reliability management
-platform for modern web applications.
+platform for modern cloud applications.
 
 ## Why is flow control needed?
 
