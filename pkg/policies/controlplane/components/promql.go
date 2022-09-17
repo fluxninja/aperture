@@ -383,12 +383,12 @@ func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API) err
 // Execute implements runtime.Component.Execute.
 func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToValue, err error) {
 	// Re-run query if evaluationInterval elapsed since last query
-	if tickInfo.Timestamp.Sub(promQL.lastQueryTimestamp) >= promQL.evaluationInterval {
+	if tickInfo.Timestamp().Sub(promQL.lastQueryTimestamp) >= promQL.evaluationInterval {
 		// Run query
-		promQL.lastQueryTimestamp = tickInfo.Timestamp
+		promQL.lastQueryTimestamp = tickInfo.Timestamp()
 		// Launch job only if previous one is completed
 		// Quantize endTimestamp of query based on tick interval
-		endTimestamp := tickInfo.Timestamp.Truncate(tickInfo.Interval)
+		endTimestamp := tickInfo.Timestamp().Truncate(tickInfo.Interval())
 
 		// Register jobFunc with jobExecutor
 		promQL.jobRegisterer.registerJob(endTimestamp)

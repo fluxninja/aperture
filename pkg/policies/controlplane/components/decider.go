@@ -143,7 +143,7 @@ func (dec *Decider) computeDecisionType(currentDecision bool, tickInfo runtime.T
 	} else {
 		pendingSince := dec.getPendingSince(currentDecision, tickInfo)
 		// check how much time has elapsed since the pending state was set
-		if tickInfo.Timestamp.Sub(pendingSince) < dec.trueForDuration {
+		if tickInfo.Timestamp().Sub(pendingSince) < dec.trueForDuration {
 			dec.setPending(currentDecision)
 			return currentPending
 		} else {
@@ -189,12 +189,12 @@ func (dec *Decider) setDecided(currentDecision bool) {
 func (dec *Decider) getPendingSince(currentDecision bool, tickInfo runtime.TickInfo) time.Time {
 	if currentDecision {
 		if dec.truePendingSince.IsZero() {
-			dec.truePendingSince = tickInfo.Timestamp
+			dec.truePendingSince = tickInfo.Timestamp()
 		}
 		return dec.truePendingSince
 	} else {
 		if dec.falsePendingSince.IsZero() {
-			dec.falsePendingSince = tickInfo.Timestamp
+			dec.falsePendingSince = tickInfo.Timestamp()
 		}
 		return dec.falsePendingSince
 	}

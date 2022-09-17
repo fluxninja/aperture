@@ -43,10 +43,10 @@ func (exp *Extrapolator) Execute(inPortReadings runtime.PortToValue, tickInfo ru
 	if input.Valid {
 		output = input
 		exp.lastOutput = output
-		exp.lastValidTimestamp = tickInfo.Timestamp
+		exp.lastValidTimestamp = tickInfo.Timestamp()
 	} else {
 		// Check if elapsed since lastValidTimestamp has reached the maximum Extrapolation interval.
-		if tickInfo.Timestamp.Sub(exp.lastValidTimestamp) <= exp.maxExtrapolationInterval {
+		if tickInfo.Timestamp().Sub(exp.lastValidTimestamp) <= exp.maxExtrapolationInterval {
 			// If the signal is invalid, it repeats the last value for up to maxExtrapolationInterval.
 			output = exp.lastOutput
 		} else {

@@ -261,7 +261,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				componentInPortReadings[port] = readingList
 			}
 			// log the component being executed
-			log.Trace().Str("component", cmp.CompiledComponent.Name).Int("tick", tickInfo.Tick).Interface("in_ports", componentInPortReadings).Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).Msg("Executing component")
+			log.Trace().Str("component", cmp.CompiledComponent.Name).Int("tick", tickInfo.Tick()).Interface("in_ports", componentInPortReadings).Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).Msg("Executing component")
 			// If control reaches this point, the component is ready to execute
 			componentOutPortReadings, err := cmp.CompiledComponent.Component.Execute(
 				/* pass signal */
