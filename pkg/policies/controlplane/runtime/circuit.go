@@ -109,6 +109,8 @@ type Circuit struct {
 	components []CompiledComponentAndPorts
 	// Tick end callbacks
 	tickEndCallbacks []TickEndCallback
+	// Tick start callbacks
+	tickStartCallbacks []TickStartCallback
 }
 
 // Make sure Circuit complies with CircuitAPI interface.
@@ -202,6 +204,11 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 	defer circuit.UnlockExecution()
 	// errMulti appends errors from Executing all the components
 	var errMulti error
+	// Invoke TickStartCallback(s)
+	for _, sc := range circuit.tickStartCallbacks {
+		err := sc(tickInfo)
+		errMulti = multierr.Append(errMulti, err)
+	}
 	// Signals for this tick
 	circuitSignalReadings := make(signalToReading)
 	defer func() {
@@ -336,8 +343,8 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 		}
 	}
 	// Invoke TickEndCallback(s)
-	for _, cb := range circuit.tickEndCallbacks {
-		err := cb(tickInfo)
+	for _, ec := range circuit.tickEndCallbacks {
+		err := ec(tickInfo)
 		errMulti = multierr.Append(errMulti, err)
 	}
 	return errMulti
@@ -354,6 +361,11 @@ func (circuit *Circuit) UnlockExecution() {
 }
 
 // RegisterTickEndCallback adds a callback function to be called when a tick ends.
-func (circuit *Circuit) RegisterTickEndCallback(cb TickEndCallback) {
-	circuit.tickEndCallbacks = append(circuit.tickEndCallbacks, cb)
+func (circuit *Circuit) RegisterTickEndCallback(ec TickEndCallback) {
+	circuit.tickEndCallbacks = append(circuit.tickEndCallbacks, ec)
+}
+
+// RegisterTickStartCallback adds a callback function to be called when a tick starts.
+func (circuit *Circuit) RegisterTickStartCallback(sc TickStartCallback) {
+	circuit.tickStartCallbacks = append(circuit.tickStartCallbacks, sc)
 }
