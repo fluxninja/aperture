@@ -6,7 +6,7 @@ keywords:
   - policies
   - rate limit
   - concurrency control
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 # Playground
@@ -18,12 +18,17 @@ Kubernetes. Tilt watches for changes to local files and auto-deploys any
 resources that change. This is very convenient for getting quick feedback during
 development of Aperture.
 
-Playground deploys resources to the Kubernetes cluster that `kubectl` on your
-machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s)
-which includes instructions for deploying a local Kubernetes cluster using
-[Kind](https://kind.sigs.k8s.io/).
+**<em>Environment:</em>**<br></br> Aperture is loaded with a <em>Latency Gradient Control Policy</em> which protects the
+demo application against sudden surges in traffic load.
 
 ## How to Run
+
+**<em>Cluster:</em>**<br></br>
+Playground deploys resources to the Kubernetes cluster that `kubectl` on your
+machine points at.
+For convenience, refer to [prerequisites](#prerequisites-k8s)
+which includes instructions for deploying a local Kubernetes cluster using
+[Kind](https://kind.sigs.k8s.io/).
 
 Once [requirements](#tools) are installed, simply run below commands from the
 `playground` directory (present under the aperture home directory):
@@ -34,32 +39,26 @@ tilt up
 
 Can press (Space) to open the Tilt UI.
 
-_Note_: Nothing is running locally on port 3000, else you won't be able to
-access Grafana dashboard.
-
 The above command starts Aperture Controller and an Aperture Agent on each
 worker in the Kubernetes cluster. Additionally, it starts a demo application
 with an Istio and Envoy based service mesh configured to integrate with
 Aperture. There is a Grafana installation as well for viewing metrics from
 experiments.
 
-Aperture is loaded with a Latency Gradient Control Policy which protects the
-demo application against sudden surges in traffic load. To run the traffic load,
-navigate to K6 resource in the Tilt UI and press the `Run load test` button.
-Once finished, press the `Delete load test` button. To view results from the
+**<em>Grafana Dashboard:</em>**<br></br>
+To view results from the
 experiment navigate to the "FluxNinja" dashboard in Grafana under
 "aperture-system" folder. Grafana runs at
 [localhost:3000](http://localhost:3000).
+<strong>Note</strong>: Nothing is running locally on port 3000, else you won't be able to
+access Grafana dashboard.<br></br><br></br>
 
-Now your _Aperture playground_ is ready. You will be able to see our Rate Limit
-policy in action. Subscribe vs Non Subscribed Priority
-
-**Note**: We need to talk about how to load grafana dashboard
-
-Now that you have your Grafana Dashboard ready, you can just click "Start"
+**<em>Start Load:</em>**<br></br>Now that you have your Grafana dashboard ready, To run the traffic load,
+navigate to K6 resource in the Tilt UI and just click "Start"
 button as shown below. ![Start Load Test](../assets/img/starttrafficbig.png)
+Once finished, press the `Delete load test` button.
 
-**Note**: How do we monitor the traffic and what is happening
+**<em>Monitoring Control Policy:</em>**<br></br> Now that the <em>Latency Gradient Control Policy</em> has started automatically. You can see....
 
 ---
 
@@ -243,6 +242,8 @@ fs.inotify.max_user_watches = 524288
 ### Teardown
 
 Simply run `tilt down`. All created resources will be deleted.
+
+Once finished, don't forget to press the `Delete load test` button by navigating to the K6 resource in the Tilt UI
 
 ### Port forwards
 
