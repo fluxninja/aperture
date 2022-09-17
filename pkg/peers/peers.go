@@ -123,7 +123,7 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 			if err != nil {
 				return err
 			}
-			err = pd.registerSelf(ctx, advertiseAddr)
+			err = pd.RegisterSelf(ctx, advertiseAddr)
 			if err != nil {
 				return err
 			}
@@ -131,7 +131,7 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 		},
 		OnStop: func(ctx context.Context) error {
 			var merr, e error
-			e = pd.deregisterSelf(ctx)
+			e = pd.DeregisterSelf(ctx)
 			if e != nil {
 				merr = multierr.Combine(merr, e)
 			}
@@ -192,8 +192,8 @@ func NewPeerDiscovery(prefix string,
 	return pd, nil
 }
 
-// registerSelf registers self to etcd.
-func (pd *PeerDiscovery) registerSelf(ctx context.Context, advertiseAddr string) error {
+// RegisterSelf registers self to etcd.
+func (pd *PeerDiscovery) RegisterSelf(ctx context.Context, advertiseAddr string) error {
 	pd.lock.Lock()
 	defer pd.lock.Unlock()
 
@@ -224,8 +224,8 @@ func (pd *PeerDiscovery) registerSelf(ctx context.Context, advertiseAddr string)
 	return err
 }
 
-// deregisterSelf deregisters self from etcd.
-func (pd *PeerDiscovery) deregisterSelf(ctx context.Context) error {
+// DeregisterSelf deregisters self from etcd.
+func (pd *PeerDiscovery) DeregisterSelf(ctx context.Context) error {
 	pd.lock.Lock()
 	defer pd.lock.Unlock()
 
