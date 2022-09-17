@@ -18,10 +18,11 @@ check_var_set REMOTE_PORT
 : "${LOCAL_PORT:=${REMOTE_PORT}}"
 
 : "${REQUEST_PATH:=/}"
-: "${INITIAL_DELAY:=5s}"
 : "${TIMEOUT:=1}"
-: "${PERIOD:=5s}"
 : "${FAILURE_THRESHOLD:=1}"
+
+INITIAL_DELAY="${INITIAL_DELAY:-5}"
+PERIOD="${PERIOD:-5}"
 
 port_forward_args=()
 if [ -n "${NAMESPACE:-}" ]; then
