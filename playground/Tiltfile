@@ -863,8 +863,8 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
             local_port=3000,
             remote_port=3000,
             extra_env={
-                "PERIOD": "1s",
-                "INITIAL_DELAY": "1s",
+                "PERIOD": "1",
+                "INITIAL_DELAY": "1",
             },
         )
 

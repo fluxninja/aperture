@@ -19,7 +19,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/flowlabel"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/services"
 )
 
 // logSampled provides log sampling for classifier.
@@ -121,7 +120,7 @@ func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm
 // LabelsForMatching are additional labels to use for selector matching.
 func (c *ClassifierEngine) Classify(
 	ctx context.Context,
-	svcs []services.ServiceID,
+	svcs []string,
 	labelsForMatching selectors.Labels,
 	direction selectors.TrafficDirection,
 	input ast.Value,
@@ -141,9 +140,7 @@ func (c *ClassifierEngine) Classify(
 
 	// Catch all Service
 	cpID := selectors.ControlPointID{
-		ServiceID: services.ServiceID{
-			Service: "",
-		},
+		ServiceName:  "",
 		ControlPoint: cp,
 	}
 	mm, ok := r.MultiMatcherByControlPointID[cpID]
@@ -156,7 +153,7 @@ func (c *ClassifierEngine) Classify(
 	// Specific Service
 	for _, svc := range svcs {
 		cpID := selectors.ControlPointID{
-			ServiceID:    svc,
+			ServiceName:  svc,
 			ControlPoint: cp,
 		}
 		mm, ok := r.MultiMatcherByControlPointID[cpID]

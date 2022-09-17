@@ -46,22 +46,18 @@ definitions:
       ca_file:
         type: string
         x-go-name: CAFile
-        x-go-validate: omitempty,file
       cert_file:
         type: string
         x-go-name: CertFile
-        x-go-validate: omitempty,file
       insecure_skip_verify:
         type: boolean
         x-go-name: InsecureSkipVerify
       key_file:
         type: string
         x-go-name: KeyFile
-        x-go-validate: omitempty,file
       key_log_file:
         type: string
         x-go-name: KeyLogWriter
-        x-go-validate: omitempty,file
     title: ClientTLSConfig is the config for client TLS.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
@@ -152,7 +148,6 @@ definitions:
         description: SSL key log file (useful for debugging with wireshark)
         type: string
         x-go-name: KeyLogWriter
-        x-go-validate: omitempty,file
       max_conns_per_host:
         description: Max Connections Per Host. 0 = no limit.
         format: int64

@@ -30,7 +30,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	classification "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/services"
 )
 
 // NewHandler creates new authorization handler for authz api
@@ -133,15 +132,15 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		return resp, errors.New("invalid traffic-direction")
 	}
 
-	var svcs []services.ServiceID
-	var err error
-
+	var svcs []string
 	rpcPeer, peerExists := peer.FromContext(ctx)
 	if peerExists {
 		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
 		if h.entityCache != nil {
-			entity := h.entityCache.GetByIP(clientIP)
-			svcs = entitycache.ServiceIDsFromEntity(entity)
+			entity, err := h.entityCache.GetByIP(clientIP)
+			if err == nil {
+				svcs = entity.Services
+			}
 		}
 	}
 

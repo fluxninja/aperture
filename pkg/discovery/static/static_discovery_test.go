@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/fluxninja/aperture/pkg/discovery/common"
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/mocks"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
@@ -59,10 +59,10 @@ var _ = Describe("Static service discovery", func() {
 				},
 			}
 
-			expectedEntity := &common.Entity{
-				IPAddress: someIPAddress,
+			expectedEntity := &entitycachev1.Entity{
+				IpAddress: someIPAddress,
 				Prefix:    staticEntityTrackerPrefix,
-				UID:       someUID,
+				Uid:       someUID,
 				Services:  []string{someService},
 				Name:      someName,
 			}
@@ -140,10 +140,10 @@ var _ = Describe("Static service discovery", func() {
 				},
 			}
 
-			expectedEntity := &common.Entity{
-				IPAddress: someIPAddress,
+			expectedEntity := &entitycachev1.Entity{
+				IpAddress: someIPAddress,
 				Prefix:    staticEntityTrackerPrefix,
-				UID:       someUID,
+				Uid:       someUID,
 				Services:  []string{someService, someOtherService},
 				Name:      someName,
 			}

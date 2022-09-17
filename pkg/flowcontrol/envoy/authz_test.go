@@ -18,7 +18,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	classification "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/services"
 )
 
 var (
@@ -47,7 +46,7 @@ type AcceptingHandler struct {
 func (s *AcceptingHandler) CheckWithValues(
 	context.Context,
 	selectors.ControlPoint,
-	[]services.ServiceID,
+	[]string,
 	selectors.Labels,
 ) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{

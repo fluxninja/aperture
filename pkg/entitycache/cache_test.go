@@ -21,13 +21,15 @@ var _ = Describe("Cache", func() {
 			name := "entity_1234"
 			entity := testEntity("foo", ip, name, nil)
 			ec.Put(entity)
-			actual := ec.GetByIP(ip)
+			actual, err := ec.GetByIP(ip)
+			Expect(err).To(BeNil())
 			Expect(actual).To(Equal(entity))
 		})
 
 		It("returns nil when no entity found", func() {
 			ip := "1.2.3.4"
-			actual := ec.GetByIP(ip)
+			actual, err := ec.GetByIP(ip)
+			Expect(err).To(Not(BeNil()))
 			Expect(actual).To(BeNil())
 		})
 
@@ -40,7 +42,8 @@ var _ = Describe("Cache", func() {
 			removed := ec.Remove(entity)
 			Expect(removed).To(BeTrue())
 
-			found := ec.GetByIP(ip)
+			found, err := ec.GetByIP(ip)
+			Expect(err).To(Not(BeNil()))
 			Expect(found).To(BeNil())
 		})
 
@@ -56,7 +59,8 @@ var _ = Describe("Cache", func() {
 			removed := ec.Remove(otherEntity)
 			Expect(removed).To(BeFalse())
 
-			found := ec.GetByIP(ip)
+			found, err := ec.GetByIP(ip)
+			Expect(err).To(BeNil())
 			Expect(found).To(Equal(entity))
 		})
 	})
@@ -67,13 +71,15 @@ var _ = Describe("Cache", func() {
 			name := "some_name"
 			entity := testEntity(uid, "", name, nil)
 			ec.Put(entity)
-			actual := ec.GetByName(name)
+			actual, err := ec.GetByName(name)
+			Expect(err).To(BeNil())
 			Expect(actual).To(Equal(entity))
 		})
 
 		It("returns nil when no entity found", func() {
 			name := "some_name"
-			actual := ec.GetByName(name)
+			actual, err := ec.GetByName(name)
+			Expect(err).To(Not(BeNil()))
 			Expect(actual).To(BeNil())
 		})
 
@@ -86,7 +92,8 @@ var _ = Describe("Cache", func() {
 			removed := ec.Remove(entity)
 			Expect(removed).To(BeTrue())
 
-			found := ec.GetByName(name)
+			found, err := ec.GetByName(name)
+			Expect(err).To(Not(BeNil()))
 			Expect(found).To(BeNil())
 		})
 
@@ -102,7 +109,8 @@ var _ = Describe("Cache", func() {
 			removed := ec.Remove(otherEntity)
 			Expect(removed).To(BeFalse())
 
-			found := ec.GetByName(name)
+			found, err := ec.GetByName(name)
+			Expect(err).To(BeNil())
 			Expect(found).To(Equal(entity))
 		})
 	})
@@ -112,55 +120,18 @@ var _ = Describe("Cache", func() {
 		entity := testEntity("foo", "", "some_name", nil)
 		ec.Put(entity)
 		ec.Clear()
-		found := ec.GetByIP(ip)
+		found, err := ec.GetByIP(ip)
+		Expect(err).To(Not(BeNil()))
 		Expect(found).To(BeNil())
-	})
-
-	Context("Services", func() {
-		It("reads same service from two entities", func() {
-			ec.Put(testEntity("1", "1.1.1.1", "some_name", []string{"baz"}))
-			ec.Put(testEntity("2", "1.1.1.2", "some_name", []string{"baz"}))
-			entityCache := ec.Services()
-			Expect(entityCache.Services).To(HaveLen(1))
-			Expect(entityCache.Services).To(ContainElement(&entitycachev1.Service{
-				Name:          "baz",
-				EntitiesCount: 2,
-			}))
-		})
-
-		It("reads two services from one entity", func() {
-			ip := "1.1.1.1"
-			serviceNames := []string{"baz1", "baz2"}
-			name := "entity_1234"
-			ec.Put(testEntity("1", ip, name, serviceNames))
-			entityCache := ec.Services()
-			Expect(entityCache.Services).To(HaveLen(2))
-			Expect(entityCache.Services).To(ContainElement(&entitycachev1.Service{
-				Name:          "baz1",
-				EntitiesCount: 1,
-			}))
-			Expect(entityCache.Services).To(ContainElement(&entitycachev1.Service{
-				Name:          "baz2",
-				EntitiesCount: 1,
-			}))
-		})
-
-		It("returns no service after being cleared", func() {
-			ip := "1.1.1.1"
-			serviceNames := []string{"baz"}
-			name := "entity_1234"
-			ec.Put(testEntity("1", ip, name, serviceNames))
-			ec.Clear()
-			entityCache := ec.Services()
-			Expect(entityCache.Services).To(HaveLen(0))
-		})
 	})
 })
 
 func testEntity(uid, ipAddress, name string, services []string) *entitycachev1.Entity {
-	entity := entitycache.NewEntity(entitycache.EntityID{
-		Prefix: "test",
-		UID:    uid,
-	}, ipAddress, name, services)
-	return entity
+	return &entitycachev1.Entity{
+		Prefix:    "test",
+		Uid:       uid,
+		IpAddress: ipAddress,
+		Name:      name,
+		Services:  services,
+	}
 }
