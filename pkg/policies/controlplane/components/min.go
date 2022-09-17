@@ -27,7 +27,7 @@ func NewMinAndOptions(minProto *policylangv1.Min, componentIndex int, policyRead
 func (min *Min) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	minValue := math.MaxFloat64
 	inputs := inPortReadings.ReadRepeatedValuePort("inputs")
-	output := reading.NewInvalid()
+	output := reading.InvalidReading()
 
 	if len(inputs) > 0 {
 		for _, singleInput := range inputs {
@@ -42,7 +42,7 @@ func (min *Min) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		}
 		output = reading.NewReading(minValue)
 	} else {
-		output = reading.NewInvalid()
+		output = reading.InvalidReading()
 	}
 
 	return runtime.PortToValue{

@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("Reading", func() {
 	It("Creates default invalid reading", func() {
-		reading := reading.NewInvalid()
+		reading := reading.InvalidReading()
 		Expect(reading).ToNot(BeNil())
 		Expect(reading.Valid()).To(BeFalse())
 	})

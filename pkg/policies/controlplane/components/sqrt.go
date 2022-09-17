@@ -30,7 +30,7 @@ func NewSqrtAndOptions(sqrtProto *policylangv1.Sqrt, componentIndex int, policyR
 // Execute implements runtime.Component.Execute.
 func (sqrt *Sqrt) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	input := inPortReadings.ReadSingleValuePort("input")
-	output := reading.NewInvalid()
+	output := reading.InvalidReading()
 
 	if input.Valid() {
 		// Square root the input and scale it.

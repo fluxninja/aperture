@@ -7,7 +7,7 @@ type PortToValue map[string][]reading.Reading
 
 // ReadSingleValuePort returns the reading of the first signal at port=portName. If no signal is found, reading.NewInvalid() is returned.
 func (ptv PortToValue) ReadSingleValuePort(portName string) reading.Reading {
-	retReading := reading.NewInvalid()
+	retReading := reading.InvalidReading()
 	signals, ok := ptv[portName]
 	if ok {
 		if len(signals) > 0 {

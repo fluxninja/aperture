@@ -27,7 +27,7 @@ func NewMaxAndOptions(maxProto *policylangv1.Max, componentIndex int, policyRead
 func (max *Max) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	maxValue := -math.MaxFloat64
 	inputs := inPortReadings.ReadRepeatedValuePort("inputs")
-	output := reading.NewInvalid()
+	output := reading.InvalidReading()
 
 	if len(inputs) > 0 {
 		for _, singleInput := range inputs {
@@ -42,7 +42,7 @@ func (max *Max) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		}
 		output = reading.NewReading(maxValue)
 	} else {
-		output = reading.NewInvalid()
+		output = reading.InvalidReading()
 	}
 
 	return runtime.PortToValue{

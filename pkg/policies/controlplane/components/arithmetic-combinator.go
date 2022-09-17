@@ -55,7 +55,7 @@ func NewArithmeticCombinatorAndOptions(arithmeticCombinatorProto *policylangv1.A
 func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	lhs := inPortReadings.ReadSingleValuePort("lhs")
 	rhs := inPortReadings.ReadSingleValuePort("rhs")
-	output := reading.NewInvalid()
+	output := reading.InvalidReading()
 	var err error
 
 	if lhs.Valid() && rhs.Valid() {

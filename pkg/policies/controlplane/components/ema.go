@@ -74,21 +74,21 @@ func (ema *EMA) resetStages() {
 	ema.invalidCount = 0
 	ema.sum = 0
 	ema.count = 0
-	ema.lastGoodOutput = reading.NewInvalid()
+	ema.lastGoodOutput = reading.InvalidReading()
 }
 
 // Execute implements runtime.Component.Execute.
 func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	retErr := func(err error) (runtime.PortToValue, error) {
 		return runtime.PortToValue{
-			"output": []reading.Reading{reading.NewInvalid()},
+			"output": []reading.Reading{reading.InvalidReading()},
 		}, err
 	}
 
 	input := inPortReadings.ReadSingleValuePort("input")
 	maxEnvelope := inPortReadings.ReadSingleValuePort("max_envelope")
 	minEnvelope := inPortReadings.ReadSingleValuePort("min_envelope")
-	output := reading.NewInvalid()
+	output := reading.InvalidReading()
 
 	switch ema.currentStage {
 	case warmUpStage:
@@ -154,11 +154,11 @@ func (ema *EMA) computeAverage(minEnvelope, maxEnvelope reading.Reading) (readin
 		avg := ema.sum / (ema.count)
 		envelopedAvg, err := ema.applyEnvelope(avg, minEnvelope, maxEnvelope)
 		if err != nil {
-			return reading.NewInvalid(), err
+			return reading.InvalidReading(), err
 		}
 		return reading.NewReading(envelopedAvg), nil
 	} else {
-		return reading.NewInvalid(), nil
+		return reading.InvalidReading(), nil
 	}
 }
 

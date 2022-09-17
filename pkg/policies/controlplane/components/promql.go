@@ -397,7 +397,7 @@ func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runti
 	// Create current reading based on err and value
 	var currentReading reading.Reading
 	if promQL.err != nil {
-		currentReading = reading.NewInvalid()
+		currentReading = reading.InvalidReading()
 	} else {
 		currentReading = reading.NewReading(promQL.value)
 	}

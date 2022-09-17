@@ -28,7 +28,7 @@ var _ runtime.Component = (*Extrapolator)(nil)
 func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	exp := Extrapolator{
 		maxExtrapolationInterval: extrapolatorProto.MaxExtrapolationInterval.AsDuration(),
-		lastOutput:               reading.NewInvalid(),
+		lastOutput:               reading.InvalidReading(),
 		lastValidTimestamp:       time.Time{},
 	}
 
@@ -38,7 +38,7 @@ func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, com
 // Execute implements runtime.Component.Execute.
 func (exp *Extrapolator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	input := inPortReadings.ReadSingleValuePort("input")
-	output := reading.NewInvalid()
+	output := reading.InvalidReading()
 
 	if input.Valid() {
 		output = input

@@ -135,7 +135,7 @@ func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts, policyR
 			for _, outPort := range component.OutPortToSignalsMap {
 				for _, signal := range outPort {
 					if signal.Looped {
-						circuit.loopedSignals[signal] = reading.NewInvalid()
+						circuit.loopedSignals[signal] = reading.InvalidReading()
 					}
 				}
 			}
@@ -292,13 +292,13 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 					// Fill with invalid readings
 					componentOutPortReadings[port] = make([]reading.Reading, len(signals))
 					for index := range signals {
-						componentOutPortReadings[port][index] = reading.NewInvalid()
+						componentOutPortReadings[port][index] = reading.InvalidReading()
 					}
 				} else if len(componentOutPortReadings[port]) < len(signals) {
 					// The reading list has fewer readings compared to portOutsSpec
 					// Fill with invalid readings
 					for index := len(componentOutPortReadings[port]); index < len(signals); index++ {
-						componentOutPortReadings[port][index] = reading.NewInvalid()
+						componentOutPortReadings[port][index] = reading.InvalidReading()
 					}
 				}
 			}

@@ -54,12 +54,12 @@ func (g *GradientController) ComputeOutput(signal, setpoint, controlVariable rea
 			gradient = g.maxGradient
 		}
 		if math.IsNaN(gradient) {
-			output = reading.NewInvalid()
+			output = reading.InvalidReading()
 		} else {
 			output = reading.NewReading(controlVariable.Value() * gradient)
 		}
 	} else {
-		output = reading.NewInvalid()
+		output = reading.InvalidReading()
 	}
 
 	return output, nil

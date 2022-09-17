@@ -213,7 +213,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 
 	acceptedValue, err := s.acceptedQuery.ExecuteScalarQuery(tickInfo)
 	if err != nil {
-		acceptedReading = reading.NewInvalid()
+		acceptedReading = reading.InvalidReading()
 		errMulti = multierr.Append(errMulti, err)
 	} else {
 		acceptedReading = reading.NewReading(acceptedValue)
@@ -222,7 +222,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 
 	incomingValue, err := s.incomingQuery.ExecuteScalarQuery(tickInfo)
 	if err != nil {
-		incomingReading = reading.NewInvalid()
+		incomingReading = reading.InvalidReading()
 		errMulti = multierr.Append(errMulti, err)
 	} else {
 		incomingReading = reading.NewReading(incomingValue)

@@ -25,10 +25,10 @@ type ControllerComponent struct {
 // NewControllerComponent creates a new ControllerComponent.
 func NewControllerComponent(controller Controller, componentIndex int, policyReadAPI iface.Policy) *ControllerComponent {
 	return &ControllerComponent{
-		signal:          reading.NewInvalid(),
-		setpoint:        reading.NewInvalid(),
-		controlVariable: reading.NewInvalid(),
-		output:          reading.NewInvalid(),
+		signal:          reading.InvalidReading(),
+		setpoint:        reading.InvalidReading(),
+		controlVariable: reading.InvalidReading(),
+		output:          reading.InvalidReading(),
 		controller:      controller,
 		componentIndex:  componentIndex,
 		policyReadAPI:   policyReadAPI,
@@ -39,7 +39,7 @@ func NewControllerComponent(controller Controller, componentIndex int, policyRea
 func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToValue, err error) {
 	retErr := func(err error) (runtime.PortToValue, error) {
 		return runtime.PortToValue{
-			"output": []reading.Reading{reading.NewInvalid()},
+			"output": []reading.Reading{reading.InvalidReading()},
 		}, err
 	}
 
@@ -49,7 +49,7 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickI
 	max := inPortReadings.ReadSingleValuePort("max")
 	min := inPortReadings.ReadSingleValuePort("min")
 	controlVariable := inPortReadings.ReadSingleValuePort("control_variable")
-	output := reading.NewInvalid()
+	output := reading.InvalidReading()
 
 	prevSetpoint := cc.setpoint
 
