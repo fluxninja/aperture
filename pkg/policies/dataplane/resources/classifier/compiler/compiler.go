@@ -103,13 +103,13 @@ func CompileRuleset(ctx context.Context, name string, classifierWrapper *wrapper
 		return CompiledRuleset{}, fmt.Errorf("%w: %v", BadSelector, err)
 	}
 
-	labelers, err := compileRules(ctx, selector.LabelMatcher, classifierWrapper)
+	labelers, err := compileRules(ctx, selector.LabelMatcher(), classifierWrapper)
 	if err != nil {
 		return CompiledRuleset{}, fmt.Errorf("failed to compile %q rules for %v: %w", name, selector, err)
 	}
 
 	cr := CompiledRuleset{
-		ControlPointID: selector.ControlPointID,
+		ControlPointID: selector.ControlPointID(),
 		Labelers:       labelers,
 		ReportedRules:  rulesetToReportedRules(classifierMsg, name),
 	}

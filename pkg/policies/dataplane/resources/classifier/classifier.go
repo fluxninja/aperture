@@ -121,8 +121,8 @@ func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm
 func (c *ClassifierEngine) Classify(
 	ctx context.Context,
 	svcs []string,
+	ctrlPt selectors.ControlPoint,
 	labelsForMatching map[string]string,
-	direction selectors.TrafficDirection,
 	input ast.Value,
 ) ([]*flowcontrolv1.Classifier, flowlabel.FlowLabels, error) {
 	flowLabels := make(flowlabel.FlowLabels)
@@ -134,15 +134,8 @@ func (c *ClassifierEngine) Classify(
 
 	var classifierMsgs []*flowcontrolv1.Classifier
 
-	cp := selectors.ControlPoint{
-		Traffic: direction,
-	}
-
 	// Catch all Service
-	cpID := selectors.ControlPointID{
-		ServiceName:  "",
-		ControlPoint: cp,
-	}
+	cpID := selectors.NewControlPointID("", ctrlPt)
 	mm, ok := r.MultiMatcherByControlPointID[cpID]
 	if ok {
 		classifierMsgs = append(classifierMsgs, populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)
@@ -152,13 +145,10 @@ func (c *ClassifierEngine) Classify(
 
 	// Specific Service
 	for _, svc := range svcs {
-		cpID := selectors.ControlPointID{
-			ServiceName:  svc,
-			ControlPoint: cp,
-		}
+		cpID := selectors.NewControlPointID(svc, ctrlPt)
 		mm, ok := r.MultiMatcherByControlPointID[cpID]
 		if !ok {
-			log.Trace().Str("controlPoint", cpID.String()).Msg("No labelers for controlPoint")
+			logSampled.Trace().Interface("controlPointID", cpID).Msg("No labelers for controlPointID")
 			continue
 		}
 		classifierMsgs = append(classifierMsgs, populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)

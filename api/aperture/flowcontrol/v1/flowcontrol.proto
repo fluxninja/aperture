@@ -50,20 +50,34 @@ message CheckResponse {
   Error error = 3;
   // services that matched
   repeated string services = 4;
+  // control_point of request
+  ControlPoint control_point = 5;
   // flow label keys that were matched for this request.
-  repeated string flow_label_keys = 5;
+  repeated string flow_label_keys = 6;
   // telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
-  map<string, string> telemetry_flow_labels = 6;
+  map<string, string> telemetry_flow_labels = 7;
   // decision_type contains what the decision was.
-  DecisionType decision_type = 7;
+  DecisionType decision_type = 8;
   // reject_reason contains the reason for the rejection.
-  RejectReason reject_reason = 8;
+  RejectReason reject_reason = 9;
   // classifiers that were matched for this request.
-  repeated Classifier classifiers = 9;
+  repeated Classifier classifiers = 10;
   // flux meters that were matched for this request.
-  repeated FluxMeter flux_meters = 10;
+  repeated FluxMeter flux_meters = 11;
   // limiter_decisions contains information about decision made by each limiter.
-  repeated LimiterDecision limiter_decisions = 11;
+  repeated LimiterDecision limiter_decisions = 12;
+}
+
+message ControlPoint {
+  // Type contains fields that represent type of ControlPoint.
+  enum Type {
+    TYPE_UNKNOWN = 0;
+    TYPE_FEATURE = 1;
+    TYPE_INGRESS = 2;
+    TYPE_EGRESS = 3;
+  }
+  Type type = 1;
+  string feature = 2;
 }
 
 // Classifier describes details for each Classifier.

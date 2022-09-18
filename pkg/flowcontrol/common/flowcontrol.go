@@ -38,8 +38,8 @@ func NewHandler(entityCache *entitycache.EntityCache, metrics Metrics, engine if
 type HandlerWithValues interface {
 	CheckWithValues(
 		context.Context,
-		selectors.ControlPoint,
 		[]string,
+		selectors.ControlPoint,
 		map[string]string,
 	) *flowcontrolv1.CheckResponse
 }
@@ -47,11 +47,11 @@ type HandlerWithValues interface {
 // CheckWithValues makes decision using collected inferred fields from authz or Handler.
 func (h *Handler) CheckWithValues(
 	ctx context.Context,
-	controlPoint selectors.ControlPoint,
 	serviceIDs []string,
+	controlPoint selectors.ControlPoint,
 	labels map[string]string,
 ) *flowcontrolv1.CheckResponse {
-	log.Trace().Interface("labels", labels).Interface("serviceIDs", serviceIDs).Str("controlPoint", controlPoint.String()).Msg("FlowControl.CheckWithValues()")
+	logSampled.Trace().Interface("labels", labels).Interface("serviceIDs", serviceIDs).Interface("controlPoint", controlPoint).Msg("FlowControl.CheckWithValues()")
 
 	checkResponse := h.engine.ProcessRequest(controlPoint, serviceIDs, labels)
 	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetRejectReason(), checkResponse.GetError())
@@ -77,8 +77,8 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	// CheckWithValues already pushes result to metrics
 	resp := h.CheckWithValues(
 		ctx,
-		selectors.ControlPoint{Feature: req.Feature},
 		serviceIDs,
+		selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_FEATURE, req.Feature),
 		req.Labels,
 	)
 	return resp, nil

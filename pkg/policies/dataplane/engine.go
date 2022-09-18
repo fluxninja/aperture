@@ -243,20 +243,14 @@ func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []st
 	mmResult := &multiMatchResult{}
 
 	// Lookup catchall multi matchers for controlPoint
-	controlPointID := selectors.ControlPointID{
-		ControlPoint: controlPoint,
-		ServiceName:  "",
-	}
+	controlPointID := selectors.NewControlPointID("", controlPoint)
 	camm, ok := e.multiMatchers[controlPointID]
 	if ok {
 		mmResult.populateFromMultiMatcher(camm, labels)
 	}
 
 	for _, serviceID := range serviceIDs {
-		controlPointID := selectors.ControlPointID{
-			ControlPoint: controlPoint,
-			ServiceName:  serviceID,
-		}
+		controlPointID := selectors.NewControlPointID(serviceID, controlPoint)
 		// Lookup multi matcher for controlPointID
 		mm, ok := e.multiMatchers[controlPointID]
 		if ok {
@@ -276,12 +270,12 @@ func (e *Engine) register(key string, selectorProto *selectorv1.Selector, matche
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
 
-	mm, ok := e.multiMatchers[selector.ControlPointID]
+	mm, ok := e.multiMatchers[selector.ControlPointID()]
 	if !ok {
 		mm = multimatcher.New[string, multiMatchResult]()
-		e.multiMatchers[selector.ControlPointID] = mm
+		e.multiMatchers[selector.ControlPointID()] = mm
 	}
-	err = mm.AddEntry(key, selector.LabelMatcher, matchedCB)
+	err = mm.AddEntry(key, selector.LabelMatcher(), matchedCB)
 	if err != nil {
 		return err
 	}
@@ -299,9 +293,9 @@ func (e *Engine) unregister(key string, selectorProto *selectorv1.Selector) erro
 	}
 
 	// check if multi matcher exists for this control point id
-	mm, ok := e.multiMatchers[selector.ControlPointID]
+	mm, ok := e.multiMatchers[selector.ControlPointID()]
 	if !ok {
-		return fmt.Errorf("unable to unregister, multi matcher not found for control point id: %v", selector.ControlPointID)
+		return fmt.Errorf("unable to unregister, multi matcher not found for control point id")
 	}
 	err = mm.RemoveEntry(key)
 	if err != nil {
@@ -309,7 +303,7 @@ func (e *Engine) unregister(key string, selectorProto *selectorv1.Selector) erro
 	}
 	// remove this multi matcher if this was the last entry
 	if mm.Length() == 0 {
-		delete(e.multiMatchers, selector.ControlPointID)
+		delete(e.multiMatchers, selector.ControlPointID())
 	}
 
 	return nil

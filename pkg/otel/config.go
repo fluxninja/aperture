@@ -26,7 +26,7 @@ const (
 	// ReceiverPrometheus collects metrics from environment and services.
 	ReceiverPrometheus = "prometheus"
 
-	// ProcessorEnrichment enriches traces, logs and metrics with discovery data.
+	// ProcessorEnrichment enriches metrics with discovery data.
 	ProcessorEnrichment = "enrichment"
 	// ProcessorMetrics generates metrics based on traces and logs and exposes them
 	// on application prometheus metrics endpoint.
@@ -164,7 +164,6 @@ func addLogsAndTracesPipelines(cfg *otelParams) {
 	config := cfg.config
 	// Common dependencies for pipelines
 	addOTLPReceiver(cfg)
-	config.AddProcessor(ProcessorEnrichment, nil)
 	addMetricsProcessor(config)
 	config.AddBatchProcessor(ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPrerollup.SendBatchSize)
 	addRollupProcessor(config)
@@ -172,7 +171,6 @@ func addLogsAndTracesPipelines(cfg *otelParams) {
 	config.AddExporter(ExporterLogging, nil)
 
 	processors := []string{
-		ProcessorEnrichment,
 		ProcessorAgentGroup,
 		ProcessorMetrics,
 		ProcessorBatchPrerollup,

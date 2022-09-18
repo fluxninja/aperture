@@ -9,6 +9,7 @@ import (
 
 	labelmatcherv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/labelmatcher/v1"
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -143,8 +144,8 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
+				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
 				map[string]string{"version": "one", "other": "tag"},
-				selectors.Ingress,
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"bar": 21,
@@ -161,8 +162,8 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
+				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_EGRESS, ""),
 				map[string]string{"version": "one"},
-				selectors.Egress,
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"bar": 21,
@@ -176,8 +177,8 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
+				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
 				map[string]string{"version": "two"},
-				selectors.Ingress,
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"bar": 21,
@@ -196,8 +197,8 @@ var _ = Describe("Classifier", func() {
 				_, labels, err := classifier.Classify(
 					context.TODO(),
 					[]string{"my-service.default.svc.cluster.local"},
+					selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
 					map[string]string{"version": "one"},
-					selectors.Ingress,
 					attributesWithHeaders(object{
 						"foo": "hello",
 						"bar": 21,
@@ -269,8 +270,8 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
+				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
 				nil,
-				selectors.Ingress,
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"bar": 21,
@@ -313,8 +314,8 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
+				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
 				nil,
-				selectors.Ingress,
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"xyz": "cos",
@@ -370,8 +371,8 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
+				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
 				nil,
-				selectors.Ingress,
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"bar": 21,
@@ -434,8 +435,8 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
+				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
 				nil,
-				selectors.Ingress,
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"bar": 21,

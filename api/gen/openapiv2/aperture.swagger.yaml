@@ -376,12 +376,43 @@ definitions:
       policy_name:
         type: string
     description: Classifier describes details for each Classifier.
+  apertureflowcontrolv1ControlPoint:
+    type: object
+    properties:
+      feature:
+        type: string
+      type:
+        $ref: '#/definitions/v1ControlPointType'
   apertureflowcontrolv1FluxMeter:
     type: object
     properties:
       flux_meter_name:
         type: string
     description: FluxMeter describes detail for each FluxMeter.
+  commonselectorv1ControlPoint:
+    type: object
+    properties:
+      feature:
+        type: string
+        description: |-
+          Name of Aperture SDK's feature.
+          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
+
+          Note: Flowcontrol only.
+        x-go-validate: required
+      traffic:
+        type: string
+        description: |-
+          Type of traffic service, either "ingress" or "egress".
+          Apply the policy to the whole incoming/outgoing traffic of a service.
+          Usually powered by integration with a proxy (like envoy) or a web framework.
+
+          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
+          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
+        x-go-validate: required,oneof=ingress egress
+    description: |-
+      Identifies control point within a service that the rule or policy should apply to.
+      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
   googlerpcStatus:
     type: object
     properties:
@@ -755,6 +786,9 @@ definitions:
         items:
           $ref: '#/definitions/apertureflowcontrolv1Classifier'
         description: classifiers that were matched for this request.
+      control_point:
+        $ref: '#/definitions/apertureflowcontrolv1ControlPoint'
+        title: control_point of request
       decision_type:
         $ref: '#/definitions/CheckResponseDecisionType'
         description: decision_type contains what the decision was.
@@ -954,30 +988,15 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: The constant value is emitted to the output port.
     description: Outputs for the Constant component.
-  v1ControlPoint:
-    type: object
-    properties:
-      feature:
-        type: string
-        description: |-
-          Name of Aperture SDK's feature.
-          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
-
-          Note: Flowcontrol only.
-        x-go-validate: required
-      traffic:
-        type: string
-        description: |-
-          Type of traffic service, either "ingress" or "egress".
-          Apply the policy to the whole incoming/outgoing traffic of a service.
-          Usually powered by integration with a proxy (like envoy) or a web framework.
-
-          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
-          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
-        x-go-validate: required,oneof=ingress egress
-    description: |-
-      Identifies control point within a service that the rule or policy should apply to.
-      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
+  v1ControlPointType:
+    type: string
+    enum:
+      - TYPE_UNKNOWN
+      - TYPE_FEATURE
+      - TYPE_INGRESS
+      - TYPE_EGRESS
+    default: TYPE_UNKNOWN
+    description: Type contains fields that represent type of ControlPoint.
   v1ControllerInfo:
     type: object
     properties:
@@ -2004,7 +2023,7 @@ definitions:
           selector applies to.
         x-go-default: default
       control_point:
-        $ref: '#/definitions/v1ControlPoint'
+        $ref: '#/definitions/commonselectorv1ControlPoint'
         description: |-
           Describes
           [control point](/concepts/flow-control/flow-control.md#control-point)

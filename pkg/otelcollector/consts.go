@@ -8,6 +8,8 @@ const (
 	// ControlPointLabel describes control point which reported traffic.
 	// May be 'ingress', 'egress' or 'feature'.
 	ControlPointLabel = "control_point"
+	// ControlPointUnknown const for unknown control point.
+	ControlPointUnknown = "unknown"
 	// ControlPointIngress const for ingress control point.
 	ControlPointIngress = "ingress"
 	// ControlPointEgress const for egress control point.

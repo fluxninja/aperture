@@ -149,6 +149,36 @@ This override is applicable only if `auto_tokens` is set to false.
 </dd>
 </dl>
 
+### commonselectorv1ControlPoint {#commonselectorv1-control-point}
+
+Identifies control point within a service that the rule or policy should apply to.
+Controlpoint is either a library feature name or one of ingress/egress traffic control point.
+
+#### Properties
+
+<dl>
+<dt>feature</dt>
+<dd>
+
+(string, `required`) Name of Aperture SDK's feature.
+Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
+
+Note: Flowcontrol only.
+
+</dd>
+<dt>traffic</dt>
+<dd>
+
+(string, `required,oneof=ingress egress`) Type of traffic service, either "ingress" or "egress".
+Apply the policy to the whole incoming/outgoing traffic of a service.
+Usually powered by integration with a proxy (like envoy) or a web framework.
+
+- Flowcontrol: Blockable atom here is a single HTTP-transaction.
+- Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
+
+</dd>
+</dl>
+
 ### languagev1ConcurrencyLimiter {#languagev1-concurrency-limiter}
 
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
@@ -625,36 +655,6 @@ Outputs for the Constant component.
 <dd>
 
 ([V1Port](#v1-port)) The constant value is emitted to the output port.
-
-</dd>
-</dl>
-
-### v1ControlPoint {#v1-control-point}
-
-Identifies control point within a service that the rule or policy should apply to.
-Controlpoint is either a library feature name or one of ingress/egress traffic control point.
-
-#### Properties
-
-<dl>
-<dt>feature</dt>
-<dd>
-
-(string, `required`) Name of Aperture SDK's feature.
-Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
-
-Note: Flowcontrol only.
-
-</dd>
-<dt>traffic</dt>
-<dd>
-
-(string, `required,oneof=ingress egress`) Type of traffic service, either "ingress" or "egress".
-Apply the policy to the whole incoming/outgoing traffic of a service.
-Usually powered by integration with a proxy (like envoy) or a web framework.
-
-- Flowcontrol: Blockable atom here is a single HTTP-transaction.
-- Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
 
 </dd>
 </dl>
@@ -1976,7 +1976,7 @@ selector applies to.
 <dt>control_point</dt>
 <dd>
 
-([V1ControlPoint](#v1-control-point), `required`) Describes
+([Commonselectorv1ControlPoint](#commonselectorv1-control-point), `required`) Describes
 [control point](/concepts/flow-control/flow-control.md#control-point)
 within the entity where the policy should apply to.
 

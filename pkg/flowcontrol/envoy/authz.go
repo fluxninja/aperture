@@ -108,18 +108,19 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		}
 	}
 
-	var direction selectors.TrafficDirection
+	ctrlPt := selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_UNKNOWN, "")
 	headers, _ := metadata.FromIncomingContext(ctx)
 	if dirHeader, exists := headers["traffic-direction"]; exists && len(dirHeader) > 0 {
 		switch dirHeader[0] {
 		case "INBOUND":
-			direction = selectors.Ingress
+			ctrlPt.SetType(flowcontrolv1.ControlPoint_TYPE_INGRESS)
 		case "OUTBOUND":
-			direction = selectors.Egress
+			ctrlPt.SetType(flowcontrolv1.ControlPoint_TYPE_EGRESS)
 		default:
 			logSampled.Error().Str("traffic-direction", dirHeader[0]).Msg("invalid traffic-direction header")
 			checkResponse := &flowcontrolv1.CheckResponse{
-				Error: flowcontrolv1.CheckResponse_ERROR_INVALID_TRAFFIC_DIRECTION,
+				Error:        flowcontrolv1.CheckResponse_ERROR_INVALID_TRAFFIC_DIRECTION,
+				ControlPoint: ctrlPt.ToFlowControlPointProto(),
 			}
 			resp := createExtAuthzResponse(checkResponse)
 			return resp, errors.New("invalid traffic-direction")
@@ -178,7 +179,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	// Baggage can overwrite request flow labels
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
 
-	classifierMsgs, newFlowLabels, err := h.classifier.Classify(ctx, svcs, mergedFlowLabels.ToPlainMap(), direction, inputValue)
+	classifierMsgs, newFlowLabels, err := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), inputValue)
 	if err != nil {
 		checkResponse := &flowcontrolv1.CheckResponse{
 			Error:       flowcontrolv1.CheckResponse_ERROR_CLASSIFY,
@@ -207,7 +208,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	flowLabels := mergedFlowLabels.ToPlainMap()
 
 	// Ask flow control service for Ok/Deny
-	checkResponse := h.fcHandler.CheckWithValues(ctx, selectors.ControlPoint{Traffic: direction}, svcs, flowLabels)
+	checkResponse := h.fcHandler.CheckWithValues(ctx, svcs, ctrlPt, flowLabels)
 	checkResponse.Classifiers = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
 	checkResponse.TelemetryFlowLabels = flowLabels

@@ -45,8 +45,8 @@ type AcceptingHandler struct {
 
 func (s *AcceptingHandler) CheckWithValues(
 	context.Context,
-	selectors.ControlPoint,
 	[]string,
+	selectors.ControlPoint,
 	map[string]string,
 ) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
