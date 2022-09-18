@@ -8,7 +8,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -83,8 +82,8 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	// Default currentDecision to False
 	currentDecision := false
 
-	if lhs.Valid && rhs.Valid {
-		lhsVal, rhsVal := lhs.Value, rhs.Value
+	if lhs.Valid() && rhs.Valid() {
+		lhsVal, rhsVal := lhs.Value(), rhs.Value()
 		switch dec.operator {
 		case gt:
 			currentDecision = (lhsVal > rhsVal)
@@ -103,7 +102,7 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 
 	decisionType := dec.computeDecisionType(currentDecision, tickInfo)
 
-	var output reading.Reading
+	var output runtime.Reading
 
 	switch decisionType {
 	case currentDecided:
@@ -123,7 +122,7 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	}
 
 	return runtime.PortToValue{
-		"output": []reading.Reading{output},
+		"output": []runtime.Reading{output},
 	}, nil
 }
 
@@ -143,7 +142,7 @@ func (dec *Decider) computeDecisionType(currentDecision bool, tickInfo runtime.T
 	} else {
 		pendingSince := dec.getPendingSince(currentDecision, tickInfo)
 		// check how much time has elapsed since the pending state was set
-		if tickInfo.Timestamp.Sub(pendingSince) < dec.trueForDuration {
+		if tickInfo.Timestamp().Sub(pendingSince) < dec.trueForDuration {
 			dec.setPending(currentDecision)
 			return currentPending
 		} else {
@@ -189,12 +188,12 @@ func (dec *Decider) setDecided(currentDecision bool) {
 func (dec *Decider) getPendingSince(currentDecision bool, tickInfo runtime.TickInfo) time.Time {
 	if currentDecision {
 		if dec.truePendingSince.IsZero() {
-			dec.truePendingSince = tickInfo.Timestamp
+			dec.truePendingSince = tickInfo.Timestamp()
 		}
 		return dec.truePendingSince
 	} else {
 		if dec.falsePendingSince.IsZero() {
-			dec.falsePendingSince = tickInfo.Timestamp
+			dec.falsePendingSince = tickInfo.Timestamp()
 		}
 		return dec.falsePendingSince
 	}

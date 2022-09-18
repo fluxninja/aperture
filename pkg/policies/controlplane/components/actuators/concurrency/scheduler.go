@@ -23,7 +23,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -207,27 +206,27 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 		}
 	}
 
-	var acceptedReading, incomingReading reading.Reading
+	var acceptedReading, incomingReading runtime.Reading
 
 	outPortReadings := make(runtime.PortToValue)
 
 	acceptedValue, err := s.acceptedQuery.ExecuteScalarQuery(tickInfo)
 	if err != nil {
-		acceptedReading = reading.NewInvalid()
+		acceptedReading = runtime.InvalidReading()
 		errMulti = multierr.Append(errMulti, err)
 	} else {
-		acceptedReading = reading.New(acceptedValue)
+		acceptedReading = runtime.NewReading(acceptedValue)
 	}
-	outPortReadings["accepted_concurrency"] = []reading.Reading{acceptedReading}
+	outPortReadings["accepted_concurrency"] = []runtime.Reading{acceptedReading}
 
 	incomingValue, err := s.incomingQuery.ExecuteScalarQuery(tickInfo)
 	if err != nil {
-		incomingReading = reading.NewInvalid()
+		incomingReading = runtime.InvalidReading()
 		errMulti = multierr.Append(errMulti, err)
 	} else {
-		incomingReading = reading.New(incomingValue)
+		incomingReading = runtime.NewReading(incomingValue)
 	}
-	outPortReadings["incoming_concurrency"] = []reading.Reading{incomingReading}
+	outPortReadings["incoming_concurrency"] = []runtime.Reading{incomingReading}
 
 	return outPortReadings, errMulti
 }

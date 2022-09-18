@@ -13,7 +13,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 )
 
 // CircuitModule returns fx options of Circuit for the main app.
@@ -95,7 +94,7 @@ type CompiledComponentAndPorts struct {
 	CompiledComponent   CompiledComponent
 }
 
-type signalToReading map[Signal]reading.Reading
+type signalToReading map[Signal]Reading
 
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
 type Circuit struct {
@@ -109,6 +108,8 @@ type Circuit struct {
 	components []CompiledComponentAndPorts
 	// Tick end callbacks
 	tickEndCallbacks []TickEndCallback
+	// Tick start callbacks
+	tickStartCallbacks []TickStartCallback
 }
 
 // Make sure Circuit complies with CircuitAPI interface.
@@ -133,7 +134,7 @@ func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts, policyR
 			for _, outPort := range component.OutPortToSignalsMap {
 				for _, signal := range outPort {
 					if signal.Looped {
-						circuit.loopedSignals[signal] = reading.NewInvalid()
+						circuit.loopedSignals[signal] = InvalidReading()
 					}
 				}
 			}
@@ -202,6 +203,11 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 	defer circuit.UnlockExecution()
 	// errMulti appends errors from Executing all the components
 	var errMulti error
+	// Invoke TickStartCallback(s)
+	for _, sc := range circuit.tickStartCallbacks {
+		err := sc(tickInfo)
+		errMulti = multierr.Append(errMulti, err)
+	}
 	// Signals for this tick
 	circuitSignalReadings := make(signalToReading)
 	defer func() {
@@ -215,8 +221,8 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to initialize SummaryVec")
 			}
-			if reading.Valid {
-				signalSummaryVecMetric.Observe(reading.Value)
+			if reading.Valid() {
+				signalSummaryVecMetric.Observe(reading.Value())
 			}
 		}
 	}()
@@ -246,7 +252,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			// Check readiness of cmp by checking in_ports
 			for port, sigs := range cmp.InPortToSignalsMap {
 				// Reading list for this port
-				readingList := make([]reading.Reading, len(sigs))
+				readingList := make([]Reading, len(sigs))
 				// Check if all the sig(s) in sigs are ready
 				for index, sig := range sigs {
 					if sigReading, ok := circuitSignalReadings[sig]; ok {
@@ -261,7 +267,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				componentInPortReadings[port] = readingList
 			}
 			// log the component being executed
-			log.Trace().Str("component", cmp.CompiledComponent.Name).Int("tick", tickInfo.Tick).Interface("in_ports", componentInPortReadings).Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).Msg("Executing component")
+			log.Trace().Str("component", cmp.CompiledComponent.Name).Int("tick", tickInfo.Tick()).Interface("in_ports", componentInPortReadings).Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).Msg("Executing component")
 			// If control reaches this point, the component is ready to execute
 			componentOutPortReadings, err := cmp.CompiledComponent.Component.Execute(
 				/* pass signal */
@@ -283,15 +289,15 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			for port, signals := range cmp.OutPortToSignalsMap {
 				if _, ok := componentOutPortReadings[port]; !ok {
 					// Fill with invalid readings
-					componentOutPortReadings[port] = make([]reading.Reading, len(signals))
+					componentOutPortReadings[port] = make([]Reading, len(signals))
 					for index := range signals {
-						componentOutPortReadings[port][index] = reading.NewInvalid()
+						componentOutPortReadings[port][index] = InvalidReading()
 					}
 				} else if len(componentOutPortReadings[port]) < len(signals) {
 					// The reading list has fewer readings compared to portOutsSpec
 					// Fill with invalid readings
 					for index := len(componentOutPortReadings[port]); index < len(signals); index++ {
-						componentOutPortReadings[port][index] = reading.NewInvalid()
+						componentOutPortReadings[port][index] = InvalidReading()
 					}
 				}
 			}
@@ -336,8 +342,8 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 		}
 	}
 	// Invoke TickEndCallback(s)
-	for _, cb := range circuit.tickEndCallbacks {
-		err := cb(tickInfo)
+	for _, ec := range circuit.tickEndCallbacks {
+		err := ec(tickInfo)
 		errMulti = multierr.Append(errMulti, err)
 	}
 	return errMulti
@@ -354,6 +360,11 @@ func (circuit *Circuit) UnlockExecution() {
 }
 
 // RegisterTickEndCallback adds a callback function to be called when a tick ends.
-func (circuit *Circuit) RegisterTickEndCallback(cb TickEndCallback) {
-	circuit.tickEndCallbacks = append(circuit.tickEndCallbacks, cb)
+func (circuit *Circuit) RegisterTickEndCallback(ec TickEndCallback) {
+	circuit.tickEndCallbacks = append(circuit.tickEndCallbacks, ec)
+}
+
+// RegisterTickStartCallback adds a callback function to be called when a tick starts.
+func (circuit *Circuit) RegisterTickStartCallback(sc TickStartCallback) {
+	circuit.tickStartCallbacks = append(circuit.tickStartCallbacks, sc)
 }

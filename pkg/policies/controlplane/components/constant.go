@@ -5,7 +5,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -27,6 +26,6 @@ func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, 
 func (con *Constant) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	// Always emit the value.
 	return runtime.PortToValue{
-		"output": []reading.Reading{reading.New(con.value)},
+		"output": []runtime.Reading{runtime.NewReading(con.value)},
 	}, nil
 }
