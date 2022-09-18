@@ -69,6 +69,8 @@ generate-config-markdown:
 generate-mermaid:
 	@echo generating mermaid diagrams
 	@find . -name '*.mmd' -exec $(MAKE) -B {}.svg \;
+	@echo generating mermaid diagrams from markdown files
+	@./tools/mermaid/md_mmd_svg.sh
 
 %.mmd.svg: %.mmd ./tools/mermaid/mermaid-theme.json
 	@echo MMDC $@
