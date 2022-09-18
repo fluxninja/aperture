@@ -46,6 +46,8 @@ At the fundamental level, Aperture enables flow control through observing, analy
   </picture>
 </p>
 
+![Aperture Architecture Overview](./docs/content/assets/gen/architecture_simple.mmd.svg)
+
 ## 🏁 Getting Started
 
 ### 🎮 Playground
