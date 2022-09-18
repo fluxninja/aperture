@@ -25,8 +25,8 @@ type multiMatchResult struct {
 type multiMatcher = multimatcher.MultiMatcher[string, multiMatchResult]
 
 // PopulateFromMultiMatcher populates result object with results from MultiMatcher.
-func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiMatcher[string, multiMatchResult], labels selectors.Labels) {
-	resultCollection := mm.Match(multimatcher.Labels(labels.ToPlainMap()))
+func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiMatcher[string, multiMatchResult], labels map[string]string) {
+	resultCollection := mm.Match(multimatcher.Labels(labels))
 	result.concurrencyLimiters = append(result.concurrencyLimiters, resultCollection.concurrencyLimiters...)
 	result.fluxMeters = append(result.fluxMeters, resultCollection.fluxMeters...)
 	result.rateLimiters = append(result.rateLimiters, resultCollection.rateLimiters...)
@@ -52,7 +52,7 @@ type Engine struct {
 }
 
 // ProcessRequest .
-func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels selectors.Labels) (response *flowcontrolv1.CheckResponse) {
+func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 		FlowLabelKeys: maps.Keys(labels),
@@ -110,7 +110,7 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	return
 }
 
-func runLimiters(limiters []iface.Limiter, labels selectors.Labels) ([]*flowcontrolv1.LimiterDecision, flowcontrolv1.CheckResponse_DecisionType) {
+func runLimiters(limiters []iface.Limiter, labels map[string]string) ([]*flowcontrolv1.LimiterDecision, flowcontrolv1.CheckResponse_DecisionType) {
 	var wg sync.WaitGroup
 	var once sync.Once
 	decisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))
@@ -148,7 +148,7 @@ func runLimiters(limiters []iface.Limiter, labels selectors.Labels) ([]*flowcont
 func returnExtraTokens(
 	rateLimiters []iface.RateLimiter,
 	rateLimiterDecisions []*flowcontrolv1.LimiterDecision,
-	labels selectors.Labels,
+	labels map[string]string,
 ) {
 	for i, l := range rateLimiterDecisions {
 		if !l.Dropped && l.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
@@ -235,7 +235,7 @@ func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.
-func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []string, labels selectors.Labels) *multiMatchResult {
+func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) *multiMatchResult {
 	e.multiMatchersMutex.RLock()
 	defer e.multiMatchersMutex.RUnlock()
 

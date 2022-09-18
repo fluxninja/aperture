@@ -17,7 +17,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 )
 
 type metricsProcessor struct {
@@ -87,8 +86,6 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
 		checkResponse := addCheckResponseBasedLabels(logRecord.Attributes(), []string{otelcollector.EnvoyMissingAttributeSourceValue})
 
-		fixupEnvoyLogs(logRecord.Attributes())
-
 		p.updateMetrics(logRecord.Attributes(), checkResponse, []string{otelcollector.EnvoyMissingAttributeSourceValue})
 
 		// Pass attributes through exclude list to drop keys that got flattened in this stage
@@ -114,16 +111,6 @@ func (p *metricsProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) 
 		return nil
 	})
 	return td, err
-}
-
-// HACK We cannot configure envoy to send some attributes according to OTEL's
-// conventions, so we let envoy send them its way and fix up here.
-func fixupEnvoyLogs(attributes pcommon.Map) {
-	if flavorVal, exists := attributes.Get("http.flavor"); exists {
-		if flavor := flavorVal.StringVal(); flavor != "" {
-			flavorVal.SetStringVal(selectors.CanonicalizeOtelHTTPFlavor(flavor))
-		}
-	}
 }
 
 // addCheckResponseBasedLabels adds the following labels:

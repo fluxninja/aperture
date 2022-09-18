@@ -52,7 +52,7 @@ func New() *ClassifierEngine {
 	}
 }
 
-func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm *multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector], labelsForMatching selectors.Labels, input ast.Value) (classifierMsgs []*flowcontrolv1.Classifier) {
+func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm *multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector], labelsForMatching map[string]string, input ast.Value) (classifierMsgs []*flowcontrolv1.Classifier) {
 	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.Classifier_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.Classifier{
 			PolicyName:      labelerWithSelector.PolicyName,
@@ -63,7 +63,7 @@ func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm
 		})
 	}
 
-	for _, labelerWithSelector := range mm.Match(labelsForMatching.ToPlainMap()) {
+	for _, labelerWithSelector := range mm.Match(labelsForMatching) {
 		labeler := labelerWithSelector.Labeler
 		resultSet, err := labeler.Query.Eval(ctx, rego.EvalParsedInput(input))
 		if err != nil {
@@ -121,7 +121,7 @@ func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm
 func (c *ClassifierEngine) Classify(
 	ctx context.Context,
 	svcs []string,
-	labelsForMatching selectors.Labels,
+	labelsForMatching map[string]string,
 	direction selectors.TrafficDirection,
 	input ast.Value,
 ) ([]*flowcontrolv1.Classifier, flowlabel.FlowLabels, error) {

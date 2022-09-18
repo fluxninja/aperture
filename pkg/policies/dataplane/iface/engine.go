@@ -10,7 +10,7 @@ import (
 
 // Engine is an interface for registering fluxmeters and schedulers.
 type Engine interface {
-	ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels selectors.Labels) *flowcontrolv1.CheckResponse
+	ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) *flowcontrolv1.CheckResponse
 
 	RegisterConcurrencyLimiter(sa Limiter) error
 	UnregisterConcurrencyLimiter(sa Limiter) error
@@ -32,8 +32,8 @@ type MultiMatchResult struct {
 }
 
 // PopulateFromMultiMatcher populates result object with results from MultiMatcher.
-func (result *MultiMatchResult) PopulateFromMultiMatcher(mm *multimatcher.MultiMatcher[string, MultiMatchResult], labels selectors.Labels) {
-	resultCollection := mm.Match(multimatcher.Labels(labels.ToPlainMap()))
+func (result *MultiMatchResult) PopulateFromMultiMatcher(mm *multimatcher.MultiMatcher[string, MultiMatchResult], labels map[string]string) {
+	resultCollection := mm.Match(multimatcher.Labels(labels))
 	result.ConcurrencyLimiters = append(result.ConcurrencyLimiters, resultCollection.ConcurrencyLimiters...)
 	result.FluxMeters = append(result.FluxMeters, resultCollection.FluxMeters...)
 	result.RateLimiters = append(result.RateLimiters, resultCollection.RateLimiters...)

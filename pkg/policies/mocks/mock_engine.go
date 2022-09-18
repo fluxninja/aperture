@@ -51,7 +51,7 @@ func (mr *MockEngineMockRecorder) GetFluxMeter(fluxMeterName interface{}) *gomoc
 }
 
 // ProcessRequest mocks base method.
-func (m *MockEngine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels selectors.Labels) *flowcontrolv1.CheckResponse {
+func (m *MockEngine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) *flowcontrolv1.CheckResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessRequest", controlPoint, serviceIDs, labels)
 	ret0, _ := ret[0].(*flowcontrolv1.CheckResponse)

@@ -9,6 +9,18 @@ type FlowLabelValue struct {
 	Telemetry bool
 }
 
+// NewFromPlainMap returns flow labels from normal map[string]string. Telemetry flag is set to true for all flow labels.
+func NewFromPlainMap(input map[string]string) FlowLabels {
+	flowLabels := make(FlowLabels, len(input))
+	for key, val := range input {
+		flowLabels[key] = FlowLabelValue{
+			Value:     val,
+			Telemetry: true,
+		}
+	}
+	return flowLabels
+}
+
 // ToPlainMap returns flow labels as normal map[string]string.
 func (fl FlowLabels) ToPlainMap() map[string]string {
 	plainMap := make(map[string]string, len(fl))
@@ -18,10 +30,9 @@ func (fl FlowLabels) ToPlainMap() map[string]string {
 	return plainMap
 }
 
-// CombineWith combines two flow labels maps into one. Overwrites overlapping key with values from other.
-func (fl FlowLabels) CombineWith(other FlowLabels) FlowLabels {
-	for k, v := range other {
-		fl[k] = v
+// Merge combines two flow labels maps into one. Overwrites overlapping keys with values from src.
+func Merge(dst, src FlowLabels) {
+	for key, val := range src {
+		dst[key] = val
 	}
-	return fl
 }

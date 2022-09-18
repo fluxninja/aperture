@@ -160,9 +160,7 @@ var _ = Describe("Dataplane Engine", func() {
 				Traffic: selectors.Ingress,
 			}
 			svcs := []string{"testService2.testNamespace2.svc.cluster.local"}
-			labels := selectors.NewLabels(selectors.LabelSources{
-				Flow: map[string]string{"service": "whatever"},
-			})
+			labels := map[string]string{"service": "whatever"}
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).To(BeEmpty())
@@ -177,9 +175,7 @@ var _ = Describe("Dataplane Engine", func() {
 				Traffic: selectors.Ingress,
 			}
 			svcs := []string{"testService.testNamespace.svc.cluster.local"}
-			labels := selectors.NewLabels(selectors.LabelSources{
-				Flow: map[string]string{"service": "testService.testNamespace.svc.cluster.local"},
-			})
+			labels := map[string]string{"service": "testService.testNamespace.svc.cluster.local"}
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).NotTo(BeEmpty())

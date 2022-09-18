@@ -28,6 +28,7 @@ import (
 	authz_baggage "github.com/fluxninja/aperture/pkg/flowcontrol/envoy/baggage"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/flowlabel"
 	classification "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 )
@@ -164,18 +165,18 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		return resp, fmt.Errorf("converting rego input to value failed: %v", err)
 	}
 
-	// Extract previous flow labels from headers
+	// Default flow labels from Authz request
+	requestFlowLabels := AuthzRequestToFlowLabels(req.GetAttributes().GetRequest())
+	// Extract flow labels from baggage headers
 	existingHeaders := authz_baggage.Headers(req.GetAttributes().GetRequest().GetHttp().GetHeaders())
-	oldFlowLabels := h.propagator.Extract(existingHeaders)
+	baggageFlowLabels := h.propagator.Extract(existingHeaders)
 
-	labelsForMatching := selectors.NewLabels(
-		selectors.LabelSources{
-			Flow:    oldFlowLabels.ToPlainMap(),
-			Request: req.GetAttributes().GetRequest(),
-		},
-	)
+	// Merge flow labels from Authz request and baggage headers
+	mergedFlowLabels := requestFlowLabels
+	// Baggage can overwrite request flow labels
+	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
 
-	classifierMsgs, newFlowLabels, err := h.classifier.Classify(ctx, svcs, labelsForMatching, direction, inputValue)
+	classifierMsgs, newFlowLabels, err := h.classifier.Classify(ctx, svcs, mergedFlowLabels.ToPlainMap(), direction, inputValue)
 	if err != nil {
 		checkResponse := &flowcontrolv1.CheckResponse{
 			Error:       flowcontrolv1.CheckResponse_ERROR_CLASSIFY,
@@ -198,14 +199,15 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	}
 
 	// Make the freshly created flow labels available to flowcontrol.
-	labelsForMatching = labelsForMatching.CombinedWith(selectors.LabelSources{
-		Flow: newFlowLabels.ToPlainMap(),
-	})
-	// TODO tgill: set telemetry_flow_labels in the CheckRequest
-	// flowLabels := mergeFlowLabels(oldFlowLabels, newFlowLabels)
+	// Newly created flow labels can overwrite existing flow labels.
+	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
+	flowLabels := mergedFlowLabels.ToPlainMap()
+
 	// Ask flow control service for Ok/Deny
-	checkResponse := h.fcHandler.CheckWithValues(ctx, selectors.ControlPoint{Traffic: direction}, svcs, labelsForMatching)
+	checkResponse := h.fcHandler.CheckWithValues(ctx, selectors.ControlPoint{Traffic: direction}, svcs, flowLabels)
 	checkResponse.Classifiers = classifierMsgs
+	// Set telemetry_flow_labels in the CheckResponse
+	checkResponse.TelemetryFlowLabels = flowLabels
 
 	resp := createExtAuthzResponse(checkResponse)
 

@@ -425,12 +425,11 @@ func (conLimiter *concurrencyLimiter) GetSelector() *selectorv1.Selector {
 }
 
 // RunLimiter .
-func (conLimiter *concurrencyLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
+func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadProto *policylangv1.Scheduler_Workload
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
-	labelMap := labels.ToPlainMap()
-	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labelMap))
+	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labels))
 	// if at least one match, return workload with lowest index
 	if len(mmr.matchedWorkloads) > 0 {
 		// select the smallest workloadIndex

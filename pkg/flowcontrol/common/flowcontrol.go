@@ -42,7 +42,7 @@ type HandlerWithValues interface {
 		context.Context,
 		selectors.ControlPoint,
 		[]string,
-		selectors.Labels,
+		map[string]string,
 	) *flowcontrolv1.CheckResponse
 }
 
@@ -51,9 +51,9 @@ func (h *Handler) CheckWithValues(
 	ctx context.Context,
 	controlPoint selectors.ControlPoint,
 	serviceIDs []string,
-	labels selectors.Labels,
+	labels map[string]string,
 ) *flowcontrolv1.CheckResponse {
-	log.Trace().Interface("labels", labels.ToPlainMap()).Interface("serviceIDs", serviceIDs).Str("controlPoint", controlPoint.String()).Msg("FlowControl.CheckWithValues()")
+	log.Trace().Interface("labels", labels).Interface("serviceIDs", serviceIDs).Str("controlPoint", controlPoint.String()).Msg("FlowControl.CheckWithValues()")
 
 	checkResponse := h.engine.ProcessRequest(controlPoint, serviceIDs, labels)
 	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetRejectReason(), checkResponse.GetError())
@@ -82,9 +82,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 		ctx,
 		selectors.ControlPoint{Feature: req.Feature},
 		serviceIDs,
-		selectors.NewLabels(selectors.LabelSources{
-			Flow: req.Labels,
-		}),
+		req.Labels,
 	)
 	return resp, nil
 }

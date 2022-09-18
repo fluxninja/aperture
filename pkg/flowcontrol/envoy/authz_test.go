@@ -47,7 +47,7 @@ func (s *AcceptingHandler) CheckWithValues(
 	context.Context,
 	selectors.ControlPoint,
 	[]string,
-	selectors.Labels,
+	map[string]string,
 ) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
 		DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
