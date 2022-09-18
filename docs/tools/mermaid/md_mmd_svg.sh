@@ -17,11 +17,15 @@ for d in $dirs; do
 		mermaid_section_files=$(find . -type f -name "mermaid_section_*")
 		count=0
 		for mermaid_section_file in $mermaid_section_files; do
-			# # extract the mermaid section content
-			# mermaid_section_content=$(cat $mermaid_section_file)
-			# echo "section: $mermaid_section_content"
+			# search for name in the comment - "%% name: <name>"
+			# if found, use the name as the svg file name
+			name=$(grep -P '^%% name: ' "$mermaid_section_file" | sed -e 's/%% name: //')
+			if [ -n "$name" ]; then
+				outfilename="$name.svg"
+			else
+				outfilename=$(basename "$f")_$count.svg
+			fi
 			# generate svg
-			outfilename=$(basename "$f")_$count.svg
 			echo "generating $outfilename"
 			npx -p @mermaid-js/mermaid-cli mmdc --configFile ./tools/mermaid/mermaid-theme.json -i "$mermaid_section_file" -o ./content/assets/gen/"$outfilename" --backgroundColor transparent
 			# increment count

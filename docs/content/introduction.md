@@ -21,6 +21,7 @@ Aperture is an open-source flow control and reliability management platform for
 modern web applications.
 
 ```mermaid
+%% name: architecture_simple
 flowchart TD
     policies[/"Policies"/]
     subgraph controller["Aperture Controller"]
