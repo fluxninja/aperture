@@ -18,9 +18,7 @@ Kubernetes. Tilt watches for changes to local files and auto-deploys any
 resources that change. This is very convenient for getting quick feedback during
 development of Aperture.
 
-Playground deploys resources to the Kubernetes cluster that `kubectl` on your
- machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s) for deploying a local Kubernetes cluster using
- [Kind](https://kind.sigs.k8s.io/).
+Playground deploys resources to the Kubernetes cluster that `kubectl` on your machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s) for deploying a local Kubernetes cluster using [Kind](https://kind.sigs.k8s.io/).
 
 
 :::note
