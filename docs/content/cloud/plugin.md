@@ -16,8 +16,8 @@ by enabling FluxNinja plugin. It enriches logs and traces collected by Aperture 
 
 Refer FluxNinja Cloud plugin configuration reference:
 
-- [Aperture Controller](/reference/configuration/controller.md/#flux-ninja-plugin)
-- [Aperture Agent](/reference/configuration/agent.md#flux-ninja-plugin)
+- [Aperture Controller](/references/configuration/controller.md/#flux-ninja-plugin)
+- [Aperture Agent](/references/configuration/agent.md#flux-ninja-plugin)
 
 ## See also
 
