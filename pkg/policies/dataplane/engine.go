@@ -56,6 +56,7 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	response = &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 		FlowLabelKeys: maps.Keys(labels),
+		Services:      serviceIDs,
 	}
 
 	mmr := e.getMatches(controlPoint, serviceIDs, labels)

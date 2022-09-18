@@ -4,8 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
@@ -70,7 +68,6 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	rpcPeer, peerExists := peer.FromContext(ctx)
 	if peerExists {
 		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
-		_ = grpc.SetHeader(ctx, metadata.Pairs("client-ip", clientIP))
 		entity, err := h.entityCache.GetByIP(clientIP)
 		if err == nil {
 			serviceIDs = entity.Services

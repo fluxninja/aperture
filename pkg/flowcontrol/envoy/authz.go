@@ -82,7 +82,7 @@ func sanitizeBaggageHeaderValue(value string) string {
 // * computes flow labels and returns them via DynamicMetadata.
 // * makes the allow/deny decision - sends flow labels to flow control's Check function.
 func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_authz.CheckResponse, error) {
-	log.Trace().Msg("Classifier.Check()")
+	logSampled.Trace().Msg("Classifier.Check()")
 	// record the start time of the request
 	start := time.Now()
 
@@ -98,7 +98,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		checkResponse.Start = timestamppb.New(start)
 		checkResponse.End = timestamppb.New(end)
 
-		log.Trace().Interface("checkResponse", marshalledCheckResponse).Msg("Created ext_authz.CheckResponse")
+		logSampled.Trace().Interface("checkResponse", marshalledCheckResponse).Msg("Created ext_authz.CheckResponse")
 		return &ext_authz.CheckResponse{
 			DynamicMetadata: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
@@ -150,7 +150,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	input, err := envoyauth.RequestToInput(req, logger, nil)
 	if err != nil {
 		checkResponse := &flowcontrolv1.CheckResponse{
-			Error: flowcontrolv1.CheckResponse_ERROR_CONVERT_TO_MAP_STRUCT,
+			Error:    flowcontrolv1.CheckResponse_ERROR_CONVERT_TO_MAP_STRUCT,
+			Services: svcs,
 		}
 		resp := createExtAuthzResponse(checkResponse)
 		return resp, fmt.Errorf("converting raw input into rego input failed: %v", err)
@@ -159,7 +160,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	inputValue, err := ast.InterfaceToValue(input)
 	if err != nil {
 		checkResponse := &flowcontrolv1.CheckResponse{
-			Error: flowcontrolv1.CheckResponse_ERROR_CONVERT_TO_REGO_AST,
+			Error:    flowcontrolv1.CheckResponse_ERROR_CONVERT_TO_REGO_AST,
+			Services: svcs,
 		}
 		resp := createExtAuthzResponse(checkResponse)
 		return resp, fmt.Errorf("converting rego input to value failed: %v", err)
@@ -180,6 +182,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	if err != nil {
 		checkResponse := &flowcontrolv1.CheckResponse{
 			Error:       flowcontrolv1.CheckResponse_ERROR_CLASSIFY,
+			Services:    svcs,
 			Classifiers: classifierMsgs,
 		}
 		resp := createExtAuthzResponse(checkResponse)
