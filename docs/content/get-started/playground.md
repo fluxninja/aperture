@@ -9,8 +9,6 @@ keywords:
 sidebar_position: 2
 ---
 
-# Playground
-
 Playground is a Kubernetes based environment for exploring the capabilities of
 Aperture. Additionally it is used as a development environment for Aperture.
 Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in
@@ -23,15 +21,19 @@ machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s)
 [Kind](https://kind.sigs.k8s.io/).
 
 :::note
-Apple Silicon users: Playground currently is not supported on Apple Silicon (e.g. m1 processor) because of Istio iptables [issue](https://github.com/istio/istio/issues/36762). That issue will likely be resolved in the upcoming Istio 1.16.0 release.
+
+Playground is currently not supported on Apple Silicon (e.g. M1 processor) because of an Istio [issue](https://github.com/istio/istio/issues/36762). That issue will likely be resolved in the upcoming Istio release.
+
 :::
 
 ## How to Run
 
-Once [requirements](#tools) are installed, simply run below commands from the
-`playground` directory (present under the aperture's root directory):
+Assuming that you have already cloned the aperture repository and brought up a [local Kubernetes cluster](#prerequisites-k8s), proceed to install the [required tools](#tools). In order to bring up the Playground, run the following commands:
 
 ```sh
+# change directory to playground
+$ cd playground
+# start Tilt and run services defined in Tiltfile
 $ tilt up
 Tilt started on http://localhost:10350/
 v0.30.2, built 2022-06-06
@@ -56,24 +58,42 @@ with an Istio and Envoy based service mesh configured to integrate with
 Aperture. There is an instance of Grafana running on the cluster as well for viewing metrics from
 experiments.
 
-The Aperture Playground is pre-loaded with a Latency Gradient Concurrency Control Policy which protects the
-demo application against sudden surges in traffic load.
+The Playground is pre-loaded with a Latency Gradient Concurrency Control Policy which protects the
+demo application against sudden surges in traffic load. You can verify it using the following command:
 
-To run the traffic load, navigate to K6 resource in the Tilt UI and press the `Run load test` button.
-Once finished, press the `Delete load test` button. To view results from the
-experiment navigate to the "FluxNinja" dashboard in Grafana under
-"aperture-system" folder. Grafana runs at
-[localhost:3000](http://localhost:3000).
+```sh
+$ k get configmaps -n aperture-controller policies
+NAME       DATA   AGE
+policies   1      36h
+```
 
-Now your _Aperture playground_ is ready. You will be able to see our Rate Limit
-policy in action. Subscribe vs Non Subscribed Priority
+The Playground comes with a demo application so that you can generate simulated traffic and see the policy in action. The demo application can be found in `demoapp` namespace. You can read more about the demo application [here](https://github.com/fluxninja/aperture/tree/main/tools/demo_app).
 
-**Note**: We need to talk about how to load grafana dashboard
+```sh
+$ kubectl get pods -n demoapp
+NAME                                 READY   STATUS    RESTARTS       AGE
+service1-demo-app-5bff5f5556-l9hdd   1/2     Running   6 (151m ago)   36h
+service1-demo-app-5bff5f5556-rj5n6   1/2     Running   6 (151m ago)   36h
+service2-demo-app-bb7d5c9b5-75c4z    1/2     Running   6 (151m ago)   36h
+service2-demo-app-bb7d5c9b5-8dhcx    1/2     Running   6 (151m ago)   36h
+service3-demo-app-68b8dbd9b9-4bqmn   1/2     Running   6 (151m ago)   36h
+service3-demo-app-68b8dbd9b9-6g87r   1/2     Running   6 (151m ago)   36h
 
-Now that you have your Grafana Dashboard ready, you can just click "Start"
-button as shown below. ![Start Load Test](../assets/img/starttrafficbig.png)
+```
 
-**Note**: How do we monitor the traffic and what is happening
+To start the simulated traffic against the demo application, navigate to K6 resource in the Tilt UI and press the `Run load test` button. The traffic is designed to overload the demo application in order showcase the capabilities of Aperture.
+
+![Start Load Test](../assets/img/starttrafficbig.png)
+
+Once the traffic is running, you can visualize the decisions made by Aperture in Grafana. Navigate to [localhost:3000](http://localhost:3000) on your browser to reach Grafana. You can open the pre-loaded "FluxNinja" dashboard under "aperture-system" folder to a bunch of useful panels.
+
+To stop the traffic at any point of time, press the `Delete load test` button in the K6 resource.
+
+:::note
+
+Every time you wish to run the traffic, make sure to press the `Delete load test` button first.
+
+:::
 
 ---
 
@@ -88,13 +108,8 @@ install manually (check
 
 ### Install via asdf
 
-When using `asdf`:
-
-- [Download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
-  and [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
-  `asdf`
-- Run the below command in aperture home directory to install all the required
-  tools.
+First, [download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and [install](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf)
+`asdf`. Then, run the following command in aperture home directory to install all the required tools.
 
 ```sh
 make install-asdf-tools
@@ -102,53 +117,43 @@ make install-asdf-tools
 
 ### Tools required for Kubernetes deployment
 
-Please skip this section in case you used [asdf to install](#install-via-asdf).
+:::note
 
-Tools which are required for local Kubernetes deployment:
+Please skip this section in case you already installed the required tools using [`asdf`](#install-via-asdf).
 
-#### helm
+:::
 
-Helm is a package manager for Kubernetes.
+#### Helm
 
-To install manually, follow instructions: <https://helm.sh/docs/intro/install/>
+Helm is a package manager for Kubernetes. To install manually, follow instructions [here](https://helm.sh/docs/intro/install/).
 
 #### Tanka and Jsonnet Bundler
 
-Grafana Tanka is the robust configuration utility for your Kubernetes cluster,
-powered by the unique Jsonnet language.
+Grafana Tanka is a robust configuration utility for your Kubernetes cluster, powered by the unique Jsonnet language. Jsonnet Bundler is used to manage Jsonnet dependencies. To install manually, follow instructions [here](https://tanka.dev/install).
 
-Jsonnet Bundler is used to manage Jsonnet dependencies.
+#### Kind
 
-To install manually, follow instructions: <https://tanka.dev/install>
+Kind allows you to run local Kubernetes clusters. To install manually, follow instructions [here](https://kind.sigs.k8s.io/docs/user/quick-start/#installation).
 
-#### Local Kubernetes cluster
+#### Kubectl
 
-May use [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/).
-
-#### kubectl
-
-The Kubernetes command line tool. Follow the instructions:
-<https://kubernetes.io/docs/tasks/tools/#kubectl>
+Kubectl is the command-line tool to interact with Kubernetes clusters. To install manually, follow instructions [here](https://kubernetes.io/docs/tasks/tools/#kubectl).
 
 ## Deploying with Tilt
 
-In case of local deployments and development work, it's nice to be able to
-automatically rebuild images and services.
-
-This can be achieved by using `tilt`.
-
-> Note: This builds up on tools mentioned earlier, their installation and
-> configuration is required.
+In case of local deployments and development work, it's nice to be able to automatically rebuild images and services. Aperture Playground uses Tilt to achieve this.
 
 ### Tilt installation
 
-Tilt can be installed with `asdf install` or manually
-<https://docs.tilt.dev/install.html>.
+Tilt can be installed using [`asdf`](#install-via-asdf) or manually by following instructions [here](https://docs.tilt.dev/install.html).
 
 ### Prerequisites - Kubernetes cluster bootstrap {#prerequisites-k8s}
 
-> Note: You can skip this section if you already have a running cluster which is
-> being pointed by the `kubectl`.
+:::note
+
+You can skip this section if you already have a running cluster which is being pointed by the `kubectl`.
+
+:::
 
 Create a K8s cluster using Kind with configuration file by executing below
 command from aperture home directory:
@@ -181,7 +186,7 @@ ctlptl delete -f ctlptl-kind-config.yaml
 ### Services deployment
 
 Simply run `tilt up` from `playground` directory - it'll automatically start
-building and deploying!
+building and deploying.
 
 You can reach the WebUI by going to <http://localhost:10350> or pressing
 (Space).
@@ -223,7 +228,25 @@ To view the available namespaces and resources, either:
 
 To disable automatic updates in Tilt, add `--manual` with the command.
 
-### To many open files "warning"
+### Teardown
+
+Simply run `tilt down`. All created resources will be deleted.
+
+### Port Forwards {#port-forwards}
+
+Tilt will automatically setup forwarding for the services.
+
+Below is the mapping of the ports being forwarded by Tilt:
+
+| Component  | Container Port | Local Port |
+| ---------- | -------------- | ---------- |
+| Prometheus | 9090           | 9090       |
+| Etcd       | 2379           | 2379       |
+| Grafana    | 3000           | 3000       |
+
+## FAQs
+
+### Too many open files "warning"
 
 If you are getting following message in cluster container:
 
@@ -253,19 +276,3 @@ fs.inotify.max_queued_events = 16384
 fs.inotify.max_user_instances = 1024
 fs.inotify.max_user_watches = 524288
 ```
-
-### Teardown
-
-Simply run `tilt down`. All created resources will be deleted.
-
-### Port Forwards {#port-forwards}
-
-Tilt will automatically setup forwarding for the services.
-
-Below is the mapping of the ports being forwarded by Tilt:
-
-| Component  | Container Port | Local Port |
-| ---------- | -------------- | ---------- |
-| Prometheus | 9090           | 9090       |
-| Etcd       | 2379           | 2379       |
-| Grafana    | 3000           | 3000       |
