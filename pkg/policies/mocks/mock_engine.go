@@ -10,7 +10,6 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	selectors "github.com/fluxninja/aperture/pkg/selectors"
-	services "github.com/fluxninja/aperture/pkg/services"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -52,7 +51,7 @@ func (mr *MockEngineMockRecorder) GetFluxMeter(fluxMeterName interface{}) *gomoc
 }
 
 // ProcessRequest mocks base method.
-func (m *MockEngine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []services.ServiceID, labels selectors.Labels) *flowcontrolv1.CheckResponse {
+func (m *MockEngine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels selectors.Labels) *flowcontrolv1.CheckResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessRequest", controlPoint, serviceIDs, labels)
 	ret0, _ := ret[0].(*flowcontrolv1.CheckResponse)

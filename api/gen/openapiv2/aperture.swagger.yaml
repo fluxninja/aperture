@@ -15,27 +15,6 @@ consumes:
 produces:
   - application/json
 paths:
-  /aperture.common.entitycache.v1.EntityCacheService/GetEntity:
-    post:
-      operationId: EntityCacheService_GetEntity
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1Entity'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          description: GetEntityRequest contains one of the required info fields to perform GetEntity call.
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1GetEntityRequest'
-      tags:
-        - EntityCacheService
   /aperture.flowcontrol.v1.FlowControlService/Check:
     post:
       summary: |-
@@ -83,7 +62,7 @@ paths:
             $ref: '#/definitions/v1ReportRequest'
       tags:
         - FluxNinjaService
-  /v1/entity-cache/entity-cache:
+  /v1/entities:
     get:
       operationId: EntityCacheService_GetEntityCache
       responses:
@@ -97,18 +76,42 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - EntityCacheService
-  /v1/entity-cache/services-list:
+  /v1/entities/ip-address/{ip_address}:
     get:
-      operationId: EntityCacheService_GetServicesList
+      operationId: EntityCacheService_GetEntityByIPAddress
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1ServicesList'
+            $ref: '#/definitions/v1Entity'
         default:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: ip_address
+          in: path
+          required: true
+          type: string
+      tags:
+        - EntityCacheService
+  /v1/entities/name/{name}:
+    get:
+      operationId: EntityCacheService_GetEntityByName
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Entity'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: name
+          in: path
+          required: true
+          type: string
       tags:
         - EntityCacheService
   /v1/info/host:
@@ -153,7 +156,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - InfoService
-  /v1/peers/{address}:
+  /v1/peers:
     get:
       operationId: PeerDiscoveryService_GetPeers
       responses:
@@ -165,15 +168,25 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - PeerDiscoveryService
+  /v1/peers/address/{address}:
+    get:
+      operationId: PeerDiscoveryService_GetPeer
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Peer'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: address
           in: path
           required: true
-          type: array
-          items:
-            type: string
-          collectionFormat: csv
-          minItems: 1
+          type: string
       tags:
         - PeerDiscoveryService
   /v1/policies:
@@ -190,6 +203,20 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - PolicyService
+  /v1/status:
+    get:
+      operationId: StatusService_GetStatus
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1GroupStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - StatusService
   /v1/status/{keys}:
     get:
       operationId: StatusService_GetGroupStatus
@@ -234,14 +261,6 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/v1Entity'
     description: Entities defines mapping of entities.
-  EntityEntityID:
-    type: object
-    properties:
-      prefix:
-        type: string
-      uid:
-        type: string
-    description: EntityID is a unique Entity identifier.
   LimiterDecisionLimiterReason:
     type: string
     enum:
@@ -1083,23 +1102,25 @@ definitions:
   v1Entity:
     type: object
     properties:
-      entity_id:
-        $ref: '#/definitions/EntityEntityID'
-      entity_name:
-        type: string
       ip_address:
+        type: string
+      name:
+        type: string
+      prefix:
         type: string
       services:
         type: array
         items:
           type: string
+      uid:
+        type: string
     description: Entity represents a pod, vm, etc.
   v1EntityCache:
     type: object
     properties:
-      entities_by_entity_name:
-        $ref: '#/definitions/EntityCacheEntities'
       entities_by_ip_address:
+        $ref: '#/definitions/EntityCacheEntities'
+      entities_by_name:
         $ref: '#/definitions/EntityCacheEntities'
     description: EntityCache contains both mappings of ip address to entity and entity name to entity.
   v1EqualsMatchExpression:
@@ -1184,14 +1205,6 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Extrapolated signal.
     description: Outputs for the Extrapolator component.
-  v1GetEntityRequest:
-    type: object
-    properties:
-      entity_name:
-        type: string
-      ip_address:
-        type: string
-    description: GetEntityRequest contains one of the required info fields to perform GetEntity call.
   v1GradientController:
     type: object
     properties:
@@ -1634,7 +1647,7 @@ definitions:
       If a match occurs, the value associated with the path template will be treated as a result.
       In case of multiple path templates matching, the most specific one will be chosen.
     title: Matches HTTP Path to given path templates
-  v1PeerInfo:
+  v1Peer:
     type: object
     properties:
       address:
@@ -1645,16 +1658,16 @@ definitions:
         type: object
         additionalProperties:
           type: string
-    description: PeerInfo holds peer info and services.
+    description: Peer holds peer info and services.
   v1Peers:
     type: object
     properties:
-      peer_info:
-        $ref: '#/definitions/v1PeerInfo'
       peers:
         type: object
         additionalProperties:
-          $ref: '#/definitions/v1PeerInfo'
+          $ref: '#/definitions/v1Peer'
+      self_peer:
+        $ref: '#/definitions/v1Peer'
     description: Peers holds the peer info of this peer and a mapping of address to other peers.
   v1Policy:
     type: object
