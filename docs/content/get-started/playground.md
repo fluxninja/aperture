@@ -18,8 +18,9 @@ Kubernetes. Tilt watches for changes to local files and auto-deploys any
 resources that change. This is very convenient for getting quick feedback during
 development of Aperture.
 
-**<em>Environment:</em>**<br></br> Aperture is loaded with a <em>Latency Gradient Control Policy</em> which protects the
-demo application against sudden surges in traffic load.
+Playground deploys resources to the Kubernetes cluster that `kubectl` on your
+ machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s) for deploying a local Kubernetes cluster using
+ [Kind](https://kind.sigs.k8s.io/).
 
 
 :::note
@@ -27,12 +28,6 @@ Apple Silicon users: Playground currently is not supported on Apple Silicon (e.g
 :::
 
 ## How to Run
-**<em>Cluster:</em>**<br></br>
-Playground deploys resources to the Kubernetes cluster that `kubectl` on your
-machine points at.
-For convenience, refer to [prerequisites](#prerequisites-k8s)
-which includes instructions for deploying a local Kubernetes cluster using
-[Kind](https://kind.sigs.k8s.io/).
 
 Once [requirements](#tools) are installed, simply run below commands from the
 `playground` directory (present under the aperture's root directory):
