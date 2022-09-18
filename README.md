@@ -26,6 +26,14 @@
 Aperture is the first open-source flow control and reliability management
 platform for modern cloud applications.
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaadark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaalight.png" />
+    <img alt="Observe. Analyze. Actuate." src="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaalight.png">
+  </picture>
+</p>
+
 ## 🎛️ Why is flow control needed?
 
 Modern cloud application architectures such as microservices are vulnerable to [cascading failures](https://sre.google/sre-book/addressing-cascading-failures/) in face of sudden loads, new deployments and performance issues. Reliable operation is impossible without [effective flow control](https://sre.google/sre-book/handling-overload/). In addition, flow control enables graceful degradation, which is the ability to preserve key user experience pathways even in the face of application failures.
@@ -38,13 +46,7 @@ At the fundamental level, Aperture enables flow control through observing, analy
 
 - 🤖 Aperture Controller is the "brain" of system. It is powered by always-on, [circuit graph driven policies](https://docs.fluxninja.com/docs/concepts/policy/) that continuously track deviations from service-level objectives (SLOs) and calculate recovery or escalation actions.
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaadark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaalight.png" />
-    <img alt="Observe. Analyze. Actuate." src="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaalight.png">
-  </picture>
-</p>
+## 🏗️ Architecture
 
 ![Aperture Architecture Overview](./docs/content/assets/gen/architecture_simple.mmd.svg)
 
