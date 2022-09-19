@@ -240,14 +240,23 @@ func (lg *Logger) Sampler() Logger {
 		DebugSampler: &zerolog.BurstSampler{
 			Burst:  5,
 			Period: 1000 * time.Millisecond,
+			NextSampler: &zerolog.BasicSampler{
+				N: 3,
+			},
 		},
 		InfoSampler: &zerolog.BurstSampler{
-			Burst:  10,
+			Burst:  5,
 			Period: 1000 * time.Millisecond,
+			NextSampler: &zerolog.BasicSampler{
+				N: 3,
+			},
 		},
 		WarnSampler: &zerolog.BurstSampler{
 			Burst:  10,
 			Period: 1000 * time.Millisecond,
+			NextSampler: &zerolog.BasicSampler{
+				N: 5,
+			},
 		},
 		ErrorSampler: &zerolog.BurstSampler{
 			Burst:  20,
@@ -259,6 +268,9 @@ func (lg *Logger) Sampler() Logger {
 		TraceSampler: &zerolog.BurstSampler{
 			Burst:  5,
 			Period: 1000 * time.Millisecond,
+			NextSampler: &zerolog.BasicSampler{
+				N: 3,
+			},
 		},
 	})
 	return Logger{
