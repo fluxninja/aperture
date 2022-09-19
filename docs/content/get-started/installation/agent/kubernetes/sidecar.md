@@ -203,7 +203,7 @@ your cluster.
            - aperture-plugin-fluxninja
        log:
          level: debug
-         pretty_console: true,
+         pretty_console: true
          non_blocking: false
    ```
 
