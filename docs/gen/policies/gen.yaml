@@ -129,6 +129,32 @@ definitions:
         description: Workload associated with flows matching the label matcher.
         x-order: 1
         $ref: '#/definitions/SchedulerWorkload'
+  commonselectorv1ControlPoint:
+    description: |-
+      Identifies control point within a service that the rule or policy should apply to.
+      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
+    type: object
+    properties:
+      feature:
+        description: |-
+          Name of Aperture SDK's feature.
+          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
+
+          Note: Flowcontrol only.
+        type: string
+        x-go-validate: required
+        x-order: 0
+      traffic:
+        description: |-
+          Type of traffic service, either "ingress" or "egress".
+          Apply the policy to the whole incoming/outgoing traffic of a service.
+          Usually powered by integration with a proxy (like envoy) or a web framework.
+
+          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
+          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
+        type: string
+        x-go-validate: required,oneof=ingress egress
+        x-order: 1
   languagev1ConcurrencyLimiter:
     description: |-
       :::info
@@ -267,7 +293,7 @@ definitions:
           [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
           :::
         type: string
-        x-go-default: duration_millis
+        x-go-default: workload_duration_ms
         x-order: 0
       histogram_buckets:
         description: Latency histogram buckets (in ms) for this FluxMeter.
@@ -510,32 +536,6 @@ definitions:
         description: The constant value is emitted to the output port.
         x-order: 0
         $ref: '#/definitions/v1Port'
-  v1ControlPoint:
-    description: |-
-      Identifies control point within a service that the rule or policy should apply to.
-      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
-    type: object
-    properties:
-      feature:
-        description: |-
-          Name of Aperture SDK's feature.
-          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
-
-          Note: Flowcontrol only.
-        type: string
-        x-go-validate: required
-        x-order: 0
-      traffic:
-        description: |-
-          Type of traffic service, either "ingress" or "egress".
-          Apply the policy to the whole incoming/outgoing traffic of a service.
-          Usually powered by integration with a proxy (like envoy) or a web framework.
-
-          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
-          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
-        type: string
-        x-go-validate: required,oneof=ingress egress
-        x-order: 1
   v1Decider:
     description: |-
       The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
@@ -1373,33 +1373,27 @@ definitions:
         description: High-level declarative extractor.
         x-order: 0
         $ref: '#/definitions/v1Extractor'
-      hidden:
+      rego:
+        description: Rego module to extract a value from the rego module.
+        x-order: 1
+        $ref: '#/definitions/RuleRego'
+      telemetry:
         description: |-
-          Decides if the created flow label should be hidden from the telemetry.
-          A hidden flow label is still accessible in policies and can be used as eg.
-          fairness key.
+          :::note
+          The flow label is always accessible in Aperture Policies regardless of this setting.
+          :::
 
           :::caution
-          When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
-          labels are sent to cloud for observability. We thus recommend to set this
-          _hidden_ flag for high-cardinality labels, such as usernames or ids, to
-          avoid bloating analytics database. _Hidden_ flag should also be set for
+          When using [FluxNinja Cloud plugin](cloud/plugin.md), telemetry enabled
+          labels are sent to FluxNinha Cloud for observability. Telemetry should be disabled for
           sensitive labels.
           :::
         type: boolean
-        x-go-validate: required
-        x-order: 1
-      propagate:
-        type: boolean
         title: |-
-          Decides if the created label should be applied to the whole request chain
-          (propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
+          Decides if the created flow label should be available as an attribute in OLAP telemetry and
+          propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
         x-go-validate: required
         x-order: 2
-      rego:
-        description: Rego module to extract a value from the rego module.
-        x-order: 3
-        $ref: '#/definitions/RuleRego'
   v1Scheduler:
     description: |-
       :::note
@@ -1564,7 +1558,7 @@ definitions:
           within the entity where the policy should apply to.
         x-go-validate: required
         x-order: 1
-        $ref: '#/definitions/v1ControlPoint'
+        $ref: '#/definitions/commonselectorv1ControlPoint'
       label_matcher:
         description: |-
           :::info

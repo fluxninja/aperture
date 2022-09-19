@@ -21,8 +21,6 @@ func NewFactory(cache *entitycache.EntityCache) component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
 		createDefaultConfig(cache),
-		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
-		component.WithTracesProcessor(createTracesProcessor, component.StabilityLevelInDevelopment),
 		component.WithMetricsProcessor(createMetricsProcessor, component.StabilityLevelInDevelopment),
 	)
 }
@@ -34,46 +32,6 @@ func createDefaultConfig(cache *entitycache.EntityCache) component.ProcessorCrea
 			entityCache:       cache,
 		}
 	}
-}
-
-func createLogsProcessor(
-	ctx context.Context,
-	params component.ProcessorCreateSettings,
-	cfg config.Processor,
-	nextLogsConsumer consumer.Logs,
-) (component.LogsProcessor, error) {
-	cfgTyped := cfg.(*Config)
-	proc := newProcessor(cfgTyped.entityCache)
-	return processorhelper.NewLogsProcessor(
-		ctx,
-		params,
-		cfg,
-		nextLogsConsumer,
-		proc.ConsumeLogs,
-		processorhelper.WithCapabilities(proc.Capabilities()),
-		processorhelper.WithStart(proc.Start),
-		processorhelper.WithShutdown(proc.Shutdown),
-	)
-}
-
-func createTracesProcessor(
-	ctx context.Context,
-	params component.ProcessorCreateSettings,
-	cfg config.Processor,
-	nextTracesConsumer consumer.Traces,
-) (component.TracesProcessor, error) {
-	cfgTyped := cfg.(*Config)
-	proc := newProcessor(cfgTyped.entityCache)
-	return processorhelper.NewTracesProcessor(
-		ctx,
-		params,
-		cfg,
-		nextTracesConsumer,
-		proc.ConsumeTraces,
-		processorhelper.WithCapabilities(proc.Capabilities()),
-		processorhelper.WithStart(proc.Start),
-		processorhelper.WithShutdown(proc.Shutdown),
-	)
 }
 
 func createMetricsProcessor(

@@ -80,7 +80,7 @@ func (mr *MockFluxMeterMockRecorder) GetFluxMeterName() *gomock.Call {
 }
 
 // GetHistogram mocks base method.
-func (m *MockFluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode, featureStatus string) prometheus.Observer {
+func (m *MockFluxMeter) GetHistogram(decisionType flowcontrolv1.CheckResponse_DecisionType, statusCode, featureStatus string) prometheus.Observer {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetHistogram", decisionType, statusCode, featureStatus)
 	ret0, _ := ret[0].(prometheus.Observer)

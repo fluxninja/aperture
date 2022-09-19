@@ -241,18 +241,21 @@ paths:
       tags:
         - StatusService
 definitions:
-  DecisionReasonErrorReason:
+  CheckResponseDecisionType:
     type: string
     enum:
-      - ERROR_REASON_UNSPECIFIED
-    default: ERROR_REASON_UNSPECIFIED
-  DecisionReasonRejectReason:
+      - DECISION_TYPE_ACCEPTED
+      - DECISION_TYPE_REJECTED
+    default: DECISION_TYPE_ACCEPTED
+    description: DecisionType contains fields that represent decision made by Check call.
+  CheckResponseRejectReason:
     type: string
     enum:
-      - REJECT_REASON_UNSPECIFIED
+      - REJECT_REASON_NONE
       - REJECT_REASON_RATE_LIMITED
       - REJECT_REASON_CONCURRENCY_LIMITED
-    default: REJECT_REASON_UNSPECIFIED
+    default: REJECT_REASON_NONE
+    description: RejectReason contains fields that give further information about rejection.
   EntityCacheEntities:
     type: object
     properties:
@@ -364,17 +367,52 @@ definitions:
       classifier_index:
         type: string
         format: int64
+      error:
+        $ref: '#/definitions/v1ClassifierError'
+      label_key:
+        type: string
       policy_hash:
         type: string
       policy_name:
         type: string
     description: Classifier describes details for each Classifier.
+  apertureflowcontrolv1ControlPoint:
+    type: object
+    properties:
+      feature:
+        type: string
+      type:
+        $ref: '#/definitions/v1ControlPointType'
   apertureflowcontrolv1FluxMeter:
     type: object
     properties:
       flux_meter_name:
         type: string
     description: FluxMeter describes detail for each FluxMeter.
+  commonselectorv1ControlPoint:
+    type: object
+    properties:
+      feature:
+        type: string
+        description: |-
+          Name of Aperture SDK's feature.
+          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
+
+          Note: Flowcontrol only.
+        x-go-validate: required
+      traffic:
+        type: string
+        description: |-
+          Type of traffic service, either "ingress" or "egress".
+          Apply the policy to the whole incoming/outgoing traffic of a service.
+          Usually powered by integration with a proxy (like envoy) or a web framework.
+
+          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
+          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
+        x-go-validate: required,oneof=ingress egress
+    description: |-
+      Identifies control point within a service that the rule or policy should apply to.
+      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
   googlerpcStatus:
     type: object
     properties:
@@ -500,7 +538,7 @@ definitions:
           For list of available attributes in Envoy access logs, refer
           [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
           :::
-        x-go-default: duration_millis
+        x-go-default: workload_duration_ms
       histogram_buckets:
         type: array
         items:
@@ -748,12 +786,19 @@ definitions:
         items:
           $ref: '#/definitions/apertureflowcontrolv1Classifier'
         description: classifiers that were matched for this request.
-      decision_reason:
-        $ref: '#/definitions/v1DecisionReason'
-        description: reason contains information in the case of an error or rejection.
+      control_point:
+        $ref: '#/definitions/apertureflowcontrolv1ControlPoint'
+        title: control_point of request
       decision_type:
-        $ref: '#/definitions/v1DecisionType'
+        $ref: '#/definitions/CheckResponseDecisionType'
         description: decision_type contains what the decision was.
+      end:
+        type: string
+        format: date-time
+        title: end timestamp
+      error:
+        $ref: '#/definitions/v1CheckResponseError'
+        description: error information.
       flow_label_keys:
         type: array
         items:
@@ -769,7 +814,35 @@ definitions:
         items:
           $ref: '#/definitions/v1LimiterDecision'
         description: limiter_decisions contains information about decision made by each limiter.
+      reject_reason:
+        $ref: '#/definitions/CheckResponseRejectReason'
+        description: reject_reason contains the reason for the rejection.
+      services:
+        type: array
+        items:
+          type: string
+        title: services that matched
+      start:
+        type: string
+        format: date-time
+        title: start timestamp
+      telemetry_flow_labels:
+        type: object
+        additionalProperties:
+          type: string
+        description: telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
     description: CheckResponse contains fields that represent decision made by Check call.
+  v1CheckResponseError:
+    type: string
+    enum:
+      - ERROR_NONE
+      - ERROR_MISSING_TRAFFIC_DIRECTION
+      - ERROR_INVALID_TRAFFIC_DIRECTION
+      - ERROR_CONVERT_TO_MAP_STRUCT
+      - ERROR_CONVERT_TO_REGO_AST
+      - ERROR_CLASSIFY
+    default: ERROR_NONE
+    description: Error information.
   v1Circuit:
     type: object
     properties:
@@ -809,6 +882,17 @@ definitions:
       docs on how exactly it handles invalid inputs.
       :::
     title: Circuit is defined as a dataflow graph of inter-connected components
+  v1ClassifierError:
+    type: string
+    enum:
+      - ERROR_NONE
+      - ERROR_EVAL_FAILED
+      - ERROR_EMPTY_RESULTSET
+      - ERROR_AMBIGUOUS_RESULTSET
+      - ERROR_MULTI_EXPRESSION
+      - ERROR_EXPRESSION_NOT_MAP
+    default: ERROR_NONE
+    description: Error information.
   v1Component:
     type: object
     properties:
@@ -904,30 +988,15 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: The constant value is emitted to the output port.
     description: Outputs for the Constant component.
-  v1ControlPoint:
-    type: object
-    properties:
-      feature:
-        type: string
-        description: |-
-          Name of Aperture SDK's feature.
-          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
-
-          Note: Flowcontrol only.
-        x-go-validate: required
-      traffic:
-        type: string
-        description: |-
-          Type of traffic service, either "ingress" or "egress".
-          Apply the policy to the whole incoming/outgoing traffic of a service.
-          Usually powered by integration with a proxy (like envoy) or a web framework.
-
-          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
-          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
-        x-go-validate: required,oneof=ingress egress
-    description: |-
-      Identifies control point within a service that the rule or policy should apply to.
-      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
+  v1ControlPointType:
+    type: string
+    enum:
+      - TYPE_UNKNOWN
+      - TYPE_FEATURE
+      - TYPE_INGRESS
+      - TYPE_EGRESS
+    default: TYPE_UNKNOWN
+    description: Type contains fields that represent type of ControlPoint.
   v1ControllerInfo:
     type: object
     properties:
@@ -990,21 +1059,6 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Selected signal (on_true or on_false).
     description: Outputs for the Decider component.
-  v1DecisionReason:
-    type: object
-    properties:
-      error_reason:
-        $ref: '#/definitions/DecisionReasonErrorReason'
-      reject_reason:
-        $ref: '#/definitions/DecisionReasonRejectReason'
-    description: Reason contains fields that give further information about error or rejection.
-  v1DecisionType:
-    type: string
-    enum:
-      - DECISION_TYPE_UNSPECIFIED
-      - DECISION_TYPE_ACCEPTED
-      - DECISION_TYPE_REJECTED
-    default: DECISION_TYPE_UNSPECIFIED
   v1EMA:
     type: object
     properties:
@@ -1796,30 +1850,25 @@ definitions:
       extractor:
         $ref: '#/definitions/v1Extractor'
         description: High-level declarative extractor.
-      hidden:
-        type: boolean
-        description: |-
-          Decides if the created flow label should be hidden from the telemetry.
-          A hidden flow label is still accessible in policies and can be used as eg.
-          fairness key.
-
-          :::caution
-          When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
-          labels are sent to cloud for observability. We thus recommend to set this
-          _hidden_ flag for high-cardinality labels, such as usernames or ids, to
-          avoid bloating analytics database. _Hidden_ flag should also be set for
-          sensitive labels.
-          :::
-        x-go-validate: required
-      propagate:
-        type: boolean
-        title: |-
-          Decides if the created label should be applied to the whole request chain
-          (propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
-        x-go-validate: required
       rego:
         $ref: '#/definitions/RuleRego'
         description: Rego module to extract a value from the rego module.
+      telemetry:
+        type: boolean
+        description: |-
+          :::note
+          The flow label is always accessible in Aperture Policies regardless of this setting.
+          :::
+
+          :::caution
+          When using [FluxNinja Cloud plugin](cloud/plugin.md), telemetry enabled
+          labels are sent to FluxNinha Cloud for observability. Telemetry should be disabled for
+          sensitive labels.
+          :::
+        title: |-
+          Decides if the created flow label should be available as an attribute in OLAP telemetry and
+          propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
+        x-go-validate: required
     description: |-
       Flow classification rule extracts a value from request metadata.
       More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
@@ -1974,7 +2023,7 @@ definitions:
           selector applies to.
         x-go-default: default
       control_point:
-        $ref: '#/definitions/v1ControlPoint'
+        $ref: '#/definitions/commonselectorv1ControlPoint'
         description: |-
           Describes
           [control point](/concepts/flow-control/flow-control.md#control-point)

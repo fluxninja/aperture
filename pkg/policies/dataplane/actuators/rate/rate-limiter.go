@@ -24,7 +24,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/paths"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/rate/ratetracker"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
-	"github.com/fluxninja/aperture/pkg/selectors"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -284,7 +283,7 @@ func (rateLimiter *rateLimiter) GetSelector() *selectorv1.Selector {
 }
 
 // RunLimiter runs the limiter.
-func (rateLimiter *rateLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
+func (rateLimiter *rateLimiter) RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
 	label, ok, remaining, current := rateLimiter.TakeN(labels, 1)
@@ -310,7 +309,7 @@ func (rateLimiter *rateLimiter) RunLimiter(labels selectors.Labels) *flowcontrol
 }
 
 // TakeN takes n tokens from the limiter.
-func (rateLimiter *rateLimiter) TakeN(labels selectors.Labels, n int) (label string, ok bool, remaining int, current int) {
+func (rateLimiter *rateLimiter) TakeN(labels map[string]string, n int) (label string, ok bool, remaining int, current int) {
 	labelKey := rateLimiter.rateLimiterProto.GetLabelKey()
 	var labelValue string
 	if val, found := labels[labelKey]; found {
