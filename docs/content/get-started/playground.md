@@ -6,7 +6,7 @@ keywords:
   - policies
   - rate limit
   - concurrency control
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 Playground is a Kubernetes based environment for exploring the capabilities of
@@ -31,6 +31,7 @@ Playground is currently not supported on Apple Silicon (e.g. M1 processor) becau
 Assuming that you have already cloned the aperture repository and brought up a [local Kubernetes cluster](#prerequisites-k8s), proceed to install the [required tools](#tools). In order to bring up the Playground, run the following commands:
 
 ```sh
+$ git clone https://github.com/fluxninja/aperture.git
 # change directory to playground
 $ cd playground
 # start Tilt and run services defined in Tiltfile

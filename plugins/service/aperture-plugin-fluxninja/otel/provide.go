@@ -3,6 +3,7 @@ package otel
 import (
 	"context"
 	_ "embed"
+	"errors"
 	"fmt"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	httpclient "github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/imdario/mergo"
+	"github.com/mitchellh/copystructure"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
@@ -140,6 +142,11 @@ func addMetricsControllerSlowPipeline(baseConfig, config *otelcollector.OTELConf
 
 func addFluxninjaPrometheusReceiver(baseConfig, config *otelcollector.OTELConfig) {
 	rawReceiverConfig, _ := baseConfig.Receivers[otel.ReceiverPrometheus].(map[string]any)
+	duplicatedReceiverConfig, err := duplicateMap(rawReceiverConfig)
+	if err != nil {
+		// It should not happen, unless the original config is messed up.
+		log.Fatal().Err(err).Msg("failed to duplicate config")
+	}
 	configPatch := map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
@@ -147,12 +154,24 @@ func addFluxninjaPrometheusReceiver(baseConfig, config *otelcollector.OTELConfig
 			},
 		},
 	}
-	err := mergo.MergeWithOverwrite(&rawReceiverConfig, configPatch)
+	err = mergo.MergeWithOverwrite(&duplicatedReceiverConfig, configPatch)
 	if err != nil {
 		// It should not happen, unless the original config is messed up.
 		log.Fatal().Err(err).Msg("failed to merge configs")
 	}
-	config.AddReceiver(receiverPrometheus, rawReceiverConfig)
+	config.AddReceiver(receiverPrometheus, duplicatedReceiverConfig)
+}
+
+func duplicateMap(in map[string]any) (map[string]any, error) {
+	rawDuplicatedMap, err := copystructure.Copy(in)
+	if err != nil {
+		return nil, err
+	}
+	duplicatedMap, ok := rawDuplicatedMap.(map[string]any)
+	if !ok {
+		return nil, errors.New("duplicated object not a map")
+	}
+	return duplicatedMap, nil
 }
 
 func addFluxninjaExporter(config *otelcollector.OTELConfig,
