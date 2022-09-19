@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/mitchellh/copystructure"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/processor/batchprocessor"
@@ -69,6 +70,9 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 	)
 	app := platform.New(opts)
 
+	originalBaseConfig, err := copystructure.Copy(baseConfig)
+	Expect(err).NotTo(HaveOccurred())
+
 	err = app.Err()
 	if err != nil {
 		visualize, _ := fx.VisualizeError(err)
@@ -82,6 +86,9 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 
 	err = app.Stop(context.TODO())
 	Expect(err).NotTo(HaveOccurred())
+
+	// Ensure we did not modify the original base config
+	Expect(baseConfig).To(BeEquivalentTo(originalBaseConfig))
 
 	Expect(in.Actual).To(HaveLen(1))
 	Expect(in.Actual[0].Receivers).To(Equal(expected.Receivers))
