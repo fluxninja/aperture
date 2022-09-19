@@ -83,6 +83,10 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
+		retErr := func(errMsg string) error {
+			otelcollector.LogSampled.Warn().Msg(errMsg)
+			return fmt.Errorf(errMsg)
+		}
 		// Attributes
 		attributes := logRecord.Attributes()
 
@@ -92,29 +96,25 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		// Source specific processing
 		source, exists := attributes.Get(otelcollector.ApertureSourceLabel)
 		if !exists {
-			otelcollector.LogSampled.Warn().Msg("Aperture source label not found")
-			return nil
+			return retErr("aperture source label not found")
 		}
 		sourceStr := source.StringVal()
 		if sourceStr == otelcollector.ApertureSourceSDK {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{})
 			if !success {
-				otelcollector.LogSampled.Warn().Msg("Aperture check response label not found in Envoy access logs")
-				return nil
+				return retErr("aperture check response label not found in Envoy access logs")
 			}
 
 			addSDKSpecificLabels(attributes)
 		} else if sourceStr == otelcollector.ApertureSourceEnvoy {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
 			if !success {
-				otelcollector.LogSampled.Warn().Msg("Aperture check response label not found in SDK access logs")
-				return nil
+				return retErr("aperture check response label not found in SDK access logs")
 			}
 
 			addEnvoySpecificLabels(attributes)
 		} else {
-			otelcollector.LogSampled.Warn().Str("source", sourceStr).Msg("Aperture source label not recognized")
-			return nil
+			return retErr("aperture source label not recognized")
 		}
 
 		addCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
@@ -163,7 +163,7 @@ func addEnvoySpecificLabels(attributes pcommon.Map) {
 
 	// Compute durations
 	responseDuration, responseDurationExists := otelcollector.GetFloat64(attributes, otelcollector.EnvoyResponseDurationLabel, treatAsZero)
-	authzDuration, authzDurationExists := otelcollector.GetFloat64(attributes, otelcollector.EnvoyAuthzDurationLabel, treatAsZero)
+	authzDuration, authzDurationExists := otelcollector.GetFloat64(attributes, otelcollector.EnvoyAuthzDurationLabel, []string{})
 
 	if responseDurationExists {
 		attributes.PutDouble(otelcollector.FlowDurationLabel, responseDuration)
