@@ -32,7 +32,7 @@ repos:
         args:
           - "--allow-multiple-documents"
       - id: check-added-large-files
-        exclude: ^operator/config/crd/
+        exclude: ^(operator/config/crd/.*|docs/content/assets/.*)
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
       - id: check-json
