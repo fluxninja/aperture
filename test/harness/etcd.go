@@ -129,7 +129,7 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return h, err
 	}
 
-	cancel, _ := h.activateAuthentication()
+	cancel := h.activateAuthentication()
 	defer cancel()
 
 	err = h.pollEtcdForReadiness()
@@ -159,30 +159,29 @@ func (h *EtcdHarness) pollEtcdForReadiness() error {
 	return fmt.Errorf("etcd didn't come up in 4000ms")
 }
 
-func (h *EtcdHarness) activateAuthentication() (context.CancelFunc, error) {
-	var err error
+func (h *EtcdHarness) activateAuthentication() context.CancelFunc {
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
 	// Root user must be created before activating the authentication.
-	if _, err = h.Client.RoleAdd(ctx, "root"); err != nil {
-		return cancel, err
+	if _, err := h.Client.RoleAdd(ctx, "root"); err != nil {
+		return cancel
 	}
-	if _, err = h.Client.UserAdd(ctx, "root", "root"); err != nil {
-		return cancel, err
+	if _, err := h.Client.UserAdd(ctx, "root", "root"); err != nil {
+		return cancel
 	}
-	if _, err = h.Client.UserGrantRole(ctx, "root", "root"); err != nil {
-		return cancel, err
+	if _, err := h.Client.UserGrantRole(ctx, "root", "root"); err != nil {
+		return cancel
 	}
 	// Add user and grant root role to the new user.
-	if _, err = h.Client.UserAdd(ctx, h.Client.Username, h.Client.Password); err != nil {
-		return cancel, err
+	if _, err := h.Client.UserAdd(ctx, h.Client.Username, h.Client.Password); err != nil {
+		return cancel
 	}
-	if _, err = h.Client.UserGrantRole(ctx, h.Client.Username, "root"); err != nil {
-		return cancel, err
+	if _, err := h.Client.UserGrantRole(ctx, h.Client.Username, "root"); err != nil {
+		return cancel
 	}
-	if _, err = h.Client.AuthEnable(ctx); err != nil {
-		return cancel, err
+	if _, err := h.Client.AuthEnable(ctx); err != nil {
+		return cancel
 	}
-	return cancel, err
+	return cancel
 }
 
 // Stop kills the harnessed etcd server and cleans up the etcd directory.
