@@ -185,7 +185,7 @@ into your cluster.
    ```
 
    All the config parameters for the Aperture Controller are available
-   [here](/reference/configuration/controller.md).
+   [here](/references/configuration/controller.md).
 
    A list of configurable parameters for the installation can be found in the
    [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters).

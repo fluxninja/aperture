@@ -159,7 +159,7 @@ your cluster.
    ```
 
    All the config parameters for the Aperture Agent are available
-   [here](/reference/configuration/agent.md).
+   [here](/references/configuration/agent.md).
 
    A list of configurable parameters for the installation can be found in the
    [README](https://artifacthub.io/packages/helm/aperture/aperture-agent#parameters).
