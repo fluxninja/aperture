@@ -229,6 +229,45 @@ func Sample(sampler zerolog.Sampler) Logger {
 	return global.Sample(sampler)
 }
 
+// Sampler returns the global logger with the level sampler, each level set with BurstSampler.
+func Sampler() Logger {
+	return global.Sampler()
+}
+
+// Sampler returns the global logger with the level sampler, each level set with BurstSampler.
+func (lg *Logger) Sampler() Logger {
+	sampler := lg.logger.Sample(&zerolog.LevelSampler{
+		DebugSampler: &zerolog.BurstSampler{
+			Burst:  5,
+			Period: 1000 * time.Millisecond,
+		},
+		InfoSampler: &zerolog.BurstSampler{
+			Burst:  10,
+			Period: 1000 * time.Millisecond,
+		},
+		WarnSampler: &zerolog.BurstSampler{
+			Burst:  10,
+			Period: 1000 * time.Millisecond,
+		},
+		ErrorSampler: &zerolog.BurstSampler{
+			Burst:  20,
+			Period: 1000 * time.Millisecond,
+			NextSampler: &zerolog.BasicSampler{
+				N: 10,
+			},
+		},
+		TraceSampler: &zerolog.BurstSampler{
+			Burst:  5,
+			Period: 1000 * time.Millisecond,
+		},
+	})
+	return Logger{
+		logger: &sampler,
+		w:      lg.w,
+		valid:  lg.valid,
+	}
+}
+
 // Hook returns the current logger with the h hook.
 func (lg Logger) Hook(hook zerolog.Hook) Logger {
 	zerolog := lg.logger.Hook(hook)
