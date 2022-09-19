@@ -12,12 +12,12 @@ spec:
       - name: kube-rbac-proxy
         image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
         args:
-        - "--secure-listen-address=0.0.0.0:8443"
-        - "--upstream=http://127.0.0.1:8080/"
+        - "--secure-listen-address=0.0.0.0:9553"
+        - "--upstream=http://127.0.0.1:9090/"
         - "--logtostderr=true"
         - "--v=0"
         ports:
-        - containerPort: 8443
+        - containerPort: 9553
           protocol: TCP
           name: https
         resources:
@@ -29,8 +29,9 @@ spec:
             memory: 64Mi
       - name: manager
         args:
-        - "--health-probe-bind-address=:8081"
-        - "--metrics-bind-address=127.0.0.1:8080"
+        - "--health-probe-bind-address=:9091"
+        - "--metrics-bind-address=127.0.0.1:9090"
         - "--leader-elect"
         - "--controller"
         - "--agent"
+        - "--policy"

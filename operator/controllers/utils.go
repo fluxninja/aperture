@@ -319,7 +319,7 @@ func controllerVolumeMounts(controllerSpec v1alpha1.CommonSpec) []corev1.VolumeM
 		},
 		{
 			Name:      "etc-aperture-policies",
-			MountPath: "/etc/aperture/aperture-controller/policies",
+			MountPath: policyFilePath,
 			ReadOnly:  true,
 		},
 		{
@@ -354,13 +354,7 @@ func controllerVolumes(instance *v1alpha1.Controller) []corev1.Volume {
 		{
 			Name: "etc-aperture-policies",
 			VolumeSource: corev1.VolumeSource{
-				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32Ptr(420),
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: "policies",
-					},
-					Optional: pointer.BoolPtr(true),
-				},
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
 			},
 		},
 		{

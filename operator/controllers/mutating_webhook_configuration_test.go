@@ -244,7 +244,7 @@ var _ = Describe("MutatingWebhookConfiguration for Controller CR", func() {
 								Rule: admissionregistrationv1.Rule{
 									APIGroups:   []string{"fluxninja.com"},
 									APIVersions: []string{v1Alpha1Version},
-									Resources:   []string{"controllers"},
+									Resources:   []string{"controllers", "policies"},
 									Scope:       &[]admissionregistrationv1.ScopeType{admissionregistrationv1.NamespacedScope}[0],
 								},
 							},
