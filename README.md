@@ -48,7 +48,13 @@ At the fundamental level, Aperture enables flow control through observing, analy
 
 ## 🏗️ Architecture
 
-![Aperture Architecture Overview](./docs/content/assets/gen/architecture_simple.mmd.svg)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/gen/architecture_simple.mmd.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/gen/architecture_simple.mmd.svg" />
+    <img alt="Observe. Analyze. Actuate." src="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/gen/architecture_simple-dark.mmd.svg">
+  </picture>
+</p>
 
 ## 🏁 Getting Started
 

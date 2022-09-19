@@ -81,8 +81,8 @@ generate-mermaid: generate-mmd
 			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --output $<.$$fmt --backgroundColor transparent \
 			&& git add $<.$$fmt; \
 		npx -p @mermaid-js/mermaid-cli mmdc \
-			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme-dark.json --output $<-dark.$$fmt --backgroundColor transparent \
-			&& git add $<-dark.$$fmt; \
+			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme-dark.json --output $<_dark.$$fmt --backgroundColor transparent \
+			&& git add $<_dark.$$fmt; \
 	done
 
 .PHONY: generate-config-markdown generate-mermaid generate-mmd
