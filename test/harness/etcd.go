@@ -129,33 +129,8 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return h, err
 	}
 
-	// Root user must be created before activating the authentication.
-	ctx := context.Background()
-	if _, err = h.Client.RoleAdd(ctx, "root"); err != nil {
-		defer h.Stop()
-		return nil, err
-	}
-	if _, err = h.Client.UserAdd(ctx, "root", "root"); err != nil {
-		defer h.Stop()
-		return nil, err
-	}
-	if _, err = h.Client.UserGrantRole(ctx, "root", "root"); err != nil {
-		defer h.Stop()
-		return nil, err
-	}
-	// Add user and grant root role to the new user.
-	if _, err = h.Client.UserAdd(ctx, h.Client.Username, h.Client.Password); err != nil {
-		defer h.Stop()
-		return nil, err
-	}
-	if _, err = h.Client.UserGrantRole(ctx, h.Client.Username, "root"); err != nil {
-		defer h.Stop()
-		return nil, err
-	}
-	if _, err = h.Client.AuthEnable(ctx); err != nil {
-		defer h.Stop()
-		return nil, err
-	}
+	cancel, _ := h.activateAuthentication()
+	defer cancel()
 
 	err = h.pollEtcdForReadiness()
 	if err != nil {
@@ -182,6 +157,32 @@ func (h *EtcdHarness) pollEtcdForReadiness() error {
 		}
 	}
 	return fmt.Errorf("etcd didn't come up in 4000ms")
+}
+
+func (h *EtcdHarness) activateAuthentication() (context.CancelFunc, error) {
+	var err error
+	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	// Root user must be created before activating the authentication.
+	if _, err = h.Client.RoleAdd(ctx, "root"); err != nil {
+		return cancel, err
+	}
+	if _, err = h.Client.UserAdd(ctx, "root", "root"); err != nil {
+		return cancel, err
+	}
+	if _, err = h.Client.UserGrantRole(ctx, "root", "root"); err != nil {
+		return cancel, err
+	}
+	// Add user and grant root role to the new user.
+	if _, err = h.Client.UserAdd(ctx, h.Client.Username, h.Client.Password); err != nil {
+		return cancel, err
+	}
+	if _, err = h.Client.UserGrantRole(ctx, h.Client.Username, "root"); err != nil {
+		return cancel, err
+	}
+	if _, err = h.Client.AuthEnable(ctx); err != nil {
+		return cancel, err
+	}
+	return cancel, err
 }
 
 // Stop kills the harnessed etcd server and cleans up the etcd directory.
