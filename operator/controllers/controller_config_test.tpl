@@ -6,6 +6,14 @@ etcd:
   endpoints:
   - http://agent-etcd:2379
   lease_ttl: 60s
+  password: ""
+  tls:
+    ca_file: ""
+    cert_file: ""
+    insecure_skip_verify: false
+    key_file: ""
+    key_log_file: ""
+  username: ""
 fluxninja_plugin:
   api_key: ""
   client:
