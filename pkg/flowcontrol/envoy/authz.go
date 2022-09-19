@@ -102,7 +102,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		return &ext_authz.CheckResponse{
 			DynamicMetadata: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
-					otelcollector.MarshalledCheckResponseLabel: marshalledCheckResponse,
+					otelcollector.ApertureCheckResponseLabel: marshalledCheckResponse,
 				},
 			},
 		}
