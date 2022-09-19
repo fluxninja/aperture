@@ -10,9 +10,7 @@ import (
 // ControlPoint is the interface for controlPoint.
 type ControlPoint interface {
 	Type() flowcontrolv1.ControlPoint_Type
-	SetType(type_ flowcontrolv1.ControlPoint_Type)
 	Feature() string
-	SetFeature(feature string)
 	ToFlowControlPointProto() *flowcontrolv1.ControlPoint
 }
 
@@ -26,7 +24,7 @@ var _ ControlPoint = (*controlPoint)(nil)
 
 // NewControlPoint returns a controlPoint.
 func NewControlPoint(type_ flowcontrolv1.ControlPoint_Type, feature string) ControlPoint {
-	return &controlPoint{
+	return controlPoint{
 		type_:   type_,
 		feature: feature,
 	}
@@ -52,27 +50,17 @@ func controlPointFromSelectorControlPointProto(controlPointMsg *selectorv1.Contr
 }
 
 // Type returns the control point type.
-func (p *controlPoint) Type() flowcontrolv1.ControlPoint_Type {
+func (p controlPoint) Type() flowcontrolv1.ControlPoint_Type {
 	return p.type_
 }
 
-// SetType sets the control point type.
-func (p *controlPoint) SetType(type_ flowcontrolv1.ControlPoint_Type) {
-	p.type_ = type_
-}
-
 // Feature returns the control point feature.
-func (p *controlPoint) Feature() string {
+func (p controlPoint) Feature() string {
 	return p.feature
 }
 
-// SetFeature sets the control point feature.
-func (p *controlPoint) SetFeature(feature string) {
-	p.feature = feature
-}
-
 // ToFlowControlPointProto returns a flow control control point proto.
-func (p *controlPoint) ToFlowControlPointProto() *flowcontrolv1.ControlPoint {
+func (p controlPoint) ToFlowControlPointProto() *flowcontrolv1.ControlPoint {
 	return &flowcontrolv1.ControlPoint{
 		Type:    p.type_,
 		Feature: p.feature,

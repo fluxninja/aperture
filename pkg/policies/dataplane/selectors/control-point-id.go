@@ -20,7 +20,7 @@ var _ ControlPointID = (*controlPointID)(nil)
 
 // NewControlPointID returns a controlPointID.
 func NewControlPointID(service string, controlPoint ControlPoint) ControlPointID {
-	return &controlPointID{
+	return controlPointID{
 		service:      service,
 		controlPoint: controlPoint,
 	}
@@ -28,18 +28,18 @@ func NewControlPointID(service string, controlPoint ControlPoint) ControlPointID
 
 func controlPointIDFromSelectorProto(selectorMsg *selectorv1.Selector) (ControlPointID, error) {
 	ctrlPt, err := controlPointFromSelectorControlPointProto(selectorMsg.ControlPoint)
-	return &controlPointID{
+	return controlPointID{
 		service:      selectorMsg.Service,
 		controlPoint: ctrlPt,
 	}, err
 }
 
 // Service returns the service name.
-func (p *controlPointID) Service() string {
+func (p controlPointID) Service() string {
 	return p.service
 }
 
 // ControlPoint returns the control point.
-func (p *controlPointID) ControlPoint() ControlPoint {
+func (p controlPointID) ControlPoint() ControlPoint {
 	return p.controlPoint
 }

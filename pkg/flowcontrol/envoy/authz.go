@@ -113,9 +113,9 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	if dirHeader, exists := headers["traffic-direction"]; exists && len(dirHeader) > 0 {
 		switch dirHeader[0] {
 		case "INBOUND":
-			ctrlPt.SetType(flowcontrolv1.ControlPoint_TYPE_INGRESS)
+			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, "")
 		case "OUTBOUND":
-			ctrlPt.SetType(flowcontrolv1.ControlPoint_TYPE_EGRESS)
+			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_EGRESS, "")
 		default:
 			logSampled.Error().Str("traffic-direction", dirHeader[0]).Msg("invalid traffic-direction header")
 			checkResponse := &flowcontrolv1.CheckResponse{
