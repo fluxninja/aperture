@@ -127,7 +127,7 @@ var _ = Describe("W3 Baggage propagator", func() {
 	Context("when flow label has 'hidden' flag", func() {
 		It("extracts it correctly", func() {
 			Expect(propagator.Extract(map[string]string{
-				"baggage":      "foo=bar;hidden",
+				"baggage":      "foo=bar",
 				"content-type": "application/json",
 			})).To(Equal(flowlabel.FlowLabels{
 				"foo": flowlabel.FlowLabelValue{
@@ -146,7 +146,7 @@ var _ = Describe("W3 Baggage propagator", func() {
 			}, nil)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(newHeaders).To(Equal([]*envoy_core.HeaderValueOption{{
-				Header: &envoy_core.HeaderValue{Key: "baggage", Value: "foo=bar;hidden"},
+				Header: &envoy_core.HeaderValue{Key: "baggage", Value: "foo=bar"},
 				Append: wrapperspb.Bool(false),
 			}}))
 		})

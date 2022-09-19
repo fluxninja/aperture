@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/genproto/googleapis/rpc/code"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -66,6 +67,8 @@ var _ = Describe("Authorization handler", func() {
 		It("returns ok response", func() {
 			Eventually(func(g Gomega) {
 				ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer())
+				// add "traffic-direction" header to ctx
+				ctxWithIp = metadata.NewIncomingContext(ctxWithIp, metadata.Pairs("traffic-direction", "INBOUND"))
 				resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
 				g.Expect(err).NotTo(HaveOccurred())
 				g.Expect(code.Code(resp.GetStatus().GetCode())).To(Equal(code.Code_OK))
@@ -74,6 +77,7 @@ var _ = Describe("Authorization handler", func() {
 		It("injects metadata", func() {
 			Eventually(func(g Gomega) {
 				ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer())
+				ctxWithIp = metadata.NewIncomingContext(ctxWithIp, metadata.Pairs("traffic-direction", "INBOUND"))
 				resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
 				g.Expect(err).NotTo(HaveOccurred())
 				g.Expect(resp.GetDynamicMetadata()).ShouldNot(BeNil())
