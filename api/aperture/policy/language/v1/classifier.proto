@@ -119,9 +119,19 @@ message Rule {
     Rego rego = 2;
   } // @gotags: validate:"required"
 
-  // Decides if the created label should be applied to the whole request chain
-  // (propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
-  bool propagate = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  // Decides if the created flow label should be available as an attribute in OLAP telemetry and
+  // propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
+  //
+  // :::note
+  // The flow label is always accessible in Aperture Policies regardless of this setting.
+  // :::
+  //
+  // :::caution
+  // When using [FluxNinja Cloud plugin](cloud/plugin.md), telemetry enabled
+  // labels are sent to FluxNinha Cloud for observability. Telemetry should be disabled for
+  // sensitive labels.
+  // :::
+  bool telemetry = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {
@@ -129,26 +139,6 @@ message Rule {
       }
     }
   }]; // @gotags: default:"true"
-
-  // Decides if the created flow label should be hidden from the telemetry.
-  // A hidden flow label is still accessible in policies and can be used as eg.
-  // fairness key.
-  //
-  // :::caution
-  // When using [FluxNinja Cloud plugin](cloud/plugin.md), all non-hidden
-  // labels are sent to cloud for observability. We thus recommend to set this
-  // _hidden_ flag for high-cardinality labels, such as usernames or ids, to
-  // avoid bloating analytics database. _Hidden_ flag should also be set for
-  // sensitive labels.
-  // :::
-  bool hidden = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
-    }
-  }]; // @gotags: default:"false"
 }
 
 // Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code

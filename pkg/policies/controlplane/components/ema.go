@@ -11,7 +11,6 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -24,7 +23,7 @@ const (
 
 // EMA is an Exponential Moving Average filter.
 type EMA struct {
-	lastGoodOutput reading.Reading
+	lastGoodOutput runtime.Reading
 	// The smoothing factor between 0-1. A higher value discounts older observations faster.
 	alpha float64
 	sum   float64
@@ -74,27 +73,27 @@ func (ema *EMA) resetStages() {
 	ema.invalidCount = 0
 	ema.sum = 0
 	ema.count = 0
-	ema.lastGoodOutput = reading.NewInvalid()
+	ema.lastGoodOutput = runtime.InvalidReading()
 }
 
 // Execute implements runtime.Component.Execute.
 func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	retErr := func(err error) (runtime.PortToValue, error) {
 		return runtime.PortToValue{
-			"output": []reading.Reading{reading.NewInvalid()},
+			"output": []runtime.Reading{runtime.InvalidReading()},
 		}, err
 	}
 
 	input := inPortReadings.ReadSingleValuePort("input")
 	maxEnvelope := inPortReadings.ReadSingleValuePort("max_envelope")
 	minEnvelope := inPortReadings.ReadSingleValuePort("min_envelope")
-	output := reading.NewInvalid()
+	output := runtime.InvalidReading()
 
 	switch ema.currentStage {
 	case warmUpStage:
 		ema.warmupCount++
-		if input.Valid {
-			ema.sum += input.Value
+		if input.Valid() {
+			ema.sum += input.Value()
 			ema.count++
 			// Emit the avg for the valid values in the warmup window.
 			avg, err := ema.computeAverage(minEnvelope, maxEnvelope)
@@ -117,15 +116,15 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 			ema.resetStages()
 		}
 	case emaStage:
-		if input.Valid {
-			if !ema.lastGoodOutput.Valid {
+		if input.Valid() {
+			if !ema.lastGoodOutput.Valid() {
 				err := errors.New("ema: last good output is invalid")
 				log.Error().Err(err).Msg("This is unexpected!")
 				return retErr(err)
 			}
 			// Compute the new outputValue.
-			outputValue := (ema.alpha * input.Value) + ((1 - ema.alpha) * ema.lastGoodOutput.Value)
-			output = reading.New(outputValue)
+			outputValue := (ema.alpha * input.Value()) + ((1 - ema.alpha) * ema.lastGoodOutput.Value())
+			output = runtime.NewReading(outputValue)
 		} else {
 			ema.invalidCount++
 			// emit last good EMA value
@@ -140,38 +139,38 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 	}
 
 	// Set the last good output
-	if output.Valid {
+	if output.Valid() {
 		ema.lastGoodOutput = output
 	}
 	// Returns Exponential Moving Average of a series of readings.
 	return runtime.PortToValue{
-		"output": []reading.Reading{output},
+		"output": []runtime.Reading{output},
 	}, nil
 }
 
-func (ema *EMA) computeAverage(minEnvelope, maxEnvelope reading.Reading) (reading.Reading, error) {
+func (ema *EMA) computeAverage(minEnvelope, maxEnvelope runtime.Reading) (runtime.Reading, error) {
 	if ema.count > 0 {
 		avg := ema.sum / (ema.count)
 		envelopedAvg, err := ema.applyEnvelope(avg, minEnvelope, maxEnvelope)
 		if err != nil {
-			return reading.NewInvalid(), err
+			return runtime.InvalidReading(), err
 		}
-		return reading.New(envelopedAvg), nil
+		return runtime.NewReading(envelopedAvg), nil
 	} else {
-		return reading.NewInvalid(), nil
+		return runtime.InvalidReading(), nil
 	}
 }
 
-func (ema *EMA) applyEnvelope(input float64, minEnvelope, maxEnvelope reading.Reading) (float64, error) {
+func (ema *EMA) applyEnvelope(input float64, minEnvelope, maxEnvelope runtime.Reading) (float64, error) {
 	minxMaxConstraints := constraints.NewMinMaxConstraints()
-	if maxEnvelope.Valid {
-		maxErr := minxMaxConstraints.SetMax(maxEnvelope.Value)
+	if maxEnvelope.Valid() {
+		maxErr := minxMaxConstraints.SetMax(maxEnvelope.Value())
 		if maxErr != nil {
 			return 0, maxErr
 		}
 	}
-	if minEnvelope.Valid {
-		minErr := minxMaxConstraints.SetMin(minEnvelope.Value)
+	if minEnvelope.Valid() {
+		minErr := minxMaxConstraints.SetMin(minEnvelope.Value())
 		if minErr != nil {
 			return 0, minErr
 		}

@@ -1,13 +1,11 @@
 ---
-title: Blueprints
+title: Policy Blueprints
 description: Policies and Dashboards pre-packaged as reusable Blueprints
 keywords:
   - jsonnet
   - grafana
 sidebar_position: 3
 ---
-
-# Policy Blueprints
 
 ## Introduction
 

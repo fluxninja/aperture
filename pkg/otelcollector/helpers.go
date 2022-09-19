@@ -172,7 +172,7 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 func GetFloat64(attributes pcommon.Map, key string, treatAsZero []string) (float64, bool) {
 	rawNewValue, exists := attributes.Get(key)
 	if !exists {
-		log.Trace().Msg("key not found")
+		LogSampled.Trace().Str("key", key).Msg("Key not found")
 		return 0, false
 	}
 	if rawNewValue.Type() == pcommon.ValueTypeDouble {

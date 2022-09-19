@@ -1,6 +1,6 @@
 ---
 title: Rate Limiter
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 :::info
@@ -54,7 +54,7 @@ A limit for particular value of a label can be increased via the override
 mechanisms. Eg. you might want to increase the limit for the admin user. See
 [reference][reference] for more details.
 
-[reference]: /reference/configuration/policies.md#languagev1-rate-limiter
+[reference]: /references/configuration/policies.md#languagev1-rate-limiter
 [agent-group]: /concepts/service.md#agent-group
 [policies]: /concepts/policy/policy.md
 [flow-label]: /concepts/flow-control/flow-label.md

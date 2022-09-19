@@ -26,7 +26,7 @@ The Aperture Agent related configurations are stored in a configmap which is
 created during the installation using Helm.
 
 All the configuration parameters for Aperture Agent are listed
-[here](/reference/configuration/agent.md).
+[here](/references/configuration/agent.md).
 
 ## Installation Modes {#agent-installation-modes}
 

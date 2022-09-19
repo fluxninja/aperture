@@ -71,48 +71,36 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
                    - key: aperture.source
                      value:
                        string_value: "envoy"
-                   - key: http.method
-                     value:
-                       string_value: "%REQ(:METHOD)%"
-                   - key: http.target
-                     value:
-                       string_value: "%REQ(:PATH)%"
-                   - key: http.host
-                     value:
-                       string_value: "%REQ(HOST)%"
-                   - key: http.user_agent
-                     value:
-                       string_value: "%REQ(USER-AGENT)%"
-                   - key: duration_millis
-                     value:
-                       string_value: "%DURATION%"
-                   - key: http.request_content_length
-                     value:
-                       string_value: "%BYTES_RECEIVED%"
-                   - key: http.response_content_length
-                     value:
-                       string_value: "%BYTES_SENT%"
-                   - key: http.status_code
-                     value:
-                       string_value: "%RESPONSE_CODE%"
-                   - key: aperture.labels
-                      value:
-                        string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.labels)%"
                    - key: aperture.check_response
                      value:
                        string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
-                   - key: aperture.authz_response
+                   - key: http.status_code
                      value:
-                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.authz_response)%"
-                   - key: control_point
+                       string_value: "%RESPONSE_CODE%"
+                   - key: authz_duration
                      value:
-                       string_value: "egress"
-                   - key: net.peer.address
+                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:ext_authz_duration)%"
+                   - key: BYTES_RECEIVED
                      value:
-                       string_value: "%UPSTREAM_HOST%"
-                   - key: net.host.address
+                       string_value: "%BYTES_RECEIVED%"
+                   - key: BYTES_SENT
                      value:
-                       string_value: "%UPSTREAM_LOCAL_ADDRESS%"
+                       string_value: "%BYTES_SENT%"
+                   - key: DURATION
+                     value:
+                       string_value: "%DURATION%"
+                   - key: REQUEST_DURATION
+                     value:
+                       string_value: "%REQUEST_DURATION%"
+                   - key: REQUEST_TX_DURATION
+                     value:
+                       string_value: "%REQUEST_TX_DURATION%"
+                   - key: RESPONSE_DURATION
+                     value:
+                       string_value: "%RESPONSE_DURATION%"
+                   - key: RESPONSE_TX_DURATION
+                     value:
+                       string_value: "%RESPONSE_TX_DURATION%"
    ```
 
 2. The below patch also merges the
@@ -163,51 +151,36 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
                    - key: aperture.source
                      value:
                        string_value: "envoy"
-                   - key: http.method
-                     value:
-                       string_value: "%REQ(:METHOD)%"
-                   - key: http.target
-                     value:
-                       string_value: "%REQ(:PATH)%"
-                   - key: http.host
-                     value:
-                       string_value: "%REQ(HOST)%"
-                   - key: http.user_agent
-                     value:
-                       string_value: "%REQ(USER-AGENT)%"
-                   - key: duration_millis
-                     value:
-                       string_value: "%DURATION%"
-                   - key: http.request_content_length
-                     value:
-                       string_value: "%BYTES_RECEIVED%"
-                   - key: http.response_content_length
-                     value:
-                       string_value: "%BYTES_SENT%"
-                   - key: http.status_code
-                     value:
-                       string_value: "%RESPONSE_CODE%"
-                   - key: aperture.labels
-                      value:
-                        string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.labels)%"
                    - key: aperture.check_response
                      value:
                        string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
-                   - key: aperture.authz_response
+                   - key: http.status_code
                      value:
-                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.authz_response)%"
-                   - key: control_point
+                       string_value: "%RESPONSE_CODE%"
+                   - key: authz_duration
                      value:
-                       string_value: "ingress"
-                   - key: net.peer.ip
+                       string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:ext_authz_duration)%"
+                   - key: BYTES_RECEIVED
                      value:
-                       string_value: "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"
-                   - key: net.host.ip
+                       string_value: "%BYTES_RECEIVED%"
+                   - key: BYTES_SENT
                      value:
-                       string_value: "%DOWNSTREAM_LOCAL_ADDRESS_WITHOUT_PORT%"
-                   - key: net.host.port
+                       string_value: "%BYTES_SENT%"
+                   - key: DURATION
                      value:
-                       string_value: "%DOWNSTREAM_LOCAL_PORT%"
+                       string_value: "%DURATION%"
+                   - key: REQUEST_DURATION
+                     value:
+                       string_value: "%REQUEST_DURATION%"
+                   - key: REQUEST_TX_DURATION
+                     value:
+                       string_value: "%REQUEST_TX_DURATION%"
+                   - key: RESPONSE_DURATION
+                     value:
+                       string_value: "%RESPONSE_DURATION%"
+                   - key: RESPONSE_TX_DURATION
+                     value:
+                       string_value: "%RESPONSE_TX_DURATION%"
    ```
 
 3. The below patch inserts the
@@ -297,29 +270,6 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
              - key: traffic-direction
                value: OUTBOUND
    ```
-
-## Data Collected
-
-The Aperture Agent collects the below data using the Envoy Filter:
-
-| Key                          | Value                                                          | Description                                                                                                      | Type              |
-| ---------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------- |
-| http.method                  | "%REQ(:METHOD)%"                                               | The HTTP method used for the request                                                                             | Inbound, Outbound |
-| http.target                  | "%REQ(:PATH)%"                                                 | The HTTP path requested by the client                                                                            | Inbound, Outbound |
-| http.host                    | "%REQ(HOST)%"                                                  | The value of the Host (HTTP/1.1)                                                                                 | Inbound, Outbound |
-| http.user_agent              | "%REQ(USER-AGENT)%"                                            | The user agent string to identify the specific type of software request agent                                    | Inbound, Outbound |
-| duration_millis              | "%RESPONSE_DURATION%"                                          | Total duration in milliseconds of the request from the start time to the first byte read from the upstream host. | Inbound, Outbound |
-| http.request_content_length  | "%BYTES_RECEIVED%"                                             | Body bytes received                                                                                              | Inbound, Outbound |
-| http.response_content_length | "%BYTES_SENT%"                                                 | Body bytes sent. For WebSocket connection it will also include response header bytes                             | Inbound, Outbound |
-| http.status_code             | "%RESPONSE_CODE%"                                              | HTTP response code                                                                                               | Inbound, Outbound |
-| fn.flow                      | "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.flow)%"     | FluxNinja Flow Labels                                                                                            | Inbound, Outbound |
-| fn.policies                  | "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:fn.policies)%" | FluxNinja Policy details                                                                                         | Inbound, Outbound |
-| control_point                | ingress/egress                                                 | Request Type                                                                                                     | Inbound, Outbound |
-| net.peer.address             | "%UPSTREAM_HOST%"                                              | Upstream host URL                                                                                                | Outbound          |
-| net.host.address             | "%UPSTREAM_LOCAL_ADDRESS%"                                     | Local address of the upstream connection                                                                         | Outbound          |
-| net.peer.ip                  | "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"                     | Remote address of the downstream connection, without any port component                                          | Inbound           |
-| net.host.ip                  | "%DOWNSTREAM_LOCAL_ADDRESS_WITHOUT_PORT%"                      | Local address of the downstream connection, without any port component                                           | Inbound           |
-| net.host.port                | "%DOWNSTREAM_LOCAL_PORT%"                                      | Local port of the downstream connection                                                                          | Inbound           |
 
 More information about the extracted values can be found on
 [this site](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log).

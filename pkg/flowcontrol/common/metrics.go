@@ -11,14 +11,17 @@ import (
 // Metrics is used for collecting metrics about Aperture flowcontrol.
 type Metrics interface {
 	// CheckResponse collects metrics about Aperture Check call with DecisionType and Reason.
-	CheckResponse(flowcontrolv1.DecisionType, *flowcontrolv1.DecisionReason)
+	CheckResponse(flowcontrolv1.CheckResponse_DecisionType, flowcontrolv1.CheckResponse_RejectReason, flowcontrolv1.CheckResponse_Error)
 }
 
 // NopMetrics is a no-op implementation of Metrics.
 type NopMetrics struct{}
 
+// Ensure NopMetrics implements Metrics interface.
+var _ Metrics = NopMetrics{}
+
 // CheckResponse is no-op method for NopMetrics.
-func (NopMetrics) CheckResponse(flowcontrolv1.DecisionType, *flowcontrolv1.DecisionReason) {
+func (NopMetrics) CheckResponse(flowcontrolv1.CheckResponse_DecisionType, flowcontrolv1.CheckResponse_RejectReason, flowcontrolv1.CheckResponse_Error) {
 }
 
 // PrometheusMetrics stores collected metrics.
@@ -29,15 +32,18 @@ type PrometheusMetrics struct {
 	// TODO: 3 gauges for 3 types of flowcontrol decisions
 	checkReceivedTotal prometheus.Counter
 	checkDecision      prometheus.CounterVec
-	errorReason        prometheus.CounterVec
+	error              prometheus.CounterVec
 	rejectReason       prometheus.CounterVec
 }
+
+// Ensure PrometheusMetrics implements Metrics interface.
+var _ Metrics = &PrometheusMetrics{}
 
 func (pm *PrometheusMetrics) allMetrics() []prometheus.Collector {
 	return []prometheus.Collector{
 		pm.checkReceivedTotal,
 		pm.checkDecision,
-		pm.errorReason,
+		pm.error,
 		pm.rejectReason,
 	}
 }
@@ -58,7 +64,7 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 				Help: "Number of aperture check decisions",
 			}, []string{metrics.FlowControlCheckDecisionTypeLabel},
 		),
-		errorReason: *prometheus.NewCounterVec(
+		error: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: metrics.FlowControlErrorReasonsMetricName,
 				Help: "Number of error reasons other than unspecified",
@@ -83,17 +89,14 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 	return pm, nil
 }
 
-// CheckResponse collects metrics about Aperture Check call with DecisionType, Reason.
-func (pm *PrometheusMetrics) CheckResponse(decision flowcontrolv1.DecisionType, reason *flowcontrolv1.DecisionReason) {
+// CheckResponse collects metrics about Aperture Check call with DecisionType, RejectReason, Error.
+func (pm *PrometheusMetrics) CheckResponse(decision flowcontrolv1.CheckResponse_DecisionType, rejectReason flowcontrolv1.CheckResponse_RejectReason, error flowcontrolv1.CheckResponse_Error) {
 	pm.checkReceivedTotal.Inc()
 	pm.checkDecision.With(prometheus.Labels{metrics.FlowControlCheckDecisionTypeLabel: decision.Enum().String()}).Inc()
-	if reason != nil {
-		if reason.GetErrorReason() != flowcontrolv1.DecisionReason_ERROR_REASON_UNSPECIFIED {
-			pm.errorReason.With(prometheus.Labels{metrics.FlowControlCheckErrorReasonLabel: reason.GetErrorReason().Enum().String()}).Inc()
-		}
-		if reason.GetRejectReason() != flowcontrolv1.DecisionReason_REJECT_REASON_UNSPECIFIED {
-			pm.rejectReason.With(prometheus.Labels{metrics.FlowControlCheckRejectReasonLabel: reason.GetRejectReason().Enum().String()}).Inc()
-		}
+	if error != flowcontrolv1.CheckResponse_ERROR_NONE {
+		pm.error.With(prometheus.Labels{metrics.FlowControlCheckErrorReasonLabel: error.Enum().String()}).Inc()
 	}
-	// TODO: update fluxmeter metrics
+	if rejectReason != flowcontrolv1.CheckResponse_REJECT_REASON_NONE {
+		pm.rejectReason.With(prometheus.Labels{metrics.FlowControlCheckRejectReasonLabel: rejectReason.Enum().String()}).Inc()
+	}
 }

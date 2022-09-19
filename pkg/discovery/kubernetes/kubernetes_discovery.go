@@ -16,7 +16,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/watch"
 
-	"github.com/fluxninja/aperture/pkg/discovery/common"
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
@@ -293,7 +293,7 @@ func (kc *KubernetesDiscovery) updatePodInTracker(podInfo podInfo) error {
 	key := notifiers.Key(getPodIDKey(podInfo.UID))
 	currentPodData := kc.trackers.GetCurrentValue(key)
 
-	var entity *common.Entity
+	var entity *entitycachev1.Entity
 
 	if len(currentPodData) > 0 {
 		err := json.Unmarshal(currentPodData, &entity)
@@ -302,12 +302,12 @@ func (kc *KubernetesDiscovery) updatePodInTracker(podInfo podInfo) error {
 			return err
 		}
 	} else {
-		entity = &common.Entity{}
+		entity = &entitycachev1.Entity{}
 	}
 
 	entity.Services = services
-	entity.IPAddress = podInfo.IPAddress
-	entity.UID = podInfo.UID
+	entity.IpAddress = podInfo.IPAddress
+	entity.Uid = podInfo.UID
 	entity.Prefix = podTrackerPrefix
 	entity.Name = podInfo.Name
 

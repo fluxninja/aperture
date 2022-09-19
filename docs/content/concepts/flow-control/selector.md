@@ -1,7 +1,7 @@
 ---
 title: Flow Selector
 sidebar_label: Selector
-sidebar_position: 1
+sidebar_position: 2
 keywords:
   - flows
   - services
@@ -11,14 +11,14 @@ keywords:
 
 :::info
 
-See also [Selector reference](/reference/configuration/policies.md#v1-selector)
+See also [Selector reference](/references/configuration/policies.md#v1-selector)
 
 :::
 
 Flow Selectors are used by all flow observability and control components
 instantiated on Aperture Agents ([Classifiers][classifier], [Flux
 Meters][flux-meter] and Limiters). Flow Selectors define scoping rules – how
-these components should select [flows][flow] for their operations.
+these components should select [Flows][flow] for their operations.
 
 A Selector consists of:
 
@@ -46,15 +46,15 @@ select all services within the agent group, you can skip the service name.
 
 :::
 
-### Control point
+### Control Point
 
-Flow Selector selects flows from only one [control point][control-point] within
+Flow Selector selects flows from only one [Control Point][control-point] within
 a service.
 
 ### Label Matcher
 
 Label matcher allows to optionally narrow down the selected flow based on
-conditions on [flow labels][label].
+conditions on [Flow Labels][label].
 
 There are multiple ways to define a label matcher. The simplest way is to
 provide a map of labels for exact-match:
@@ -66,13 +66,13 @@ label_matcher:
 ```
 
 You can also provide a matching-expression-tree, which allows for arbitrary
-conditions, including regex matching. See more details in [LabelMatcher
-reference][label-matcher].
+conditions, including regex matching. Refer to [LabelMatcher][label-matcher] for further details.
 
 ### Example
 
 ```yaml
 service: checkout.myns.svc.cluster.local
+agent_group: default
 control_point:
   traffic: ingress
 label_matcher:
@@ -87,4 +87,4 @@ label_matcher:
 [agent-group]: /concepts/service.md#agent-group
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [classifier]: /concepts/flow-control/flow-classifier.md
-[label-matcher]: /reference/configuration/policies.md#v1-label-matcher
+[label-matcher]: /references/configuration/policies.md#v1-label-matcher

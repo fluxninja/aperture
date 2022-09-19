@@ -10,7 +10,6 @@ import (
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
-	selectors "github.com/fluxninja/aperture/pkg/selectors"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -80,7 +79,7 @@ func (mr *MockLimiterMockRecorder) GetSelector() *gomock.Call {
 }
 
 // RunLimiter mocks base method.
-func (m *MockLimiter) RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision {
+func (m *MockLimiter) RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RunLimiter", labels)
 	ret0, _ := ret[0].(*flowcontrolv1.LimiterDecision)

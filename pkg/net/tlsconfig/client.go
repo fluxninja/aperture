@@ -16,10 +16,10 @@ import (
 // swagger:model
 // +kubebuilder:object:generate=true
 type ClientTLSConfig struct {
-	CertFile           string `json:"cert_file" validate:"omitempty,file"`
-	KeyFile            string `json:"key_file" validate:"omitempty,file"`
-	CAFile             string `json:"ca_file" validate:"omitempty,file"`
-	KeyLogWriter       string `json:"key_log_file" validate:"omitempty,file"`
+	CertFile           string `json:"cert_file"`
+	KeyFile            string `json:"key_file"`
+	CAFile             string `json:"ca_file"`
+	KeyLogWriter       string `json:"key_log_file"`
 	InsecureSkipVerify bool   `json:"insecure_skip_verify"`
 }
 

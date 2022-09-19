@@ -5,7 +5,7 @@ sidebar_position: 1
 
 :::info
 
-See also [Policy reference](/reference/configuration/policies.md#v1-policy)
+See also [Policy reference](/references/configuration/policies.md#v1-policy)
 
 :::
 

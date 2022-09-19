@@ -79,13 +79,13 @@ func (lsa *LoadShedActuator) Execute(inPortReadings runtime.PortToValue, tickInf
 		if len(lsf) > 0 {
 			lsfReading := lsf[0]
 			var lsfValue float64
-			if !lsfReading.Valid {
+			if !lsfReading.Valid() {
 				lsfValue = 0
 			} else {
-				if lsfReading.Value <= 0 {
+				if lsfReading.Value() <= 0 {
 					lsfValue = 0
 				} else {
-					lsfValue = lsfReading.Value
+					lsfValue = lsfReading.Value()
 				}
 			}
 			return nil, lsa.publishLoadShedFactor(lsfValue)

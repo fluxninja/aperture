@@ -7,7 +7,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -27,25 +26,25 @@ func NewMaxAndOptions(maxProto *policylangv1.Max, componentIndex int, policyRead
 func (max *Max) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	maxValue := -math.MaxFloat64
 	inputs := inPortReadings.ReadRepeatedValuePort("inputs")
-	output := reading.NewInvalid()
+	output := runtime.InvalidReading()
 
 	if len(inputs) > 0 {
 		for _, singleInput := range inputs {
-			if !singleInput.Valid {
+			if !singleInput.Valid() {
 				return runtime.PortToValue{
-					"output": []reading.Reading{output},
+					"output": []runtime.Reading{output},
 				}, nil
 			}
-			if singleInput.Value > maxValue {
-				maxValue = singleInput.Value
+			if singleInput.Value() > maxValue {
+				maxValue = singleInput.Value()
 			}
 		}
-		output = reading.New(maxValue)
+		output = runtime.NewReading(maxValue)
 	} else {
-		output = reading.NewInvalid()
+		output = runtime.InvalidReading()
 	}
 
 	return runtime.PortToValue{
-		"output": []reading.Reading{output},
+		"output": []runtime.Reading{output},
 	}, nil
 }

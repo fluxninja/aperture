@@ -19,7 +19,7 @@ FROM base AS builder
 # App build
 RUN --mount=type=cache,target=/go/pkg/ \
     --mount=type=cache,target=/root/.cache/go-build/ \
-    CGO_ENABLED=1 GOOS=linux GOARCH=amd64 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" LDFLAGS="-s -w" \
+    CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" LDFLAGS="-s -w" \
     ./pkg/info/build.sh
 
 
@@ -30,7 +30,7 @@ RUN --mount=type=cache,target=/go/pkg/ \
     --mount=type=cache,target=/root/.cache/go-build/ \
     /bin/bash -c 'shopt -s nullglob; for plugin in ./plugins/{service,agent}/aperture-plugin-*; do\
     echo "building plugin $plugin";\
-    CGO_ENABLED=1 GOOS=linux GOARCH=amd64 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w" \
+    CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w" \
     ./pkg/plugins/build.sh;\
     done\
     '

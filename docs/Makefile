@@ -37,7 +37,7 @@ generate-config-markdown:
 			cat $$dir/metadata $$dir/$$basename.md > $$dir/$$basename.md.tmp; \
 			mv $$dir/$$basename.md.tmp $$dir/$$basename.md; \
 			npx prettier --write $$dir/$$basename.md; \
-			mv $$dir/$$basename.md ./content/reference/configuration; \
+			mv $$dir/$$basename.md ./content/references/configuration; \
 		done; \
 		rm merged-plugin-swagger.yaml; \
 	}
@@ -63,10 +63,14 @@ generate-config-markdown:
 	@cat gen/policies/metadata gen/policies/policies.md > gen/policies/policies.md.tmp
 	@mv gen/policies/policies.md.tmp gen/policies/policies.md
 	@npx prettier --write gen/policies/policies.md
-	@mv gen/policies/policies.md content/reference/configuration
+	@mv gen/policies/policies.md content/references/configuration
+
+generate-mmd:
+	@echo generating mermaid files from markdown files
+	@./tools/mermaid/md_to_mmd.sh
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
-generate-mermaid:
+generate-mermaid: generate-mmd
 	@echo generating mermaid diagrams
 	@find . -name '*.mmd' -exec $(MAKE) -B {}.svg \;
 
@@ -74,7 +78,8 @@ generate-mermaid:
 	@echo MMDC $@
 	@for fmt in svg; \
 		do npx -p @mermaid-js/mermaid-cli mmdc \
-			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --output $<.$$fmt --backgroundColor transparent; \
+			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --output $<.$$fmt --backgroundColor transparent \
+			&& git add $<.$$fmt; \
 	done
 
-.PHONY: generate-config-markdown generate-mermaid
+.PHONY: generate-config-markdown generate-mermaid generate-mmd

@@ -18,4 +18,4 @@ if grep <<<"${TOOLS}" '^python$'; then
 		libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 fi
 
-(yes || true) | ./scripts/manage_tools.sh setup "${tools[@]}"
+(yes || true) | ./playground/scripts/manage_tools.sh setup "${tools[@]}"

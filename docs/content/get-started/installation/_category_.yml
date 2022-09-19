@@ -1,2 +1,8 @@
 label: Installation
 position: 1
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Installation"
+  keywords: ["install"]
