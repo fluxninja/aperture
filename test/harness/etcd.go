@@ -24,9 +24,7 @@ const (
 	// EtcdUsername is the username to etcd cluster.
 	EtcdUsername = "user"
 	// EtcdPassword is the password for the EtcdUsername.
-	EtcdPassword       = "password"
-	etcdServerCertPath = "/tmp/etcd_testserver/server.crt"
-	etcdServerKeyPath  = "/tmp/etcd_testserver/server.key"
+	EtcdPassword = "password"
 )
 
 // EtcdHarness represents a running etcd server for an integration test environment.
@@ -66,13 +64,13 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return nil, err
 	}
 
-	// Generates the certificates and private keys and store temporary files into etcdDir directory.
+	// Generates the certificates and private keys in temporary directory.
 	cert, key, err := generateCertAndKey()
 	if err != nil {
 		return nil, err
 	}
 
-	certf, err := os.CreateTemp(h.etcdDir, "server.crt")
+	certf, err := os.CreateTemp("", "server.crt")
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +80,7 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return nil, err
 	}
 
-	keyf, err := os.CreateTemp(h.etcdDir, "server.key")
+	keyf, err := os.CreateTemp("", "server.key")
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +90,7 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return nil, err
 	}
 
-	cer, _ := tls.LoadX509KeyPair(etcdServerCertPath, etcdServerKeyPath)
+	cer, _ := tls.LoadX509KeyPair("server.crt", "server.key")
 	etcdTLSConfig := &tls.Config{
 		Certificates: []tls.Certificate{cer},
 		MinVersion:   tls.VersionTLS12,
@@ -107,8 +105,8 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		"--listen-client-urls="+endpoint,
 		"--advertise-client-urls="+endpoint,
 		"--client-cert-auth=true",
-		"--cert-file="+etcdServerCertPath,
-		"--key-file="+etcdServerKeyPath,
+		"--cert-file=server.crt",
+		"--key-file=server.key",
 	)
 	h.etcdServer.Stderr = h.errWriter
 	h.etcdServer.Stdout = io.Discard
