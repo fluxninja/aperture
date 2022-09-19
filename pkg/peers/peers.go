@@ -316,7 +316,8 @@ func (pd *PeerDiscovery) GetPeerKeys() []string {
 	defer pd.lock.RUnlock()
 
 	keys := make([]string, 0)
-	for key := range pd.peers.Peers {
+	x := pd.peers.DeepCopy()
+	for key := range x.Peers {
 		keys = append(keys, key)
 	}
 
