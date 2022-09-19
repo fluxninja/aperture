@@ -10,8 +10,8 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
-	"github.com/fluxninja/aperture/pkg/selectors"
 )
 
 var _ = Describe("Dataplane Engine", func() {
@@ -49,7 +49,7 @@ var _ = Describe("Dataplane Engine", func() {
 				metrics.PolicyNameLabel:    "test",
 				metrics.FluxMeterNameLabel: "test",
 				metrics.PolicyHashLabel:    "test",
-				metrics.DecisionTypeLabel:  flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED.String(),
+				metrics.DecisionTypeLabel:  flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
 			},
 		})
 		fluxMeterID = iface.FluxMeterID{
@@ -98,7 +98,7 @@ var _ = Describe("Dataplane Engine", func() {
 		BeforeEach(func() {
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED, "200", "").Return(histogram).AnyTimes()
+			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "200", "").Return(histogram).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 
@@ -135,7 +135,7 @@ var _ = Describe("Dataplane Engine", func() {
 			err := engine.RegisterFluxMeter(mockFluxmeter)
 			Expect(err).NotTo(HaveOccurred())
 			fluxMeter := engine.GetFluxMeter("test")
-			h := fluxMeter.GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED, "200", "")
+			h := fluxMeter.GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "200", "")
 			Expect(h).To(Equal(histogram))
 		})
 	})
@@ -148,7 +148,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.DecisionType_DECISION_TYPE_REJECTED, "503", "").Return(histogram).AnyTimes()
+			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "503", "").Return(histogram).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 
@@ -156,13 +156,9 @@ var _ = Describe("Dataplane Engine", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
 			_ = engine.RegisterConcurrencyLimiter(mockLimiter)
 
-			controlPoint := selectors.ControlPoint{
-				Traffic: selectors.Ingress,
-			}
+			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, "")
 			svcs := []string{"testService2.testNamespace2.svc.cluster.local"}
-			labels := selectors.NewLabels(selectors.LabelSources{
-				Flow: map[string]string{"service": "whatever"},
-			})
+			labels := map[string]string{"service": "whatever"}
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).To(BeEmpty())
@@ -173,13 +169,9 @@ var _ = Describe("Dataplane Engine", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
 			_ = engine.RegisterConcurrencyLimiter(mockLimiter)
 
-			controlPoint := selectors.ControlPoint{
-				Traffic: selectors.Ingress,
-			}
+			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, "")
 			svcs := []string{"testService.testNamespace.svc.cluster.local"}
-			labels := selectors.NewLabels(selectors.LabelSources{
-				Flow: map[string]string{"service": "testService.testNamespace.svc.cluster.local"},
-			})
+			labels := map[string]string{"service": "testService.testNamespace.svc.cluster.local"}
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).NotTo(BeEmpty())

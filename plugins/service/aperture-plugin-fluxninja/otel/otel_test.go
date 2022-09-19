@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/mitchellh/copystructure"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/processor/batchprocessor"
@@ -69,6 +70,9 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 	)
 	app := platform.New(opts)
 
+	originalBaseConfig, err := copystructure.Copy(baseConfig)
+	Expect(err).NotTo(HaveOccurred())
+
 	err = app.Err()
 	if err != nil {
 		visualize, _ := fx.VisualizeError(err)
@@ -83,6 +87,9 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 	err = app.Stop(context.TODO())
 	Expect(err).NotTo(HaveOccurred())
 
+	// Ensure we did not modify the original base config
+	Expect(baseConfig).To(BeEquivalentTo(originalBaseConfig))
+
 	Expect(in.Actual).To(HaveLen(1))
 	Expect(in.Actual[0].Receivers).To(Equal(expected.Receivers))
 	Expect(in.Actual[0].Processors).To(Equal(expected.Processors))
@@ -92,27 +99,27 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 	Entry(
 		"add FN processors and exporters",
 		otelcollector.NewOTELConfig(),
-		baseOTELConfig(),
+		basePluginOTELConfig(),
 	),
 	Entry(
 		"add FN exporters to logs pipeline",
 		baseOTELConfigWithPipeline("logs", testPipeline()),
-		baseOTELConfigWithPipeline("logs", testPipelineWithFN()),
+		basePluginOTELConfigWithPipeline("logs", testPipelineWithFN()),
 	),
 	Entry(
 		"add FN exporters to traces pipeline",
 		baseOTELConfigWithPipeline("traces", testPipeline()),
-		baseOTELConfigWithPipeline("traces", testPipelineWithFN()),
+		basePluginOTELConfigWithPipeline("traces", testPipelineWithFN()),
 	),
 	Entry(
 		"add metrics/slow pipeline if metrics/fast pipeline exists",
 		baseOTELConfigWithPipeline("metrics/fast", testPipeline()),
-		baseOTELConfigWithMetrics("metrics/slow"),
+		basePluginOTELConfigWithMetrics("metrics/slow"),
 	),
 	Entry(
 		"add metrics/controller-slow pipeline if metrics/controller-fast pipeline exists",
 		baseOTELConfigWithPipeline("metrics/controller-fast", testPipeline()),
-		baseOTELConfigWithMetrics("metrics/controller-slow"),
+		basePluginOTELConfigWithMetrics("metrics/controller-slow"),
 	),
 )
 
@@ -122,8 +129,23 @@ func baseOTELConfigWithPipeline(name string, pipeline otelcollector.Pipeline) *o
 	return cfg
 }
 
-func baseOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELConfig {
-	cfg := baseOTELConfig()
+func basePluginOTELConfigWithPipeline(name string, pipeline otelcollector.Pipeline) *otelcollector.OTELConfig {
+	cfg := basePluginOTELConfig()
+	cfg.Service.AddPipeline(name, pipeline)
+	return cfg
+}
+
+func basePluginOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELConfig {
+	cfg := basePluginOTELConfig()
+	cfg.AddReceiver("prometheus/fluxninja", map[string]any{
+		"config": map[string]any{
+			"global": map[string]any{
+				// Here is different scrape interval than in the base otel config.
+				"scrape_interval": "10s",
+			},
+			"scrape_configs": []string{"foo", "bar"},
+		},
+	})
 	cfg.AddProcessor("batch/metrics-slow", batchprocessor.Config{
 		SendBatchSize: 10000,
 		Timeout:       10 * time.Second,
@@ -136,7 +158,7 @@ func baseOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELConfig {
 		processors = append([]string{"enrichment"}, processors...)
 	}
 	cfg.Service.AddPipeline(pipelineName, otelcollector.Pipeline{
-		Receivers:  []string{"prometheus"},
+		Receivers:  []string{"prometheus/fluxninja"},
 		Processors: processors,
 		Exporters:  []string{"otlp/fluxninja"},
 	})
@@ -144,6 +166,21 @@ func baseOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELConfig {
 }
 
 func baseOTELConfig() *otelcollector.OTELConfig {
+	cfg := otelcollector.NewOTELConfig()
+	cfg.AddReceiver("prometheus", map[string]any{
+		"config": map[string]any{
+			"global": map[string]any{
+				"scrape_interval": "1s",
+			},
+			// Put some scrape configs to be sure they are not overwritten.
+			"scrape_configs": []string{"foo", "bar"},
+		},
+	})
+	return cfg
+}
+
+// basePluginOTELConfig as produced by FN plugin
+func basePluginOTELConfig() *otelcollector.OTELConfig {
 	cfg := otelcollector.NewOTELConfig()
 	cfg.AddProcessor("attributes/fluxninja", map[string]interface{}{
 		"actions": []map[string]interface{}{

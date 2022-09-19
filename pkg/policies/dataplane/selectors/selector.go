@@ -17,123 +17,37 @@ import (
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 )
 
-// Selector is a parsed/preprocessed version of policylangv1.Selector
-//
-// refer to proto definition for docs.
-type Selector struct {
-	// Additionally, arbitrary label matcher can be used to match labels.
-	// For policies this matcher can _also_ match flow labels.
-	LabelMatcher mm.Expr
-	// ServiceID and control point are required
-	ControlPointID
+type selector struct {
+	labelMatcher mm.Expr
+	ctrlPtID     ControlPointID
 }
 
 // FromProto creates a Selector from a "raw" proto-based Selector
 //
 // The selector is assumed to be already validated and non-nil.
-func FromProto(selector *selectorv1.Selector) (Selector, error) {
-	labelMatcher, err := MMExprFromLabelMatcher(selector.GetLabelMatcher())
+func FromProto(selectorMsg *selectorv1.Selector) (selector, error) {
+	labelMatcher, err := MMExprFromLabelMatcher(selectorMsg.GetLabelMatcher())
 	if err != nil {
-		return Selector{}, fmt.Errorf("invalid label matcher: %w", err)
+		return selector{}, fmt.Errorf("invalid label matcher: %w", err)
 	}
-	return Selector{
-		ControlPointID: ControlPointIDFromProto(selector),
-		LabelMatcher:   labelMatcher,
+	ctrlPtID, err := controlPointIDFromSelectorProto(selectorMsg)
+	if err != nil {
+		return selector{}, fmt.Errorf("invalid control point: %w", err)
+	}
+	return selector{
+		ctrlPtID:     ctrlPtID,
+		labelMatcher: labelMatcher,
 	}, nil
 }
 
-// ControlPoint identifies control point within a service that the rule or
-// policy should apply to
-//
-// ControlPoint is either a library feature name or one of ingress / egress
-// traffic control point.
-type ControlPoint struct {
-	// FIXME(FLUX-2362) Stop hardcoding "envoy vs feature" (?)
-	// either
-	Feature string
-	// or
-	Traffic TrafficDirection
+// LabelMatcher returns the label matcher of the selector.
+func (s *selector) LabelMatcher() mm.Expr {
+	return s.labelMatcher
 }
 
-// TrafficDirection indicates enumerated traffic direction.
-type TrafficDirection int
-
-const (
-	// TrafficDirectionUndefined is a placeholder for undefined traffic direction.
-	TrafficDirectionUndefined TrafficDirection = iota
-	// Ingress is a traffic direction for inbound traffic.
-	Ingress
-	// Egress is a traffic direction for outbound traffic.
-	Egress
-)
-
-// String returns a string representation of the traffic direction.
-func (d TrafficDirection) String() string {
-	switch d {
-	case Ingress:
-		return "ingress"
-	case Egress:
-		return "egress"
-	default:
-		return ""
-	}
-}
-
-// String returns a string representation of either a library feature name or a traffic direction.
-func (p *ControlPoint) String() string {
-	if p.Feature != "" {
-		return p.Feature
-	}
-	return fmt.Sprintf("traffic:%s", p.Traffic)
-}
-
-// ControlPointFromProto creates a ControlPoint from "raw" proto-based ControlPoint
-//
-// The controlPoint is assumed to be already validated and nonnil.
-func ControlPointFromProto(controlPoint *selectorv1.ControlPoint) ControlPoint {
-	if controlPoint != nil && controlPoint.Controlpoint != nil {
-		switch cp := controlPoint.Controlpoint.(type) {
-		case *selectorv1.ControlPoint_Feature:
-			return ControlPoint{Feature: cp.Feature}
-		case *selectorv1.ControlPoint_Traffic:
-			switch cp.Traffic {
-			case "ingress":
-				return ControlPoint{Traffic: Ingress}
-			case "egress":
-				return ControlPoint{Traffic: Egress}
-			default:
-				log.Error().Msg("invalid traffic direction")
-				return ControlPoint{}
-			}
-		}
-	}
-	log.Error().Msg("unknown/missing control point")
-	return ControlPoint{}
-}
-
-// ControlPointID uniquely identifies the control point within a cluster – so
-// it's a ServiceName and ControlPoint combined
-//
-// Control Point.
-type ControlPointID struct {
-	ServiceName  string
-	ControlPoint ControlPoint
-}
-
-// String returns a string representation of control point and service.
-func (p ControlPointID) String() string {
-	return fmt.Sprintf("%v@%v", p.ControlPoint, p.ServiceName)
-}
-
-// ControlPointIDFromProto extracts a ControlPointID from proto-based selector
-// (ignoring LabelMatcher)
-//
-// Selector is assumed to be validated and non-nil.
-func ControlPointIDFromProto(selector *selectorv1.Selector) ControlPointID {
-	return ControlPointID{
-		ServiceName:  selector.Service,
-		ControlPoint: ControlPointFromProto(selector.ControlPoint),
-	}
+// ControlPointID returns the control point ID of the selector.
+func (s *selector) ControlPointID() ControlPointID {
+	return s.ctrlPtID
 }
 
 // MMExprFromLabelMatcher translates proto definition of label matcher into

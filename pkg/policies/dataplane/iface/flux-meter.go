@@ -34,5 +34,5 @@ type FluxMeter interface {
 	GetFluxMeterID() FluxMeterID
 
 	// GetHistogram returns the histogram observer for the flowcontrolv1.DecisionType
-	GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode string, featureStatus string) prometheus.Observer
+	GetHistogram(decisionType flowcontrolv1.CheckResponse_DecisionType, statusCode string, featureStatus string) prometheus.Observer
 }

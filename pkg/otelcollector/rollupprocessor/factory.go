@@ -18,8 +18,7 @@ func NewFactory() component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
 		createDefaultConfig,
-		component.WithLogsProcessor(CreateLogsProcessor, component.StabilityLevelInDevelopment),
-		component.WithTracesProcessor(CreateTracesProcessor, component.StabilityLevelInDevelopment))
+		component.WithLogsProcessor(CreateLogsProcessor, component.StabilityLevelInDevelopment))
 }
 
 func createDefaultConfig() config.Processor {
@@ -36,14 +35,4 @@ func CreateLogsProcessor(
 	nextConsumer consumer.Logs,
 ) (component.LogsProcessor, error) {
 	return newRollupLogsProcessor(set, nextConsumer, cfg.(*Config))
-}
-
-// CreateTracesProcessor returns rollupProcessor handling traces.
-func CreateTracesProcessor(
-	_ context.Context,
-	set component.ProcessorCreateSettings,
-	cfg config.Processor,
-	nextConsumer consumer.Traces,
-) (component.TracesProcessor, error) {
-	return newRollupTracesProcessor(set, nextConsumer, cfg.(*Config))
 }

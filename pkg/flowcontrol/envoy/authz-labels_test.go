@@ -1,12 +1,11 @@
-package selectors_test
+package envoy_test
 
 import (
+	. "github.com/fluxninja/aperture/pkg/flowcontrol/envoy"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
-
-	"github.com/fluxninja/aperture/pkg/selectors"
 )
 
 var _ = Describe("Flow labels", func() {
@@ -25,15 +24,9 @@ var _ = Describe("Flow labels", func() {
 				Protocol: "HTTP/2",
 			},
 		}
-		existingLabels := map[string]string{
-			"hello": "world",
-		}
 
-		labels := selectors.NewLabels(selectors.LabelSources{
-			Flow:    existingLabels,
-			Request: req,
-		})
-		Expect(labels).To(HaveKeyWithValue("hello", "world"))
+		flowLabels := AuthzRequestToFlowLabels(req)
+		labels := flowLabels.ToPlainMap()
 		Expect(labels).To(HaveKeyWithValue("http.method", "GET"))
 		Expect(labels).To(HaveKeyWithValue("http.target", "/foo/bar"))
 		Expect(labels).To(HaveKeyWithValue("http.host", "example.com"))

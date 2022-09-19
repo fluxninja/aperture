@@ -21,14 +21,14 @@ import (
 )
 
 const (
-	// ReceiverOTLP collects traces and logs from libraries and SDKs.
+	// ReceiverOTLP collects logs from libraries and SDKs.
 	ReceiverOTLP = "otlp"
 	// ReceiverPrometheus collects metrics from environment and services.
 	ReceiverPrometheus = "prometheus"
 
-	// ProcessorEnrichment enriches traces, logs and metrics with discovery data.
+	// ProcessorEnrichment enriches metrics with discovery data.
 	ProcessorEnrichment = "enrichment"
-	// ProcessorMetrics generates metrics based on traces and logs and exposes them
+	// ProcessorMetrics generates metrics based on logs and exposes them
 	// on application prometheus metrics endpoint.
 	ProcessorMetrics = "metrics"
 	// ProcessorBatchPrerollup batches incoming data before rolling up. This is
@@ -150,7 +150,7 @@ func newOtelConfig(in FxIn) (*otelParams, error) {
 }
 
 func provideAgent(cfg *otelParams) *otelcollector.OTELConfig {
-	addLogsAndTracesPipelines(cfg)
+	addLogsPipeline(cfg)
 	addMetricsPipeline(cfg)
 	return cfg.config
 }
@@ -160,11 +160,10 @@ func provideController(cfg *otelParams) *otelcollector.OTELConfig {
 	return cfg.config
 }
 
-func addLogsAndTracesPipelines(cfg *otelParams) {
+func addLogsPipeline(cfg *otelParams) {
 	config := cfg.config
 	// Common dependencies for pipelines
 	addOTLPReceiver(cfg)
-	config.AddProcessor(ProcessorEnrichment, nil)
 	addMetricsProcessor(config)
 	config.AddBatchProcessor(ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPrerollup.SendBatchSize)
 	addRollupProcessor(config)
@@ -172,7 +171,6 @@ func addLogsAndTracesPipelines(cfg *otelParams) {
 	config.AddExporter(ExporterLogging, nil)
 
 	processors := []string{
-		ProcessorEnrichment,
 		ProcessorAgentGroup,
 		ProcessorMetrics,
 		ProcessorBatchPrerollup,
@@ -181,12 +179,6 @@ func addLogsAndTracesPipelines(cfg *otelParams) {
 	}
 
 	config.Service.AddPipeline("logs", otelcollector.Pipeline{
-		Receivers:  []string{ReceiverOTLP},
-		Processors: processors,
-		Exporters:  []string{ExporterLogging},
-	})
-
-	config.Service.AddPipeline("traces", otelcollector.Pipeline{
 		Receivers:  []string{ReceiverOTLP},
 		Processors: processors,
 		Exporters:  []string{ExporterLogging},
@@ -256,8 +248,8 @@ func addPrometheusReceiver(cfg *otelParams) {
 	config.AddReceiver(ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
-				"scrape_interval":     "1m",
-				"scrape_timeout":      "10s",
+				"scrape_interval":     "1s",
+				"scrape_timeout":      "1s",
 				"evaluation_interval": "1m",
 			},
 			"scrape_configs": scrapeConfigs,
@@ -274,8 +266,8 @@ func addControllerPrometheusReceiver(config *otelcollector.OTELConfig, cfg *otel
 	config.AddReceiver(ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
-				"scrape_interval":     "1m",
-				"scrape_timeout":      "10s",
+				"scrape_interval":     "1s",
+				"scrape_timeout":      "1s",
 				"evaluation_interval": "1m",
 			},
 			"scrape_configs": scrapeConfigs,
@@ -303,9 +295,7 @@ func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]any 
 		"tls_config": map[string]any{
 			"insecure_skip_verify": true,
 		},
-		"scrape_interval": "1s",
-		"scrape_timeout":  "900ms",
-		"metrics_path":    "/metrics",
+		"metrics_path": "/metrics",
 		"static_configs": []map[string]any{
 			{
 				"targets": []string{cfg.listener.GetAddr()},
@@ -320,11 +310,9 @@ func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]any 
 
 func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]any {
 	return map[string]any{
-		"job_name":        "kubernetes-nodes",
-		"scheme":          "https",
-		"scrape_interval": "2s",
-		"scrape_timeout":  "1500ms",
-		"metrics_path":    "/metrics/cadvisor",
+		"job_name":     "kubernetes-nodes",
+		"scheme":       "https",
+		"metrics_path": "/metrics/cadvisor",
 		"authorization": map[string]any{
 			"credentials_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
 		},
@@ -359,11 +347,9 @@ func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]any {
 
 func buildKubernetesPodsScrapeConfig(cfg *otelParams) map[string]any {
 	return map[string]any{
-		"job_name":        "kubernetes-pods",
-		"scheme":          "http",
-		"scrape_interval": "2s",
-		"scrape_timeout":  "1500ms",
-		"metrics_path":    "/metrics",
+		"job_name":     "kubernetes-pods",
+		"scheme":       "http",
+		"metrics_path": "/metrics",
 		"kubernetes_sd_configs": []map[string]any{
 			{"role": "pod"},
 		},

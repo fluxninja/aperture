@@ -12,7 +12,6 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
-	"go.opentelemetry.io/collector/pdata/ptrace"
 
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
@@ -29,24 +28,22 @@ var rollupTypes = []RollupType{
 func initRollupsLog() []*Rollup {
 	rollupsInit := []*Rollup{
 		{
-			FromField:   otelcollector.DurationLabel,
-			TreatAsZero: []string{otelcollector.EnvoyMissingAttributeSourceValue},
+			FromField:   otelcollector.WorkloadDurationLabel,
+			TreatAsZero: []string{},
+		},
+		{
+			FromField:   otelcollector.FlowDurationLabel,
+			TreatAsZero: []string{},
+		},
+		{
+			FromField:   otelcollector.ApertureProcessingDurationLabel,
+			TreatAsZero: []string{},
 		},
 		{
 			FromField: otelcollector.HTTPRequestContentLength,
 		},
 		{
 			FromField: otelcollector.HTTPResponseContentLength,
-		},
-	}
-
-	return _initRollupsPerType(rollupsInit, rollupTypes)
-}
-
-func initRollupsSpan() []*Rollup {
-	rollupsInit := []*Rollup{
-		{
-			FromField: otelcollector.DurationLabel,
 		},
 	}
 
@@ -76,16 +73,13 @@ func _initRollupsPerType(rollupsInit []*Rollup, rollupTypes []RollupType) []*Rol
 type rollupProcessor struct {
 	cfg *Config
 
-	logsNextConsumer   consumer.Logs
-	tracesNextConsumer consumer.Traces
+	logsNextConsumer consumer.Logs
 }
 
 var (
-	_ consumer.Traces = (*rollupProcessor)(nil)
-	_ consumer.Logs   = (*rollupProcessor)(nil)
+	_ consumer.Logs = (*rollupProcessor)(nil)
 
-	rollupsLog  = initRollupsLog()
-	rollupsSpan = initRollupsSpan()
+	rollupsLog = initRollupsLog()
 )
 
 func newRollupProcessor(set component.ProcessorCreateSettings, cfg *Config) (*rollupProcessor, error) {
@@ -107,43 +101,6 @@ func (rp *rollupProcessor) Start(context.Context, component.Host) error {
 // Shutdown is invoked during service shutdown.
 func (rp *rollupProcessor) Shutdown(context.Context) error {
 	return nil
-}
-
-// ConsumeTraces implements TracesProcessor.
-func (rp *rollupProcessor) ConsumeTraces(ctx context.Context, td ptrace.Traces) error {
-	rollupData := make(map[string]pcommon.Map)
-	datasketches := make(map[string]map[string]*sketches.HeapDoublesSketch)
-	err := otelcollector.IterateSpans(td, func(span ptrace.Span) error {
-		key := rp.key(span.Attributes(), rollupsSpan)
-		_, exists := rollupData[key]
-		if !exists {
-			rollupData[key] = span.Attributes()
-			rollupData[key].PutInt(RollupCountKey, 0)
-		}
-		_, exists = datasketches[key]
-		if !exists {
-			datasketches[key] = make(map[string]*sketches.HeapDoublesSketch)
-		}
-		rawCount, _ := rollupData[key].Get(RollupCountKey)
-		rollupData[key].PutInt(RollupCountKey, rawCount.IntVal()+1)
-		rp.rollupAttributes(datasketches[key], rollupData[key], span.Attributes(), rollupsSpan)
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-	for k, v := range datasketches {
-		attributes := rollupData[k]
-		for toField, sketch := range v {
-			serializedBytes, err := sketch.Compact().Serialize()
-			if err != nil {
-				return err
-			}
-			serialized := base64.StdEncoding.EncodeToString(serializedBytes)
-			attributes.PutString(toField, serialized)
-		}
-	}
-	return rp.exportTraces(ctx, rollupData)
 }
 
 // ConsumeLogs implements LogsProcessor.
@@ -264,10 +221,6 @@ func (rp *rollupProcessor) setLogsNextConsumer(c consumer.Logs) {
 	rp.logsNextConsumer = c
 }
 
-func (rp *rollupProcessor) setTracesNextConsumer(c consumer.Traces) {
-	rp.tracesNextConsumer = c
-}
-
 func (rp *rollupProcessor) exportLogs(ctx context.Context, rollupData map[string]pcommon.Map) error {
 	ld := plog.NewLogs()
 	logs := ld.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords()
@@ -278,18 +231,6 @@ func (rp *rollupProcessor) exportLogs(ctx context.Context, rollupData map[string
 		v.CopyTo(logRecord.Attributes())
 	}
 	return rp.logsNextConsumer.ConsumeLogs(ctx, ld)
-}
-
-func (rp *rollupProcessor) exportTraces(ctx context.Context, rollupData map[string]pcommon.Map) error {
-	ld := ptrace.NewTraces()
-	spans := ld.ResourceSpans().AppendEmpty().ScopeSpans().AppendEmpty().Spans()
-	for _, v := range rollupData {
-		spanRecord := spans.AppendEmpty()
-		// TODO tgill: need to get timestamp from v
-		spanRecord.SetStartTimestamp(pcommon.NewTimestampFromTime(time.Now()))
-		v.CopyTo(spanRecord.Attributes())
-	}
-	return rp.tracesNextConsumer.ConsumeTraces(ctx, ld)
 }
 
 // key returns string key used in the hashmap. Current implementations marshals
@@ -316,15 +257,5 @@ func newRollupLogsProcessor(set component.ProcessorCreateSettings, next consumer
 		return nil, err
 	}
 	rp.setLogsNextConsumer(next)
-	return rp, nil
-}
-
-// newRollupTracesProcessor creates a new rollup processor that rollupes traces.
-func newRollupTracesProcessor(set component.ProcessorCreateSettings, next consumer.Traces, cfg *Config) (*rollupProcessor, error) {
-	rp, err := newRollupProcessor(set, cfg)
-	if err != nil {
-		return nil, err
-	}
-	rp.setTracesNextConsumer(next)
 	return rp, nil
 }

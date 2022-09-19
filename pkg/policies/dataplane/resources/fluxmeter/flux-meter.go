@@ -211,7 +211,7 @@ func (fluxMeter *FluxMeter) GetFluxMeterID() iface.FluxMeterID {
 }
 
 // GetHistogram returns the histogram.
-func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.DecisionType, statusCode string, featureStatus string) prometheus.Observer {
+func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.CheckResponse_DecisionType, statusCode string, featureStatus string) prometheus.Observer {
 	labels := make(map[string]string)
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
 	labels[metrics.StatusCodeLabel] = statusCode

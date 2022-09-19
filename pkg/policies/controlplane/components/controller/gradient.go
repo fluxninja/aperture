@@ -8,7 +8,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -41,11 +40,11 @@ func NewGradientControllerAndOptions(gradientControllerProto *policylangv1.Gradi
 }
 
 // ComputeOutput based on previous and current signal reading.
-func (g *GradientController) ComputeOutput(signal, setpoint, controlVariable reading.Reading, controllerStateReadAPI ControllerStateReadAPI, tickInfo runtime.TickInfo) (reading.Reading, error) {
-	var output reading.Reading
-	if setpoint.Valid && signal.Valid && controlVariable.Valid {
+func (g *GradientController) ComputeOutput(signal, setpoint, controlVariable runtime.Reading, controllerStateReadAPI ControllerStateReadAPI, tickInfo runtime.TickInfo) (runtime.Reading, error) {
+	var output runtime.Reading
+	if setpoint.Valid() && signal.Valid() && controlVariable.Valid() {
 		var gradient float64
-		gradient = math.Pow(signal.Value/setpoint.Value, g.slope)
+		gradient = math.Pow(signal.Value()/setpoint.Value(), g.slope)
 		// clamp to min/max
 		if gradient < g.minGradient {
 			gradient = g.minGradient
@@ -54,23 +53,23 @@ func (g *GradientController) ComputeOutput(signal, setpoint, controlVariable rea
 			gradient = g.maxGradient
 		}
 		if math.IsNaN(gradient) {
-			output = reading.NewInvalid()
+			output = runtime.InvalidReading()
 		} else {
-			output = reading.New(controlVariable.Value * gradient)
+			output = runtime.NewReading(controlVariable.Value() * gradient)
 		}
 	} else {
-		output = reading.NewInvalid()
+		output = runtime.InvalidReading()
 	}
 
 	return output, nil
 }
 
 // MaintainOutput - Gradient Controller is stateless, so a bump is inevitable.
-func (g *GradientController) MaintainOutput(prevSetpoint, currentSetpoint reading.Reading, _ ControllerStateReadAPI, tickInfo runtime.TickInfo) error {
+func (g *GradientController) MaintainOutput(prevSetpoint, currentSetpoint runtime.Reading, _ ControllerStateReadAPI, tickInfo runtime.TickInfo) error {
 	return nil
 }
 
 // WindOutput - Gradient Controller relies on ControllerComponent to store the last output, returning targetOutput should wind the output.
-func (g *GradientController) WindOutput(currentOutput, targetOutput reading.Reading, _ ControllerStateReadAPI, tickInfo runtime.TickInfo) (reading.Reading, error) {
+func (g *GradientController) WindOutput(currentOutput, targetOutput runtime.Reading, _ ControllerStateReadAPI, tickInfo runtime.TickInfo) (runtime.Reading, error) {
 	return targetOutput, nil
 }

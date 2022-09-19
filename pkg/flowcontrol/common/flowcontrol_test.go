@@ -72,7 +72,7 @@ var _ = Describe("FlowControl Check", func() {
 			ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
 			resp, err := svc.Check(ctx, &flowcontrolv1.CheckRequest{})
 			Expect(err).NotTo(HaveOccurred())
-			Expect((resp.GetDecisionType())).To(Equal(flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED))
+			Expect((resp.GetDecisionType())).To(Equal(flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED))
 		})
 	})
 })

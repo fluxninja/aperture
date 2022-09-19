@@ -9,7 +9,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
-	selectors "github.com/fluxninja/aperture/pkg/selectors"
+	selectors "github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -51,7 +51,7 @@ func (mr *MockEngineMockRecorder) GetFluxMeter(fluxMeterName interface{}) *gomoc
 }
 
 // ProcessRequest mocks base method.
-func (m *MockEngine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels selectors.Labels) *flowcontrolv1.CheckResponse {
+func (m *MockEngine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) *flowcontrolv1.CheckResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessRequest", controlPoint, serviceIDs, labels)
 	ret0, _ := ret[0].(*flowcontrolv1.CheckResponse)
@@ -62,20 +62,6 @@ func (m *MockEngine) ProcessRequest(controlPoint selectors.ControlPoint, service
 func (mr *MockEngineMockRecorder) ProcessRequest(controlPoint, serviceIDs, labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessRequest", reflect.TypeOf((*MockEngine)(nil).ProcessRequest), controlPoint, serviceIDs, labels)
-}
-
-// RegisterClassifier mocks base method.
-func (m *MockEngine) RegisterClassifier(c iface.Classifier) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegisterClassifier", c)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// RegisterClassifier indicates an expected call of RegisterClassifier.
-func (mr *MockEngineMockRecorder) RegisterClassifier(c interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterClassifier", reflect.TypeOf((*MockEngine)(nil).RegisterClassifier), c)
 }
 
 // RegisterConcurrencyLimiter mocks base method.
@@ -118,20 +104,6 @@ func (m *MockEngine) RegisterRateLimiter(l iface.RateLimiter) error {
 func (mr *MockEngineMockRecorder) RegisterRateLimiter(l interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterRateLimiter", reflect.TypeOf((*MockEngine)(nil).RegisterRateLimiter), l)
-}
-
-// UnregisterClassifier mocks base method.
-func (m *MockEngine) UnregisterClassifier(c iface.Classifier) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UnregisterClassifier", c)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UnregisterClassifier indicates an expected call of UnregisterClassifier.
-func (mr *MockEngineMockRecorder) UnregisterClassifier(c interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterClassifier", reflect.TypeOf((*MockEngine)(nil).UnregisterClassifier), c)
 }
 
 // UnregisterConcurrencyLimiter mocks base method.
