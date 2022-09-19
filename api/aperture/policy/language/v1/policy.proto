@@ -149,32 +149,35 @@ message Component {
     // Applies the given operator on input operands (signals) and emits the result.
     ArithmeticCombinator arithmetic_combinator = 3;
 
-    // Decider acts as a switch that emits one of the two signals based on the binary result of comparison operator on two operands.
+    // Decider emits the binary result of comparison operator on two operands.
     Decider decider = 4;
 
+    // Switcher acts as a switch that emits one of the two signals based on third signal.
+    Switcher switcher = 5;
+
     // Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-    ConcurrencyLimiter concurrency_limiter = 5;
+    ConcurrencyLimiter concurrency_limiter = 6;
 
     // Rate Limiter provides service protection by applying rate limiter.
-    RateLimiter rate_limiter = 6;
+    RateLimiter rate_limiter = 7;
 
     // Periodically runs a Prometheus query in the background and emits the result.
-    PromQL promql = 7;
+    PromQL promql = 8;
 
     // Emits a constant signal.
-    Constant constant = 8;
+    Constant constant = 9;
 
     // Takes an input signal and emits the square root of the input signal.
-    Sqrt sqrt = 9;
+    Sqrt sqrt = 10;
 
     // Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.
-    Extrapolator extrapolator = 10;
+    Extrapolator extrapolator = 11;
 
     // Emits the maximum of the input siganls.
-    Max max = 11;
+    Max max = 12;
 
     // Emits the minimum of the input signals.
-    Min min = 12;
+    Min min = 13;
   }
 }
 
@@ -468,13 +471,13 @@ message ArithmeticCombinator {
   }]; // @gotags: validate:"oneof=add sub mul div xor lshift rshift"
 }
 
-// Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
+// Type of combinator that computes the comparison operation on lhs and rhs signals
 //
 // The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 //
 // This component also supports time-based response, i.e. the output
-// transitions between on_true or on_false signal if the decider condition is
-// true or false for at least "positive_for" or "negative_for" duration. If
+// transitions between 1.0 or 0.0 signal if the decider condition is
+// true or false for at least "true_for" or "false_for" duration. If
 // `true_for` and `false_for` durations are zero then the transitions are
 // instantaneous.
 message Decider {
@@ -485,17 +488,11 @@ message Decider {
 
     // Right hand side input signal for the comparison operation.
     Port rhs = 2;
-
-    // Output signal when the result of the operation is true.
-    Port on_true = 3;
-
-    // Output signal when the result of the operation is false.
-    Port on_false = 4;
   }
 
   // Outputs for the Decider component.
   message Outs {
-    // Selected signal (on_true or on_false).
+    // Selected signal (1.0 or 0.0).
     Port output = 1;
   }
 
@@ -536,6 +533,36 @@ message Decider {
       }
     }
   }]; // @gotags: default:"0s"
+}
+
+// Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+//
+// `on_true` will be returned if switch input is valid and not equal to 0.0 ,
+//  otherwise `on_false` will be returned.
+message Switcher {
+  // Inputs for the Switcher component.
+  message Ins {
+    // Output signal when switch is valid and not 0.0.
+    Port on_true = 1;
+
+    // Output signal when switch is invalid or 0.0.
+    Port on_false = 2;
+
+    // Decides whether to return on_true or on_false.
+    Port switch = 3;
+  }
+
+  // Outputs for the Switcher component.
+  message Outs {
+    // Selected signal (on_true or on_false).
+    Port output = 1;
+  }
+
+  // Input ports for the Switcher component.
+  Ins in_ports = 1;
+
+  // Output ports for the Switcher component.
+  Outs out_ports = 2;
 }
 
 // Limits the traffic on a control point to specified rate

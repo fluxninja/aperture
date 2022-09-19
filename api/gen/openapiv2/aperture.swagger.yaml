@@ -907,7 +907,7 @@ definitions:
         description: Emits a constant signal.
       decider:
         $ref: '#/definitions/v1Decider'
-        description: Decider acts as a switch that emits one of the two signals based on the binary result of comparison operator on two operands.
+        description: Decider emits the binary result of comparison operator on two operands.
       ema:
         $ref: '#/definitions/v1EMA'
         description: Exponential Moving Average filter.
@@ -934,6 +934,9 @@ definitions:
       sqrt:
         $ref: '#/definitions/v1Sqrt'
         description: Takes an input signal and emits the square root of the input signal.
+      switcher:
+        $ref: '#/definitions/v1Switcher'
+        description: Switcher acts as a switch that emits one of the two signals based on third signal.
     description: |-
       :::info
       See also [Components overview](/concepts/policy/circuit.md#components).
@@ -1031,23 +1034,17 @@ definitions:
       The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
       This component also supports time-based response, i.e. the output
-      transitions between on_true or on_false signal if the decider condition is
-      true or false for at least "positive_for" or "negative_for" duration. If
+      transitions between 1.0 or 0.0 signal if the decider condition is
+      true or false for at least "true_for" or "false_for" duration. If
       `true_for` and `false_for` durations are zero then the transitions are
       instantaneous.
-    title: Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
+    title: Type of combinator that computes the comparison operation on lhs and rhs signals
   v1DeciderIns:
     type: object
     properties:
       lhs:
         $ref: '#/definitions/v1Port'
         description: Left hand side input signal for the comparison operation.
-      on_false:
-        $ref: '#/definitions/v1Port'
-        description: Output signal when the result of the operation is false.
-      on_true:
-        $ref: '#/definitions/v1Port'
-        description: Output signal when the result of the operation is true.
       rhs:
         $ref: '#/definitions/v1Port'
         description: Right hand side input signal for the comparison operation.
@@ -1057,7 +1054,7 @@ definitions:
     properties:
       output:
         $ref: '#/definitions/v1Port'
-        description: Selected signal (on_true or on_false).
+        description: Selected signal (1.0 or 0.0).
     description: Outputs for the Decider component.
   v1EMA:
     type: object
@@ -2144,6 +2141,39 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Output signal.
     description: Outputs for the Sqrt component.
+  v1Switcher:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1SwitcherIns'
+        description: Input ports for the Switcher component.
+      out_ports:
+        $ref: '#/definitions/v1SwitcherOuts'
+        description: Output ports for the Switcher component.
+    description: |-
+      `on_true` will be returned if switch input is valid and not equal to 0.0 ,
+       otherwise `on_false` will be returned.
+    title: Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+  v1SwitcherIns:
+    type: object
+    properties:
+      on_false:
+        $ref: '#/definitions/v1Port'
+        description: Output signal when switch is invalid or 0.0.
+      on_true:
+        $ref: '#/definitions/v1Port'
+        description: Output signal when switch is valid and not 0.0.
+      switch:
+        $ref: '#/definitions/v1Port'
+        description: Decides whether to return on_true or on_false.
+    description: Inputs for the Switcher component.
+  v1SwitcherOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1Port'
+        description: Selected signal (on_true or on_false).
+    description: Outputs for the Switcher component.
   v1VersionInfo:
     type: object
     properties:

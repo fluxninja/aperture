@@ -60,4 +60,7 @@
   Sqrt: import 'sqrt.libsonnet',
   SqrtIns: import 'sqrtins.libsonnet',
   SqrtOuts: import 'sqrtouts.libsonnet',
+  Switcher: import 'switcher.libsonnet',
+  SwitcherIns: import 'switcherins.libsonnet',
+  SwitcherOuts: import 'switcherouts.libsonnet',
 }

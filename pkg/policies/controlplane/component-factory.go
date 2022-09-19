@@ -98,6 +98,15 @@ func NewComponentAndOptions(
 			Name:          "Decider",
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
+	} else if switcher := componentProto.GetSwitcher(); switcher != nil {
+		component, option, err := components.NewSwitcherAndOptions(switcher, componentIndex, policyReadAPI)
+		mapStruct, err := encodeMapStructOnNilErr(switcher, err)
+		return runtime.CompiledComponent{
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "Switcher",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
+		}, nil, option, err
 	} else if sqrt := componentProto.GetSqrt(); sqrt != nil {
 		component, option, err := components.NewSqrtAndOptions(sqrt, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(sqrt, err)

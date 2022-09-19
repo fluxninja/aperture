@@ -39,6 +39,17 @@ var _ = Describe("Component factory", func() {
 		})
 	})
 
+	Context("Switcher", func() {
+		switcherProto := &policylangv1.Switcher{}
+		It("Creates Switcher component", func() {
+			switcherComponent := &components.Switcher{}
+			component, options, err := components.NewSwitcherAndOptions(switcherProto, 0, nil)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(reflect.TypeOf(component)).To(Equal(reflect.TypeOf(switcherComponent)))
+			Expect(options).To(BeNil())
+		})
+	})
+
 	Context("Gradient", func() {
 		Context("With correct gradient", func() {
 			gradientControllerProto := &policylangv1.GradientController{
