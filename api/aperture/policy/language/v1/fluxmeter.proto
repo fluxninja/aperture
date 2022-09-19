@@ -51,8 +51,8 @@ message FluxMeter {
     extensions: {
       key: "x-go-default"
       value: {
-        string_value: "duration_millis"
+        string_value: "workload_duration_ms"
       }
     }
-  }]; // @gotags: default:"duration_millis"
+  }]; // @gotags: default:"workload_duration_ms"
 }

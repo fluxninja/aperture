@@ -293,7 +293,7 @@ definitions:
           [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
           :::
         type: string
-        x-go-default: duration_millis
+        x-go-default: workload_duration_ms
         x-order: 0
       histogram_buckets:
         description: Latency histogram buckets (in ms) for this FluxMeter.

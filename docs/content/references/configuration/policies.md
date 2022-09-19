@@ -336,7 +336,7 @@ selector:
 <dt>attribute_key</dt>
 <dd>
 
-(string, default: `duration_millis`) Key of the attribute in access log or span from which the metric for this flux meter is read.
+(string, default: `workload_duration_ms`) Key of the attribute in access log or span from which the metric for this flux meter is read.
 
 :::info
 For list of available attributes in Envoy access logs, refer
