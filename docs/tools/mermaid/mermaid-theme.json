@@ -5,13 +5,13 @@
   "theme": "base",
   "themeVariables": {
     "primaryColor": "#8EC4AD",
-    "primaryTextColor": "#20242C",
+    "primaryTextColor": "#1c1c1c",
     "primaryBorderColor": "#20242C",
-    "secondaryColor": "#ECEDF0",
-    "secondaryTextColor": "#20242C",
+    "secondaryColor": "#bcc0cc",
+    "secondaryTextColor": "#1c1c1c",
     "tertiaryColor": "#c2c6cf50",
     "tertiaryBorderColor": "#00000080",
-    "tertiaryTextColor": "#3D4554",
+    "tertiaryTextColor": "#1c1c1c",
     "lineColor": "#20242C"
   },
   "background": "transparent",
