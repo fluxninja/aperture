@@ -218,8 +218,7 @@ func getLabelValue(attributes pcommon.Map, labelKey, source string) (pcommon.Val
 // * `flow_label_keys`.
 // * `classifiers`.
 func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, sourceStr string) {
-	// TODO tgill: aperture processing duration
-	// Convert proto timestamp to time.Time
+	// Aperture Processing Duration
 	startTime := checkResponse.GetStart().AsTime()
 	endTime := checkResponse.GetEnd().AsTime()
 	if !startTime.IsZero() && !endTime.IsZero() {
@@ -227,6 +226,14 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	} else {
 		otelcollector.LogSampled.Warn().Msgf("Aperture processing duration not found in %s access logs", sourceStr)
 	}
+	// Services
+	servicesValue := pcommon.NewValueSlice()
+	for _, service := range checkResponse.Services {
+		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
+	}
+	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
+	// Control Point
+	attributes.PutString(otelcollector.ApertureControlPointLabel, checkResponse.GetControlPoint().String())
 
 	labels := map[string]pcommon.Value{
 		otelcollector.ApertureRateLimitersLabel:                pcommon.NewValueSlice(),

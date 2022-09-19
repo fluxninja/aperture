@@ -103,5 +103,5 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 	for _, service := range hostEntity.Services {
 		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
 	}
-	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ServicesLabel))
+	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
 }

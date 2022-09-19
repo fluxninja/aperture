@@ -3,8 +3,10 @@ package common
 import (
 	"context"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc/peer"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
@@ -62,6 +64,8 @@ func (h *Handler) CheckWithValues(
 // whether to accept the traffic after running the algorithms.
 func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*flowcontrolv1.CheckResponse, error) {
 	log.Trace().Msg("FlowControl.Check()")
+	// record the start time of the request
+	start := time.Now()
 
 	var serviceIDs []string
 
@@ -81,5 +85,8 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 		selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_FEATURE, req.Feature),
 		req.Labels,
 	)
+	end := time.Now()
+	resp.Start = timestamppb.New(start)
+	resp.End = timestamppb.New(end)
 	return resp, nil
 }

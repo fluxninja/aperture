@@ -15,8 +15,10 @@ const (
 
 	/* Derived label that is applied based on content of labels. */
 
-	// ServicesLabel describes services to which metrics refer.
-	ServicesLabel = "services"
+	// ApertureServicesLabel describes services to which metrics refer.
+	ApertureServicesLabel = "aperture.services"
+	// ApertureControlPointLabel describes control point to which metrics refer.
+	ApertureControlPointLabel = "aperture.control_point"
 	// WorkloadDurationLabel describes duration of the workload in milliseconds.
 	WorkloadDurationLabel = "workload_duration_ms"
 	// FlowDurationLabel describes duration of the flow in milliseconds.
