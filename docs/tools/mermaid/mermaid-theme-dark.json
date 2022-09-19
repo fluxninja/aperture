@@ -1,0 +1,25 @@
+{
+  "darkMode": true,
+  "logLevel": "debug",
+  "deterministicIds": true,
+  "deterministicIDSeed": "mermaid",
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#8EC4AD",
+    "primaryTextColor": "#1c1c1c",
+    "primaryBorderColor": "#20242C",
+    "secondaryColor": "#bcc0cc",
+    "secondaryTextColor": "#1c1c1c",
+    "tertiaryColor": "#c2c6cf50",
+    "tertiaryBorderColor": "#00000080",
+    "tertiaryTextColor": "#1c1c1c",
+    "lineColor": "#20242C"
+  },
+  "background": "transparent",
+  "themeCSS": ".node rect { fill: #FC9A69; } span.edgeLabel { padding: 0.1em }",
+  "startOnLoad": true,
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true
+  }
+}

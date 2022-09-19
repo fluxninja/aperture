@@ -76,10 +76,13 @@ generate-mermaid: generate-mmd
 
 %.mmd.svg: %.mmd ./tools/mermaid/mermaid-theme.json
 	@echo MMDC $@
-	@for fmt in svg; \
-		do npx -p @mermaid-js/mermaid-cli mmdc \
+	@for fmt in svg; do \
+		npx -p @mermaid-js/mermaid-cli mmdc \
 			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --output $<.$$fmt --backgroundColor transparent \
 			&& git add $<.$$fmt; \
+		npx -p @mermaid-js/mermaid-cli mmdc \
+			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme-dark.json --output $<-dark.$$fmt --backgroundColor transparent \
+			&& git add $<-dark.$$fmt; \
 	done
 
 .PHONY: generate-config-markdown generate-mermaid generate-mmd
