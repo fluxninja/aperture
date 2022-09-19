@@ -855,7 +855,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
 
     if "aperture-grafana" in resources:
         forward_port_delayed(
-            workload="aperture-grafana-forward",
+            workload="grafana-forward",
             namespace=APERTURE_CONTROLLER_NS,
             labels=["ApertureController"],
             resource_deps=["grafana"],
