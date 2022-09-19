@@ -72,14 +72,21 @@ generate-mmd:
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid: generate-mmd
 	@echo generating mermaid diagrams
-	@find . -name '*.mmd' -exec $(MAKE) -B {}.svg \;
+	@parallel --no-notice --gnu --halt soon,fail=1 --line-buffer --tagstring {} \
+		$(MAKE) --no-print-directory -B {}.svg ::: $(shell find . -name '*.mmd' -print)
+	@parallel --no-notice --gnu --halt soon,fail=1 --line-buffer --tagstring {} \
+		$(MAKE) --no-print-directory -B {}.png ::: $(shell find . -name '*.mmd' -print)
+	@git add -f $(shell find . -name '*.mmd.svg' -print)
+	@git add -f $(shell find . -name '*.mmd.png' -print)
 
-%.mmd.svg: %.mmd ./tools/mermaid/mermaid-theme.json
+%.mmd.png %.mmd.svg: %.mmd ./tools/mermaid/mermaid-theme.json
 	@echo MMDC $@
-	@for fmt in svg; \
+	@for fmt in svg png; \
 		do npx -p @mermaid-js/mermaid-cli mmdc \
-			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --output $<.$$fmt --backgroundColor transparent \
-			&& git add $<.$$fmt; \
+			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --cssFile ./tools/mermaid/mermaid.css --scale 2 --output $<.$$fmt --backgroundColor transparent; \
+	done
+	@for fmt in png; \
+		do convert $<.$$fmt -trim $<.$$fmt; \
 	done
 
 .PHONY: generate-config-markdown generate-mermaid generate-mmd
