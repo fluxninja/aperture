@@ -7,23 +7,24 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/genproto/googleapis/rpc/code"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/flowcontrol/common"
 	"github.com/fluxninja/aperture/pkg/flowcontrol/envoy"
 	"github.com/fluxninja/aperture/pkg/log"
 	classification "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/selectors"
-	"github.com/fluxninja/aperture/pkg/services"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 )
 
 var (
 	ctx        context.Context
 	cancel     context.CancelFunc
-	classifier *classification.Classifier
+	classifier *classification.ClassificationEngine
 	handler    *envoy.Handler
 )
 
@@ -45,12 +46,12 @@ type AcceptingHandler struct {
 
 func (s *AcceptingHandler) CheckWithValues(
 	context.Context,
+	[]string,
 	selectors.ControlPoint,
-	[]services.ServiceID,
-	selectors.Labels,
+	map[string]string,
 ) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
-		DecisionType: flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED,
+		DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 	}
 	return resp
 }
@@ -66,6 +67,8 @@ var _ = Describe("Authorization handler", func() {
 		It("returns ok response", func() {
 			Eventually(func(g Gomega) {
 				ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer())
+				// add "traffic-direction" header to ctx
+				ctxWithIp = metadata.NewIncomingContext(ctxWithIp, metadata.Pairs("traffic-direction", "INBOUND"))
 				resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
 				g.Expect(err).NotTo(HaveOccurred())
 				g.Expect(code.Code(resp.GetStatus().GetCode())).To(Equal(code.Code_OK))
@@ -74,6 +77,7 @@ var _ = Describe("Authorization handler", func() {
 		It("injects metadata", func() {
 			Eventually(func(g Gomega) {
 				ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer())
+				ctxWithIp = metadata.NewIncomingContext(ctxWithIp, metadata.Pairs("traffic-direction", "INBOUND"))
 				resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
 				g.Expect(err).NotTo(HaveOccurred())
 				g.Expect(resp.GetDynamicMetadata()).ShouldNot(BeNil())
@@ -91,32 +95,34 @@ var service1Selector = selectorv1.Selector{
 	},
 }
 
-var hardcodedRegoRules = classificationv1.Classifier{
-	Selector: &service1Selector,
-	Rules: map[string]*classificationv1.Rule{
-		"destination": {
-			Source: &classificationv1.Rule_Rego_{
-				Rego: &classificationv1.Rule_Rego{
-					Source: `
+var hardcodedRegoRules = wrappersv1.ClassifierWrapper{
+	Classifier: &classificationv1.Classifier{
+		Selector: &service1Selector,
+		Rules: map[string]*classificationv1.Rule{
+			"destination": {
+				Source: &classificationv1.Rule_Rego_{
+					Rego: &classificationv1.Rule_Rego{
+						Source: `
 						package envoy.authz
 						destination := v {
 							v := input.attributes.destination.address.socketAddress.address
 						}
 					`,
-					Query: "data.envoy.authz.destination",
+						Query: "data.envoy.authz.destination",
+					},
 				},
 			},
-		},
-		"source": {
-			Source: &classificationv1.Rule_Rego_{
-				Rego: &classificationv1.Rule_Rego{
-					Source: `
+			"source": {
+				Source: &classificationv1.Rule_Rego_{
+					Rego: &classificationv1.Rule_Rego{
+						Source: `
 						package envoy.authz
 						source := v {
 							v := input.attributes.destination.address.socketAddress.address
 						}
 					`,
-					Query: "data.envoy.authz.source",
+						Query: "data.envoy.authz.source",
+					},
 				},
 			},
 		},

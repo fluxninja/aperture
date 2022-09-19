@@ -14,11 +14,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/status"
 )
-
-var engineAPI iface.Engine
 
 // Module is a default set of components to enable flow classification
 //
@@ -31,10 +28,10 @@ var Module fx.Option = fx.Options(
 			Name:   "classifier",
 		},
 		fx.Annotated{
-			Target: ProvideEmptyClassifier,
+			Target: ProvideEmptyClassificationEngine,
 			Name:   "empty",
 		},
-		ProvideClassifier,
+		ProvideClassificationEngine,
 	),
 )
 
@@ -58,25 +55,23 @@ func setupEtcdClassifierWatcher(etcdClient *etcdclient.Client, lc fx.Lifecycle, 
 	return etcdWatcher, nil
 }
 
-// ProvideEmptyClassifier provides a classifier that is empty
+// ProvideEmptyClassificationEngine provides a classifier that is empty
 //
 // The classifier could be populated by calling UpdateRules.
-func ProvideEmptyClassifier() *Classifier { return New() }
+func ProvideEmptyClassificationEngine() *ClassificationEngine { return New() }
 
-// ProvideClassifierIn holds parameters for ProvideClassifier.
-type ProvideClassifierIn struct {
+// ClassificationEngineIn holds parameters for ProvideClassificationEngine.
+type ClassificationEngineIn struct {
 	fx.In
-	Classifier *Classifier       `name:"empty"`
-	Watcher    notifiers.Watcher `name:"classifier"`
+	Classifier *ClassificationEngine `name:"empty"`
+	Watcher    notifiers.Watcher     `name:"classifier"`
 	Lifecycle  fx.Lifecycle
 	Registry   status.Registry
-	Engine     iface.Engine
 }
 
-// ProvideClassifier provides a classifier that loads the rules from config file.
-func ProvideClassifier(in ProvideClassifierIn) *Classifier {
+// ProvideClassificationEngine provides a classifier that loads the rules from config file.
+func ProvideClassificationEngine(in ClassificationEngineIn) *ClassificationEngine {
 	reg := in.Registry.Child("classifiers")
-	engineAPI = in.Engine
 
 	fxDriver := &notifiers.FxDriver{
 		FxOptionsFuncs: []notifiers.FxOptionsFunc{in.Classifier.provideClassifierFxOptions},
@@ -98,7 +93,7 @@ func ProvideClassifier(in ProvideClassifierIn) *Classifier {
 }
 
 // Per classifier fx app.
-func (c *Classifier) provideClassifierFxOptions(
+func (c *ClassificationEngine) provideClassifierFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	_ status.Registry,
@@ -113,7 +108,7 @@ func invokeMiniApp(
 	lc fx.Lifecycle,
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	classifier *Classifier,
+	classificationEngine *ClassificationEngine,
 ) error {
 	wrapperMessage := &wrappersv1.ClassifierWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
@@ -122,34 +117,18 @@ func invokeMiniApp(
 		return err
 	}
 	var activeRuleset ActiveRuleset
-	rs := wrapperMessage.Classifier
-	classifier.classifierProto = rs
-	classifier.policyName = wrapperMessage.PolicyName
-	classifier.policyHash = wrapperMessage.PolicyHash
-	classifier.classifierIndex = wrapperMessage.ClassifierIndex
 	lc.Append(
 		fx.Hook{
 			OnStart: func(startCtx context.Context) error {
 				var err error
-				activeRuleset, err = classifier.AddRules(startCtx, string(key), rs)
+				activeRuleset, err = classificationEngine.AddRules(startCtx, string(key), wrapperMessage)
 				if err != nil {
 					return err
 				}
 
-				// Register metric with PCA
-				err = engineAPI.RegisterClassifier(classifier)
-				if err != nil {
-					log.Error().Err(err).Msg("Failed to register Classifier with EngineAPI")
-					return err
-				}
 				return nil
 			},
 			OnStop: func(_ context.Context) error {
-				// Unregister metric with PCA
-				err := engineAPI.UnregisterClassifier(classifier)
-				if err != nil {
-					log.Error().Err(err).Msgf("Failed to unregister Classifier with EngineAPI")
-				}
 				activeRuleset.Drop()
 				return nil
 			},

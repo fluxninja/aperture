@@ -8,7 +8,7 @@ import (
 )
 
 // MarshalJSON implements json.Marshaler
-func (msg *ServicesList) MarshalJSON() ([]byte, error) {
+func (msg *GetEntityByIPAddressRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -17,14 +17,14 @@ func (msg *ServicesList) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *ServicesList) UnmarshalJSON(b []byte) error {
+func (msg *GetEntityByIPAddressRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Service) MarshalJSON() ([]byte, error) {
+func (msg *GetEntityByNameRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -33,23 +33,7 @@ func (msg *Service) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Service) UnmarshalJSON(b []byte) error {
-	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
-	}.Unmarshal(b, msg)
-}
-
-// MarshalJSON implements json.Marshaler
-func (msg *OverlappingService) MarshalJSON() ([]byte, error) {
-	return protojson.MarshalOptions{
-		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
-		UseProtoNames:   true,
-	}.Marshal(msg)
-}
-
-// UnmarshalJSON implements json.Unmarshaler
-func (msg *OverlappingService) UnmarshalJSON(b []byte) error {
+func (msg *GetEntityByNameRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
@@ -98,38 +82,6 @@ func (msg *Entity) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *Entity) UnmarshalJSON(b []byte) error {
-	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
-	}.Unmarshal(b, msg)
-}
-
-// MarshalJSON implements json.Marshaler
-func (msg *Entity_EntityID) MarshalJSON() ([]byte, error) {
-	return protojson.MarshalOptions{
-		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
-		UseProtoNames:   true,
-	}.Marshal(msg)
-}
-
-// UnmarshalJSON implements json.Unmarshaler
-func (msg *Entity_EntityID) UnmarshalJSON(b []byte) error {
-	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
-	}.Unmarshal(b, msg)
-}
-
-// MarshalJSON implements json.Marshaler
-func (msg *GetEntityRequest) MarshalJSON() ([]byte, error) {
-	return protojson.MarshalOptions{
-		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
-		UseProtoNames:   true,
-	}.Marshal(msg)
-}
-
-// UnmarshalJSON implements json.Unmarshaler
-func (msg *GetEntityRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

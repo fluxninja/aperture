@@ -29,7 +29,7 @@ The Aperture Controller related configurations are stored in a configmap which
 is created during the installation using Helm.
 
 All the configuration parameters for Aperture Controller are listed
-[here](/reference/configuration/controller.md).
+[here](/references/configuration/controller.md).
 
 ## Installation {#controller-installation}
 
@@ -132,14 +132,14 @@ into your cluster.
 
    ```yaml
    controller:
-     plugins:
-       disabled_plugins:
-         - aperture-plugin-fluxninja
      config:
        etcd:
          endpoints: ["ETCD_ENDPOINT_HERE"]
        prometheus:
          address: "PROMETHEUS_ADDRESS_HERE"
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
 
    etcd:
      enabled: false
@@ -157,21 +157,37 @@ into your cluster.
    ```
 
    A list of all the configurable parameters for Etcd are available
-   [here](/reference/configuration/controller.md#etcd) and Prometheus are
-   available [here](/reference/configuration/controller.md#prometheus).
+   [here](/references/configuration/controller.md#etcd) and Prometheus are
+   available [here](/references/configuration/controller.md#prometheus).
 
    **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
    is enabled on your existing Prometheus instance as it is required by the
-   Controller.
+   Aperture Controller.
 
-5. If you want to modify the default parameters, you can create or update the
-   `values.yaml` file and pass it with `helm upgrade`:
+5. If you want to modify the default parameters or the Aperture Controller
+   config, for example `log`, you can create or update the `values.yaml` file
+   and pass it with `helm upgrade`:
+
+   ```yaml
+   controller:
+     config:
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
+       log:
+         level: debug
+         pretty_console: true
+         non_blocking: false
+   ```
 
    ```bash
    helm upgrade --install controller aperture/aperture-controller -f values.yaml
    ```
 
-   A list of configurable parameters can be found in the
+   All the config parameters for the Aperture Controller are available
+   [here](/references/configuration/controller.md).
+
+   A list of configurable parameters for the installation can be found in the
    [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters).
 
 6. If you want to deploy the Aperture Controller into a namespace other than

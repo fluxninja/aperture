@@ -7,7 +7,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -27,25 +26,25 @@ func NewMinAndOptions(minProto *policylangv1.Min, componentIndex int, policyRead
 func (min *Min) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	minValue := math.MaxFloat64
 	inputs := inPortReadings.ReadRepeatedValuePort("inputs")
-	output := reading.NewInvalid()
+	output := runtime.InvalidReading()
 
 	if len(inputs) > 0 {
 		for _, singleInput := range inputs {
-			if !singleInput.Valid {
+			if !singleInput.Valid() {
 				return runtime.PortToValue{
-					"output": []reading.Reading{output},
+					"output": []runtime.Reading{output},
 				}, nil
 			}
-			if singleInput.Value < minValue {
-				minValue = singleInput.Value
+			if singleInput.Value() < minValue {
+				minValue = singleInput.Value()
 			}
 		}
-		output = reading.New(minValue)
+		output = runtime.NewReading(minValue)
 	} else {
-		output = reading.NewInvalid()
+		output = runtime.InvalidReading()
 	}
 
 	return runtime.PortToValue{
-		"output": []reading.Reading{output},
+		"output": []runtime.Reading{output},
 	}, nil
 }

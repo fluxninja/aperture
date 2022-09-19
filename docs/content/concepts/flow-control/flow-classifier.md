@@ -1,6 +1,6 @@
 ---
 title: Flow Classifier
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 :::info
@@ -9,7 +9,7 @@ See also [Classifier reference][reference]
 
 :::
 
-If existing [flow labels][label] are not sufficient, Flow Classifier can be used
+If existing [Flow Labels][label] are not sufficient, Flow Classifier can be used
 to inject additional ones without any changes to your service.
 
 A classifier is defined as a resource in a [policy][policies] and describes a
@@ -21,15 +21,15 @@ the request attributes may look like.
 
 :::note
 
-At _feature_ [control points][control-point] developers already can provide
+At _feature_ [Control Points][control-point] developers already can provide
 arbitrary flow labels – either by setting baggage, or directly as arguments to
 the `Check()` call. Since at feature control points flow labels can be easily
 controlled, classifiers are available only on at _traffic_ control points.
 
 :::
 
-Classifier-created flow label is immediately available for usage in other
-components at the same [control point][control-point]. The flow-label is also
+Flow Labels created via Classifier are immediately available for use in other
+components at the same [Control Point][control-point]. The Flow Label is also
 injected as baggage, so it will be available on every subsequent control point
 too (assuming you have [baggage propagation][baggage] configured in your
 system). If you're a [FluxNinja Cloud plugin][plugin] user, such flow label will
@@ -37,15 +37,15 @@ also be available in the Cloud for analytics.
 
 :::note
 
-Both these behaviours (baggage propagation and inclusion in telemetry) are
-[disablable][rule].
+Both these behaviours (baggage propagation and inclusion in telemetry) can be
+[disabled][rule].
 
 :::
 
 :::caution
 
-Although the classifier is defined as a resource in a [policy][policies], flow
-labels are not namespaced in any way.
+Although Classifier is defined as a resource in a [policy][policies], Flow
+Labels are not namespaced in any way.
 
 :::
 
@@ -130,10 +130,10 @@ See [full example in reference][reference]
 [label]: /concepts/flow-control/flow-label.md
 [baggage]: /concepts/flow-control/flow-label.md#baggage
 [request-labels]: /concepts/flow-control/flow-label.md#request-labels
-[reference]: /reference/configuration/policies.md#v1-classifier
-[rule]: /reference/configuration/policies.md#v1-rule
-[extractor]: /reference/configuration/policies.md#v1-extractor
-[rego-rule]: /reference/configuration/policies.md#rule-rego
+[reference]: /references/configuration/policies.md#v1-classifier
+[rule]: /references/configuration/policies.md#v1-rule
+[extractor]: /references/configuration/policies.md#v1-extractor
+[rego-rule]: /references/configuration/policies.md#rule-rego
 [plugin]: /cloud/plugin.md
 [label-matcher]: /concepts/flow-control/selector.md#label-matcher
 [policies]: /concepts/policy/policy.md

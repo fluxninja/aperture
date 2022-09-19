@@ -7,19 +7,22 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 var _ = Describe("Enrichment Processor - Metrics", func() {
 	It("Enriches metrics attributes with data from entity cache", func() {
 		entityCache := entitycache.NewEntityCache()
-		entityCache.Put(entitycache.NewEntity(
-			entitycache.EntityID{
-				Prefix: "testPrefix",
-				UID:    "1",
-			},
-			"", "someName", []string{"fooSvc1", "fooSvc2"},
-		))
+		entityCache.Put(&entitycachev1.Entity{
+			Prefix:    "testPrefix",
+			Uid:       "1",
+			IpAddress: "",
+			Name:      "someName",
+			Services:  []string{"fooSvc1", "fooSvc2"},
+		})
+
 		processor := newProcessor(entityCache)
 		Expect(processor).NotTo(BeNil())
 
@@ -31,8 +34,8 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		assertMetricsEqual(md, metricsFromLabels(map[string]interface{}{
-			"preserve": "this",
-			"services": []string{"fooSvc1", "fooSvc2"},
+			"preserve":                          "this",
+			otelcollector.ApertureServicesLabel: []string{"fooSvc1", "fooSvc2"},
 		}))
 	})
 
@@ -60,8 +63,8 @@ func metricsFromLabels(labels map[string]interface{}) pmetric.Metrics {
 		ScopeMetrics().AppendEmpty().Metrics()
 	metric := metrics.AppendEmpty()
 	metric.SetDataType(pmetric.MetricDataTypeGauge)
-	spanRecord := metric.Gauge()
-	populateAttrsFromLabels(spanRecord.DataPoints().AppendEmpty().Attributes(), labels)
+	metricRecord := metric.Gauge()
+	populateAttrsFromLabels(metricRecord.DataPoints().AppendEmpty().Attributes(), labels)
 	return td
 }
 

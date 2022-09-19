@@ -23,7 +23,6 @@ func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine) componen
 		typeStr,
 		createDefaultConfig(promRegistry, engine),
 		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
-		component.WithTracesProcessor(createTracesProcessor, component.StabilityLevelInDevelopment),
 	)
 }
 
@@ -54,29 +53,6 @@ func createLogsProcessor(
 		cfg,
 		nextLogsConsumer,
 		proc.ConsumeLogs,
-		processorhelper.WithCapabilities(proc.Capabilities()),
-		processorhelper.WithStart(proc.Start),
-		processorhelper.WithShutdown(proc.Shutdown),
-	)
-}
-
-func createTracesProcessor(
-	ctx context.Context,
-	params component.ProcessorCreateSettings,
-	cfg config.Processor,
-	nextTracesConsumer consumer.Traces,
-) (component.TracesProcessor, error) {
-	cfgTyped := cfg.(*Config)
-	proc, err := newProcessor(cfgTyped)
-	if err != nil {
-		return nil, err
-	}
-	return processorhelper.NewTracesProcessor(
-		ctx,
-		params,
-		cfg,
-		nextTracesConsumer,
-		proc.ConsumeTraces,
 		processorhelper.WithCapabilities(proc.Capabilities()),
 		processorhelper.WithStart(proc.Start),
 		processorhelper.WithShutdown(proc.Shutdown),

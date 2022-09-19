@@ -5,7 +5,6 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"github.com/fluxninja/aperture/pkg/selectors"
 )
 
 //go:generate mockgen -source=limiter.go -destination=../../mocks/mock_limiter.go -package=mocks
@@ -27,6 +26,6 @@ func (limiterID LimiterID) String() string {
 type Limiter interface {
 	GetPolicyName() string
 	GetSelector() *selectorv1.Selector
-	RunLimiter(labels selectors.Labels) *flowcontrolv1.LimiterDecision
+	RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
 }

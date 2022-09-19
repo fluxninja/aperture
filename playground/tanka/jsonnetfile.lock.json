@@ -4,12 +4,22 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/fluxninja/aperture.git",
+          "subdir": ""
+        }
+      },
+      "version": "e5a7ac535acbb013d5e91f55f18b6fbbca482365",
+      "sum": "BzFSmmBKlPgyt9ZT5vh9OA6zqdeIt7WVQg2+A/c1sxE="
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/fluxninja/aperture-blueprints.git",
           "subdir": ""
         }
       },
-      "version": "e1a89bc173b0b12fa18d9e0872dae20d2cf2cac9",
-      "sum": "Pwozb11eB/SvxisbUO8pAafuC9d7iUcmK3txDNgHZXI="
+      "version": "edd3afb408620982994574979b0879dfa59061ad",
+      "sum": "QPsi/vocvPAki9auebr+MCYPaIsAaGPUE+PZBPSJ5/g="
     },
     {
       "source": {
@@ -18,18 +28,8 @@
           "subdir": "lib/1.0"
         }
       },
-      "version": "e1a89bc173b0b12fa18d9e0872dae20d2cf2cac9",
-      "sum": "ObxgoFqdHild6NTOWnc89GkSAEYetDABEM29Scf+5UY="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/fluxninja/aperture.git",
-          "subdir": "libsonnet/1.0"
-        }
-      },
-      "version": "c419c8b15effa115180739a6ce89090ef6b0cd21",
-      "sum": "LiUNRWyIlGwdkKpAIfgSpSLCYN4qzz06wsDrOiZgWxA="
+      "version": "edd3afb408620982994574979b0879dfa59061ad",
+      "sum": "bP+umhlQ1OobXrAD0Dz8rAj8Pb7l3RwnP3mdZxsuqC8="
     },
     {
       "source": {

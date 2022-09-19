@@ -22,7 +22,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -383,27 +382,27 @@ func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API) err
 // Execute implements runtime.Component.Execute.
 func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToValue, err error) {
 	// Re-run query if evaluationInterval elapsed since last query
-	if tickInfo.Timestamp.Sub(promQL.lastQueryTimestamp) >= promQL.evaluationInterval {
+	if tickInfo.Timestamp().Sub(promQL.lastQueryTimestamp) >= promQL.evaluationInterval {
 		// Run query
-		promQL.lastQueryTimestamp = tickInfo.Timestamp
+		promQL.lastQueryTimestamp = tickInfo.Timestamp()
 		// Launch job only if previous one is completed
 		// Quantize endTimestamp of query based on tick interval
-		endTimestamp := tickInfo.Timestamp.Truncate(tickInfo.Interval)
+		endTimestamp := tickInfo.Timestamp().Truncate(tickInfo.Interval())
 
 		// Register jobFunc with jobExecutor
 		promQL.jobRegisterer.registerJob(endTimestamp)
 	}
 
 	// Create current reading based on err and value
-	var currentReading reading.Reading
+	var currentReading runtime.Reading
 	if promQL.err != nil {
-		currentReading = reading.NewInvalid()
+		currentReading = runtime.InvalidReading()
 	} else {
-		currentReading = reading.New(promQL.value)
+		currentReading = runtime.NewReading(promQL.value)
 	}
 
 	return runtime.PortToValue{
-		"output": []reading.Reading{currentReading},
+		"output": []runtime.Reading{currentReading},
 	}, nil
 }
 

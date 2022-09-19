@@ -32,24 +32,6 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_EntityCacheService_GetServicesList_0(ctx context.Context, marshaler runtime.Marshaler, client EntityCacheServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq emptypb.Empty
-	var metadata runtime.ServerMetadata
-
-	msg, err := client.GetServicesList(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func local_request_EntityCacheService_GetServicesList_0(ctx context.Context, marshaler runtime.Marshaler, server EntityCacheServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq emptypb.Empty
-	var metadata runtime.ServerMetadata
-
-	msg, err := server.GetServicesList(ctx, &protoReq)
-	return msg, metadata, err
-
-}
-
 func request_EntityCacheService_GetEntityCache_0(ctx context.Context, marshaler runtime.Marshaler, client EntityCacheServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
@@ -68,36 +50,115 @@ func local_request_EntityCacheService_GetEntityCache_0(ctx context.Context, mars
 
 }
 
+func request_EntityCacheService_GetEntityByIPAddress_0(ctx context.Context, marshaler runtime.Marshaler, client EntityCacheServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetEntityByIPAddressRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["ip_address"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ip_address")
+	}
+
+	protoReq.IpAddress, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ip_address", err)
+	}
+
+	msg, err := client.GetEntityByIPAddress(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_EntityCacheService_GetEntityByIPAddress_0(ctx context.Context, marshaler runtime.Marshaler, server EntityCacheServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetEntityByIPAddressRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["ip_address"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ip_address")
+	}
+
+	protoReq.IpAddress, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ip_address", err)
+	}
+
+	msg, err := server.GetEntityByIPAddress(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_EntityCacheService_GetEntityByName_0(ctx context.Context, marshaler runtime.Marshaler, client EntityCacheServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetEntityByNameRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+
+	protoReq.Name, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+
+	msg, err := client.GetEntityByName(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_EntityCacheService_GetEntityByName_0(ctx context.Context, marshaler runtime.Marshaler, server EntityCacheServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetEntityByNameRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+
+	protoReq.Name, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+
+	msg, err := server.GetEntityByName(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 // RegisterEntityCacheServiceHandlerServer registers the http handlers for service EntityCacheService to "mux".
 // UnaryRPC     :call EntityCacheServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterEntityCacheServiceHandlerFromEndpoint instead.
 func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EntityCacheServiceServer) error {
-
-	mux.Handle("GET", pattern_EntityCacheService_GetServicesList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetServicesList", runtime.WithHTTPPathPattern("/v1/entity-cache/services-list"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_EntityCacheService_GetServicesList_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_EntityCacheService_GetServicesList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
 
 	mux.Handle("GET", pattern_EntityCacheService_GetEntityCache_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -107,7 +168,7 @@ func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", runtime.WithHTTPPathPattern("/v1/entity-cache/entity-cache"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", runtime.WithHTTPPathPattern("/v1/entities"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -121,6 +182,56 @@ func RegisterEntityCacheServiceHandlerServer(ctx context.Context, mux *runtime.S
 		}
 
 		forward_EntityCacheService_GetEntityCache_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_EntityCacheService_GetEntityByIPAddress_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByIPAddress", runtime.WithHTTPPathPattern("/v1/entities/ip-address/{ip_address}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_EntityCacheService_GetEntityByIPAddress_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EntityCacheService_GetEntityByIPAddress_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_EntityCacheService_GetEntityByName_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByName", runtime.WithHTTPPathPattern("/v1/entities/name/{name}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_EntityCacheService_GetEntityByName_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EntityCacheService_GetEntityByName_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -165,35 +276,13 @@ func RegisterEntityCacheServiceHandler(ctx context.Context, mux *runtime.ServeMu
 // "EntityCacheServiceClient" to call the correct interceptors.
 func RegisterEntityCacheServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client EntityCacheServiceClient) error {
 
-	mux.Handle("GET", pattern_EntityCacheService_GetServicesList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetServicesList", runtime.WithHTTPPathPattern("/v1/entity-cache/services-list"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_EntityCacheService_GetServicesList_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_EntityCacheService_GetServicesList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("GET", pattern_EntityCacheService_GetEntityCache_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", runtime.WithHTTPPathPattern("/v1/entity-cache/entity-cache"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityCache", runtime.WithHTTPPathPattern("/v1/entities"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -209,17 +298,65 @@ func RegisterEntityCacheServiceHandlerClient(ctx context.Context, mux *runtime.S
 
 	})
 
+	mux.Handle("GET", pattern_EntityCacheService_GetEntityByIPAddress_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByIPAddress", runtime.WithHTTPPathPattern("/v1/entities/ip-address/{ip_address}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_EntityCacheService_GetEntityByIPAddress_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EntityCacheService_GetEntityByIPAddress_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_EntityCacheService_GetEntityByName_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.entitycache.v1.EntityCacheService/GetEntityByName", runtime.WithHTTPPathPattern("/v1/entities/name/{name}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_EntityCacheService_GetEntityByName_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EntityCacheService_GetEntityByName_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
 var (
-	pattern_EntityCacheService_GetServicesList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "entity-cache", "services-list"}, ""))
+	pattern_EntityCacheService_GetEntityCache_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "entities"}, ""))
 
-	pattern_EntityCacheService_GetEntityCache_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1}, []string{"v1", "entity-cache"}, ""))
+	pattern_EntityCacheService_GetEntityByIPAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "entities", "ip-address", "ip_address"}, ""))
+
+	pattern_EntityCacheService_GetEntityByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"v1", "entities", "name"}, ""))
 )
 
 var (
-	forward_EntityCacheService_GetServicesList_0 = runtime.ForwardResponseMessage
-
 	forward_EntityCacheService_GetEntityCache_0 = runtime.ForwardResponseMessage
+
+	forward_EntityCacheService_GetEntityByIPAddress_0 = runtime.ForwardResponseMessage
+
+	forward_EntityCacheService_GetEntityByName_0 = runtime.ForwardResponseMessage
 )

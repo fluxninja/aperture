@@ -6,6 +6,8 @@ keywords:
   - enterprise
 ---
 
+# FluxNinja Cloud
+
 :::info Join the Cloud Waitlist
 
 FluxNinja Cloud is inviting beta users. Please join the wait list

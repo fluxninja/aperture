@@ -7,7 +7,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -30,17 +29,17 @@ func NewSqrtAndOptions(sqrtProto *policylangv1.Sqrt, componentIndex int, policyR
 // Execute implements runtime.Component.Execute.
 func (sqrt *Sqrt) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	input := inPortReadings.ReadSingleValuePort("input")
-	output := reading.NewInvalid()
+	output := runtime.InvalidReading()
 
-	if input.Valid {
+	if input.Valid() {
 		// Square root the input and scale it.
-		sqrtIn := math.Sqrt(input.Value)
+		sqrtIn := math.Sqrt(input.Value())
 		if !math.IsNaN(sqrtIn) {
-			output = reading.New(sqrt.scale * sqrtIn)
+			output = runtime.NewReading(sqrt.scale * sqrtIn)
 		}
 	}
 
 	return runtime.PortToValue{
-		"output": []reading.Reading{output},
+		"output": []runtime.Reading{output},
 	}, nil
 }

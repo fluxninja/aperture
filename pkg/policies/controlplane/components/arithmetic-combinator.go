@@ -8,7 +8,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -55,34 +54,34 @@ func NewArithmeticCombinatorAndOptions(arithmeticCombinatorProto *policylangv1.A
 func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	lhs := inPortReadings.ReadSingleValuePort("lhs")
 	rhs := inPortReadings.ReadSingleValuePort("rhs")
-	output := reading.NewInvalid()
+	output := runtime.InvalidReading()
 	var err error
 
-	if lhs.Valid && rhs.Valid {
-		lhsVal, rhsVal := lhs.Value, rhs.Value
+	if lhs.Valid() && rhs.Valid() {
+		lhsVal, rhsVal := lhs.Value(), rhs.Value()
 		switch arith.operator {
 		case add:
-			output = reading.New(lhsVal + rhsVal)
+			output = runtime.NewReading(lhsVal + rhsVal)
 		case sub:
-			output = reading.New(lhsVal - rhsVal)
+			output = runtime.NewReading(lhsVal - rhsVal)
 		case mul:
-			output = reading.New(lhsVal * rhsVal)
+			output = runtime.NewReading(lhsVal * rhsVal)
 		case div:
 			if rhsVal == 0 {
 				err = fmt.Errorf("divide by zero")
 			} else {
-				output = reading.New(lhsVal / rhsVal)
+				output = runtime.NewReading(lhsVal / rhsVal)
 			}
 		case xor:
-			output = reading.New(float64(int(lhsVal) ^ int(rhsVal)))
+			output = runtime.NewReading(float64(int(lhsVal) ^ int(rhsVal)))
 		case lshift:
-			output = reading.New(float64(int(lhsVal) << int(rhsVal)))
+			output = runtime.NewReading(float64(int(lhsVal) << int(rhsVal)))
 		case rshift:
-			output = reading.New(float64(int(lhsVal) >> int(rhsVal)))
+			output = runtime.NewReading(float64(int(lhsVal) >> int(rhsVal)))
 		}
 	}
 
 	return runtime.PortToValue{
-		"output": []reading.Reading{output},
+		"output": []runtime.Reading{output},
 	}, err
 }
