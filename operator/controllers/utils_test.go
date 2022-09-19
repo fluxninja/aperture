@@ -907,7 +907,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 				{
 					Name:      "etc-aperture-policies",
-					MountPath: "/etc/aperture/aperture-controller/policies",
+					MountPath: policyFilePath,
 					ReadOnly:  true,
 				},
 				{
@@ -957,7 +957,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 				{
 					Name:      "etc-aperture-policies",
-					MountPath: "/etc/aperture/aperture-controller/policies",
+					MountPath: policyFilePath,
 					ReadOnly:  true,
 				},
 				{
@@ -1004,13 +1004,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 				{
 					Name: "etc-aperture-policies",
 					VolumeSource: corev1.VolumeSource{
-						ConfigMap: &corev1.ConfigMapVolumeSource{
-							DefaultMode: pointer.Int32Ptr(420),
-							LocalObjectReference: corev1.LocalObjectReference{
-								Name: "policies",
-							},
-							Optional: pointer.BoolPtr(true),
-						},
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
 					},
 				},
 				{
@@ -1083,13 +1077,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 				{
 					Name: "etc-aperture-policies",
 					VolumeSource: corev1.VolumeSource{
-						ConfigMap: &corev1.ConfigMapVolumeSource{
-							DefaultMode: pointer.Int32Ptr(420),
-							LocalObjectReference: corev1.LocalObjectReference{
-								Name: "policies",
-							},
-							Optional: pointer.BoolPtr(true),
-						},
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
 					},
 				},
 				{

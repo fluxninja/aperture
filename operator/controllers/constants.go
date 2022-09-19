@@ -16,6 +16,8 @@ limitations under the License.
 
 package controllers
 
+import "path/filepath"
+
 const (
 	// MutatingWebhookURI defines the URI for the Mutating Webhook for Pods.
 	MutatingWebhookURI = "/mutate-pod"
@@ -56,3 +58,5 @@ const (
 	defaulterAnnotationKey        = "fluxninja.com/set-defaults"
 	failedStatus                  = "failed"
 )
+
+var policyFilePath = filepath.Join("/", "etc", "aperture", "aperture-controller", "policies")

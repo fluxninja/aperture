@@ -111,6 +111,7 @@ DEP_TREE = {
             "pvc_selectors": ["app.kubernetes.io/name=etcd"],
             "kinds": [
                 dict(kind="Controller", image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait'),
+                dict(kind="Controller", image_object={'json_path': '{.spec.operatorImage}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait'),
             ],
             "child_resources": [
                 {
@@ -118,6 +119,7 @@ DEP_TREE = {
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "controllers.fluxninja.com:customresourcedefinition",
+                        "policies.fluxninja.com:customresourcedefinition",
                         "aperture-controller-defaulter:mutatingwebhookconfiguration",
                     ]
                 },
@@ -321,7 +323,7 @@ DEP_TREE = {
                     "new_name": "policies",
                     "resource_deps": ["cluster-bootstrap", "controller-service"],
                     "extra_objects": [
-                        ("policies$", "ConfigMap", APERTURE_CONTROLLER_NS),
+                        ("service1$", "policy", APERTURE_DEMOAPP_NS),
                     ]
                 },
             ]
@@ -884,6 +886,8 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
             local('if (kubectl get agent agent -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete agent agent -n {0};  fi'.format(APERTURE_AGENT_NS))
         if "controller" in resources:
             local('if (kubectl get controller controller -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete controller controller -n {0};  fi'.format(APERTURE_CONTROLLER_NS))
+        if "policies" in resources:
+            local('if (kubectl get policy service1 -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete policy service1 -n {0};  fi'.format(APERTURE_DEMOAPP_NS))
         for resource_name in resources:
             resource = inv_dep_tree[resource_name]
             pvc_selectors = resource.get("pvc_selectors", [])

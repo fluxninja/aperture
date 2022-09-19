@@ -13,6 +13,7 @@ The operator has below custom resources:
 
 - Agent
 - Controller
+- Policy
 
 all custom resources use the api group `fluxninja.com` and version `v1alpha1`.
 
@@ -45,6 +46,7 @@ Follow the below steps to deploy the operator on the local cluster:
   ```bash
   kubectl apply -f config/samples/fluxninja.com_v1alpha1_agent.yaml
   kubectl apply -f config/samples/fluxninja.com_v1alpha1_controller.yaml
+  kubectl apply -f config/samples/fluxninja.com_v1alpha1_policy.yaml
   ```
 
 - To uninstall the operator, run below commands:
@@ -52,6 +54,7 @@ Follow the below steps to deploy the operator on the local cluster:
   ```bash
   kubectl delete -f config/samples/fluxninja.com_v1alpha1_agent.yaml
   kubectl delete -f config/samples/fluxninja.com_v1alpha1_controller.yaml
+  kubectl delete -f config/samples/fluxninja.com_v1alpha1_policy.yaml
   make operator-undeploy
   ```
 
@@ -73,6 +76,9 @@ below steps.
   ```yaml
   agent:
     config:
+      plugins:
+        disabled_plugins:
+          - aperture-plugin-fluxninja
       etcd:
         endpoints: ["http://controller-etcd:2379"]
       prometheus:
@@ -117,6 +123,9 @@ below steps.
   ```yaml
   controller:
     config:
+      plugins:
+        disabled_plugins:
+          - aperture-plugin-fluxninja
       etcd:
         endpoints: ["ETCD_ENDPOINT"]
       prometheus:
@@ -132,6 +141,9 @@ below steps.
   ```yaml
   agent:
     config:
+      plugins:
+        disabled_plugins:
+          - aperture-plugin-fluxninja
       etcd:
         endpoints: ["ETCD_ENDPOINT"]
       prometheus:

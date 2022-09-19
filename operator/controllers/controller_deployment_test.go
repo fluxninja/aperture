@@ -116,6 +116,14 @@ var _ = Describe("Controller Deployment", func() {
 							},
 						},
 					},
+					OperatorImage: v1alpha1.OperatorImage{
+						Image: v1alpha1.Image{
+							Registry:   "docker.io/fluxninja",
+							Tag:        "latest",
+							PullPolicy: "IfNotPresent",
+						},
+						Repository: "aperture-operator",
+					},
 					Image: v1alpha1.ControllerImage{
 						Image: v1alpha1.Image{
 							Registry:   "docker.io/fluxninja",
@@ -177,6 +185,56 @@ var _ = Describe("Controller Deployment", func() {
 							InitContainers:                nil,
 							Containers: []corev1.Container{
 								{
+									Name:            "policy-watcher",
+									Image:           "docker.io/fluxninja/aperture-operator:latest",
+									ImagePullPolicy: corev1.PullIfNotPresent,
+									SecurityContext: &corev1.SecurityContext{},
+									Command: []string{
+										"/aperture-operator",
+										"--policy",
+										"--health-probe-bind-address=:9091",
+										"--metrics-bind-address=127.0.0.1:9090",
+									},
+									Args: []string{
+										"--leader-elect=True",
+									},
+									TerminationMessagePath:   "/dev/termination-log",
+									TerminationMessagePolicy: corev1.TerminationMessageReadFile,
+									LivenessProbe: &corev1.Probe{
+										ProbeHandler: corev1.ProbeHandler{
+											HTTPGet: &corev1.HTTPGetAction{
+												Path: "/healthz",
+												Port: intstr.FromInt(9091),
+											},
+										},
+										FailureThreshold:    3,
+										InitialDelaySeconds: 10,
+										PeriodSeconds:       10,
+										SuccessThreshold:    1,
+										TimeoutSeconds:      1,
+									},
+									ReadinessProbe: &corev1.Probe{
+										ProbeHandler: corev1.ProbeHandler{
+											HTTPGet: &corev1.HTTPGetAction{
+												Path: "/readyz",
+												Port: intstr.FromInt(9091),
+											},
+										},
+										FailureThreshold:    3,
+										InitialDelaySeconds: 10,
+										PeriodSeconds:       10,
+										SuccessThreshold:    1,
+										TimeoutSeconds:      1,
+									},
+									VolumeMounts: []corev1.VolumeMount{
+										{
+											Name:      "etc-aperture-policies",
+											MountPath: policyFilePath,
+											ReadOnly:  false,
+										},
+									},
+								},
+								{
 									Name:            controllerServiceName,
 									Image:           "docker.io/fluxninja/aperture-controller:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
@@ -225,7 +283,7 @@ var _ = Describe("Controller Deployment", func() {
 										},
 										{
 											Name:      "etc-aperture-policies",
-											MountPath: "/etc/aperture/aperture-controller/policies",
+											MountPath: policyFilePath,
 											ReadOnly:  true,
 										},
 										{
@@ -256,13 +314,7 @@ var _ = Describe("Controller Deployment", func() {
 								{
 									Name: "etc-aperture-policies",
 									VolumeSource: corev1.VolumeSource{
-										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
-											LocalObjectReference: corev1.LocalObjectReference{
-												Name: "policies",
-											},
-											Optional: pointer.BoolPtr(true),
-										},
+										EmptyDir: &corev1.EmptyDirVolumeSource{},
 									},
 								},
 								{
@@ -397,6 +449,15 @@ var _ = Describe("Controller Deployment", func() {
 						},
 						Repository: "aperture-controller",
 					},
+					OperatorImage: v1alpha1.OperatorImage{
+						Image: v1alpha1.Image{
+							Registry:    "docker.io/fluxninja",
+							Tag:         "latest",
+							PullPolicy:  "IfNotPresent",
+							PullSecrets: testArrayTwo,
+						},
+						Repository: "aperture-operator",
+					},
 					HostAliases: hostAliases,
 				},
 			}
@@ -448,6 +509,9 @@ var _ = Describe("Controller Deployment", func() {
 							HostAliases:        hostAliases,
 							ImagePullSecrets: []corev1.LocalObjectReference{
 								{
+									Name: testTwo,
+								},
+								{
 									Name: test,
 								},
 							},
@@ -464,6 +528,60 @@ var _ = Describe("Controller Deployment", func() {
 								},
 							},
 							Containers: []corev1.Container{
+								{
+									Name:            "policy-watcher",
+									Image:           "docker.io/fluxninja/aperture-operator:latest",
+									ImagePullPolicy: corev1.PullIfNotPresent,
+									SecurityContext: &corev1.SecurityContext{
+										RunAsUser:              pointer.Int64Ptr(0),
+										RunAsNonRoot:           pointer.BoolPtr(false),
+										ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+									},
+									Command: []string{
+										"/aperture-operator",
+										"--policy",
+										"--health-probe-bind-address=:9091",
+										"--metrics-bind-address=127.0.0.1:9090",
+									},
+									Args: []string{
+										"--leader-elect=True",
+									},
+									TerminationMessagePath:   "/dev/termination-log",
+									TerminationMessagePolicy: corev1.TerminationMessageReadFile,
+									LivenessProbe: &corev1.Probe{
+										ProbeHandler: corev1.ProbeHandler{
+											HTTPGet: &corev1.HTTPGetAction{
+												Path: "/healthz",
+												Port: intstr.FromInt(9091),
+											},
+										},
+										FailureThreshold:    3,
+										InitialDelaySeconds: 10,
+										PeriodSeconds:       10,
+										SuccessThreshold:    1,
+										TimeoutSeconds:      1,
+									},
+									ReadinessProbe: &corev1.Probe{
+										ProbeHandler: corev1.ProbeHandler{
+											HTTPGet: &corev1.HTTPGetAction{
+												Path: "/readyz",
+												Port: intstr.FromInt(9091),
+											},
+										},
+										FailureThreshold:    3,
+										InitialDelaySeconds: 10,
+										PeriodSeconds:       10,
+										SuccessThreshold:    1,
+										TimeoutSeconds:      1,
+									},
+									VolumeMounts: []corev1.VolumeMount{
+										{
+											Name:      "etc-aperture-policies",
+											MountPath: policyFilePath,
+											ReadOnly:  false,
+										},
+									},
+								},
 								{
 									Name:            controllerServiceName,
 									Image:           "docker.io/fluxninja/aperture-controller:latest",
@@ -566,7 +684,7 @@ var _ = Describe("Controller Deployment", func() {
 										},
 										{
 											Name:      "etc-aperture-policies",
-											MountPath: "/etc/aperture/aperture-controller/policies",
+											MountPath: policyFilePath,
 											ReadOnly:  true,
 										},
 										{
@@ -606,13 +724,7 @@ var _ = Describe("Controller Deployment", func() {
 								{
 									Name: "etc-aperture-policies",
 									VolumeSource: corev1.VolumeSource{
-										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
-											LocalObjectReference: corev1.LocalObjectReference{
-												Name: "policies",
-											},
-											Optional: pointer.BoolPtr(true),
-										},
+										EmptyDir: &corev1.EmptyDirVolumeSource{},
 									},
 								},
 								{
@@ -645,7 +757,7 @@ var _ = Describe("Controller Deployment", func() {
 			result, err := deploymentForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result).To(Equal(expected))
+			Expect(result.Spec.Template.Spec.ImagePullSecrets).To(Equal(expected.Spec.Template.Spec.ImagePullSecrets))
 		})
 	})
 })
