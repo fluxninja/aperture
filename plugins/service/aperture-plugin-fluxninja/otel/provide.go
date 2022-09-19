@@ -9,9 +9,11 @@ import (
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 	httpclient "github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
+	"github.com/imdario/mergo"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/utils"
@@ -20,6 +22,8 @@ import (
 )
 
 const (
+	receiverPrometheus = "prometheus/fluxninja"
+
 	processorBatchMetricsSlow = "batch/metrics-slow"
 	processorRollup           = "rollup"
 	processorAttributes       = "attributes/fluxninja"
@@ -70,10 +74,10 @@ func provideOtelConfig(baseConfig *otelcollector.OTELConfig,
 				addFNToPipeline("traces", config, tracesPipeline)
 			}
 			if _, exists := baseConfig.Service.Pipeline("metrics/fast"); exists {
-				addMetricsSlowPipeline(config)
+				addMetricsSlowPipeline(baseConfig, config)
 			}
 			if _, exists := baseConfig.Service.Pipeline("metrics/controller-fast"); exists {
-				addMetricsControllerSlowPipeline(config)
+				addMetricsControllerSlowPipeline(baseConfig, config)
 			}
 			return nil
 		},
@@ -107,10 +111,11 @@ func addFNToPipeline(
 	config.Service.AddPipeline(name, pipeline)
 }
 
-func addMetricsSlowPipeline(config *otelcollector.OTELConfig) {
+func addMetricsSlowPipeline(baseConfig, config *otelcollector.OTELConfig) {
+	addFluxninjaPrometheusReceiver(baseConfig, config)
 	config.AddBatchProcessor(processorBatchMetricsSlow, 10*time.Second, 10000)
 	config.Service.AddPipeline("metrics/slow", otelcollector.Pipeline{
-		Receivers: []string{otel.ReceiverPrometheus},
+		Receivers: []string{receiverPrometheus},
 		Processors: []string{
 			otel.ProcessorEnrichment,
 			processorBatchMetricsSlow,
@@ -120,16 +125,34 @@ func addMetricsSlowPipeline(config *otelcollector.OTELConfig) {
 	})
 }
 
-func addMetricsControllerSlowPipeline(config *otelcollector.OTELConfig) {
+func addMetricsControllerSlowPipeline(baseConfig, config *otelcollector.OTELConfig) {
+	addFluxninjaPrometheusReceiver(baseConfig, config)
 	config.AddBatchProcessor(processorBatchMetricsSlow, 10*time.Second, 10000)
 	config.Service.AddPipeline("metrics/controller-slow", otelcollector.Pipeline{
-		Receivers: []string{otel.ReceiverPrometheus},
+		Receivers: []string{receiverPrometheus},
 		Processors: []string{
 			processorBatchMetricsSlow,
 			processorAttributes,
 		},
 		Exporters: []string{exporterFluxninja},
 	})
+}
+
+func addFluxninjaPrometheusReceiver(baseConfig, config *otelcollector.OTELConfig) {
+	rawReceiverConfig, _ := baseConfig.Receivers[otel.ReceiverPrometheus].(map[string]any)
+	configPatch := map[string]any{
+		"config": map[string]any{
+			"global": map[string]any{
+				"scrape_interval": "10s",
+			},
+		},
+	}
+	err := mergo.MergeWithOverwrite(&rawReceiverConfig, configPatch)
+	if err != nil {
+		// It should not happen, unless the original config is messed up.
+		log.Fatal().Err(err).Msg("failed to merge configs")
+	}
+	config.AddReceiver(receiverPrometheus, rawReceiverConfig)
 }
 
 func addFluxninjaExporter(config *otelcollector.OTELConfig,
