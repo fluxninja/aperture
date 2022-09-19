@@ -112,7 +112,7 @@ First, [download](https://asdf-vm.com/guide/getting-started.html#_2-download-asd
 `asdf`. Then, run the following command in aperture home directory to install all the required tools.
 
 ```sh
-make install-asdf-tools
+bash scripts/manage_tools.sh setup
 ```
 
 ### Tools required for Kubernetes deployment
