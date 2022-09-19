@@ -8,7 +8,7 @@ const (
 	// ApertureSourceSDK const for SDK source.
 	ApertureSourceSDK = "sdk"
 	// ApertureSourceEnvoy const for Envoy source.
-	ApertureSourceEnvoy = "sdk"
+	ApertureSourceEnvoy = "envoy"
 
 	// ApertureCheckResponseLabel contains JSON encoded check response struct.
 	ApertureCheckResponseLabel = "aperture.check_response"
