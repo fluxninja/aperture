@@ -47,14 +47,15 @@ DEP_TREE = {
             "tkenv": TANKA_ROOT + "/apps/aperture-grafana",
             "child_resources": [
                 {
-                    "new_name": "aperture-grafana-operator-bootstrap",
+                    "new_name": "grafana-operator-bootstrap",
                     "extra_objects": [
                         ("integreatly.org$", "CustomResourceDefinition", None),
                     ]
                 },
                 {
                     "workload": "aperture-grafana-operator",
-                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "new_name": "grafana-operator",
+                    "resource_deps": ["grafana-operator-bootstrap"],
                     "extra_objects": [
                         ("^aperture-grafana-operator", None, APERTURE_CONTROLLER_NS)
                     ],
@@ -63,23 +64,23 @@ DEP_TREE = {
                     ]
                 },
                 {
-                    "new_name": "aperture-grafana",
-                    "resource_deps": ["aperture-grafana-operator"],
+                    "new_name": "grafana",
+                    "resource_deps": ["grafana-operator"],
                     "extra_objects": [
                         "aperture-grafana:grafana",
                         "controller-prometheus:grafanadatasource"
                     ]
                 },
                 {
-                    "new_name": "aperture-dashboards",
-                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "new_name": "dashboards",
+                    "resource_deps": ["grafana-operator-bootstrap"],
                     "extra_objects": [
                         (None, "GrafanaDashboard", APERTURE_CONTROLLER_NS)
                     ]
                 },
                 {
-                    "new_name": "aperture-grafana-data-sources",
-                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "new_name": "grafana-data-sources",
+                    "resource_deps": ["grafana-operator-bootstrap"],
                     "extra_objects": [
                         (None, "GrafanaDataSource", APERTURE_CONTROLLER_NS)
                     ]
@@ -113,7 +114,7 @@ DEP_TREE = {
             ],
             "child_resources": [
                 {
-                    "new_name": "aperture-controller-operator-bootstrap",
+                    "new_name": "controller-operator-bootstrap",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "controllers.fluxninja.com:customresourcedefinition",
@@ -122,7 +123,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "controller",
-                    "new_name": "aperture-controller",
+                    "new_name": "controller",
                     "resource_deps": ["controller-etcd", "controller-aperture-controller-manager", "controller-prometheus"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'controller', 'app.kubernetes.io/managed-by': 'aperture-operator'},
@@ -130,7 +131,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "controller-aperture-controller-manager",
-                    "resource_deps": ["aperture-controller-operator-bootstrap"],
+                    "resource_deps": ["controller-operator-bootstrap"],
                     "extra_objects": [
                         ("^controller-aperture-controller", "Role|RoleBinding|ServiceAccount", APERTURE_CONTROLLER_NS),
                         ("^controller-aperture-controller", "ClusterRole|ClusterRoleBinding"),
@@ -192,7 +193,7 @@ DEP_TREE = {
             ],
             "child_resources": [
                 {
-                    "new_name": "aperture-agent-operator-bootstrap",
+                    "new_name": "agent-operator-bootstrap",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "agents.fluxninja.com:customresourcedefinition",
@@ -201,7 +202,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "agent",
-                    "new_name": "aperture-agent",
+                    "new_name": "agent",
                     "resource_deps": ["controller-etcd", "agent-aperture-agent-manager", "controller-prometheus"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
@@ -209,7 +210,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "agent-aperture-agent-manager",
-                    "resource_deps": ["aperture-agent-operator-bootstrap"],
+                    "resource_deps": ["agent-operator-bootstrap"],
                     "extra_objects": [
                         ("^agent-aperture-agent", "Role|RoleBinding|ServiceAccount", APERTURE_AGENT_NS),
                         ("^agent-aperture-agent", "ClusterRole|ClusterRoleBinding"),
@@ -855,10 +856,10 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
 
     if "aperture-grafana" in resources:
         forward_port_delayed(
-            workload="aperture-grafana-forward",
+            workload="grafana-forward",
             namespace=APERTURE_CONTROLLER_NS,
             labels=["ApertureController"],
-            resource_deps=["aperture-grafana"],
+            resource_deps=["grafana"],
             service="aperture-grafana",
             local_port=3000,
             remote_port=3000,
@@ -873,7 +874,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
         local_resource(
             name="controller-service",
             labels="ApertureController",
-            resource_deps=["aperture-controller"],
+            resource_deps=["controller"],
             serve_cmd=['./scripts/check-controller-service.sh'],
             readiness_probe=readiness_probe,
         )
