@@ -270,6 +270,7 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
+			logRecord.Attributes().InsertString(otelcollector.ApertureSourceLabel, otelcollector.ApertureSourceEnvoy)
 			logRecord.Attributes().InsertString(otelcollector.ApertureCheckResponseLabel, string(marshalledCheckResponse))
 			logRecord.Attributes().InsertString(otelcollector.HTTPStatusCodeLabel, "201")
 			logRecord.Attributes().InsertString(otelcollector.WorkloadDurationLabel, "5")
