@@ -273,7 +273,8 @@ func someLogs(
 			logRecord.Attributes().InsertString(otelcollector.ApertureSourceLabel, otelcollector.ApertureSourceEnvoy)
 			logRecord.Attributes().InsertString(otelcollector.ApertureCheckResponseLabel, string(marshalledCheckResponse))
 			logRecord.Attributes().InsertString(otelcollector.HTTPStatusCodeLabel, "201")
-			logRecord.Attributes().InsertString(otelcollector.WorkloadDurationLabel, "5")
+			logRecord.Attributes().InsertDouble(otelcollector.WorkloadDurationLabel, 5)
+			logRecord.Attributes().InsertDouble(otelcollector.EnvoyAuthzDurationLabel, 1)
 			for i, fm := range checkResponse.FluxMeters {
 				// TODO actually return some Histogram
 				expectedCalls[i] = engine.EXPECT().GetFluxMeter(fm.GetFluxMeterName()).Return(nil)

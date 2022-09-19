@@ -287,8 +287,10 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 			}
 		}
 	}
+	log.Info().Msgf("checkResponse.FluxMeters: %v", checkResponse.FluxMeters)
 	for _, fluxMeter := range checkResponse.FluxMeters {
 		value := fluxMeter.GetFluxMeterName()
+		log.Info().Msgf("fluxMeter: %v", fluxMeter)
 		labels[otelcollector.ApertureFluxMetersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 	}
 
@@ -306,6 +308,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	}
 
 	for key, value := range labels {
+		log.Info().Msgf("key: %v, value: %v", key, value)
 		value.CopyTo(attributes.PutEmpty(key))
 	}
 }
@@ -405,6 +408,18 @@ var (
 		otelcollector.WorkloadDurationLabel,
 		otelcollector.FlowDurationLabel,
 		otelcollector.ApertureProcessingDurationLabel,
+		otelcollector.ApertureDecisionTypeLabel,
+		otelcollector.ApertureErrorLabel,
+		otelcollector.ApertureRejectReasonLabel,
+		otelcollector.ApertureRateLimitersLabel,
+		otelcollector.ApertureDroppingRateLimitersLabel,
+		otelcollector.ApertureConcurrencyLimitersLabel,
+		otelcollector.ApertureDroppingConcurrencyLimitersLabel,
+		otelcollector.ApertureWorkloadsLabel,
+		otelcollector.ApertureDroppingWorkloadsLabel,
+		otelcollector.ApertureFluxMetersLabel,
+		otelcollector.ApertureFlowLabelKeysLabel,
+		otelcollector.ApertureClassifiersLabel,
 	}
 
 	_includeAttributesHTTP = []string{
