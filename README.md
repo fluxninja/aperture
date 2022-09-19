@@ -42,9 +42,13 @@ Modern cloud application architectures such as microservices are vulnerable to [
 
 At the fundamental level, Aperture enables flow control through observing, analyzing, and actuating, facilitated by agents and a controller.
 
-- 🎟️ Aperture Agents live next to your service instances as a sidecar and provide powerful [flow control](https://docs.fluxninja.com/docs/concepts/flow-control/) components such as a [weighted fair queuing scheduler](https://docs.fluxninja.com/docs/concepts/flow-control/concurrency-limiter) for prioritized load-shedding and a [distributed rate-limiter](https://docs.fluxninja.com/docs/concepts/flow-control/rate-limiter). A [flow](https://docs.fluxninja.com/docs/concepts/flow-control/flow-label) is the fundamental unit of work from the perspective of an Aperture Agent. It could be an API call, a feature, or even a database query.
+- 🚦 Aperture Agents live next to your service instances as a sidecar and provide powerful [flow control](https://docs.fluxninja.com/docs/concepts/flow-control/) components such as a [weighted fair queuing scheduler](https://docs.fluxninja.com/docs/concepts/flow-control/concurrency-limiter) for prioritized load-shedding and a [distributed rate-limiter](https://docs.fluxninja.com/docs/concepts/flow-control/rate-limiter). A [flow](https://docs.fluxninja.com/docs/concepts/flow-control/flow-label) is the fundamental unit of work from the perspective of an Aperture Agent. It could be an API call, a feature, or even a database query.
 
 - 🤖 Aperture Controller is the "brain" of system. It is powered by always-on, [circuit graph driven policies](https://docs.fluxninja.com/docs/concepts/policy/) that continuously track deviations from service-level objectives (SLOs) and calculate recovery or escalation actions.
+
+## ▶️ Explainer Video
+
+[![Build Indestructible Applications with Aperture Flow Control](https://img.youtube.com/vi/sEl4SMo3KNo/0.jpg)](https://www.youtube.com/watch?v=sEl4SMo3KNo)
 
 ## 🏗️ Architecture
 
