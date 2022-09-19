@@ -70,7 +70,7 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return nil, err
 	}
 
-	certf, err := os.CreateTemp("", "server.crt")
+	certf, err := os.CreateTemp(h.etcdDir, "server.crt")
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return nil, err
 	}
 
-	keyf, err := os.CreateTemp("", "server.key")
+	keyf, err := os.CreateTemp(h.etcdDir, "server.key")
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return nil, err
 	}
 
-	cer, _ := tls.LoadX509KeyPair("server.crt", "server.key")
+	cer, _ := tls.LoadX509KeyPair(certf.Name(), keyf.Name())
 	etcdTLSConfig := &tls.Config{
 		Certificates: []tls.Certificate{cer},
 		MinVersion:   tls.VersionTLS12,
@@ -105,8 +105,8 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		"--listen-client-urls="+endpoint,
 		"--advertise-client-urls="+endpoint,
 		"--client-cert-auth=true",
-		"--cert-file=server.crt",
-		"--key-file=server.key",
+		"--cert-file="+certf.Name(),
+		"--key-file="+keyf.Name(),
 	)
 	h.etcdServer.Stderr = h.errWriter
 	h.etcdServer.Stdout = io.Discard
