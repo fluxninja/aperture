@@ -92,27 +92,27 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 	Entry(
 		"add FN processors and exporters",
 		otelcollector.NewOTELConfig(),
-		basePluginOTELConfig(),
+		baseOTELConfig(),
 	),
 	Entry(
 		"add FN exporters to logs pipeline",
 		baseOTELConfigWithPipeline("logs", testPipeline()),
-		basePluginOTELConfigWithPipeline("logs", testPipelineWithFN()),
+		baseOTELConfigWithPipeline("logs", testPipelineWithFN()),
 	),
 	Entry(
 		"add FN exporters to traces pipeline",
 		baseOTELConfigWithPipeline("traces", testPipeline()),
-		basePluginOTELConfigWithPipeline("traces", testPipelineWithFN()),
+		baseOTELConfigWithPipeline("traces", testPipelineWithFN()),
 	),
 	Entry(
 		"add metrics/slow pipeline if metrics/fast pipeline exists",
 		baseOTELConfigWithPipeline("metrics/fast", testPipeline()),
-		basePluginOTELConfigWithMetrics("metrics/slow"),
+		baseOTELConfigWithMetrics("metrics/slow"),
 	),
 	Entry(
 		"add metrics/controller-slow pipeline if metrics/controller-fast pipeline exists",
 		baseOTELConfigWithPipeline("metrics/controller-fast", testPipeline()),
-		basePluginOTELConfigWithMetrics("metrics/controller-slow"),
+		baseOTELConfigWithMetrics("metrics/controller-slow"),
 	),
 )
 
@@ -122,23 +122,8 @@ func baseOTELConfigWithPipeline(name string, pipeline otelcollector.Pipeline) *o
 	return cfg
 }
 
-func basePluginOTELConfigWithPipeline(name string, pipeline otelcollector.Pipeline) *otelcollector.OTELConfig {
-	cfg := basePluginOTELConfig()
-	cfg.Service.AddPipeline(name, pipeline)
-	return cfg
-}
-
-func basePluginOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELConfig {
-	cfg := basePluginOTELConfig()
-	cfg.AddReceiver("prometheus/fluxninja", map[string]any{
-		"config": map[string]any{
-			"global": map[string]any{
-				// Here is different scrape interval than in the base otel config.
-				"scrape_interval": "10s",
-			},
-			"scrape_configs": []string{"foo", "bar"},
-		},
-	})
+func baseOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELConfig {
+	cfg := baseOTELConfig()
 	cfg.AddProcessor("batch/metrics-slow", batchprocessor.Config{
 		SendBatchSize: 10000,
 		Timeout:       10 * time.Second,
@@ -151,7 +136,7 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELCon
 		processors = append([]string{"enrichment"}, processors...)
 	}
 	cfg.Service.AddPipeline(pipelineName, otelcollector.Pipeline{
-		Receivers:  []string{"prometheus/fluxninja"},
+		Receivers:  []string{"prometheus"},
 		Processors: processors,
 		Exporters:  []string{"otlp/fluxninja"},
 	})
@@ -159,21 +144,6 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELCon
 }
 
 func baseOTELConfig() *otelcollector.OTELConfig {
-	cfg := otelcollector.NewOTELConfig()
-	cfg.AddReceiver("prometheus", map[string]any{
-		"config": map[string]any{
-			"global": map[string]any{
-				"scrape_interval": "1s",
-			},
-			// Put some scrape configs to be sure they are not overwritten.
-			"scrape_configs": []string{"foo", "bar"},
-		},
-	})
-	return cfg
-}
-
-// basePluginOTELConfig as produced by FN plugin
-func basePluginOTELConfig() *otelcollector.OTELConfig {
 	cfg := otelcollector.NewOTELConfig()
 	cfg.AddProcessor("attributes/fluxninja", map[string]interface{}{
 		"actions": []map[string]interface{}{
