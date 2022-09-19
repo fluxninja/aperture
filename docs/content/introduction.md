@@ -23,6 +23,7 @@ modern web applications.
 ```mermaid
 %% name: architecture_simple
 flowchart TD
+    blueprints[/"Blueprints"/]
     policies[/"Policies"/]
     subgraph controller["Aperture Controller"]
         circuit[Control Circuit]
@@ -31,7 +32,7 @@ flowchart TD
       prometheus[("Prometheus")]
       etcd[("etcd")]
     end
-    subgraph worker["Worker Node"]
+    subgraph worker["Worker Node (Kubernetes/VM/Bare-metal)"]
       subgraph agent["Aperture Agent"]
           servicediscovery["Service Discovery"]
           telemetry["Telemetry Collector"]
@@ -46,9 +47,10 @@ flowchart TD
       kubernetes["Kubernetes"]
       consul["Consul"]
     end
-    policies --> controller
-    controller<-->databases
-    databases<-->agent
+    blueprints --> |Jsonnet generator| policies
+    policies --> |Kubernetes Custom Resource| controller
+    controller<--> |Configuration/Telemetry/Decisions| databases
+    databases<-->|Configuration/Telemetry/Decisions|agent
     agent <-->|SDK: Telemetry/Decisions| servicelogic
     agent <-->|Mesh: Telemetry/Decisions| servicemesh
     platforms <-->|Service Discovery| agent
