@@ -99,14 +99,28 @@ repos:
         language: script
         files: "values.yaml$"
         pass_filenames: false
-        description: "Generate docs"
-      - id: generate-docs
-        name: "Docs"
-        entry: "./scripts/precommit/generate_docs.sh"
+        description: "Generate helm readme"
+      - id: generate-swagger
+        name: "Config Swagger"
+        entry: "./scripts/precommit/generate_swagger.sh"
         language: script
-        files: '\.proto$|\.go$|\.md$|\.mmd$'
+        files: '\.proto$|\.go$'
         pass_filenames: false
-        description: "Generate docs"
+        description: "Generate swagger"
+      - id: generate-config-markdown
+        name: "Config Markdown"
+        entry: "./scripts/precommit/generate_config_markdown.sh"
+        language: script
+        files: '\.proto$|\.go$'
+        pass_filenames: false
+        description: "Generate config markdown"
+      # - id: generate-mermaid
+      #   name: "Mermaid Diagrams"
+      #   entry: "./scripts/precommit/generate_mermaid.sh"
+      #   language: script
+      #   files: '\.md$|\.mmd$'
+      #   pass_filenames: false
+      #   description: "Generate mermaid diagrams"
       - id: generate-libsonnet
         name: "libsonnet"
         entry: "./scripts/precommit/generate_libsonnet.sh"

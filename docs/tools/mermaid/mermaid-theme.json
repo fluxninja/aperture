@@ -1,6 +1,7 @@
 {
   "logLevel": "debug",
   "deterministicIds": true,
+  "deterministicIDSeed": "mermaid",
   "theme": "base",
   "themeVariables": {
     "primaryColor": "#8EC4AD",
@@ -17,7 +18,7 @@
   "themeCSS": ".node rect { fill: #FC9A69; } span.edgeLabel { padding: 0.1em }",
   "startOnLoad": true,
   "flowchart": {
-    "useMaxWidth": false,
+    "useMaxWidth": true,
     "htmlLabels": true
   }
 }

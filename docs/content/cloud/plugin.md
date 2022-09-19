@@ -10,53 +10,14 @@ keywords:
 # FluxNinja Cloud Plugin
 
 If you are a FluxNinja Cloud customer you can enhance your Aperture experience
-by enabling FluxNinja plugins. Plugins provide us with the ability to enrich
-your logs and traces with additional information. The plugins process logs and
-traces according to the Open Telemetry standard. We batch/rollup metrics so that
-they do not take a lot of bandwidth. In FluxNinja Cloud, you can visualize
-policies and use the information from plugins to refine your policies. We also
-send heartbeats from Aperture Agents and Controllers to track their liveness,
-policy allocation and history.
+by enabling FluxNinja plugin. It enriches logs and traces collected by Aperture with additional dimensions and batches/rollups metrics to optimize bandwidth usage. In FluxNinja Cloud, you can monitor your policies and analyze flows. FluxNinja plugin also sends periodic heartbeats from Aperture Agents and Controllers to track their health and configuration.
 
 ## Configuration
 
-If you enable plugins then you can configure certificates for a secure
-connection with FluxNinja Cloud or a heartbeat interval.
+Refer FluxNinja Cloud plugin configuration reference:
 
-```yaml
-plugins:
-  disable_plugins: false
-
-fluxninja_plugin:
-  fluxninja_endpoint: "placeholder.local.dev.fluxninja.com:443"
-  heartbeat_interval: "10s"
-  client:
-    grpc:
-      insecure: false
-      tls:
-        insecure_skip_verify: true
-        cert_file: "cert.pem"
-        key_file: "key.pem"
-        ca_file: test
-    http:
-      tls:
-        insecure_skip_verify: true
-        ca_file: test
-```
-
-You can also selectively disable plugins like this:
-
-```yaml
-plugins:
-  disable_plugins: false
-  disabled_plugins:
-    - aperture-plugin-fluxninja
-```
-
-For more details, see plugin configuration reference:
-
-- [Agent](/references/configuration/agent.md#plugins)
-- [Controller](/references/configuration/controller.md#plugins)
+- [Aperture Controller](/references/configuration/controller.md/#flux-ninja-plugin)
+- [Aperture Agent](/references/configuration/agent.md#flux-ninja-plugin)
 
 ## See also
 
