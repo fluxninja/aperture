@@ -112,9 +112,9 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
-				otelcollector.ApertureDecisionTypeLabel:                "DECISION_TYPE_REJECTED",
-				otelcollector.ApertureErrorLabel:                       "",
-				otelcollector.ApertureRejectReasonLabel:                "",
+				otelcollector.ApertureDecisionTypeLabel:                flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+				otelcollector.ApertureErrorLabel:                       flowcontrolv1.CheckResponse_ERROR_NONE.String(),
+				otelcollector.ApertureRejectReasonLabel:                flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
 				otelcollector.ApertureClassifiersLabel:                 []interface{}{"policy_name:foo,classifier_index:1"},
 				otelcollector.ApertureFluxMetersLabel:                  []interface{}{"bar"},
 				otelcollector.ApertureFlowLabelKeysLabel:               []interface{}{"someLabel"},
@@ -225,8 +225,8 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 			`,
 			map[string]interface{}{
-				otelcollector.ApertureDecisionTypeLabel:         "DECISION_TYPE_REJECTED",
-				otelcollector.ApertureErrorLabel:                "ERROR_REASON_UNSPECIFIED",
+				otelcollector.ApertureDecisionTypeLabel:         flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+				otelcollector.ApertureErrorLabel:                flowcontrolv1.CheckResponse_ERROR_NONE.String(),
 				otelcollector.ApertureRateLimitersLabel:         []interface{}{},
 				otelcollector.ApertureDroppingRateLimitersLabel: []interface{}{},
 				otelcollector.ApertureConcurrencyLimitersLabel: []interface{}{
@@ -270,9 +270,11 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
+			logRecord.Attributes().InsertString(otelcollector.ApertureSourceLabel, otelcollector.ApertureSourceEnvoy)
 			logRecord.Attributes().InsertString(otelcollector.ApertureCheckResponseLabel, string(marshalledCheckResponse))
 			logRecord.Attributes().InsertString(otelcollector.HTTPStatusCodeLabel, "201")
-			logRecord.Attributes().InsertString(otelcollector.WorkloadDurationLabel, "5")
+			logRecord.Attributes().InsertDouble(otelcollector.WorkloadDurationLabel, 5)
+			logRecord.Attributes().InsertDouble(otelcollector.EnvoyAuthzDurationLabel, 1)
 			for i, fm := range checkResponse.FluxMeters {
 				// TODO actually return some Histogram
 				expectedCalls[i] = engine.EXPECT().GetFluxMeter(fm.GetFluxMeterName()).Return(nil)

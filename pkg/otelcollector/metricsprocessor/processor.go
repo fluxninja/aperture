@@ -405,6 +405,18 @@ var (
 		otelcollector.WorkloadDurationLabel,
 		otelcollector.FlowDurationLabel,
 		otelcollector.ApertureProcessingDurationLabel,
+		otelcollector.ApertureDecisionTypeLabel,
+		otelcollector.ApertureErrorLabel,
+		otelcollector.ApertureRejectReasonLabel,
+		otelcollector.ApertureRateLimitersLabel,
+		otelcollector.ApertureDroppingRateLimitersLabel,
+		otelcollector.ApertureConcurrencyLimitersLabel,
+		otelcollector.ApertureDroppingConcurrencyLimitersLabel,
+		otelcollector.ApertureWorkloadsLabel,
+		otelcollector.ApertureDroppingWorkloadsLabel,
+		otelcollector.ApertureFluxMetersLabel,
+		otelcollector.ApertureFlowLabelKeysLabel,
+		otelcollector.ApertureClassifiersLabel,
 	}
 
 	_includeAttributesHTTP = []string{
