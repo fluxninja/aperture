@@ -83,7 +83,7 @@ generate-mermaid: generate-mmd
 	@echo MMDC $@
 	@for fmt in svg png; \
 		do npx -p @mermaid-js/mermaid-cli mmdc \
-			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --cssFile ./tools/mermaid/mermaid.css --scale 4 --output $<.$$fmt --backgroundColor transparent; \
+			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --cssFile ./tools/mermaid/mermaid.css --scale 2 --output $<.$$fmt --backgroundColor transparent; \
 	done
 	@for fmt in png; \
 		do convert $<.$$fmt -trim $<.$$fmt; \
