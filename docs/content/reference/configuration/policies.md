@@ -539,7 +539,7 @@ See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 <dt>decider</dt>
 <dd>
 
-([V1Decider](#v1-decider)) Decider acts as a switch that emits one of the two signals based on the binary result of comparison operator on two operands.
+([V1Decider](#v1-decider)) Decider emits the binary result of comparison operator on two operands.
 
 </dd>
 <dt>ema</dt>
@@ -589,6 +589,12 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 <dd>
 
 ([V1Sqrt](#v1-sqrt)) Takes an input signal and emits the square root of the input signal.
+
+</dd>
+<dt>switch</dt>
+<dd>
+
+([V1Switcher](#v1-switcher)) Switcher acts as a switch that emits one of the two signals based on third signal.
 
 </dd>
 </dl>
@@ -661,30 +667,30 @@ Usually powered by integration with a proxy (like envoy) or a web framework.
 
 ### v1Decider {#v1-decider}
 
-Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
+Type of combinator that computes the comparison operation on lhs and rhs signals
 
 The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
 This component also supports time-based response, i.e. the output
-transitions between on_true or on_false signal if the decider condition is
+transitions between 1.0 or 0.0 signal if the decider condition is
 true or false for at least "positive_for" or "negative_for" duration. If
-`true_for` and `false_for` durations are zero then the transitions are
+`positive_for` and `negative_for` durations are zero then the transitions are
 instantaneous.
 
 #### Properties
 
 <dl>
-<dt>false_for</dt>
-<dd>
-
-(string, default: `0s`) Duration of time to wait before a transition to false state.
-If the duration is zero, the transition will happen instantaneously.
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
 ([V1DeciderIns](#v1-decider-ins)) Input ports for the Decider component.
+
+</dd>
+<dt>negative_for</dt>
+<dd>
+
+(string, default: `0s`) Duration of time to wait before a transition to false state.
+If the duration is zero, the transition will happen instantaneously.
 
 </dd>
 <dt>operator</dt>
@@ -699,7 +705,7 @@ If the duration is zero, the transition will happen instantaneously.
 ([V1DeciderOuts](#v1-decider-outs)) Output ports for the Decider component.
 
 </dd>
-<dt>true_for</dt>
+<dt>positive_for</dt>
 <dd>
 
 (string, default: `0s`) Duration of time to wait before a transition to true state.
@@ -721,18 +727,6 @@ Inputs for the Decider component.
 ([V1Port](#v1-port)) Left hand side input signal for the comparison operation.
 
 </dd>
-<dt>on_false</dt>
-<dd>
-
-([V1Port](#v1-port)) Output signal when the result of the operation is false.
-
-</dd>
-<dt>on_true</dt>
-<dd>
-
-([V1Port](#v1-port)) Output signal when the result of the operation is true.
-
-</dd>
 <dt>rhs</dt>
 <dd>
 
@@ -751,7 +745,7 @@ Outputs for the Decider component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Selected signal (on_true or on_false).
+([V1Port](#v1-port)) Selected signal (1.0 or 0.0).
 
 </dd>
 </dl>
@@ -2084,6 +2078,72 @@ Outputs for the Sqrt component.
 <dd>
 
 ([V1Port](#v1-port)) Output signal.
+
+</dd>
+</dl>
+
+### v1Switcher {#v1-switcher}
+
+Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+
+`on_true` will be returned if switch input is valid and not equal to 0.0 ,
+otherwise `on_false` will be returned.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1SwitcherIns](#v1-switcher-ins)) Input ports for the Switcher component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1SwitcherOuts](#v1-switcher-outs)) Output ports for the Switcher component.
+
+</dd>
+</dl>
+
+### v1SwitcherIns {#v1-switcher-ins}
+
+Inputs for the Switcher component.
+
+#### Properties
+
+<dl>
+<dt>on_false</dt>
+<dd>
+
+([V1Port](#v1-port)) Output signal when switch is invalid or 0.0.
+
+</dd>
+<dt>on_true</dt>
+<dd>
+
+([V1Port](#v1-port)) Output signal when switch is valid and not 0.0.
+
+</dd>
+<dt>switch</dt>
+<dd>
+
+([V1Port](#v1-port)) Decides whether to return on_true or on_false.
+
+</dd>
+</dl>
+
+### v1SwitcherOuts {#v1-switcher-outs}
+
+Outputs for the Switcher component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1Port](#v1-port)) Selected signal (on_true or on_false).
 
 </dd>
 </dl>

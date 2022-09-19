@@ -285,10 +285,17 @@ data:
                 signal_name: "LATENCY"
               rhs:
                 signal_name: "LATENCY_OVERLOAD"
+            out_ports:
+              output:
+                signal_name: "CONCURRENCY_INCREMENT_DECISION"
+		- switcher:
+			in_ports:
               on_true:
                 signal_name: "CONCURRENCY_INCREMENT_OVERLOAD"
               on_false:
                 signal_name: "CONCURRENCY_INCREMENT_NORMAL"
+              switch:
+                signal_name: "CONCURRENCY_INCREMENT_DECISION"
             out_ports:
               output:
                 signal_name: "CONCURRENCY_INCREMENT"

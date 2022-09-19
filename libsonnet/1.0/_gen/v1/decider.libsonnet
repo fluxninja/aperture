@@ -4,8 +4,6 @@ local deciderouts = import './deciderouts.libsonnet';
   new():: {
     in_ports: {
       lhs: error 'Port lhs is missing',
-      on_false: error 'Port on_false is missing',
-      on_true: error 'Port on_true is missing',
       rhs: error 'Port rhs is missing',
     },
     out_ports: {
@@ -14,17 +12,17 @@ local deciderouts = import './deciderouts.libsonnet';
   },
   inPorts:: deciderins,
   outPorts:: deciderouts,
-  withFalseFor(false_for):: {
-    false_for: false_for,
-  },
-  withFalseForMixin(false_for):: {
-    false_for+: false_for,
-  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
+  },
+  withNegativeFor(negative_for):: {
+    negative_for: negative_for,
+  },
+  withNegativeForMixin(negative_for):: {
+    negative_for+: negative_for,
   },
   withOperator(operator):: {
     operator: operator,
@@ -38,10 +36,10 @@ local deciderouts = import './deciderouts.libsonnet';
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
   },
-  withTrueFor(true_for):: {
-    true_for: true_for,
+  withPositiveFor(positive_for):: {
+    positive_for: positive_for,
   },
-  withTrueForMixin(true_for):: {
-    true_for+: true_for,
+  withPositiveForMixin(positive_for):: {
+    positive_for+: positive_for,
   },
 }

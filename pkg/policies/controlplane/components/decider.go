@@ -40,10 +40,10 @@ type Decider struct {
 	truePendingSince time.Time
 	// Time at which state became false pending
 	falsePendingSince time.Time
-	// The duration of time the condition must be met before transitioning to on_true signal
-	trueForDuration time.Duration
-	// The duration of time the condition must be unmet before transitioning to on_false signal
-	falseForDuration time.Duration
+	// The duration of time the condition must be met before transitioning to 1.0 signal
+	positiveForDuration time.Duration
+	// The duration of time the condition must be unmet before transitioning to 0.0 signal
+	negativeForDuration time.Duration
 	// The current error correction state
 	state deciderState
 	// The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
@@ -63,20 +63,20 @@ func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI
 		return nil, fx.Options(), fmt.Errorf("unknown operator")
 	}
 	timed := &Decider{
-		trueForDuration:   timedProto.TrueFor.AsDuration(),
-		falseForDuration:  timedProto.FalseFor.AsDuration(),
-		operator:          operator,
-		state:             decidedFalse,
-		truePendingSince:  time.Time{},
-		falsePendingSince: time.Time{},
+		positiveForDuration: timedProto.PositiveFor.AsDuration(),
+		negativeForDuration: timedProto.NegativeFor.AsDuration(),
+		operator:            operator,
+		state:               decidedFalse,
+		truePendingSince:    time.Time{},
+		falsePendingSince:   time.Time{},
 	}
 	return timed, fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
 func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	onTrue := inPortReadings.ReadSingleValuePort("on_true")
-	onFalse := inPortReadings.ReadSingleValuePort("on_false")
+	onTrue := reading.New(1.0)
+	onFalse := reading.New(0.0)
 	lhs := inPortReadings.ReadSingleValuePort("lhs")
 	rhs := inPortReadings.ReadSingleValuePort("rhs")
 
@@ -143,7 +143,7 @@ func (dec *Decider) computeDecisionType(currentDecision bool, tickInfo runtime.T
 	} else {
 		pendingSince := dec.getPendingSince(currentDecision, tickInfo)
 		// check how much time has elapsed since the pending state was set
-		if tickInfo.Timestamp.Sub(pendingSince) < dec.trueForDuration {
+		if tickInfo.Timestamp.Sub(pendingSince) < dec.positiveForDuration {
 			dec.setPending(currentDecision)
 			return currentPending
 		} else {
