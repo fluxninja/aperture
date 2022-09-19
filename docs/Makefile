@@ -65,8 +65,12 @@ generate-config-markdown:
 	@npx prettier --write gen/policies/policies.md
 	@mv gen/policies/policies.md content/references/configuration
 
+generate-mmd:
+	@echo generating mermaid files from markdown files
+	@./tools/mermaid/md_to_mmd.sh
+
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
-generate-mermaid:
+generate-mermaid: generate-mmd
 	@echo generating mermaid diagrams
 	@find . -name '*.mmd' -exec $(MAKE) -B {}.svg \;
 
@@ -74,7 +78,8 @@ generate-mermaid:
 	@echo MMDC $@
 	@for fmt in svg; \
 		do npx -p @mermaid-js/mermaid-cli mmdc \
-			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --output $<.$$fmt --backgroundColor transparent; \
+			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --output $<.$$fmt --backgroundColor transparent \
+			&& git add $<.$$fmt; \
 	done
 
-.PHONY: generate-config-markdown generate-mermaid
+.PHONY: generate-config-markdown generate-mermaid generate-mmd

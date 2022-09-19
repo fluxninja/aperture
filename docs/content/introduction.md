@@ -20,6 +20,42 @@ Welcome to the official documentation for
 Aperture is an open-source flow control and reliability management platform for
 modern web applications.
 
+```mermaid
+%% name: architecture_simple
+flowchart TD
+    blueprints[/"Blueprints"/]
+    policies[/"Policies"/]
+    subgraph controller["Aperture Controller"]
+        circuit[Control Circuit]
+    end
+    subgraph databases["Aperture Databases"]
+      prometheus[("Prometheus")]
+      etcd[("etcd")]
+    end
+    subgraph worker["Worker Node (Kubernetes/VM/Bare-metal)"]
+      subgraph agent["Aperture Agent"]
+          servicediscovery["Service Discovery"]
+          telemetry["Telemetry Collector"]
+          flowcontrol["Flow Control"]
+      end
+      subgraph serviceinstance["Service Instance"]
+        servicelogic["Service Logic"]
+        servicemesh["Service Mesh"]
+      end
+    end
+    subgraph platforms["Discovery Databases"]
+      kubernetes["Kubernetes"]
+      consul["Consul"]
+    end
+    blueprints --> |Jsonnet generator| policies
+    policies --> |Kubernetes Custom Resource| controller
+    controller<--> |Configuration/Telemetry/Decisions| databases
+    databases<-->|Configuration/Telemetry/Decisions|agent
+    agent <-->|SDK: Telemetry/Decisions| servicelogic
+    agent <-->|Mesh: Telemetry/Decisions| servicemesh
+    platforms <-->|Service Discovery| agent
+```
+
 ## Why is flow control needed?
 
 Modern web-scale apps are a complex network of inter-connected microservices

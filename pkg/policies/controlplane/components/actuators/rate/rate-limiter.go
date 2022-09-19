@@ -119,10 +119,10 @@ func (limiterSync *rateLimiterSync) Execute(inPortReadings runtime.PortToValue, 
 
 	limitReading := limit[0]
 	var limitValue float64
-	if !limitReading.Valid {
+	if !limitReading.Valid() {
 		limitValue = -1.0 // no limit is applied
 	} else {
-		limitValue = limitReading.Value
+		limitValue = limitReading.Value()
 	}
 	return nil, limiterSync.publishLimit(limitValue)
 }

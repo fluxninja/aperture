@@ -1,4 +1,4 @@
-package reading_test
+package runtime_test
 
 import (
 	"testing"
@@ -10,11 +10,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 
-func TestReading(t *testing.T) {
+func TestRuntime(t *testing.T) {
 	log.SetGlobalLevel(log.WarnLevel)
 
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Reading Suite")
+	RunSpecs(t, "Runtime Suite")
 }
 
 var l *utils.GoLeakDetector
