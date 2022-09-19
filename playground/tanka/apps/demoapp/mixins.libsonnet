@@ -14,13 +14,15 @@ local extractor = aperture.v1.Extractor;
 local rule = aperture.v1.Rule;
 local selector = aperture.v1.Selector;
 local controlPoint = aperture.v1.ControlPoint;
+local bucket = aperture.v1.FluxMeterBuckets;
 
 local svcSelector = selector.new()
                     + selector.withAgentGroup('default')
                     + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
                     + selector.withControlPoint(controlPoint.new()
                                                 + controlPoint.withTraffic('ingress'));
-
+local defaultBucket = bucket.new()
+                      + bucket.withBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0]);
 local demoappMixin =
   demoApp {
     values+: {
@@ -47,6 +49,7 @@ local demoappMixin =
 local policy = latencyGradientPolicy({
   policyName: 'service1-demo-app',
   fluxMeterSelector: svcSelector,
+  fluxMeterBuckets: defaultBucket,
   concurrencyLimiterSelector: svcSelector,
   classifiers: [
     classifier.new()
