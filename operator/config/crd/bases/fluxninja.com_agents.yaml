@@ -3645,8 +3645,6 @@ spec:
                   tag:
                     description: The tag (version) of the image
                     type: string
-                required:
-                - repository
                 type: object
               initContainers:
                 description: Add additional init containers
@@ -5198,9 +5196,6 @@ spec:
                           name:
                             description: Name of the secret
                             type: string
-                        required:
-                        - key
-                        - name
                         type: object
                       value:
                         description: Value for the ApiKey

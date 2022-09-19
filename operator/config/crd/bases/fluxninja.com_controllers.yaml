@@ -3567,8 +3567,6 @@ spec:
                   tag:
                     description: The tag (version) of the image
                     type: string
-                required:
-                - repository
                 type: object
               initContainers:
                 description: Add additional init containers
@@ -5023,6 +5021,27 @@ spec:
                 description: Node labels for pods assignment
                 type: object
                 x-kubernetes-map-type: atomic
+              operatorImage:
+                description: Image configuration for Policy sidecar container
+                properties:
+                  pullPolicy:
+                    description: The ImagePullPolicy of the image
+                    type: string
+                  pullSecrets:
+                    description: The PullSecrets for the image
+                    items:
+                      type: string
+                    type: array
+                  registry:
+                    description: The registry of the image
+                    type: string
+                  repository:
+                    description: The repository of the image
+                    type: string
+                  tag:
+                    description: The tag (version) of the image
+                    type: string
+                type: object
               podAnnotations:
                 additionalProperties:
                   type: string
@@ -5120,9 +5139,6 @@ spec:
                           name:
                             description: Name of the secret
                             type: string
-                        required:
-                        - key
-                        - name
                         type: object
                       value:
                         description: Value for the ApiKey

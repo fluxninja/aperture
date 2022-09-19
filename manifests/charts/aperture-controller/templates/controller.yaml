@@ -17,6 +17,9 @@ spec:
   {{- if or .Values.controller.image.registry .Values.controller.image.repository .Values.controller.image.tag .Values.controller.image.pullPolicy .Values.controller.image.pullSecrets }}
   image: {{ .Values.controller.image | toYaml | nindent 4 }}
   {{- end }}
+  {{- if or .Values.operator.image.registry .Values.operator.image.repository .Values.operator.image.tag .Values.operator.image.pullPolicy .Values.operator.image.pullSecrets }}
+  operatorImage: {{ .Values.operator.image | toYaml | nindent 4 }}
+  {{- end }}
   {{- if .Values.controller.service.annotations }}
   service:
     annotations: {{ .Values.controller.service.annotations | toYaml | nindent 6 }}

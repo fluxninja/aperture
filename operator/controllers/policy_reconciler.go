@@ -20,6 +20,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -28,7 +30,6 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
@@ -42,7 +43,7 @@ type PolicyReconciler struct {
 	client.Client
 	Scheme           *runtime.Scheme
 	Recorder         record.EventRecorder
-	resourcesDeleted bool
+	resourcesDeleted map[types.NamespacedName]bool
 }
 
 //+kubebuilder:rbac:groups=fluxninja.com,resources=policies,verbs=get;list;watch;create;update;patch;delete
@@ -60,14 +61,22 @@ type PolicyReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.2/pkg/reconcile
 func (r *PolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
+	if r.resourcesDeleted == nil {
+		r.resourcesDeleted = make(map[types.NamespacedName]bool)
+	}
 
 	instance := &v1alpha1.Policy{}
 	err := r.Get(ctx, req.NamespacedName, instance)
 	if err != nil && errors.IsNotFound(err) {
-		if !r.resourcesDeleted {
+		if !r.resourcesDeleted[req.NamespacedName] {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and don't requeue
+			logger.Info(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", req.Name, req.Namespace))
+			instance.Name = req.Name
+			instance.Namespace = req.Namespace
+			r.deleteResources(ctx, instance.DeepCopy())
+			r.resourcesDeleted[req.NamespacedName] = true
 			logger.Info("Policy resource not found. Ignoring since object must be deleted")
 		}
 		return ctrl.Result{}, nil
@@ -80,16 +89,8 @@ func (r *PolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	// Handing delete operation
 	if instance.GetDeletionTimestamp() != nil {
 		logger.Info(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", instance.GetName(), instance.GetNamespace()))
-		if controllerutil.ContainsFinalizer(instance, finalizerName) {
-			r.deleteResources(ctx, instance.DeepCopy())
-
-			controllerutil.RemoveFinalizer(instance, finalizerName)
-			if err = r.updatePolicy(ctx, instance); err != nil && !errors.IsNotFound(err) {
-				return ctrl.Result{}, err
-			}
-		}
-
-		r.resourcesDeleted = true
+		r.deleteResources(ctx, instance.DeepCopy())
+		r.resourcesDeleted[req.NamespacedName] = true
 		return ctrl.Result{}, nil
 	}
 
@@ -100,23 +101,19 @@ func (r *PolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		} else if instance.Status.Status == failedStatus {
 			return ctrl.Result{}, nil
 		}
+
+		if err := r.updatePolicy(ctx, instance); err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
 	instance.Status.Status = "uploading"
 	if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
 		return ctrl.Result{}, err
 	}
-	r.resourcesDeleted = false
+	r.resourcesDeleted[req.NamespacedName] = false
 
 	if err := r.reconcilePolicy(ctx, instance); err != nil {
-		return ctrl.Result{}, err
-	}
-
-	if !controllerutil.ContainsFinalizer(instance, finalizerName) {
-		controllerutil.AddFinalizer(instance, finalizerName)
-	}
-
-	if err := r.updatePolicy(ctx, instance); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -129,12 +126,15 @@ func (r *PolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 }
 
 func (r *PolicyReconciler) deleteResources(ctx context.Context, instance *v1alpha1.Policy) {
-	// TODO: write logic to remove policy from Etcd
+	filename := filepath.Join(policyFilePath, fmt.Sprintf("%s.%s.yaml", instance.GetName(), instance.GetNamespace()))
+	err := os.Remove(filename)
+	if err != nil {
+		log.FromContext(ctx).Info(fmt.Sprintf("Failed to write Policy to file '%s'. Error: '%s'", filename, err.Error()))
+	}
 }
 
 func (r *PolicyReconciler) updatePolicy(ctx context.Context, instance *v1alpha1.Policy) error {
 	attempt := 5
-	finalizers := instance.DeepCopy().Finalizers
 	annotations := instance.DeepCopy().Annotations
 	for attempt > 0 {
 		attempt -= 1
@@ -147,7 +147,6 @@ func (r *PolicyReconciler) updatePolicy(ctx context.Context, instance *v1alpha1.
 				if err = r.Get(ctx, namespacesName, instance); err != nil {
 					return err
 				}
-				instance.Finalizers = finalizers
 				instance.Annotations = annotations
 				continue
 			}
@@ -204,7 +203,14 @@ func (r *PolicyReconciler) validatePolicy(ctx context.Context, instance *v1alpha
 }
 
 func (r *PolicyReconciler) reconcilePolicy(ctx context.Context, instance *v1alpha1.Policy) error {
-	// TODO: write logic to store policy in Etcd
+	filename := filepath.Join(policyFilePath, fmt.Sprintf("%s.%s.yaml", instance.GetName(), instance.GetNamespace()))
+	err := os.WriteFile(filename, instance.Spec.Raw, 0o600)
+	if err != nil {
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "UploadFailed", "Failed to write Policy to file '%s'. Error: '%s'", filename, err.Error())
+		return err
+	}
+
+	r.Recorder.Eventf(instance, corev1.EventTypeWarning, "UploadSuccessful", "Wrote Policy to file '%s'.", filename)
 	return nil
 }
 

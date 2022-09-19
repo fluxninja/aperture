@@ -33,6 +33,10 @@ type ControllerSpec struct {
 	//+kubebuilder:validation:Optional
 	Image ControllerImage `json:"image"`
 
+	// Image configuration for Policy sidecar container
+	//+kubebuilder:validation:Optional
+	OperatorImage OperatorImage `json:"operatorImage"`
+
 	// Pod's host aliases
 	//+kubebuilder:validation:Optional
 	HostAliases []corev1.HostAlias `json:"hostAliases,omitempty"`

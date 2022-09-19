@@ -62,6 +62,7 @@ type AgentImage struct {
 	Image `json:",inline"`
 
 	// The repository of the image
+	//+kubebuilder:validation:Optional
 	Repository string `json:"repository" default:"aperture-agent"`
 }
 
@@ -71,7 +72,18 @@ type ControllerImage struct {
 	Image `json:",inline"`
 
 	// The repository of the image
+	//+kubebuilder:validation:Optional
 	Repository string `json:"repository" default:"aperture-controller"`
+}
+
+// OperatorImage defines Image spec for Aperture Operator.
+type OperatorImage struct {
+	// Image specs for Controller
+	Image `json:",inline"`
+
+	// The repository of the image
+	//+kubebuilder:validation:Optional
+	Repository string `json:"repository" default:"aperture-operator"`
 }
 
 // Probe defines Enabled, InitialDelaySeconds, PeriodSeconds, TimeoutSeconds, FailureThreshold and SuccessThreshold for probes like livenessProbe.
@@ -269,9 +281,11 @@ type APIKeySecret struct {
 // SecretKeyRef defines fields for details of the ApiKey secret.
 type SecretKeyRef struct {
 	// Name of the secret
+	//+kubebuilder:validation:Optional
 	Name string `json:"name"`
 
 	// Key of the secret in Data
+	//+kubebuilder:validation:Optional
 	Key string `json:"key" default:"apiKey"`
 }
 
