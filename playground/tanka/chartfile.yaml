@@ -8,9 +8,9 @@ requires:
   - chart: bitnami/grafana-operator
     version: 2.6.2
   - chart: istio/base
-    version: 1.15.0
+    version: 1.14.3
   - chart: istio/istiod
-    version: 1.15.0
+    version: 1.14.3
   - chart: istio/gateway
-    version: 1.15.0
+    version: 1.14.3
 version: 1
