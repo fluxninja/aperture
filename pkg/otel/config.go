@@ -21,14 +21,14 @@ import (
 )
 
 const (
-	// ReceiverOTLP collects traces and logs from libraries and SDKs.
+	// ReceiverOTLP collects logs from libraries and SDKs.
 	ReceiverOTLP = "otlp"
 	// ReceiverPrometheus collects metrics from environment and services.
 	ReceiverPrometheus = "prometheus"
 
 	// ProcessorEnrichment enriches metrics with discovery data.
 	ProcessorEnrichment = "enrichment"
-	// ProcessorMetrics generates metrics based on traces and logs and exposes them
+	// ProcessorMetrics generates metrics based on logs and exposes them
 	// on application prometheus metrics endpoint.
 	ProcessorMetrics = "metrics"
 	// ProcessorBatchPrerollup batches incoming data before rolling up. This is
@@ -150,7 +150,7 @@ func newOtelConfig(in FxIn) (*otelParams, error) {
 }
 
 func provideAgent(cfg *otelParams) *otelcollector.OTELConfig {
-	addLogsAndTracesPipelines(cfg)
+	addLogsPipeline(cfg)
 	addMetricsPipeline(cfg)
 	return cfg.config
 }
@@ -160,7 +160,7 @@ func provideController(cfg *otelParams) *otelcollector.OTELConfig {
 	return cfg.config
 }
 
-func addLogsAndTracesPipelines(cfg *otelParams) {
+func addLogsPipeline(cfg *otelParams) {
 	config := cfg.config
 	// Common dependencies for pipelines
 	addOTLPReceiver(cfg)
@@ -179,12 +179,6 @@ func addLogsAndTracesPipelines(cfg *otelParams) {
 	}
 
 	config.Service.AddPipeline("logs", otelcollector.Pipeline{
-		Receivers:  []string{ReceiverOTLP},
-		Processors: processors,
-		Exporters:  []string{ExporterLogging},
-	})
-
-	config.Service.AddPipeline("traces", otelcollector.Pipeline{
 		Receivers:  []string{ReceiverOTLP},
 		Processors: processors,
 		Exporters:  []string{ExporterLogging},
