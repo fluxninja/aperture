@@ -54,6 +54,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "aperture-grafana-operator",
+                    "new_name": "grafana-operator",
                     "resource_deps": ["grafana-operator-bootstrap"],
                     "extra_objects": [
                         ("^aperture-grafana-operator", None, APERTURE_CONTROLLER_NS)
@@ -64,7 +65,7 @@ DEP_TREE = {
                 },
                 {
                     "new_name": "grafana",
-                    "resource_deps": ["aperture-grafana-operator"],
+                    "resource_deps": ["grafana-operator"],
                     "extra_objects": [
                         "aperture-grafana:grafana",
                         "controller-prometheus:grafanadatasource"
