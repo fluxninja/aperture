@@ -23,7 +23,7 @@ import (
 var (
 	ctx        context.Context
 	cancel     context.CancelFunc
-	classifier *classification.ClassifierEngine
+	classifier *classification.ClassificationEngine
 	handler    *envoy.Handler
 )
 

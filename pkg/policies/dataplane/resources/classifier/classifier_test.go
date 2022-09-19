@@ -23,7 +23,7 @@ import (
 type object = map[string]interface{}
 
 var _ = Describe("Classifier", func() {
-	var classifier *ClassifierEngine
+	var classifier *ClassificationEngine
 
 	BeforeEach(func() {
 		log.SetGlobalLevel(log.WarnLevel)

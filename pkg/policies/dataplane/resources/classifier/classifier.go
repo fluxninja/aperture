@@ -34,8 +34,8 @@ type rules struct {
 	ReportedRules []compiler.ReportedRule
 }
 
-// ClassifierEngine receives classification policies and provides Classify method.
-type ClassifierEngine struct {
+// ClassificationEngine receives classification policies and provides Classify method.
+type ClassificationEngine struct {
 	mu              sync.Mutex
 	activeRules     atomic.Value
 	activeRulesets  map[rulesetID]compiler.CompiledRuleset
@@ -46,8 +46,8 @@ type ClassifierEngine struct {
 type rulesetID = uint64
 
 // New creates a new Flow Classifier.
-func New() *ClassifierEngine {
-	return &ClassifierEngine{
+func New() *ClassificationEngine {
+	return &ClassificationEngine{
 		activeRulesets: make(map[rulesetID]compiler.CompiledRuleset),
 	}
 }
@@ -118,7 +118,7 @@ func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm
 
 // Classify takes rego input, performs classification, and returns a map of flow labels.
 // LabelsForMatching are additional labels to use for selector matching.
-func (c *ClassifierEngine) Classify(
+func (c *ClassificationEngine) Classify(
 	ctx context.Context,
 	svcs []string,
 	ctrlPt selectors.ControlPoint,
@@ -158,7 +158,7 @@ func (c *ClassifierEngine) Classify(
 }
 
 // ActiveRules returns a slice of uncompiled Rules which are currently active.
-func (c *ClassifierEngine) ActiveRules() []compiler.ReportedRule {
+func (c *ClassificationEngine) ActiveRules() []compiler.ReportedRule {
 	ac, _ := c.activeRules.Load().(rules)
 	return ac.ReportedRules
 }
@@ -168,7 +168,7 @@ func (c *ClassifierEngine) ActiveRules() []compiler.ReportedRule {
 // # The name will be used for reporting
 //
 // To retract the rules, call Classifier.Drop.
-func (c *ClassifierEngine) AddRules(
+func (c *ClassificationEngine) AddRules(
 	ctx context.Context,
 	name string,
 	classifierWrapper *wrappersv1.ClassifierWrapper,
@@ -190,11 +190,11 @@ func (c *ClassifierEngine) AddRules(
 
 	c.activeRulesets[id] = compiledRuleset
 	c.activateRulesets()
-	return ActiveRuleset{id: id, classifierEngine: c}, nil
+	return ActiveRuleset{id: id, classificationEngine: c}, nil
 }
 
 // GetSelector returns the selector.
-func (c *ClassifierEngine) GetSelector() *selectorv1.Selector {
+func (c *ClassificationEngine) GetSelector() *selectorv1.Selector {
 	if c.classifierProto != nil {
 		return c.classifierProto.GetSelector()
 	}
@@ -203,16 +203,16 @@ func (c *ClassifierEngine) GetSelector() *selectorv1.Selector {
 
 // ActiveRuleset represents one of currently active set of rules.
 type ActiveRuleset struct {
-	classifierEngine *ClassifierEngine
-	id               rulesetID
+	classificationEngine *ClassificationEngine
+	id                   rulesetID
 }
 
 // Drop retracts all the rules belonging to a ruleset.
 func (rs ActiveRuleset) Drop() {
-	if rs.classifierEngine == nil {
+	if rs.classificationEngine == nil {
 		return
 	}
-	c := rs.classifierEngine
+	c := rs.classificationEngine
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	delete(c.activeRulesets, rs.id)
@@ -220,12 +220,12 @@ func (rs ActiveRuleset) Drop() {
 }
 
 // needs to be called with activeRulesets mutex held.
-func (c *ClassifierEngine) activateRulesets() {
+func (c *ClassificationEngine) activateRulesets() {
 	c.activeRules.Store(c.combineRulesets())
 	log.Info().Int("rulesets", len(c.activeRulesets)).Msg("Rules updated")
 }
 
-func (c *ClassifierEngine) combineRulesets() rules {
+func (c *ClassificationEngine) combineRulesets() rules {
 	combined := rules{
 		MultiMatcherByControlPointID: make(multiMatcherByControlPoint),
 		ReportedRules:                make([]compiler.ReportedRule, 0),

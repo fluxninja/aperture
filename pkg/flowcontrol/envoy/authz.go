@@ -42,7 +42,7 @@ import (
 // header.  No-entity-cache support is mostly so that authz can be experimented
 // with without the need for tagger to run.
 func NewHandler(
-	classifier *classification.ClassifierEngine,
+	classifier *classification.ClassificationEngine,
 	entityCache *entitycache.EntityCache,
 	fcHandler common.HandlerWithValues,
 ) *Handler {
@@ -60,7 +60,7 @@ func NewHandler(
 // Handler implements envoy.service.auth.v3.Authorization and handles Check call.
 type Handler struct {
 	entityCache *entitycache.EntityCache
-	classifier  *classification.ClassifierEngine
+	classifier  *classification.ClassificationEngine
 	propagator  authz_baggage.Propagator
 	fcHandler   common.HandlerWithValues
 }

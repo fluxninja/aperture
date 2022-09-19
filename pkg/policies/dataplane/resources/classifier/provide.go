@@ -28,10 +28,10 @@ var Module fx.Option = fx.Options(
 			Name:   "classifier",
 		},
 		fx.Annotated{
-			Target: ProvideEmptyClassifierEngine,
+			Target: ProvideEmptyClassificationEngine,
 			Name:   "empty",
 		},
-		ProvideClassifierEngine,
+		ProvideClassificationEngine,
 	),
 )
 
@@ -55,22 +55,22 @@ func setupEtcdClassifierWatcher(etcdClient *etcdclient.Client, lc fx.Lifecycle, 
 	return etcdWatcher, nil
 }
 
-// ProvideEmptyClassifierEngine provides a classifier that is empty
+// ProvideEmptyClassificationEngine provides a classifier that is empty
 //
 // The classifier could be populated by calling UpdateRules.
-func ProvideEmptyClassifierEngine() *ClassifierEngine { return New() }
+func ProvideEmptyClassificationEngine() *ClassificationEngine { return New() }
 
-// ClassifierEngineIn holds parameters for ProvideClassifierEngine.
-type ClassifierEngineIn struct {
+// ClassificationEngineIn holds parameters for ProvideClassificationEngine.
+type ClassificationEngineIn struct {
 	fx.In
-	Classifier *ClassifierEngine `name:"empty"`
-	Watcher    notifiers.Watcher `name:"classifier"`
+	Classifier *ClassificationEngine `name:"empty"`
+	Watcher    notifiers.Watcher     `name:"classifier"`
 	Lifecycle  fx.Lifecycle
 	Registry   status.Registry
 }
 
-// ProvideClassifierEngine provides a classifier that loads the rules from config file.
-func ProvideClassifierEngine(in ClassifierEngineIn) *ClassifierEngine {
+// ProvideClassificationEngine provides a classifier that loads the rules from config file.
+func ProvideClassificationEngine(in ClassificationEngineIn) *ClassificationEngine {
 	reg := in.Registry.Child("classifiers")
 
 	fxDriver := &notifiers.FxDriver{
@@ -93,7 +93,7 @@ func ProvideClassifierEngine(in ClassifierEngineIn) *ClassifierEngine {
 }
 
 // Per classifier fx app.
-func (c *ClassifierEngine) provideClassifierFxOptions(
+func (c *ClassificationEngine) provideClassifierFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	_ status.Registry,
@@ -108,7 +108,7 @@ func invokeMiniApp(
 	lc fx.Lifecycle,
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	classifierEngine *ClassifierEngine,
+	classificationEngine *ClassificationEngine,
 ) error {
 	wrapperMessage := &wrappersv1.ClassifierWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
@@ -121,7 +121,7 @@ func invokeMiniApp(
 		fx.Hook{
 			OnStart: func(startCtx context.Context) error {
 				var err error
-				activeRuleset, err = classifierEngine.AddRules(startCtx, string(key), wrapperMessage)
+				activeRuleset, err = classificationEngine.AddRules(startCtx, string(key), wrapperMessage)
 				if err != nil {
 					return err
 				}
