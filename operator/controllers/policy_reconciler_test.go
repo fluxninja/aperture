@@ -27,6 +27,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/yaml"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -81,11 +82,13 @@ var _ = Describe("Policy Reconciler", Ordered, func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(instance.Status.Status).To(Equal("uploaded"))
-			fileContent, err := os.OpenFile(filepath.Join(policyFilePath, "aperture.test101.yaml"), os.O_RDONLY, 0o400)
+			fileContent, err := os.OpenFile(filepath.Join(policyFilePath, "aperture-test101.yaml"), os.O_RDONLY, 0o400)
 			Expect(err).NotTo(HaveOccurred())
-			content := make([]byte, len(instance.Spec.Raw))
+			yamlContent, err := yaml.JSONToYAML(instance.Spec.Raw)
+			Expect(err).NotTo(HaveOccurred())
+			content := make([]byte, len(yamlContent))
 			fileContent.Read(content)
-			Expect(content).To(Equal(instance.Spec.Raw))
+			Expect(string(content)).To(Equal(string(yamlContent)))
 		})
 
 		It("should not create file when invalid Policy is created", func() {
@@ -114,7 +117,7 @@ var _ = Describe("Policy Reconciler", Ordered, func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(instance.Status.Status).To(Equal(failedStatus))
-			_, err = os.OpenFile(filepath.Join(policyFilePath, "aperture.test102.yaml"), os.O_RDONLY, 0o400)
+			_, err = os.OpenFile(filepath.Join(policyFilePath, "aperture-test102.yaml"), os.O_RDONLY, 0o400)
 			Expect(err).To(HaveOccurred())
 		})
 
@@ -148,11 +151,13 @@ var _ = Describe("Policy Reconciler", Ordered, func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(instance.Status.Status).To(Equal("uploaded"))
-			fileContent, err := os.OpenFile(filepath.Join(policyFilePath, "aperture.test103.yaml"), os.O_RDONLY, 0o400)
+			fileContent, err := os.OpenFile(filepath.Join(policyFilePath, "aperture-test103.yaml"), os.O_RDONLY, 0o400)
 			Expect(err).NotTo(HaveOccurred())
-			content := make([]byte, len(instance.Spec.Raw))
+			yamlContent, err := yaml.JSONToYAML(instance.Spec.Raw)
+			Expect(err).NotTo(HaveOccurred())
+			content := make([]byte, len(yamlContent))
 			fileContent.Read(content)
-			Expect(content).To(Equal(instance.Spec.Raw))
+			Expect(string(content)).To(Equal(string(yamlContent)))
 		})
 
 		It("should delete file when valid Policy is deleted", func() {
@@ -180,7 +185,7 @@ var _ = Describe("Policy Reconciler", Ordered, func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(instance.Status.Status).To(Equal("uploaded"))
-			_, err = os.OpenFile(filepath.Join(policyFilePath, "aperture.test104.yaml"), os.O_RDONLY, 0o400)
+			_, err = os.OpenFile(filepath.Join(policyFilePath, "aperture-test104.yaml"), os.O_RDONLY, 0o400)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(k8sClient.Delete(ctx, instance)).NotTo(HaveOccurred())
@@ -198,7 +203,7 @@ var _ = Describe("Policy Reconciler", Ordered, func() {
 				return err != nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			_, err = os.OpenFile(filepath.Join(policyFilePath, "aperture.test104.yaml"), os.O_RDONLY, 0o400)
+			_, err = os.OpenFile(filepath.Join(policyFilePath, "aperture-test104.yaml"), os.O_RDONLY, 0o400)
 			Expect(err).To(HaveOccurred())
 		})
 

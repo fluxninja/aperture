@@ -45,7 +45,7 @@ local demoappMixin =
   };
 
 local policy = latencyGradientPolicy({
-  policyName: 'service1-demo-app',
+  policyName: 'service1-demoapp',
   fluxMeterSelector: svcSelector,
   concurrencyLimiterSelector: svcSelector,
   classifiers: [
