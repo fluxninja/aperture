@@ -27,8 +27,12 @@ Concurrency Limiter is configured as a [policy][policies] component.
 
 ## Scheduler
 
-Each Aperture Agent instantiates a [Weighted Fair Queueing](https://en.wikipedia.org/wiki/Weighted_fair_queueing) based Scheduler as a way to prioritize flows based on their weights (priority) and size(tokens). Concurrency Limiter applies a load-shed-factor that the Scheduler uses
-to compute a level of [tokens](#tokens) per second, which it tries to maintain.
+Each Aperture Agent instantiates a
+[Weighted Fair Queueing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
+based Scheduler as a way to prioritize flows based on their weights (priority)
+and size(tokens). Concurrency Limiter applies a load-shed-factor that the
+Scheduler uses to compute a level of [tokens](#tokens) per second, which it
+tries to maintain.
 
 If rate of tokens in flows entering the scheduler exceeds the desired rate,
 flows are queued in the scheduler. If a flow can't be scheduled within its
@@ -43,12 +47,13 @@ schedule workloads based on their priorities and by estimating their
 
 ### Priority
 
-Priority represents the importance of a flow with respect to other flows in the queue.
+Priority represents the importance of a flow with respect to other flows in the
+queue.
 
 :::note
 
-Priority levels are in the range `0 to 255`.
-`0` is the lowest priority and `255` is the highest priority.
+Priority levels are in the range `0 to 255`. `0` is the lowest priority and
+`255` is the highest priority.
 
 :::
 
@@ -66,8 +71,9 @@ In some cases, tokens can be represented as the number of requests instead of
 response times, e.g. when performing flow control on external APIs that have
 hard rate-limits.
 
-Aperture can be configured to automatically estimate the tokens for each workload.
-See `auto-tokens` [configuration](/references/configuration/policies.md#v1-scheduler).
+Aperture can be configured to automatically estimate the tokens for each
+workload. See `auto-tokens`
+[configuration](/references/configuration/policies.md#v1-scheduler).
 
 ### Token bucket
 
@@ -78,15 +84,17 @@ within a deadline period in order to be admitted.
 
 ### Timeout Factor
 
-The timeout factor parameter decides how long a request in the workload can wait for
-tokens. This value impacts fairness because the larger the timeout the higher
-the chance a request has to get scheduled.
+The timeout factor parameter decides how long a request in the workload can wait
+for tokens. This value impacts fairness because the larger the timeout the
+higher the chance a request has to get scheduled.
 
 The timeout is calculated as `timeout = timeout_factor * tokens`.
 
 :::info
 
-It's advisable to configure the timeouts in the same order of magnitude as the normal latency of the workload flows in order to protect from retry storms during overload scenarios.
+It's advisable to configure the timeouts in the same order of magnitude as the
+normal latency of the workload flows in order to protect from retry storms
+during overload scenarios.
 
 :::
 

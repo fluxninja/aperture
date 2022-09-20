@@ -2,5 +2,6 @@
   "arrowParens": "always",
   "bracketSameLine": true,
   "printWidth": 80,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "proseWrap": "always"
 }
