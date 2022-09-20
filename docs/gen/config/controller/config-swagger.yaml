@@ -115,6 +115,15 @@ definitions:
         x-go-default: 60s
         x-go-name: LeaseTTL
         x-go-validate: gte=1s
+      password:
+        type: string
+        x-go-name: Password
+      tls:
+        $ref: '#/definitions/ClientTLSConfig'
+      username:
+        description: Authentication
+        type: string
+        x-go-name: Username
     title: EtcdConfig holds configuration for etcd client.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/etcd/client
