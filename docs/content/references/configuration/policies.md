@@ -476,7 +476,7 @@ Circuit is evaluated periodically in order to respond to changes in signal readi
 
 Signals are floating-point values.
 
-A signal also have a special **Invalid** value. It's usually used to
+A signal can also have a special **Invalid** value. It's usually used to
 communicate that signal doesn't have a meaningful value at the moment, eg.
 [PromQL](#v1-prom-q-l) emits such a value if it cannot execute a query.
 Components know when their input signals are invalid and can act
