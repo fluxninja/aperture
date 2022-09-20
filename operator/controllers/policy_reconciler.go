@@ -33,6 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/yaml"
 
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	policy "github.com/fluxninja/aperture/pkg/policies/controlplane"
@@ -126,7 +127,7 @@ func (r *PolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 }
 
 func (r *PolicyReconciler) deleteResources(ctx context.Context, instance *v1alpha1.Policy) {
-	filename := filepath.Join(policyFilePath, fmt.Sprintf("%s.%s.yaml", instance.GetName(), instance.GetNamespace()))
+	filename := filepath.Join(policyFilePath, fmt.Sprintf("%s-%s.yaml", instance.GetName(), instance.GetNamespace()))
 	err := os.Remove(filename)
 	if err != nil {
 		log.FromContext(ctx).Info(fmt.Sprintf("Failed to write Policy to file '%s'. Error: '%s'", filename, err.Error()))
@@ -203,8 +204,13 @@ func (r *PolicyReconciler) validatePolicy(ctx context.Context, instance *v1alpha
 }
 
 func (r *PolicyReconciler) reconcilePolicy(ctx context.Context, instance *v1alpha1.Policy) error {
-	filename := filepath.Join(policyFilePath, fmt.Sprintf("%s.%s.yaml", instance.GetName(), instance.GetNamespace()))
-	err := os.WriteFile(filename, instance.Spec.Raw, 0o600)
+	filename := filepath.Join(policyFilePath, fmt.Sprintf("%s-%s.yaml", instance.GetName(), instance.GetNamespace()))
+	yamlContent, err := yaml.JSONToYAML(instance.Spec.Raw)
+	if err != nil {
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "UploadFailed", "Failed to write Policy to file '%s'. Error: '%s'", filename, err.Error())
+		return err
+	}
+	err = os.WriteFile(filename, yamlContent, 0o600)
 	if err != nil {
 		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "UploadFailed", "Failed to write Policy to file '%s'. Error: '%s'", filename, err.Error())
 		return err
