@@ -942,6 +942,25 @@ spec:
                       lease_ttl:
                         description: Lease time-to-live
                         type: string
+                      password:
+                        type: string
+                      tls:
+                        description: Client TLS configuration
+                        properties:
+                          ca_file:
+                            type: string
+                          cert_file:
+                            type: string
+                          insecure_skip_verify:
+                            type: boolean
+                          key_file:
+                            type: string
+                          key_log_file:
+                            type: string
+                        type: object
+                      username:
+                        description: Authentication
+                        type: string
                     type: object
                   fluxninja_plugin:
                     description: FluxNinja Cloud plugin configuration.
