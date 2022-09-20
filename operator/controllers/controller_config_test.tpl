@@ -125,6 +125,12 @@ server:
   grpc:
     connection_timeout: 120s
     enable_reflection: false
+    latency_buckets_ms:
+    - 10
+    - 25
+    - 100
+    - 250
+    - 1000
   grpc_gateway:
     grpc_server_address: 0.0.0.0:1
   http:

@@ -844,6 +844,12 @@ GRPCServerConfig holds configuration for GRPC Server.
 (bool, default: `false`) Enable Reflection
 
 </dd>
+<dt>latency_buckets_ms</dt>
+<dd>
+
+([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets specification in latency histogram
+
+</dd>
 </dl>
 
 ### HTTPClientConfig {#http-client-config}

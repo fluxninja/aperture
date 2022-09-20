@@ -1440,6 +1440,11 @@ spec:
                           enable_reflection:
                             description: Enable Reflection
                             type: boolean
+                          latency_buckets_ms:
+                            description: Buckets specification in latency histogram
+                            items:
+                              type: number
+                            type: array
                         type: object
                       grpc_gateway:
                         description: GRPC Gateway configuration.
