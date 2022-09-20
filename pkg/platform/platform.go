@@ -199,7 +199,7 @@ func stop(app *fx.App) {
 	// cleanup temp
 	_ = os.RemoveAll(config.DefaultTempBase)
 	platform.statusRegistry.Detach()
-	os.Exit(0)
+	os.Exit(42)
 }
 
 // OnCrash is the panic handler.

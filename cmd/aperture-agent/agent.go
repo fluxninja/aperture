@@ -10,9 +10,6 @@
 package main
 
 import (
-	"github.com/jonboulle/clockwork"
-	"go.uber.org/fx"
-
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/discovery"
@@ -29,6 +26,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane"
 	"github.com/fluxninja/aperture/pkg/prometheus"
+	"github.com/jonboulle/clockwork"
+	"go.uber.org/fx"
+	"os"
 )
 
 func main() {
@@ -63,5 +63,6 @@ func main() {
 	}
 
 	log.Info().Msg("aperture-agent app created")
+	os.Exit(150)
 	platform.Run(app)
 }

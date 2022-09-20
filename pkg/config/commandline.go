@@ -79,7 +79,7 @@ func (config CommandLineConfig) NewCommandLine(cl CommandLineIn) (CommandLineOut
 		if err == pflag.ErrHelp {
 			if config.ExitOnHelp {
 				// quietly exit
-				os.Exit(0)
+				os.Exit(41)
 			}
 		} else {
 			log.Error().Err(err).Msg("Unable to parse command line!")
