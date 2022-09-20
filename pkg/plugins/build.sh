@@ -9,6 +9,8 @@ GOARCH=$(go env GOARCH)
 HOSTNAME=$(hostname)
 PLUGIN_FILE=$(basename -- "${TARGET}")
 PLUGIN="${PLUGIN_FILE%.*}"
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+GIT_COMMIT_HASH=$(git rev-parse HEAD)
 
 LDFLAGS="\
     ${LDFLAGS:-} \
