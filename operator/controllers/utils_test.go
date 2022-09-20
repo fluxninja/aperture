@@ -1505,6 +1505,26 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 	})
 })
 
+var _ = Describe("Tests for getPolicyFileName", func() {
+	Context("When controller namespace is same as policy namespace", func() {
+		It("it should use only name for filename", func() {
+			os.Setenv("APERTURE_CONTROLLER_NAMESPACE", appName)
+
+			filename := getPolicyFileName(test, appName)
+
+			Expect(filename).To(Equal("test.yaml"))
+		})
+	})
+
+	Context("When controller namespace is not same as policy namespace", func() {
+		It("it should use name and namespace for filename", func() {
+			filename := getPolicyFileName(test, test)
+
+			Expect(filename).To(Equal("test-test.yaml"))
+		})
+	})
+})
+
 // checkEtcdEndpoints generates endpoints list based on the release name if that is not provided else returns the provided values.
 func checkEtcdEndpoints(etcd etcd.EtcdConfig, name, namespace string) etcd.EtcdConfig {
 	endpoints := []string{}

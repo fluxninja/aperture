@@ -794,6 +794,7 @@ func updateResource(client client.Client, ctx context.Context, instance client.O
 	return nil
 }
 
+// getPort parses port value from the Address string.
 func getPort(addr string) (int32, error) {
 	_, portStr, err := net.SplitHostPort(addr)
 	if err != nil {
@@ -805,4 +806,14 @@ func getPort(addr string) (int32, error) {
 		return 0, err
 	}
 	return int32(port), nil
+}
+
+// getPolicyFileName prepares filename for Policy based on the Controller namespace.
+func getPolicyFileName(name, namespace string) string {
+	controllerNamespace := os.Getenv("APERTURE_CONTROLLER_NAMESPACE")
+	if controllerNamespace == namespace {
+		return fmt.Sprintf("%s.yaml", name)
+	}
+
+	return fmt.Sprintf("%s-%s.yaml", name, namespace)
 }

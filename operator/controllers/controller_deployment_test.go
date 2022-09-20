@@ -198,6 +198,12 @@ var _ = Describe("Controller Deployment", func() {
 									Args: []string{
 										"--leader-elect=True",
 									},
+									Env: []corev1.EnvVar{
+										{
+											Name:  "APERTURE_CONTROLLER_NAMESPACE",
+											Value: appName,
+										},
+									},
 									TerminationMessagePath:   "/dev/termination-log",
 									TerminationMessagePolicy: corev1.TerminationMessageReadFile,
 									LivenessProbe: &corev1.Probe{
@@ -545,6 +551,12 @@ var _ = Describe("Controller Deployment", func() {
 									},
 									Args: []string{
 										"--leader-elect=True",
+									},
+									Env: []corev1.EnvVar{
+										{
+											Name:  "APERTURE_CONTROLLER_NAMESPACE",
+											Value: appName,
+										},
 									},
 									TerminationMessagePath:   "/dev/termination-log",
 									TerminationMessagePolicy: corev1.TerminationMessageReadFile,

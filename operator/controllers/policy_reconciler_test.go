@@ -123,6 +123,7 @@ var _ = Describe("Policy Reconciler", Ordered, func() {
 
 		It("should create file when invalid Policy is created with annotation", func() {
 			namespace := test + "103"
+			os.Setenv("APERTURE_CONTROLLER_NAMESPACE", namespace)
 			ns := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: namespace,
@@ -151,7 +152,7 @@ var _ = Describe("Policy Reconciler", Ordered, func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(instance.Status.Status).To(Equal("uploaded"))
-			fileContent, err := os.OpenFile(filepath.Join(policyFilePath, "aperture-test103.yaml"), os.O_RDONLY, 0o400)
+			fileContent, err := os.OpenFile(filepath.Join(policyFilePath, "aperture.yaml"), os.O_RDONLY, 0o400)
 			Expect(err).NotTo(HaveOccurred())
 			yamlContent, err := yaml.JSONToYAML(instance.Spec.Raw)
 			Expect(err).NotTo(HaveOccurred())

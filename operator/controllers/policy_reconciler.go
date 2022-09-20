@@ -127,7 +127,7 @@ func (r *PolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 }
 
 func (r *PolicyReconciler) deleteResources(ctx context.Context, instance *v1alpha1.Policy) {
-	filename := filepath.Join(policyFilePath, fmt.Sprintf("%s-%s.yaml", instance.GetName(), instance.GetNamespace()))
+	filename := filepath.Join(policyFilePath, getPolicyFileName(instance.GetName(), instance.GetNamespace()))
 	err := os.Remove(filename)
 	if err != nil {
 		log.FromContext(ctx).Info(fmt.Sprintf("Failed to write Policy to file '%s'. Error: '%s'", filename, err.Error()))
@@ -204,7 +204,7 @@ func (r *PolicyReconciler) validatePolicy(ctx context.Context, instance *v1alpha
 }
 
 func (r *PolicyReconciler) reconcilePolicy(ctx context.Context, instance *v1alpha1.Policy) error {
-	filename := filepath.Join(policyFilePath, fmt.Sprintf("%s-%s.yaml", instance.GetName(), instance.GetNamespace()))
+	filename := filepath.Join(policyFilePath, getPolicyFileName(instance.GetName(), instance.GetNamespace()))
 	yamlContent, err := yaml.JSONToYAML(instance.Spec.Raw)
 	if err != nil {
 		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "UploadFailed", "Failed to write Policy to file '%s'. Error: '%s'", filename, err.Error())

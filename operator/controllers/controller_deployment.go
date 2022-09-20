@@ -118,6 +118,12 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 							Args: []string{
 								"--leader-elect=True",
 							},
+							Env: []corev1.EnvVar{
+								{
+									Name:  "APERTURE_CONTROLLER_NAMESPACE",
+									Value: instance.GetNamespace(),
+								},
+							},
 							TerminationMessagePath:   "/dev/termination-log",
 							TerminationMessagePolicy: corev1.TerminationMessageReadFile,
 							LivenessProbe: &corev1.Probe{
