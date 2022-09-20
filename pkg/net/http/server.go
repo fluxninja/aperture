@@ -196,14 +196,14 @@ func (constructor ServerConstructor) provideServer(
 func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
-		rec := statusRecorder{w, 200}
+		rec := newStatusRecorder(w)
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
-		next.ServeHTTP(&rec, r)
+		next.ServeHTTP(rec, r)
 		duration := time.Since(startTime)
 
 		labels := map[string]string{
 			metrics.MethodLabel:     r.Method,
-			metrics.StatusCodeLabel: fmt.Sprintf("%d", rec.status),
+			metrics.StatusCodeLabel: fmt.Sprintf("%d", rec.statusCode),
 		}
 
 		requestCounter, err := s.RequestCounters.GetMetricWith(labels)
@@ -211,6 +211,13 @@ func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 			log.Debug().Msgf("Could not extract request counter metric from registry: %v", err)
 		} else {
 			requestCounter.Inc()
+		}
+
+		errorCounter, err := s.ErrorCounters.GetMetricWith(labels)
+		if err != nil {
+			log.Debug().Msgf("Could not extract error counter metric from registry: %v", err)
+		} else if rec.statusCode >= http.StatusBadRequest {
+			errorCounter.Inc()
 		}
 
 		latencyHistogram, err := s.Latencies.GetMetricWith(labels)
@@ -222,7 +229,17 @@ func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func newStatusRecorder(w http.ResponseWriter) *statusRecorder {
+	return &statusRecorder{ResponseWriter: w}
+}
+
 type statusRecorder struct {
 	http.ResponseWriter
-	status int
+	statusCode int
+}
+
+// WriteHeader records statusCode and calls wrapped WriteHeader method.
+func (sr *statusRecorder) WriteHeader(statusCode int) {
+	sr.statusCode = statusCode
+	sr.ResponseWriter.WriteHeader(statusCode)
 }
