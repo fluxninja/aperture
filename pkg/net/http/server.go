@@ -42,14 +42,10 @@ type HTTPServerConfig struct {
 	ReadTimeout config.Duration `json:"read_timeout" validate:"gte=0s" default:"10s"`
 	// Write timeout
 	WriteTimeout config.Duration `json:"write_timeout" validate:"gte=0s" default:"45s"`
-	// The lowest bucket in latency histogram
-	LatencyBucketStartMS float64 `json:"latency_bucket_start_ms" validate:"gte=0" default:"20"`
 	// Max header size in bytes
 	MaxHeaderBytes int `json:"max_header_bytes" validate:"gte=0" default:"1048576"`
-	// The bucket width in latency histogram
-	LatencyBucketWidthMS float64 `json:"latency_bucket_width_ms" validate:"gte=0" default:"20"`
-	// The number of buckets in latency histogram
-	LatencyBucketCount int `json:"latency_bucket_count" validate:"gte=0" default:"100"`
+	// Buckets specification in latency histogram
+	LatencyBucketsMS []float64 `json:"latency_buckets_ms" validate:"gte=0" default:"[10.0,25.0,100.0,250.0,1000.0]"`
 	// Disable HTTP Keep Alives
 	DisableHTTPKeepAlives bool `json:"disable_http_keep_alives" default:"false"`
 }
@@ -127,7 +123,7 @@ func (constructor ServerConstructor) provideServer(
 	latencyHistograms := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    metrics.HTTPRequestLatencyMetricName,
 		Help:    "Latency of the requests processed by the server",
-		Buckets: prometheus.LinearBuckets(config.LatencyBucketStartMS, config.LatencyBucketWidthMS, config.LatencyBucketCount),
+		Buckets: config.LatencyBucketsMS,
 	}, defaultLabels)
 	for _, metric := range []prometheus.Collector{errorCounters, requestCounters, latencyHistograms} {
 		err := pr.Register(metric)
