@@ -10,6 +10,8 @@ GOARCH=$(go env GOARCH)
 HOSTNAME=$(hostname)
 SERVICE_FILE=$(basename -- "${TARGET}")
 SERVICE="${SERVICE_FILE%.*}"
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+GIT_COMMIT_HASH=$(git rev-parse HEAD)
 
 LDFLAGS="\
     ${LDFLAGS:-} \

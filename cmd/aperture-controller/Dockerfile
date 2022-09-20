@@ -10,11 +10,6 @@ RUN --mount=type=cache,target=/go/pkg/ \
     go mod download
 
 # App build
-ARG GIT_COMMIT_HASH
-ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
-ARG GIT_BRANCH
-ENV GIT_BRANCH=${GIT_BRANCH}
-
 FROM base AS builder
 RUN --mount=type=cache,target=/go/pkg/ \
     --mount=type=cache,target=/root/.cache/go-build/ \
