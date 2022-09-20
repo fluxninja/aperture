@@ -12,7 +12,7 @@ components to execute.
 
 :::note
 
-One entity may belong to multiple services.
+An entity (K8s Pod, VM, etc) may belong to multiple services.
 
 :::
 

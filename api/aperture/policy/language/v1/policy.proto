@@ -809,7 +809,7 @@ message Scheduler {
   // Workload to be used if none of workloads specified in `workloads` match.
   Workload default_workload = 4;
 
-  // Automatically estimate weight of flows in each workload, based on
+  // Automatically estimate the size of a request in each workload, based on
   // historical latency. Each workload's `tokens` will be set to average
   // latency of flows in that workload during last few seconds (exact duration
   // of this average can change).

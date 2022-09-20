@@ -36,7 +36,7 @@ generate-config-markdown:
 			rm $$dir/gen.yaml; \
 			cat $$dir/metadata $$dir/$$basename.md > $$dir/$$basename.md.tmp; \
 			mv $$dir/$$basename.md.tmp $$dir/$$basename.md; \
-			npx prettier --write $$dir/$$basename.md; \
+			npx prettier --prose-wrap="preserve" --write $$dir/$$basename.md; \
 			mv $$dir/$$basename.md ./content/references/configuration; \
 		done; \
 		rm merged-plugin-swagger.yaml; \
@@ -62,7 +62,7 @@ generate-config-markdown:
 	@# append gen/policies/metadata on top of gen/policies/policies.md
 	@cat gen/policies/metadata gen/policies/policies.md > gen/policies/policies.md.tmp
 	@mv gen/policies/policies.md.tmp gen/policies/policies.md
-	@npx prettier --write gen/policies/policies.md
+	@npx prettier --prose-wrap="preserve" --write gen/policies/policies.md
 	@mv gen/policies/policies.md content/references/configuration
 
 generate-mmd:

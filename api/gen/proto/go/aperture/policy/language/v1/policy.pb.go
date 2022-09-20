@@ -1320,7 +1320,7 @@ type Scheduler struct {
 	Workloads []*Scheduler_WorkloadAndLabelMatcher `protobuf:"bytes,3,rep,name=workloads,proto3" json:"workloads,omitempty"`
 	// Workload to be used if none of workloads specified in `workloads` match.
 	DefaultWorkload *Scheduler_Workload `protobuf:"bytes,4,opt,name=default_workload,json=defaultWorkload,proto3" json:"default_workload,omitempty"`
-	// Automatically estimate weight of flows in each workload, based on
+	// Automatically estimate the size of a request in each workload, based on
 	// historical latency. Each workload's `tokens` will be set to average
 	// latency of flows in that workload during last few seconds (exact duration
 	// of this average can change).
