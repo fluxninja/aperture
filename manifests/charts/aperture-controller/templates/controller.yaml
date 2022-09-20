@@ -123,8 +123,41 @@ spec:
   {{- if .Values.controller.sidecars }}
   sidecars: {{ .Values.controller.sidecars | toYaml | nindent 4 }}
   {{- end }}
-  {{- if .Values.controller.initContainers }}
-  initContainers: {{ .Values.controller.initContainers | toYaml | nindent 4 }}
+  {{- if or .Values.controller.initContainers .Values.etcd.enabled .Values.prometheus.enabled }}
+  initContainers:
+    {{- if .Values.etcd.enabled }}
+    - name: wait-for-etcd
+      image: bitnami/etcd:3.5
+      command:
+        - 'sh'
+        - '-c'
+        - >
+          while (etcdctl --endpoints $(yq -r '.etcd.endpoints[]' /etc/aperture/aperture-controller/config/aperture-controller.yaml) endpoint health); res=$?; [ $res != 0 ]; do
+            echo "Waiting for Etcd to be Healthy";
+          done;
+          echo "Etcd is healthy."
+      volumeMounts:
+        - mountPath: /etc/aperture/aperture-controller/config
+          name: aperture-controller-config
+    {{- end }}
+    {{- if .Values.prometheus.enabled }}
+    - name: wait-for-prometheus
+      image: bitnami/etcd:3.5
+      command:
+        - 'sh'
+        - '-c'
+        - >
+          while [ "$(curl -s -o /dev/null -w '%{http_code}' $(yq -r '.prometheus.address' /etc/aperture/aperture-controller/config/aperture-controller.yaml)/-/ready)" != "200" ] ; do
+            echo "Waiting for Prometheus to be Ready"; sleep 2;
+          done;
+          echo "Prometheus is ready."
+      volumeMounts:
+        - mountPath: /etc/aperture/aperture-controller/config
+          name: aperture-controller-config
+    {{- end }}
+    {{- if .Values.controller.initContainers }}
+    {{ .Values.controller.initContainers | toYaml | nindent 4 }}
+    {{- end }}
   {{- end }}
   {{- if .Values.commonLabels }}
   labels: {{ .Values.commonLabels | toYaml | nindent 4 }}
