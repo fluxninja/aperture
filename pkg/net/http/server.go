@@ -20,8 +20,14 @@ import (
 )
 
 const (
-	defaultServerKey = "server.http"
+	defaultServerKey   = "server.http"
+	defaultHandlerName = "default"
 )
+
+type monitoringContext struct {
+	context.Context
+	handlerName string
+}
 
 // ServerModule is an fx module that provides annotated HTTP Server using the default listener and registers its metrics with the prometheus registry.
 func ServerModule() fx.Option {
@@ -110,7 +116,7 @@ func (constructor ServerConstructor) provideServer(
 	}
 
 	// Register metrics
-	defaultLabels := []string{metrics.MethodLabel, metrics.StatusCodeLabel}
+	defaultLabels := []string{metrics.MethodLabel, metrics.StatusCodeLabel, metrics.HandlerName}
 	errorCounters := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.HTTPErrorMetricName,
 		Help: "The total number of errors that occurred",
@@ -195,15 +201,20 @@ func (constructor ServerConstructor) provideServer(
 
 func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := &monitoringContext{}
+		ctx.Context = r.Context()
+		ctx.handlerName = defaultHandlerName
 		startTime := time.Now()
 		rec := newStatusRecorder(w)
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
-		next.ServeHTTP(rec, r)
+		next.ServeHTTP(rec, r.WithContext(ctx))
+
 		duration := time.Since(startTime)
 
 		labels := map[string]string{
 			metrics.MethodLabel:     r.Method,
 			metrics.StatusCodeLabel: fmt.Sprintf("%d", rec.statusCode),
+			metrics.HandlerName:     ctx.handlerName,
 		}
 
 		requestCounter, err := s.RequestCounters.GetMetricWith(labels)
@@ -227,6 +238,19 @@ func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 			latencyHistogram.Observe(float64(duration.Milliseconds()))
 		}
 	})
+}
+
+// HandlerNameMiddleware sets handler name in monitoring context.
+func HandlerNameMiddleware(handlerName string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			if mCtx, ok := ctx.(*monitoringContext); ok {
+				mCtx.handlerName = handlerName
+			}
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 }
 
 func newStatusRecorder(w http.ResponseWriter) *statusRecorder {
