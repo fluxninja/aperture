@@ -27,9 +27,9 @@ func NewControlPointID(service string, controlPoint ControlPoint) ControlPointID
 }
 
 func controlPointIDFromSelectorProto(selectorMsg *selectorv1.Selector) (ControlPointID, error) {
-	ctrlPt, err := controlPointFromSelectorControlPointProto(selectorMsg.ControlPoint)
+	ctrlPt, err := controlPointFromSelectorControlPointProto(selectorMsg.FlowSelector.GetControlPoint())
 	return controlPointID{
-		service:      selectorMsg.Service,
+		service:      selectorMsg.ServiceSelector.GetService(),
 		controlPoint: ctrlPt,
 	}, err
 }

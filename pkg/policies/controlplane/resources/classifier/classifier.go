@@ -35,7 +35,7 @@ func NewClassifierOptions(
 	if selectorProto == nil {
 		return nil, errors.New("Classifier.Selector is nil")
 	}
-	agentGroup := selectorProto.GetAgentGroup()
+	agentGroup := selectorProto.ServiceSelector.GetAgentGroup()
 
 	etcdPath := path.Join(common.ClassifiersConfigPath, common.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))
 	configSync := &classifierConfigSync{

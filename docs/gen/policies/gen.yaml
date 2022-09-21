@@ -242,9 +242,11 @@ definitions:
       Example:
       ```yaml
       selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress
+        service_selector:
+          service: service1.default.svc.cluster.local
+        flow_selector:
+          control_point:
+            traffic: ingress
       rules:
         user:
           extractor:
@@ -322,8 +324,8 @@ definitions:
         x-order: 2
         $ref: '#/definitions/v1Constant'
       decider:
-        description: Decider acts as a switch that emits one of the two signals based
-          on the binary result of comparison operator on two operands.
+        description: Decider emits the binary result of comparison operator on two
+          operands.
         x-order: 3
         $ref: '#/definitions/v1Decider'
       ema:
@@ -364,6 +366,11 @@ definitions:
           signal.
         x-order: 11
         $ref: '#/definitions/v1Sqrt'
+      switcher:
+        description: Switcher acts as a switch that emits one of the two signals based
+          on third signal.
+        x-order: 12
+        $ref: '#/definitions/v1Switcher'
   v1ConcurrencyLimiter:
     description: |-
       :::info
@@ -447,14 +454,13 @@ definitions:
       The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
       This component also supports time-based response, i.e. the output
-      transitions between on_true or on_false signal if the decider condition is
-      true or false for at least "positive_for" or "negative_for" duration. If
+      transitions between 1.0 or 0.0 signal if the decider condition is
+      true or false for at least "true_for" or "false_for" duration. If
       `true_for` and `false_for` durations are zero then the transitions are
       instantaneous.
     type: object
     title: Type of combinator that computes the comparison operation on lhs and rhs
-      signals and switches between `on_true` and `on_false` signals based on the result
-      of the comparison
+      signals
     properties:
       false_for:
         description: |-
@@ -492,24 +498,16 @@ definitions:
         description: Left hand side input signal for the comparison operation.
         x-order: 0
         $ref: '#/definitions/v1Port'
-      on_false:
-        description: Output signal when the result of the operation is false.
-        x-order: 1
-        $ref: '#/definitions/v1Port'
-      on_true:
-        description: Output signal when the result of the operation is true.
-        x-order: 2
-        $ref: '#/definitions/v1Port'
       rhs:
         description: Right hand side input signal for the comparison operation.
-        x-order: 3
+        x-order: 1
         $ref: '#/definitions/v1Port'
   v1DeciderOuts:
     description: Outputs for the Decider component.
     type: object
     properties:
       output:
-        description: Selected signal (on_true or on_false).
+        description: Selected signal (1.0 or 0.0).
         x-order: 0
         $ref: '#/definitions/v1Port'
   v1EMA:
@@ -712,6 +710,64 @@ definitions:
         description: Extrapolated signal.
         x-order: 0
         $ref: '#/definitions/v1Port'
+  v1FlowSelector:
+    description: |-
+      :::info
+      See also [Selector overview](/concepts/flow-control/selector.md).
+      :::
+
+      Example:
+      ```yaml
+      control_point:
+        traffic: ingress # Allowed values are `ingress` and `egress`.
+      label_matcher:
+        match_labels:
+          user_tier: gold
+        match_expressions:
+          - key: query
+            operator: In
+            values:
+              - insert
+              - delete
+          - label: user_agent
+            regex: ^(?!.*Chrome).*Safari
+      ```
+    type: object
+    title: |-
+      Describes which flows a [dataplane
+      component](/concepts/flow-control/flow-control.md#components) should apply
+      to
+    properties:
+      control_point:
+        description: |-
+          Describes
+          [control point](/concepts/flow-control/flow-control.md#control-point)
+          within the entity where the policy should apply to.
+        x-go-validate: required
+        x-order: 0
+        $ref: '#/definitions/v1ControlPoint'
+      label_matcher:
+        description: |-
+          :::info
+          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+          :::
+
+          :::note
+          [Classifiers](#v1-classifier) _can_ use flow labels created by some other
+          classifier, but only if they were created at some previous control point
+          (and propagated in baggage).
+
+          This limitation doesn't apply to selectors of other entities, like
+          FluxMeters or actuators. It's valid to create a flow label on a control
+          point using classifier, and immediately use it for matching on the same
+          control point.
+          :::
+        title: |-
+          Label matcher allows to add _additional_ condition on
+          [flow labels](/concepts/flow-control/flow-label.md)
+          must also be satisfied (in addition to service+control point matching)
+        x-order: 1
+        $ref: '#/definitions/v1LabelMatcher'
   v1FluxMeter:
     description: |-
       :::info
@@ -722,9 +778,11 @@ definitions:
       to particular service:
       ```yaml
       selector:
-        service: myservice.mynamespace.svc.cluster.local
-        control_point:
-          traffic: ingress
+        service_selector:
+          service: myservice.mynamespace.svc.cluster.local
+        flow_selector:
+          control_point:
+            traffic: ingress
       ```
     type: object
     title: FluxMeter gathers metrics for the traffic that matches its selector
@@ -1516,31 +1574,32 @@ definitions:
         x-order: 1
         $ref: '#/definitions/v1Port'
   v1Selector:
+    type: object
+    title: |-
+      Describes which flow in which service a [dataplane
+      // component](/concepts/flow-control/flow-control.md#components) should apply
+      // to
+      //
+      // :::info
+      // See also [Selector overview](/concepts/flow-control/selector.md).
+      // :::
+    properties:
+      flow_selector:
+        x-go-validate: required
+        x-order: 0
+        $ref: '#/definitions/v1FlowSelector'
+      service_selector:
+        x-go-validate: required
+        x-order: 1
+        $ref: '#/definitions/v1ServiceSelector'
+  v1ServiceSelector:
     description: |-
       :::info
       See also [Selector overview](/concepts/flow-control/selector.md).
       :::
-
-      Example:
-      ```yaml
-      service: service1.default.svc.cluster.local
-      control_point:
-        traffic: ingress # Allowed values are `ingress` and `egress`.
-      label_matcher:
-        match_labels:
-          user_tier: gold
-        match_expressions:
-          - key: query
-            operator: In
-            values:
-              - insert
-              - delete
-          - label: user_agent
-            regex: ^(?!.*Chrome).*Safari
-      ```
     type: object
     title: |-
-      Describes which flows a [dataplane
+      Describes which service a [dataplane
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:
@@ -1551,36 +1610,6 @@ definitions:
         type: string
         x-go-default: default
         x-order: 0
-      control_point:
-        description: |-
-          Describes
-          [control point](/concepts/flow-control/flow-control.md#control-point)
-          within the entity where the policy should apply to.
-        x-go-validate: required
-        x-order: 1
-        $ref: '#/definitions/v1ControlPoint'
-      label_matcher:
-        description: |-
-          :::info
-          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
-          :::
-
-          :::note
-          [Classifiers](#v1-classifier) _can_ use flow labels created by some other
-          classifier, but only if they were created at some previous control point
-          (and propagated in baggage).
-
-          This limitation doesn't apply to selectors of other entities, like
-          FluxMeters or actuators. It's valid to create a flow label on a control
-          point using classifier, and immediately use it for matching on the same
-          control point.
-          :::
-        title: |-
-          Label matcher allows to add _additional_ condition on
-          [flow labels](/concepts/flow-control/flow-label.md)
-          must also be satisfied (in addition to service+control point matching)
-        x-order: 2
-        $ref: '#/definitions/v1LabelMatcher'
       service:
         description: |-
           The Fully Qualified Domain Name of the
@@ -1594,7 +1623,7 @@ definitions:
           One entity may belong to multiple services.
           :::
         type: string
-        x-order: 3
+        x-order: 1
   v1Sqrt:
     description: |-
       $$
@@ -1633,6 +1662,46 @@ definitions:
     properties:
       output:
         description: Output signal.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+  v1Switcher:
+    description: |-
+      `on_true` will be returned if switch input is valid and not equal to 0.0 ,
+       otherwise `on_false` will be returned.
+    type: object
+    title: Type of combinator that switches between `on_true` and `on_false` signals
+      based on switch input
+    properties:
+      in_ports:
+        description: Input ports for the Switcher component.
+        x-order: 0
+        $ref: '#/definitions/v1SwitcherIns'
+      out_ports:
+        description: Output ports for the Switcher component.
+        x-order: 1
+        $ref: '#/definitions/v1SwitcherOuts'
+  v1SwitcherIns:
+    description: Inputs for the Switcher component.
+    type: object
+    properties:
+      on_false:
+        description: Output signal when switch is invalid or 0.0.
+        x-order: 0
+        $ref: '#/definitions/v1Port'
+      on_true:
+        description: Output signal when switch is valid and not 0.0.
+        x-order: 1
+        $ref: '#/definitions/v1Port'
+      switch:
+        description: Decides whether to return on_true or on_false.
+        x-order: 2
+        $ref: '#/definitions/v1Port'
+  v1SwitcherOuts:
+    description: Outputs for the Switcher component.
+    type: object
+    properties:
+      output:
+        description: Selected signal (on_true or on_false).
         x-order: 0
         $ref: '#/definitions/v1Port'
 tags:

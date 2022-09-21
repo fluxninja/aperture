@@ -452,11 +452,15 @@ var _ = Describe("Duration", func() {
 var _ = Describe("ProtobufUnmarshaller", func() {
 	Context("when unmarshalling a protobuf", func() {
 		selector := &selectorv1.Selector{
-			AgentGroup: "ag",
-			Service:    "s.n.svc.cluster.local",
-			ControlPoint: &selectorv1.ControlPoint{
-				Controlpoint: &selectorv1.ControlPoint_Traffic{
-					Traffic: "egress",
+			ServiceSelector: &selectorv1.ServiceSelector{
+				AgentGroup: "ag",
+				Service:    "s.n.svc.cluster.local",
+			},
+			FlowSelector: &selectorv1.FlowSelector{
+				ControlPoint: &selectorv1.ControlPoint{
+					Controlpoint: &selectorv1.ControlPoint_Traffic{
+						Traffic: "egress",
+					},
 				},
 			},
 		}

@@ -301,9 +301,11 @@ Example:
 
 ```yaml
 selector:
-  service: service1.default.svc.cluster.local
-  control_point:
-    traffic: ingress
+  service_selector:
+    service: service1.default.svc.cluster.local
+  flow_selector:
+    control_point:
+      traffic: ingress
 rules:
   user:
     extractor:
@@ -909,6 +911,70 @@ Outputs for the Extrapolator component.
 </dd>
 </dl>
 
+### v1FlowSelector {#v1-flow-selector}
+
+Describes which flows a [dataplane
+component](/concepts/flow-control/flow-control.md#components) should apply
+to
+
+:::info
+See also [Selector overview](/concepts/flow-control/selector.md).
+:::
+
+Example:
+
+```yaml
+control_point:
+  traffic: ingress # Allowed values are `ingress` and `egress`.
+label_matcher:
+  match_labels:
+    user_tier: gold
+  match_expressions:
+    - key: query
+      operator: In
+      values:
+        - insert
+        - delete
+    - label: user_agent
+      regex: ^(?!.*Chrome).*Safari
+```
+
+#### Properties
+
+<dl>
+<dt>control_point</dt>
+<dd>
+
+([V1ControlPoint](#v1-control-point), `required`) Describes
+[control point](/concepts/flow-control/flow-control.md#control-point)
+within the entity where the policy should apply to.
+
+</dd>
+<dt>label_matcher</dt>
+<dd>
+
+([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
+[flow labels](/concepts/flow-control/flow-label.md)
+must also be satisfied (in addition to service+control point matching)
+
+:::info
+See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+:::
+
+:::note
+[Classifiers](#v1-classifier) _can_ use flow labels created by some other
+classifier, but only if they were created at some previous control point
+(and propagated in baggage).
+
+This limitation doesn't apply to selectors of other entities, like
+FluxMeters or actuators. It's valid to create a flow label on a control
+point using classifier, and immediately use it for matching on the same
+control point.
+:::
+
+</dd>
+</dl>
+
 ### v1FluxMeter {#v1-flux-meter}
 
 FluxMeter gathers metrics for the traffic that matches its selector
@@ -922,9 +988,11 @@ to particular service:
 
 ```yaml
 selector:
-  service: myservice.mynamespace.svc.cluster.local
-  control_point:
-    traffic: ingress
+  service_selector:
+    service: myservice.mynamespace.svc.cluster.local
+  flow_selector:
+    control_point:
+      traffic: ingress
 ```
 
 #### Properties
@@ -1930,32 +1998,40 @@ entering scheduler, including rejected ones.
 
 ### v1Selector {#v1-selector}
 
-Describes which flows a [dataplane
+Describes which flow in which service a [dataplane
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
+
+#### Properties
+
+<dl>
+<dt>flow_selector</dt>
+<dd>
+
+([V1FlowSelector](#v1-flow-selector), `required`)
+
+</dd>
+<dt>service_selector</dt>
+<dd>
+
+([V1ServiceSelector](#v1-service-selector), `required`)
+
+</dd>
+</dl>
+
+### v1ServiceSelector {#v1-service-selector}
+
+Describes which service a [dataplane
 component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
 :::info
 See also [Selector overview](/concepts/flow-control/selector.md).
 :::
-
-Example:
-
-```yaml
-service: service1.default.svc.cluster.local
-control_point:
-  traffic: ingress # Allowed values are `ingress` and `egress`.
-label_matcher:
-  match_labels:
-    user_tier: gold
-  match_expressions:
-    - key: query
-      operator: In
-      values:
-        - insert
-        - delete
-    - label: user_agent
-      regex: ^(?!.*Chrome).*Safari
-```
 
 #### Properties
 
@@ -1965,37 +2041,6 @@ label_matcher:
 
 (string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
 selector applies to.
-
-</dd>
-<dt>control_point</dt>
-<dd>
-
-([V1ControlPoint](#v1-control-point), `required`) Describes
-[control point](/concepts/flow-control/flow-control.md#control-point)
-within the entity where the policy should apply to.
-
-</dd>
-<dt>label_matcher</dt>
-<dd>
-
-([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
-[flow labels](/concepts/flow-control/flow-label.md)
-must also be satisfied (in addition to service+control point matching)
-
-:::info
-See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
-:::
-
-:::note
-[Classifiers](#v1-classifier) _can_ use flow labels created by some other
-classifier, but only if they were created at some previous control point
-(and propagated in baggage).
-
-This limitation doesn't apply to selectors of other entities, like
-FluxMeters or actuators. It's valid to create a flow label on a control
-point using classifier, and immediately use it for matching on the same
-control point.
-:::
 
 </dd>
 <dt>service</dt>

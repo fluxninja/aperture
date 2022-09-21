@@ -26,7 +26,7 @@ type selector struct {
 //
 // The selector is assumed to be already validated and non-nil.
 func FromProto(selectorMsg *selectorv1.Selector) (selector, error) {
-	labelMatcher, err := MMExprFromLabelMatcher(selectorMsg.GetLabelMatcher())
+	labelMatcher, err := MMExprFromLabelMatcher(selectorMsg.FlowSelector.GetLabelMatcher())
 	if err != nil {
 		return selector{}, fmt.Errorf("invalid label matcher: %w", err)
 	}
