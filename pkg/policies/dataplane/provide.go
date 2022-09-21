@@ -16,6 +16,7 @@ func PolicyModule() fx.Option {
 		classifier.Module,
 		fx.Provide(
 			ProvideEngineAPI,
+			ProvideResponseMetricsAPI,
 		),
 	)
 }

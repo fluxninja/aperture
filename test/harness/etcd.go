@@ -1,17 +1,20 @@
 package harness
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/pem"
 	"fmt"
 	"io"
 	"math/big"
 	"os"
 	"os/exec"
+	"path"
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -32,6 +35,7 @@ type EtcdHarness struct {
 	errWriter  io.Writer
 	etcdServer *exec.Cmd
 	etcdDir    string
+	certDir    string
 	Client     *clientv3.Client
 	Endpoint   string
 }
@@ -46,7 +50,7 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 	if err != nil {
 		return nil, err
 	}
-	endpoint := fmt.Sprintf("http://%s", endpointAddr)
+	endpoint := fmt.Sprintf("https://%s", endpointAddr)
 
 	peerAddr, err := AllocateLocalAddress(etcdLocalAddress)
 	if err != nil {
@@ -64,38 +68,37 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		return nil, err
 	}
 
-	// Generates the certificates and private keys in temporary directory.
-	cert, key, err := generateCertAndKey()
+	h.certDir, err = os.MkdirTemp("/tmp", "etcd_certs")
 	if err != nil {
 		return nil, err
 	}
 
-	certf, err := os.CreateTemp(h.etcdDir, "server.crt")
+	// Generates certificates, private keys, in temporary directory.
+	serverCert, serverKey, err := generateCertAndKey()
 	if err != nil {
 		return nil, err
 	}
-	defer os.Remove(certf.Name())
 
-	if _, err = certf.Write(cert); err != nil {
-		return nil, err
-	}
-
-	keyf, err := os.CreateTemp(h.etcdDir, "server.key")
+	serverCertFile, err := os.Create(path.Join(h.certDir, "server.crt"))
 	if err != nil {
 		return nil, err
 	}
-	defer os.Remove(keyf.Name())
-
-	if _, err = keyf.Write(key); err != nil {
+	if _, err = serverCertFile.Write(serverCert.Bytes()); err != nil {
 		return nil, err
 	}
 
-	cer, _ := tls.LoadX509KeyPair(certf.Name(), keyf.Name())
+	serverKeyFile, err := os.Create(path.Join(h.certDir, "server.key"))
+	if err != nil {
+		return nil, err
+	}
+	if _, err = serverKeyFile.Write(serverKey.Bytes()); err != nil {
+		return nil, err
+	}
+	// #nosec G402
 	etcdTLSConfig := &tls.Config{
-		Certificates: []tls.Certificate{cer},
-		MinVersion:   tls.VersionTLS12,
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: true,
 	}
-
 	h.etcdServer = exec.Command(
 		etcdBin,
 		"--data-dir="+h.etcdDir,
@@ -104,9 +107,8 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 		"--initial-advertise-peer-urls="+peer,
 		"--listen-client-urls="+endpoint,
 		"--advertise-client-urls="+endpoint,
-		"--client-cert-auth=true",
-		"--cert-file="+certf.Name(),
-		"--key-file="+keyf.Name(),
+		"--cert-file="+serverCertFile.Name(),
+		"--key-file="+serverKeyFile.Name(),
 	)
 	h.etcdServer.Stderr = h.errWriter
 	h.etcdServer.Stdout = io.Discard
@@ -193,28 +195,45 @@ func (h *EtcdHarness) Stop() {
 	if h.etcdDir != "" {
 		_ = os.RemoveAll(h.etcdDir)
 	}
+	if h.certDir != "" {
+		_ = os.RemoveAll(h.certDir)
+	}
 }
 
-func generateCertAndKey() ([]byte, []byte, error) {
-	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 4096)
-	if err != nil {
-		return nil, nil, err
-	}
-	err = rsaPrivateKey.Validate()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	template := &x509.Certificate{
-		SerialNumber: big.NewInt(2022),
+func generateCertAndKey() (*bytes.Buffer, *bytes.Buffer, error) {
+	var serverCertPEM, serverPrivKeyPEM *bytes.Buffer
+	// Server cert config
+	cert := &x509.Certificate{
+		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
 			Organization: []string{"fluxninja.com"},
 		},
+		NotBefore:   time.Now(),
+		NotAfter:    time.Now().AddDate(10, 0, 0),
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage:    x509.KeyUsageDigitalSignature,
 	}
-	certBytes, err := x509.CreateCertificate(rand.Reader, template, template, &rsaPrivateKey.PublicKey, rsaPrivateKey)
+
+	serverPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		return nil, nil, err
+	}
+	serverCertBytes, err := x509.CreateCertificate(rand.Reader, cert, cert, &serverPrivKey.PublicKey, serverPrivKey)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return certBytes, x509.MarshalPKCS1PrivateKey(rsaPrivateKey), nil
+	// PEM encode the server cert and key
+	serverCertPEM = new(bytes.Buffer)
+	_ = pem.Encode(serverCertPEM, &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: serverCertBytes,
+	})
+	serverPrivKeyPEM = new(bytes.Buffer)
+	_ = pem.Encode(serverPrivKeyPEM, &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(serverPrivKey),
+	})
+
+	return serverCertPEM, serverPrivKeyPEM, nil
 }
