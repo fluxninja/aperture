@@ -94,7 +94,7 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 	if _, err = serverKeyFile.Write(serverKey.Bytes()); err != nil {
 		return nil, err
 	}
-
+	// #nosec G402
 	etcdTLSConfig := &tls.Config{
 		MinVersion:         tls.VersionTLS12,
 		InsecureSkipVerify: true,
