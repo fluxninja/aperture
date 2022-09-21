@@ -241,9 +241,11 @@ definitions:
       Example:
       ```yaml
       selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress
+        service_selector:
+          service: service1.default.svc.cluster.local
+        flow_selector:
+          control_point:
+            traffic: ingress
       rules:
         user:
           extractor:
@@ -277,9 +279,11 @@ definitions:
       to particular service:
       ```yaml
       selector:
-        service: myservice.mynamespace.svc.cluster.local
-        control_point:
-          traffic: ingress
+        service_selector:
+          service: myservice.mynamespace.svc.cluster.local
+        flow_selector:
+          control_point:
+            traffic: ingress
       ```
     type: object
     title: FluxMeter gathers metrics for the traffic that matches its selector
@@ -802,6 +806,64 @@ definitions:
         description: Extrapolated signal.
         x-order: 0
         $ref: '#/definitions/v1Port'
+  v1FlowSelector:
+    description: |-
+      :::info
+      See also [Selector overview](/concepts/flow-control/selector.md).
+      :::
+
+      Example:
+      ```yaml
+      control_point:
+        traffic: ingress # Allowed values are `ingress` and `egress`.
+      label_matcher:
+        match_labels:
+          user_tier: gold
+        match_expressions:
+          - key: query
+            operator: In
+            values:
+              - insert
+              - delete
+          - label: user_agent
+            regex: ^(?!.*Chrome).*Safari
+      ```
+    type: object
+    title: |-
+      Describes which flows a [dataplane
+      component](/concepts/flow-control/flow-control.md#components) should apply
+      to
+    properties:
+      control_point:
+        description: |-
+          Describes
+          [control point](/concepts/flow-control/flow-control.md#control-point)
+          within the entity where the policy should apply to.
+        x-go-validate: required
+        x-order: 0
+        $ref: '#/definitions/commonselectorv1ControlPoint'
+      label_matcher:
+        description: |-
+          :::info
+          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+          :::
+
+          :::note
+          [Classifiers](#v1-classifier) _can_ use flow labels created by some other
+          classifier, but only if they were created at some previous control point
+          (and propagated in baggage).
+
+          This limitation doesn't apply to selectors of other entities, like
+          FluxMeters or actuators. It's valid to create a flow label on a control
+          point using classifier, and immediately use it for matching on the same
+          control point.
+          :::
+        title: |-
+          Label matcher allows to add _additional_ condition on
+          [flow labels](/concepts/flow-control/flow-label.md)
+          must also be satisfied (in addition to service+control point matching)
+        x-order: 1
+        $ref: '#/definitions/v1LabelMatcher'
   v1GradientController:
     description: |-
       The `gradient` describes a corrective factor that should be applied to the
@@ -1512,31 +1574,32 @@ definitions:
         x-order: 1
         $ref: '#/definitions/v1Port'
   v1Selector:
+    type: object
+    title: |-
+      Describes which flow in which service a [dataplane
+      // component](/concepts/flow-control/flow-control.md#components) should apply
+      // to
+      //
+      // :::info
+      // See also [Selector overview](/concepts/flow-control/selector.md).
+      // :::
+    properties:
+      flow_selector:
+        x-go-validate: required
+        x-order: 0
+        $ref: '#/definitions/v1FlowSelector'
+      service_selector:
+        x-go-validate: required
+        x-order: 1
+        $ref: '#/definitions/v1ServiceSelector'
+  v1ServiceSelector:
     description: |-
       :::info
       See also [Selector overview](/concepts/flow-control/selector.md).
       :::
-
-      Example:
-      ```yaml
-      service: service1.default.svc.cluster.local
-      control_point:
-        traffic: ingress # Allowed values are `ingress` and `egress`.
-      label_matcher:
-        match_labels:
-          user_tier: gold
-        match_expressions:
-          - key: query
-            operator: In
-            values:
-              - insert
-              - delete
-          - label: user_agent
-            regex: ^(?!.*Chrome).*Safari
-      ```
     type: object
     title: |-
-      Describes which flows a [dataplane
+      Describes which service a [dataplane
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:
@@ -1547,36 +1610,6 @@ definitions:
         type: string
         x-go-default: default
         x-order: 0
-      control_point:
-        description: |-
-          Describes
-          [control point](/concepts/flow-control/flow-control.md#control-point)
-          within the entity where the policy should apply to.
-        x-go-validate: required
-        x-order: 1
-        $ref: '#/definitions/commonselectorv1ControlPoint'
-      label_matcher:
-        description: |-
-          :::info
-          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
-          :::
-
-          :::note
-          [Classifiers](#v1-classifier) _can_ use flow labels created by some other
-          classifier, but only if they were created at some previous control point
-          (and propagated in baggage).
-
-          This limitation doesn't apply to selectors of other entities, like
-          FluxMeters or actuators. It's valid to create a flow label on a control
-          point using classifier, and immediately use it for matching on the same
-          control point.
-          :::
-        title: |-
-          Label matcher allows to add _additional_ condition on
-          [flow labels](/concepts/flow-control/flow-label.md)
-          must also be satisfied (in addition to service+control point matching)
-        x-order: 2
-        $ref: '#/definitions/v1LabelMatcher'
       service:
         description: |-
           The Fully Qualified Domain Name of the
@@ -1590,7 +1623,7 @@ definitions:
           One entity may belong to multiple services.
           :::
         type: string
-        x-order: 3
+        x-order: 1
   v1Sqrt:
     description: |-
       $$

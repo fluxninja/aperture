@@ -65,13 +65,17 @@ data:
       flux_meters:
         "service_latency":
           selector:
-            service: "service1-demo-app.demoapp.svc.cluster.local"
-            control_point:
-              traffic: "ingress"
+            service_selector:
+              service: "service1-demo-app.demoapp.svc.cluster.local"
+            flow_selector:
+              control_point:
+                traffic: "ingress"
       classifiers:
         - selector:
-            service: service1-demo-app.demoapp.svc.cluster.local
-            control_point: { traffic: ingress }
+            service_selector:
+              service: service1-demo-app.demoapp.svc.cluster.local
+            flow_selector:
+              control_point: { traffic: ingress }
           rules:
             # An example rule using extractor.
             # See following RFC for list of available extractors and their syntax.
@@ -181,9 +185,11 @@ data:
         - concurrency_limiter:
             scheduler:
               selector:
-                service: "service1-demo-app.demoapp.svc.cluster.local"
-                control_point:
-                  traffic: "ingress"
+                service_selector:
+                  service: "service1-demo-app.demoapp.svc.cluster.local"
+                flow_selector:
+                  control_point:
+                    traffic: "ingress"
               auto_tokens: true
               default_workload:
                 priority: 20
@@ -314,8 +320,10 @@ data:
     resources:
       classifiers:
         - selector:
-            service: productpage.bookinfo.svc.cluster.local
-            control_point: { traffic: ingress }
+            service_selector:
+              service: productpage.bookinfo.svc.cluster.local
+            flow_selector:
+              control_point: { traffic: ingress }
           rules:
             ua:
               extractor:
@@ -349,9 +357,11 @@ const rateLimitPolicy = `
               limit:
                 signal_name: "RATE_LIMIT"
             selector:
-              service: "service1-demo-app.demoapp.svc.cluster.local"
-              control_point:
-                traffic: "ingress"
+              service_selector:
+                service: "service1-demo-app.demoapp.svc.cluster.local"
+              flow_selector:
+                control_point:
+                  traffic: "ingress"
             label_key: "http.request.header.user_type"
             limit_reset_interval: "1s"
 `

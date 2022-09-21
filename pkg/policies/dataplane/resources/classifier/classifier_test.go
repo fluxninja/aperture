@@ -39,10 +39,14 @@ var _ = Describe("Classifier", func() {
 		// Classifier with a simple extractor-based rule
 		rs1 := &classificationv1.Classifier{
 			Selector: &selectorv1.Selector{
-				Service: "my-service.default.svc.cluster.local",
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{
-						Traffic: "ingress",
+				ServiceSelector: &selectorv1.ServiceSelector{
+					Service: "my-service.default.svc.cluster.local",
+				},
+				FlowSelector: &selectorv1.FlowSelector{
+					ControlPoint: &selectorv1.ControlPoint{
+						Controlpoint: &selectorv1.ControlPoint_Traffic{
+							Traffic: "ingress",
+						},
 					},
 				},
 			},
@@ -57,13 +61,17 @@ var _ = Describe("Classifier", func() {
 		// Classifier with Raw-rego rule, additionally gated for just "version one"
 		rs2 := &classificationv1.Classifier{
 			Selector: &selectorv1.Selector{
-				Service: "my-service.default.svc.cluster.local",
-				LabelMatcher: &labelmatcherv1.LabelMatcher{
-					MatchLabels: map[string]string{"version": "one"},
+				ServiceSelector: &selectorv1.ServiceSelector{
+					Service: "my-service.default.svc.cluster.local",
 				},
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{
-						Traffic: "ingress",
+				FlowSelector: &selectorv1.FlowSelector{
+					LabelMatcher: &labelmatcherv1.LabelMatcher{
+						MatchLabels: map[string]string{"version": "one"},
+					},
+					ControlPoint: &selectorv1.ControlPoint{
+						Controlpoint: &selectorv1.ControlPoint_Traffic{
+							Traffic: "ingress",
+						},
 					},
 				},
 			},
@@ -86,9 +94,11 @@ var _ = Describe("Classifier", func() {
 		// Classifier with a no service populated
 		rs3 := &classificationv1.Classifier{
 			Selector: &selectorv1.Selector{
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{
-						Traffic: "ingress",
+				FlowSelector: &selectorv1.FlowSelector{
+					ControlPoint: &selectorv1.ControlPoint{
+						Controlpoint: &selectorv1.ControlPoint_Traffic{
+							Traffic: "ingress",
+						},
 					},
 				},
 			},
@@ -229,10 +239,14 @@ var _ = Describe("Classifier", func() {
 		_, err := classifier.AddRules(context.TODO(), "test", &wrappersv1.ClassifierWrapper{
 			Classifier: &classificationv1.Classifier{
 				Selector: &selectorv1.Selector{
-					Service: "my-service.default.svc.cluster.local",
-					ControlPoint: &selectorv1.ControlPoint{
-						Controlpoint: &selectorv1.ControlPoint_Traffic{
-							Traffic: "ingress",
+					ServiceSelector: &selectorv1.ServiceSelector{
+						Service: "my-service.default.svc.cluster.local",
+					},
+					FlowSelector: &selectorv1.FlowSelector{
+						ControlPoint: &selectorv1.ControlPoint{
+							Controlpoint: &selectorv1.ControlPoint_Traffic{
+								Traffic: "ingress",
+							},
 						},
 					},
 				},
@@ -451,10 +465,14 @@ var _ = Describe("Classifier", func() {
 		// Classifier with a simple extractor-based rule
 		rs := &classificationv1.Classifier{
 			Selector: &selectorv1.Selector{
-				Service: "my-service.default.svc.cluster.local",
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{
-						Traffic: "ingress",
+				ServiceSelector: &selectorv1.ServiceSelector{
+					Service: "my-service.default.svc.cluster.local",
+				},
+				FlowSelector: &selectorv1.FlowSelector{
+					ControlPoint: &selectorv1.ControlPoint{
+						Controlpoint: &selectorv1.ControlPoint_Traffic{
+							Traffic: "ingress",
+						},
 					},
 				},
 			},

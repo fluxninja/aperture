@@ -37,10 +37,14 @@ var _ = Describe("Dataplane Engine", func() {
 
 		engine = ProvideEngineAPI()
 		selector = &selectorv1.Selector{
-			AgentGroup: metrics.DefaultAgentGroup,
-			Service:    "testService.testNamespace.svc.cluster.local",
-			ControlPoint: &selectorv1.ControlPoint{
-				Controlpoint: &selectorv1.ControlPoint_Traffic{Traffic: "ingress"},
+			ServiceSelector: &selectorv1.ServiceSelector{
+				AgentGroup: metrics.DefaultAgentGroup,
+				Service:    "testService.testNamespace.svc.cluster.local",
+			},
+			FlowSelector: &selectorv1.FlowSelector{
+				ControlPoint: &selectorv1.ControlPoint{
+					Controlpoint: &selectorv1.ControlPoint_Traffic{Traffic: "ingress"},
+				},
 			},
 		}
 		histogram = goprom.NewHistogram(goprom.HistogramOpts{

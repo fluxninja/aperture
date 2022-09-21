@@ -43,7 +43,7 @@ func NewRateLimiterAndOptions(
 	if selectorProto == nil {
 		return nil, fx.Options(), errors.New("selector is nil")
 	}
-	agentGroupName := selectorProto.GetAgentGroup()
+	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
 	componentID := paths.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
 	configEtcdPath := path.Join(paths.RateLimiterConfigPath, componentID)
 	decisionsEtcdPath := path.Join(paths.RateLimiterDecisionsPath, componentID)

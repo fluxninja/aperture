@@ -517,9 +517,11 @@ definitions:
       Example:
       ```yaml
       selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress
+        service_selector:
+          service: service1.default.svc.cluster.local
+        flow_selector:
+          control_point:
+            traffic: ingress
       rules:
         user:
           extractor:
@@ -566,9 +568,11 @@ definitions:
       to particular service:
       ```yaml
       selector:
-        service: myservice.mynamespace.svc.cluster.local
-        control_point:
-          traffic: ingress
+        service_selector:
+          service: myservice.mynamespace.svc.cluster.local
+        flow_selector:
+          control_point:
+            traffic: ingress
       ```
     title: FluxMeter gathers metrics for the traffic that matches its selector
   protobufAny:
@@ -1256,6 +1260,62 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Extrapolated signal.
     description: Outputs for the Extrapolator component.
+  v1FlowSelector:
+    type: object
+    properties:
+      control_point:
+        $ref: '#/definitions/commonselectorv1ControlPoint'
+        description: |-
+          Describes
+          [control point](/concepts/flow-control/flow-control.md#control-point)
+          within the entity where the policy should apply to.
+        x-go-validate: required
+      label_matcher:
+        $ref: '#/definitions/v1LabelMatcher'
+        description: |-
+          :::info
+          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+          :::
+
+          :::note
+          [Classifiers](#v1-classifier) _can_ use flow labels created by some other
+          classifier, but only if they were created at some previous control point
+          (and propagated in baggage).
+
+          This limitation doesn't apply to selectors of other entities, like
+          FluxMeters or actuators. It's valid to create a flow label on a control
+          point using classifier, and immediately use it for matching on the same
+          control point.
+          :::
+        title: |-
+          Label matcher allows to add _additional_ condition on
+          [flow labels](/concepts/flow-control/flow-label.md)
+          must also be satisfied (in addition to service+control point matching)
+    description: |-
+      :::info
+      See also [Selector overview](/concepts/flow-control/selector.md).
+      :::
+
+      Example:
+      ```yaml
+      control_point:
+        traffic: ingress # Allowed values are `ingress` and `egress`.
+      label_matcher:
+        match_labels:
+          user_tier: gold
+        match_expressions:
+          - key: query
+            operator: In
+            values:
+              - insert
+              - delete
+          - label: user_agent
+            regex: ^(?!.*Chrome).*Safari
+      ```
+    title: |-
+      Describes which flows a [dataplane
+      component](/concepts/flow-control/flow-control.md#components) should apply
+      to
   v1GradientController:
     type: object
     properties:
@@ -2013,40 +2073,40 @@ definitions:
   v1Selector:
     type: object
     properties:
+      flow_selector:
+        $ref: '#/definitions/v1FlowSelector'
+        x-go-validate: required
+      service_selector:
+        $ref: '#/definitions/v1ServiceSelector'
+        x-go-validate: required
+    title: |-
+      Describes which flow in which service a [dataplane
+      // component](/concepts/flow-control/flow-control.md#components) should apply
+      // to
+      //
+      // :::info
+      // See also [Selector overview](/concepts/flow-control/selector.md).
+      // :::
+  v1Service:
+    type: object
+    properties:
+      entities_count:
+        type: integer
+        format: int32
+      name:
+        type: string
+    description: |-
+      Service contains information about single service discovered in agent group by a
+      particular agent.
+  v1ServiceSelector:
+    type: object
+    properties:
       agent_group:
         type: string
         description: |-
           Which [agent-group](/concepts/service.md#agent-group) this
           selector applies to.
         x-go-default: default
-      control_point:
-        $ref: '#/definitions/commonselectorv1ControlPoint'
-        description: |-
-          Describes
-          [control point](/concepts/flow-control/flow-control.md#control-point)
-          within the entity where the policy should apply to.
-        x-go-validate: required
-      label_matcher:
-        $ref: '#/definitions/v1LabelMatcher'
-        description: |-
-          :::info
-          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
-          :::
-
-          :::note
-          [Classifiers](#v1-classifier) _can_ use flow labels created by some other
-          classifier, but only if they were created at some previous control point
-          (and propagated in baggage).
-
-          This limitation doesn't apply to selectors of other entities, like
-          FluxMeters or actuators. It's valid to create a flow label on a control
-          point using classifier, and immediately use it for matching on the same
-          control point.
-          :::
-        title: |-
-          Label matcher allows to add _additional_ condition on
-          [flow labels](/concepts/flow-control/flow-label.md)
-          must also be satisfied (in addition to service+control point matching)
       service:
         type: string
         description: |-
@@ -2064,39 +2124,10 @@ definitions:
       :::info
       See also [Selector overview](/concepts/flow-control/selector.md).
       :::
-
-      Example:
-      ```yaml
-      service: service1.default.svc.cluster.local
-      control_point:
-        traffic: ingress # Allowed values are `ingress` and `egress`.
-      label_matcher:
-        match_labels:
-          user_tier: gold
-        match_expressions:
-          - key: query
-            operator: In
-            values:
-              - insert
-              - delete
-          - label: user_agent
-            regex: ^(?!.*Chrome).*Safari
-      ```
     title: |-
-      Describes which flows a [dataplane
+      Describes which service a [dataplane
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
-  v1Service:
-    type: object
-    properties:
-      entities_count:
-        type: integer
-        format: int32
-      name:
-        type: string
-    description: |-
-      Service contains information about single service discovered in agent group by a
-      particular agent.
   v1ServicesList:
     type: object
     properties:
