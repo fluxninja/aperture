@@ -43,7 +43,6 @@ var (
 // Module - Controller can be initialized by passing options from Module() to fx app.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(provideCMFileValidator),
 		// Syncing policies config to etcd
 		filesystemwatcher.Constructor{Name: policiesFxTag, ConfigKey: policiesConfigKey, Path: policiesDefaultPath}.Annotate(), // Create a new watcher
 		fx.Invoke(

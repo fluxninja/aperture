@@ -107,23 +107,38 @@ jb install github.com/jsonnet-libs/k8s-libsonnet/1.24@main
 Finally, you can create a ConfigMap resource with Policy like this:
 
 ```jsonnet
-local k = import "github.com/jsonnet-libs/k8s-libsonnet/1.24/main.libsonnet";
+local k = import 'github.com/jsonnet-libs/k8s-libsonnet/1.24/main.libsonnet';
 
-local latencyGradientPolicy = import "github.com/fluxninja/aperture-blueprints/lib/1.0/policies/latency-gradient.libsonnet";
+local latencyGradientPolicy = import 'github.com/fluxninja/aperture-blueprints/lib/1.0/policies/latency-gradient.libsonnet';
+local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
+
+local selector = aperture.v1.Selector;
+local controlPoint = aperture.v1.ControlPoint;
+
+local svcSelector =
+  selector.new()
+  + selector.withAgentGroup('default')
+  + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
+  + selector.withControlPoint(controlPoint.new()
+                              + controlPoint.withTraffic('ingress'));
 
 local policy = latencyGradientPolicy({
-  policyName: "service1-demo-app",
-  serviceSelector+: {
-    service: "service1-demo-app.demoapp.svc.cluster.local"
-  },
+  policyName: 'service1-demoapp',
+  fluxMeterSelector: svcSelector,
+  concurrencyLimiterSelector: svcSelector,
 }).policy;
 
+local policResource = {
+  kind: 'Policy',
+  apiVersion: 'fluxninja.com/v1alpha1',
+  metadata: {
+    name: 'service1',
+  },
+  spec: policy,
+};
+
 [
-    k.core.v1.configMap.new("policies")
- + k.core.v1.configMap.metadata.withLabels({ "fluxninja.com/validate": "true"})
- + k.core.v1.configMap.withData({
-   "service1-demo-app.yaml": std.manifestYamlDoc(policy, quote_keys=false)
- })
+  policResource,
 ]
 ```
 

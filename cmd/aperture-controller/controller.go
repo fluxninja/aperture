@@ -18,8 +18,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/pkg/webhooks"
-	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 )
 
 func main() {
@@ -32,8 +30,6 @@ func main() {
 		),
 		otelcollector.Module(),
 		controlplane.Module(),
-		webhooks.Module(),
-		validation.Module(),
 	)
 
 	if err := app.Err(); err != nil {

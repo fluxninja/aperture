@@ -271,10 +271,6 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 	if err := r.Delete(ctx, clusterRoleBindingForController(instance)); err != nil {
 		log.Error(err, "failed to delete object of ClusterRoleBinding")
 	}
-
-	if err := r.Delete(ctx, validatingWebhookConfiguration(instance, nil)); err != nil {
-		log.Error(err, "failed to delete object of ValidatingWebhookConfiguration")
-	}
 }
 
 // checkDefaults checks and sets defaults when the Defaulter webhook is not triggered.
@@ -357,15 +353,11 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 		return err
 	}
 
-	if err := r.reconcileValidatingWebhookConfigurationAndCertSecret(ctx, instance); err != nil {
+	if err := r.reconcileSecret(ctx, instance); err != nil {
 		return err
 	}
 
 	if err := r.reconcileDeployment(ctx, log, instance); err != nil {
-		return err
-	}
-
-	if err := r.reconcileSecret(ctx, instance); err != nil {
 		return err
 	}
 
@@ -506,9 +498,9 @@ func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr
 	return nil
 }
 
-// reconcileValidatingWebhookConfigurationAndCertSecret prepares the desired states for ValidatingWebhookConfiguration and
-// secret for its certificate and sends an request to Kubernetes API to move the actual state to the prepared desired state.
-func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSecret(ctx context.Context, instance *v1alpha1.Controller) error {
+// reconcileSecret prepares the desired states for Controller ApiKey secret and
+// sends an request to Kubernetes API to move the actual state to the prepared desired state.
+func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *v1alpha1.Controller) error {
 	var err error
 	if controllerCert == nil || controllerKey == nil || controllerClientCert == nil {
 		controllerCert, controllerKey, controllerClientCert, err = generateCertificate(controllerServiceName, instance.GetNamespace())
@@ -525,40 +517,10 @@ func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSec
 		return err
 	}
 
-	vwc := validatingWebhookConfiguration(instance.DeepCopy(), controllerClientCert.Bytes())
-	res, err := controllerutil.CreateOrUpdate(ctx, r.Client, vwc, validatingWebhookConfigurationMutate(vwc, vwc.Webhooks))
-	if err != nil {
-		if errors.IsConflict(err) {
-			return r.reconcileValidatingWebhookConfigurationAndCertSecret(ctx, instance)
-		}
-
-		msg := fmt.Sprintf("failed to create ValidatingWebhookConfiguration '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
-			vwc.GetName(), instance.GetName(), instance.GetNamespace(), res, err.Error())
-		r.Recorder.Event(instance, corev1.EventTypeNormal, "ValidatingWebhookConfigurationCreationFailed", msg)
-		return fmt.Errorf(msg)
-	}
-
-	switch res {
-	case controllerutil.OperationResultCreated:
-		r.Recorder.Eventf(instance, corev1.EventTypeNormal,
-			"ValidatingWebhookConfigurationCreationSuccessful", "Created ValidatingWebhookConfiguration '%s'", vwc.GetName())
-	case controllerutil.OperationResultUpdated:
-		r.Recorder.Eventf(instance, corev1.EventTypeNormal,
-			"ValidatingWebhookConfigurationUpdationSuccessful", "Updated ValidatingWebhookConfiguration '%s'", vwc.GetName())
-	case controllerutil.OperationResultNone:
-	default:
-	}
-
-	return nil
-}
-
-// reconcileSecret prepares the desired states for Controller ApiKey secret and
-// sends an request to Kubernetes API to move the actual state to the prepared desired state.
-func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *v1alpha1.Controller) error {
 	if !instance.Spec.Secrets.FluxNinjaPlugin.Create {
 		return nil
 	}
-	secret, err := secretForControllerAPIKey(instance.DeepCopy(), r.Scheme)
+	secret, err = secretForControllerAPIKey(instance.DeepCopy(), r.Scheme)
 	if err != nil {
 		return err
 	}

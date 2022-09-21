@@ -30,7 +30,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -106,9 +105,6 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			createdControllerDeployment := &appsv1.Deployment{}
 			controllerDeploymentKey := types.NamespacedName{Name: controllerServiceName, Namespace: namespace}
 
-			createdVWC := &admissionregistrationv1.ValidatingWebhookConfiguration{}
-			vwcKey := types.NamespacedName{Name: controllerServiceName}
-
 			createdControllerSecret := &corev1.Secret{}
 			controllerSecretKey := types.NamespacedName{Name: secretName(test, "controller", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
 
@@ -125,11 +121,10 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 				err4 := k8sClient.Get(ctx, clusterRoleBindingKey, createdClusterRoleBinding)
 				err5 := k8sClient.Get(ctx, controllerServiceAccountKey, createdControllerServiceAccount)
 				err6 := k8sClient.Get(ctx, controllerDeploymentKey, createdControllerDeployment)
-				err7 := k8sClient.Get(ctx, vwcKey, createdVWC)
-				err8 := k8sClient.Get(ctx, controllerSecretKey, createdControllerSecret)
-				err9 := k8sClient.Get(ctx, controllerCertSecretKey, createdControllerCertSecret)
+				err7 := k8sClient.Get(ctx, controllerSecretKey, createdControllerSecret)
+				err8 := k8sClient.Get(ctx, controllerCertSecretKey, createdControllerCertSecret)
 				return err1 == nil && err2 == nil && err3 == nil && err4 == nil &&
-					err5 == nil && err6 == nil && err7 == nil && err8 != nil && err9 == nil
+					err5 == nil && err6 == nil && err7 != nil && err8 == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
 			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: test, Namespace: namespace}, instance)).To(BeNil())
@@ -177,9 +172,6 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			createdControllerDeployment := &appsv1.Deployment{}
 			controllerDeploymentKey := types.NamespacedName{Name: controllerServiceName, Namespace: namespace}
 
-			createdVWC := &admissionregistrationv1.ValidatingWebhookConfiguration{}
-			vwcKey := types.NamespacedName{Name: controllerServiceName}
-
 			createdControllerSecret := &corev1.Secret{}
 			controllerSecretKey := types.NamespacedName{Name: secretName(test, "controller", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
 
@@ -193,11 +185,10 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 				err4 := k8sClient.Get(ctx, clusterRoleBindingKey, createdClusterRoleBinding)
 				err5 := k8sClient.Get(ctx, controllerServiceAccountKey, createdControllerServiceAccount)
 				err6 := k8sClient.Get(ctx, controllerDeploymentKey, createdControllerDeployment)
-				err7 := k8sClient.Get(ctx, vwcKey, createdVWC)
-				err8 := k8sClient.Get(ctx, controllerSecretKey, createdControllerSecret)
-				err9 := k8sClient.Get(ctx, controllerCertSecretKey, createdControllerCertSecret)
+				err7 := k8sClient.Get(ctx, controllerSecretKey, createdControllerSecret)
+				err8 := k8sClient.Get(ctx, controllerCertSecretKey, createdControllerCertSecret)
 				return err1 == nil && err2 == nil && err3 == nil && err4 == nil &&
-					err5 == nil && err6 == nil && err7 == nil && err8 == nil && err9 == nil
+					err5 == nil && err6 == nil && err7 == nil && err8 == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
 			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
