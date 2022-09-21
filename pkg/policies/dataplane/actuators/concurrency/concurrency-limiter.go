@@ -77,8 +77,9 @@ func provideWatcher(
 }
 
 type concurrencyLimiterFactory struct {
-	engineAPI iface.Engine
-	registry  status.Registry
+	engineAPI  iface.Engine
+	metricsAPI iface.ResponseMetricsAPI
+	registry   status.Registry
 
 	autoTokensFactory       *autoTokensFactory
 	loadShedActuatorFactory *loadShedActuatorFactory
@@ -101,6 +102,7 @@ func setupConcurrencyLimiterFactory(
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
+	m iface.ResponseMetricsAPI,
 ) error {
 	agentGroup := ai.GetAgentGroup()
 
@@ -119,6 +121,7 @@ func setupConcurrencyLimiterFactory(
 
 	conLimiterFactory := &concurrencyLimiterFactory{
 		engineAPI:               e,
+		metricsAPI:              m,
 		autoTokensFactory:       autoTokensFactory,
 		loadShedActuatorFactory: loadShedActuatorFactory,
 		registry:                reg,
@@ -337,6 +340,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	}
 
 	engineAPI := conLimiterFactory.engineAPI
+	metricsAPI := conLimiterFactory.metricsAPI
 	wfqFlowsGaugeVec := conLimiterFactory.wfqFlowsGaugeVec
 	wfqRequestsGaugeVec := conLimiterFactory.wfqRequestsGaugeVec
 	incomingConcurrencyCounterVec := conLimiterFactory.incomingConcurrencyCounterVec
@@ -392,6 +396,8 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			if err != nil {
 				errMulti = multierr.Append(errMulti, err)
 			}
+
+			metricsAPI.DeleteTokenLatencyHistogram(metricLabels)
 
 			// Remove metrics from metric vectors
 			deleted := wfqFlowsGaugeVec.Delete(metricLabels)
