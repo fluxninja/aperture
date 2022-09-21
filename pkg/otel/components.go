@@ -23,6 +23,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/spantologprocessor"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
 
@@ -63,6 +64,7 @@ func AgentOTELComponents(cache *entitycache.EntityCache,
 		rollupprocessor.NewFactory(),
 		metricsprocessor.NewFactory(promRegistry, engine),
 		attributesprocessor.NewFactory(),
+		spantologprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
 
