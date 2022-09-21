@@ -18,7 +18,6 @@ func main() {
 	logger := log.NewLogger(log.GetPrettyConsoleWriter(), false, "debug")
 	log.SetGlobalLogger(logger)
 
-	// use flag to parse flags and args
 	// flags:
 	// 1. Required: --policy - path to policy file
 	// 2. Optional: --dot - path to dot file
