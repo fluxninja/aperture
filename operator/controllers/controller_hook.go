@@ -18,11 +18,14 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/clarketm/json"
 	"github.com/fluxninja/aperture/operator/api/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
+	policy "github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
@@ -31,8 +34,17 @@ type ControllerHooks struct {
 	decoder *admission.Decoder
 }
 
-// Handle receives incoming requests from MutatingWebhook for newly created Pods and injects Agent container in them.
+// Handle receives incoming requests from MutatingWebhook for newly created Controllers, set defaults and validates them.
 func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admission.Request) admission.Response {
+	if strings.ToLower(req.AdmissionRequest.Kind.Kind) == "policy" {
+		return controllerHooks.policyDefaults(ctx, req)
+	}
+
+	return controllerHooks.controllerDefaults(ctx, req)
+}
+
+// controllerDefaults validates and sets defaults for Aperture Controller Custom Resource.
+func (controllerHooks *ControllerHooks) controllerDefaults(ctx context.Context, req admission.Request) admission.Response {
 	controller := &v1alpha1.Controller{}
 
 	err := config.UnmarshalYAML([]byte(req.Object.Raw), controller)
@@ -49,12 +61,42 @@ func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admissio
 	}
 
 	controller.ObjectMeta.Annotations[defaulterAnnotationKey] = "true"
-	updatedAgent, err := json.Marshal(controller)
+	updatedController, err := json.Marshal(controller)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
-	return admission.PatchResponseFromRaw(req.Object.Raw, updatedAgent)
+	return admission.PatchResponseFromRaw(req.Object.Raw, updatedController)
+}
+
+// controllerDefaults validates and sets defaults for Aperture Controller Custom Resource.
+func (controllerHooks *ControllerHooks) policyDefaults(ctx context.Context, req admission.Request) admission.Response {
+	instance := &v1alpha1.Policy{}
+
+	err := config.UnmarshalYAML(req.Object.Raw, instance)
+	if err != nil {
+		return admission.Errored(http.StatusBadRequest, err)
+	}
+
+	_, valid, msg, err := policy.ValidateAndCompile(ctx, "", instance.Spec.Raw)
+	if err != nil || !valid {
+		if err == nil {
+			return admission.Errored(http.StatusBadRequest, fmt.Errorf(msg))
+		}
+		return admission.Errored(http.StatusBadRequest, err)
+	}
+
+	if instance.ObjectMeta.Annotations == nil {
+		instance.ObjectMeta.Annotations = map[string]string{}
+	}
+
+	instance.ObjectMeta.Annotations[defaulterAnnotationKey] = "true"
+	updatedPolicy, err := json.Marshal(instance)
+	if err != nil {
+		return admission.Errored(http.StatusInternalServerError, err)
+	}
+
+	return admission.PatchResponseFromRaw(req.Object.Raw, updatedPolicy)
 }
 
 // InjectDecoder injects the decoder.

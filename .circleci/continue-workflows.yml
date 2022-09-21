@@ -667,6 +667,14 @@ commands:
         description: |
           Which ssh socket to forward to the docker build process
         type: string
+      git-branch:
+        type: string
+        description: Use the name of the current branch been used for Image build
+        default: ${CIRCLE_BRANCH}
+      git-commit-hash:
+        type: string
+        description: Use the hash of the current commit.
+        default: ${CIRCLE_SHA1}
     steps:
       - when:
           condition: <<parameters.lint-dockerfile>>
@@ -697,6 +705,8 @@ commands:
             PARAM_TAG: <<parameters.tag>>
             PARAM_USE_BUILDKIT: <<parameters.use-buildkit>>
             PARAM_SSH_FORWARD: <<parameters.ssh>>
+            PARAM_GIT_BRANCH: <<parameters.git-branch>>
+            PARAM_GIT_COMMIT_HASH: <<parameters.git-commit-hash>>
           name: <<parameters.step-name>>
           no_output_timeout: << parameters.no_output_timeout >>
   aperture_docker_tag:

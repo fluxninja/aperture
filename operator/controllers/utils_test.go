@@ -907,7 +907,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 				{
 					Name:      "etc-aperture-policies",
-					MountPath: "/etc/aperture/aperture-controller/policies",
+					MountPath: policyFilePath,
 					ReadOnly:  true,
 				},
 				{
@@ -957,7 +957,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 				{
 					Name:      "etc-aperture-policies",
-					MountPath: "/etc/aperture/aperture-controller/policies",
+					MountPath: policyFilePath,
 					ReadOnly:  true,
 				},
 				{
@@ -1004,13 +1004,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 				{
 					Name: "etc-aperture-policies",
 					VolumeSource: corev1.VolumeSource{
-						ConfigMap: &corev1.ConfigMapVolumeSource{
-							DefaultMode: pointer.Int32Ptr(420),
-							LocalObjectReference: corev1.LocalObjectReference{
-								Name: "policies",
-							},
-							Optional: pointer.BoolPtr(true),
-						},
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
 					},
 				},
 				{
@@ -1083,13 +1077,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 				{
 					Name: "etc-aperture-policies",
 					VolumeSource: corev1.VolumeSource{
-						ConfigMap: &corev1.ConfigMapVolumeSource{
-							DefaultMode: pointer.Int32Ptr(420),
-							LocalObjectReference: corev1.LocalObjectReference{
-								Name: "policies",
-							},
-							Optional: pointer.BoolPtr(true),
-						},
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
 					},
 				},
 				{
@@ -1513,6 +1501,26 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 			Expect(checkCertificate()).To(Equal(false))
 			Expect(CheckAndGenerateCertForOperator()).To(BeNil())
 			Expect(checkCertificate()).To(Equal(true))
+		})
+	})
+})
+
+var _ = Describe("Tests for getPolicyFileName", func() {
+	Context("When controller namespace is same as policy namespace", func() {
+		It("it should use only name for filename", func() {
+			os.Setenv("APERTURE_CONTROLLER_NAMESPACE", appName)
+
+			filename := getPolicyFileName(test, appName)
+
+			Expect(filename).To(Equal("test.yaml"))
+		})
+	})
+
+	Context("When controller namespace is not same as policy namespace", func() {
+		It("it should use name and namespace for filename", func() {
+			filename := getPolicyFileName(test, test)
+
+			Expect(filename).To(Equal("test-test.yaml"))
 		})
 	})
 })
