@@ -22,7 +22,6 @@ func main() {
 	// 1. Required: --policy - path to policy file
 	// 2. Optional: --dot - path to dot file
 	fs := flag.NewFlagSet("circuit-compiler", flag.ExitOnError)
-	// add policy and dot flags to fs
 	policy := fs.String("policy", "", "path to policy file")
 	dot := fs.String("dot", "", "path to dot file")
 	// parse flags
