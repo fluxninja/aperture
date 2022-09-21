@@ -18,7 +18,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/concurrency/scheduler"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -40,7 +40,7 @@ func newLoadShedActuatorFactory(
 	prometheusRegistry *prometheus.Registry,
 ) (*loadShedActuatorFactory, error) {
 	// Scope the sync to the agent group.
-	etcdPath := path.Join(paths.LoadShedDecisionsPath, paths.AgentGroupPrefix(agentGroup))
+	etcdPath := path.Join(common.LoadShedDecisionsPath, common.AgentGroupPrefix(agentGroup))
 	loadShedDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
@@ -155,7 +155,7 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concu
 	}
 	// decision notifier
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.DataplaneComponentKey(lsaFactory.agentGroupName, lsa.conLimiter.GetPolicyName(), lsa.conLimiter.GetComponentIndex())),
+		notifiers.Key(common.DataplaneComponentKey(lsaFactory.agentGroupName, lsa.conLimiter.GetPolicyName(), lsa.conLimiter.GetComponentIndex())),
 		unmarshaller,
 		lsa.decisionUpdateCallback,
 	)

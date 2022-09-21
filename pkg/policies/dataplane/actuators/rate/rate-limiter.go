@@ -21,7 +21,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/rate/ratetracker"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -54,7 +54,7 @@ func provideWatchers(
 ) (notifiers.Watcher, error) {
 	agentGroupName := ai.GetAgentGroup()
 
-	etcdPath := path.Join(paths.RateLimiterConfigPath, paths.AgentGroupPrefix(agentGroupName))
+	etcdPath := path.Join(common.RateLimiterConfigPath, common.AgentGroupPrefix(agentGroupName))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func setupRateLimiterFactory(
 	ai *agentinfo.AgentInfo,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
-	etcdPath := path.Join(paths.RateLimiterDecisionsPath)
+	etcdPath := path.Join(common.RateLimiterDecisionsPath)
 	rateLimitDecisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return err
@@ -200,7 +200,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	if err != nil {
 		return err
 	}
-	decisionKey := paths.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName, rateLimiter.GetPolicyName(), rateLimiter.GetComponentIndex())
+	decisionKey := common.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName, rateLimiter.GetPolicyName(), rateLimiter.GetComponentIndex())
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(decisionKey),
 		unmarshaller,
