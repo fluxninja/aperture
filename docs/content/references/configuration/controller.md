@@ -561,6 +561,24 @@ EtcdConfig holds configuration for etcd client.
 (string, `gte=1s`, default: `60s`) Lease time-to-live
 
 </dd>
+<dt>password</dt>
+<dd>
+
+(string)
+
+</dd>
+<dt>username</dt>
+<dd>
+
+(string) Authentication
+
+</dd>
+<dt>tls</dt>
+<dd>
+
+([ClientTLSConfig](#client-tls-config))
+
+</dd>
 </dl>
 
 ### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
