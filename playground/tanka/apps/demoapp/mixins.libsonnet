@@ -10,6 +10,7 @@ local LabelMatcher = aperture.v1.LabelMatcher;
 local WorkloadWithLabelMatcher = aperture.v1.SchedulerWorkloadAndLabelMatcher;
 
 local classifier = aperture.v1.policylanguagev1Classifier;
+local fluxMeter = aperture.v1.policylanguagev1FluxMeter;
 local extractor = aperture.v1.Extractor;
 local rule = aperture.v1.Rule;
 local selector = aperture.v1.Selector;
@@ -21,8 +22,6 @@ local svcSelector = selector.new()
                     + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
                     + selector.withControlPoint(controlPoint.new()
                                                 + controlPoint.withTraffic('ingress'));
-local defaultBucket = bucket.new()
-                      + bucket.withBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0]);
 local demoappMixin =
   demoApp {
     values+: {
@@ -49,7 +48,12 @@ local demoappMixin =
 local policy = latencyGradientPolicy({
   policyName: 'service1-demo-app',
   fluxMeterSelector: svcSelector,
-  fluxMeterBuckets: defaultBucket,
+  fluxMeters: fluxMeter.new()
+              + fluxMeter.withAttributeKey('workload_duration_ms')
+              + fluxMeter.withBuckets(
+                bucket.new(),
+                +bucket.withBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0]),
+              ),
   concurrencyLimiterSelector: svcSelector,
   classifiers: [
     classifier.new()

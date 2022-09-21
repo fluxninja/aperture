@@ -4,10 +4,9 @@ local patch =
     local fluxMeter = super.policylanguagev1FluxMeter,
     policylanguagev1FluxMeter:: null,
     FluxMeter: fluxMeter {
-      new(selector, buckets)::
+      new(selector)::
         super.new()
-        + fluxMeter.withSelector(selector)
-        + fluxMeter.withBuckets(buckets),
+        + fluxMeter.withSelector(selector),
     },
   };
 
