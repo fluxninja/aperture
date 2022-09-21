@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -19,46 +18,15 @@ import (
 )
 
 type metricsProcessor struct {
-	cfg                    *Config
-	workloadLatencySummary *prometheus.SummaryVec
+	cfg *Config
 }
 
 func newProcessor(cfg *Config) (*metricsProcessor, error) {
 	p := &metricsProcessor{
 		cfg: cfg,
 	}
-	err := p.registerRequestLatencyHistogram()
-	if err != nil {
-		return nil, err
-	}
 
 	return p, nil
-}
-
-func (p *metricsProcessor) registerRequestLatencyHistogram() error {
-	p.workloadLatencySummary = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Name: metrics.WorkloadLatencyMetricName,
-		Help: "Latency summary of workload",
-	}, []string{
-		metrics.PolicyNameLabel,
-		metrics.PolicyHashLabel,
-		metrics.ComponentIndexLabel,
-		metrics.DecisionTypeLabel,
-		metrics.WorkloadIndexLabel,
-	})
-	err := p.cfg.promRegistry.Register(p.workloadLatencySummary)
-	if err != nil {
-		if are, ok := err.(prometheus.AlreadyRegisteredError); ok {
-			// We're registering this histogram vec from multiple processors
-			// (logs processor and traces processor), so if both processors are
-			// enabled, it's expected that whichever processor is created
-			// second, it will see that the histogram vec was already
-			// registered. Use the existing histogram vec from now on.
-			p.workloadLatencySummary = are.ExistingCollector.(*prometheus.SummaryVec)
-			return nil
-		}
-	}
-	return err
 }
 
 // Start indicates and logs the start of the metrics processor.
@@ -361,7 +329,7 @@ func (p *metricsProcessor) updateMetrics(
 }
 
 func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64) {
-	latencyHistogram, err := p.workloadLatencySummary.GetMetricWith(labels)
+	latencyHistogram, err := p.cfg.metricsAPI.GetTokenLatencyHistogram(labels)
 	if err != nil {
 		otelcollector.LogSampled.Warn().Err(err).Msg("Getting latency histogram")
 		return

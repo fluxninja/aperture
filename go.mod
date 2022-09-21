@@ -77,12 +77,14 @@ require (
 	k8s.io/api v0.25.0
 	k8s.io/apimachinery v0.25.0
 	k8s.io/client-go v0.25.0
+	k8s.io/component-base v0.24.3
 	k8s.io/klog/v2 v2.70.1
 	sigs.k8s.io/controller-runtime v0.12.3
 )
 
 require (
 	github.com/antonmedv/expr v1.9.0 // indirect
+	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/dnephin/pflag v1.0.7 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
@@ -109,7 +111,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiextensions-apiserver v0.24.3 // indirect
-	k8s.io/component-base v0.24.3 // indirect
 )
 
 require (
