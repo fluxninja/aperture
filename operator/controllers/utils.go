@@ -319,7 +319,7 @@ func controllerVolumeMounts(controllerSpec v1alpha1.CommonSpec) []corev1.VolumeM
 		},
 		{
 			Name:      "etc-aperture-policies",
-			MountPath: "/etc/aperture/aperture-controller/policies",
+			MountPath: policyFilePath,
 			ReadOnly:  true,
 		},
 		{
@@ -354,13 +354,7 @@ func controllerVolumes(instance *v1alpha1.Controller) []corev1.Volume {
 		{
 			Name: "etc-aperture-policies",
 			VolumeSource: corev1.VolumeSource{
-				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32Ptr(420),
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: "policies",
-					},
-					Optional: pointer.BoolPtr(true),
-				},
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
 			},
 		},
 		{
@@ -800,6 +794,7 @@ func updateResource(client client.Client, ctx context.Context, instance client.O
 	return nil
 }
 
+// getPort parses port value from the Address string.
 func getPort(addr string) (int32, error) {
 	_, portStr, err := net.SplitHostPort(addr)
 	if err != nil {
@@ -811,4 +806,14 @@ func getPort(addr string) (int32, error) {
 		return 0, err
 	}
 	return int32(port), nil
+}
+
+// getPolicyFileName prepares filename for Policy based on the Controller namespace.
+func getPolicyFileName(name, namespace string) string {
+	controllerNamespace := os.Getenv("APERTURE_CONTROLLER_NAMESPACE")
+	if controllerNamespace == namespace {
+		return fmt.Sprintf("%s.yaml", name)
+	}
+
+	return fmt.Sprintf("%s-%s.yaml", name, namespace)
 }

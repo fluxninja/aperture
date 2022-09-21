@@ -56,6 +56,7 @@ func main() {
 	var enableLeaderElection bool
 	var agentManager bool
 	var controllerManager bool
+	var policyManager bool
 	var probeAddr string
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
@@ -68,6 +69,9 @@ func main() {
 	flag.BoolVar(&controllerManager, "controller", false,
 		"Enable manager for Aperture Controller. "+
 			"Enabling this will ensure that Controller Custom Resource is monitored by the Operator.")
+	flag.BoolVar(&policyManager, "policy", false,
+		"Enable manager for Aperture Policy. "+
+			"Enabling this will ensure that Policy Custom Resource is monitored by the Operator.")
 
 	opts := zap.Options{
 		Development: true,
@@ -77,19 +81,21 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
-	if !agentManager && !controllerManager {
-		setupLog.Info("One of the --agent or --controller flag is required.")
+	if !agentManager && !controllerManager && !policyManager {
+		setupLog.Info("One of the --agent, --controller or --policy flag is required.")
 		os.Exit(1)
 	}
 
 	var leaderElectionID string
 
-	if agentManager && controllerManager {
+	if agentManager && controllerManager && policyManager {
 		leaderElectionID = "a4362587.fluxninja.com"
 	} else if agentManager {
 		leaderElectionID = "a4362587-agent.fluxninja.com"
-	} else {
+	} else if controllerManager {
 		leaderElectionID = "a4362587-controller.fluxninja.com"
+	} else {
+		leaderElectionID = "a4362587-policy.fluxninja.com"
 	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
@@ -105,20 +111,34 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = controllers.CheckAndGenerateCertForOperator(); err != nil {
-		setupLog.Error(err, "unable to manage webhook certificates")
-		os.Exit(1)
-	}
-
-	server := mgr.GetWebhookServer()
-	server.CertDir = os.Getenv("APERTURE_OPERATOR_CERT_DIR")
-	server.CertName = os.Getenv("APERTURE_OPERATOR_CERT_NAME")
-	server.KeyName = os.Getenv("APERTURE_OPERATOR_KEY_NAME")
-
 	dynamicClient, err := dynamic.NewForConfig(ctrl.GetConfigOrDie())
 	if err != nil {
 		setupLog.Error(err, "unable to create Dynamic Client")
 		os.Exit(1)
+	}
+
+	var server *webhook.Server
+
+	if agentManager || controllerManager {
+		if err = controllers.CheckAndGenerateCertForOperator(); err != nil {
+			setupLog.Error(err, "unable to manage webhook certificates")
+			os.Exit(1)
+		}
+
+		server = mgr.GetWebhookServer()
+		server.CertDir = os.Getenv("APERTURE_OPERATOR_CERT_DIR")
+		server.CertName = os.Getenv("APERTURE_OPERATOR_CERT_NAME")
+		server.KeyName = os.Getenv("APERTURE_OPERATOR_KEY_NAME")
+
+		if err = (&controllers.MutatingWebhookReconciler{
+			Client:            mgr.GetClient(),
+			Scheme:            mgr.GetScheme(),
+			AgentManager:      agentManager,
+			ControllerManager: controllerManager,
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "MutatingWebhook")
+			os.Exit(1)
+		}
 	}
 
 	if agentManager {
@@ -165,14 +185,15 @@ func main() {
 		server.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controllers.ControllerHooks{}})
 	}
 
-	if err = (&controllers.MutatingWebhookReconciler{
-		Client:            mgr.GetClient(),
-		Scheme:            mgr.GetScheme(),
-		AgentManager:      agentManager,
-		ControllerManager: controllerManager,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "MutatingWebhook")
-		os.Exit(1)
+	if policyManager {
+		if err = (&controllers.PolicyReconciler{
+			Client:   mgr.GetClient(),
+			Scheme:   mgr.GetScheme(),
+			Recorder: mgr.GetEventRecorderFor("aperture-policy"),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "Policy")
+			os.Exit(1)
+		}
 	}
 
 	//+kubebuilder:scaffold:builder

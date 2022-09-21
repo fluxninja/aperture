@@ -107,7 +107,7 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, nil
 	} else if err != nil {
 		// Error reading the object - requeue the request.
-		logger.Error(err, "failed to get Aperture")
+		logger.Error(err, "failed to get Agent")
 		return ctrl.Result{}, err
 	}
 

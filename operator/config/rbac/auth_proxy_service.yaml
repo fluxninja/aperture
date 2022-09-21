@@ -8,7 +8,7 @@ metadata:
 spec:
   ports:
   - name: https
-    port: 8443
+    port: 9553
     protocol: TCP
     targetPort: https
   selector:

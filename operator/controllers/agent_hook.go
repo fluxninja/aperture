@@ -31,7 +31,7 @@ type AgentHooks struct {
 	decoder *admission.Decoder
 }
 
-// Handle receives incoming requests from MutatingWebhook for newly created Pods and injects Agent container in them.
+// Handle receives incoming requests from MutatingWebhook for newly created Agents, set defaults and validates them.
 func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request) admission.Response {
 	agent := &v1alpha1.Agent{}
 

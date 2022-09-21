@@ -7,8 +7,8 @@ local apertureControllerMixin =
     values+:: {
       operator+: {
         image: {
-          registry: 'docker.io/fluxninja',
-          repository: 'aperture-operator',
+          registry: '',
+          repository: 'docker.io/fluxninja/aperture-operator',
           tag: 'latest',
         },
       },
