@@ -26,6 +26,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -95,7 +96,7 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 				Spec: corev1.PodSpec{
 					ServiceAccountName:            controllerServiceName,
 					HostAliases:                   spec.HostAliases,
-					ImagePullSecrets:              imagePullSecrets(spec.Image.Image),
+					ImagePullSecrets:              mergeImagePullSecrets(imagePullSecrets(spec.Image.Image), imagePullSecrets(spec.OperatorImage.Image)),
 					NodeSelector:                  spec.NodeSelector,
 					Affinity:                      spec.Affinity,
 					Tolerations:                   spec.Tolerations,
@@ -103,6 +104,62 @@ func deploymentForController(instance *v1alpha1.Controller, log logr.Logger, sch
 					TerminationGracePeriodSeconds: pointer.Int64(spec.TerminationGracePeriodSeconds),
 					InitContainers:                spec.InitContainers,
 					Containers: []corev1.Container{
+						{
+							Name:            "policy-watcher",
+							Image:           imageString(spec.OperatorImage.Image, spec.OperatorImage.Repository),
+							ImagePullPolicy: corev1.PullPolicy(spec.OperatorImage.PullPolicy),
+							SecurityContext: containerSecurityContext(spec.ContainerSecurityContext),
+							Command: []string{
+								"/aperture-operator",
+								"--policy",
+								"--health-probe-bind-address=:9091",
+								"--metrics-bind-address=127.0.0.1:9090",
+							},
+							Args: []string{
+								"--leader-elect=True",
+							},
+							Env: []corev1.EnvVar{
+								{
+									Name:  "APERTURE_CONTROLLER_NAMESPACE",
+									Value: instance.GetNamespace(),
+								},
+							},
+							TerminationMessagePath:   "/dev/termination-log",
+							TerminationMessagePolicy: corev1.TerminationMessageReadFile,
+							LivenessProbe: &corev1.Probe{
+								ProbeHandler: corev1.ProbeHandler{
+									HTTPGet: &corev1.HTTPGetAction{
+										Path: "/healthz",
+										Port: intstr.FromInt(9091),
+									},
+								},
+								FailureThreshold:    3,
+								InitialDelaySeconds: 10,
+								PeriodSeconds:       10,
+								SuccessThreshold:    1,
+								TimeoutSeconds:      1,
+							},
+							ReadinessProbe: &corev1.Probe{
+								ProbeHandler: corev1.ProbeHandler{
+									HTTPGet: &corev1.HTTPGetAction{
+										Path: "/readyz",
+										Port: intstr.FromInt(9091),
+									},
+								},
+								FailureThreshold:    3,
+								InitialDelaySeconds: 10,
+								PeriodSeconds:       10,
+								SuccessThreshold:    1,
+								TimeoutSeconds:      1,
+							},
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      "etc-aperture-policies",
+									MountPath: policyFilePath,
+									ReadOnly:  false,
+								},
+							},
+						},
 						{
 							Name:            controllerServiceName,
 							Image:           imageString(spec.Image.Image, spec.Image.Repository),

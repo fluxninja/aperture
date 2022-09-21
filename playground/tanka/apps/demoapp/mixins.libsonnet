@@ -46,7 +46,7 @@ local demoappMixin =
   };
 
 local policy = latencyGradientPolicy({
-  policyName: 'service1-demo-app',
+  policyName: 'service1-demoapp',
   fluxMeterSelector: svcSelector,
   fluxMeters: fluxMeter.new()
               + fluxMeter.withAttributeKey('workload_duration_ms')
@@ -84,13 +84,16 @@ local policy = latencyGradientPolicy({
   },
 }).policy;
 
+local policMixin = {
+  kind: 'Policy',
+  apiVersion: 'fluxninja.com/v1alpha1',
+  metadata: {
+    name: 'service1',
+  },
+  spec: policy,
+};
+
 {
-  configMap:
-    k.core.v1.configMap.new('policies')
-    + k.core.v1.configMap.metadata.withLabels({ 'fluxninja.com/validate': 'true' })
-    + k.core.v1.configMap.metadata.withNamespace('aperture-controller')
-    + k.core.v1.configMap.withData({
-      'service1-demo-app.yaml': std.manifestYamlDoc(policy, quote_keys=false),
-    }),
+  policy: policMixin,
   demoapp: demoappMixin,
 }

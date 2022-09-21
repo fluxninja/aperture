@@ -4,6 +4,9 @@ metadata:
   name: agent-sample
 spec:
   config:
+    plugins:
+      disabled_plugins:
+        - aperture-plugin-fluxninja
     etcd:
       endpoints: ["http://controller-etcd:2379"]
     prometheus:
