@@ -1,13 +1,6 @@
 package agent
 
 import (
-	"github.com/fluxninja/aperture/pkg/entitycache"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
-	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
-	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
-	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
@@ -29,6 +22,15 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/grpc"
+
+	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
+	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/spantologprocessor"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
 
 // ModuleForAgentOTEL provides fx options for AgentOTELComponent.
@@ -94,6 +96,7 @@ func AgentOTELComponents(
 		rollupprocessor.NewFactory(),
 		metricsprocessor.NewFactory(promRegistry, engine),
 		attributesprocessor.NewFactory(),
+		spantologprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
 
