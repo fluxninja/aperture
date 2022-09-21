@@ -114,8 +114,11 @@ var _ = BeforeSuite(func() {
 	if ehStarted {
 		apertureConfig["etcd"] = map[string]interface{}{
 			"endpoints": []string{eh.Endpoint},
-			"username":  harness.EtcdUsername,
-			"password":  harness.EtcdPassword,
+			"tls": map[string]interface{}{
+				"insecure_skip_verify": true,
+			},
+			"username": harness.EtcdUsername,
+			"password": harness.EtcdPassword,
 		}
 	}
 
