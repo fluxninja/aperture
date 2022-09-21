@@ -125,14 +125,23 @@ server:
   grpc:
     connection_timeout: 120s
     enable_reflection: false
+    latency_buckets_ms:
+    - 10
+    - 25
+    - 100
+    - 250
+    - 1000
   grpc_gateway:
     grpc_server_address: 0.0.0.0:1
   http:
     disable_http_keep_alives: false
     idle_timeout: 30s
-    latency_bucket_count: 100
-    latency_bucket_start_ms: 20
-    latency_bucket_width_ms: 20
+    latency_buckets_ms:
+    - 10
+    - 25
+    - 100
+    - 250
+    - 1000
     max_header_bytes: 1048576
     read_header_timeout: 10s
     read_timeout: 10s

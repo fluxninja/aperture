@@ -10,6 +10,7 @@ local apertureControllerMixin =
           registry: '',
           repository: 'docker.io/fluxninja/aperture-operator',
           tag: 'latest',
+          pullPolicy: 'IfNotPresent',
         },
       },
       controller+: {
