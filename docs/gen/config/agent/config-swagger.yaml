@@ -242,6 +242,15 @@ definitions:
         type: boolean
         x-go-default: "false"
         x-go-name: EnableReflection
+      latency_buckets_ms:
+        description: Buckets specification in latency histogram
+        items:
+          format: double
+          type: number
+        type: array
+        x-go-default: '[10.0,25.0,100.0,250.0,1000.0]'
+        x-go-name: LatencyBucketsMS
+        x-go-validate: gte=0
     title: GRPCServerConfig holds configuration for GRPC Server.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
@@ -380,26 +389,14 @@ definitions:
         x-go-default: 30s
         x-go-name: IdleTimeout
         x-go-validate: gte=0s
-      latency_bucket_count:
-        description: The number of buckets in latency histogram
-        format: int64
-        type: integer
-        x-go-default: "100"
-        x-go-name: LatencyBucketCount
-        x-go-validate: gte=0
-      latency_bucket_start_ms:
-        description: The lowest bucket in latency histogram
-        format: double
-        type: number
-        x-go-default: "20"
-        x-go-name: LatencyBucketStartMS
-        x-go-validate: gte=0
-      latency_bucket_width_ms:
-        description: The bucket width in latency histogram
-        format: double
-        type: number
-        x-go-default: "20"
-        x-go-name: LatencyBucketWidthMS
+      latency_buckets_ms:
+        description: Buckets specification in latency histogram
+        items:
+          format: double
+          type: number
+        type: array
+        x-go-default: '[10.0,25.0,100.0,250.0,1000.0]'
+        x-go-name: LatencyBucketsMS
         x-go-validate: gte=0
       max_header_bytes:
         description: Max header size in bytes

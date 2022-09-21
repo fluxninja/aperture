@@ -1346,6 +1346,11 @@ spec:
                           enable_reflection:
                             description: Enable Reflection
                             type: boolean
+                          latency_buckets_ms:
+                            description: Buckets specification in latency histogram
+                            items:
+                              type: number
+                            type: array
                         type: object
                       grpc_gateway:
                         description: GRPC Gateway configuration.
@@ -1365,15 +1370,11 @@ spec:
                           idle_timeout:
                             description: Idle timeout
                             type: string
-                          latency_bucket_count:
-                            description: The number of buckets in latency histogram
-                            type: integer
-                          latency_bucket_start_ms:
-                            description: The lowest bucket in latency histogram
-                            type: number
-                          latency_bucket_width_ms:
-                            description: The bucket width in latency histogram
-                            type: number
+                          latency_buckets_ms:
+                            description: Buckets specification in latency histogram
+                            items:
+                              type: number
+                            type: array
                           max_header_bytes:
                             description: Max header size in bytes
                             type: integer

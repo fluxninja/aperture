@@ -20,8 +20,14 @@ import (
 )
 
 const (
-	defaultServerKey = "server.http"
+	defaultServerKey   = "server.http"
+	defaultHandlerName = "default"
 )
+
+type monitoringContext struct {
+	context.Context
+	handlerName string
+}
 
 // ServerModule is an fx module that provides annotated HTTP Server using the default listener and registers its metrics with the prometheus registry.
 func ServerModule() fx.Option {
@@ -42,14 +48,10 @@ type HTTPServerConfig struct {
 	ReadTimeout config.Duration `json:"read_timeout" validate:"gte=0s" default:"10s"`
 	// Write timeout
 	WriteTimeout config.Duration `json:"write_timeout" validate:"gte=0s" default:"45s"`
-	// The lowest bucket in latency histogram
-	LatencyBucketStartMS float64 `json:"latency_bucket_start_ms" validate:"gte=0" default:"20"`
 	// Max header size in bytes
 	MaxHeaderBytes int `json:"max_header_bytes" validate:"gte=0" default:"1048576"`
-	// The bucket width in latency histogram
-	LatencyBucketWidthMS float64 `json:"latency_bucket_width_ms" validate:"gte=0" default:"20"`
-	// The number of buckets in latency histogram
-	LatencyBucketCount int `json:"latency_bucket_count" validate:"gte=0" default:"100"`
+	// Buckets specification in latency histogram
+	LatencyBucketsMS []float64 `json:"latency_buckets_ms" validate:"gte=0" default:"[10.0,25.0,100.0,250.0,1000.0]"`
 	// Disable HTTP Keep Alives
 	DisableHTTPKeepAlives bool `json:"disable_http_keep_alives" default:"false"`
 }
@@ -114,7 +116,7 @@ func (constructor ServerConstructor) provideServer(
 	}
 
 	// Register metrics
-	defaultLabels := []string{metrics.MethodLabel, metrics.StatusCodeLabel}
+	defaultLabels := []string{metrics.MethodLabel, metrics.StatusCodeLabel, metrics.HandlerName}
 	errorCounters := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.HTTPErrorMetricName,
 		Help: "The total number of errors that occurred",
@@ -127,7 +129,7 @@ func (constructor ServerConstructor) provideServer(
 	latencyHistograms := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    metrics.HTTPRequestLatencyMetricName,
 		Help:    "Latency of the requests processed by the server",
-		Buckets: prometheus.LinearBuckets(config.LatencyBucketStartMS, config.LatencyBucketWidthMS, config.LatencyBucketCount),
+		Buckets: config.LatencyBucketsMS,
 	}, defaultLabels)
 	for _, metric := range []prometheus.Collector{errorCounters, requestCounters, latencyHistograms} {
 		err := pr.Register(metric)
@@ -199,15 +201,20 @@ func (constructor ServerConstructor) provideServer(
 
 func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := &monitoringContext{}
+		ctx.Context = r.Context()
+		ctx.handlerName = defaultHandlerName
 		startTime := time.Now()
-		rec := statusRecorder{w, 200}
+		rec := newStatusRecorder(w)
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
-		next.ServeHTTP(&rec, r)
+		next.ServeHTTP(rec, r.WithContext(ctx))
+
 		duration := time.Since(startTime)
 
 		labels := map[string]string{
 			metrics.MethodLabel:     r.Method,
-			metrics.StatusCodeLabel: fmt.Sprintf("%d", rec.status),
+			metrics.StatusCodeLabel: fmt.Sprintf("%d", rec.statusCode),
+			metrics.HandlerName:     ctx.handlerName,
 		}
 
 		requestCounter, err := s.RequestCounters.GetMetricWith(labels)
@@ -215,6 +222,13 @@ func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 			log.Debug().Msgf("Could not extract request counter metric from registry: %v", err)
 		} else {
 			requestCounter.Inc()
+		}
+
+		errorCounter, err := s.ErrorCounters.GetMetricWith(labels)
+		if err != nil {
+			log.Debug().Msgf("Could not extract error counter metric from registry: %v", err)
+		} else if rec.statusCode >= http.StatusBadRequest {
+			errorCounter.Inc()
 		}
 
 		latencyHistogram, err := s.Latencies.GetMetricWith(labels)
@@ -226,7 +240,30 @@ func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// HandlerNameMiddleware sets handler name in monitoring context.
+func HandlerNameMiddleware(handlerName string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			if mCtx, ok := ctx.(*monitoringContext); ok {
+				mCtx.handlerName = handlerName
+			}
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+func newStatusRecorder(w http.ResponseWriter) *statusRecorder {
+	return &statusRecorder{ResponseWriter: w}
+}
+
 type statusRecorder struct {
 	http.ResponseWriter
-	status int
+	statusCode int
+}
+
+// WriteHeader records statusCode and calls wrapped WriteHeader method.
+func (sr *statusRecorder) WriteHeader(statusCode int) {
+	sr.statusCode = statusCode
+	sr.ResponseWriter.WriteHeader(statusCode)
 }
