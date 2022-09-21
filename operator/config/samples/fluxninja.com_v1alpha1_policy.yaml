@@ -197,10 +197,12 @@ spec:
             incoming_concurrency:
               signal_name: INCOMING_CONCURRENCY
           selector:
-            agent_group: default
-            control_point:
-              traffic: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
+            flow_selector:
+              control_point:
+                traffic: ingress
           timeout_factor: 0.1
           workloads:
           - label_matcher:
@@ -249,10 +251,12 @@ spec:
           extractor:
             from: request.http.headers.user_type
       selector:
-        agent_group: default
-        control_point:
-          traffic: ingress
-        service: service1-demo-app.demoapp.svc.cluster.local
+        service_selector:
+          agent_group: default
+          service: service1-demo-app.demoapp.svc.cluster.local
+        flow_selector:
+          control_point:
+            traffic: ingress
     flux_meters:
       service1-demo-app:
         selector:
