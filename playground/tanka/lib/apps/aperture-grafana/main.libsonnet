@@ -41,7 +41,7 @@ local dashboards =
     dashboard.new('example-dashboard') +
     dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
     dashboard.spec.withJson(std.manifestJsonEx(policyDashboard({
-      policyName: 'service1-demoapp',
+      policyName: 'service1-demo-app',
     }).dashboard, indent='  ')) +
     dashboard.spec.withDatasources({
       inputName: 'DS_CONTROLLER-PROMETHEUS',

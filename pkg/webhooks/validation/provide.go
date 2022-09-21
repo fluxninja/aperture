@@ -5,23 +5,23 @@ import (
 	"go.uber.org/fx"
 )
 
-// Module provides fx module for configmap validator.
+// Module provides fx module for Policy Custom Resource validator.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Invoke(registerCMValidator),
+		fx.Invoke(registerPolicyValidator),
 	)
 }
 
-// FxIn is a struct that contains all dependencies for configmap validator.
+// FxIn is a struct that contains all dependencies for Policy Custom Resource validator.
 type FxIn struct {
 	fx.In
 	Webhooks   *webhooks.K8sRegistry
-	Validators []CMFileValidator `group:"cm-file-validators"`
+	Validators []PolicySpecValidator `group:"policy-validators"`
 }
 
-// registerCMValidator registers configmap validator as k8s webhook.
-func registerCMValidator(in FxIn) {
+// registerPolicyValidator registers Policy Custom Resource validator as k8s webhook.
+func registerPolicyValidator(in FxIn) {
 	// The path is not configurable – if one doesn't want default path, one
 	// could just write their own Register function
-	in.Webhooks.RegisterValidator("/validate/configmap", NewCMValidator(in.Validators))
+	in.Webhooks.RegisterValidator("/validate/policy", NewPolicyValidator(in.Validators))
 }

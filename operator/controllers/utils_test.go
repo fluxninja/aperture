@@ -21,7 +21,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"os"
-	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -33,8 +32,6 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
 var _ = Describe("Tests for containerSecurityContext", func() {
@@ -832,6 +829,10 @@ var _ = Describe("Tests for controllerEnv", func() {
 					},
 				},
 				{
+					Name:  "APERTURE_CONTROLLER_NAMESPACE",
+					Value: AppName,
+				},
+				{
 					Name: "APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_API_KEY",
 					ValueFrom: &corev1.EnvVarSource{
 						SecretKeyRef: &corev1.SecretKeySelector{
@@ -882,6 +883,10 @@ var _ = Describe("Tests for controllerEnv", func() {
 							FieldPath:  "spec.nodeName",
 						},
 					},
+				},
+				{
+					Name:  "APERTURE_CONTROLLER_NAMESPACE",
+					Value: AppName,
 				},
 			}
 
@@ -1162,127 +1167,6 @@ var _ = Describe("Tests for commonLabels", func() {
 	})
 })
 
-var _ = Describe("Tests for checkEtcdEndpoints", func() {
-	Context("When Etcd endpoints are not provided", func() {
-		It("returns correct etcd config", func() {
-			instance := &controllerv1alpha1.Controller{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
-					Namespace: AppName,
-				},
-				Spec: controllerv1alpha1.ControllerSpec{},
-			}
-
-			expected := etcd.EtcdConfig{
-				Endpoints: []string{
-					fmt.Sprintf("http://%s-etcd.%s:2379", AppName, AppName),
-				},
-			}
-
-			result := checkEtcdEndpoints(instance.Spec.ConfigSpec.Etcd, instance.Name, instance.Namespace)
-			Expect(result).To(Equal(expected))
-		})
-	})
-
-	Context("When Etcd endpoints are provided", func() {
-		It("returns correct etcd config", func() {
-			instance := &controllerv1alpha1.Controller{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
-					Namespace: AppName,
-				},
-				Spec: controllerv1alpha1.ControllerSpec{
-					ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
-						CommonConfigSpec: common.CommonConfigSpec{
-							Etcd: etcd.EtcdConfig{
-								Endpoints: TestArray,
-							},
-						},
-					},
-				},
-			}
-
-			expected := etcd.EtcdConfig{
-				Endpoints: TestArray,
-			}
-
-			result := checkEtcdEndpoints(instance.Spec.ConfigSpec.Etcd, instance.Name, instance.Namespace)
-			Expect(result).To(Equal(expected))
-		})
-	})
-
-	Context("When Etcd endpoints are provided with empty string", func() {
-		It("returns correct etcd config", func() {
-			instance := &controllerv1alpha1.Controller{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
-					Namespace: AppName,
-				},
-				Spec: controllerv1alpha1.ControllerSpec{
-					ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
-						CommonConfigSpec: common.CommonConfigSpec{
-							Etcd: etcd.EtcdConfig{
-								Endpoints: []string{""},
-							},
-						},
-					},
-				},
-			}
-
-			expected := etcd.EtcdConfig{
-				Endpoints: []string{
-					fmt.Sprintf("http://%s-etcd.%s:2379", AppName, AppName),
-				},
-			}
-
-			result := checkEtcdEndpoints(instance.Spec.ConfigSpec.Etcd, instance.Name, instance.Namespace)
-			Expect(result).To(Equal(expected))
-		})
-	})
-})
-
-var _ = Describe("Tests for checkPrometheusAddress", func() {
-	Context("When prometheus address is not provided", func() {
-		It("returns correct prometheus address", func() {
-			instance := &agentv1alpha1.Agent{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
-					Namespace: AppName,
-				},
-				Spec: agentv1alpha1.AgentSpec{},
-			}
-
-			expected := fmt.Sprintf("http://%s-prometheus-server.%s:80", AppName, AppName)
-
-			result := checkPrometheusAddress(instance.Spec.ConfigSpec.Prometheus.Address, instance.Name, instance.Namespace)
-			Expect(result).To(Equal(expected))
-		})
-	})
-
-	Context("When prometheus address is provided", func() {
-		It("returns correct prometheus address", func() {
-			instance := &agentv1alpha1.Agent{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
-					Namespace: AppName,
-				},
-				Spec: agentv1alpha1.AgentSpec{
-					ConfigSpec: agentv1alpha1.AgentConfigSpec{
-						CommonConfigSpec: common.CommonConfigSpec{
-							Prometheus: prometheus.PrometheusConfig{
-								Address: Test,
-							},
-						},
-					},
-				},
-			}
-
-			result := checkPrometheusAddress(instance.Spec.ConfigSpec.Prometheus.Address, instance.Name, instance.Namespace)
-			Expect(result).To(Equal(Test))
-		})
-	})
-})
-
 var _ = Describe("Tests for secretName", func() {
 	Context("When secret name is provided", func() {
 		It("returns correct secret name", func() {
@@ -1506,50 +1390,3 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 		})
 	})
 })
-
-var _ = Describe("Tests for getPolicyFileName", func() {
-	Context("When controller namespace is same as policy namespace", func() {
-		It("it should use only name for filename", func() {
-			os.Setenv("APERTURE_CONTROLLER_NAMESPACE", AppName)
-
-			filename := GetPolicyFileName(Test, AppName)
-
-			Expect(filename).To(Equal("test.yaml"))
-		})
-	})
-
-	Context("When controller namespace is not same as policy namespace", func() {
-		It("it should use name and namespace for filename", func() {
-			filename := GetPolicyFileName(Test, Test)
-
-			Expect(filename).To(Equal("test-test.yaml"))
-		})
-	})
-})
-
-// checkEtcdEndpoints generates endpoints list based on the release name if that is not provided else returns the provided values.
-func checkEtcdEndpoints(etcd etcd.EtcdConfig, name, namespace string) etcd.EtcdConfig {
-	endpoints := []string{}
-	if etcd.Endpoints != nil {
-		for _, endpoint := range etcd.Endpoints {
-			if endpoint != "" {
-				endpoints = append(endpoints, endpoint)
-			}
-		}
-	}
-
-	if len(endpoints) == 0 {
-		endpoints = append(endpoints, fmt.Sprintf("http://%s-etcd.%s:2379", name, namespace))
-	}
-
-	etcd.Endpoints = endpoints
-	return etcd
-}
-
-// checkPrometheusAddress generates prometheus address based on the release name if that is not provided else returns the provided value.
-func checkPrometheusAddress(address, name, namespace string) string {
-	if address == "" {
-		address = fmt.Sprintf("http://%s-prometheus-server.%s:80", name, namespace)
-	}
-	return strings.TrimRight(address, "/")
-}

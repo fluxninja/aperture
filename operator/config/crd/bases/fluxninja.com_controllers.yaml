@@ -1227,9 +1227,6 @@ spec:
                   policies:
                     description: Policies configuration.
                     properties:
-                      policies_path:
-                        description: Policies path configuration.
-                        type: string
                       promql_jobs_scheduler:
                         description: Scheduler for PromQL jobs.
                         properties:
@@ -1241,7 +1238,6 @@ spec:
                             type: integer
                         type: object
                     required:
-                    - policies_path
                     - promql_jobs_scheduler
                     type: object
                   profilers:
@@ -5022,27 +5018,6 @@ spec:
                 description: Node labels for pods assignment
                 type: object
                 x-kubernetes-map-type: atomic
-              operatorImage:
-                description: Image configuration for Policy sidecar container
-                properties:
-                  pullPolicy:
-                    description: The ImagePullPolicy of the image
-                    type: string
-                  pullSecrets:
-                    description: The PullSecrets for the image
-                    items:
-                      type: string
-                    type: array
-                  registry:
-                    description: The registry of the image
-                    type: string
-                  repository:
-                    description: The repository of the image
-                    type: string
-                  tag:
-                    description: The tag (version) of the image
-                    type: string
-                type: object
               podAnnotations:
                 additionalProperties:
                   type: string

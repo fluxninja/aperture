@@ -220,12 +220,6 @@ Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_`
 #### Members
 
 <dl>
-<dt>policies_path</dt>
-<dd>
-
-(string, default: `/etc/aperture/aperture-controller/policies`, env-var: `APERTURE_CONTROLLER_POLICIES_POLICIES_PATH`) Directory containing policies rules
-
-</dd>
 
 <dt>promql_jobs_scheduler</dt>
 <dd>

@@ -910,11 +910,6 @@ paths:
         name: promql_jobs_scheduler
         schema:
           $ref: '#/definitions/JobGroupConfig'
-      - description: Directory containing policies rules
-        in: query
-        name: policies_path
-        type: string
-        x-go-default: /etc/aperture/aperture-controller/policies
       tags:
       - common-configuration
       x-fn-config-env: true
