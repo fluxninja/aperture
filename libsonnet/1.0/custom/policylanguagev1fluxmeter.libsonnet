@@ -8,7 +8,7 @@ local patch =
         super.new()
         + fluxMeter.withSelector(selector)
         + fluxMeter.withAttributeKey(attribute_key)
-        + fluxMeter.withBuckets(buckets),
+        + fluxMeter.withStaticBuckets(buckets),
     },
   };
 

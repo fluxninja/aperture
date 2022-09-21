@@ -15,7 +15,7 @@ local extractor = aperture.v1.Extractor;
 local rule = aperture.v1.Rule;
 local selector = aperture.v1.Selector;
 local controlPoint = aperture.v1.ControlPoint;
-local bucket = aperture.v1.FluxMeterBuckets;
+local bucket = aperture.v1.FluxMeterStaticBuckets;
 
 local svcSelector = selector.new()
                     + selector.withAgentGroup('default')
@@ -53,7 +53,7 @@ local policy = latencyGradientPolicy({
       fluxMeter.new(
         svcSelector,
         fluxMeter.withAttributeKey('workload_duration_ms'),
-        fluxMeter.withBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0]),
+        fluxMeter.withStaticBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0]),
       ),
   },
 

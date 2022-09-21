@@ -14,19 +14,6 @@ Generated File Starts
 
 ## Objects
 
-### FluxMeterBuckets {#flux-meter-buckets}
-
-#### Properties
-
-<dl>
-<dt>buckets</dt>
-<dd>
-
-([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`)
-
-</dd>
-</dl>
-
 ### FluxMeterExponentialBuckets {#flux-meter-exponential-buckets}
 
 #### Properties
@@ -98,6 +85,19 @@ Generated File Starts
 <dd>
 
 (float64)
+
+</dd>
+</dl>
+
+### FluxMeterStaticBuckets {#flux-meter-static-buckets}
+
+#### Properties
+
+<dl>
+<dt>buckets</dt>
+<dd>
+
+([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`)
 
 </dd>
 </dl>
@@ -435,7 +435,7 @@ For list of available attributes in Envoy access logs, refer
 <dt>buckets</dt>
 <dd>
 
-([FluxMeterBuckets](#flux-meter-buckets))
+([FluxMeterStaticBuckets](#flux-meter-static-buckets))
 
 </dd>
 <dt>exponential_buckets</dt>

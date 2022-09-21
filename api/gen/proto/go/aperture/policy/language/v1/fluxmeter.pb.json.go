@@ -24,7 +24,7 @@ func (msg *FluxMeter) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *FluxMeter_Buckets) MarshalJSON() ([]byte, error) {
+func (msg *FluxMeter_StaticBuckets) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -33,7 +33,7 @@ func (msg *FluxMeter_Buckets) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *FluxMeter_Buckets) UnmarshalJSON(b []byte) error {
+func (msg *FluxMeter_StaticBuckets) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

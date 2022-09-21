@@ -264,15 +264,6 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/v1Entity'
     description: Entities defines mapping of entities.
-  FluxMeterBuckets:
-    type: object
-    properties:
-      buckets:
-        type: array
-        items:
-          type: number
-          format: double
-        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
   FluxMeterExponentialBuckets:
     type: object
     properties:
@@ -309,6 +300,15 @@ definitions:
       width:
         type: number
         format: double
+  FluxMeterStaticBuckets:
+    type: object
+    properties:
+      buckets:
+        type: array
+        items:
+          type: number
+          format: double
+        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
   LimiterDecisionLimiterReason:
     type: string
     enum:
@@ -585,7 +585,7 @@ definitions:
           :::
         x-go-default: workload_duration_ms
       buckets:
-        $ref: '#/definitions/FluxMeterBuckets'
+        $ref: '#/definitions/FluxMeterStaticBuckets'
       exponential_buckets:
         $ref: '#/definitions/FluxMeterExponentialBuckets'
       exponential_buckets_range:

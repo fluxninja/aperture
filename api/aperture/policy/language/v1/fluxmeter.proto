@@ -20,7 +20,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 //     traffic: ingress
 // ```
 message FluxMeter {
-  message Buckets {
+  message StaticBuckets {
     repeated double buckets = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
@@ -61,7 +61,7 @@ message FluxMeter {
 
   // Histogram buckets (in ms) for this FluxMeter.
   oneof histogram_buckets {
-    Buckets buckets = 2;
+    StaticBuckets buckets = 2;
     LinearBuckets linear_buckets = 3;
     ExponentialBuckets exponential_buckets = 4;
     ExponentialBucketsRange exponential_buckets_range = 5;

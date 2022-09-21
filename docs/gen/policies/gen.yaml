@@ -23,16 +23,6 @@ paths:
         "200":
           description: A successful response.
 definitions:
-  FluxMeterBuckets:
-    type: object
-    properties:
-      buckets:
-        type: array
-        items:
-          type: number
-          format: double
-        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
-        x-order: 0
   FluxMeterExponentialBuckets:
     type: object
     properties:
@@ -78,6 +68,16 @@ definitions:
         type: number
         format: double
         x-order: 2
+  FluxMeterStaticBuckets:
+    type: object
+    properties:
+      buckets:
+        type: array
+        items:
+          type: number
+          format: double
+        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+        x-order: 0
   MatchExpressionList:
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     type: object
@@ -352,7 +352,7 @@ definitions:
         x-order: 0
       buckets:
         x-order: 1
-        $ref: '#/definitions/FluxMeterBuckets'
+        $ref: '#/definitions/FluxMeterStaticBuckets'
       exponential_buckets:
         x-order: 2
         $ref: '#/definitions/FluxMeterExponentialBuckets'
