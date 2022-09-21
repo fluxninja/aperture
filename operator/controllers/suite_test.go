@@ -34,6 +34,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 
 	ctrl "sigs.k8s.io/controller-runtime"
 
@@ -56,9 +57,12 @@ var (
 	cancel                    context.CancelFunc
 	defaultAgentInstance      *v1alpha1.Agent
 	defaultControllerInstance *v1alpha1.Controller
+	defaultPolicyInstance     *v1alpha1.Policy
 	namespaceReconciler       *NamespaceReconciler
+	policyReconciler          *PolicyReconciler
 	mutatingWebhookReconciler *MutatingWebhookReconciler
 	certDir                   = filepath.Join(".", "certs")
+	policiesDir               = filepath.Join(".", "policies")
 	test                      = "test"
 	testTwo                   = "test2"
 	testArray                 = []string{test}
@@ -111,9 +115,20 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sDynamicClient).NotTo(BeNil())
 
+	k8sManager, err = ctrl.NewManager(cfg, ctrl.Options{
+		Scheme: scheme.Scheme,
+	})
+	Expect(err).ToNot(HaveOccurred())
+
 	namespaceReconciler = &NamespaceReconciler{
 		Client: k8sClient,
 		Scheme: k8sClient.Scheme(),
+	}
+
+	policyReconciler = &PolicyReconciler{
+		Client:   k8sClient,
+		Scheme:   k8sClient.Scheme(),
+		Recorder: k8sManager.GetEventRecorderFor(appName),
 	}
 
 	mutatingWebhookReconciler = &MutatingWebhookReconciler{
@@ -122,11 +137,6 @@ var _ = BeforeSuite(func() {
 		AgentManager:      true,
 		ControllerManager: true,
 	}
-
-	k8sManager, err = ctrl.NewManager(cfg, ctrl.Options{
-		Scheme: scheme.Scheme,
-	})
-	Expect(err).ToNot(HaveOccurred())
 
 	err = os.MkdirAll(certDir, 0o777)
 	Expect(err).NotTo(HaveOccurred())
@@ -224,11 +234,26 @@ var _ = BeforeSuite(func() {
 	}
 	err = config.UnmarshalYAML([]byte{}, &defaultAgentInstance.Spec)
 	Expect(err).NotTo(HaveOccurred())
+
+	defaultPolicyInstance = &v1alpha1.Policy{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      appName,
+			Namespace: appName,
+		},
+		Spec: runtime.RawExtension{
+			Raw: []byte("{\"circuit\":{\"components\":[{\"constant\":{\"out_ports\":{\"output\":{\"signal_name\":\"EMA_LIMIT_MULTIPLIER\"}}}}]},\"resources\":{\"flux_meters\":{\"service1-demo-app\":{\"selector\":{\"agent_group\":\"default\",\"control_point\":{\"traffic\":\"ingress\"},\"service\":\"service1-demo-app.demoapp.svc.cluster.local\"}}},\"classifiers\":[{\"rules\":{\"user_type\":{\"extractor\":{\"from\":\"request.http.headers.user_type\"}}},\"selector\":{\"agent_group\":\"default\",\"control_point\":{\"traffic\":\"ingress\"},\"service\":\"service1-demo-app.demoapp.svc.cluster.local\"}}]}}"),
+		},
+	}
+
+	policyFilePath = policiesDir
+	err = os.MkdirAll(policyFilePath, 0o777)
+	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
 	os.RemoveAll(certDir)
+	os.RemoveAll(policiesDir)
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
 })

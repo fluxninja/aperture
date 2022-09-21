@@ -9,14 +9,13 @@ RUN --mount=type=cache,target=/go/pkg/ \
     --mount=type=cache,target=/root/.cache/go-build/ \
     go mod download
 
+# App build
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
 ARG GIT_BRANCH
 ENV GIT_BRANCH=${GIT_BRANCH}
 
-
 FROM base AS builder
-# App build
 RUN --mount=type=cache,target=/go/pkg/ \
     --mount=type=cache,target=/root/.cache/go-build/ \
     CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" LDFLAGS="-s -w" \

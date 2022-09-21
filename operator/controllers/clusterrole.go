@@ -70,7 +70,32 @@ var (
 		{
 			APIGroups: []string{"coordination.k8s.io"},
 			Resources: []string{"leases"},
-			Verbs:     []string{"get"},
+			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
+		},
+		{
+			APIGroups: []string{"admissionregistration.k8s.io"},
+			Resources: []string{"mutatingwebhookconfigurations"},
+			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
+		},
+		{
+			APIGroups: []string{"fluxninja.com"},
+			Resources: []string{"policies"},
+			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
+		},
+		{
+			APIGroups: []string{""},
+			Resources: []string{"events"},
+			Verbs:     []string{"create", "patch"},
+		},
+		{
+			APIGroups: []string{"fluxninja.com"},
+			Resources: []string{"policies/finalizers"},
+			Verbs:     []string{"update"},
+		},
+		{
+			APIGroups: []string{"fluxninja.com"},
+			Resources: []string{"policies/status"},
+			Verbs:     []string{"get", "patch", "update"},
 		},
 	}
 
