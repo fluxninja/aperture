@@ -175,13 +175,13 @@ Alternatively, you can use [`ctlptl`](https://github.com/tilt-dev/ctlptl) to
 start a cluster with built-in local registry for Docker images:
 
 ```sh
-ctlptl apply -f ctlptl-kind-config.yaml
+ctlptl apply -f playground/ctlptl-kind-config.yaml
 ```
 
 Once done, you can delete the cluster and registry with following command:
 
 ```sh
-ctlptl delete -f ctlptl-kind-config.yaml
+ctlptl delete -f playground/ctlptl-kind-config.yaml
 ```
 
 ### Services deployment
