@@ -26,7 +26,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/concurrency/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
@@ -68,7 +68,7 @@ func provideWatcher(
 	// Get Agent Group from host info gatherer
 	agentGroupName := ai.GetAgentGroup()
 	// Scope the sync to the agent group.
-	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath, paths.AgentGroupPrefix(agentGroupName))
+	etcdPath := path.Join(common.ConcurrencyLimiterConfigPath, common.AgentGroupPrefix(agentGroupName))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
@@ -77,8 +77,9 @@ func provideWatcher(
 }
 
 type concurrencyLimiterFactory struct {
-	engineAPI iface.Engine
-	registry  status.Registry
+	engineAPI  iface.Engine
+	metricsAPI iface.ResponseMetricsAPI
+	registry   status.Registry
 
 	autoTokensFactory       *autoTokensFactory
 	loadShedActuatorFactory *loadShedActuatorFactory
@@ -101,6 +102,7 @@ func setupConcurrencyLimiterFactory(
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
+	m iface.ResponseMetricsAPI,
 ) error {
 	agentGroup := ai.GetAgentGroup()
 
@@ -119,6 +121,7 @@ func setupConcurrencyLimiterFactory(
 
 	conLimiterFactory := &concurrencyLimiterFactory{
 		engineAPI:               e,
+		metricsAPI:              m,
 		autoTokensFactory:       autoTokensFactory,
 		loadShedActuatorFactory: loadShedActuatorFactory,
 		registry:                reg,
@@ -337,6 +340,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	}
 
 	engineAPI := conLimiterFactory.engineAPI
+	metricsAPI := conLimiterFactory.metricsAPI
 	wfqFlowsGaugeVec := conLimiterFactory.wfqFlowsGaugeVec
 	wfqRequestsGaugeVec := conLimiterFactory.wfqRequestsGaugeVec
 	incomingConcurrencyCounterVec := conLimiterFactory.incomingConcurrencyCounterVec
@@ -392,6 +396,8 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			if err != nil {
 				errMulti = multierr.Append(errMulti, err)
 			}
+
+			metricsAPI.DeleteTokenLatencyHistogram(metricLabels)
 
 			// Remove metrics from metric vectors
 			deleted := wfqFlowsGaugeVec.Delete(metricLabels)
@@ -494,8 +500,8 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flow
 		PolicyHash:     conLimiter.GetPolicyHash(),
 		ComponentIndex: conLimiter.GetComponentIndex(),
 		Dropped:        !accepted,
-		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-			ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+			ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 				WorkloadIndex: matchedWorkloadIndex,
 			},
 		},

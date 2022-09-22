@@ -144,7 +144,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				map[string]string{"version": "one", "other": "tag"},
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -162,7 +162,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_EGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, ""),
 				map[string]string{"version": "one"},
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -177,7 +177,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				map[string]string{"version": "two"},
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -197,7 +197,7 @@ var _ = Describe("Classifier", func() {
 				_, labels, err := classifier.Classify(
 					context.TODO(),
 					[]string{"my-service.default.svc.cluster.local"},
-					selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+					selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 					map[string]string{"version": "one"},
 					attributesWithHeaders(object{
 						"foo": "hello",
@@ -270,7 +270,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -314,7 +314,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -371,7 +371,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -435,7 +435,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",

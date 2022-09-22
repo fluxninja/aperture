@@ -156,7 +156,7 @@ var _ = Describe("Dataplane Engine", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
 			_ = engine.RegisterConcurrencyLimiter(mockLimiter)
 
-			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, "")
+			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
 			svcs := []string{"testService2.testNamespace2.svc.cluster.local"}
 			labels := map[string]string{"service": "whatever"}
 
@@ -169,7 +169,7 @@ var _ = Describe("Dataplane Engine", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
 			_ = engine.RegisterConcurrencyLimiter(mockLimiter)
 
-			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, "")
+			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
 			svcs := []string{"testService.testNamespace.svc.cluster.local"}
 			labels := map[string]string{"service": "testService.testNamespace.svc.cluster.local"}
 

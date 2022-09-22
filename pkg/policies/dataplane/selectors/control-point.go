@@ -9,21 +9,21 @@ import (
 
 // ControlPoint is the interface for controlPoint.
 type ControlPoint interface {
-	Type() flowcontrolv1.ControlPoint_Type
+	Type() flowcontrolv1.ControlPointInfo_Type
 	Feature() string
-	ToFlowControlPointProto() *flowcontrolv1.ControlPoint
+	ToControlPointInfoProto() *flowcontrolv1.ControlPointInfo
 }
 
 type controlPoint struct {
 	feature string
-	type_   flowcontrolv1.ControlPoint_Type
+	type_   flowcontrolv1.ControlPointInfo_Type
 }
 
 // controlPoint implements the ControlPoint interface.
 var _ ControlPoint = (*controlPoint)(nil)
 
 // NewControlPoint returns a controlPoint.
-func NewControlPoint(type_ flowcontrolv1.ControlPoint_Type, feature string) ControlPoint {
+func NewControlPoint(type_ flowcontrolv1.ControlPointInfo_Type, feature string) ControlPoint {
 	return controlPoint{
 		type_:   type_,
 		feature: feature,
@@ -34,23 +34,23 @@ func controlPointFromSelectorControlPointProto(controlPointMsg *selectorv1.Contr
 	if controlPointMsg != nil && controlPointMsg.Controlpoint != nil {
 		switch cp := controlPointMsg.Controlpoint.(type) {
 		case *selectorv1.ControlPoint_Feature:
-			return NewControlPoint(flowcontrolv1.ControlPoint_TYPE_FEATURE, cp.Feature), nil
+			return NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_FEATURE, cp.Feature), nil
 		case *selectorv1.ControlPoint_Traffic:
 			switch cp.Traffic {
 			case "ingress":
-				return NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""), nil
+				return NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""), nil
 			case "egress":
-				return NewControlPoint(flowcontrolv1.ControlPoint_TYPE_EGRESS, ""), nil
+				return NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, ""), nil
 			default:
-				return NewControlPoint(flowcontrolv1.ControlPoint_TYPE_UNKNOWN, ""), fmt.Errorf("invalid traffic direction")
+				return NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_UNKNOWN, ""), fmt.Errorf("invalid traffic direction")
 			}
 		}
 	}
-	return NewControlPoint(flowcontrolv1.ControlPoint_TYPE_UNKNOWN, ""), fmt.Errorf("unknown/missing control point")
+	return NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_UNKNOWN, ""), fmt.Errorf("unknown/missing control point")
 }
 
 // Type returns the control point type.
-func (p controlPoint) Type() flowcontrolv1.ControlPoint_Type {
+func (p controlPoint) Type() flowcontrolv1.ControlPointInfo_Type {
 	return p.type_
 }
 
@@ -59,9 +59,9 @@ func (p controlPoint) Feature() string {
 	return p.feature
 }
 
-// ToFlowControlPointProto returns a flow control control point proto.
-func (p controlPoint) ToFlowControlPointProto() *flowcontrolv1.ControlPoint {
-	return &flowcontrolv1.ControlPoint{
+// ToControlPointInfoProto returns a flow control control point proto.
+func (p controlPoint) ToControlPointInfoProto() *flowcontrolv1.ControlPointInfo {
+	return &flowcontrolv1.ControlPointInfo{
 		Type:    p.type_,
 		Feature: p.feature,
 	}

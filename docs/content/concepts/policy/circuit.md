@@ -111,10 +111,10 @@ Components are divided into following functional categories to aid exploration:
     This Controller acts on the ratio of Setpoint and Signal.
 - **Actuators**: Actuators are Components which act on Signals to make real
   changes like shed traffic, change rate limits etc.
-  - [Concurrency Limiter](/references/configuration/policies.md#languagev1-concurrency-limiter):
+  - [Concurrency Limiter](/references/configuration/policies.md#v1-concurrency-limiter):
     Takes load shed factor as a Signal which determines the proportional of Flow
     concurrency to shed.
-  - [Rate Limiter](/references/configuration/policies.md#languagev1-rate-limiter):
+  - [Rate Limiter](/references/configuration/policies.md#v1-rate-limiter):
     Take rate limit as a Signal which determines the rate of flows handled by
     that Rate Limiter.
 
