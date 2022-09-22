@@ -35,7 +35,9 @@ import (
 
 	cryptorand "crypto/rand"
 
-	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/imdario/mergo"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -45,8 +47,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// containerSecurityContext prepares SecurityContext for containers based on the provided parameter.
-func containerSecurityContext(containerSecurityContext v1alpha1.ContainerSecurityContext) *corev1.SecurityContext {
+// ContainerSecurityContext prepares SecurityContext for containers based on the provided parameter.
+func ContainerSecurityContext(containerSecurityContext common.ContainerSecurityContext) *corev1.SecurityContext {
 	var securityContext *corev1.SecurityContext
 	if containerSecurityContext.Enabled {
 		securityContext = &corev1.SecurityContext{
@@ -61,8 +63,8 @@ func containerSecurityContext(containerSecurityContext v1alpha1.ContainerSecurit
 	return securityContext
 }
 
-// getContainerSecurityContext prepares SecurityContext for containers based on the provided parameter.
-func podSecurityContext(podSecurityContext v1alpha1.PodSecurityContext) *corev1.PodSecurityContext {
+// PodSecurityContext prepares SecurityContext for Pods based on the provided parameter.
+func PodSecurityContext(podSecurityContext common.PodSecurityContext) *corev1.PodSecurityContext {
 	var securityContext *corev1.PodSecurityContext
 	if podSecurityContext.Enabled {
 		securityContext = &corev1.PodSecurityContext{
@@ -75,8 +77,8 @@ func podSecurityContext(podSecurityContext v1alpha1.PodSecurityContext) *corev1.
 	return securityContext
 }
 
-// imageString prepares image string from the provided Image struct.
-func imageString(image v1alpha1.Image, repository string) string {
+// ImageString prepares image string from the provided Image struct.
+func ImageString(image common.Image, repository string) string {
 	var imageStr string
 	if image.Registry != "" {
 		imageStr = fmt.Sprintf("%s/%s:%s", image.Registry, repository, image.Tag)
@@ -86,8 +88,8 @@ func imageString(image v1alpha1.Image, repository string) string {
 	return imageStr
 }
 
-// imagePullSecrets prepares imagePullSecrets string slice from the provided Image struct.
-func imagePullSecrets(image v1alpha1.Image) []corev1.LocalObjectReference {
+// ImagePullSecrets prepares ImagePullSecrets string slice from the provided Image struct.
+func ImagePullSecrets(image common.Image) []corev1.LocalObjectReference {
 	imagePullSecrets := []corev1.LocalObjectReference{}
 
 	for _, secret := range image.PullSecrets {
@@ -99,8 +101,8 @@ func imagePullSecrets(image v1alpha1.Image) []corev1.LocalObjectReference {
 	return imagePullSecrets
 }
 
-// containerEnvFrom prepares EnvFrom resource for Agent and Controllers' container.
-func containerEnvFrom(controllerSpec v1alpha1.CommonSpec) []corev1.EnvFromSource {
+// ContainerEnvFrom prepares EnvFrom resource for Agent and Controllers' container.
+func ContainerEnvFrom(controllerSpec common.CommonSpec) []corev1.EnvFromSource {
 	envFrom := []corev1.EnvFromSource{}
 	if controllerSpec.ExtraEnvVarsCM != "" {
 		envFrom = append(envFrom, corev1.EnvFromSource{
@@ -125,8 +127,8 @@ func containerEnvFrom(controllerSpec v1alpha1.CommonSpec) []corev1.EnvFromSource
 	return envFrom
 }
 
-// containerProbes prepares livenessProbe and readinessProbe based on the provided parameters.
-func containerProbes(spec v1alpha1.CommonSpec, scheme corev1.URIScheme) (*corev1.Probe, *corev1.Probe) {
+// ContainerProbes prepares livenessProbe and readinessProbe based on the provided parameters.
+func ContainerProbes(spec common.CommonSpec, scheme corev1.URIScheme) (*corev1.Probe, *corev1.Probe) {
 	var livenessProbe *corev1.Probe
 	var readinessProbe *corev1.Probe
 	if spec.LivenessProbe.Enabled {
@@ -134,7 +136,7 @@ func containerProbes(spec v1alpha1.CommonSpec, scheme corev1.URIScheme) (*corev1
 			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
 					Path:   "/v1/status/liveness",
-					Port:   intstr.FromString(server),
+					Port:   intstr.FromString(Server),
 					Scheme: scheme,
 				},
 			},
@@ -153,7 +155,7 @@ func containerProbes(spec v1alpha1.CommonSpec, scheme corev1.URIScheme) (*corev1
 			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
 					Path:   "/v1/status/readiness",
-					Port:   intstr.FromString(server),
+					Port:   intstr.FromString(Server),
 					Scheme: scheme,
 				},
 			},
@@ -170,8 +172,8 @@ func containerProbes(spec v1alpha1.CommonSpec, scheme corev1.URIScheme) (*corev1
 	return livenessProbe, readinessProbe
 }
 
-// agentEnv prepares env resources for Agents' container.
-func agentEnv(instance *v1alpha1.Agent, agentGroup string) []corev1.EnvVar {
+// AgentEnv prepares env resources for Agents' container.
+func AgentEnv(instance *agentv1alpha1.Agent, agentGroup string) []corev1.EnvVar {
 	spec := instance.Spec
 
 	envs := []corev1.EnvVar{
@@ -179,7 +181,7 @@ func agentEnv(instance *v1alpha1.Agent, agentGroup string) []corev1.EnvVar {
 			Name: "NODE_NAME",
 			ValueFrom: &corev1.EnvVarSource{
 				FieldRef: &corev1.ObjectFieldSelector{
-					APIVersion: v1Version,
+					APIVersion: V1Version,
 					FieldPath:  "spec.nodeName",
 				},
 			},
@@ -202,7 +204,7 @@ func agentEnv(instance *v1alpha1.Agent, agentGroup string) []corev1.EnvVar {
 			Name: "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_POD_NAME",
 			ValueFrom: &corev1.EnvVarSource{
 				FieldRef: &corev1.ObjectFieldSelector{
-					APIVersion: v1Version,
+					APIVersion: V1Version,
 					FieldPath:  "metadata.name",
 				},
 			},
@@ -216,7 +218,7 @@ func agentEnv(instance *v1alpha1.Agent, agentGroup string) []corev1.EnvVar {
 			Name: "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_NODE_NAME",
 			ValueFrom: &corev1.EnvVarSource{
 				FieldRef: &corev1.ObjectFieldSelector{
-					APIVersion: v1Version,
+					APIVersion: V1Version,
 					FieldPath:  "spec.nodeName",
 				},
 			},
@@ -233,20 +235,20 @@ func agentEnv(instance *v1alpha1.Agent, agentGroup string) []corev1.EnvVar {
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: secretName(instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaPlugin),
+						Name: SecretName(instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaPlugin),
 					},
-					Key:      secretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
+					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
 					Optional: pointer.BoolPtr(false),
 				},
 			},
 		})
 	}
 
-	return mergeEnvVars(envs, spec.ExtraEnvVars)
+	return MergeEnvVars(envs, spec.ExtraEnvVars)
 }
 
-// agentVolumeMounts prepares volumeMounts for Agents' container.
-func agentVolumeMounts(agentSpec v1alpha1.AgentSpec) []corev1.VolumeMount {
+// AgentVolumeMounts prepares volumeMounts for Agents' container.
+func AgentVolumeMounts(agentSpec agentv1alpha1.AgentSpec) []corev1.VolumeMount {
 	volumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "aperture-agent-config",
@@ -254,11 +256,11 @@ func agentVolumeMounts(agentSpec v1alpha1.AgentSpec) []corev1.VolumeMount {
 		},
 	}
 
-	return mergeVolumeMounts(volumeMounts, agentSpec.ExtraVolumeMounts)
+	return MergeVolumeMounts(volumeMounts, agentSpec.ExtraVolumeMounts)
 }
 
-// agentVolumes prepares volumes for Agent.
-func agentVolumes(agentSpec v1alpha1.AgentSpec) []corev1.Volume {
+// AgentVolumes prepares volumes for Agent.
+func AgentVolumes(agentSpec agentv1alpha1.AgentSpec) []corev1.Volume {
 	volumes := []corev1.Volume{
 		{
 			Name: "aperture-agent-config",
@@ -266,18 +268,18 @@ func agentVolumes(agentSpec v1alpha1.AgentSpec) []corev1.Volume {
 				ConfigMap: &corev1.ConfigMapVolumeSource{
 					DefaultMode: pointer.Int32Ptr(420),
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: agentServiceName,
+						Name: AgentServiceName,
 					},
 				},
 			},
 		},
 	}
 
-	return mergeVolumes(volumes, agentSpec.ExtraVolumes)
+	return MergeVolumes(volumes, agentSpec.ExtraVolumes)
 }
 
-// controllerEnv prepares env resources for Controller' container.
-func controllerEnv(instance *v1alpha1.Controller) []corev1.EnvVar {
+// ControllerEnv prepares env resources for Controller' container.
+func ControllerEnv(instance *controllerv1alpha1.Controller) []corev1.EnvVar {
 	spec := instance.Spec
 
 	envs := []corev1.EnvVar{
@@ -285,7 +287,7 @@ func controllerEnv(instance *v1alpha1.Controller) []corev1.EnvVar {
 			Name: "APERTURE_CONTROLLER_SERVICE_DISCOVERY_KUBERNETES_NODE_NAME",
 			ValueFrom: &corev1.EnvVarSource{
 				FieldRef: &corev1.ObjectFieldSelector{
-					APIVersion: v1Version,
+					APIVersion: V1Version,
 					FieldPath:  "spec.nodeName",
 				},
 			},
@@ -298,20 +300,20 @@ func controllerEnv(instance *v1alpha1.Controller) []corev1.EnvVar {
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: secretName(instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin),
+						Name: SecretName(instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin),
 					},
-					Key:      secretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
+					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
 					Optional: pointer.BoolPtr(false),
 				},
 			},
 		})
 	}
 
-	return mergeEnvVars(envs, spec.ExtraEnvVars)
+	return MergeEnvVars(envs, spec.ExtraEnvVars)
 }
 
-// getVolumes prepares volumeMounts for Controllers' container.
-func controllerVolumeMounts(controllerSpec v1alpha1.CommonSpec) []corev1.VolumeMount {
+// ControllerVolumeMounts prepares volumeMounts for Controllers' container.
+func ControllerVolumeMounts(controllerSpec common.CommonSpec) []corev1.VolumeMount {
 	volumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "aperture-controller-config",
@@ -319,7 +321,7 @@ func controllerVolumeMounts(controllerSpec v1alpha1.CommonSpec) []corev1.VolumeM
 		},
 		{
 			Name:      "etc-aperture-policies",
-			MountPath: policyFilePath,
+			MountPath: PolicyFilePath,
 			ReadOnly:  true,
 		},
 		{
@@ -334,11 +336,11 @@ func controllerVolumeMounts(controllerSpec v1alpha1.CommonSpec) []corev1.VolumeM
 		},
 	}
 
-	return mergeVolumeMounts(volumeMounts, controllerSpec.ExtraVolumeMounts)
+	return MergeVolumeMounts(volumeMounts, controllerSpec.ExtraVolumeMounts)
 }
 
-// controllerVolumes prepares volumes for Controller.
-func controllerVolumes(instance *v1alpha1.Controller) []corev1.Volume {
+// ControllerVolumes prepares volumes for Controller.
+func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume {
 	volumes := []corev1.Volume{
 		{
 			Name: "aperture-controller-config",
@@ -346,7 +348,7 @@ func controllerVolumes(instance *v1alpha1.Controller) []corev1.Volume {
 				ConfigMap: &corev1.ConfigMapVolumeSource{
 					DefaultMode: pointer.Int32Ptr(420),
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: controllerServiceName,
+						Name: ControllerServiceName,
 					},
 				},
 			},
@@ -380,15 +382,15 @@ func controllerVolumes(instance *v1alpha1.Controller) []corev1.Volume {
 		},
 	}
 
-	return mergeVolumes(volumes, instance.Spec.ExtraVolumes)
+	return MergeVolumes(volumes, instance.Spec.ExtraVolumes)
 }
 
-// commonLabels prepares common labels used by all resources.
-func commonLabels(commonLabels map[string]string, instanceName, component string) map[string]string {
+// CommonLabels prepares common labels used by all resources.
+func CommonLabels(commonLabels map[string]string, instanceName, component string) map[string]string {
 	labels := map[string]string{
-		"app.kubernetes.io/name":       appName,
+		"app.kubernetes.io/name":       AppName,
 		"app.kubernetes.io/instance":   instanceName,
-		"app.kubernetes.io/managed-by": operatorName,
+		"app.kubernetes.io/managed-by": OperatorName,
 		"app.kubernetes.io/component":  component,
 	}
 
@@ -401,18 +403,18 @@ func commonLabels(commonLabels map[string]string, instanceName, component string
 	return labels
 }
 
-// selectorLabels prepares the labels used for Selector.
-func selectorLabels(instance, component string) map[string]string {
+// SelectorLabels prepares the labels used for Selector.
+func SelectorLabels(instance, component string) map[string]string {
 	return map[string]string{
-		"app.kubernetes.io/name":       appName,
+		"app.kubernetes.io/name":       AppName,
 		"app.kubernetes.io/instance":   instance,
-		"app.kubernetes.io/managed-by": operatorName,
+		"app.kubernetes.io/managed-by": OperatorName,
 		"app.kubernetes.io/component":  component,
 	}
 }
 
-// getControllerAnnotationsWithOwnerRef prepares the map for Annotation with reference to the creator instance.
-func getControllerAnnotationsWithOwnerRef(instance *v1alpha1.Controller) map[string]string {
+// ControllerAnnotationsWithOwnerRef prepares the map for Annotation with reference to the creator instance.
+func ControllerAnnotationsWithOwnerRef(instance *controllerv1alpha1.Controller) map[string]string {
 	annotations := instance.Spec.Annotations
 	if annotations == nil {
 		annotations = map[string]string{}
@@ -424,8 +426,8 @@ func getControllerAnnotationsWithOwnerRef(instance *v1alpha1.Controller) map[str
 	return annotations
 }
 
-// getAgentAnnotationsWithOwnerRef prepares the map for Annotation with reference to the creator instance.
-func getAgentAnnotationsWithOwnerRef(instance *v1alpha1.Agent) map[string]string {
+// AgentAnnotationsWithOwnerRef prepares the map for Annotation with reference to the creator instance.
+func AgentAnnotationsWithOwnerRef(instance *agentv1alpha1.Agent) map[string]string {
 	annotations := instance.Spec.Annotations
 	if annotations == nil {
 		annotations = map[string]string{}
@@ -437,8 +439,8 @@ func getAgentAnnotationsWithOwnerRef(instance *v1alpha1.Agent) map[string]string
 	return annotations
 }
 
-// secretName fetches name for ApiKey secret from config or generates the name if not present in config.
-func secretName(instance, component string, spec *v1alpha1.APIKeySecret) string {
+// SecretName fetches name for ApiKey secret from config or generates the name if not present in config.
+func SecretName(instance, component string, spec *common.APIKeySecret) string {
 	name := spec.SecretKeyRef.Name
 	if name != "" {
 		return name
@@ -447,18 +449,18 @@ func secretName(instance, component string, spec *v1alpha1.APIKeySecret) string 
 	return fmt.Sprintf("%s-%s-apikey", instance, component)
 }
 
-// secretDataKey fetches Key for ApiKey secret from config or generates the Key if not present in config.
-func secretDataKey(spec *v1alpha1.SecretKeyRef) string {
+// SecretDataKey fetches Key for ApiKey secret from config or generates the Key if not present in config.
+func SecretDataKey(spec *common.SecretKeyRef) string {
 	key := spec.Key
 	if key != "" {
 		return key
 	}
 
-	return secretKey
+	return SecretKey
 }
 
-// checkCertificate checks if existing certificates are available.
-func checkCertificate() bool {
+// CheckCertificate checks if existing certificates are available.
+func CheckCertificate() bool {
 	certDir := strings.TrimRight(os.Getenv("APERTURE_OPERATOR_CERT_DIR"), "/")
 	if certDir == "" {
 		certDir = filepath.Join(os.TempDir(), "k8s-webhook-server", "serving-certs")
@@ -483,8 +485,8 @@ func checkCertificate() bool {
 	return err == nil
 }
 
-// generateCertificate generates certificate and stores it in the desired location.
-func generateCertificate(dnsPrefix, namespace string) (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
+// GenerateCertificate generates certificate and stores it in the desired location.
+func GenerateCertificate(dnsPrefix, namespace string) (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
 	var caPEM, serverCertPEM, serverPrivKeyPEM *bytes.Buffer
 
 	ca := &x509.Certificate{
@@ -571,8 +573,8 @@ func generateCertificate(dnsPrefix, namespace string) (*bytes.Buffer, *bytes.Buf
 	return serverCertPEM, serverPrivKeyPEM, caPEM, nil
 }
 
-// writeFile writes data in the file at the given path.
-func writeFile(filepath string, sCert *bytes.Buffer) error {
+// WriteFile writes data in the file at the given path.
+func WriteFile(filepath string, sCert *bytes.Buffer) error {
 	f, err := os.Create(filepath)
 	if err != nil {
 		return err
@@ -588,7 +590,7 @@ func writeFile(filepath string, sCert *bytes.Buffer) error {
 
 // CheckAndGenerateCertForOperator checks if existing certificates are present and creates new if not present.
 func CheckAndGenerateCertForOperator() error {
-	if checkCertificate() {
+	if CheckCertificate() {
 		return nil
 	}
 
@@ -602,7 +604,7 @@ func CheckAndGenerateCertForOperator() error {
 		return fmt.Errorf("the value for environment variable 'APERTURE_OPERATOR_SERVICE_NAME' is not configured")
 	}
 
-	serverCertPEM, serverPrivKeyPEM, caPEM, err := generateCertificate(serviceName, namespace)
+	serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(serviceName, namespace)
 	if err != nil {
 		return err
 	}
@@ -612,17 +614,17 @@ func CheckAndGenerateCertForOperator() error {
 		return err
 	}
 
-	err = writeFile(fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), os.Getenv("APERTURE_OPERATOR_CERT_NAME")), serverCertPEM)
+	err = WriteFile(fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), os.Getenv("APERTURE_OPERATOR_CERT_NAME")), serverCertPEM)
 	if err != nil {
 		return err
 	}
 
-	err = writeFile(fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), os.Getenv("APERTURE_OPERATOR_KEY_NAME")), serverPrivKeyPEM)
+	err = WriteFile(fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), os.Getenv("APERTURE_OPERATOR_KEY_NAME")), serverPrivKeyPEM)
 	if err != nil {
 		return err
 	}
 
-	err = writeFile(fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), webhookClientCertName), caPEM)
+	err = WriteFile(fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), WebhookClientCertName), caPEM)
 	if err != nil {
 		return err
 	}
@@ -630,8 +632,8 @@ func CheckAndGenerateCertForOperator() error {
 	return nil
 }
 
-// mergeEnvVars merges common and provided extra Environment variables of Kubernetes container.
-func mergeEnvVars(common, extra []corev1.EnvVar) []corev1.EnvVar {
+// MergeEnvVars merges common and provided extra Environment variables of Kubernetes container.
+func MergeEnvVars(common, extra []corev1.EnvVar) []corev1.EnvVar {
 	if extra == nil {
 		return common
 	}
@@ -651,8 +653,8 @@ func mergeEnvVars(common, extra []corev1.EnvVar) []corev1.EnvVar {
 	return extra
 }
 
-// mergeEnvFromSources merges common and provided extra Environment From of Kubernetes container.
-func mergeEnvFromSources(common, extra []corev1.EnvFromSource) []corev1.EnvFromSource {
+// MergeEnvFromSources merges common and provided extra Environment From of Kubernetes container.
+func MergeEnvFromSources(common, extra []corev1.EnvFromSource) []corev1.EnvFromSource {
 	if extra == nil {
 		return common
 	}
@@ -691,8 +693,8 @@ func mergeEnvFromSources(common, extra []corev1.EnvFromSource) []corev1.EnvFromS
 	return extra
 }
 
-// mergeVolumeMounts merges common and provided extra Volume mounts of Kubernetes container.
-func mergeVolumeMounts(common, extra []corev1.VolumeMount) []corev1.VolumeMount {
+// MergeVolumeMounts merges common and provided extra Volume mounts of Kubernetes container.
+func MergeVolumeMounts(common, extra []corev1.VolumeMount) []corev1.VolumeMount {
 	if extra == nil {
 		return common
 	}
@@ -711,8 +713,8 @@ func mergeVolumeMounts(common, extra []corev1.VolumeMount) []corev1.VolumeMount 
 	return extra
 }
 
-// mergeVolumes merges common and provided extra Volume of Kubernetes Pod.
-func mergeVolumes(common, extra []corev1.Volume) []corev1.Volume {
+// MergeVolumes merges common and provided extra Volume of Kubernetes Pod.
+func MergeVolumes(common, extra []corev1.Volume) []corev1.Volume {
 	if extra == nil {
 		return common
 	}
@@ -731,8 +733,8 @@ func mergeVolumes(common, extra []corev1.Volume) []corev1.Volume {
 	return extra
 }
 
-// mergeContainers merges common and provided Container/Init Container of Kubernetes container.
-func mergeContainers(common, extra []corev1.Container) []corev1.Container {
+// MergeContainers merges common and provided Container/Init Container of Kubernetes container.
+func MergeContainers(common, extra []corev1.Container) []corev1.Container {
 	if extra == nil {
 		return common
 	}
@@ -751,8 +753,8 @@ func mergeContainers(common, extra []corev1.Container) []corev1.Container {
 	return extra
 }
 
-// mergeImagePullSecrets merges common and provided Image Pull Secrets of Kubernetes.
-func mergeImagePullSecrets(common, extra []corev1.LocalObjectReference) []corev1.LocalObjectReference {
+// MergeImagePullSecrets merges common and provided Image Pull Secrets of Kubernetes.
+func MergeImagePullSecrets(common, extra []corev1.LocalObjectReference) []corev1.LocalObjectReference {
 	if extra == nil {
 		return common
 	}
@@ -771,8 +773,8 @@ func mergeImagePullSecrets(common, extra []corev1.LocalObjectReference) []corev1
 	return extra
 }
 
-// updateAperture updates the Aperture resource in Kubernetes.
-func updateResource(client client.Client, ctx context.Context, instance client.Object) error {
+// UpdateResource updates the Aperture resource in Kubernetes.
+func UpdateResource(client client.Client, ctx context.Context, instance client.Object) error {
 	attempt := 5
 	for attempt > 0 {
 		attempt -= 1
@@ -794,8 +796,8 @@ func updateResource(client client.Client, ctx context.Context, instance client.O
 	return nil
 }
 
-// getPort parses port value from the Address string.
-func getPort(addr string) (int32, error) {
+// GetPort parses port value from the Address string.
+func GetPort(addr string) (int32, error) {
 	_, portStr, err := net.SplitHostPort(addr)
 	if err != nil {
 		return 0, err
@@ -808,8 +810,8 @@ func getPort(addr string) (int32, error) {
 	return int32(port), nil
 }
 
-// getPolicyFileName prepares filename for Policy based on the Controller namespace.
-func getPolicyFileName(name, namespace string) string {
+// GetPolicyFileName prepares filename for Policy based on the Controller namespace.
+func GetPolicyFileName(name, namespace string) string {
 	controllerNamespace := os.Getenv("APERTURE_CONTROLLER_NAMESPACE")
 	if controllerNamespace == namespace {
 		return fmt.Sprintf("%s.yaml", name)
