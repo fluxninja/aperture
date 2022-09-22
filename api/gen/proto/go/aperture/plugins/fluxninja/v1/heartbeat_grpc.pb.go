@@ -7,6 +7,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -96,6 +97,90 @@ var FluxNinjaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Report",
 			Handler:    _FluxNinjaService_Report_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "aperture/plugins/fluxninja/v1/heartbeat.proto",
+}
+
+// ControllerInfoServiceClient is the client API for ControllerInfoService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ControllerInfoServiceClient interface {
+	GetControllerInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ControllerInfo, error)
+}
+
+type controllerInfoServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewControllerInfoServiceClient(cc grpc.ClientConnInterface) ControllerInfoServiceClient {
+	return &controllerInfoServiceClient{cc}
+}
+
+func (c *controllerInfoServiceClient) GetControllerInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ControllerInfo, error) {
+	out := new(ControllerInfo)
+	err := c.cc.Invoke(ctx, "/aperture.plugins.fluxninja.v1.ControllerInfoService/GetControllerInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ControllerInfoServiceServer is the server API for ControllerInfoService service.
+// All implementations should embed UnimplementedControllerInfoServiceServer
+// for forward compatibility
+type ControllerInfoServiceServer interface {
+	GetControllerInfo(context.Context, *emptypb.Empty) (*ControllerInfo, error)
+}
+
+// UnimplementedControllerInfoServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedControllerInfoServiceServer struct {
+}
+
+func (UnimplementedControllerInfoServiceServer) GetControllerInfo(context.Context, *emptypb.Empty) (*ControllerInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetControllerInfo not implemented")
+}
+
+// UnsafeControllerInfoServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ControllerInfoServiceServer will
+// result in compilation errors.
+type UnsafeControllerInfoServiceServer interface {
+	mustEmbedUnimplementedControllerInfoServiceServer()
+}
+
+func RegisterControllerInfoServiceServer(s grpc.ServiceRegistrar, srv ControllerInfoServiceServer) {
+	s.RegisterService(&ControllerInfoService_ServiceDesc, srv)
+}
+
+func _ControllerInfoService_GetControllerInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerInfoServiceServer).GetControllerInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aperture.plugins.fluxninja.v1.ControllerInfoService/GetControllerInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerInfoServiceServer).GetControllerInfo(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ControllerInfoService_ServiceDesc is the grpc.ServiceDesc for ControllerInfoService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ControllerInfoService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "aperture.plugins.fluxninja.v1.ControllerInfoService",
+	HandlerType: (*ControllerInfoServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetControllerInfo",
+			Handler:    _ControllerInfoService_GetControllerInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

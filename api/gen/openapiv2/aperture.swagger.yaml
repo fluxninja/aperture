@@ -9,6 +9,7 @@ tags:
   - name: StatusService
   - name: FlowControlService
   - name: FluxNinjaService
+  - name: ControllerInfoService
   - name: PolicyService
 consumes:
   - application/json
@@ -39,6 +40,20 @@ paths:
             $ref: '#/definitions/v1CheckRequest'
       tags:
         - FlowControlService
+  /plugins/fluxninja/v1/controllerinfo:
+    get:
+      operationId: ControllerInfoService_GetControllerInfo
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1ControllerInfo'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - ControllerInfoService
   /plugins/fluxninja/v1/report:
     post:
       summary: |-
