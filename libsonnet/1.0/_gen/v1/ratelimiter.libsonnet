@@ -1,11 +1,11 @@
-local languagev1ratelimiterins = import './ratelimiterins.libsonnet';
+local ratelimiterins = import './ratelimiterins.libsonnet';
 {
   new():: {
     in_ports: {
       limit: error 'Port limit is missing',
     },
   },
-  inPorts:: languagev1ratelimiterins,
+  inPorts:: ratelimiterins,
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },

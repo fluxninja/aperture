@@ -20,7 +20,7 @@ import (
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -58,8 +58,8 @@ func NewSchedulerAndOptions(
 	policyReadAPI iface.Policy,
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
-	etcdPath := path.Join(paths.AutoTokenResultsPath,
-		paths.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
+	etcdPath := path.Join(common.AutoTokenResultsPath,
+		common.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,

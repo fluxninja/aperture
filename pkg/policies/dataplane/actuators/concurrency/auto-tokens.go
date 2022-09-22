@@ -16,7 +16,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 )
 
 type autoTokensFactory struct {
@@ -30,7 +30,7 @@ func newAutoTokensFactory(
 	agentGroup string,
 ) (*autoTokensFactory, error) {
 	var err error
-	etcdPath := path.Join(paths.AutoTokenResultsPath, paths.AgentGroupPrefix(agentGroup))
+	etcdPath := path.Join(common.AutoTokenResultsPath, common.AgentGroupPrefix(agentGroup))
 	tokensDecisionWatcher, err := etcdwatcher.NewWatcher(client, etcdPath)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 	}
 
 	tokensNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.DataplaneComponentKey(atFactory.agentGroup, at.policyName, at.componentIdx)),
+		notifiers.Key(common.DataplaneComponentKey(atFactory.agentGroup, at.policyName, at.componentIdx)),
 		unmarshaller,
 		at.tokenUpdateCallback,
 	)

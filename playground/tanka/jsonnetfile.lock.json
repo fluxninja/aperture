@@ -4,36 +4,6 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/fluxninja/aperture.git",
-          "subdir": ""
-        }
-      },
-      "version": "e5a7ac535acbb013d5e91f55f18b6fbbca482365",
-      "sum": "BzFSmmBKlPgyt9ZT5vh9OA6zqdeIt7WVQg2+A/c1sxE="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/fluxninja/aperture-blueprints.git",
-          "subdir": ""
-        }
-      },
-      "version": "edd3afb408620982994574979b0879dfa59061ad",
-      "sum": "QPsi/vocvPAki9auebr+MCYPaIsAaGPUE+PZBPSJ5/g="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/fluxninja/aperture-blueprints.git",
-          "subdir": "lib/1.0"
-        }
-      },
-      "version": "edd3afb408620982994574979b0879dfa59061ad",
-      "sum": "bP+umhlQ1OobXrAD0Dz8rAj8Pb7l3RwnP3mdZxsuqC8="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/grafana/grafonnet-lib.git",
           "subdir": "grafonnet"
         }
@@ -48,7 +18,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
+      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
       "sum": "tDR6yT2GVfw0wTU12iZH+m01HrbIr6g/xN+/8nzNkU0="
     },
     {
@@ -58,7 +28,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
+      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
       "sum": "2++XoPslyz02LRgsxREWxjLgYgiCIqhAtXCyVSvYcoE="
     },
     {
@@ -68,7 +38,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
+      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {
@@ -100,16 +70,6 @@
       },
       "version": "610803705e9ec295ef2e4eeaa6b2f8fc1419e5b1",
       "sum": "QKsc62wl5Wc+uxxP4NJCF1NidiPi9zjngbzIszFvesc="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/jsonnet-libs/k8s-libsonnet.git",
-          "subdir": "1.24"
-        }
-      },
-      "version": "610803705e9ec295ef2e4eeaa6b2f8fc1419e5b1",
-      "sum": "OcNQsWgCXnMSoWZNS7u9P9yn6d7HZk6/d/7++sgIc6Q="
     },
     {
       "source": {

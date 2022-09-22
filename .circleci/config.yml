@@ -98,7 +98,7 @@ jobs:
       executor:
         type: executor
         description: executor to use for this job
-        default:  ubuntu-go-executor
+        default: ubuntu-go-executor
       workspace-name:
         type: string
         description: the name of the workspace to which built packages should be added
@@ -176,7 +176,7 @@ jobs:
           command: .circleci/scripts/helm_release.sh
 
 orbs:
-  path-filtering: circleci/path-filtering@0.1.1
+  path-filtering: circleci/path-filtering@0.1.3
   continuation: circleci/continuation@0.3.1
 
 workflows:
@@ -219,7 +219,8 @@ workflows:
           base-revision: main
   release-components:
     when:
-      matches: { value: << pipeline.git.tag >>, pattern: "^releases/(?!charts).*$" }
+      matches:
+        { value: << pipeline.git.tag >>, pattern: "^releases/(?!charts).*$" }
     jobs:
       - release-components:
           # both this and workflow's when is needed
@@ -237,11 +238,12 @@ workflows:
               only: /^releases\/aperture-agent\/.*$/
           matrix:
             parameters:
-              executor: [ ubuntu-go-executor ]
-              goarch: [ amd64 ]
+              executor: [ubuntu-go-executor]
+              goarch: [amd64]
   helm-release:
     when:
-      matches: { value: << pipeline.git.tag >>, pattern: "^releases/charts/.*/v.*" }
+      matches:
+        { value: << pipeline.git.tag >>, pattern: "^releases/charts/.*/v.*" }
     jobs:
       - helm-release:
           filters:

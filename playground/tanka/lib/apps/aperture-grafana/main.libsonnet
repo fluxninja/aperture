@@ -1,7 +1,7 @@
 local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonnet/4.3/main.libsonnet';
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
-local policyDashboard = import 'github.com/fluxninja/aperture-blueprints/lib/1.0/dashboards/latency-gradient.libsonnet';
+local policyDashboard = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/dashboards/latency-gradient.libsonnet';
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;

@@ -28,9 +28,11 @@ import (
 )
 
 // AgentOTELComponents constructs OTEL Collector Factories for Agent.
-func AgentOTELComponents(cache *entitycache.EntityCache,
+func AgentOTELComponents(
+	cache *entitycache.EntityCache,
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
+	metricsAPI iface.ResponseMetricsAPI,
 ) (component.Factories, error) {
 	var errs error
 
@@ -62,7 +64,7 @@ func AgentOTELComponents(cache *entitycache.EntityCache,
 		memorylimiterprocessor.NewFactory(),
 		enrichmentprocessor.NewFactory(cache),
 		rollupprocessor.NewFactory(),
-		metricsprocessor.NewFactory(promRegistry, engine),
+		metricsprocessor.NewFactory(promRegistry, engine, metricsAPI),
 		attributesprocessor.NewFactory(),
 		spantologprocessor.NewFactory(),
 	)
