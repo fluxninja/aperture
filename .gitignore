@@ -49,6 +49,8 @@ Sessionx.vim
 # Temporary
 .netrwhist
 *~
+\#*
+.\#*
 
 # Auto-generated tag files
 tags*
@@ -57,3 +59,6 @@ tags*
 [._]*.un~
 
 dist/
+
+blueprints/_gen/
+blueprints/vendor/
