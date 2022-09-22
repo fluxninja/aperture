@@ -106,10 +106,7 @@ var _ = Describe("Agent Daemonset", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
@@ -210,16 +207,6 @@ var _ = Describe("Agent Daemonset", func() {
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{
-											Name:          GrpcOtel,
-											ContainerPort: 4317,
-											Protocol:      corev1.ProtocolTCP,
-										},
-										{
-											Name:          HTTPOtel,
-											ContainerPort: 4318,
-											Protocol:      corev1.ProtocolTCP,
-										},
-										{
 											Name:          DistCache,
 											ContainerPort: 3320,
 											Protocol:      corev1.ProtocolTCP,
@@ -290,10 +277,7 @@ var _ = Describe("Agent Daemonset", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
@@ -491,16 +475,6 @@ var _ = Describe("Agent Daemonset", func() {
 										{
 											Name:          Server,
 											ContainerPort: 80,
-											Protocol:      corev1.ProtocolTCP,
-										},
-										{
-											Name:          GrpcOtel,
-											ContainerPort: 4317,
-											Protocol:      corev1.ProtocolTCP,
-										},
-										{
-											Name:          HTTPOtel,
-											ContainerPort: 4318,
 											Protocol:      corev1.ProtocolTCP,
 										},
 										{

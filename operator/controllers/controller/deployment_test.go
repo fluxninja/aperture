@@ -112,10 +112,7 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 					},
 					Image: common.ControllerImage{
@@ -206,16 +203,6 @@ var _ = Describe("Controller Deployment", func() {
 										{
 											Name:          Server,
 											ContainerPort: 80,
-											Protocol:      corev1.ProtocolTCP,
-										},
-										{
-											Name:          GrpcOtel,
-											ContainerPort: 4317,
-											Protocol:      corev1.ProtocolTCP,
-										},
-										{
-											Name:          HTTPOtel,
-											ContainerPort: 4318,
 											Protocol:      corev1.ProtocolTCP,
 										},
 									},
@@ -321,10 +308,7 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 					},
 					CommonSpec: common.CommonSpec{
@@ -515,16 +499,6 @@ var _ = Describe("Controller Deployment", func() {
 										{
 											Name:          Server,
 											ContainerPort: 80,
-											Protocol:      corev1.ProtocolTCP,
-										},
-										{
-											Name:          GrpcOtel,
-											ContainerPort: 4317,
-											Protocol:      corev1.ProtocolTCP,
-										},
-										{
-											Name:          HTTPOtel,
-											ContainerPort: 4318,
 											Protocol:      corev1.ProtocolTCP,
 										},
 									},

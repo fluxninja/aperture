@@ -54,16 +54,6 @@ func serviceForController(instance *controllerv1alpha1.Controller, log logr.Logg
 		return nil, err
 	}
 
-	otelGRPCPort, err := controllers.GetPort(spec.ConfigSpec.Otel.GRPCAddr)
-	if err != nil {
-		return nil, err
-	}
-
-	otelHTTPPort, err := controllers.GetPort(spec.ConfigSpec.Otel.HTTPAddr)
-	if err != nil {
-		return nil, err
-	}
-
 	svc := &corev1.Service{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        controllers.ControllerServiceName,
@@ -78,18 +68,6 @@ func serviceForController(instance *controllerv1alpha1.Controller, log logr.Logg
 					Protocol:   corev1.Protocol(controllers.TCP),
 					Port:       int32(serverPort),
 					TargetPort: intstr.FromString(controllers.Server),
-				},
-				{
-					Name:       controllers.GrpcOtel,
-					Protocol:   corev1.Protocol(controllers.TCP),
-					Port:       int32(otelGRPCPort),
-					TargetPort: intstr.FromString(controllers.GrpcOtel),
-				},
-				{
-					Name:       controllers.HTTPOtel,
-					Protocol:   corev1.Protocol(controllers.TCP),
-					Port:       int32(otelHTTPPort),
-					TargetPort: intstr.FromString(controllers.HTTPOtel),
 				},
 			},
 			Selector: controllers.SelectorLabels(instance.GetName(), controllers.ControllerServiceName),

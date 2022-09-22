@@ -1276,18 +1276,6 @@ OtelConfig is the configuration for the OTEL collector.
 #### Properties
 
 <dl>
-<dt>grpc_addr</dt>
-<dd>
-
-(string, `hostname_port`, default: `:4317`) GRPC listener addr for OTEL Collector.
-
-</dd>
-<dt>http_addr</dt>
-<dd>
-
-(string, `hostname_port`, default: `:4318`) HTTP listener addr for OTEL Collector.
-
-</dd>
 <dt>batch_postrollup</dt>
 <dd>
 

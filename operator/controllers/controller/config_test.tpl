@@ -87,8 +87,6 @@ otel:
   batch_prerollup:
     send_batch_size: 15000
     timeout: 1s
-  grpc_addr: :4317
-  http_addr: :4318
 plugins:
   disable_plugins: false
   disabled_plugins:

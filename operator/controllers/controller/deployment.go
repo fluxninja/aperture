@@ -64,16 +64,6 @@ func deploymentForController(instance *controllerv1alpha1.Controller, log logr.L
 		return nil, err
 	}
 
-	otelGRPCPort, err := controllers.GetPort(spec.ConfigSpec.Otel.GRPCAddr)
-	if err != nil {
-		return nil, err
-	}
-
-	otelHTTPPort, err := controllers.GetPort(spec.ConfigSpec.Otel.HTTPAddr)
-	if err != nil {
-		return nil, err
-	}
-
 	dep := &appsv1.Deployment{
 		ObjectMeta: v1.ObjectMeta{
 			Name:        controllers.ControllerServiceName,
@@ -120,16 +110,6 @@ func deploymentForController(instance *controllerv1alpha1.Controller, log logr.L
 									Name:          controllers.Server,
 									ContainerPort: serverPort,
 									Protocol:      controllers.TCP,
-								},
-								{
-									Name:          controllers.GrpcOtel,
-									ContainerPort: otelGRPCPort,
-									Protocol:      corev1.ProtocolTCP,
-								},
-								{
-									Name:          controllers.HTTPOtel,
-									ContainerPort: otelHTTPPort,
-									Protocol:      corev1.ProtocolTCP,
 								},
 							},
 							TerminationMessagePath:   "/dev/termination-log",

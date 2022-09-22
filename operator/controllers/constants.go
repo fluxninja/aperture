@@ -80,10 +80,6 @@ const (
 	ControllerCertPath = "/etc/aperture/aperture-controller/certs"
 	// Server string.
 	Server = "server"
-	// GrpcOtel string.
-	GrpcOtel = "grpc-otel"
-	// HTTPOtel string.
-	HTTPOtel = "http-otel"
 	// TCP string.
 	TCP = "TCP"
 	// DistCache string.

@@ -1301,12 +1301,6 @@ spec:
                               will be sent regardless of size.
                             type: string
                         type: object
-                      grpc_addr:
-                        description: GRPC listener addr for OTEL Collector.
-                        type: string
-                      http_addr:
-                        description: HTTP listener addr for OTEL Collector.
-                        type: string
                     type: object
                   peer_discovery:
                     description: Peer discovery configuration.

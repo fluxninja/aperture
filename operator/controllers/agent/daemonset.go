@@ -58,16 +58,6 @@ func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *r
 		return nil, err
 	}
 
-	otelGRPCPort, err := controllers.GetPort(spec.ConfigSpec.Otel.GRPCAddr)
-	if err != nil {
-		return nil, err
-	}
-
-	otelHTTPPort, err := controllers.GetPort(spec.ConfigSpec.Otel.HTTPAddr)
-	if err != nil {
-		return nil, err
-	}
-
 	distCachePort, err := controllers.GetPort(spec.ConfigSpec.DistCache.BindAddr)
 	if err != nil {
 		return nil, err
@@ -118,16 +108,6 @@ func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *r
 								{
 									Name:          controllers.Server,
 									ContainerPort: serverPort,
-									Protocol:      corev1.ProtocolTCP,
-								},
-								{
-									Name:          controllers.GrpcOtel,
-									ContainerPort: otelGRPCPort,
-									Protocol:      corev1.ProtocolTCP,
-								},
-								{
-									Name:          controllers.HTTPOtel,
-									ContainerPort: otelHTTPPort,
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{

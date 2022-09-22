@@ -82,8 +82,6 @@ var _ = Describe("ConfigMap for Controller", func() {
 								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
 							},
 							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
 								BatchPrerollup: otel.BatchConfig{
 									Timeout:       config.MakeDuration(1 * time.Second),
 									SendBatchSize: 15000,
