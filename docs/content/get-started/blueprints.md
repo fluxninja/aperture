@@ -46,7 +46,7 @@ usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG]
 
 Aperture Policies & Dashboards generator utility.
 
-This utility can be used to generate Aperture Policies and Grafana Dashboards "in-place". Check [aperture-blueprint's README.md][blueprints-readme] for more
+This utility can be used to generate Aperture Policies and Grafana Dashboards "in-place". Check [blueprint's README.md][blueprints-readme] for more
 details.
 
 positional arguments:
@@ -110,7 +110,7 @@ You can then create a Policy resource with policy definition like this:
 ```jsonnet
 local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
 
-local latencyGradientPolicy = import 'github.com/fluxninja/aperture-blueprints/lib/1.0/policies/latency-gradient.libsonnet';
+local latencyGradientPolicy = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/policies/latency-gradient.libsonnet';
 
 local selector = aperture.v1.Selector;
 local controlPoint = aperture.v1.ControlPoint;

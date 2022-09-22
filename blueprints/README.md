@@ -1,6 +1,6 @@
-# aperture-blueprints
+# Aperture Blueprints
 
-This repository provides a set of Aperture policies and pre-defined Grafana dashboards that can
+This directory provides a set of Aperture policies and pre-defined Grafana dashboards that can
 be used both as-is, and as examples to create your own custom policies for the Aperture
 controller.
 
@@ -47,14 +47,14 @@ And all generated policies and dashboards will be available under `_gen/policies
 
 ### Using Blueprints as a Jsonnet library
 
-When used as a Jsonnet library, aperture-blueprints can be used with libraries like [k8s-libsonnet][k8s-libsonnet]
+When used as a Jsonnet library, aperture blueprints can be used with libraries like [k8s-libsonnet][k8s-libsonnet]
 or [grafana-operator-libsonnet][grafana-libsonnet] to generate kubernetes resources that can be deployed
 on the cluster.
 
-To install aperture-blueprints as a jsonnet dependency, use [jsonnet-bundler][jb]:
+To install aperture blueprints as a jsonnet dependency, use [jsonnet-bundler][jb]:
 
 ```sh
-jb install github.com/fluxninja/aperture-blueprints@main
+jb install github.com/fluxninja/aperture/blueprints@main
 ```
 
 Additionally, for this example to work install k8s-libsonnet dependency:
@@ -68,7 +68,7 @@ Finally, you can create a ConfigMap resource with policy like that:
 ```jsonnet
 local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
 
-local latencyGradientPolicy = import 'github.com/fluxninja/aperture-blueprints/lib/1.0/policies/latency-gradient.libsonnet';
+local latencyGradientPolicy = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/policies/latency-gradient.libsonnet';
 
 local selector = aperture.v1.Selector;
 local controlPoint = aperture.v1.ControlPoint;

@@ -23,7 +23,7 @@ Aperture policies & dashboards generator utility.
 
 This utility can be used to generate policies and dashboards "in-place", that
 is generate json files with grafana dashboards and aperture policies, as opposed
-to using aperture-blueprints library as jsonnet library. Check main README.md for more
+to using blueprints library as jsonnet library. Check main README.md for more
 details.
 """
 
