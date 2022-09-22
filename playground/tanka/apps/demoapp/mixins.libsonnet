@@ -9,11 +9,11 @@ local Workload = aperture.v1.SchedulerWorkload;
 local LabelMatcher = aperture.v1.LabelMatcher;
 local WorkloadWithLabelMatcher = aperture.v1.SchedulerWorkloadAndLabelMatcher;
 
-local classifier = aperture.v1.policylanguagev1Classifier;
+local classifier = aperture.v1.Classifier;
 local extractor = aperture.v1.Extractor;
 local rule = aperture.v1.Rule;
 local selector = aperture.v1.Selector;
-local controlPoint = aperture.v1.commonselectorv1ControlPoint;
+local controlPoint = aperture.v1.ControlPoint;
 
 local svcSelector = selector.new()
                     + selector.withAgentGroup('default')
@@ -63,16 +63,14 @@ local policy = latencyGradientPolicy({
       priority: 20,
     },
     workloads: [
-      WorkloadWithLabelMatcher.new(
-        workload=Workload.withPriority(50),
-        // match the label extracted by classifier
-        label_matcher=LabelMatcher.withMatchLabels({ user_type: 'guest' })
-      ),
-      WorkloadWithLabelMatcher.new(
-        workload=Workload.withPriority(200),
-        // match the http header directly
-        label_matcher=LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })
-      ),
+      WorkloadWithLabelMatcher.new()
+      + WorkloadWithLabelMatcher.withWorkload(Workload.withPriority(50))
+      // match the label extracted by classifier
+      + WorkloadWithLabelMatcher.withLabelMatcher(LabelMatcher.withMatchLabels({ user_type: 'guest' })),
+      WorkloadWithLabelMatcher.new()
+      + WorkloadWithLabelMatcher.withWorkload(Workload.withPriority(200))
+      // match the http header directly
+      + WorkloadWithLabelMatcher.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
     ],
   },
 }).policy;
