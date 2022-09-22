@@ -3,15 +3,15 @@ digraph  {
 		label="Constant (0)";margin="50.0";
 		n2[label="output"];
 		{rank=same; n2;};
-
+		
 	}
 	subgraph cluster_s3 {
 		label="RateLimiter (1)";margin="50.0";
 		n4[label="limit"];
 		{rank=same; n4;};
-
+		
 	}
 	rankdir="LR";splines="ortho";
 	n2->n4[label="RATE_LIMIT"];
-
+	
 }
