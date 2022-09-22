@@ -1,4 +1,5 @@
 local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
+local blueprint = import 'main.libsonnet';
 
 local Workload = aperture.v1.SchedulerWorkload;
 local LabelMatcher = aperture.v1.LabelMatcher;
@@ -23,9 +24,9 @@ local svcSelector = selector.new()
                                                 + controlPoint.withTraffic('ingress'));
 
 
-{
+local config = {
   common+: {
-    policyName: 'service1-latency-gradient',
+    policyName: 'example',
   },
   policy+: {
     policyName: $.common.policyName,
@@ -59,4 +60,6 @@ local svcSelector = selector.new()
   dashboard+: {
     policyName: $.common.policyName,
   },
-}
+};
+
+blueprint { _config:: config }

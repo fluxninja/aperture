@@ -146,7 +146,7 @@ and replace existing generated docs with new content.
 Blueprints can be visualized. A blueprint is saved as a [DOT](https://graphviz.org/doc/info/lang.html) file and then can be converted into an image with GraphViz:
 
 ```sh
-go run -mod=mod scripts/circuit-generator/main.go _gen/policies/service1-latency-gradient.yaml blueprints/latency-gradient/graph.dot
+go run -mod=mod scripts/circuit-generator/main.go examples/gen/policies/service1-latency-gradient.yaml blueprints/latency-gradient/graph.dot
 dot -Tsvg blueprints/latency-gradient/graph.dot > blueprints/latency-gradient/graph.svg
 ```
 

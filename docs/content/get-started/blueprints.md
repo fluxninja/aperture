@@ -42,15 +42,12 @@ To generate files, `blueprints/scripts/aperture-generate.py` can be used:
 
 ```sh
 $ ./scripts/aperture-generate.py --help
-usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG] BLUEPRINT
+usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG]
 
 Aperture Policies & Dashboards generator utility.
 
 This utility can be used to generate Aperture Policies and Grafana Dashboards "in-place". Check [blueprint's README.md][blueprints-readme] for more
 details.
-
-positional arguments:
-  BLUEPRINT        Aperture blueprint path
 
 options:
   -h, --help       show this help message and exit
@@ -77,11 +74,11 @@ can be overwritten by reusing them in the custom configuration and nested
 objects can be merged by using `+:` operator. Check the `examples/` directory
 for more information.
 
-The full command using the demoapp-latency-grand example looks like this:
+The full command using the example looks like this:
 
 ```sh
 jb install
-./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet Blueprints/latency-gradient
+./scripts/aperture-generate.py --output _gen --config blueprints/latency-gradient/examples.jsonnet
 ```
 
 [blueprints-readme]: https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
