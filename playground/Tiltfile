@@ -462,7 +462,7 @@ def render_tanka(environment, env_vars):
         # tanka/apps/default -> tanka/
         # apps/default -> ./
         # Make sure jb dependencies are up to date
-        local(command=["jb", "install"], dir=base_dir)
+        local(command=["./scripts/jb_install.sh"])
 
         # Refreshing the dependencies for the Agent chart
         refresh_chart_dependencies(base_dir + "charts/aperture-agent")
