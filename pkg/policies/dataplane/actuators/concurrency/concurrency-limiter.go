@@ -500,8 +500,8 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flow
 		PolicyHash:     conLimiter.GetPolicyHash(),
 		ComponentIndex: conLimiter.GetComponentIndex(),
 		Dropped:        !accepted,
-		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-			ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+			ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 				WorkloadIndex: matchedWorkloadIndex,
 			},
 		},

@@ -149,222 +149,6 @@ This override is applicable only if `auto_tokens` is set to false.
 </dd>
 </dl>
 
-### commonselectorv1ControlPoint {#commonselectorv1-control-point}
-
-Identifies control point within a service that the rule or policy should apply to.
-Controlpoint is either a library feature name or one of ingress/egress traffic control point.
-
-#### Properties
-
-<dl>
-<dt>feature</dt>
-<dd>
-
-(string, `required`) Name of Aperture SDK's feature.
-Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
-
-Note: Flowcontrol only.
-
-</dd>
-<dt>traffic</dt>
-<dd>
-
-(string, `required,oneof=ingress egress`) Type of traffic service, either "ingress" or "egress".
-Apply the policy to the whole incoming/outgoing traffic of a service.
-Usually powered by integration with a proxy (like envoy) or a web framework.
-
-- Flowcontrol: Blockable atom here is a single HTTP-transaction.
-- Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
-
-</dd>
-</dl>
-
-### languagev1ConcurrencyLimiter {#languagev1-concurrency-limiter}
-
-Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-
-:::info
-See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
-:::
-
-It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
-
-ConcurrencyLimiter configuration is split into two parts: An actuation
-strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
-
-#### Properties
-
-<dl>
-<dt>load_shed_actuator</dt>
-<dd>
-
-([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a portion of requests.
-
-Actuation strategy defines the input signal that will drive the scheduler.
-
-</dd>
-<dt>scheduler</dt>
-<dd>
-
-([V1Scheduler](#v1-scheduler), `required`) Configuration of Weighted Fair Queuing-based workload scheduler.
-
-Contains configuration of per-agent scheduler, and also defines some
-output signals.
-
-</dd>
-</dl>
-
-### languagev1RateLimiter {#languagev1-rate-limiter}
-
-Limits the traffic on a control point to specified rate
-
-:::info
-See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
-:::
-
-Ratelimiting is done separately on per-label-value basis. Use _label_key_
-to select which label should be used as key.
-
-#### Properties
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([V1RateLimiterIns](#v1-rate-limiter-ins), `required`)
-
-</dd>
-<dt>label_key</dt>
-<dd>
-
-(string, `required`) Specifies which label the ratelimiter should be keyed by.
-
-Rate limiting is done independently for each value of the
-[label](/concepts/flow-control/flow-label.md) with given key.
-Eg., to give each user a separate limit, assuming you have a _user_ flow
-label set up, set `label_key: "user"`.
-
-</dd>
-<dt>lazy_sync</dt>
-<dd>
-
-([RateLimiterLazySync](#rate-limiter-lazy-sync)) Configuration of lazy-syncing behaviour of ratelimiter
-
-</dd>
-<dt>limit_reset_interval</dt>
-<dd>
-
-(string, default: `60s`) Time after which the limit for a given label value will be reset.
-
-</dd>
-<dt>overrides</dt>
-<dd>
-
-([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
-
-</dd>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector), `required`) Which control point to apply this ratelimiter to.
-
-</dd>
-</dl>
-
-### policylanguagev1Classifier {#policylanguagev1-classifier}
-
-Set of classification rules sharing a common selector
-
-:::info
-See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
-:::
-
-Example:
-
-```yaml
-selector:
-  service: service1.default.svc.cluster.local
-  control_point:
-    traffic: ingress
-rules:
-  user:
-    extractor:
-      from: request.http.headers.user
-```
-
-#### Properties
-
-<dl>
-<dt>rules</dt>
-<dd>
-
-(map of [V1Rule](#v1-rule), `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/flow-label.md) keys to rules that define
-how to extract and propagate flow labels with that key.
-
-</dd>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector), `required`) Defines where to apply the flow classification rule.
-
-</dd>
-</dl>
-
-### policylanguagev1FluxMeter {#policylanguagev1-flux-meter}
-
-FluxMeter gathers metrics for the traffic that matches its selector
-
-:::info
-See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
-:::
-
-Example of a selector that creates a histogram metric for all HTTP requests
-to particular service:
-
-```yaml
-selector:
-  service: myservice.mynamespace.svc.cluster.local
-  control_point:
-    traffic: ingress
-```
-
-#### Properties
-
-<dl>
-<dt>attribute_key</dt>
-<dd>
-
-(string, default: `workload_duration_ms`) Key of the attribute in access log or span from which the metric for this flux meter is read.
-
-:::info
-For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
-:::
-
-</dd>
-<dt>histogram_buckets</dt>
-<dd>
-
-([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) Latency histogram buckets (in ms) for this FluxMeter.
-
-</dd>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector)) What latency should we measure in the histogram created by this FluxMeter.
-
-- For traffic control points, fluxmeter will measure the duration of the
-  whole http transaction (including sending request and receiving
-  response).
-- For feature control points, fluxmeter will measure execution of the span
-  associated with particular feature. What contributes to the span's
-  duration is entirely up to the user code that uses Aperture SDK.
-
-</dd>
-</dl>
-
 ### v1AddressExtractor {#v1-address-extractor}
 
 Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
@@ -505,6 +289,46 @@ This interval is typically aligned with how often the corrective action (actuati
 </dd>
 </dl>
 
+### v1Classifier {#v1-classifier}
+
+Set of classification rules sharing a common selector
+
+:::info
+See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
+:::
+
+Example:
+
+```yaml
+selector:
+  service: service1.default.svc.cluster.local
+  control_point:
+    traffic: ingress
+rules:
+  user:
+    extractor:
+      from: request.http.headers.user
+```
+
+#### Properties
+
+<dl>
+<dt>rules</dt>
+<dd>
+
+(map of [V1Rule](#v1-rule), `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
+[flow label](/concepts/flow-control/flow-label.md) keys to rules that define
+how to extract and propagate flow labels with that key.
+
+</dd>
+<dt>selector</dt>
+<dd>
+
+([V1Selector](#v1-selector), `required`) Defines where to apply the flow classification rule.
+
+</dd>
+</dl>
+
 ### v1Component {#v1-component}
 
 Computational block that form the circuit
@@ -557,7 +381,7 @@ See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 <dt>concurrency_limiter</dt>
 <dd>
 
-([Languagev1ConcurrencyLimiter](#languagev1-concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+([V1ConcurrencyLimiter](#v1-concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
 
 </dd>
 <dt>constant</dt>
@@ -612,13 +436,49 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 <dt>rate_limiter</dt>
 <dd>
 
-([Languagev1RateLimiter](#languagev1-rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
+([V1RateLimiter](#v1-rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
 
 </dd>
 <dt>sqrt</dt>
 <dd>
 
 ([V1Sqrt](#v1-sqrt)) Takes an input signal and emits the square root of the input signal.
+
+</dd>
+</dl>
+
+### v1ConcurrencyLimiter {#v1-concurrency-limiter}
+
+Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
+
+:::info
+See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+:::
+
+It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+
+ConcurrencyLimiter configuration is split into two parts: An actuation
+strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
+
+#### Properties
+
+<dl>
+<dt>load_shed_actuator</dt>
+<dd>
+
+([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a portion of requests.
+
+Actuation strategy defines the input signal that will drive the scheduler.
+
+</dd>
+<dt>scheduler</dt>
+<dd>
+
+([V1Scheduler](#v1-scheduler), `required`) Configuration of Weighted Fair Queuing-based workload scheduler.
+
+Contains configuration of per-agent scheduler, and also defines some
+output signals.
 
 </dd>
 </dl>
@@ -655,6 +515,36 @@ Outputs for the Constant component.
 <dd>
 
 ([V1Port](#v1-port)) The constant value is emitted to the output port.
+
+</dd>
+</dl>
+
+### v1ControlPoint {#v1-control-point}
+
+Identifies control point within a service that the rule or policy should apply to.
+Controlpoint is either a library feature name or one of ingress/egress traffic control point.
+
+#### Properties
+
+<dl>
+<dt>feature</dt>
+<dd>
+
+(string, `required`) Name of Aperture SDK's feature.
+Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
+
+Note: Flowcontrol only.
+
+</dd>
+<dt>traffic</dt>
+<dd>
+
+(string, `required,oneof=ingress egress`) Type of traffic service, either "ingress" or "egress".
+Apply the policy to the whole incoming/outgoing traffic of a service.
+Usually powered by integration with a proxy (like envoy) or a web framework.
+
+- Flowcontrol: Blockable atom here is a single HTTP-transaction.
+- Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
 
 </dd>
 </dl>
@@ -1021,6 +911,59 @@ Outputs for the Extrapolator component.
 <dd>
 
 ([V1Port](#v1-port)) Extrapolated signal.
+
+</dd>
+</dl>
+
+### v1FluxMeter {#v1-flux-meter}
+
+FluxMeter gathers metrics for the traffic that matches its selector
+
+:::info
+See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+:::
+
+Example of a selector that creates a histogram metric for all HTTP requests
+to particular service:
+
+```yaml
+selector:
+  service: myservice.mynamespace.svc.cluster.local
+  control_point:
+    traffic: ingress
+```
+
+#### Properties
+
+<dl>
+<dt>attribute_key</dt>
+<dd>
+
+(string, default: `workload_duration_ms`) Key of the attribute in access log or span from which the metric for this flux meter is read.
+
+:::info
+For list of available attributes in Envoy access logs, refer
+[Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
+:::
+
+</dd>
+<dt>histogram_buckets</dt>
+<dd>
+
+([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) Latency histogram buckets (in ms) for this FluxMeter.
+
+</dd>
+<dt>selector</dt>
+<dd>
+
+([V1Selector](#v1-selector)) What latency should we measure in the histogram created by this FluxMeter.
+
+- For traffic control points, fluxmeter will measure the duration of the
+  whole http transaction (including sending request and receiving
+  response).
+- For feature control points, fluxmeter will measure execution of the span
+  associated with particular feature. What contributes to the span's
+  duration is entirely up to the user code that uses Aperture SDK.
 
 </dd>
 </dl>
@@ -1671,6 +1614,63 @@ Output for the PromQL component.
 </dd>
 </dl>
 
+### v1RateLimiter {#v1-rate-limiter}
+
+Limits the traffic on a control point to specified rate
+
+:::info
+See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+:::
+
+Ratelimiting is done separately on per-label-value basis. Use _label_key_
+to select which label should be used as key.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1RateLimiterIns](#v1-rate-limiter-ins), `required`)
+
+</dd>
+<dt>label_key</dt>
+<dd>
+
+(string, `required`) Specifies which label the ratelimiter should be keyed by.
+
+Rate limiting is done independently for each value of the
+[label](/concepts/flow-control/flow-label.md) with given key.
+Eg., to give each user a separate limit, assuming you have a _user_ flow
+label set up, set `label_key: "user"`.
+
+</dd>
+<dt>lazy_sync</dt>
+<dd>
+
+([RateLimiterLazySync](#rate-limiter-lazy-sync)) Configuration of lazy-syncing behaviour of ratelimiter
+
+</dd>
+<dt>limit_reset_interval</dt>
+<dd>
+
+(string, default: `60s`) Time after which the limit for a given label value will be reset.
+
+</dd>
+<dt>overrides</dt>
+<dd>
+
+([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
+
+</dd>
+<dt>selector</dt>
+<dd>
+
+([V1Selector](#v1-selector), `required`) Which control point to apply this ratelimiter to.
+
+</dd>
+</dl>
+
 ### v1RateLimiterIns {#v1-rate-limiter-ins}
 
 Inputs for the RateLimiter component
@@ -1708,7 +1708,7 @@ Resources are typically FluxMeters, Classifiers, etc. that can be used to create
 <dt>classifiers</dt>
 <dd>
 
-([[]Policylanguagev1Classifier](#policylanguagev1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+([[]V1Classifier](#v1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
 
@@ -1716,7 +1716,7 @@ The flow labels created by Classifiers can be matched by FluxMeters to create me
 <dt>flux_meters</dt>
 <dd>
 
-(map of [Policylanguagev1FluxMeter](#policylanguagev1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+(map of [V1FluxMeter](#v1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
 
 FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
 
@@ -1976,7 +1976,7 @@ selector applies to.
 <dt>control_point</dt>
 <dd>
 
-([Commonselectorv1ControlPoint](#commonselectorv1-control-point), `required`) Describes
+([V1ControlPoint](#v1-control-point), `required`) Describes
 [control point](/concepts/flow-control/flow-control.md#control-point)
 within the entity where the policy should apply to.
 

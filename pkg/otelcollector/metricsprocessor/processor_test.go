@@ -90,8 +90,8 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with single policy - ingress",
 			&flowcontrolv1.CheckResponse{
-				ControlPoint: &flowcontrolv1.ControlPoint{
-					Type: flowcontrolv1.ControlPoint_TYPE_INGRESS,
+				ControlPointInfo: &flowcontrolv1.ControlPointInfo{
+					Type: flowcontrolv1.ControlPointInfo_TYPE_INGRESS,
 				},
 				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
@@ -100,21 +100,21 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyHash:     "foo-hash",
 						ComponentIndex: 1,
 						Dropped:        true,
-						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+							ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 								WorkloadIndex: "0",
 							},
 						},
 					},
 				},
-				Classifiers: []*flowcontrolv1.Classifier{
+				ClassifierInfos: []*flowcontrolv1.ClassifierInfo{
 					{
 						PolicyName:      "foo",
 						PolicyHash:      "foo-hash",
 						ClassifierIndex: 1,
 					},
 				},
-				FluxMeters: []*flowcontrolv1.FluxMeter{
+				FluxMeterInfos: []*flowcontrolv1.FluxMeterInfo{
 					{
 						FluxMeterName: "bar",
 					},
@@ -147,8 +147,8 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with single policy - feature",
 			&flowcontrolv1.CheckResponse{
-				ControlPoint: &flowcontrolv1.ControlPoint{
-					Type:    flowcontrolv1.ControlPoint_TYPE_FEATURE,
+				ControlPointInfo: &flowcontrolv1.ControlPointInfo{
+					Type:    flowcontrolv1.ControlPointInfo_TYPE_FEATURE,
 					Feature: "featureX",
 				},
 				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
@@ -159,15 +159,15 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyHash:     "foo-hash",
 						ComponentIndex: 1,
 						Dropped:        true,
-						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+							ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 								WorkloadIndex: "0",
 							},
 						},
 					},
 				},
-				FluxMeters:    []*flowcontrolv1.FluxMeter{},
-				FlowLabelKeys: []string{},
+				FluxMeterInfos: []*flowcontrolv1.FluxMeterInfo{},
+				FlowLabelKeys:  []string{},
 			},
 			nil,
 			`# HELP workload_latency_ms Latency summary of workload
@@ -189,8 +189,8 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with two policies",
 			&flowcontrolv1.CheckResponse{
-				ControlPoint: &flowcontrolv1.ControlPoint{
-					Type: flowcontrolv1.ControlPoint_TYPE_INGRESS,
+				ControlPointInfo: &flowcontrolv1.ControlPointInfo{
+					Type: flowcontrolv1.ControlPointInfo_TYPE_INGRESS,
 				},
 				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
 				RejectReason: flowcontrolv1.CheckResponse_REJECT_REASON_NONE,
@@ -200,8 +200,8 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyHash:     "foo-hash",
 						ComponentIndex: 1,
 						Dropped:        true,
-						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+							ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 								WorkloadIndex: "0",
 							},
 						},
@@ -211,8 +211,8 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyHash:     "fizz-hash",
 						ComponentIndex: 1,
 						Dropped:        true,
-						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+							ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 								WorkloadIndex: "1",
 							},
 						},
@@ -222,15 +222,15 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyHash:     "fizz-hash",
 						ComponentIndex: 2,
 						Dropped:        false,
-						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+							ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 								WorkloadIndex: "2",
 							},
 						},
 					},
 				},
-				FluxMeters:    []*flowcontrolv1.FluxMeter{},
-				FlowLabelKeys: []string{},
+				FluxMeterInfos: []*flowcontrolv1.FluxMeterInfo{},
+				FlowLabelKeys:  []string{},
 			},
 			nil,
 			`# HELP workload_latency_ms Latency summary of workload
@@ -278,7 +278,7 @@ func someLogs(
 	logs := plog.NewLogs()
 	logs.ResourceLogs().AppendEmpty()
 
-	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
+	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeterInfos))
 	resourceLogsSlice := logs.ResourceLogs()
 	for i := 0; i < resourceLogsSlice.Len(); i++ {
 		resourceLogsSlice.At(i).ScopeLogs().AppendEmpty()
@@ -293,7 +293,7 @@ func someLogs(
 			logRecord.Attributes().InsertString(otelcollector.HTTPStatusCodeLabel, "201")
 			logRecord.Attributes().InsertDouble(otelcollector.WorkloadDurationLabel, 5)
 			logRecord.Attributes().InsertDouble(otelcollector.EnvoyAuthzDurationLabel, 1)
-			for i, fm := range checkResponse.FluxMeters {
+			for i, fm := range checkResponse.FluxMeterInfos {
 				// TODO actually return some Histogram
 				expectedCalls[i] = engine.EXPECT().GetFluxMeter(fm.GetFluxMeterName()).Return(nil)
 			}

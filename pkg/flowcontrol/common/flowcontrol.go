@@ -82,7 +82,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	resp := h.CheckWithValues(
 		ctx,
 		serviceIDs,
-		selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_FEATURE, req.Feature),
+		selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_FEATURE, req.Feature),
 		req.Labels,
 	)
 	end := time.Now()

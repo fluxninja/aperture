@@ -264,12 +264,28 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/v1Entity'
     description: Entities defines mapping of entities.
+  LimiterDecisionConcurrencyLimiterInfo:
+    type: object
+    properties:
+      workload_index:
+        type: string
   LimiterDecisionLimiterReason:
     type: string
     enum:
       - LIMITER_REASON_UNSPECIFIED
       - LIMITER_REASON_KEY_NOT_FOUND
     default: LIMITER_REASON_UNSPECIFIED
+  LimiterDecisionRateLimiterInfo:
+    type: object
+    properties:
+      current:
+        type: string
+        format: int64
+      label:
+        type: string
+      remaining:
+        type: string
+        format: int64
   MatchExpressionList:
     type: object
     properties:
@@ -361,58 +377,6 @@ definitions:
       workload:
         $ref: '#/definitions/SchedulerWorkload'
         description: Workload associated with flows matching the label matcher.
-  apertureflowcontrolv1Classifier:
-    type: object
-    properties:
-      classifier_index:
-        type: string
-        format: int64
-      error:
-        $ref: '#/definitions/v1ClassifierError'
-      label_key:
-        type: string
-      policy_hash:
-        type: string
-      policy_name:
-        type: string
-    description: Classifier describes details for each Classifier.
-  apertureflowcontrolv1ControlPoint:
-    type: object
-    properties:
-      feature:
-        type: string
-      type:
-        $ref: '#/definitions/v1ControlPointType'
-  apertureflowcontrolv1FluxMeter:
-    type: object
-    properties:
-      flux_meter_name:
-        type: string
-    description: FluxMeter describes detail for each FluxMeter.
-  commonselectorv1ControlPoint:
-    type: object
-    properties:
-      feature:
-        type: string
-        description: |-
-          Name of Aperture SDK's feature.
-          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
-
-          Note: Flowcontrol only.
-        x-go-validate: required
-      traffic:
-        type: string
-        description: |-
-          Type of traffic service, either "ingress" or "egress".
-          Apply the policy to the whole incoming/outgoing traffic of a service.
-          Usually powered by integration with a proxy (like envoy) or a web framework.
-
-          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
-          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
-        x-go-validate: required,oneof=ingress egress
-    description: |-
-      Identifies control point within a service that the rule or policy should apply to.
-      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
   googlerpcStatus:
     type: object
     properties:
@@ -425,152 +389,6 @@ definitions:
           $ref: '#/definitions/protobufAny'
       message:
         type: string
-  languagev1ConcurrencyLimiter:
-    type: object
-    properties:
-      load_shed_actuator:
-        $ref: '#/definitions/v1LoadShedActuator'
-        description: |-
-          Actuator based on load shedding a portion of requests.
-
-          Actuation strategy defines the input signal that will drive the scheduler.
-      scheduler:
-        $ref: '#/definitions/v1Scheduler'
-        description: |-
-          Configuration of Weighted Fair Queuing-based workload scheduler.
-
-          Contains configuration of per-agent scheduler, and also defines some
-          output signals.
-        x-go-validate: required
-    description: |-
-      :::info
-      See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
-      :::
-
-      It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-      Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
-
-      ConcurrencyLimiter configuration is split into two parts: An actuation
-      strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
-    title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-  languagev1RateLimiter:
-    type: object
-    properties:
-      in_ports:
-        $ref: '#/definitions/v1RateLimiterIns'
-        x-go-validate: required
-      label_key:
-        type: string
-        description: |-
-          Specifies which label the ratelimiter should be keyed by.
-
-          Rate limiting is done independently for each value of the
-          [label](/concepts/flow-control/flow-label.md) with given key.
-          Eg., to give each user a separate limit, assuming you have a _user_ flow
-          label set up, set `label_key: "user"`.
-        x-go-validate: required
-      lazy_sync:
-        $ref: '#/definitions/RateLimiterLazySync'
-        title: Configuration of lazy-syncing behaviour of ratelimiter
-      limit_reset_interval:
-        type: string
-        description: Time after which the limit for a given label value will be reset.
-        x-go-default: 60s
-      overrides:
-        type: array
-        items:
-          $ref: '#/definitions/RateLimiterOverride'
-        description: Allows to specify different limits for particular label values.
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Which control point to apply this ratelimiter to.
-        x-go-validate: required
-    description: |-
-      :::info
-      See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
-      :::
-
-      Ratelimiting is done separately on per-label-value basis. Use _label\_key_
-      to select which label should be used as key.
-    title: Limits the traffic on a control point to specified rate
-  policylanguagev1Classifier:
-    type: object
-    properties:
-      rules:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Rule'
-        description: |-
-          A map of {key, value} pairs mapping from
-          [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
-          how to extract and propagate flow labels with that key.
-        x-go-validate: required,gt=0,dive,keys,required,endkeys,required
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Defines where to apply the flow classification rule.
-        x-go-validate: required
-    description: |-
-      :::info
-      See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
-      :::
-
-      Example:
-      ```yaml
-      selector:
-        service: service1.default.svc.cluster.local
-        control_point:
-          traffic: ingress
-      rules:
-        user:
-          extractor:
-            from: request.http.headers.user
-      ```
-    title: Set of classification rules sharing a common selector
-  policylanguagev1FluxMeter:
-    type: object
-    properties:
-      attribute_key:
-        type: string
-        description: |-
-          Key of the attribute in access log or span from which the metric for this flux meter is read.
-
-          :::info
-          For list of available attributes in Envoy access logs, refer
-          [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
-          :::
-        x-go-default: workload_duration_ms
-      histogram_buckets:
-        type: array
-        items:
-          type: number
-          format: double
-        description: Latency histogram buckets (in ms) for this FluxMeter.
-        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: |-
-          What latency should we measure in the histogram created by this FluxMeter.
-
-          * For traffic control points, fluxmeter will measure the duration of the
-            whole http transaction (including sending request and receiving
-            response).
-          * For feature control points, fluxmeter will measure execution of the span
-            associated with particular feature. What contributes to the span's
-            duration is entirely up to the user code that uses Aperture SDK.
-    description: |-
-      :::info
-      See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
-      :::
-
-      Example of a selector that creates a histogram metric for all HTTP requests
-      to particular service:
-      ```yaml
-      selector:
-        service: myservice.mynamespace.svc.cluster.local
-        control_point:
-          traffic: ingress
-      ```
-    title: FluxMeter gathers metrics for the traffic that matches its selector
   protobufAny:
     type: object
     properties:
@@ -781,13 +599,13 @@ definitions:
   v1CheckResponse:
     type: object
     properties:
-      classifiers:
+      classifier_infos:
         type: array
         items:
-          $ref: '#/definitions/apertureflowcontrolv1Classifier'
+          $ref: '#/definitions/v1ClassifierInfo'
         description: classifiers that were matched for this request.
-      control_point:
-        $ref: '#/definitions/apertureflowcontrolv1ControlPoint'
+      control_point_info:
+        $ref: '#/definitions/v1ControlPointInfo'
         title: control_point of request
       decision_type:
         $ref: '#/definitions/CheckResponseDecisionType'
@@ -804,10 +622,10 @@ definitions:
         items:
           type: string
         description: flow label keys that were matched for this request.
-      flux_meters:
+      flux_meter_infos:
         type: array
         items:
-          $ref: '#/definitions/apertureflowcontrolv1FluxMeter'
+          $ref: '#/definitions/v1FluxMeterInfo'
         description: flux meters that were matched for this request.
       limiter_decisions:
         type: array
@@ -882,7 +700,55 @@ definitions:
       docs on how exactly it handles invalid inputs.
       :::
     title: Circuit is defined as a dataflow graph of inter-connected components
-  v1ClassifierError:
+  v1Classifier:
+    type: object
+    properties:
+      rules:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Rule'
+        description: |-
+          A map of {key, value} pairs mapping from
+          [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
+          how to extract and propagate flow labels with that key.
+        x-go-validate: required,gt=0,dive,keys,required,endkeys,required
+      selector:
+        $ref: '#/definitions/v1Selector'
+        description: Defines where to apply the flow classification rule.
+        x-go-validate: required
+    description: |-
+      :::info
+      See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
+      :::
+
+      Example:
+      ```yaml
+      selector:
+        service: service1.default.svc.cluster.local
+        control_point:
+          traffic: ingress
+      rules:
+        user:
+          extractor:
+            from: request.http.headers.user
+      ```
+    title: Set of classification rules sharing a common selector
+  v1ClassifierInfo:
+    type: object
+    properties:
+      classifier_index:
+        type: string
+        format: int64
+      error:
+        $ref: '#/definitions/v1ClassifierInfoError'
+      label_key:
+        type: string
+      policy_hash:
+        type: string
+      policy_name:
+        type: string
+    description: ClassifierInfo describes details for each ClassifierInfo.
+  v1ClassifierInfoError:
     type: string
     enum:
       - ERROR_NONE
@@ -900,7 +766,7 @@ definitions:
         $ref: '#/definitions/v1ArithmeticCombinator'
         description: Applies the given operator on input operands (signals) and emits the result.
       concurrency_limiter:
-        $ref: '#/definitions/languagev1ConcurrencyLimiter'
+        $ref: '#/definitions/v1ConcurrencyLimiter'
         description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
       constant:
         $ref: '#/definitions/v1Constant'
@@ -929,7 +795,7 @@ definitions:
         $ref: '#/definitions/v1PromQL'
         description: Periodically runs a Prometheus query in the background and emits the result.
       rate_limiter:
-        $ref: '#/definitions/languagev1RateLimiter'
+        $ref: '#/definitions/v1RateLimiter'
         description: Rate Limiter provides service protection by applying rate limiter.
       sqrt:
         $ref: '#/definitions/v1Sqrt'
@@ -970,6 +836,34 @@ definitions:
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
     title: Computational block that form the circuit
+  v1ConcurrencyLimiter:
+    type: object
+    properties:
+      load_shed_actuator:
+        $ref: '#/definitions/v1LoadShedActuator'
+        description: |-
+          Actuator based on load shedding a portion of requests.
+
+          Actuation strategy defines the input signal that will drive the scheduler.
+      scheduler:
+        $ref: '#/definitions/v1Scheduler'
+        description: |-
+          Configuration of Weighted Fair Queuing-based workload scheduler.
+
+          Contains configuration of per-agent scheduler, and also defines some
+          output signals.
+        x-go-validate: required
+    description: |-
+      :::info
+      See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+      :::
+
+      It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+      Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+
+      ConcurrencyLimiter configuration is split into two parts: An actuation
+      strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
+    title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
   v1Constant:
     type: object
     properties:
@@ -988,7 +882,38 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: The constant value is emitted to the output port.
     description: Outputs for the Constant component.
-  v1ControlPointType:
+  v1ControlPoint:
+    type: object
+    properties:
+      feature:
+        type: string
+        description: |-
+          Name of Aperture SDK's feature.
+          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
+
+          Note: Flowcontrol only.
+        x-go-validate: required
+      traffic:
+        type: string
+        description: |-
+          Type of traffic service, either "ingress" or "egress".
+          Apply the policy to the whole incoming/outgoing traffic of a service.
+          Usually powered by integration with a proxy (like envoy) or a web framework.
+
+          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
+          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
+        x-go-validate: required,oneof=ingress egress
+    description: |-
+      Identifies control point within a service that the rule or policy should apply to.
+      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
+  v1ControlPointInfo:
+    type: object
+    properties:
+      feature:
+        type: string
+      type:
+        $ref: '#/definitions/v1ControlPointInfoType'
+  v1ControlPointInfoType:
     type: string
     enum:
       - TYPE_UNKNOWN
@@ -996,7 +921,7 @@ definitions:
       - TYPE_INGRESS
       - TYPE_EGRESS
     default: TYPE_UNKNOWN
-    description: Type contains fields that represent type of ControlPoint.
+    description: Type contains fields that represent type of ControlPointInfo.
   v1ControllerInfo:
     type: object
     properties:
@@ -1259,6 +1184,57 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: Extrapolated signal.
     description: Outputs for the Extrapolator component.
+  v1FluxMeter:
+    type: object
+    properties:
+      attribute_key:
+        type: string
+        description: |-
+          Key of the attribute in access log or span from which the metric for this flux meter is read.
+
+          :::info
+          For list of available attributes in Envoy access logs, refer
+          [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
+          :::
+        x-go-default: workload_duration_ms
+      histogram_buckets:
+        type: array
+        items:
+          type: number
+          format: double
+        description: Latency histogram buckets (in ms) for this FluxMeter.
+        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+      selector:
+        $ref: '#/definitions/v1Selector'
+        description: |-
+          What latency should we measure in the histogram created by this FluxMeter.
+
+          * For traffic control points, fluxmeter will measure the duration of the
+            whole http transaction (including sending request and receiving
+            response).
+          * For feature control points, fluxmeter will measure execution of the span
+            associated with particular feature. What contributes to the span's
+            duration is entirely up to the user code that uses Aperture SDK.
+    description: |-
+      :::info
+      See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+      :::
+
+      Example of a selector that creates a histogram metric for all HTTP requests
+      to particular service:
+      ```yaml
+      selector:
+        service: myservice.mynamespace.svc.cluster.local
+        control_point:
+          traffic: ingress
+      ```
+    title: FluxMeter gathers metrics for the traffic that matches its selector
+  v1FluxMeterInfo:
+    type: object
+    properties:
+      flux_meter_name:
+        type: string
+    description: FluxMeterInfo describes detail for each FluxMeterInfo.
   v1GradientController:
     type: object
     properties:
@@ -1508,35 +1484,19 @@ definitions:
       component_index:
         type: string
         format: int64
-      concurrency_limiter:
-        $ref: '#/definitions/v1LimiterDecisionConcurrencyLimiter'
+      concurrency_limiter_info:
+        $ref: '#/definitions/LimiterDecisionConcurrencyLimiterInfo'
       dropped:
         type: boolean
       policy_hash:
         type: string
       policy_name:
         type: string
-      rate_limiter:
-        $ref: '#/definitions/v1LimiterDecisionRateLimiter'
+      rate_limiter_info:
+        $ref: '#/definitions/LimiterDecisionRateLimiterInfo'
       reason:
         $ref: '#/definitions/LimiterDecisionLimiterReason'
     description: LimiterDecision describes details for each limiter.
-  v1LimiterDecisionConcurrencyLimiter:
-    type: object
-    properties:
-      workload_index:
-        type: string
-  v1LimiterDecisionRateLimiter:
-    type: object
-    properties:
-      current:
-        type: string
-        format: int64
-      label:
-        type: string
-      remaining:
-        type: string
-        format: int64
   v1LoadShedActuator:
     type: object
     properties:
@@ -1781,6 +1741,46 @@ definitions:
         $ref: '#/definitions/v1Port'
         description: The result of the Prometheus query as an output signal.
     description: Output for the PromQL component.
+  v1RateLimiter:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1RateLimiterIns'
+        x-go-validate: required
+      label_key:
+        type: string
+        description: |-
+          Specifies which label the ratelimiter should be keyed by.
+
+          Rate limiting is done independently for each value of the
+          [label](/concepts/flow-control/flow-label.md) with given key.
+          Eg., to give each user a separate limit, assuming you have a _user_ flow
+          label set up, set `label_key: "user"`.
+        x-go-validate: required
+      lazy_sync:
+        $ref: '#/definitions/RateLimiterLazySync'
+        title: Configuration of lazy-syncing behaviour of ratelimiter
+      limit_reset_interval:
+        type: string
+        description: Time after which the limit for a given label value will be reset.
+        x-go-default: 60s
+      overrides:
+        type: array
+        items:
+          $ref: '#/definitions/RateLimiterOverride'
+        description: Allows to specify different limits for particular label values.
+      selector:
+        $ref: '#/definitions/v1Selector'
+        description: Which control point to apply this ratelimiter to.
+        x-go-validate: required
+    description: |-
+      :::info
+      See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+      :::
+
+      Ratelimiting is done separately on per-label-value basis. Use _label\_key_
+      to select which label should be used as key.
+    title: Limits the traffic on a control point to specified rate
   v1RateLimiterIns:
     type: object
     properties:
@@ -1824,7 +1824,7 @@ definitions:
       classifiers:
         type: array
         items:
-          $ref: '#/definitions/policylanguagev1Classifier'
+          $ref: '#/definitions/v1Classifier'
         description: |-
           Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
@@ -1832,7 +1832,7 @@ definitions:
       flux_meters:
         type: object
         additionalProperties:
-          $ref: '#/definitions/policylanguagev1FluxMeter'
+          $ref: '#/definitions/v1FluxMeter'
         description: |-
           FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
 
@@ -2023,7 +2023,7 @@ definitions:
           selector applies to.
         x-go-default: default
       control_point:
-        $ref: '#/definitions/commonselectorv1ControlPoint'
+        $ref: '#/definitions/v1ControlPoint'
         description: |-
           Describes
           [control point](/concepts/flow-control/flow-control.md#control-point)

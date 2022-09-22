@@ -51,7 +51,7 @@ message CheckResponse {
   // services that matched
   repeated string services = 4;
   // control_point of request
-  ControlPoint control_point = 5;
+  ControlPointInfo control_point_info = 5;
   // flow label keys that were matched for this request.
   repeated string flow_label_keys = 6;
   // telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
@@ -61,15 +61,15 @@ message CheckResponse {
   // reject_reason contains the reason for the rejection.
   RejectReason reject_reason = 9;
   // classifiers that were matched for this request.
-  repeated Classifier classifiers = 10;
+  repeated ClassifierInfo classifier_infos = 10;
   // flux meters that were matched for this request.
-  repeated FluxMeter flux_meters = 11;
+  repeated FluxMeterInfo flux_meter_infos = 11;
   // limiter_decisions contains information about decision made by each limiter.
   repeated LimiterDecision limiter_decisions = 12;
 }
 
-message ControlPoint {
-  // Type contains fields that represent type of ControlPoint.
+message ControlPointInfo {
+  // Type contains fields that represent type of ControlPointInfo.
   enum Type {
     TYPE_UNKNOWN = 0;
     TYPE_FEATURE = 1;
@@ -80,8 +80,8 @@ message ControlPoint {
   string feature = 2;
 }
 
-// Classifier describes details for each Classifier.
-message Classifier {
+// ClassifierInfo describes details for each ClassifierInfo.
+message ClassifierInfo {
   // Error information.
   enum Error {
     ERROR_NONE = 0;
@@ -101,13 +101,13 @@ message Classifier {
 
 // LimiterDecision describes details for each limiter.
 message LimiterDecision {
-  message RateLimiter {
+  message RateLimiterInfo {
     int64 remaining = 1;
     int64 current = 2;
     string label = 3;
   }
 
-  message ConcurrencyLimiter {
+  message ConcurrencyLimiterInfo {
     string workload_index = 1;
   }
 
@@ -122,12 +122,12 @@ message LimiterDecision {
   bool dropped = 4;
   LimiterReason reason = 5;
   oneof details {
-    RateLimiter rate_limiter = 6;
-    ConcurrencyLimiter concurrency_limiter = 7;
+    RateLimiterInfo rate_limiter_info = 6;
+    ConcurrencyLimiterInfo concurrency_limiter_info = 7;
   }
 }
 
-// FluxMeter describes detail for each FluxMeter.
-message FluxMeter {
+// FluxMeterInfo describes detail for each FluxMeterInfo.
+message FluxMeterInfo {
   string flux_meter_name = 1;
 }
