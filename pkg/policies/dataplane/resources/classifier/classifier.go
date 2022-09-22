@@ -52,9 +52,9 @@ func New() *ClassificationEngine {
 	}
 }
 
-func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm *multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector], labelsForMatching map[string]string, input ast.Value) (classifierMsgs []*flowcontrolv1.Classifier) {
-	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.Classifier_Error) {
-		classifierMsgs = append(classifierMsgs, &flowcontrolv1.Classifier{
+func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm *multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector], labelsForMatching map[string]string, input ast.Value) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
+	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.ClassifierInfo_Error) {
+		classifierMsgs = append(classifierMsgs, &flowcontrolv1.ClassifierInfo{
 			PolicyName:      labelerWithSelector.PolicyName,
 			PolicyHash:      labelerWithSelector.PolicyHash,
 			ClassifierIndex: labelerWithSelector.ClassifierIndex,
@@ -68,23 +68,23 @@ func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm
 		resultSet, err := labeler.Query.Eval(ctx, rego.EvalParsedInput(input))
 		if err != nil {
 			logSampled.Warn().Msg("Rego: Evaluation failed")
-			appendNewClassifier(labelerWithSelector, flowcontrolv1.Classifier_ERROR_EVAL_FAILED)
+			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_EVAL_FAILED)
 			continue
 		}
 
 		if len(resultSet) == 0 {
 			logSampled.Warn().Msg("Rego: Empty resultSet")
-			appendNewClassifier(labelerWithSelector, flowcontrolv1.Classifier_ERROR_EMPTY_RESULTSET)
+			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_EMPTY_RESULTSET)
 			continue
 		} else if len(resultSet) > 1 {
 			logSampled.Warn().Msg("Rego: Ambiguous resultSet")
-			appendNewClassifier(labelerWithSelector, flowcontrolv1.Classifier_ERROR_AMBIGUOUS_RESULTSET)
+			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_AMBIGUOUS_RESULTSET)
 			continue
 		}
 
 		if len(resultSet[0].Expressions) != 1 {
 			log.Warn().Msg("Rego: Expected exactly one expression")
-			appendNewClassifier(labelerWithSelector, flowcontrolv1.Classifier_ERROR_MULTI_EXPRESSION)
+			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_MULTI_EXPRESSION)
 			continue
 		}
 
@@ -94,17 +94,17 @@ func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm
 				Value:     resultSet[0].Expressions[0].String(),
 				Telemetry: labeler.Telemetry,
 			}
-			appendNewClassifier(labelerWithSelector, flowcontrolv1.Classifier_ERROR_NONE)
+			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_NONE)
 		} else {
 			// multi-label-query
 			variables, isMap := resultSet[0].Expressions[0].Value.(map[string]interface{})
 			if !isMap {
 				logSampled.Error().Msg("Rego: Expression's not a map (bug)")
-				appendNewClassifier(labelerWithSelector, flowcontrolv1.Classifier_ERROR_EXPRESSION_NOT_MAP)
+				appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_EXPRESSION_NOT_MAP)
 				continue
 			}
 
-			appendNewClassifier(labelerWithSelector, flowcontrolv1.Classifier_ERROR_NONE)
+			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_NONE)
 			for key, value := range variables {
 				flowLabels[key] = flowlabel.FlowLabelValue{
 					Value:     fmt.Sprint(value),
@@ -124,7 +124,7 @@ func (c *ClassificationEngine) Classify(
 	ctrlPt selectors.ControlPoint,
 	labelsForMatching map[string]string,
 	input ast.Value,
-) ([]*flowcontrolv1.Classifier, flowlabel.FlowLabels, error) {
+) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels, error) {
 	flowLabels := make(flowlabel.FlowLabels)
 
 	r, ok := c.activeRules.Load().(rules)
@@ -132,7 +132,7 @@ func (c *ClassificationEngine) Classify(
 		return nil, flowLabels, nil
 	}
 
-	var classifierMsgs []*flowcontrolv1.Classifier
+	var classifierMsgs []*flowcontrolv1.ClassifierInfo
 
 	// Catch all Service
 	cpID := selectors.NewControlPointID("", ctrlPt)

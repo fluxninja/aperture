@@ -298,8 +298,8 @@ func (rateLimiter *rateLimiter) RunLimiter(labels map[string]string) *flowcontro
 		ComponentIndex: rateLimiter.GetComponentIndex(),
 		Dropped:        !ok,
 		Reason:         reason,
-		Details: &flowcontrolv1.LimiterDecision_RateLimiter_{
-			RateLimiter: &flowcontrolv1.LimiterDecision_RateLimiter{
+		Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
+			RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
 				Label:     label,
 				Remaining: int64(remaining),
 				Current:   int64(current),

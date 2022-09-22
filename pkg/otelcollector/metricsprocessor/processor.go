@@ -201,7 +201,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	}
 	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
 	// Control Point
-	attributes.PutString(otelcollector.ApertureControlPointLabel, checkResponse.GetControlPoint().String())
+	attributes.PutString(otelcollector.ApertureControlPointLabel, checkResponse.GetControlPointInfo().String())
 
 	labels := map[string]pcommon.Value{
 		otelcollector.ApertureRateLimitersLabel:                pcommon.NewValueSlice(),
@@ -218,7 +218,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		otelcollector.ApertureErrorLabel:                       pcommon.NewValueString(checkResponse.GetError().String()),
 	}
 	for _, decision := range checkResponse.LimiterDecisions {
-		if decision.GetRateLimiter() != nil {
+		if decision.GetRateLimiterInfo() != nil {
 			rawValue := []string{
 				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
 				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
@@ -230,7 +230,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 				labels[otelcollector.ApertureDroppingRateLimitersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 			}
 		}
-		if cl := decision.GetConcurrencyLimiter(); cl != nil {
+		if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
 			rawValue := []string{
 				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
 				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
@@ -255,7 +255,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 			}
 		}
 	}
-	for _, fluxMeter := range checkResponse.FluxMeters {
+	for _, fluxMeter := range checkResponse.FluxMeterInfos {
 		value := fluxMeter.GetFluxMeterName()
 		labels[otelcollector.ApertureFluxMetersLabel].SliceVal().AppendEmpty().SetStringVal(value)
 	}
@@ -264,7 +264,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		labels[otelcollector.ApertureFlowLabelKeysLabel].SliceVal().AppendEmpty().SetStringVal(flowLabelKey)
 	}
 
-	for _, classifier := range checkResponse.Classifiers {
+	for _, classifier := range checkResponse.ClassifierInfos {
 		rawValue := []string{
 			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
 			fmt.Sprintf("%s:%v", metrics.ClassifierIndexLabel, classifier.ClassifierIndex),
@@ -296,7 +296,7 @@ func (p *metricsProcessor) updateMetrics(
 		// Update workload metrics
 		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, []string{})
 		for _, decision := range checkResponse.LimiterDecisions {
-			if cl := decision.GetConcurrencyLimiter(); cl != nil {
+			if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
 				labels := map[string]string{
 					metrics.PolicyNameLabel:     decision.PolicyName,
 					metrics.PolicyHashLabel:     decision.PolicyHash,
@@ -310,7 +310,7 @@ func (p *metricsProcessor) updateMetrics(
 		}
 	}
 
-	if len(checkResponse.FluxMeters) > 0 {
+	if len(checkResponse.FluxMeterInfos) > 0 {
 		// Update flux meter metrics
 		statusCodeStr := ""
 		statusCode, exists := attributes.Get(otelcollector.HTTPStatusCodeLabel)
@@ -322,7 +322,7 @@ func (p *metricsProcessor) updateMetrics(
 		if exists {
 			featureStatusStr = featureStatus.StringVal()
 		}
-		for _, fluxMeter := range checkResponse.FluxMeters {
+		for _, fluxMeter := range checkResponse.FluxMeterInfos {
 			p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, attributes, treatAsZero)
 		}
 	}
@@ -338,7 +338,7 @@ func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, la
 }
 
 func (p *metricsProcessor) updateMetricsForFluxMeters(
-	fluxMeterMessage *flowcontrolv1.FluxMeter,
+	fluxMeterMessage *flowcontrolv1.FluxMeterInfo,
 	decisionType flowcontrolv1.CheckResponse_DecisionType,
 	statusCode string,
 	featureStatus string,
