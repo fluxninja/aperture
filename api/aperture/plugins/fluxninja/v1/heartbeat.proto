@@ -6,6 +6,7 @@ import "aperture/common/info/v1/info.proto";
 import "aperture/common/peers/v1/peers.proto";
 import "aperture/common/status/v1/status.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 // FluxNinjaService is used to receive health and status info from agents.
 service FluxNinjaService {
@@ -15,6 +16,15 @@ service FluxNinjaService {
     option (google.api.http) = {
       post: "/plugins/fluxninja/v1/report"
       body: "*"
+    };
+  }
+}
+
+// ControllerInfoService is used to read controllerID to which agent/controller belong.
+service ControllerInfoService {
+  rpc GetControllerInfo(google.protobuf.Empty) returns (ControllerInfo) {
+    option (google.api.http) = {
+      get: "/plugins/fluxninja/v1/controllerinfo"
     };
   }
 }
