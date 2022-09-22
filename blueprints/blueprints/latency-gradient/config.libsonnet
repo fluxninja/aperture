@@ -17,6 +17,29 @@
     fluxMeterSelector: error 'fluxMeterSelector is not set',
     /**
     * @section Latency Gradient Policy
+    * @subsection Flux Meters
+    *
+    * @param (policy.fluxMeters: map[string]aperture.v1.FluxMeter) Mappings of fluxMeterName to fluxMeter.
+    * @param (policy.fluxMeters[policyName].attributeKey: string) Key of the attribute in access log or span.
+    * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.v1.FluxMeterStaticBuckets) Flux Meter static histogram buckets.
+    * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.v1.FluxMeterLinearBuckets) Flux Meter linear histogram buckets.
+    * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.v1.ExponentialBuckets) Flux Meter exponential histogram buckets.
+    * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.v1.ExponentialBucketsRange) Flux Meter exponential buckets range.
+    */
+    fluxMeters: {
+      'service1-latency-gradient': {
+        attributeKey: 'workload_duration_ms',
+        staticBuckets: {
+          buckets: [5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0],
+        },
+        linearBuckets: {},
+        exponentialBuckets: {},
+        exponentialBucketsRange: {},
+      },
+    },
+    /**
+    /**
+    * @section Latency Gradient Policy
     * @subsection Concurrency Limiter Selector
     *
     * @param (policy.concurrencyLimiterSelector: aperture.v1.Selector required) Concurrency Limiter selector.
