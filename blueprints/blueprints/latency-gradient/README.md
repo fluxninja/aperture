@@ -4,37 +4,38 @@
 
 [configuration]: # Configuration Marker
 
+
 ### Latency Gradient Policy
 
-| Parameter Name              | Parameter Type | Default      | Description                                                             |
-| --------------------------- | -------------- | ------------ | ----------------------------------------------------------------------- |
-| `policy.policyName`         | `string`       | `(required)` | A name of the policy, used within PromQL queries for fluxmeter metrics. |
-| `policy.evaluationInterval` | `string`       | `"0.5s"`     | How often should policy be re-evaluated.                                |
+| Parameter Name | Parameter Type | Default | Description |
+| -------------- | -------------- | ------- | ----------- |
+| `policy.policyName` | `string` | `(required)` | A name of the policy, used within PromQL queries for fluxmeter metrics. |
+| `policy.evaluationInterval` | `string` | `"0.5s"` | How often should policy be re-evaluated. |
 
 #### Flux Meter Selector
 
-| Parameter Name             | Parameter Type         | Default      | Description          |
-| -------------------------- | ---------------------- | ------------ | -------------------- |
+| Parameter Name | Parameter Type | Default | Description |
+| -------------- | -------------- | ------- | ----------- |
 | `policy.fluxMeterSelector` | `aperture.v1.Selector` | `(required)` | Flux Meter selector. |
 
 #### Concurrency Limiter Selector
 
-| Parameter Name                      | Parameter Type         | Default      | Description                   |
-| ----------------------------------- | ---------------------- | ------------ | ----------------------------- |
+| Parameter Name | Parameter Type | Default | Description |
+| -------------- | -------------- | ------- | ----------- |
 | `policy.concurrencyLimiterSelector` | `aperture.v1.Selector` | `(required)` | Concurrency Limiter selector. |
 
 #### Classification Rules
 
-| Parameter Name       | Parameter Type | Default | Description                   |
-| -------------------- | -------------- | ------- | ----------------------------- |
-| `policy.classifiers` | `string`       | `[]`    | List of classification rules. |
+| Parameter Name | Parameter Type | Default | Description |
+| -------------- | -------------- | ------- | ----------- |
+| `policy.classifiers` | `string` | `[]` | List of classification rules. |
 
 #### Exponential Moving Average configuration
 
-| Parameter Name            | Parameter Type | Default   | Description                                                        |
-| ------------------------- | -------------- | --------- | ------------------------------------------------------------------ |
-| `policy.ema.window`       | `string`       | `"1500s"` | How far back to look when calculating moving average               |
-| `policy.ema.warmUpWindow` | `string`       | `"10s"`   | How much time to give circuit before we start calculating averages |
+| Parameter Name | Parameter Type | Default | Description |
+| -------------- | -------------- | ------- | ----------- |
+| `policy.ema.window` | `string` | `"1500s"` | How far back to look when calculating moving average |
+| `policy.ema.warmUpWindow` | `string` | `"10s"` | How much time to give circuit before we start calculating averages |
 
 #### Concurrency Limiter
 
@@ -91,13 +92,15 @@ Or it can be passed as a list of jsonnet objects directly:
 }
 ```
 
-| Parameter Name                                       | Parameter Type                                   | Default | Description                                      |
-| ---------------------------------------------------- | ------------------------------------------------ | ------- | ------------------------------------------------ |
-| `policy.concurrencyLimiter.defaultWorkload.priority` | `int`                                            | `20`    | TODO                                             |
-| `policy.concurrencyLimiter.workloads`                | `[]aperture.v1.SchedulerWorkloadAndLabelMatcher` | `[]`    | A list of additional workloads for the scheduler |
+
+
+| Parameter Name | Parameter Type | Default | Description |
+| -------------- | -------------- | ------- | ----------- |
+| `policy.concurrencyLimiter.defaultWorkload.priority` | `int` | `20` | TODO |
+| `policy.concurrencyLimiter.workloads` | `[]aperture.v1.SchedulerWorkloadAndLabelMatcher` | `[]` | A list of additional workloads for the scheduler |
 
 ### FluxMeter Dashboard
 
-| Parameter Name         | Parameter Type | Default      | Description                                                               |
-| ---------------------- | -------------- | ------------ | ------------------------------------------------------------------------- |
-| `dashboard.policyName` | `string`       | `(required)` | A name of the policy used as a promQL query filter for flux meter metrics |
+| Parameter Name | Parameter Type | Default | Description |
+| -------------- | -------------- | ------- | ----------- |
+| `dashboard.policyName` | `string` | `(required)` | A name of the policy used as a promQL query filter for flux meter metrics |
