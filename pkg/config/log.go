@@ -7,7 +7,6 @@ import (
 	"path"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/fluxninja/lumberjack"
 	"github.com/rs/zerolog"
@@ -178,7 +177,7 @@ func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
 	}
 
 	if config.PrettyConsole {
-		writers = append(writers, zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})
+		writers = append(writers, log.GetPrettyConsoleWriter())
 	}
 
 	multi := zerolog.MultiLevelWriter(writers...)

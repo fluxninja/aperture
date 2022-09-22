@@ -5,6 +5,7 @@ import (
 	"io"
 	stdlog "log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -129,6 +130,24 @@ func closeDiodeWriter(dw diode.Writer) {
 // WaitFlush waits a few ms to let the diode buffer to flush.
 func WaitFlush() {
 	time.Sleep(diodeFlushWait)
+}
+
+// GetPrettyConsoleWriter returns a pretty console writer.
+func GetPrettyConsoleWriter() io.Writer {
+	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+	output.FormatLevel = func(i interface{}) string {
+		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
+	}
+	output.FormatMessage = func(i interface{}) string {
+		return fmt.Sprintf("***%s****", i)
+	}
+	output.FormatFieldName = func(i interface{}) string {
+		return fmt.Sprintf("%s:", i)
+	}
+	output.FormatFieldValue = func(i interface{}) string {
+		return fmt.Sprintf("%s", i)
+	}
+	return output
 }
 
 /* Wrappers around zerolog */

@@ -13,7 +13,7 @@ import (
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 )
 
@@ -38,8 +38,8 @@ func NewFluxMeterOptions(
 	}
 	agentGroup := selectorProto.GetAgentGroup()
 
-	etcdPath := path.Join(paths.FluxMeterConfigPath,
-		paths.FluxMeterKey(agentGroup, name))
+	etcdPath := path.Join(common.FluxMeterConfigPath,
+		common.FluxMeterKey(agentGroup, name))
 	configSync := &fluxMeterConfigSync{
 		fluxMeterProto: fluxMeterProto,
 		policyBaseAPI:  policyBaseAPI,

@@ -9,7 +9,7 @@ import (
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
@@ -37,7 +37,7 @@ func NewClassifierOptions(
 	}
 	agentGroup := selectorProto.GetAgentGroup()
 
-	etcdPath := path.Join(paths.ClassifiersConfigPath, paths.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))
+	etcdPath := path.Join(common.ClassifiersConfigPath, common.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))
 	configSync := &classifierConfigSync{
 		classifierProto: classifierProto,
 		policyBaseAPI:   policyBaseAPI,
