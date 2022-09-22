@@ -13,7 +13,7 @@ local classifier = aperture.v1.policylanguagev1Classifier;
 local extractor = aperture.v1.Extractor;
 local rule = aperture.v1.Rule;
 local selector = aperture.v1.Selector;
-local controlPoint = aperture.v1.ControlPoint;
+local controlPoint = aperture.v1.commonselectorv1ControlPoint;
 
 local svcSelector = selector.new()
                     + selector.withAgentGroup('default')
