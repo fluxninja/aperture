@@ -16,7 +16,7 @@ import (
 	filesystemwatcher "github.com/fluxninja/aperture/pkg/filesystem/watcher"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 )
 
@@ -92,7 +92,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 	}
 
 	notifier := etcdnotifier.NewPrefixToEtcdNotifier(
-		paths.PoliciesConfigPath,
+		common.PoliciesConfigPath,
 		etcdClient,
 		true)
 	// content transform callback to wrap policy in config properties wrapper

@@ -12,8 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/common"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -25,7 +24,7 @@ var policiesDriverFxTag = "policies-driver"
 // policyFactoryModule module for policy factory.
 func policyFactoryModule() fx.Option {
 	return fx.Options(
-		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: paths.PoliciesConfigPath}.Annotate(),
+		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: common.PoliciesConfigPath}.Annotate(),
 		fx.Invoke(
 			fx.Annotate(
 				setupPolicyFxDriver,

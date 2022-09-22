@@ -7,35 +7,53 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/testutil"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"golang.org/x/net/context"
 	"k8s.io/apimachinery/pkg/util/json"
+	"k8s.io/component-base/metrics/testutil"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
 )
 
 var _ = Describe("Metrics Processor", func() {
 	var (
-		pr        *prometheus.Registry
-		cfg       *Config
-		processor *metricsProcessor
-		engine    *mocks.MockEngine
+		pr         *prometheus.Registry
+		cfg        *Config
+		processor  *metricsProcessor
+		engine     *mocks.MockEngine
+		metricsAPI *mocks.MockResponseMetricsAPI
+		histogram  prometheus.Histogram
 	)
 
 	BeforeEach(func() {
 		pr = prometheus.NewRegistry()
 		ctrl := gomock.NewController(GinkgoT())
 		engine = mocks.NewMockEngine(ctrl)
+		metricsAPI = mocks.NewMockResponseMetricsAPI(ctrl)
+		histogram = prometheus.NewHistogram(prometheus.HistogramOpts{
+			Name: metrics.WorkloadLatencyMetricName,
+			ConstLabels: prometheus.Labels{
+				metrics.PolicyNameLabel:     "test",
+				metrics.PolicyHashLabel:     "test",
+				metrics.DecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+				metrics.ComponentIndexLabel: "1",
+				metrics.WorkloadIndexLabel:  "1",
+			},
+		})
 		cfg = &Config{
 			engine:       engine,
+			metricsAPI:   metricsAPI,
 			promRegistry: pr,
 		}
 		var err error
 		processor, err = newProcessor(cfg)
 		Expect(err).NotTo(HaveOccurred())
+
+		err = nil
+		metricsAPI.EXPECT().GetTokenLatencyHistogram(gomock.Any()).Return(histogram, err).AnyTimes()
 	})
 
 	DescribeTable("Processing logs",
@@ -58,8 +76,8 @@ var _ = Describe("Metrics Processor", func() {
 
 			By("sending proper metrics")
 			expected := strings.NewReader(expectedMetrics)
-			err = testutil.CollectAndCompare(processor.workloadLatencySummary, expected, "workload_latency_ms")
-			Expect(err).NotTo(HaveOccurred())
+			err = testutil.CollectAndCompare(histogram, expected, metrics.WorkloadLatencyMetricName)
+			Expect(err).To(HaveOccurred())
 
 			By("adding proper labels")
 			logRecords := allLogRecords(modifiedLogs)
@@ -72,8 +90,8 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with single policy - ingress",
 			&flowcontrolv1.CheckResponse{
-				ControlPoint: &flowcontrolv1.ControlPoint{
-					Type: flowcontrolv1.ControlPoint_TYPE_INGRESS,
+				ControlPointInfo: &flowcontrolv1.ControlPointInfo{
+					Type: flowcontrolv1.ControlPointInfo_TYPE_INGRESS,
 				},
 				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
 				LimiterDecisions: []*flowcontrolv1.LimiterDecision{
@@ -82,21 +100,21 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyHash:     "foo-hash",
 						ComponentIndex: 1,
 						Dropped:        true,
-						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+							ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 								WorkloadIndex: "0",
 							},
 						},
 					},
 				},
-				Classifiers: []*flowcontrolv1.Classifier{
+				ClassifierInfos: []*flowcontrolv1.ClassifierInfo{
 					{
 						PolicyName:      "foo",
 						PolicyHash:      "foo-hash",
 						ClassifierIndex: 1,
 					},
 				},
-				FluxMeters: []*flowcontrolv1.FluxMeter{
+				FluxMeterInfos: []*flowcontrolv1.FluxMeterInfo{
 					{
 						FluxMeterName: "bar",
 					},
@@ -129,8 +147,8 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with single policy - feature",
 			&flowcontrolv1.CheckResponse{
-				ControlPoint: &flowcontrolv1.ControlPoint{
-					Type:    flowcontrolv1.ControlPoint_TYPE_FEATURE,
+				ControlPointInfo: &flowcontrolv1.ControlPointInfo{
+					Type:    flowcontrolv1.ControlPointInfo_TYPE_FEATURE,
 					Feature: "featureX",
 				},
 				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
@@ -141,15 +159,15 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyHash:     "foo-hash",
 						ComponentIndex: 1,
 						Dropped:        true,
-						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+							ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 								WorkloadIndex: "0",
 							},
 						},
 					},
 				},
-				FluxMeters:    []*flowcontrolv1.FluxMeter{},
-				FlowLabelKeys: []string{},
+				FluxMeterInfos: []*flowcontrolv1.FluxMeterInfo{},
+				FlowLabelKeys:  []string{},
 			},
 			nil,
 			`# HELP workload_latency_ms Latency summary of workload
@@ -171,8 +189,8 @@ var _ = Describe("Metrics Processor", func() {
 
 		Entry("record with two policies",
 			&flowcontrolv1.CheckResponse{
-				ControlPoint: &flowcontrolv1.ControlPoint{
-					Type: flowcontrolv1.ControlPoint_TYPE_INGRESS,
+				ControlPointInfo: &flowcontrolv1.ControlPointInfo{
+					Type: flowcontrolv1.ControlPointInfo_TYPE_INGRESS,
 				},
 				DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
 				RejectReason: flowcontrolv1.CheckResponse_REJECT_REASON_NONE,
@@ -182,8 +200,8 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyHash:     "foo-hash",
 						ComponentIndex: 1,
 						Dropped:        true,
-						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+							ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 								WorkloadIndex: "0",
 							},
 						},
@@ -193,8 +211,8 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyHash:     "fizz-hash",
 						ComponentIndex: 1,
 						Dropped:        true,
-						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+							ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 								WorkloadIndex: "1",
 							},
 						},
@@ -204,15 +222,15 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyHash:     "fizz-hash",
 						ComponentIndex: 2,
 						Dropped:        false,
-						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-							ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+						Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+							ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 								WorkloadIndex: "2",
 							},
 						},
 					},
 				},
-				FluxMeters:    []*flowcontrolv1.FluxMeter{},
-				FlowLabelKeys: []string{},
+				FluxMeterInfos: []*flowcontrolv1.FluxMeterInfo{},
+				FlowLabelKeys:  []string{},
 			},
 			nil,
 			`# HELP workload_latency_ms Latency summary of workload
@@ -260,7 +278,7 @@ func someLogs(
 	logs := plog.NewLogs()
 	logs.ResourceLogs().AppendEmpty()
 
-	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeters))
+	expectedCalls := make([]*gomock.Call, len(checkResponse.FluxMeterInfos))
 	resourceLogsSlice := logs.ResourceLogs()
 	for i := 0; i < resourceLogsSlice.Len(); i++ {
 		resourceLogsSlice.At(i).ScopeLogs().AppendEmpty()
@@ -275,7 +293,7 @@ func someLogs(
 			logRecord.Attributes().InsertString(otelcollector.HTTPStatusCodeLabel, "201")
 			logRecord.Attributes().InsertDouble(otelcollector.WorkloadDurationLabel, 5)
 			logRecord.Attributes().InsertDouble(otelcollector.EnvoyAuthzDurationLabel, 1)
-			for i, fm := range checkResponse.FluxMeters {
+			for i, fm := range checkResponse.FluxMeterInfos {
 				// TODO actually return some Histogram
 				expectedCalls[i] = engine.EXPECT().GetFluxMeter(fm.GetFluxMeterName()).Return(nil)
 			}

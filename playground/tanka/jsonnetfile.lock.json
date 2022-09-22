@@ -8,8 +8,8 @@
           "subdir": ""
         }
       },
-      "version": "e5a7ac535acbb013d5e91f55f18b6fbbca482365",
-      "sum": "BzFSmmBKlPgyt9ZT5vh9OA6zqdeIt7WVQg2+A/c1sxE="
+      "version": "73da0af0443104b3abd0ce76e6dd4ff24ee13c9b",
+      "sum": "PB4kiP8j/nb/Tif2jfvXkttVpfjvhkJqPEnvzNZNAps="
     },
     {
       "source": {
@@ -18,8 +18,8 @@
           "subdir": ""
         }
       },
-      "version": "edd3afb408620982994574979b0879dfa59061ad",
-      "sum": "QPsi/vocvPAki9auebr+MCYPaIsAaGPUE+PZBPSJ5/g="
+      "version": "719a3ad14b1efab7765ffdd73adb45592141f6f4",
+      "sum": "cVMdweVRGi24B82/QAXV5sonZ9csuvD3M1L5NqXkS0g="
     },
     {
       "source": {
@@ -28,8 +28,8 @@
           "subdir": "lib/1.0"
         }
       },
-      "version": "edd3afb408620982994574979b0879dfa59061ad",
-      "sum": "bP+umhlQ1OobXrAD0Dz8rAj8Pb7l3RwnP3mdZxsuqC8="
+      "version": "719a3ad14b1efab7765ffdd73adb45592141f6f4",
+      "sum": "rCTNC8BUXRoyv/9rx5LY/FNNJUjVziGyWV+132tQpiI="
     },
     {
       "source": {
@@ -48,7 +48,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
+      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
       "sum": "tDR6yT2GVfw0wTU12iZH+m01HrbIr6g/xN+/8nzNkU0="
     },
     {
@@ -58,7 +58,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
+      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
       "sum": "2++XoPslyz02LRgsxREWxjLgYgiCIqhAtXCyVSvYcoE="
     },
     {
@@ -68,7 +68,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
+      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {

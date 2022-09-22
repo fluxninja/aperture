@@ -360,7 +360,7 @@ func (x *Resources) GetClassifiers() []*Classifier {
 //   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
 //   :::
 // * "sink" components – they affect the real world.
-//   [ConcurrencyLimiter.LoadShedActuator](#languagev1-concurrency-limiter) and [RateLimiter](#languagev1-rate-limiter).
+//   [ConcurrencyLimiter.LoadShedActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
 //   In the UI, represented by orange color.  Sink components usually come in pairs with a
 //   "sources" component which emits a feedback signal, like
 //   `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
@@ -1287,7 +1287,7 @@ func (*ConcurrencyLimiter_LoadShedActuator) isConcurrencyLimiter_ActuationStrate
 // signal are aggregated across all agents.
 // :::
 //
-// See [ConcurrencyLimiter](#languagev1-concurrency-limiter) for more context.
+// See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
 type Scheduler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
