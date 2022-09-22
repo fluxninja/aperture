@@ -34,8 +34,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/operator/controllers/agent"
+	"github.com/fluxninja/aperture/operator/controllers/controller"
+	"github.com/fluxninja/aperture/operator/controllers/mutatingwebhook"
+	"github.com/fluxninja/aperture/operator/controllers/namespace"
+	"github.com/fluxninja/aperture/operator/controllers/policy"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -47,7 +52,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(v1alpha1.AddToScheme(scheme))
+	utilruntime.Must(api.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -130,7 +135,7 @@ func main() {
 		server.CertName = os.Getenv("APERTURE_OPERATOR_CERT_NAME")
 		server.KeyName = os.Getenv("APERTURE_OPERATOR_KEY_NAME")
 
-		if err = (&controllers.MutatingWebhookReconciler{
+		if err = (&mutatingwebhook.MutatingWebhookReconciler{
 			Client:            mgr.GetClient(),
 			Scheme:            mgr.GetScheme(),
 			AgentManager:      agentManager,
@@ -142,7 +147,7 @@ func main() {
 	}
 
 	if agentManager {
-		reconciler := &controllers.AgentReconciler{
+		reconciler := &agent.AgentReconciler{
 			Client:        mgr.GetClient(),
 			DynamicClient: dynamicClient,
 			Scheme:        mgr.GetScheme(),
@@ -154,7 +159,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		if err = (&controllers.NamespaceReconciler{
+		if err = (&namespace.NamespaceReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
@@ -162,17 +167,17 @@ func main() {
 			os.Exit(1)
 		}
 
-		apertureInjector := &controllers.ApertureInjector{
+		apertureInjector := &mutatingwebhook.ApertureInjector{
 			Client: mgr.GetClient(),
 		}
 		reconciler.ApertureInjector = apertureInjector
 
 		server.Register(controllers.MutatingWebhookURI, &webhook.Admission{Handler: apertureInjector})
-		server.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &controllers.AgentHooks{}})
+		server.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &agent.AgentHooks{}})
 	}
 
 	if controllerManager {
-		if err = (&controllers.ControllerReconciler{
+		if err = (&controller.ControllerReconciler{
 			Client:        mgr.GetClient(),
 			DynamicClient: dynamicClient,
 			Scheme:        mgr.GetScheme(),
@@ -182,11 +187,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		server.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controllers.ControllerHooks{}})
+		server.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controller.ControllerHooks{}})
 	}
 
 	if policyManager {
-		if err = (&controllers.PolicyReconciler{
+		if err = (&policy.PolicyReconciler{
 			Client:   mgr.GetClient(),
 			Scheme:   mgr.GetScheme(),
 			Recorder: mgr.GetEventRecorderFor("aperture-policy"),
