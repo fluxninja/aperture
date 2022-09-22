@@ -35,8 +35,8 @@
 </g>
 <g id="clust16" class="cluster">
 <title>cluster_s15</title>
-<polygon fill="none" stroke="black" points="392.19,-1031 392.19,-1244 735.39,-1244 735.39,-1031 392.19,-1031"/>
-<text text-anchor="middle" x="563.79" y="-1228.8" font-family="Times,serif" font-size="14.00">ArithmeticCombinator (7)</text>
+<polygon fill="none" stroke="black" points="392.19,-1019 392.19,-1232 735.39,-1232 735.39,-1019 392.19,-1019"/>
+<text text-anchor="middle" x="563.79" y="-1216.8" font-family="Times,serif" font-size="14.00">ArithmeticCombinator (7)</text>
 </g>
 <g id="clust19" class="cluster">
 <title>cluster_s19</title>
@@ -130,8 +130,8 @@
 </g>
 <g id="clust62" class="cluster">
 <title>cluster_s56</title>
-<polygon fill="none" stroke="black" points="8,-898 8,-1057 191.19,-1057 191.19,-898 8,-898"/>
-<text text-anchor="middle" x="99.6" y="-1041.8" font-family="Times,serif" font-size="14.00">PromQL (18)</text>
+<polygon fill="none" stroke="black" points="8,-886 8,-1045 191.19,-1045 191.19,-886 8,-886"/>
+<text text-anchor="middle" x="99.6" y="-1029.8" font-family="Times,serif" font-size="14.00">PromQL (18)</text>
 </g>
 <g id="clust64" class="cluster">
 <title>cluster_s53</title>
@@ -157,7 +157,7 @@
 <text text-anchor="middle" x="1339.86" y="-1545.3" font-family="Times,serif" font-size="14.00">load_shed_factor</text>
 </g>
 <!-- n30&#45;&gt;n74 -->
-<g id="edge42" class="edge">
+<g id="edge40" class="edge">
 <title>n30&#45;&gt;n74</title>
 <path fill="none" stroke="black" d="M2249.9,-1722.93C2249.9,-1678.38 2249.9,-1562 2249.9,-1562 2249.9,-1562 1411.34,-1562 1411.34,-1562"/>
 <polygon fill="black" stroke="black" points="1411.34,-1558.5 1401.34,-1562 1411.34,-1565.5 1411.34,-1558.5"/>
@@ -189,7 +189,7 @@
 <text text-anchor="middle" x="2780.13" y="-1799.3" font-family="Times,serif" font-size="14.00">inputs</text>
 </g>
 <!-- n34&#45;&gt;n51 -->
-<g id="edge29" class="edge">
+<g id="edge24" class="edge">
 <title>n34&#45;&gt;n51</title>
 <path fill="none" stroke="black" d="M2305.35,-2182C2428.54,-2182 2780.9,-2182 2780.9,-2182 2780.9,-2182 2780.9,-1831.02 2780.9,-1831.02"/>
 <polygon fill="black" stroke="black" points="2784.4,-1831.02 2780.9,-1821.02 2777.4,-1831.03 2784.4,-1831.02"/>
@@ -214,15 +214,15 @@
 <ellipse fill="none" stroke="black" cx="2263.44" cy="-1010" rx="41.69" ry="18"/>
 <text text-anchor="middle" x="2263.44" y="-1006.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
-<!-- n78 -->
+<!-- n77 -->
 <g id="node39" class="node">
-<title>n78</title>
+<title>n77</title>
 <ellipse fill="none" stroke="black" cx="2780.13" cy="-1010" rx="27" ry="18"/>
 <text text-anchor="middle" x="2780.13" y="-1006.3" font-family="Times,serif" font-size="14.00">rhs</text>
 </g>
-<!-- n38&#45;&gt;n78 -->
-<g id="edge43" class="edge">
-<title>n38&#45;&gt;n78</title>
+<!-- n38&#45;&gt;n77 -->
+<g id="edge27" class="edge">
+<title>n38&#45;&gt;n77</title>
 <path fill="none" stroke="black" d="M2302.7,-1016C2302.7,-1016 2744.53,-1016 2744.53,-1016"/>
 <polygon fill="black" stroke="black" points="2744.53,-1019.5 2754.53,-1016 2744.53,-1012.5 2744.53,-1019.5"/>
 <text text-anchor="middle" x="2518.54" y="-1013.8" font-family="Times,serif" font-size="14.00">LATENCY_OVERLOAD</text>
@@ -234,10 +234,10 @@
 <text text-anchor="middle" x="2780.13" y="-583.3" font-family="Times,serif" font-size="14.00">rhs</text>
 </g>
 <!-- n38&#45;&gt;n82 -->
-<g id="edge44" class="edge">
+<g id="edge28" class="edge">
 <title>n38&#45;&gt;n82</title>
-<path fill="none" stroke="black" d="M2302.8,-1004C2374.45,-1004 2518.9,-1004 2518.9,-1004 2518.9,-1004 2518.9,-587 2518.9,-587 2518.9,-587 2742.67,-587 2742.67,-587"/>
-<polygon fill="black" stroke="black" points="2742.67,-590.5 2752.67,-587 2742.67,-583.5 2742.67,-590.5"/>
+<path fill="none" stroke="black" d="M2302.82,-1004C2389.65,-1004 2589.9,-1004 2589.9,-1004 2589.9,-1004 2589.9,-587 2589.9,-587 2589.9,-587 2742.88,-587 2742.88,-587"/>
+<polygon fill="black" stroke="black" points="2742.88,-590.5 2752.88,-587 2742.88,-583.5 2742.88,-590.5"/>
 <text text-anchor="middle" x="2518.54" y="-926.8" font-family="Times,serif" font-size="14.00">LATENCY_OVERLOAD</text>
 </g>
 <!-- n37 -->
@@ -266,11 +266,11 @@
 <text text-anchor="middle" x="3781.56" y="-367.3" font-family="Times,serif" font-size="14.00">lhs</text>
 </g>
 <!-- n42&#45;&gt;n44 -->
-<g id="edge38" class="edge">
+<g id="edge47" class="edge">
 <title>n42&#45;&gt;n44</title>
 <path fill="none" stroke="black" d="M3252.82,-243C3384.7,-243 3781.9,-243 3781.9,-243 3781.9,-243 3781.9,-342.93 3781.9,-342.93"/>
 <polygon fill="black" stroke="black" points="3778.4,-342.93 3781.9,-352.93 3785.4,-342.93 3778.4,-342.93"/>
-<text text-anchor="middle" x="3474.42" y="-310.8" font-family="Times,serif" font-size="14.00">CONCURRENCY_INCREMENT_SINGLE_TICK</text>
+<text text-anchor="middle" x="3474.42" y="-316.8" font-family="Times,serif" font-size="14.00">CONCURRENCY_INCREMENT_SINGLE_TICK</text>
 </g>
 <!-- n41 -->
 <g id="node12" class="node">
@@ -292,7 +292,7 @@
 <text text-anchor="middle" x="1930.55" y="-685.3" font-family="Times,serif" font-size="14.00">inputs</text>
 </g>
 <!-- n46&#45;&gt;n48 -->
-<g id="edge26" class="edge">
+<g id="edge41" class="edge">
 <title>n46&#45;&gt;n48</title>
 <path fill="none" stroke="black" d="M3945.9,-443.16C3945.9,-448.04 3945.9,-452 3945.9,-452 3945.9,-452 1930.9,-452 1930.9,-452 1930.9,-452 1930.9,-660.8 1930.9,-660.8"/>
 <polygon fill="black" stroke="black" points="1927.4,-660.8 1930.9,-670.8 1934.4,-660.8 1927.4,-660.8"/>
@@ -305,18 +305,19 @@
 <text text-anchor="middle" x="3781.56" y="-421.3" font-family="Times,serif" font-size="14.00">rhs</text>
 </g>
 <!-- n45&#45;&gt;n46 -->
-<!-- n16 -->
+<!-- n17 -->
 <g id="node16" class="node">
-<title>n16</title>
-<ellipse fill="none" stroke="black" cx="469.19" cy="-1099" rx="27" ry="18"/>
-<text text-anchor="middle" x="469.19" y="-1095.3" font-family="Times,serif" font-size="14.00">lhs</text>
+<title>n17</title>
+<ellipse fill="none" stroke="black" cx="469.19" cy="-1087" rx="27" ry="18"/>
+<text text-anchor="middle" x="469.19" y="-1083.3" font-family="Times,serif" font-size="14.00">lhs</text>
 </g>
 <!-- n18 -->
 <g id="node17" class="node">
 <title>n18</title>
-<ellipse fill="none" stroke="black" cx="643.79" cy="-1126" rx="41.69" ry="18"/>
-<text text-anchor="middle" x="643.79" y="-1122.3" font-family="Times,serif" font-size="14.00">output</text>
+<ellipse fill="none" stroke="black" cx="643.79" cy="-1087" rx="41.69" ry="18"/>
+<text text-anchor="middle" x="643.79" y="-1083.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
+<!-- n17&#45;&gt;n18 -->
 <!-- n60 -->
 <g id="node46" class="node">
 <title>n60</title>
@@ -324,19 +325,18 @@
 <text text-anchor="middle" x="953.43" y="-1043.3" font-family="Times,serif" font-size="14.00">max_envelope</text>
 </g>
 <!-- n18&#45;&gt;n60 -->
-<g id="edge24" class="edge">
+<g id="edge38" class="edge">
 <title>n18&#45;&gt;n60</title>
-<path fill="none" stroke="black" d="M643.9,-1107.68C643.9,-1084.34 643.9,-1047 643.9,-1047 643.9,-1047 867.31,-1047 867.31,-1047"/>
+<path fill="none" stroke="black" d="M643.9,-1068.87C643.9,-1058.29 643.9,-1047 643.9,-1047 643.9,-1047 867.31,-1047 867.31,-1047"/>
 <polygon fill="black" stroke="black" points="867.31,-1050.5 877.31,-1047 867.31,-1043.5 867.31,-1050.5"/>
-<text text-anchor="middle" x="781.39" y="-1076.8" font-family="Times,serif" font-size="14.00">MAX_EMA</text>
+<text text-anchor="middle" x="781.39" y="-1070.8" font-family="Times,serif" font-size="14.00">MAX_EMA</text>
 </g>
-<!-- n17 -->
+<!-- n16 -->
 <g id="node18" class="node">
-<title>n17</title>
-<ellipse fill="none" stroke="black" cx="469.19" cy="-1153" rx="27" ry="18"/>
-<text text-anchor="middle" x="469.19" y="-1149.3" font-family="Times,serif" font-size="14.00">rhs</text>
+<title>n16</title>
+<ellipse fill="none" stroke="black" cx="469.19" cy="-1141" rx="27" ry="18"/>
+<text text-anchor="middle" x="469.19" y="-1137.3" font-family="Times,serif" font-size="14.00">rhs</text>
 </g>
-<!-- n17&#45;&gt;n18 -->
 <!-- n20 -->
 <g id="node19" class="node">
 <title>n20</title>
@@ -349,15 +349,15 @@
 <ellipse fill="none" stroke="black" cx="2263.44" cy="-1410" rx="41.69" ry="18"/>
 <text text-anchor="middle" x="2263.44" y="-1406.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
-<!-- n63 -->
+<!-- n65 -->
 <g id="node52" class="node">
-<title>n63</title>
+<title>n65</title>
 <ellipse fill="none" stroke="black" cx="3781.56" cy="-1593" rx="48.99" ry="18"/>
 <text text-anchor="middle" x="3781.56" y="-1589.3" font-family="Times,serif" font-size="14.00">setpoint</text>
 </g>
-<!-- n22&#45;&gt;n63 -->
-<g id="edge37" class="edge">
-<title>n22&#45;&gt;n63</title>
+<!-- n22&#45;&gt;n65 -->
+<g id="edge39" class="edge">
+<title>n22&#45;&gt;n65</title>
 <path fill="none" stroke="black" d="M2277.9,-1426.89C2277.9,-1472.19 2277.9,-1593 2277.9,-1593 2277.9,-1593 3722.81,-1593 3722.81,-1593"/>
 <polygon fill="black" stroke="black" points="3722.81,-1596.5 3732.81,-1593 3722.81,-1589.5 3722.81,-1596.5"/>
 <text text-anchor="middle" x="2998.73" y="-1495.8" font-family="Times,serif" font-size="14.00">LATENCY_SETPOINT</text>
@@ -382,7 +382,7 @@
 <text text-anchor="middle" x="2263.44" y="-1957.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
 <!-- n26&#45;&gt;n28 -->
-<g id="edge25" class="edge">
+<g id="edge23" class="edge">
 <title>n26&#45;&gt;n28</title>
 <path fill="none" stroke="black" d="M2263.9,-1942.99C2263.9,-1900.68 2263.9,-1798.5 2263.9,-1798.5 2263.9,-1798.5 1966.71,-1798.5 1966.71,-1798.5"/>
 <polygon fill="black" stroke="black" points="1966.71,-1795 1956.71,-1798.5 1966.71,-1802 1966.71,-1795"/>
@@ -408,15 +408,15 @@
 <polygon fill="black" stroke="black" points="1893.46,-2185.5 1903.46,-2182 1893.46,-2178.5 1893.46,-2185.5"/>
 <text text-anchor="middle" x="1697.25" y="-1866.8" font-family="Times,serif" font-size="14.00">ACCEPTED_CONCURRENCY</text>
 </g>
-<!-- n66 -->
+<!-- n63 -->
 <g id="node48" class="node">
-<title>n66</title>
+<title>n63</title>
 <ellipse fill="none" stroke="black" cx="3781.56" cy="-1647" rx="85.29" ry="18"/>
 <text text-anchor="middle" x="3781.56" y="-1643.3" font-family="Times,serif" font-size="14.00">control_variable</text>
 </g>
-<!-- n71&#45;&gt;n66 -->
+<!-- n71&#45;&gt;n63 -->
 <g id="edge18" class="edge">
-<title>n71&#45;&gt;n66</title>
+<title>n71&#45;&gt;n63</title>
 <path fill="none" stroke="black" d="M1445.9,-1751.39C1445.9,-1727.49 1445.9,-1647 1445.9,-1647 1445.9,-1647 3686.36,-1647 3686.36,-1647"/>
 <polygon fill="black" stroke="black" points="3686.36,-1650.5 3696.36,-1647 3686.36,-1643.5 3686.36,-1650.5"/>
 <text text-anchor="middle" x="2518.54" y="-1615.8" font-family="Times,serif" font-size="14.00">ACCEPTED_CONCURRENCY</text>
@@ -460,11 +460,11 @@
 <ellipse fill="none" stroke="black" cx="99.6" cy="-2420" rx="41.69" ry="18"/>
 <text text-anchor="middle" x="99.6" y="-2416.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
-<!-- n2&#45;&gt;n17 -->
-<g id="edge22" class="edge">
-<title>n2&#45;&gt;n17</title>
-<path fill="none" stroke="black" d="M141.35,-2420C238.2,-2420 469.9,-2420 469.9,-2420 469.9,-2420 469.9,-1181.4 469.9,-1181.4"/>
-<polygon fill="black" stroke="black" points="473.4,-1181.4 469.9,-1171.4 466.4,-1181.4 473.4,-1181.4"/>
+<!-- n2&#45;&gt;n16 -->
+<g id="edge25" class="edge">
+<title>n2&#45;&gt;n16</title>
+<path fill="none" stroke="black" d="M141.35,-2420C238.2,-2420 469.9,-2420 469.9,-2420 469.9,-2420 469.9,-1169.08 469.9,-1169.08"/>
+<polygon fill="black" stroke="black" points="473.4,-1169.08 469.9,-1159.08 466.4,-1169.08 473.4,-1169.08"/>
 <text text-anchor="middle" x="291.69" y="-2423.8" font-family="Times,serif" font-size="14.00">EMA_LIMIT_MULTIPLIER</text>
 </g>
 <!-- n4 -->
@@ -474,7 +474,7 @@
 <text text-anchor="middle" x="1339.86" y="-2232.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
 <!-- n4&#45;&gt;n32 -->
-<g id="edge23" class="edge">
+<g id="edge37" class="edge">
 <title>n4&#45;&gt;n32</title>
 <path fill="none" stroke="black" d="M1381.87,-2236C1381.87,-2236 1893.54,-2236 1893.54,-2236"/>
 <polygon fill="black" stroke="black" points="1893.54,-2239.5 1903.54,-2236 1893.54,-2232.5 1893.54,-2239.5"/>
@@ -493,7 +493,7 @@
 <text text-anchor="middle" x="2263.44" y="-72.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
 <!-- n8&#45;&gt;n40 -->
-<g id="edge34" class="edge">
+<g id="edge26" class="edge">
 <title>n8&#45;&gt;n40</title>
 <path fill="none" stroke="black" d="M2305.35,-76C2428.54,-76 2780.9,-76 2780.9,-76 2780.9,-76 2780.9,-160.84 2780.9,-160.84"/>
 <polygon fill="black" stroke="black" points="2777.4,-160.84 2780.9,-170.84 2784.4,-160.84 2777.4,-160.84"/>
@@ -505,17 +505,17 @@
 <ellipse fill="none" stroke="black" cx="2263.44" cy="-1189" rx="41.69" ry="18"/>
 <text text-anchor="middle" x="2263.44" y="-1185.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
-<!-- n79 -->
+<!-- n78 -->
 <g id="node37" class="node">
-<title>n79</title>
+<title>n78</title>
 <ellipse fill="none" stroke="black" cx="2780.13" cy="-1064" rx="46.29" ry="18"/>
 <text text-anchor="middle" x="2780.13" y="-1060.3" font-family="Times,serif" font-size="14.00">on_true</text>
 </g>
-<!-- n10&#45;&gt;n79 -->
-<g id="edge35" class="edge">
-<title>n10&#45;&gt;n79</title>
-<path fill="none" stroke="black" d="M2263.9,-1170.88C2263.9,-1138.25 2263.9,-1073 2263.9,-1073 2263.9,-1073 2730.05,-1073 2730.05,-1073"/>
-<polygon fill="black" stroke="black" points="2730.05,-1076.5 2740.05,-1073 2730.05,-1069.5 2730.05,-1076.5"/>
+<!-- n10&#45;&gt;n78 -->
+<g id="edge45" class="edge">
+<title>n10&#45;&gt;n78</title>
+<path fill="none" stroke="black" d="M2263.9,-1170.76C2263.9,-1138.68 2263.9,-1075.5 2263.9,-1075.5 2263.9,-1075.5 2734.24,-1075.5 2734.24,-1075.5"/>
+<polygon fill="black" stroke="black" points="2734.24,-1079 2744.24,-1075.5 2734.24,-1072 2734.24,-1079"/>
 <text text-anchor="middle" x="2518.54" y="-1129.8" font-family="Times,serif" font-size="14.00">CONCURRENCY_INCREMENT_OVERLOAD</text>
 </g>
 <!-- n12 -->
@@ -525,14 +525,14 @@
 <text text-anchor="middle" x="1339.86" y="-1249.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
 <!-- n12&#45;&gt;n37 -->
-<g id="edge41" class="edge">
+<g id="edge22" class="edge">
 <title>n12&#45;&gt;n37</title>
 <path fill="none" stroke="black" d="M1381.58,-1253C1517.65,-1253 1939.9,-1253 1939.9,-1253 1939.9,-1253 1939.9,-1048.99 1939.9,-1048.99"/>
 <polygon fill="black" stroke="black" points="1943.4,-1048.99 1939.9,-1038.99 1936.4,-1048.99 1943.4,-1048.99"/>
 <text text-anchor="middle" x="1697.25" y="-1099.8" font-family="Times,serif" font-size="14.00">TOLERANCE</text>
 </g>
 <!-- n12&#45;&gt;n21 -->
-<g id="edge40" class="edge">
+<g id="edge21" class="edge">
 <title>n12&#45;&gt;n21</title>
 <path fill="none" stroke="black" d="M1339.9,-1271.01C1339.9,-1312.25 1339.9,-1410 1339.9,-1410 1339.9,-1410 1893.24,-1410 1893.24,-1410"/>
 <polygon fill="black" stroke="black" points="1893.24,-1413.5 1903.24,-1410 1893.24,-1406.5 1893.24,-1413.5"/>
@@ -551,42 +551,42 @@
 <text text-anchor="middle" x="2780.13" y="-475.3" font-family="Times,serif" font-size="14.00">on_true</text>
 </g>
 <!-- n14&#45;&gt;n83 -->
-<g id="edge36" class="edge">
+<g id="edge46" class="edge">
 <title>n14&#45;&gt;n83</title>
 <path fill="none" stroke="black" d="M2293.5,-509.5C2403.94,-509.5 2780.9,-509.5 2780.9,-509.5 2780.9,-509.5 2780.9,-507.09 2780.9,-507.09"/>
 <polygon fill="black" stroke="black" points="2784.4,-507.09 2780.9,-497.09 2777.4,-507.09 2784.4,-507.09"/>
 <text text-anchor="middle" x="2518.54" y="-507.8" font-family="Times,serif" font-size="14.00">ZERO</text>
 </g>
-<!-- n77 -->
+<!-- n76 -->
 <g id="node35" class="node">
-<title>n77</title>
+<title>n76</title>
 <ellipse fill="none" stroke="black" cx="2780.13" cy="-956" rx="27" ry="18"/>
 <text text-anchor="middle" x="2780.13" y="-952.3" font-family="Times,serif" font-size="14.00">lhs</text>
 </g>
-<!-- n76 -->
+<!-- n79 -->
 <g id="node36" class="node">
-<title>n76</title>
+<title>n79</title>
 <ellipse fill="none" stroke="black" cx="2780.13" cy="-902" rx="48.19" ry="18"/>
 <text text-anchor="middle" x="2780.13" y="-898.3" font-family="Times,serif" font-size="14.00">on_false</text>
 </g>
 <!-- n80 -->
 <g id="node38" class="node">
 <title>n80</title>
-<ellipse fill="none" stroke="black" cx="3210.82" cy="-1064" rx="41.69" ry="18"/>
-<text text-anchor="middle" x="3210.82" y="-1060.3" font-family="Times,serif" font-size="14.00">output</text>
+<ellipse fill="none" stroke="black" cx="3210.82" cy="-983" rx="41.69" ry="18"/>
+<text text-anchor="middle" x="3210.82" y="-979.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
 <!-- n79&#45;&gt;n80 -->
-<!-- n64 -->
+<!-- n66 -->
 <g id="node50" class="node">
-<title>n64</title>
+<title>n66</title>
 <ellipse fill="none" stroke="black" cx="3781.56" cy="-1539" rx="50.89" ry="18"/>
 <text text-anchor="middle" x="3781.56" y="-1535.3" font-family="Times,serif" font-size="14.00">optimize</text>
 </g>
-<!-- n80&#45;&gt;n64 -->
-<g id="edge28" class="edge">
-<title>n80&#45;&gt;n64</title>
-<path fill="none" stroke="black" d="M3252.58,-1064C3378.01,-1064 3742.9,-1064 3742.9,-1064 3742.9,-1064 3742.9,-1517.26 3742.9,-1517.26"/>
-<polygon fill="black" stroke="black" points="3739.4,-1517.26 3742.9,-1527.26 3746.4,-1517.26 3739.4,-1517.26"/>
+<!-- n80&#45;&gt;n66 -->
+<g id="edge50" class="edge">
+<title>n80&#45;&gt;n66</title>
+<path fill="none" stroke="black" d="M3252.58,-983C3378.01,-983 3742.9,-983 3742.9,-983 3742.9,-983 3742.9,-1517.13 3742.9,-1517.13"/>
+<polygon fill="black" stroke="black" points="3739.4,-1517.13 3742.9,-1527.13 3746.4,-1517.13 3739.4,-1517.13"/>
 <text text-anchor="middle" x="3474.42" y="-1302.8" font-family="Times,serif" font-size="14.00">CONCURRENCY_INCREMENT</text>
 </g>
 <!-- n85 -->
@@ -609,7 +609,7 @@
 <text text-anchor="middle" x="2780.13" y="-529.3" font-family="Times,serif" font-size="14.00">on_false</text>
 </g>
 <!-- n86&#45;&gt;n45 -->
-<g id="edge39" class="edge">
+<g id="edge36" class="edge">
 <title>n86&#45;&gt;n45</title>
 <path fill="none" stroke="black" d="M3252.79,-425C3252.79,-425 3744.38,-425 3744.38,-425"/>
 <polygon fill="black" stroke="black" points="3744.38,-428.5 3754.38,-425 3744.38,-421.5 3744.38,-428.5"/>
@@ -629,45 +629,45 @@
 </g>
 <!-- n60&#45;&gt;n61 -->
 <!-- n61&#45;&gt;n36 -->
-<g id="edge33" class="edge">
+<g id="edge43" class="edge">
 <title>n61&#45;&gt;n36</title>
 <path fill="none" stroke="black" d="M1339.9,-1028.83C1339.9,-1009.14 1339.9,-980.5 1339.9,-980.5 1339.9,-980.5 1900.9,-980.5 1900.9,-980.5"/>
 <polygon fill="black" stroke="black" points="1900.9,-984 1910.9,-980.5 1900.9,-977 1900.9,-984"/>
 <text text-anchor="middle" x="1697.25" y="-1010.8" font-family="Times,serif" font-size="14.00">LATENCY_EMA</text>
 </g>
 <!-- n61&#45;&gt;n20 -->
-<g id="edge32" class="edge">
+<g id="edge42" class="edge">
 <title>n61&#45;&gt;n20</title>
 <path fill="none" stroke="black" d="M1376.71,-1055.5C1504.66,-1055.5 1921.9,-1055.5 1921.9,-1055.5 1921.9,-1055.5 1921.9,-1328.54 1921.9,-1328.54"/>
 <polygon fill="black" stroke="black" points="1918.4,-1328.54 1921.9,-1338.54 1925.4,-1328.55 1918.4,-1328.54"/>
 <text text-anchor="middle" x="1697.25" y="-1211.8" font-family="Times,serif" font-size="14.00">LATENCY_EMA</text>
 </g>
-<!-- n65 -->
+<!-- n67 -->
 <g id="node49" class="node">
-<title>n65</title>
+<title>n67</title>
 <ellipse fill="none" stroke="black" cx="3781.56" cy="-1701" rx="30.59" ry="18"/>
 <text text-anchor="middle" x="3781.56" y="-1697.3" font-family="Times,serif" font-size="14.00">max</text>
 </g>
 <!-- n68 -->
 <g id="node51" class="node">
 <title>n68</title>
-<ellipse fill="none" stroke="black" cx="3945.3" cy="-1755" rx="41.69" ry="18"/>
-<text text-anchor="middle" x="3945.3" y="-1751.3" font-family="Times,serif" font-size="14.00">output</text>
+<ellipse fill="none" stroke="black" cx="3945.3" cy="-1728" rx="41.69" ry="18"/>
+<text text-anchor="middle" x="3945.3" y="-1724.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
+<!-- n67&#45;&gt;n68 -->
 <!-- n68&#45;&gt;n25 -->
-<g id="edge50" class="edge">
+<g id="edge44" class="edge">
 <title>n68&#45;&gt;n25</title>
-<path fill="none" stroke="black" d="M3945.9,-1773.16C3945.9,-1794.04 3945.9,-1825.5 3945.9,-1825.5 3945.9,-1825.5 1930.9,-1825.5 1930.9,-1825.5 1930.9,-1825.5 1930.9,-1932.73 1930.9,-1932.73"/>
+<path fill="none" stroke="black" d="M3945.9,-1746.34C3945.9,-1774.58 3945.9,-1825.5 3945.9,-1825.5 3945.9,-1825.5 1930.9,-1825.5 1930.9,-1825.5 1930.9,-1825.5 1930.9,-1932.73 1930.9,-1932.73"/>
 <polygon fill="black" stroke="black" points="1927.4,-1932.73 1930.9,-1942.73 1934.4,-1932.73 1927.4,-1932.73"/>
 <text text-anchor="middle" x="2998.73" y="-2057.8" font-family="Times,serif" font-size="14.00">DESIRED_CONCURRENCY</text>
 </g>
-<!-- n67 -->
+<!-- n64 -->
 <g id="node53" class="node">
-<title>n67</title>
+<title>n64</title>
 <ellipse fill="none" stroke="black" cx="3781.56" cy="-1755" rx="38.19" ry="18"/>
 <text text-anchor="middle" x="3781.56" y="-1751.3" font-family="Times,serif" font-size="14.00">signal</text>
 </g>
-<!-- n67&#45;&gt;n68 -->
 <!-- n52 -->
 <g id="node55" class="node">
 <title>n52</title>
@@ -675,9 +675,9 @@
 <text text-anchor="middle" x="3210.82" y="-1799.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
 <!-- n51&#45;&gt;n52 -->
-<!-- n52&#45;&gt;n65 -->
-<g id="edge27" class="edge">
-<title>n52&#45;&gt;n65</title>
+<!-- n52&#45;&gt;n67 -->
+<g id="edge29" class="edge">
+<title>n52&#45;&gt;n67</title>
 <path fill="none" stroke="black" d="M3210.9,-1784.76C3210.9,-1755.43 3210.9,-1701 3210.9,-1701 3210.9,-1701 3740.88,-1701 3740.88,-1701"/>
 <polygon fill="black" stroke="black" points="3740.88,-1704.5 3750.88,-1701 3740.88,-1697.5 3740.88,-1704.5"/>
 <text text-anchor="middle" x="3474.42" y="-1738.8" font-family="Times,serif" font-size="14.00">MAX_CONCURRENCY</text>
@@ -689,15 +689,15 @@
 <text text-anchor="middle" x="2263.44" y="-685.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
 <!-- n48&#45;&gt;n49 -->
-<!-- n49&#45;&gt;n76 -->
-<g id="edge30" class="edge">
-<title>n49&#45;&gt;n76</title>
+<!-- n49&#45;&gt;n79 -->
+<g id="edge48" class="edge">
+<title>n49&#45;&gt;n79</title>
 <path fill="none" stroke="black" d="M2302.84,-695C2416.99,-695 2739.9,-695 2739.9,-695 2739.9,-695 2739.9,-882.02 2739.9,-882.02"/>
 <polygon fill="black" stroke="black" points="2736.4,-882.02 2739.9,-892.02 2743.4,-882.02 2736.4,-882.02"/>
 <text text-anchor="middle" x="2518.54" y="-798.8" font-family="Times,serif" font-size="14.00">CONCURRENCY_INCREMENT_NORMAL</text>
 </g>
 <!-- n49&#45;&gt;n84 -->
-<g id="edge31" class="edge">
+<g id="edge49" class="edge">
 <title>n49&#45;&gt;n84</title>
 <path fill="none" stroke="black" d="M2303,-683C2418.47,-683 2746.9,-683 2746.9,-683 2746.9,-683 2746.9,-556.05 2746.9,-556.05"/>
 <polygon fill="black" stroke="black" points="2750.4,-556.05 2746.9,-546.05 2743.4,-556.05 2750.4,-556.05"/>
@@ -706,42 +706,42 @@
 <!-- n57 -->
 <g id="node58" class="node">
 <title>n57</title>
-<ellipse fill="none" stroke="black" cx="99.6" cy="-966" rx="41.69" ry="18"/>
-<text text-anchor="middle" x="99.6" y="-962.3" font-family="Times,serif" font-size="14.00">output</text>
+<ellipse fill="none" stroke="black" cx="99.6" cy="-954" rx="41.69" ry="18"/>
+<text text-anchor="middle" x="99.6" y="-950.3" font-family="Times,serif" font-size="14.00">output</text>
 </g>
-<!-- n57&#45;&gt;n16 -->
-<g id="edge45" class="edge">
-<title>n57&#45;&gt;n16</title>
-<path fill="none" stroke="black" d="M122.76,-981C203.83,-981 469.9,-981 469.9,-981 469.9,-981 469.9,-1070.82 469.9,-1070.82"/>
-<polygon fill="black" stroke="black" points="466.4,-1070.82 469.9,-1080.82 473.4,-1070.82 466.4,-1070.82"/>
-<text text-anchor="middle" x="291.69" y="-1052.8" font-family="Times,serif" font-size="14.00">LATENCY</text>
+<!-- n57&#45;&gt;n17 -->
+<g id="edge31" class="edge">
+<title>n57&#45;&gt;n17</title>
+<path fill="none" stroke="black" d="M133.11,-964.67C224.26,-964.67 469.9,-964.67 469.9,-964.67 469.9,-964.67 469.9,-1058.95 469.9,-1058.95"/>
+<polygon fill="black" stroke="black" points="466.4,-1058.95 469.9,-1068.95 473.4,-1058.95 466.4,-1058.95"/>
+<text text-anchor="middle" x="291.69" y="-1040.8" font-family="Times,serif" font-size="14.00">LATENCY</text>
 </g>
-<!-- n57&#45;&gt;n77 -->
-<g id="edge48" class="edge">
-<title>n57&#45;&gt;n77</title>
-<path fill="none" stroke="black" d="M113.9,-948.8C113.9,-945.48 113.9,-943 113.9,-943 113.9,-943 2751.32,-943 2751.32,-943"/>
-<polygon fill="black" stroke="black" points="2751.32,-946.5 2761.32,-943 2751.32,-939.5 2751.32,-946.5"/>
+<!-- n57&#45;&gt;n76 -->
+<g id="edge34" class="edge">
+<title>n57&#45;&gt;n76</title>
+<path fill="none" stroke="black" d="M130.63,-942C130.63,-942 2752.85,-942 2752.85,-942"/>
+<polygon fill="black" stroke="black" points="2752.85,-945.5 2762.85,-942 2752.85,-938.5 2752.85,-945.5"/>
 <text text-anchor="middle" x="1082.47" y="-843.8" font-family="Times,serif" font-size="14.00">LATENCY</text>
 </g>
 <!-- n57&#45;&gt;n85 -->
-<g id="edge49" class="edge">
+<g id="edge35" class="edge">
 <title>n57&#45;&gt;n85</title>
-<path fill="none" stroke="black" d="M85.9,-948.92C85.9,-856.96 85.9,-425 85.9,-425 85.9,-425 2743.03,-425 2743.03,-425"/>
-<polygon fill="black" stroke="black" points="2743.03,-428.5 2753.03,-425 2743.03,-421.5 2743.03,-428.5"/>
+<path fill="none" stroke="black" d="M99.9,-935.79C99.9,-842.77 99.9,-425 99.9,-425 99.9,-425 2742.73,-425 2742.73,-425"/>
+<polygon fill="black" stroke="black" points="2742.73,-428.5 2752.73,-425 2742.73,-421.5 2742.73,-428.5"/>
 <text text-anchor="middle" x="1082.47" y="-397.8" font-family="Times,serif" font-size="14.00">LATENCY</text>
 </g>
 <!-- n57&#45;&gt;n59 -->
-<g id="edge46" class="edge">
+<g id="edge32" class="edge">
 <title>n57&#45;&gt;n59</title>
-<path fill="none" stroke="black" d="M130.74,-978C130.74,-978 923.96,-978 923.96,-978"/>
-<polygon fill="black" stroke="black" points="923.96,-981.5 933.96,-978 923.96,-974.5 923.96,-981.5"/>
-<text text-anchor="middle" x="549.19" y="-969.8" font-family="Times,serif" font-size="14.00">LATENCY</text>
+<path fill="none" stroke="black" d="M140.51,-957.33C310.73,-957.33 953.9,-957.33 953.9,-957.33 953.9,-957.33 953.9,-964.75 953.9,-964.75"/>
+<polygon fill="black" stroke="black" points="950.4,-964.75 953.9,-974.75 957.4,-964.75 950.4,-964.75"/>
+<text text-anchor="middle" x="549.19" y="-957.8" font-family="Times,serif" font-size="14.00">LATENCY</text>
 </g>
-<!-- n57&#45;&gt;n67 -->
-<g id="edge47" class="edge">
-<title>n57&#45;&gt;n67</title>
-<path fill="none" stroke="black" d="M99.9,-984.21C99.9,-1095.03 99.9,-1674 99.9,-1674 99.9,-1674 3747.9,-1674 3747.9,-1674 3747.9,-1674 3747.9,-1736.33 3747.9,-1736.33"/>
-<polygon fill="black" stroke="black" points="3744.4,-1736.33 3747.9,-1746.33 3751.4,-1736.33 3744.4,-1736.33"/>
+<!-- n57&#45;&gt;n64 -->
+<g id="edge33" class="edge">
+<title>n57&#45;&gt;n64</title>
+<path fill="none" stroke="black" d="M136.96,-946C437.36,-946 2447.9,-946 2447.9,-946 2447.9,-946 2447.9,-1747.5 2447.9,-1747.5 2447.9,-1747.5 3736.58,-1747.5 3736.58,-1747.5"/>
+<polygon fill="black" stroke="black" points="3736.58,-1751 3746.58,-1747.5 3736.58,-1744 3736.58,-1751"/>
 <text text-anchor="middle" x="1697.25" y="-2390.8" font-family="Times,serif" font-size="14.00">LATENCY</text>
 </g>
 <!-- n55 -->
@@ -752,7 +752,7 @@
 </g>
 <!-- n54&#45;&gt;n55 -->
 <!-- n55&#45;&gt;n41 -->
-<g id="edge21" class="edge">
+<g id="edge30" class="edge">
 <title>n55&#45;&gt;n41</title>
 <path fill="none" stroke="black" d="M2305.29,-243C2305.29,-243 2743.1,-243 2743.1,-243"/>
 <polygon fill="black" stroke="black" points="2743.1,-246.5 2753.1,-243 2743.1,-239.5 2743.1,-246.5"/>

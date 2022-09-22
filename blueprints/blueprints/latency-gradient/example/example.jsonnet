@@ -1,5 +1,5 @@
+local blueprint = import '../main.libsonnet';
 local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
-local blueprint = import 'main.libsonnet';
 
 local Workload = aperture.v1.SchedulerWorkload;
 local LabelMatcher = aperture.v1.LabelMatcher;

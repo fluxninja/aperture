@@ -1,5 +1,5 @@
+local blueprint = import '../main.libsonnet';
 local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
-local blueprint = import 'main.libsonnet';
 
 local Override = aperture.v1.RateLimiterOverride;
 local LazySync = aperture.v1.RateLimiterLazySync;

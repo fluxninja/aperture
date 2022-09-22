@@ -16,12 +16,23 @@ $FIND "$blueprints_root"/blueprints -mindepth 1 -maxdepth 1 -type d | while read
 	if which prettier >/dev/null 2>&1; then
 		prettier --write "$dir"/README.md
 	fi
+	# save the contents of $dir/example/gen/policies/example.yaml for comparison
+	old_example_yaml=$(cat "$dir"/example/gen/policies/example.yaml)
+
 	# generate example blueprint
-	python "${blueprints_root}"/scripts/aperture-generate.py --output "$dir"/_gen/ \
-		--config "$dir"/example.jsonnet
-	go run -mod=mod "${blueprints_root}"/../cmd/circuit-compiler/main.go \
-		-policy "$dir"/_gen/policies/example.yaml \
-		-dot "$dir"/graph.dot
-	dot -Tsvg "$dir"/graph.dot >"$dir"/graph.svg
-	rm -rf "$dir"/_gen
+	python "${blueprints_root}"/scripts/aperture-generate.py --output "$dir"/example/gen/ \
+		--config "$dir"/example/example.jsonnet
+
+	if which prettier >/dev/null 2>&1; then
+		prettier --write "$dir"/example/gen/.. || true
+	fi
+
+	new_example_yaml=$(cat "$dir"/example/gen/policies/example.yaml)
+	if [[ "$old_example_yaml" != "$new_example_yaml" ]]; then
+		mkdir -p "$dir"/example/gen/graph
+		go run -mod=mod "${blueprints_root}"/../cmd/circuit-compiler/main.go \
+			-policy "$dir"/example/gen/policies/example.yaml \
+			-dot "$dir"/example/gen/graph/graph.dot
+		dot -Tsvg "$dir"/example/gen/graph/graph.dot >"$dir"/example/gen/graph/graph.svg
+	fi
 done
