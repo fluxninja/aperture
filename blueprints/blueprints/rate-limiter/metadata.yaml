@@ -1,0 +1,5 @@
+blueprint: Rate Limiter Blueprint
+sources:
+  Rate Limiter Policy:
+    prefix: policy
+    path: lib/1.0/policies/rate-limiter.libsonnet

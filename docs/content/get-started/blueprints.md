@@ -20,25 +20,25 @@ language, and can be used both as jsonnet mixins or as standalone Blueprints.
 
 ## Initial Setup
 
-All Blueprints are available from a separate [repository][aperture-blueprints].
-See the repository [README.md][blueprints-readme] for the list of required tools
-and instructions on installing jsonnet dependencies with the help of a [jsonnet
-bundler][jb].
+Blueprints can be found in the [aperture repository][aperture-repo] under `blueprints/`
+directory. See the [blueprints README.md][blueprints-readme] for the list of required
+tools and instructions on installing jsonnet dependencies with a help of
+[jsonnet bundler][jb].
 
 The Blueprint Generator (used to generate Policy files from Blueprints) also
 depends on Python 3.8+ and [jsonnet][go-jsonnet].
 
-[aperture-blueprints]: https://github.com/fluxninja/aperture-blueprints
-[blueprints-readme]: https://github.com/fluxninja/aperture-blueprints/blob/main/README.md
+[aperture-repo]: https://github.com/fluxninja/aperture/
+[blueprints-readme]: https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
 [jb]: https://github.com/jsonnet-bundler/jsonnet-bundler
 [go-jsonnet]: https://github.com/google/go-jsonnet
 
 ## Generating Aperture Policies and Grafana Dashboards
 
-The simplest way to use the Blueprints repository is to render Blueprints into
-Policy and dashboard files.
+The simplest way to use Aperture Blueprints is to render blueprints into
+policy and dashboard files.
 
-To generate files, `scripts/aperture-generate.py` can be used:
+To generate files, `blueprints/scripts/aperture-generate.py` can be used:
 
 ```sh
 $ ./scripts/aperture-generate.py --help
@@ -46,7 +46,7 @@ usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG]
 
 Aperture Policies & Dashboards generator utility.
 
-This utility can be used to generate Aperture Policies and Grafana Dashboards "in-place". Check [aperture-blueprint's README.md](https://github.com/fluxninja/aperture-blueprints/blob/main/README.md) for more
+This utility can be used to generate Aperture Policies and Grafana Dashboards "in-place". Check [blueprint's README.md][blueprints-readme] for more
 details.
 
 positional arguments:
@@ -84,46 +84,61 @@ jb install
 ./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet Blueprints/latency-gradient
 ```
 
-## Using aperture-blueprints as a jsonnet mixins library
+[blueprints-readme]: https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
 
-An alternate way of using the aperture-blueprints repository is to import it
-from another jsonnet project and render Policies or Dashboards directly in
-jsonnet.
+## Using aperture blueprints as a jsonnet mixins library
 
-For example, to create a ConfigMap with Aperture Policies that can be loaded by
-the controller, you need to install aperture-blueprints with the jsonnet
-bundler:
+An alternate way of using the aperture blueprints is to import them from another
+jsonnet project and render Policies or Dashboards directly in jsonnet.
 
-```sh
-jb install github.com/fluxninja/aperture-blueprints@main
-```
-
-Additionally, for this example to work install the k8s-libsonnet dependency:
+For example, to create a Latency Gradient Policy that can be loaded by
+the controller, you need to install aperture blueprints library with jsonnet bundler:
 
 ```sh
-jb install github.com/jsonnet-libs/k8s-libsonnet/1.24@main
+jb install github.com/fluxninja/aperture/blueprints@main
 ```
 
-Finally, you can create a ConfigMap resource with Policy like this:
+:::info
+
+You can use specific aperture branch instead of _main_ e.g. _stable/v0.2.x_, or even
+a specific release tag e.g. _v0.2.2_
+
+:::
+
+You can then create a Policy resource with policy definition like this:
 
 ```jsonnet
-local k = import "github.com/jsonnet-libs/k8s-libsonnet/1.24/main.libsonnet";
+local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
 
-local latencyGradientPolicy = import "github.com/fluxninja/aperture-blueprints/lib/1.0/policies/latency-gradient.libsonnet";
+local latencyGradientPolicy = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/policies/latency-gradient.libsonnet';
+
+local selector = aperture.v1.Selector;
+local controlPoint = aperture.v1.ControlPoint;
+
+local svcSelector =
+  selector.new()
+  + selector.withAgentGroup('default')
+  + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
+  + selector.withControlPoint(controlPoint.new()
+                              + controlPoint.withTraffic('ingress'));
 
 local policy = latencyGradientPolicy({
-  policyName: "service1-demo-app",
-  serviceSelector+: {
-    service: "service1-demo-app.demoapp.svc.cluster.local"
-  },
+  policyName: 'service1-demoapp',
+  fluxMeterSelector: svcSelector,
+  concurrencyLimiterSelector: svcSelector,
 }).policy;
 
+local policyResource = {
+  kind: 'Policy',
+  apiVersion: 'fluxninja.com/v1alpha1',
+  metadata: {
+    name: 'service1',
+  },
+  spec: policy,
+};
+
 [
-    k.core.v1.configMap.new("policies")
- + k.core.v1.configMap.metadata.withLabels({ "fluxninja.com/validate": "true"})
- + k.core.v1.configMap.withData({
-   "service1-demo-app.yaml": std.manifestYamlDoc(policy, quote_keys=false)
- })
+  policyResource,
 ]
 ```
 

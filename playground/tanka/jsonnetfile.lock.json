@@ -4,36 +4,6 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/fluxninja/aperture.git",
-          "subdir": ""
-        }
-      },
-      "version": "73da0af0443104b3abd0ce76e6dd4ff24ee13c9b",
-      "sum": "PB4kiP8j/nb/Tif2jfvXkttVpfjvhkJqPEnvzNZNAps="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/fluxninja/aperture-blueprints.git",
-          "subdir": ""
-        }
-      },
-      "version": "719a3ad14b1efab7765ffdd73adb45592141f6f4",
-      "sum": "cVMdweVRGi24B82/QAXV5sonZ9csuvD3M1L5NqXkS0g="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/fluxninja/aperture-blueprints.git",
-          "subdir": "lib/1.0"
-        }
-      },
-      "version": "719a3ad14b1efab7765ffdd73adb45592141f6f4",
-      "sum": "rCTNC8BUXRoyv/9rx5LY/FNNJUjVziGyWV+132tQpiI="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/grafana/grafonnet-lib.git",
           "subdir": "grafonnet"
         }
@@ -100,16 +70,6 @@
       },
       "version": "610803705e9ec295ef2e4eeaa6b2f8fc1419e5b1",
       "sum": "QKsc62wl5Wc+uxxP4NJCF1NidiPi9zjngbzIszFvesc="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/jsonnet-libs/k8s-libsonnet.git",
-          "subdir": "1.24"
-        }
-      },
-      "version": "610803705e9ec295ef2e4eeaa6b2f8fc1419e5b1",
-      "sum": "OcNQsWgCXnMSoWZNS7u9P9yn6d7HZk6/d/7++sgIc6Q="
     },
     {
       "source": {
