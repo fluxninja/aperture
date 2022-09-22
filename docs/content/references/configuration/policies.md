@@ -1035,12 +1035,6 @@ For list of available attributes in Envoy access logs, refer
 :::
 
 </dd>
-<dt>buckets</dt>
-<dd>
-
-([FluxMeterStaticBuckets](#flux-meter-static-buckets))
-
-</dd>
 <dt>exponential_buckets</dt>
 <dd>
 
@@ -1070,6 +1064,12 @@ For list of available attributes in Envoy access logs, refer
 - For feature control points, fluxmeter will measure execution of the span
   associated with particular feature. What contributes to the span's
   duration is entirely up to the user code that uses Aperture SDK.
+
+</dd>
+<dt>static_buckets</dt>
+<dd>
+
+([FluxMeterStaticBuckets](#flux-meter-static-buckets))
 
 </dd>
 </dl>

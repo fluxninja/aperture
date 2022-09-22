@@ -1242,8 +1242,6 @@ definitions:
           [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
           :::
         x-go-default: workload_duration_ms
-      buckets:
-        $ref: '#/definitions/FluxMeterStaticBuckets'
       exponential_buckets:
         $ref: '#/definitions/FluxMeterExponentialBuckets'
       exponential_buckets_range:
@@ -1261,6 +1259,8 @@ definitions:
           * For feature control points, fluxmeter will measure execution of the span
             associated with particular feature. What contributes to the span's
             duration is entirely up to the user code that uses Aperture SDK.
+      static_buckets:
+        $ref: '#/definitions/FluxMeterStaticBuckets'
     description: |-
       :::info
       See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
