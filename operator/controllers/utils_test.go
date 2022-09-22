@@ -30,7 +30,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 
-	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 )
@@ -38,35 +40,35 @@ import (
 var _ = Describe("Tests for containerSecurityContext", func() {
 	Context("When ContainerSecurityContext is not enabled", func() {
 		It("returns correct SecurityContext", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						ContainerSecurityContext: common.ContainerSecurityContext{
 							Enabled: false,
 						},
 					},
 				},
 			}
 
-			result := containerSecurityContext(instance.Spec.ContainerSecurityContext)
+			result := ContainerSecurityContext(instance.Spec.ContainerSecurityContext)
 			Expect(result).To(Equal(&corev1.SecurityContext{}))
 		})
 	})
 
 	Context("When ContainerSecurityContext is enabled", func() {
 		It("returns correct SecurityContext", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						ContainerSecurityContext: v1alpha1.ContainerSecurityContext{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						ContainerSecurityContext: common.ContainerSecurityContext{
 							Enabled:                true,
 							RunAsUser:              0,
 							RunAsNonRootUser:       false,
@@ -82,7 +84,7 @@ var _ = Describe("Tests for containerSecurityContext", func() {
 				ReadOnlyRootFilesystem: pointer.BoolPtr(false),
 			}
 
-			result := containerSecurityContext(instance.Spec.ContainerSecurityContext)
+			result := ContainerSecurityContext(instance.Spec.ContainerSecurityContext)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -91,35 +93,35 @@ var _ = Describe("Tests for containerSecurityContext", func() {
 var _ = Describe("Tests for podSecurityContext", func() {
 	Context("When PodSecurityContext is not enabled", func() {
 		It("returns correct SecurityContext", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						PodSecurityContext: v1alpha1.PodSecurityContext{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						PodSecurityContext: common.PodSecurityContext{
 							Enabled: false,
 						},
 					},
 				},
 			}
 
-			result := podSecurityContext(instance.Spec.PodSecurityContext)
+			result := PodSecurityContext(instance.Spec.PodSecurityContext)
 			Expect(result).To(Equal(&corev1.PodSecurityContext{}))
 		})
 	})
 
 	Context("When PodSecurityContext is enabled", func() {
 		It("returns correct SecurityContext", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						PodSecurityContext: v1alpha1.PodSecurityContext{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						PodSecurityContext: common.PodSecurityContext{
 							Enabled: true,
 							FsGroup: 1001,
 						},
@@ -131,7 +133,7 @@ var _ = Describe("Tests for podSecurityContext", func() {
 				FSGroup: pointer.Int64Ptr(1001),
 			}
 
-			result := podSecurityContext(instance.Spec.PodSecurityContext)
+			result := PodSecurityContext(instance.Spec.PodSecurityContext)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -140,45 +142,45 @@ var _ = Describe("Tests for podSecurityContext", func() {
 var _ = Describe("Tests for imageString", func() {
 	Context("When local image registry is provided", func() {
 		It("returns correct image string", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.AgentImage{
-						Image: v1alpha1.Image{
-							Registry: test,
-							Tag:      test,
+				Spec: agentv1alpha1.AgentSpec{
+					Image: common.AgentImage{
+						Image: common.Image{
+							Registry: Test,
+							Tag:      Test,
 						},
-						Repository: test,
+						Repository: Test,
 					},
 				},
 			}
 
-			result := imageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
+			result := ImageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
 			Expect(result).To(Equal("test/test:test"))
 		})
 	})
 
 	Context("When any image registry is not provided", func() {
 		It("returns correct image string", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.AgentImage{
-						Image: v1alpha1.Image{
-							Tag: test,
+				Spec: agentv1alpha1.AgentSpec{
+					Image: common.AgentImage{
+						Image: common.Image{
+							Tag: Test,
 						},
-						Repository: test,
+						Repository: Test,
 					},
 				},
 			}
 
-			result := imageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
+			result := ImageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
 			Expect(result).To(Equal("test:test"))
 		})
 	})
@@ -187,15 +189,15 @@ var _ = Describe("Tests for imageString", func() {
 var _ = Describe("Tests for imagePullSecrets", func() {
 	Context("When only local image pullSecrets are provided", func() {
 		It("returns correct imagePullSecrets", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					Image: v1alpha1.AgentImage{
-						Image: v1alpha1.Image{
-							PullSecrets: testArray,
+				Spec: agentv1alpha1.AgentSpec{
+					Image: common.AgentImage{
+						Image: common.Image{
+							PullSecrets: TestArray,
 						},
 					},
 				},
@@ -203,11 +205,11 @@ var _ = Describe("Tests for imagePullSecrets", func() {
 
 			expected := []corev1.LocalObjectReference{
 				{
-					Name: test,
+					Name: Test,
 				},
 			}
 
-			result := imagePullSecrets(instance.Spec.Image.Image)
+			result := ImagePullSecrets(instance.Spec.Image.Image)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -216,14 +218,14 @@ var _ = Describe("Tests for imagePullSecrets", func() {
 var _ = Describe("Tests for containerEnvFrom", func() {
 	Context("When only configMap is provided", func() {
 		It("returns correct EnvFromSource", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						ExtraEnvVarsCM: test,
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						ExtraEnvVarsCM: Test,
 					},
 				},
 			}
@@ -232,27 +234,27 @@ var _ = Describe("Tests for containerEnvFrom", func() {
 				{
 					ConfigMapRef: &corev1.ConfigMapEnvSource{
 						LocalObjectReference: corev1.LocalObjectReference{
-							Name: test,
+							Name: Test,
 						},
 					},
 				},
 			}
 
-			result := containerEnvFrom(instance.Spec.CommonSpec)
+			result := ContainerEnvFrom(instance.Spec.CommonSpec)
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When only secret is provided", func() {
 		It("returns correct EnvFromSource", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						ExtraEnvVarsSecret: test,
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						ExtraEnvVarsSecret: Test,
 					},
 				},
 			}
@@ -261,28 +263,28 @@ var _ = Describe("Tests for containerEnvFrom", func() {
 				{
 					SecretRef: &corev1.SecretEnvSource{
 						LocalObjectReference: corev1.LocalObjectReference{
-							Name: test,
+							Name: Test,
 						},
 					},
 				},
 			}
 
-			result := containerEnvFrom(instance.Spec.CommonSpec)
+			result := ContainerEnvFrom(instance.Spec.CommonSpec)
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When both configMap and secret are provided", func() {
 		It("returns correct EnvFromSource", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						ExtraEnvVarsCM:     test,
-						ExtraEnvVarsSecret: test,
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						ExtraEnvVarsCM:     Test,
+						ExtraEnvVarsSecret: Test,
 					},
 				},
 			}
@@ -291,20 +293,20 @@ var _ = Describe("Tests for containerEnvFrom", func() {
 				{
 					ConfigMapRef: &corev1.ConfigMapEnvSource{
 						LocalObjectReference: corev1.LocalObjectReference{
-							Name: test,
+							Name: Test,
 						},
 					},
 				},
 				{
 					SecretRef: &corev1.SecretEnvSource{
 						LocalObjectReference: corev1.LocalObjectReference{
-							Name: test,
+							Name: Test,
 						},
 					},
 				},
 			}
 
-			result := containerEnvFrom(instance.Spec.CommonSpec)
+			result := ContainerEnvFrom(instance.Spec.CommonSpec)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -313,14 +315,14 @@ var _ = Describe("Tests for containerEnvFrom", func() {
 var _ = Describe("Tests for containerProbes", func() {
 	Context("When only livenessProbe is provided", func() {
 		It("returns correct Probe", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						LivenessProbe: v1alpha1.Probe{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						LivenessProbe: common.Probe{
 							Enabled:             true,
 							TimeoutSeconds:      10,
 							InitialDelaySeconds: 10,
@@ -336,7 +338,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/liveness",
-						Port:   intstr.FromString(server),
+						Port:   intstr.FromString(Server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -349,7 +351,7 @@ var _ = Describe("Tests for containerProbes", func() {
 
 			var expectedReadiness *corev1.Probe
 
-			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
+			liveness, readiness := ContainerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
 			Expect(readiness).To(Equal(expectedReadiness))
 		})
@@ -361,7 +363,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path: "/v1/status/liveness",
-						Port: intstr.FromString(server),
+						Port: intstr.FromString(Server),
 					},
 				},
 				InitialDelaySeconds: 10,
@@ -371,13 +373,13 @@ var _ = Describe("Tests for containerProbes", func() {
 				SuccessThreshold:    1,
 			}
 
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
 						CustomLivenessProbe: probe,
 					},
 				},
@@ -387,7 +389,7 @@ var _ = Describe("Tests for containerProbes", func() {
 
 			var expectedReadiness *corev1.Probe
 
-			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
+			liveness, readiness := ContainerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
 			Expect(readiness).To(Equal(expectedReadiness))
 		})
@@ -395,14 +397,14 @@ var _ = Describe("Tests for containerProbes", func() {
 
 	Context("When only readinessProbe is provided", func() {
 		It("returns correct Probe", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						ReadinessProbe: v1alpha1.Probe{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						ReadinessProbe: common.Probe{
 							Enabled:             true,
 							TimeoutSeconds:      10,
 							InitialDelaySeconds: 10,
@@ -418,7 +420,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/readiness",
-						Port:   intstr.FromString(server),
+						Port:   intstr.FromString(Server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -431,7 +433,7 @@ var _ = Describe("Tests for containerProbes", func() {
 
 			var expectedLiveness *corev1.Probe
 
-			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
+			liveness, readiness := ContainerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
 			Expect(readiness).To(Equal(expectedReadiness))
 		})
@@ -443,7 +445,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path: "/v1/status/readiness",
-						Port: intstr.FromString(server),
+						Port: intstr.FromString(Server),
 					},
 				},
 				InitialDelaySeconds: 10,
@@ -453,13 +455,13 @@ var _ = Describe("Tests for containerProbes", func() {
 				SuccessThreshold:    1,
 			}
 
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
 						CustomReadinessProbe: probe,
 					},
 				},
@@ -469,7 +471,7 @@ var _ = Describe("Tests for containerProbes", func() {
 
 			var expectedLiveness *corev1.Probe
 
-			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
+			liveness, readiness := ContainerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
 			Expect(readiness).To(Equal(expectedReadiness))
 		})
@@ -477,14 +479,14 @@ var _ = Describe("Tests for containerProbes", func() {
 
 	Context("When both livenessProbe and readinessProbe are provided", func() {
 		It("returns correct Probe", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						LivenessProbe: v1alpha1.Probe{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						LivenessProbe: common.Probe{
 							Enabled:             true,
 							InitialDelaySeconds: 10,
 							TimeoutSeconds:      10,
@@ -492,7 +494,7 @@ var _ = Describe("Tests for containerProbes", func() {
 							FailureThreshold:    1,
 							SuccessThreshold:    1,
 						},
-						ReadinessProbe: v1alpha1.Probe{
+						ReadinessProbe: common.Probe{
 							Enabled:             true,
 							InitialDelaySeconds: 10,
 							TimeoutSeconds:      10,
@@ -508,7 +510,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/readiness",
-						Port:   intstr.FromString(server),
+						Port:   intstr.FromString(Server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -523,7 +525,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
 						Path:   "/v1/status/liveness",
-						Port:   intstr.FromString(server),
+						Port:   intstr.FromString(Server),
 						Scheme: corev1.URISchemeHTTP,
 					},
 				},
@@ -534,7 +536,7 @@ var _ = Describe("Tests for containerProbes", func() {
 				SuccessThreshold:    1,
 			}
 
-			liveness, readiness := containerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
+			liveness, readiness := ContainerProbes(instance.Spec.CommonSpec, corev1.URISchemeHTTP)
 			Expect(liveness).To(Equal(expectedLiveness))
 			Expect(readiness).To(Equal(expectedReadiness))
 		})
@@ -544,19 +546,19 @@ var _ = Describe("Tests for containerProbes", func() {
 var _ = Describe("Tests for agentEnv", func() {
 	Context("When extra Env are not provided", func() {
 		It("returns correct EnvVarSource", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Secrets: v1alpha1.Secrets{
-							FluxNinjaPlugin: v1alpha1.APIKeySecret{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						Secrets: common.Secrets{
+							FluxNinjaPlugin: common.APIKeySecret{
 								Create: true,
-								SecretKeyRef: v1alpha1.SecretKeyRef{
-									Name: test,
-									Key:  test,
+								SecretKeyRef: common.SecretKeyRef{
+									Name: Test,
+									Key:  Test,
 								},
 							},
 						},
@@ -569,7 +571,7 @@ var _ = Describe("Tests for agentEnv", func() {
 					Name: "NODE_NAME",
 					ValueFrom: &corev1.EnvVarSource{
 						FieldRef: &corev1.ObjectFieldSelector{
-							APIVersion: v1Version,
+							APIVersion: V1Version,
 							FieldPath:  "spec.nodeName",
 						},
 					},
@@ -578,7 +580,7 @@ var _ = Describe("Tests for agentEnv", func() {
 					Name: "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_NODE_NAME",
 					ValueFrom: &corev1.EnvVarSource{
 						FieldRef: &corev1.ObjectFieldSelector{
-							APIVersion: v1Version,
+							APIVersion: V1Version,
 							FieldPath:  "spec.nodeName",
 						},
 					},
@@ -592,33 +594,33 @@ var _ = Describe("Tests for agentEnv", func() {
 					ValueFrom: &corev1.EnvVarSource{
 						SecretKeyRef: &corev1.SecretKeySelector{
 							LocalObjectReference: corev1.LocalObjectReference{
-								Name: test,
+								Name: Test,
 							},
-							Key:      test,
+							Key:      Test,
 							Optional: pointer.BoolPtr(false),
 						},
 					},
 				},
 			}
 
-			result := agentEnv(instance, "")
+			result := AgentEnv(instance, "")
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When extra Env are provided", func() {
 		It("returns correct EnvVarSource", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
 						ExtraEnvVars: []corev1.EnvVar{
 							{
-								Name:  test,
-								Value: test,
+								Name:  Test,
+								Value: Test,
 							},
 						},
 					},
@@ -627,14 +629,14 @@ var _ = Describe("Tests for agentEnv", func() {
 
 			expected := []corev1.EnvVar{
 				{
-					Name:  test,
-					Value: test,
+					Name:  Test,
+					Value: Test,
 				},
 				{
 					Name: "NODE_NAME",
 					ValueFrom: &corev1.EnvVarSource{
 						FieldRef: &corev1.ObjectFieldSelector{
-							APIVersion: v1Version,
+							APIVersion: V1Version,
 							FieldPath:  "spec.nodeName",
 						},
 					},
@@ -643,7 +645,7 @@ var _ = Describe("Tests for agentEnv", func() {
 					Name: "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_NODE_NAME",
 					ValueFrom: &corev1.EnvVarSource{
 						FieldRef: &corev1.ObjectFieldSelector{
-							APIVersion: v1Version,
+							APIVersion: V1Version,
 							FieldPath:  "spec.nodeName",
 						},
 					},
@@ -654,7 +656,7 @@ var _ = Describe("Tests for agentEnv", func() {
 				},
 			}
 
-			result := agentEnv(instance, "")
+			result := AgentEnv(instance, "")
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -663,12 +665,12 @@ var _ = Describe("Tests for agentEnv", func() {
 var _ = Describe("Tests for agentVolumeMounts", func() {
 	Context("When extra VolumeMounts are not provided", func() {
 		It("returns correct VolumeMount", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{},
+				Spec: agentv1alpha1.AgentSpec{},
 			}
 
 			expected := []corev1.VolumeMount{
@@ -678,24 +680,24 @@ var _ = Describe("Tests for agentVolumeMounts", func() {
 				},
 			}
 
-			result := agentVolumeMounts(instance.Spec)
+			result := AgentVolumeMounts(instance.Spec)
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When extra VolumeMounts are provided", func() {
 		It("returns correct VolumeMount", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
 						ExtraVolumeMounts: []corev1.VolumeMount{
 							{
-								Name:      test,
-								MountPath: test,
+								Name:      Test,
+								MountPath: Test,
 							},
 						},
 					},
@@ -704,8 +706,8 @@ var _ = Describe("Tests for agentVolumeMounts", func() {
 
 			expected := []corev1.VolumeMount{
 				{
-					Name:      test,
-					MountPath: test,
+					Name:      Test,
+					MountPath: Test,
 				},
 				{
 					Name:      "aperture-agent-config",
@@ -713,7 +715,7 @@ var _ = Describe("Tests for agentVolumeMounts", func() {
 				},
 			}
 
-			result := agentVolumeMounts(instance.Spec)
+			result := AgentVolumeMounts(instance.Spec)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -722,12 +724,12 @@ var _ = Describe("Tests for agentVolumeMounts", func() {
 var _ = Describe("Tests for agentVolumes", func() {
 	Context("When extra Volumes are not provided", func() {
 		It("returns correct Volume", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{},
+				Spec: agentv1alpha1.AgentSpec{},
 			}
 
 			expected := []corev1.Volume{
@@ -737,30 +739,30 @@ var _ = Describe("Tests for agentVolumes", func() {
 						ConfigMap: &corev1.ConfigMapVolumeSource{
 							DefaultMode: pointer.Int32Ptr(420),
 							LocalObjectReference: corev1.LocalObjectReference{
-								Name: agentServiceName,
+								Name: AgentServiceName,
 							},
 						},
 					},
 				},
 			}
 
-			result := agentVolumes(instance.Spec)
+			result := AgentVolumes(instance.Spec)
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When extra Volumes are provided", func() {
 		It("returns correct Volume", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
 						ExtraVolumes: []corev1.Volume{
 							{
-								Name: test,
+								Name: Test,
 								VolumeSource: corev1.VolumeSource{
 									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},
@@ -772,7 +774,7 @@ var _ = Describe("Tests for agentVolumes", func() {
 
 			expected := []corev1.Volume{
 				{
-					Name: test,
+					Name: Test,
 					VolumeSource: corev1.VolumeSource{
 						EmptyDir: &corev1.EmptyDirVolumeSource{},
 					},
@@ -783,14 +785,14 @@ var _ = Describe("Tests for agentVolumes", func() {
 						ConfigMap: &corev1.ConfigMapVolumeSource{
 							DefaultMode: pointer.Int32Ptr(420),
 							LocalObjectReference: corev1.LocalObjectReference{
-								Name: agentServiceName,
+								Name: AgentServiceName,
 							},
 						},
 					},
 				},
 			}
 
-			result := agentVolumes(instance.Spec)
+			result := AgentVolumes(instance.Spec)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -799,19 +801,19 @@ var _ = Describe("Tests for agentVolumes", func() {
 var _ = Describe("Tests for controllerEnv", func() {
 	Context("When extra Env are not provided", func() {
 		It("returns correct EnvVarSource", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Secrets: v1alpha1.Secrets{
-							FluxNinjaPlugin: v1alpha1.APIKeySecret{
+				Spec: controllerv1alpha1.ControllerSpec{
+					CommonSpec: common.CommonSpec{
+						Secrets: common.Secrets{
+							FluxNinjaPlugin: common.APIKeySecret{
 								Create: true,
-								SecretKeyRef: v1alpha1.SecretKeyRef{
-									Name: test,
-									Key:  test,
+								SecretKeyRef: common.SecretKeyRef{
+									Name: Test,
+									Key:  Test,
 								},
 							},
 						},
@@ -824,7 +826,7 @@ var _ = Describe("Tests for controllerEnv", func() {
 					Name: "APERTURE_CONTROLLER_SERVICE_DISCOVERY_KUBERNETES_NODE_NAME",
 					ValueFrom: &corev1.EnvVarSource{
 						FieldRef: &corev1.ObjectFieldSelector{
-							APIVersion: v1Version,
+							APIVersion: V1Version,
 							FieldPath:  "spec.nodeName",
 						},
 					},
@@ -834,33 +836,33 @@ var _ = Describe("Tests for controllerEnv", func() {
 					ValueFrom: &corev1.EnvVarSource{
 						SecretKeyRef: &corev1.SecretKeySelector{
 							LocalObjectReference: corev1.LocalObjectReference{
-								Name: test,
+								Name: Test,
 							},
-							Key:      test,
+							Key:      Test,
 							Optional: pointer.BoolPtr(false),
 						},
 					},
 				},
 			}
 
-			result := controllerEnv(instance)
+			result := ControllerEnv(instance)
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When extra Env are provided", func() {
 		It("returns correct EnvVarSource", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{
-					CommonSpec: v1alpha1.CommonSpec{
+				Spec: controllerv1alpha1.ControllerSpec{
+					CommonSpec: common.CommonSpec{
 						ExtraEnvVars: []corev1.EnvVar{
 							{
-								Name:  test,
-								Value: test,
+								Name:  Test,
+								Value: Test,
 							},
 						},
 					},
@@ -869,21 +871,21 @@ var _ = Describe("Tests for controllerEnv", func() {
 
 			expected := []corev1.EnvVar{
 				{
-					Name:  test,
-					Value: test,
+					Name:  Test,
+					Value: Test,
 				},
 				{
 					Name: "APERTURE_CONTROLLER_SERVICE_DISCOVERY_KUBERNETES_NODE_NAME",
 					ValueFrom: &corev1.EnvVarSource{
 						FieldRef: &corev1.ObjectFieldSelector{
-							APIVersion: v1Version,
+							APIVersion: V1Version,
 							FieldPath:  "spec.nodeName",
 						},
 					},
 				},
 			}
 
-			result := controllerEnv(instance)
+			result := ControllerEnv(instance)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -892,12 +894,12 @@ var _ = Describe("Tests for controllerEnv", func() {
 var _ = Describe("Tests for controllerVolumeMounts", func() {
 	Context("When extra VolumeMounts are not provided", func() {
 		It("returns correct VolumeMount", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{},
+				Spec: controllerv1alpha1.ControllerSpec{},
 			}
 
 			expected := []corev1.VolumeMount{
@@ -907,7 +909,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 				{
 					Name:      "etc-aperture-policies",
-					MountPath: policyFilePath,
+					MountPath: PolicyFilePath,
 					ReadOnly:  true,
 				},
 				{
@@ -922,24 +924,24 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 			}
 
-			result := controllerVolumeMounts(instance.Spec.CommonSpec)
+			result := ControllerVolumeMounts(instance.Spec.CommonSpec)
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When extra VolumeMounts are provided", func() {
 		It("returns correct VolumeMount", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{
-					CommonSpec: v1alpha1.CommonSpec{
+				Spec: controllerv1alpha1.ControllerSpec{
+					CommonSpec: common.CommonSpec{
 						ExtraVolumeMounts: []corev1.VolumeMount{
 							{
-								Name:      test,
-								MountPath: test,
+								Name:      Test,
+								MountPath: Test,
 							},
 						},
 					},
@@ -948,8 +950,8 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 
 			expected := []corev1.VolumeMount{
 				{
-					Name:      test,
-					MountPath: test,
+					Name:      Test,
+					MountPath: Test,
 				},
 				{
 					Name:      "aperture-controller-config",
@@ -957,7 +959,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 				{
 					Name:      "etc-aperture-policies",
-					MountPath: policyFilePath,
+					MountPath: PolicyFilePath,
 					ReadOnly:  true,
 				},
 				{
@@ -972,7 +974,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 			}
 
-			result := controllerVolumeMounts(instance.Spec.CommonSpec)
+			result := ControllerVolumeMounts(instance.Spec.CommonSpec)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -981,12 +983,12 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 var _ = Describe("Tests for controllerVolumes", func() {
 	Context("When extra Volumes are not provided", func() {
 		It("returns correct Volume", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{},
+				Spec: controllerv1alpha1.ControllerSpec{},
 			}
 
 			expected := []corev1.Volume{
@@ -996,7 +998,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 						ConfigMap: &corev1.ConfigMapVolumeSource{
 							DefaultMode: pointer.Int32Ptr(420),
 							LocalObjectReference: corev1.LocalObjectReference{
-								Name: controllerServiceName,
+								Name: ControllerServiceName,
 							},
 						},
 					},
@@ -1030,23 +1032,23 @@ var _ = Describe("Tests for controllerVolumes", func() {
 				},
 			}
 
-			result := controllerVolumes(instance.DeepCopy())
+			result := ControllerVolumes(instance.DeepCopy())
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When extra Volumes are provided", func() {
 		It("returns correct Volume", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{
-					CommonSpec: v1alpha1.CommonSpec{
+				Spec: controllerv1alpha1.ControllerSpec{
+					CommonSpec: common.CommonSpec{
 						ExtraVolumes: []corev1.Volume{
 							{
-								Name: test,
+								Name: Test,
 								VolumeSource: corev1.VolumeSource{
 									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},
@@ -1058,7 +1060,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 
 			expected := []corev1.Volume{
 				{
-					Name: test,
+					Name: Test,
 					VolumeSource: corev1.VolumeSource{
 						EmptyDir: &corev1.EmptyDirVolumeSource{},
 					},
@@ -1069,7 +1071,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 						ConfigMap: &corev1.ConfigMapVolumeSource{
 							DefaultMode: pointer.Int32Ptr(420),
 							LocalObjectReference: corev1.LocalObjectReference{
-								Name: controllerServiceName,
+								Name: ControllerServiceName,
 							},
 						},
 					},
@@ -1103,7 +1105,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 				},
 			}
 
-			result := controllerVolumes(instance.DeepCopy())
+			result := ControllerVolumes(instance.DeepCopy())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1112,49 +1114,49 @@ var _ = Describe("Tests for controllerVolumes", func() {
 var _ = Describe("Tests for commonLabels", func() {
 	Context("When global labels are not provided", func() {
 		It("returns correct labels", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{},
+				Spec: controllerv1alpha1.ControllerSpec{},
 			}
 
 			expected := map[string]string{
-				"app.kubernetes.io/name":       appName,
+				"app.kubernetes.io/name":       AppName,
 				"app.kubernetes.io/instance":   instance.GetName(),
-				"app.kubernetes.io/managed-by": operatorName,
-				"app.kubernetes.io/component":  test,
+				"app.kubernetes.io/managed-by": OperatorName,
+				"app.kubernetes.io/component":  Test,
 			}
 
-			result := commonLabels(instance.Spec.Labels, instance.GetName(), test)
+			result := CommonLabels(instance.Spec.Labels, instance.GetName(), Test)
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When global labels are provided", func() {
 		It("returns correct labels", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Labels: testMap,
+				Spec: controllerv1alpha1.ControllerSpec{
+					CommonSpec: common.CommonSpec{
+						Labels: TestMap,
 					},
 				},
 			}
 
 			expected := map[string]string{
-				"app.kubernetes.io/name":       appName,
+				"app.kubernetes.io/name":       AppName,
 				"app.kubernetes.io/instance":   instance.GetName(),
-				"app.kubernetes.io/managed-by": operatorName,
-				"app.kubernetes.io/component":  test,
-				test:                           test,
+				"app.kubernetes.io/managed-by": OperatorName,
+				"app.kubernetes.io/component":  Test,
+				Test:                           Test,
 			}
 
-			result := commonLabels(instance.Spec.Labels, instance.GetName(), test)
+			result := CommonLabels(instance.Spec.Labels, instance.GetName(), Test)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1163,17 +1165,17 @@ var _ = Describe("Tests for commonLabels", func() {
 var _ = Describe("Tests for checkEtcdEndpoints", func() {
 	Context("When Etcd endpoints are not provided", func() {
 		It("returns correct etcd config", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{},
+				Spec: controllerv1alpha1.ControllerSpec{},
 			}
 
 			expected := etcd.EtcdConfig{
 				Endpoints: []string{
-					fmt.Sprintf("http://%s-etcd.%s:2379", appName, appName),
+					fmt.Sprintf("http://%s-etcd.%s:2379", AppName, AppName),
 				},
 			}
 
@@ -1184,16 +1186,16 @@ var _ = Describe("Tests for checkEtcdEndpoints", func() {
 
 	Context("When Etcd endpoints are provided", func() {
 		It("returns correct etcd config", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{
-					ConfigSpec: v1alpha1.ControllerConfigSpec{
-						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+				Spec: controllerv1alpha1.ControllerSpec{
+					ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
+						CommonConfigSpec: common.CommonConfigSpec{
 							Etcd: etcd.EtcdConfig{
-								Endpoints: testArray,
+								Endpoints: TestArray,
 							},
 						},
 					},
@@ -1201,7 +1203,7 @@ var _ = Describe("Tests for checkEtcdEndpoints", func() {
 			}
 
 			expected := etcd.EtcdConfig{
-				Endpoints: testArray,
+				Endpoints: TestArray,
 			}
 
 			result := checkEtcdEndpoints(instance.Spec.ConfigSpec.Etcd, instance.Name, instance.Namespace)
@@ -1211,14 +1213,14 @@ var _ = Describe("Tests for checkEtcdEndpoints", func() {
 
 	Context("When Etcd endpoints are provided with empty string", func() {
 		It("returns correct etcd config", func() {
-			instance := &v1alpha1.Controller{
+			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.ControllerSpec{
-					ConfigSpec: v1alpha1.ControllerConfigSpec{
-						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+				Spec: controllerv1alpha1.ControllerSpec{
+					ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
+						CommonConfigSpec: common.CommonConfigSpec{
 							Etcd: etcd.EtcdConfig{
 								Endpoints: []string{""},
 							},
@@ -1229,7 +1231,7 @@ var _ = Describe("Tests for checkEtcdEndpoints", func() {
 
 			expected := etcd.EtcdConfig{
 				Endpoints: []string{
-					fmt.Sprintf("http://%s-etcd.%s:2379", appName, appName),
+					fmt.Sprintf("http://%s-etcd.%s:2379", AppName, AppName),
 				},
 			}
 
@@ -1242,15 +1244,15 @@ var _ = Describe("Tests for checkEtcdEndpoints", func() {
 var _ = Describe("Tests for checkPrometheusAddress", func() {
 	Context("When prometheus address is not provided", func() {
 		It("returns correct prometheus address", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{},
+				Spec: agentv1alpha1.AgentSpec{},
 			}
 
-			expected := fmt.Sprintf("http://%s-prometheus-server.%s:80", appName, appName)
+			expected := fmt.Sprintf("http://%s-prometheus-server.%s:80", AppName, AppName)
 
 			result := checkPrometheusAddress(instance.Spec.ConfigSpec.Prometheus.Address, instance.Name, instance.Namespace)
 			Expect(result).To(Equal(expected))
@@ -1259,16 +1261,16 @@ var _ = Describe("Tests for checkPrometheusAddress", func() {
 
 	Context("When prometheus address is provided", func() {
 		It("returns correct prometheus address", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					ConfigSpec: v1alpha1.AgentConfigSpec{
-						CommonConfigSpec: v1alpha1.CommonConfigSpec{
+				Spec: agentv1alpha1.AgentSpec{
+					ConfigSpec: agentv1alpha1.AgentConfigSpec{
+						CommonConfigSpec: common.CommonConfigSpec{
 							Prometheus: prometheus.PrometheusConfig{
-								Address: test,
+								Address: Test,
 							},
 						},
 					},
@@ -1276,7 +1278,7 @@ var _ = Describe("Tests for checkPrometheusAddress", func() {
 			}
 
 			result := checkPrometheusAddress(instance.Spec.ConfigSpec.Prometheus.Address, instance.Name, instance.Namespace)
-			Expect(result).To(Equal(test))
+			Expect(result).To(Equal(Test))
 		})
 	})
 })
@@ -1284,17 +1286,17 @@ var _ = Describe("Tests for checkPrometheusAddress", func() {
 var _ = Describe("Tests for secretName", func() {
 	Context("When secret name is provided", func() {
 		It("returns correct secret name", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Secrets: v1alpha1.Secrets{
-							FluxNinjaPlugin: v1alpha1.APIKeySecret{
-								SecretKeyRef: v1alpha1.SecretKeyRef{
-									Name: test,
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						Secrets: common.Secrets{
+							FluxNinjaPlugin: common.APIKeySecret{
+								SecretKeyRef: common.SecretKeyRef{
+									Name: Test,
 								},
 							},
 						},
@@ -1302,57 +1304,57 @@ var _ = Describe("Tests for secretName", func() {
 				},
 			}
 
-			result := secretName(appName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
-			Expect(result).To(Equal(test))
+			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
+			Expect(result).To(Equal(Test))
 		})
 	})
 
 	Context("When secret name is not provided for Agent", func() {
 		It("returns correct secret name for Agent", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Secrets: v1alpha1.Secrets{
-							FluxNinjaPlugin: v1alpha1.APIKeySecret{
-								SecretKeyRef: v1alpha1.SecretKeyRef{},
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						Secrets: common.Secrets{
+							FluxNinjaPlugin: common.APIKeySecret{
+								SecretKeyRef: common.SecretKeyRef{},
 							},
 						},
 					},
 				},
 			}
 
-			expected := fmt.Sprintf("%s-agent-apikey", appName)
+			expected := fmt.Sprintf("%s-agent-apikey", AppName)
 
-			result := secretName(appName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
+			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
 			Expect(result).To(Equal(expected))
 		})
 	})
 
 	Context("When secret name is not provided for Controller", func() {
 		It("returns correct secret name for controller", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Secrets: v1alpha1.Secrets{
-							FluxNinjaPlugin: v1alpha1.APIKeySecret{
-								SecretKeyRef: v1alpha1.SecretKeyRef{},
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						Secrets: common.Secrets{
+							FluxNinjaPlugin: common.APIKeySecret{
+								SecretKeyRef: common.SecretKeyRef{},
 							},
 						},
 					},
 				},
 			}
 
-			expected := fmt.Sprintf("%s-controller-apikey", appName)
+			expected := fmt.Sprintf("%s-controller-apikey", AppName)
 
-			result := secretName(appName, "controller", &instance.Spec.Secrets.FluxNinjaPlugin)
+			result := SecretName(AppName, "controller", &instance.Spec.Secrets.FluxNinjaPlugin)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1361,17 +1363,17 @@ var _ = Describe("Tests for secretName", func() {
 var _ = Describe("Tests for secretDataKey", func() {
 	Context("When secret key is provided", func() {
 		It("returns correct secret key", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Secrets: v1alpha1.Secrets{
-							FluxNinjaPlugin: v1alpha1.APIKeySecret{
-								SecretKeyRef: v1alpha1.SecretKeyRef{
-									Key: test,
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						Secrets: common.Secrets{
+							FluxNinjaPlugin: common.APIKeySecret{
+								SecretKeyRef: common.SecretKeyRef{
+									Key: Test,
 								},
 							},
 						},
@@ -1379,31 +1381,31 @@ var _ = Describe("Tests for secretDataKey", func() {
 				},
 			}
 
-			result := secretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef)
-			Expect(result).To(Equal(test))
+			result := SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef)
+			Expect(result).To(Equal(Test))
 		})
 	})
 
 	Context("When secret key is not provided", func() {
 		It("returns correct secret key", func() {
-			instance := &v1alpha1.Agent{
+			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      appName,
-					Namespace: appName,
+					Name:      AppName,
+					Namespace: AppName,
 				},
-				Spec: v1alpha1.AgentSpec{
-					CommonSpec: v1alpha1.CommonSpec{
-						Secrets: v1alpha1.Secrets{
-							FluxNinjaPlugin: v1alpha1.APIKeySecret{
-								SecretKeyRef: v1alpha1.SecretKeyRef{},
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						Secrets: common.Secrets{
+							FluxNinjaPlugin: common.APIKeySecret{
+								SecretKeyRef: common.SecretKeyRef{},
 							},
 						},
 					},
 				},
 			}
 
-			result := secretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef)
-			Expect(result).To(Equal(secretKey))
+			result := SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef)
+			Expect(result).To(Equal(SecretKey))
 		})
 	})
 })
@@ -1411,37 +1413,37 @@ var _ = Describe("Tests for secretDataKey", func() {
 var _ = Describe("Tests for checkCertificate", func() {
 	Context("When certificate is provided", func() {
 		It("returns true", func() {
-			os.Setenv("APERTURE_OPERATOR_CERT_DIR", certDir)
+			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls.crt")
 			os.Setenv("APERTURE_OPERATOR_KEY_NAME", "tls.key")
-			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", appName)
-			os.Setenv("APERTURE_OPERATOR_NAMESPACE", appName)
+			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
+			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
 
 			err := CheckAndGenerateCertForOperator()
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(checkCertificate()).To(Equal(true))
+			Expect(CheckCertificate()).To(Equal(true))
 		})
 	})
 
 	Context("When certificate is not provided", func() {
 		It("returns false", func() {
-			os.Setenv("APERTURE_OPERATOR_CERT_DIR", certDir)
+			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls1.crt")
-			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", appName)
+			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
 			os.Setenv("APERTURE_OPERATOR_KEY_NAME", "tls1.key")
 
-			Expect(checkCertificate()).To(Equal(false))
+			Expect(CheckCertificate()).To(Equal(false))
 		})
 	})
 
 	Context("When invalid certificate is provided", func() {
 		It("returns false", func() {
-			os.Setenv("APERTURE_OPERATOR_CERT_DIR", certDir)
+			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls2.crt")
 			os.Setenv("APERTURE_OPERATOR_KEY_NAME", "tls2.key")
-			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", appName)
-			os.Setenv("APERTURE_OPERATOR_NAMESPACE", appName)
+			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
+			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
 
 			err := CheckAndGenerateCertForOperator()
 
@@ -1451,11 +1453,11 @@ var _ = Describe("Tests for checkCertificate", func() {
 			serverCertPEM := new(bytes.Buffer)
 			_ = pem.Encode(serverCertPEM, &pem.Block{
 				Type:  "CERTIFICATE",
-				Bytes: []byte(test),
+				Bytes: []byte(Test),
 			})
-			err = writeFile(certPath, serverCertPEM)
+			err = WriteFile(certPath, serverCertPEM)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(checkCertificate()).To(Equal(false))
+			Expect(CheckCertificate()).To(Equal(false))
 		})
 	})
 
@@ -1463,10 +1465,10 @@ var _ = Describe("Tests for checkCertificate", func() {
 		It("uses default values", func() {
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", "")
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "")
-			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", appName)
+			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
 			os.Setenv("APERTURE_OPERATOR_KEY_NAME", "")
 
-			checkCertificate()
+			CheckCertificate()
 
 			Expect(os.Getenv("APERTURE_OPERATOR_CERT_DIR")).To(Equal("/tmp/k8s-webhook-server/serving-certs"))
 			Expect(os.Getenv("APERTURE_OPERATOR_CERT_NAME")).To(Equal("tls.crt"))
@@ -1478,10 +1480,10 @@ var _ = Describe("Tests for checkCertificate", func() {
 var _ = Describe("Tests for CheckAndGenerateCert", func() {
 	Context("When service name is not provided in environment variable", func() {
 		It("it should not create cert", func() {
-			os.Setenv("APERTURE_OPERATOR_CERT_DIR", certDir)
+			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls3.crt")
 			os.Setenv("APERTURE_OPERATOR_KEY_NAME", "tls3.key")
-			os.Setenv("APERTURE_OPERATOR_NAMESPACE", appName)
+			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
 			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", "")
 
 			err := CheckAndGenerateCertForOperator()
@@ -1492,15 +1494,15 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 
 	Context("When certificate is not provided", func() {
 		It("it should create cert", func() {
-			os.Setenv("APERTURE_OPERATOR_CERT_DIR", certDir)
+			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls4.crt")
 			os.Setenv("APERTURE_OPERATOR_KEY_NAME", "tls4.key")
-			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", appName)
+			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
 			os.Setenv("APERTURE_OPERATOR_NAMESPACE", "")
 
-			Expect(checkCertificate()).To(Equal(false))
+			Expect(CheckCertificate()).To(Equal(false))
 			Expect(CheckAndGenerateCertForOperator()).To(BeNil())
-			Expect(checkCertificate()).To(Equal(true))
+			Expect(CheckCertificate()).To(Equal(true))
 		})
 	})
 })
@@ -1508,9 +1510,9 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 var _ = Describe("Tests for getPolicyFileName", func() {
 	Context("When controller namespace is same as policy namespace", func() {
 		It("it should use only name for filename", func() {
-			os.Setenv("APERTURE_CONTROLLER_NAMESPACE", appName)
+			os.Setenv("APERTURE_CONTROLLER_NAMESPACE", AppName)
 
-			filename := getPolicyFileName(test, appName)
+			filename := GetPolicyFileName(Test, AppName)
 
 			Expect(filename).To(Equal("test.yaml"))
 		})
@@ -1518,7 +1520,7 @@ var _ = Describe("Tests for getPolicyFileName", func() {
 
 	Context("When controller namespace is not same as policy namespace", func() {
 		It("it should use name and namespace for filename", func() {
-			filename := getPolicyFileName(test, test)
+			filename := GetPolicyFileName(Test, Test)
 
 			Expect(filename).To(Equal("test-test.yaml"))
 		})
