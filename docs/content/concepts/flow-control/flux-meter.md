@@ -101,7 +101,7 @@ signal to a Controller which determines the desired Concurrency of a Service.
 Flux Meters are a great way to measure [SLOs][google-sre-slo] of your Service
 down to fine-grained APIs.
 
-[reference]: /references/configuration/policies.md#policylanguagev1-flux-meter
+[reference]: /references/configuration/policies.md#v1-flux-meter
 [flow]: /concepts/flow-control/flow-control.md#flow
 [selector]: /concepts/flow-control/selector.md
 [flow-control-integration]: /concepts/flow-control/flow-control.md#integrations
