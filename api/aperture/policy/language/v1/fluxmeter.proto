@@ -61,7 +61,7 @@ message FluxMeter {
 
   // Histogram buckets (in ms) for this FluxMeter.
   oneof histogram_buckets {
-    StaticBuckets buckets = 2;
+    StaticBuckets static_buckets = 2;
     LinearBuckets linear_buckets = 3;
     ExponentialBuckets exponential_buckets = 4;
     ExponentialBucketsRange exponential_buckets_range = 5;

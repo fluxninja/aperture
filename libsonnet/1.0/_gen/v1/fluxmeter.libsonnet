@@ -7,12 +7,6 @@
   withAttributeKeyMixin(attribute_key):: {
     attribute_key+: attribute_key,
   },
-  withBuckets(buckets):: {
-    buckets: buckets,
-  },
-  withBucketsMixin(buckets):: {
-    buckets+: buckets,
-  },
   withExponentialBuckets(exponential_buckets):: {
     exponential_buckets: exponential_buckets,
   },
@@ -36,5 +30,11 @@
   },
   withSelectorMixin(selector):: {
     selector+: selector,
+  },
+  withStaticBuckets(static_buckets):: {
+    static_buckets: static_buckets,
+  },
+  withStaticBucketsMixin(static_buckets):: {
+    static_buckets+: static_buckets,
   },
 }

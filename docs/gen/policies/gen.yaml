@@ -795,17 +795,14 @@ definitions:
         type: string
         x-go-default: workload_duration_ms
         x-order: 0
-      buckets:
-        x-order: 1
-        $ref: '#/definitions/FluxMeterStaticBuckets'
       exponential_buckets:
-        x-order: 2
+        x-order: 1
         $ref: '#/definitions/FluxMeterExponentialBuckets'
       exponential_buckets_range:
-        x-order: 3
+        x-order: 2
         $ref: '#/definitions/FluxMeterExponentialBucketsRange'
       linear_buckets:
-        x-order: 4
+        x-order: 3
         $ref: '#/definitions/FluxMeterLinearBuckets'
       selector:
         description: |-
@@ -817,8 +814,11 @@ definitions:
           * For feature control points, fluxmeter will measure execution of the span
             associated with particular feature. What contributes to the span's
             duration is entirely up to the user code that uses Aperture SDK.
-        x-order: 5
+        x-order: 4
         $ref: '#/definitions/v1Selector'
+      static_buckets:
+        x-order: 5
+        $ref: '#/definitions/FluxMeterStaticBuckets'
   v1GradientController:
     description: |-
       The `gradient` describes a corrective factor that should be applied to the

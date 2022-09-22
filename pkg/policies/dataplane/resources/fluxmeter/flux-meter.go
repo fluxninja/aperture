@@ -143,7 +143,7 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 				exponentialBucketsRange.GetMin(), exponentialBucketsRange.GetMax(), int(exponentialBucketsRange.GetCount()))...)
 		}
 	default:
-		if defaultBuckets := fluxMeterProto.GetBuckets(); defaultBuckets != nil {
+		if defaultBuckets := fluxMeterProto.GetStaticBuckets(); defaultBuckets != nil {
 			buckets = append(buckets, defaultBuckets.Buckets...)
 		}
 	}
