@@ -71,14 +71,22 @@ local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libson
 local latencyGradientPolicy = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/policies/latency-gradient.libsonnet';
 
 local selector = aperture.v1.Selector;
+local serviceSelector = aperture.v1.ServiceSelector;
+local flowSelector = aperture.v1.FlowSelector;
 local controlPoint = aperture.v1.ControlPoint;
 
 local svcSelector =
   selector.new()
-  + selector.withAgentGroup('default')
-  + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
-  + selector.withControlPoint(controlPoint.new()
-                              + controlPoint.withTraffic('ingress'));
+  + selector.withServiceSelector(
+    serviceSelector.new()
+    + serviceSelector.withAgentGroup('default')
+    + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+  )
+  + selector.withFlowSelector(
+    flowSelector.new()
+    + flowSelector.withControlPoint(controlPoint.new()
+                              + controlPoint.withTraffic('ingress'))
+  );
 
 local policy = latencyGradientPolicy({
   policyName: 'service1-demoapp',
