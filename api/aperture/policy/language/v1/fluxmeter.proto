@@ -15,9 +15,11 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // to particular service:
 // ```yaml
 // selector:
-//   service: myservice.mynamespace.svc.cluster.local
-//   control_point:
-//     traffic: ingress
+//   service_selector:
+//     service: myservice.mynamespace.svc.cluster.local
+//   flow_selector:
+//     control_point:
+//       traffic: ingress
 // ```
 message FluxMeter {
   // What latency should we measure in the histogram created by this FluxMeter.

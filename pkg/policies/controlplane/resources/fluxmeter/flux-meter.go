@@ -36,7 +36,7 @@ func NewFluxMeterOptions(
 	if selectorProto == nil {
 		return nil, errors.New("FluxMeter.Selector is nil")
 	}
-	agentGroup := selectorProto.GetAgentGroup()
+	agentGroup := selectorProto.ServiceSelector.GetAgentGroup()
 
 	etcdPath := path.Join(common.FluxMeterConfigPath,
 		common.FluxMeterKey(agentGroup, name))

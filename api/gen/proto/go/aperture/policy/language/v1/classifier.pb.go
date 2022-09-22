@@ -31,9 +31,11 @@ const (
 // Example:
 // ```yaml
 // selector:
-//   service: service1.default.svc.cluster.local
-//   control_point:
-//     traffic: ingress
+//   service_selector:
+//     service: service1.default.svc.cluster.local
+//   flow_selector:
+//     control_point:
+//       traffic: ingress
 // rules:
 //   user:
 //     extractor:

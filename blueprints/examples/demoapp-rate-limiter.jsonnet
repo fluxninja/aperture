@@ -6,8 +6,10 @@ local LazySync = aperture.v1.RateLimiterLazySync;
 {
   policy+: {
     policyName: 'service1-rate-limiter',
-    serviceSelector+: {
-      service: 'service1-demo-app.demoapp.svc.cluster.local',
+    selector+: {
+      serviceSelector+: {
+        service: 'service1-demo-app.demoapp.svc.cluster.local',
+      },
     },
     rateLimit: '50.0',
     labelKey: 'http.request.header.user_type',

@@ -40,7 +40,7 @@ func NewConcurrencyLimiterOptions(
 	if selectorProto == nil {
 		return fx.Options(), "", errors.New("concurrencyLimiter.Scheduler.Selector is nil")
 	}
-	agentGroupName := selectorProto.GetAgentGroup()
+	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
 	etcdPath := path.Join(common.ConcurrencyLimiterConfigPath, common.DataplaneComponentKey(agentGroupName, policyBaseAPI.GetPolicyName(), int64(componentStackIndex)))
 	configSync := &concurrencyLimiterConfigSync{
 		concurrencyLimiterProto: concurrencyLimiterProto,

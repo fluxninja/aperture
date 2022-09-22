@@ -87,10 +87,14 @@ var _ = Describe("Authorization handler", func() {
 })
 
 var service1Selector = selectorv1.Selector{
-	Service: "service1-demo-app.demoapp.svc.cluster.local",
-	ControlPoint: &selectorv1.ControlPoint{
-		Controlpoint: &selectorv1.ControlPoint_Traffic{
-			Traffic: "ingress",
+	ServiceSelector: &selectorv1.ServiceSelector{
+		Service: "service1-demo-app.demoapp.svc.cluster.local",
+	},
+	FlowSelector: &selectorv1.FlowSelector{
+		ControlPoint: &selectorv1.ControlPoint{
+			Controlpoint: &selectorv1.ControlPoint_Traffic{
+				Traffic: "ingress",
+			},
 		},
 	},
 }
