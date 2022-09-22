@@ -65,13 +65,13 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	}
 
 	fluxMeters := mmr.fluxMeters
-	fluxMeterProtos := make([]*flowcontrolv1.FluxMeter, len(fluxMeters))
+	fluxMeterProtos := make([]*flowcontrolv1.FluxMeterInfo, len(fluxMeters))
 	for i, fluxMeter := range fluxMeters {
-		fluxMeterProtos[i] = &flowcontrolv1.FluxMeter{
+		fluxMeterProtos[i] = &flowcontrolv1.FluxMeterInfo{
 			FluxMeterName: fluxMeter.GetFluxMeterName(),
 		}
 	}
-	response.FluxMeters = fluxMeterProtos
+	response.FluxMeterInfos = fluxMeterProtos
 
 	// execute rate limiters first
 	rateLimiters := make([]iface.Limiter, len(mmr.rateLimiters))
