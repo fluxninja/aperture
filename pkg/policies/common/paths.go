@@ -1,4 +1,4 @@
-package paths
+package common
 
 import (
 	"path"
