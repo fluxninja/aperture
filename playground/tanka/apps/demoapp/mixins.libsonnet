@@ -97,13 +97,13 @@ local policy = latencyGradientPolicy({
     },
     workloads: [
       WorkloadWithLabelMatcher.new()
-      + WorkloadWithLabelMatcher.withWorkload(Workload.withPriority(50)),
+      + WorkloadWithLabelMatcher.withWorkload(Workload.withPriority(50))
       // match the label extracted by classifier
-      +WorkloadWithLabelMatcher.withLabelMatcher(LabelMatcher.withMatchLabels({ user_type: 'guest' })),
+      + WorkloadWithLabelMatcher.withLabelMatcher(LabelMatcher.withMatchLabels({ user_type: 'guest' })),
       WorkloadWithLabelMatcher.new()
-      + WorkloadWithLabelMatcher.withWorkload(Workload.withPriority(200)),
+      + WorkloadWithLabelMatcher.withWorkload(Workload.withPriority(200))
       // match the http header directly
-      +WorkloadWithLabelMatcher.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
+      + WorkloadWithLabelMatcher.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
     ],
   },
 }).policy;
