@@ -128,6 +128,13 @@ repos:
         files: '\.proto$'
         pass_filenames: false
         description: "Generate Aperture libsonnet"
+      - id: generate-blueprints
+        name: "blueprints"
+        entry: "./scripts/precommit/generate_blueprints.sh"
+        language: script
+        files: ^(libsonnet|blueprints)
+        pass_filenames: false
+        description: "Generate Aperture blueprints"
       - id: tanka-show
         name: "Check tanka parses jsonnet"
         language: script
