@@ -2,7 +2,7 @@ local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonn
 local k = import 'github.com/jsonnet-libs/k8s-libsonnet/1.22/main.libsonnet';
 
 local latencyGradientPolicy = import '../../../../blueprints/lib/1.0/policies/latency-gradient.libsonnet';
-local aperture = import '../../../../libsonnet/1.0/main.libsonnet';
+local aperture = import '../../../../blueprints/libsonnet/1.0/main.libsonnet';
 local demoApp = import 'apps/demoapp/main.libsonnet';
 
 local Workload = aperture.v1.SchedulerWorkload;
