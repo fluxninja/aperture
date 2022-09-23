@@ -189,7 +189,6 @@ func (lg *Logger) Component(component string) *Logger {
 	return &Logger{
 		logger: &zerolog,
 		w:      lg.w,
-		owner:  lg.owner,
 	}
 }
 
@@ -204,7 +203,6 @@ func (lg *Logger) Output(w io.Writer) *Logger {
 	return &Logger{
 		logger: &zerolog,
 		w:      lg.w,
-		owner:  false,
 	}
 }
 
@@ -229,7 +227,6 @@ func (lg *Logger) Level(level zerolog.Level) *Logger {
 	return &Logger{
 		logger: &zerolog,
 		w:      lg.w,
-		owner:  false,
 	}
 }
 
@@ -244,7 +241,6 @@ func (lg *Logger) Sample(sampler zerolog.Sampler) *Logger {
 	return &Logger{
 		logger: &zerolog,
 		w:      lg.w,
-		owner:  false,
 	}
 }
 
@@ -259,7 +255,6 @@ func (lg *Logger) Hook(hook zerolog.Hook) *Logger {
 	return &Logger{
 		logger: &zerolog,
 		w:      lg.w,
-		owner:  false,
 	}
 }
 
