@@ -5,32 +5,40 @@ package aperture.common.selector.v1;
 import "aperture/common/labelmatcher/v1/labelmatcher.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-// Describes which flows a [dataplane
+// Describes which flow in which service a [dataplane
+//// component](/concepts/flow-control/flow-control.md#components) should apply
+//// to
+////
+//// :::info
+//// See also [Selector overview](/concepts/flow-control/selector.md).
+//// :::
+message Selector {
+  ServiceSelector service_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
+  FlowSelector flow_selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
+}
+
+// Describes which service a [dataplane
 // component](/concepts/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
 // See also [Selector overview](/concepts/flow-control/selector.md).
 // :::
-//
-// Example:
-// ```yaml
-// service: service1.default.svc.cluster.local
-// control_point:
-//   traffic: ingress # Allowed values are `ingress` and `egress`.
-// label_matcher:
-//   match_labels:
-//     user_tier: gold
-//   match_expressions:
-//     - key: query
-//       operator: In
-//       values:
-//         - insert
-//         - delete
-//     - label: user_agent
-//       regex: ^(?!.*Chrome).*Safari
-// ```
-message Selector {
+message ServiceSelector {
   // Which [agent-group](/concepts/service.md#agent-group) this
   // selector applies to.
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -53,11 +61,37 @@ message Selector {
   // One entity may belong to multiple services.
   // :::
   string service = 2;
+}
 
+// Describes which flows a [dataplane
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
+//
+// Example:
+// ```yaml
+// control_point:
+//   traffic: ingress # Allowed values are `ingress` and `egress`.
+// label_matcher:
+//   match_labels:
+//     user_tier: gold
+//   match_expressions:
+//     - key: query
+//       operator: In
+//       values:
+//         - insert
+//         - delete
+//     - label: user_agent
+//       regex: ^(?!.*Chrome).*Safari
+// ```
+message FlowSelector {
   // Describes
   // [control point](/concepts/flow-control/flow-control.md#control-point)
   // within the entity where the policy should apply to.
-  ControlPoint control_point = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  ControlPoint control_point = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {
@@ -84,7 +118,7 @@ message Selector {
   // point using classifier, and immediately use it for matching on the same
   // control point.
   // :::
-  common.labelmatcher.v1.LabelMatcher label_matcher = 4;
+  common.labelmatcher.v1.LabelMatcher label_matcher = 2;
 }
 
 // Identifies control point within a service that the rule or policy should apply to.

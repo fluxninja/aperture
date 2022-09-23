@@ -73,4 +73,10 @@
   withSqrtMixin(sqrt):: {
     sqrt+: sqrt,
   },
+  withSwitcher(switcher):: {
+    switcher: switcher,
+  },
+  withSwitcherMixin(switcher):: {
+    switcher+: switcher,
+  },
 }

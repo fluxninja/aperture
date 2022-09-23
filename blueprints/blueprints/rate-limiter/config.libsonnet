@@ -49,19 +49,23 @@
       enabled: true,
       numSync: 5,
     },
-    serviceSelector: {
+    selector: {
       /**
       * @section Rate Limiter Policy
-      * @subsection Service Selector
+      * @subsection Selector
       *
-      * @param (policy.serviceSelector.agentGroup: string) Which agents to install this policy on
-      * @param (policy.serviceSelector.service: string required) A fully-qualified domain name of the service that this policy will apply to
-      * @param (policy.serviceSelector.controlPoint.traffic: string) Whether to control `ingress` or `egress` traffic
+      * @param (policy.selector.serviceSelector.agentGroup: string) Which agents to install this policy on
+      * @param (policy.selector.serviceSelector.service: string required) A fully-qualified domain name of the service that this policy will apply to
+      * @param (policy.selector.flowSelector.controlPoint.traffic: string) Whether to control `ingress` or `egress` traffic
       */
-      agentGroup: 'default',
-      service: error 'policy.serviceSelector.service is required',
-      controlPoint: {
-        traffic: 'ingress',
+      serviceSelector: {
+        agentGroup: 'default',
+        service: error 'policy.selector.serviceSelector.service is required',
+      },
+      flowSelector: {
+        controlPoint: {
+          traffic: 'ingress',
+        },
       },
     },
   },

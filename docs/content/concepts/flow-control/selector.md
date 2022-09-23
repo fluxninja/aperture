@@ -15,19 +15,29 @@ See also [Selector reference](/references/configuration/policies.md#v1-selector)
 
 :::
 
-Flow Selectors are used by all flow observability and control components
+Selectors are used by all flow observability and control components
 instantiated on Aperture Agents ([Classifiers][classifier], [Flux
 Meters][flux-meter] and Limiters). Flow Selectors define scoping rules – how
 these components should select [Flows][flow] for their operations.
 
 A Selector consists of:
 
-- [agent group][agent-group] name,
-- [service][service] name,
-- [control point][control-point], and
-- optional [flow label matcher](#label-matcher).
+- ServiceSelector, containing
 
-### Service
+  - [agent group][agent-group] name,
+  - [service][service] name,
+
+- FlowSelector, containing
+  - [control point][control-point], and
+  - optional [flow label matcher](#label-matcher).
+
+### ServiceSelector
+
+:::info
+
+See also [ServiceSelector reference](/references/configuration/policies.md#v1-service-selector)
+
+:::
 
 _Agent group_ name together with _service_ name determine the [service][service]
 to select flows from.
@@ -46,12 +56,20 @@ select all services within the agent group, you can skip the service name.
 
 :::
 
-### Control Point
+### FlowSelector
+
+:::info
+
+See also [FlowSelector reference](/references/configuration/policies.md#v1-flow-selector)
+
+:::
+
+#### Control Point
 
 Flow Selector selects flows from only one [Control Point][control-point] within
 a service.
 
-### Label Matcher
+#### Label Matcher
 
 Label matcher allows to optionally narrow down the selected flow based on
 conditions on [Flow Labels][label].
@@ -71,13 +89,15 @@ conditions, including regex matching. Refer to [LabelMatcher][label-matcher] for
 ### Example
 
 ```yaml
-service: checkout.myns.svc.cluster.local
-agent_group: default
-control_point:
-  traffic: ingress
-label_matcher:
-  match_labels:
-    user_tier: gold
+service_selector:
+  service: checkout.myns.svc.cluster.local
+  agent_group: default
+flow_selector:
+  control_point:
+    traffic: ingress
+  label_matcher:
+    match_labels:
+      user_tier: gold
 ```
 
 [flow]: /concepts/flow-control/flow-control.md#flow

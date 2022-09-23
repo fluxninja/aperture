@@ -301,9 +301,11 @@ Example:
 
 ```yaml
 selector:
-  service: service1.default.svc.cluster.local
-  control_point:
-    traffic: ingress
+  service_selector:
+    service: service1.default.svc.cluster.local
+  flow_selector:
+    control_point:
+      traffic: ingress
 rules:
   user:
     extractor:
@@ -393,7 +395,7 @@ See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 <dt>decider</dt>
 <dd>
 
-([V1Decider](#v1-decider)) Decider acts as a switch that emits one of the two signals based on the binary result of comparison operator on two operands.
+([V1Decider](#v1-decider)) Decider emits the binary result of comparison operator on two operands.
 
 </dd>
 <dt>ema</dt>
@@ -443,6 +445,12 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 <dd>
 
 ([V1Sqrt](#v1-sqrt)) Takes an input signal and emits the square root of the input signal.
+
+</dd>
+<dt>switcher</dt>
+<dd>
+
+([V1Switcher](#v1-switcher)) Switcher acts as a switch that emits one of the two signals based on third signal.
 
 </dd>
 </dl>
@@ -551,13 +559,13 @@ Usually powered by integration with a proxy (like envoy) or a web framework.
 
 ### v1Decider {#v1-decider}
 
-Type of combinator that computes the comparison operation on lhs and rhs signals and switches between `on_true` and `on_false` signals based on the result of the comparison
+Type of combinator that computes the comparison operation on lhs and rhs signals
 
 The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
 This component also supports time-based response, i.e. the output
-transitions between on_true or on_false signal if the decider condition is
-true or false for at least "positive_for" or "negative_for" duration. If
+transitions between 1.0 or 0.0 signal if the decider condition is
+true or false for at least "true_for" or "false_for" duration. If
 `true_for` and `false_for` durations are zero then the transitions are
 instantaneous.
 
@@ -611,18 +619,6 @@ Inputs for the Decider component.
 ([V1Port](#v1-port)) Left hand side input signal for the comparison operation.
 
 </dd>
-<dt>on_false</dt>
-<dd>
-
-([V1Port](#v1-port)) Output signal when the result of the operation is false.
-
-</dd>
-<dt>on_true</dt>
-<dd>
-
-([V1Port](#v1-port)) Output signal when the result of the operation is true.
-
-</dd>
 <dt>rhs</dt>
 <dd>
 
@@ -641,7 +637,7 @@ Outputs for the Decider component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Selected signal (on_true or on_false).
+([V1Port](#v1-port)) Selected signal (1.0 or 0.0).
 
 </dd>
 </dl>
@@ -915,6 +911,70 @@ Outputs for the Extrapolator component.
 </dd>
 </dl>
 
+### v1FlowSelector {#v1-flow-selector}
+
+Describes which flows a [dataplane
+component](/concepts/flow-control/flow-control.md#components) should apply
+to
+
+:::info
+See also [Selector overview](/concepts/flow-control/selector.md).
+:::
+
+Example:
+
+```yaml
+control_point:
+  traffic: ingress # Allowed values are `ingress` and `egress`.
+label_matcher:
+  match_labels:
+    user_tier: gold
+  match_expressions:
+    - key: query
+      operator: In
+      values:
+        - insert
+        - delete
+    - label: user_agent
+      regex: ^(?!.*Chrome).*Safari
+```
+
+#### Properties
+
+<dl>
+<dt>control_point</dt>
+<dd>
+
+([V1ControlPoint](#v1-control-point), `required`) Describes
+[control point](/concepts/flow-control/flow-control.md#control-point)
+within the entity where the policy should apply to.
+
+</dd>
+<dt>label_matcher</dt>
+<dd>
+
+([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
+[flow labels](/concepts/flow-control/flow-label.md)
+must also be satisfied (in addition to service+control point matching)
+
+:::info
+See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+:::
+
+:::note
+[Classifiers](#v1-classifier) _can_ use flow labels created by some other
+classifier, but only if they were created at some previous control point
+(and propagated in baggage).
+
+This limitation doesn't apply to selectors of other entities, like
+FluxMeters or actuators. It's valid to create a flow label on a control
+point using classifier, and immediately use it for matching on the same
+control point.
+:::
+
+</dd>
+</dl>
+
 ### v1FluxMeter {#v1-flux-meter}
 
 FluxMeter gathers metrics for the traffic that matches its selector
@@ -928,9 +988,11 @@ to particular service:
 
 ```yaml
 selector:
-  service: myservice.mynamespace.svc.cluster.local
-  control_point:
-    traffic: ingress
+  service_selector:
+    service: myservice.mynamespace.svc.cluster.local
+  flow_selector:
+    control_point:
+      traffic: ingress
 ```
 
 #### Properties
@@ -1936,32 +1998,40 @@ entering scheduler, including rejected ones.
 
 ### v1Selector {#v1-selector}
 
-Describes which flows a [dataplane
+Describes which flow in which service a [dataplane
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
+
+#### Properties
+
+<dl>
+<dt>flow_selector</dt>
+<dd>
+
+([V1FlowSelector](#v1-flow-selector), `required`)
+
+</dd>
+<dt>service_selector</dt>
+<dd>
+
+([V1ServiceSelector](#v1-service-selector), `required`)
+
+</dd>
+</dl>
+
+### v1ServiceSelector {#v1-service-selector}
+
+Describes which service a [dataplane
 component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
 :::info
 See also [Selector overview](/concepts/flow-control/selector.md).
 :::
-
-Example:
-
-```yaml
-service: service1.default.svc.cluster.local
-control_point:
-  traffic: ingress # Allowed values are `ingress` and `egress`.
-label_matcher:
-  match_labels:
-    user_tier: gold
-  match_expressions:
-    - key: query
-      operator: In
-      values:
-        - insert
-        - delete
-    - label: user_agent
-      regex: ^(?!.*Chrome).*Safari
-```
 
 #### Properties
 
@@ -1971,37 +2041,6 @@ label_matcher:
 
 (string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
 selector applies to.
-
-</dd>
-<dt>control_point</dt>
-<dd>
-
-([V1ControlPoint](#v1-control-point), `required`) Describes
-[control point](/concepts/flow-control/flow-control.md#control-point)
-within the entity where the policy should apply to.
-
-</dd>
-<dt>label_matcher</dt>
-<dd>
-
-([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
-[flow labels](/concepts/flow-control/flow-label.md)
-must also be satisfied (in addition to service+control point matching)
-
-:::info
-See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
-:::
-
-:::note
-[Classifiers](#v1-classifier) _can_ use flow labels created by some other
-classifier, but only if they were created at some previous control point
-(and propagated in baggage).
-
-This limitation doesn't apply to selectors of other entities, like
-FluxMeters or actuators. It's valid to create a flow label on a control
-point using classifier, and immediately use it for matching on the same
-control point.
-:::
 
 </dd>
 <dt>service</dt>
@@ -2078,6 +2117,72 @@ Outputs for the Sqrt component.
 <dd>
 
 ([V1Port](#v1-port)) Output signal.
+
+</dd>
+</dl>
+
+### v1Switcher {#v1-switcher}
+
+Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+
+`on_true` will be returned if switch input is valid and not equal to 0.0 ,
+otherwise `on_false` will be returned.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1SwitcherIns](#v1-switcher-ins)) Input ports for the Switcher component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1SwitcherOuts](#v1-switcher-outs)) Output ports for the Switcher component.
+
+</dd>
+</dl>
+
+### v1SwitcherIns {#v1-switcher-ins}
+
+Inputs for the Switcher component.
+
+#### Properties
+
+<dl>
+<dt>on_false</dt>
+<dd>
+
+([V1Port](#v1-port)) Output signal when switch is invalid or 0.0.
+
+</dd>
+<dt>on_true</dt>
+<dd>
+
+([V1Port](#v1-port)) Output signal when switch is valid and not 0.0.
+
+</dd>
+<dt>switch</dt>
+<dd>
+
+([V1Port](#v1-port)) Decides whether to return on_true or on_false.
+
+</dd>
+</dl>
+
+### v1SwitcherOuts {#v1-switcher-outs}
+
+Outputs for the Switcher component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1Port](#v1-port)) Selected signal (on_true or on_false).
 
 </dd>
 </dl>

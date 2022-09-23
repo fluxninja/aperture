@@ -1,28 +1,16 @@
 {
   new():: {
   },
-  withAgentGroup(agent_group):: {
-    agent_group: agent_group,
+  withFlowSelector(flow_selector):: {
+    flow_selector: flow_selector,
   },
-  withAgentGroupMixin(agent_group):: {
-    agent_group+: agent_group,
+  withFlowSelectorMixin(flow_selector):: {
+    flow_selector+: flow_selector,
   },
-  withControlPoint(control_point):: {
-    control_point: control_point,
+  withServiceSelector(service_selector):: {
+    service_selector: service_selector,
   },
-  withControlPointMixin(control_point):: {
-    control_point+: control_point,
-  },
-  withLabelMatcher(label_matcher):: {
-    label_matcher: label_matcher,
-  },
-  withLabelMatcherMixin(label_matcher):: {
-    label_matcher+: label_matcher,
-  },
-  withService(service):: {
-    service: service,
-  },
-  withServiceMixin(service):: {
-    service+: service,
+  withServiceSelectorMixin(service_selector):: {
+    service_selector+: service_selector,
   },
 }
