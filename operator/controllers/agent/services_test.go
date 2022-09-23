@@ -50,10 +50,7 @@ var _ = Describe("Service for Agent", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
@@ -91,18 +88,6 @@ var _ = Describe("Service for Agent", func() {
 							Protocol:   corev1.Protocol(TCP),
 							Port:       int32(8080),
 							TargetPort: intstr.FromString(Server),
-						},
-						{
-							Name:       GrpcOtel,
-							Protocol:   corev1.Protocol(TCP),
-							Port:       int32(4317),
-							TargetPort: intstr.FromString(GrpcOtel),
-						},
-						{
-							Name:       HTTPOtel,
-							Protocol:   corev1.Protocol(TCP),
-							Port:       int32(4318),
-							TargetPort: intstr.FromString(HTTPOtel),
 						},
 						{
 							Name:       DistCache,
@@ -156,10 +141,7 @@ var _ = Describe("Service for Agent", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
@@ -201,18 +183,6 @@ var _ = Describe("Service for Agent", func() {
 							Protocol:   corev1.Protocol(TCP),
 							Port:       int32(8080),
 							TargetPort: intstr.FromString(Server),
-						},
-						{
-							Name:       GrpcOtel,
-							Protocol:   corev1.Protocol(TCP),
-							Port:       int32(4317),
-							TargetPort: intstr.FromString(GrpcOtel),
-						},
-						{
-							Name:       HTTPOtel,
-							Protocol:   corev1.Protocol(TCP),
-							Port:       int32(4318),
-							TargetPort: intstr.FromString(HTTPOtel),
 						},
 						{
 							Name:       DistCache,

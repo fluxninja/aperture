@@ -79,10 +79,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -114,16 +111,6 @@ var _ = Describe("Sidecar container for Agent", func() {
 					{
 						Name:          Server,
 						ContainerPort: 80,
-						Protocol:      corev1.ProtocolTCP,
-					},
-					{
-						Name:          GrpcOtel,
-						ContainerPort: 4317,
-						Protocol:      corev1.ProtocolTCP,
-					},
-					{
-						Name:          HTTPOtel,
-						ContainerPort: 4318,
 						Protocol:      corev1.ProtocolTCP,
 					},
 					{
@@ -198,10 +185,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -266,16 +250,6 @@ var _ = Describe("Sidecar container for Agent", func() {
 					{
 						Name:          Server,
 						ContainerPort: 80,
-						Protocol:      corev1.ProtocolTCP,
-					},
-					{
-						Name:          GrpcOtel,
-						ContainerPort: 4317,
-						Protocol:      corev1.ProtocolTCP,
-					},
-					{
-						Name:          HTTPOtel,
-						ContainerPort: 4318,
 						Protocol:      corev1.ProtocolTCP,
 					},
 					{
@@ -362,10 +336,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":8000",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -447,16 +418,6 @@ var _ = Describe("Sidecar container for Agent", func() {
 					{
 						Name:          Server,
 						ContainerPort: 8000,
-						Protocol:      corev1.ProtocolTCP,
-					},
-					{
-						Name:          GrpcOtel,
-						ContainerPort: 4317,
-						Protocol:      corev1.ProtocolTCP,
-					},
-					{
-						Name:          HTTPOtel,
-						ContainerPort: 4318,
 						Protocol:      corev1.ProtocolTCP,
 					},
 					{
@@ -600,10 +561,7 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -639,16 +597,6 @@ var _ = Describe("Pod modification for Agent", func() {
 								{
 									Name:          Server,
 									ContainerPort: 80,
-									Protocol:      corev1.ProtocolTCP,
-								},
-								{
-									Name:          GrpcOtel,
-									ContainerPort: 4317,
-									Protocol:      corev1.ProtocolTCP,
-								},
-								{
-									Name:          HTTPOtel,
-									ContainerPort: 4318,
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{
@@ -739,10 +687,7 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{
-								GRPCAddr: ":4317",
-								HTTPAddr: ":4318",
-							},
+							Otel: otel.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -834,16 +779,6 @@ var _ = Describe("Pod modification for Agent", func() {
 								{
 									Name:          Server,
 									ContainerPort: 80,
-									Protocol:      corev1.ProtocolTCP,
-								},
-								{
-									Name:          GrpcOtel,
-									ContainerPort: 4317,
-									Protocol:      corev1.ProtocolTCP,
-								},
-								{
-									Name:          HTTPOtel,
-									ContainerPort: 4318,
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{

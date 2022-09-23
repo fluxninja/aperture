@@ -69,16 +69,6 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 		return fmt.Errorf("invalid value '%v' provided for 'server.addr' config", spec.ConfigSpec.Server.Addr)
 	}
 
-	otelGRPCPort, err := controllers.GetPort(spec.ConfigSpec.Otel.GRPCAddr)
-	if err != nil {
-		return fmt.Errorf("invalid value '%v' provided for 'otel.grpc_addr' config", spec.ConfigSpec.Otel.GRPCAddr)
-	}
-
-	otelHTTPPort, err := controllers.GetPort(spec.ConfigSpec.Otel.HTTPAddr)
-	if err != nil {
-		return fmt.Errorf("invalid value '%v' provided for 'otel.http_addr' config", spec.ConfigSpec.Otel.HTTPAddr)
-	}
-
 	distCachePort, err := controllers.GetPort(spec.ConfigSpec.DistCache.BindAddr)
 	if err != nil {
 		return fmt.Errorf("invalid value '%v' provided for 'dist_cache.bind_addr' config", spec.ConfigSpec.DistCache.BindAddr)
@@ -93,16 +83,6 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 		{
 			Name:          controllers.Server,
 			ContainerPort: serverPort,
-			Protocol:      corev1.ProtocolTCP,
-		},
-		{
-			Name:          controllers.GrpcOtel,
-			ContainerPort: otelGRPCPort,
-			Protocol:      corev1.ProtocolTCP,
-		},
-		{
-			Name:          controllers.HTTPOtel,
-			ContainerPort: otelHTTPPort,
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{

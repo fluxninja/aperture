@@ -488,6 +488,8 @@ github.com/fluxninja/go-swagger v0.29.0-fn.patch.8 h1:EdIA15vOFLFgxUMXJPtpI2TaTR
 github.com/fluxninja/go-swagger v0.29.0-fn.patch.8/go.mod h1:hHQC4q+Cd26/JhLSXAUauYmDCTAR9u4TIALMYXZbeWM=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814 h1:AHC1PtYLUw9PWqmgB9VHcxzGEm1GDYGXzC1PRtgIqqs=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814/go.mod h1:kARLh/xWGaisrwkOGOWKcqk7fagFUFthOTX7mIFVJlw=
+github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.1 h1:k7ZO3DOBXLhEVvTJDLWemN2k+zx8GVJn4WZdj4DDEfQ=
+github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.1/go.mod h1:n2KBSgs7AakuedVxLR/Tayl3EEztmngrrjZBsYS+qBI=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
 github.com/form3tech-oss/jwt-go v3.2.3+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
@@ -1509,8 +1511,6 @@ go.opencensus.io v0.22.4/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
 go.opencensus.io v0.22.5/go.mod h1:5pWMHQbX5EPX2/62yrJeAkowc+lfs/XD7Uxpq3pI6kk=
 go.opencensus.io v0.23.0 h1:gqCw0LfLxScz8irSi8exQc7fyQ0fKQU/qnC/X8+V/1M=
 go.opencensus.io v0.23.0/go.mod h1:XItmlyltB5F7CS4xOC1DcqMoFqwtC6OG2xF7mCv7P7E=
-go.opentelemetry.io/collector v0.60.0 h1:rHndW/xILGjNoFaYIvwYpngZnRWw1oQT6GLtzxIs7pw=
-go.opentelemetry.io/collector v0.60.0/go.mod h1:n2KBSgs7AakuedVxLR/Tayl3EEztmngrrjZBsYS+qBI=
 go.opentelemetry.io/collector/pdata v0.60.0 h1:jCNR5jtUom2FcUu30h4tw7enZytwGnXX6fs/K2FM/A0=
 go.opentelemetry.io/collector/pdata v0.60.0/go.mod h1:0hqgNMRneVXaLNelv3q0XKJbyBW9aMDwyC15pKd30+E=
 go.opentelemetry.io/collector/semconv v0.60.0 h1:xy6HSukzA5CC8SR4DvFyLd28EFEOnQgxtpU1bSCM0qY=
@@ -1566,6 +1566,8 @@ go.opentelemetry.io/proto/otlp v0.7.0/go.mod h1:PqfVotwruBrMGOCsRd/89rSnXhoiJIqe
 go.opentelemetry.io/proto/otlp v0.11.0/go.mod h1:QpEjXPrNQzrFDZgoTo49dgHR9RYRSrg3NAKnUGl9YpQ=
 go.opentelemetry.io/proto/otlp v0.15.0/go.mod h1:H7XAot3MsfNsj7EXtrA2q5xSNQ10UqI405h3+duxN4U=
 go.opentelemetry.io/proto/otlp v0.16.0/go.mod h1:H7XAot3MsfNsj7EXtrA2q5xSNQ10UqI405h3+duxN4U=
+go.opentelemetry.io/proto/otlp v0.18.0 h1:W5hyXNComRa23tGpKwG+FRAc4rfF6ZUg1JReK+QHS80=
+go.opentelemetry.io/proto/otlp v0.18.0/go.mod h1:H7XAot3MsfNsj7EXtrA2q5xSNQ10UqI405h3+duxN4U=
 go.uber.org/atomic v1.3.2/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
 go.uber.org/atomic v1.4.0/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
 go.uber.org/atomic v1.7.0/go.mod h1:fEN4uk6kAWBTFdckzkM89CLk9XfWZrxpCo0nPH17wJc=

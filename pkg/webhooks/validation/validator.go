@@ -2,15 +2,16 @@ package validation
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
+	"os"
 
 	admissionv1 "k8s.io/api/admission/v1"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/fluxninja/aperture/operator/api"
+	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -18,38 +19,37 @@ import (
 // compilation, which might be heavy).
 const maxValidationConcurrency = 3
 
-// CMFileValidator is an interface for configmap validation.
-type CMFileValidator interface {
-	CheckCMName(name string) bool
-	ValidateFile(
+// PolicySpecValidator is an interface for Policy Custom Resource validation.
+type PolicySpecValidator interface {
+	ValidateSpec(
 		ctx context.Context,
 		name string,
 		yamlSrc []byte,
 	) (bool, string, error)
 }
 
-// CMValidator validates the policies configmap.
-type CMValidator struct {
-	tokens         chan concurrencyToken
-	fileValidators []CMFileValidator
+// PolicyValidator validates the Policy Custom Resource.
+type PolicyValidator struct {
+	tokens           chan concurrencyToken
+	policyValidators []PolicySpecValidator
 }
 
-// NewCMValidator creates a NewCMValidator.
-func NewCMValidator(validators []CMFileValidator) *CMValidator {
+// NewPolicyValidator creates a new instance of PolicyValidator.
+func NewPolicyValidator(validators []PolicySpecValidator) *PolicyValidator {
 	tokens := make(chan concurrencyToken, maxValidationConcurrency)
 	for i := 0; i < maxValidationConcurrency; i++ {
 		tokens <- concurrencyToken{}
 	}
-	return &CMValidator{
-		tokens:         tokens,
-		fileValidators: validators,
+	return &PolicyValidator{
+		tokens:           tokens,
+		policyValidators: validators,
 	}
 }
 
 type concurrencyToken struct{}
 
 // ValidateObject checks the validity of a object as a k8s object.
-func (v *CMValidator) ValidateObject(
+func (v *PolicyValidator) ValidateObject(
 	ctx context.Context,
 	req *admissionv1.AdmissionRequest,
 ) (ok bool, msg string, err error) {
@@ -62,63 +62,34 @@ func (v *CMValidator) ValidateObject(
 		defer func() { v.tokens <- tok }()
 	}
 
-	cmKind := corev1.SchemeGroupVersion.WithKind("ConfigMap")
+	policyKind := api.GroupVersion.WithKind("Policy")
 	expectedKind := metav1.GroupVersionKind{
-		Group:   cmKind.Group,
-		Version: cmKind.Version,
-		Kind:    cmKind.Kind,
+		Group:   policyKind.Group,
+		Version: policyKind.Version,
+		Kind:    policyKind.Kind,
 	}
 	if req.Kind != expectedKind {
-		return false, "object is not a configmap", nil
+		return false, "object is not a Policy", nil
 	}
 
-	var cm corev1.ConfigMap
-	err = json.Unmarshal(req.Object.Raw, &cm)
+	if req.Namespace != os.Getenv("APERTURE_CONTROLLER_NAMESPACE") {
+		return false, "Policy should be created in the same namespace as Aperture Controller", nil
+	}
+
+	var policy policyv1alpha1.Policy
+	err = config.UnmarshalYAML(req.Object.Raw, &policy)
 	if err != nil {
-		return
+		return false, "Not a valid Policy Object", err
 	}
 
-	return v.ValidateConfigMap(ctx, cm)
-}
-
-// ValidateConfigMap checks if configmap is valid
-//
-// returns:
-// * true, "", nil when config is valid
-// * false, message, nil when config is invalid
-// and
-// * false, "", err on other errors.
-func (v *CMValidator) ValidateConfigMap(ctx context.Context, cm corev1.ConfigMap) (bool, string, error) {
-	files := make(map[string][]byte, len(cm.Data)+len(cm.BinaryData))
-
-	for filename, contents := range cm.Data {
-		files[filename] = []byte(contents)
-	}
-
-	for filename, contents := range cm.BinaryData {
-		if _, exists := files[filename]; exists {
-			return false, fmt.Sprintf("duplicate file %q", filename), nil
+	for _, validator := range v.policyValidators {
+		ok, msg, err := validator.ValidateSpec(ctx, policy.GetName(), policy.Spec.Raw)
+		if err != nil {
+			return false, "", err
 		}
-		files[filename] = contents
-	}
 
-	for _, validator := range v.fileValidators {
-		if !validator.CheckCMName(cm.Name) {
-			continue
-		}
-		for filename, contents := range files {
-			if !strings.HasSuffix(filename, ".yaml") {
-				continue
-			}
-
-			ok, msg, err := validator.ValidateFile(ctx, strings.TrimSuffix(filename, ".yaml"), contents)
-			if err != nil {
-				return false, "", err
-			}
-
-			if !ok {
-				return ok, fmt.Sprintf("%s: %s", filename, msg), err
-			}
+		if !ok {
+			return ok, fmt.Sprintf("%s: %s", policy.GetName(), msg), err
 		}
 	}
 

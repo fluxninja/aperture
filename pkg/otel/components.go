@@ -13,10 +13,14 @@ import (
 	"go.opentelemetry.io/collector/exporter/otlphttpexporter"
 	"go.opentelemetry.io/collector/extension/ballastextension"
 	"go.opentelemetry.io/collector/extension/zpagesextension"
+	"go.opentelemetry.io/collector/pdata/plog/plogotlp"
+	"go.opentelemetry.io/collector/pdata/pmetric/pmetricotlp"
+	"go.opentelemetry.io/collector/pdata/ptrace/ptraceotlp"
 	"go.opentelemetry.io/collector/processor/batchprocessor"
 	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/multierr"
+	"google.golang.org/grpc"
 
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
@@ -32,6 +36,7 @@ func AgentOTELComponents(
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
 	metricsAPI iface.ResponseMetricsAPI,
+	serverGRPC *grpc.Server,
 ) (component.Factories, error) {
 	var errs error
 
@@ -43,8 +48,18 @@ func AgentOTELComponents(
 	)
 	errs = multierr.Append(errs, err)
 
+	// We need to create and register empty server wrappers in GRPC server, as OTEL
+	// receivers are created after our GRPC server is started.
+	// Inside the otlpreceiver the wrappers are filled with proper servers.
+	tsw := &otlpreceiver.TraceServerWrapper{}
+	msw := &otlpreceiver.MetricServerWrapper{}
+	lsw := &otlpreceiver.LogServerWrapper{}
+	ptraceotlp.RegisterServer(serverGRPC, tsw)
+	pmetricotlp.RegisterServer(serverGRPC, msw)
+	plogotlp.RegisterServer(serverGRPC, lsw)
+
 	receivers, err := component.MakeReceiverFactoryMap(
-		otlpreceiver.NewFactory(),
+		otlpreceiver.NewFactory(tsw, msw, lsw),
 		prometheusreceiver.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)

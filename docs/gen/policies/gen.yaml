@@ -1772,4 +1772,5 @@ tags:
 - name: StatusService
 - name: FlowControlService
 - name: FluxNinjaService
+- name: ControllerInfoService
 - name: PolicyService

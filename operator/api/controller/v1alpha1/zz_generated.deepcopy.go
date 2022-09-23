@@ -107,7 +107,6 @@ func (in *ControllerSpec) DeepCopyInto(out *ControllerSpec) {
 	*out = *in
 	in.CommonSpec.DeepCopyInto(&out.CommonSpec)
 	in.Image.DeepCopyInto(&out.Image)
-	in.OperatorImage.DeepCopyInto(&out.OperatorImage)
 	if in.HostAliases != nil {
 		in, out := &in.HostAliases, &out.HostAliases
 		*out = make([]v1.HostAlias, len(*in))

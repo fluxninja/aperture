@@ -220,12 +220,6 @@ Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_`
 #### Members
 
 <dl>
-<dt>policies_path</dt>
-<dd>
-
-(string, default: `/etc/aperture/aperture-controller/policies`, env-var: `APERTURE_CONTROLLER_POLICIES_POLICIES_PATH`) Directory containing policies rules
-
-</dd>
 
 <dt>promql_jobs_scheduler</dt>
 <dd>
@@ -1092,18 +1086,6 @@ OtelConfig is the configuration for the OTEL collector.
 #### Properties
 
 <dl>
-<dt>grpc_addr</dt>
-<dd>
-
-(string, `hostname_port`, default: `:4317`) GRPC listener addr for OTEL Collector.
-
-</dd>
-<dt>http_addr</dt>
-<dd>
-
-(string, `hostname_port`, default: `:4318`) HTTP listener addr for OTEL Collector.
-
-</dd>
 <dt>batch_postrollup</dt>
 <dd>
 
