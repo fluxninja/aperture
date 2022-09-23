@@ -14,6 +14,94 @@ Generated File Starts
 
 ## Objects
 
+### FluxMeterExponentialBuckets {#flux-meter-exponential-buckets}
+
+#### Properties
+
+<dl>
+<dt>count</dt>
+<dd>
+
+(int32)
+
+</dd>
+<dt>factor</dt>
+<dd>
+
+(float64)
+
+</dd>
+<dt>start</dt>
+<dd>
+
+(float64)
+
+</dd>
+</dl>
+
+### FluxMeterExponentialBucketsRange {#flux-meter-exponential-buckets-range}
+
+#### Properties
+
+<dl>
+<dt>count</dt>
+<dd>
+
+(int32)
+
+</dd>
+<dt>max</dt>
+<dd>
+
+(float64)
+
+</dd>
+<dt>min</dt>
+<dd>
+
+(float64)
+
+</dd>
+</dl>
+
+### FluxMeterLinearBuckets {#flux-meter-linear-buckets}
+
+#### Properties
+
+<dl>
+<dt>count</dt>
+<dd>
+
+(int32)
+
+</dd>
+<dt>start</dt>
+<dd>
+
+(float64)
+
+</dd>
+<dt>width</dt>
+<dd>
+
+(float64)
+
+</dd>
+</dl>
+
+### FluxMeterStaticBuckets {#flux-meter-static-buckets}
+
+#### Properties
+
+<dl>
+<dt>buckets</dt>
+<dd>
+
+([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`)
+
+</dd>
+</dl>
+
 ### MatchExpressionList {#match-expression-list}
 
 List of MatchExpressions that is used for all/any matching
@@ -1009,10 +1097,22 @@ For list of available attributes in Envoy access logs, refer
 :::
 
 </dd>
-<dt>histogram_buckets</dt>
+<dt>exponential_buckets</dt>
 <dd>
 
-([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) Latency histogram buckets (in ms) for this FluxMeter.
+([FluxMeterExponentialBuckets](#flux-meter-exponential-buckets))
+
+</dd>
+<dt>exponential_buckets_range</dt>
+<dd>
+
+([FluxMeterExponentialBucketsRange](#flux-meter-exponential-buckets-range))
+
+</dd>
+<dt>linear_buckets</dt>
+<dd>
+
+([FluxMeterLinearBuckets](#flux-meter-linear-buckets))
 
 </dd>
 <dt>selector</dt>
@@ -1026,6 +1126,12 @@ For list of available attributes in Envoy access logs, refer
 - For feature control points, fluxmeter will measure execution of the span
   associated with particular feature. What contributes to the span's
   duration is entirely up to the user code that uses Aperture SDK.
+
+</dd>
+<dt>static_buckets</dt>
+<dd>
+
+([FluxMeterStaticBuckets](#flux-meter-static-buckets))
 
 </dd>
 </dl>

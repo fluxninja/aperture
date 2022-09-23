@@ -22,6 +22,35 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 //       traffic: ingress
 // ```
 message FluxMeter {
+  message StaticBuckets {
+    repeated double buckets = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-default"
+        value: {
+          string_value: "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+        }
+      }
+    }]; // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+  }
+
+  message LinearBuckets {
+    double start = 1;
+    double width = 2;
+    int32 count = 3;
+  }
+
+  message ExponentialBuckets {
+    double start = 1;
+    double factor = 2;
+    int32 count = 3;
+  }
+
+  message ExponentialBucketsRange {
+    double min = 1;
+    double max = 2;
+    int32 count = 3;
+  }
+
   // What latency should we measure in the histogram created by this FluxMeter.
   //
   // * For traffic control points, fluxmeter will measure the duration of the
@@ -32,15 +61,13 @@ message FluxMeter {
   //   duration is entirely up to the user code that uses Aperture SDK.
   common.selector.v1.Selector selector = 1;
 
-  // Latency histogram buckets (in ms) for this FluxMeter.
-  repeated double histogram_buckets = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {
-        string_value: "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
-      }
-    }
-  }]; // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+  // Histogram buckets (in ms) for this FluxMeter.
+  oneof histogram_buckets {
+    StaticBuckets static_buckets = 2;
+    LinearBuckets linear_buckets = 3;
+    ExponentialBuckets exponential_buckets = 4;
+    ExponentialBucketsRange exponential_buckets_range = 5;
+  }
 
   // Key of the attribute in access log or span from which the metric for this flux meter is read.
   //
@@ -49,7 +76,7 @@ message FluxMeter {
   // [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
   // :::
   //
-  string attribute_key = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  string attribute_key = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {

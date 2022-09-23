@@ -23,6 +23,61 @@ paths:
         "200":
           description: A successful response.
 definitions:
+  FluxMeterExponentialBuckets:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int32
+        x-order: 0
+      factor:
+        type: number
+        format: double
+        x-order: 1
+      start:
+        type: number
+        format: double
+        x-order: 2
+  FluxMeterExponentialBucketsRange:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int32
+        x-order: 0
+      max:
+        type: number
+        format: double
+        x-order: 1
+      min:
+        type: number
+        format: double
+        x-order: 2
+  FluxMeterLinearBuckets:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int32
+        x-order: 0
+      start:
+        type: number
+        format: double
+        x-order: 1
+      width:
+        type: number
+        format: double
+        x-order: 2
+  FluxMeterStaticBuckets:
+    type: object
+    properties:
+      buckets:
+        type: array
+        items:
+          type: number
+          format: double
+        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+        x-order: 0
   MatchExpressionList:
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     type: object
@@ -798,14 +853,15 @@ definitions:
         type: string
         x-go-default: workload_duration_ms
         x-order: 0
-      histogram_buckets:
-        description: Latency histogram buckets (in ms) for this FluxMeter.
-        type: array
-        items:
-          type: number
-          format: double
-        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+      exponential_buckets:
         x-order: 1
+        $ref: '#/definitions/FluxMeterExponentialBuckets'
+      exponential_buckets_range:
+        x-order: 2
+        $ref: '#/definitions/FluxMeterExponentialBucketsRange'
+      linear_buckets:
+        x-order: 3
+        $ref: '#/definitions/FluxMeterLinearBuckets'
       selector:
         description: |-
           What latency should we measure in the histogram created by this FluxMeter.
@@ -816,8 +872,11 @@ definitions:
           * For feature control points, fluxmeter will measure execution of the span
             associated with particular feature. What contributes to the span's
             duration is entirely up to the user code that uses Aperture SDK.
-        x-order: 2
+        x-order: 4
         $ref: '#/definitions/v1Selector'
+      static_buckets:
+        x-order: 5
+        $ref: '#/definitions/FluxMeterStaticBuckets'
   v1GradientController:
     description: |-
       The `gradient` describes a corrective factor that should be applied to the

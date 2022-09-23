@@ -269,6 +269,7 @@ resources:
           service: service1-demo-app.demoapp.svc.cluster.local
   flux_meters:
     example:
+      attribute_key: workload_duration_ms
       selector:
         flow_selector:
           control_point:
@@ -276,3 +277,16 @@ resources:
         service_selector:
           agent_group: default
           service: service1-demo-app.demoapp.svc.cluster.local
+      static_buckets:
+        buckets:
+          - 5
+          - 10
+          - 25
+          - 50
+          - 100
+          - 250
+          - 500
+          - 1000
+          - 2500
+          - 5000
+          - 10000

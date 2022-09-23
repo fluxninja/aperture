@@ -7,19 +7,34 @@
   withAttributeKeyMixin(attribute_key):: {
     attribute_key+: attribute_key,
   },
-  withHistogramBuckets(histogram_buckets):: {
-    histogram_buckets:
-      if std.isArray(histogram_buckets)
-      then histogram_buckets
-      else [histogram_buckets],
+  withExponentialBuckets(exponential_buckets):: {
+    exponential_buckets: exponential_buckets,
   },
-  withHistogramBucketsMixin(histogram_buckets):: {
-    histogram_buckets+: histogram_buckets,
+  withExponentialBucketsMixin(exponential_buckets):: {
+    exponential_buckets+: exponential_buckets,
+  },
+  withExponentialBucketsRange(exponential_buckets_range):: {
+    exponential_buckets_range: exponential_buckets_range,
+  },
+  withExponentialBucketsRangeMixin(exponential_buckets_range):: {
+    exponential_buckets_range+: exponential_buckets_range,
+  },
+  withLinearBuckets(linear_buckets):: {
+    linear_buckets: linear_buckets,
+  },
+  withLinearBucketsMixin(linear_buckets):: {
+    linear_buckets+: linear_buckets,
   },
   withSelector(selector):: {
     selector: selector,
   },
   withSelectorMixin(selector):: {
     selector+: selector,
+  },
+  withStaticBuckets(static_buckets):: {
+    static_buckets: static_buckets,
+  },
+  withStaticBucketsMixin(static_buckets):: {
+    static_buckets+: static_buckets,
   },
 }

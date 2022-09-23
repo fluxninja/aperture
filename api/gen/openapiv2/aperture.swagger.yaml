@@ -264,6 +264,51 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/v1Entity'
     description: Entities defines mapping of entities.
+  FluxMeterExponentialBuckets:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int32
+      factor:
+        type: number
+        format: double
+      start:
+        type: number
+        format: double
+  FluxMeterExponentialBucketsRange:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int32
+      max:
+        type: number
+        format: double
+      min:
+        type: number
+        format: double
+  FluxMeterLinearBuckets:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int32
+      start:
+        type: number
+        format: double
+      width:
+        type: number
+        format: double
+  FluxMeterStaticBuckets:
+    type: object
+    properties:
+      buckets:
+        type: array
+        items:
+          type: number
+          format: double
+        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
   LimiterDecisionConcurrencyLimiterInfo:
     type: object
     properties:
@@ -1252,13 +1297,12 @@ definitions:
           [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
           :::
         x-go-default: workload_duration_ms
-      histogram_buckets:
-        type: array
-        items:
-          type: number
-          format: double
-        description: Latency histogram buckets (in ms) for this FluxMeter.
-        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+      exponential_buckets:
+        $ref: '#/definitions/FluxMeterExponentialBuckets'
+      exponential_buckets_range:
+        $ref: '#/definitions/FluxMeterExponentialBucketsRange'
+      linear_buckets:
+        $ref: '#/definitions/FluxMeterLinearBuckets'
       selector:
         $ref: '#/definitions/v1Selector'
         description: |-
@@ -1270,6 +1314,8 @@ definitions:
           * For feature control points, fluxmeter will measure execution of the span
             associated with particular feature. What contributes to the span's
             duration is entirely up to the user code that uses Aperture SDK.
+      static_buckets:
+        $ref: '#/definitions/FluxMeterStaticBuckets'
     description: |-
       :::info
       See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).

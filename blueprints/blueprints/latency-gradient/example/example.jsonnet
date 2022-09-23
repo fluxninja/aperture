@@ -5,12 +5,14 @@ local Workload = aperture.v1.SchedulerWorkload;
 local LabelMatcher = aperture.v1.LabelMatcher;
 local WorkloadWithLabelMatcher = aperture.v1.SchedulerWorkloadAndLabelMatcher;
 local classifier = aperture.v1.Classifier;
+local fluxMeter = aperture.v1.FluxMeter;
 local extractor = aperture.v1.Extractor;
 local rule = aperture.v1.Rule;
 local selector = aperture.v1.Selector;
 local serviceSelector = aperture.v1.ServiceSelector;
 local flowSelector = aperture.v1.FlowSelector;
 local controlPoint = aperture.v1.ControlPoint;
+local staticBuckets = aperture.v1.FluxMeterStaticBuckets;
 
 local svcSelector = {
   sSelector: {
@@ -43,6 +45,15 @@ local config = {
   policy+: {
     policyName: $.common.policyName,
     fluxMeterSelector: svcSelector,
+    fluxMeters: {
+      [$.common.policyName]: fluxMeter.new()
+                             + fluxMeter.withSelector(svcSelector)
+                             + fluxMeter.withAttributeKey('workload_duration_ms')
+                             + fluxMeter.withStaticBuckets(
+                               staticBuckets.new()
+                               + staticBuckets.withBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0])
+                             ),
+    },
     concurrencyLimiterSelector: svcSelector,
     classifiers: [
       classifier.new()

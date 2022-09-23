@@ -44,7 +44,7 @@ that for example all require in/out ports are properly set in the final object:
 local component = Component.withPromql(PromQL.withQueryString("vector(1)"));
 
 // Instead, do the following:
-local component = Component.withPromql(PromQL.new() + PromQL.withQueryString(""vector(1)"));
+local component = Component.withPromql(PromQL.new() + PromQL.withQueryString("vector(1)"));
 ```
 
 ## Development
@@ -54,7 +54,7 @@ the swagger API specification, and a set of custom bindings that build upon
 those generated bindings and extend the API to provide some "syntactic sugar" and
 make the library easier to use.
 
-To updated auto generated bindings, the script `jsonnet-lib-gen.py` can be used
+To update auto generated bindings, the script `jsonnet-lib-gen.py` can be used
 after its dependencies (listed in `requirements.txt`) are installed. The script
 requires Python 3.10+.
 

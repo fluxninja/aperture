@@ -10,6 +10,7 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	policylanguagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -124,11 +125,34 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	}
 	fluxMeterProto := wrapperMessage.FluxMeter
 
+	buckets := make([]float64, 0)
+	switch fluxMeterProto.GetHistogramBuckets().(type) {
+	case *policylanguagev1.FluxMeter_LinearBuckets_:
+		if linearBuckets := fluxMeterProto.GetLinearBuckets(); linearBuckets != nil {
+			buckets = append(buckets, prometheus.LinearBuckets(
+				linearBuckets.GetStart(), linearBuckets.GetWidth(), int(linearBuckets.GetCount()))...)
+		}
+	case *policylanguagev1.FluxMeter_ExponentialBuckets_:
+		if exponentialBuckets := fluxMeterProto.GetExponentialBuckets(); exponentialBuckets != nil {
+			buckets = append(buckets, prometheus.ExponentialBuckets(
+				exponentialBuckets.GetStart(), exponentialBuckets.GetFactor(), int(exponentialBuckets.GetCount()))...)
+		}
+	case *policylanguagev1.FluxMeter_ExponentialBucketsRange_:
+		if exponentialBucketsRange := fluxMeterProto.GetExponentialBucketsRange(); exponentialBucketsRange != nil {
+			buckets = append(buckets, prometheus.ExponentialBucketsRange(
+				exponentialBucketsRange.GetMin(), exponentialBucketsRange.GetMax(), int(exponentialBucketsRange.GetCount()))...)
+		}
+	default:
+		if defaultBuckets := fluxMeterProto.GetStaticBuckets(); defaultBuckets != nil {
+			buckets = append(buckets, defaultBuckets.Buckets...)
+		}
+	}
+
 	fluxMeter := &FluxMeter{
 		fluxMeterName: wrapperMessage.FluxMeterName,
 		attributeKey:  fluxMeterProto.AttributeKey,
 		selector:      fluxMeterProto.GetSelector(),
-		buckets:       fluxMeterProto.GetHistogramBuckets(),
+		buckets:       buckets,
 	}
 
 	return fx.Options(
