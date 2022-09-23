@@ -255,6 +255,7 @@ jobs:
             tanka
             helm
             kustomize
+            jsonnet
       - run:
           name: Install additional system dependencies for pre-commit
           command: |

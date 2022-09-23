@@ -4,16 +4,6 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/fluxninja/aperture.git",
-          "subdir": "libsonnet/1.0"
-        }
-      },
-      "version": "720408fe568c4d0469ccb0f47d307732773c4f11",
-      "sum": "EC80SRdCwEwW7As2OVmavb3MyiO71oPd23H1+O3ml0A="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/grafana/grafonnet-lib.git",
           "subdir": "grafonnet"
         }

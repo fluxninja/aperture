@@ -1,12 +1,6 @@
 {
   new():: {
   },
-  withLhs(lhs):: {
-    lhs: lhs,
-  },
-  withLhsMixin(lhs):: {
-    lhs+: lhs,
-  },
   withOnFalse(on_false):: {
     on_false: on_false,
   },
@@ -19,10 +13,10 @@
   withOnTrueMixin(on_true):: {
     on_true+: on_true,
   },
-  withRhs(rhs):: {
-    rhs: rhs,
+  withSwitch(switch):: {
+    switch: switch,
   },
-  withRhsMixin(rhs):: {
-    rhs+: rhs,
+  withSwitchMixin(switch):: {
+    switch+: switch,
   },
 }

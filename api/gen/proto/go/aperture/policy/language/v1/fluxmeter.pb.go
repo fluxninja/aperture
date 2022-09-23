@@ -32,9 +32,11 @@ const (
 // to particular service:
 // ```yaml
 // selector:
-//   service: myservice.mynamespace.svc.cluster.local
-//   control_point:
-//     traffic: ingress
+//   service_selector:
+//     service: myservice.mynamespace.svc.cluster.local
+//   flow_selector:
+//     control_point:
+//       traffic: ingress
 // ```
 type FluxMeter struct {
 	state         protoimpl.MessageState

@@ -45,19 +45,9 @@ def command_with_exit_code(func):
     return wrapper
 
 
-def parse_user_args(blueprint: str, output: str, config: str) -> Tuple[Path, Path, Path]:
-    blueprint_path = Path(blueprint).absolute()
+def parse_user_args(output: str, config: str) -> Tuple[Path, Path]:
     output_path = Path(output).absolute()
     config_path = Path(config).absolute()
-    if not blueprint_path.exists():
-        LOG.error(f"Policy directory does not exist: {blueprint_path}")
-        raise ExitException(1)
-
-    blueprint_main_path = blueprint_path / "main.libsonnet"
-    if not blueprint_main_path.exists():
-        LOG.error(f"Policy main.libsonnet is missing: {blueprint_main_path}")
-        raise ExitException(1)
-
     if not config_path.exists():
         LOG.error(f"Policy jsonnet configuration does not exist: {config_path}")
         raise ExitException(1)
@@ -79,7 +69,7 @@ def parse_user_args(blueprint: str, output: str, config: str) -> Tuple[Path, Pat
             raise ExitException(1)
         output_path.mkdir()
 
-    return blueprint_path, output_path, config_path
+    return output_path, config_path
 
 
 def configure_logging(verbose: bool):
@@ -131,15 +121,6 @@ def check_blueprint_configfile(repository_root: Path, config_path: Path):
         jsonnet_stderr = textwrap.indent(ex.stderr.decode("utf-8").strip(), prefix="  ")
         LOG.error(f"Couldn't parse blueprint configuration as jsonnet:\n{jsonnet_stderr}")
         raise ExitException(1)
-
-
-def generate_blueprint_entrypoint(blueprint_relative_path: Path, config_path: Path) -> str:
-    config_text = config_path.read_text()
-    blueprint_main_path = str(blueprint_relative_path / "main.libsonnet")
-    data = f"local blueprint = import '{blueprint_main_path}';\n"
-    data += f"local config = ({config_text});\n"
-    data += "blueprint + { _config:: config }\n"
-    return data
 
 
 def generate_policies_json(repository_root: Path, config_path: Path) -> Dict:
@@ -197,35 +178,22 @@ def main():
     parser.add_argument(
         "--config", help="jsonnet file with blueprint configuration"
     )
-    parser.add_argument(
-        "blueprint", metavar="BLUEPRINT", type=str, help="Aperture blueprint path"
-    )
 
     args = parser.parse_args()
     configure_logging(args.verbose)
 
-    blueprint_path, output_path, config_path = parse_user_args(
-        args.blueprint, args.output, args.config
+    output_path, config_path = parse_user_args(
+        args.output, args.config
     )
 
     script_path = Path(__file__).absolute()
     repo_root_path = script_path.parent.parent
-    policies_root_path = repo_root_path / "blueprints"
-    blueprint_relative_path = blueprint_path.resolve().relative_to(policies_root_path.resolve())
 
     check_jsonnet()
     check_blueprint_configfile(repo_root_path, config_path)
 
-    with tempfile.TemporaryDirectory() as tmp:
-        tempdir = Path(tmp)
-        entrypoint_path = tempdir / "main.jsonnet"
-        entrypoint_text = generate_blueprint_entrypoint(blueprint_relative_path, config_path)
-        LOG.debug(entrypoint_text)
-        entrypoint_path.write_text(entrypoint_text)
-
-        policies_json = generate_policies_json(repo_root_path, entrypoint_path)
-
-        create_policies_yaml(output_path, policies_json)
+    policies_json = generate_policies_json(repo_root_path, config_path)
+    create_policies_yaml(output_path, policies_json)
 
 
 if __name__ == "__main__":

@@ -39,9 +39,9 @@ type Decider struct {
 	truePendingSince time.Time
 	// Time at which state became false pending
 	falsePendingSince time.Time
-	// The duration of time the condition must be met before transitioning to on_true signal
+	// The duration of time the condition must be met before transitioning to 1.0 signal
 	trueForDuration time.Duration
-	// The duration of time the condition must be unmet before transitioning to on_false signal
+	// The duration of time the condition must be unmet before transitioning to 0.0 signal
 	falseForDuration time.Duration
 	// The current error correction state
 	state deciderState
@@ -53,8 +53,8 @@ type Decider struct {
 var _ runtime.Component = (*Decider)(nil)
 
 // NewDeciderAndOptions creates timed controller and its fx options.
-func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
-	operator, err := comparisonOperatorString(timedProto.Operator)
+func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+	operator, err := comparisonOperatorString(deciderProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err
 	}
@@ -62,8 +62,8 @@ func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI
 		return nil, fx.Options(), fmt.Errorf("unknown operator")
 	}
 	timed := &Decider{
-		trueForDuration:   timedProto.TrueFor.AsDuration(),
-		falseForDuration:  timedProto.FalseFor.AsDuration(),
+		trueForDuration:   deciderProto.TrueFor.AsDuration(),
+		falseForDuration:  deciderProto.FalseFor.AsDuration(),
 		operator:          operator,
 		state:             decidedFalse,
 		truePendingSince:  time.Time{},
@@ -74,8 +74,8 @@ func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI
 
 // Execute implements runtime.Component.Execute.
 func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	onTrue := inPortReadings.ReadSingleValuePort("on_true")
-	onFalse := inPortReadings.ReadSingleValuePort("on_false")
+	onTrue := runtime.NewReading(1.0)
+	onFalse := runtime.NewReading(0.0)
 	lhs := inPortReadings.ReadSingleValuePort("lhs")
 	rhs := inPortReadings.ReadSingleValuePort("rhs")
 

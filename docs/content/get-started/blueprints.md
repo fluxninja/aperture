@@ -42,15 +42,12 @@ To generate files, `blueprints/scripts/aperture-generate.py` can be used:
 
 ```sh
 $ ./scripts/aperture-generate.py --help
-usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG] BLUEPRINT
+usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG]
 
 Aperture Policies & Dashboards generator utility.
 
 This utility can be used to generate Aperture Policies and Grafana Dashboards "in-place". Check [blueprint's README.md][blueprints-readme] for more
 details.
-
-positional arguments:
-  BLUEPRINT        Aperture blueprint path
 
 options:
   -h, --help       show this help message and exit
@@ -74,14 +71,14 @@ the default configuration for the given Policy. This can be overridden by the
 Custom configurations will be merged with Blueprints' `config.libsonnet`
 resulting in the final configuration, according to jsonnet language rules: keys
 can be overwritten by reusing them in the custom configuration and nested
-objects can be merged by using `+:` operator. Check the `examples/` directory
+objects can be merged by using `+:` operator. Check the `example` directory
 for more information.
 
-The full command using the demoapp-latency-grand example looks like this:
+The full command using the example looks like this:
 
 ```sh
 jb install
-./scripts/aperture-generate.py --output _gen --config examples/demoapp-latency-gradient.jsonnet Blueprints/latency-gradient
+./scripts/aperture-generate.py --output _gen --config blueprints/latency-gradient/example/example.jsonnet
 ```
 
 [blueprints-readme]: https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
@@ -113,14 +110,22 @@ local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libson
 local latencyGradientPolicy = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/policies/latency-gradient.libsonnet';
 
 local selector = aperture.v1.Selector;
+local serviceSelector = aperture.v1.ServiceSelector;
+local flowSelector = aperture.v1.FlowSelector;
 local controlPoint = aperture.v1.ControlPoint;
 
 local svcSelector =
   selector.new()
-  + selector.withAgentGroup('default')
-  + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
-  + selector.withControlPoint(controlPoint.new()
-                              + controlPoint.withTraffic('ingress'));
+  + selector.withServiceSelector(
+    serviceSelector.new()
+    + serviceSelector.withAgentGroup('default')
+    + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+  )
+  + selector.withFlowSelector(
+    flowSelector.new()
+    + flowSelector.withControlPoint(controlPoint.new()
+                              + controlPoint.withTraffic('ingress'))
+  );
 
 local policy = latencyGradientPolicy({
   policyName: 'service1-demoapp',

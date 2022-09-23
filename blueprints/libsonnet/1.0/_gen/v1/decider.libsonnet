@@ -4,8 +4,6 @@ local deciderouts = import './deciderouts.libsonnet';
   new():: {
     in_ports: {
       lhs: error 'Port lhs is missing',
-      on_false: error 'Port on_false is missing',
-      on_true: error 'Port on_true is missing',
       rhs: error 'Port rhs is missing',
     },
     out_ports: {

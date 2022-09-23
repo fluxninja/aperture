@@ -44,10 +44,10 @@ This allows us to prioritize some incoming requests over others.
 | `policy.lazySync.enabled` | `boolean`      | `true`  | TODO document what happens when lazy sync is disabled                |
 | `policy.lazySync.numSync` | `integer`      | `10`    | Number of times to lazy sync within the `policy.limitResetInterval`. |
 
-#### Service Selector
+#### Selector
 
-| Parameter Name                                | Parameter Type | Default      | Description                                                                 |
-| --------------------------------------------- | -------------- | ------------ | --------------------------------------------------------------------------- |
-| `policy.serviceSelector.agentGroup`           | `string`       | `"default"`  | Which agents to install this policy on                                      |
-| `policy.serviceSelector.service`              | `string`       | `(required)` | A fully-qualified domain name of the service that this policy will apply to |
-| `policy.serviceSelector.controlPoint.traffic` | `string`       | `"ingress"`  | Whether to control `ingress` or `egress` traffic                            |
+| Parameter Name                                      | Parameter Type | Default      | Description                                                                 |
+| --------------------------------------------------- | -------------- | ------------ | --------------------------------------------------------------------------- |
+| `policy.selector.serviceSelector.agentGroup`        | `string`       | `"default"`  | Which agents to install this policy on                                      |
+| `policy.selector.serviceSelector.service`           | `string`       | `(required)` | A fully-qualified domain name of the service that this policy will apply to |
+| `policy.selector.flowSelector.controlPoint.traffic` | `string`       | `"ingress"`  | Whether to control `ingress` or `egress` traffic                            |

@@ -1,12 +1,6 @@
 {
   new():: {
   },
-  withAgentGroup(agent_group):: {
-    agent_group: agent_group,
-  },
-  withAgentGroupMixin(agent_group):: {
-    agent_group+: agent_group,
-  },
   withControlPoint(control_point):: {
     control_point: control_point,
   },
@@ -18,11 +12,5 @@
   },
   withLabelMatcherMixin(label_matcher):: {
     label_matcher+: label_matcher,
-  },
-  withService(service):: {
-    service: service,
-  },
-  withServiceMixin(service):: {
-    service+: service,
   },
 }

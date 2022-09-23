@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-pushd ./libsonnet >/dev/null
-make gen-lib
+pushd ./blueprints >/dev/null
+make generate-blueprints
 popd >/dev/null
