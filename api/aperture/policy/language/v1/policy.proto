@@ -736,8 +736,8 @@ message ConcurrencyLimiter {
 //
 // See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
 message Scheduler {
-  // Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
-  message Workload {
+  // WorkloadParameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
+  message WorkloadParameters {
     // Describes priority level of the requests within the workload.
     // Priority level ranges from 0 to 255.
     // Higher numbers means higher priority level.
@@ -768,9 +768,10 @@ message Scheduler {
     string fairness_key = 3;
   }
 
-  message WorkloadAndLabelMatcher {
-    // Workload associated with flows matching the label matcher.
-    Workload workload = 1;
+  // Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
+  message Workload {
+    // WorkloadParameters associated with flows matching the label matcher.
+    WorkloadParameters workload_parameters = 1;
 
     // Label Matcher to select a Workload based on
     // [flow labels](/concepts/flow-control/flow-label.md).
@@ -785,7 +786,7 @@ message Scheduler {
     // **Accepted tokens** are tokens associated with
     // [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
     // this scheduler. Number of tokens for a flow is determined by a
-    // [workload](#scheduler-workload) that the flow was assigned to (either
+    // [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
     // via `auto_tokens` or explicitly by `Workload.tokens`).
     // :::
     //
@@ -831,10 +832,10 @@ message Scheduler {
   // See also [workload definition in the concepts
   // section](/concepts/flow-control/concurrency-limiter.md#workload).
   // :::
-  repeated WorkloadAndLabelMatcher workloads = 3;
+  repeated Workload workloads = 3;
 
-  // Workload to be used if none of workloads specified in `workloads` match.
-  Workload default_workload = 4;
+  // WorkloadParameters to be used if none of workloads specified in `workloads` match.
+  WorkloadParameters default_workload_parameters = 4;
 
   // Automatically estimate weight of flows in each workload, based on
   // historical latency. Each workload's `tokens` will be set to average

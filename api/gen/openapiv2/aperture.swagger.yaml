@@ -403,6 +403,18 @@ definitions:
   SchedulerWorkload:
     type: object
     properties:
+      label_matcher:
+        $ref: '#/definitions/v1LabelMatcher'
+        description: |-
+          Label Matcher to select a Workload based on
+          [flow labels](/concepts/flow-control/flow-label.md).
+      workload_parameters:
+        $ref: '#/definitions/SchedulerWorkloadParameters'
+        description: WorkloadParameters associated with flows matching the label matcher.
+    description: Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
+  SchedulerWorkloadParameters:
+    type: object
+    properties:
       fairness_key:
         type: string
         description: |-
@@ -425,18 +437,7 @@ definitions:
           Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
           This override is applicable only if `auto_tokens` is set to false.
         x-go-default: 1
-    description: Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
-  SchedulerWorkloadAndLabelMatcher:
-    type: object
-    properties:
-      label_matcher:
-        $ref: '#/definitions/v1LabelMatcher'
-        description: |-
-          Label Matcher to select a Workload based on
-          [flow labels](/concepts/flow-control/flow-label.md).
-      workload:
-        $ref: '#/definitions/SchedulerWorkload'
-        description: Workload associated with flows matching the label matcher.
+    description: WorkloadParameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
   googlerpcStatus:
     type: object
     properties:
@@ -2033,9 +2034,9 @@ definitions:
           latency of flows in that workload during last few seconds (exact duration
           of this average can change).
         x-go-default: "true"
-      default_workload:
-        $ref: '#/definitions/SchedulerWorkload'
-        description: Workload to be used if none of workloads specified in `workloads` match.
+      default_workload_parameters:
+        $ref: '#/definitions/SchedulerWorkloadParameters'
+        description: WorkloadParameters to be used if none of workloads specified in `workloads` match.
       max_timeout:
         type: string
         description: |-
@@ -2077,7 +2078,7 @@ definitions:
       workloads:
         type: array
         items:
-          $ref: '#/definitions/SchedulerWorkloadAndLabelMatcher'
+          $ref: '#/definitions/SchedulerWorkload'
         description: |-
           List of workloads to be used in scheduler.
 
@@ -2119,7 +2120,7 @@ definitions:
           **Accepted tokens** are tokens associated with
           [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
           this scheduler. Number of tokens for a flow is determined by a
-          [workload](#scheduler-workload) that the flow was assigned to (either
+          [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
           via `auto_tokens` or explicitly by `Workload.tokens`).
           :::
 

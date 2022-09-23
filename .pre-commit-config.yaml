@@ -133,7 +133,7 @@ repos:
         language: script
         entry: ./scripts/precommit/check_tanka_show.sh
         pass_filenames: false
-        files: ^playground/tanka/
+        files: ^(playground/tanka/|blueprints)
         types_or:
           - jsonnet
           - json

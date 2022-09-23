@@ -8,7 +8,7 @@
   RateLimiterOverride: import 'ratelimiteroverride.libsonnet',
   RuleRego: import 'rulerego.libsonnet',
   SchedulerWorkload: import 'schedulerworkload.libsonnet',
-  SchedulerWorkloadAndLabelMatcher: import 'schedulerworkloadandlabelmatcher.libsonnet',
+  SchedulerWorkloadParameters: import 'schedulerworkloadparameters.libsonnet',
   AddressExtractor: import 'addressextractor.libsonnet',
   ArithmeticCombinator: import 'arithmeticcombinator.libsonnet',
   ArithmeticCombinatorIns: import 'arithmeticcombinatorins.libsonnet',
