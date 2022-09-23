@@ -121,20 +121,13 @@ repos:
       #   files: '\.md$|\.mmd$'
       #   pass_filenames: false
       #   description: "Generate mermaid diagrams"
-      - id: generate-libsonnet
-        name: "libsonnet"
-        entry: "./scripts/precommit/generate_libsonnet.sh"
-        language: script
-        files: '\.proto$'
-        pass_filenames: false
-        description: "Generate Aperture libsonnet"
       - id: generate-blueprints
         name: "blueprints"
         entry: "./scripts/precommit/generate_blueprints.sh"
         language: script
-        files: ^(libsonnet|blueprints)
+        files: ^(blueprints)|\.proto$
         pass_filenames: false
-        description: "Generate Aperture blueprints"
+        description: "Generate Aperture libsonnet and blueprints"
       - id: tanka-show
         name: "Check tanka parses jsonnet"
         language: script

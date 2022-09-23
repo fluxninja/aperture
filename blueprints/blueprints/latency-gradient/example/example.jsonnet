@@ -1,4 +1,4 @@
-local aperture = import '../../../../libsonnet/1.0/main.libsonnet';
+local aperture = import '../../../libsonnet/1.0/main.libsonnet';
 local blueprint = import '../main.libsonnet';
 
 local Workload = aperture.v1.SchedulerWorkload;

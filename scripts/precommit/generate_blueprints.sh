@@ -2,5 +2,5 @@
 set -euo pipefail
 
 pushd ./blueprints >/dev/null
-make gen-blueprints
+make generate-blueprints
 popd >/dev/null
