@@ -23,12 +23,16 @@ import (
 func Module() fx.Option {
 	log.Info().Msg("Loading Heartbeats plugin")
 	return fx.Options(
+		RegisterControllerInfoServiceHTTP(),
 		grpcclient.ClientConstructor{Name: "heartbeats-grpc-client", ConfigKey: pluginconfig.PluginConfigKey + ".client.grpc"}.Annotate(),
 		httpclient.ClientConstructor{Name: "heartbeats-http-client", ConfigKey: pluginconfig.PluginConfigKey + ".client.http"}.Annotate(),
 		fx.Provide(Provide),
 		PeersWatcherModule(),
 		jobs.JobGroupConstructor{Name: heartbeatsGroup}.Annotate(),
-		fx.Invoke(Invoke),
+		fx.Invoke(
+			Invoke,
+			RegisterControllerInfoService,
+		),
 	)
 }
 
