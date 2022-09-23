@@ -23,8 +23,8 @@
     * @param (policy.fluxMeters[policyName].attributeKey: string) Key of the attribute in access log or span.
     * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.v1.FluxMeterStaticBuckets) Flux Meter static histogram buckets.
     * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.v1.FluxMeterLinearBuckets) Flux Meter linear histogram buckets.
-    * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.v1.ExponentialBuckets) Flux Meter exponential histogram buckets.
-    * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.v1.ExponentialBucketsRange) Flux Meter exponential buckets range.
+    * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.v1.FluxMeterExponentialBuckets) Flux Meter exponential histogram buckets.
+    * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.v1.FluxMeterExponentialBucketsRange) Flux Meter exponential buckets range.
     */
     fluxMeters: {
       'service1-latency-gradient': {

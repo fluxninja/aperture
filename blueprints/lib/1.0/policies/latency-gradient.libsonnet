@@ -113,7 +113,7 @@ function(params) {
                            + resources.withClassifiers($._config.classifiers))
     + policy.withCircuit(
       circuit.new()
-      + circuit.withEvaluationInterval(evaluation_interval=($._config.evaluationInterval))
+      + circuit.withEvaluationInterval(evaluation_interval=$._config.evaluationInterval)
       + circuit.withComponents(constants + [
         component.withArithmeticCombinator(combinator.mul(latencyPort,
                                                           emaLimitMultiplierPort,
