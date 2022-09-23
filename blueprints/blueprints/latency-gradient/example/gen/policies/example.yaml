@@ -185,7 +185,7 @@ circuit:
               signal_name: LSF
         scheduler:
           auto_tokens: true
-          default_workload:
+          default_workload_parameters:
             priority: 20
           out_ports:
             accepted_concurrency:
@@ -204,12 +204,12 @@ circuit:
             - label_matcher:
                 match_labels:
                   user_type: guest
-              workload:
+              workload_parameters:
                 priority: 50
             - label_matcher:
                 match_labels:
                   http.request.header.user_type: subscriber
-              workload:
+              workload_parameters:
                 priority: 200
     - decider:
         in_ports:

@@ -146,6 +146,21 @@ definitions:
       properties such as response latency or desired priority.
     type: object
     properties:
+      label_matcher:
+        description: |-
+          Label Matcher to select a Workload based on
+          [flow labels](/concepts/flow-control/flow-label.md).
+        x-order: 0
+        $ref: '#/definitions/v1LabelMatcher'
+      workload_parameters:
+        description: WorkloadParameters associated with flows matching the label matcher.
+        x-order: 1
+        $ref: '#/definitions/SchedulerWorkloadParameters'
+  SchedulerWorkloadParameters:
+    description: WorkloadParameters defines parameters such as priority, tokens and
+      fairness key that are applicable to flows within a workload.
+    type: object
+    properties:
       fairness_key:
         description: |-
           Fairness key is a label key that can be used to provide fairness within a workload.
@@ -171,19 +186,6 @@ definitions:
         format: uint64
         x-go-default: 1
         x-order: 2
-  SchedulerWorkloadAndLabelMatcher:
-    type: object
-    properties:
-      label_matcher:
-        description: |-
-          Label Matcher to select a Workload based on
-          [flow labels](/concepts/flow-control/flow-label.md).
-        x-order: 0
-        $ref: '#/definitions/v1LabelMatcher'
-      workload:
-        description: Workload associated with flows matching the label matcher.
-        x-order: 1
-        $ref: '#/definitions/SchedulerWorkload'
   v1AddressExtractor:
     description: |-
       IP addresses in attribute context are defined as objects with separate ip and port fields.
@@ -1531,11 +1533,11 @@ definitions:
         type: boolean
         x-go-default: "true"
         x-order: 0
-      default_workload:
-        description: Workload to be used if none of workloads specified in `workloads`
-          match.
+      default_workload_parameters:
+        description: WorkloadParameters to be used if none of workloads specified
+          in `workloads` match.
         x-order: 1
-        $ref: '#/definitions/SchedulerWorkload'
+        $ref: '#/definitions/SchedulerWorkloadParameters'
       max_timeout:
         description: |-
           :::caution
@@ -1604,7 +1606,7 @@ definitions:
           :::
         type: array
         items:
-          $ref: '#/definitions/SchedulerWorkloadAndLabelMatcher'
+          $ref: '#/definitions/SchedulerWorkload'
         x-order: 6
   v1SchedulerOuts:
     description: Output for the Scheduler component.
@@ -1618,7 +1620,7 @@ definitions:
           **Accepted tokens** are tokens associated with
           [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
           this scheduler. Number of tokens for a flow is determined by a
-          [workload](#scheduler-workload) that the flow was assigned to (either
+          [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
           via `auto_tokens` or explicitly by `Workload.tokens`).
           :::
 

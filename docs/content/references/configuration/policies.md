@@ -191,6 +191,28 @@ Workload defines a class of requests that preferably have similar properties suc
 #### Properties
 
 <dl>
+<dt>label_matcher</dt>
+<dd>
+
+([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based on
+[flow labels](/concepts/flow-control/flow-label.md).
+
+</dd>
+<dt>workload_parameters</dt>
+<dd>
+
+([SchedulerWorkloadParameters](#scheduler-workload-parameters)) WorkloadParameters associated with flows matching the label matcher.
+
+</dd>
+</dl>
+
+### SchedulerWorkloadParameters {#scheduler-workload-parameters}
+
+WorkloadParameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
+
+#### Properties
+
+<dl>
 <dt>fairness_key</dt>
 <dd>
 
@@ -213,26 +235,6 @@ Higher numbers means higher priority level.
 
 (string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
 This override is applicable only if `auto_tokens` is set to false.
-
-</dd>
-</dl>
-
-### SchedulerWorkloadAndLabelMatcher {#scheduler-workload-and-label-matcher}
-
-#### Properties
-
-<dl>
-<dt>label_matcher</dt>
-<dd>
-
-([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based on
-[flow labels](/concepts/flow-control/flow-label.md).
-
-</dd>
-<dt>workload</dt>
-<dd>
-
-([SchedulerWorkload](#scheduler-workload)) Workload associated with flows matching the label matcher.
 
 </dd>
 </dl>
@@ -1989,10 +1991,10 @@ latency of flows in that workload during last few seconds (exact duration
 of this average can change).
 
 </dd>
-<dt>default_workload</dt>
+<dt>default_workload_parameters</dt>
 <dd>
 
-([SchedulerWorkload](#scheduler-workload)) Workload to be used if none of workloads specified in `workloads` match.
+([SchedulerWorkloadParameters](#scheduler-workload-parameters)) WorkloadParameters to be used if none of workloads specified in `workloads` match.
 
 </dd>
 <dt>max_timeout</dt>
@@ -2044,7 +2046,7 @@ This value impacts the prioritization and fairness because the larger the timeou
 <dt>workloads</dt>
 <dd>
 
-([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) List of workloads to be used in scheduler.
+([[]SchedulerWorkload](#scheduler-workload)) List of workloads to be used in scheduler.
 
 Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
@@ -2085,7 +2087,7 @@ Output for the Scheduler component.
 **Accepted tokens** are tokens associated with
 [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
 this scheduler. Number of tokens for a flow is determined by a
-[workload](#scheduler-workload) that the flow was assigned to (either
+[workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
 via `auto_tokens` or explicitly by `Workload.tokens`).
 :::
 

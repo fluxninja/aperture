@@ -219,7 +219,7 @@ func setupConcurrencyLimiterFactory(
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	matchedWorkloads map[int]*policylangv1.Scheduler_Workload
+	matchedWorkloads map[int]*policylangv1.Scheduler_WorkloadParameters
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -265,13 +265,13 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	}
 
 	conLimiter := &concurrencyLimiter{
-		Component:                 wrapperMessage,
-		concurrencyLimiterProto:   concurrencyLimiterMessage,
-		registry:                  reg,
-		concurrencyLimiterFactory: conLimiterFactory,
-		workloadMultiMatcher:      mm,
-		defaultWorkloadProto:      schedulerProto.DefaultWorkload,
-		schedulerProto:            schedulerProto,
+		Component:                      wrapperMessage,
+		concurrencyLimiterProto:        concurrencyLimiterMessage,
+		registry:                       reg,
+		concurrencyLimiterFactory:      conLimiterFactory,
+		workloadMultiMatcher:           mm,
+		defaultWorkloadParametersProto: schedulerProto.DefaultWorkloadParameters,
+		schedulerProto:                 schedulerProto,
 	}
 
 	return fx.Options(
@@ -282,32 +282,32 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 }
 
 type workloadMatcher struct {
-	workloadProto *policylangv1.Scheduler_WorkloadAndLabelMatcher
+	workloadProto *policylangv1.Scheduler_Workload
 	workloadIndex int
 }
 
 func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult {
 	// mmr.matchedWorkloads is nil on first match.
 	if mmr.matchedWorkloads == nil {
-		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload)
+		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_WorkloadParameters)
 	}
-	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetWorkload()
+	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetWorkloadParameters()
 	return mmr
 }
 
 // concurrencyLimiter implements concurrency limiter on the dataplane side.
 type concurrencyLimiter struct {
 	iface.Component
-	scheduler                  scheduler.Scheduler
-	registry                   status.Registry
-	incomingConcurrencyCounter prometheus.Counter
-	acceptedConcurrencyCounter prometheus.Counter
-	concurrencyLimiterProto    *policylangv1.ConcurrencyLimiter
-	concurrencyLimiterFactory  *concurrencyLimiterFactory
-	autoTokens                 *autoTokens
-	workloadMultiMatcher       *multiMatcher
-	defaultWorkloadProto       *policylangv1.Scheduler_Workload
-	schedulerProto             *policylangv1.Scheduler
+	scheduler                      scheduler.Scheduler
+	registry                       status.Registry
+	incomingConcurrencyCounter     prometheus.Counter
+	acceptedConcurrencyCounter     prometheus.Counter
+	concurrencyLimiterProto        *policylangv1.ConcurrencyLimiter
+	concurrencyLimiterFactory      *concurrencyLimiterFactory
+	autoTokens                     *autoTokens
+	workloadMultiMatcher           *multiMatcher
+	defaultWorkloadParametersProto *policylangv1.Scheduler_WorkloadParameters
+	schedulerProto                 *policylangv1.Scheduler
 }
 
 // Make sure ConcurrencyLimiter implements the iface.ConcurrencyLimiter.
@@ -432,7 +432,7 @@ func (conLimiter *concurrencyLimiter) GetSelector() *selectorv1.Selector {
 
 // RunLimiter .
 func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision {
-	var matchedWorkloadProto *policylangv1.Scheduler_Workload
+	var matchedWorkloadProto *policylangv1.Scheduler_WorkloadParameters
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
 	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labels))
@@ -449,7 +449,7 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flow
 		matchedWorkloadIndex = strconv.Itoa(smallestWorkloadIndex)
 	} else {
 		// no match, return default workload
-		matchedWorkloadProto = conLimiter.defaultWorkloadProto
+		matchedWorkloadProto = conLimiter.defaultWorkloadParametersProto
 		matchedWorkloadIndex = metrics.DefaultWorkloadIndex
 	}
 
