@@ -10,6 +10,11 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 	FIND="gfind"
 fi
 
+# run jb install in the blueprints_root
+pushd "${blueprints_root}" >/dev/null
+jb install
+popd >/dev/null
+
 # for all directories within "$blueprints_root"/blueprints, generate README
 $FIND "$blueprints_root"/blueprints -mindepth 1 -maxdepth 1 -type d | while read -r dir; do
 	python "${blueprints_root}"/scripts/blueprint-readme-generator.py "$dir"
