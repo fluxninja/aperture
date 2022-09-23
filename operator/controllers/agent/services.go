@@ -54,16 +54,6 @@ func serviceForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *run
 		return nil, err
 	}
 
-	otelGRPCPort, err := controllers.GetPort(spec.ConfigSpec.Otel.GRPCAddr)
-	if err != nil {
-		return nil, err
-	}
-
-	otelHTTPPort, err := controllers.GetPort(spec.ConfigSpec.Otel.HTTPAddr)
-	if err != nil {
-		return nil, err
-	}
-
 	distCachePort, err := controllers.GetPort(spec.ConfigSpec.DistCache.BindAddr)
 	if err != nil {
 		return nil, err
@@ -88,18 +78,6 @@ func serviceForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *run
 					Protocol:   corev1.Protocol(controllers.TCP),
 					Port:       int32(serverPort),
 					TargetPort: intstr.FromString(controllers.Server),
-				},
-				{
-					Name:       controllers.GrpcOtel,
-					Protocol:   corev1.Protocol(controllers.TCP),
-					Port:       int32(otelGRPCPort),
-					TargetPort: intstr.FromString(controllers.GrpcOtel),
-				},
-				{
-					Name:       controllers.HTTPOtel,
-					Protocol:   corev1.Protocol(controllers.TCP),
-					Port:       int32(otelHTTPPort),
-					TargetPort: intstr.FromString(controllers.HTTPOtel),
 				},
 				{
 					Name:       controllers.DistCache,

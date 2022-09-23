@@ -626,18 +626,6 @@ definitions:
         $ref: '#/definitions/BatchConfig'
       batch_prerollup:
         $ref: '#/definitions/BatchConfig'
-      grpc_addr:
-        description: GRPC listener addr for OTEL Collector.
-        type: string
-        x-go-default: :4317
-        x-go-name: GRPCAddr
-        x-go-validate: hostname_port
-      http_addr:
-        description: HTTP listener addr for OTEL Collector.
-        type: string
-        x-go-default: :4318
-        x-go-name: HTTPAddr
-        x-go-validate: hostname_port
     title: OtelConfig is the configuration for the OTEL collector.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otel
