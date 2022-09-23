@@ -72,7 +72,7 @@ func setup(in ConstructorIn) error {
 					ConfigProvider:          configProvider,
 					DisableGracefulShutdown: true,
 					LoggingOptions: []zap.Option{zap.WrapCore(func(zapcore.Core) zapcore.Core {
-						return log.NewZerologAdapter(log.GetGlobalLogger())
+						return log.NewZapAdapter(log.GetGlobalLogger(), "otel-collector")
 					})},
 					// NOTE: do not remove this becauase it causes a data-race condition.
 					SkipSettingGRPCLogger: true,

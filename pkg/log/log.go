@@ -45,6 +45,8 @@ const (
 	defaultLevel = "info"
 	// ServiceKey is a field key that are used with Service name value as a string to the logger context.
 	serviceKey = "service"
+	// ComponentKey is a field key that are used with Component name value as a string to the logger context.
+	componentKey = "component"
 )
 
 // Logger is wrapper around zerolog.Logger and io.writers.
@@ -139,7 +141,7 @@ func GetPrettyConsoleWriter() io.Writer {
 		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
 	}
 	output.FormatMessage = func(i interface{}) string {
-		return fmt.Sprintf("***%s****", i)
+		return fmt.Sprintf("%s | ", i)
 	}
 	output.FormatFieldName = func(i interface{}) string {
 		return fmt.Sprintf("%s:", i)
@@ -180,7 +182,7 @@ func Component(component string) Logger {
 
 // Component enables the current logger to chain loggers with additional context, component name.
 func (lg *Logger) Component(component string) Logger {
-	zerolog := lg.logger.With().Str("component", component).Logger()
+	zerolog := lg.logger.With().Str(componentKey, component).Logger()
 	return Logger{
 		logger: &zerolog,
 		w:      lg.w,

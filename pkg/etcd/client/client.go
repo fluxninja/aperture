@@ -7,6 +7,7 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -96,6 +97,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 				TLS:       tlsConfig,
 				Username:  config.Username,
 				Password:  config.Password,
+				Logger:    zap.New(log.NewZapAdapter(log.GetGlobalLogger(), "etcd-client")),
 			})
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to initialize etcd client")

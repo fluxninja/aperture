@@ -7,8 +7,8 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// NewZerologAdapter returns a new zapcore Core logger interface that converts given logger's io.writer to WriteSyncer.
-func NewZerologAdapter(logger Logger) zapcore.Core {
+// NewZapAdapter returns a new zapcore Core logger interface that converts given logger's io.writer to WriteSyncer.
+func NewZapAdapter(logger Logger, component string) zapcore.Core {
 	currentLevel := zerolog.GlobalLevel().String()
 	// zap has no "trace" level, so we use "debug" instead
 	if currentLevel == "trace" {
@@ -29,5 +29,5 @@ func NewZerologAdapter(logger Logger) zapcore.Core {
 		zapcore.NewJSONEncoder(encodercfg),
 		zapcore.AddSync(logger.w),
 		level,
-	).With([]zap.Field{zap.String(serviceKey, "otelcollector")})
+	).With([]zap.Field{zap.String(componentKey, component)})
 }
