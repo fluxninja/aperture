@@ -13,7 +13,7 @@ import (
 )
 
 // logSampled provides log sampling for envoy handler.
-var logSampled log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
+var logSampled *log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
 
 // Module provides authz handler
 //

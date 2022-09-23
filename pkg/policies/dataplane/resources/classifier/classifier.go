@@ -22,7 +22,7 @@ import (
 )
 
 // logSampled provides log sampling for classifier.
-var logSampled log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
+var logSampled *log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
 
 type multiMatcherByControlPoint map[selectors.ControlPointID]*multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector]
 

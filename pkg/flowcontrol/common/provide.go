@@ -17,7 +17,7 @@ import (
 )
 
 // logSampled provides log sampling for flowcontrol handler.
-var logSampled log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
+var logSampled *log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
 
 // Module is a set of default providers for flowcontrol components
 //

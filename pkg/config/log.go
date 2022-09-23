@@ -111,7 +111,7 @@ func (constructor LoggerConstructor) Annotate() fx.Option {
 func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 	unmarshaller Unmarshaller,
 	lifecycle fx.Lifecycle,
-) (log.Logger, error) {
+) (*log.Logger, error) {
 	config := constructor.DefaultConfig
 
 	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
@@ -143,7 +143,7 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 }
 
 // NewLogger creates a new instance of logger and writers with the given configuration.
-func NewLogger(config LogConfig) (log.Logger, []io.Writer) {
+func NewLogger(config LogConfig) (*log.Logger, []io.Writer) {
 	var writers []io.Writer
 	// append file writers
 	for _, writerConfig := range config.Writers {

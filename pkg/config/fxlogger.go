@@ -7,7 +7,7 @@ import (
 )
 
 type logger struct {
-	Logger log.Logger
+	Logger *log.Logger
 }
 
 // LogEvent is the event fired when a log event is written.
@@ -147,8 +147,8 @@ func (lo *logger) LogEvent(event fxevent.Event) {
 }
 
 // WithApertureLogger overrides fx default logger.
-func WithApertureLogger() func(lg log.Logger) fxevent.Logger {
-	return func(lg log.Logger) fxevent.Logger {
+func WithApertureLogger() func(lg *log.Logger) fxevent.Logger {
+	return func(lg *log.Logger) fxevent.Logger {
 		return &logger{Logger: lg}
 	}
 }

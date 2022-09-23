@@ -53,11 +53,11 @@ const (
 type Logger struct {
 	logger *zerolog.Logger
 	w      io.Writer
-	// flag to detect valid Logger instance
-	valid bool
+	// flag to detect owner Logger instance
+	owner bool
 }
 
-var global Logger
+var global *Logger
 
 // Always create a global logger instance.
 func init() {
@@ -68,24 +68,26 @@ func init() {
 }
 
 // NewDefaultLogger creates a new default logger with default settings.
-func NewDefaultLogger() Logger {
+func NewDefaultLogger() *Logger {
 	return NewLogger(os.Stderr, false, defaultLevel)
 }
 
 // SetGlobalLogger closes the previous global logger and sets given logger as a new global logger.
-func SetGlobalLogger(lg Logger) {
-	global.Close()
+func SetGlobalLogger(lg *Logger) {
+	if global != nil {
+		global.Close()
+	}
 	global = lg
 }
 
 // SetStdLogger sets output for the standard logger.
-func SetStdLogger(lg Logger) {
+func SetStdLogger(lg *Logger) {
 	stdlog.SetFlags(0)
 	stdlog.SetOutput(lg.logger)
 }
 
 // NewLogger creates a new logger by wrapping io.Writer in a diode. Make sure to call Logger.Close() once done with this logger.
-func NewLogger(w io.Writer, useDiode bool, levelString string) Logger {
+func NewLogger(w io.Writer, useDiode bool, levelString string) *Logger {
 	level, err := zerolog.ParseLevel(levelString)
 	if err != nil {
 		log.Panic().Err(err).Str("level", level.String()).Msg("Unable to parse logger level")
@@ -102,21 +104,22 @@ func NewLogger(w io.Writer, useDiode bool, levelString string) Logger {
 		wr = w
 	}
 	zerolog := zerolog.New(wr).Level(level).With().Timestamp().Caller().Str(serviceKey, info.Service).Logger()
-	logger := Logger{
+	logger := &Logger{
 		logger: &zerolog,
 		w:      wr,
-		valid:  true,
+		owner:  true,
 	}
 
 	return logger
 }
 
 // Close closes all the underlying diode Writer when there are valid Logger instances.
-func (lg Logger) Close() {
-	if lg.valid {
+func (lg *Logger) Close() {
+	if lg.owner {
 		if dw, ok := lg.w.(diode.Writer); ok {
 			closeDiodeWriter(dw)
 		}
+		lg.owner = false
 	}
 }
 
@@ -171,22 +174,22 @@ func SetGlobalLevelString(levelString string) error {
 }
 
 // GetGlobalLogger returns the global logger.
-func GetGlobalLogger() Logger {
+func GetGlobalLogger() *Logger {
 	return global
 }
 
 // Component enables the global logger to chain loggers with additional context, component name.
-func Component(component string) Logger {
+func Component(component string) *Logger {
 	return global.Component(component)
 }
 
 // Component enables the current logger to chain loggers with additional context, component name.
-func (lg *Logger) Component(component string) Logger {
+func (lg *Logger) Component(component string) *Logger {
 	zerolog := lg.logger.With().Str(componentKey, component).Logger()
-	return Logger{
+	return &Logger{
 		logger: &zerolog,
 		w:      lg.w,
-		valid:  lg.valid,
+		owner:  lg.owner,
 	}
 }
 
@@ -196,22 +199,22 @@ func (lg *Logger) Zerolog() *zerolog.Logger {
 }
 
 // Output duplicates the current logger and sets w as its output.
-func (lg Logger) Output(w io.Writer) Logger {
+func (lg *Logger) Output(w io.Writer) *Logger {
 	zerolog := lg.logger.Output(w)
-	return Logger{
+	return &Logger{
 		logger: &zerolog,
 		w:      lg.w,
-		valid:  lg.valid,
+		owner:  false,
 	}
 }
 
 // Output duplicates the global logger and sets w as its output.
-func Output(w io.Writer) Logger {
+func Output(w io.Writer) *Logger {
 	return global.Output(w)
 }
 
 // With creates a child logger of the current logger with the field added to its context.
-func (lg Logger) With() zerolog.Context {
+func (lg *Logger) With() zerolog.Context {
 	return lg.logger.With()
 }
 
@@ -221,47 +224,47 @@ func With() zerolog.Context {
 }
 
 // Level creates a child logger of the current logger with the minimum accepted level set to level.
-func (lg Logger) Level(level zerolog.Level) Logger {
+func (lg *Logger) Level(level zerolog.Level) *Logger {
 	zerolog := lg.logger.Level(level)
-	return Logger{
+	return &Logger{
 		logger: &zerolog,
 		w:      lg.w,
-		valid:  lg.valid,
+		owner:  false,
 	}
 }
 
 // Level creates a child logger of the global logger with the minimum accepted level set to level.
-func Level(level zerolog.Level) Logger {
+func Level(level zerolog.Level) *Logger {
 	return global.Level(level)
 }
 
 // Sample returns the current logger with the s sampler.
-func (lg Logger) Sample(sampler zerolog.Sampler) Logger {
+func (lg *Logger) Sample(sampler zerolog.Sampler) *Logger {
 	zerolog := lg.logger.Sample(sampler)
-	return Logger{
+	return &Logger{
 		logger: &zerolog,
 		w:      lg.w,
-		valid:  lg.valid,
+		owner:  false,
 	}
 }
 
 // Sample returns the global logger with the s sampler.
-func Sample(sampler zerolog.Sampler) Logger {
+func Sample(sampler zerolog.Sampler) *Logger {
 	return global.Sample(sampler)
 }
 
 // Hook returns the current logger with the h hook.
-func (lg Logger) Hook(hook zerolog.Hook) Logger {
+func (lg *Logger) Hook(hook zerolog.Hook) *Logger {
 	zerolog := lg.logger.Hook(hook)
-	return Logger{
+	return &Logger{
 		logger: &zerolog,
 		w:      lg.w,
-		valid:  lg.valid,
+		owner:  false,
 	}
 }
 
 // Hook returns the global logger with the h hook.
-func Hook(hook zerolog.Hook) Logger {
+func Hook(hook zerolog.Hook) *Logger {
 	return global.Hook(hook)
 }
 

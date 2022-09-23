@@ -89,5 +89,5 @@ func ProvidePrometheusRegistry(unmarshaller config.Unmarshaller) (*prometheus.Re
 func RegisterMetricsHandler(router *mux.Router, pr *prometheus.Registry) {
 	log.Info().Msg("Registering Prometheus metrics endpoint")
 	logger := log.Component("PROM_HTTP")
-	router.Handle(metricsEndpoint, promhttp.HandlerFor(pr, promhttp.HandlerOpts{ErrorLog: &logger}))
+	router.Handle(metricsEndpoint, promhttp.HandlerFor(pr, promhttp.HandlerOpts{ErrorLog: logger}))
 }

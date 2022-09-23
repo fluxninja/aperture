@@ -15,7 +15,7 @@ import (
 )
 
 // LogSampled provides log sampling for OTEL collector.
-var LogSampled log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
+var LogSampled *log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
 
 // IterateLogRecords calls given function for each logRecord. If the function
 // returns error further logRecords will not be processed and the error will be returned.
