@@ -21,6 +21,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // Suppress "imported and not used" errors
@@ -65,6 +66,24 @@ func local_request_FluxNinjaService_Report_0(ctx context.Context, marshaler runt
 
 }
 
+func request_ControllerInfoService_GetControllerInfo_0(ctx context.Context, marshaler runtime.Marshaler, client ControllerInfoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq emptypb.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetControllerInfo(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_ControllerInfoService_GetControllerInfo_0(ctx context.Context, marshaler runtime.Marshaler, server ControllerInfoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq emptypb.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetControllerInfo(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 // RegisterFluxNinjaServiceHandlerServer registers the http handlers for service FluxNinjaService to "mux".
 // UnaryRPC     :call FluxNinjaServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -93,6 +112,40 @@ func RegisterFluxNinjaServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		}
 
 		forward_FluxNinjaService_Report_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
+// RegisterControllerInfoServiceHandlerServer registers the http handlers for service ControllerInfoService to "mux".
+// UnaryRPC     :call ControllerInfoServiceServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterControllerInfoServiceHandlerFromEndpoint instead.
+func RegisterControllerInfoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ControllerInfoServiceServer) error {
+
+	mux.Handle("GET", pattern_ControllerInfoService_GetControllerInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.plugins.fluxninja.v1.ControllerInfoService/GetControllerInfo", runtime.WithHTTPPathPattern("/plugins/fluxninja/v1/controllerinfo"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_ControllerInfoService_GetControllerInfo_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ControllerInfoService_GetControllerInfo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -168,4 +221,75 @@ var (
 
 var (
 	forward_FluxNinjaService_Report_0 = runtime.ForwardResponseMessage
+)
+
+// RegisterControllerInfoServiceHandlerFromEndpoint is same as RegisterControllerInfoServiceHandler but
+// automatically dials to "endpoint" and closes the connection when "ctx" gets done.
+func RegisterControllerInfoServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+	conn, err := grpc.Dial(endpoint, opts...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+			return
+		}
+		go func() {
+			<-ctx.Done()
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+		}()
+	}()
+
+	return RegisterControllerInfoServiceHandler(ctx, mux, conn)
+}
+
+// RegisterControllerInfoServiceHandler registers the http handlers for service ControllerInfoService to "mux".
+// The handlers forward requests to the grpc endpoint over "conn".
+func RegisterControllerInfoServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterControllerInfoServiceHandlerClient(ctx, mux, NewControllerInfoServiceClient(conn))
+}
+
+// RegisterControllerInfoServiceHandlerClient registers the http handlers for service ControllerInfoService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ControllerInfoServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ControllerInfoServiceClient"
+// doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
+// "ControllerInfoServiceClient" to call the correct interceptors.
+func RegisterControllerInfoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ControllerInfoServiceClient) error {
+
+	mux.Handle("GET", pattern_ControllerInfoService_GetControllerInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.plugins.fluxninja.v1.ControllerInfoService/GetControllerInfo", runtime.WithHTTPPathPattern("/plugins/fluxninja/v1/controllerinfo"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ControllerInfoService_GetControllerInfo_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ControllerInfoService_GetControllerInfo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
+var (
+	pattern_ControllerInfoService_GetControllerInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"plugins", "fluxninja", "v1", "controllerinfo"}, ""))
+)
+
+var (
+	forward_ControllerInfoService_GetControllerInfo_0 = runtime.ForwardResponseMessage
 )
