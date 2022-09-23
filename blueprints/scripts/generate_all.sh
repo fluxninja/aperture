@@ -18,9 +18,7 @@ popd >/dev/null
 # for all directories within "$blueprints_root"/blueprints, generate README
 $FIND "$blueprints_root"/blueprints -mindepth 1 -maxdepth 1 -type d | while read -r dir; do
 	python "${blueprints_root}"/scripts/blueprint-readme-generator.py "$dir"
-	if which prettier >/dev/null 2>&1; then
-		prettier --write "$dir"/README.md
-	fi
+	npx prettier --write "$dir"/README.md
 	# save the contents of $dir/example/gen/policies/example.yaml for comparison
 	old_example_yaml=$(cat "$dir"/example/gen/policies/example.yaml)
 
@@ -28,9 +26,7 @@ $FIND "$blueprints_root"/blueprints -mindepth 1 -maxdepth 1 -type d | while read
 	python "${blueprints_root}"/scripts/aperture-generate.py --output "$dir"/example/gen/ \
 		--config "$dir"/example/example.jsonnet
 
-	if which prettier >/dev/null 2>&1; then
-		prettier --write "$dir"/example/gen/.. || true
-	fi
+	npx prettier --write "$dir"/example/gen/.. || true
 
 	new_example_yaml=$(cat "$dir"/example/gen/policies/example.yaml)
 	if [[ "$old_example_yaml" != "$new_example_yaml" ]]; then
