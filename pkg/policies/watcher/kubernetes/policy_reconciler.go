@@ -1,29 +1,9 @@
-/*
-Copyright 2022.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
-package policy
+package kubernetes
 
 import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
-
-	"github.com/fluxninja/aperture/operator/controllers"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -33,25 +13,21 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/yaml"
 
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
-	policy "github.com/fluxninja/aperture/pkg/policies/controlplane"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
-// PolicyReconciler reconciles a Policy object.
+// PolicyReconciler reconciles a Policy Custom Resource.
 type PolicyReconciler struct {
 	client.Client
 	Scheme           *runtime.Scheme
 	Recorder         record.EventRecorder
+	Trackers         notifiers.Trackers
 	resourcesDeleted map[types.NamespacedName]bool
 }
-
-//+kubebuilder:rbac:groups=fluxninja.com,resources=policies,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=fluxninja.com,resources=policies/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=fluxninja.com,resources=policies/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -63,7 +39,6 @@ type PolicyReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.2/pkg/reconcile
 func (r *PolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	logger := log.FromContext(ctx)
 	if r.resourcesDeleted == nil {
 		r.resourcesDeleted = make(map[types.NamespacedName]bool)
 	}
@@ -75,39 +50,26 @@ func (r *PolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and don't requeue
-			logger.Info(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", req.Name, req.Namespace))
+			log.Debug().Msg(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", req.Name, req.Namespace))
 			instance.Name = req.Name
 			instance.Namespace = req.Namespace
 			r.deleteResources(ctx, instance.DeepCopy())
 			r.resourcesDeleted[req.NamespacedName] = true
-			logger.Info("Policy resource not found. Ignoring since object must be deleted")
+			log.Debug().Msg("Policy resource not found. Ignoring since object must be deleted")
 		}
 		return ctrl.Result{}, nil
 	} else if err != nil {
 		// Error reading the object - requeue the request.
-		logger.Error(err, "failed to get Policy")
+		log.Error().Err(err).Msg("failed to get Policy")
 		return ctrl.Result{}, err
 	}
 
 	// Handing delete operation
 	if instance.GetDeletionTimestamp() != nil {
-		logger.Info(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", instance.GetName(), instance.GetNamespace()))
+		log.Debug().Msg(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", instance.GetName(), instance.GetNamespace()))
 		r.deleteResources(ctx, instance.DeepCopy())
 		r.resourcesDeleted[req.NamespacedName] = true
 		return ctrl.Result{}, nil
-	}
-
-	if instance.Annotations == nil || instance.Annotations[controllers.DefaulterAnnotationKey] != "true" {
-		err = r.validatePolicy(ctx, instance)
-		if err != nil {
-			return ctrl.Result{}, err
-		} else if instance.Status.Status == controllers.FailedStatus {
-			return ctrl.Result{}, nil
-		}
-
-		if err := r.updatePolicy(ctx, instance); err != nil {
-			return ctrl.Result{}, err
-		}
 	}
 
 	instance.Status.Status = "uploading"
@@ -129,35 +91,7 @@ func (r *PolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 }
 
 func (r *PolicyReconciler) deleteResources(ctx context.Context, instance *policyv1alpha1.Policy) {
-	filename := filepath.Join(controllers.PolicyFilePath, controllers.GetPolicyFileName(instance.GetName(), instance.GetNamespace()))
-	err := os.Remove(filename)
-	if err != nil {
-		log.FromContext(ctx).Info(fmt.Sprintf("Failed to write Policy to file '%s'. Error: '%s'", filename, err.Error()))
-	}
-}
-
-func (r *PolicyReconciler) updatePolicy(ctx context.Context, instance *policyv1alpha1.Policy) error {
-	attempt := 5
-	annotations := instance.DeepCopy().Annotations
-	for attempt > 0 {
-		attempt -= 1
-		if err := r.Update(ctx, instance); err != nil {
-			if errors.IsConflict(err) {
-				namespacesName := types.NamespacedName{
-					Namespace: instance.GetNamespace(),
-					Name:      instance.GetName(),
-				}
-				if err = r.Get(ctx, namespacesName, instance); err != nil {
-					return err
-				}
-				instance.Annotations = annotations
-				continue
-			}
-			return err
-		}
-	}
-
-	return nil
+	r.Trackers.RemoveEvent(notifiers.Key(instance.GetName()))
 }
 
 // updateResource updates the Aperture resource in Kubernetes.
@@ -184,41 +118,11 @@ func (r *PolicyReconciler) updateStatus(ctx context.Context, instance *policyv1a
 	return nil
 }
 
-func (r *PolicyReconciler) validatePolicy(ctx context.Context, instance *policyv1alpha1.Policy) error {
-	_, valid, msg, err := policy.ValidateAndCompile(ctx, "", instance.Spec.Raw)
-	if err != nil || !valid {
-		instance.Status.Status = controllers.FailedStatus
-		if msg == "" {
-			msg = err.Error()
-		}
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "Failed to validate Policy. Error: '%s'", msg)
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
-		}
-		return nil
-	}
-
-	if instance.Status.Status == controllers.FailedStatus {
-		instance.Status.Status = ""
-	}
-	return nil
-}
-
+// reconcilePolicy sends a write event to notifier to get it uploaded on the Etcd.
 func (r *PolicyReconciler) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.Policy) error {
-	filename := filepath.Join(controllers.PolicyFilePath, controllers.GetPolicyFileName(instance.GetName(), instance.GetNamespace()))
-	yamlContent, err := yaml.JSONToYAML(instance.Spec.Raw)
-	if err != nil {
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "UploadFailed", "Failed to write Policy to file '%s'. Error: '%s'", filename, err.Error())
-		return err
-	}
-	err = os.WriteFile(filename, yamlContent, 0o600)
-	if err != nil {
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "UploadFailed", "Failed to write Policy to file '%s'. Error: '%s'", filename, err.Error())
-		return err
-	}
+	r.Trackers.WriteEvent(notifiers.Key(instance.GetName()), instance.Spec.Raw)
 
-	r.Recorder.Eventf(instance, corev1.EventTypeWarning, "UploadSuccessful", "Wrote Policy to file '%s'.", filename)
+	r.Recorder.Eventf(instance, corev1.EventTypeWarning, "UploadSuccessful", "Uploaded policy to Etcd.")
 	return nil
 }
 

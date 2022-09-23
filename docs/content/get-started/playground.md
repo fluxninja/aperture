@@ -63,23 +63,22 @@ The Playground is pre-loaded with a Latency Gradient Concurrency Control Policy 
 demo application against sudden surges in traffic load. You can verify it using the following command:
 
 ```sh
-$ k get configmaps -n aperture-controller policies
-NAME       DATA   AGE
-policies   1      36h
+$ k get policy -n aperture-controller service1-demo-app
+NAME                STATUS     AGE
+service1-demo-app   uploaded   103s
 ```
 
 The Playground comes with a demo application so that you can generate simulated traffic and see the policy in action. The demo application can be found in `demoapp` namespace. You can read more about the demo application [here](https://github.com/fluxninja/aperture/tree/main/tools/demo_app).
 
 ```sh
 $ kubectl get pods -n demoapp
-NAME                                 READY   STATUS    RESTARTS       AGE
-service1-demo-app-5bff5f5556-l9hdd   1/2     Running   6 (151m ago)   36h
-service1-demo-app-5bff5f5556-rj5n6   1/2     Running   6 (151m ago)   36h
-service2-demo-app-bb7d5c9b5-75c4z    1/2     Running   6 (151m ago)   36h
-service2-demo-app-bb7d5c9b5-8dhcx    1/2     Running   6 (151m ago)   36h
-service3-demo-app-68b8dbd9b9-4bqmn   1/2     Running   6 (151m ago)   36h
-service3-demo-app-68b8dbd9b9-6g87r   1/2     Running   6 (151m ago)   36h
-
+NAME                                 READY   STATUS    RESTARTS   AGE
+service1-demo-app-54f6549446-ct8k9   2/2     Running   0          7m14s
+service1-demo-app-54f6549446-r4mmq   2/2     Running   0          7m14s
+service2-demo-app-759bbcc899-kxgwj   2/2     Running   0          7m13s
+service2-demo-app-759bbcc899-njpxj   2/2     Running   0          7m13s
+service3-demo-app-788857c7cc-557zj   2/2     Running   0          7m13s
+service3-demo-app-788857c7cc-vlchn   2/2     Running   0          7m13s
 ```
 
 To start the simulated traffic against the demo application, navigate to K6 resource in the Tilt UI and press the `Run load test` button. The traffic is designed to overload the demo application in order showcase the capabilities of Aperture.

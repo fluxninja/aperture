@@ -65,10 +65,13 @@ var (
 
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=validatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=fluxninja.com,resources=controllers,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=fluxninja.com,resources=agents,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=fluxninja.com,resources=controllers,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=fluxninja.com,resources=controllers/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=fluxninja.com,resources=controllers/finalizers,verbs=update
+//+kubebuilder:rbac:groups=fluxninja.com,resources=policies,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=fluxninja.com,resources=policies/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=fluxninja.com,resources=policies/finalizers,verbs=update
 //+kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get
 //+kubebuilder:rbac:groups=core,resources=configmaps,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=componentstatuses,verbs=get;list;watch;create;update;patch;delete

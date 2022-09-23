@@ -22,7 +22,6 @@ import (
 
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"k8s.io/client-go/dynamic"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -97,6 +96,10 @@ const (
 	DefaulterAnnotationKey = "fluxninja.com/set-defaults"
 	// FailedStatus string.
 	FailedStatus = "failed"
+	// PolicyValidatingWebhookName defines Validating Webhook name for Policy.
+	PolicyValidatingWebhookName = "policy-validator.fluxninja.com"
+	// PolicyValidatingWebhookURI defines Validating Webhook URI for Policy.
+	PolicyValidatingWebhookURI = "/validate/policy"
 )
 
 var (
@@ -131,8 +134,6 @@ var (
 	DefaultAgentInstance *agentv1alpha1.Agent
 	// DefaultControllerInstance defines default Controller instance for tests.
 	DefaultControllerInstance *controllerv1alpha1.Controller
-	// DefaultPolicyInstance defines default Policy instance for tests.
-	DefaultPolicyInstance *policyv1alpha1.Policy
 	// CertDir defines cert directory for tests.
 	CertDir = filepath.Join(".", "certs")
 	// PoliciesDir defines policies directory for tests.
