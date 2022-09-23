@@ -71,14 +71,14 @@ the default configuration for the given Policy. This can be overridden by the
 Custom configurations will be merged with Blueprints' `config.libsonnet`
 resulting in the final configuration, according to jsonnet language rules: keys
 can be overwritten by reusing them in the custom configuration and nested
-objects can be merged by using `+:` operator. Check the `examples/` directory
+objects can be merged by using `+:` operator. Check the `example` directory
 for more information.
 
 The full command using the example looks like this:
 
 ```sh
 jb install
-./scripts/aperture-generate.py --output _gen --config blueprints/latency-gradient/examples.jsonnet
+./scripts/aperture-generate.py --output _gen --config blueprints/latency-gradient/example/example.jsonnet
 ```
 
 [blueprints-readme]: https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
