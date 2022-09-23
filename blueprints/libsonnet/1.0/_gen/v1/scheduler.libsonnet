@@ -13,11 +13,11 @@ local schedulerouts = import './schedulerouts.libsonnet';
   withAutoTokensMixin(auto_tokens):: {
     auto_tokens+: auto_tokens,
   },
-  withDefaultWorkload(default_workload):: {
-    default_workload: default_workload,
+  withDefaultWorkloadParameters(default_workload_parameters):: {
+    default_workload_parameters: default_workload_parameters,
   },
-  withDefaultWorkloadMixin(default_workload):: {
-    default_workload+: default_workload,
+  withDefaultWorkloadParametersMixin(default_workload_parameters):: {
+    default_workload_parameters+: default_workload_parameters,
   },
   withMaxTimeout(max_timeout):: {
     max_timeout: max_timeout,

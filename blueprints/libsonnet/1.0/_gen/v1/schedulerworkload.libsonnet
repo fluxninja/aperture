@@ -1,22 +1,16 @@
 {
   new():: {
   },
-  withFairnessKey(fairness_key):: {
-    fairness_key: fairness_key,
+  withLabelMatcher(label_matcher):: {
+    label_matcher: label_matcher,
   },
-  withFairnessKeyMixin(fairness_key):: {
-    fairness_key+: fairness_key,
+  withLabelMatcherMixin(label_matcher):: {
+    label_matcher+: label_matcher,
   },
-  withPriority(priority):: {
-    priority: priority,
+  withWorkloadParameters(workload_parameters):: {
+    workload_parameters: workload_parameters,
   },
-  withPriorityMixin(priority):: {
-    priority+: priority,
-  },
-  withTokens(tokens):: {
-    tokens: tokens,
-  },
-  withTokensMixin(tokens):: {
-    tokens+: tokens,
+  withWorkloadParametersMixin(workload_parameters):: {
+    workload_parameters+: workload_parameters,
   },
 }

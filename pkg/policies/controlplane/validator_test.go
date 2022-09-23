@@ -208,15 +208,15 @@ spec:
                 control_point:
                   traffic: "ingress"
             auto_tokens: true
-            default_workload:
+            default_workload_parameters:
               priority: 20
             workloads:
-              - workload:
+              - workload_parameters:
                   priority: 50
                 label_matcher:
                   match_labels:
                     user_type: "guest"
-              - workload:
+              - workload_parameters:
                   priority: 200
                 label_matcher:
                   match_labels:
