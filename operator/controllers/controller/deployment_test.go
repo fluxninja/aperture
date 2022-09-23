@@ -118,14 +118,6 @@ var _ = Describe("Controller Deployment", func() {
 							},
 						},
 					},
-					OperatorImage: common.OperatorImage{
-						Image: common.Image{
-							Registry:   "docker.io/fluxninja",
-							Tag:        "latest",
-							PullPolicy: "IfNotPresent",
-						},
-						Repository: "aperture-operator",
-					},
 					Image: common.ControllerImage{
 						Image: common.Image{
 							Registry:   "docker.io/fluxninja",
@@ -187,62 +179,6 @@ var _ = Describe("Controller Deployment", func() {
 							InitContainers:                nil,
 							Containers: []corev1.Container{
 								{
-									Name:            "policy-watcher",
-									Image:           "docker.io/fluxninja/aperture-operator:latest",
-									ImagePullPolicy: corev1.PullIfNotPresent,
-									SecurityContext: &corev1.SecurityContext{},
-									Command: []string{
-										"/aperture-operator",
-										"--policy",
-										"--health-probe-bind-address=:9091",
-										"--metrics-bind-address=127.0.0.1:9090",
-									},
-									Args: []string{
-										"--leader-elect=True",
-									},
-									Env: []corev1.EnvVar{
-										{
-											Name:  "APERTURE_CONTROLLER_NAMESPACE",
-											Value: AppName,
-										},
-									},
-									TerminationMessagePath:   "/dev/termination-log",
-									TerminationMessagePolicy: corev1.TerminationMessageReadFile,
-									LivenessProbe: &corev1.Probe{
-										ProbeHandler: corev1.ProbeHandler{
-											HTTPGet: &corev1.HTTPGetAction{
-												Path: "/healthz",
-												Port: intstr.FromInt(9091),
-											},
-										},
-										FailureThreshold:    3,
-										InitialDelaySeconds: 10,
-										PeriodSeconds:       10,
-										SuccessThreshold:    1,
-										TimeoutSeconds:      1,
-									},
-									ReadinessProbe: &corev1.Probe{
-										ProbeHandler: corev1.ProbeHandler{
-											HTTPGet: &corev1.HTTPGetAction{
-												Path: "/readyz",
-												Port: intstr.FromInt(9091),
-											},
-										},
-										FailureThreshold:    3,
-										InitialDelaySeconds: 10,
-										PeriodSeconds:       10,
-										SuccessThreshold:    1,
-										TimeoutSeconds:      1,
-									},
-									VolumeMounts: []corev1.VolumeMount{
-										{
-											Name:      "etc-aperture-policies",
-											MountPath: PolicyFilePath,
-											ReadOnly:  false,
-										},
-									},
-								},
-								{
 									Name:            ControllerServiceName,
 									Image:           "docker.io/fluxninja/aperture-controller:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
@@ -258,6 +194,10 @@ var _ = Describe("Controller Deployment", func() {
 													FieldPath:  "spec.nodeName",
 												},
 											},
+										},
+										{
+											Name:  "APERTURE_CONTROLLER_NAMESPACE",
+											Value: AppName,
 										},
 									},
 									EnvFrom:   []corev1.EnvFromSource{},
@@ -457,15 +397,6 @@ var _ = Describe("Controller Deployment", func() {
 						},
 						Repository: "aperture-controller",
 					},
-					OperatorImage: common.OperatorImage{
-						Image: common.Image{
-							Registry:    "docker.io/fluxninja",
-							Tag:         "latest",
-							PullPolicy:  "IfNotPresent",
-							PullSecrets: TestArrayTwo,
-						},
-						Repository: "aperture-operator",
-					},
 					HostAliases: hostAliases,
 				},
 			}
@@ -517,9 +448,6 @@ var _ = Describe("Controller Deployment", func() {
 							HostAliases:        hostAliases,
 							ImagePullSecrets: []corev1.LocalObjectReference{
 								{
-									Name: TestTwo,
-								},
-								{
 									Name: Test,
 								},
 							},
@@ -536,66 +464,6 @@ var _ = Describe("Controller Deployment", func() {
 								},
 							},
 							Containers: []corev1.Container{
-								{
-									Name:            "policy-watcher",
-									Image:           "docker.io/fluxninja/aperture-operator:latest",
-									ImagePullPolicy: corev1.PullIfNotPresent,
-									SecurityContext: &corev1.SecurityContext{
-										RunAsUser:              pointer.Int64Ptr(0),
-										RunAsNonRoot:           pointer.BoolPtr(false),
-										ReadOnlyRootFilesystem: pointer.BoolPtr(false),
-									},
-									Command: []string{
-										"/aperture-operator",
-										"--policy",
-										"--health-probe-bind-address=:9091",
-										"--metrics-bind-address=127.0.0.1:9090",
-									},
-									Args: []string{
-										"--leader-elect=True",
-									},
-									Env: []corev1.EnvVar{
-										{
-											Name:  "APERTURE_CONTROLLER_NAMESPACE",
-											Value: AppName,
-										},
-									},
-									TerminationMessagePath:   "/dev/termination-log",
-									TerminationMessagePolicy: corev1.TerminationMessageReadFile,
-									LivenessProbe: &corev1.Probe{
-										ProbeHandler: corev1.ProbeHandler{
-											HTTPGet: &corev1.HTTPGetAction{
-												Path: "/healthz",
-												Port: intstr.FromInt(9091),
-											},
-										},
-										FailureThreshold:    3,
-										InitialDelaySeconds: 10,
-										PeriodSeconds:       10,
-										SuccessThreshold:    1,
-										TimeoutSeconds:      1,
-									},
-									ReadinessProbe: &corev1.Probe{
-										ProbeHandler: corev1.ProbeHandler{
-											HTTPGet: &corev1.HTTPGetAction{
-												Path: "/readyz",
-												Port: intstr.FromInt(9091),
-											},
-										},
-										FailureThreshold:    3,
-										InitialDelaySeconds: 10,
-										PeriodSeconds:       10,
-										SuccessThreshold:    1,
-										TimeoutSeconds:      1,
-									},
-									VolumeMounts: []corev1.VolumeMount{
-										{
-											Name:      "etc-aperture-policies",
-											MountPath: PolicyFilePath,
-											ReadOnly:  false,
-										},
-									},
-								},
 								{
 									Name:            ControllerServiceName,
 									Image:           "docker.io/fluxninja/aperture-controller:latest",
@@ -620,6 +488,10 @@ var _ = Describe("Controller Deployment", func() {
 													FieldPath:  "spec.nodeName",
 												},
 											},
+										},
+										{
+											Name:  "APERTURE_CONTROLLER_NAMESPACE",
+											Value: AppName,
 										},
 									},
 									EnvFrom: []corev1.EnvFromSource{

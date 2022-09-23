@@ -292,6 +292,10 @@ func ControllerEnv(instance *controllerv1alpha1.Controller) []corev1.EnvVar {
 				},
 			},
 		},
+		{
+			Name:  "APERTURE_CONTROLLER_NAMESPACE",
+			Value: instance.GetNamespace(),
+		},
 	}
 
 	if spec.Secrets.FluxNinjaPlugin.Create || instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name != "" {
@@ -808,14 +812,4 @@ func GetPort(addr string) (int32, error) {
 		return 0, err
 	}
 	return int32(port), nil
-}
-
-// GetPolicyFileName prepares filename for Policy based on the Controller namespace.
-func GetPolicyFileName(name, namespace string) string {
-	controllerNamespace := os.Getenv("APERTURE_CONTROLLER_NAMESPACE")
-	if controllerNamespace == namespace {
-		return fmt.Sprintf("%s.yaml", name)
-	}
-
-	return fmt.Sprintf("%s-%s.yaml", name, namespace)
 }

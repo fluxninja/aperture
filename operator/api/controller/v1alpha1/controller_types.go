@@ -37,10 +37,6 @@ type ControllerSpec struct {
 	//+kubebuilder:validation:Optional
 	Image common.ControllerImage `json:"image"`
 
-	// Image configuration for Policy sidecar container
-	//+kubebuilder:validation:Optional
-	OperatorImage common.OperatorImage `json:"operatorImage"`
-
 	// Pod's host aliases
 	//+kubebuilder:validation:Optional
 	HostAliases []corev1.HostAlias `json:"hostAliases,omitempty"`
@@ -63,9 +59,6 @@ type ControllerConfigSpec struct {
 
 // PoliciesConfig for policy engine.
 type PoliciesConfig struct {
-	// Policies path configuration.
-	PoliciesPath string `json:"policies_path"`
-
 	// Scheduler for PromQL jobs.
 	PromQLJobsScheduler jobs.JobGroupConfig `json:"promql_jobs_scheduler"`
 }

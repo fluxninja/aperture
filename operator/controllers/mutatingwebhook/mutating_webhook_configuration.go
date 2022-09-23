@@ -117,7 +117,7 @@ func controllerMutatingWebhookConfiguration() (*admissionregistrationv1.Mutating
 						Rule: admissionregistrationv1.Rule{
 							APIGroups:   []string{"fluxninja.com"},
 							APIVersions: []string{controllers.V1Alpha1Version},
-							Resources:   []string{"controllers", "policies"},
+							Resources:   []string{"controllers"},
 							Scope:       &[]admissionregistrationv1.ScopeType{admissionregistrationv1.NamespacedScope}[0],
 						},
 					},

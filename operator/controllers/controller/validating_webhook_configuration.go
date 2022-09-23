@@ -37,20 +37,15 @@ func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cer
 		},
 		Webhooks: []admissionregistrationv1.ValidatingWebhook{
 			{
-				Name: "cm-validator.fluxninja.com",
+				Name: controllers.PolicyValidatingWebhookName,
 				ClientConfig: admissionregistrationv1.WebhookClientConfig{
 					Service: &admissionregistrationv1.ServiceReference{
 						Name:      controllers.ControllerServiceName,
 						Namespace: instance.GetNamespace(),
-						Path:      pointer.StringPtr("/validate/configmap"),
+						Path:      pointer.StringPtr(controllers.PolicyValidatingWebhookURI),
 						Port:      pointer.Int32(serverPort),
 					},
 					CABundle: cert,
-				},
-				NamespaceSelector: &v1.LabelSelector{
-					MatchLabels: map[string]string{
-						"kubernetes.io/metadata.name": instance.GetNamespace(),
-					},
 				},
 				ObjectSelector: &v1.LabelSelector{
 					MatchLabels: map[string]string{
@@ -61,9 +56,9 @@ func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cer
 					{
 						Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},
 						Rule: admissionregistrationv1.Rule{
-							APIGroups:   []string{""},
-							APIVersions: []string{controllers.V1Version},
-							Resources:   []string{"configmaps"},
+							APIGroups:   []string{"fluxninja.com"},
+							APIVersions: []string{controllers.V1Alpha1Version},
+							Resources:   []string{"policies"},
 							Scope:       &[]admissionregistrationv1.ScopeType{admissionregistrationv1.NamespacedScope}[0],
 						},
 					},
@@ -71,7 +66,7 @@ func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cer
 				AdmissionReviewVersions: []string{controllers.V1Version},
 				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-				TimeoutSeconds:          pointer.Int32Ptr(5),
+				TimeoutSeconds:          pointer.Int32Ptr(10),
 			},
 		},
 	}

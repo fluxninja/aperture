@@ -95,7 +95,6 @@ plugins:
   - aperture-plugin-fluxninja
   plugins_path: default
 policies:
-  policies_path: ""
   promql_jobs_scheduler:
     max_concurrent_jobs: 0
 profilers:

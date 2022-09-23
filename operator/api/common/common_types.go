@@ -77,16 +77,6 @@ type ControllerImage struct {
 	Repository string `json:"repository" default:"aperture-controller"`
 }
 
-// OperatorImage defines Image spec for Aperture Operator.
-type OperatorImage struct {
-	// Image specs for Controller
-	Image `json:",inline"`
-
-	// The repository of the image
-	//+kubebuilder:validation:Optional
-	Repository string `json:"repository" default:"aperture-operator"`
-}
-
 // Probe defines Enabled, InitialDelaySeconds, PeriodSeconds, TimeoutSeconds, FailureThreshold and SuccessThreshold for probes like livenessProbe.
 type Probe struct {
 	// Enable probe on agent containers
