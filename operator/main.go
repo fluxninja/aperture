@@ -40,7 +40,6 @@ import (
 	"github.com/fluxninja/aperture/operator/controllers/controller"
 	"github.com/fluxninja/aperture/operator/controllers/mutatingwebhook"
 	"github.com/fluxninja/aperture/operator/controllers/namespace"
-	"github.com/fluxninja/aperture/operator/controllers/policy"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -61,7 +60,6 @@ func main() {
 	var enableLeaderElection bool
 	var agentManager bool
 	var controllerManager bool
-	var policyManager bool
 	var probeAddr string
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
@@ -74,9 +72,6 @@ func main() {
 	flag.BoolVar(&controllerManager, "controller", false,
 		"Enable manager for Aperture Controller. "+
 			"Enabling this will ensure that Controller Custom Resource is monitored by the Operator.")
-	flag.BoolVar(&policyManager, "policy", false,
-		"Enable manager for Aperture Policy. "+
-			"Enabling this will ensure that Policy Custom Resource is monitored by the Operator.")
 
 	opts := zap.Options{
 		Development: true,
@@ -86,21 +81,19 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
-	if !agentManager && !controllerManager && !policyManager {
-		setupLog.Info("One of the --agent, --controller or --policy flag is required.")
+	if !agentManager && !controllerManager {
+		setupLog.Info("One of the --agent or --controller flag is required.")
 		os.Exit(1)
 	}
 
 	var leaderElectionID string
 
-	if agentManager && controllerManager && policyManager {
+	if agentManager && controllerManager {
 		leaderElectionID = "a4362587.fluxninja.com"
 	} else if agentManager {
 		leaderElectionID = "a4362587-agent.fluxninja.com"
-	} else if controllerManager {
-		leaderElectionID = "a4362587-controller.fluxninja.com"
 	} else {
-		leaderElectionID = "a4362587-policy.fluxninja.com"
+		leaderElectionID = "a4362587-controller.fluxninja.com"
 	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
@@ -188,17 +181,6 @@ func main() {
 		}
 
 		server.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controller.ControllerHooks{}})
-	}
-
-	if policyManager {
-		if err = (&policy.PolicyReconciler{
-			Client:   mgr.GetClient(),
-			Scheme:   mgr.GetScheme(),
-			Recorder: mgr.GetEventRecorderFor("aperture-policy"),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "Policy")
-			os.Exit(1)
-		}
 	}
 
 	//+kubebuilder:scaffold:builder

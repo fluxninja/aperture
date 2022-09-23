@@ -72,20 +72,15 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 				},
 				Webhooks: []admissionregistrationv1.ValidatingWebhook{
 					{
-						Name: "cm-validator.fluxninja.com",
+						Name: PolicyValidatingWebhookName,
 						ClientConfig: admissionregistrationv1.WebhookClientConfig{
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      ControllerServiceName,
 								Namespace: instance.GetNamespace(),
-								Path:      pointer.StringPtr("/validate/configmap"),
+								Path:      pointer.StringPtr(PolicyValidatingWebhookURI),
 								Port:      pointer.Int32(8080),
 							},
 							CABundle: []byte(Test),
-						},
-						NamespaceSelector: &v1.LabelSelector{
-							MatchLabels: map[string]string{
-								"kubernetes.io/metadata.name": instance.GetNamespace(),
-							},
 						},
 						ObjectSelector: &v1.LabelSelector{
 							MatchLabels: map[string]string{
@@ -96,9 +91,9 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 							{
 								Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},
 								Rule: admissionregistrationv1.Rule{
-									APIGroups:   []string{""},
-									APIVersions: []string{V1Version},
-									Resources:   []string{"configmaps"},
+									APIGroups:   []string{"fluxninja.com"},
+									APIVersions: []string{V1Alpha1Version},
+									Resources:   []string{"policies"},
 									Scope:       &[]admissionregistrationv1.ScopeType{admissionregistrationv1.NamespacedScope}[0],
 								},
 							},
@@ -106,7 +101,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32Ptr(5),
+						TimeoutSeconds:          pointer.Int32Ptr(10),
 					},
 				},
 			}
@@ -163,20 +158,15 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 				},
 				Webhooks: []admissionregistrationv1.ValidatingWebhook{
 					{
-						Name: "cm-validator.fluxninja.com",
+						Name: PolicyValidatingWebhookName,
 						ClientConfig: admissionregistrationv1.WebhookClientConfig{
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      ControllerServiceName,
 								Namespace: instance.GetNamespace(),
-								Path:      pointer.StringPtr("/validate/configmap"),
+								Path:      pointer.StringPtr(PolicyValidatingWebhookURI),
 								Port:      pointer.Int32(80),
 							},
 							CABundle: []byte(Test),
-						},
-						NamespaceSelector: &v1.LabelSelector{
-							MatchLabels: map[string]string{
-								"kubernetes.io/metadata.name": instance.GetNamespace(),
-							},
 						},
 						ObjectSelector: &v1.LabelSelector{
 							MatchLabels: map[string]string{
@@ -187,9 +177,9 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 							{
 								Operations: []admissionregistrationv1.OperationType{"CREATE", "UPDATE"},
 								Rule: admissionregistrationv1.Rule{
-									APIGroups:   []string{""},
-									APIVersions: []string{V1Version},
-									Resources:   []string{"configmaps"},
+									APIGroups:   []string{"fluxninja.com"},
+									APIVersions: []string{V1Alpha1Version},
+									Resources:   []string{"policies"},
 									Scope:       &[]admissionregistrationv1.ScopeType{admissionregistrationv1.NamespacedScope}[0],
 								},
 							},
@@ -197,7 +187,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32Ptr(5),
+						TimeoutSeconds:          pointer.Int32Ptr(10),
 					},
 				},
 			}
@@ -205,5 +195,51 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 			result := validatingWebhookConfiguration(instance.DeepCopy(), []byte(Test))
 			Expect(result).To(Equal(expected))
 		})
+	})
+})
+
+var _ = Describe("Test ValidatingWebhookConfiguration Mutate", func() {
+	It("Mutate should update required fields only", func() {
+		expected := &admissionregistrationv1.ValidatingWebhookConfiguration{
+			ObjectMeta: v1.ObjectMeta{},
+			Webhooks: []admissionregistrationv1.ValidatingWebhook{
+				{
+					Name:                    PolicyValidatingWebhookName,
+					AdmissionReviewVersions: TestArray,
+					ClientConfig: admissionregistrationv1.WebhookClientConfig{
+						URL: &Test,
+					},
+					NamespaceSelector: &v1.LabelSelector{
+						MatchLabels: TestMap,
+					},
+					ObjectSelector: &v1.LabelSelector{
+						MatchLabels: TestMap,
+					},
+					Rules: []admissionregistrationv1.RuleWithOperations{
+						{
+							Rule: admissionregistrationv1.Rule{
+								APIGroups: TestArray,
+							},
+						},
+					},
+					FailurePolicy:  &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Ignore}[0],
+					SideEffects:    &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassSome}[0],
+					TimeoutSeconds: pointer.Int32Ptr(10),
+				},
+			},
+		}
+
+		vwc := &admissionregistrationv1.ValidatingWebhookConfiguration{
+			Webhooks: []admissionregistrationv1.ValidatingWebhook{
+				{
+					Name: PolicyValidatingWebhookName,
+				},
+			},
+		}
+
+		err := ValidatingWebhookConfigurationMutate(vwc, expected.Webhooks)()
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(vwc).To(Equal(expected))
 	})
 })

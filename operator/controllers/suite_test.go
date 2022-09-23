@@ -34,7 +34,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
 	ctrl "sigs.k8s.io/controller-runtime"
 
@@ -42,7 +41,6 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/prometheus"
@@ -197,26 +195,11 @@ var _ = BeforeSuite(func() {
 	}
 	err = config.UnmarshalYAML([]byte{}, &DefaultAgentInstance.Spec)
 	Expect(err).NotTo(HaveOccurred())
-
-	DefaultPolicyInstance = &policyv1alpha1.Policy{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      AppName,
-			Namespace: AppName,
-		},
-		Spec: runtime.RawExtension{
-			Raw: []byte("{\"circuit\":{\"components\":[{\"constant\":{\"out_ports\":{\"output\":{\"signal_name\":\"EMA_LIMIT_MULTIPLIER\"}}}}]},\"resources\":{\"flux_meters\":{\"service1-demo-app\":{\"selector\":{\"agent_group\":\"default\",\"control_point\":{\"traffic\":\"ingress\"},\"service\":\"service1-demo-app.demoapp.svc.cluster.local\"}}},\"classifiers\":[{\"rules\":{\"user_type\":{\"extractor\":{\"from\":\"request.http.headers.user_type\"}}},\"selector\":{\"agent_group\":\"default\",\"control_point\":{\"traffic\":\"ingress\"},\"service\":\"service1-demo-app.demoapp.svc.cluster.local\"}}]}}"),
-		},
-	}
-
-	PolicyFilePath = PoliciesDir
-	err = os.MkdirAll(PolicyFilePath, 0o777)
-	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
 	os.RemoveAll(CertDir)
-	os.RemoveAll(PoliciesDir)
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
 })

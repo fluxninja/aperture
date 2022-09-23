@@ -9,6 +9,9 @@ import (
 	"go.opentelemetry.io/collector/confmap/converter/expandconverter"
 	"go.opentelemetry.io/collector/confmap/converter/overwritepropertiesconverter"
 	"go.opentelemetry.io/collector/service"
+	logsv1 "go.opentelemetry.io/proto/otlp/collector/logs/v1"
+	metricsv1 "go.opentelemetry.io/proto/otlp/collector/metrics/v1"
+	tracev1 "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -16,6 +19,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
@@ -23,7 +27,12 @@ const schemeName = "file"
 
 // Module is a fx module that invokes OTEL Collector.
 func Module() fx.Option {
-	return fx.Invoke(setup)
+	return fx.Options(
+		grpcgateway.RegisterHandler{Handler: logsv1.RegisterLogsServiceHandlerFromEndpoint}.Annotate(),
+		grpcgateway.RegisterHandler{Handler: tracev1.RegisterTraceServiceHandlerFromEndpoint}.Annotate(),
+		grpcgateway.RegisterHandler{Handler: metricsv1.RegisterMetricsServiceHandlerFromEndpoint}.Annotate(),
+		fx.Invoke(setup),
+	)
 }
 
 // ConstructorIn describes parameters passed to create OTEL Collector, server providing the OpenTelemetry Collector service.
