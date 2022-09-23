@@ -96,9 +96,9 @@ const (
 	DefaulterAnnotationKey = "fluxninja.com/set-defaults"
 	// FailedStatus string.
 	FailedStatus = "failed"
-	// PolicyValidatingWebhookName defines Validating Webhook name for Policy
+	// PolicyValidatingWebhookName defines Validating Webhook name for Policy.
 	PolicyValidatingWebhookName = "policy-validator.fluxninja.com"
-	// PolicyValidatingWebhookURI defines Validating Webhook URI for Policy
+	// PolicyValidatingWebhookURI defines Validating Webhook URI for Policy.
 	PolicyValidatingWebhookURI = "/validate/policy"
 )
 

@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
+	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
@@ -22,7 +22,7 @@ var _ = Describe("Validator", Ordered, func() {
 
 	validateExample := func(contents string) {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "aperture-controller")
-		var policy v1alpha1.Policy
+		var policy policyv1alpha1.Policy
 		err := config.UnmarshalYAML([]byte(contents), &policy)
 		Expect(err).NotTo(HaveOccurred())
 		request := &admissinv1.AdmissionRequest{
@@ -52,7 +52,7 @@ var _ = Describe("Validator", Ordered, func() {
 
 	It("does not accept policy in other namespace than controller", func() {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "")
-		var policy v1alpha1.Policy
+		var policy policyv1alpha1.Policy
 		err := config.UnmarshalYAML([]byte(rateLimitPolicy), &policy)
 		Expect(err).NotTo(HaveOccurred())
 		request := &admissinv1.AdmissionRequest{
@@ -82,13 +82,17 @@ spec:
     flux_meters:
       "service_latency":
         selector:
-          service: "service1-demo-app.demoapp.svc.cluster.local"
-          control_point:
-            traffic: "ingress"
+          service_selector:
+            service: "service1-demo-app.demoapp.svc.cluster.local"
+          flow_selector:
+            control_point:
+              traffic: "ingress"
     classifiers:
       - selector:
-          service: service1-demo-app.demoapp.svc.cluster.local
-          control_point: { traffic: ingress }
+          service_selector:
+            service: service1-demo-app.demoapp.svc.cluster.local
+          flow_selector:
+            control_point: { traffic: ingress }
         rules:
           # An example rule using extractor.
           # See following RFC for list of available extractors and their syntax.
@@ -198,9 +202,11 @@ spec:
       - concurrency_limiter:
           scheduler:
             selector:
-              service: "service1-demo-app.demoapp.svc.cluster.local"
-              control_point:
-                traffic: "ingress"
+              service_selector:
+                service: "service1-demo-app.demoapp.svc.cluster.local"
+              flow_selector:
+                control_point:
+                  traffic: "ingress"
             auto_tokens: true
             default_workload:
               priority: 20
@@ -302,10 +308,17 @@ spec:
               signal_name: "LATENCY"
             rhs:
               signal_name: "LATENCY_OVERLOAD"
+          out_ports:
+            output:
+              signal_name: "CONCURRENCY_INCREMENT_DECISION"
+      - switcher:
+          in_ports:
             on_true:
               signal_name: "CONCURRENCY_INCREMENT_OVERLOAD"
             on_false:
               signal_name: "CONCURRENCY_INCREMENT_NORMAL"
+            switch:
+              signal_name: "CONCURRENCY_INCREMENT_DECISION"
           out_ports:
             output:
               signal_name: "CONCURRENCY_INCREMENT"
@@ -323,8 +336,10 @@ spec:
   resources:
     classifiers:
       - selector:
-          service: productpage.bookinfo.svc.cluster.local
-          control_point: { traffic: ingress }
+          service_selector:
+            service: productpage.bookinfo.svc.cluster.local
+          flow_selector:
+            control_point: { traffic: ingress }
         rules:
           ua:
             extractor:
@@ -365,9 +380,11 @@ spec:
             limit:
               signal_name: "RATE_LIMIT"
           selector:
-            service: "service1-demo-app.demoapp.svc.cluster.local"
-            control_point:
-              traffic: "ingress"
+            service_selector:
+              service: "service1-demo-app.demoapp.svc.cluster.local"
+            flow_selector:
+              control_point:
+                traffic: "ingress"
           label_key: "http.request.header.user_type"
           limit_reset_interval: "1s"
 `
