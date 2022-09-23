@@ -17,6 +17,14 @@
 | -------------------------- | ---------------------- | ------------ | -------------------- |
 | `policy.fluxMeterSelector` | `aperture.v1.Selector` | `(required)` | Flux Meter selector. |
 
+#### Flux Meters
+
+| Parameter Name                                   | Parameter Type                       | Default      | Description                                 |
+| ------------------------------------------------ | ------------------------------------ | ------------ | ------------------------------------------- |
+| `policy.fluxMeters`                              | `map[string]aperture.v1.FluxMeter`   | `{}`         | Mappings of fluxMeterName to fluxMeter.     |
+| `policy.fluxMeters[policyName].attributeKey`     | `string`                             | `(required)` | Key of the attribute in access log or span. |
+| `policy.fluxMeters[policyName].histogramBuckets` | `aperture.v1.FluxMeterStaticBuckets` | `(required)` | Flux Meter static histogram buckets.        |
+
 #### Concurrency Limiter Selector
 
 | Parameter Name                      | Parameter Type         | Default      | Description                   |

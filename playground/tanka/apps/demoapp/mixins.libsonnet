@@ -66,24 +66,6 @@ local policy = latencyGradientPolicy({
         staticBuckets.new()
         + staticBuckets.withBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0])
       ),
-    // + fluxMeter.withLinearBuckets(
-    //   linearBuckets.new()
-    //   + linearBuckets.withStart(1.0)
-    //   + linearBuckets.withWidth(100.0)
-    //   + linearBuckets.withCount(50)
-    // )
-    // + fluxMeter.withExponentialBuckets(
-    //   exponentialBuckets.new()
-    //   + exponentialBuckets.withStart(2.0)
-    //   + exponentialBuckets.withFactor(1.5)
-    //   + exponentialBuckets.withCount(50)
-    // )
-    // + fluxMeter.withExponentialBucketsRange(
-    //   exponentialBucketsRange.new()
-    //   + exponentialBucketsRange.withMin(1.0)
-    //   + exponentialBucketsRange.withMax(50.0)
-    //   + exponentialBucketsRange.withCount(50)
-    // ),
   },
 
   concurrencyLimiterSelector: svcSelector,
