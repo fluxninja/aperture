@@ -19,4 +19,4 @@ if grep <<<"${TOOLS}" '^python$'; then
 		graphviz
 fi
 
-(yes || true) | ./playground/scripts/manage_tools.sh setup "${tools[@]}"
+(yes || true) | ./scripts/manage_tools.sh setup "${tools[@]}"

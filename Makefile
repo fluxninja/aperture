@@ -34,7 +34,7 @@ go-build-plugins:
 
 install-asdf-tools:
 	@echo Installing Asdf tools
-	@./playground/scripts/manage_tools.sh setup
+	@./scripts/manage_tools.sh setup
 
 install-go-tools:
 	@echo Installing tools from tools.go
