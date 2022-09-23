@@ -105,7 +105,7 @@ a specific release tag e.g. _v0.2.2_
 You can then create a Policy resource with policy definition like this:
 
 ```jsonnet
-local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
+local aperture = import 'github.com/fluxninja/aperture/blueprints/libsonnet/1.0/main.libsonnet';
 
 local latencyGradientPolicy = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/policies/latency-gradient.libsonnet';
 
@@ -128,7 +128,7 @@ local svcSelector =
   );
 
 local policy = latencyGradientPolicy({
-  policyName: 'service1-demoapp',
+  policyName: 'service1-demo-app',
   fluxMeterSelector: svcSelector,
   concurrencyLimiterSelector: svcSelector,
 }).policy;
@@ -137,7 +137,10 @@ local policyResource = {
   kind: 'Policy',
   apiVersion: 'fluxninja.com/v1alpha1',
   metadata: {
-    name: 'service1',
+    name: 'service1-demo-app',
+    labels: {
+      'fluxninja.com/validate': 'true',
+    },
   },
   spec: policy,
 };
