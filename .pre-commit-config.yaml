@@ -24,9 +24,9 @@ repos:
     rev: v4.2.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^(manifests/charts/.*/README*)
+        exclude: ^(manifests/charts/.*/README*)|\.*svg$|\.*dot$
       - id: end-of-file-fixer
-        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$
+        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot$
       - id: check-yaml
         exclude: ^(manifests/charts/.*/(templates|files)/.*|playground/tanka/charts/.*)
         args:
@@ -121,13 +121,13 @@ repos:
       #   files: '\.md$|\.mmd$'
       #   pass_filenames: false
       #   description: "Generate mermaid diagrams"
-      - id: generate-libsonnet
-        name: "libsonnet"
-        entry: "./scripts/precommit/generate_libsonnet.sh"
+      - id: generate-blueprints
+        name: "blueprints"
+        entry: "./scripts/precommit/generate_blueprints.sh"
         language: script
-        files: '\.proto$'
+        files: ^(blueprints)|\.proto$
         pass_filenames: false
-        description: "Generate Aperture libsonnet"
+        description: "Generate Aperture libsonnet and blueprints"
       - id: tanka-show
         name: "Check tanka parses jsonnet"
         language: script

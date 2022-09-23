@@ -1,23 +1,39 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-blueprint_name=${1}
-echo "$blueprint_name"
-
 script_root=$(dirname "$0")
 blueprints_root=${script_root}/..
 
-python "${blueprints_root}"/scripts/blueprint-readme-generator.py "${blueprints_root}"/blueprints/"${blueprint_name}"
-if which prettier > /dev/null 2>&1; then
-    prettier --write "${blueprints_root}"/blueprints/"${blueprint_name}"/README.md
+FIND="find"
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	FIND="gfind"
 fi
 
-python "${blueprints_root}"/scripts/aperture-generate.py --output "${blueprints_root}"/_gen/ \
-    --config "${blueprints_root}"/examples/demoapp-"${blueprint_name}".jsonnet \
-    "${blueprints_root}"/blueprints/"${blueprint_name}"
+# run jb install in the blueprints_root
+pushd "${blueprints_root}" >/dev/null
+jb install
+popd >/dev/null
 
-go run -mod=mod "${blueprints_root}"/../cmd/circuit-compiler/main.go \
-    -policy "${blueprints_root}"/_gen/policies/service1-"${blueprint_name}".yaml \
-    -dot "${blueprints_root}"/blueprints/"${blueprint_name}"/graph.dot
-dot -Tsvg "${blueprints_root}"/blueprints/"${blueprint_name}"/graph.dot \
-     > "${blueprints_root}"/blueprints/"${blueprint_name}"/graph.svg
+# for all directories within "$blueprints_root"/blueprints, generate README
+$FIND "$blueprints_root"/blueprints -mindepth 1 -maxdepth 1 -type d | while read -r dir; do
+	python "${blueprints_root}"/scripts/blueprint-readme-generator.py "$dir"
+	npx prettier --write "$dir"/README.md
+	# save the contents of $dir/example/gen/policies/example.yaml for comparison
+	old_example_yaml=$(cat "$dir"/example/gen/policies/example.yaml)
+
+	# generate example blueprint
+	python "${blueprints_root}"/scripts/aperture-generate.py --output "$dir"/example/gen/ \
+		--config "$dir"/example/example.jsonnet
+
+	npx prettier --write "$dir"/example/gen/.. || true
+
+	new_example_yaml=$(cat "$dir"/example/gen/policies/example.yaml)
+	if [[ "$old_example_yaml" != "$new_example_yaml" ]]; then
+		mkdir -p "$dir"/example/gen/graph
+		go run -mod=mod "${blueprints_root}"/../cmd/circuit-compiler/main.go \
+			-policy "$dir"/example/gen/policies/example.yaml \
+			-dot "$dir"/example/gen/graph/graph.dot
+		dot -Tsvg "$dir"/example/gen/graph/graph.dot >"$dir"/example/gen/graph/graph.svg
+	fi
+done

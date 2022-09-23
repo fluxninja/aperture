@@ -1,4 +1,4 @@
-local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
+local aperture = import '../../../libsonnet/1.0/main.libsonnet';
 
 
 local defaults = {
