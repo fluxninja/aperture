@@ -1,5 +1,5 @@
+local aperture = import '../../../../libsonnet/1.0/main.libsonnet';
 local blueprint = import '../main.libsonnet';
-local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
 
 local Override = aperture.v1.RateLimiterOverride;
 local LazySync = aperture.v1.RateLimiterLazySync;
@@ -7,8 +7,10 @@ local LazySync = aperture.v1.RateLimiterLazySync;
 local config = {
   policy+: {
     policyName: 'example',
-    serviceSelector+: {
-      service: 'service1-demo-app.demoapp.svc.cluster.local',
+    selector+: {
+      serviceSelector+: {
+        service: 'service1-demo-app.demoapp.svc.cluster.local',
+      },
     },
     rateLimit: '50.0',
     labelKey: 'http.request.header.user_type',

@@ -193,10 +193,12 @@ circuit:
             incoming_concurrency:
               signal_name: INCOMING_CONCURRENCY
           selector:
-            agent_group: default
-            control_point:
-              traffic: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
+            flow_selector:
+              control_point:
+                traffic: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
           timeout_factor: "0.5"
           workloads:
             - label_matcher:
@@ -213,13 +215,20 @@ circuit:
         in_ports:
           lhs:
             signal_name: LATENCY
+          rhs:
+            signal_name: LATENCY_OVERLOAD
+        operator: gt
+        out_ports:
+          output:
+            signal_name: CONCURRENCY_INCREMENT_SWITCH
+    - switcher:
+        in_ports:
           on_false:
             signal_name: CONCURRENCY_INCREMENT_NORMAL
           on_true:
             signal_name: CONCURRENCY_INCREMENT_OVERLOAD
-          rhs:
-            signal_name: LATENCY_OVERLOAD
-        operator: gt
+          switch:
+            signal_name: CONCURRENCY_INCREMENT_SWITCH
         out_ports:
           output:
             signal_name: CONCURRENCY_INCREMENT
@@ -227,13 +236,20 @@ circuit:
         in_ports:
           lhs:
             signal_name: LATENCY
+          rhs:
+            signal_name: LATENCY_OVERLOAD
+        operator: gt
+        out_ports:
+          output:
+            signal_name: CONCURRENCY_INCREMENT_FEEDBACK_SWITCH
+    - switcher:
+        in_ports:
           on_false:
             signal_name: CONCURRENCY_INCREMENT_NORMAL
           on_true:
             signal_name: ZERO
-          rhs:
-            signal_name: LATENCY_OVERLOAD
-        operator: gt
+          switch:
+            signal_name: CONCURRENCY_INCREMENT_FEEDBACK_SWITCH
         out_ports:
           output:
             signal_name: CONCURRENCY_INCREMENT_FEEDBACK
@@ -245,14 +261,18 @@ resources:
           extractor:
             from: request.http.headers.user-type
       selector:
-        agent_group: default
-        control_point:
-          traffic: ingress
-        service: service1-demo-app.demoapp.svc.cluster.local
+        flow_selector:
+          control_point:
+            traffic: ingress
+        service_selector:
+          agent_group: default
+          service: service1-demo-app.demoapp.svc.cluster.local
   flux_meters:
     example:
       selector:
-        agent_group: default
-        control_point:
-          traffic: ingress
-        service: service1-demo-app.demoapp.svc.cluster.local
+        flow_selector:
+          control_point:
+            traffic: ingress
+        service_selector:
+          agent_group: default
+          service: service1-demo-app.demoapp.svc.cluster.local

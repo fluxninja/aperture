@@ -1,14 +1,18 @@
-local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
+local aperture = import '../../../../libsonnet/1.0/main.libsonnet';
 
 // A set of defaults used by the policy that can be overridden when instantiating it
 local defaults = {
   policyName: error 'policyName must be set',
   evaluationInterval: '0.5s',
-  serviceSelector: {
-    agentGroup: 'default',
-    service: error 'policy serviceSelector.service is required',
-    controlPoint: {
-      traffic: 'ingress',
+  selector: {
+    serviceSelector: {
+      agentGroup: 'default',
+      service: error 'policy serviceSelector.service is required',
+    },
+    flowSelector: {
+      controlPoint: {
+        traffic: 'ingress',
+      },
     },
   },
   rateLimit: '50.0',
@@ -26,6 +30,8 @@ local component = aperture.v1.Component;
 local constant = aperture.v1.Constant;
 local rateLimiter = aperture.v1.RateLimiter;
 local selector = aperture.v1.Selector;
+local serviceSelector = aperture.v1.ServiceSelector;
+local flowSelector = aperture.v1.FlowSelector;
 local circuit = aperture.v1.Circuit;
 local override = aperture.v1.RateLimiterOverride;
 local lazySync = aperture.v1.RateLimiterLazySync;
@@ -39,9 +45,15 @@ function(params) {
 
   local svcSelector =
     selector.new()
-    + selector.withAgentGroup($._config.serviceSelector.agentGroup)
-    + selector.withService($._config.serviceSelector.service)
-    + selector.withControlPoint({ traffic: $._config.serviceSelector.controlPoint.traffic }),
+    + selector.withServiceSelector(
+      serviceSelector.new()
+      + serviceSelector.withAgentGroup($._config.selector.serviceSelector.agentGroup)
+      + serviceSelector.withService($._config.selector.serviceSelector.service)
+    )
+    + selector.withFlowSelector(
+      flowSelector.new()
+      + flowSelector.withControlPoint({ traffic: $._config.selector.flowSelector.controlPoint.traffic })
+    ),
 
   local constants = [
     component.withConstant(constant.new()

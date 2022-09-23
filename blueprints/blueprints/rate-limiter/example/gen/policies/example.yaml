@@ -18,8 +18,10 @@ circuit:
           - label_value: gold
             limit_scale_factor: 1
         selector:
-          agent_group: default
-          control_point:
-            traffic: ingress
-          service: service1-demo-app.demoapp.svc.cluster.local
+          flow_selector:
+            control_point:
+              traffic: ingress
+          service_selector:
+            agent_group: default
+            service: service1-demo-app.demoapp.svc.cluster.local
   evaluation_interval: 0.5s

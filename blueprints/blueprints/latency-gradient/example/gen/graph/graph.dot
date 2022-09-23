@@ -15,8 +15,8 @@ digraph  {
 		n34[label="output"];
 		n33[label="rhs"];
 		n33->n34[style="invis"];
-		{rank=same; n34;};
 		{rank=same; n32;n33;};
+		{rank=same; n34;};
 		
 	}
 	subgraph cluster_s35 {
@@ -41,19 +41,19 @@ digraph  {
 	}
 	subgraph cluster_s43 {
 		label="ArithmeticCombinator (14)";margin="50.0";
-		n44[label="lhs"];
+		n45[label="lhs"];
 		n46[label="output"];
-		n45[label="rhs"];
+		n44[label="rhs"];
 		n45->n46[style="invis"];
-		{rank=same; n46;};
 		{rank=same; n44;n45;};
+		{rank=same; n46;};
 		
 	}
 	subgraph cluster_s15 {
 		label="ArithmeticCombinator (7)";margin="50.0";
-		n17[label="lhs"];
+		n16[label="lhs"];
 		n18[label="output"];
-		n16[label="rhs"];
+		n17[label="rhs"];
 		n17->n18[style="invis"];
 		{rank=same; n16;n17;};
 		{rank=same; n18;};
@@ -141,25 +141,21 @@ digraph  {
 	subgraph cluster_s75 {
 		label="Decider (22)";margin="50.0";
 		n76[label="lhs"];
-		n79[label="on_false"];
-		n78[label="on_true"];
-		n80[label="output"];
+		n78[label="output"];
 		n77[label="rhs"];
-		n79->n80[style="invis"];
-		{rank=same; n76;n77;n78;n79;};
-		{rank=same; n80;};
+		n77->n78[style="invis"];
+		{rank=same; n76;n77;};
+		{rank=same; n78;};
 		
 	}
-	subgraph cluster_s81 {
-		label="Decider (23)";margin="50.0";
+	subgraph cluster_s84 {
+		label="Decider (24)";margin="50.0";
 		n85[label="lhs"];
-		n84[label="on_false"];
-		n83[label="on_true"];
-		n86[label="output"];
-		n82[label="rhs"];
-		n85->n86[style="invis"];
-		{rank=same; n82;n83;n84;n85;};
-		{rank=same; n86;};
+		n87[label="output"];
+		n86[label="rhs"];
+		n86->n87[style="invis"];
+		{rank=same; n85;n86;};
+		{rank=same; n87;};
 		
 	}
 	subgraph cluster_s58 {
@@ -168,18 +164,18 @@ digraph  {
 		n60[label="max_envelope"];
 		n61[label="output"];
 		n60->n61[style="invis"];
-		{rank=same; n59;n60;};
 		{rank=same; n61;};
+		{rank=same; n59;n60;};
 		
 	}
 	subgraph cluster_s62 {
 		label="Gradient (20)";margin="50.0";
-		n63[label="control_variable"];
-		n67[label="max"];
-		n66[label="optimize"];
+		n67[label="control_variable"];
+		n66[label="max"];
+		n65[label="optimize"];
 		n68[label="output"];
-		n65[label="setpoint"];
-		n64[label="signal"];
+		n64[label="setpoint"];
+		n63[label="signal"];
 		n67->n68[style="invis"];
 		{rank=same; n63;n64;n65;n66;n67;};
 		{rank=same; n68;};
@@ -214,45 +210,69 @@ digraph  {
 		n54[label="input"];
 		n55[label="output"];
 		n54->n55[style="invis"];
-		{rank=same; n54;};
 		{rank=same; n55;};
+		{rank=same; n54;};
+		
+	}
+	subgraph cluster_s79 {
+		label="Switcher (23)";margin="50.0";
+		n82[label="on_false"];
+		n81[label="on_true"];
+		n83[label="output"];
+		n80[label="switch"];
+		n82->n83[style="invis"];
+		{rank=same; n83;};
+		{rank=same; n80;n81;n82;};
+		
+	}
+	subgraph cluster_s88 {
+		label="Switcher (25)";margin="50.0";
+		n90[label="on_false"];
+		n89[label="on_true"];
+		n92[label="output"];
+		n91[label="switch"];
+		n91->n92[style="invis"];
+		{rank=same; n89;n90;n91;};
+		{rank=same; n92;};
 		
 	}
 	rankdir="LR";splines="ortho";
 	n71->n33[label="ACCEPTED_CONCURRENCY"];
 	n71->n54[label="ACCEPTED_CONCURRENCY"];
-	n71->n63[label="ACCEPTED_CONCURRENCY"];
+	n71->n67[label="ACCEPTED_CONCURRENCY"];
 	n72->n24[label="INCOMING_CONCURRENCY"];
 	n72->n29[label="INCOMING_CONCURRENCY"];
-	n12->n21[label="TOLERANCE"];
-	n12->n37[label="TOLERANCE"];
-	n26->n28[label="DELTA_CONCURRENCY"];
-	n34->n51[label="UPPER_CONCURRENCY_LIMIT"];
-	n2->n16[label="EMA_LIMIT_MULTIPLIER"];
-	n8->n40[label="LINEAR_CONCURRENCY_INCREMENT"];
-	n38->n77[label="LATENCY_OVERLOAD"];
-	n38->n82[label="LATENCY_OVERLOAD"];
-	n52->n67[label="MAX_CONCURRENCY"];
 	n55->n41[label="SQRT_CONCURRENCY_INCREMENT"];
-	n57->n17[label="LATENCY"];
+	n57->n16[label="LATENCY"];
 	n57->n59[label="LATENCY"];
-	n57->n64[label="LATENCY"];
+	n57->n63[label="LATENCY"];
 	n57->n76[label="LATENCY"];
 	n57->n85[label="LATENCY"];
-	n86->n45[label="CONCURRENCY_INCREMENT_FEEDBACK"];
-	n4->n32[label="CONCURRENCY_LIMIT_MULTIPLIER"];
-	n18->n60[label="MAX_EMA"];
-	n22->n65[label="LATENCY_SETPOINT"];
-	n30->n74[label="LSF"];
-	n46->n48[label="CONCURRENCY_INCREMENT_INTEGRAL"];
+	n12->n21[label="TOLERANCE"];
+	n12->n37[label="TOLERANCE"];
 	n61->n20[label="LATENCY_EMA"];
 	n61->n36[label="LATENCY_EMA"];
 	n68->n25[label="DESIRED_CONCURRENCY"];
-	n10->n78[label="CONCURRENCY_INCREMENT_OVERLOAD"];
-	n14->n83[label="ZERO"];
-	n42->n44[label="CONCURRENCY_INCREMENT_SINGLE_TICK"];
-	n49->n79[label="CONCURRENCY_INCREMENT_NORMAL"];
-	n49->n84[label="CONCURRENCY_INCREMENT_NORMAL"];
-	n80->n66[label="CONCURRENCY_INCREMENT"];
+	n83->n65[label="CONCURRENCY_INCREMENT"];
+	n4->n32[label="CONCURRENCY_LIMIT_MULTIPLIER"];
+	n87->n91[label="CONCURRENCY_INCREMENT_FEEDBACK_SWITCH"];
+	n30->n74[label="LSF"];
+	n42->n45[label="CONCURRENCY_INCREMENT_SINGLE_TICK"];
+	n78->n80[label="CONCURRENCY_INCREMENT_SWITCH"];
+	n92->n44[label="CONCURRENCY_INCREMENT_FEEDBACK"];
+	n10->n81[label="CONCURRENCY_INCREMENT_OVERLOAD"];
+	n46->n48[label="CONCURRENCY_INCREMENT_INTEGRAL"];
+	n49->n82[label="CONCURRENCY_INCREMENT_NORMAL"];
+	n49->n90[label="CONCURRENCY_INCREMENT_NORMAL"];
+	n52->n66[label="MAX_CONCURRENCY"];
+	n22->n64[label="LATENCY_SETPOINT"];
+	n38->n77[label="LATENCY_OVERLOAD"];
+	n38->n86[label="LATENCY_OVERLOAD"];
+	n2->n17[label="EMA_LIMIT_MULTIPLIER"];
+	n14->n89[label="ZERO"];
+	n18->n60[label="MAX_EMA"];
+	n8->n40[label="LINEAR_CONCURRENCY_INCREMENT"];
+	n26->n28[label="DELTA_CONCURRENCY"];
+	n34->n51[label="UPPER_CONCURRENCY_LIMIT"];
 	
 }

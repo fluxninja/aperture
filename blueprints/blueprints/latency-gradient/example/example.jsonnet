@@ -1,5 +1,5 @@
+local aperture = import '../../../../libsonnet/1.0/main.libsonnet';
 local blueprint = import '../main.libsonnet';
-local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
 
 local Workload = aperture.v1.SchedulerWorkload;
 local LabelMatcher = aperture.v1.LabelMatcher;
@@ -8,20 +8,32 @@ local classifier = aperture.v1.Classifier;
 local extractor = aperture.v1.Extractor;
 local rule = aperture.v1.Rule;
 local selector = aperture.v1.Selector;
+local serviceSelector = aperture.v1.ServiceSelector;
+local flowSelector = aperture.v1.FlowSelector;
 local controlPoint = aperture.v1.ControlPoint;
 
 local svcSelector = {
-  service: 'service1-demo-app.demoapp.svc.cluster.local',
-  controlPoint: {
-    traffic: 'ingress',
+  sSelector: {
+    service: 'service1-demo-app.demoapp.svc.cluster.local',
+  },
+  fSelector: {
+    controlPoint: {
+      traffic: 'ingress',
+    },
   },
 };
 
 local svcSelector = selector.new()
-                    + selector.withAgentGroup('default')
-                    + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
-                    + selector.withControlPoint(controlPoint.new()
-                                                + controlPoint.withTraffic('ingress'));
+                    + selector.withServiceSelector(
+                      serviceSelector.new()
+                      + serviceSelector.withAgentGroup('default')
+                      + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                    )
+                    + selector.withFlowSelector(
+                      flowSelector.new()
+                      + flowSelector.withControlPoint(controlPoint.new()
+                                                      + controlPoint.withTraffic('ingress'))
+                    );
 
 
 local config = {
