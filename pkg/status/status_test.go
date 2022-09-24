@@ -54,7 +54,7 @@ var _ = Describe("Status Registry", func() {
 			Expect(rootRegistry.ChildIfExists("child")).To(BeNil())
 		})
 		It("returns the key of the root registry", func() {
-			Expect(rootRegistry.Key()).To(Equal(""))
+			Expect(rootRegistry.Key()).To(Equal("root"))
 		})
 	})
 
