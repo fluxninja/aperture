@@ -91,13 +91,14 @@ func NewLogger(w io.Writer, useDiode bool, levelString string) *Logger {
 
 	if useDiode {
 		// Use diode writer
-		wr = diode.NewWriter(w, 1000, 0, func(missed int) {
+		dr := diode.NewWriter(w, 1000, 0, func(missed int) {
 			Printf("Dropped %d messages", missed)
 		})
 		// set finalizer
-		runtime.SetFinalizer(wr, func(w io.Writer) {
-			w.(*diode.Writer).Close()
+		runtime.SetFinalizer(&dr, func(w *diode.Writer) {
+			w.Close()
 		})
+		wr = dr
 	} else {
 		wr = w
 	}
