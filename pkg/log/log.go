@@ -47,6 +47,8 @@ const (
 	serviceKey = "service"
 	// ComponentKey is a field key that are used with Component name value as a string to the logger context.
 	componentKey = "component"
+	// Sampled is a field key that are used with Sampled value as a bool to the logger context.
+	sampledKey = "sampled"
 )
 
 // Logger is wrapper around zerolog.Logger and io.writers.
@@ -195,6 +197,19 @@ func WithStr(key string, value string) *Logger {
 	return global.WithStr(key, value)
 }
 
+// WithBool adds a bool to the logger context.
+func (lg *Logger) WithBool(key string, value bool) *Logger {
+	zerolog := lg.logger.With().Bool(key, value).Logger()
+	return &Logger{
+		logger: &zerolog,
+	}
+}
+
+// WithBool adds a bool to the global logger context.
+func WithBool(key string, value bool) *Logger {
+	return global.WithBool(key, value)
+}
+
 // GetZerolog returns underlying zerolog logger.
 func (lg *Logger) GetZerolog() *zerolog.Logger {
 	return lg.logger
@@ -255,7 +270,7 @@ func GetLevel() zerolog.Level {
 
 // Sample returns the current logger with the s sampler.
 func (lg *Logger) Sample(sampler zerolog.Sampler) *Logger {
-	zerolog := lg.logger.Sample(sampler)
+	zerolog := lg.WithBool(sampledKey, true).logger.Sample(sampler)
 	return &Logger{
 		logger: &zerolog,
 	}

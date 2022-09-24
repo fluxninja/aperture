@@ -11,6 +11,8 @@ import (
 	"github.com/fluxninja/lumberjack"
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
+	"go.uber.org/zap"
 
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -33,7 +35,7 @@ func LogModule() fx.Option {
 		LoggerConstructor{ConfigKey: configKey}.Annotate(),
 		fx.Invoke(log.SetGlobalLogger),
 		fx.Invoke(log.SetStdLogger),
-		fx.WithLogger(WithApertureLogger()),
+		fx.WithLogger(FxLogger()),
 	)
 }
 
@@ -184,4 +186,11 @@ func NewLogger(config LogConfig) (*log.Logger, []io.Writer) {
 	logger := log.NewLogger(multi, config.NonBlocking, strings.ToLower(config.LogLevel))
 
 	return logger, writers
+}
+
+// FxLogger overrides fx default logger.
+func FxLogger() func(lg *log.Logger) fxevent.Logger {
+	return func(lg *log.Logger) fxevent.Logger {
+		return &fxevent.ZapLogger{Logger: zap.New(log.NewZapAdapter(lg, "fx"))}
+	}
 }

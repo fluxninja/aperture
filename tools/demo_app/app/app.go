@@ -81,7 +81,7 @@ func (simpleService SimpleService) Run() error {
 }
 
 func limitClients(h *RequestHandler, n int, l time.Duration) http.Handler {
-	logger := log.Sample(&zerolog.BasicSampler{N: 100})
+	logger := log.Sample(zerolog.Sometimes)
 
 	sem := make(chan struct{}, n)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

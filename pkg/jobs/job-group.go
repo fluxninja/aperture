@@ -187,7 +187,7 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 	// set initial status
 	err = jg.gt.updateStatus(executor, status.NewStatus(nil, initialErr))
 	if err != nil {
-		log.Error().Err(err).Str("job", job.Name()).Msg("Unable to update status of job")
+		jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("job", job.Name()).Msg("Unable to update status of job")
 		return err
 	}
 

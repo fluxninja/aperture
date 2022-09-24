@@ -12,7 +12,6 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -73,11 +72,11 @@ type JobConfig struct {
 type jobExecutor struct {
 	execLock sync.Mutex
 	Job
+	livenessRegistry status.Registry
 	jg               *JobGroup
 	job              *gocron.Job
 	config           JobConfig
 	jobTag           string
-	livenessRegistry status.Registry
 	stopped          bool
 }
 
@@ -143,7 +142,7 @@ func (executor *jobExecutor) doJob() {
 		}()
 		_, err := executor.jg.gt.execute(ctx, executor)
 		if err != nil {
-			log.Error().Err(err).Str("job", executor.Name()).Msg("job execution failed")
+			executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("job", executor.Name()).Msg("job execution failed")
 			return
 		}
 	})
@@ -198,7 +197,7 @@ func (executor *jobExecutor) start() {
 	// Scheduler.Do checks executor parameter and if the job has not been run before, it will schedule the job.
 	j, err := scheduler.Do(executor.doJob)
 	if err != nil {
-		log.Error().Err(err).Str("executor", executor.Name()).Msg("Unable to schedule the job")
+		executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("executor", executor.Name()).Msg("Unable to schedule the job")
 		return
 	}
 	executor.job = j
@@ -211,7 +210,7 @@ func (executor *jobExecutor) stop() {
 	executor.livenessRegistry.Detach()
 	err := executor.jg.scheduler.RemoveByTag(executor.jobTag)
 	if err != nil {
-		log.Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job")
+		executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job")
 		return
 	}
 	executor.stopped = true
@@ -220,7 +219,7 @@ func (executor *jobExecutor) stop() {
 func (executor *jobExecutor) trigger() {
 	err := executor.jg.scheduler.RunByTag(executor.jobTag)
 	if err != nil {
-		log.Error().Err(err).Str("executor", executor.Name()).Msg("Unable to trigger job")
+		executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("executor", executor.Name()).Msg("Unable to trigger job")
 		return
 	}
 }

@@ -2,14 +2,12 @@ package notifiers
 
 import (
 	"context"
-	"errors"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -35,41 +33,43 @@ func (fr *fxRunner) Notify(event Event) {
 }
 
 func (fr *fxRunner) processEvent(event Event) {
+	logger := fr.fxRunnerStatusRegistry.GetLogger()
 	switch event.Type {
 	case Write:
-		log.Info().Str("event", event.String()).Msg("key update")
+		logger.Info().Str("event", event.String()).Msg("key update")
 		if fr.app != nil {
 			// stop existing app
 			err := fr.deinitApp()
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to stop existing app")
+				logger.Error().Err(err).Msg("Failed to stop existing app")
 			}
 		}
 		// instantiate and start a new app
 		err := fr.initApp(event.Key)
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to instanticate and start a new app")
+			logger.Error().Err(err).Msg("Failed to instanticate and start a new app")
 		}
 	case Remove:
-		log.Info().Str("event", event.String()).Msg("key removed")
+		logger.Info().Str("event", event.String()).Msg("key removed")
 		// deinit the app
 		err := fr.deinitApp()
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to deinit app")
+			logger.Error().Err(err).Msg("Failed to deinit app")
 		}
 		fr.statusRegistry.Detach()
 	}
 }
 
 func (fr *fxRunner) initApp(key Key) error {
-	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, errors.New("policy runner initializing")))
+	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner initializing"), nil))
+	logger := fr.fxRunnerStatusRegistry.GetLogger()
 
 	if fr.app == nil && fr.Unmarshaller != nil {
 		var options []fx.Option
 		for _, fxOptionsFunc := range fr.fxOptionsFuncs {
 			o, e := fxOptionsFunc(key, fr.Unmarshaller, fr.statusRegistry)
 			if e != nil {
-				log.Error().Err(e).Msg("fxOptionsFunc failed")
+				logger.Error().Err(e).Msg("fxOptionsFunc failed")
 				return e
 			}
 			options = append(options, o)
@@ -92,18 +92,18 @@ func (fr *fxRunner) initApp(key Key) error {
 		var err error
 		if err = fr.app.Err(); err != nil {
 			visualize, _ := fx.VisualizeError(err)
-			log.Error().Err(err).Str("visualize", visualize).Msg("fx.New failed")
+			logger.Error().Err(err).Str("visualize", visualize).Msg("fx.New failed")
 			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err))
 			_ = fr.deinitApp()
 			return err
 		}
 
-		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, errors.New("policy runner starting")))
+		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner starting"), nil))
 
 		ctx, cancel := context.WithTimeout(context.Background(), fr.app.StartTimeout())
 		defer cancel()
 		if err = fr.app.Start(ctx); err != nil {
-			log.Error().Str("key", string(key)).Err(err).Msg("Could not start application")
+			logger.Error().Err(err).Msg("Could not start application")
 			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err))
 			return err
 		}
@@ -115,20 +115,25 @@ func (fr *fxRunner) initApp(key Key) error {
 }
 
 func (fr *fxRunner) deinitApp() error {
+	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner stopping"), nil))
+	logger := fr.fxRunnerStatusRegistry.GetLogger()
 	if fr.app != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), fr.app.StopTimeout())
 		defer func() { fr.app = nil }()
 		defer cancel()
 		if err := fr.app.Stop(ctx); err != nil {
-			log.Error().Err(err).Msg("Could not stop application")
+			logger.Error().Err(err).Msg("Could not stop application")
 			return err
 		}
 	}
+	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner stopped"), nil))
 	return nil
 }
 
 // FxDriver tracks prefix and allows spawning "mini FX-based apps" per key in the prefix.
 type FxDriver struct {
+	StatusRegistry     status.Registry
+	PrometheusRegistry *prometheus.Registry
 	// Options for new unmarshaller instances
 	UnmarshalPrefixNotifier
 
@@ -138,9 +143,7 @@ type FxDriver struct {
 	// The lifecycle of the app will be tied to the existence of the key.
 	// Note that when key's contents change the previous App will be stopped
 	// and a fresh one will be created.
-	FxOptionsFuncs     []FxOptionsFunc
-	StatusRegistry     status.Registry
-	PrometheusRegistry *prometheus.Registry
+	FxOptionsFuncs []FxOptionsFunc
 }
 
 // Make sure FxDriver implements PrefixNotifier.
@@ -148,8 +151,6 @@ var _ PrefixNotifier = (*FxDriver)(nil)
 
 // GetKeyNotifier returns a KeyNotifier that will notify the driver of key changes.
 func (fxDriver *FxDriver) GetKeyNotifier(key Key) KeyNotifier {
-	log.Info().Str("key", key.String()).Msg("GetKeyNotifier")
-
 	statusRegistry := fxDriver.StatusRegistry.Child(key.String())
 	fr := &fxRunner{
 		UnmarshalKeyNotifier:   fxDriver.getUnmarshalKeyNotifier(key),

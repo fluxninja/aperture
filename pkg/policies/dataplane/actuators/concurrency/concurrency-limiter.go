@@ -22,7 +22,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/notifiers"
@@ -231,12 +230,13 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
+	logger := conLimiterFactory.registry.GetLogger()
 	wrapperMessage := &wrappersv1.ConcurrencyLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	concurrencyLimiterMessage := wrapperMessage.ConcurrencyLimiter
 	if err != nil || concurrencyLimiterMessage == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
-		log.Warn().Err(err).Msg("Failed to unmarshal concurrency limiter config wrapper")
+		logger.Warn().Err(err).Msg("Failed to unmarshal concurrency limiter config wrapper")
 		return fx.Options(), err
 	}
 
@@ -245,7 +245,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	if schedulerProto == nil {
 		err = fmt.Errorf("no scheduler specified")
 		reg.SetStatus(status.NewStatus(nil, err))
-		log.Warn().Err(err).Msg("Failed to unmarshal scheduler")
+		logger.Warn().Err(err).Msg("Failed to unmarshal scheduler")
 		return fx.Options(), err
 	}
 	mm := multimatcher.New[int, multiMatchResult]()
