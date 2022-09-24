@@ -9,7 +9,7 @@ import (
 
 // NewZapAdapter returns a new zapcore Core logger interface that converts given logger's io.writer to WriteSyncer.
 func NewZapAdapter(logger *Logger, component string) zapcore.Core {
-	currentLevel := zerolog.GlobalLevel().String()
+	currentLevel := logger.GetLevel().String()
 	// zap has no "trace" level, so we use "debug" instead
 	if currentLevel == "trace" {
 		currentLevel = "debug"
@@ -27,7 +27,7 @@ func NewZapAdapter(logger *Logger, component string) zapcore.Core {
 
 	return zapcore.NewCore(
 		zapcore.NewJSONEncoder(encodercfg),
-		zapcore.AddSync(logger.w),
+		zapcore.AddSync(logger),
 		level,
 	).With([]zap.Field{zap.String(componentKey, component)})
 }

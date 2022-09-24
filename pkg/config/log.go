@@ -127,7 +127,6 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 		},
 		OnStop: func(context.Context) error {
 			panichandler.Go(func() {
-				logger.Close()
 				log.WaitFlush()
 				for _, writer := range writers {
 					if closer, ok := writer.(io.Closer); ok {

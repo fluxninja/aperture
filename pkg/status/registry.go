@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 // Registry .
@@ -19,7 +20,10 @@ type Registry interface {
 	Detach()
 	Key() string
 	HasError() bool
+	GetLogger() *log.Logger
 }
+
+var _ Registry = &registry{}
 
 // registry implements Registry.
 type registry struct {
@@ -29,6 +33,7 @@ type registry struct {
 	parent   *registry
 	children map[string]*registry
 	key      string
+	logger   *log.Logger
 }
 
 // NewRegistry creates a new Registry.
@@ -38,6 +43,7 @@ func NewRegistry() Registry {
 		parent:   nil,
 		status:   &statusv1.Status{},
 		children: make(map[string]*registry),
+		logger:   log.GetGlobalLogger(),
 	}
 	r.root = r
 	return r
@@ -57,6 +63,7 @@ func (r *registry) Child(key string) Registry {
 			root:     r.root,
 			status:   &statusv1.Status{},
 			children: make(map[string]*registry),
+			logger:   r.logger,
 		}
 		r.children[key] = child
 	}
@@ -165,4 +172,9 @@ func (r *registry) HasError() bool {
 		}
 	}
 	return false
+}
+
+// GetLogger returns the logger of the Registry.
+func (r *registry) GetLogger() *log.Logger {
+	return r.logger
 }

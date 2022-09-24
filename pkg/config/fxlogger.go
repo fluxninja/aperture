@@ -12,7 +12,7 @@ type logger struct {
 
 // LogEvent is the event fired when a log event is written.
 func (lo *logger) LogEvent(event fxevent.Event) {
-	l := lo.Logger.Component("FX")
+	l := lo.Logger.WithComponent("FX")
 	switch e := event.(type) {
 	case *fxevent.OnStartExecuting:
 		l.Trace().
