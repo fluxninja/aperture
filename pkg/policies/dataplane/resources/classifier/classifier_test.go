@@ -29,7 +29,7 @@ var _ = Describe("Classifier", func() {
 	BeforeEach(func() {
 		log.SetGlobalLevel(log.WarnLevel)
 
-		classifier = NewClassificationEngine(status.NewRegistry())
+		classifier = NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger()))
 	})
 
 	It("returns empty slice, when no rules configured", func() {

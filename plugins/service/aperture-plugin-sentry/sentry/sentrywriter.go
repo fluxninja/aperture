@@ -34,10 +34,10 @@ var zerologToSentryLevel = map[zerolog.Level]sentry.Level{
 
 // SentryWriter is a writer that forwards the data to the sentry client and the CrashWriter.
 type SentryWriter struct {
-	Client         *sentry.Client
-	Levels         map[zerolog.Level]struct{}
-	CrashWriter    *CrashWriter
-	StatusRegistry status.Registry
+	client         *sentry.Client
+	levels         map[zerolog.Level]struct{}
+	crashWriter    *CrashWriter
+	statusRegistry status.Registry
 }
 
 // Write implements io.Writer and forwards the data to CrashWriter buffer.
@@ -51,11 +51,11 @@ func (s *SentryWriter) Write(data []byte) (int, error) {
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to parse log event")
 			} else {
-				s.Client.CaptureEvent(event, nil, nil)
+				s.client.CaptureEvent(event, nil, nil)
 			}
 			_ = s.Close()
 		} else {
-			_, _ = s.CrashWriter.Write(data)
+			_, _ = s.crashWriter.Write(data)
 		}
 	}
 	return len(data), nil
@@ -72,7 +72,7 @@ func (s *SentryWriter) parseLogLevel(data []byte) (sentry.Level, bool) {
 		return "", false
 	}
 
-	_, enabled := s.Levels[level]
+	_, enabled := s.levels[level]
 	if !enabled {
 		return "", false
 	}
@@ -113,7 +113,7 @@ func (s *SentryWriter) parseLogEvent(level sentry.Level, data []byte) (*sentry.E
 // Close implements io.Closer and wait for the sentry client to flush its queue.
 func (s *SentryWriter) Close() error {
 	duration, _ := time.ParseDuration(SentryFlushWait)
-	s.Client.Flush(duration)
+	s.client.Flush(duration)
 	return nil
 }
 
@@ -121,12 +121,12 @@ func bytesToStrUnsafe(data []byte) string {
 	return *(*string)(unsafe.Pointer(&data))
 }
 
-// SentryPanicHandler is a panic handler that sends the fatal level event to Sentry with diagnostic information.
-func (s *SentryWriter) SentryPanicHandler(e interface{}, stacktrace panichandler.Callstack) {
+// sentryPanicHandler is a panic handler that sends the fatal level event to Sentry with diagnostic information.
+func (s *SentryWriter) sentryPanicHandler(e interface{}, stacktrace panichandler.Callstack) {
 	duration, _ := time.ParseDuration(SentryFlushWait)
 
 	// Crash Log
-	crashLogs := s.CrashWriter.GetCrashLogs()
+	crashLogs := s.crashWriter.GetCrashLogs()
 	for _, crashLog := range crashLogs {
 		levelStr, ok := crashLog["level"].(string)
 		if !ok {
@@ -161,31 +161,32 @@ func (s *SentryWriter) SentryPanicHandler(e interface{}, stacktrace panichandler
 		})
 	}
 
-	// Dump Status Registry
-	status := s.StatusRegistry.GetGroupStatus()
-	if status != nil {
-		groupStatus, err := json.Marshal(status)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to marshal status registry")
-		}
+	if s.statusRegistry != nil {
+		// Dump Status Registry
+		if status := s.statusRegistry.GetGroupStatus(); status != nil {
+			groupStatus, err := json.Marshal(status)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to marshal status registry")
+			}
 
-		statusData := make(map[string]interface{})
-		err = json.Unmarshal(groupStatus, &statusData)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to unmarshal status registry")
-		}
+			statusData := make(map[string]interface{})
+			err = json.Unmarshal(groupStatus, &statusData)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to unmarshal status registry")
+			}
 
-		sentry.AddBreadcrumb(&sentry.Breadcrumb{
-			Category: "Status Registry",
-			Level:    sentry.LevelInfo,
-			Data:     statusData,
-		})
-	} else {
-		sentry.AddBreadcrumb(&sentry.Breadcrumb{
-			Category: "Status Registry",
-			Level:    sentry.LevelInfo,
-			Message:  "No Status Registry found",
-		})
+			sentry.AddBreadcrumb(&sentry.Breadcrumb{
+				Category: "Status Registry",
+				Level:    sentry.LevelInfo,
+				Data:     statusData,
+			})
+		} else {
+			sentry.AddBreadcrumb(&sentry.Breadcrumb{
+				Category: "Status Registry",
+				Level:    sentry.LevelInfo,
+				Message:  "No Status Registry found",
+			})
+		}
 	}
 
 	// Service Version Information

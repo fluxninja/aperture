@@ -37,13 +37,13 @@ type registry struct {
 }
 
 // NewRegistry creates a new Registry.
-func NewRegistry() Registry {
+func NewRegistry(logger *log.Logger) Registry {
 	r := &registry{
 		key:      "root",
 		parent:   nil,
 		status:   &statusv1.Status{},
 		children: make(map[string]*registry),
-		logger:   log.GetGlobalLogger(),
+		logger:   logger,
 	}
 	r.root = r
 	return r
@@ -81,7 +81,7 @@ func (r *registry) ChildIfExists(key string) Registry {
 	return child
 }
 
-// Detach detaches the child from the parent.
+// Detach detaches the child from the parent to become root.
 func (r *registry) Detach() {
 	if r.parent == nil {
 		return
@@ -90,7 +90,7 @@ func (r *registry) Detach() {
 	r.parent.mu.Lock()
 	defer func() {
 		r.parent.mu.Unlock()
-		r.logger = log.GetGlobalLogger()
+		r.logger = r.root.logger
 		r.parent = nil
 		r.root = r
 	}()

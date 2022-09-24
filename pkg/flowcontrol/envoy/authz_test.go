@@ -60,7 +60,7 @@ func (s *AcceptingHandler) CheckWithValues(
 var _ = Describe("Authorization handler", func() {
 	When("it is queried with a request", func() {
 		BeforeEach(func() {
-			classifier = classification.NewClassificationEngine(status.NewRegistry())
+			classifier = classification.NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger()))
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
 			Expect(err).NotTo(HaveOccurred())
 			handler = envoy.NewHandler(classifier, nil, &AcceptingHandler{})
