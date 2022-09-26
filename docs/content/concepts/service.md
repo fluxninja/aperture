@@ -12,7 +12,7 @@ components to execute.
 
 :::note
 
-One entity may belong to multiple services.
+An entity (K8s Pod, VM, etc) may belong to multiple services.
 
 :::
 
@@ -53,8 +53,8 @@ of DaemonSet deployment or it can be a service name for sidecar deployments.
 In addition to providing scoping of services, Agent Group also defines the scope
 of **Agent-to-Agent synchronization**. Agents within their Group form a
 peer-to-peer network to synchronize fine-grained state such as per-label global
-counters that are used for [rate limiting purposes][distributed-counters]. Also,
-all the agents within an Agent Group instantiate the same set of [dataplane
+counters that are used for [rate limiting purposes][dist-counters]. Also, all
+the agents within an Agent Group instantiate the same set of [dataplane
 components][components], as published by Aperture Controller.
 
 :::
@@ -87,6 +87,6 @@ graph TB
     end
 ```
 
-[distributed-counters]: /concepts/flow-control/rate-limiter.md#distributed-counters
+[dist-counters]: /concepts/flow-control/rate-limiter.md#distributed-counters
 [components]: /concepts/flow-control/flow-control.md#components
 [catch-all-service]: /concepts/flow-control/selector.md#service

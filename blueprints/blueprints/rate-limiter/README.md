@@ -8,8 +8,8 @@
 
 #### Rate Limiter Overrides
 
-To tweak rate limiter behaviour based on specific label values, a list of `RateLimierOverride` objects
-can be added to the policy:
+To tweak rate limiter behaviour based on specific label values, a list of
+`RateLimierOverride` objects can be added to the policy:
 
 ```jsonnet
 local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
