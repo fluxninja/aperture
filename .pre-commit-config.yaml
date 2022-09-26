@@ -24,15 +24,15 @@ repos:
     rev: v4.2.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^(manifests/charts/.*/README*)
+        exclude: ^(manifests/charts/.*/README*)|\.*svg$|\.*dot$
       - id: end-of-file-fixer
-        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$
+        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot$
       - id: check-yaml
         exclude: ^(manifests/charts/.*/(templates|files)/.*|playground/tanka/charts/.*)
         args:
           - "--allow-multiple-documents"
       - id: check-added-large-files
-        exclude: ^operator/config/crd/
+        exclude: ^(operator/config/crd/.*|docs/content/assets/.*)
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
       - id: check-json
@@ -63,7 +63,7 @@ repos:
     rev: "v2.7.1"
     hooks:
       - id: prettier
-        exclude: ^(docs/gen/.*|manifests/charts/.*/README*|.github/.*/.*.md)
+        exclude: ^(docs/content/references/configuration/.*|manifests/charts/.*/README*|.github/.*/.*.md)
         types_or:
           [
             sh,
@@ -99,27 +99,41 @@ repos:
         language: script
         files: "values.yaml$"
         pass_filenames: false
-        description: "Generate docs"
-      - id: generate-docs
-        name: "Docs"
-        entry: "./scripts/precommit/generate_docs.sh"
+        description: "Generate helm readme"
+      - id: generate-swagger
+        name: "Config Swagger"
+        entry: "./scripts/precommit/generate_swagger.sh"
         language: script
-        files: '\.proto$|\.go$|\.md$|\.mmd$'
+        files: '\.proto$|\.go$'
         pass_filenames: false
-        description: "Generate docs"
-      - id: generate-libsonnet
-        name: "libsonnet"
-        entry: "./scripts/precommit/generate_libsonnet.sh"
+        description: "Generate swagger"
+      - id: generate-config-markdown
+        name: "Config Markdown"
+        entry: "./scripts/precommit/generate_config_markdown.sh"
         language: script
-        files: '\.proto$'
+        files: '\.proto$|\.go$'
         pass_filenames: false
-        description: "Generate Aperture libsonnet"
+        description: "Generate config markdown"
+      # - id: generate-mermaid
+      #   name: "Mermaid Diagrams"
+      #   entry: "./scripts/precommit/generate_mermaid.sh"
+      #   language: script
+      #   files: '\.md$|\.mmd$'
+      #   pass_filenames: false
+      #   description: "Generate mermaid diagrams"
+      - id: generate-blueprints
+        name: "blueprints"
+        entry: "./scripts/precommit/generate_blueprints.sh"
+        language: script
+        files: ^(blueprints)|\.proto$
+        pass_filenames: false
+        description: "Generate Aperture libsonnet and blueprints"
       - id: tanka-show
         name: "Check tanka parses jsonnet"
         language: script
         entry: ./scripts/precommit/check_tanka_show.sh
         pass_filenames: false
-        files: ^playground/tanka/
+        files: ^(playground/tanka/|blueprints)
         types_or:
           - jsonnet
           - json
@@ -143,3 +157,8 @@ repos:
         description: Checking if the Operator spec is changed
         entry: ./scripts/precommit/check-operator-spec.sh
         language: script
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.1.0
+    hooks:
+      - id: codespell
+        exclude: ^(.*\.svg|yarn.lock|go.sum)$

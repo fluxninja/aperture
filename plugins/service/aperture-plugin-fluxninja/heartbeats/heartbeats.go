@@ -8,13 +8,13 @@ import (
 
 	guuid "github.com/google/uuid"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -25,6 +25,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
@@ -43,6 +44,7 @@ const (
 )
 
 type Heartbeats struct {
+	heartbeatv1.UnimplementedControllerInfoServiceServer
 	heartbeatsClient heartbeatv1.FluxNinjaServiceClient
 	peersWatcher     *peers.PeerDiscovery
 	clientHTTP       *http.Client
@@ -52,14 +54,10 @@ type Heartbeats struct {
 	clientConn       *grpc.ClientConn
 	statusRegistry   status.Registry
 	entityCache      *entitycache.EntityCache
-	controllerInfo   *heartbeatv1.ControllerInfo
+	ControllerInfo   *heartbeatv1.ControllerInfo
 	heartbeatsAddr   string
 	APIKey           string
 	jobName          string
-}
-
-func (h *Heartbeats) GetControllerInfo() *heartbeatv1.ControllerInfo {
-	return h.controllerInfo
 }
 
 func newHeartbeats(
@@ -123,7 +121,7 @@ func (h *Heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdcl
 		}
 	}
 
-	h.controllerInfo = &heartbeatv1.ControllerInfo{
+	h.ControllerInfo = &heartbeatv1.ControllerInfo{
 		Id: controllerID,
 	}
 
@@ -188,9 +186,9 @@ func (h *Heartbeats) stop() {
 func (h *Heartbeats) newHeartbeat(
 	jobCtxt context.Context,
 ) *heartbeatv1.ReportRequest {
-	var servicesList *entitycachev1.ServicesList
+	var servicesList *heartbeatv1.ServicesList
 	if h.entityCache != nil {
-		servicesList = h.entityCache.Services()
+		servicesList = populateServicesList(h.entityCache)
 	}
 
 	var agentGroup string
@@ -208,7 +206,7 @@ func (h *Heartbeats) newHeartbeat(
 		ProcessInfo:    info.GetProcessInfo(),
 		HostInfo:       info.GetHostInfo(),
 		AgentGroup:     agentGroup,
-		ControllerInfo: h.controllerInfo,
+		ControllerInfo: h.ControllerInfo,
 		Peers:          peers,
 		ServicesList:   servicesList,
 		AllStatuses:    h.statusRegistry.GetGroupStatus(),
@@ -251,4 +249,17 @@ func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.M
 		log.Warn().Err(err).Msg("could not send heartbeat report")
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func (h *Heartbeats) GetControllerInfo(context.Context, *emptypb.Empty) (*heartbeatv1.ControllerInfo, error) {
+	return h.ControllerInfo, nil
+}
+
+func RegisterControllerInfoService(grpc *grpc.Server, handler *Heartbeats) error {
+	heartbeatv1.RegisterControllerInfoServiceServer(grpc, handler)
+	return nil
+}
+
+func RegisterControllerInfoServiceHTTP() fx.Option {
+	return grpcgateway.RegisterHandler{Handler: heartbeatv1.RegisterControllerInfoServiceHandlerFromEndpoint}.Annotate()
 }

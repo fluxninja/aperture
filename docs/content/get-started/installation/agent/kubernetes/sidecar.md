@@ -55,9 +55,17 @@ your cluster.
    helm repo update
    ```
 
-2. Configure the required parameters of Etcd and Prometheus for the Agent Custom
-   Resource by creating a `values.yaml` with below parameters and pass it with
-   `helm upgrade`:
+2. Configure the below parameters of Plugins, Etcd and Prometheus for the Agent
+   Custom Resource by creating a `values.yaml` with below parameters and pass it
+   with `helm upgrade`:
+
+   :::info
+
+   The below parameters disable the FluxNinja Cloud Plugin for the Aperture
+   Agent. If you want to keep it enabled, add parameters provided
+   [here](/cloud/plugin.md#configuration) under the `agent.config` section.
+
+   :::
 
    ```yaml
    agent:
@@ -68,6 +76,9 @@ your cluster.
          endpoints: ["ETCD_ENDPOINT_HERE"]
        prometheus:
          address: "PROMETHEUS_ADDRESS_HERE"
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
    ```
 
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
@@ -84,9 +95,12 @@ your cluster.
    agent:
      config:
        etcd:
-         endpoints: ['http://controller-etcd.default.svc.cluster.local:2379'],
+         endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
        prometheus:
-         address: 'http://controller-prometheus-server.default.svc.cluster.local:80',
+         address: "http://controller-prometheus-server.default.svc.cluster.local:80"
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
    ```
 
    ```bash
@@ -118,10 +132,14 @@ your cluster.
       spec:
         sidecar:
           enabled: true
-        etcd:
-          endpoints: ["ETCD_ENDPOINT_HERE"]
-        prometheus:
-          address: "PROMETHEUS_ADDRESS_HERE"
+        config:
+          etcd:
+            endpoints: ["ETCD_ENDPOINT_HERE"]
+          prometheus:
+            address: "PROMETHEUS_ADDRESS_HERE"
+          plugins:
+            disabled_plugins:
+              - aperture-plugin-fluxninja
       ```
 
       Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE`
@@ -167,14 +185,36 @@ your cluster.
    `.values.agent.sidecar.enableNamespacesByDefault` to deploy with the Helm
    chart.
 
-5. If you want to modify the default parameters, you can create or update the
-   `values.yaml` file and pass it with `helm upgrade`:
+5. If you want to modify the default parameters or the Aperture Agent config,
+   for example `log`, you can create or update the `values.yaml` file and pass
+   it with `helm upgrade`:
+
+   ```yaml
+   agent:
+     sidecar:
+       enabled: true
+     config:
+       etcd:
+         endpoints: ["ETCD_ENDPOINT_HERE"]
+       prometheus:
+         address: "PROMETHEUS_ADDRESS_HERE"
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
+       log:
+         level: debug
+         pretty_console: true
+         non_blocking: false
+   ```
 
    ```bash
    helm upgrade --install agent aperture/aperture-agent -f values.yaml
    ```
 
-   A list of configurable parameters can be found in the
+   All the config parameters for the Aperture Agent are available
+   [here](/references/configuration/agent.md).
+
+   A list of configurable parameters for the installation can be found in the
    [README](https://artifacthub.io/packages/helm/aperture/aperture-agent#parameters).
 
 6. If you want to deploy the Aperture Agent into a namespace other than
@@ -184,8 +224,9 @@ your cluster.
    helm upgrade --install agent aperture/aperture-agent -n aperture-agent --create-namespace
    ```
 
-7. Refer steps on the [Istio Configuration](/get-started/istio.md) if you don't
-   have the
+7. Refer steps on the
+   [Istio Configuration](/get-started/installation/agent/envoy/istio.md) if you
+   don't have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 
@@ -283,7 +324,7 @@ charts installed above:
    helm uninstall agent
    ```
 
-2. Alternativey, if you have installed the Aperture Agent Custom Resource
+2. Alternatively, if you have installed the Aperture Agent Custom Resource
    separately, follow below steps:
 
    1. Delete the Aperture Agent Custom Resource:

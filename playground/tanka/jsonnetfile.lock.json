@@ -4,36 +4,6 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/fluxninja/aperture-blueprints.git",
-          "subdir": ""
-        }
-      },
-      "version": "52b76b186a6fec62fbf4929a4a71d90caaa1efd8",
-      "sum": "uk6EpEDqUxUDMveDjS0R/5hU8inSVSQVA16G50fqK7Y="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/fluxninja/aperture-blueprints.git",
-          "subdir": "lib/1.0"
-        }
-      },
-      "version": "52b76b186a6fec62fbf4929a4a71d90caaa1efd8",
-      "sum": "fatDjTb+pmaIoCCeiLCtDABaKeNgslNq/rFWA0aDm9A="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/fluxninja/aperture.git",
-          "subdir": "libsonnet/1.0"
-        }
-      },
-      "version": "e3ad439e62f7ca4f668b3636fb9bcadcd0424fc1",
-      "sum": "LiUNRWyIlGwdkKpAIfgSpSLCYN4qzz06wsDrOiZgWxA="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/grafana/grafonnet-lib.git",
           "subdir": "grafonnet"
         }
@@ -48,7 +18,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
+      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
       "sum": "tDR6yT2GVfw0wTU12iZH+m01HrbIr6g/xN+/8nzNkU0="
     },
     {
@@ -58,7 +28,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
+      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
       "sum": "2++XoPslyz02LRgsxREWxjLgYgiCIqhAtXCyVSvYcoE="
     },
     {
@@ -68,7 +38,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "dbf6fc14105c28b6fd0253005f7ca2da37d3d4e1",
+      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {
@@ -104,22 +74,12 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/jsonnet-libs/k8s-libsonnet.git",
-          "subdir": "1.24"
-        }
-      },
-      "version": "610803705e9ec295ef2e4eeaa6b2f8fc1419e5b1",
-      "sum": "OcNQsWgCXnMSoWZNS7u9P9yn6d7HZk6/d/7++sgIc6Q="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/kubernetes-monitoring/kubernetes-mixin.git",
           "subdir": ""
         }
       },
-      "version": "1ddc6f6f739cc9fe4b8ac6a0fbb23cb09fe53bc3",
-      "sum": "0Goz56z5rF8rRarGQNj4f7VFvnsw7D7pSPUsYutt+J4="
+      "version": "5e44626d70c2bf2d35c37f3fee5a6261a5335cc6",
+      "sum": "F0lSJ5J+DUU7Y5u+j783bFLTHNd8Ir1IEkbXuK59RaA="
     }
   ],
   "legacyImports": false

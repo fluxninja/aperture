@@ -17,7 +17,7 @@ func getValidate() *validator.Validate {
 	validate := validator.New()
 	validate.RegisterCustomTypeFunc(durationCustomTypeFunc, Duration{})
 	validate.RegisterCustomTypeFunc(durationpbCustomTypeFunc, durationpb.Duration{})
-	validate.RegisterCustomTypeFunc(timestampCustomTypeFunc, Timestamp{})
+	validate.RegisterCustomTypeFunc(timestampCustomTypeFunc, Time{})
 	validate.RegisterCustomTypeFunc(timestamppbCustomTypeFunc, timestamppb.Timestamp{})
 	return validate
 }
@@ -78,8 +78,8 @@ func durationpbCustomTypeFunc(field reflect.Value) interface{} {
 }
 
 func timestampCustomTypeFunc(field reflect.Value) interface{} {
-	if value, ok := field.Interface().(Timestamp); ok {
-		return value.Timestamp.AsTime()
+	if value, ok := field.Interface().(Time); ok {
+		return value.timestamp.AsTime()
 	}
 	return nil
 }

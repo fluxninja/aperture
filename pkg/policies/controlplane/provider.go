@@ -3,7 +3,6 @@ package controlplane
 import (
 	"context"
 	"encoding/json"
-	"path"
 
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -13,11 +12,10 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdnotifier "github.com/fluxninja/aperture/pkg/etcd/notifier"
-	filesystemwatcher "github.com/fluxninja/aperture/pkg/filesystem/watcher"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/common"
+	kuberneteswatcher "github.com/fluxninja/aperture/pkg/policies/watcher/kubernetes"
 )
 
 // swagger:operation POST /policies common-configuration PoliciesConfig
@@ -28,24 +26,14 @@ import (
 //   in: body
 //   schema:
 //     "$ref": "#/definitions/JobGroupConfig"
-// - name: policies_path
-//   in: query
-//   type: string
-//   description: Directory containing policies rules
-//   x-go-default: "/etc/aperture/aperture-controller/policies"
-
-var (
-	policiesDefaultPath = path.Join(config.DefaultAssetsDirectory, "policies")
-	policiesConfigKey   = iface.PoliciesRoot + ".policies_path"
-	policiesFxTag       = "Policies"
-)
 
 // Module - Controller can be initialized by passing options from Module() to fx app.
 func Module() fx.Option {
+	policiesFxTag := "Policies"
 	return fx.Options(
-		fx.Provide(provideCMFileValidator),
+		fx.Provide(providePolicyValidator),
 		// Syncing policies config to etcd
-		filesystemwatcher.Constructor{Name: policiesFxTag, ConfigKey: policiesConfigKey, Path: policiesDefaultPath}.Annotate(), // Create a new watcher
+		kuberneteswatcher.Constructor{Name: policiesFxTag}.Annotate(), // Create a new watcher
 		fx.Invoke(
 			fx.Annotate(
 				setupPoliciesNotifier,
@@ -63,9 +51,8 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 		var dat []byte
 		switch etype {
 		case notifiers.Write:
-			unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
 			policyMessage := &policylangv1.Policy{}
-			unmarshalErr := unmarshaller.Unmarshal(policyMessage)
+			unmarshalErr := config.UnmarshalYAML(bytes, policyMessage)
 			if unmarshalErr != nil {
 				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 				return key, nil, unmarshalErr
@@ -93,7 +80,7 @@ func setupPoliciesNotifier(w notifiers.Watcher, etcdClient *etcdclient.Client, l
 	}
 
 	notifier := etcdnotifier.NewPrefixToEtcdNotifier(
-		paths.PoliciesConfigPath,
+		common.PoliciesConfigPath,
 		etcdClient,
 		true)
 	// content transform callback to wrap policy in config properties wrapper

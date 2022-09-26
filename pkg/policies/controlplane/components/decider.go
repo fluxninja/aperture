@@ -8,7 +8,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
@@ -40,9 +39,9 @@ type Decider struct {
 	truePendingSince time.Time
 	// Time at which state became false pending
 	falsePendingSince time.Time
-	// The duration of time the condition must be met before transitioning to on_true signal
+	// The duration of time the condition must be met before transitioning to 1.0 signal
 	trueForDuration time.Duration
-	// The duration of time the condition must be unmet before transitioning to on_false signal
+	// The duration of time the condition must be unmet before transitioning to 0.0 signal
 	falseForDuration time.Duration
 	// The current error correction state
 	state deciderState
@@ -54,8 +53,8 @@ type Decider struct {
 var _ runtime.Component = (*Decider)(nil)
 
 // NewDeciderAndOptions creates timed controller and its fx options.
-func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
-	operator, err := comparisonOperatorString(timedProto.Operator)
+func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+	operator, err := comparisonOperatorString(deciderProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err
 	}
@@ -63,8 +62,8 @@ func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI
 		return nil, fx.Options(), fmt.Errorf("unknown operator")
 	}
 	timed := &Decider{
-		trueForDuration:   timedProto.TrueFor.AsDuration(),
-		falseForDuration:  timedProto.FalseFor.AsDuration(),
+		trueForDuration:   deciderProto.TrueFor.AsDuration(),
+		falseForDuration:  deciderProto.FalseFor.AsDuration(),
 		operator:          operator,
 		state:             decidedFalse,
 		truePendingSince:  time.Time{},
@@ -75,16 +74,16 @@ func NewDeciderAndOptions(timedProto *policylangv1.Decider, _ int, policyReadAPI
 
 // Execute implements runtime.Component.Execute.
 func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	onTrue := inPortReadings.ReadSingleValuePort("on_true")
-	onFalse := inPortReadings.ReadSingleValuePort("on_false")
+	onTrue := runtime.NewReading(1.0)
+	onFalse := runtime.NewReading(0.0)
 	lhs := inPortReadings.ReadSingleValuePort("lhs")
 	rhs := inPortReadings.ReadSingleValuePort("rhs")
 
 	// Default currentDecision to False
 	currentDecision := false
 
-	if lhs.Valid && rhs.Valid {
-		lhsVal, rhsVal := lhs.Value, rhs.Value
+	if lhs.Valid() && rhs.Valid() {
+		lhsVal, rhsVal := lhs.Value(), rhs.Value()
 		switch dec.operator {
 		case gt:
 			currentDecision = (lhsVal > rhsVal)
@@ -103,7 +102,7 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 
 	decisionType := dec.computeDecisionType(currentDecision, tickInfo)
 
-	var output reading.Reading
+	var output runtime.Reading
 
 	switch decisionType {
 	case currentDecided:
@@ -123,7 +122,7 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	}
 
 	return runtime.PortToValue{
-		"output": []reading.Reading{output},
+		"output": []runtime.Reading{output},
 	}, nil
 }
 
@@ -143,7 +142,7 @@ func (dec *Decider) computeDecisionType(currentDecision bool, tickInfo runtime.T
 	} else {
 		pendingSince := dec.getPendingSince(currentDecision, tickInfo)
 		// check how much time has elapsed since the pending state was set
-		if tickInfo.Timestamp.Sub(pendingSince) < dec.trueForDuration {
+		if tickInfo.Timestamp().Sub(pendingSince) < dec.trueForDuration {
 			dec.setPending(currentDecision)
 			return currentPending
 		} else {
@@ -189,12 +188,12 @@ func (dec *Decider) setDecided(currentDecision bool) {
 func (dec *Decider) getPendingSince(currentDecision bool, tickInfo runtime.TickInfo) time.Time {
 	if currentDecision {
 		if dec.truePendingSince.IsZero() {
-			dec.truePendingSince = tickInfo.Timestamp
+			dec.truePendingSince = tickInfo.Timestamp()
 		}
 		return dec.truePendingSince
 	} else {
 		if dec.falsePendingSince.IsZero() {
-			dec.falsePendingSince = tickInfo.Timestamp
+			dec.falsePendingSince = tickInfo.Timestamp()
 		}
 		return dec.falsePendingSince
 	}

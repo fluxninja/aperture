@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -38,4 +39,9 @@ func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.Grou
 		}
 	}
 	return registry.GetGroupStatus(), nil
+}
+
+// GetStatus returns the status for all the keys in the registry.
+func (svc *StatusService) GetStatus(ctx context.Context, _ *emptypb.Empty) (*statusv1.GroupStatus, error) {
+	return svc.registry.GetGroupStatus(), nil
 }

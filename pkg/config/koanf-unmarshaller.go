@@ -25,9 +25,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// Unmarshal unmarshals using _just_ bytes as source of truth (no env, no
+// UnmarshalYAML unmarshals using _just_ bytes as source of truth (no env, no
 // flags, no other overrides).
-func Unmarshal(bytes []byte, output interface{}) error {
+func UnmarshalYAML(bytes []byte, output interface{}) error {
 	un, err := KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
 	if err != nil {
 		return err
@@ -295,14 +295,14 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 			case reflect.Slice:
 				sliceType := fv.Type().Elem()
 				reg := regexp.MustCompile(`^\[(.*)\]$`)
-				matchs := reg.FindStringSubmatch(val)
-				if len(matchs) != 2 {
+				matches := reg.FindStringSubmatch(val)
+				if len(matches) != 2 {
 					return
 				}
-				if matchs[1] == "" {
+				if matches[1] == "" {
 					v, err = nil, errors.New("empty slice provided in env var")
 				} else {
-					sliceValues := strings.Split(matchs[1], ",")
+					sliceValues := strings.Split(matches[1], ",")
 					switch sliceType.Kind() {
 					case reflect.Bool:
 						v, err = sliceconv.Atob(sliceValues)

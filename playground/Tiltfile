@@ -14,7 +14,7 @@ TILT_OBJECTS = []
 APERTURE_AGENT_NS = "aperture-agent"
 APERTURE_CONTROLLER_NS = "aperture-controller"
 APERTURE_DEMOAPP_NS = "demoapp"
-APERTURE_BOOKINFO_NS = "bookinfo"
+# APERTURE_BOOKINFO_NS = "bookinfo"
 APERTURE_ISTIO_NS = "istio-system"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
@@ -47,14 +47,15 @@ DEP_TREE = {
             "tkenv": TANKA_ROOT + "/apps/aperture-grafana",
             "child_resources": [
                 {
-                    "new_name": "aperture-grafana-operator-bootstrap",
+                    "new_name": "grafana-operator-bootstrap",
                     "extra_objects": [
                         ("integreatly.org$", "CustomResourceDefinition", None),
                     ]
                 },
                 {
                     "workload": "aperture-grafana-operator",
-                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "new_name": "grafana-operator",
+                    "resource_deps": ["grafana-operator-bootstrap"],
                     "extra_objects": [
                         ("^aperture-grafana-operator", None, APERTURE_CONTROLLER_NS)
                     ],
@@ -63,23 +64,23 @@ DEP_TREE = {
                     ]
                 },
                 {
-                    "new_name": "aperture-grafana",
-                    "resource_deps": ["aperture-grafana-operator"],
+                    "new_name": "grafana",
+                    "resource_deps": ["grafana-operator"],
                     "extra_objects": [
                         "aperture-grafana:grafana",
                         "controller-prometheus:grafanadatasource"
                     ]
                 },
                 {
-                    "new_name": "aperture-dashboards",
-                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "new_name": "dashboards",
+                    "resource_deps": ["grafana-operator-bootstrap"],
                     "extra_objects": [
                         (None, "GrafanaDashboard", APERTURE_CONTROLLER_NS)
                     ]
                 },
                 {
-                    "new_name": "aperture-grafana-data-sources",
-                    "resource_deps": ["aperture-grafana-operator-bootstrap"],
+                    "new_name": "grafana-data-sources",
+                    "resource_deps": ["grafana-operator-bootstrap"],
                     "extra_objects": [
                         (None, "GrafanaDataSource", APERTURE_CONTROLLER_NS)
                     ]
@@ -113,16 +114,17 @@ DEP_TREE = {
             ],
             "child_resources": [
                 {
-                    "new_name": "aperture-controller-operator-bootstrap",
+                    "new_name": "controller-operator-bootstrap",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "controllers.fluxninja.com:customresourcedefinition",
+                        "policies.fluxninja.com:customresourcedefinition",
                         "aperture-controller-defaulter:mutatingwebhookconfiguration",
                     ]
                 },
                 {
                     "workload": "controller",
-                    "new_name": "aperture-controller",
+                    "new_name": "controller",
                     "resource_deps": ["controller-etcd", "controller-aperture-controller-manager", "controller-prometheus"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'controller', 'app.kubernetes.io/managed-by': 'aperture-operator'},
@@ -130,7 +132,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "controller-aperture-controller-manager",
-                    "resource_deps": ["aperture-controller-operator-bootstrap"],
+                    "resource_deps": ["controller-operator-bootstrap"],
                     "extra_objects": [
                         ("^controller-aperture-controller", "Role|RoleBinding|ServiceAccount", APERTURE_CONTROLLER_NS),
                         ("^controller-aperture-controller", "ClusterRole|ClusterRoleBinding"),
@@ -170,7 +172,14 @@ DEP_TREE = {
                     "ignored_objects": [
                         ("^controller-kube-state-metrics", "Service|Deployment", APERTURE_CONTROLLER_NS),
                     ]
-                }
+                },
+                {
+                    "new_name": "policies",
+                    "resource_deps": ["cluster-bootstrap", "controller-service"],
+                    "extra_objects": [
+                        ("service1-demo-app$", "policy", APERTURE_CONTROLLER_NS),
+                    ]
+                },
             ]
         }
     },
@@ -192,7 +201,7 @@ DEP_TREE = {
             ],
             "child_resources": [
                 {
-                    "new_name": "aperture-agent-operator-bootstrap",
+                    "new_name": "agent-operator-bootstrap",
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "agents.fluxninja.com:customresourcedefinition",
@@ -201,7 +210,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "agent",
-                    "new_name": "aperture-agent",
+                    "new_name": "agent",
                     "resource_deps": ["controller-etcd", "agent-aperture-agent-manager", "controller-prometheus"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
@@ -209,7 +218,7 @@ DEP_TREE = {
                 },
                 {
                     "workload": "agent-aperture-agent-manager",
-                    "resource_deps": ["aperture-agent-operator-bootstrap"],
+                    "resource_deps": ["agent-operator-bootstrap"],
                     "extra_objects": [
                         ("^agent-aperture-agent", "Role|RoleBinding|ServiceAccount", APERTURE_AGENT_NS),
                         ("^agent-aperture-agent", "ClusterRole|ClusterRoleBinding"),
@@ -269,6 +278,7 @@ DEP_TREE = {
             "child_resources": [
                 {
                     "workload": "k6-operator-controller-manager",
+                    "resource_deps": ["cluster-bootstrap", "controller-service"],
                     "extra_objects": [
                         ("^k6-operator", "Namespace"),
                         ("k6.io$", "CustomResourceDefinition"),
@@ -315,47 +325,40 @@ DEP_TREE = {
                         "service3-demo-app:serviceaccount"
                     ]
                 },
-                {
-                    "new_name": "policies",
-                    "resource_deps": ["cluster-bootstrap", "controller-service"],
-                    "extra_objects": [
-                        ("policies$", "ConfigMap", APERTURE_CONTROLLER_NS),
-                    ]
-                },
             ]
         },
     },
-    APERTURE_BOOKINFO_NS: {
-        "bookinfo": {
-            "labels": ["DemoApplications"],
-            "needs": ["istio"],
-            "tkenv": TANKA_ROOT + "/apps/bookinfo",
-            "child_resources": [
-                {
-                    "new_name": "bookinfo-common",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
-                    "extra_objects": [
-                        ("^bookinfo", None, APERTURE_BOOKINFO_NS)
-                    ],
-                },
-                { "workload": "details-v1", "resource_deps": ["bookinfo-common"] },
-                { "workload": "ratings-v1", "resource_deps": ["bookinfo-common"] },
-                { "workload": "productpage-v1", "resource_deps": ["bookinfo-common"] },
-                { "workload": "reviews-v1", "resource_deps": ["bookinfo-common"] },
-                { "workload": "reviews-v2", "resource_deps": ["bookinfo-common"] },
-                { "workload": "reviews-v3", "resource_deps": ["bookinfo-common"] },
-            ],
-        },
-    }
+    # APERTURE_BOOKINFO_NS: {
+    #     "bookinfo": {
+    #         "labels": ["DemoApplications"],
+    #         "needs": ["istio"],
+    #         "tkenv": TANKA_ROOT + "/apps/bookinfo",
+    #         "child_resources": [
+    #             {
+    #                 "new_name": "bookinfo-common",
+    #                 "resource_deps": ["cluster-bootstrap", "istiod"],
+    #                 "extra_objects": [
+    #                     ("^bookinfo", None, APERTURE_BOOKINFO_NS)
+    #                 ],
+    #             },
+    #             { "workload": "details-v1", "resource_deps": ["bookinfo-common"] },
+    #             { "workload": "ratings-v1", "resource_deps": ["bookinfo-common"] },
+    #             { "workload": "productpage-v1", "resource_deps": ["bookinfo-common"] },
+    #             { "workload": "reviews-v1", "resource_deps": ["bookinfo-common"] },
+    #             { "workload": "reviews-v2", "resource_deps": ["bookinfo-common"] },
+    #             { "workload": "reviews-v3", "resource_deps": ["bookinfo-common"] },
+    #         ],
+    #     },
+    # }
 }
 
 NS_CONFIG = {
     APERTURE_DEMOAPP_NS: {
         "labels": ["istio-injection: enabled"],
     },
-    APERTURE_BOOKINFO_NS: {
-        "labels": ["istio-injection: enabled"]
-    },
+    # APERTURE_BOOKINFO_NS: {
+    #     "labels": ["istio-injection: enabled"]
+    # },
 }
 
 ###############
@@ -458,7 +461,7 @@ def render_tanka(environment, env_vars):
         # tanka/apps/default -> tanka/
         # apps/default -> ./
         # Make sure jb dependencies are up to date
-        local(command=["jb", "install"], dir=base_dir)
+        local(command=["./scripts/jb_install.sh"])
 
         # Refreshing the dependencies for the Agent chart
         refresh_chart_dependencies(base_dir + "charts/aperture-agent")
@@ -533,7 +536,7 @@ def invert_dep_tree(dep_tree):
 
 def get_resource_list_to_deploy(names, run_only_listed, dep_tree, inv_dep_tree):
     """
-    Resursively convert list of NS and service names to set of required services
+    Recursively convert list of NS and service names to set of required services
     If a given name is both a name of resource and namespace, it is assumed to be resource
     """
     if "all" in names:
@@ -854,25 +857,25 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
 
     if "aperture-grafana" in resources:
         forward_port_delayed(
-            workload="aperture-grafana-forward",
+            workload="grafana-forward",
             namespace=APERTURE_CONTROLLER_NS,
             labels=["ApertureController"],
-            resource_deps=["aperture-grafana"],
+            resource_deps=["grafana"],
             service="aperture-grafana",
             local_port=3000,
             remote_port=3000,
             extra_env={
-                "PERIOD": "1s",
-                "INITIAL_DELAY": "1s",
+                "PERIOD": "1",
+                "INITIAL_DELAY": "1",
             },
         )
 
     if "demo-app" in resources:
-        readiness_probe=probe(initial_delay_secs=5, exec=exec_action(['kubectl', 'get', "svc", "aperture-controller", "-n", APERTURE_CONTROLLER_NS])) # Treat as success if servie is available
+        readiness_probe=probe(initial_delay_secs=5, exec=exec_action(['kubectl', 'get', "svc", "aperture-controller", "-n", APERTURE_CONTROLLER_NS])) # Treat as success if service is available
         local_resource(
             name="controller-service",
             labels="ApertureController",
-            resource_deps=["aperture-controller"],
+            resource_deps=["controller"],
             serve_cmd=['./scripts/check-controller-service.sh'],
             readiness_probe=readiness_probe,
         )
@@ -882,6 +885,8 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
             local('if (kubectl get agent agent -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete agent agent -n {0};  fi'.format(APERTURE_AGENT_NS))
         if "controller" in resources:
             local('if (kubectl get controller controller -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete controller controller -n {0};  fi'.format(APERTURE_CONTROLLER_NS))
+        if "policies" in resources:
+            local('if (kubectl get policy service1-demo-app -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete policy service1-demo-app -n {0};  fi'.format(APERTURE_CONTROLLER_NS))
         for resource_name in resources:
             resource = inv_dep_tree[resource_name]
             pvc_selectors = resource.get("pvc_selectors", [])

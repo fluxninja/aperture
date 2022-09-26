@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/fluxninja/aperture/pkg/discovery/common"
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
@@ -44,24 +44,24 @@ func (sd *StaticDiscovery) stop() error {
 	return nil
 }
 
-func (sd *StaticDiscovery) entitiesFromConfig() map[string]*common.Entity {
+func (sd *StaticDiscovery) entitiesFromConfig() map[string]*entitycachev1.Entity {
 	// entities maps entity tracker key to the entity.
 	// We assume that configured entities are consistent, i.e. same Prefix+UID implies equality of other fields
-	entities := make(map[string]*common.Entity)
+	entities := make(map[string]*entitycachev1.Entity)
 
 	for _, service := range sd.services {
 		serviceName := service.Name
 		for _, e := range service.Entities {
 			key := fmt.Sprintf("%s.%s", staticEntityTrackerPrefix, e.UID)
 
-			var entity *common.Entity
+			var entity *entitycachev1.Entity
 			var ok bool
 
 			if entity, ok = entities[key]; !ok {
-				entity = &common.Entity{
-					IPAddress: e.IPAddress,
+				entity = &entitycachev1.Entity{
+					IpAddress: e.IPAddress,
 					Prefix:    staticEntityTrackerPrefix,
-					UID:       e.UID,
+					Uid:       e.UID,
 					Services:  nil,
 					Name:      e.Name,
 				}

@@ -4,6 +4,7 @@
 resources:
 - bases/fluxninja.com_agents.yaml
 - bases/fluxninja.com_controllers.yaml
+- bases/fluxninja.com_policies.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

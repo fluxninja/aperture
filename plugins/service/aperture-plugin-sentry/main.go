@@ -10,11 +10,11 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/sentry"
 )
 
+// Set via ldflags.
 const (
 	Plugin        = "aperture-plugin-sentry"
 	BuildHost     = "unknown"
@@ -35,20 +35,4 @@ func (sp *SentryPlugin) Module() fx.Option {
 	return fx.Options(
 		sentry.SentryWriterConstructor{ConfigKey: Plugin}.Annotate(),
 	)
-}
-
-func main() {
-	sp := &SentryPlugin{}
-	app := platform.New(
-		platform.Config{}.Module(),
-		sp.Module(),
-	)
-
-	if err := app.Err(); err != nil {
-		visualize, _ := fx.VisualizeError(err)
-		log.Panic().Err(err).Msg("fx.New failed: " + visualize)
-	}
-
-	log.Info().Msg("sentry-plugin app created")
-	platform.Run(app)
 }

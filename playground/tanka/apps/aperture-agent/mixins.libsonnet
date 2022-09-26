@@ -1,5 +1,3 @@
-local k = import 'k.libsonnet';
-
 local apertureAgentApp = import 'apps/aperture-agent/main.libsonnet';
 
 local apertureAgentMixin =

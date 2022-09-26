@@ -18,21 +18,21 @@ const (
 )
 
 // NewFactory returns a new factory for the metrics processor.
-func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine) component.ProcessorFactory {
+func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine, metricsAPI iface.ResponseMetricsAPI) component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
-		createDefaultConfig(promRegistry, engine),
+		createDefaultConfig(promRegistry, engine, metricsAPI),
 		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
-		component.WithTracesProcessor(createTracesProcessor, component.StabilityLevelInDevelopment),
 	)
 }
 
-func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.Engine) component.ProcessorCreateDefaultConfigFunc {
+func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.Engine, metricsAPI iface.ResponseMetricsAPI) component.ProcessorCreateDefaultConfigFunc {
 	return func() config.Processor {
 		return &Config{
 			ProcessorSettings: config.NewProcessorSettings(config.NewComponentID(typeStr)),
 			promRegistry:      promRegistry,
 			engine:            engine,
+			metricsAPI:        metricsAPI,
 		}
 	}
 }
@@ -48,35 +48,12 @@ func createLogsProcessor(
 	if err != nil {
 		return nil, err
 	}
-	return processorhelper.NewLogsProcessorWithCreateSettings(
+	return processorhelper.NewLogsProcessor(
 		ctx,
 		params,
 		cfg,
 		nextLogsConsumer,
 		proc.ConsumeLogs,
-		processorhelper.WithCapabilities(proc.Capabilities()),
-		processorhelper.WithStart(proc.Start),
-		processorhelper.WithShutdown(proc.Shutdown),
-	)
-}
-
-func createTracesProcessor(
-	ctx context.Context,
-	params component.ProcessorCreateSettings,
-	cfg config.Processor,
-	nextTracesConsumer consumer.Traces,
-) (component.TracesProcessor, error) {
-	cfgTyped := cfg.(*Config)
-	proc, err := newProcessor(cfgTyped)
-	if err != nil {
-		return nil, err
-	}
-	return processorhelper.NewTracesProcessorWithCreateSettings(
-		ctx,
-		params,
-		cfg,
-		nextTracesConsumer,
-		proc.ConsumeTraces,
 		processorhelper.WithCapabilities(proc.Capabilities()),
 		processorhelper.WithStart(proc.Start),
 		processorhelper.WithShutdown(proc.Shutdown),

@@ -894,7 +894,7 @@ spec:
                       agent_group:
                         description: "All agents within an agent_group receive the
                           same data-plane configuration (e.g. schedulers, FluxMeters,
-                          rate limiter). \n [Read more about agent groups here](/concepts/flow-control/service.md#agent-group)."
+                          rate limiter). \n [Read more about agent groups here](/concepts/service.md#agent-group)."
                         type: string
                     type: object
                   client:
@@ -941,6 +941,25 @@ spec:
                         type: array
                       lease_ttl:
                         description: Lease time-to-live
+                        type: string
+                      password:
+                        type: string
+                      tls:
+                        description: Client TLS configuration
+                        properties:
+                          ca_file:
+                            type: string
+                          cert_file:
+                            type: string
+                          insecure_skip_verify:
+                            type: boolean
+                          key_file:
+                            type: string
+                          key_log_file:
+                            type: string
+                        type: object
+                      username:
+                        description: Authentication
                         type: string
                     type: object
                   fluxninja_plugin:
@@ -1282,12 +1301,6 @@ spec:
                               will be sent regardless of size.
                             type: string
                         type: object
-                      grpc_addr:
-                        description: GRPC listener addr for OTEL Collector.
-                        type: string
-                      http_addr:
-                        description: HTTP listener addr for OTEL Collector.
-                        type: string
                     type: object
                   peer_discovery:
                     description: Peer discovery configuration.
@@ -1421,6 +1434,11 @@ spec:
                           enable_reflection:
                             description: Enable Reflection
                             type: boolean
+                          latency_buckets_ms:
+                            description: Buckets specification in latency histogram
+                            items:
+                              type: number
+                            type: array
                         type: object
                       grpc_gateway:
                         description: GRPC Gateway configuration.
@@ -1440,15 +1458,11 @@ spec:
                           idle_timeout:
                             description: Idle timeout
                             type: string
-                          latency_bucket_count:
-                            description: The number of buckets in latency histogram
-                            type: integer
-                          latency_bucket_start_ms:
-                            description: The lowest bucket in latency histogram
-                            type: number
-                          latency_bucket_width_ms:
-                            description: The bucket width in latency histogram
-                            type: number
+                          latency_buckets_ms:
+                            description: Buckets specification in latency histogram
+                            items:
+                              type: number
+                            type: array
                           max_header_bytes:
                             description: Max header size in bytes
                             type: integer
@@ -1464,7 +1478,7 @@ spec:
                         type: object
                       keep_alive:
                         description: Keep-alive period - 0 = enabled if supported
-                          by protocol or OS. If negative then keep-alives are disabled.
+                          by protocol or OS. If negative then keep-alive is disabled.
                         type: string
                       network:
                         description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6"
@@ -1476,21 +1490,17 @@ spec:
                           allowed_cn:
                             description: Allowed CN
                             type: string
-                          certs_path:
-                            description: Path to credentials. This can be set via
-                              command line arguments as well.
+                          cert_file:
+                            description: Server Cert file path
                             type: string
-                          client_ca:
-                            description: Client CA file
+                          client_ca_file:
+                            description: Client CA file path
                             type: string
                           enabled:
                             description: Enabled TLS
                             type: boolean
-                          server_cert:
-                            description: Server Cert file
-                            type: string
-                          server_key:
-                            description: Server Key file
+                          key_file:
+                            description: Server Key file path
                             type: string
                         type: object
                     type: object
@@ -3630,8 +3640,6 @@ spec:
                   tag:
                     description: The tag (version) of the image
                     type: string
-                required:
-                - repository
                 type: object
               initContainers:
                 description: Add additional init containers
@@ -5183,9 +5191,6 @@ spec:
                           name:
                             description: Name of the secret
                             type: string
-                        required:
-                        - key
-                        - name
                         type: object
                       value:
                         description: Value for the ApiKey

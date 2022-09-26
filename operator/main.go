@@ -34,8 +34,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	"github.com/fluxninja/aperture/operator/api/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/operator/controllers/agent"
+	"github.com/fluxninja/aperture/operator/controllers/controller"
+	"github.com/fluxninja/aperture/operator/controllers/mutatingwebhook"
+	"github.com/fluxninja/aperture/operator/controllers/namespace"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -47,7 +51,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(v1alpha1.AddToScheme(scheme))
+	utilruntime.Must(api.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -105,24 +109,38 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = controllers.CheckAndGenerateCertForOperator(); err != nil {
-		setupLog.Error(err, "unable to manage webhook certificates")
-		os.Exit(1)
-	}
-
-	server := mgr.GetWebhookServer()
-	server.CertDir = os.Getenv("APERTURE_OPERATOR_CERT_DIR")
-	server.CertName = os.Getenv("APERTURE_OPERATOR_CERT_NAME")
-	server.KeyName = os.Getenv("APERTURE_OPERATOR_KEY_NAME")
-
 	dynamicClient, err := dynamic.NewForConfig(ctrl.GetConfigOrDie())
 	if err != nil {
 		setupLog.Error(err, "unable to create Dynamic Client")
 		os.Exit(1)
 	}
 
+	var server *webhook.Server
+
+	if agentManager || controllerManager {
+		if err = controllers.CheckAndGenerateCertForOperator(); err != nil {
+			setupLog.Error(err, "unable to manage webhook certificates")
+			os.Exit(1)
+		}
+
+		server = mgr.GetWebhookServer()
+		server.CertDir = os.Getenv("APERTURE_OPERATOR_CERT_DIR")
+		server.CertName = os.Getenv("APERTURE_OPERATOR_CERT_NAME")
+		server.KeyName = os.Getenv("APERTURE_OPERATOR_KEY_NAME")
+
+		if err = (&mutatingwebhook.MutatingWebhookReconciler{
+			Client:            mgr.GetClient(),
+			Scheme:            mgr.GetScheme(),
+			AgentManager:      agentManager,
+			ControllerManager: controllerManager,
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "MutatingWebhook")
+			os.Exit(1)
+		}
+	}
+
 	if agentManager {
-		reconciler := &controllers.AgentReconciler{
+		reconciler := &agent.AgentReconciler{
 			Client:        mgr.GetClient(),
 			DynamicClient: dynamicClient,
 			Scheme:        mgr.GetScheme(),
@@ -134,7 +152,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		if err = (&controllers.NamespaceReconciler{
+		if err = (&namespace.NamespaceReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
@@ -142,17 +160,17 @@ func main() {
 			os.Exit(1)
 		}
 
-		apertureInjector := &controllers.ApertureInjector{
+		apertureInjector := &mutatingwebhook.ApertureInjector{
 			Client: mgr.GetClient(),
 		}
 		reconciler.ApertureInjector = apertureInjector
 
 		server.Register(controllers.MutatingWebhookURI, &webhook.Admission{Handler: apertureInjector})
-		server.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &controllers.AgentHooks{}})
+		server.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &agent.AgentHooks{}})
 	}
 
 	if controllerManager {
-		if err = (&controllers.ControllerReconciler{
+		if err = (&controller.ControllerReconciler{
 			Client:        mgr.GetClient(),
 			DynamicClient: dynamicClient,
 			Scheme:        mgr.GetScheme(),
@@ -162,17 +180,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		server.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controllers.ControllerHooks{}})
-	}
-
-	if err = (&controllers.MutatingWebhookReconciler{
-		Client:            mgr.GetClient(),
-		Scheme:            mgr.GetScheme(),
-		AgentManager:      agentManager,
-		ControllerManager: controllerManager,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "MutatingWebhook")
-		os.Exit(1)
+		server.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controller.ControllerHooks{}})
 	}
 
 	//+kubebuilder:scaffold:builder

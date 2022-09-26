@@ -1,40 +1,22 @@
 {{- define "common-otlp-attributes" -}}
-- key: http.method
+- key: aperture.source
   value:
-    string_value: "%REQ(:METHOD)%"
-- key: http.target
-  value:
-    string_value: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
-- key: http.flavor
-  value:
-    string_value: "%PROTOCOL%"
-- key: http.host
-  value:
-    string_value: "%REQ(HOST)%"
-- key: http.user_agent
-  value:
-    string_value: "%REQ(USER-AGENT)%"
-- key: duration_millis
-  value:
-    string_value: "%RESPONSE_DURATION%"
-- key: http.request_content_length
-  value:
-    string_value: "%BYTES_RECEIVED%"
-- key: http.response_content_length
-  value:
-    string_value: "%BYTES_SENT%"
-- key: http.status_code
-  value:
-    string_value: "%RESPONSE_CODE%"
-- key: aperture.labels
-  value:
-    string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.labels)%"
+    string_value: "envoy"
 - key: aperture.check_response
   value:
     string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
-- key: aperture.authz_response
+- key: http.status_code
   value:
-    string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.authz_response)%"
+    string_value: "%RESPONSE_CODE%"
+- key: authz_duration
+  value:
+    string_value: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:ext_authz_duration)%"
+- key: BYTES_RECEIVED
+  value:
+    string_value: "%BYTES_RECEIVED%"
+- key: BYTES_SENT
+  value:
+    string_value: "%BYTES_SENT%"
 - key: DURATION
   value:
     string_value: "%DURATION%"
@@ -80,7 +62,7 @@ spec:
                   log_name: ingress
                   grpc_service:
                     google_grpc:
-                      target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.otlpPort }}
+                      target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.port }}
                       stat_prefix: aperture_access_log
                   transport_api_version: V3
                 body:
@@ -90,18 +72,6 @@ spec:
                 attributes:
                   values:
                     {{- include "common-otlp-attributes" . | nindent 20 }}
-                    - key: control_point
-                      value:
-                        string_value: "ingress"
-                    - key: net.peer.ip
-                      value:
-                        string_value: "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"
-                    - key: net.host.ip
-                      value:
-                        string_value: "%DOWNSTREAM_LOCAL_ADDRESS_WITHOUT_PORT%"
-                    - key: net.host.port
-                      value:
-                        string_value: "%DOWNSTREAM_LOCAL_PORT%"
 
   - applyTo: NETWORK_FILTER
     match:
@@ -124,7 +94,7 @@ spec:
                   log_name: egress
                   grpc_service:
                     google_grpc:
-                      target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.otlpPort }}
+                      target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.port }}
                       stat_prefix: aperture_access_log
                   transport_api_version: V3
                 body:
@@ -134,16 +104,6 @@ spec:
                 attributes:
                   values:
                     {{- include "common-otlp-attributes" . | nindent 20 }}
-                    - key: control_point
-                      value:
-                        string_value: "egress"
-                    # Can't set separate net.peer.ip/port as envoy doesn't provide such attributes for upstream
-                    - key: net.peer.address
-                      value:
-                        string_value: "%UPSTREAM_HOST%"
-                    - key: net.host.address
-                      value:
-                        string_value: "%UPSTREAM_LOCAL_ADDRESS%"
 
   - applyTo: HTTP_FILTER
     match:
@@ -162,13 +122,10 @@ spec:
         typed_config:
           "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
           transport_api_version: V3
-          with_request_body:
-            max_request_bytes: {{ .Values.envoyFilter.maxRequestBytes }}
-            allow_partial_message: true
           failure_mode_allow: true
           grpc_service:
             google_grpc:
-              target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.authzPort }}
+              target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.port }}
               stat_prefix: ext_authz
             timeout: {{ .Values.envoyFilter.authzGrpcTimeout }}
             initial_metadata:
@@ -195,13 +152,10 @@ spec:
         typed_config:
           "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
           transport_api_version: V3
-          with_request_body:
-            max_request_bytes: {{ .Values.envoyFilter.maxRequestBytes }}
-            allow_partial_message: true
           failure_mode_allow: true
           grpc_service:
             google_grpc:
-              target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.authzPort }}
+              target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.port }}
               stat_prefix: ext_authz
             timeout: {{ .Values.envoyFilter.authzGrpcTimeout }}
             initial_metadata:

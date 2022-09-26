@@ -57,6 +57,7 @@ rules:
   - fluxninja.com
   resources:
   - controllers
+  - policies
   verbs:
   - create
   - delete
@@ -69,12 +70,14 @@ rules:
   - fluxninja.com
   resources:
   - controllers/finalizers
+  - policies/finalizers
   verbs:
   - update
 - apiGroups:
   - fluxninja.com
   resources:
   - controllers/status
+  - policies/status
   verbs:
   - get
   - patch
@@ -169,6 +172,18 @@ rules:
   - patch
   - watch
 - apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
   - ""
   resources:
   - endpoints
@@ -231,77 +246,8 @@ subjects:
 - kind: ServiceAccount
   name: {{ include "controller-operator.serviceAccountName" . }}
   namespace: {{ template "common.names.namespace" . }}
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: {{ template "common.names.fullname" . }}-leader-election-role
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-controller-manager
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
-    {{- end }}
-  {{- if .Values.commonAnnotations }}
-  annotations:
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
-  {{- end }}
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: {{ template "common.names.fullname" . }}-leader-election-rolebinding
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-controller-manager
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
-    {{- end }}
-  {{- if .Values.commonAnnotations }}
-  annotations:
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
-  {{- end }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: {{ template "common.names.fullname" . }}-leader-election-role
-subjects:
-- kind: ServiceAccount
-  name: {{ include "controller-operator.serviceAccountName" . }}
-  namespace: {{ template "common.names.namespace" . }}
 {{- end }}
+
 ---
 {{ if .Values.operator.serviceAccount.create -}}
 apiVersion: v1

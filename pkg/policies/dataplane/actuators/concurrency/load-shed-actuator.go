@@ -15,10 +15,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/concurrency/scheduler"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -40,7 +39,7 @@ func newLoadShedActuatorFactory(
 	prometheusRegistry *prometheus.Registry,
 ) (*loadShedActuatorFactory, error) {
 	// Scope the sync to the agent group.
-	etcdPath := path.Join(paths.LoadShedDecisionsPath, paths.AgentGroupPrefix(agentGroup))
+	etcdPath := path.Join(common.LoadShedDecisionsPath, common.AgentGroupPrefix(agentGroup))
 	loadShedDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
@@ -60,7 +59,7 @@ func newLoadShedActuatorFactory(
 	f.tokenBucketFillRateGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: metrics.TokenBucketFillRateMetricName,
-			Help: "A gauge that tracks the fill rate of token bucket",
+			Help: "A gauge that tracks the fill rate of token bucket in tokens/sec",
 		},
 		metricLabelKeys,
 	)
@@ -155,7 +154,7 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concu
 	}
 	// decision notifier
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.DataplaneComponentKey(lsaFactory.agentGroupName, lsa.conLimiter.GetPolicyName(), lsa.conLimiter.GetComponentIndex())),
+		notifiers.Key(common.DataplaneComponentKey(lsaFactory.agentGroupName, lsa.conLimiter.GetPolicyName(), lsa.conLimiter.GetComponentIndex())),
 		unmarshaller,
 		lsa.decisionUpdateCallback,
 	)
@@ -245,17 +244,18 @@ type loadShedActuator struct {
 }
 
 func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := lsa.statusRegistry.GetLogger()
 	if event.Type == notifiers.Remove {
-		log.Debug().Msg("Decision was removed")
+		logger.Debug().Msg("Decision was removed")
 		return
 	}
 
-	var wrapperMessage wrappersv1.LoadShedDecsisionWrapper
+	var wrapperMessage wrappersv1.LoadShedDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	loadShedDecision := wrapperMessage.LoadShedDecision
 	if err != nil || loadShedDecision == nil {
 		statusMsg := "Failed to unmarshal config wrapper"
-		log.Warn().Err(err).Msg(statusMsg)
+		logger.Warn().Err(err).Msg(statusMsg)
 		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
@@ -263,11 +263,11 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 	if wrapperMessage.PolicyHash != lsa.conLimiter.GetPolicyHash() {
 		err = errors.New("policy id mismatch")
 		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", lsa.conLimiter.GetPolicyHash(), wrapperMessage.PolicyHash)
-		log.Warn().Err(err).Msg(statusMsg)
+		logger.Warn().Err(err).Msg(statusMsg)
 		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
 
-	log.Trace().Float64("loadShedFactor", loadShedDecision.LoadShedFactor).Msg("Setting load shed factor")
+	logger.Trace().Float64("loadShedFactor", loadShedDecision.LoadShedFactor).Msg("Setting load shed factor")
 	lsa.tokenBucketLoadShed.SetLoadShedFactor(lsa.clock.Now(), loadShedDecision.LoadShedFactor)
 }

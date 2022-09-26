@@ -11,32 +11,51 @@ import "google/protobuf/empty.proto";
 
 // EntityCacheService is used to query EntityCache.
 service EntityCacheService {
-  rpc GetServicesList(google.protobuf.Empty) returns (ServicesList) {
+  rpc GetEntityCache(google.protobuf.Empty) returns (EntityCache) {
     option (google.api.http) = {
-      get: "/v1/entity-cache/services-list"
+      get: "/v1/entities"
     };
   }
+  rpc GetEntityByIPAddress(GetEntityByIPAddressRequest) returns (Entity) {
+    option (google.api.http) = {
+      get: "/v1/entities/ip-address/{ip_address}"
+    };
+  }
+  rpc GetEntityByName(GetEntityByNameRequest) returns (Entity) {
+    option (google.api.http) = {
+      get: "/v1/entities/name/{name}"
+    };
+  }
+}
+
+message GetEntityByIPAddressRequest {
+  string ip_address = 1;
+}
+
+message GetEntityByNameRequest {
+  string name = 1;
 }
 
 //
 // Data models
 //
 
-message ServicesList {
-  repeated Service services = 1;
-  repeated OverlappingService overlapping_services = 2;
+// EntityCache contains both mappings of ip address to entity and entity name to entity.
+message EntityCache {
+  // Entities defines mapping of entities.
+  message Entities {
+    map<string, Entity> entities = 1;
+  }
+
+  Entities entities_by_ip_address = 1;
+  Entities entities_by_name = 2;
 }
 
-// Service contains information about single service discovered in agent group by a
-// particular agent
-message Service {
-  string name = 1;
-  int32 entities_count = 2;
-}
-
-// OverlappingService contains info about a service that overlaps with another one
-message OverlappingService {
-  string service1 = 1;
-  string service2 = 2;
-  int32 entities_count = 3;
+// Entity represents a pod, vm, etc.
+message Entity {
+  string prefix = 1;
+  string uid = 2;
+  string ip_address = 3;
+  string name = 4;
+  repeated string services = 5;
 }

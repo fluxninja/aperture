@@ -14,8 +14,7 @@ The Aperture Controller functions as the brain of the Aperture system.
 Leveraging an advanced control loop, the Controller routinely analyzes polled
 metrics and indicators to determine how traffic should be shaped as defined by
 set policies. Once determined, these decisions are then exported to all Aperture
-Agents to effectively handle workloads. Only one Controller is needed to manage
-each cluster.
+Agents to effectively handle workloads.
 
 The closed feedback loop functions primarily by monitoring the variables
 reflecting stability conditions (i.e. process variables) and compares them
@@ -30,7 +29,7 @@ The Aperture Controller related configurations are stored in a configmap which
 is created during the installation using Helm.
 
 All the configuration parameters for Aperture Controller are listed
-[here](/reference/configuration/controller.md).
+[here](/references/configuration/controller.md).
 
 ## Installation {#controller-installation}
 
@@ -55,7 +54,24 @@ into your cluster.
    helm repo update
    ```
 
-2. The Aperture Controller can be installed using the default `values.yaml`:
+2. Configure the below parameters for the Controller Custom Resource by creating
+   a `values.yaml` with below parameters and pass it with `helm upgrade`:
+
+   :::info
+
+   The below parameters disable the FluxNinja Cloud Plugin for the Aperture
+   Controller. If you want to keep it enabled, add parameters provided
+   [here](/cloud/plugin.md#configuration) under the `controller.config` section.
+
+   :::
+
+   ```yaml
+   controller:
+     config:
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
+   ```
 
    ```bash
    helm upgrade --install controller aperture/aperture-controller
@@ -88,6 +104,14 @@ into your cluster.
           registry: docker.io/fluxninja
           repository: aperture-controller
           tag: latest
+        config:
+          etcd:
+            endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
+          prometheus:
+            address: "http://controller-prometheus-server.default.svc.cluster.local:80"
+          plugins:
+            disabled_plugins:
+              - aperture-plugin-fluxninja
       ```
 
       All the configuration parameters for the Controller Custom Resource are
@@ -113,6 +137,9 @@ into your cluster.
          endpoints: ["ETCD_ENDPOINT_HERE"]
        prometheus:
          address: "PROMETHEUS_ADDRESS_HERE"
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
 
    etcd:
      enabled: false
@@ -130,21 +157,37 @@ into your cluster.
    ```
 
    A list of all the configurable parameters for Etcd are available
-   [here](/reference/configuration/controller.md#etcd) and Prometheus are
-   available [here](/reference/configuration/controller.md#prometheus).
+   [here](/references/configuration/controller.md#etcd) and Prometheus are
+   available [here](/references/configuration/controller.md#prometheus).
 
    **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
    is enabled on your existing Prometheus instance as it is required by the
-   Controller.
+   Aperture Controller.
 
-5. If you want to modify the default parameters, you can create or update the
-   `values.yaml` file and pass it with `helm upgrade`:
+5. If you want to modify the default parameters or the Aperture Controller
+   config, for example `log`, you can create or update the `values.yaml` file
+   and pass it with `helm upgrade`:
+
+   ```yaml
+   controller:
+     config:
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
+       log:
+         level: debug
+         pretty_console: true
+         non_blocking: false
+   ```
 
    ```bash
    helm upgrade --install controller aperture/aperture-controller -f values.yaml
    ```
 
-   A list of configurable parameters can be found in the
+   All the config parameters for the Aperture Controller are available
+   [here](/references/configuration/controller.md).
+
+   A list of configurable parameters for the installation can be found in the
    [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters).
 
 6. If you want to deploy the Aperture Controller into a namespace other than
@@ -168,6 +211,15 @@ kubectl get controller -A
 You should see pods for Aperture Controller and Controller Manager in `RUNNING`
 state and `Controller` Custom Resource in `created` state.
 
+## Applying Policies
+
+Follow the information on [Policy](/concepts/policy/policy.md) to understand and
+design the policy circuits.
+
+Once the design is ready, follow the steps on the
+[Blueprints](/get-started/blueprints.md) to generate the Policy ConfigMap and
+apply it on the Kubernetes.
+
 ## Uninstall
 
 You can uninstall the Aperture Controller and it's components by uninstalling
@@ -179,7 +231,7 @@ the charts installed above:
    helm uninstall controller
    ```
 
-2. Alternativey, if you have installed the Aperture Controller Custom Resource
+2. Alternatively, if you have installed the Aperture Controller Custom Resource
    separately, follow below steps:
 
    1. Delete the Aperture Controller Custom Resource:

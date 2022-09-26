@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"os"
-	"path"
 
 	"go.uber.org/fx"
 
@@ -30,14 +29,12 @@ func Module() fx.Option {
 // swagger:model
 // +kubebuilder:object:generate=true
 type ServerTLSConfig struct {
-	// Path to credentials. This can be set via command line arguments as well.
-	CertsPath string `json:"certs_path"`
-	// Server Cert file
-	ServerCert string `json:"server_cert" default:"ca.crt"`
-	// Server Key file
-	ServerKey string `json:"server_key" default:"ca.key"`
-	// Client CA file
-	ClientCA string `json:"client_ca" validate:"omitempty"`
+	// Server Cert file path
+	CertFile string `json:"cert_file"`
+	// Server Key file path
+	KeyFile string `json:"key_file"`
+	// Client CA file path
+	ClientCAFile string `json:"client_ca_file"`
 	// Allowed CN
 	AllowedCN string `json:"allowed_cn" validate:"omitempty,fqdn"`
 	// Enabled TLS
@@ -59,21 +56,32 @@ func (constructor Constructor) Annotate() fx.Option {
 			constructor.provideTLSConfig,
 			fx.ResultTags(name),
 		),
+		fx.Annotate(
+			constructor.provideServerTLSConfig,
+			fx.ResultTags(name),
+		),
 	)
 }
 
-func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller) (*tls.Config, error) {
+func (constructor Constructor) provideServerTLSConfig(unmarshaller config.Unmarshaller) (ServerTLSConfig, error) {
 	config := constructor.DefaultConfig
 	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize tls configuration!")
+		return ServerTLSConfig{}, err
+	}
+	return config, nil
+}
+
+func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller) (*tls.Config, error) {
+	config, err := constructor.provideServerTLSConfig(unmarshaller)
+	if err != nil {
 		return nil, err
 	}
 
 	if config.Enabled {
-		certPath := config.CertsPath
 		serverCertKeyPair, err := tls.LoadX509KeyPair(
-			path.Join(certPath, config.ServerCert),
-			path.Join(certPath, config.ServerKey))
+			config.CertFile,
+			config.KeyFile)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to load server tls cert/key")
 			return nil, err
@@ -85,7 +93,10 @@ func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller
 		}
 
 		if config.AllowedCN != "" {
-			tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			tlsConfig.VerifyPeerCertificate = func(_ [][]byte, verifiedChains [][]*x509.Certificate) error {
+				if len(verifiedChains) == 0 || len(verifiedChains[0]) == 0 {
+					return errors.New("no verified chains")
+				}
 				for _, chains := range verifiedChains {
 					if len(chains) != 0 {
 						if config.AllowedCN == chains[0].Subject.CommonName {
@@ -98,9 +109,9 @@ func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller
 		}
 
 		var clientCertPool *x509.CertPool
-		if config.ClientCA != "" {
+		if config.ClientCAFile != "" {
 
-			caCert, err := os.ReadFile(path.Join(certPath, config.ClientCA))
+			caCert, err := os.ReadFile(config.ClientCAFile)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to load client CA")
 				return nil, err

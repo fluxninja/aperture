@@ -8,10 +8,8 @@ envoyFilter:
   name: aperture-agent
   ## @param envoyFilter.namespace Namespace where aperture-agent is running
   namespace: aperture-agent
-  ## @param envoyFilter.authzPort Port serving ext authz API
-  authzPort: 8080
-  ## @param envoyFilter.otlpPort Port for streaming access logs
-  otlpPort: 4317
+  ## @param envoyFilter.port Port serving ext authz API and for streaming access logs
+  port: 8080
   ## @param envoyFilter.authzGrpcTimeout Timeout in seconds to authz requests made to aperture-agent. Note: aperture-agent scheduler has max_timeout parameter that must tuned to match the setting here.
   authzGrpcTimeout: 0.5s
   ## @param envoyFilter.maxRequestBytes Maximum size of request that is sent over ext authz API

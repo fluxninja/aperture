@@ -16,11 +16,10 @@ check_var_set REMOTE_PORT
 : "${NAMESPACE:-}"
 : "${RESOURCE_TYPE:=svc}"
 : "${LOCAL_PORT:=${REMOTE_PORT}}"
-
+: "${INITIAL_DELAY:=5}"
 : "${REQUEST_PATH:=/}"
-: "${INITIAL_DELAY:=5s}"
 : "${TIMEOUT:=1}"
-: "${PERIOD:=5s}"
+: "${PERIOD:=5}"
 : "${FAILURE_THRESHOLD:=1}"
 
 port_forward_args=()

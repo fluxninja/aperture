@@ -18,11 +18,9 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/common"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/reading"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -205,6 +203,7 @@ func (pje *promJobsExecutor) OnJobCompleted(_ *statusv1.Status, _ jobs.JobStats)
 }
 
 func (pje *promJobsExecutor) onTickEnd(_ runtime.TickInfo) (err error) {
+	logger := pje.circuitAPI.GetStatusRegistry().GetLogger()
 	// Already under circuit execution lock
 	// Launch job only if previous one is completed
 	if pje.jobRunning {
@@ -218,7 +217,7 @@ func (pje *promJobsExecutor) onTickEnd(_ runtime.TickInfo) (err error) {
 			job := jobResBroker.getJob()
 			err = pje.promMultiJob.RegisterJob(job)
 			if err != nil {
-				log.Error().Err(err).Str("job", job.Name()).Msg("Error registering job")
+				logger.Error().Err(err).Str("job", job.Name()).Msg("Error registering job")
 				return err
 			}
 		}
@@ -383,27 +382,27 @@ func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API) err
 // Execute implements runtime.Component.Execute.
 func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToValue, err error) {
 	// Re-run query if evaluationInterval elapsed since last query
-	if tickInfo.Timestamp.Sub(promQL.lastQueryTimestamp) >= promQL.evaluationInterval {
+	if tickInfo.Timestamp().Sub(promQL.lastQueryTimestamp) >= promQL.evaluationInterval {
 		// Run query
-		promQL.lastQueryTimestamp = tickInfo.Timestamp
+		promQL.lastQueryTimestamp = tickInfo.Timestamp()
 		// Launch job only if previous one is completed
 		// Quantize endTimestamp of query based on tick interval
-		endTimestamp := tickInfo.Timestamp.Truncate(tickInfo.Interval)
+		endTimestamp := tickInfo.Timestamp().Truncate(tickInfo.Interval())
 
 		// Register jobFunc with jobExecutor
 		promQL.jobRegisterer.registerJob(endTimestamp)
 	}
 
 	// Create current reading based on err and value
-	var currentReading reading.Reading
+	var currentReading runtime.Reading
 	if promQL.err != nil {
-		currentReading = reading.NewInvalid()
+		currentReading = runtime.InvalidReading()
 	} else {
-		currentReading = reading.New(promQL.value)
+		currentReading = runtime.NewReading(promQL.value)
 	}
 
 	return runtime.PortToValue{
-		"output": []reading.Reading{currentReading},
+		"output": []runtime.Reading{currentReading},
 	}, nil
 }
 

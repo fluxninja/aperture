@@ -5,29 +5,29 @@ import (
 	"crypto/tls"
 
 	promapi "github.com/prometheus/client_golang/api"
-	"go.opentelemetry.io/collector/config/configgrpc"
-	"go.opentelemetry.io/collector/config/confighttp"
-	"go.opentelemetry.io/collector/config/confignet"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/fx"
+	"k8s.io/client-go/rest"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
 )
 
 const (
-	// ReceiverOTLP collects traces and logs from libraries and SDKs.
+	// ReceiverOTLP collects logs from libraries and SDKs.
 	ReceiverOTLP = "otlp"
 	// ReceiverPrometheus collects metrics from environment and services.
 	ReceiverPrometheus = "prometheus"
 
-	// ProcessorEnrichment enriches traces, logs and metrics with discovery data.
+	// ProcessorEnrichment enriches metrics with discovery data.
 	ProcessorEnrichment = "enrichment"
-	// ProcessorMetrics generates metrics based on traces and logs and exposes them
+	// ProcessorMetrics generates metrics based on logs and exposes them
 	// on application prometheus metrics endpoint.
 	ProcessorMetrics = "metrics"
 	// ProcessorBatchPrerollup batches incoming data before rolling up. This is
@@ -70,10 +70,6 @@ type otelParams struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type OtelConfig struct {
-	// GRPC listener addr for OTEL Collector.
-	GRPCAddr string `json:"grpc_addr" validate:"hostname_port" default:":4317"`
-	// HTTP listener addr for OTEL Collector.
-	HTTPAddr string `json:"http_addr" validate:"hostname_port" default:":4318"`
 	// BatchPrerollup configures batch prerollup processor.
 	BatchPrerollup BatchConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
@@ -121,10 +117,11 @@ func (c OTELConfigConstructor) Annotate() fx.Option {
 // FxIn consumes parameters via Fx.
 type FxIn struct {
 	fx.In
-	Unmarshaller config.Unmarshaller
-	Listener     *listener.Listener
-	PromClient   promapi.Client
-	TLSConfig    *tls.Config `optional:"true"`
+	Unmarshaller    config.Unmarshaller
+	Listener        *listener.Listener
+	PromClient      promapi.Client
+	TLSConfig       *tls.Config
+	ServerTLSConfig tlsconfig.ServerTLSConfig
 }
 
 func newOtelConfig(in FxIn) (*otelParams, error) {
@@ -146,7 +143,7 @@ func newOtelConfig(in FxIn) (*otelParams, error) {
 }
 
 func provideAgent(cfg *otelParams) *otelcollector.OTELConfig {
-	addLogsAndTracesPipelines(cfg)
+	addLogsPipeline(cfg)
 	addMetricsPipeline(cfg)
 	return cfg.config
 }
@@ -156,11 +153,10 @@ func provideController(cfg *otelParams) *otelcollector.OTELConfig {
 	return cfg.config
 }
 
-func addLogsAndTracesPipelines(cfg *otelParams) {
+func addLogsPipeline(cfg *otelParams) {
 	config := cfg.config
 	// Common dependencies for pipelines
 	addOTLPReceiver(cfg)
-	config.AddProcessor(ProcessorEnrichment, nil)
 	addMetricsProcessor(config)
 	config.AddBatchProcessor(ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPrerollup.SendBatchSize)
 	addRollupProcessor(config)
@@ -168,7 +164,6 @@ func addLogsAndTracesPipelines(cfg *otelParams) {
 	config.AddExporter(ExporterLogging, nil)
 
 	processors := []string{
-		ProcessorEnrichment,
 		ProcessorAgentGroup,
 		ProcessorMetrics,
 		ProcessorBatchPrerollup,
@@ -177,12 +172,6 @@ func addLogsAndTracesPipelines(cfg *otelParams) {
 	}
 
 	config.Service.AddPipeline("logs", otelcollector.Pipeline{
-		Receivers:  []string{ReceiverOTLP},
-		Processors: processors,
-		Exporters:  []string{ExporterLogging},
-	})
-
-	config.Service.AddPipeline("traces", otelcollector.Pipeline{
 		Receivers:  []string{ReceiverOTLP},
 		Processors: processors,
 		Exporters:  []string{ExporterLogging},
@@ -217,19 +206,7 @@ func addControllerMetricsPipeline(cfg *otelParams) {
 
 func addOTLPReceiver(cfg *otelParams) {
 	config := cfg.config
-	config.AddReceiver(ReceiverOTLP, otlpreceiver.Config{
-		Protocols: otlpreceiver.Protocols{
-			GRPC: &configgrpc.GRPCServerSettings{
-				NetAddr: confignet.NetAddr{
-					Endpoint:  cfg.GRPCAddr,
-					Transport: "tcp",
-				},
-			},
-			HTTP: &confighttp.HTTPServerSettings{
-				Endpoint: cfg.HTTPAddr,
-			},
-		},
-	})
+	config.AddReceiver(ReceiverOTLP, otlpreceiver.Config{})
 }
 
 func addMetricsProcessor(config *otelcollector.OTELConfig) {
@@ -242,18 +219,27 @@ func addRollupProcessor(config *otelcollector.OTELConfig) {
 
 func addPrometheusReceiver(cfg *otelParams) {
 	config := cfg.config
-	scrapeConfigs := []map[string]interface{}{
+	scrapeConfigs := []map[string]any{
 		buildApertureSelfScrapeConfig("aperture-self", cfg),
-		buildKubernetesNodesScrapeConfig(cfg),
-		buildKubernetesPodsScrapeConfig(cfg),
 	}
+
+	_, err := rest.InClusterConfig()
+	if err == rest.ErrNotInCluster {
+		log.Debug().Msg("K8s environment not detected. Skipping K8s scrape configurations.")
+	} else if err != nil {
+		log.Warn().Err(err).Msg("Error when discovering k8s environment")
+	} else {
+		log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
+		scrapeConfigs = append(scrapeConfigs, buildKubernetesNodesScrapeConfig(cfg), buildKubernetesPodsScrapeConfig(cfg))
+	}
+
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
-	config.AddReceiver(ReceiverPrometheus, map[string]interface{}{
-		"config": map[string]interface{}{
-			"global": map[string]interface{}{
-				"scrape_interval":     "1m",
-				"scrape_timeout":      "10s",
+	config.AddReceiver(ReceiverPrometheus, map[string]any{
+		"config": map[string]any{
+			"global": map[string]any{
+				"scrape_interval":     "1s",
+				"scrape_timeout":      "1s",
 				"evaluation_interval": "1m",
 			},
 			"scrape_configs": scrapeConfigs,
@@ -262,16 +248,16 @@ func addPrometheusReceiver(cfg *otelParams) {
 }
 
 func addControllerPrometheusReceiver(config *otelcollector.OTELConfig, cfg *otelParams) {
-	scrapeConfigs := []map[string]interface{}{
+	scrapeConfigs := []map[string]any{
 		buildApertureSelfScrapeConfig("aperture-controller-self", cfg),
 	}
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
-	config.AddReceiver(ReceiverPrometheus, map[string]interface{}{
-		"config": map[string]interface{}{
-			"global": map[string]interface{}{
-				"scrape_interval":     "1m",
-				"scrape_timeout":      "10s",
+	config.AddReceiver(ReceiverPrometheus, map[string]any{
+		"config": map[string]any{
+			"global": map[string]any{
+				"scrape_interval":     "1s",
+				"scrape_timeout":      "1s",
 				"evaluation_interval": "1m",
 			},
 			"scrape_configs": scrapeConfigs,
@@ -283,29 +269,27 @@ func addPrometheusRemoteWriteExporter(config *otelcollector.OTELConfig, promClie
 	endpoint := promClient.URL("api/v1/write", nil)
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
-	config.AddExporter(ExporterPrometheusRemoteWrite, map[string]interface{}{
+	config.AddExporter(ExporterPrometheusRemoteWrite, map[string]any{
 		"endpoint": endpoint.String(),
 	})
 }
 
-func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]interface{} {
+func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]any {
 	scheme := "http"
 	if cfg.tlsConfig != nil {
 		scheme = "https"
 	}
-	return map[string]interface{}{
+	return map[string]any{
 		"job_name": name,
 		"scheme":   scheme,
-		"tls_config": map[string]interface{}{
+		"tls_config": map[string]any{
 			"insecure_skip_verify": true,
 		},
-		"scrape_interval": "1s",
-		"scrape_timeout":  "900ms",
-		"metrics_path":    "/metrics",
-		"static_configs": []map[string]interface{}{
+		"metrics_path": "/metrics",
+		"static_configs": []map[string]any{
 			{
 				"targets": []string{cfg.listener.GetAddr()},
-				"labels": map[string]interface{}{
+				"labels": map[string]any{
 					"instance":     info.Hostname,
 					"process_uuid": info.UUID,
 				},
@@ -314,23 +298,21 @@ func buildApertureSelfScrapeConfig(name string, cfg *otelParams) map[string]inte
 	}
 }
 
-func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]interface{} {
-	return map[string]interface{}{
-		"job_name":        "kubernetes-nodes",
-		"scheme":          "https",
-		"scrape_interval": "2s",
-		"scrape_timeout":  "1500ms",
-		"metrics_path":    "/metrics/cadvisor",
-		"authorization": map[string]interface{}{
+func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]any {
+	return map[string]any{
+		"job_name":     "kubernetes-nodes",
+		"scheme":       "https",
+		"metrics_path": "/metrics/cadvisor",
+		"authorization": map[string]any{
 			"credentials_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
 		},
-		"tls_config": map[string]interface{}{
+		"tls_config": map[string]any{
 			"insecure_skip_verify": true,
 		},
-		"kubernetes_sd_configs": []map[string]interface{}{
+		"kubernetes_sd_configs": []map[string]any{
 			{"role": "node"},
 		},
-		"relabel_configs": []map[string]interface{}{
+		"relabel_configs": []map[string]any{
 			// Scrape only the node on which this agent is running.
 			{
 				"source_labels": []string{"__meta_kubernetes_node_name"},
@@ -338,7 +320,7 @@ func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]interface{} {
 				"regex":         info.Hostname,
 			},
 		},
-		"metric_relabel_configs": []map[string]interface{}{
+		"metric_relabel_configs": []map[string]any{
 			{
 				"source_labels": []string{"__name__"},
 				"action":        "keep",
@@ -353,17 +335,15 @@ func buildKubernetesNodesScrapeConfig(cfg *otelParams) map[string]interface{} {
 	}
 }
 
-func buildKubernetesPodsScrapeConfig(cfg *otelParams) map[string]interface{} {
-	return map[string]interface{}{
-		"job_name":        "kubernetes-pods",
-		"scheme":          "http",
-		"scrape_interval": "2s",
-		"scrape_timeout":  "1500ms",
-		"metrics_path":    "/metrics",
-		"kubernetes_sd_configs": []map[string]interface{}{
+func buildKubernetesPodsScrapeConfig(cfg *otelParams) map[string]any {
+	return map[string]any{
+		"job_name":     "kubernetes-pods",
+		"scheme":       "http",
+		"metrics_path": "/metrics",
+		"kubernetes_sd_configs": []map[string]any{
 			{"role": "pod"},
 		},
-		"relabel_configs": []map[string]interface{}{
+		"relabel_configs": []map[string]any{
 			// Scrape only the node on which this agent is running.
 			{
 				"source_labels": []string{"__meta_kubernetes_pod_node_name"},
@@ -397,7 +377,7 @@ func buildKubernetesPodsScrapeConfig(cfg *otelParams) map[string]interface{} {
 				"target_label":  "__address__",
 			},
 		},
-		"metric_relabel_configs": []map[string]interface{}{
+		"metric_relabel_configs": []map[string]any{
 			// For now, dropping everything. In future, we'll want to filter in some
 			// metrics based on policies. See #4632.
 			{

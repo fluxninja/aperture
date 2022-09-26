@@ -28,7 +28,7 @@ var (
 		ExecutionTimeout: config.MakeDuration(time.Millisecond * 200),
 		InitiallyHealthy: false,
 	}
-	registry = status.NewRegistry().Child("jobs")
+	registry = status.NewRegistry(log.GetGlobalLogger()).Child("jobs")
 )
 
 var _ JobWatcher = (*groupConfig)(nil)

@@ -5,9 +5,11 @@ import (
 	"errors"
 
 	policiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
+	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 	"go.uber.org/fx"
 )
@@ -15,75 +17,71 @@ import (
 // FxOut is the output of the controlplane module.
 type FxOut struct {
 	fx.Out
-	Validator validation.CMFileValidator `group:"cm-file-validators"`
+	Validator validation.PolicySpecValidator `group:"policy-validators"`
 }
 
-// provideCMFileValidator provides classification config map file validator
+// providePolicyValidator provides classification Policy Custom Resource validator
 //
 // Note: This validator must be registered to be accessible.
-func provideCMFileValidator() FxOut {
+func providePolicyValidator() FxOut {
 	return FxOut{
-		Validator: &CMFileValidator{},
+		Validator: &PolicySpecValidator{},
 	}
 }
 
-// CMFileValidator Policy implementation of CMFileValidator interface.
-type CMFileValidator struct{}
+// PolicySpecValidator Policy implementation of PolicySpecValidator interface.
+type PolicySpecValidator struct{}
 
-// CheckCMName checks configmap name is equals to "policies"
+// ValidateSpec checks the validity of a Policy spec
 //
 // returns:
-// * true when config is policies
-// * false when config is not policies.
-func (v *CMFileValidator) CheckCMName(name string) bool {
-	if name == "policies" {
-		return true
-	}
-	log.Trace().Str("name", name).Msg("Not a policies cm, skipping")
-	return false
-}
-
-// ValidateFile checks the validity of a single Policy as yaml file
-//
-// returns:
-// * true, "", nil when config is valid
-// * false, message, nil when config is invalid
+// * true, "", nil when Policy is valid
+// * false, message, nil when Policy is invalid
 // and
 // * false, "", err on other errors.
 //
-// ValidateConfig checks the syntax, validity of extractors, and validity of
+// ValidateSpec checks the syntax, validity of extractors, and validity of
 // rego modules (by attempting to compile them).
-func (v *CMFileValidator) ValidateFile(
+func (v *PolicySpecValidator) ValidateSpec(
 	ctx context.Context,
 	name string,
 	yamlSrc []byte,
 ) (bool, string, error) {
-	log.Info().Str("name", name).Msg("Validating CM policy yaml")
+	_, valid, msg, err := ValidateAndCompile(ctx, name, yamlSrc)
+	return valid, msg, err
+}
+
+// ValidateAndCompile checks the validity of a single Policy and compiles it.
+func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (CompiledCircuit, bool, string, error) {
+	log.Info().Str("name", name).Msg("Validating Policy Spec")
 	if len(yamlSrc) == 0 {
-		return false, "empty yaml", nil
+		return nil, false, "empty yaml", nil
 	}
-	var policy policiesv1.Policy
-	err := config.Unmarshal(yamlSrc, &policy)
+	policy := &policiesv1.Policy{}
+	err := config.UnmarshalYAML(yamlSrc, policy)
 	if err != nil {
-		return false, err.Error(), nil
+		return nil, false, err.Error(), nil
 	}
-	_, err = CompilePolicy(&policy)
+	registry := status.NewRegistry(log.GetGlobalLogger())
+	circuit, err := CompilePolicy(policy, registry)
 	if err != nil {
-		return false, err.Error(), nil
+		return nil, false, err.Error(), nil
 	}
 
 	if policy.GetResources() != nil {
 		for _, c := range policy.GetResources().Classifiers {
-			_, err = compiler.CompileRuleset(ctx, name, c)
+			_, err = compiler.CompileRuleset(ctx, name, &wrappersv1.ClassifierWrapper{
+				Classifier: c,
+			})
 			if err != nil {
 				if errors.Is(err, compiler.BadExtractor) || errors.Is(err, compiler.BadSelector) ||
 					errors.Is(err, compiler.BadRego) || errors.Is(err, compiler.BadLabelName) {
-					return false, err.Error(), nil
+					return nil, false, err.Error(), nil
 				} else {
-					return false, "", err
+					return nil, false, "", err
 				}
 			}
 		}
 	}
-	return true, "", nil
+	return circuit, true, "", nil
 }

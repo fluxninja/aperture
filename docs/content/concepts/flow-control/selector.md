@@ -1,6 +1,7 @@
 ---
 title: Flow Selector
-sidebar_position: 1
+sidebar_label: Selector
+sidebar_position: 2
 keywords:
   - flows
   - services
@@ -10,24 +11,34 @@ keywords:
 
 :::info
 
-See also [Selector reference](/reference/configuration/policies.md#v1-selector)
+See also [Selector reference](/references/configuration/policies.md#v1-selector)
 
 :::
 
-Flow Selectors are used by all flow observability and control components
-instantiated on Aperture Agents ([classifiers][classifier],
-[fluxmeters][fluxmeter] and [acturators][actuators]). Flow Selectors define
-scoping rules – how these components should select [flows][flow] for their
-operations.
+Selectors are used by all flow observability and control components instantiated
+on Aperture Agents ([Classifiers][classifier], [Flux Meters][flux-meter] and
+Limiters). Flow Selectors define scoping rules – how these components should
+select [Flows][flow] for their operations.
 
 A Selector consists of:
 
-- [agent group][agent-group] name,
-- [service][service] name,
-- [control point][control-point], and
-- optional [flow label matcher](#label-matcher).
+- ServiceSelector, containing
 
-### Service
+  - [agent group][agent-group] name,
+  - [service][service] name,
+
+- FlowSelector, containing
+  - [control point][control-point], and
+  - optional [flow label matcher](#label-matcher).
+
+### ServiceSelector
+
+:::info
+
+See also
+[ServiceSelector reference](/references/configuration/policies.md#v1-service-selector)
+
+:::
 
 _Agent group_ name together with _service_ name determine the [service][service]
 to select flows from.
@@ -46,15 +57,24 @@ select all services within the agent group, you can skip the service name.
 
 :::
 
-### Control point
+### FlowSelector
 
-Flow Selector selects flows from only one [control point][control-point] within
+:::info
+
+See also
+[FlowSelector reference](/references/configuration/policies.md#v1-flow-selector)
+
+:::
+
+#### Control Point
+
+Flow Selector selects flows from only one [Control Point][control-point] within
 a service.
 
-### Label Matcher
+#### Label Matcher
 
 Label matcher allows to optionally narrow down the selected flow based on
-conditions on [flow labels][label].
+conditions on [Flow Labels][label].
 
 There are multiple ways to define a label matcher. The simplest way is to
 provide a map of labels for exact-match:
@@ -66,26 +86,28 @@ label_matcher:
 ```
 
 You can also provide a matching-expression-tree, which allows for arbitrary
-conditions, including regex matching. See more details in [LabelMatcher
-reference][label-matcher].
+conditions, including regex matching. Refer to [LabelMatcher][label-matcher] for
+further details.
 
 ### Example
 
 ```yaml
-service: checkout.myns.svc.cluster.local
-control_point:
-  traffic: ingress
-label_matcher:
-  match_labels:
-    user_tier: gold
+service_selector:
+  service: checkout.myns.svc.cluster.local
+  agent_group: default
+flow_selector:
+  control_point:
+    traffic: ingress
+  label_matcher:
+    match_labels:
+      user_tier: gold
 ```
 
-[flow]: flow-control.md#flow
-[label]: label/label.md
-[control-point]: flow-control.md#control-point
-[service]: service.md
-[agent-group]: service.md#agent-group
-[actuators]: ./actuators/actuators.md
-[fluxmeter]: ./fluxmeter.md
-[classifier]: ./label/classifier.md
-[label-matcher]: /reference/configuration/policies.md#v1-label-matcher
+[flow]: /concepts/flow-control/flow-control.md#flow
+[label]: /concepts/flow-control/flow-label.md
+[control-point]: /concepts/flow-control/flow-control.md#control-point
+[service]: /concepts/service.md
+[agent-group]: /concepts/service.md#agent-group
+[flux-meter]: /concepts/flow-control/flux-meter.md
+[classifier]: /concepts/flow-control/flow-classifier.md
+[label-matcher]: /references/configuration/policies.md#v1-label-matcher

@@ -114,6 +114,11 @@ var _ = BeforeSuite(func() {
 	if ehStarted {
 		apertureConfig["etcd"] = map[string]interface{}{
 			"endpoints": []string{eh.Endpoint},
+			"tls": map[string]interface{}{
+				"insecure_skip_verify": true,
+			},
+			"username": harness.EtcdUsername,
+			"password": harness.EtcdPassword,
 		}
 	}
 
@@ -137,6 +142,7 @@ var _ = BeforeSuite(func() {
 			clockwork.NewRealClock,
 			otel.AgentOTELComponents,
 			dataplane.ProvideEngineAPI,
+			dataplane.ProvideResponseMetricsAPI,
 			entitycache.NewEntityCache,
 			agentinfo.ProvideAgentInfo,
 		),

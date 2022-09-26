@@ -311,16 +311,16 @@ func newDefaultFiller() *filler {
 		}
 	}
 
-	types[getTypeHash(reflect.TypeOf(Timestamp{}))] = func(field *fieldData) {
-		if value, ok := field.Value.Interface().(Timestamp); ok {
+	types[getTypeHash(reflect.TypeOf(Time{}))] = func(field *fieldData) {
+		if value, ok := field.Value.Interface().(Time); ok {
 			if field.TagValue != "" {
 				nullTime := time.Time{}
-				if value.Timestamp.AsTime() != nullTime {
+				if value.timestamp.AsTime() != nullTime {
 					return
 				}
 				timestampJSON, _ := json.Marshal(field.TagValue)
-				t := &Timestamp{
-					Timestamp: timestamppb.Now(),
+				t := &Time{
+					timestamp: timestamppb.Now(),
 				}
 				err := json.Unmarshal(timestampJSON, t)
 				if err != nil {
@@ -340,8 +340,8 @@ func newDefaultFiller() *filler {
 			}
 			if field.TagValue != "" {
 				timestampJSON, _ := json.Marshal(field.TagValue)
-				t := &Timestamp{
-					Timestamp: timestamppb.Now(),
+				t := &Time{
+					timestamp: timestamppb.Now(),
 				}
 				err := json.Unmarshal(timestampJSON, t)
 				if err != nil {
@@ -376,14 +376,14 @@ func newDefaultFiller() *filler {
 			// FIXME: also descend into slice of maps
 		default:
 			reg := regexp.MustCompile(`^\[(.*)\]$`)
-			matchs := reg.FindStringSubmatch(field.TagValue)
-			if len(matchs) != 2 {
+			matches := reg.FindStringSubmatch(field.TagValue)
+			if len(matches) != 2 {
 				return
 			}
-			if matchs[1] == "" {
+			if matches[1] == "" {
 				field.Value.Set(reflect.MakeSlice(field.Value.Type(), 0, 0))
 			} else {
-				defaultValue := strings.Split(matchs[1], ",")
+				defaultValue := strings.Split(matches[1], ",")
 				result := reflect.MakeSlice(field.Value.Type(), len(defaultValue), len(defaultValue))
 				for i := 0; i < len(defaultValue); i++ {
 					itemValue := result.Index(i)

@@ -9,8 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	class "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/flowlabel"
 )
 
 // Headers is a header map in authz convention – keys are lowercase.
@@ -27,7 +26,7 @@ type Propagator interface {
 	//
 	// The headers are expected to be in envoy's authz convention – with
 	// lower-case keys
-	Extract(headers Headers) class.FlowLabels
+	Extract(headers Headers) flowlabel.FlowLabels
 
 	// Inject emits instructions for envoy how to inject flow labels into
 	// headers based on given flow labels and existing headers
@@ -35,7 +34,7 @@ type Propagator interface {
 	// The returned list is expected to be put in
 	// CheckResponse.OkHttpResponse.Headers, so that envoy will take care of
 	// injecting appropriate headers.
-	Inject(flowLabels class.FlowLabels, headers Headers) ([]*envoy_core.HeaderValueOption, error)
+	Inject(flowLabels flowlabel.FlowLabels, headers Headers) ([]*envoy_core.HeaderValueOption, error)
 }
 
 // Prefixed puts each flow label into a separate header.  Header name is
@@ -47,8 +46,8 @@ type Prefixed struct {
 }
 
 // Extract extracts prefixed flow labels from headers.
-func (p Prefixed) Extract(headers Headers) class.FlowLabels {
-	flowLabels := make(class.FlowLabels)
+func (p Prefixed) Extract(headers Headers) flowlabel.FlowLabels {
+	flowLabels := make(flowlabel.FlowLabels)
 	for key, val := range headers {
 		if strings.HasPrefix(key, p.Prefix) {
 			metaKey := strings.TrimPrefix(key, p.Prefix)
@@ -56,11 +55,9 @@ func (p Prefixed) Extract(headers Headers) class.FlowLabels {
 			if err != nil {
 				log.Warn().Msg("Could not unescape flow label value in baggage")
 			} else {
-				flowLabels[metaKey] = class.FlowLabelValue{
-					Value: metaVal,
-					Flags: compiler.LabelFlags{
-						Propagate: true,
-					},
+				flowLabels[metaKey] = flowlabel.FlowLabelValue{
+					Value:     metaVal,
+					Telemetry: true,
 				}
 			}
 		}
@@ -70,16 +67,13 @@ func (p Prefixed) Extract(headers Headers) class.FlowLabels {
 
 // Inject emits instructions for envoy how to inject flow labels into headers supported by prefixed propagator.
 func (p Prefixed) Inject(
-	flowLabels class.FlowLabels,
+	flowLabels flowlabel.FlowLabels,
 	headers Headers,
 ) ([]*envoy_core.HeaderValueOption, error) {
 	newHeaders := make([]*envoy_core.HeaderValueOption, 0, len(flowLabels))
 	for key, fl := range flowLabels {
-		if !fl.Flags.Propagate {
+		if !fl.Telemetry {
 			continue
-		}
-		if fl.Flags.Hidden {
-			log.Warn().Msg("Hidden flow labels are not supported by Prefixed propagator")
 		}
 		baggageKey := p.Prefix + key
 		newHeader := &envoy_core.HeaderValueOption{
@@ -109,31 +103,22 @@ const (
 )
 
 // Extract extracts flow labels from w3Baggage headers.
-func (b W3Baggage) Extract(headers Headers) class.FlowLabels {
+func (b W3Baggage) Extract(headers Headers) flowlabel.FlowLabels {
 	baggage, err := otel_baggage.Parse(headers[w3BaggageHeaderName])
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed to parse baggage header")
 		return nil
 	}
-	flowLabels := make(class.FlowLabels)
+	flowLabels := make(flowlabel.FlowLabels)
 	for _, member := range baggage.Members() {
 		value, err := url.QueryUnescape(member.Value())
 		if err != nil {
 			log.Warn().Msg("Could not unescape flow label value in baggage")
 			continue
 		}
-		isHidden := false
-		for _, prop := range member.Properties() {
-			if prop.Key() == hiddenPropertyKey {
-				isHidden = true
-			}
-		}
-		flowLabels[member.Key()] = class.FlowLabelValue{
-			Value: value,
-			Flags: compiler.LabelFlags{
-				Hidden:    isHidden,
-				Propagate: true,
-			},
+		flowLabels[member.Key()] = flowlabel.FlowLabelValue{
+			Value:     value,
+			Telemetry: true,
 		}
 	}
 	return flowLabels
@@ -141,23 +126,15 @@ func (b W3Baggage) Extract(headers Headers) class.FlowLabels {
 
 // Inject emits instructions for envoy how to inject flow labels into headers supported by baggage propagator.
 func (b W3Baggage) Inject(
-	flowLabels class.FlowLabels,
+	flowLabels flowlabel.FlowLabels,
 	headers Headers,
 ) ([]*envoy_core.HeaderValueOption, error) {
 	members := make([]otel_baggage.Member, 0, len(flowLabels))
 	for k, v := range flowLabels {
-		if !v.Flags.Propagate {
+		if !v.Telemetry {
 			continue
 		}
-		var props []otel_baggage.Property
-		if v.Flags.Hidden {
-			prop, err := otel_baggage.NewKeyProperty(hiddenPropertyKey)
-			if err != nil {
-				log.Panic().Err(err).Msgf("Failed to create new key property: %v", err)
-			}
-			props = append(props, prop)
-		}
-		member, err := otel_baggage.NewMember(k, v.Value, props...)
+		member, err := otel_baggage.NewMember(k, v.Value)
 		if err != nil {
 			return nil, err
 		}

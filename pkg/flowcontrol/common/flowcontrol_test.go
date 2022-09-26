@@ -9,6 +9,7 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc/peer"
 
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/entitycache/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -26,10 +27,12 @@ var (
 
 var _ = BeforeEach(func() {
 	entities := entitycache.NewEntityCache()
-	entities.Put(&entitycache.Entity{
-		ID:        entitycache.EntityID{},
+	entities.Put(&entitycachev1.Entity{
+		Prefix:    "",
+		Uid:       "",
+		IpAddress: hardCodedIPAddress,
+		Name:      hardCodedEntityName,
 		Services:  hardCodedServices,
-		IPAddress: hardCodedIPAddress,
 	})
 	app = platform.New(
 		config.ModuleConfig{
@@ -69,14 +72,15 @@ var _ = Describe("FlowControl Check", func() {
 			ctx := peer.NewContext(context.Background(), newFakeRpcPeer())
 			resp, err := svc.Check(ctx, &flowcontrolv1.CheckRequest{})
 			Expect(err).NotTo(HaveOccurred())
-			Expect((resp.GetDecisionType())).To(Equal(flowcontrolv1.DecisionType_DECISION_TYPE_ACCEPTED))
+			Expect((resp.GetDecisionType())).To(Equal(flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED))
 		})
 	})
 })
 
 var (
-	hardCodedServices  = []string{"service1", "service2"}
-	hardCodedIPAddress = "1.2.3.4"
+	hardCodedIPAddress  = "1.2.3.4"
+	hardCodedEntityName = "test-entity"
+	hardCodedServices   = []string{"service1", "service2"}
 )
 
 type fakeAddr string

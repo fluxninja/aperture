@@ -177,16 +177,13 @@ any
   {{- end -}}
 {{- end }}
 
-{{- define "summary" -}}
-{{- if le (len .) 80 -}}
-    {{- . -}}
-{{- else -}}
-    {{- slice . 0 80 }}…
-{{- end -}}
-{{- end -}}
+<!---
+Generated File Starts
+-->
 
-# {{ .Info.Description }} Configuration Reference{{/* an index of all config keys */}}
+{{/* Metadata, title and description are handled by `metadata` files in `/docs/gen` */}}
 
+{{- if or .OperationGroups .Operations }}
 ## Table of contents
 
 {{- $alltags := .Tags }}
@@ -202,15 +199,7 @@ any
   {{- printf "\n" }}
 {{- end }}
 
-### Object Index
-
-{{ range .Models -}}
-* [{{ .Name }}](#{{ dasherize .Name }})
-    {{- if .Title }} – {{ .Title -}}
-    {{- else if .Description }} – {{ template "summary" .Description -}}
-    {{- end }}
-{{ end }}
-
+{{- if .Operations }}
 ## Reference{{/* all config sections */}}
 
 {{- range .Operations }}
@@ -259,7 +248,9 @@ Type: {{ template "fnSchemaSimple" . }}
 {{- end }}
 {{- end }}{{/* end .HasBodyParams */}}
 </dl>
-{{- end }}{{/* end .Operations */}}
+{{- end }}{{/* end range .Operations */}}
+{{- end }}{{/* end if .Operations */}}
+{{- end }}{{/* end if or .OperationGroups .Operations */}}
 
 ## Objects
 {{- range .Models }}

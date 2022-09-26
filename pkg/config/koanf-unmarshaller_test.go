@@ -287,7 +287,7 @@ var _ = Describe("Koanf-unmarshaller", func() {
 			"koanf-unmarshaller": "test",
 		}
 		It("returns an error when unmarshalling a map", func() {
-			err := Unmarshal(bytes, &mp)
+			err := UnmarshalYAML(bytes, &mp)
 			Expect(err).To(HaveOccurred())
 		})
 	})
@@ -301,7 +301,7 @@ var _ = Describe("Koanf-unmarshaller", func() {
 		bytes := []byte("Val: 0")
 		unmarshaller, err := KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
 		Expect(err).NotTo(HaveOccurred())
-		It("returns the overriden value", func() {
+		It("returns the overridden value", func() {
 			err = unmarshaller.Unmarshal(&defaultConfig)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(defaultConfig.Val).To(Equal(int(0)))
@@ -379,8 +379,8 @@ var _ = Describe("Koanf-unmarshaller", func() {
 
 var _ = Describe("TimeStamp", func() {
 	Context("when marshalling same timeStamp twice", func() {
-		ts := &Timestamp{
-			Timestamp: timestamppb.Now(),
+		ts := &Time{
+			timestamp: timestamppb.Now(),
 		}
 		b, err := ts.MarshalJSON()
 		b2, err2 := ts.MarshalJSON()
@@ -391,17 +391,17 @@ var _ = Describe("TimeStamp", func() {
 		})
 	})
 	Context("when unmarshalling a timestamp", func() {
-		ts := &Timestamp{
-			Timestamp: timestamppb.Now(),
+		ts := &Time{
+			timestamp: timestamppb.Now(),
 		}
-		ts2 := &Timestamp{}
+		ts2 := &Time{}
 		b, err := ts.MarshalJSON()
-		errBytes := []byte(`{"timestamp":"` + ts.Timestamp.String() + `"}`)
+		errBytes := []byte(`{"timestamp":"` + ts.timestamp.String() + `"}`)
 		It("should return nil error, match both timestamps and their string values", func() {
 			Expect(err).NotTo(HaveOccurred())
 			err = ts2.UnmarshalJSON(b)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(ts2.Timestamp).To(Equal(ts.Timestamp))
+			Expect(ts2.timestamp).To(Equal(ts.timestamp))
 			Expect(ts2.String()).To(Equal(ts.String()))
 		})
 		It("should return error when trying to parse an unsupported timestamp", func() {
@@ -452,11 +452,15 @@ var _ = Describe("Duration", func() {
 var _ = Describe("ProtobufUnmarshaller", func() {
 	Context("when unmarshalling a protobuf", func() {
 		selector := &selectorv1.Selector{
-			AgentGroup: "ag",
-			Service:    "s.n.svc.cluster.local",
-			ControlPoint: &selectorv1.ControlPoint{
-				Controlpoint: &selectorv1.ControlPoint_Traffic{
-					Traffic: "egress",
+			ServiceSelector: &selectorv1.ServiceSelector{
+				AgentGroup: "ag",
+				Service:    "s.n.svc.cluster.local",
+			},
+			FlowSelector: &selectorv1.FlowSelector{
+				ControlPoint: &selectorv1.ControlPoint{
+					Controlpoint: &selectorv1.ControlPoint_Traffic{
+						Traffic: "egress",
+					},
 				},
 			},
 		}
