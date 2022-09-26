@@ -21,6 +21,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/fluxmeter"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 // policyModule returns Fx options of Policy for the Main App.
@@ -37,6 +38,8 @@ func policyModule() fx.Option {
 // Policy invokes the Circuit runtime at tick frequency.
 type Policy struct {
 	iface.PolicyBase
+	// status registry
+	registry status.Registry
 	// Circuit
 	circuit *runtime.Circuit
 	// job group
@@ -53,10 +56,11 @@ var _ iface.Policy = (*Policy)(nil)
 // newPolicyOptions creates a new Policy object and returns its Fx options for the per Policy App.
 func newPolicyOptions(
 	wrapperMessage *wrappersv1.PolicyWrapper,
+	registry status.Registry,
 ) (fx.Option, error) {
 	// List of options for the policy.
 	policyOptions := []fx.Option{}
-	policy, compiledCircuit, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage)
+	policy, compiledCircuit, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage, registry)
 	if err != nil {
 		return nil, err
 	}
@@ -86,12 +90,12 @@ func newPolicyOptions(
 }
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
-func CompilePolicy(policyMessage *policylangv1.Policy) (CompiledCircuit, error) {
+func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry) (CompiledCircuit, error) {
 	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter")
 	if err != nil {
 		return nil, err
 	}
-	_, compWithPortsList, _, err := compilePolicyWrapper(wrapperMessage)
+	_, compWithPortsList, _, err := compilePolicyWrapper(wrapperMessage, registry)
 	if err != nil {
 		return nil, err
 	}
@@ -99,13 +103,14 @@ func CompilePolicy(policyMessage *policylangv1.Policy) (CompiledCircuit, error) 
 }
 
 // compilePolicyWrapper takes policyProto and returns a compiled policy.
-func compilePolicyWrapper(wrapperMessage *wrappersv1.PolicyWrapper) (*Policy, CompiledCircuit, fx.Option, error) {
+func compilePolicyWrapper(wrapperMessage *wrappersv1.PolicyWrapper, registry status.Registry) (*Policy, CompiledCircuit, fx.Option, error) {
 	if wrapperMessage == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy wrapper message")
 	}
 
 	policy := &Policy{
 		PolicyBase: wrapperMessage,
+		registry:   registry,
 	}
 
 	// Get Policy Proto
@@ -163,6 +168,7 @@ func (policy *Policy) setupCircuitJob(
 	lifecycle fx.Lifecycle,
 	circuitJobGroup *jobs.JobGroup,
 ) error {
+	logger := policy.GetStatusRegistry().GetLogger()
 	if policy.evaluationInterval > 0 {
 		// Job name
 		policy.jobName = fmt.Sprintf("Policy-%s", policy.GetPolicyName())
@@ -188,7 +194,7 @@ func (policy *Policy) setupCircuitJob(
 				// Register job with registry
 				err := policy.circuitJobGroup.RegisterJob(&job, jobConfig)
 				if err != nil {
-					log.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
+					logger.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
 					return err
 				}
 				return nil
@@ -215,6 +221,11 @@ func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error
 	err := policy.circuit.Execute(tickInfo)
 	// TODO: return tick info (publish to health framework) instead of returning nil proto.Message
 	return nil, err
+}
+
+// GetStatusRegistry returns the status registry of the policy.
+func (policy *Policy) GetStatusRegistry() status.Registry {
+	return policy.registry
 }
 
 // hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.

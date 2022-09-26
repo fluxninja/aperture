@@ -14,9 +14,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/common"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 type autoTokensFactory struct {
@@ -66,6 +66,7 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 	policyHash string,
 	lc fx.Lifecycle,
 	componentIdx int64,
+	registry status.Registry,
 ) (*autoTokens, error) {
 	at := &autoTokens{
 		tokensDecision: &policydecisionsv1.TokensDecision{
@@ -75,11 +76,13 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 		policyHash:            policyHash,
 		tokensDecisionWatcher: atFactory.tokensDecisionWatcher,
 		componentIdx:          componentIdx,
+		registry:              registry,
 	}
+	logger := at.registry.GetLogger()
 
 	unmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to create protobuf unmarshaller")
+		logger.Error().Err(err).Msg("Failed to create protobuf unmarshaller")
 		return nil, err
 	}
 
@@ -111,20 +114,22 @@ type autoTokens struct {
 	policyName            string
 	policyHash            string
 	componentIdx          int64
+	registry              status.Registry
 }
 
 func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := at.registry.GetLogger()
 	at.mutex.Lock()
 	defer at.mutex.Unlock()
 	if event.Type == notifiers.Remove {
-		log.Trace().Msg("Tokens were removed")
+		logger.Trace().Msg("Tokens were removed")
 		return
 	}
 
 	var wrapperMessage wrappersv1.TokensDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.TokensDecision == nil {
-		log.Error().Err(err).Msg("Failed to unmarshal config wrapper")
+		logger.Error().Err(err).Msg("Failed to unmarshal config wrapper")
 		return
 	}
 
@@ -133,7 +138,7 @@ func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller co
 		err = errors.New("policy id mismatch")
 		statusMsg := fmt.Sprintf("Expected policy: %s, %s, Got: %s, %s",
 			at.policyName, at.policyHash, wrapperMessage.PolicyName, wrapperMessage.PolicyHash)
-		log.Warn().Err(err).Msg(statusMsg)
+		logger.Warn().Err(err).Msg(statusMsg)
 		return
 	}
 

@@ -4,8 +4,6 @@ import (
 	"errors"
 	"math"
 
-	"github.com/fluxninja/aperture/pkg/log"
-
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -38,6 +36,7 @@ type EMA struct {
 	// The correction factor on the minimum relative to the signal
 	correctionFactorOnMinViolation float64
 	currentStage                   stage
+	policyReadAPI                  iface.Policy
 }
 
 // Make sure EMA complies with Component interface.
@@ -62,6 +61,7 @@ func NewEMAAndOptions(emaProto *policylangv1.EMA,
 		alpha:                          alpha,
 		warmUpWindow:                   warmUpWindow,
 		emaWindow:                      uint32(emaWindow),
+		policyReadAPI:                  policyReadAPI,
 	}
 	ema.resetStages()
 	return ema, fx.Options(), nil
@@ -78,6 +78,7 @@ func (ema *EMA) resetStages() {
 
 // Execute implements runtime.Component.Execute.
 func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+	logger := ema.policyReadAPI.GetStatusRegistry().GetLogger()
 	retErr := func(err error) (runtime.PortToValue, error) {
 		return runtime.PortToValue{
 			"output": []runtime.Reading{runtime.InvalidReading()},
@@ -119,7 +120,7 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		if input.Valid() {
 			if !ema.lastGoodOutput.Valid() {
 				err := errors.New("ema: last good output is invalid")
-				log.Error().Err(err).Msg("This is unexpected!")
+				logger.Error().Err(err).Msg("This is unexpected!")
 				return retErr(err)
 			}
 			// Compute the new outputValue.
@@ -135,7 +136,7 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 			}
 		}
 	default:
-		log.Panic().Msg("unexpected ema stage")
+		logger.Panic().Msg("unexpected ema stage")
 	}
 
 	// Set the last good output
