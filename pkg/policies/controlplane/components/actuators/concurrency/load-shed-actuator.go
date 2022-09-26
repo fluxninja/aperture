@@ -16,6 +16,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/rs/zerolog"
 )
 
 // LoadShedActuator struct.
@@ -101,7 +102,7 @@ func (lsa *LoadShedActuator) publishLoadShedFactor(loadShedFactor float64) error
 		// Save load shed factor in decision message
 		lsa.decision.LoadShedFactor = loadShedFactor
 		// Publish decision
-		logger.Debug().Float64("loadShedFactor", loadShedFactor).Msg("Publish load shed decision")
+		logger.Sample(zerolog.Often).Debug().Float64("loadShedFactor", loadShedFactor).Msg("Publish load shed decision")
 		wrapper := &wrappersv1.LoadShedDecisionWrapper{
 			LoadShedDecision: lsa.decision,
 			ComponentIndex:   int64(lsa.componentIndex),
