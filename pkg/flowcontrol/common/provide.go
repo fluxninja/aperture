@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -15,9 +14,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
-
-// logSampled provides log sampling for flowcontrol handler.
-var logSampled log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
 
 // Module is a set of default providers for flowcontrol components
 //

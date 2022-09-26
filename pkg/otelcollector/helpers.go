@@ -14,9 +14,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// LogSampled provides log sampling for OTEL collector.
-var LogSampled log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
-
 // IterateLogRecords calls given function for each logRecord. If the function
 // returns error further logRecords will not be processed and the error will be returned.
 func IterateLogRecords(ld plog.Logs, fn func(plog.LogRecord) error) error {
@@ -143,11 +140,11 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAsMissing []string) bool {
 	value, ok := attributes.Get(label)
 	if !ok {
-		LogSampled.Warn().Str("label", label).Msg("Label does not exist in attributes map")
+		log.Sample(zerolog.Sometimes).Warn().Str("label", label).Msg("Label does not exist in attributes map")
 		return false
 	}
 	if value.Type() != pcommon.ValueTypeString {
-		LogSampled.Warn().Str("label", label).Msg("Label is not a string")
+		log.Sample(zerolog.Sometimes).Warn().Str("label", label).Msg("Label is not a string")
 		return false
 	}
 
@@ -155,14 +152,14 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 
 	for _, markerForMissing := range treatAsMissing {
 		if stringVal == markerForMissing {
-			LogSampled.Info().Str("label", label).Msg("Missing attribute from source")
+			log.Sample(zerolog.Sometimes).Info().Str("label", label).Msg("Missing attribute from source")
 			return false
 		}
 	}
 
 	err := json.Unmarshal([]byte(stringVal), output)
 	if err != nil {
-		LogSampled.Error().Err(err).Str("label", label).Msg("Failed to unmarshal")
+		log.Sample(zerolog.Sometimes).Error().Err(err).Str("label", label).Msg("Failed to unmarshal")
 	}
 
 	return true
@@ -172,7 +169,7 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 func GetFloat64(attributes pcommon.Map, key string, treatAsZero []string) (float64, bool) {
 	rawNewValue, exists := attributes.Get(key)
 	if !exists {
-		LogSampled.Trace().Str("key", key).Msg("Key not found")
+		log.Sample(zerolog.Sometimes).Trace().Str("key", key).Msg("Key not found")
 		return 0, false
 	}
 	if rawNewValue.Type() == pcommon.ValueTypeDouble {
@@ -187,12 +184,12 @@ func GetFloat64(attributes pcommon.Map, key string, treatAsZero []string) (float
 					return 0, true
 				}
 			}
-			LogSampled.Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Failed parsing value as float")
+			log.Sample(zerolog.Sometimes).Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Failed parsing value as float")
 			return 0, false
 		}
 		return newValue, true
 	}
-	LogSampled.Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Unsupported value type")
+	log.Sample(zerolog.Sometimes).Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Unsupported value type")
 	return 0, false
 }
 

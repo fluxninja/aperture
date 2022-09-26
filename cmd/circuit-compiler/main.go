@@ -15,7 +15,7 @@ import (
 func main() {
 	info.Service = "circuit-compiler"
 
-	logger := log.NewLogger(log.GetPrettyConsoleWriter(), false, "debug")
+	logger := log.NewLogger(log.GetPrettyConsoleWriter(), "debug")
 	log.SetGlobalLogger(logger)
 
 	// flags:

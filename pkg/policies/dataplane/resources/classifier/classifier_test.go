@@ -13,6 +13,7 @@ import (
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/status"
 
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/flowlabel"
 	. "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
@@ -28,7 +29,7 @@ var _ = Describe("Classifier", func() {
 	BeforeEach(func() {
 		log.SetGlobalLevel(log.WarnLevel)
 
-		classifier = New()
+		classifier = NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger()))
 	})
 
 	It("returns empty slice, when no rules configured", func() {

@@ -9,7 +9,6 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -174,7 +173,7 @@ func (gt *groupTracker) execute(ctx context.Context, job Job) (proto.Message, er
 	s := status.NewStatus(details, err)
 	err = gt.updateStatus(job, s)
 	if err != nil {
-		log.Error().Err(err).Str("job", job.Name()).Msg("Recently completed job has been removed from tracker and is not reporting results")
+		gt.statusRegistry.GetLogger().Error().Err(err).Str("job", job.Name()).Msg("Recently completed job has been removed from tracker and is not reporting results")
 		return nil, err
 	}
 
