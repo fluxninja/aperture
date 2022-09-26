@@ -16,80 +16,92 @@ Generated File Starts
 
 ### FluxMeterExponentialBuckets {#flux-meter-exponential-buckets}
 
+ExponentialBuckets creates 'count' number of buckets where the lowest bucket has an upper bound of `start`
+and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
+bucket is not counted.
+
 #### Properties
 
 <dl>
 <dt>count</dt>
 <dd>
 
-(int32)
+(int32, `gt=0`) Number of buckets.
 
 </dd>
 <dt>factor</dt>
 <dd>
 
-(float64)
+(float64, `gt=1.0`) Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
 
 </dd>
 <dt>start</dt>
 <dd>
 
-(float64)
+(float64, `gt=0`) Upper bound of the lowest bucket.
 
 </dd>
 </dl>
 
 ### FluxMeterExponentialBucketsRange {#flux-meter-exponential-buckets-range}
 
+ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
+bucket is `max`. The final +inf bucket is not counted.
+
 #### Properties
 
 <dl>
 <dt>count</dt>
 <dd>
 
-(int32)
+(int32, `gt=0`) Number of buckets.
 
 </dd>
 <dt>max</dt>
 <dd>
 
-(float64)
+(float64) Highest bucket.
 
 </dd>
 <dt>min</dt>
 <dd>
 
-(float64)
+(float64, `gt=0`) Lowest bucket.
 
 </dd>
 </dl>
 
 ### FluxMeterLinearBuckets {#flux-meter-linear-buckets}
 
+LinearBuckets creates 'count' number of buckets, each 'width' wide, where the lowest bucket has an
+upper bound of `start`. The final +inf bucket is not counted.
+
 #### Properties
 
 <dl>
 <dt>count</dt>
 <dd>
 
-(int32)
+(int32, `gt=0`) Number of buckets.
 
 </dd>
 <dt>start</dt>
 <dd>
 
-(float64)
+(float64) Upper bound of the lowest bucket.
 
 </dd>
 <dt>width</dt>
 <dd>
 
-(float64)
+(float64) Width of each bucket.
 
 </dd>
 </dl>
 
 ### FluxMeterStaticBuckets {#flux-meter-static-buckets}
+
+StaticBuckets holds the static value of the buckets where latency histogram will be stored.
 
 #### Properties
 

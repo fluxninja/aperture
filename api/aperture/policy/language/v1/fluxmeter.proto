@@ -22,6 +22,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 //       traffic: ingress
 // ```
 message FluxMeter {
+  // StaticBuckets holds the static value of the buckets where latency histogram will be stored.
   message StaticBuckets {
     repeated double buckets = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
@@ -33,22 +34,86 @@ message FluxMeter {
     }]; // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
   }
 
+  // LinearBuckets creates 'count' number of buckets, each 'width' wide, where the lowest bucket has an
+  // upper bound of `start`. The final +inf bucket is not counted.
   message LinearBuckets {
+    // Upper bound of the lowest bucket.
     double start = 1;
+
+    // Width of each bucket.
     double width = 2;
-    int32 count = 3;
+
+    // Number of buckets.
+    int32 count = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=0"
+        }
+      }
+    }]; // @gotags: validate:"gt=0"
   }
 
+  // ExponentialBuckets creates 'count' number of buckets where the lowest bucket has an upper bound of `start`
+  // and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
+  // bucket is not counted.
   message ExponentialBuckets {
-    double start = 1;
-    double factor = 2;
-    int32 count = 3;
+    // Upper bound of the lowest bucket.
+    double start = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=0"
+        }
+      }
+    }]; // @gotags: validate:"gt=0.0"
+
+    // Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
+    double factor = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=1.0"
+        }
+      }
+    }]; // @gotags: validate:"gt=1.0"
+
+    // Number of buckets.
+    int32 count = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=0"
+        }
+      }
+    }]; // @gotags: validate:"gt=0"
   }
 
+  // ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
+  // bucket is `max`. The final +inf bucket is not counted.
   message ExponentialBucketsRange {
-    double min = 1;
+    // Lowest bucket.
+    double min = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=0"
+        }
+      }
+    }]; // @gotags: validate:"gt=0.0"
+
+    // Highest bucket.
     double max = 2;
-    int32 count = 3;
+
+    // Number of buckets.
+    int32 count = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=0"
+        }
+      }
+    }]; // @gotags: validate:"gt=0"
   }
 
   // What latency should we measure in the histogram created by this FluxMeter.
@@ -61,7 +126,7 @@ message FluxMeter {
   //   duration is entirely up to the user code that uses Aperture SDK.
   common.selector.v1.Selector selector = 1;
 
-  // Histogram buckets (in ms) for this FluxMeter.
+  // Latency histogram buckets (in ms) for this FluxMeter.
   oneof histogram_buckets {
     StaticBuckets static_buckets = 2;
     LinearBuckets linear_buckets = 3;
