@@ -82,7 +82,8 @@ workflows:
   version: 2
 
   publish-protobuf-files:
-    when: *job-when-clause
+    when:
+      matches: { value: << pipeline.git.tag >>, pattern: ^v.*$ }
     jobs:
       - publish-protobuf-files:
           filters:
