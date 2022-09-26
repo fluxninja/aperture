@@ -34,7 +34,7 @@ message FluxMeter {
     }]; // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
   }
 
-  // LinearBuckets creates 'count' number of buckets, each 'width' wide, where the lowest bucket has an
+  // LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
   // upper bound of `start`. The final +inf bucket is not counted.
   message LinearBuckets {
     // Upper bound of the lowest bucket.
@@ -54,7 +54,7 @@ message FluxMeter {
     }]; // @gotags: validate:"gt=0"
   }
 
-  // ExponentialBuckets creates 'count' number of buckets where the lowest bucket has an upper bound of `start`
+  // ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
   // and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
   // bucket is not counted.
   message ExponentialBuckets {

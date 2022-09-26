@@ -16,7 +16,7 @@ Generated File Starts
 
 ### FluxMeterExponentialBuckets {#flux-meter-exponential-buckets}
 
-ExponentialBuckets creates 'count' number of buckets where the lowest bucket has an upper bound of `start`
+ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
 and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
 bucket is not counted.
 
@@ -73,7 +73,7 @@ bucket is `max`. The final +inf bucket is not counted.
 
 ### FluxMeterLinearBuckets {#flux-meter-linear-buckets}
 
-LinearBuckets creates 'count' number of buckets, each 'width' wide, where the lowest bucket has an
+LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
 upper bound of `start`. The final +inf bucket is not counted.
 
 #### Properties
