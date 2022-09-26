@@ -43,12 +43,12 @@ type K8sClientConstructorIn struct {
 func Module() fx.Option {
 	return fx.Options(
 		commonhttp.ClientConstructor{Name: "k8s-http-client", ConfigKey: httpConfigKey}.Annotate(),
-		fx.Provide(Providek8sClient),
+		fx.Provide(SetupFork8sClient),
 	)
 }
 
-// Providek8sDynamicClient provides a dynamic kubernetes client.
-func Providek8sDynamicClient(in K8sClientConstructorIn) (dynamic.Interface, error) {
+// SetupFork8sDynamicClient provides a dynamic kubernetes client.
+func SetupFork8sDynamicClient(in K8sClientConstructorIn) (dynamic.Interface, error) {
 	dynamicClient, err := newk8sDynamicClient(in.K8sClient)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to create new dynamic client!")
@@ -123,8 +123,8 @@ func (r *RealK8sClient) GetErrNotInCluster() bool {
 	return r.err == rest.ErrNotInCluster
 }
 
-// Providek8sClient provides a new kubernetes client and sets logger.
-func Providek8sClient(in K8sClientConstructorIn) K8sClient {
+// SetupFork8sClient provides a new kubernetes client and sets logger.
+func SetupFork8sClient(in K8sClientConstructorIn) K8sClient {
 	k8sClientSet, err := newk8sClientSetAndErr(in.K8sClient)
 	if err != nil {
 		log.Debug().Err(err).Msg("K8s clientset could not be created")

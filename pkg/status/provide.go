@@ -11,12 +11,12 @@ import (
 // Module is a fx module that provides a status Registry and registers status service handlers as grpc-gateway handlers.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(provideRegistry),
+		fx.Provide(setupForRegistry),
 		grpcgateway.RegisterHandler{Handler: statusv1.RegisterStatusServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(RegisterStatusService),
 	)
 }
 
-func provideRegistry(logger *log.Logger) Registry {
+func setupForRegistry(logger *log.Logger) Registry {
 	return NewRegistry(logger)
 }

@@ -43,7 +43,7 @@ const (
 // Module is a fx module that provides annotated Watchdog jobs and triggers Watchdog checks.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Invoke(Constructor{ConfigKey: watchdogConfigKey}.setupWatchdog),
+		fx.Invoke(Constructor{ConfigKey: watchdogConfigKey}.setupForWatchdog),
 	)
 }
 
@@ -73,7 +73,7 @@ type watchdog struct {
 	config             WatchdogConfig
 }
 
-func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
+func (constructor Constructor) setupForWatchdog(in WatchdogIn) error {
 	config := constructor.DefaultConfig
 
 	if err := in.Unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {

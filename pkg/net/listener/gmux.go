@@ -22,14 +22,14 @@ type GMuxConstructor struct {
 func (constructor GMuxConstructor) Annotate() fx.Option {
 	return fx.Provide(
 		fx.Annotate(
-			constructor.configureServer,
+			constructor.setupForServer,
 			fx.ParamTags(config.NameTag(constructor.HTTPServerName)),
 			fx.ResultTags(config.NameTag(constructor.ListenerName)),
 		),
 	)
 }
 
-func (constructor GMuxConstructor) configureServer(server *http.Server) (*Listener, error) {
+func (constructor GMuxConstructor) setupForServer(server *http.Server) (*Listener, error) {
 	listener := &Listener{}
 	var err error
 	// Listener is automatically closed by http server on shutdown

@@ -30,14 +30,14 @@ func (c Constructor) Annotate() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			fx.Annotate(
-				c.provideWatcher,
+				c.setupForWatcher,
 				fx.ResultTags(name),
 			),
 		),
 	)
 }
 
-func (c Constructor) provideWatcher(client *etcdclient.Client, unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (notifiers.Watcher, error) {
+func (c Constructor) setupForWatcher(client *etcdclient.Client, unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (notifiers.Watcher, error) {
 	watcher, err := NewWatcher(client, c.EtcdPath)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create etcd watcher")

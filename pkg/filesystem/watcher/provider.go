@@ -43,13 +43,13 @@ func (constructor Constructor) Annotate() fx.Option {
 
 	return fx.Options(fx.Provide(
 		fx.Annotate(
-			constructor.provideWatcher,
+			constructor.setupForWatcher,
 			fx.ResultTags(name),
 		),
 	))
 }
 
-func (constructor Constructor) provideWatcher(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (notifiers.Watcher, error) {
+func (constructor Constructor) setupForWatcher(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (notifiers.Watcher, error) {
 	var directory string
 
 	if constructor.ConfigKey != "" {

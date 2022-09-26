@@ -53,17 +53,17 @@ func (constructor Constructor) Annotate() fx.Option {
 	name := config.NameTag(constructor.Name)
 	return fx.Provide(
 		fx.Annotate(
-			constructor.provideTLSConfig,
+			constructor.setupForTLSConfig,
 			fx.ResultTags(name),
 		),
 		fx.Annotate(
-			constructor.provideServerTLSConfig,
+			constructor.setupForServerTLSConfig,
 			fx.ResultTags(name),
 		),
 	)
 }
 
-func (constructor Constructor) provideServerTLSConfig(unmarshaller config.Unmarshaller) (ServerTLSConfig, error) {
+func (constructor Constructor) setupForServerTLSConfig(unmarshaller config.Unmarshaller) (ServerTLSConfig, error) {
 	config := constructor.DefaultConfig
 	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize tls configuration!")
@@ -72,8 +72,8 @@ func (constructor Constructor) provideServerTLSConfig(unmarshaller config.Unmars
 	return config, nil
 }
 
-func (constructor Constructor) provideTLSConfig(unmarshaller config.Unmarshaller) (*tls.Config, error) {
-	config, err := constructor.provideServerTLSConfig(unmarshaller)
+func (constructor Constructor) setupForTLSConfig(unmarshaller config.Unmarshaller) (*tls.Config, error) {
+	config, err := constructor.setupForServerTLSConfig(unmarshaller)
 	if err != nil {
 		return nil, err
 	}

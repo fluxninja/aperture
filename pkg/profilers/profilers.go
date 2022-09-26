@@ -32,7 +32,7 @@ func Module() fx.Option {
 	constructor := Constructor{ConfigKey: defaultKey}
 
 	return fx.Options(
-		fx.Invoke(constructor.setupProfilers),
+		fx.Invoke(constructor.setupForProfilers),
 	)
 }
 
@@ -62,7 +62,7 @@ type Constructor struct {
 	DefaultConfig ProfilersConfig
 }
 
-func (constructor Constructor) setupProfilers(unmarshaller config.Unmarshaller,
+func (constructor Constructor) setupForProfilers(unmarshaller config.Unmarshaller,
 	router *mux.Router,
 	lc fx.Lifecycle,
 ) error {

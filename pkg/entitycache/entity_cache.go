@@ -17,7 +17,7 @@ import (
 // Module sets up EntityCache with Fx.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(provideEntityCache),
+		fx.Provide(setupForEntityCache),
 		grpcgateway.RegisterHandler{Handler: entitycachev1.RegisterEntityCacheServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(RegisterEntityCacheService),
 	)
@@ -36,8 +36,8 @@ type FxIn struct {
 	EntityTrackers notifiers.Trackers `name:"entity_trackers"`
 }
 
-// provideEntityCache creates Entity Cache.
-func provideEntityCache(in FxIn) (*EntityCache, error) {
+// setupForEntityCache creates Entity Cache.
+func setupForEntityCache(in FxIn) (*EntityCache, error) {
 	entityCache := NewEntityCache()
 
 	// create a ConfigPrefixNotifier

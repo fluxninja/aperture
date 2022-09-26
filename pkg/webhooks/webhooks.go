@@ -19,13 +19,13 @@ import (
 // and kubernetes registry.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(provideK8sRegistry),
+		fx.Provide(setupForK8sRegistry),
 	)
 }
 
-// provideK8sRegistry provides k8s registry which allows serving k8s webhooks
+// setupForK8sRegistry provides k8s registry which allows serving k8s webhooks
 // using given router.
-func provideK8sRegistry(mux *mux.Router) *K8sRegistry {
+func setupForK8sRegistry(mux *mux.Router) *K8sRegistry {
 	return &K8sRegistry{
 		mux:      mux,
 		handlers: make(map[string]*handler),

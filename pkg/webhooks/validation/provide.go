@@ -8,7 +8,7 @@ import (
 // Module provides fx module for Policy Custom Resource validator.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Invoke(registerPolicyValidator),
+		fx.Invoke(setupForPolicyValidator),
 	)
 }
 
@@ -19,8 +19,8 @@ type FxIn struct {
 	Validators []PolicySpecValidator `group:"policy-validators"`
 }
 
-// registerPolicyValidator registers Policy Custom Resource validator as k8s webhook.
-func registerPolicyValidator(in FxIn) {
+// setupForPolicyValidator registers Policy Custom Resource validator as k8s webhook.
+func setupForPolicyValidator(in FxIn) {
 	// The path is not configurable – if one doesn't want default path, one
 	// could just write their own Register function
 	in.Webhooks.RegisterValidator("/validate/policy", NewPolicyValidator(in.Validators))

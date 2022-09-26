@@ -21,13 +21,13 @@ import (
 // externally.
 var ModuleForFlowcontrol = fx.Options(
 	fx.Provide(
-		ProvideMetrics,
-		ProvideHandler,
+		SetupForMetrics,
+		SetupForHandler,
 	),
 	fx.Invoke(Register),
 )
 
-// ConstructorIn holds parameters for ProvideHandler.
+// ConstructorIn holds parameters for SetupForHandler.
 type ConstructorIn struct {
 	fx.In
 
@@ -36,8 +36,8 @@ type ConstructorIn struct {
 	EngineAPI   iface.Engine
 }
 
-// ProvideHandler provides a Flow Control Handler.
-func ProvideHandler(in ConstructorIn) (flowcontrolv1.FlowControlServiceServer, HandlerWithValues, error) {
+// SetupForHandler provides a Flow Control Handler.
+func SetupForHandler(in ConstructorIn) (flowcontrolv1.FlowControlServiceServer, HandlerWithValues, error) {
 	h := NewHandler(in.EntityCache, in.Metrics, in.EngineAPI)
 
 	// Note: Returning the same handler twice as different interfaces – once as
@@ -49,8 +49,8 @@ func ProvideHandler(in ConstructorIn) (flowcontrolv1.FlowControlServiceServer, H
 // ProvideDummyHandler provides an empty Flow Control Handler.
 var ProvideDummyHandler = fx.Annotate(NewHandler, fx.As(new(HandlerWithValues)))
 
-// ProvideMetrics provides flowcontrol metrics that hook to prometheus registry.
-func ProvideMetrics(promRegistry *prometheus.Registry) (Metrics, error) {
+// SetupForMetrics provides flowcontrol metrics that hook to prometheus registry.
+func SetupForMetrics(promRegistry *prometheus.Registry) (Metrics, error) {
 	metrics, err := NewPrometheusMetrics(promRegistry)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating Prometheus collector: %v", err)

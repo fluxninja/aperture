@@ -45,7 +45,7 @@ type PrometheusConfig struct {
 // Module provides a singleton pointer to prometheusv1.API via FX.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(providePrometheusClient),
+		fx.Provide(setupForPrometheusClient),
 		commonhttp.ClientConstructor{Name: "prometheus.http-client", ConfigKey: httpConfigKey}.Annotate(),
 	)
 }
@@ -57,7 +57,7 @@ type ClientIn struct {
 	Unmarshaller config.Unmarshaller
 }
 
-func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, error) {
+func setupForPrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, error) {
 	var config PrometheusConfig
 	if err := in.Unmarshaller.UnmarshalKey(prometheusConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("unable to deserialize")

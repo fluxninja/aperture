@@ -15,7 +15,7 @@ import (
 // Module is a fx module that provides Prometheus registry and invokes registering metrics handler.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(ProvidePrometheusRegistry),
+		fx.Provide(SetupForPrometheusRegistry),
 		fx.Invoke(RegisterMetricsHandler),
 	)
 }
@@ -49,9 +49,9 @@ type MetricsConfig struct {
 	EnableProcessCollector bool `json:"enable_process_collector" default:"false"`
 }
 
-// ProvidePrometheusRegistry creates a new Prometheus Registry and provides it via Fx.
+// SetupForPrometheusRegistry creates a new Prometheus Registry and provides it via Fx.
 // Metrics from the Registry are served on /metrics via the default http server of Fx application.
-func ProvidePrometheusRegistry(unmarshaller config.Unmarshaller) (*prometheus.Registry, error) {
+func SetupForPrometheusRegistry(unmarshaller config.Unmarshaller) (*prometheus.Registry, error) {
 	var pr *prometheus.Registry
 	var config MetricsConfig
 

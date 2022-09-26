@@ -17,7 +17,7 @@ const (
 // ProxyModule returns the fx module that applies the provided proxy configuration.
 func ProxyModule() fx.Option {
 	return fx.Options(
-		fx.Invoke(ProxyConstructor{}.applyProxyConfig),
+		fx.Invoke(ProxyConstructor{}.setupForProxyConfig),
 	)
 }
 
@@ -39,7 +39,7 @@ type ProxyConfig struct {
 	NoProxy []string `json:"no_proxy,omitempty" validate:"omitempty,dive,ip|cidr|fqdn|hostname_port"`
 }
 
-func (constructor ProxyConstructor) applyProxyConfig(unmarshaller config.Unmarshaller) error {
+func (constructor ProxyConstructor) setupForProxyConfig(unmarshaller config.Unmarshaller) error {
 	if constructor.ConfigKey == "" {
 		constructor.ConfigKey = defaultProxyKey
 	}

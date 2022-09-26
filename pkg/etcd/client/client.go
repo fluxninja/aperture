@@ -18,7 +18,7 @@ import (
 // Module is a fx module that provides etcd client.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(ProvideClient),
+		fx.Provide(SetupForClient),
 	)
 }
 
@@ -70,8 +70,8 @@ type Client struct {
 	LeaseID clientv3.LeaseID
 }
 
-// ProvideClient creates a new Etcd Client and provides it via Fx.
-func ProvideClient(in ClientIn) (*Client, error) {
+// SetupForClient creates a new Etcd Client and provides it via Fx.
+func SetupForClient(in ClientIn) (*Client, error) {
 	var config EtcdConfig
 
 	if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &config); err != nil {

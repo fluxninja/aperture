@@ -55,8 +55,8 @@ type FxIn struct {
 	EntityTrackers notifiers.Trackers `name:"entity_trackers"`
 }
 
-// InvokeStaticServiceDiscovery causes statically configured services to be uploaded to the tracker.
-func InvokeStaticServiceDiscovery(in FxIn) error {
+// SetupForStaticServiceDiscovery causes statically configured services to be uploaded to the tracker.
+func SetupForStaticServiceDiscovery(in FxIn) error {
 	var cfg StaticDiscoveryConfig
 	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize static services configuration!")

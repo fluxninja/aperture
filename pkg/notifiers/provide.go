@@ -24,13 +24,13 @@ func (t TrackersConstructor) Annotate() fx.Option {
 
 	return fx.Provide(
 		fx.Annotate(
-			t.provideTrackers,
+			t.setupForTrackers,
 			fx.ResultTags(name),
 		),
 	)
 }
 
-func (t TrackersConstructor) provideTrackers(lifecycle fx.Lifecycle) (Trackers, error) {
+func (t TrackersConstructor) setupForTrackers(lifecycle fx.Lifecycle) (Trackers, error) {
 	trackers := NewDefaultTrackers()
 
 	lifecycle.Append(fx.Hook{

@@ -19,14 +19,14 @@ import (
 // Note: Register function is not bundled inside this module and should be
 // invoked explicitly.
 var ModuleForAuthzHandler = fx.Options(
-	fx.Provide(ProvideHandler),
+	fx.Provide(SetupForHandler),
 	fx.Invoke(Register),
 )
 
-// ProvideHandler provides an authz handler
+// SetupForHandler provides an authz handler
 //
 // See NewHandler for more docs.
-var ProvideHandler = NewHandler
+var SetupForHandler = NewHandler
 
 // Register registers the handler on grpc.Server
 //

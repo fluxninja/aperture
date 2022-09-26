@@ -17,17 +17,17 @@ import (
 func ModuleForGrpcHealthServer() fx.Option {
 	return fx.Options(
 		grpcclient.ClientConstructor{Name: "health-grpc-client", ConfigKey: "health.client.grpc"}.Annotate(),
-		fx.Provide(provideHealthServer),
+		fx.Provide(setupForHealthServer),
 		fx.Provide(fx.Annotate(
-			provideHealthClient,
+			setupForHealthClient,
 			fx.ParamTags(config.NameTag("health-grpc-client")),
 		)),
 		fx.Invoke(RegisterHealthServer),
 	)
 }
 
-// provideHealthServer creates instance of health server.
-func provideHealthServer(lifecycle fx.Lifecycle) *health.Server {
+// setupForHealthServer creates instance of health server.
+func setupForHealthServer(lifecycle fx.Lifecycle) *health.Server {
 	server := health.NewServer()
 
 	lifecycle.Append(fx.Hook{
@@ -40,8 +40,8 @@ func provideHealthServer(lifecycle fx.Lifecycle) *health.Server {
 	return server
 }
 
-// provideHealthClient creates instance of client to health server.
-func provideHealthClient(GRPClientConnectionBuilder grpcclient.ClientConnectionBuilder) (grpc_health_v1.HealthClient, error) {
+// setupForHealthClient creates instance of client to health server.
+func setupForHealthClient(GRPClientConnectionBuilder grpcclient.ClientConnectionBuilder) (grpc_health_v1.HealthClient, error) {
 	// Setup connection to health service
 	connWrapper := GRPClientConnectionBuilder.Build()
 	conn, err := connWrapper.Dial(context.Background(), "localhost:80")

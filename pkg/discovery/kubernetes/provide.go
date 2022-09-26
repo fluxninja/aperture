@@ -36,8 +36,8 @@ type FxIn struct {
 	EntityTrackers   notifiers.Trackers `name:"entity_trackers"`
 }
 
-// InvokeKubernetesServiceDiscovery creates a Kubernetes service discovery.
-func InvokeKubernetesServiceDiscovery(in FxIn) error {
+// SetupForKubernetesServiceDiscovery creates a Kubernetes service discovery.
+func SetupForKubernetesServiceDiscovery(in FxIn) error {
 	var cfg KubernetesDiscoveryConfig
 	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")

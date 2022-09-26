@@ -58,7 +58,7 @@ type ModuleConfig struct {
 func (config ModuleConfig) Module() fx.Option {
 	return fx.Options(
 		fx.Invoke(
-			panichandler.RegisterPanicHandlers,
+			panichandler.SetupForPanicHandlers,
 		),
 		fx.Provide(CommandLineConfig{UnknownFlags: config.UnknownFlags, ExitOnHelp: config.ExitOnHelp}.NewCommandLine),
 		FileUnmarshallerConstructor{

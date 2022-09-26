@@ -26,8 +26,8 @@ type PanicHandlerRegistryIn struct {
 	Handlers []PanicHandler `group:"panic-handlers"`
 }
 
-// RegisterPanicHandlers register panic handlers to panic handler registry.
-func RegisterPanicHandlers(in PanicHandlerRegistryIn) {
+// SetupForPanicHandlers register panic handlers to panic handler registry.
+func SetupForPanicHandlers(in PanicHandlerRegistryIn) {
 	// loop the handlers
 	for _, handler := range in.Handlers {
 		RegisterPanicHandler(handler)

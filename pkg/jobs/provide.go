@@ -49,7 +49,7 @@ func Module() fx.Option {
 	return fx.Options(
 		provideServiceLivenessCheck(),
 		provideServiceReadinessCheck(),
-		fx.Invoke(registerSelfChecks),
+		fx.Invoke(setupForRegisterSelfChecks),
 	)
 }
 
@@ -90,8 +90,8 @@ type SelfChecksIn struct {
 	Readiness *MultiJob `name:"readiness.service"`
 }
 
-// RegisterSelfChecks registers self check jobs (liveness, readiness) for internal service components.
-func registerSelfChecks(sc SelfChecksIn) {
+// setupForRegisterSelfChecks registers self check jobs (liveness, readiness) for internal service components.
+func setupForRegisterSelfChecks(sc SelfChecksIn) {
 	liveness := &BasicJob{
 		JobBase: JobBase{
 			JobName: "job-module",

@@ -63,7 +63,7 @@ type Constructor struct {
 func (constructor Constructor) Module() fx.Option {
 	_ = os.MkdirAll(peerDiscoverySyncPath, fs.ModePerm)
 	return fx.Options(
-		fx.Provide(constructor.providePeerDiscovery),
+		fx.Provide(constructor.setupForPeerDiscovery),
 		grpcgateway.RegisterHandler{Handler: peersv1.RegisterPeerDiscoveryServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(RegisterPeerDiscoveryService),
 	)
@@ -84,7 +84,7 @@ type PeerDiscoveryIn struct {
 	Watchers       PeerWatchers `group:"peer-watchers"`
 }
 
-func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDiscovery, error) {
+func (constructor Constructor) setupForPeerDiscovery(in PeerDiscoveryIn) (*PeerDiscovery, error) {
 	var configKey string
 	if constructor.ConfigKey == "" {
 		configKey = defaultConfigKey

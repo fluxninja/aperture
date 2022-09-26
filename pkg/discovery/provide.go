@@ -11,8 +11,8 @@ import (
 func Module() fx.Option {
 	return fx.Options(
 		fx.Invoke(
-			kubernetes.InvokeKubernetesServiceDiscovery,
-			static.InvokeStaticServiceDiscovery,
+			kubernetes.SetupForKubernetesServiceDiscovery,
+			static.SetupForStaticServiceDiscovery,
 		),
 	)
 }

@@ -49,7 +49,7 @@ var _ = BeforeEach(func() {
 		fx.Provide(agentinfo.ProvideAgentInfo),
 		fx.Supply(entities),
 		fx.Provide(common.ProvideNopMetrics),
-		fx.Provide(common.ProvideHandler),
+		fx.Provide(common.SetupForHandler),
 		fx.Provide(dataplane.ProvideEngineAPI),
 		grpcclient.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 		fx.Populate(&svc),
