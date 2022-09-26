@@ -1,8 +1,8 @@
 apiVersion: v2
 name: aperture-controller
 description: A Helm chart to deploy Aperture Controller
-version: v0.3.0-rc.1
-appVersion: v0.3.0-rc.1
+version: v0.3.0-rc.2
+appVersion: v0.3.0-rc.2
 icon: https://raw.githubusercontent.com/fluxninja/aperture/gh-pages/FluxNinja--main--logo--ICON.svg
 dependencies:
   - name: common
