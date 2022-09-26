@@ -285,36 +285,61 @@ definitions:
       count:
         type: integer
         format: int32
+        description: Number of buckets.
+        x-go-validate: gt=0
       factor:
         type: number
         format: double
+        description: Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
+        x-go-validate: gt=1.0
       start:
         type: number
         format: double
+        description: Upper bound of the lowest bucket.
+        x-go-validate: gt=0
+    description: |-
+      ExponentialBuckets creates 'count' number of buckets where the lowest bucket has an upper bound of `start`
+      and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
+      bucket is not counted.
   FluxMeterExponentialBucketsRange:
     type: object
     properties:
       count:
         type: integer
         format: int32
+        description: Number of buckets.
+        x-go-validate: gt=0
       max:
         type: number
         format: double
+        description: Highest bucket.
       min:
         type: number
         format: double
+        description: Lowest bucket.
+        x-go-validate: gt=0
+    description: |-
+      ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
+      bucket is `max`. The final +inf bucket is not counted.
   FluxMeterLinearBuckets:
     type: object
     properties:
       count:
         type: integer
         format: int32
+        description: Number of buckets.
+        x-go-validate: gt=0
       start:
         type: number
         format: double
+        description: Upper bound of the lowest bucket.
       width:
         type: number
         format: double
+        description: Width of each bucket.
+    description: |-
+      LinearBuckets creates 'count' number of buckets, each 'width' wide, where the lowest bucket has an
+      upper bound of `start`. The final +inf bucket is not counted.
   FluxMeterStaticBuckets:
     type: object
     properties:
@@ -324,6 +349,7 @@ definitions:
           type: number
           format: double
         x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+    description: StaticBuckets holds the static value of the buckets where latency histogram will be stored.
   LimiterDecisionConcurrencyLimiterInfo:
     type: object
     properties:
