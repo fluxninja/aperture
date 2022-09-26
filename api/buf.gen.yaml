@@ -39,3 +39,5 @@ plugins:
       - allow_merge=true
       - output_format=yaml
       - generate_unbound_methods=true
+  - name: java
+    out: gen/proto/java
