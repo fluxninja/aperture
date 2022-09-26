@@ -4,6 +4,7 @@ import (
 	"go.uber.org/fx"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 )
 
@@ -16,6 +17,6 @@ func Module() fx.Option {
 	)
 }
 
-func provideRegistry() Registry {
-	return NewRegistry()
+func provideRegistry(logger *log.Logger) Registry {
+	return NewRegistry(logger)
 }

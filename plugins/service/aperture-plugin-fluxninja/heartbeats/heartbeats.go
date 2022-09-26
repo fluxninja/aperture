@@ -8,6 +8,7 @@ import (
 
 	guuid "github.com/google/uuid"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -24,6 +25,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
@@ -42,6 +44,7 @@ const (
 )
 
 type Heartbeats struct {
+	heartbeatv1.UnimplementedControllerInfoServiceServer
 	heartbeatsClient heartbeatv1.FluxNinjaServiceClient
 	peersWatcher     *peers.PeerDiscovery
 	clientHTTP       *http.Client
@@ -246,4 +249,17 @@ func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.M
 		log.Warn().Err(err).Msg("could not send heartbeat report")
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func (h *Heartbeats) GetControllerInfo(context.Context, *emptypb.Empty) (*heartbeatv1.ControllerInfo, error) {
+	return h.ControllerInfo, nil
+}
+
+func RegisterControllerInfoService(grpc *grpc.Server, handler *Heartbeats) error {
+	heartbeatv1.RegisterControllerInfoServiceServer(grpc, handler)
+	return nil
+}
+
+func RegisterControllerInfoServiceHTTP() fx.Option {
+	return grpcgateway.RegisterHandler{Handler: heartbeatv1.RegisterControllerInfoServiceHandlerFromEndpoint}.Annotate()
 }

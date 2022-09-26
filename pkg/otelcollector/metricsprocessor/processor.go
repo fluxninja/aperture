@@ -15,6 +15,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/rs/zerolog"
 )
 
 type metricsProcessor struct {
@@ -52,7 +53,7 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
 		retErr := func(errMsg string) error {
-			otelcollector.LogSampled.Warn().Msg(errMsg)
+			log.Sample(zerolog.Sometimes).Warn().Msg(errMsg)
 			return fmt.Errorf(errMsg)
 		}
 		// Attributes
@@ -159,7 +160,7 @@ func _getLabelTimestampValue(value pcommon.Value, labelKey, source string) (time
 	if value.Type() == pcommon.ValueTypeInt {
 		valueInt = value.IntVal()
 	} else {
-		otelcollector.LogSampled.Warn().Str("source", source).Str("key", labelKey).Msg("Failed to parse a timestamp field")
+		log.Sample(zerolog.Sometimes).Warn().Str("source", source).Str("key", labelKey).Msg("Failed to parse a timestamp field")
 		return time.Time{}, false
 	}
 
@@ -169,7 +170,7 @@ func _getLabelTimestampValue(value pcommon.Value, labelKey, source string) (time
 func getLabelValue(attributes pcommon.Map, labelKey, source string) (pcommon.Value, bool) {
 	value, exists := attributes.Get(labelKey)
 	if !exists {
-		otelcollector.LogSampled.Warn().Str("source", source).Str("key", labelKey).Msg("Label not found")
+		log.Sample(zerolog.Sometimes).Warn().Str("source", source).Str("key", labelKey).Msg("Label not found")
 		return pcommon.Value{}, false
 	}
 	return value, exists
@@ -192,7 +193,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	if !startTime.IsZero() && !endTime.IsZero() {
 		attributes.PutDouble(otelcollector.ApertureProcessingDurationLabel, float64(endTime.Sub(startTime).Milliseconds()))
 	} else {
-		otelcollector.LogSampled.Warn().Msgf("Aperture processing duration not found in %s access logs", sourceStr)
+		log.Sample(zerolog.Sometimes).Warn().Msgf("Aperture processing duration not found in %s access logs", sourceStr)
 	}
 	// Services
 	servicesValue := pcommon.NewValueSlice()
@@ -331,7 +332,7 @@ func (p *metricsProcessor) updateMetrics(
 func (p *metricsProcessor) updateMetricsForWorkload(labels map[string]string, latency float64) {
 	latencyHistogram, err := p.cfg.metricsAPI.GetTokenLatencyHistogram(labels)
 	if err != nil {
-		otelcollector.LogSampled.Warn().Err(err).Msg("Getting latency histogram")
+		log.Sample(zerolog.Sometimes).Warn().Err(err).Msg("Getting latency histogram")
 		return
 	}
 	latencyHistogram.Observe(latency)
@@ -347,7 +348,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 ) {
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
-		otelcollector.LogSampled.Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
+		log.Sample(zerolog.Sometimes).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
 			Str(metrics.FeatureStatusLabel, featureStatus).

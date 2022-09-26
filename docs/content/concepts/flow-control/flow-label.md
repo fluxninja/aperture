@@ -150,8 +150,10 @@ select which labels to include in telemetry.
 [ratelimiter]: /concepts/flow-control/rate-limiter.md
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
-[traces]: https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
+[traces]:
+  https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
 [control-point]: /concepts/flow-control/flow-control.md#control-point
-[otel-conventions]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
+[otel-conventions]:
+  https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
 [aperture-go]: https://github.com/FluxNinja/aperture-go
 [istio]: /get-started/installation/agent/envoy/istio.md

@@ -30,7 +30,7 @@ local defaults = {
   concurrencyLimiter: {
     autoTokens: true,
     timeoutFactor: '0.5',
-    defaultWorkload: {
+    defaultWorkloadParameters: {
       priority: 20,
     },
     workloads: [],
@@ -201,7 +201,7 @@ function(params) {
             + scheduler.withSelector($._config.concurrencyLimiterSelector)
             + scheduler.withAutoTokens(c.autoTokens)
             + scheduler.withTimeoutFactor(c.timeoutFactor)
-            + scheduler.withDefaultWorkload(c.defaultWorkload)
+            + scheduler.withDefaultWorkloadParameters(c.defaultWorkloadParameters)
             + scheduler.withWorkloads(c.workloads)
             + scheduler.withOutPortsMixin({
               accepted_concurrency: acceptedConcurrencyPort,

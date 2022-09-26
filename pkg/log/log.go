@@ -9,12 +9,10 @@ import (
 	"time"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/diode"
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
 
 	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 const (
@@ -39,23 +37,24 @@ const (
 )
 
 const (
-	// DiodeFlushWait is the amount of time to wait for diode buffer to flush.
-	diodeFlushWait = 1000 * time.Millisecond
+	// FlushWait is the amount of time to wait for the buffer to flush.
+	flushWait = 1000 * time.Millisecond
 	// DefaultLevel sets info log level, InfoLevel, as default.
 	defaultLevel = "info"
 	// ServiceKey is a field key that are used with Service name value as a string to the logger context.
 	serviceKey = "service"
+	// ComponentKey is a field key that are used with Component name value as a string to the logger context.
+	componentKey = "component"
+	// Sampled is a field key that are used with Sampled value as a bool to the logger context.
+	sampledKey = "sampled"
 )
 
 // Logger is wrapper around zerolog.Logger and io.writers.
 type Logger struct {
 	logger *zerolog.Logger
-	w      io.Writer
-	// flag to detect valid Logger instance
-	valid bool
 }
 
-var global Logger
+var global *Logger
 
 // Always create a global logger instance.
 func init() {
@@ -66,70 +65,39 @@ func init() {
 }
 
 // NewDefaultLogger creates a new default logger with default settings.
-func NewDefaultLogger() Logger {
-	return NewLogger(os.Stderr, false, defaultLevel)
+func NewDefaultLogger() *Logger {
+	return NewLogger(os.Stderr, defaultLevel)
 }
 
 // SetGlobalLogger closes the previous global logger and sets given logger as a new global logger.
-func SetGlobalLogger(lg Logger) {
-	global.Close()
+func SetGlobalLogger(lg *Logger) {
 	global = lg
 }
 
 // SetStdLogger sets output for the standard logger.
-func SetStdLogger(lg Logger) {
+func SetStdLogger(lg *Logger) {
 	stdlog.SetFlags(0)
 	stdlog.SetOutput(lg.logger)
 }
 
-// NewLogger creates a new logger by wrapping io.Writer in a diode. Make sure to call Logger.Close() once done with this logger.
-func NewLogger(w io.Writer, useDiode bool, levelString string) Logger {
+// NewLogger creates a new logger.
+func NewLogger(w io.Writer, levelString string) *Logger {
 	level, err := zerolog.ParseLevel(levelString)
 	if err != nil {
 		log.Panic().Err(err).Str("level", level.String()).Msg("Unable to parse logger level")
 	}
 
-	var wr io.Writer
-
-	if useDiode {
-		// Use diode writer
-		wr = diode.NewWriter(w, 1000, 0, func(missed int) {
-			Printf("Dropped %d messages", missed)
-		})
-	} else {
-		wr = w
-	}
-	zerolog := zerolog.New(wr).Level(level).With().Timestamp().Caller().Str(serviceKey, info.Service).Logger()
-	logger := Logger{
+	zerolog := zerolog.New(w).Level(level).With().Timestamp().Caller().Str(serviceKey, info.Service).Logger()
+	logger := &Logger{
 		logger: &zerolog,
-		w:      wr,
-		valid:  true,
 	}
 
 	return logger
 }
 
-// Close closes all the underlying diode Writer when there are valid Logger instances.
-func (lg Logger) Close() {
-	if lg.valid {
-		if dw, ok := lg.w.(diode.Writer); ok {
-			closeDiodeWriter(dw)
-		}
-	}
-}
-
-// closeDiodeWriter.
-func closeDiodeWriter(dw diode.Writer) {
-	log.Info().Msg("Closing DiodeWriter after a delay!")
-	panichandler.Go(func() {
-		WaitFlush()
-		_ = dw.Close()
-	})
-}
-
-// WaitFlush waits a few ms to let the diode buffer to flush.
+// WaitFlush waits a few ms to let the the buffer to flush.
 func WaitFlush() {
-	time.Sleep(diodeFlushWait)
+	time.Sleep(flushWait)
 }
 
 // GetPrettyConsoleWriter returns a pretty console writer.
@@ -139,7 +107,7 @@ func GetPrettyConsoleWriter() io.Writer {
 		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
 	}
 	output.FormatMessage = func(i interface{}) string {
-		return fmt.Sprintf("***%s****", i)
+		return fmt.Sprintf("message: %s *** ", i)
 	}
 	output.FormatFieldName = func(i interface{}) string {
 		return fmt.Sprintf("%s:", i)
@@ -169,47 +137,89 @@ func SetGlobalLevelString(levelString string) error {
 }
 
 // GetGlobalLogger returns the global logger.
-func GetGlobalLogger() Logger {
+func GetGlobalLogger() *Logger {
 	return global
 }
 
-// Component enables the global logger to chain loggers with additional context, component name.
-func Component(component string) Logger {
-	return global.Component(component)
+// WithComponent enables the global logger to chain loggers with additional context, component name.
+func WithComponent(component string) *Logger {
+	return global.WithComponent(component)
 }
 
-// Component enables the current logger to chain loggers with additional context, component name.
-func (lg *Logger) Component(component string) Logger {
-	zerolog := lg.logger.With().Str("component", component).Logger()
-	return Logger{
+// WithComponent enables the current logger to chain loggers with additional context, component name.
+func (lg *Logger) WithComponent(component string) *Logger {
+	zerolog := lg.logger.With().Str(componentKey, component).Logger()
+	return &Logger{
 		logger: &zerolog,
-		w:      lg.w,
-		valid:  lg.valid,
 	}
 }
 
-// Zerolog returns underlying zerolog logger.
-func (lg *Logger) Zerolog() *zerolog.Logger {
+// WithInterface adds an interface to the logger context.
+func (lg *Logger) WithInterface(key string, value interface{}) *Logger {
+	zerolog := lg.logger.With().Interface(key, value).Logger()
+	return &Logger{
+		logger: &zerolog,
+	}
+}
+
+// WithInterface adds an interface to the global logger context.
+func WithInterface(key string, value interface{}) *Logger {
+	return global.WithInterface(key, value)
+}
+
+// WithStr adds a string to the logger context.
+func (lg *Logger) WithStr(key string, value string) *Logger {
+	zerolog := lg.logger.With().Str(key, value).Logger()
+	return &Logger{
+		logger: &zerolog,
+	}
+}
+
+// WithStr adds a string to the global logger context.
+func WithStr(key string, value string) *Logger {
+	return global.WithStr(key, value)
+}
+
+// WithBool adds a bool to the logger context.
+func (lg *Logger) WithBool(key string, value bool) *Logger {
+	zerolog := lg.logger.With().Bool(key, value).Logger()
+	return &Logger{
+		logger: &zerolog,
+	}
+}
+
+// WithBool adds a bool to the global logger context.
+func WithBool(key string, value bool) *Logger {
+	return global.WithBool(key, value)
+}
+
+// GetZerolog returns underlying zerolog logger.
+func (lg *Logger) GetZerolog() *zerolog.Logger {
 	return lg.logger
 }
 
+// NewFromZerolog creates the logger from zerolog instance.
+func (lg *Logger) NewFromZerolog(logger *zerolog.Logger) *Logger {
+	return &Logger{
+		logger: logger,
+	}
+}
+
 // Output duplicates the current logger and sets w as its output.
-func (lg Logger) Output(w io.Writer) Logger {
+func (lg *Logger) Output(w io.Writer) *Logger {
 	zerolog := lg.logger.Output(w)
-	return Logger{
+	return &Logger{
 		logger: &zerolog,
-		w:      lg.w,
-		valid:  lg.valid,
 	}
 }
 
 // Output duplicates the global logger and sets w as its output.
-func Output(w io.Writer) Logger {
+func Output(w io.Writer) *Logger {
 	return global.Output(w)
 }
 
 // With creates a child logger of the current logger with the field added to its context.
-func (lg Logger) With() zerolog.Context {
+func (lg *Logger) With() zerolog.Context {
 	return lg.logger.With()
 }
 
@@ -219,47 +229,51 @@ func With() zerolog.Context {
 }
 
 // Level creates a child logger of the current logger with the minimum accepted level set to level.
-func (lg Logger) Level(level zerolog.Level) Logger {
+func (lg *Logger) Level(level zerolog.Level) *Logger {
 	zerolog := lg.logger.Level(level)
-	return Logger{
+	return &Logger{
 		logger: &zerolog,
-		w:      lg.w,
-		valid:  lg.valid,
 	}
 }
 
 // Level creates a child logger of the global logger with the minimum accepted level set to level.
-func Level(level zerolog.Level) Logger {
+func Level(level zerolog.Level) *Logger {
 	return global.Level(level)
 }
 
+// GetLevel returns the current logger level.
+func (lg *Logger) GetLevel() zerolog.Level {
+	return lg.logger.GetLevel()
+}
+
+// GetLevel returns the global logger level.
+func GetLevel() zerolog.Level {
+	return global.GetLevel()
+}
+
 // Sample returns the current logger with the s sampler.
-func (lg Logger) Sample(sampler zerolog.Sampler) Logger {
-	zerolog := lg.logger.Sample(sampler)
-	return Logger{
+func (lg *Logger) Sample(sampler zerolog.Sampler) *Logger {
+	zerolog := lg.WithBool(sampledKey, true).logger.Sample(sampler)
+	return &Logger{
 		logger: &zerolog,
-		w:      lg.w,
-		valid:  lg.valid,
 	}
 }
 
 // Sample returns the global logger with the s sampler.
-func Sample(sampler zerolog.Sampler) Logger {
+func Sample(sampler zerolog.Sampler) *Logger {
 	return global.Sample(sampler)
 }
 
 // Hook returns the current logger with the h hook.
-func (lg Logger) Hook(hook zerolog.Hook) Logger {
+func (lg *Logger) Hook(hook zerolog.Hook) *Logger {
 	zerolog := lg.logger.Hook(hook)
-	return Logger{
+	return &Logger{
 		logger: &zerolog,
-		w:      lg.w,
-		valid:  lg.valid,
 	}
 }
 
 // Hook returns the global logger with the h hook.
-func Hook(hook zerolog.Hook) Logger {
+func Hook(hook zerolog.Hook) *Logger {
 	return global.Hook(hook)
 }
 
@@ -604,4 +618,14 @@ func (lg *Logger) Errorln(v ...interface{}) {
 // Arguments are handled in the manner of fmt.Println.
 func Errorln(v ...interface{}) {
 	printlnEvent(global.logger.Error(), v...)
+}
+
+// Write implements io.Writer interface.
+func (lg *Logger) Write(p []byte) (n int, err error) {
+	return lg.logger.Write(p)
+}
+
+// Write implements io.Writer interface.
+func Write(p []byte) (n int, err error) {
+	return global.logger.Write(p)
 }

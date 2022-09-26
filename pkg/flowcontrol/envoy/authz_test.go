@@ -19,6 +19,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	classification "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 var (
@@ -59,7 +60,7 @@ func (s *AcceptingHandler) CheckWithValues(
 var _ = Describe("Authorization handler", func() {
 	When("it is queried with a request", func() {
 		BeforeEach(func() {
-			classifier = classification.New()
+			classifier = classification.NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger()))
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
 			Expect(err).NotTo(HaveOccurred())
 			handler = envoy.NewHandler(classifier, nil, &AcceptingHandler{})

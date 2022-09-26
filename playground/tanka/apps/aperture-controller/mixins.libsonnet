@@ -2,9 +2,9 @@ local latencyGradientPolicy = import '../../../../blueprints/lib/1.0/policies/la
 local aperture = import '../../../../blueprints/libsonnet/1.0/main.libsonnet';
 local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
 
-local Workload = aperture.v1.SchedulerWorkload;
+local WorkloadParameters = aperture.v1.SchedulerWorkloadParameters;
 local LabelMatcher = aperture.v1.LabelMatcher;
-local WorkloadWithLabelMatcher = aperture.v1.SchedulerWorkloadAndLabelMatcher;
+local Workload = aperture.v1.SchedulerWorkload;
 
 local classifier = aperture.v1.Classifier;
 local fluxMeter = aperture.v1.FluxMeter;
@@ -94,18 +94,18 @@ local policy = latencyGradientPolicy({
   ],
   concurrencyLimiter+: {
     timeoutFactor: 0.5,
-    defaultWorkload: {
+    defaultWorkloadParameters: {
       priority: 20,
     },
     workloads: [
-      WorkloadWithLabelMatcher.new()
-      + WorkloadWithLabelMatcher.withWorkload(Workload.withPriority(50))
+      Workload.new()
+      + Workload.withWorkloadParameters(WorkloadParameters.withPriority(50))
       // match the label extracted by classifier
-      + WorkloadWithLabelMatcher.withLabelMatcher(LabelMatcher.withMatchLabels({ user_type: 'guest' })),
-      WorkloadWithLabelMatcher.new()
-      + WorkloadWithLabelMatcher.withWorkload(Workload.withPriority(200))
+      + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ user_type: 'guest' })),
+      Workload.new()
+      + Workload.withWorkloadParameters(WorkloadParameters.withPriority(200))
       // match the http header directly
-      + WorkloadWithLabelMatcher.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
+      + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
     ],
   },
 }).policy;

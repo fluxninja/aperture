@@ -38,11 +38,12 @@ func Module() fx.Option {
 // ConstructorIn describes parameters passed to create OTEL Collector, server providing the OpenTelemetry Collector service.
 type ConstructorIn struct {
 	fx.In
+	Factories     component.Factories
 	Lifecycle     fx.Lifecycle
 	Shutdowner    fx.Shutdowner
-	Factories     component.Factories
 	Unmarshaller  config.Unmarshaller
-	BaseConfig    *OTELConfig   `name:"base"`
+	BaseConfig    *OTELConfig `name:"base"`
+	Logger        *log.Logger
 	PluginConfigs []*OTELConfig `group:"plugin-config"`
 }
 
@@ -81,7 +82,7 @@ func setup(in ConstructorIn) error {
 					ConfigProvider:          configProvider,
 					DisableGracefulShutdown: true,
 					LoggingOptions: []zap.Option{zap.WrapCore(func(zapcore.Core) zapcore.Core {
-						return log.NewZerologAdapter(log.GetGlobalLogger())
+						return log.NewZapAdapter(in.Logger, "otel-collector")
 					})},
 					// NOTE: do not remove this becauase it causes a data-race condition.
 					SkipSettingGRPCLogger: true,

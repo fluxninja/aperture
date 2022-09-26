@@ -65,10 +65,13 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 				fx.ResultTags(group),
 			),
 		),
+		fx.Invoke(setStatusRegistry),
 	)
 }
 
-func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller, statusRegistry status.Registry, lifecycle fx.Lifecycle) (io.Writer, error) {
+func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller,
+	lifecycle fx.Lifecycle,
+) (io.Writer, *SentryWriter, error) {
 	config := constructor.DefaultConfig
 
 	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
@@ -77,15 +80,14 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 
 	if config.Disabled {
 		log.Info().Msg("Sentry crash report disabled")
-		return nil, nil
+		return nil, nil, nil
 	}
 
-	sentryWriter, _ := NewSentryWriter(config)
-	sentryWriter.StatusRegistry = statusRegistry
+	sentryWriter, _ := newSentryWriter(config)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			sentry.CurrentHub().BindClient(sentryWriter.Client)
+			sentry.CurrentHub().BindClient(sentryWriter.client)
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
@@ -95,11 +97,16 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 		},
 	})
 
-	return sentryWriter, nil
+	return sentryWriter, sentryWriter, nil
 }
 
-// NewSentryWriter creates a new SentryWriter instance with Sentry Client and registers panic handler.
-func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
+// setStatusRegistry sets the status registry.
+func setStatusRegistry(sentryWriter *SentryWriter, statusRegistry status.Registry) {
+	sentryWriter.statusRegistry = statusRegistry
+}
+
+// newSentryWriter creates a new SentryWriter instance with Sentry Client and registers panic handler.
+func newSentryWriter(config SentryConfig) (*SentryWriter, error) {
 	client, err := sentry.NewClient(sentry.ClientOptions{
 		Dsn:              config.Dsn,
 		Debug:            config.Debug,
@@ -130,11 +137,11 @@ func NewSentryWriter(config SentryConfig) (*SentryWriter, error) {
 
 	crashWriter := NewCrashWriter(logCountLimit)
 	sentryWriter := &SentryWriter{
-		Client:      client,
-		Levels:      levels,
-		CrashWriter: crashWriter,
+		client:      client,
+		levels:      levels,
+		crashWriter: crashWriter,
 	}
 
-	panichandler.RegisterPanicHandler(sentryWriter.SentryPanicHandler)
+	panichandler.RegisterPanicHandler(sentryWriter.sentryPanicHandler)
 	return sentryWriter, nil
 }

@@ -15,7 +15,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/common"
@@ -245,8 +244,9 @@ type loadShedActuator struct {
 }
 
 func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := lsa.statusRegistry.GetLogger()
 	if event.Type == notifiers.Remove {
-		log.Debug().Msg("Decision was removed")
+		logger.Debug().Msg("Decision was removed")
 		return
 	}
 
@@ -255,7 +255,7 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 	loadShedDecision := wrapperMessage.LoadShedDecision
 	if err != nil || loadShedDecision == nil {
 		statusMsg := "Failed to unmarshal config wrapper"
-		log.Warn().Err(err).Msg(statusMsg)
+		logger.Warn().Err(err).Msg(statusMsg)
 		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
@@ -263,11 +263,11 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 	if wrapperMessage.PolicyHash != lsa.conLimiter.GetPolicyHash() {
 		err = errors.New("policy id mismatch")
 		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", lsa.conLimiter.GetPolicyHash(), wrapperMessage.PolicyHash)
-		log.Warn().Err(err).Msg(statusMsg)
+		logger.Warn().Err(err).Msg(statusMsg)
 		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
 
-	log.Trace().Float64("loadShedFactor", loadShedDecision.LoadShedFactor).Msg("Setting load shed factor")
+	logger.Trace().Float64("loadShedFactor", loadShedDecision.LoadShedFactor).Msg("Setting load shed factor")
 	lsa.tokenBucketLoadShed.SetLoadShedFactor(lsa.clock.Now(), loadShedDecision.LoadShedFactor)
 }

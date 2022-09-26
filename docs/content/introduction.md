@@ -47,7 +47,7 @@ flowchart TD
       kubernetes["Kubernetes"]
       consul["Consul"]
     end
-    blueprints --> |Jsonnet generator| policies
+    blueprints --> |Jsonnet Generator| policies
     policies --> |Kubernetes Custom Resource| controller
     controller<--> |Configuration/Telemetry/Decisions| databases
     databases<-->|Configuration/Telemetry/Decisions|agent

@@ -16,80 +16,92 @@ Generated File Starts
 
 ### FluxMeterExponentialBuckets {#flux-meter-exponential-buckets}
 
+ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
+and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
+bucket is not counted.
+
 #### Properties
 
 <dl>
 <dt>count</dt>
 <dd>
 
-(int32)
+(int32, `gt=0`) Number of buckets.
 
 </dd>
 <dt>factor</dt>
 <dd>
 
-(float64)
+(float64, `gt=1.0`) Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
 
 </dd>
 <dt>start</dt>
 <dd>
 
-(float64)
+(float64, `gt=0`) Upper bound of the lowest bucket.
 
 </dd>
 </dl>
 
 ### FluxMeterExponentialBucketsRange {#flux-meter-exponential-buckets-range}
 
+ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
+bucket is `max`. The final +inf bucket is not counted.
+
 #### Properties
 
 <dl>
 <dt>count</dt>
 <dd>
 
-(int32)
+(int32, `gt=0`) Number of buckets.
 
 </dd>
 <dt>max</dt>
 <dd>
 
-(float64)
+(float64) Highest bucket.
 
 </dd>
 <dt>min</dt>
 <dd>
 
-(float64)
+(float64, `gt=0`) Lowest bucket.
 
 </dd>
 </dl>
 
 ### FluxMeterLinearBuckets {#flux-meter-linear-buckets}
 
+LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
+upper bound of `start`. The final +inf bucket is not counted.
+
 #### Properties
 
 <dl>
 <dt>count</dt>
 <dd>
 
-(int32)
+(int32, `gt=0`) Number of buckets.
 
 </dd>
 <dt>start</dt>
 <dd>
 
-(float64)
+(float64) Upper bound of the lowest bucket.
 
 </dd>
 <dt>width</dt>
 <dd>
 
-(float64)
+(float64) Width of each bucket.
 
 </dd>
 </dl>
 
 ### FluxMeterStaticBuckets {#flux-meter-static-buckets}
+
+StaticBuckets holds the static value of the buckets where latency histogram will be stored.
 
 #### Properties
 
@@ -191,6 +203,28 @@ Workload defines a class of requests that preferably have similar properties suc
 #### Properties
 
 <dl>
+<dt>label_matcher</dt>
+<dd>
+
+([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based on
+[flow labels](/concepts/flow-control/flow-label.md).
+
+</dd>
+<dt>workload_parameters</dt>
+<dd>
+
+([SchedulerWorkloadParameters](#scheduler-workload-parameters)) WorkloadParameters associated with flows matching the label matcher.
+
+</dd>
+</dl>
+
+### SchedulerWorkloadParameters {#scheduler-workload-parameters}
+
+WorkloadParameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
+
+#### Properties
+
+<dl>
 <dt>fairness_key</dt>
 <dd>
 
@@ -213,26 +247,6 @@ Higher numbers means higher priority level.
 
 (string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
 This override is applicable only if `auto_tokens` is set to false.
-
-</dd>
-</dl>
-
-### SchedulerWorkloadAndLabelMatcher {#scheduler-workload-and-label-matcher}
-
-#### Properties
-
-<dl>
-<dt>label_matcher</dt>
-<dd>
-
-([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based on
-[flow labels](/concepts/flow-control/flow-label.md).
-
-</dd>
-<dt>workload</dt>
-<dd>
-
-([SchedulerWorkload](#scheduler-workload)) Workload associated with flows matching the label matcher.
 
 </dd>
 </dl>
@@ -1983,16 +1997,16 @@ See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
 <dt>auto_tokens</dt>
 <dd>
 
-(bool, default: `true`) Automatically estimate weight of flows in each workload, based on
+(bool, default: `true`) Automatically estimate the size of a request in each workload, based on
 historical latency. Each workload's `tokens` will be set to average
 latency of flows in that workload during last few seconds (exact duration
 of this average can change).
 
 </dd>
-<dt>default_workload</dt>
+<dt>default_workload_parameters</dt>
 <dd>
 
-([SchedulerWorkload](#scheduler-workload)) Workload to be used if none of workloads specified in `workloads` match.
+([SchedulerWorkloadParameters](#scheduler-workload-parameters)) WorkloadParameters to be used if none of workloads specified in `workloads` match.
 
 </dd>
 <dt>max_timeout</dt>
@@ -2044,7 +2058,7 @@ This value impacts the prioritization and fairness because the larger the timeou
 <dt>workloads</dt>
 <dd>
 
-([[]SchedulerWorkloadAndLabelMatcher](#scheduler-workload-and-label-matcher)) List of workloads to be used in scheduler.
+([[]SchedulerWorkload](#scheduler-workload)) List of workloads to be used in scheduler.
 
 Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
@@ -2085,7 +2099,7 @@ Output for the Scheduler component.
 **Accepted tokens** are tokens associated with
 [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
 this scheduler. Number of tokens for a flow is determined by a
-[workload](#scheduler-workload) that the flow was assigned to (either
+[workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
 via `auto_tokens` or explicitly by `Workload.tokens`).
 :::
 

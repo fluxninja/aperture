@@ -20,9 +20,9 @@ respond to changes in Signal readings.
 
 Building blocks of a Circuit are Components. Each Component has Input Ports
 (`in_ports`) and Output Ports (`out_ports`). The exact Ports available are
-determined by the [type of Component][components]. Each Port can be
-associated with a [Signal][signal]. Components get chained to one another based
-on name of the Signal.
+determined by the [type of Component][components]. Each Port can be associated
+with a [Signal][signal]. Components get chained to one another based on name of
+the Signal.
 
 ## Signal
 
@@ -114,9 +114,9 @@ Components are divided into following functional categories to aid exploration:
   - [Concurrency Limiter](/references/configuration/policies.md#v1-concurrency-limiter):
     Takes load shed factor as a Signal which determines the proportional of Flow
     concurrency to shed.
-  - [Rate Limiter](/references/configuration/policies.md#v1-rate-limiter):
-    Take rate limit as a Signal which determines the rate of flows handled by
-    that Rate Limiter.
+  - [Rate Limiter](/references/configuration/policies.md#v1-rate-limiter): Take
+    rate limit as a Signal which determines the rate of flows handled by that
+    Rate Limiter.
 
 [control-system]: https://en.wikipedia.org/wiki/Control_system
 [tick]: #runtime
