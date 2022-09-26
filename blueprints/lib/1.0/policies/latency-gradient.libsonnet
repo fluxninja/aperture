@@ -74,7 +74,7 @@ local zeroPort = port.new() + port.withSignalName('ZERO');
 local concurrencyIncrementOverloadPort = port.new() + port.withSignalName('CONCURRENCY_INCREMENT_OVERLOAD');
 local concurrencyIncrementSingleTickPort = port.new() + port.withSignalName('CONCURRENCY_INCREMENT_SINGLE_TICK');
 local concurrencyIncrementFeedbackPort = port.new() + port.withSignalName('CONCURRENCY_INCREMENT_FEEDBACK');
-local concurrencyIncrementFeedbackSwitchPort = port.new() + port.withSignalName('CONCURRENCY_INCREMENT_FEEDBACK_SWITCH');
+local isOverloadSwitchPort = port.new() + port.withSignalName('IS_OVERLOAD_SWITCH');
 local concurrencyIncrementIntegralPort = port.new() + port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL');
 local concurrencyIncrementNormalPort = port.new() + port.withSignalName('CONCURRENCY_INCREMENT_NORMAL');
 
@@ -89,7 +89,6 @@ local desiredConcurrencyPort = port.new() + port.withSignalName('DESIRED_CONCURR
 local maxConcurrencyPort = port.new() + port.withSignalName('MAX_CONCURRENCY');
 local acceptedConcurrencyPort = port.new() + port.withSignalName('ACCEPTED_CONCURRENCY');
 local concurrencyIncrementPort = port.new() + port.withSignalName('CONCURRENCY_INCREMENT');
-local concurrencyIncrementSwitchPort = port.new() + port.withSignalName('CONCURRENCY_INCREMENT_SWITCH');
 local incomingConcurrencyPort = port.new() + port.withSignalName('INCOMING_CONCURRENCY');
 local deltaConcurrencyPort = port.new() + port.withSignalName('DELTA_CONCURRENCY');
 
@@ -219,32 +218,23 @@ function(params) {
             decider.inPorts.withLhs(latencyPort)
             + decider.inPorts.withRhs(latencyOverloadPort)
           )
-          + decider.withOutPortsMixin(decider.outPorts.withOutput(concurrencyIncrementSwitchPort))
+          + decider.withOutPortsMixin(decider.outPorts.withOutput(isOverloadSwitchPort))
         ),
         component.withSwitcher(
           switcher.new()
           + switcher.withInPortsMixin(
             switcher.inPorts.withOnTrue(concurrencyIncrementOverloadPort)
             + switcher.inPorts.withOnFalse(concurrencyIncrementNormalPort)
-            + switcher.inPorts.withSwitch(concurrencyIncrementSwitchPort)
+            + switcher.inPorts.withSwitch(isOverloadSwitchPort)
           )
           + switcher.withOutPortsMixin(switcher.outPorts.withOutput(concurrencyIncrementPort))
-        ),
-        component.withDecider(
-          decider.new()
-          + decider.withOperator('gt')
-          + decider.withInPortsMixin(
-            decider.inPorts.withLhs(latencyPort)
-            + decider.inPorts.withRhs(latencyOverloadPort)
-          )
-          + decider.withOutPortsMixin(decider.outPorts.withOutput(concurrencyIncrementFeedbackSwitchPort))
         ),
         component.withSwitcher(
           switcher.new()
           + switcher.withInPortsMixin(
             switcher.inPorts.withOnTrue(zeroPort)
             + switcher.inPorts.withOnFalse(concurrencyIncrementNormalPort)
-            + switcher.inPorts.withSwitch(concurrencyIncrementFeedbackSwitchPort)
+            + switcher.inPorts.withSwitch(isOverloadSwitchPort)
           )
           + switcher.withOutPortsMixin(switcher.outPorts.withOutput(concurrencyIncrementFeedbackPort))
         ),
