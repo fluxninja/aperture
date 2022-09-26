@@ -34,17 +34,20 @@ definitions:
         description: Number of buckets.
         type: integer
         format: int32
+        x-go-validate: gt=0
         x-order: 0
       factor:
         description: Factor to be multiplied to the previous bucket's upper bound
           to calculate the following bucket's upper bound.
         type: number
         format: double
+        x-go-validate: gt=1.0
         x-order: 1
       start:
         description: Upper bound of the lowest bucket.
         type: number
         format: double
+        x-go-validate: gt=0
         x-order: 2
   FluxMeterExponentialBucketsRange:
     description: |-
@@ -56,6 +59,7 @@ definitions:
         description: Number of buckets.
         type: integer
         format: int32
+        x-go-validate: gt=0
         x-order: 0
       max:
         description: Highest bucket.
@@ -66,6 +70,7 @@ definitions:
         description: Lowest bucket.
         type: number
         format: double
+        x-go-validate: gt=0
         x-order: 2
   FluxMeterLinearBuckets:
     description: |-
@@ -77,6 +82,7 @@ definitions:
         description: Number of buckets.
         type: integer
         format: int32
+        x-go-validate: gt=0
         x-order: 0
       start:
         description: Upper bound of the lowest bucket.

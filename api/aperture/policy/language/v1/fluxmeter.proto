@@ -39,10 +39,19 @@ message FluxMeter {
   message LinearBuckets {
     // Upper bound of the lowest bucket.
     double start = 1;
+
     // Width of each bucket.
     double width = 2;
+
     // Number of buckets.
-    int32 count = 3;
+    int32 count = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=0"
+        }
+      }
+    }]; // @gotags: validate:"gt=0"
   }
 
   // ExponentialBuckets creates 'count' number of buckets where the lowest bucket has an upper bound of `start`
@@ -50,22 +59,61 @@ message FluxMeter {
   // bucket is not counted.
   message ExponentialBuckets {
     // Upper bound of the lowest bucket.
-    double start = 1;
+    double start = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=0"
+        }
+      }
+    }]; // @gotags: validate:"gt=0.0"
+
     // Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
-    double factor = 2;
+    double factor = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=1.0"
+        }
+      }
+    }]; // @gotags: validate:"gt=1.0"
+
     // Number of buckets.
-    int32 count = 3;
+    int32 count = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=0"
+        }
+      }
+    }]; // @gotags: validate:"gt=0"
   }
 
   // ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
   // bucket is `max`. The final +inf bucket is not counted.
   message ExponentialBucketsRange {
     // Lowest bucket.
-    double min = 1;
+    double min = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=0"
+        }
+      }
+    }]; // @gotags: validate:"gt=0.0"
+
     // Highest bucket.
     double max = 2;
+
     // Number of buckets.
-    int32 count = 3;
+    int32 count = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "gt=0"
+        }
+      }
+    }]; // @gotags: validate:"gt=0"
   }
 
   // What latency should we measure in the histogram created by this FluxMeter.

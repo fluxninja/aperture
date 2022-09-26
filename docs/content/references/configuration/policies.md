@@ -26,19 +26,19 @@ bucket is not counted.
 <dt>count</dt>
 <dd>
 
-(int32) Number of buckets.
+(int32, `gt=0`) Number of buckets.
 
 </dd>
 <dt>factor</dt>
 <dd>
 
-(float64) Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
+(float64, `gt=1.0`) Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
 
 </dd>
 <dt>start</dt>
 <dd>
 
-(float64) Upper bound of the lowest bucket.
+(float64, `gt=0`) Upper bound of the lowest bucket.
 
 </dd>
 </dl>
@@ -54,7 +54,7 @@ bucket is `max`. The final +inf bucket is not counted.
 <dt>count</dt>
 <dd>
 
-(int32) Number of buckets.
+(int32, `gt=0`) Number of buckets.
 
 </dd>
 <dt>max</dt>
@@ -66,7 +66,7 @@ bucket is `max`. The final +inf bucket is not counted.
 <dt>min</dt>
 <dd>
 
-(float64) Lowest bucket.
+(float64, `gt=0`) Lowest bucket.
 
 </dd>
 </dl>
@@ -82,7 +82,7 @@ upper bound of `start`. The final +inf bucket is not counted.
 <dt>count</dt>
 <dd>
 
-(int32) Number of buckets.
+(int32, `gt=0`) Number of buckets.
 
 </dd>
 <dt>start</dt>
