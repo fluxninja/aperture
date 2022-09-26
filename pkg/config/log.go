@@ -193,7 +193,7 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 				log.WaitFlush()
 				// close diode writer
 				if config.NonBlocking {
-					dr := wr.(*diode.Writer)
+					dr := wr.(diode.Writer)
 					dr.Close()
 				}
 				for _, writer := range writers {
