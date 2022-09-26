@@ -125,7 +125,7 @@ repos:
         name: "blueprints"
         entry: "./scripts/precommit/generate_blueprints.sh"
         language: script
-        files: ^(blueprints)|\.proto$
+        files: ^(blueprints)|\.proto$|^requirements.txt$
         pass_filenames: false
         description: "Generate Aperture libsonnet and blueprints"
       - id: tanka-show
