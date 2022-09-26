@@ -81,24 +81,9 @@ jobs:
 workflows:
   version: 2
 
-  tag-aperture-go-sdk:
-    when: &job-when-clause
-      matches: { value: << pipeline.git.tag >>, pattern: ^v.*$ }
-    jobs:
-      - tag-github-repository:
-          # both this and workflow's when is needed
-          filters:
-            branches:
-              ignore: /.+/
-            tags:
-              only: /^v.*/
-          name: tag-aperture-go-sdk
-          repository: fluxninja/aperture-go
-          tag: << pipeline.git.tag >>
-          deployment-key: af:55:26:47:84:7f:0e:36:6b:74:25:19:64:4a:f2:41
-
   publish-protobuf-files:
-    when: *job-when-clause
+    when:
+      matches: { value: << pipeline.git.tag >>, pattern: ^v.*$ }
     jobs:
       - publish-protobuf-files:
           filters:
