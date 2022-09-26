@@ -13,7 +13,7 @@ sidebar_position: 6
 :::info
 
 See also
-[Concurrency Limiter reference](/references/configuration/policies.md#languagev1-concurrency-limiter).
+[Concurrency Limiter reference](/references/configuration/policies.md#v1-concurrency-limiter).
 
 :::
 

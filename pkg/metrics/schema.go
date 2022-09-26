@@ -77,6 +77,8 @@ const (
 	StatusCodeLabel = "http_status_code"
 	// MethodLabel - label from http method.
 	MethodLabel = "http_method"
+	// HandlerName - name of the http handler. Defaults to 'default'.
+	HandlerName = "handler_name"
 	// FeatureStatusLabel - feature status.
 	FeatureStatusLabel = "feature_status"
 	// FlowControlCheckDecisionTypeLabel - label for decision type dropped or accepted.

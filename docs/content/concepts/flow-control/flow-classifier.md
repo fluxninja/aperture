@@ -56,12 +56,14 @@ likely, you'll want to classify ingress traffic to your service:
 
 ```yaml
 selector:
-  service: service1.default.svc.cluster.local
-  control_point:
-    traffic: ingress
+  service_selector:
+    service: service1.default.svc.cluster.local
+  flow_selector:
+    control_point:
+      traffic: ingress
 ```
 
-You can be more precise by adding a [label matcher][label-matcher] and eg. gate
+You can be more precise by adding a [label matcher][label-matcher] and e.g. gate
 the classifier to particular paths.
 
 ## Rules ([reference][rule]) {#rules}

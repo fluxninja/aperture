@@ -10,10 +10,8 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/jobs"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/paths"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/common"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -25,7 +23,7 @@ var policiesDriverFxTag = "policies-driver"
 // policyFactoryModule module for policy factory.
 func policyFactoryModule() fx.Option {
 	return fx.Options(
-		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: paths.PoliciesConfigPath}.Annotate(),
+		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: common.PoliciesConfigPath}.Annotate(),
 		fx.Invoke(
 			fx.Annotate(
 				setupPolicyFxDriver,
@@ -55,10 +53,11 @@ func setupPolicyFxDriver(
 	registry status.Registry,
 ) error {
 	policiesStatusRegistry := registry.Child(iface.PoliciesRoot)
+	logger := policiesStatusRegistry.GetLogger()
 
 	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("circuit_jobs"), 0, jobs.RescheduleMode, nil)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to create job group")
+		logger.Error().Err(err).Msg("Failed to create job group")
 		return err
 	}
 
@@ -112,7 +111,7 @@ func (factory *policyFactory) provideControllerPolicyFxOptions(
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.Policy == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
-		log.Warn().Err(err).Msg("Failed to unmarshal policy config wrapper")
+		reg.GetLogger().Warn().Err(err).Msg("Failed to unmarshal policy config wrapper")
 		return fx.Options(), err
 	}
 
@@ -124,7 +123,7 @@ func (factory *policyFactory) provideControllerPolicyFxOptions(
 	)
 	if err != nil {
 		reg.SetStatus(status.NewStatus(nil, err))
-		log.Warn().Err(err).Msg("Failed to create policy options")
+		reg.GetLogger().Warn().Err(err).Msg("Failed to create policy options")
 		return fx.Options(), err
 	}
 	return fx.Options(

@@ -48,6 +48,8 @@ type GRPCServerConfig struct {
 	ConnectionTimeout config.Duration `json:"connection_timeout" validate:"gte=0s" default:"120s"`
 	// Enable Reflection
 	EnableReflection bool `json:"enable_reflection" default:"false"`
+	// Buckets specification in latency histogram
+	LatencyBucketsMS []float64 `json:"latency_buckets_ms" validate:"gte=0" default:"[10.0,25.0,100.0,250.0,1000.0]"`
 }
 
 // ServerConstructor holds fields to create an annotated GRPC Server.
@@ -94,6 +96,9 @@ func (constructor ServerConstructor) provideServer(
 	}
 
 	grpcServerMetrics := grpc_prometheus.NewServerMetrics()
+	grpcServerMetrics.EnableHandlingTimeHistogram(
+		grpc_prometheus.WithHistogramBuckets(config.LatencyBucketsMS),
+	)
 
 	// Connection timeout from config
 	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))

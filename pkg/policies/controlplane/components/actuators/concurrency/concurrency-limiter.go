@@ -12,7 +12,7 @@ import (
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
@@ -40,8 +40,8 @@ func NewConcurrencyLimiterOptions(
 	if selectorProto == nil {
 		return fx.Options(), "", errors.New("concurrencyLimiter.Scheduler.Selector is nil")
 	}
-	agentGroupName := selectorProto.GetAgentGroup()
-	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath, paths.DataplaneComponentKey(agentGroupName, policyBaseAPI.GetPolicyName(), int64(componentStackIndex)))
+	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
+	etcdPath := path.Join(common.ConcurrencyLimiterConfigPath, common.DataplaneComponentKey(agentGroupName, policyBaseAPI.GetPolicyName(), int64(componentStackIndex)))
 	configSync := &concurrencyLimiterConfigSync{
 		concurrencyLimiterProto: concurrencyLimiterProto,
 		policyBaseAPI:           policyBaseAPI,

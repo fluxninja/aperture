@@ -37,10 +37,14 @@ var _ = Describe("Dataplane Engine", func() {
 
 		engine = ProvideEngineAPI()
 		selector = &selectorv1.Selector{
-			AgentGroup: metrics.DefaultAgentGroup,
-			Service:    "testService.testNamespace.svc.cluster.local",
-			ControlPoint: &selectorv1.ControlPoint{
-				Controlpoint: &selectorv1.ControlPoint_Traffic{Traffic: "ingress"},
+			ServiceSelector: &selectorv1.ServiceSelector{
+				AgentGroup: metrics.DefaultAgentGroup,
+				Service:    "testService.testNamespace.svc.cluster.local",
+			},
+			FlowSelector: &selectorv1.FlowSelector{
+				ControlPoint: &selectorv1.ControlPoint{
+					Controlpoint: &selectorv1.ControlPoint_Traffic{Traffic: "ingress"},
+				},
 			},
 		}
 		histogram = goprom.NewHistogram(goprom.HistogramOpts{
@@ -156,7 +160,7 @@ var _ = Describe("Dataplane Engine", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
 			_ = engine.RegisterConcurrencyLimiter(mockLimiter)
 
-			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, "")
+			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
 			svcs := []string{"testService2.testNamespace2.svc.cluster.local"}
 			labels := map[string]string{"service": "whatever"}
 
@@ -169,7 +173,7 @@ var _ = Describe("Dataplane Engine", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
 			_ = engine.RegisterConcurrencyLimiter(mockLimiter)
 
-			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, "")
+			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
 			svcs := []string{"testService.testNamespace.svc.cluster.local"}
 			labels := map[string]string{"service": "testService.testNamespace.svc.cluster.local"}
 

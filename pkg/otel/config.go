@@ -5,9 +5,6 @@ import (
 	"crypto/tls"
 
 	promapi "github.com/prometheus/client_golang/api"
-	"go.opentelemetry.io/collector/config/configgrpc"
-	"go.opentelemetry.io/collector/config/confighttp"
-	"go.opentelemetry.io/collector/config/confignet"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/fx"
 
@@ -51,11 +48,10 @@ const (
 var baseFxTag = config.NameTag("base")
 
 type otelParams struct {
-	promClient      promapi.Client
-	config          *otelcollector.OTELConfig
-	listener        *listener.Listener
-	tlsConfig       *tls.Config
-	serverTLSConfig tlsconfig.ServerTLSConfig
+	promClient promapi.Client
+	config     *otelcollector.OTELConfig
+	listener   *listener.Listener
+	tlsConfig  *tls.Config
 	OtelConfig
 }
 
@@ -72,10 +68,6 @@ type otelParams struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type OtelConfig struct {
-	// GRPC listener addr for OTEL Collector.
-	GRPCAddr string `json:"grpc_addr" validate:"hostname_port" default:":4317"`
-	// HTTP listener addr for OTEL Collector.
-	HTTPAddr string `json:"http_addr" validate:"hostname_port" default:":4318"`
 	// BatchPrerollup configures batch prerollup processor.
 	BatchPrerollup BatchConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
@@ -139,12 +131,11 @@ func newOtelConfig(in FxIn) (*otelParams, error) {
 		return nil, err
 	}
 	cfg := &otelParams{
-		OtelConfig:      userCfg,
-		listener:        in.Listener,
-		promClient:      in.PromClient,
-		tlsConfig:       in.TLSConfig,
-		config:          config,
-		serverTLSConfig: in.ServerTLSConfig,
+		OtelConfig: userCfg,
+		listener:   in.Listener,
+		promClient: in.PromClient,
+		tlsConfig:  in.TLSConfig,
+		config:     config,
 	}
 	return cfg, nil
 }
@@ -213,19 +204,7 @@ func addControllerMetricsPipeline(cfg *otelParams) {
 
 func addOTLPReceiver(cfg *otelParams) {
 	config := cfg.config
-	config.AddReceiver(ReceiverOTLP, otlpreceiver.Config{
-		Protocols: otlpreceiver.Protocols{
-			GRPC: &configgrpc.GRPCServerSettings{
-				NetAddr: confignet.NetAddr{
-					Endpoint:  cfg.GRPCAddr,
-					Transport: "tcp",
-				},
-			},
-			HTTP: &confighttp.HTTPServerSettings{
-				Endpoint: cfg.HTTPAddr,
-			},
-		},
-	})
+	config.AddReceiver(ReceiverOTLP, otlpreceiver.Config{})
 }
 
 func addMetricsProcessor(config *otelcollector.OTELConfig) {

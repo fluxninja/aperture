@@ -220,12 +220,6 @@ Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_`
 #### Members
 
 <dl>
-<dt>policies_path</dt>
-<dd>
-
-(string, default: `/etc/aperture/aperture-controller/policies`, env-var: `APERTURE_CONTROLLER_POLICIES_POLICIES_PATH`) Directory containing policies rules
-
-</dd>
 
 <dt>promql_jobs_scheduler</dt>
 <dd>
@@ -687,6 +681,12 @@ GRPCServerConfig holds configuration for GRPC Server.
 (bool, default: `false`) Enable Reflection
 
 </dd>
+<dt>latency_buckets_ms</dt>
+<dd>
+
+([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets specification in latency histogram
+
+</dd>
 </dl>
 
 ### HTTPClientConfig {#http-client-config}
@@ -831,22 +831,10 @@ HTTPServerConfig holds configuration for HTTP Server.
 (string, `gte=0s`, default: `30s`) Idle timeout
 
 </dd>
-<dt>latency_bucket_count</dt>
+<dt>latency_buckets_ms</dt>
 <dd>
 
-(int64, `gte=0`, default: `100`) The number of buckets in latency histogram
-
-</dd>
-<dt>latency_bucket_start_ms</dt>
-<dd>
-
-(float64, `gte=0`, default: `20`) The lowest bucket in latency histogram
-
-</dd>
-<dt>latency_bucket_width_ms</dt>
-<dd>
-
-(float64, `gte=0`, default: `20`) The bucket width in latency histogram
+([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets specification in latency histogram
 
 </dd>
 <dt>max_header_bytes</dt>
@@ -1098,18 +1086,6 @@ OtelConfig is the configuration for the OTEL collector.
 #### Properties
 
 <dl>
-<dt>grpc_addr</dt>
-<dd>
-
-(string, `hostname_port`, default: `:4317`) GRPC listener addr for OTEL Collector.
-
-</dd>
-<dt>http_addr</dt>
-<dd>
-
-(string, `hostname_port`, default: `:4318`) HTTP listener addr for OTEL Collector.
-
-</dd>
 <dt>batch_postrollup</dt>
 <dd>
 

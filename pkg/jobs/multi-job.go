@@ -113,7 +113,7 @@ func NewMultiJob(name string, alwaysHealthy bool, jws JobWatchers, gws GroupWatc
 			JWS:     jws,
 		},
 		alwaysHealthy: alwaysHealthy,
-		gt:            newGroupTracker(gws, status.NewRegistry()),
+		gt:            newGroupTracker(gws, status.NewRegistry(log.GetGlobalLogger())),
 	}
 }
 

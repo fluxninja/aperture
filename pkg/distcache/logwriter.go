@@ -8,7 +8,7 @@ import (
 
 // OlricLogWriter is wrapper around aperture Logger that parse the message before writing to olricConfig.LogOutput.
 type OlricLogWriter struct {
-	Logger log.Logger
+	Logger *log.Logger
 }
 
 // Write writes the message and logs in aperture Logger format.

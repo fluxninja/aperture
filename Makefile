@@ -34,7 +34,7 @@ go-build-plugins:
 
 install-asdf-tools:
 	@echo Installing Asdf tools
-	@./playground/scripts/manage_tools.sh setup
+	@./scripts/manage_tools.sh setup
 
 install-go-tools:
 	@echo Installing tools from tools.go
@@ -63,8 +63,8 @@ helm-lint:
 	@echo helm lint
 	@cd ./manifests/charts && $(MAKE) helm-lint
 
-generate-libsonnet: generate-config-markdown
-	@cd ./libsonnet && $(MAKE) gen-lib
+generate-blueprints:
+	@cd ./blueprints && $(MAKE) generate-blueprints
 
 generate-mermaid:
 	@cd ./docs && $(MAKE) generate-mermaid
@@ -75,10 +75,10 @@ coverage_profile:
 show_coverage_in_browser: profile.coverprofile
 	go tool cover -html profile.coverprofile
 
-all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-libsonnet helm-lint
+all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-blueprints helm-lint
 	@echo "Done"
 
-.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint
+.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-mermaid generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint generate-blueprints
 
 #####################################
 ###### OPERATOR section starts ######

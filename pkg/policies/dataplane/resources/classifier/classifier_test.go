@@ -13,6 +13,7 @@ import (
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/status"
 
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/flowlabel"
 	. "github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
@@ -28,7 +29,7 @@ var _ = Describe("Classifier", func() {
 	BeforeEach(func() {
 		log.SetGlobalLevel(log.WarnLevel)
 
-		classifier = New()
+		classifier = NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger()))
 	})
 
 	It("returns empty slice, when no rules configured", func() {
@@ -39,10 +40,14 @@ var _ = Describe("Classifier", func() {
 		// Classifier with a simple extractor-based rule
 		rs1 := &classificationv1.Classifier{
 			Selector: &selectorv1.Selector{
-				Service: "my-service.default.svc.cluster.local",
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{
-						Traffic: "ingress",
+				ServiceSelector: &selectorv1.ServiceSelector{
+					Service: "my-service.default.svc.cluster.local",
+				},
+				FlowSelector: &selectorv1.FlowSelector{
+					ControlPoint: &selectorv1.ControlPoint{
+						Controlpoint: &selectorv1.ControlPoint_Traffic{
+							Traffic: "ingress",
+						},
 					},
 				},
 			},
@@ -57,13 +62,17 @@ var _ = Describe("Classifier", func() {
 		// Classifier with Raw-rego rule, additionally gated for just "version one"
 		rs2 := &classificationv1.Classifier{
 			Selector: &selectorv1.Selector{
-				Service: "my-service.default.svc.cluster.local",
-				LabelMatcher: &labelmatcherv1.LabelMatcher{
-					MatchLabels: map[string]string{"version": "one"},
+				ServiceSelector: &selectorv1.ServiceSelector{
+					Service: "my-service.default.svc.cluster.local",
 				},
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{
-						Traffic: "ingress",
+				FlowSelector: &selectorv1.FlowSelector{
+					LabelMatcher: &labelmatcherv1.LabelMatcher{
+						MatchLabels: map[string]string{"version": "one"},
+					},
+					ControlPoint: &selectorv1.ControlPoint{
+						Controlpoint: &selectorv1.ControlPoint_Traffic{
+							Traffic: "ingress",
+						},
 					},
 				},
 			},
@@ -86,9 +95,11 @@ var _ = Describe("Classifier", func() {
 		// Classifier with a no service populated
 		rs3 := &classificationv1.Classifier{
 			Selector: &selectorv1.Selector{
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{
-						Traffic: "ingress",
+				FlowSelector: &selectorv1.FlowSelector{
+					ControlPoint: &selectorv1.ControlPoint{
+						Controlpoint: &selectorv1.ControlPoint_Traffic{
+							Traffic: "ingress",
+						},
 					},
 				},
 			},
@@ -144,7 +155,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				map[string]string{"version": "one", "other": "tag"},
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -162,7 +173,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_EGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, ""),
 				map[string]string{"version": "one"},
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -177,7 +188,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				map[string]string{"version": "two"},
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -197,7 +208,7 @@ var _ = Describe("Classifier", func() {
 				_, labels, err := classifier.Classify(
 					context.TODO(),
 					[]string{"my-service.default.svc.cluster.local"},
-					selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+					selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 					map[string]string{"version": "one"},
 					attributesWithHeaders(object{
 						"foo": "hello",
@@ -229,10 +240,14 @@ var _ = Describe("Classifier", func() {
 		_, err := classifier.AddRules(context.TODO(), "test", &wrappersv1.ClassifierWrapper{
 			Classifier: &classificationv1.Classifier{
 				Selector: &selectorv1.Selector{
-					Service: "my-service.default.svc.cluster.local",
-					ControlPoint: &selectorv1.ControlPoint{
-						Controlpoint: &selectorv1.ControlPoint_Traffic{
-							Traffic: "ingress",
+					ServiceSelector: &selectorv1.ServiceSelector{
+						Service: "my-service.default.svc.cluster.local",
+					},
+					FlowSelector: &selectorv1.FlowSelector{
+						ControlPoint: &selectorv1.ControlPoint{
+							Controlpoint: &selectorv1.ControlPoint_Traffic{
+								Traffic: "ingress",
+							},
 						},
 					},
 				},
@@ -270,7 +285,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -314,7 +329,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -371,7 +386,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -435,7 +450,7 @@ var _ = Describe("Classifier", func() {
 			_, labels, err := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, ""),
+				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -451,10 +466,14 @@ var _ = Describe("Classifier", func() {
 		// Classifier with a simple extractor-based rule
 		rs := &classificationv1.Classifier{
 			Selector: &selectorv1.Selector{
-				Service: "my-service.default.svc.cluster.local",
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{
-						Traffic: "ingress",
+				ServiceSelector: &selectorv1.ServiceSelector{
+					Service: "my-service.default.svc.cluster.local",
+				},
+				FlowSelector: &selectorv1.FlowSelector{
+					ControlPoint: &selectorv1.ControlPoint{
+						Controlpoint: &selectorv1.ControlPoint_Traffic{
+							Traffic: "ingress",
+						},
 					},
 				},
 			},

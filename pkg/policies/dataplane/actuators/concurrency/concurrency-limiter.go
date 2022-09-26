@@ -22,11 +22,10 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/paths"
+	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/concurrency/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
@@ -68,7 +67,7 @@ func provideWatcher(
 	// Get Agent Group from host info gatherer
 	agentGroupName := ai.GetAgentGroup()
 	// Scope the sync to the agent group.
-	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath, paths.AgentGroupPrefix(agentGroupName))
+	etcdPath := path.Join(common.ConcurrencyLimiterConfigPath, common.AgentGroupPrefix(agentGroupName))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
@@ -77,8 +76,9 @@ func provideWatcher(
 }
 
 type concurrencyLimiterFactory struct {
-	engineAPI iface.Engine
-	registry  status.Registry
+	engineAPI  iface.Engine
+	metricsAPI iface.ResponseMetricsAPI
+	registry   status.Registry
 
 	autoTokensFactory       *autoTokensFactory
 	loadShedActuatorFactory *loadShedActuatorFactory
@@ -101,6 +101,7 @@ func setupConcurrencyLimiterFactory(
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
+	m iface.ResponseMetricsAPI,
 ) error {
 	agentGroup := ai.GetAgentGroup()
 
@@ -119,6 +120,7 @@ func setupConcurrencyLimiterFactory(
 
 	conLimiterFactory := &concurrencyLimiterFactory{
 		engineAPI:               e,
+		metricsAPI:              m,
 		autoTokensFactory:       autoTokensFactory,
 		loadShedActuatorFactory: loadShedActuatorFactory,
 		registry:                reg,
@@ -216,7 +218,7 @@ func setupConcurrencyLimiterFactory(
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	matchedWorkloads map[int]*policylangv1.Scheduler_Workload
+	matchedWorkloads map[int]*policylangv1.Scheduler_WorkloadParameters
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -228,12 +230,13 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
+	logger := conLimiterFactory.registry.GetLogger()
 	wrapperMessage := &wrappersv1.ConcurrencyLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	concurrencyLimiterMessage := wrapperMessage.ConcurrencyLimiter
 	if err != nil || concurrencyLimiterMessage == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
-		log.Warn().Err(err).Msg("Failed to unmarshal concurrency limiter config wrapper")
+		logger.Warn().Err(err).Msg("Failed to unmarshal concurrency limiter config wrapper")
 		return fx.Options(), err
 	}
 
@@ -242,7 +245,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	if schedulerProto == nil {
 		err = fmt.Errorf("no scheduler specified")
 		reg.SetStatus(status.NewStatus(nil, err))
-		log.Warn().Err(err).Msg("Failed to unmarshal scheduler")
+		logger.Warn().Err(err).Msg("Failed to unmarshal scheduler")
 		return fx.Options(), err
 	}
 	mm := multimatcher.New[int, multiMatchResult]()
@@ -262,13 +265,13 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	}
 
 	conLimiter := &concurrencyLimiter{
-		Component:                 wrapperMessage,
-		concurrencyLimiterProto:   concurrencyLimiterMessage,
-		registry:                  reg,
-		concurrencyLimiterFactory: conLimiterFactory,
-		workloadMultiMatcher:      mm,
-		defaultWorkloadProto:      schedulerProto.DefaultWorkload,
-		schedulerProto:            schedulerProto,
+		Component:                      wrapperMessage,
+		concurrencyLimiterProto:        concurrencyLimiterMessage,
+		registry:                       reg,
+		concurrencyLimiterFactory:      conLimiterFactory,
+		workloadMultiMatcher:           mm,
+		defaultWorkloadParametersProto: schedulerProto.DefaultWorkloadParameters,
+		schedulerProto:                 schedulerProto,
 	}
 
 	return fx.Options(
@@ -279,32 +282,32 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 }
 
 type workloadMatcher struct {
-	workloadProto *policylangv1.Scheduler_WorkloadAndLabelMatcher
+	workloadProto *policylangv1.Scheduler_Workload
 	workloadIndex int
 }
 
 func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult {
 	// mmr.matchedWorkloads is nil on first match.
 	if mmr.matchedWorkloads == nil {
-		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload)
+		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_WorkloadParameters)
 	}
-	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetWorkload()
+	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetWorkloadParameters()
 	return mmr
 }
 
 // concurrencyLimiter implements concurrency limiter on the dataplane side.
 type concurrencyLimiter struct {
 	iface.Component
-	scheduler                  scheduler.Scheduler
-	registry                   status.Registry
-	incomingConcurrencyCounter prometheus.Counter
-	acceptedConcurrencyCounter prometheus.Counter
-	concurrencyLimiterProto    *policylangv1.ConcurrencyLimiter
-	concurrencyLimiterFactory  *concurrencyLimiterFactory
-	autoTokens                 *autoTokens
-	workloadMultiMatcher       *multiMatcher
-	defaultWorkloadProto       *policylangv1.Scheduler_Workload
-	schedulerProto             *policylangv1.Scheduler
+	scheduler                      scheduler.Scheduler
+	registry                       status.Registry
+	incomingConcurrencyCounter     prometheus.Counter
+	acceptedConcurrencyCounter     prometheus.Counter
+	concurrencyLimiterProto        *policylangv1.ConcurrencyLimiter
+	concurrencyLimiterFactory      *concurrencyLimiterFactory
+	autoTokens                     *autoTokens
+	workloadMultiMatcher           *multiMatcher
+	defaultWorkloadParametersProto *policylangv1.Scheduler_WorkloadParameters
+	schedulerProto                 *policylangv1.Scheduler
 }
 
 // Make sure ConcurrencyLimiter implements the iface.ConcurrencyLimiter.
@@ -337,6 +340,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	}
 
 	engineAPI := conLimiterFactory.engineAPI
+	metricsAPI := conLimiterFactory.metricsAPI
 	wfqFlowsGaugeVec := conLimiterFactory.wfqFlowsGaugeVec
 	wfqRequestsGaugeVec := conLimiterFactory.wfqRequestsGaugeVec
 	incomingConcurrencyCounterVec := conLimiterFactory.incomingConcurrencyCounterVec
@@ -393,6 +397,8 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 				errMulti = multierr.Append(errMulti, err)
 			}
 
+			metricsAPI.DeleteTokenLatencyHistogram(metricLabels)
+
 			// Remove metrics from metric vectors
 			deleted := wfqFlowsGaugeVec.Delete(metricLabels)
 			if !deleted {
@@ -426,7 +432,7 @@ func (conLimiter *concurrencyLimiter) GetSelector() *selectorv1.Selector {
 
 // RunLimiter .
 func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision {
-	var matchedWorkloadProto *policylangv1.Scheduler_Workload
+	var matchedWorkloadProto *policylangv1.Scheduler_WorkloadParameters
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
 	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labels))
@@ -443,7 +449,7 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flow
 		matchedWorkloadIndex = strconv.Itoa(smallestWorkloadIndex)
 	} else {
 		// no match, return default workload
-		matchedWorkloadProto = conLimiter.defaultWorkloadProto
+		matchedWorkloadProto = conLimiter.defaultWorkloadParametersProto
 		matchedWorkloadIndex = metrics.DefaultWorkloadIndex
 	}
 
@@ -494,8 +500,8 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flow
 		PolicyHash:     conLimiter.GetPolicyHash(),
 		ComponentIndex: conLimiter.GetComponentIndex(),
 		Dropped:        !accepted,
-		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter_{
-			ConcurrencyLimiter: &flowcontrolv1.LimiterDecision_ConcurrencyLimiter{
+		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
+			ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 				WorkloadIndex: matchedWorkloadIndex,
 			},
 		},

@@ -49,5 +49,4 @@ webhooks:
     - UPDATE
     resources:
     - controllers
-    - policies
   sideEffects: None

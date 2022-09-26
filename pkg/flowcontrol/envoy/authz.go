@@ -13,6 +13,7 @@ import (
 	"github.com/open-policy-agent/opa-envoy-plugin/envoyauth"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/logging"
+	"github.com/rs/zerolog"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/metadata"
@@ -82,14 +83,13 @@ func sanitizeBaggageHeaderValue(value string) string {
 // * computes flow labels and returns them via DynamicMetadata.
 // * makes the allow/deny decision - sends flow labels to flow control's Check function.
 func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_authz.CheckResponse, error) {
-	logSampled.Trace().Msg("Classifier.Check()")
 	// record the start time of the request
 	start := time.Now()
 
 	createExtAuthzResponse := func(checkResponse *flowcontrolv1.CheckResponse) *ext_authz.CheckResponse {
 		marshalledCheckResponse, err := protoMessageAsPbValue(checkResponse)
 		if err != nil {
-			logSampled.Error().Err(err).Msg("Failed to marshal check response")
+			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to marshal check response")
 			return nil
 		}
 
@@ -98,7 +98,6 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		checkResponse.Start = timestamppb.New(start)
 		checkResponse.End = timestamppb.New(end)
 
-		logSampled.Trace().Interface("checkResponse", marshalledCheckResponse).Msg("Created ext_authz.CheckResponse")
 		return &ext_authz.CheckResponse{
 			DynamicMetadata: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
@@ -108,25 +107,25 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		}
 	}
 
-	ctrlPt := selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_UNKNOWN, "")
+	ctrlPt := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_UNKNOWN, "")
 	headers, _ := metadata.FromIncomingContext(ctx)
 	if dirHeader, exists := headers["traffic-direction"]; exists && len(dirHeader) > 0 {
 		switch dirHeader[0] {
 		case "INBOUND":
-			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_INGRESS, "")
+			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
 		case "OUTBOUND":
-			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPoint_TYPE_EGRESS, "")
+			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, "")
 		default:
-			logSampled.Error().Str("traffic-direction", dirHeader[0]).Msg("invalid traffic-direction header")
+			log.Sample(zerolog.Sometimes).Error().Str("traffic-direction", dirHeader[0]).Msg("invalid traffic-direction header")
 			checkResponse := &flowcontrolv1.CheckResponse{
-				Error:        flowcontrolv1.CheckResponse_ERROR_INVALID_TRAFFIC_DIRECTION,
-				ControlPoint: ctrlPt.ToFlowControlPointProto(),
+				Error:            flowcontrolv1.CheckResponse_ERROR_INVALID_TRAFFIC_DIRECTION,
+				ControlPointInfo: ctrlPt.ToControlPointInfoProto(),
 			}
 			resp := createExtAuthzResponse(checkResponse)
 			return resp, errors.New("invalid traffic-direction")
 		}
 	} else {
-		logSampled.Error().Msg("traffic-direction not set")
+		log.Sample(zerolog.Sometimes).Error().Msg("traffic-direction not set")
 		checkResponse := &flowcontrolv1.CheckResponse{
 			Error: flowcontrolv1.CheckResponse_ERROR_MISSING_TRAFFIC_DIRECTION,
 		}
@@ -182,9 +181,9 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	classifierMsgs, newFlowLabels, err := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), inputValue)
 	if err != nil {
 		checkResponse := &flowcontrolv1.CheckResponse{
-			Error:       flowcontrolv1.CheckResponse_ERROR_CLASSIFY,
-			Services:    svcs,
-			Classifiers: classifierMsgs,
+			Error:           flowcontrolv1.CheckResponse_ERROR_CLASSIFY,
+			Services:        svcs,
+			ClassifierInfos: classifierMsgs,
 		}
 		resp := createExtAuthzResponse(checkResponse)
 		return resp, fmt.Errorf("failed to classify: %v", err)
@@ -199,7 +198,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	// Add new flow labels to baggage
 	newHeaders, err := h.propagator.Inject(newFlowLabels, existingHeaders)
 	if err != nil {
-		logSampled.Warn().Err(err).Msg("Failed to inject baggage into headers")
+		log.Sample(zerolog.Sometimes).Warn().Err(err).Msg("Failed to inject baggage into headers")
 	}
 
 	// Make the freshly created flow labels available to flowcontrol.
@@ -209,7 +208,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 	// Ask flow control service for Ok/Deny
 	checkResponse := h.fcHandler.CheckWithValues(ctx, svcs, ctrlPt, flowLabels)
-	checkResponse.Classifiers = classifierMsgs
+	checkResponse.ClassifierInfos = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
 	checkResponse.TelemetryFlowLabels = flowLabels
 
@@ -246,7 +245,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 				},
 			}
 		} else {
-			logSampled.Error().Msg("Unexpected reject reason: " + checkResponse.RejectReason.String())
+			log.Sample(zerolog.Sometimes).Error().Msg("Unexpected reject reason: " + checkResponse.RejectReason.String())
 		}
 	}
 

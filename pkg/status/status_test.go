@@ -8,13 +8,14 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 var rootRegistry Registry
 
 var _ = Describe("Status Registry", func() {
 	BeforeEach(func() {
-		rootRegistry = NewRegistry()
+		rootRegistry = NewRegistry(log.GetGlobalLogger())
 	})
 
 	Context("there is a single level root registry", func() {
@@ -54,7 +55,7 @@ var _ = Describe("Status Registry", func() {
 			Expect(rootRegistry.ChildIfExists("child")).To(BeNil())
 		})
 		It("returns the key of the root registry", func() {
-			Expect(rootRegistry.Key()).To(Equal(""))
+			Expect(rootRegistry.Key()).To(Equal("root"))
 		})
 	})
 
