@@ -9,6 +9,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
+	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/webhooks/validation"
 	"go.uber.org/fx"
 )
@@ -61,7 +62,8 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (Compi
 	if err != nil {
 		return nil, false, err.Error(), nil
 	}
-	circuit, err := CompilePolicy(policy)
+	registry := status.NewRegistry(log.GetGlobalLogger())
+	circuit, err := CompilePolicy(policy, registry)
 	if err != nil {
 		return nil, false, err.Error(), nil
 	}

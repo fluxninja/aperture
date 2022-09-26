@@ -116,7 +116,9 @@ type Circuit struct {
 var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
-func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts, policyReadAPI iface.Policy) (*Circuit, fx.Option) {
+func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts,
+	policyReadAPI iface.Policy,
+) (*Circuit, fx.Option) {
 	circuit := &Circuit{
 		Policy:        policyReadAPI,
 		loopedSignals: make(signalToReading),
