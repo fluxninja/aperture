@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 // Registry .
@@ -19,7 +20,10 @@ type Registry interface {
 	Detach()
 	Key() string
 	HasError() bool
+	GetLogger() *log.Logger
 }
+
+var _ Registry = &registry{}
 
 // registry implements Registry.
 type registry struct {
@@ -28,16 +32,18 @@ type registry struct {
 	root     *registry
 	parent   *registry
 	children map[string]*registry
+	logger   *log.Logger
 	key      string
 }
 
 // NewRegistry creates a new Registry.
-func NewRegistry() Registry {
+func NewRegistry(logger *log.Logger) Registry {
 	r := &registry{
-		key:      "",
+		key:      "root",
 		parent:   nil,
 		status:   &statusv1.Status{},
 		children: make(map[string]*registry),
+		logger:   logger,
 	}
 	r.root = r
 	return r
@@ -57,6 +63,7 @@ func (r *registry) Child(key string) Registry {
 			root:     r.root,
 			status:   &statusv1.Status{},
 			children: make(map[string]*registry),
+			logger:   r.logger.WithStr(r.key, key),
 		}
 		r.children[key] = child
 	}
@@ -74,7 +81,7 @@ func (r *registry) ChildIfExists(key string) Registry {
 	return child
 }
 
-// Detach detaches the child from the parent.
+// Detach detaches the child from the parent to become root.
 func (r *registry) Detach() {
 	if r.parent == nil {
 		return
@@ -83,6 +90,7 @@ func (r *registry) Detach() {
 	r.parent.mu.Lock()
 	defer func() {
 		r.parent.mu.Unlock()
+		r.logger = r.root.logger
 		r.parent = nil
 		r.root = r
 	}()
@@ -165,4 +173,9 @@ func (r *registry) HasError() bool {
 		}
 	}
 	return false
+}
+
+// GetLogger returns the logger of the Registry.
+func (r *registry) GetLogger() *log.Logger {
+	return r.logger
 }

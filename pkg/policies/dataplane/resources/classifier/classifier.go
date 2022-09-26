@@ -19,10 +19,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/flowlabel"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
+	"github.com/fluxninja/aperture/pkg/status"
 )
-
-// logSampled provides log sampling for classifier.
-var logSampled log.Logger = log.Sample(&zerolog.BasicSampler{N: 1000})
 
 type multiMatcherByControlPoint map[selectors.ControlPointID]*multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector]
 
@@ -38,6 +36,7 @@ type rules struct {
 type ClassificationEngine struct {
 	mu              sync.Mutex
 	activeRules     atomic.Value
+	registry        status.Registry
 	activeRulesets  map[rulesetID]compiler.CompiledRuleset
 	classifierProto *classificationv1.Classifier
 	nextRulesetID   rulesetID
@@ -45,14 +44,22 @@ type ClassificationEngine struct {
 
 type rulesetID = uint64
 
-// New creates a new Flow Classifier.
-func New() *ClassificationEngine {
+// NewClassificationEngine creates a new Flow Classifier.
+func NewClassificationEngine(registry status.Registry) *ClassificationEngine {
 	return &ClassificationEngine{
 		activeRulesets: make(map[rulesetID]compiler.CompiledRuleset),
+		registry:       registry,
 	}
 }
 
-func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm *multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector], labelsForMatching map[string]string, input ast.Value) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
+func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
+	flowLabels flowlabel.FlowLabels,
+	mm *multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector],
+	labelsForMatching map[string]string,
+	input ast.Value,
+) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
+	logger := c.registry.GetLogger()
+	logSampled := logger.Sample(zerolog.Sometimes)
 	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.ClassifierInfo_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.ClassifierInfo{
 			PolicyName:      labelerWithSelector.PolicyName,
@@ -83,7 +90,7 @@ func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm
 		}
 
 		if len(resultSet[0].Expressions) != 1 {
-			log.Warn().Msg("Rego: Expected exactly one expression")
+			logger.Warn().Msg("Rego: Expected exactly one expression")
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_MULTI_EXPRESSION)
 			continue
 		}
@@ -99,7 +106,7 @@ func populateFlowLabels(ctx context.Context, flowLabels flowlabel.FlowLabels, mm
 			// multi-label-query
 			variables, isMap := resultSet[0].Expressions[0].Value.(map[string]interface{})
 			if !isMap {
-				logSampled.Error().Msg("Rego: Expression's not a map (bug)")
+				logger.Error().Msg("Rego: Expression's not a map (bug)")
 				appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_EXPRESSION_NOT_MAP)
 				continue
 			}
@@ -125,6 +132,7 @@ func (c *ClassificationEngine) Classify(
 	labelsForMatching map[string]string,
 	input ast.Value,
 ) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels, error) {
+	logSampled := c.registry.GetLogger().Sample(zerolog.Sometimes)
 	flowLabels := make(flowlabel.FlowLabels)
 
 	r, ok := c.activeRules.Load().(rules)
@@ -138,7 +146,7 @@ func (c *ClassificationEngine) Classify(
 	cpID := selectors.NewControlPointID("", ctrlPt)
 	mm, ok := r.MultiMatcherByControlPointID[cpID]
 	if ok {
-		classifierMsgs = append(classifierMsgs, populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)
+		classifierMsgs = append(classifierMsgs, c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)
 	}
 
 	// TODO (krdln): update prometheus metrics upon classification errors.
@@ -151,7 +159,7 @@ func (c *ClassificationEngine) Classify(
 			logSampled.Trace().Interface("controlPointID", cpID).Msg("No labelers for controlPointID")
 			continue
 		}
-		classifierMsgs = append(classifierMsgs, populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)
+		classifierMsgs = append(classifierMsgs, c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)
 	}
 
 	return classifierMsgs, flowLabels, nil
@@ -221,8 +229,9 @@ func (rs ActiveRuleset) Drop() {
 
 // needs to be called with activeRulesets mutex held.
 func (c *ClassificationEngine) activateRulesets() {
+	logger := c.registry.GetLogger()
 	c.activeRules.Store(c.combineRulesets())
-	log.Info().Int("rulesets", len(c.activeRulesets)).Msg("Rules updated")
+	logger.Info().Int("rulesets", len(c.activeRulesets)).Msg("Rules updated")
 }
 
 func (c *ClassificationEngine) combineRulesets() rules {

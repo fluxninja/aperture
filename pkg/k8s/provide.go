@@ -37,7 +37,6 @@ var (
 type K8sClientConstructorIn struct {
 	fx.In
 	K8sClient *http.Client `name:"k8s-http-client"`
-	Logger    log.Logger
 }
 
 // Module provides a K8sClient.
@@ -130,7 +129,7 @@ func Providek8sClient(in K8sClientConstructorIn) K8sClient {
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to create new client set!")
 	}
-	zerolog := in.Logger.Zerolog()
+	zerolog := log.WithComponent("k8s-client").GetZerolog()
 	klog.SetLogger(zerologr.New(zerolog))
 	return NewK8sClient(k8sClientSet, err)
 }
