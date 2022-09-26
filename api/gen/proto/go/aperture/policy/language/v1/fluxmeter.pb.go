@@ -52,7 +52,7 @@ type FluxMeter struct {
 	//   associated with particular feature. What contributes to the span's
 	//   duration is entirely up to the user code that uses Aperture SDK.
 	Selector *v1.Selector `protobuf:"bytes,1,opt,name=selector,proto3" json:"selector,omitempty"`
-	// Histogram buckets (in ms) for this FluxMeter.
+	// Latency histogram buckets (in ms) for this FluxMeter.
 	//
 	// Types that are assignable to HistogramBuckets:
 	//	*FluxMeter_StaticBuckets_
@@ -179,6 +179,7 @@ func (*FluxMeter_ExponentialBuckets_) isFluxMeter_HistogramBuckets() {}
 
 func (*FluxMeter_ExponentialBucketsRange_) isFluxMeter_HistogramBuckets() {}
 
+// StaticBuckets holds the static value of the buckets where latency histogram will be stored.
 type FluxMeter_StaticBuckets struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -226,14 +227,19 @@ func (x *FluxMeter_StaticBuckets) GetBuckets() []float64 {
 	return nil
 }
 
+// LinearBuckets creates 'count' number of buckets, each 'width' wide, where the lowest bucket has an
+// upper bound of `start`. The final +inf bucket is not counted.
 type FluxMeter_LinearBuckets struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Upper bound of the lowest bucket.
 	Start float64 `protobuf:"fixed64,1,opt,name=start,proto3" json:"start,omitempty"`
+	// Width of each bucket.
 	Width float64 `protobuf:"fixed64,2,opt,name=width,proto3" json:"width,omitempty"`
-	Count int32   `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
+	// Number of buckets.
+	Count int32 `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
 }
 
 func (x *FluxMeter_LinearBuckets) Reset() {
@@ -289,14 +295,20 @@ func (x *FluxMeter_LinearBuckets) GetCount() int32 {
 	return 0
 }
 
+// ExponentialBuckets creates 'count' number of buckets where the lowest bucket has an upper bound of `start`
+// and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
+// bucket is not counted.
 type FluxMeter_ExponentialBuckets struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Start  float64 `protobuf:"fixed64,1,opt,name=start,proto3" json:"start,omitempty"`
+	// Upper bound of the lowest bucket.
+	Start float64 `protobuf:"fixed64,1,opt,name=start,proto3" json:"start,omitempty"`
+	// Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
 	Factor float64 `protobuf:"fixed64,2,opt,name=factor,proto3" json:"factor,omitempty"`
-	Count  int32   `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
+	// Number of buckets.
+	Count int32 `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
 }
 
 func (x *FluxMeter_ExponentialBuckets) Reset() {
@@ -352,14 +364,19 @@ func (x *FluxMeter_ExponentialBuckets) GetCount() int32 {
 	return 0
 }
 
+// ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
+// bucket is `max`. The final +inf bucket is not counted.
 type FluxMeter_ExponentialBucketsRange struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Min   float64 `protobuf:"fixed64,1,opt,name=min,proto3" json:"min,omitempty"`
-	Max   float64 `protobuf:"fixed64,2,opt,name=max,proto3" json:"max,omitempty"`
-	Count int32   `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
+	// Lowest bucket.
+	Min float64 `protobuf:"fixed64,1,opt,name=min,proto3" json:"min,omitempty"`
+	// Highest bucket.
+	Max float64 `protobuf:"fixed64,2,opt,name=max,proto3" json:"max,omitempty"`
+	// Number of buckets.
+	Count int32 `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
 }
 
 func (x *FluxMeter_ExponentialBucketsRange) Reset() {
