@@ -11,14 +11,13 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 type concurrencyLimiterConfigSync struct {
-	policyBaseAPI           iface.PolicyBase
+	policyBaseAPI           iface.Policy
 	concurrencyLimiterProto *policylangv1.ConcurrencyLimiter
 	etcdPath                string
 	agentGroupName          string
@@ -29,7 +28,7 @@ type concurrencyLimiterConfigSync struct {
 func NewConcurrencyLimiterOptions(
 	concurrencyLimiterProto *policylangv1.ConcurrencyLimiter,
 	componentStackIndex int,
-	policyBaseAPI iface.PolicyBase,
+	policyReadAPI iface.Policy,
 ) (fx.Option, string, error) {
 	// Get Agent Group Name from ConcurrencyLimiter.Scheduler.Selector.AgentGroup
 	schedulerProto := concurrencyLimiterProto.GetScheduler()
@@ -41,10 +40,10 @@ func NewConcurrencyLimiterOptions(
 		return fx.Options(), "", errors.New("concurrencyLimiter.Scheduler.Selector is nil")
 	}
 	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
-	etcdPath := path.Join(common.ConcurrencyLimiterConfigPath, common.DataplaneComponentKey(agentGroupName, policyBaseAPI.GetPolicyName(), int64(componentStackIndex)))
+	etcdPath := path.Join(common.ConcurrencyLimiterConfigPath, common.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentStackIndex)))
 	configSync := &concurrencyLimiterConfigSync{
 		concurrencyLimiterProto: concurrencyLimiterProto,
-		policyBaseAPI:           policyBaseAPI,
+		policyBaseAPI:           policyReadAPI,
 		etcdPath:                etcdPath,
 		componentIndex:          componentStackIndex,
 		agentGroupName:          agentGroupName,
@@ -58,6 +57,7 @@ func NewConcurrencyLimiterOptions(
 }
 
 func (configSync *concurrencyLimiterConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+	logger := configSync.policyBaseAPI.GetStatusRegistry().GetLogger()
 	// Add/remove file in lifecycle hooks in order to sync with etcd.
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -69,13 +69,13 @@ func (configSync *concurrencyLimiterConfigSync) doSync(etcdClient *etcdclient.Cl
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to marshal flux meter config")
+				logger.Error().Err(err).Msg("Failed to marshal flux meter config")
 				return err
 			}
 			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
 				configSync.etcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to put flux meter config")
+				logger.Error().Err(err).Msg("Failed to put flux meter config")
 				return err
 			}
 			return nil
@@ -83,7 +83,7 @@ func (configSync *concurrencyLimiterConfigSync) doSync(etcdClient *etcdclient.Cl
 		OnStop: func(ctx context.Context) error {
 			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to delete flux meter config")
+				logger.Error().Err(err).Msg("Failed to delete flux meter config")
 				return err
 			}
 			return nil

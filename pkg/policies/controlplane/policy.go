@@ -168,6 +168,7 @@ func (policy *Policy) setupCircuitJob(
 	lifecycle fx.Lifecycle,
 	circuitJobGroup *jobs.JobGroup,
 ) error {
+	logger := policy.GetStatusRegistry().GetLogger()
 	if policy.evaluationInterval > 0 {
 		// Job name
 		policy.jobName = fmt.Sprintf("Policy-%s", policy.GetPolicyName())
@@ -193,7 +194,7 @@ func (policy *Policy) setupCircuitJob(
 				// Register job with registry
 				err := policy.circuitJobGroup.RegisterJob(&job, jobConfig)
 				if err != nil {
-					log.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
+					logger.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
 					return err
 				}
 				return nil

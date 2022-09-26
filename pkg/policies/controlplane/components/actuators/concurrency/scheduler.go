@@ -18,7 +18,6 @@ import (
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
@@ -150,6 +149,7 @@ func NewSchedulerAndOptions(
 }
 
 func (s *Scheduler) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			s.writer = etcdwriter.NewWriter(etcdClient, true)
@@ -158,7 +158,7 @@ func (s *Scheduler) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Life
 		OnStop: func(ctx context.Context) error {
 			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), s.etcdPath)
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to delete tokens decision config")
+				logger.Error().Err(err).Msg("Failed to delete tokens decision config")
 				return err
 			}
 			s.writer.Close()
@@ -170,12 +170,13 @@ func (s *Scheduler) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Life
 
 // Execute implements runtime.Component.Execute.
 func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
 	var errMulti error
 
 	if s.tokensQuery != nil {
 		promValue, err := s.tokensQuery.ExecutePromQuery(tickInfo)
 		if err != nil {
-			log.Error().Err(err).Msg("could not read tokens query from prometheus")
+			logger.Error().Err(err).Msg("could not read tokens query from prometheus")
 			errMulti = multierr.Append(errMulti, err)
 		} else if promValue != nil && !reflect.DeepEqual(promValue, s.tokensPromValue) {
 			// update only if something changed
@@ -197,11 +198,11 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 				}
 				err = s.publishQueryTokens(tokensDecision)
 				if err != nil {
-					log.Error().Err(err).Msg("failed to publish tokens")
+					logger.Error().Err(err).Msg("failed to publish tokens")
 				}
 			} else {
 				err = fmt.Errorf("tokens query returned a non-vector value")
-				log.Error().Err(err).Msg("Failed to parse tokens")
+				logger.Error().Err(err).Msg("Failed to parse tokens")
 			}
 		}
 	}
@@ -232,6 +233,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 }
 
 func (s *Scheduler) publishQueryTokens(tokens *policydecisionsv1.TokensDecision) error {
+	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
 	// TODO: publish only on change
 	s.tokensByWorkload = tokens
 	policyName := s.policyReadAPI.GetPolicyName()
@@ -245,7 +247,7 @@ func (s *Scheduler) publishQueryTokens(tokens *policydecisionsv1.TokensDecision)
 	}
 	dat, err := proto.Marshal(wrapper)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to marshal tokens")
+		logger.Error().Err(err).Msg("Failed to marshal tokens")
 		return err
 	}
 	s.writer.Write(s.etcdPath, dat)
