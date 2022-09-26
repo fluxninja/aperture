@@ -9,7 +9,6 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -36,6 +35,7 @@ func compileCircuit(
 	circuitProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
 ) (CompiledCircuit, fx.Option, error) {
+	logger := policyReadAPI.GetStatusRegistry().GetLogger()
 	// List of runtime.CompiledComponent. The index of CompiledComponent in compiledCircuit is referred as graphNodeIndex.
 	var compiledCircuit CompiledCircuit
 	// Map from signal name to a list of graphNodeIndex(es) which accept the signal as input.
@@ -81,11 +81,11 @@ func compileCircuit(
 
 	for graphNodeIndex, compiledComp := range compiledCircuit {
 		mapStruct := compiledComp.CompiledComponent.MapStruct
-		log.Trace().Msgf("mapStruct: %+v", mapStruct)
+		logger.Trace().Msgf("mapStruct: %+v", mapStruct)
 
 		// Read in_ports in mapStruct
 		inPorts, ok := mapStruct["in_ports"]
-		log.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", compiledComp.CompiledComponent.Name).Msg("mapStruct[in_ports]")
+		logger.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", compiledComp.CompiledComponent.Name).Msg("mapStruct[in_ports]")
 		if ok {
 			// Convert in_ports to map[string]interface{}
 			inPortsMap, castOk := inPorts.(map[string]interface{})
@@ -94,13 +94,13 @@ func compileCircuit(
 				if err != nil {
 					return nil, nil, err
 				}
-				log.Trace().Msgf("inPortToSignalsMap: %+v", inPortToSignalsMap)
+				logger.Trace().Msgf("inPortToSignalsMap: %+v", inPortToSignalsMap)
 				compiledComp.InPortToSignalsMap = inPortToSignalsMap
 			}
 		}
 		// Read out_ports in mapStruct
 		outPorts, ok := mapStruct["out_ports"]
-		log.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", compiledComp.CompiledComponent.Name).Msg("mapStruct[out_ports]")
+		logger.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", compiledComp.CompiledComponent.Name).Msg("mapStruct[out_ports]")
 		if ok {
 			// Convert out_ports to map[string]interface{}
 			outPortsMap, castOk := outPorts.(map[string]interface{})
@@ -109,7 +109,7 @@ func compileCircuit(
 				if err != nil {
 					return nil, nil, err
 				}
-				log.Trace().Msgf("inPortToSignalsMap: %+v", outPortToSignalsMap)
+				logger.Trace().Msgf("inPortToSignalsMap: %+v", outPortToSignalsMap)
 				compiledComp.OutPortToSignalsMap = outPortToSignalsMap
 			}
 		}
@@ -152,7 +152,7 @@ func compileCircuit(
 	// Run Tarjan's algorithm for detecting loops
 	loops := tarjan.Connections(graph)
 	// Log loops and graph
-	log.Trace().Msgf("Tarjan Loops: %+v \nTarjan Graph: %+v", loops, graph)
+	logger.Trace().Msgf("Tarjan Loops: %+v \nTarjan Graph: %+v", loops, graph)
 
 	// Iterate over loops
 	for _, loop := range loops {
@@ -219,7 +219,7 @@ func compileCircuit(
 
 	// Log compiledCircuit
 	for compIndex, compiledComp := range compiledCircuit {
-		log.Trace().Msgf("compIndex: %d, compiledComp: %+v", compIndex, compiledComp)
+		logger.Trace().Msgf("compIndex: %d, compiledComp: %+v", compIndex, compiledComp)
 	}
 
 	return compiledCircuit, fx.Options(componentOptions...), nil
@@ -280,13 +280,10 @@ func getPortSignals(portMapping map[string]interface{}, inSignals map[string][]i
 
 	portToSignalMapping := make(runtime.PortToSignal)
 
-	log.Trace().Msgf("portMapping: %+v", portMapping)
-
 	// Iterate each port
 	for port, portMap := range portMapping {
 		// Convert portMap to map[string][]interface{}
 		portList, isList := portMap.([]interface{})
-		log.Trace().Bool("isList", isList).Msgf("portMap: %+v", portMap)
 		// Convert portMap to map[string]interface{}
 		portSpec, isSpec := portMap.(map[string]interface{})
 		if isList {

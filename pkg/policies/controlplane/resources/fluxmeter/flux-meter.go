@@ -12,13 +12,12 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 )
 
 type fluxMeterConfigSync struct {
-	policyBaseAPI  iface.PolicyBase
+	policyReadAPI  iface.Policy
 	fluxMeterProto *policylangv1.FluxMeter
 	etcdPath       string
 	agentGroupName string
@@ -29,7 +28,7 @@ type fluxMeterConfigSync struct {
 func NewFluxMeterOptions(
 	name string,
 	fluxMeterProto *policylangv1.FluxMeter,
-	policyBaseAPI iface.PolicyBase,
+	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {
 	// Get Agent Group Name from FluxMeter.Selector.AgentGroup
 	selectorProto := fluxMeterProto.GetSelector()
@@ -42,7 +41,7 @@ func NewFluxMeterOptions(
 		common.FluxMeterKey(agentGroup, name))
 	configSync := &fluxMeterConfigSync{
 		fluxMeterProto: fluxMeterProto,
-		policyBaseAPI:  policyBaseAPI,
+		policyReadAPI:  policyBaseAPI,
 		agentGroupName: agentGroup,
 		etcdPath:       etcdPath,
 		fluxMeterName:  name,
@@ -56,6 +55,7 @@ func NewFluxMeterOptions(
 }
 
 func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			wrapper := &wrappersv1.FluxMeterWrapper{
@@ -64,13 +64,13 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to marshal flux meter config")
+				logger.Error().Err(err).Msg("Failed to marshal flux meter config")
 				return err
 			}
 			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
 				configSync.etcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to put flux meter config")
+				logger.Error().Err(err).Msg("Failed to put flux meter config")
 				return err
 			}
 			return nil
@@ -78,7 +78,7 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 		OnStop: func(ctx context.Context) error {
 			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to delete flux meter config")
+				logger.Error().Err(err).Msg("Failed to delete flux meter config")
 				return err
 			}
 			return nil

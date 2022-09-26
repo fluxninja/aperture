@@ -10,7 +10,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 )
@@ -116,7 +115,9 @@ type Circuit struct {
 var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
-func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts, policyReadAPI iface.Policy) (*Circuit, fx.Option) {
+func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts,
+	policyReadAPI iface.Policy,
+) (*Circuit, fx.Option) {
 	circuit := &Circuit{
 		Policy:        policyReadAPI,
 		loopedSignals: make(signalToReading),
@@ -197,6 +198,7 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 
 // Execute runs one tick of computations of all the Components in the Circuit.
 func (circuit *Circuit) Execute(tickInfo TickInfo) error {
+	logger := circuit.GetStatusRegistry().GetLogger()
 	// Lock execution
 	circuit.LockExecution()
 	// Defer unlock
@@ -219,7 +221,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			}
 			signalSummaryVecMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to initialize SummaryVec")
+				logger.Error().Err(err).Msg("Failed to initialize SummaryVec")
 			}
 			if reading.Valid() {
 				signalSummaryVecMetric.Observe(reading.Value())
@@ -267,7 +269,11 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				componentInPortReadings[port] = readingList
 			}
 			// log the component being executed
-			log.Trace().Str("component", cmp.CompiledComponent.Name).Int("tick", tickInfo.Tick()).Interface("in_ports", componentInPortReadings).Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).Msg("Executing component")
+			logger.Trace().Str("component", cmp.CompiledComponent.Name).
+				Int("tick", tickInfo.Tick()).
+				Interface("in_ports", componentInPortReadings).
+				Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).
+				Msg("Executing component")
 			// If control reaches this point, the component is ready to execute
 			componentOutPortReadings, err := cmp.CompiledComponent.Component.Execute(
 				/* pass signal */
@@ -309,7 +315,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 						// Create error message
 						errMsg := fmt.Sprintf("unexpected state: port %s is not defined in componentOutPortReadings. abort circuit execution", port)
 						// Log error
-						log.Error().Msg(errMsg)
+						logger.Error().Msg(errMsg)
 						return errors.New(errMsg)
 					}
 					// check presence of index in readings
@@ -317,7 +323,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 						// Create error message
 						errMsg := fmt.Sprintf("unexpected state: index %d is out of range in port %s. abort circuit execution", index, port)
 						// Log error
-						log.Error().Msg(errMsg)
+						logger.Error().Msg(errMsg)
 						return errors.New(errMsg)
 					}
 					if sig.Looped {
@@ -337,7 +343,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 		// Return with error if there is no change in number of executed components.
 		if numExecutedBefore == numExecutedAfter {
 			errMsg := fmt.Sprintf("circuit execution failed. number of executed components (%d) remained same across consecutive rounds", numExecutedBefore)
-			log.Error().Msg(errMsg)
+			logger.Error().Msg(errMsg)
 			return errors.New(errMsg)
 		}
 	}
