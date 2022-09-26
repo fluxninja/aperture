@@ -1985,7 +1985,7 @@ See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
 <dt>auto_tokens</dt>
 <dd>
 
-(bool, default: `true`) Automatically estimate weight of flows in each workload, based on
+(bool, default: `true`) Automatically estimate the size of a request in each workload, based on
 historical latency. Each workload's `tokens` will be set to average
 latency of flows in that workload during last few seconds (exact duration
 of this average can change).
