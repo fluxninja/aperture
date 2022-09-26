@@ -1,8 +1,8 @@
 apiVersion: v2
 name: aperture-agent
 description: A Helm chart to deploy Aperture Agent
-version: v0.3.0-rc.2
-appVersion: v0.3.0-rc.2
+version: v0.3.0
+appVersion: v0.3.0
 icon: https://raw.githubusercontent.com/fluxninja/aperture/gh-pages/FluxNinja--main--logo--ICON.svg
 dependencies:
   - name: common
