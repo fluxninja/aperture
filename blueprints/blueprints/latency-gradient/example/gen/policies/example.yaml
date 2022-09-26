@@ -220,7 +220,7 @@ circuit:
         operator: gt
         out_ports:
           output:
-            signal_name: CONCURRENCY_INCREMENT_SWITCH
+            signal_name: IS_OVERLOAD_SWITCH
     - switcher:
         in_ports:
           on_false:
@@ -228,20 +228,10 @@ circuit:
           on_true:
             signal_name: CONCURRENCY_INCREMENT_OVERLOAD
           switch:
-            signal_name: CONCURRENCY_INCREMENT_SWITCH
+            signal_name: IS_OVERLOAD_SWITCH
         out_ports:
           output:
             signal_name: CONCURRENCY_INCREMENT
-    - decider:
-        in_ports:
-          lhs:
-            signal_name: LATENCY
-          rhs:
-            signal_name: LATENCY_OVERLOAD
-        operator: gt
-        out_ports:
-          output:
-            signal_name: CONCURRENCY_INCREMENT_FEEDBACK_SWITCH
     - switcher:
         in_ports:
           on_false:
@@ -249,7 +239,7 @@ circuit:
           on_true:
             signal_name: ZERO
           switch:
-            signal_name: CONCURRENCY_INCREMENT_FEEDBACK_SWITCH
+            signal_name: IS_OVERLOAD_SWITCH
         out_ports:
           output:
             signal_name: CONCURRENCY_INCREMENT_FEEDBACK
