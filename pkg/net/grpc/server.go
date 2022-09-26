@@ -23,16 +23,16 @@ const (
 	defaultGMuxListener = "grpc-gmux-listener"
 )
 
-// ServerModule is an fx module that provides annotated GRPC Server using the default listener and registers its metrics with the prometheus registry.
-func ServerModule() fx.Option {
+// ModuleForGrpcServer is an fx module that provides annotated GRPC Server using the default listener and registers its metrics with the prometheus registry.
+func ModuleForGrpcServer() fx.Option {
 	return fx.Options(
 		ServerConstructor{}.Annotate(),
 		fx.Invoke(RegisterGRPCServerMetrics),
 	)
 }
 
-// GMuxServerModule is an fx module that provides annotated grpc Server using gmux provided listener and registers its metrics with the prometheus registry.
-func GMuxServerModule() fx.Option {
+// ModuleForGMuxServer is an fx module that provides annotated grpc Server using gmux provided listener and registers its metrics with the prometheus registry.
+func ModuleForGMuxServer() fx.Option {
 	return fx.Options(
 		listener.GMuxConstructor{ListenerName: defaultGMuxListener}.Annotate(),
 		ServerConstructor{ListenerName: defaultGMuxListener}.Annotate(),

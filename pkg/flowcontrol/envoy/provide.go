@@ -11,14 +11,14 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// Module provides authz handler
+// ModuleForAuthzHandler provides authz handler
 //
 // Authz handler is one of the APIs to classification and flowcontrol modules.
 // Authz uses envoy's external authorization grpc API.
 //
 // Note: Register function is not bundled inside this module and should be
 // invoked explicitly.
-var Module = fx.Options(
+var ModuleForAuthzHandler = fx.Options(
 	fx.Provide(ProvideHandler),
 	fx.Invoke(Register),
 )

@@ -29,8 +29,8 @@ type monitoringContext struct {
 	handlerName string
 }
 
-// ServerModule is an fx module that provides annotated HTTP Server using the default listener and registers its metrics with the prometheus registry.
-func ServerModule() fx.Option {
+// ModuleForHTTPServer is an fx module that provides annotated HTTP Server using the default listener and registers its metrics with the prometheus registry.
+func ModuleForHTTPServer() fx.Option {
 	return fx.Options(
 		ServerConstructor{}.Annotate(),
 	)

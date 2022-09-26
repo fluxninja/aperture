@@ -15,11 +15,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
 
-// Module is a set of default providers for flowcontrol components
+// ModuleForFlowcontrol is a set of default providers for flowcontrol components
 //
 // Note that the handler needs to be Registered for flowcontrol to be available
 // externally.
-var Module = fx.Options(
+var ModuleForFlowcontrol = fx.Options(
 	fx.Provide(
 		ProvideMetrics,
 		ProvideHandler,

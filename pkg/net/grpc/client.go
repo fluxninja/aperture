@@ -15,8 +15,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 )
 
-// ClientModule is an fx module that provides annotated grpc ClientConnectionBuilder.
-func ClientModule() fx.Option {
+// ModuleForGrpcClient is an fx module that provides annotated grpc ClientConnectionBuilder.
+func ModuleForGrpcClient() fx.Option {
 	return ClientConstructor{}.Annotate()
 }
 

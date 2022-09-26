@@ -16,8 +16,8 @@ type Constructor struct {
 	Name string
 }
 
-// Module is a fx module that provides Kubernetes watcher.
-func Module() fx.Option {
+// ModuleForKubernetesWatcher is a fx module that provides Kubernetes watcher.
+func ModuleForKubernetesWatcher() fx.Option {
 	return fx.Options(
 		Constructor{}.Annotate(),
 	)

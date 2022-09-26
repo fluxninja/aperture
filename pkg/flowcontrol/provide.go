@@ -11,6 +11,6 @@ import (
 // Note that the handler needs to be Registered for flowcontrol to be available
 // externally.
 var Module = fx.Options(
-	common.Module,
-	envoy.Module,
+	common.ModuleForFlowcontrol,
+	envoy.ModuleForAuthzHandler,
 )

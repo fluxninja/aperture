@@ -30,8 +30,8 @@ const (
 	defaultFile = "default"
 )
 
-// LogModule is a fx module that provides a logger and invokes setting global and standard loggers.
-func LogModule() fx.Option {
+// ModuleForLogger is a fx module that provides a logger and invokes setting global and standard loggers.
+func ModuleForLogger() fx.Option {
 	return fx.Options(
 		LoggerConstructor{ConfigKey: configKey, IsGlobal: true}.Annotate(),
 		fx.WithLogger(FxLogger()),

@@ -8,8 +8,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/fluxmeter"
 )
 
-// PolicyModule returns the fx options for dataplane side pieces of policy.
-func PolicyModule() fx.Option {
+// Module returns the fx options for dataplane side pieces of policy.
+func Module() fx.Option {
 	return fx.Options(
 		actuators.Module(),
 		fluxmeter.Module(),

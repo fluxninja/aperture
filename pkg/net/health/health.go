@@ -13,8 +13,8 @@ import (
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 )
 
-// Module is a module that provides grpc health server for checking services status.
-func Module() fx.Option {
+// ModuleForGrpcHealthServer is a module that provides grpc health server for checking services status.
+func ModuleForGrpcHealthServer() fx.Option {
 	return fx.Options(
 		grpcclient.ClientConstructor{Name: "health-grpc-client", ConfigKey: "health.client.grpc"}.Annotate(),
 		fx.Provide(provideHealthServer),

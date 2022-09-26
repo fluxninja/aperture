@@ -14,7 +14,7 @@ const (
 	platformStatusPath  = "platform"
 )
 
-func platformStatusModule() fx.Option {
+func moduleForPlatformStatus() fx.Option {
 	return fx.Options(
 		fx.Invoke(platformReadinessStatus),
 	)

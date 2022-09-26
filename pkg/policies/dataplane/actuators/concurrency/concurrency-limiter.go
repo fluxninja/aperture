@@ -40,8 +40,8 @@ var (
 	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel}
 )
 
-// concurrencyLimiterModule returns the fx options for dataplane side pieces of concurrency limiter in the main fx app.
-func concurrencyLimiterModule() fx.Option {
+// moduleForConcurrencyLimiter returns the fx options for dataplane side pieces of concurrency limiter in the main fx app.
+func moduleForConcurrencyLimiter() fx.Option {
 	return fx.Options(
 		// Tag the watcher so that other modules can find it.
 		fx.Provide(

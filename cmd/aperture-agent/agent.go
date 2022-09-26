@@ -51,7 +51,7 @@ func main() {
 		entitycache.Module(),
 		flowcontrol.Module,
 		distcache.Module(),
-		dataplane.PolicyModule(),
+		dataplane.Module(),
 		discovery.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 		otelcollector.Module(),

@@ -12,8 +12,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 )
 
-// ClientModule is an fx module that provides annotated HTTP client.
-func ClientModule() fx.Option {
+// ModuleForHTTPClient is an fx module that provides annotated HTTP client.
+func ModuleForHTTPClient() fx.Option {
 	return fx.Options(
 		ClientConstructor{}.Annotate(),
 	)
