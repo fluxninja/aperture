@@ -51,8 +51,8 @@ local component = Component.withPromql(PromQL.new() + PromQL.withQueryString("ve
 
 There are two parts to this library: automatically generated bindings based on
 the swagger API specification, and a set of custom bindings that build upon
-those generated bindings and extend the API to provide some "syntactic sugar" and
-make the library easier to use.
+those generated bindings and extend the API to provide some "syntactic sugar"
+and make the library easier to use.
 
 To update auto generated bindings, the script `jsonnet-lib-gen.py` can be used
 after its dependencies (listed in `requirements.txt`) are installed. The script

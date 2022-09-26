@@ -9,9 +9,10 @@ sidebar_position: 3
 
 ## Introduction
 
-Aperture comes with a pre-packaged list of [Aperture Policies][policies] and Grafana Dashboards that
-can be used both as a guide for creating new Policies, and as ready-to-use
-Blueprints for generating Aperture Policies customized to a [Service][service].
+Aperture comes with a pre-packaged list of [Aperture Policies][policies] and
+Grafana Dashboards that can be used both as a guide for creating new Policies,
+and as ready-to-use Blueprints for generating Aperture Policies customized to a
+[Service][service].
 
 All Dashboards and Policies are written using the [Jsonnet][jsonnet-lang]
 language, and can be used both as jsonnet mixins or as standalone Blueprints.
@@ -20,23 +21,24 @@ language, and can be used both as jsonnet mixins or as standalone Blueprints.
 
 ## Initial Setup
 
-Blueprints can be found in the [aperture repository][aperture-repo] under `blueprints/`
-directory. See the [blueprints README.md][blueprints-readme] for the list of required
-tools and instructions on installing jsonnet dependencies with a help of
-[jsonnet bundler][jb].
+Blueprints can be found in the [aperture repository][aperture-repo] under
+`blueprints/` directory. See the [blueprints README.md][blueprints-readme] for
+the list of required tools and instructions on installing jsonnet dependencies
+with a help of [jsonnet bundler][jb].
 
 The Blueprint Generator (used to generate Policy files from Blueprints) also
 depends on Python 3.8+ and [jsonnet][go-jsonnet].
 
 [aperture-repo]: https://github.com/fluxninja/aperture/
-[blueprints-readme]: https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
+[blueprints-readme]:
+  https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
 [jb]: https://github.com/jsonnet-bundler/jsonnet-bundler
 [go-jsonnet]: https://github.com/google/go-jsonnet
 
 ## Generating Aperture Policies and Grafana Dashboards
 
-The simplest way to use Aperture Blueprints is to render blueprints into
-policy and dashboard files.
+The simplest way to use Aperture Blueprints is to render blueprints into policy
+and dashboard files.
 
 To generate files, `blueprints/scripts/aperture-generate.py` can be used:
 
@@ -56,10 +58,10 @@ options:
   --config CONFIG  jsonnet file with blueprint configuration
 ```
 
-This script takes as options an output directory path where files will be
-saved and a path to a `config.libsonnet` file with local blueprint
-configuration. It also takes the BLUEPRINT argument, which is a path to the
-blueprint under the `blueprints/` directory.
+This script takes as options an output directory path where files will be saved
+and a path to a `config.libsonnet` file with local blueprint configuration. It
+also takes the BLUEPRINT argument, which is a path to the blueprint under the
+`blueprints/` directory.
 
 Under the `blueprints/` directory, the currently available Blueprints can be
 found. Each blueprint consists of at least two files: `config.libsonnet` and
@@ -71,8 +73,8 @@ the default configuration for the given Policy. This can be overridden by the
 Custom configurations will be merged with Blueprints' `config.libsonnet`
 resulting in the final configuration, according to jsonnet language rules: keys
 can be overwritten by reusing them in the custom configuration and nested
-objects can be merged by using `+:` operator. Check the `example` directory
-for more information.
+objects can be merged by using `+:` operator. Check the `example` directory for
+more information.
 
 The full command using the example looks like this:
 
@@ -81,15 +83,17 @@ jb install
 ./scripts/aperture-generate.py --output _gen --config blueprints/latency-gradient/example/example.jsonnet
 ```
 
-[blueprints-readme]: https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
+[blueprints-readme]:
+  https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
 
 ## Using aperture blueprints as a jsonnet mixins library
 
 An alternate way of using the aperture blueprints is to import them from another
 jsonnet project and render Policies or Dashboards directly in jsonnet.
 
-For example, to create a Latency Gradient Policy that can be loaded by
-the controller, you need to install aperture blueprints library with jsonnet bundler:
+For example, to create a Latency Gradient Policy that can be loaded by the
+controller, you need to install aperture blueprints library with jsonnet
+bundler:
 
 ```sh
 jb install github.com/fluxninja/aperture/blueprints@main
@@ -97,8 +101,8 @@ jb install github.com/fluxninja/aperture/blueprints@main
 
 :::info
 
-You can use specific aperture branch instead of _main_ e.g. _stable/v0.2.x_, or even
-a specific release tag e.g. _v0.2.2_
+You can use specific aperture branch instead of _main_ e.g. _stable/v0.2.x_, or
+even a specific release tag e.g. _v0.2.2_
 
 :::
 

@@ -70,7 +70,9 @@ There are two types of Control Points:
   at its **ingress** Control Point. Likewise every outgoing request from a
   service is a Flow at its **egress** Control Point.
 
-- **Feature** Control Points. Aperture SDK wraps any function call or code snippet inside the Service code as a Feature Control Point. Every invocation of the Feature is a Flow from the perspective of Aperture.
+- **Feature** Control Points. Aperture SDK wraps any function call or code
+  snippet inside the Service code as a Feature Control Point. Every invocation
+  of the Feature is a Flow from the perspective of Aperture.
 
 :::note
 
@@ -132,8 +134,10 @@ we recommend to start with concepts like [services][service] and
 [classifier]: /concepts/flow-control/flow-classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [istio]: /get-started/installation/agent/envoy/istio.md
-[ext-authz]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
+[ext-authz]:
+  https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [aperture-go]: https://github.com/FluxNinja/aperture-go
 [service]: /concepts/service.md
 [flow-label]: /concepts/flow-control/flow-label.md
-[flowcontrol-proto]: https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.v1
+[flowcontrol-proto]:
+  https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.v1
