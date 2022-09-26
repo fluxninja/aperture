@@ -15,10 +15,10 @@ See also [Selector reference](/references/configuration/policies.md#v1-selector)
 
 :::
 
-Selectors are used by all flow observability and control components
-instantiated on Aperture Agents ([Classifiers][classifier], [Flux
-Meters][flux-meter] and Limiters). Flow Selectors define scoping rules – how
-these components should select [Flows][flow] for their operations.
+Selectors are used by all flow observability and control components instantiated
+on Aperture Agents ([Classifiers][classifier], [Flux Meters][flux-meter] and
+Limiters). Flow Selectors define scoping rules – how these components should
+select [Flows][flow] for their operations.
 
 A Selector consists of:
 
@@ -35,7 +35,8 @@ A Selector consists of:
 
 :::info
 
-See also [ServiceSelector reference](/references/configuration/policies.md#v1-service-selector)
+See also
+[ServiceSelector reference](/references/configuration/policies.md#v1-service-selector)
 
 :::
 
@@ -60,7 +61,8 @@ select all services within the agent group, you can skip the service name.
 
 :::info
 
-See also [FlowSelector reference](/references/configuration/policies.md#v1-flow-selector)
+See also
+[FlowSelector reference](/references/configuration/policies.md#v1-flow-selector)
 
 :::
 
@@ -84,7 +86,8 @@ label_matcher:
 ```
 
 You can also provide a matching-expression-tree, which allows for arbitrary
-conditions, including regex matching. Refer to [LabelMatcher][label-matcher] for further details.
+conditions, including regex matching. Refer to [LabelMatcher][label-matcher] for
+further details.
 
 ### Example
 

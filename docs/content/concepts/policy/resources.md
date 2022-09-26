@@ -7,7 +7,8 @@ sidebar_position: 3
 
 :::info
 
-See also [Resources reference](/references/configuration/policies.md#v1-resources)
+See also
+[Resources reference](/references/configuration/policies.md#v1-resources)
 
 :::
 
