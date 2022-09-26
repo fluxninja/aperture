@@ -5,6 +5,7 @@ import (
 	"io"
 	stdlog "log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -59,6 +60,17 @@ var global *Logger
 func init() {
 	zerolog.TimeFieldFormat = time.RFC3339
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+	zerolog.CallerMarshalFunc = func(_ uintptr, file string, line int) string {
+		// short caller format
+		short := strings.Split(file, "/")
+		// return the last n elements of the file path
+		n := 3
+		if len(short) < n {
+			n = len(short)
+		}
+		path := strings.Join(short[len(short)-n:], "/")
+		return path + fmt.Sprintf("%d", line)
+	}
 	// Create global logger
 	SetGlobalLogger(NewDefaultLogger())
 }
