@@ -105,25 +105,26 @@ func setupPolicyFxDriver(
 func (factory *policyFactory) provideControllerPolicyFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	reg status.Registry,
+	registry status.Registry,
 ) (fx.Option, error) {
 	var wrapperMessage wrappersv1.PolicyWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.Policy == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
-		reg.GetLogger().Warn().Err(err).Msg("Failed to unmarshal policy config wrapper")
+		registry.SetStatus(status.NewStatus(nil, err))
+		registry.GetLogger().Warn().Err(err).Msg("Failed to unmarshal policy config wrapper")
 		return fx.Options(), err
 	}
 
 	// save policy wrapper proto in status registry
-	reg.Child("policy_config").SetStatus(status.NewStatus(&wrapperMessage, nil))
+	registry.Child("policy_config").SetStatus(status.NewStatus(&wrapperMessage, nil))
 
 	policyFxOptions, err := newPolicyOptions(
 		&wrapperMessage,
+		registry,
 	)
 	if err != nil {
-		reg.SetStatus(status.NewStatus(nil, err))
-		reg.GetLogger().Warn().Err(err).Msg("Failed to create policy options")
+		registry.SetStatus(status.NewStatus(nil, err))
+		registry.GetLogger().Warn().Err(err).Msg("Failed to create policy options")
 		return fx.Options(), err
 	}
 	return fx.Options(

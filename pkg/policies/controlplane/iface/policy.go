@@ -2,6 +2,8 @@ package iface
 
 import (
 	"time"
+
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 const (
@@ -19,4 +21,5 @@ type PolicyBase interface {
 type Policy interface {
 	PolicyBase
 	GetEvaluationInterval() time.Duration
+	GetStatusRegistry() status.Registry
 }
