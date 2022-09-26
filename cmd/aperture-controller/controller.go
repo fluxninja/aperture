@@ -14,8 +14,8 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/components"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/webhooks"
@@ -25,10 +25,10 @@ import (
 func main() {
 	app := platform.New(
 		platform.Config{}.Module(),
-		otel.OTELConfigConstructor{Type: otel.ControllerType}.Annotate(),
+		components.OTELConfigConstructor{Type: components.ControllerType}.Annotate(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			otel.ControllerOTELComponents,
+			components.ControllerOTELComponents,
 		),
 		otelcollector.Module(),
 		controlplane.Module(),

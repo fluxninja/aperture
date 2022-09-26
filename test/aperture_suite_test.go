@@ -22,8 +22,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/components"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
@@ -140,7 +140,7 @@ var _ = BeforeSuite(func() {
 		),
 		fx.Provide(
 			clockwork.NewRealClock,
-			otel.AgentOTELComponents,
+			components.AgentOTELComponents,
 			dataplane.ProvideEngineAPI,
 			dataplane.ProvideResponseMetricsAPI,
 			entitycache.NewEntityCache,

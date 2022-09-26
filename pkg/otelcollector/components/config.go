@@ -1,5 +1,5 @@
 // +kubebuilder:validation:Optional
-package otel
+package components
 
 import (
 	"crypto/tls"
@@ -17,34 +17,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
-)
-
-const (
-	// ReceiverOTLP collects logs from libraries and SDKs.
-	ReceiverOTLP = "otlp"
-	// ReceiverPrometheus collects metrics from environment and services.
-	ReceiverPrometheus = "prometheus"
-
-	// ProcessorEnrichment enriches metrics with discovery data.
-	ProcessorEnrichment = "enrichment"
-	// ProcessorMetrics generates metrics based on logs and exposes them
-	// on application prometheus metrics endpoint.
-	ProcessorMetrics = "metrics"
-	// ProcessorBatchPrerollup batches incoming data before rolling up. This is
-	// required, as rollup processor can only roll up data inside a single batch.
-	ProcessorBatchPrerollup = "batch/prerollup"
-	// ProcessorBatchPostrollup batches data after rolling up, as roll up process
-	// shrinks number of data points significantly.
-	ProcessorBatchPostrollup = "batch/postrollup"
-	// ProcessorRollup rolls up data to decrease cardinality.
-	ProcessorRollup = "rollup"
-	// ProcessorAgentGroup adds `agent_group` attribute.
-	ProcessorAgentGroup = "attributes/agent_group"
-
-	// ExporterLogging exports telemetry using Aperture logger.
-	ExporterLogging = "aperturelogging"
-	// ExporterPrometheusRemoteWrite exports metrics to local prometheus instance.
-	ExporterPrometheusRemoteWrite = "prometheusremotewrite"
 )
 
 var baseFxTag = config.NameTag("base")
@@ -156,10 +128,10 @@ func provideController(cfg *otelParams) *otelcollector.OTELConfig {
 func addLogsPipeline(cfg *otelParams) {
 	config := cfg.config
 	// Common dependencies for pipelines
-	addOTLPReceiver(cfg)
-	addMetricsProcessor(config)
+	config.AddReceiver(ReceiverOTLP, otlpreceiver.Config{})
+	config.AddProcessor(ProcessorMetrics, metricsprocessor.Config{})
 	config.AddBatchProcessor(ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPrerollup.SendBatchSize)
-	addRollupProcessor(config)
+	config.AddProcessor(ProcessorRollup, rollupprocessor.Config{})
 	config.AddBatchProcessor(ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
 	config.AddExporter(ExporterLogging, nil)
 
@@ -202,19 +174,6 @@ func addControllerMetricsPipeline(cfg *otelParams) {
 		Processors: []string{},
 		Exporters:  []string{ExporterPrometheusRemoteWrite},
 	})
-}
-
-func addOTLPReceiver(cfg *otelParams) {
-	config := cfg.config
-	config.AddReceiver(ReceiverOTLP, otlpreceiver.Config{})
-}
-
-func addMetricsProcessor(config *otelcollector.OTELConfig) {
-	config.AddProcessor(ProcessorMetrics, metricsprocessor.Config{})
-}
-
-func addRollupProcessor(config *otelcollector.OTELConfig) {
-	config.AddProcessor(ProcessorRollup, rollupprocessor.Config{})
 }
 
 func addPrometheusReceiver(cfg *otelParams) {
