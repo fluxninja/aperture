@@ -79,6 +79,7 @@ type DistCacheConstructorIn struct {
 	Unmarshaller  config.Unmarshaller
 	Lifecycle     fx.Lifecycle
 	Shutdowner    fx.Shutdowner
+	Logger        *log.Logger
 }
 
 // DistCacheConstructor holds fields to create an instance of *DistCache.
@@ -110,7 +111,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	oc.ReadQuorum = 1
 	oc.MemberCountQuorum = 1
 	oc.DMaps.Custom = make(map[string]olricconfig.DMap)
-	oc.Logger = stdlog.New(&OlricLogWriter{Logger: log.GetGlobalLogger()}, "", 0)
+	oc.Logger = stdlog.New(&OlricLogWriter{Logger: in.Logger}, "", 0)
 
 	bindAddr, port, err := net.SplitHostPort(config.BindAddr)
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/fluxninja/lumberjack"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/diode"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 	"go.uber.org/zap"
@@ -32,9 +33,7 @@ const (
 // LogModule is a fx module that provides a logger and invokes setting global and standard loggers.
 func LogModule() fx.Option {
 	return fx.Options(
-		LoggerConstructor{ConfigKey: configKey}.Annotate(),
-		fx.Invoke(log.SetGlobalLogger),
-		fx.Invoke(log.SetStdLogger),
+		LoggerConstructor{ConfigKey: configKey, IsGlobal: true}.Annotate(),
 		fx.WithLogger(FxLogger()),
 	)
 }
@@ -88,6 +87,8 @@ type LoggerConstructor struct {
 	ConfigKey string
 	// Default Config
 	DefaultConfig LogConfig
+	// Global logger
+	IsGlobal bool
 }
 
 // Annotate creates an annotated instance of loggers which can be used to create multiple loggers.
@@ -119,32 +120,7 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
 		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
 	}
-	logger, writers := NewLogger(config)
-	// append writers provided via Fx
-	writers = append(writers, w...)
 
-	lifecycle.Append(fx.Hook{
-		OnStart: func(context.Context) error {
-			return nil
-		},
-		OnStop: func(context.Context) error {
-			panichandler.Go(func() {
-				log.WaitFlush()
-				for _, writer := range writers {
-					if closer, ok := writer.(io.Closer); ok {
-						_ = closer.Close()
-					}
-				}
-			})
-			return nil
-		},
-	})
-
-	return logger, nil
-}
-
-// NewLogger creates a new instance of logger and writers with the given configuration.
-func NewLogger(config LogConfig) (*log.Logger, []io.Writer) {
 	var writers []io.Writer
 	// append file writers
 	for _, writerConfig := range config.Writers {
@@ -183,9 +159,54 @@ func NewLogger(config LogConfig) (*log.Logger, []io.Writer) {
 
 	multi := zerolog.MultiLevelWriter(writers...)
 
-	logger := log.NewLogger(multi, config.NonBlocking, strings.ToLower(config.LogLevel))
+	var wr io.Writer
 
-	return logger, writers
+	if config.NonBlocking {
+		// Use diode writer
+		dr := diode.NewWriter(multi, 1000, 0, func(missed int) {
+			log.Printf("Dropped %d messages", missed)
+		})
+		wr = dr
+	} else {
+		// use sync writer
+		wr = zerolog.SyncWriter(multi)
+	}
+
+	logger := log.NewLogger(wr, strings.ToLower(config.LogLevel))
+
+	// append writers provided via Fx
+	writers = append(writers, w...)
+
+	if constructor.IsGlobal {
+		// set global logger
+		log.SetGlobalLogger(logger)
+		// set standard loggers
+		log.SetStdLogger(logger)
+	}
+
+	lifecycle.Append(fx.Hook{
+		OnStart: func(context.Context) error {
+			return nil
+		},
+		OnStop: func(context.Context) error {
+			panichandler.Go(func() {
+				log.WaitFlush()
+				// close diode writer
+				if config.NonBlocking {
+					dr := wr.(*diode.Writer)
+					dr.Close()
+				}
+				for _, writer := range writers {
+					if closer, ok := writer.(io.Closer); ok {
+						_ = closer.Close()
+					}
+				}
+			})
+			return nil
+		},
+	})
+
+	return logger, nil
 }
 
 // FxLogger overrides fx default logger.

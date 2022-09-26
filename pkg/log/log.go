@@ -5,12 +5,10 @@ import (
 	"io"
 	stdlog "log"
 	"os"
-	"runtime"
 	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/diode"
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
 
@@ -39,8 +37,8 @@ const (
 )
 
 const (
-	// DiodeFlushWait is the amount of time to wait for diode buffer to flush.
-	diodeFlushWait = 1000 * time.Millisecond
+	// FlushWait is the amount of time to wait for the buffer to flush.
+	flushWait = 1000 * time.Millisecond
 	// DefaultLevel sets info log level, InfoLevel, as default.
 	defaultLevel = "info"
 	// ServiceKey is a field key that are used with Service name value as a string to the logger context.
@@ -68,7 +66,7 @@ func init() {
 
 // NewDefaultLogger creates a new default logger with default settings.
 func NewDefaultLogger() *Logger {
-	return NewLogger(os.Stderr, false, defaultLevel)
+	return NewLogger(os.Stderr, defaultLevel)
 }
 
 // SetGlobalLogger closes the previous global logger and sets given logger as a new global logger.
@@ -82,29 +80,14 @@ func SetStdLogger(lg *Logger) {
 	stdlog.SetOutput(lg.logger)
 }
 
-// NewLogger creates a new logger by wrapping io.Writer in a diode.Writer.
-func NewLogger(w io.Writer, useDiode bool, levelString string) *Logger {
+// NewLogger creates a new logger.
+func NewLogger(w io.Writer, levelString string) *Logger {
 	level, err := zerolog.ParseLevel(levelString)
 	if err != nil {
 		log.Panic().Err(err).Str("level", level.String()).Msg("Unable to parse logger level")
 	}
 
-	var wr io.Writer
-
-	if useDiode {
-		// Use diode writer
-		dr := diode.NewWriter(w, 1000, 0, func(missed int) {
-			Printf("Dropped %d messages", missed)
-		})
-		// set finalizer
-		runtime.SetFinalizer(&dr, func(w *diode.Writer) {
-			w.Close()
-		})
-		wr = dr
-	} else {
-		wr = w
-	}
-	zerolog := zerolog.New(wr).Level(level).With().Timestamp().Caller().Str(serviceKey, info.Service).Logger()
+	zerolog := zerolog.New(w).Level(level).With().Timestamp().Caller().Str(serviceKey, info.Service).Logger()
 	logger := &Logger{
 		logger: &zerolog,
 	}
@@ -112,9 +95,9 @@ func NewLogger(w io.Writer, useDiode bool, levelString string) *Logger {
 	return logger
 }
 
-// WaitFlush waits a few ms to let the diode buffer to flush.
+// WaitFlush waits a few ms to let the the buffer to flush.
 func WaitFlush() {
-	time.Sleep(diodeFlushWait)
+	time.Sleep(flushWait)
 }
 
 // GetPrettyConsoleWriter returns a pretty console writer.
@@ -124,7 +107,7 @@ func GetPrettyConsoleWriter() io.Writer {
 		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
 	}
 	output.FormatMessage = func(i interface{}) string {
-		return fmt.Sprintf("%s | ", i)
+		return fmt.Sprintf("message: %s *** ", i)
 	}
 	output.FormatFieldName = func(i interface{}) string {
 		return fmt.Sprintf("%s:", i)
