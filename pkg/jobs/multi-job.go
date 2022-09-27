@@ -6,6 +6,7 @@ import (
 
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -142,7 +143,7 @@ func (mj *MultiJob) Execute(ctx context.Context) (proto.Message, error) {
 	wg.Wait()
 
 	// nothing to report at the multijob level
-	return nil, nil
+	return wrapperspb.String("MultiJob"), nil
 }
 
 // RegisterJob registers a job with the MultiJob.
