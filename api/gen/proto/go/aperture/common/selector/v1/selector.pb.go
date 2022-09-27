@@ -23,12 +23,12 @@ const (
 )
 
 // Describes which flow in which service a [dataplane
-//// component](/concepts/flow-control/flow-control.md#components) should apply
-//// to
-////
-//// :::info
-//// See also [Selector overview](/concepts/flow-control/selector.md).
-//// :::
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
 type Selector struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

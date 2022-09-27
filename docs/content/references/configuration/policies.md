@@ -2119,12 +2119,12 @@ entering scheduler, including rejected ones.
 ### v1Selector {#v1-selector}
 
 Describes which flow in which service a [dataplane
-// component](/concepts/flow-control/flow-control.md#components) should apply
-// to
-//
-// :::info
-// See also [Selector overview](/concepts/flow-control/selector.md).
-// :::
+component](/concepts/flow-control/flow-control.md#components) should apply
+to
+
+:::info
+See also [Selector overview](/concepts/flow-control/selector.md).
+:::
 
 #### Properties
 
