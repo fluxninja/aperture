@@ -101,17 +101,29 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 
 		groupConfig.OnJobCompleted(nil, JobStats{})
 
+		groupConfigExpectdScheduling := groupConfig.expectedScheduling
 		_, val := jobGroup.Results()
-		if val != groupConfig.expectedScheduling {
-			t.Errorf("Expected scheduling to be %v, got %v", groupConfig.expectedScheduling, val)
+		if val != groupConfigExpectdScheduling {
+			t.Errorf("Expected scheduling to be %v, got %v", groupConfigExpectdScheduling, val)
 		}
-
+		checkStatus(t, job.Name(), groupConfigExpectdScheduling)
 	}
 	if len(groupConfig.jobs) > 1 {
 		jobGroup.DeregisterAll()
 	} else {
 		err = jobGroup.DeregisterJob(groupConfig.jobs[0].Name())
 		require.NoError(t, err)
+	}
+}
+
+func checkStatus(t *testing.T, name string, expectedScheduling bool) {
+	jobRegistry := registry.ChildIfExists(name)
+	require.NotNil(t, jobRegistry)
+	require.Equal(t, jobRegistry.Key(), name)
+	if expectedScheduling {
+		require.False(t, jobRegistry.HasError())
+	} else {
+		require.True(t, jobRegistry.HasError())
 	}
 }
 
@@ -375,9 +387,11 @@ func TestSameJobTwiceAndSchedulingErrors(t *testing.T) {
 	job2 := job
 	err = jobGroup.RegisterJob(job, jobConfig)
 	require.NoError(t, err)
+	checkStatus(t, job.JobName, false)
 
 	err = jobGroup.RegisterJob(job2, jobConfig)
 	require.Error(t, err)
+	checkStatus(t, job2.JobName, false)
 
 	jobGroup.DeregisterAll()
 	// error when registering job multiple times, written here to achieve more coverage
@@ -398,5 +412,6 @@ func TestEmptyJobFunc(t *testing.T) {
 	if err == nil {
 		t.Log("Expected log message when registering job with nil job func")
 	}
+	checkStatus(t, job.JobName, false)
 	jobGroup.DeregisterAll()
 }
