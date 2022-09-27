@@ -682,6 +682,8 @@ definitions:
         type: object
         additionalProperties:
           type: string
+      remove_me:
+        type: string
     description: CheckRequest contains fields required to perform Check call.
   v1CheckResponse:
     type: object

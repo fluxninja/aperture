@@ -15,6 +15,7 @@ service FlowControlService {
 message CheckRequest {
   string feature = 1;
   map<string, string> labels = 2;
+  string remove_me = 3;
 }
 
 // CheckResponse contains fields that represent decision made by Check call.
@@ -76,6 +77,7 @@ message ControlPointInfo {
     TYPE_INGRESS = 2;
     TYPE_EGRESS = 3;
   }
+
   Type type = 1;
   string feature = 2;
 }
