@@ -73,7 +73,7 @@ func (mjc MultiJobConstructor) provideMultiJob(
 	}
 
 	// Create a new MultiJob instance
-	mj := NewMultiJob(mjc.Name, config.AlwaysHealthy, jwAll, gwAll)
+	mj := NewMultiJob(mjc.Name, config.AlwaysHealthy, jg.GetStatusRegistry(), jwAll, gwAll)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -106,14 +106,14 @@ type MultiJob struct {
 var _ Job = (*MultiJob)(nil)
 
 // NewMultiJob creates a new instance of MultiJob.
-func NewMultiJob(name string, alwaysHealthy bool, jws JobWatchers, gws GroupWatchers) *MultiJob {
+func NewMultiJob(name string, alwaysHealthy bool, registry status.Registry, jws JobWatchers, gws GroupWatchers) *MultiJob {
 	return &MultiJob{
 		JobBase: JobBase{
 			JobName: name,
 			JWS:     jws,
 		},
 		alwaysHealthy: alwaysHealthy,
-		gt:            newGroupTracker(gws, status.NewRegistry(log.GetGlobalLogger())),
+		gt:            newGroupTracker(gws, registry),
 	}
 }
 
