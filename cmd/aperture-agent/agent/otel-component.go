@@ -1,7 +1,8 @@
-package components
+package agent
 
 import (
 	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
@@ -25,9 +26,20 @@ import (
 	"go.opentelemetry.io/collector/processor/batchprocessor"
 	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
+	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/grpc"
 )
+
+// AgentOTELComponentAnnotate provides fx options for AgentOTELComponent.
+func AgentOTELComponentAnnotate() fx.Option {
+	options := fx.Provide(otelcollector.NewOtelConfig)
+	return fx.Options(options,
+		fx.Provide(
+			fx.Annotate(provideAgent, fx.ResultTags(otelcollector.BaseFxTag)),
+		),
+	)
+}
 
 // AgentOTELComponents constructs OTEL Collector Factories for Agent.
 func AgentOTELComponents(
@@ -90,4 +102,35 @@ func AgentOTELComponents(
 	}
 
 	return factories, errs
+}
+
+func provideAgent(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
+	addLogsPipeline(cfg)
+	otelcollector.AddMetricsPipeline(cfg)
+	return cfg.Config
+}
+
+func addLogsPipeline(cfg *otelcollector.OtelParams) {
+	config := cfg.Config
+	// Common dependencies for pipelines
+	config.AddReceiver(otelcollector.ReceiverOTLP, otlpreceiver.Config{})
+	config.AddProcessor(otelcollector.ProcessorMetrics, metricsprocessor.Config{})
+	config.AddBatchProcessor(otelcollector.ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
+	config.AddProcessor(otelcollector.ProcessorRollup, rollupprocessor.Config{})
+	config.AddBatchProcessor(otelcollector.ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
+	config.AddExporter(otelcollector.ExporterLogging, nil)
+
+	processors := []string{
+		otelcollector.ProcessorAgentGroup,
+		otelcollector.ProcessorMetrics,
+		otelcollector.ProcessorBatchPrerollup,
+		otelcollector.ProcessorRollup,
+		otelcollector.ProcessorBatchPostrollup,
+	}
+
+	config.Service.AddPipeline("logs", otelcollector.Pipeline{
+		Receivers:  []string{otelcollector.ReceiverOTLP},
+		Processors: processors,
+		Exporters:  []string{otelcollector.ExporterLogging},
+	})
 }

@@ -1,6 +1,7 @@
-package components
+package controller
 
 import (
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
@@ -12,8 +13,19 @@ import (
 	"go.opentelemetry.io/collector/extension/ballastextension"
 	"go.opentelemetry.io/collector/extension/zpagesextension"
 	"go.opentelemetry.io/collector/processor/batchprocessor"
+	"go.uber.org/fx"
 	"go.uber.org/multierr"
 )
+
+// ControllerOTELComponentAnnotate provides fx options for ControllerOTELComponents.
+func ControllerOTELComponentAnnotate() fx.Option {
+	options := fx.Provide(otelcollector.NewOtelConfig)
+	return fx.Options(options,
+		fx.Provide(
+			fx.Annotate(provideController, fx.ResultTags(otelcollector.BaseFxTag)),
+		),
+	)
+}
 
 // ControllerOTELComponents constructs OTEL Collector Factories for Controller.
 func ControllerOTELComponents() (component.Factories, error) {
@@ -53,4 +65,9 @@ func ControllerOTELComponents() (component.Factories, error) {
 	}
 
 	return factories, errs
+}
+
+func provideController(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
+	otelcollector.AddControllerMetricsPipeline(cfg)
+	return cfg.Config
 }
