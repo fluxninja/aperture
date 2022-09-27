@@ -586,11 +586,6 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/metrics
   MultiJobConfig:
     properties:
-      always_healthy:
-        description: Sets whether the job is always passing
-        type: boolean
-        x-go-default: "false"
-        x-go-name: AlwaysHealthy
       execution_period:
         description: Time period between job executions. Zero or negative value means
           that the job will never execute periodically.

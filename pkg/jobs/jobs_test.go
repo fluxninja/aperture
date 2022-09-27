@@ -190,7 +190,7 @@ func TestMultiJobRun(t *testing.T) {
 	var counter int32
 	var counter2 int32
 	jobConfig.InitialDelay = config.MakeDuration(0)
-	multiJob := NewMultiJob("multi-job", false, jobGroup.GetStatusRegistry(), jws, gws)
+	multiJob := NewMultiJob("multi-job", jobGroup.GetStatusRegistry(), jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
@@ -291,8 +291,8 @@ func TestMultipleMultiJobs(t *testing.T) {
 	var counter int32
 	var counter2 int32
 	var counter3 int32
-	multiJob := NewMultiJob("multiJob1", false, jobGroup.GetStatusRegistry(), jws, gws)
-	multiJob2 := NewMultiJob("multiJob2", false, jobGroup.GetStatusRegistry(), jws, gws)
+	multiJob := NewMultiJob("multiJob1", jobGroup.GetStatusRegistry(), jws, gws)
+	multiJob2 := NewMultiJob("multiJob2", jobGroup.GetStatusRegistry(), jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",

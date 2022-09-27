@@ -2,7 +2,6 @@ package jobs
 
 import (
 	"context"
-	"errors"
 	"sync"
 
 	"go.uber.org/fx"
@@ -18,17 +17,15 @@ import (
 // swagger:model
 type MultiJobConfig struct {
 	JobConfig
-	// Sets whether the job is always passing
-	AlwaysHealthy bool `json:"always_healthy" default:"false"`
 }
 
 // MultiJobConstructor holds fields to create annotated instance of MultiJob.
 type MultiJobConstructor struct {
+	DefaultConfig MultiJobConfig
 	Name          string
 	JobGroupName  string
 	JWS           JobWatchers
 	GWS           GroupWatchers
-	DefaultConfig MultiJobConfig
 }
 
 // Annotate provides annotated instance of MultiJob.
@@ -73,7 +70,7 @@ func (mjc MultiJobConstructor) provideMultiJob(
 	}
 
 	// Create a new MultiJob instance
-	mj := NewMultiJob(mjc.Name, config.AlwaysHealthy, jg.GetStatusRegistry(), jwAll, gwAll)
+	mj := NewMultiJob(mjc.Name, jg.GetStatusRegistry(), jwAll, gwAll)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -99,21 +96,19 @@ func (mjc MultiJobConstructor) provideMultiJob(
 type MultiJob struct {
 	gt *groupTracker
 	JobBase
-	alwaysHealthy bool // Always marks the jobs as healthy even when Jobs fail.
 }
 
 // Make sure MultiJob complies with Job interface.
 var _ Job = (*MultiJob)(nil)
 
 // NewMultiJob creates a new instance of MultiJob.
-func NewMultiJob(name string, alwaysHealthy bool, registry status.Registry, jws JobWatchers, gws GroupWatchers) *MultiJob {
+func NewMultiJob(name string, registry status.Registry, jws JobWatchers, gws GroupWatchers) *MultiJob {
 	return &MultiJob{
 		JobBase: JobBase{
 			JobName: name,
 			JWS:     jws,
 		},
-		alwaysHealthy: alwaysHealthy,
-		gt:            newGroupTracker(gws, registry.Child(name)),
+		gt: newGroupTracker(gws, registry.Child(name)),
 	}
 }
 
@@ -146,16 +141,8 @@ func (mj *MultiJob) Execute(ctx context.Context) (proto.Message, error) {
 	// wait for results
 	wg.Wait()
 
-	results, healthy := mj.gt.results()
-
-	var err error
-	if healthy || mj.alwaysHealthy {
-		err = nil
-	} else {
-		err = errors.New("one or more jobs are unhealthy")
-	}
-
-	return results, err
+	// nothing to report at the multijob level
+	return nil, nil
 }
 
 // RegisterJob registers a job with the MultiJob.
