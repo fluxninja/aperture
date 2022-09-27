@@ -82,7 +82,7 @@ var _ = Describe("Dataplane Engine", func() {
 			err := engine.RegisterConcurrencyLimiter(mockLimiter)
 			err2 := engine.RegisterConcurrencyLimiter(mockLimiter)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(err2).NotTo(HaveOccurred())
+			Expect(err2).To(HaveOccurred())
 		})
 
 		It("Unregisters not registered scheduler actuator", func() {

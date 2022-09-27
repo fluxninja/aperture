@@ -10,7 +10,6 @@ import (
 // Config holds configuration for the metrics processor.
 type Config struct {
 	promRegistry             *prometheus.Registry
-	metricsAPI               iface.ResponseMetricsAPI
 	engine                   iface.Engine
 	config.ProcessorSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct
 }
