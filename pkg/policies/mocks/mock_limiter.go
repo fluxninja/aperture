@@ -11,6 +11,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	gomock "github.com/golang/mock/gomock"
+	prometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 // MockLimiter is a mock of Limiter interface.
@@ -34,6 +35,20 @@ func NewMockLimiter(ctrl *gomock.Controller) *MockLimiter {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockLimiter) EXPECT() *MockLimiterMockRecorder {
 	return m.recorder
+}
+
+// GetHistogram mocks base method.
+func (m *MockLimiter) GetHistogram(labels map[string]string) prometheus.Observer {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetHistogram", labels)
+	ret0, _ := ret[0].(prometheus.Observer)
+	return ret0
+}
+
+// GetHistogram indicates an expected call of GetHistogram.
+func (mr *MockLimiterMockRecorder) GetHistogram(labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockLimiter)(nil).GetHistogram), labels)
 }
 
 // GetLimiterID mocks base method.
