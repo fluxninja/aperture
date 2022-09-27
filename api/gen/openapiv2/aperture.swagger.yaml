@@ -2167,14 +2167,14 @@ definitions:
       service_selector:
         $ref: '#/definitions/v1ServiceSelector'
         x-go-validate: required
+    description: |-
+      :::info
+      See also [Selector overview](/concepts/flow-control/selector.md).
+      :::
     title: |-
       Describes which flow in which service a [dataplane
-      // component](/concepts/flow-control/flow-control.md#components) should apply
-      // to
-      //
-      // :::info
-      // See also [Selector overview](/concepts/flow-control/selector.md).
-      // :::
+      component](/concepts/flow-control/flow-control.md#components) should apply
+      to
   v1Service:
     type: object
     properties:
