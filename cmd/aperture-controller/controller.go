@@ -28,7 +28,6 @@ func main() {
 		controller.ModuleForControllerOTEL(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			controller.ControllerOTELComponents,
 		),
 		otelcollector.Module(),
 		controlplane.Module(),

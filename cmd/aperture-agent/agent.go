@@ -41,7 +41,6 @@ func main() {
 		fx.Provide(
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
-			agent.AgentOTELComponents,
 			agent.ProvidePeersPrefix,
 		),
 		fx.Invoke(

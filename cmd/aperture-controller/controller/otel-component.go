@@ -26,6 +26,7 @@ func ModuleForControllerOTEL() fx.Option {
 				provideController,
 				fx.ResultTags(otelcollector.BaseFxTag),
 			),
+			ControllerOTELComponents,
 		),
 	)
 }

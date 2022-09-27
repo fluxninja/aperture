@@ -40,6 +40,7 @@ func ModuleForAgentOTEL() fx.Option {
 				provideAgent,
 				fx.ResultTags(otelcollector.BaseFxTag),
 			),
+			AgentOTELComponents,
 		),
 	)
 }
