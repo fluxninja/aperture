@@ -100,8 +100,9 @@ func (jgc JobGroupConstructor) provideJobGroup(
 		gwAll = append(gwAll, jgc.GW...)
 		gwAll = append(gwAll, gw...)
 	}
+	reg := registry.Child(jgc.Name)
 
-	jg, err := NewJobGroup(registry.Child(jgc.Name), config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
+	jg, err := NewJobGroup(reg, config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
 	if err != nil {
 		return nil, err
 	}
@@ -111,6 +112,7 @@ func (jgc JobGroupConstructor) provideJobGroup(
 			return jg.Start()
 		},
 		OnStop: func(_ context.Context) error {
+			defer reg.Detach()
 			return jg.Stop()
 		},
 	})
@@ -123,8 +125,9 @@ var errInitialResult = errors.New("job hasn't been scheduled yet")
 // JobGroup tracks a group of jobs.
 // It is responsible for scheduling jobs and keeping track of their statuses.
 type JobGroup struct {
-	scheduler *gocron.Scheduler
-	gt        *groupTracker
+	scheduler        *gocron.Scheduler
+	gt               *groupTracker
+	livenessRegistry status.Registry
 }
 
 // NewJobGroup creates a new JobGroup.
@@ -157,6 +160,10 @@ func NewJobGroup(
 
 // Start starts the JobGroup.
 func (jg *JobGroup) Start() error {
+	jg.livenessRegistry = jg.gt.statusRegistry.Root().
+		Child("liveness").
+		Child("job_groups").
+		Child(jg.gt.statusRegistry.Key())
 	jg.scheduler.StartAsync()
 	return nil
 }
@@ -165,6 +172,7 @@ func (jg *JobGroup) Start() error {
 func (jg *JobGroup) Stop() error {
 	jg.DeregisterAll()
 	jg.scheduler.Stop()
+	jg.livenessRegistry.Detach()
 	return nil
 }
 
@@ -177,7 +185,7 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 		initialErr = errInitialResult
 	}
 
-	executor := newJobExecutor(job, jg, config)
+	executor := newJobExecutor(job, jg, config, jg.livenessRegistry)
 	// add to the tracker
 	err := jg.gt.registerJob(executor)
 	if err != nil {

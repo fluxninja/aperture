@@ -140,6 +140,7 @@ func setupRateLimiterFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
+			reg.Detach()
 			return merr
 		},
 	})
