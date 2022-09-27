@@ -61,14 +61,14 @@ func request_StatusService_GetGroupStatus_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["keys"]
+	val, ok = pathParams["path"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "keys")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "path")
 	}
 
-	protoReq.Keys, err = runtime.StringSlice(val, ",")
+	protoReq.Path, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "keys", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "path", err)
 	}
 
 	msg, err := client.GetGroupStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -87,14 +87,14 @@ func local_request_StatusService_GetGroupStatus_0(ctx context.Context, marshaler
 		_   = err
 	)
 
-	val, ok = pathParams["keys"]
+	val, ok = pathParams["path"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "keys")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "path")
 	}
 
-	protoReq.Keys, err = runtime.StringSlice(val, ",")
+	protoReq.Path, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "keys", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "path", err)
 	}
 
 	msg, err := server.GetGroupStatus(ctx, &protoReq)
@@ -141,7 +141,7 @@ func RegisterStatusServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.status.v1.StatusService/GetGroupStatus", runtime.WithHTTPPathPattern("/v1/status/{keys}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.common.status.v1.StatusService/GetGroupStatus", runtime.WithHTTPPathPattern("/v1/status/{path}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -227,7 +227,7 @@ func RegisterStatusServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.status.v1.StatusService/GetGroupStatus", runtime.WithHTTPPathPattern("/v1/status/{keys}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.common.status.v1.StatusService/GetGroupStatus", runtime.WithHTTPPathPattern("/v1/status/{path}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -249,7 +249,7 @@ func RegisterStatusServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 var (
 	pattern_StatusService_GetStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "status"}, ""))
 
-	pattern_StatusService_GetGroupStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "status", "keys"}, ""))
+	pattern_StatusService_GetGroupStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "status", "path"}, ""))
 )
 
 var (

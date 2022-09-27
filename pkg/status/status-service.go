@@ -2,6 +2,7 @@ package status
 
 import (
 	"context"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -26,10 +27,13 @@ func RegisterStatusService(server *grpc.Server, reg Registry) {
 
 // GetGroupStatus returns the group status for the requested group in the Registry.
 func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.GroupStatusRequest) (*statusv1.GroupStatus, error) {
-	log.Trace().Interface("keys", req.Keys).Msg("Received request on GetGroupStatus handler")
+	log.Trace().Interface("keys", req.Path).Msg("Received request on GetGroupStatus handler")
+
+	// extract keys from the path, separated by /
+	keys := strings.Split(req.Path, "/")
 
 	registry := svc.registry
-	for _, key := range req.Keys {
+	for _, key := range keys {
 		if key == "" {
 			continue
 		}

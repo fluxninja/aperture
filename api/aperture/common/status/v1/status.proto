@@ -20,7 +20,7 @@ service StatusService {
   }
   rpc GetGroupStatus(GroupStatusRequest) returns (GroupStatus) {
     option (google.api.http) = {
-      get: "/v1/status/{keys}"
+      get: "/v1/status/{path}"
     };
   }
 }
@@ -30,7 +30,7 @@ service StatusService {
 //
 
 message GroupStatusRequest {
-  repeated string keys = 1;
+  string path = 1;
 }
 
 //
