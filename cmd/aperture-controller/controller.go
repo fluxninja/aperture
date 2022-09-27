@@ -25,7 +25,7 @@ import (
 func main() {
 	app := platform.New(
 		platform.Config{}.Module(),
-		controller.ControllerOTELComponentAnnotate(),
+		controller.ModuleForControllerOTEL(),
 		fx.Provide(
 			clockwork.NewRealClock,
 			controller.ControllerOTELComponents,

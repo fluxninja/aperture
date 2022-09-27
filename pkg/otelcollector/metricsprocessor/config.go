@@ -1,9 +1,10 @@
 package metricsprocessor
 
 import (
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/config"
+
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
 
 // Config holds configuration for the metrics processor.

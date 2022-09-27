@@ -17,8 +17,8 @@ import (
 	"go.uber.org/multierr"
 )
 
-// ControllerOTELComponentAnnotate provides fx options for ControllerOTELComponents.
-func ControllerOTELComponentAnnotate() fx.Option {
+// ModuleForControllerOTEL provides fx options for ControllerOTELComponents.
+func ModuleForControllerOTEL() fx.Option {
 	options := fx.Provide(otelcollector.NewOtelConfig)
 	return fx.Options(options,
 		fx.Provide(

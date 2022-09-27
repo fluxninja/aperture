@@ -36,7 +36,7 @@ func main() {
 		notifiers.TrackersConstructor{Name: "entity_trackers"}.Annotate(),
 		prometheus.Module(),
 		k8s.Module(),
-		agent.AgentOTELComponentAnnotate(),
+		agent.ModuleForAgentOTEL(),
 		peers.Constructor{}.Module(),
 		fx.Provide(
 			agentinfo.ProvideAgentInfo,

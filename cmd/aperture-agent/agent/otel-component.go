@@ -31,8 +31,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-// AgentOTELComponentAnnotate provides fx options for AgentOTELComponent.
-func AgentOTELComponentAnnotate() fx.Option {
+// ModuleForAgentOTEL provides fx options for AgentOTELComponent.
+func ModuleForAgentOTEL() fx.Option {
 	options := fx.Provide(otelcollector.NewOtelConfig)
 	return fx.Options(options,
 		fx.Provide(
