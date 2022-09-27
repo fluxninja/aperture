@@ -279,7 +279,7 @@ jobs:
             export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
-            pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
+            pip install 'git+ssh://git@github.com/fluxninja/cloud@aperture-java-secrets#egg=opsninja&subdirectory=ops/apps/opsninja/'
       - run:
           name: set GOMAXPROCS to 4
           command: |
@@ -375,14 +375,6 @@ jobs:
           cache_name: pre-commit
           tools: |-
             buf
-      - run:
-          name: Generate Java stubs from protobuf files
-          command:
-            buf generate --template '{"version":"v1", "managed":{"enabled":true,
-            "java_package_prefix":"com.fluxninja.aperture"},
-            "plugins":[{"remote":"buf.build/protocolbuffers/plugins/java:v21.6.0-1",
-            "out":"."}]}' --path api/aperture/flowcontrol/v1/flowcontrol.proto
-            --include-imports
       - run:
           name: << parameters.task-name >>
           command: |
