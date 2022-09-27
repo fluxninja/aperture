@@ -10,6 +10,7 @@ import (
 	"runtime/debug"
 
 	"github.com/elastic/gosigar"
+	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
@@ -100,7 +101,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config WatchdogConfig) *watchdog {
 	heapStatusRegistry := registry.Child("heap")
 
-	job := jobs.NewMultiJob(watchdogJobName, true, nil, nil)
+	job := jobs.NewMultiJob(watchdogJobName, jobGroup.GetStatusRegistry(), nil, nil)
 
 	w := &watchdog{
 		heapStatusRegistry: heapStatusRegistry,
@@ -177,7 +178,10 @@ func (w *watchdog) start() error {
 				w.jobGroup.TriggerJob(watchdogJobName)
 				if hp != nil {
 					details, e := hp.checkHeap()
-					w.heapStatusRegistry.SetStatus(status.NewStatus(details, e))
+					if e != nil {
+						log.Sample(zerolog.Rarely).Error().Err(e).Msg("Heap check failed")
+					}
+					w.heapStatusRegistry.SetStatus(status.NewStatus(details, nil))
 				}
 			case <-w.sentinel.ctx.Done():
 				return
@@ -262,7 +266,11 @@ type systemWatermarks struct {
 // Check evaluates the system memory usage and runs GC at configured watermarks of memory utilization.
 func (policy *systemWatermarks) Check(ctx context.Context) (proto.Message, error) {
 	log.Debug().Msg("System watermarks check triggered")
-	return check(policy, ctx, systemUsage)
+	msg, err := check(policy, ctx, systemUsage)
+	if err != nil {
+		log.Sample(zerolog.Rarely).Error().Err(err).Msg("System watermarks check failed")
+	}
+	return msg, nil
 }
 
 type systemAdaptive struct {
@@ -272,7 +280,11 @@ type systemAdaptive struct {
 // Check evaluates the system memory usage and runs GC at configured adaptive thresholds of memory utilization.
 func (policy *systemAdaptive) Check(ctx context.Context) (proto.Message, error) {
 	log.Debug().Msg("System adaptive check triggered")
-	return check(policy, ctx, systemUsage)
+	msg, err := check(policy, ctx, systemUsage)
+	if err != nil {
+		log.Sample(zerolog.Rarely).Error().Err(err).Msg("System adaptive check failed")
+	}
+	return msg, nil
 }
 
 // Heap Policy.

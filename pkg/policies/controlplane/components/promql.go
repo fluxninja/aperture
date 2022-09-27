@@ -70,7 +70,7 @@ func PromQLModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 		jws = append(jws, pje)
 
 		// Create promMultiJob for this circuit
-		promMultiJob := jobs.NewMultiJob(circuitAPI.GetPolicyName(), false, jws, nil)
+		promMultiJob := jobs.NewMultiJob(circuitAPI.GetPolicyName(), promQLJobGroup.GetStatusRegistry(), jws, nil)
 		pje.promMultiJob = promMultiJob
 
 		initialDelay := config.MakeDuration(-1)
