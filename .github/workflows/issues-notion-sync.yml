@@ -24,6 +24,15 @@ jobs:
       - uses: mktcode/consecutive-workflow-action@7e955aee180a0e1a4e7d44c58eed3ff29abfbbad
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Send slack notification
+        uses: rtCamp/action-slack-notify@v2.2.0
+        if: ${{ failure() }}
+        env:
+          SLACK_MESSAGE: |
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Issue: ${{ github.event.issue.html_url }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_NOTION_SYNC_FAILURE }}
 
   notion_job:
     runs-on: ubuntu-latest
@@ -35,3 +44,12 @@ jobs:
         with:
           notion-token: ${{ secrets.NOTION_TOKEN }}
           notion-db: ${{ secrets.NOTION_DATABASE }}
+      - name: Send slack notification
+        uses: rtCamp/action-slack-notify@v2.2.0
+        if: ${{ failure() }}
+        env:
+          SLACK_MESSAGE: |
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Issue: ${{ github.event.issue.html_url }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_NOTION_SYNC_FAILURE }}
