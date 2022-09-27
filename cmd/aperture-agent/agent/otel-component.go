@@ -33,10 +33,13 @@ import (
 
 // ModuleForAgentOTEL provides fx options for AgentOTELComponent.
 func ModuleForAgentOTEL() fx.Option {
-	options := fx.Provide(otelcollector.NewOtelConfig)
-	return fx.Options(options,
+	return fx.Options(
 		fx.Provide(
-			fx.Annotate(provideAgent, fx.ResultTags(otelcollector.BaseFxTag)),
+			otelcollector.NewOtelConfig,
+			fx.Annotate(
+				provideAgent,
+				fx.ResultTags(otelcollector.BaseFxTag),
+			),
 		),
 	)
 }

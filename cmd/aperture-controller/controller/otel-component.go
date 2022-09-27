@@ -19,10 +19,13 @@ import (
 
 // ModuleForControllerOTEL provides fx options for ControllerOTELComponents.
 func ModuleForControllerOTEL() fx.Option {
-	options := fx.Provide(otelcollector.NewOtelConfig)
-	return fx.Options(options,
+	return fx.Options(
 		fx.Provide(
-			fx.Annotate(provideController, fx.ResultTags(otelcollector.BaseFxTag)),
+			otelcollector.NewOtelConfig,
+			fx.Annotate(
+				provideController,
+				fx.ResultTags(otelcollector.BaseFxTag),
+			),
 		),
 	)
 }
