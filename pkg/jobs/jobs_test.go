@@ -106,7 +106,7 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 		if val != groupConfigExpectdScheduling {
 			t.Errorf("Expected scheduling to be %v, got %v", groupConfigExpectdScheduling, val)
 		}
-		checkStatus(t, job.Name(), groupConfigExpectdScheduling)
+		checkStatusBeforeDeregister(t, []string{job.Name()}, groupConfigExpectdScheduling)
 	}
 	if len(groupConfig.jobs) > 1 {
 		jobGroup.DeregisterAll()
@@ -116,14 +116,23 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 	}
 }
 
-func checkStatus(t *testing.T, name string, expectedScheduling bool) {
-	jobRegistry := registry.ChildIfExists(name)
-	require.NotNil(t, jobRegistry)
-	require.Equal(t, jobRegistry.Key(), name)
-	if expectedScheduling {
-		require.False(t, jobRegistry.HasError())
-	} else {
-		require.True(t, jobRegistry.HasError())
+func checkStatusBeforeDeregister(t *testing.T, names []string, expectedScheduling bool) {
+	for _, name := range names {
+		jobRegistry := registry.ChildIfExists(name)
+		require.NotNil(t, jobRegistry)
+		require.Equal(t, jobRegistry.Key(), name)
+		if expectedScheduling {
+			require.False(t, jobRegistry.HasError())
+		} else {
+			require.True(t, jobRegistry.HasError())
+		}
+	}
+}
+
+func checkStatusAfterDeregister(t *testing.T, names []string) {
+	for _, name := range names {
+		jobRegistry := registry.ChildIfExists(name)
+		require.Nil(t, jobRegistry)
 	}
 }
 
@@ -162,6 +171,7 @@ func TestInstantRunJob(t *testing.T) {
 
 	runTest(t, groupConfig)
 	checkResults(t, counter, int32(2))
+	checkStatusAfterDeregister(t, []string{job.JobName})
 }
 
 // TestTimeoutJob tests the liveness of the job, when the job is stuck.
@@ -195,6 +205,7 @@ func TestTimeoutJob(t *testing.T) {
 	}
 	runTest(t, groupConfig)
 	checkResults(t, counter, int32(0))
+	checkStatusAfterDeregister(t, []string{job.JobName})
 }
 
 // TestMultiJobRun tests the scheduling of a multi-job containing a basic job.
@@ -250,6 +261,7 @@ func TestMultiJobRun(t *testing.T) {
 	err = multiJob.DeregisterJob(job.Name())
 	require.NoError(t, err)
 	multiJob.DeregisterAll()
+	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName})
 }
 
 // TestMultipleBasicJobs tests the scheduling and parallel run of multiple basic jobs.
@@ -296,6 +308,7 @@ func TestMultipleBasicJobs(t *testing.T) {
 	runTest(t, groupConfig)
 	checkResults(t, counter, int32(2))
 	checkResults(t, counter2, int32(10))
+	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName})
 }
 
 // TestMultipleMultiJobs tests the scheduling and parallel run of multiple multi-jobs containing multiple basic jobs.
@@ -365,6 +378,7 @@ func TestMultipleMultiJobs(t *testing.T) {
 	checkResults(t, counter, int32(2))
 	checkResults(t, counter2, int32(10))
 	checkResults(t, counter3, int32(20))
+	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName, job3.JobName})
 }
 
 // TestSameJobTwice returns error when scheduling job with same name.
@@ -387,17 +401,16 @@ func TestSameJobTwiceAndSchedulingErrors(t *testing.T) {
 	job2 := job
 	err = jobGroup.RegisterJob(job, jobConfig)
 	require.NoError(t, err)
-	checkStatus(t, job.JobName, false)
 
 	err = jobGroup.RegisterJob(job2, jobConfig)
 	require.Error(t, err)
-	checkStatus(t, job2.JobName, false)
+	checkStatusBeforeDeregister(t, []string{job.JobName, job2.JobName}, false)
 
 	jobGroup.DeregisterAll()
+	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName})
 	// error when registering job multiple times, written here to achieve more coverage
 	err = jobGroup.DeregisterJob(job.Name())
 	require.Errorf(t, err, "Expected error when deregistering job multiple times")
-
 	require.Empty(t, jobGroup.JobInfo(job.Name()), "Expected error when getting job info, because job was already deregistered")
 }
 
@@ -412,6 +425,7 @@ func TestEmptyJobFunc(t *testing.T) {
 	if err == nil {
 		t.Log("Expected log message when registering job with nil job func")
 	}
-	checkStatus(t, job.JobName, false)
+	checkStatusBeforeDeregister(t, []string{job.JobName}, false)
 	jobGroup.DeregisterAll()
+	checkStatusAfterDeregister(t, []string{job.JobName})
 }
