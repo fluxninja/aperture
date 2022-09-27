@@ -1663,15 +1663,15 @@ definitions:
         x-order: 1
         $ref: '#/definitions/v1Port'
   v1Selector:
+    description: |-
+      :::info
+      See also [Selector overview](/concepts/flow-control/selector.md).
+      :::
     type: object
     title: |-
       Describes which flow in which service a [dataplane
-      // component](/concepts/flow-control/flow-control.md#components) should apply
-      // to
-      //
-      // :::info
-      // See also [Selector overview](/concepts/flow-control/selector.md).
-      // :::
+      component](/concepts/flow-control/flow-control.md#components) should apply
+      to
     properties:
       flow_selector:
         x-go-validate: required
