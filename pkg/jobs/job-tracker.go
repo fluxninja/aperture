@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"errors"
+	"runtime"
 	"sync"
 	"time"
 
@@ -39,11 +40,18 @@ type groupTracker struct {
 }
 
 func newGroupTracker(gws GroupWatchers, statusRegistry status.Registry) *groupTracker {
-	return &groupTracker{
+	gt := &groupTracker{
 		trackers:       make(map[string]*jobTracker),
 		statusRegistry: statusRegistry,
 		groupWatchers:  gws,
 	}
+
+	// detach the status registry from the parent
+	runtime.SetFinalizer(gt, func(gt *groupTracker) {
+		gt.statusRegistry.Detach()
+	})
+
+	return gt
 }
 
 func (gt *groupTracker) updateStatus(job Job, s *statusv1.Status) error {
