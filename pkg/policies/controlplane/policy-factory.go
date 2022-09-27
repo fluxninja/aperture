@@ -89,6 +89,7 @@ func setupPolicyFxDriver(
 			return nil
 		},
 		OnStop: func(context.Context) error {
+			defer policiesStatusRegistry.Detach()
 			err := factory.circuitJobGroup.Stop()
 			if err != nil {
 				return err

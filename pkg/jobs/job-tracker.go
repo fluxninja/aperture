@@ -3,7 +3,6 @@ package jobs
 import (
 	"context"
 	"errors"
-	"runtime"
 	"sync"
 	"time"
 
@@ -45,11 +44,6 @@ func newGroupTracker(gws GroupWatchers, statusRegistry status.Registry) *groupTr
 		statusRegistry: statusRegistry,
 		groupWatchers:  gws,
 	}
-
-	// detach the status registry from the parent
-	runtime.SetFinalizer(gt, func(gt *groupTracker) {
-		gt.statusRegistry.Detach()
-	})
 
 	return gt
 }
