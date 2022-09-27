@@ -113,7 +113,7 @@ func NewMultiJob(name string, alwaysHealthy bool, registry status.Registry, jws 
 			JWS:     jws,
 		},
 		alwaysHealthy: alwaysHealthy,
-		gt:            newGroupTracker(gws, registry),
+		gt:            newGroupTracker(gws, registry.Child(name)),
 	}
 }
 
