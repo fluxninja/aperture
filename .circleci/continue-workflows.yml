@@ -506,7 +506,7 @@ workflows:
     when:
       and:
         - << pipeline.parameters.updated-api-flowcontrol >>
-        - equal: [main, << pipeline.git.branch >>]
+        # - equal: [main, << pipeline.git.branch >>]
     jobs:
       - gen-push-java-stubs
 
