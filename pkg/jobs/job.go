@@ -142,7 +142,7 @@ func (executor *jobExecutor) doJob() {
 		}()
 		_, err := executor.jg.gt.execute(ctx, executor)
 		if err != nil {
-			executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("job", executor.Name()).Msg("job execution failed")
+			executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("job", executor.Name()).Msg("job status unhealthy")
 			return
 		}
 	})

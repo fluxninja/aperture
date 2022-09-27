@@ -258,7 +258,7 @@ func (jg *JobGroup) Results() (*statusv1.GroupStatus, bool) {
 	return jg.gt.results()
 }
 
-// GetRegistry returns the registry of the JobGroup.
-func (jg *JobGroup) GetRegistry() status.Registry {
+// GetStatusRegistry returns the registry of the JobGroup.
+func (jg *JobGroup) GetStatusRegistry() status.Registry {
 	return jg.gt.statusRegistry
 }
