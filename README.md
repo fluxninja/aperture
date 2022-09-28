@@ -100,7 +100,3 @@ template to create an issue. Make sure to explain the problem you are trying to
 solve and what is the expected behavior.
 
 To contribute code, please read the [Contribution guide](CONTRIBUTING.md).
-
-## 📄 License Compliance
-
-[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B33466%2Fgit%40github.com%3Afluxninja%2Faperture.git.svg?type=large)](https://app.fossa.com/projects/custom%2B33466%2Fgit%40github.com%3Afluxninja%2Faperture.git?ref=badge_large)

@@ -234,10 +234,6 @@ jobs:
           fingerprints:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
             - "75:2f:7a:fe:d3:a1:5e:81:a8:d2:cc:3a:21:59:b7:2c" # fluxninja/aperture-libsonnet R/O
-      - run:
-          name: Download FOSSA
-          command: |
-            curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash
       - checkout
       - asdf_install:
           cache_name: pre-commit
@@ -344,10 +340,6 @@ jobs:
             git add .
             git diff --cached --exit-code
           when: always
-      - run:
-          name: FOSSA Analyze
-          command: fossa analyze
-          working_directory: .
 
   publish-aperture-docs:
     executor: python-cimg-executor
