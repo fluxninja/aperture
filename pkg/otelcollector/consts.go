@@ -52,6 +52,8 @@ const (
 	ApertureFlowLabelKeysLabel = "aperture.flow_label_keys"
 	// ApertureClassifiersLabel describes classifiers matched to the traffic.
 	ApertureClassifiersLabel = "aperture.classifiers"
+	// ApertureClassifierErrorsLabel describes encountered classifier errors for specified policy.
+	ApertureClassifierErrorsLabel = "aperture.classifier_errors"
 
 	/* HTTP Specific labels. */
 

@@ -1,6 +1,7 @@
 package metricsprocessor
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/golang/mock/gomock"
@@ -112,6 +113,7 @@ var _ = Describe("Metrics Processor", func() {
 						PolicyName:      "foo",
 						PolicyHash:      "foo-hash",
 						ClassifierIndex: 1,
+						Error:           flowcontrolv1.ClassifierInfo_ERROR_EMPTY_RESULTSET,
 					},
 				},
 				FluxMeterInfos: []*flowcontrolv1.FluxMeterInfo{
@@ -130,10 +132,14 @@ var _ = Describe("Metrics Processor", func() {
 			workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 			`,
 			map[string]interface{}{
-				otelcollector.ApertureDecisionTypeLabel:                flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
-				otelcollector.ApertureErrorLabel:                       flowcontrolv1.CheckResponse_ERROR_NONE.String(),
-				otelcollector.ApertureRejectReasonLabel:                flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
-				otelcollector.ApertureClassifiersLabel:                 []interface{}{"policy_name:foo,classifier_index:1"},
+				otelcollector.ApertureDecisionTypeLabel: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+				otelcollector.ApertureErrorLabel:        flowcontrolv1.CheckResponse_ERROR_NONE.String(),
+				otelcollector.ApertureRejectReasonLabel: flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
+				otelcollector.ApertureClassifiersLabel:  []interface{}{"policy_name:foo,classifier_index:1"},
+
+				otelcollector.ApertureClassifierErrorsLabel: []interface{}{fmt.Sprintf("%s,policy_name:foo,classifier_index:1,policy_hash:foo-hash",
+					flowcontrolv1.ClassifierInfo_ERROR_EMPTY_RESULTSET.String())},
+
 				otelcollector.ApertureFluxMetersLabel:                  []interface{}{"bar"},
 				otelcollector.ApertureFlowLabelKeysLabel:               []interface{}{"someLabel"},
 				otelcollector.ApertureRateLimitersLabel:                []interface{}{},
