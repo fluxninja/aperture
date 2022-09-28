@@ -320,7 +320,7 @@ def render_jsonnet_definition(definition: JsonnetDefinition) -> str:
     return template.render(definition=definition)
 
 
-def render_main_libsonnet(custom_patches: Iterable[Path]) -> str:
+def render_aperture_libsonnet(custom_patches: Iterable[Path]) -> str:
     import_str = "(import 'gen.libsonnet')"
     # sort custom_patches by name
     custom_patches = sorted(custom_patches, key=lambda p: p.name)
@@ -363,9 +363,9 @@ def main(output_dir: Path = typer.Option(..., help="Output path for the generate
     custom_patches_basedir = output_dir / "custom"
     custom_patches = [path.relative_to(output_dir) for path in custom_patches_basedir.glob("*.libsonnet")]
 
-    main_libsonnet_path = output_dir / "main.libsonnet"
-    main_libsonnet_data = render_main_libsonnet(custom_patches)
-    main_libsonnet_path.write_text(main_libsonnet_data)
+    aperture_libsonnet_path = output_dir / "aperture.libsonnet"
+    aperture_libsonnet_data = render_aperture_libsonnet(custom_patches)
+    aperture_libsonnet_path.write_text(aperture_libsonnet_data)
 
     gen_libsonnet_path = output_dir / "gen.libsonnet"
     imports = [("v1", Path("_gen/v1/gen.libsonnet"))]

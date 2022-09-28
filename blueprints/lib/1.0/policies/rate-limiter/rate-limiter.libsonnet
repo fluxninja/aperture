@@ -1,4 +1,4 @@
-local aperture = import '../../../libsonnet/1.0/main.libsonnet';
+local aperture = import '../../aperture.libsonnet';
 
 // A set of defaults used by the policy that can be overridden when instantiating it
 local defaults = {

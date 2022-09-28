@@ -1,6 +1,8 @@
-local latencyGradientPolicy = import '../../../../blueprints/lib/1.0/policies/latency-gradient.libsonnet';
-local aperture = import '../../../../blueprints/libsonnet/1.0/main.libsonnet';
+local aperture = import '../../../../blueprints/lib/1.0/main.libsonnet';
+
 local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
+
+local latencyGradientPolicy = aperture.blueprints.policies.LatencyGradient;
 
 local WorkloadParameters = aperture.v1.SchedulerWorkloadParameters;
 local LabelMatcher = aperture.v1.LabelMatcher;

@@ -1,5 +1,4 @@
-local aperture = import '../../../libsonnet/1.0/main.libsonnet';
-
+local aperture = import '../../aperture.libsonnet';
 
 local defaults = {
   policyName: error 'policyName must be set',

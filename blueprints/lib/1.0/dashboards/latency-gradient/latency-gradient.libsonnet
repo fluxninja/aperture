@@ -1,4 +1,4 @@
-local aperture = import '../grafana/aperture.libsonnet';
+local lib = import '../../grafana/grafana.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
 local dashboard = grafana.dashboard;
@@ -10,7 +10,7 @@ local tablePanel = grafana.tablePanel;
 local barGaugePanel = grafana.barGaugePanel;
 local statPanel = grafana.statPanel;
 local annotation = grafana.annotation;
-local timeSeriesPanel = aperture.timeSeriesPanel;
+local timeSeriesPanel = lib.TimeSeriesPanel;
 
 local defaults = {
   policyName: error 'policyName must be set',
