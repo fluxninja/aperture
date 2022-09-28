@@ -122,8 +122,7 @@ is not validated but should be one of:
 - string
 - number
 - boolean
-- aperture libsonnet type (e.g.
-  `[]aperture.v1.SchedulerWorkloadAndLabelMatcher`)
+- aperture libsonnet type (e.g. `[]aperture.spec.v1.SchedulerWorkload`)
 
 It's not used for anything else currently, but keeping it consistent is a win
 for users.
