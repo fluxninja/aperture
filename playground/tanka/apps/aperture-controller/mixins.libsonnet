@@ -1,20 +1,22 @@
-local latencyGradientPolicy = import '../../../../blueprints/lib/1.0/policies/latency-gradient.libsonnet';
-local aperture = import '../../../../blueprints/libsonnet/1.0/main.libsonnet';
+local aperture = import '../../../../blueprints/lib/1.0/main.libsonnet';
+
 local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
 
-local WorkloadParameters = aperture.v1.SchedulerWorkloadParameters;
-local LabelMatcher = aperture.v1.LabelMatcher;
-local Workload = aperture.v1.SchedulerWorkload;
+local latencyGradientPolicy = aperture.blueprints.policies.LatencyGradient;
 
-local classifier = aperture.v1.Classifier;
-local fluxMeter = aperture.v1.FluxMeter;
-local extractor = aperture.v1.Extractor;
-local rule = aperture.v1.Rule;
-local selector = aperture.v1.Selector;
-local serviceSelector = aperture.v1.ServiceSelector;
-local flowSelector = aperture.v1.FlowSelector;
-local controlPoint = aperture.v1.ControlPoint;
-local staticBuckets = aperture.v1.FluxMeterStaticBuckets;
+local WorkloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
+local LabelMatcher = aperture.spec.v1.LabelMatcher;
+local Workload = aperture.spec.v1.SchedulerWorkload;
+
+local classifier = aperture.spec.v1.Classifier;
+local fluxMeter = aperture.spec.v1.FluxMeter;
+local extractor = aperture.spec.v1.Extractor;
+local rule = aperture.spec.v1.Rule;
+local selector = aperture.spec.v1.Selector;
+local serviceSelector = aperture.spec.v1.ServiceSelector;
+local flowSelector = aperture.spec.v1.FlowSelector;
+local controlPoint = aperture.spec.v1.ControlPoint;
+local staticBuckets = aperture.spec.v1.FluxMeterStaticBuckets;
 
 local svcSelector = selector.new()
                     + selector.withServiceSelector(

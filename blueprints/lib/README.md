@@ -71,18 +71,4 @@ make them available to the user.
 
 Custom bindings can be used to enchant the auto generated code with additional,
 more ergonomic API, that could not be generated automatically based on the
-specification. For example, `v1.Constant.new()` function is updated to accept
-`output_port` and `value` as its arguments, so that instead of:
-
-```jsonnet
-local c =
-  aperture.v1.Constant.new()
-  + aperture.v1.Constant.withValue(1.0)
-  + aperture.v1.Constant.withOutputPorts({output: outputPort});
-```
-
-one can write:
-
-```jsonnet
-local c = aperture.v1.Constant.new(1.0, outputPort);
-```
+specification.

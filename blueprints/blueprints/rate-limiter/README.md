@@ -14,7 +14,7 @@ To tweak rate limiter behaviour based on specific label values, a list of
 ```jsonnet
 local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
 
-local Override = aperture.v1.RateLimiterOverride;
+local Override = aperture.spec.v1.RateLimiterOverride;
 
 {
   policy+: {
@@ -28,14 +28,14 @@ local Override = aperture.v1.RateLimiterOverride;
 
 This allows us to prioritize some incoming requests over others.
 
-| Parameter Name              | Parameter Type                      | Default      | Description                                                 |
-| --------------------------- | ----------------------------------- | ------------ | ----------------------------------------------------------- |
-| `policy.policyName`         | `string`                            | `(required)` | An unique name for the policy created by this blueprint     |
-| `policy.evaluationInterval` | `string`                            | `"0.5s"`     | How often should the policy be re-evaluated                 |
-| `policy.rateLimit`          | `string`                            | `(required)` | How many requests per `policy.limitResetInterval` to accept |
-| `policy.limitResetInterval` | `string`                            | `"1s"`       | The window for `policy.rateLimit`                           |
-| `policy.labelKey`           | `string`                            | `(required)` | What flow label to use for rate limiting                    |
-| `policy.overrides`          | `[]aperture.v1.RateLimiterOverride` | `[]`         | A list of overrides for the rate limiter                    |
+| Parameter Name              | Parameter Type                           | Default      | Description                                                 |
+| --------------------------- | ---------------------------------------- | ------------ | ----------------------------------------------------------- |
+| `policy.policyName`         | `string`                                 | `(required)` | An unique name for the policy created by this blueprint     |
+| `policy.evaluationInterval` | `string`                                 | `"0.5s"`     | How often should the policy be re-evaluated                 |
+| `policy.rateLimit`          | `string`                                 | `(required)` | How many requests per `policy.limitResetInterval` to accept |
+| `policy.limitResetInterval` | `string`                                 | `"1s"`       | The window for `policy.rateLimit`                           |
+| `policy.labelKey`           | `string`                                 | `(required)` | What flow label to use for rate limiting                    |
+| `policy.overrides`          | `[]aperture.spec.v1.RateLimiterOverride` | `[]`         | A list of overrides for the rate limiter                    |
 
 #### Rate Limiter Lazy Sync
 
