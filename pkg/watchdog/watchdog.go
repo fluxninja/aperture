@@ -101,7 +101,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config WatchdogConfig) *watchdog {
 	heapStatusRegistry := registry.Child("heap")
 
-	job := jobs.NewMultiJob(watchdogJobName, jobGroup.GetStatusRegistry(), nil, nil)
+	job := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child(watchdogJobName), nil, nil)
 
 	w := &watchdog{
 		heapStatusRegistry: heapStatusRegistry,
