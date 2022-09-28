@@ -369,7 +369,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-            - "da:8c:82:ae:94:a2:31:d3:ea:c9:df:d7:12:ab:68:b7" # fluxninja/aperture-java R/w
+            - "14:8a:b9:90:ba:48:a4:f0:27:b0:70:d7:95:17:16:1e" # fluxninja/aperture-java R/W
       - run: *install_opsninja
       - asdf_install:
           cache_name: pre-commit
