@@ -218,21 +218,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - PolicyService
-  /v1/status:
-    get:
-      operationId: StatusService_GetStatus
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1GroupStatus'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      tags:
-        - StatusService
-  /v1/status/{keys}:
+  /v1/status/{path}:
     get:
       operationId: StatusService_GetGroupStatus
       responses:
@@ -245,14 +231,11 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
-        - name: keys
+        - name: path
           in: path
           required: true
-          type: array
-          items:
-            type: string
-          collectionFormat: csv
-          minItems: 1
+          type: string
+          pattern: .+
       tags:
         - StatusService
 definitions:

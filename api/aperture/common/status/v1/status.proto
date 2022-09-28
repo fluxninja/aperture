@@ -4,7 +4,6 @@ package aperture.common.status.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
-import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 //
@@ -13,14 +12,9 @@ import "google/protobuf/timestamp.proto";
 
 // StatusService is used to query Jobs.
 service StatusService {
-  rpc GetStatus(google.protobuf.Empty) returns (GroupStatus) {
-    option (google.api.http) = {
-      get: "/v1/status"
-    };
-  }
   rpc GetGroupStatus(GroupStatusRequest) returns (GroupStatus) {
     option (google.api.http) = {
-      get: "/v1/status/{keys}"
+      get: "/v1/status/{path=**}"
     };
   }
 }
@@ -30,7 +24,7 @@ service StatusService {
 //
 
 message GroupStatusRequest {
-  repeated string keys = 1;
+  string path = 1;
 }
 
 //

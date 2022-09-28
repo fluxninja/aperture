@@ -109,14 +109,14 @@ even a specific release tag e.g. _v0.2.2_
 You can then create a Policy resource with policy definition like this:
 
 ```jsonnet
-local aperture = import 'github.com/fluxninja/aperture/blueprints/libsonnet/1.0/main.libsonnet';
+local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
 
-local latencyGradientPolicy = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/policies/latency-gradient.libsonnet';
+local latencyGradientPolicy = aperture.blueprints.policies.LatencyGradient;
 
-local selector = aperture.v1.Selector;
-local serviceSelector = aperture.v1.ServiceSelector;
-local flowSelector = aperture.v1.FlowSelector;
-local controlPoint = aperture.v1.ControlPoint;
+local selector = aperture.spec.v1.Selector;
+local serviceSelector = aperture.spec.v1.ServiceSelector;
+local flowSelector = aperture.spec.v1.FlowSelector;
+local controlPoint = aperture.spec.v1.ControlPoint;
 
 local svcSelector =
   selector.new()

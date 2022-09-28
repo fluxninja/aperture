@@ -72,29 +72,27 @@ type JobConfig struct {
 type jobExecutor struct {
 	execLock sync.Mutex
 	Job
+	parentRegistry   status.Registry
 	livenessRegistry status.Registry
 	jg               *JobGroup
 	job              *gocron.Job
 	config           JobConfig
 	jobTag           string
-	stopped          bool
+	running          bool
 }
 
 // Make sure jobExecutor complies with Job interface.
 var _ Job = (*jobExecutor)(nil)
 
-func newJobExecutor(job Job, jg *JobGroup, config JobConfig) *jobExecutor {
+func newJobExecutor(job Job, jg *JobGroup, config JobConfig, parentRegistry status.Registry) *jobExecutor {
 	executor := &jobExecutor{
-		Job:    job,
-		jg:     jg,
-		job:    &gocron.Job{},
-		config: config,
-		jobTag: job.Name(),
-		livenessRegistry: jg.gt.statusRegistry.Root().
-			Child("liveness").
-			Child("job_groups").
-			Child(jg.gt.statusRegistry.Key()).
-			Child(job.Name()),
+		Job:            job,
+		jg:             jg,
+		job:            &gocron.Job{},
+		config:         config,
+		jobTag:         job.Name(),
+		parentRegistry: parentRegistry,
+		running:        false,
 	}
 	return executor
 }
@@ -118,7 +116,7 @@ func (executor *jobExecutor) doJob() {
 	executor.execLock.Lock()
 	defer executor.execLock.Unlock()
 
-	if executor.stopped {
+	if !executor.running {
 		return
 	}
 
@@ -171,6 +169,12 @@ func (executor *jobExecutor) start() {
 	executor.execLock.Lock()
 	defer executor.execLock.Unlock()
 
+	if executor.running {
+		return
+	}
+
+	executor.livenessRegistry = executor.parentRegistry.Child(executor.Name())
+
 	var scheduler *gocron.Scheduler
 	if executor.config.ExecutionPeriod.AsDuration() > 0 {
 		scheduler = executor.jg.scheduler.
@@ -201,19 +205,24 @@ func (executor *jobExecutor) start() {
 		return
 	}
 	executor.job = j
+	executor.running = true
 }
 
 func (executor *jobExecutor) stop() {
 	executor.execLock.Lock()
 	defer executor.execLock.Unlock()
 
-	executor.livenessRegistry.Detach()
+	if !executor.running {
+		return
+	}
+
 	err := executor.jg.scheduler.RemoveByTag(executor.jobTag)
 	if err != nil {
 		executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job")
 		return
 	}
-	executor.stopped = true
+	executor.livenessRegistry.Detach()
+	executor.running = false
 }
 
 func (executor *jobExecutor) trigger() {
