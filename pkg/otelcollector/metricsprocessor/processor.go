@@ -214,6 +214,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		otelcollector.ApertureFluxMetersLabel:                  pcommon.NewValueSlice(),
 		otelcollector.ApertureFlowLabelKeysLabel:               pcommon.NewValueSlice(),
 		otelcollector.ApertureClassifiersLabel:                 pcommon.NewValueSlice(),
+		otelcollector.ApertureClassifierErrorsLabel:            pcommon.NewValueSlice(),
 		otelcollector.ApertureDecisionTypeLabel:                pcommon.NewValueString(checkResponse.DecisionType.String()),
 		otelcollector.ApertureRejectReasonLabel:                pcommon.NewValueString(checkResponse.GetRejectReason().String()),
 		otelcollector.ApertureErrorLabel:                       pcommon.NewValueString(checkResponse.GetError().String()),
@@ -272,6 +273,18 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		}
 		value := strings.Join(rawValue, ",")
 		labels[otelcollector.ApertureClassifiersLabel].SliceVal().AppendEmpty().SetStringVal(value)
+
+		// add errors as attributes as well
+		if classifier.Error != flowcontrolv1.ClassifierInfo_ERROR_NONE {
+			errorsValue := []string{
+				classifier.Error.String(),
+				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
+				fmt.Sprintf("%s:%v", metrics.ClassifierIndexLabel, classifier.ClassifierIndex),
+				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, classifier.PolicyHash),
+			}
+			joinedValue := strings.Join(errorsValue, ",")
+			labels[otelcollector.ApertureClassifierErrorsLabel].SliceVal().AppendEmpty().SetStringVal(joinedValue)
+		}
 	}
 
 	for key, value := range labels {
@@ -386,6 +399,7 @@ var (
 		otelcollector.ApertureFluxMetersLabel,
 		otelcollector.ApertureFlowLabelKeysLabel,
 		otelcollector.ApertureClassifiersLabel,
+		otelcollector.ApertureClassifierErrorsLabel,
 	}
 
 	_includeAttributesHTTP = []string{
