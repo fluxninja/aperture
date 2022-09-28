@@ -2,7 +2,7 @@ blueprint: Latency Gradient Blueprint
 sources:
   FluxMeter Dashboard:
     prefix: dashboard
-    path: lib/1.0/dashboards/latency-gradient.libsonnet
+    path: lib/1.0/dashboards/latency-gradient/latency-gradient.libsonnet
   Latency Gradient Policy:
     prefix: policy
-    path: lib/1.0/policies/latency-gradient.libsonnet
+    path: lib/1.0/policies/latency-gradient/latency-gradient.libsonnet

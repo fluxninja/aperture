@@ -1,8 +1,8 @@
-local aperture = import '../../../libsonnet/1.0/main.libsonnet';
+local aperture = import '../../../lib/1.0/main.libsonnet';
 local blueprint = import '../main.libsonnet';
 
-local Override = aperture.v1.RateLimiterOverride;
-local LazySync = aperture.v1.RateLimiterLazySync;
+local Override = aperture.spec.v1.RateLimiterOverride;
+local LazySync = aperture.spec.v1.RateLimiterLazySync;
 
 local config = {
   policy+: {
