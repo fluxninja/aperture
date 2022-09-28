@@ -6,6 +6,7 @@ managed:
     except:
       - buf.build/googleapis/googleapis
       - buf.build/grpc-ecosystem/grpc-gateway
+  java_package_prefix: com.fluxninja
 plugins:
   - remote: buf.build/library/plugins/go:v1.27.1-1
     out: gen/proto/go
