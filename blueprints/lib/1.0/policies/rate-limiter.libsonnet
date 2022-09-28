@@ -27,7 +27,6 @@ local defaults = {
 
 local policy = aperture.v1.Policy;
 local component = aperture.v1.Component;
-local constant = aperture.v1.Constant;
 local rateLimiter = aperture.v1.RateLimiter;
 local selector = aperture.v1.Selector;
 local serviceSelector = aperture.v1.ServiceSelector;
@@ -35,10 +34,9 @@ local flowSelector = aperture.v1.FlowSelector;
 local circuit = aperture.v1.Circuit;
 local override = aperture.v1.RateLimiterOverride;
 local lazySync = aperture.v1.RateLimiterLazySync;
-local port = aperture.v1.Port;
+local inPort = aperture.v1.InPort;
 
-local rateLimitPort = port.new() + port.withSignalName('RATE_LIMIT');
-
+local rateLimitPort = inPort.new() + inPort.withConstantValue(defaults.rateLimit);
 
 function(params) {
   _config:: defaults + params,
@@ -55,18 +53,12 @@ function(params) {
       + flowSelector.withControlPoint({ traffic: $._config.selector.flowSelector.controlPoint.traffic })
     ),
 
-  local constants = [
-    component.withConstant(constant.new()
-                           + constant.withValue($._config.rateLimit)
-                           + constant.withOutPorts({ output: rateLimitPort })),
-  ],
-
   local policyDef =
     policy.new()
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval($._config.evaluationInterval)
-      + circuit.withComponents(constants + [
+      + circuit.withComponents([
         component.withRateLimiter(
           rateLimiter.new()
           + rateLimiter.withInPorts({ limit: rateLimitPort })
