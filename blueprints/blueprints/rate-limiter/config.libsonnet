@@ -11,7 +11,7 @@
     * ```jsonnet
     * local aperture = import 'github.com/fluxninja/aperture/libsonnet/1.0/main.libsonnet';
     *
-    * local Override = aperture.v1.RateLimiterOverride;
+    * local Override = aperture.spec.v1.RateLimiterOverride;
     *
     * {
     *   policy+: {
@@ -29,7 +29,7 @@
     * @param (policy.rateLimit: string required) How many requests per `policy.limitResetInterval` to accept
     * @param (policy.limitResetInterval: string) The window for `policy.rateLimit`
     * @param (policy.labelKey: string required) What flow label to use for rate limiting
-    * @param (policy.overrides: []aperture.v1.RateLimiterOverride) A list of overrides for the rate limiter
+    * @param (policy.overrides: []aperture.spec.v1.RateLimiterOverride) A list of overrides for the rate limiter
     */
     policyName: error 'policy.policyName is required',
     evaluationInterval: '0.5s',

@@ -1,4 +1,4 @@
-local aperture = import '../../../libsonnet/1.0/main.libsonnet';
+local spec = import '../../spec.libsonnet';
 
 // A set of defaults used by the policy that can be overridden when instantiating it
 local defaults = {
@@ -25,17 +25,17 @@ local defaults = {
   },
 };
 
-local policy = aperture.v1.Policy;
-local component = aperture.v1.Component;
-local constant = aperture.v1.Constant;
-local rateLimiter = aperture.v1.RateLimiter;
-local selector = aperture.v1.Selector;
-local serviceSelector = aperture.v1.ServiceSelector;
-local flowSelector = aperture.v1.FlowSelector;
-local circuit = aperture.v1.Circuit;
-local override = aperture.v1.RateLimiterOverride;
-local lazySync = aperture.v1.RateLimiterLazySync;
-local port = aperture.v1.Port;
+local policy = spec.v1.Policy;
+local component = spec.v1.Component;
+local constant = spec.v1.Constant;
+local rateLimiter = spec.v1.RateLimiter;
+local selector = spec.v1.Selector;
+local serviceSelector = spec.v1.ServiceSelector;
+local flowSelector = spec.v1.FlowSelector;
+local circuit = spec.v1.Circuit;
+local override = spec.v1.RateLimiterOverride;
+local lazySync = spec.v1.RateLimiterLazySync;
+local port = spec.v1.Port;
 
 local rateLimitPort = port.new() + port.withSignalName('RATE_LIMIT');
 

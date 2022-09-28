@@ -1,6 +1,8 @@
-local policy = import '../../lib/1.0/policies/rate-limiter.libsonnet';
+local lib = import '../../lib/1.0/main.libsonnet';
 
 local config = import './config.libsonnet';
+
+local policy = lib.blueprints.policies.RateLimiter;
 
 {
   dashboards: {},

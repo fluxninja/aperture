@@ -5,11 +5,9 @@ generate-blueprints: generate-libsonnet
 generate-libsonnet:
 	@echo Generating library
 	@{ \
-		rm -rf libsonnet/1.0/_gen/* || true; \
-		rm -rf libsonnet/1.0/*.libsonnet || true; \
-		python libsonnet/scripts/jsonnet-lib-gen.py --output-dir libsonnet/1.0/ ../docs/gen/policies/gen.yaml; \
-		tk fmt libsonnet/1.0/; \
-		git add libsonnet/1.0/*; \
+		python lib/scripts/jsonnet-lib-gen.py --output-dir lib/1.0/ ../docs/gen/policies/gen.yaml; \
+		tk fmt lib/1.0/; \
+		git add lib/1.0/*; \
 	}
 
 
