@@ -1,4 +1,4 @@
-(import 'aperture.libsonnet') +
 {
+  spec: import 'aperture.libsonnet',
   blueprints: import 'blueprints.libsonnet',
 }

@@ -113,10 +113,10 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.l
 
 local latencyGradientPolicy = aperture.blueprints.policies.LatencyGradient;
 
-local selector = aperture.v1.Selector;
-local serviceSelector = aperture.v1.ServiceSelector;
-local flowSelector = aperture.v1.FlowSelector;
-local controlPoint = aperture.v1.ControlPoint;
+local selector = aperture.spec.v1.Selector;
+local serviceSelector = aperture.spec.v1.ServiceSelector;
+local flowSelector = aperture.spec.v1.FlowSelector;
+local controlPoint = aperture.spec.v1.ControlPoint;
 
 local svcSelector =
   selector.new()
