@@ -372,7 +372,6 @@ jobs:
           command: |
             export LOGURU_LEVEL=TRACE
             export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
-            pwd
             fn release push-to-aperture-java
 
   publish-aperture-docs:
@@ -492,7 +491,7 @@ workflows:
     when:
       and:
         - << pipeline.parameters.updated-api-flowcontrol >>
-        # - equal: [main, << pipeline.git.branch >>]
+        - equal: [main, << pipeline.git.branch >>]
     jobs:
       - gen-push-java-stubs
 
