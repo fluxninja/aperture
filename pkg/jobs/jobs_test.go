@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"context"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -116,13 +117,32 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 	}
 }
 
+func checkMultiJobStatus(t *testing.T, registry status.Registry) {
+	require.False(t, registry.HasError())
+	gotStatusMsg := registry.GetStatus().GetMessage()
+	expectuedStatusMsg, _ := anypb.New(wrapperspb.String("MultiJob"))
+	if !proto.Equal(gotStatusMsg, expectuedStatusMsg) {
+		t.Errorf("Expected job status message to be %v, got %v", expectuedStatusMsg, gotStatusMsg)
+	}
+}
+
 func checkStatusBeforeDeregister(t *testing.T, names []string, expectedScheduling bool) {
 	for _, name := range names {
 		jobRegistry := registry.ChildIfExists(name)
 		require.NotNil(t, jobRegistry)
 		require.Equal(t, jobRegistry.Key(), name)
+
+		if strings.Split(name, "-")[0] == "multi" {
+			checkMultiJobStatus(t, jobRegistry)
+			continue
+		}
 		if expectedScheduling {
 			require.False(t, jobRegistry.HasError())
+			gotStatusMsg := jobRegistry.GetStatus().GetMessage()
+			expectuedStatusMsg, _ := anypb.New(&emptypb.Empty{})
+			if !proto.Equal(gotStatusMsg, expectuedStatusMsg) {
+				t.Errorf("Expected job status message to be %v, got %v", expectuedStatusMsg, gotStatusMsg)
+			}
 		} else {
 			require.True(t, jobRegistry.HasError())
 		}
@@ -316,8 +336,8 @@ func TestMultipleMultiJobs(t *testing.T) {
 	var counter int32
 	var counter2 int32
 	var counter3 int32
-	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multiJob1"), jws, gws)
-	multiJob2 := NewMultiJob(jobGroup.GetStatusRegistry().Child("multiJob2"), jws, gws)
+	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job1"), jws, gws)
+	multiJob2 := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job2"), jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
