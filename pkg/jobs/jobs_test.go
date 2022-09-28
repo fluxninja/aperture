@@ -91,11 +91,7 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 			Child(registry.Key()).
 			Child(job.Name())
 
-		gotStatusMsg := livenessReg.GetStatus().GetMessage()
-		expectedStatusMsg, _ := anypb.New(wrapperspb.String(groupConfig.jobRunConfig.expectedStatusMsg))
-		if !proto.Equal(gotStatusMsg, expectedStatusMsg) {
-			t.Errorf("Expected status message to be %v, got %v", expectedStatusMsg, gotStatusMsg)
-		}
+		checkStatusMessage(t, livenessReg, groupConfig.jobRunConfig.expectedStatusMsg)
 		if groupConfig.jobRunConfig.expectedStatusMsg == "Timeout" {
 			jobGroup.TriggerJob(job.Name())
 		}
@@ -117,12 +113,17 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 	}
 }
 
-func checkMultiJobStatus(t *testing.T, registry status.Registry) {
+func checkStatusMessage(t *testing.T, registry status.Registry, protoMsg string) {
+	var gotStatusMsg, expectuedStatusMsg *anypb.Any
 	require.False(t, registry.HasError())
-	gotStatusMsg := registry.GetStatus().GetMessage()
-	expectuedStatusMsg, _ := anypb.New(wrapperspb.String("MultiJob"))
+	gotStatusMsg = registry.GetStatus().GetMessage()
+	if protoMsg == "" {
+		expectuedStatusMsg, _ = anypb.New(&emptypb.Empty{})
+	} else {
+		expectuedStatusMsg, _ = anypb.New(wrapperspb.String(protoMsg))
+	}
 	if !proto.Equal(gotStatusMsg, expectuedStatusMsg) {
-		t.Errorf("Expected job status message to be %v, got %v", expectuedStatusMsg, gotStatusMsg)
+		t.Errorf("Expected status message to be %v, got %v", expectuedStatusMsg, gotStatusMsg)
 	}
 }
 
@@ -133,16 +134,11 @@ func checkStatusBeforeDeregister(t *testing.T, names []string, expectedSchedulin
 		require.Equal(t, jobRegistry.Key(), name)
 
 		if strings.Split(name, "-")[0] == "multi" {
-			checkMultiJobStatus(t, jobRegistry)
+			checkStatusMessage(t, jobRegistry, "MultiJob")
 			continue
 		}
 		if expectedScheduling {
-			require.False(t, jobRegistry.HasError())
-			gotStatusMsg := jobRegistry.GetStatus().GetMessage()
-			expectuedStatusMsg, _ := anypb.New(&emptypb.Empty{})
-			if !proto.Equal(gotStatusMsg, expectuedStatusMsg) {
-				t.Errorf("Expected job status message to be %v, got %v", expectuedStatusMsg, gotStatusMsg)
-			}
+			checkStatusMessage(t, jobRegistry, "")
 		} else {
 			require.True(t, jobRegistry.HasError())
 		}
