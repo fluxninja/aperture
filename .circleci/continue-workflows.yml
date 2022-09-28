@@ -372,7 +372,8 @@ jobs:
           command: |
             export LOGURU_LEVEL=TRACE
             export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
-            fn --help
+            pwd
+            fn release push-to-aperture-java
 
   publish-aperture-docs:
     executor: python-cimg-executor
