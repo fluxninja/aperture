@@ -39,11 +39,13 @@ type groupTracker struct {
 }
 
 func newGroupTracker(gws GroupWatchers, statusRegistry status.Registry) *groupTracker {
-	return &groupTracker{
+	gt := &groupTracker{
 		trackers:       make(map[string]*jobTracker),
 		statusRegistry: statusRegistry,
 		groupWatchers:  gws,
 	}
+
+	return gt
 }
 
 func (gt *groupTracker) updateStatus(job Job, s *statusv1.Status) error {

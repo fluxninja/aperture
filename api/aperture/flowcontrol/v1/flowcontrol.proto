@@ -76,6 +76,7 @@ message ControlPointInfo {
     TYPE_INGRESS = 2;
     TYPE_EGRESS = 3;
   }
+
   Type type = 1;
   string feature = 2;
 }

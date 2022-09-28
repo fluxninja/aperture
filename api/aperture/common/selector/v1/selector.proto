@@ -6,12 +6,12 @@ import "aperture/common/labelmatcher/v1/labelmatcher.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 // Describes which flow in which service a [dataplane
-//// component](/concepts/flow-control/flow-control.md#components) should apply
-//// to
-////
-//// :::info
-//// See also [Selector overview](/concepts/flow-control/selector.md).
-//// :::
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
 message Selector {
   ServiceSelector service_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {

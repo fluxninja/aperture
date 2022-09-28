@@ -17,6 +17,13 @@ Aperture Agent requires additional details and needs the following
 [Config Patches](https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-EnvoyConfigObjectPatch)
 to be added via the Envoy Filter.
 
+:::caution warning
+
+The latest Istio release (1.15) is
+[not supported](/get-started/supported-platforms.md) yet.
+
+:::
+
 **Note**: In all the below patches, it is presumed that the Aperture Agent is
 installed with `DaemonSet` mode and is installed in the `aperture-agent`
 namespace, which makes the target URL value

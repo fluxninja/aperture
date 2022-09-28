@@ -18,7 +18,6 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -71,7 +70,7 @@ func PromQLModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 		jws = append(jws, pje)
 
 		// Create promMultiJob for this circuit
-		promMultiJob := jobs.NewMultiJob(circuitAPI.GetPolicyName(), false, jws, nil)
+		promMultiJob := jobs.NewMultiJob(promQLJobGroup.GetStatusRegistry().Child(circuitAPI.GetPolicyName()), jws, nil)
 		pje.promMultiJob = promMultiJob
 
 		initialDelay := config.MakeDuration(-1)
@@ -204,6 +203,7 @@ func (pje *promJobsExecutor) OnJobCompleted(_ *statusv1.Status, _ jobs.JobStats)
 }
 
 func (pje *promJobsExecutor) onTickEnd(_ runtime.TickInfo) (err error) {
+	logger := pje.circuitAPI.GetStatusRegistry().GetLogger()
 	// Already under circuit execution lock
 	// Launch job only if previous one is completed
 	if pje.jobRunning {
@@ -217,7 +217,7 @@ func (pje *promJobsExecutor) onTickEnd(_ runtime.TickInfo) (err error) {
 			job := jobResBroker.getJob()
 			err = pje.promMultiJob.RegisterJob(job)
 			if err != nil {
-				log.Error().Err(err).Str("job", job.Name()).Msg("Error registering job")
+				logger.Error().Err(err).Str("job", job.Name()).Msg("Error registering job")
 				return err
 			}
 		}

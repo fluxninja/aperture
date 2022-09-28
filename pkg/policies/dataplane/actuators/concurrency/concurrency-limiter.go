@@ -332,7 +332,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	if conLimiter.schedulerProto.AutoTokens {
 		autoTokens, err := autoTokensFactory.newAutoTokens(
 			conLimiter.GetPolicyName(), conLimiter.GetPolicyHash(),
-			lifecycle, conLimiter.GetComponentIndex())
+			lifecycle, conLimiter.GetComponentIndex(), conLimiter.registry)
 		if err != nil {
 			return err
 		}

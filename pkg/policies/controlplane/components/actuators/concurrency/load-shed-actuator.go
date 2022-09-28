@@ -13,10 +13,10 @@ import (
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/rs/zerolog"
 )
 
 // LoadShedActuator struct.
@@ -52,6 +52,7 @@ func NewLoadShedActuatorAndOptions(
 }
 
 func (lsa *LoadShedActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+	logger := lsa.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			lsa.writer = etcdwriter.NewWriter(etcdClient, true)
@@ -60,7 +61,7 @@ func (lsa *LoadShedActuator) setupWriter(etcdClient *etcdclient.Client, lifecycl
 		OnStop: func(ctx context.Context) error {
 			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), lsa.etcdPath)
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to delete load shed decision config")
+				logger.Error().Err(err).Msg("Failed to delete load shed decision config")
 				return err
 			}
 			lsa.writer.Close()
@@ -95,12 +96,13 @@ func (lsa *LoadShedActuator) Execute(inPortReadings runtime.PortToValue, tickInf
 }
 
 func (lsa *LoadShedActuator) publishLoadShedFactor(loadShedFactor float64) error {
+	logger := lsa.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Publish only if there's a change
 	if lsa.decision.GetLoadShedFactor() != loadShedFactor {
 		// Save load shed factor in decision message
 		lsa.decision.LoadShedFactor = loadShedFactor
 		// Publish decision
-		log.Debug().Float64("loadShedFactor", loadShedFactor).Msg("Publish load shed decision")
+		logger.Sample(zerolog.Often).Debug().Float64("loadShedFactor", loadShedFactor).Msg("Publish load shed decision")
 		wrapper := &wrappersv1.LoadShedDecisionWrapper{
 			LoadShedDecision: lsa.decision,
 			ComponentIndex:   int64(lsa.componentIndex),
@@ -109,7 +111,7 @@ func (lsa *LoadShedActuator) publishLoadShedFactor(loadShedFactor float64) error
 		}
 		dat, err := proto.Marshal(wrapper)
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to marshal policy decision")
+			logger.Error().Err(err).Msg("Failed to marshal policy decision")
 			return err
 		}
 		lsa.writer.Write(lsa.etcdPath, dat)

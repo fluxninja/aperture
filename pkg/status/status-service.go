@@ -2,9 +2,9 @@ package status
 
 import (
 	"context"
+	"strings"
 
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -26,10 +26,13 @@ func RegisterStatusService(server *grpc.Server, reg Registry) {
 
 // GetGroupStatus returns the group status for the requested group in the Registry.
 func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.GroupStatusRequest) (*statusv1.GroupStatus, error) {
-	log.Trace().Interface("keys", req.Keys).Msg("Received request on GetGroupStatus handler")
+	log.Trace().Interface("path", req.Path).Msg("Received request on GetGroupStatus handler")
+
+	// extract keys from the path, separated by /
+	keys := strings.Split(req.Path, "/")
 
 	registry := svc.registry
-	for _, key := range req.Keys {
+	for _, key := range keys {
 		if key == "" {
 			continue
 		}
@@ -39,9 +42,4 @@ func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.Grou
 		}
 	}
 	return registry.GetGroupStatus(), nil
-}
-
-// GetStatus returns the status for all the keys in the registry.
-func (svc *StatusService) GetStatus(ctx context.Context, _ *emptypb.Empty) (*statusv1.GroupStatus, error) {
-	return svc.registry.GetGroupStatus(), nil
 }

@@ -60,6 +60,17 @@ var global *Logger
 func init() {
 	zerolog.TimeFieldFormat = time.RFC3339
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+	zerolog.CallerMarshalFunc = func(_ uintptr, file string, line int) string {
+		// short caller format
+		short := strings.Split(file, "/")
+		// return the last n elements of the file path
+		n := 3
+		if len(short) < n {
+			n = len(short)
+		}
+		path := strings.Join(short[len(short)-n:], "/")
+		return path + fmt.Sprintf("%d", line)
+	}
 	// Create global logger
 	SetGlobalLogger(NewDefaultLogger())
 }
@@ -102,19 +113,7 @@ func WaitFlush() {
 
 // GetPrettyConsoleWriter returns a pretty console writer.
 func GetPrettyConsoleWriter() io.Writer {
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
-	output.FormatLevel = func(i interface{}) string {
-		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
-	}
-	output.FormatMessage = func(i interface{}) string {
-		return fmt.Sprintf("message: %s *** ", i)
-	}
-	output.FormatFieldName = func(i interface{}) string {
-		return fmt.Sprintf("%s:", i)
-	}
-	output.FormatFieldValue = func(i interface{}) string {
-		return fmt.Sprintf("%s", i)
-	}
+	output := zerolog.NewConsoleWriter()
 	return output
 }
 

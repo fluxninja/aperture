@@ -1,5 +1,4 @@
-local aperture = import '../../../libsonnet/1.0/main.libsonnet';
-
+local spec = import '../../spec.libsonnet';
 
 local defaults = {
   policyName: error 'policyName must be set',
@@ -38,27 +37,27 @@ local defaults = {
 };
 
 
-local policy = aperture.v1.Policy;
-local resources = aperture.v1.Resources;
-local circuit = aperture.v1.Circuit;
-local fluxMeter = aperture.v1.FluxMeter;
-local classifier = aperture.v1.Classifier;
-local selector = aperture.v1.Selector;
-local component = aperture.v1.Component;
-local promQL = aperture.v1.PromQL;
-local port = aperture.v1.Port;
-local constant = aperture.v1.Constant;
-local combinator = aperture.v1.ArithmeticCombinator;
-local ema = aperture.v1.EMA;
-local gradient = aperture.v1.GradientController;
-local limiter = aperture.v1.ConcurrencyLimiter;
-local scheduler = aperture.v1.Scheduler;
-local decider = aperture.v1.Decider;
-local switcher = aperture.v1.Switcher;
-local loadShed = aperture.v1.LoadShedActuator;
-local max = aperture.v1.Max;
-local min = aperture.v1.Min;
-local sqrt = aperture.v1.Sqrt;
+local policy = spec.v1.Policy;
+local resources = spec.v1.Resources;
+local circuit = spec.v1.Circuit;
+local fluxMeter = spec.v1.FluxMeter;
+local classifier = spec.v1.Classifier;
+local selector = spec.v1.Selector;
+local component = spec.v1.Component;
+local promQL = spec.v1.PromQL;
+local port = spec.v1.Port;
+local constant = spec.v1.Constant;
+local combinator = spec.v1.ArithmeticCombinator;
+local ema = spec.v1.EMA;
+local gradient = spec.v1.GradientController;
+local limiter = spec.v1.ConcurrencyLimiter;
+local scheduler = spec.v1.Scheduler;
+local decider = spec.v1.Decider;
+local switcher = spec.v1.Switcher;
+local loadShed = spec.v1.LoadShedActuator;
+local max = spec.v1.Max;
+local min = spec.v1.Min;
+local sqrt = spec.v1.Sqrt;
 
 local latencyPort = port.new() + port.withSignalName('LATENCY');
 

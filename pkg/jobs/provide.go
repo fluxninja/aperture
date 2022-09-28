@@ -58,9 +58,6 @@ func provideServiceLivenessCheck() fx.Option {
 	mjc := MultiJobConstructor{
 		Name:         livenessMultiJobName,
 		JobGroupName: livenessGroup,
-		DefaultConfig: MultiJobConfig{
-			AlwaysHealthy: true,
-		},
 	}
 
 	return fx.Options(
