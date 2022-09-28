@@ -272,6 +272,17 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		}
 		value := strings.Join(rawValue, ",")
 		labels[otelcollector.ApertureClassifiersLabel].SliceVal().AppendEmpty().SetStringVal(value)
+
+		// add errors as attributes as well
+		if classifier.Error != flowcontrolv1.ClassifierInfo_ERROR_NONE {
+			errorsValue := []string{
+				classifier.Error.String(),
+				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, classifier.PolicyHash),
+			}
+			errorsValue = append(errorsValue, rawValue...)
+			value = strings.Join(errorsValue, ",")
+			labels[otelcollector.ApertureClassifierErrorsLabel].SliceVal().AppendEmpty().SetStringVal(value)
+		}
 	}
 
 	for key, value := range labels {
