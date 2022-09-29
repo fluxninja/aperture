@@ -142,7 +142,6 @@ var _ = BeforeSuite(func() {
 			clockwork.NewRealClock,
 			agent.AgentOTELComponents,
 			dataplane.ProvideEngineAPI,
-			dataplane.ProvideResponseMetricsAPI,
 			entitycache.NewEntityCache,
 			agentinfo.ProvideAgentInfo,
 		),

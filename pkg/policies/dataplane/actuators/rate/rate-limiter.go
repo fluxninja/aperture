@@ -355,3 +355,9 @@ func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
 		PolicyHash:     rateLimiter.GetPolicyHash(),
 	}
 }
+
+// GetObserver is there to satisfy Limiter interface.
+func (rateLimiter *rateLimiter) GetObserver(map[string]string) prometheus.Observer {
+	// Not implemented for rate limiter
+	return nil
+}

@@ -37,16 +37,20 @@ func ProvideEngineAPI() iface.Engine {
 	e := &Engine{
 		multiMatchers: make(map[selectors.ControlPointID]*multiMatcher),
 		fluxMetersMap: make(map[iface.FluxMeterID]iface.FluxMeter),
+		conLimiterMap: make(map[iface.LimiterID]iface.Limiter),
 	}
 	return e
 }
 
 // Engine APIs to
-// (1) Get schedulers given a service, control point and set of labels
+// (1) Get schedulers given a service, control point and set of labels.
 // (2) Get flux meter histogram given a metric id.
+// (3) Get workload latency histogram given a policy and component index.
 type Engine struct {
 	fluxMeterMapMutex  sync.RWMutex
 	fluxMetersMap      map[iface.FluxMeterID]iface.FluxMeter
+	conLimiterMapMutex sync.RWMutex
+	conLimiterMap      map[iface.LimiterID]iface.Limiter
 	multiMatchersMutex sync.RWMutex
 	multiMatchers      map[selectors.ControlPointID]*multiMatcher
 }
@@ -160,6 +164,14 @@ func returnExtraTokens(
 
 // RegisterConcurrencyLimiter adds concurrency limiter to multimatcher.
 func (e *Engine) RegisterConcurrencyLimiter(cl iface.Limiter) error {
+	e.conLimiterMapMutex.Lock()
+	defer e.conLimiterMapMutex.Unlock()
+	if _, ok := e.conLimiterMap[cl.GetLimiterID()]; !ok {
+		e.conLimiterMap[cl.GetLimiterID()] = cl
+	} else {
+		return fmt.Errorf("metric id already registered")
+	}
+
 	concurrencyLimiterMatchedCB := func(mmr multiMatchResult) multiMatchResult {
 		mmr.concurrencyLimiters = append(mmr.concurrencyLimiters, cl)
 		return mmr
@@ -169,6 +181,10 @@ func (e *Engine) RegisterConcurrencyLimiter(cl iface.Limiter) error {
 
 // UnregisterConcurrencyLimiter removes concurrency limiter from multimatcher.
 func (e *Engine) UnregisterConcurrencyLimiter(cl iface.Limiter) error {
+	e.conLimiterMapMutex.Lock()
+	defer e.conLimiterMapMutex.Unlock()
+	delete(e.conLimiterMap, cl.GetLimiterID())
+
 	selectorProto := cl.GetSelector()
 	return e.unregister("ConcurrencyLimiter:"+cl.GetLimiterID().String(), selectorProto)
 }
@@ -214,6 +230,13 @@ func (e *Engine) GetFluxMeter(fluxMeterName string) iface.FluxMeter {
 		FluxMeterName: fluxMeterName,
 	}
 	return e.fluxMetersMap[fmID]
+}
+
+// GetConcurrencyLimiter Lookup function for getting concurrency limiter.
+func (e *Engine) GetConcurrencyLimiter(limiterID iface.LimiterID) iface.Limiter {
+	e.conLimiterMapMutex.RLock()
+	defer e.conLimiterMapMutex.RUnlock()
+	return e.conLimiterMap[limiterID]
 }
 
 // RegisterRateLimiter adds limiter actuator to multimatcher.

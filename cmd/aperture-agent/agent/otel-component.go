@@ -50,7 +50,6 @@ func AgentOTELComponents(
 	cache *entitycache.EntityCache,
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
-	metricsAPI iface.ResponseMetricsAPI,
 	serverGRPC *grpc.Server,
 ) (component.Factories, error) {
 	var errs error
@@ -93,7 +92,7 @@ func AgentOTELComponents(
 		memorylimiterprocessor.NewFactory(),
 		enrichmentprocessor.NewFactory(cache),
 		rollupprocessor.NewFactory(),
-		metricsprocessor.NewFactory(promRegistry, engine, metricsAPI),
+		metricsprocessor.NewFactory(promRegistry, engine),
 		attributesprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)

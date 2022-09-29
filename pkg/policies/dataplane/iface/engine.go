@@ -14,6 +14,7 @@ type Engine interface {
 
 	RegisterConcurrencyLimiter(sa Limiter) error
 	UnregisterConcurrencyLimiter(sa Limiter) error
+	GetConcurrencyLimiter(limiterID LimiterID) Limiter
 
 	RegisterFluxMeter(fm FluxMeter) error
 	UnregisterFluxMeter(fm FluxMeter) error
