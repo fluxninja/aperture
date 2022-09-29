@@ -37,6 +37,20 @@ func (m *MockLimiter) EXPECT() *MockLimiterMockRecorder {
 	return m.recorder
 }
 
+// GetCounter mocks base method.
+func (m *MockLimiter) GetCounter() prometheus.Counter {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCounter")
+	ret0, _ := ret[0].(prometheus.Counter)
+	return ret0
+}
+
+// GetCounter indicates an expected call of GetCounter.
+func (mr *MockLimiterMockRecorder) GetCounter() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCounter", reflect.TypeOf((*MockLimiter)(nil).GetCounter))
+}
+
 // GetLimiterID mocks base method.
 func (m *MockLimiter) GetLimiterID() iface.LimiterID {
 	m.ctrl.T.Helper()
