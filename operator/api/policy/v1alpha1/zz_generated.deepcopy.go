@@ -31,6 +31,7 @@ func (in *Policy) DeepCopyInto(out *Policy) {
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	in.Spec.DeepCopyInto(&out.Spec)
+	in.DynamicConfig.DeepCopyInto(&out.DynamicConfig)
 	out.Status = in.Status
 }
 

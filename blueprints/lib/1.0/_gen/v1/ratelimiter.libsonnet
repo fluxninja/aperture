@@ -6,6 +6,18 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
     },
   },
   inPorts:: ratelimiterins,
+  withDynamicConfig(dynamic_config):: {
+    dynamic_config: dynamic_config,
+  },
+  withDynamicConfigMixin(dynamic_config):: {
+    dynamic_config+: dynamic_config,
+  },
+  withDynamicConfigKey(dynamic_config_key):: {
+    dynamic_config_key: dynamic_config_key,
+  },
+  withDynamicConfigKeyMixin(dynamic_config_key):: {
+    dynamic_config_key+: dynamic_config_key,
+  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
@@ -29,15 +41,6 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   },
   withLimitResetIntervalMixin(limit_reset_interval):: {
     limit_reset_interval+: limit_reset_interval,
-  },
-  withOverrides(overrides):: {
-    overrides:
-      if std.isArray(overrides)
-      then overrides
-      else [overrides],
-  },
-  withOverridesMixin(overrides):: {
-    overrides+: overrides,
   },
   withSelector(selector):: {
     selector: selector,

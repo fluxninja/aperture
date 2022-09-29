@@ -131,6 +131,19 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
+### RateLimiterDynamicConfig {#rate-limiter-dynamic-config}
+
+#### Properties
+
+<dl>
+<dt>overrides</dt>
+<dd>
+
+([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
+
+</dd>
+</dl>
+
 ### RateLimiterLazySync {#rate-limiter-lazy-sync}
 
 #### Properties
@@ -1810,6 +1823,18 @@ to select which label should be used as key.
 #### Properties
 
 <dl>
+<dt>dynamic_config</dt>
+<dd>
+
+([RateLimiterDynamicConfig](#rate-limiter-dynamic-config)) Dynamic configuration
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -1837,12 +1862,6 @@ label set up, set `label_key: "user"`.
 <dd>
 
 (string, default: `60s`) Time after which the limit for a given label value will be reset.
-
-</dd>
-<dt>overrides</dt>
-<dd>
-
-([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
 
 </dd>
 <dt>selector</dt>

@@ -214,10 +214,12 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 		OnStart: func(context.Context) error {
 			var err error
 			rateLimiter.rateLimitChecker = ratetracker.NewBasicRateLimitChecker()
-			// loop through overrides
-			for _, override := range rateLimiter.rateLimiterProto.GetOverrides() {
-				label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
-				rateLimiter.rateLimitChecker.AddOverride(label, override.GetLimitScaleFactor())
+			if dynamicConfig := rateLimiter.rateLimiterProto.GetDynamicConfig(); dynamicConfig != nil {
+				// loop through overrides
+				for _, override := range dynamicConfig.GetOverrides() {
+					label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
+					rateLimiter.rateLimitChecker.AddOverride(label, override.GetLimitScaleFactor())
+				}
 			}
 			rateLimiter.rateTracker, err = ratetracker.NewDistCacheRateTracker(
 				rateLimiter.rateLimitChecker,

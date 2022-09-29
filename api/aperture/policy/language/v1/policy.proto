@@ -602,6 +602,11 @@ message RateLimiter {
     }]; // @gotags: default:"5" validate:"gt=0"
   }
 
+  message DynamicConfig {
+    // Allows to specify different limits for particular label values.
+    repeated Override overrides = 1;
+  }
+
   message Override {
     // Value of the label for which the override should be applied.
     string label_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -687,11 +692,14 @@ message RateLimiter {
     }
   }]; // @gotags: validate:"required"
 
-  // Allows to specify different limits for particular label values.
-  repeated Override overrides = 5;
-
   // Configuration of lazy-syncing behaviour of ratelimiter
-  LazySync lazy_sync = 6;
+  LazySync lazy_sync = 5;
+
+  // Configuration key
+  string dynamic_config_key = 6;
+
+  // Dynamic configuration
+  DynamicConfig dynamic_config = 7;
 }
 
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection

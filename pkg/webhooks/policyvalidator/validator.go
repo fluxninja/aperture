@@ -1,7 +1,8 @@
-package validation
+package policyvalidator
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -53,8 +53,6 @@ func (v *PolicyValidator) ValidateObject(
 	ctx context.Context,
 	req *admissionv1.AdmissionRequest,
 ) (ok bool, msg string, err error) {
-	log.Trace().Msg("ValidateObject start")
-
 	select {
 	case <-ctx.Done():
 		return false, "", errors.New("context expired before concurrency token was ready")
@@ -77,15 +75,16 @@ func (v *PolicyValidator) ValidateObject(
 	}
 
 	var policy policyv1alpha1.Policy
-	err = config.UnmarshalYAML(req.Object.Raw, &policy)
+	err = json.Unmarshal(req.Object.Raw, &policy)
 	if err != nil {
 		return false, "Not a valid Policy Object", err
 	}
+	log.Info().Bytes("PolicySpec", policy.Spec.Raw).Msg("Validating Policy Spec")
 
 	for _, validator := range v.policyValidators {
 		ok, msg, err := validator.ValidateSpec(ctx, policy.GetName(), policy.Spec.Raw)
 		if err != nil {
-			return false, "", err
+			return false, "Spec is not valid", err
 		}
 
 		if !ok {

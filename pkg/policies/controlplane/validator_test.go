@@ -13,12 +13,12 @@ import (
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/pkg/webhooks/validation"
+	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidation"
 )
 
 var _ = Describe("Validator", Ordered, func() {
 	policySpecValidator := &controlplane.PolicySpecValidator{}
-	policyVatidator := validation.NewPolicyValidator([]validation.PolicySpecValidator{policySpecValidator})
+	policyVatidator := policyvalidation.NewPolicyValidator([]policyvalidation.PolicySpecValidator{policySpecValidator})
 
 	validateExample := func(contents string) {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "aperture-controller")

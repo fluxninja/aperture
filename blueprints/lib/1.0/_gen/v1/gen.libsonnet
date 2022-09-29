@@ -4,6 +4,7 @@
   FluxMeterLinearBuckets: import 'fluxmeterlinearbuckets.libsonnet',
   FluxMeterStaticBuckets: import 'fluxmeterstaticbuckets.libsonnet',
   MatchExpressionList: import 'matchexpressionlist.libsonnet',
+  RateLimiterDynamicConfig: import 'ratelimiterdynamicconfig.libsonnet',
   RateLimiterLazySync: import 'ratelimiterlazysync.libsonnet',
   RateLimiterOverride: import 'ratelimiteroverride.libsonnet',
   RuleRego: import 'rulerego.libsonnet',
