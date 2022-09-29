@@ -47,12 +47,14 @@ func ProvideEngineAPI() iface.Engine {
 // (2) Get flux meter histogram given a metric id.
 // (3) Get workload latency histogram given a policy and component index.
 type Engine struct {
-	fluxMeterMapMutex  sync.RWMutex
-	fluxMetersMap      map[iface.FluxMeterID]iface.FluxMeter
-	conLimiterMapMutex sync.RWMutex
-	conLimiterMap      map[iface.LimiterID]iface.Limiter
-	multiMatchersMutex sync.RWMutex
-	multiMatchers      map[selectors.ControlPointID]*multiMatcher
+	fluxMeterMapMutex   sync.RWMutex
+	fluxMetersMap       map[iface.FluxMeterID]iface.FluxMeter
+	conLimiterMapMutex  sync.RWMutex
+	conLimiterMap       map[iface.LimiterID]iface.Limiter
+	rateLimiterMapMutex sync.RWMutex
+	rateLimiterMap      map[iface.LimiterID]iface.Limiter
+	multiMatchersMutex  sync.RWMutex
+	multiMatchers       map[selectors.ControlPointID]*multiMatcher
 }
 
 // ProcessRequest .
@@ -242,6 +244,14 @@ func (e *Engine) GetConcurrencyLimiter(limiterID iface.LimiterID) iface.Limiter 
 
 // RegisterRateLimiter adds limiter actuator to multimatcher.
 func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
+	e.rateLimiterMapMutex.Lock()
+	defer e.rateLimiterMapMutex.Unlock()
+	if _, ok := e.rateLimiterMap[rl.GetLimiterID()]; !ok {
+		e.rateLimiterMap[rl.GetLimiterID()] = rl
+	} else {
+		return fmt.Errorf("metric id already registered")
+	}
+
 	limiterActuatorMatchedCB := func(mmr multiMatchResult) multiMatchResult {
 		mmr.rateLimiters = append(
 			mmr.rateLimiters,
@@ -255,8 +265,19 @@ func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
 
 // UnregisterRateLimiter removes limiter actuator from multimatcher.
 func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
+	e.rateLimiterMapMutex.Lock()
+	defer e.rateLimiterMapMutex.Unlock()
+	delete(e.rateLimiterMap, rl.GetLimiterID())
+
 	selectorProto := rl.GetSelector()
 	return e.unregister("RateLimiter:"+rl.GetLimiterID().String(), selectorProto)
+}
+
+// GetRateLimiter Lookup function for getting rate limiter.
+func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.Limiter {
+	e.rateLimiterMapMutex.RLock()
+	defer e.rateLimiterMapMutex.RUnlock()
+	return e.rateLimiterMap[limiterID]
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.

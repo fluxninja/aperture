@@ -64,6 +64,20 @@ func (mr *MockEngineMockRecorder) GetFluxMeter(fluxMeterName interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFluxMeter", reflect.TypeOf((*MockEngine)(nil).GetFluxMeter), fluxMeterName)
 }
 
+// GetRateLimiter mocks base method.
+func (m *MockEngine) GetRateLimiter(limiterID iface.LimiterID) iface.Limiter {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRateLimiter", limiterID)
+	ret0, _ := ret[0].(iface.Limiter)
+	return ret0
+}
+
+// GetRateLimiter indicates an expected call of GetRateLimiter.
+func (mr *MockEngineMockRecorder) GetRateLimiter(limiterID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRateLimiter", reflect.TypeOf((*MockEngine)(nil).GetRateLimiter), limiterID)
+}
+
 // ProcessRequest mocks base method.
 func (m *MockEngine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) *flowcontrolv1.CheckResponse {
 	m.ctrl.T.Helper()

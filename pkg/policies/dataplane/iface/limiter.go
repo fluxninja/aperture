@@ -30,4 +30,5 @@ type Limiter interface {
 	RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
 	GetObserver(labels map[string]string) prometheus.Observer
+	GetCounter() prometheus.Counter
 }

@@ -22,6 +22,7 @@ type Engine interface {
 
 	RegisterRateLimiter(l RateLimiter) error
 	UnregisterRateLimiter(l RateLimiter) error
+	GetRateLimiter(limiterID LimiterID) Limiter
 }
 
 // MultiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
