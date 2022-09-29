@@ -22,6 +22,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/notifiers"
@@ -76,9 +77,8 @@ func provideWatcher(
 }
 
 type concurrencyLimiterFactory struct {
-	engineAPI  iface.Engine
-	metricsAPI iface.ResponseMetricsAPI
-	registry   status.Registry
+	engineAPI iface.Engine
+	registry  status.Registry
 
 	autoTokensFactory       *autoTokensFactory
 	loadShedActuatorFactory *loadShedActuatorFactory
@@ -90,6 +90,8 @@ type concurrencyLimiterFactory struct {
 	// TODO: following will be moved to scheduler.
 	incomingConcurrencyCounterVec *prometheus.CounterVec
 	acceptedConcurrencyCounterVec *prometheus.CounterVec
+
+	workloadLatencySummaryVec *prometheus.SummaryVec
 }
 
 // setupConcurrencyLimiterFactory sets up the concurrency limiter module in the main fx app.
@@ -101,7 +103,6 @@ func setupConcurrencyLimiterFactory(
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
-	m iface.ResponseMetricsAPI,
 ) error {
 	agentGroup := ai.GetAgentGroup()
 
@@ -120,7 +121,6 @@ func setupConcurrencyLimiterFactory(
 
 	conLimiterFactory := &concurrencyLimiterFactory{
 		engineAPI:               e,
-		metricsAPI:              m,
 		autoTokensFactory:       autoTokensFactory,
 		loadShedActuatorFactory: loadShedActuatorFactory,
 		registry:                reg,
@@ -155,6 +155,15 @@ func setupConcurrencyLimiterFactory(
 		metricLabelKeys,
 	)
 
+	conLimiterFactory.workloadLatencySummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.WorkloadLatencyMetricName,
+		Help: "Latency summary of workload",
+	}, []string{
+		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel,
+		metrics.DecisionTypeLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
 	fxDriver := &notifiers.FxDriver{
 		FxOptionsFuncs: []notifiers.FxOptionsFunc{conLimiterFactory.newConcurrencyLimiterOptions},
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
@@ -184,6 +193,10 @@ func setupConcurrencyLimiterFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
+			err = prometheusRegistry.Register(conLimiterFactory.workloadLatencySummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
 
 			return merr
 		},
@@ -204,6 +217,10 @@ func setupConcurrencyLimiterFactory(
 			}
 			if !prometheusRegistry.Unregister(conLimiterFactory.acceptedConcurrencyCounterVec) {
 				err := fmt.Errorf("failed to unregister accepted_concurrency metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(conLimiterFactory.workloadLatencySummaryVec) {
+				err := fmt.Errorf("failed to unregister workload_latency_ms metric")
 				merr = multierr.Append(merr, err)
 			}
 
@@ -272,6 +289,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 		workloadMultiMatcher:           mm,
 		defaultWorkloadParametersProto: schedulerProto.DefaultWorkloadParameters,
 		schedulerProto:                 schedulerProto,
+		workloadLatencySummaryVec:      conLimiterFactory.workloadLatencySummaryVec,
 	}
 
 	return fx.Options(
@@ -302,6 +320,7 @@ type concurrencyLimiter struct {
 	registry                       status.Registry
 	incomingConcurrencyCounter     prometheus.Counter
 	acceptedConcurrencyCounter     prometheus.Counter
+	workloadLatencySummaryVec      *prometheus.SummaryVec
 	concurrencyLimiterProto        *policylangv1.ConcurrencyLimiter
 	concurrencyLimiterFactory      *concurrencyLimiterFactory
 	autoTokens                     *autoTokens
@@ -340,7 +359,6 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	}
 
 	engineAPI := conLimiterFactory.engineAPI
-	metricsAPI := conLimiterFactory.metricsAPI
 	wfqFlowsGaugeVec := conLimiterFactory.wfqFlowsGaugeVec
 	wfqRequestsGaugeVec := conLimiterFactory.wfqRequestsGaugeVec
 	incomingConcurrencyCounterVec := conLimiterFactory.incomingConcurrencyCounterVec
@@ -397,8 +415,6 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 				errMulti = multierr.Append(errMulti, err)
 			}
 
-			metricsAPI.DeleteTokenLatencyHistogram(metricLabels)
-
 			// Remove metrics from metric vectors
 			deleted := wfqFlowsGaugeVec.Delete(metricLabels)
 			if !deleted {
@@ -415,6 +431,10 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			deleted = acceptedConcurrencyCounterVec.Delete(metricLabels)
 			if !deleted {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete accepted_concurrency counter from its metric vector"))
+			}
+			deletedCount := conLimiter.workloadLatencySummaryVec.DeletePartialMatch(metricLabels)
+			if deletedCount == 0 {
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete workload_latency_ms gauge from its metric vector"))
 			}
 
 			conLimiter.registry.SetStatus(status.NewStatus(nil, errMulti))
@@ -516,4 +536,15 @@ func (conLimiter *concurrencyLimiter) GetLimiterID() iface.LimiterID {
 		ComponentIndex: conLimiter.GetComponentIndex(),
 		PolicyHash:     conLimiter.GetPolicyHash(),
 	}
+}
+
+// GetObserver returns histogram for specific workload.
+func (conLimiter *concurrencyLimiter) GetObserver(labels map[string]string) prometheus.Observer {
+	latencyHistogram, err := conLimiter.workloadLatencySummaryVec.GetMetricWith(labels)
+	if err != nil {
+		log.Warn().Err(err).Msg("Getting latency histogram")
+		return nil
+	}
+
+	return latencyHistogram
 }
