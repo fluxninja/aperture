@@ -12,7 +12,6 @@ import (
 
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/log"
 )
 
 // limit the concurrent validation requests (some validations incurs rego
@@ -79,7 +78,6 @@ func (v *PolicyValidator) ValidateObject(
 	if err != nil {
 		return false, "Not a valid Policy Object", err
 	}
-	log.Info().Bytes("PolicySpec", policy.Spec.Raw).Msg("Validating Policy Spec")
 
 	for _, validator := range v.policyValidators {
 		ok, msg, err := validator.ValidateSpec(ctx, policy.GetName(), policy.Spec.Raw)
