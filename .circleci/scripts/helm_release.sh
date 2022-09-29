@@ -51,8 +51,8 @@ dependencies() {
 
 package() {
   for chart in "${CHARTS[@]}"; do
-    CHART_VERSION_CMD=$(helm inspect chart "$chart" | grep version | cut -d' ' -f2|tr -d " \t\n\r")
-    APP_VERSION_CMD=$(helm inspect chart "$chart" | grep appVersion | cut -d' ' -f2|tr -d " \t\n\r")
+    CHART_VERSION_CMD=$(echo "$CIRCLE_TAG" | cut -d "/" -f 4)
+    APP_VERSION_CMD=$(echo "$CIRCLE_TAG" | cut -d "/" -f 4)
     helm package "$chart" --destination "${CHARTS_TMP_DIR}" --version "$CHART_VERSION_CMD" --app-version "$APP_VERSION_CMD"
   done
 }
