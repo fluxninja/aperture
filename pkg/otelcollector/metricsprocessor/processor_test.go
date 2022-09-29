@@ -21,19 +21,17 @@ import (
 
 var _ = Describe("Metrics Processor", func() {
 	var (
-		pr         *prometheus.Registry
-		cfg        *Config
-		processor  *metricsProcessor
-		engine     *mocks.MockEngine
-		metricsAPI *mocks.MockResponseMetricsAPI
-		histogram  prometheus.Histogram
+		pr        *prometheus.Registry
+		cfg       *Config
+		processor *metricsProcessor
+		engine    *mocks.MockEngine
+		histogram prometheus.Histogram
 	)
 
 	BeforeEach(func() {
 		pr = prometheus.NewRegistry()
 		ctrl := gomock.NewController(GinkgoT())
 		engine = mocks.NewMockEngine(ctrl)
-		metricsAPI = mocks.NewMockResponseMetricsAPI(ctrl)
 		histogram = prometheus.NewHistogram(prometheus.HistogramOpts{
 			Name: metrics.WorkloadLatencyMetricName,
 			ConstLabels: prometheus.Labels{
@@ -46,15 +44,12 @@ var _ = Describe("Metrics Processor", func() {
 		})
 		cfg = &Config{
 			engine:       engine,
-			metricsAPI:   metricsAPI,
 			promRegistry: pr,
 		}
 		var err error
 		processor, err = newProcessor(cfg)
 		Expect(err).NotTo(HaveOccurred())
-
-		err = nil
-		metricsAPI.EXPECT().GetTokenLatencyHistogram(gomock.Any()).Return(histogram, err).AnyTimes()
+		engine.EXPECT().GetConcurrencyLimiter(gomock.Any()).Return(nil).AnyTimes()
 	})
 
 	DescribeTable("Processing logs",

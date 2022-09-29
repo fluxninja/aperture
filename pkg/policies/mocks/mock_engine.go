@@ -36,6 +36,20 @@ func (m *MockEngine) EXPECT() *MockEngineMockRecorder {
 	return m.recorder
 }
 
+// GetConcurrencyLimiter mocks base method.
+func (m *MockEngine) GetConcurrencyLimiter(limiterID iface.LimiterID) iface.Limiter {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetConcurrencyLimiter", limiterID)
+	ret0, _ := ret[0].(iface.Limiter)
+	return ret0
+}
+
+// GetConcurrencyLimiter indicates an expected call of GetConcurrencyLimiter.
+func (mr *MockEngineMockRecorder) GetConcurrencyLimiter(limiterID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConcurrencyLimiter", reflect.TypeOf((*MockEngine)(nil).GetConcurrencyLimiter), limiterID)
+}
+
 // GetFluxMeter mocks base method.
 func (m *MockEngine) GetFluxMeter(fluxMeterName string) iface.FluxMeter {
 	m.ctrl.T.Helper()
