@@ -31,7 +31,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/distcache"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	. "github.com/onsi/ginkgo/v2"
@@ -75,12 +75,12 @@ var _ = Describe("ConfigMap for Agent", func() {
 								DisablePlugins:  false,
 								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
 							},
-							Otel: otel.OtelConfig{
-								BatchPrerollup: otel.BatchConfig{
+							Otel: otelcollector.OtelConfig{
+								BatchPrerollup: otelcollector.BatchConfig{
 									Timeout:       config.MakeDuration(1 * time.Second),
 									SendBatchSize: 15000,
 								},
-								BatchPostrollup: otel.BatchConfig{
+								BatchPostrollup: otelcollector.BatchConfig{
 									Timeout:       config.MakeDuration(1 * time.Second),
 									SendBatchSize: 15000,
 								},

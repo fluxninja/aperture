@@ -23,7 +23,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/platform"
@@ -37,12 +36,11 @@ func main() {
 		notifiers.TrackersConstructor{Name: "entity_trackers"}.Annotate(),
 		prometheus.Module(),
 		k8s.Module(),
-		otel.OTELConfigConstructor{Type: otel.AgentType}.Annotate(),
+		agent.ModuleForAgentOTEL(),
 		peers.Constructor{}.Module(),
 		fx.Provide(
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
-			otel.AgentOTELComponents,
 			agent.ProvidePeersPrefix,
 		),
 		fx.Invoke(

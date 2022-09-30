@@ -11,6 +11,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	gomock "github.com/golang/mock/gomock"
+	prometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 // MockLimiter is a mock of Limiter interface.
@@ -48,6 +49,20 @@ func (m *MockLimiter) GetLimiterID() iface.LimiterID {
 func (mr *MockLimiterMockRecorder) GetLimiterID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLimiterID", reflect.TypeOf((*MockLimiter)(nil).GetLimiterID))
+}
+
+// GetObserver mocks base method.
+func (m *MockLimiter) GetObserver(labels map[string]string) prometheus.Observer {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetObserver", labels)
+	ret0, _ := ret[0].(prometheus.Observer)
+	return ret0
+}
+
+// GetObserver indicates an expected call of GetObserver.
+func (mr *MockLimiterMockRecorder) GetObserver(labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObserver", reflect.TypeOf((*MockLimiter)(nil).GetObserver), labels)
 }
 
 // GetPolicyName mocks base method.

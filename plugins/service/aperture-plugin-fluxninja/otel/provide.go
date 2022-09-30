@@ -16,7 +16,6 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/heartbeats"
@@ -119,7 +118,7 @@ func addMetricsSlowPipeline(baseConfig, config *otelcollector.OTELConfig) {
 	config.Service.AddPipeline("metrics/slow", otelcollector.Pipeline{
 		Receivers: []string{receiverPrometheus},
 		Processors: []string{
-			otel.ProcessorEnrichment,
+			otelcollector.ProcessorEnrichment,
 			processorBatchMetricsSlow,
 			processorAttributes,
 		},
@@ -141,7 +140,7 @@ func addMetricsControllerSlowPipeline(baseConfig, config *otelcollector.OTELConf
 }
 
 func addFluxninjaPrometheusReceiver(baseConfig, config *otelcollector.OTELConfig) {
-	rawReceiverConfig, _ := baseConfig.Receivers[otel.ReceiverPrometheus].(map[string]any)
+	rawReceiverConfig, _ := baseConfig.Receivers[otelcollector.ReceiverPrometheus].(map[string]any)
 	duplicatedReceiverConfig, err := duplicateMap(rawReceiverConfig)
 	if err != nil {
 		// It should not happen, unless the original config is messed up.
