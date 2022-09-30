@@ -51,7 +51,10 @@ func (p *processorImp) Start(ctx context.Context, host component.Host) error {
 
 		availableLogsExporters = append(availableLogsExporters, k.String())
 
-		log.Debug().Str("spantolog-exporter", p.config.LogsExporter).Strs("available-exporters", availableLogsExporters).Msg("Looking for spanmetrics exporter from available exporters")
+		log.Debug().
+			Str("spantolog-exporter", p.config.LogsExporter).
+			Strs("available-exporters", availableLogsExporters).
+			Msg("Looking for spanmetrics exporter from available exporters")
 		if k.String() == p.config.LogsExporter {
 			p.logsExporter = logsExp
 			log.Info().Str("spantolog-exporter", p.config.LogsExporter).Msg("Found exporter")
@@ -59,7 +62,7 @@ func (p *processorImp) Start(ctx context.Context, host component.Host) error {
 		}
 	}
 	if p.logsExporter == nil {
-		return fmt.Errorf("failed to find metrics exporter: '%s'; please configure metrics_exporter from one of: %+v", p.config.LogsExporter, availableLogsExporters)
+		return fmt.Errorf("failed to find logs exporter: '%s'; please configure logs_exporter from one of: %+v", p.config.LogsExporter, availableLogsExporters)
 	}
 	log.Info().Msg("Started spantologprocessor")
 	return nil

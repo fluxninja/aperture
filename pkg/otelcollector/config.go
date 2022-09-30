@@ -195,7 +195,7 @@ var BaseFxTag = config.NameTag("base")
 type OtelParams struct {
 	promClient promapi.Client
 	Config     *OTELConfig
-	listener   *listener.Listener
+	Listener   *listener.Listener
 	tlsConfig  *tls.Config
 	OtelConfig
 }
@@ -251,7 +251,7 @@ func NewOtelConfig(in FxIn) (*OtelParams, error) {
 	}
 	cfg := &OtelParams{
 		OtelConfig: userCfg,
-		listener:   in.Listener,
+		Listener:   in.Listener,
 		promClient: in.PromClient,
 		tlsConfig:  in.TLSConfig,
 		Config:     config,
@@ -358,7 +358,7 @@ func buildApertureSelfScrapeConfig(name string, cfg *OtelParams) map[string]any 
 		"metrics_path": "/metrics",
 		"static_configs": []map[string]any{
 			{
-				"targets": []string{cfg.listener.GetAddr()},
+				"targets": []string{cfg.Listener.GetAddr()},
 				"labels": map[string]any{
 					"instance":     info.Hostname,
 					"process_uuid": info.UUID,
