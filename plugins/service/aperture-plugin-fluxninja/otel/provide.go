@@ -71,9 +71,6 @@ func provideOtelConfig(baseConfig *otelcollector.OTELConfig,
 			if logsPipeline, exists := baseConfig.Service.Pipeline("logs"); exists {
 				addFNToPipeline("logs", config, logsPipeline)
 			}
-			if tracesPipeline, exists := baseConfig.Service.Pipeline("traces"); exists {
-				addFNToPipeline("traces", config, tracesPipeline)
-			}
 			if _, exists := baseConfig.Service.Pipeline("metrics/fast"); exists {
 				addMetricsSlowPipeline(baseConfig, config)
 			}

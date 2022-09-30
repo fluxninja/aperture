@@ -1,18 +1,12 @@
 package agent
 
 import (
-	"github.com/fluxninja/aperture/pkg/entitycache"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
-	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
-	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
-	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/component"
@@ -29,6 +23,15 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/grpc"
+
+	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
+	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
 
 // ModuleForAgentOTEL provides fx options for AgentOTELComponent.
@@ -75,6 +78,7 @@ func AgentOTELComponents(
 	receivers, err := component.MakeReceiverFactoryMap(
 		otlpreceiver.NewFactory(tsw, msw, lsw),
 		prometheusreceiver.NewFactory(),
+		filelogreceiver.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
 
@@ -94,6 +98,7 @@ func AgentOTELComponents(
 		rollupprocessor.NewFactory(),
 		metricsprocessor.NewFactory(promRegistry, engine),
 		attributesprocessor.NewFactory(),
+		tracestologsprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
 
@@ -109,6 +114,7 @@ func AgentOTELComponents(
 
 func provideAgent(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
 	addLogsPipeline(cfg)
+	addTracesPipeline(cfg)
 	otelcollector.AddMetricsPipeline(cfg)
 	return cfg.Config
 }
@@ -135,5 +141,38 @@ func addLogsPipeline(cfg *otelcollector.OtelParams) {
 		Receivers:  []string{otelcollector.ReceiverOTLP},
 		Processors: processors,
 		Exporters:  []string{otelcollector.ExporterLogging},
+	})
+}
+
+func addTracesPipeline(cfg *otelcollector.OtelParams) {
+	config := cfg.Config
+	config.AddExporter(otelcollector.ExporterOTLPLoopback, map[string]any{
+		"endpoint": cfg.Listener.GetAddr(),
+		"tls": map[string]any{
+			"insecure": true,
+		},
+	})
+	config.AddProcessor(otelcollector.ProcessorTracesToLogs, tracestologsprocessor.Config{
+		LogsExporter: otelcollector.ExporterOTLPLoopback,
+	})
+
+	config.Service.AddPipeline("traces", otelcollector.Pipeline{
+		Receivers:  []string{otelcollector.ReceiverOTLP},
+		Processors: []string{otelcollector.ProcessorTracesToLogs},
+		// We need some exporter configured to make this pipeline correct. Actual
+		// Log exporting is done inside the processor.
+		Exporters: []string{otelcollector.ExporterLogging},
+	})
+
+	// TODO This receiver should be replaced with some receiver which really does nothing.
+	config.AddReceiver("filelog", map[string]any{
+		"include":       []string{"/var/log/myservice/*.json"},
+		"poll_interval": "1000h",
+	})
+	// We need a fake log pipeline which will initialize the ExporterOTLPLoopback
+	// for logs type.
+	config.Service.AddPipeline("logs/fake", otelcollector.Pipeline{
+		Receivers: []string{"filelog"},
+		Exporters: []string{otelcollector.ExporterOTLPLoopback},
 	})
 }

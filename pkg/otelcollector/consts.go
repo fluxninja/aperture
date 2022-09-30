@@ -125,9 +125,15 @@ const (
 	ProcessorRollup = "rollup"
 	// ProcessorAgentGroup adds `agent_group` attribute.
 	ProcessorAgentGroup = "attributes/agent_group"
+	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured
+	// log exporter.
+	ProcessorTracesToLogs = "tracestologs"
 
 	// ExporterLogging exports telemetry using Aperture logger.
 	ExporterLogging = "aperturelogging"
 	// ExporterPrometheusRemoteWrite exports metrics to local prometheus instance.
 	ExporterPrometheusRemoteWrite = "prometheusremotewrite"
+	// ExporterOTLPLoopback exports OTLP data to local OTLP receiver. To be used only
+	// with ProcessorSpanToLog.
+	ExporterOTLPLoopback = "otlp/loopback"
 )
