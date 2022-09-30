@@ -58,9 +58,10 @@ type Engine struct {
 // ProcessRequest .
 func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
-		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
-		FlowLabelKeys: maps.Keys(labels),
-		Services:      serviceIDs,
+		DecisionType:     flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
+		FlowLabelKeys:    maps.Keys(labels),
+		Services:         serviceIDs,
+		ControlPointInfo: controlPoint.ToControlPointInfoProto(),
 	}
 
 	mmr := e.getMatches(controlPoint, serviceIDs, labels)
