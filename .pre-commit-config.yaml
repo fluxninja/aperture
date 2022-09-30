@@ -45,10 +45,10 @@ repos:
     rev: v0.1.17
     hooks:
       - id: shellcheck
-  - repo: https://github.com/syntaqx/git-hooks
-    rev: v0.0.17
+  - repo: https://github.com/fluxninja/pre-commit-hooks.git
+    rev: v0.0.1
     hooks:
-      - id: circleci-config-validate
+      - id: circleci-validate
   - repo: https://github.com/fluxninja/pre-commit-golang
     rev: v1.0.0-fn
     hooks:
