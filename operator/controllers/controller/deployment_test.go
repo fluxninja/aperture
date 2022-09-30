@@ -34,7 +34,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 var _ = Describe("Controller Deployment", func() {
@@ -112,7 +112,7 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 					},
 					Image: common.ControllerImage{
@@ -308,7 +308,7 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 					},
 					CommonSpec: common.CommonSpec{

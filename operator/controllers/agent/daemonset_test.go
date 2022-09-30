@@ -33,7 +33,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 var _ = Describe("Agent Daemonset", func() {
@@ -106,7 +106,7 @@ var _ = Describe("Agent Daemonset", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
@@ -277,7 +277,7 @@ var _ = Describe("Agent Daemonset", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",

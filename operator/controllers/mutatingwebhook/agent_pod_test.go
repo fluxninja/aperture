@@ -31,7 +31,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 var _ = Describe("Sidecar container for Agent", func() {
@@ -79,7 +79,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -185,7 +185,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -336,7 +336,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":8000",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -561,7 +561,7 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -687,7 +687,7 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",

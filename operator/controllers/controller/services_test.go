@@ -30,7 +30,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otel"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 var _ = Describe("Service for Controller", func() {
@@ -49,7 +49,7 @@ var _ = Describe("Service for Controller", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 					},
 				},
@@ -123,7 +123,7 @@ var _ = Describe("Service for Controller", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otel.OtelConfig{},
+							Otel: otelcollector.OtelConfig{},
 						},
 					},
 				},

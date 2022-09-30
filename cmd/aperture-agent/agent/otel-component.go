@@ -1,6 +1,13 @@
-package otel
+package agent
 
 import (
+	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
+	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
@@ -19,16 +26,24 @@ import (
 	"go.opentelemetry.io/collector/processor/batchprocessor"
 	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
+	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/grpc"
-
-	"github.com/fluxninja/aperture/pkg/entitycache"
-	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
-	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
-	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
-	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
+
+// ModuleForAgentOTEL provides fx options for AgentOTELComponent.
+func ModuleForAgentOTEL() fx.Option {
+	return fx.Options(
+		fx.Provide(
+			otelcollector.NewOtelConfig,
+			fx.Annotate(
+				provideAgent,
+				fx.ResultTags(otelcollector.BaseFxTag),
+			),
+			AgentOTELComponents,
+		),
+	)
+}
 
 // AgentOTELComponents constructs OTEL Collector Factories for Agent.
 func AgentOTELComponents(
@@ -92,42 +107,33 @@ func AgentOTELComponents(
 	return factories, errs
 }
 
-// ControllerOTELComponents constructs OTEL Collector Factories for Controller.
-func ControllerOTELComponents() (component.Factories, error) {
-	var errs error
+func provideAgent(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
+	addLogsPipeline(cfg)
+	otelcollector.AddMetricsPipeline(cfg)
+	return cfg.Config
+}
 
-	extensions, err := component.MakeExtensionFactoryMap(
-		zpagesextension.NewFactory(),
-		ballastextension.NewFactory(),
-		healthcheckextension.NewFactory(),
-		pprofextension.NewFactory(),
-	)
-	errs = multierr.Append(errs, err)
+func addLogsPipeline(cfg *otelcollector.OtelParams) {
+	config := cfg.Config
+	// Common dependencies for pipelines
+	config.AddReceiver(otelcollector.ReceiverOTLP, otlpreceiver.Config{})
+	config.AddProcessor(otelcollector.ProcessorMetrics, metricsprocessor.Config{})
+	config.AddBatchProcessor(otelcollector.ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
+	config.AddProcessor(otelcollector.ProcessorRollup, rollupprocessor.Config{})
+	config.AddBatchProcessor(otelcollector.ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
+	config.AddExporter(otelcollector.ExporterLogging, nil)
 
-	receivers, err := component.MakeReceiverFactoryMap(
-		prometheusreceiver.NewFactory(),
-	)
-	errs = multierr.Append(errs, err)
-
-	exporters, err := component.MakeExporterFactoryMap(
-		otlpexporter.NewFactory(),
-		otlphttpexporter.NewFactory(),
-		prometheusremotewriteexporter.NewFactory(),
-	)
-	errs = multierr.Append(errs, err)
-
-	processors, err := component.MakeProcessorFactoryMap(
-		batchprocessor.NewFactory(),
-		attributesprocessor.NewFactory(),
-	)
-	errs = multierr.Append(errs, err)
-
-	factories := component.Factories{
-		Extensions: extensions,
-		Receivers:  receivers,
-		Processors: processors,
-		Exporters:  exporters,
+	processors := []string{
+		otelcollector.ProcessorAgentGroup,
+		otelcollector.ProcessorMetrics,
+		otelcollector.ProcessorBatchPrerollup,
+		otelcollector.ProcessorRollup,
+		otelcollector.ProcessorBatchPostrollup,
 	}
 
-	return factories, errs
+	config.Service.AddPipeline("logs", otelcollector.Pipeline{
+		Receivers:  []string{otelcollector.ReceiverOTLP},
+		Processors: processors,
+		Exporters:  []string{otelcollector.ExporterLogging},
+	})
 }
