@@ -49,11 +49,25 @@ dependencies() {
   done
 }
 
+version_check() {
+# Refer the issue for the Regex https://github.com/semver/semver/issues/232
+rx='^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
+if [[ $VERSION_CMD =~ $rx ]]; then
+ echo "INFO:<-->Version $VERSION_CMD"
+else
+ echo "ERROR:<->Unable to validate package version: '$VERSION_CMD'"
+ exit 1
+fi
+}
+
 package() {
   for chart in "${CHARTS[@]}"; do
-    CHART_VERSION_CMD=$(helm inspect chart "$chart" | grep version | cut -d' ' -f2|tr -d " \t\n\r")
-    APP_VERSION_CMD=$(helm inspect chart "$chart" | grep appVersion | cut -d' ' -f2|tr -d " \t\n\r")
-    helm package "$chart" --destination "${CHARTS_TMP_DIR}" --version "$CHART_VERSION_CMD" --app-version "$APP_VERSION_CMD"
+    # For now we are using the same version for app-version and version. Change it to two if we are using different versions.
+    VERSION_CMD=$(echo "$CIRCLE_TAG" | cut -d "/" -f 4)
+    if version_check "$VERSION_CMD"
+    then
+        helm package "$chart" --destination "${CHARTS_TMP_DIR}" --version "$VERSION_CMD" --app-version "$VERSION_CMD"
+    fi
   done
 }
 
