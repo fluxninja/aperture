@@ -17,6 +17,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/fluxmeter"
@@ -155,7 +156,8 @@ func compilePolicyWrapper(wrapperMessage *wrappersv1.PolicyWrapper, registry sta
 	return policy, compiledCircuit, fx.Options(
 		fx.Options(resourceOptions...),
 		partialCircuitOption,
-		fx.Invoke(policy.setupCircuitJob),
+		fx.Invoke(policy.setupCircuitJob,
+			policy.setupDynamicConfig),
 	), nil
 }
 
@@ -208,6 +210,32 @@ func (policy *Policy) setupCircuitJob(
 	}
 
 	return nil
+}
+
+func (policy *Policy) setupDynamicConfig(
+	watcher notifiers.Watcher,
+	lifecycle fx.Lifecycle,
+) error {
+	unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
+	unmarshalNotifier := notifiers.NewUnmarshalKeyNotifier(notifiers.Key(policy.GetPolicyName()),
+		unmarshaller,
+		policy.dynamicConfigUpdate,
+	)
+
+	lifecycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			return watcher.AddKeyNotifier(unmarshalNotifier)
+		},
+		OnStop: func(_ context.Context) error {
+			return watcher.RemoveKeyNotifier(unmarshalNotifier)
+		},
+	})
+
+	return nil
+}
+
+func (policy *Policy) dynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	policy.circuit.DynamicConfigUpdate(event, unmarshaller)
 }
 
 func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error) {

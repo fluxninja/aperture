@@ -33,9 +33,9 @@ import (
 type watcher struct {
 	waitGroup sync.WaitGroup
 	notifiers.Trackers
-	configTrackers notifiers.Trackers
-	ctx            context.Context
-	cancel         context.CancelFunc
+	dynamicConfigTrackers notifiers.Trackers
+	ctx                   context.Context
+	cancel                context.CancelFunc
 	client.Client
 	scheme           *runtime.Scheme
 	recorder         record.EventRecorder
@@ -50,10 +50,10 @@ func NewWatcher() (*watcher, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	watcher := &watcher{
-		Trackers:       notifiers.NewDefaultTrackers(),
-		configTrackers: notifiers.NewDefaultTrackers(),
-		ctx:            ctx,
-		cancel:         cancel,
+		Trackers:              notifiers.NewDefaultTrackers(),
+		dynamicConfigTrackers: notifiers.NewDefaultTrackers(),
+		ctx:                   ctx,
+		cancel:                cancel,
 	}
 
 	return watcher, nil
@@ -114,9 +114,9 @@ func (w *watcher) Stop() error {
 	return w.Trackers.Stop()
 }
 
-// GetConfigTrackers returns the config trackers.
-func (w *watcher) GetConfigTrackers() notifiers.Trackers {
-	return w.configTrackers
+// GetDynamicConfigWatcher returns the config watcher.
+func (w *watcher) GetDynamicConfigWatcher() notifiers.Watcher {
+	return w.dynamicConfigTrackers
 }
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -182,7 +182,7 @@ func (w *watcher) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result,
 
 func (w *watcher) deleteResources(ctx context.Context, instance *policyv1alpha1.Policy) {
 	w.RemoveEvent(notifiers.Key(instance.GetName()))
-	w.configTrackers.RemoveEvent(notifiers.Key(instance.GetName()))
+	w.dynamicConfigTrackers.RemoveEvent(notifiers.Key(instance.GetName()))
 }
 
 // updateResource updates the Aperture resource in Kubernetes.
@@ -212,7 +212,7 @@ func (w *watcher) updateStatus(ctx context.Context, instance *policyv1alpha1.Pol
 // reconcilePolicy sends a write event to notifier to get it uploaded on the Etcd.
 func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.Policy) error {
 	w.WriteEvent(notifiers.Key(instance.GetName()), instance.Spec.Raw)
-	w.configTrackers.WriteEvent(notifiers.Key(instance.GetName()), instance.DynamicConfig.Raw)
+	w.dynamicConfigTrackers.WriteEvent(notifiers.Key(instance.GetName()), instance.DynamicConfig.Raw)
 
 	w.recorder.Eventf(instance, corev1.EventTypeWarning, "UploadSuccessful", "Uploaded policy to trackers.")
 	return nil

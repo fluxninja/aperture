@@ -336,6 +336,8 @@ type PromQL struct {
 	evaluationInterval time.Duration
 }
 
+var _ runtime.Component = (*PromQL)(nil)
+
 // Make sure PromQL implements jobRegistererIfc.
 var _ jobRegistererIfc = (*PromQL)(nil)
 
@@ -405,6 +407,9 @@ func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runti
 		"output": []runtime.Reading{currentReading},
 	}, nil
 }
+
+// DynamicConfigUpdate is a no-op for PromQL.
+func (promQL *PromQL) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
 
 func (promQL *PromQL) registerJob(endTimestamp time.Time) {
 	promQL.jobExecutor.registerScalarJob(

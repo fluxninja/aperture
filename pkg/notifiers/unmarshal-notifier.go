@@ -23,7 +23,10 @@ type UnmarshalKeyNotifier struct {
 var _ KeyNotifier = (*UnmarshalKeyNotifier)(nil)
 
 // NewUnmarshalKeyNotifier creates a new instance of ConfigKeyNotifier.
-func NewUnmarshalKeyNotifier(key Key, unmarshaller config.Unmarshaller, unmarshalNotifyFunc UnmarshalNotifyFunc) *UnmarshalKeyNotifier {
+func NewUnmarshalKeyNotifier(key Key,
+	unmarshaller config.Unmarshaller,
+	unmarshalNotifyFunc UnmarshalNotifyFunc,
+) *UnmarshalKeyNotifier {
 	notifier := &UnmarshalKeyNotifier{
 		KeyNotifierBase: KeyNotifierBase{
 			key: key,

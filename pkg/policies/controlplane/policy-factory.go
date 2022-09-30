@@ -19,16 +19,19 @@ import (
 
 // Fx tag to match etcd watcher name.
 var policiesDriverFxTag = "policies-driver"
+var policiesDynamicConfigFxTag = "policies-dynamic-config"
 
 // policyFactoryModule module for policy factory.
 func policyFactoryModule() fx.Option {
 	return fx.Options(
-		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: common.PoliciesConfigPath}.Annotate(),
+		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: common.PoliciesPath}.Annotate(),
+		etcdwatcher.Constructor{Name: policiesDynamicConfigFxTag, EtcdPath: common.PoliciesDynamicConfigPath}.Annotate(),
 		fx.Invoke(
 			fx.Annotate(
 				setupPolicyFxDriver,
 				fx.ParamTags(
 					config.NameTag(policiesDriverFxTag),
+					config.NameTag(policiesDynamicConfigFxTag),
 					common.FxOptionsFuncTag,
 				),
 			),
@@ -39,14 +42,16 @@ func policyFactoryModule() fx.Option {
 }
 
 type policyFactory struct {
-	circuitJobGroup *jobs.JobGroup
-	etcdClient      *etcdclient.Client
-	registry        status.Registry
+	circuitJobGroup      *jobs.JobGroup
+	etcdClient           *etcdclient.Client
+	registry             status.Registry
+	dynamicConfigWatcher notifiers.Watcher
 }
 
 // Main fx app.
 func setupPolicyFxDriver(
 	etcdWatcher notifiers.Watcher,
+	dynamicConfigWatcher notifiers.Watcher,
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
@@ -62,9 +67,10 @@ func setupPolicyFxDriver(
 	}
 
 	factory := &policyFactory{
-		registry:        policiesStatusRegistry,
-		circuitJobGroup: circuitJobGroup,
-		etcdClient:      etcdClient,
+		registry:             policiesStatusRegistry,
+		circuitJobGroup:      circuitJobGroup,
+		etcdClient:           etcdClient,
+		dynamicConfigWatcher: dynamicConfigWatcher,
 	}
 
 	optionsFunc := []notifiers.FxOptionsFunc{factory.provideControllerPolicyFxOptions}
@@ -131,6 +137,7 @@ func (factory *policyFactory) provideControllerPolicyFxOptions(
 	return fx.Options(
 		policyFxOptions,
 		fx.Supply(
+			factory.dynamicConfigWatcher,
 			factory.circuitJobGroup,
 			factory.etcdClient,
 		),

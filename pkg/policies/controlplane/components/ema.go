@@ -7,6 +7,8 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -161,6 +163,9 @@ func (ema *EMA) computeAverage(minEnvelope, maxEnvelope runtime.Reading) (runtim
 		return runtime.InvalidReading(), nil
 	}
 }
+
+// DynamicConfigUpdate is a no-op for EMA.
+func (ema *EMA) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
 
 func (ema *EMA) applyEnvelope(input float64, minEnvelope, maxEnvelope runtime.Reading) (float64, error) {
 	minxMaxConstraints := constraints.NewMinMaxConstraints()

@@ -36,7 +36,7 @@ func NewClassifierOptions(
 	}
 	agentGroup := selectorProto.ServiceSelector.GetAgentGroup()
 
-	etcdPath := path.Join(common.ClassifiersConfigPath, common.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))
+	etcdPath := path.Join(common.ClassifiersPath, common.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))
 	configSync := &classifierConfigSync{
 		classifierProto: classifierProto,
 		policyReadAPI:   policyBaseAPI,
