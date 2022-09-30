@@ -133,7 +133,7 @@ func addEnvoySpecificLabels(attributes pcommon.Map) {
 
 	// Compute durations
 	responseDuration, responseDurationExists := otelcollector.GetFloat64(attributes, otelcollector.EnvoyResponseDurationLabel, treatAsZero)
-	authzDuration, authzDurationExists := otelcollector.GetFloat64(attributes, otelcollector.EnvoyAuthzDurationLabel, []string{})
+	authzDuration, authzDurationExists := otelcollector.GetFloat64(attributes, otelcollector.EnvoyAuthzDurationLabel, treatAsZero)
 
 	if responseDurationExists {
 		attributes.PutDouble(otelcollector.FlowDurationLabel, responseDuration)
