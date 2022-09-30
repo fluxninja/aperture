@@ -30,7 +30,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
-	"github.com/fluxninja/aperture/pkg/otelcollector/spantologprocessor"
+	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 )
 
@@ -98,7 +98,7 @@ func AgentOTELComponents(
 		rollupprocessor.NewFactory(),
 		metricsprocessor.NewFactory(promRegistry, engine),
 		attributesprocessor.NewFactory(),
-		spantologprocessor.NewFactory(),
+		tracestologsprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
 
@@ -152,13 +152,13 @@ func addTracesPipeline(cfg *otelcollector.OtelParams) {
 			"insecure": true,
 		},
 	})
-	config.AddProcessor(otelcollector.ProcessorSpanToLog, spantologprocessor.Config{
+	config.AddProcessor(otelcollector.ProcessorTracesToLogs, tracestologsprocessor.Config{
 		LogsExporter: otelcollector.ExporterOTLPLoopback,
 	})
 
 	config.Service.AddPipeline("traces", otelcollector.Pipeline{
 		Receivers:  []string{otelcollector.ReceiverOTLP},
-		Processors: []string{otelcollector.ProcessorSpanToLog},
+		Processors: []string{otelcollector.ProcessorTracesToLogs},
 		// We need some exporter configured to make this pipeline correct. Actual
 		// Log exporting is done inside the processor.
 		Exporters: []string{otelcollector.ExporterLogging},

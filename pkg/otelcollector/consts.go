@@ -125,9 +125,9 @@ const (
 	ProcessorRollup = "rollup"
 	// ProcessorAgentGroup adds `agent_group` attribute.
 	ProcessorAgentGroup = "attributes/agent_group"
-	// ProcessorSpanToLog converts received spans to logs and passes them to configured
+	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured
 	// log exporter.
-	ProcessorSpanToLog = "spantolog"
+	ProcessorTracesToLogs = "tracestologs"
 
 	// ExporterLogging exports telemetry using Aperture logger.
 	ExporterLogging = "aperturelogging"

@@ -1,4 +1,4 @@
-package spantologprocessor
+package tracestologsprocessor
 
 import (
 	"context"
@@ -8,9 +8,9 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 )
 
-const typeStr = "spantolog" // The value of "type" key in configuration.
+const typeStr = "tracestologs" // The value of "type" key in configuration.
 
-// NewFactory returns a new factory for the spantologexporter.
+// NewFactory returns a new factory for the tracestologsprocessor.
 func NewFactory() component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
