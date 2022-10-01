@@ -1,7 +1,6 @@
 package jobs
 
 import (
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -41,25 +40,4 @@ func (jm *JobMetrics) allMetrics() []prometheus.Collector {
 		jm.executionTotal,
 		jm.latencySummary,
 	}
-}
-
-func (jg *JobGroup) registerJobMetrics(prometheusRegistry *prometheus.Registry) error {
-	for _, m := range jg.metrics.allMetrics() {
-		err := prometheusRegistry.Register(m)
-		if err != nil {
-			log.Warn().Err(err).Msg("Unable to register job metric")
-			return err
-		}
-	}
-	return nil
-}
-
-func (jg *JobGroup) deregisterJobMetrics(prometheusRegistry *prometheus.Registry) error {
-	for _, m := range jg.metrics.allMetrics() {
-		deregistered := prometheusRegistry.Unregister(m)
-		if !deregistered {
-			log.Warn().Msg("Unable to deregister job metric")
-		}
-	}
-	return nil
 }

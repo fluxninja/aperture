@@ -8,10 +8,12 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
+	"go.uber.org/multierr"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -215,20 +217,35 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 // It returns an error if the job is not registered.
 // It also stops the job's executor.
 func (jg *JobGroup) DeregisterJob(name string) error {
+	var errMulti error
 	job, err := jg.gt.deregisterJob(name)
 	if err != nil {
-		return err
+		errMulti = multierr.Append(errMulti, err)
 	}
 	if executor, ok := job.(*jobExecutor); ok {
 		executor.stop()
 	}
-	// TODO: Maintain to the pointer to the Metrics - then we delete the instance of the metrics here.
-	return nil
+
+	label := prometheus.Labels{
+		metrics.JobNameLabel: name,
+	}
+	deleted := jg.metrics.errorTotal.Delete(label)
+	if !deleted {
+		errMulti = multierr.Append(errMulti, errors.New("failed to delete job_error_total vector from its metric vector"))
+	}
+	deleted = jg.metrics.executionTotal.Delete(label)
+	if !deleted {
+		errMulti = multierr.Append(errMulti, errors.New("failed to delete job_execution_total vector from its metric vector"))
+	}
+	deleted = jg.metrics.latencySummary.Delete(label)
+	if !deleted {
+		errMulti = multierr.Append(errMulti, errors.New("failed to delete job_latency_ms summary from its metric vector"))
+	}
+	return errMulti
 }
 
 // DeregisterAll deregisters all Jobs from the JobGroup.
 func (jg *JobGroup) DeregisterAll() {
-	// TODO: Shouldn't this call DeregisterJob for all jobs?
 	jobs := jg.gt.reset()
 	for _, job := range jobs {
 		if executor, ok := job.(*jobExecutor); ok {
@@ -277,4 +294,25 @@ func (jg *JobGroup) Results() (*statusv1.GroupStatus, bool) {
 // GetStatusRegistry returns the registry of the JobGroup.
 func (jg *JobGroup) GetStatusRegistry() status.Registry {
 	return jg.gt.statusRegistry
+}
+
+func (jg *JobGroup) registerJobMetrics(prometheusRegistry *prometheus.Registry) error {
+	for _, m := range jg.metrics.allMetrics() {
+		err := prometheusRegistry.Register(m)
+		if err != nil {
+			log.Warn().Err(err).Msg("Unable to register job metric")
+			return err
+		}
+	}
+	return nil
+}
+
+func (jg *JobGroup) deregisterJobMetrics(prometheusRegistry *prometheus.Registry) error {
+	for _, m := range jg.metrics.allMetrics() {
+		deregistered := prometheusRegistry.Unregister(m)
+		if !deregistered {
+			log.Warn().Msg("Unable to deregister job metric")
+		}
+	}
+	return nil
 }
