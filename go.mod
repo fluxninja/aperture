@@ -41,8 +41,8 @@ require (
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.1.6
 	github.com/onsi/gomega v1.20.2
-	github.com/open-policy-agent/opa v0.43.1
-	github.com/open-policy-agent/opa-envoy-plugin v0.43.0-envoy
+	github.com/open-policy-agent/opa v0.44.0
+	github.com/open-policy-agent/opa-envoy-plugin v0.44.0-envoy
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.60.0
@@ -109,6 +109,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheus v0.60.0 // indirect
 	github.com/pascaldekloe/name v1.0.0 // indirect
 	github.com/prometheus/prometheus v0.38.0 // indirect
+	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.9.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
@@ -273,7 +274,6 @@ require (
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.5.0 // indirect
 	github.com/toqueteos/webbrowser v1.2.0 // indirect
-	github.com/vektah/gqlparser/v2 v2.4.7 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vultr/govultr/v2 v2.17.2 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
