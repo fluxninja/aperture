@@ -60,6 +60,7 @@ func (simpleService SimpleService) Run() error {
 		handler = &RequestHandler{
 			hostname:   simpleService.hostname,
 			httpClient: &http.Client{},
+			latency:    simpleService.latency,
 		}
 	} else {
 		proxyURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", simpleService.envoyPort))
@@ -72,7 +73,7 @@ func (simpleService SimpleService) Run() error {
 		}
 	}
 
-	http.Handle("/request", limitClients(handler, simpleService.concurrency, simpleService.latency))
+	http.Handle("/request", limitClients(handler, simpleService.concurrency))
 	address := fmt.Sprintf(":%d", simpleService.port)
 
 	server := &http.Server{Addr: address}
@@ -80,17 +81,14 @@ func (simpleService SimpleService) Run() error {
 	return server.ListenAndServe()
 }
 
-func limitClients(h *RequestHandler, n int, l time.Duration) http.Handler {
-	logger := log.Sample(zerolog.Sometimes)
-
+func limitClients(h *RequestHandler, n int) http.Handler {
 	sem := make(chan struct{}, n)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info().Msgf("Received request: %s", r.URL.Path)
+		log.Sample(zerolog.Sometimes).Info().Msg("received request")
 		sem <- struct{}{}
 		defer func() {
 			<-sem
 		}()
-		time.Sleep(l)
 		h.ServeHTTP(w, r)
 	})
 }
@@ -133,6 +131,7 @@ type Response struct{}
 type RequestHandler struct {
 	httpClient HTTPClient
 	hostname   string
+	latency    time.Duration
 }
 
 func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -144,13 +143,18 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx, span := otel.Tracer(libraryName).Start(ctx, "ServeHTTP")
 	defer span.End()
 
+	// Fake workload
+	time.Sleep(h.latency)
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to read request body")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	err = json.Unmarshal(body, &p)
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to unmarshal request body")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -158,16 +162,19 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	subresponses := make([]Response, len(p.Chains))
 	for i, chain := range p.Chains {
 		if len(chain.subrequests) == 0 {
+			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Empty chain")
 			http.Error(w, "Received empty subrequest chain", http.StatusBadRequest)
 			return
 		}
 		requestDestination := chain.subrequests[0].Destination
 		if requestDestination != h.hostname {
+			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Invalid destination")
 			http.Error(w, "Invalid message destination", http.StatusBadRequest)
 			return
 		}
 		subresponses[i], err = h.processChain(ctx, chain)
 		if err != nil {
+			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to process chain")
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -176,6 +183,7 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	response := generateResponse(subresponses)
 	jsonString, err := json.Marshal(response)
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to marshal response")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -184,13 +192,13 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err = fmt.Fprintln(w, string(jsonString))
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to write response")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 }
 
 func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain) (Response, error) {
-	log.Info().Msg("processChain()")
 	if len(chain.subrequests) == 1 {
 		return h.processRequest(chain.subrequests[0])
 	}
@@ -214,11 +222,13 @@ func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname 
 
 	jsonRequest, err := json.Marshal(requestBody)
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to marshal request")
 		return Response{}, err
 	}
 
 	request, err := http.NewRequest("POST", address, bytes.NewBuffer(jsonRequest))
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to create request")
 		return Response{}, err
 	}
 
@@ -229,16 +239,19 @@ func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname 
 
 	response, err := h.httpClient.Do(request)
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to send request")
 		return Response{}, err
 	}
 
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to read response body")
 		return Response{}, err
 	}
 
 	err = response.Body.Close()
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to close response body")
 		return Response{}, err
 	}
 
@@ -246,6 +259,7 @@ func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname 
 
 	err = json.Unmarshal(responseBody, &rsp)
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to unmarshal response body")
 		return Response{}, err
 	}
 

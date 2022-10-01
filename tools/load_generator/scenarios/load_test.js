@@ -36,7 +36,21 @@ export default function () {
       "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
     "User-Type": userType,
   };
-  const body = {};
+  const body = {
+    request: [
+      [
+        {
+          destination: "service1-demo-app.demoapp.svc.cluster.local",
+        },
+        {
+          destination: "service2-demo-app.demoapp.svc.cluster.local",
+        },
+        {
+          destination: "service3-demo-app.demoapp.svc.cluster.local",
+        },
+      ],
+    ],
+  };
   let res = http.request("POST", url, JSON.stringify(body), {
     headers: headers,
   });
