@@ -133,6 +133,8 @@ eg. {any: {of: [expr1, expr2]}}.
 
 ### RateLimiterDynamicConfig {#rate-limiter-dynamic-config}
 
+Dynamic Configuration for the rate limiter
+
 #### Properties
 
 <dl>
@@ -1823,22 +1825,22 @@ to select which label should be used as key.
 #### Properties
 
 <dl>
-<dt>dynamic_config</dt>
-<dd>
-
-([RateLimiterDynamicConfig](#rate-limiter-dynamic-config)) Dynamic configuration
-
-</dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
-(string) Configuration key
+(string) Configuration key for DynamicConfig
 
 </dd>
 <dt>in_ports</dt>
 <dd>
 
 ([V1RateLimiterIns](#v1-rate-limiter-ins), `required`)
+
+</dd>
+<dt>init_config</dt>
+<dd>
+
+([RateLimiterDynamicConfig](#rate-limiter-dynamic-config)) Initial configuration
 
 </dd>
 <dt>label_key</dt>

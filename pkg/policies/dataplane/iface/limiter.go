@@ -5,6 +5,7 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -12,9 +13,7 @@ import (
 
 // LimiterID is the ID of the Limiter.
 type LimiterID struct {
-	PolicyName     string
-	PolicyHash     string
-	ComponentIndex int64
+	*wrappersv1.CommonAttributes
 }
 
 // String function returns the LimiterID as a string.

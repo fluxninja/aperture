@@ -62,9 +62,9 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	logSampled := logger.Sample(zerolog.Sometimes)
 	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.ClassifierInfo_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.ClassifierInfo{
-			PolicyName:      labelerWithSelector.PolicyName,
-			PolicyHash:      labelerWithSelector.PolicyHash,
-			ClassifierIndex: labelerWithSelector.ClassifierIndex,
+			PolicyName:      labelerWithSelector.CommonAttributes.PolicyName,
+			PolicyHash:      labelerWithSelector.CommonAttributes.PolicyHash,
+			ClassifierIndex: labelerWithSelector.CommonAttributes.ComponentIndex,
 			LabelKey:        labelerWithSelector.Labeler.LabelName,
 			Error:           error,
 		})

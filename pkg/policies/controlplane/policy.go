@@ -110,7 +110,7 @@ func compilePolicyWrapper(wrapperMessage *wrappersv1.PolicyWrapper, registry sta
 	}
 
 	policy := &Policy{
-		PolicyBase: wrapperMessage,
+		PolicyBase: wrapperMessage.GetCommonAttributes(),
 		registry:   registry,
 	}
 
@@ -278,8 +278,10 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 	hash := base64.StdEncoding.EncodeToString(hashBytes[:])
 
 	return &wrappersv1.PolicyWrapper{
-		Policy:     policyMessage,
-		PolicyName: policyName,
-		PolicyHash: hash,
+		Policy: policyMessage,
+		CommonAttributes: &wrappersv1.CommonAttributes{
+			PolicyName: policyName,
+			PolicyHash: hash,
+		},
 	}, nil
 }

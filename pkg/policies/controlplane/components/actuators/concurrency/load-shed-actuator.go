@@ -111,9 +111,11 @@ func (lsa *LoadShedActuator) publishLoadShedFactor(loadShedFactor float64) error
 		logger.Sample(zerolog.Often).Debug().Float64("loadShedFactor", loadShedFactor).Msg("Publish load shed decision")
 		wrapper := &wrappersv1.LoadShedDecisionWrapper{
 			LoadShedDecision: lsa.decision,
-			ComponentIndex:   int64(lsa.componentIndex),
-			PolicyName:       lsa.policyReadAPI.GetPolicyName(),
-			PolicyHash:       lsa.policyReadAPI.GetPolicyHash(),
+			CommonAttributes: &wrappersv1.CommonAttributes{
+				PolicyName:     lsa.policyReadAPI.GetPolicyName(),
+				PolicyHash:     lsa.policyReadAPI.GetPolicyHash(),
+				ComponentIndex: int64(lsa.componentIndex),
+			},
 		}
 		dat, err := proto.Marshal(wrapper)
 		if err != nil {

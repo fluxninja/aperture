@@ -6,12 +6,6 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
     },
   },
   inPorts:: ratelimiterins,
-  withDynamicConfig(dynamic_config):: {
-    dynamic_config: dynamic_config,
-  },
-  withDynamicConfigMixin(dynamic_config):: {
-    dynamic_config+: dynamic_config,
-  },
   withDynamicConfigKey(dynamic_config_key):: {
     dynamic_config_key: dynamic_config_key,
   },
@@ -23,6 +17,12 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   },
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
+  },
+  withInitConfig(init_config):: {
+    init_config: init_config,
+  },
+  withInitConfigMixin(init_config):: {
+    init_config+: init_config,
   },
   withLabelKey(label_key):: {
     label_key: label_key,

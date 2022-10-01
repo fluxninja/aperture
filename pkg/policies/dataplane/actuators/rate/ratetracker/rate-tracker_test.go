@@ -26,9 +26,7 @@ import (
 func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit int, ttl time.Duration, overrides map[string]float64) (RateTracker, error) {
 	limitCheck := NewBasicRateLimitChecker()
 	limitCheck.SetRateLimit(limit)
-	for label, limit := range overrides {
-		limitCheck.AddOverride(label, limit)
-	}
+	limitCheck.SetOverrides(overrides)
 	limiter, err := NewDistCacheRateTracker(limitCheck, distCache, "Limiter", ttl)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
@@ -213,36 +211,6 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 		}(f)
 	}
 	fr.wg.Wait()
-}
-
-// TestLimitSetGetAndOverrides tests the basic limitset, get and overrides of the limiter.
-func TestLimitSetGetAndOverrides(t *testing.T) {
-	limit := 10
-
-	limitCheck := NewBasicRateLimitChecker()
-	limitCheck.SetRateLimit(limit)
-
-	limitCheck.SetRateLimit(limit + 1)
-	gotLimit := limitCheck.GetRateLimit()
-	if gotLimit != limit+1 {
-		t.Logf("got limit=%d, expected=%d", gotLimit, limit+1)
-		t.Fail()
-	}
-
-	overrides := map[string]float64{
-		"user-0": 0.5,
-		"user-1": 1.0,
-	}
-	for label, limit := range overrides {
-		limitCheck.AddOverride(label, limit)
-	}
-
-	limitCheck.RemoveOverride("user-0")
-	_, ok := limitCheck.overrides["user-0"]
-	if ok {
-		t.Logf("Failed to remove override")
-		t.Fail()
-	}
 }
 
 // createJobGroup creates a job group for the given limiter

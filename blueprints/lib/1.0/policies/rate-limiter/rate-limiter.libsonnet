@@ -74,7 +74,7 @@ function(params) {
           + rateLimiter.withSelector(svcSelector)
           + rateLimiter.withLimitResetInterval($._config.limitResetInterval)
           + rateLimiter.withLabelKey($._config.labelKey)
-          + rateLimiter.withDynamicConfig(
+          + rateLimiter.withInitConfig(
             dynamicConfig.new()
             + dynamicConfig.withOverrides($._config.overrides)
           )

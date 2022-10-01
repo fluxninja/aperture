@@ -6,13 +6,13 @@ circuit:
             signal_name: RATE_LIMIT
         value: "50.0"
     - rate_limiter:
-        dynamic_config:
-          overrides:
-            - label_value: gold
-              limit_scale_factor: 1
         in_ports:
           limit:
             signal_name: RATE_LIMIT
+        init_config:
+          overrides:
+            - label_value: gold
+              limit_scale_factor: 1
         label_key: http.request.header.user_type
         lazy_sync:
           enabled: true

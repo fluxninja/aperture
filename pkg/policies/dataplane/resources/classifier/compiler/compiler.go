@@ -26,11 +26,9 @@ type CompiledRuleset struct {
 
 // LabelerWithSelector is a labeler with its selector.
 type LabelerWithSelector struct {
-	Labeler         *Labeler
-	LabelSelector   multimatcher.Expr
-	PolicyName      string
-	PolicyHash      string
-	ClassifierIndex int64
+	Labeler          *Labeler
+	LabelSelector    multimatcher.Expr
+	CommonAttributes *wrappersv1.CommonAttributes
 }
 
 // Labeler is used to create flow labels
@@ -164,6 +162,10 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 					err,
 				)
 			}
+			commonAttributes := classifierWrapper.GetCommonAttributes()
+			if commonAttributes == nil {
+				return nil, fmt.Errorf("commonAttributes is nil")
+			}
 			labelers = append(labelers, LabelerWithSelector{
 				LabelSelector: labelSelector,
 				Labeler: &Labeler{
@@ -171,9 +173,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 					LabelName: labelName,
 					Telemetry: rule.GetTelemetry(),
 				},
-				PolicyName:      classifierWrapper.GetPolicyName(),
-				PolicyHash:      classifierWrapper.GetPolicyHash(),
-				ClassifierIndex: classifierWrapper.GetClassifierIndex(),
+				CommonAttributes: commonAttributes,
 			})
 			rawRegoCount++
 		}

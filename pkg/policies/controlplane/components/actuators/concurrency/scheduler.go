@@ -246,9 +246,11 @@ func (s *Scheduler) publishQueryTokens(tokens *policydecisionsv1.TokensDecision)
 
 	wrapper := &wrappersv1.TokensDecisionWrapper{
 		TokensDecision: tokens,
-		ComponentIndex: int64(s.componentIndex),
-		PolicyName:     policyName,
-		PolicyHash:     policyHash,
+		CommonAttributes: &wrappersv1.CommonAttributes{
+			PolicyName:     policyName,
+			PolicyHash:     policyHash,
+			ComponentIndex: int64(s.componentIndex),
+		},
 	}
 	dat, err := proto.Marshal(wrapper)
 	if err != nil {
