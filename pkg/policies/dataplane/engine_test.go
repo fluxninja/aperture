@@ -8,7 +8,6 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
@@ -61,11 +60,9 @@ var _ = Describe("Dataplane Engine", func() {
 			FluxMeterName: "test",
 		}
 		limiterID = iface.LimiterID{
-			CommonAttributes: &wrappersv1.CommonAttributes{
-				PolicyName:     "test",
-				ComponentIndex: 0,
-				PolicyHash:     "test",
-			},
+			PolicyName:     "test",
+			ComponentIndex: 0,
+			PolicyHash:     "test",
 		}
 	})
 

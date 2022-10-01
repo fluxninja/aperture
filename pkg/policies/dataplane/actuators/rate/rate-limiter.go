@@ -427,11 +427,9 @@ func (rateLimiter *rateLimiter) dynamicConfigUpdateCallback(event notifiers.Even
 // GetLimiterID returns the limiter ID.
 func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
 	return iface.LimiterID{
-		CommonAttributes: &wrappersv1.CommonAttributes{
-			PolicyName:     rateLimiter.GetPolicyName(),
-			PolicyHash:     rateLimiter.GetPolicyHash(),
-			ComponentIndex: rateLimiter.GetComponentIndex(),
-		},
+		PolicyName:     rateLimiter.GetPolicyName(),
+		PolicyHash:     rateLimiter.GetPolicyHash(),
+		ComponentIndex: rateLimiter.GetComponentIndex(),
 	}
 }
 

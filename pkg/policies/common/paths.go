@@ -12,10 +12,6 @@ var (
 	DecisionsPrefix = path.Join("/decisions")
 	// ClassifiersPath is config path in etcd for classifiers.
 	ClassifiersPath = path.Join(ConfigPrefix, "classifiers")
-	// PoliciesPath is config path in etcd for policies.
-	PoliciesPath = path.Join(ConfigPrefix, "policies")
-	// PoliciesDynamicConfigPath is config path in etcd for dynamic config of policies.
-	PoliciesDynamicConfigPath = path.Join(ConfigPrefix, "policies_dynamic_config")
 	// LoadShedDecisionsPath is decision path in etcd for load shed decisions.
 	LoadShedDecisionsPath = path.Join(DecisionsPrefix, "load_shed")
 	// AutoTokenResultsPath is config path in etcd for query tokens.

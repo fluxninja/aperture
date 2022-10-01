@@ -12,7 +12,6 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
@@ -322,11 +321,9 @@ func (p *metricsProcessor) updateMetrics(
 				}
 
 				limiterID := iface.LimiterID{
-					CommonAttributes: &wrappersv1.CommonAttributes{
-						PolicyName:     decision.PolicyName,
-						PolicyHash:     decision.PolicyHash,
-						ComponentIndex: decision.ComponentIndex,
-					},
+					PolicyName:     decision.PolicyName,
+					PolicyHash:     decision.PolicyHash,
+					ComponentIndex: decision.ComponentIndex,
 				}
 
 				p.updateMetricsForWorkload(limiterID, labels, latency)

@@ -122,6 +122,11 @@ func CompileRuleset(ctx context.Context, name string, classifierWrapper *wrapper
 func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifierWrapper *wrappersv1.ClassifierWrapper) ([]LabelerWithSelector, error) {
 	log.Trace().Msg("Classifier.compileRules starting")
 
+	commonAttributes := classifierWrapper.GetCommonAttributes()
+	if commonAttributes == nil {
+		return nil, fmt.Errorf("commonAttributes is nil")
+	}
+
 	labelRules := classifierWrapper.GetClassifier().GetRules()
 
 	// Group all the extractor-based rules so that we can compile them to a
@@ -162,10 +167,6 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 					err,
 				)
 			}
-			commonAttributes := classifierWrapper.GetCommonAttributes()
-			if commonAttributes == nil {
-				return nil, fmt.Errorf("commonAttributes is nil")
-			}
 			labelers = append(labelers, LabelerWithSelector{
 				LabelSelector: labelSelector,
 				Labeler: &Labeler{
@@ -202,6 +203,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 				Query:           query,
 				LabelsTelemetry: labelsTelemetry,
 			},
+			CommonAttributes: commonAttributes,
 		})
 	}
 

@@ -213,7 +213,7 @@ func (policy *Policy) setupCircuitJob(
 }
 
 func (policy *Policy) setupDynamicConfig(
-	watcher notifiers.Watcher,
+	dynamicConfigWatcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
 ) error {
 	unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
@@ -224,10 +224,10 @@ func (policy *Policy) setupDynamicConfig(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			return watcher.AddKeyNotifier(unmarshalNotifier)
+			return dynamicConfigWatcher.AddKeyNotifier(unmarshalNotifier)
 		},
 		OnStop: func(_ context.Context) error {
-			return watcher.RemoveKeyNotifier(unmarshalNotifier)
+			return dynamicConfigWatcher.RemoveKeyNotifier(unmarshalNotifier)
 		},
 	})
 

@@ -532,11 +532,9 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flow
 func (conLimiter *concurrencyLimiter) GetLimiterID() iface.LimiterID {
 	// TODO: move this to limiter base.
 	return iface.LimiterID{
-		CommonAttributes: &wrappersv1.CommonAttributes{
-			PolicyName:     conLimiter.GetPolicyName(),
-			PolicyHash:     conLimiter.GetPolicyHash(),
-			ComponentIndex: conLimiter.GetComponentIndex(),
-		},
+		PolicyName:     conLimiter.GetPolicyName(),
+		PolicyHash:     conLimiter.GetPolicyHash(),
+		ComponentIndex: conLimiter.GetComponentIndex(),
 	}
 }
 

@@ -1,4 +1,4 @@
-package kubernetes
+package crwatcher
 
 import (
 	"bytes"
@@ -11,6 +11,7 @@ import (
 	"github.com/cenkalti/backoff"
 	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/hashicorp/go-multierror"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -65,6 +66,10 @@ func (w *watcher) Start() error {
 	if err != nil {
 		return err
 	}
+	err = w.dynamicConfigTrackers.Start()
+	if err != nil {
+		return err
+	}
 
 	w.waitGroup.Add(1)
 
@@ -111,7 +116,16 @@ func (w *watcher) Start() error {
 func (w *watcher) Stop() error {
 	w.cancel()
 	w.waitGroup.Wait()
-	return w.Trackers.Stop()
+	var err, merr error
+	err = w.Trackers.Stop()
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	err = w.dynamicConfigTrackers.Stop()
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	return merr
 }
 
 // GetDynamicConfigWatcher returns the config watcher.
