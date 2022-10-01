@@ -178,8 +178,10 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	if s.tokensQuery != nil {
 		promValue, err := s.tokensQuery.ExecutePromQuery(tickInfo)
 		if err != nil {
-			logger.Error().Err(err).Msg("could not read tokens query from prometheus")
-			errMulti = multierr.Append(errMulti, err)
+			if err != components.ErrNoQueriesReturned {
+				logger.Error().Err(err).Msg("could not read tokens query from prometheus")
+				errMulti = multierr.Append(errMulti, err)
+			}
 		} else if promValue != nil && !reflect.DeepEqual(promValue, s.tokensPromValue) {
 			// update only if something changed
 			s.tokensPromValue = promValue
@@ -216,7 +218,9 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	acceptedValue, err := s.acceptedQuery.ExecuteScalarQuery(tickInfo)
 	if err != nil {
 		acceptedReading = runtime.InvalidReading()
-		errMulti = multierr.Append(errMulti, err)
+		if err != components.ErrNoQueriesReturned {
+			errMulti = multierr.Append(errMulti, err)
+		}
 	} else {
 		acceptedReading = runtime.NewReading(acceptedValue)
 	}
@@ -225,7 +229,9 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	incomingValue, err := s.incomingQuery.ExecuteScalarQuery(tickInfo)
 	if err != nil {
 		incomingReading = runtime.InvalidReading()
-		errMulti = multierr.Append(errMulti, err)
+		if err != components.ErrNoQueriesReturned {
+			errMulti = multierr.Append(errMulti, err)
+		}
 	} else {
 		incomingReading = runtime.NewReading(incomingValue)
 	}

@@ -26,7 +26,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-var errNoQueriesReturned = errors.New("no queries returned until now")
+// ErrNoQueriesReturned is returned when no queries are returned by the policy (initial state).
+var ErrNoQueriesReturned = errors.New("no queries returned until now")
 
 const (
 	promTimeout = time.Second * 5
@@ -353,7 +354,7 @@ func NewPromQLAndOptions(
 		componentIndex:     componentIndex,
 		lastQueryTimestamp: time.Time{},
 		// Set err to make sure the initial runs of Execute return Invalid readings.
-		err: errNoQueriesReturned,
+		err: ErrNoQueriesReturned,
 	}
 
 	// Job register is implemented by self
@@ -490,7 +491,7 @@ func NewTaggedQueryAndOptions(
 	taggedQuery := &TaggedQuery{
 		scalarQuery: scalarQuery,
 		// Set err to make sure the initial runs of ExecutePromQuery return error.
-		err: errNoQueriesReturned,
+		err: ErrNoQueriesReturned,
 	}
 	// taggedQuery implements jobRegisterer
 	scalarQuery.promQL.jobRegisterer = taggedQuery
