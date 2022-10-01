@@ -72,6 +72,11 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (Compi
 		for _, c := range policy.GetResources().Classifiers {
 			_, err = compiler.CompileRuleset(ctx, name, &wrappersv1.ClassifierWrapper{
 				Classifier: c,
+				CommonAttributes: &wrappersv1.CommonAttributes{
+					PolicyName:     "dummy",
+					PolicyHash:     "dummy",
+					ComponentIndex: 0,
+				},
 			})
 			if err != nil {
 				if errors.Is(err, compiler.BadExtractor) || errors.Is(err, compiler.BadSelector) ||
