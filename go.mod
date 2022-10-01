@@ -63,7 +63,7 @@ require (
 	go.opentelemetry.io/collector/pdata v0.60.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0
 	go.opentelemetry.io/otel v1.9.0
-	go.opentelemetry.io/proto/otlp v0.18.0
+	go.opentelemetry.io/proto/otlp v0.19.0
 	go.uber.org/automaxprocs v1.5.1
 	go.uber.org/fx v1.18.1
 	go.uber.org/goleak v1.2.0
