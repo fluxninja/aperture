@@ -157,7 +157,7 @@ function(params) {
           + sqrt.withScale($._config.constants.sqrtScale),
         ),
         component.withPromql(
-          local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
+          local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
           promQL.new()
           + promQL.withQueryString(q)
           + promQL.withEvaluationInterval('1s')
