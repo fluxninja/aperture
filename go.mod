@@ -62,7 +62,7 @@ require (
 	go.opentelemetry.io/collector v0.60.0
 	go.opentelemetry.io/collector/pdata v0.60.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0
-	go.opentelemetry.io/otel v1.9.0
+	go.opentelemetry.io/otel v1.10.0
 	go.opentelemetry.io/proto/otlp v0.18.0
 	go.uber.org/automaxprocs v1.5.1
 	go.uber.org/fx v1.18.1
@@ -290,7 +290,7 @@ require (
 	go.opentelemetry.io/otel/metric v0.31.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.9.0
 	go.opentelemetry.io/otel/sdk/metric v0.31.0 // indirect
-	go.opentelemetry.io/otel/trace v1.9.0 // indirect
+	go.opentelemetry.io/otel/trace v1.10.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/dig v1.15.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
