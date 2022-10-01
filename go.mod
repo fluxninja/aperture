@@ -77,7 +77,7 @@ require (
 	gopkg.in/fsnotify.v1 v1.4.7
 	gotest.tools/gotestsum v1.8.2
 	k8s.io/api v0.25.0
-	k8s.io/apimachinery v0.25.0
+	k8s.io/apimachinery v0.25.2
 	k8s.io/client-go v0.25.0
 	k8s.io/component-base v0.24.3
 	k8s.io/klog/v2 v2.70.1
