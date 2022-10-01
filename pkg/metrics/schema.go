@@ -19,6 +19,15 @@ const (
 	// FluxMeterMetricName name of fluxmeter metrics.
 	FluxMeterMetricName = "flux_meter"
 
+	// Job metrics.
+
+	// JobErrorMetricName - metric for tracking total numbers of error occurred.
+	JobErrorMetricName = "job_error_total"
+	// JobExecutionMetricName - metric for tracking total numbers of job execution occurred.
+	JobExecutionMetricName = "job_execution_total"
+	// JobLatencyMetricName - metric for measuring latencies of job executions.
+	JobLatencyMetricName = "job_latency_ms"
+
 	// Workload metrics.
 
 	// WorkloadLatencyMetricName - metric used for grouping latencies per workload.
@@ -57,6 +66,8 @@ const (
 
 	// PROMETHEUS LABELS.
 
+	// JobNameLabel - label used in prometheus.
+	JobNameLabel = "job_name"
 	// PolicyNameLabel - label used in prometheus.
 	PolicyNameLabel = "policy_name"
 	// PolicyHashLabel - label used in prometheus.

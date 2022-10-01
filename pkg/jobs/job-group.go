@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
@@ -82,6 +83,7 @@ func (jgc JobGroupConstructor) provideJobGroup(
 	gw GroupWatchers,
 	registry status.Registry,
 	unmarshaller config.Unmarshaller,
+	promRegistry *prometheus.Registry,
 	lifecycle fx.Lifecycle,
 ) (*JobGroup, error) {
 	config := jgc.DefaultConfig
@@ -109,9 +111,11 @@ func (jgc JobGroupConstructor) provideJobGroup(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
+			_ = jg.registerJobMetrics(promRegistry)
 			return jg.Start()
 		},
 		OnStop: func(_ context.Context) error {
+			_ = jg.deregisterJobMetrics(promRegistry)
 			defer reg.Detach()
 			return jg.Stop()
 		},
@@ -128,6 +132,7 @@ type JobGroup struct {
 	scheduler        *gocron.Scheduler
 	gt               *groupTracker
 	livenessRegistry status.Registry
+	metrics          *JobMetrics
 }
 
 // NewJobGroup creates a new JobGroup.
@@ -153,6 +158,7 @@ func NewJobGroup(
 	jg := &JobGroup{
 		scheduler: scheduler,
 		gt:        newGroupTracker(gws, statusRegistry),
+		metrics:   newJobMetrics(),
 	}
 
 	return jg, nil
@@ -216,11 +222,13 @@ func (jg *JobGroup) DeregisterJob(name string) error {
 	if executor, ok := job.(*jobExecutor); ok {
 		executor.stop()
 	}
+	// TODO: Maintain to the pointer to the Metrics - then we delete the instance of the metrics here.
 	return nil
 }
 
 // DeregisterAll deregisters all Jobs from the JobGroup.
 func (jg *JobGroup) DeregisterAll() {
+	// TODO: Shouldn't this call DeregisterJob for all jobs?
 	jobs := jg.gt.reset()
 	for _, job := range jobs {
 		if executor, ok := job.(*jobExecutor); ok {
