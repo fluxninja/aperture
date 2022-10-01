@@ -85,7 +85,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otel
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   ClientTLSConfig:
     properties:
       ca_file:
@@ -701,7 +701,7 @@ definitions:
         $ref: '#/definitions/BatchConfig'
     title: OtelConfig is the configuration for the OTEL collector.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otel
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   PeerDiscoveryConfig:
     properties:
       advertisement_addr:

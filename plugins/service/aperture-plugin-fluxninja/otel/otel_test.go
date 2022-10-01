@@ -107,11 +107,6 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 		basePluginOTELConfigWithPipeline("logs", testPipelineWithFN()),
 	),
 	Entry(
-		"add FN exporters to traces pipeline",
-		baseOTELConfigWithPipeline("traces", testPipeline()),
-		basePluginOTELConfigWithPipeline("traces", testPipelineWithFN()),
-	),
-	Entry(
 		"add metrics/slow pipeline if metrics/fast pipeline exists",
 		baseOTELConfigWithPipeline("metrics/fast", testPipeline()),
 		basePluginOTELConfigWithMetrics("metrics/slow"),

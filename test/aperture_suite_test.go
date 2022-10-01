@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"go.uber.org/fx"
 
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -22,7 +23,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane"
@@ -140,7 +140,7 @@ var _ = BeforeSuite(func() {
 		),
 		fx.Provide(
 			clockwork.NewRealClock,
-			otel.AgentOTELComponents,
+			agent.AgentOTELComponents,
 			dataplane.ProvideEngineAPI,
 			entitycache.NewEntityCache,
 			agentinfo.ProvideAgentInfo,

@@ -5,7 +5,6 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"go.uber.org/fx"
@@ -25,7 +24,7 @@ type FxIn struct {
 }
 
 func AddAgentInfoAttribute(in FxIn) {
-	in.BaseConfig.AddProcessor(otel.ProcessorAgentGroup, map[string]interface{}{
+	in.BaseConfig.AddProcessor(otelcollector.ProcessorAgentGroup, map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{
 				"key":    otelcollector.AgentGroupLabel,
