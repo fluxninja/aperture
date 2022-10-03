@@ -18,17 +18,30 @@ local flowSelector = aperture.spec.v1.FlowSelector;
 local controlPoint = aperture.spec.v1.ControlPoint;
 local staticBuckets = aperture.spec.v1.FluxMeterStaticBuckets;
 
-local svcSelector = selector.new()
-                    + selector.withServiceSelector(
-                      serviceSelector.new()
-                      + serviceSelector.withAgentGroup('default')
-                      + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
-                    )
-                    + selector.withFlowSelector(
-                      flowSelector.new()
-                      + flowSelector.withControlPoint(controlPoint.new()
-                                                      + controlPoint.withTraffic('ingress'))
-                    );
+local fluxMeterSelector = selector.new()
+                          + selector.withServiceSelector(
+                            serviceSelector.new()
+                            + serviceSelector.withAgentGroup('default')
+                            + serviceSelector.withService('service3-demo-app.demoapp.svc.cluster.local')
+                          )
+                          + selector.withFlowSelector(
+                            flowSelector.new()
+                            + flowSelector.withControlPoint(controlPoint.new()
+                                                            + controlPoint.withTraffic('ingress'))
+                          );
+
+local concurrencyLimiterSelector = selector.new()
+                                   + selector.withServiceSelector(
+                                     serviceSelector.new()
+                                     + serviceSelector.withAgentGroup('default')
+                                     + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                                   )
+                                   + selector.withFlowSelector(
+                                     flowSelector.new()
+                                     + flowSelector.withControlPoint(controlPoint.new()
+                                                                     + controlPoint.withTraffic('ingress'))
+                                   );
+
 
 local apertureControllerMixin =
   apertureControllerApp {
@@ -72,22 +85,11 @@ local apertureControllerMixin =
 
 local policy = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  fluxMeterSelector: svcSelector,
-  fluxMeters: {
-    'service1-demo-app':
-      fluxMeter.new()
-      + fluxMeter.withSelector(svcSelector)
-      + fluxMeter.withAttributeKey('workload_duration_ms')
-      + fluxMeter.withStaticBuckets(
-        staticBuckets.new()
-        + staticBuckets.withBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0])
-      ),
-  },
-
-  concurrencyLimiterSelector: svcSelector,
+  fluxMeterSelector: fluxMeterSelector,
+  concurrencyLimiterSelector: concurrencyLimiterSelector,
   classifiers: [
     classifier.new()
-    + classifier.withSelector(svcSelector)
+    + classifier.withSelector(concurrencyLimiterSelector)
     + classifier.withRules({
       user_type: rule.new()
                  + rule.withExtractor(extractor.new()

@@ -12,25 +12,9 @@
     * @section Latency Gradient Policy
     * @subsection Flux Meter Selector
     *
-    * @param (policy.fluxMeterSelector: aperture.spec.v1.Selector required) Flux Meter selector.
+    * @param (policy.fluxMeterSelector: aperture.v1.Selector required) Flux Meter selector.
     */
     fluxMeterSelector: error 'fluxMeterSelector is not set',
-    /**
-    * @section Latency Gradient Policy
-    * @subsection Flux Meters
-    *
-    * @param (policy.fluxMeters: map[string]aperture.spec.v1.FluxMeter) Mappings of fluxMeterName to fluxMeter.
-    * @param (policy.fluxMeters[policyName].attributeKey: string) Key of the attribute in access log or span.
-    * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.spec.v1.FluxMeterStaticBuckets) Flux Meter static histogram buckets.
-    */
-    fluxMeters: {
-      'service1-latency-gradient': {
-        attributeKey: 'workload_duration_ms',
-        staticBuckets: {
-          buckets: [5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0],
-        },
-      },
-    },
     /**
     * @section Latency Gradient Policy
     * @subsection Concurrency Limiter Selector

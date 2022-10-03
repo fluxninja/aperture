@@ -4,7 +4,6 @@ local defaults = {
   policyName: error 'policyName must be set',
   evaluationInterval: '0.5s',
   fluxMeterSelector: error 'fluxMeterSelector must be set',
-  fluxMeters: {},
   concurrencyLimiterSelector: error 'concurrencyLimiterSelector must be set',
   classifiers: [],
   constants: {
@@ -110,7 +109,8 @@ function(params) {
   local policyDef =
     policy.new()
     + policy.withResources(resources.new()
-                           + resources.withFluxMeters($._config.fluxMeters)
+                           + resources.withFluxMetersMixin({ [$._config.policyName]: fluxMeter.new()
+                                                                                     + fluxMeter.withSelector($._config.fluxMeterSelector) })
                            + resources.withClassifiers($._config.classifiers))
     + policy.withCircuit(
       circuit.new()

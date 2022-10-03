@@ -23,6 +23,7 @@ func main() {
 	envoyPort := envoyPortFromEnv()
 	concurrency := concurrencyFromEnv()
 	latency := latencyFromEnv()
+	rejectRatio := rejectRatioFromEnv()
 
 	// We don't necessarily need tracing providers (just propagators), but lets
 	// do them anyway to have a "more realistic" otel usage
@@ -46,7 +47,7 @@ func main() {
 		propagation.Baggage{},
 	))
 
-	service := app.NewSimpleService(hostname, port, envoyPort, concurrency, latency)
+	service := app.NewSimpleService(hostname, port, envoyPort, concurrency, latency, rejectRatio)
 	err := service.Run()
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -101,6 +102,18 @@ func latencyFromEnv() time.Duration {
 		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_LATENCY: %v", err)
 	}
 	return latency
+}
+
+func rejectRatioFromEnv() float64 {
+	rejectRatioValue, exists := os.LookupEnv("SIMPLE_SERVICE_REJECT_RATIO")
+	if !exists {
+		return 0.05
+	}
+	rejectRatio, err := strconv.ParseFloat(rejectRatioValue, 64)
+	if err != nil {
+		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_REJECT_RATIO: %v", err)
+	}
+	return rejectRatio
 }
 
 // newResource returns a resource describing this application.

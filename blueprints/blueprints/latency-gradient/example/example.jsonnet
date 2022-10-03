@@ -45,15 +45,6 @@ local config = {
   policy+: {
     policyName: $.common.policyName,
     fluxMeterSelector: svcSelector,
-    fluxMeters: {
-      [$.common.policyName]: fluxMeter.new()
-                             + fluxMeter.withSelector(svcSelector)
-                             + fluxMeter.withAttributeKey('workload_duration_ms')
-                             + fluxMeter.withStaticBuckets(
-                               staticBuckets.new()
-                               + staticBuckets.withBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0])
-                             ),
-    },
     concurrencyLimiterSelector: svcSelector,
     classifiers: [
       classifier.new()
