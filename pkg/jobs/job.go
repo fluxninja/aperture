@@ -133,6 +133,9 @@ func (executor *jobExecutor) doJob() {
 	newDuration := newTime.Sub(now)
 
 	jobCh := make(chan bool, 1)
+	errorCounter, _ := executor.jg.metrics.errorTotal.GetMetricWithLabelValues(executor.Name())
+	executionCounter, _ := executor.jg.metrics.executionTotal.GetMetricWithLabelValues(executor.Name())
+	latency, _ := executor.jg.metrics.latencySummary.GetMetricWithLabelValues(executor.Name())
 
 	panichandler.Go(func() {
 		defer func() {
@@ -140,10 +143,10 @@ func (executor *jobExecutor) doJob() {
 		}()
 		afterExecution := time.Now()
 		_, err := executor.jg.gt.execute(ctx, executor)
-		executor.jg.metrics.executionTotal.WithLabelValues(executor.Name()).Inc()
-		executor.jg.metrics.latencySummary.WithLabelValues(executor.Name()).Observe(float64(time.Since(afterExecution)))
+		executionCounter.Inc()
+		latency.Observe(float64(time.Since(afterExecution)))
 		if err != nil {
-			executor.jg.metrics.errorTotal.WithLabelValues(executor.Name()).Inc()
+			errorCounter.Inc()
 			executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("job", executor.Name()).Msg("job status unhealthy")
 			return
 		}

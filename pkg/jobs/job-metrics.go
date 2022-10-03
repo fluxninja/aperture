@@ -1,8 +1,11 @@
 package jobs
 
 import (
+	"errors"
+
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/multierr"
 )
 
 // JobMetrics holds prometheus metrics related to jobs.
@@ -40,4 +43,24 @@ func (jm *JobMetrics) allMetrics() []prometheus.Collector {
 		jm.executionTotal,
 		jm.latencySummary,
 	}
+}
+
+func (jm *JobMetrics) removeMetrics(jobNameLabel string) error {
+	var errMulti error
+	label := prometheus.Labels{
+		metrics.JobNameLabel: jobNameLabel,
+	}
+	deleted := jm.errorTotal.Delete(label)
+	if !deleted {
+		errMulti = multierr.Append(errMulti, errors.New("failed to delete job_error_total vector from its metric vector"))
+	}
+	deleted = jm.executionTotal.Delete(label)
+	if !deleted {
+		errMulti = multierr.Append(errMulti, errors.New("failed to delete job_execution_total vector from its metric vector"))
+	}
+	deleted = jm.latencySummary.Delete(label)
+	if !deleted {
+		errMulti = multierr.Append(errMulti, errors.New("failed to delete job_latency_ms summary from its metric vector"))
+	}
+	return errMulti
 }

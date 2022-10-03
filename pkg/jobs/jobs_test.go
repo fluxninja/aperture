@@ -109,12 +109,7 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 		jobGroup.DeregisterAll()
 	} else {
 		err = jobGroup.DeregisterJob(groupConfig.jobs[0].Name())
-		// TODO: Test JobGroup not created by fx provideJobGroup which doesn't have metrics registered.
-		if groupConfig.jobs[0].Name() == "instant-run-job" {
-			require.Error(t, err)
-		} else {
-			require.NoError(t, err)
-		}
+		require.NoError(t, err)
 	}
 }
 
