@@ -19,6 +19,21 @@ const (
 	// FluxMeterMetricName name of fluxmeter metrics.
 	FluxMeterMetricName = "flux_meter"
 
+	// Olric DMaps metrics.
+
+	// OlricEntriesTotalMetricName - metric for the total number of entries stored during the life of this instance.
+	OlricEntriesTotalMetricName = "olric_entries_total"
+	// OlricDeleteHitsMetricName - metric for number of deletion requests resulting in an item being removed.
+	OlricDeleteHitsMetricName = "olric_delete_hits"
+	// OlricDeleteMissesMetricName - metric for number of deletion requests for missing keys.
+	OlricDeleteMissesMetricName = "olric_delete_misses"
+	// OlricGetMissesMetricName - metric for number of entries that have been requested and not found.
+	OlricGetMissesMetricName = "olric_get_misses"
+	// OlricGetHitsMetricName - metric for number of entries that have been requested and found present.
+	OlricGetHitsMetricName = "olric_get_hits"
+	// OlricEvictedTotalMetricName - metric for number of entries removed from cache to free memory for new entries.
+	OlricEvictedTotalMetricName = "olric_evicted_total"
+
 	// Workload metrics.
 
 	// WorkloadLatencyMetricName - metric used for grouping latencies per workload.
