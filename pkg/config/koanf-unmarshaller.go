@@ -398,7 +398,14 @@ func jsonOverrideHookFunc(replaceSlice bool) mapstructure.DecodeHookFunc {
 
 		// Now we merge the raw map into defaults map
 
-		merge(data.(map[string]interface{}), mapStruct, replaceSlice)
+		// make sure we can cast data to map[string]interface{}
+		var ok bool
+		var dataMapStruct map[string]interface{}
+		if dataMapStruct, ok = data.(map[string]interface{}); !ok {
+			return nil, errors.New("unable to cast data to map[string]interface{}")
+		}
+
+		merge(dataMapStruct, mapStruct, replaceSlice)
 
 		log.Trace().Interface("data", data).Interface("data type", f.Type().String()).Interface("result type", t.Type().String()).Interface("result", result).Interface("mapStruct", mapStruct).Msg("AFTER MERGE")
 

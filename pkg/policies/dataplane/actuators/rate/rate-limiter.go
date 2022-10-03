@@ -315,6 +315,8 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 }
 
 func (rateLimiter *rateLimiter) updateDynamicConfig(dynamicConfig *policylangv1.RateLimiter_DynamicConfig) {
+	logger := rateLimiter.registry.GetLogger()
+
 	if dynamicConfig == nil {
 		return
 	}
@@ -324,6 +326,9 @@ func (rateLimiter *rateLimiter) updateDynamicConfig(dynamicConfig *policylangv1.
 		label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
 		overrides[label] = override.GetLimitScaleFactor()
 	}
+
+	logger.Debug().Interface("overrides", overrides).Str("name", rateLimiter.name).Msgf("Updating dynamic config for rate limiter")
+
 	rateLimiter.rateLimitChecker.SetOverrides(overrides)
 }
 

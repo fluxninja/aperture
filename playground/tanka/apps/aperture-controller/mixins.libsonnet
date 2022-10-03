@@ -144,7 +144,8 @@ local policy = latencyGradientPolicy({
       + rateLimiter.withSelector(rateLimiterSelector)
       + rateLimiter.withInPorts({ limit: rateLimitPort })
       + rateLimiter.withLimitResetInterval('1s')
-      + rateLimiter.withLabelKey('http.request.header.user_id'),
+      + rateLimiter.withLabelKey('http.request.header.user_id')
+      + rateLimiter.withDynamicConfigKey('rate_limiter'),
     ),
   ],
 }).policy;
