@@ -64,9 +64,10 @@ func NewSimpleService(hostname string, port, envoyPort int,
 // Run starts listening for requests on given port.
 func (simpleService SimpleService) Run() error {
 	handler := &RequestHandler{
-		hostname:    simpleService.hostname,
-		latency:     simpleService.latency,
-		rejectRatio: simpleService.rejectRatio,
+		hostname:     simpleService.hostname,
+		latency:      simpleService.latency,
+		rejectRatio:  simpleService.rejectRatio,
+		limitClients: make(chan struct{}, simpleService.concurrency),
 	}
 	if simpleService.envoyPort == -1 {
 		handler.httpClient = &http.Client{}
@@ -78,7 +79,7 @@ func (simpleService SimpleService) Run() error {
 		handler.httpClient = &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}}
 	}
 
-	http.Handle("/request", limitClients(handler, simpleService.concurrency))
+	http.Handle("/request", handlerFunc(handler))
 	address := fmt.Sprintf(":%d", simpleService.port)
 
 	server := &http.Server{Addr: address}
@@ -86,14 +87,9 @@ func (simpleService SimpleService) Run() error {
 	return server.ListenAndServe()
 }
 
-func limitClients(h *RequestHandler, n int) http.Handler {
-	sem := make(chan struct{}, n)
+func handlerFunc(h *RequestHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Sample(zerolog.Sometimes).Info().Msg("received request")
-		sem <- struct{}{}
-		defer func() {
-			<-sem
-		}()
 		h.ServeHTTP(w, r)
 	})
 }
@@ -131,10 +127,11 @@ type Subrequest struct {
 
 // RequestHandler handles processing of incoming requests.
 type RequestHandler struct {
-	httpClient  HTTPClient
-	hostname    string
-	latency     time.Duration
-	rejectRatio float64
+	httpClient   HTTPClient
+	limitClients chan struct{}
+	hostname     string
+	latency      time.Duration
+	rejectRatio  float64
 }
 
 func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -153,9 +150,6 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
-
-	// Fake workload
-	time.Sleep(h.latency)
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -216,6 +210,12 @@ func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain)
 }
 
 func (h RequestHandler) processRequest(s Subrequest) (int, error) {
+	h.limitClients <- struct{}{}
+	defer func() {
+		<-h.limitClients
+	}()
+	// Fake workload
+	time.Sleep(h.latency)
 	return http.StatusOK, nil
 }
 

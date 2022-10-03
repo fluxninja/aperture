@@ -95,7 +95,7 @@ func concurrencyFromEnv() int {
 func latencyFromEnv() time.Duration {
 	latencyValue, exists := os.LookupEnv("SIMPLE_SERVICE_LATENCY")
 	if !exists {
-		return time.Millisecond * 10
+		return time.Millisecond * 50
 	}
 	latency, err := time.ParseDuration(latencyValue)
 	if err != nil {
