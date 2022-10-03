@@ -81,6 +81,16 @@ const (
 	HandlerName = "handler_name"
 	// FeatureStatusLabel - feature status.
 	FeatureStatusLabel = "feature_status"
+	// FeatureStatusOK - feature status OK.
+	FeatureStatusOK = "OK"
+	// FeatureStatusError - feature status Error.
+	FeatureStatusError = "Error"
+	// ResponseStatusLabel - response status. A common label to denote OK or Error across all protocols.
+	ResponseStatusLabel = "response_status"
+	// ResponseStatusOK - response status OK.
+	ResponseStatusOK = FeatureStatusOK
+	// ResponseStatusError - response status Error.
+	ResponseStatusError = FeatureStatusError
 	// FlowControlCheckDecisionTypeLabel - label for decision type dropped or accepted.
 	FlowControlCheckDecisionTypeLabel = "decision_type"
 	// FlowControlCheckErrorReasonLabel - label for error reason on FCS Check request.

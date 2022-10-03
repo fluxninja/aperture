@@ -132,6 +132,11 @@ var hardcodedRegoRules = wrappersv1.ClassifierWrapper{
 			},
 		},
 	},
+	CommonAttributes: &wrappersv1.CommonAttributes{
+		PolicyName:     "test",
+		PolicyHash:     "test",
+		ComponentIndex: 0,
+	},
 }
 
 type fakeAddr string

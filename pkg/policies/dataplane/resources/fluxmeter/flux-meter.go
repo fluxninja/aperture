@@ -3,6 +3,7 @@ package fluxmeter
 import (
 	"context"
 	"path"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
@@ -177,6 +178,7 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
 			}, []string{
 				metrics.DecisionTypeLabel,
+				metrics.ResponseStatusLabel,
 				metrics.StatusCodeLabel,
 				metrics.FeatureStatusLabel,
 			})
@@ -244,6 +246,21 @@ func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.CheckRespons
 ) prometheus.Observer {
 	logger := fluxMeter.registry.GetLogger()
 	labels := make(map[string]string)
+	// Default ResponseStatusLabel is ResponseStatusFailure
+	labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusError
+	// Set ResponseStatusLabel based on protocol specific status
+	if statusCode != "" {
+		// Set ResponseStatusLabel=ResponseStatusSuccess if status code is 2xx
+		if strings.HasPrefix(statusCode, "2") {
+			labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusOK
+		} else {
+			labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusError
+		}
+	} else if featureStatus != "" {
+		// pass through in case of feature status
+		labels[metrics.ResponseStatusLabel] = featureStatus
+	}
+
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
 	labels[metrics.StatusCodeLabel] = statusCode
 	labels[metrics.FeatureStatusLabel] = featureStatus

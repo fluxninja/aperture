@@ -15,6 +15,6 @@ kubectl 1.25.1
 kustomize 4.5.7
 kind 0.15.0
 jb 0.5.1
-tanka 0.22.1
+tanka 0.23.1
 tilt 0.30.8
 jsonnet 0.18.0

@@ -365,6 +365,15 @@ definitions:
         description: List of subexpressions of the match expression.
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     title: List of MatchExpressions that is used for all/any matching
+  RateLimiterDynamicConfig:
+    type: object
+    properties:
+      overrides:
+        type: array
+        items:
+          $ref: '#/definitions/RateLimiterOverride'
+        description: Allows to specify different limits for particular label values.
+    title: Dynamic Configuration for the rate limiter
   RateLimiterLazySync:
     type: object
     properties:
@@ -1872,9 +1881,15 @@ definitions:
   v1RateLimiter:
     type: object
     properties:
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
       in_ports:
         $ref: '#/definitions/v1RateLimiterIns'
         x-go-validate: required
+      init_config:
+        $ref: '#/definitions/RateLimiterDynamicConfig'
+        title: Initial configuration
       label_key:
         type: string
         description: |-
@@ -1892,11 +1907,6 @@ definitions:
         type: string
         description: Time after which the limit for a given label value will be reset.
         x-go-default: 60s
-      overrides:
-        type: array
-        items:
-          $ref: '#/definitions/RateLimiterOverride'
-        description: Allows to specify different limits for particular label values.
       selector:
         $ref: '#/definitions/v1Selector'
         description: Which control point to apply this ratelimiter to.

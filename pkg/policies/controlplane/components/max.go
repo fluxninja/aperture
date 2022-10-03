@@ -6,6 +6,8 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -48,3 +50,6 @@ func (max *Max) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		"output": []runtime.Reading{output},
 	}, nil
 }
+
+// DynamicConfigUpdate is a no-op for Max.
+func (max *Max) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
