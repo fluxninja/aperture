@@ -201,8 +201,8 @@ function(params) {
     newTimeSeriesPanel('FluxMeter',
                        ds,
                        |||
-                         sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", flux_meter_name="%(policyName)s"}[$__rate_interval]))
-                         / sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", flux_meter_name="%(policyName)s"}[$__rate_interval]))
+                         sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
+                         / sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
                        ||| % { policyName: $._config.policyName },
                        'Latency (ms)',
                        'ms'),

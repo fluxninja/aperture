@@ -152,6 +152,7 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concu
 	if err != nil {
 		return nil, err
 	}
+
 	// decision notifier
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(common.DataplaneComponentKey(lsaFactory.agentGroupName, lsa.conLimiter.GetPolicyName(), lsa.conLimiter.GetComponentIndex())),
@@ -259,10 +260,17 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
+	commonAttributes := wrapperMessage.GetCommonAttributes()
+	if commonAttributes == nil {
+		statusMsg := "Failed to get common attributes from config wrapper"
+		logger.Error().Err(err).Msg(statusMsg)
+		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
+		return
+	}
 	// check if this decision is for the same policy id as what we have
-	if wrapperMessage.PolicyHash != lsa.conLimiter.GetPolicyHash() {
+	if commonAttributes.PolicyHash != lsa.conLimiter.GetPolicyHash() {
 		err = errors.New("policy id mismatch")
-		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", lsa.conLimiter.GetPolicyHash(), wrapperMessage.PolicyHash)
+		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", lsa.conLimiter.GetPolicyHash(), commonAttributes.PolicyHash)
 		logger.Warn().Err(err).Msg(statusMsg)
 		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return

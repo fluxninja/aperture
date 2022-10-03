@@ -19,9 +19,9 @@ import (
 
 // watcher holds the state of the watcher.
 type watcher struct {
+	notifiers.Trackers
 	waitGroup  sync.WaitGroup
 	ctx        context.Context
-	trackers   notifiers.Trackers
 	etcdClient *etcdclient.Client
 	cancel     context.CancelFunc
 	etcdPath   string
@@ -42,7 +42,7 @@ func NewWatcher(etcdClient *etcdclient.Client, etcdPath string) (notifiers.Watch
 	w := &watcher{
 		etcdPath:   etcdPath,
 		etcdClient: etcdClient,
-		trackers:   notifiers.NewDefaultTrackers(),
+		Trackers:   notifiers.NewDefaultTrackers(),
 	}
 
 	// context to track the lifecycle of watcher
@@ -54,7 +54,7 @@ func NewWatcher(etcdClient *etcdclient.Client, etcdPath string) (notifiers.Watch
 
 // Start first starts trackers, bootstraps from existing keys in etcd and then starts watching etcd prefix w.etcdPath.
 func (w *watcher) Start() error {
-	err := w.trackers.Start()
+	err := w.Trackers.Start()
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (w *watcher) Start() error {
 				}
 				if resp.Canceled {
 					log.Error().Err(resp.Err()).Msg("Etcd watch channel was canceled")
-					w.trackers.Purge("")
+					w.Trackers.Purge("")
 					w.bootstrap()
 					continue
 				}
@@ -90,9 +90,9 @@ func (w *watcher) Start() error {
 
 					switch ev.Type {
 					case mvccpb.PUT:
-						w.trackers.WriteEvent(key, ev.Kv.Value)
+						w.WriteEvent(key, ev.Kv.Value)
 					case mvccpb.DELETE:
-						w.trackers.RemoveEvent(key)
+						w.RemoveEvent(key)
 					}
 				}
 			case <-w.ctx.Done():
@@ -107,7 +107,7 @@ func (w *watcher) Start() error {
 func (w *watcher) Stop() error {
 	w.cancel()
 	w.waitGroup.Wait()
-	return w.trackers.Stop()
+	return w.Trackers.Stop()
 }
 
 // bootstrap iterates throughout all existing keys in etcd and updates trackers in the existing watcher.
@@ -146,28 +146,8 @@ func (w *watcher) bootstrap() {
 			continue
 		}
 		key := getNotifierKey(kv.Key)
-		w.trackers.WriteEvent(key, kv.Value)
+		w.WriteEvent(key, kv.Value)
 	}
-}
-
-// AddPrefixNotifier is a helper function to add a new prefix notifier to watcher.
-func (w *watcher) AddPrefixNotifier(notifier notifiers.PrefixNotifier) error {
-	return w.trackers.AddPrefixNotifier(notifier)
-}
-
-// RemovePrefixNotifier is a helper function to remove an existing prefix notifier from watcher.
-func (w *watcher) RemovePrefixNotifier(notifier notifiers.PrefixNotifier) error {
-	return w.trackers.RemovePrefixNotifier(notifier)
-}
-
-// AddKeyNotifier is a helper method to add a new key notifier to watcher.
-func (w *watcher) AddKeyNotifier(notifier notifiers.KeyNotifier) error {
-	return w.trackers.AddKeyNotifier(notifier)
-}
-
-// RemoveKeyNotifier is a helper method to remove an existing key notifier from watcher.
-func (w *watcher) RemoveKeyNotifier(notifier notifiers.KeyNotifier) error {
-	return w.trackers.RemoveKeyNotifier(notifier)
 }
 
 func getNotifierKey(etcdKey []byte) notifiers.Key {

@@ -3,10 +3,10 @@ local spec = import '../../spec.libsonnet';
 local defaults = {
   policyName: error 'policyName must be set',
   evaluationInterval: '0.5s',
-  fluxMeterSelector: error 'fluxMeterSelector must be set',
-  fluxMeters: {},
+  fluxMeter: error 'fluxMeter must be set',
   concurrencyLimiterSelector: error 'concurrencyLimiterSelector must be set',
   classifiers: [],
+  components: [],
   constants: {
     emaLimitMultiplier: '2.0',
     tolerance: '1.1',
@@ -40,7 +40,6 @@ local defaults = {
 local policy = spec.v1.Policy;
 local resources = spec.v1.Resources;
 local circuit = spec.v1.Circuit;
-local fluxMeter = spec.v1.FluxMeter;
 local classifier = spec.v1.Classifier;
 local selector = spec.v1.Selector;
 local component = spec.v1.Component;
@@ -110,134 +109,136 @@ function(params) {
   local policyDef =
     policy.new()
     + policy.withResources(resources.new()
-                           + resources.withFluxMeters($._config.fluxMeters)
+                           + resources.withFluxMetersMixin({ [$._config.policyName]: $._config.fluxMeter })
                            + resources.withClassifiers($._config.classifiers))
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval(evaluation_interval=$._config.evaluationInterval)
-      + circuit.withComponents(constants + [
-        component.withArithmeticCombinator(combinator.mul(latencyPort,
-                                                          emaLimitMultiplierPort,
-                                                          output=maxEmaPort)),
-        component.withArithmeticCombinator(combinator.mul(latencyEmaPort,
-                                                          tolerancePort,
-                                                          output=latencySetpointPort)),
-        component.withArithmeticCombinator(combinator.sub(incomingConcurrencyPort,
-                                                          desiredConcurrencyPort,
-                                                          output=deltaConcurrencyPort)),
-        component.withArithmeticCombinator(combinator.div(deltaConcurrencyPort,
-                                                          incomingConcurrencyPort,
-                                                          output=LSFPort)),
-        component.withArithmeticCombinator(combinator.mul(concurrencyLimitMultiplierPort,
-                                                          acceptedConcurrencyPort,
-                                                          output=upperConcurrencyLimitPort)),
-        component.withArithmeticCombinator(combinator.mul(latencyEmaPort,
-                                                          tolerancePort,
-                                                          output=latencyOverloadPort)),
-        component.withArithmeticCombinator(combinator.add(linearConcurrencyIncrementPort,
-                                                          sqrtConcurrencyIncrementPort,
-                                                          output=concurrencyIncrementSingleTickPort)),
-        component.withArithmeticCombinator(combinator.add(concurrencyIncrementSingleTickPort,
-                                                          concurrencyIncrementFeedbackPort,
-                                                          output=concurrencyIncrementIntegralPort)),
-        component.withMin(
-          min.new()
-          + min.withInPorts(min.inPorts.withInputs([concurrencyIncrementIntegralPort, acceptedConcurrencyPort]))
-          + min.withOutPorts(min.outPorts.withOutput(concurrencyIncrementNormalPort)),
-        ),
-        component.withMax(
-          max.new()
-          + max.withInPorts(max.inPorts.withInputs([upperConcurrencyLimitPort, minConcurrencyPort]))
-          + max.withOutPorts(max.outPorts.withOutput(maxConcurrencyPort)),
-        ),
-        component.withSqrt(
-          sqrt.new()
-          + sqrt.withInPorts({ input: acceptedConcurrencyPort })
-          + sqrt.withOutPorts({ output: sqrtConcurrencyIncrementPort })
-          + sqrt.withScale($._config.constants.sqrtScale),
-        ),
-        component.withPromql(
-          local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
-          promQL.new()
-          + promQL.withQueryString(q)
-          + promQL.withEvaluationInterval('1s')
-          + promQL.withOutPorts({ output: latencyPort }),
-        ),
-        component.withEma(
-          local e = $._config.ema;
-          ema.withEmaWindow(e.window)
-          + ema.withWarmUpWindow(e.warmUpWindow)
-          + ema.withCorrectionFactorOnMaxEnvelopeViolation(e.correctionFactor)
-          + ema.withInPortsMixin(
-            ema.inPorts.withInput(latencyPort)
-            + ema.inPorts.withMaxEnvelope(maxEmaPort)
-          )
-          + ema.withOutPortsMixin(ema.outPorts.withOutput(latencyEmaPort))
-        ),
-        component.withGradientController(
-          local g = $._config.gradient;
-          gradient.new()
-          + gradient.withSlope(g.slope)
-          + gradient.withMinGradient(g.minGradient)
-          + gradient.withMaxGradient(g.maxGradient)
-          + gradient.withInPorts({
-            signal: latencyPort,
-            setpoint: latencySetpointPort,
-            max: maxConcurrencyPort,
-            control_variable: acceptedConcurrencyPort,
-            optimize: concurrencyIncrementPort,
-          })
-          + gradient.withOutPortsMixin({
-            output: desiredConcurrencyPort,
-          })
-        ),
-        component.withConcurrencyLimiter(
-          local c = $._config.concurrencyLimiter;
-          limiter.new()
-          + limiter.withScheduler(
-            scheduler.new()
-            + scheduler.withSelector($._config.concurrencyLimiterSelector)
-            + scheduler.withAutoTokens(c.autoTokens)
-            + scheduler.withTimeoutFactor(c.timeoutFactor)
-            + scheduler.withDefaultWorkloadParameters(c.defaultWorkloadParameters)
-            + scheduler.withWorkloads(c.workloads)
-            + scheduler.withOutPortsMixin({
-              accepted_concurrency: acceptedConcurrencyPort,
-              incoming_concurrency: incomingConcurrencyPort,
+      + circuit.withComponents(
+        constants + [
+          component.withArithmeticCombinator(combinator.mul(latencyPort,
+                                                            emaLimitMultiplierPort,
+                                                            output=maxEmaPort)),
+          component.withArithmeticCombinator(combinator.mul(latencyEmaPort,
+                                                            tolerancePort,
+                                                            output=latencySetpointPort)),
+          component.withArithmeticCombinator(combinator.sub(incomingConcurrencyPort,
+                                                            desiredConcurrencyPort,
+                                                            output=deltaConcurrencyPort)),
+          component.withArithmeticCombinator(combinator.div(deltaConcurrencyPort,
+                                                            incomingConcurrencyPort,
+                                                            output=LSFPort)),
+          component.withArithmeticCombinator(combinator.mul(concurrencyLimitMultiplierPort,
+                                                            acceptedConcurrencyPort,
+                                                            output=upperConcurrencyLimitPort)),
+          component.withArithmeticCombinator(combinator.mul(latencyEmaPort,
+                                                            tolerancePort,
+                                                            output=latencyOverloadPort)),
+          component.withArithmeticCombinator(combinator.add(linearConcurrencyIncrementPort,
+                                                            sqrtConcurrencyIncrementPort,
+                                                            output=concurrencyIncrementSingleTickPort)),
+          component.withArithmeticCombinator(combinator.add(concurrencyIncrementSingleTickPort,
+                                                            concurrencyIncrementFeedbackPort,
+                                                            output=concurrencyIncrementIntegralPort)),
+          component.withMin(
+            min.new()
+            + min.withInPorts(min.inPorts.withInputs([concurrencyIncrementIntegralPort, acceptedConcurrencyPort]))
+            + min.withOutPorts(min.outPorts.withOutput(concurrencyIncrementNormalPort)),
+          ),
+          component.withMax(
+            max.new()
+            + max.withInPorts(max.inPorts.withInputs([upperConcurrencyLimitPort, minConcurrencyPort]))
+            + max.withOutPorts(max.outPorts.withOutput(maxConcurrencyPort)),
+          ),
+          component.withSqrt(
+            sqrt.new()
+            + sqrt.withInPorts({ input: acceptedConcurrencyPort })
+            + sqrt.withOutPorts({ output: sqrtConcurrencyIncrementPort })
+            + sqrt.withScale($._config.constants.sqrtScale),
+          ),
+          component.withPromql(
+            local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
+            promQL.new()
+            + promQL.withQueryString(q)
+            + promQL.withEvaluationInterval('1s')
+            + promQL.withOutPorts({ output: latencyPort }),
+          ),
+          component.withEma(
+            local e = $._config.ema;
+            ema.withEmaWindow(e.window)
+            + ema.withWarmUpWindow(e.warmUpWindow)
+            + ema.withCorrectionFactorOnMaxEnvelopeViolation(e.correctionFactor)
+            + ema.withInPortsMixin(
+              ema.inPorts.withInput(latencyPort)
+              + ema.inPorts.withMaxEnvelope(maxEmaPort)
+            )
+            + ema.withOutPortsMixin(ema.outPorts.withOutput(latencyEmaPort))
+          ),
+          component.withGradientController(
+            local g = $._config.gradient;
+            gradient.new()
+            + gradient.withSlope(g.slope)
+            + gradient.withMinGradient(g.minGradient)
+            + gradient.withMaxGradient(g.maxGradient)
+            + gradient.withInPorts({
+              signal: latencyPort,
+              setpoint: latencySetpointPort,
+              max: maxConcurrencyPort,
+              control_variable: acceptedConcurrencyPort,
+              optimize: concurrencyIncrementPort,
             })
-          )
-          + limiter.withLoadShedActuator(
-            loadShed.withInPortsMixin({ load_shed_factor: LSFPort })
-          )
-        ),
-        component.withDecider(
-          decider.new()
-          + decider.withOperator('gt')
-          + decider.withInPortsMixin(
-            decider.inPorts.withLhs(latencyPort)
-            + decider.inPorts.withRhs(latencyOverloadPort)
-          )
-          + decider.withOutPortsMixin(decider.outPorts.withOutput(isOverloadSwitchPort))
-        ),
-        component.withSwitcher(
-          switcher.new()
-          + switcher.withInPortsMixin(
-            switcher.inPorts.withOnTrue(concurrencyIncrementOverloadPort)
-            + switcher.inPorts.withOnFalse(concurrencyIncrementNormalPort)
-            + switcher.inPorts.withSwitch(isOverloadSwitchPort)
-          )
-          + switcher.withOutPortsMixin(switcher.outPorts.withOutput(concurrencyIncrementPort))
-        ),
-        component.withSwitcher(
-          switcher.new()
-          + switcher.withInPortsMixin(
-            switcher.inPorts.withOnTrue(zeroPort)
-            + switcher.inPorts.withOnFalse(concurrencyIncrementNormalPort)
-            + switcher.inPorts.withSwitch(isOverloadSwitchPort)
-          )
-          + switcher.withOutPortsMixin(switcher.outPorts.withOutput(concurrencyIncrementFeedbackPort))
-        ),
-      ]),
+            + gradient.withOutPortsMixin({
+              output: desiredConcurrencyPort,
+            })
+          ),
+          component.withConcurrencyLimiter(
+            local c = $._config.concurrencyLimiter;
+            limiter.new()
+            + limiter.withScheduler(
+              scheduler.new()
+              + scheduler.withSelector($._config.concurrencyLimiterSelector)
+              + scheduler.withAutoTokens(c.autoTokens)
+              + scheduler.withTimeoutFactor(c.timeoutFactor)
+              + scheduler.withDefaultWorkloadParameters(c.defaultWorkloadParameters)
+              + scheduler.withWorkloads(c.workloads)
+              + scheduler.withOutPortsMixin({
+                accepted_concurrency: acceptedConcurrencyPort,
+                incoming_concurrency: incomingConcurrencyPort,
+              })
+            )
+            + limiter.withLoadShedActuator(
+              loadShed.withInPortsMixin({ load_shed_factor: LSFPort })
+            )
+          ),
+          component.withDecider(
+            decider.new()
+            + decider.withOperator('gt')
+            + decider.withInPortsMixin(
+              decider.inPorts.withLhs(latencyPort)
+              + decider.inPorts.withRhs(latencyOverloadPort)
+            )
+            + decider.withOutPortsMixin(decider.outPorts.withOutput(isOverloadSwitchPort))
+          ),
+          component.withSwitcher(
+            switcher.new()
+            + switcher.withInPortsMixin(
+              switcher.inPorts.withOnTrue(concurrencyIncrementOverloadPort)
+              + switcher.inPorts.withOnFalse(concurrencyIncrementNormalPort)
+              + switcher.inPorts.withSwitch(isOverloadSwitchPort)
+            )
+            + switcher.withOutPortsMixin(switcher.outPorts.withOutput(concurrencyIncrementPort))
+          ),
+          component.withSwitcher(
+            switcher.new()
+            + switcher.withInPortsMixin(
+              switcher.inPorts.withOnTrue(zeroPort)
+              + switcher.inPorts.withOnFalse(concurrencyIncrementNormalPort)
+              + switcher.inPorts.withSwitch(isOverloadSwitchPort)
+            )
+            + switcher.withOutPortsMixin(switcher.outPorts.withOutput(concurrencyIncrementFeedbackPort))
+          ),
+        ] + $._config.components,
+      ),
     ),
   policy: policyDef,
 }

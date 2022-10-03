@@ -2,37 +2,40 @@ package controlplane_test
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	admissinv1 "k8s.io/api/admission/v1"
+	admissionv1 "k8s.io/api/admission/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/yaml"
 
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/pkg/webhooks/validation"
+	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
 )
 
 var _ = Describe("Validator", Ordered, func() {
 	policySpecValidator := &controlplane.PolicySpecValidator{}
-	policyVatidator := validation.NewPolicyValidator([]validation.PolicySpecValidator{policySpecValidator})
+	policyValidator := policyvalidator.NewPolicyValidator([]policyvalidator.PolicySpecValidator{policySpecValidator})
 
 	validateExample := func(contents string) {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "aperture-controller")
+		jsonPolicy, err := yaml.YAMLToJSON([]byte(contents))
+		Expect(err).ToNot(HaveOccurred())
 		var policy policyv1alpha1.Policy
-		err := config.UnmarshalYAML([]byte(contents), &policy)
+		err = json.Unmarshal([]byte(jsonPolicy), &policy)
 		Expect(err).NotTo(HaveOccurred())
-		request := &admissinv1.AdmissionRequest{
+		request := &admissionv1.AdmissionRequest{
 			Name:      policy.Name,
 			Namespace: policy.Namespace,
 			Kind:      v1.GroupVersionKind(policy.GroupVersionKind()),
-			Object:    runtime.RawExtension{Raw: []byte(contents)},
+			Object:    runtime.RawExtension{Raw: []byte(jsonPolicy)},
 		}
 
-		ok, msg, err := policyVatidator.ValidateObject(context.TODO(), request)
+		ok, msg, err := policyValidator.ValidateObject(context.TODO(), request)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(msg).To(BeEmpty())
 		Expect(ok).To(BeTrue())
@@ -52,17 +55,19 @@ var _ = Describe("Validator", Ordered, func() {
 
 	It("does not accept policy in other namespace than controller", func() {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "")
+		jsonPolicy, err := yaml.YAMLToJSON([]byte(rateLimitPolicy))
+		Expect(err).ToNot(HaveOccurred())
 		var policy policyv1alpha1.Policy
-		err := config.UnmarshalYAML([]byte(rateLimitPolicy), &policy)
+		err = json.Unmarshal([]byte(jsonPolicy), &policy)
 		Expect(err).NotTo(HaveOccurred())
-		request := &admissinv1.AdmissionRequest{
+		request := &admissionv1.AdmissionRequest{
 			Name:      policy.Name,
 			Namespace: policy.Namespace,
 			Kind:      v1.GroupVersionKind(policy.GroupVersionKind()),
-			Object:    runtime.RawExtension{Raw: []byte(rateLimitPolicy)},
+			Object:    runtime.RawExtension{Raw: []byte(jsonPolicy)},
 		}
 
-		ok, msg, err := policyVatidator.ValidateObject(context.TODO(), request)
+		ok, msg, err := policyValidator.ValidateObject(context.TODO(), request)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(msg).To(Equal("Policy should be created in the same namespace as Aperture Controller"))
 		Expect(ok).To(BeFalse())

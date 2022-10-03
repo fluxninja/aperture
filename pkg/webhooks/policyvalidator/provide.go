@@ -1,4 +1,4 @@
-package validation
+package policyvalidator
 
 import (
 	"github.com/fluxninja/aperture/pkg/webhooks"

@@ -945,9 +945,10 @@ watch_file(GIT_ROOT + "/pkg/")
 watch_file(GIT_ROOT + "/plugins/")
 watch_file(GIT_ROOT + "/operator/")
 
+
 run_load_generator = '''
-kubectl create configmap load-test --from-file=''' + GIT_ROOT + '''/tools/load_generator/scenarios/load_test.js
-kubectl apply -f ''' + GIT_ROOT + '''/tools/load_generator/scenarios/demoapp-load-test-cr.yaml
+kubectl create configmap load-test --from-file=./load_generator/scenarios/load_test.js
+kubectl apply -f ./load_generator/scenarios/demoapp-load-test-cr.yaml
 '''
 cmd_button('demoapp-load-test-run',
     resource='k6-operator-controller-manager',
@@ -958,7 +959,7 @@ cmd_button('demoapp-load-test-run',
 
 delete_load_generator = '''
 # delete load-test
-kubectl delete -f ''' + GIT_ROOT + '''/tools/load_generator/scenarios/demoapp-load-test-cr.yaml
+kubectl delete -f ./load_generator/scenarios/demoapp-load-test-cr.yaml
 kubectl delete configmap load-test
 '''
 cmd_button('demoapp-load-test-del',

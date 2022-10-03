@@ -10,7 +10,9 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/metrics"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 )
 
@@ -353,6 +355,16 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 		errMulti = multierr.Append(errMulti, err)
 	}
 	return errMulti
+}
+
+// DynamicConfigUpdate updates the circuit with the new dynamic config.
+func (circuit *Circuit) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	// loop through all the components
+	for _, cmp := range circuit.components {
+		component := cmp.CompiledComponent.Component
+		// update the dynamic config
+		component.DynamicConfigUpdate(event, unmarshaller)
+	}
 }
 
 // LockExecution locks the execution of the circuit.

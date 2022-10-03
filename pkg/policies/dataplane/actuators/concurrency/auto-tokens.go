@@ -133,11 +133,16 @@ func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller co
 		return
 	}
 
+	commonAttributes := wrapperMessage.GetCommonAttributes()
+	if commonAttributes == nil {
+		logger.Error().Err(err).Msg("Failed to get common attributes")
+		return
+	}
 	// check if this token value is for the same policy id as what we have
-	if wrapperMessage.PolicyName != at.policyName || wrapperMessage.PolicyHash != at.policyHash {
+	if commonAttributes.PolicyName != at.policyName || commonAttributes.PolicyHash != at.policyHash {
 		err = errors.New("policy id mismatch")
 		statusMsg := fmt.Sprintf("Expected policy: %s, %s, Got: %s, %s",
-			at.policyName, at.policyHash, wrapperMessage.PolicyName, wrapperMessage.PolicyHash)
+			at.policyName, at.policyHash, commonAttributes.PolicyName, commonAttributes.PolicyHash)
 		logger.Warn().Err(err).Msg(statusMsg)
 		return
 	}
