@@ -39,11 +39,11 @@ fetch_aperture_version() {
     current_branch="$(git branch --show-current)"
 
     if [[ "${current_branch}" == "stable/"* ]]; then
-    version="$(git describe --match "${tag_matcher}" | cut -d/ -f 3)"
+        version="$(git describe --match "${tag_matcher}" | cut -d/ -f 3)"
     else
-    tag="$(git tag -l --sort="-version:refname" "${tag_matcher}" | head -n1 | cut -d/ -f 3)"
-    commits="$(git rev-list "${tag}"..HEAD --count)"
-    version="${tag##*/}-b.${commits}"
+        tag="$(git tag -l --sort="-version:refname" "${tag_matcher}" | head -n1 | cut -d/ -f 3)"
+        commits="$(git rev-list "${tag}"..HEAD --count)"
+        version="${tag##*/}-b.${commits}"
     fi
 
     echo "${version}" | cut -dv -f 2
