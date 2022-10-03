@@ -66,9 +66,9 @@ fi
 build_args=(
     "--file=$PARAM_DOCKERFILE_PATH/$PARAM_DOCKERFILE_NAME"
     "$DOCKER_TAGS_ARG"
-    "--build-arg=$PARAM_GIT_BRANCH"
-    "--build-arg=$PARAM_GIT_COMMIT_HASH"
-    "--build-arg=$(fetch_aperture_version)"
+    "--build-arg=GIT_BRANCH=$PARAM_GIT_BRANCH"
+    "--build-arg=GIT_COMMIT_HASH=$PARAM_GIT_COMMIT_HASH"
+    "--build-arg=VERSION=$(fetch_aperture_version)"
 )
 
 if [ -n "$PARAM_SSH_FORWARD" ]; then
