@@ -42,8 +42,10 @@ type Policy struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	//+kubebuilder:pruning:PreserveUnknownFields
-	Spec   runtime.RawExtension `json:"spec,omitempty"`
-	Status PolicyStatus         `json:"status,omitempty"`
+	Spec runtime.RawExtension `json:"spec,omitempty"`
+	//+kubebuilder:pruning:PreserveUnknownFields
+	DynamicConfig runtime.RawExtension `json:"dynamicConfig,omitempty"`
+	Status        PolicyStatus         `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true

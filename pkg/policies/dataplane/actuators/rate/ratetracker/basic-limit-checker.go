@@ -7,10 +7,13 @@ import (
 // Make sure BasicLimitCheck implements LimitCheck.
 var _ RateLimitChecker = &BasicRateLimitChecker{}
 
+// Overrides is a map of label to limit scale factor.
+type Overrides map[string]float64
+
 // BasicRateLimitChecker implements LimitCheck.
 type BasicRateLimitChecker struct {
 	lock      sync.RWMutex
-	overrides map[string]float64
+	overrides Overrides
 	limit     int
 }
 
@@ -18,22 +21,15 @@ type BasicRateLimitChecker struct {
 func NewBasicRateLimitChecker() *BasicRateLimitChecker {
 	return &BasicRateLimitChecker{
 		limit:     -1,
-		overrides: make(map[string]float64),
+		overrides: Overrides{},
 	}
 }
 
-// AddOverride sets the limit for a specific label.
-func (l *BasicRateLimitChecker) AddOverride(label string, scaleFactor float64) {
+// SetOverrides applies the overrides to the limit.
+func (l *BasicRateLimitChecker) SetOverrides(overrides Overrides) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
-	l.overrides[label] = scaleFactor
-}
-
-// RemoveOverride removes the limit for a specific label.
-func (l *BasicRateLimitChecker) RemoveOverride(label string) {
-	l.lock.Lock()
-	defer l.lock.Unlock()
-	delete(l.overrides, label)
+	l.overrides = overrides
 }
 
 // CheckRateLimit checks the limit for a specific label and the remaining limit. If limit is exceeded then we return false and 0 as remaining limit.

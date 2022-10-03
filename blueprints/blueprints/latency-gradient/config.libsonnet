@@ -10,27 +10,11 @@
     evaluationInterval: '0.1s',
     /**
     * @section Latency Gradient Policy
-    * @subsection Flux Meter Selector
+    * @subsection Flux Meter
     *
-    * @param (policy.fluxMeterSelector: aperture.spec.v1.Selector required) Flux Meter selector.
+    * @param (policy.fluxMeter: aperture.v1.FluxMeter required) Flux Meter selector.
     */
-    fluxMeterSelector: error 'fluxMeterSelector is not set',
-    /**
-    * @section Latency Gradient Policy
-    * @subsection Flux Meters
-    *
-    * @param (policy.fluxMeters: map[string]aperture.spec.v1.FluxMeter) Mappings of fluxMeterName to fluxMeter.
-    * @param (policy.fluxMeters[policyName].attributeKey: string) Key of the attribute in access log or span.
-    * @param (policy.fluxMeters[policyName].histogramBuckets: aperture.spec.v1.FluxMeterStaticBuckets) Flux Meter static histogram buckets.
-    */
-    fluxMeters: {
-      'service1-latency-gradient': {
-        attributeKey: 'workload_duration_ms',
-        staticBuckets: {
-          buckets: [5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0],
-        },
-      },
-    },
+    fluxMeter: error 'fluxMeter is not set',
     /**
     * @section Latency Gradient Policy
     * @subsection Concurrency Limiter Selector
@@ -42,9 +26,16 @@
     * @section Latency Gradient Policy
     * @subsection Classification Rules
     *
-    * @param (policy.classifiers: string) List of classification rules.
+    * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
     */
     classifiers: [],
+    /**
+    * @section Latency Gradient Policy
+    * @subsection Additional Circuit Components
+    *
+    * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
+    */
+    components: [],
     constants: {
       emaLimitMultiplier: '2.0',
       tolerance: '1.1',

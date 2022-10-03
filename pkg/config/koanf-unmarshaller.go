@@ -59,58 +59,16 @@ type KoanfUnmarshallerConstructor struct {
 
 // NewKoanfUnmarshaller creates a new Unmarshaller instance that can be used to unmarshal configs.
 func (constructor KoanfUnmarshallerConstructor) NewKoanfUnmarshaller(bytes []byte) (Unmarshaller, error) {
-	k := koanf.New(DefaultKoanfDelim)
-
-	// Precedence:
-	// 1. MergeConfig
-	// 2. Env
-	// 3. Bytes
-	// 4. Flags
-
-	// On runtime, reloaded bytes config take precedence
-
-	if constructor.FlagSet != nil {
-		err := k.Load(posflag.Provider(constructor.FlagSet, k.Delim(), k), nil)
-		if err != nil {
-			log.Error().Err(err).Msg("failed to load flags")
-			return nil, err
-		}
-	}
-
-	// Default to YAML
-	if constructor.ConfigFormat == "" {
-		constructor.ConfigFormat = YAML
-	}
-
-	err := loadBytesProvider(k, bytes, constructor.ConfigFormat)
-	if err != nil {
-		log.Error().Err(err).Msg("failed to load")
-		return nil, err
-	}
-
-	if constructor.EnableEnv {
-		err = k.Load(env.Provider(EnvPrefix, k.Delim(), func(s string) string {
-			return strings.TrimPrefix(s, EnvPrefix)
-		}), nil)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if constructor.MergeConfig != nil {
-		err = k.Load(confmap.Provider(constructor.MergeConfig, k.Delim()), nil)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	log.Trace().Strs("keys", k.Keys()).Msg("All merged config")
-
 	unmarshaller := &KoanfUnmarshaller{
-		koanf:        k,
-		bytes:        bytes,
+		flagSet:      constructor.FlagSet,
 		enableEnv:    constructor.EnableEnv,
 		configFormat: constructor.ConfigFormat,
+		mergeConfig:  constructor.MergeConfig,
+	}
+
+	err := unmarshaller.Reload(bytes)
+	if err != nil {
+		return nil, err
 	}
 
 	return unmarshaller, nil
@@ -120,6 +78,8 @@ func (constructor KoanfUnmarshallerConstructor) NewKoanfUnmarshaller(bytes []byt
 type KoanfUnmarshaller struct {
 	sync.Mutex
 	koanf        *koanf.Koanf
+	flagSet      *pflag.FlagSet
+	mergeConfig  map[string]interface{}
 	configFormat ConfigFormat
 	bytes        []byte
 	enableEnv    bool
@@ -194,7 +154,56 @@ func (u *KoanfUnmarshaller) UnmarshalKey(keyPath string, i interface{}) error {
 
 // Reload reloads the config using the underlying koanf.
 func (u *KoanfUnmarshaller) Reload(bytes []byte) error {
-	return loadBytesProvider(u.koanf, bytes, u.configFormat)
+	k := koanf.New(DefaultKoanfDelim)
+
+	// Precedence:
+	// 1. MergeConfig
+	// 2. Env
+	// 3. Bytes
+	// 4. Flags
+
+	// On runtime, reloaded bytes config take precedence
+
+	if u.flagSet != nil {
+		err := k.Load(posflag.Provider(u.flagSet, k.Delim(), k), nil)
+		if err != nil {
+			log.Error().Err(err).Msg("failed to load flags")
+			return err
+		}
+	}
+
+	// Default to YAML
+	if u.configFormat == "" {
+		u.configFormat = YAML
+	}
+
+	err := loadBytesProvider(k, bytes, u.configFormat)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to load")
+		return err
+	}
+
+	if u.enableEnv {
+		err = k.Load(env.Provider(EnvPrefix, k.Delim(), func(s string) string {
+			return strings.TrimPrefix(s, EnvPrefix)
+		}), nil)
+		if err != nil {
+			return err
+		}
+	}
+
+	if u.mergeConfig != nil {
+		err = k.Load(confmap.Provider(u.mergeConfig, k.Delim()), nil)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Trace().Strs("keys", k.Keys()).Msg("All merged config")
+	u.koanf = k
+	u.bytes = bytes
+
+	return nil
 }
 
 func loadBytesProvider(k *koanf.Koanf, bytes []byte, configFormat ConfigFormat) error {
@@ -389,7 +398,14 @@ func jsonOverrideHookFunc(replaceSlice bool) mapstructure.DecodeHookFunc {
 
 		// Now we merge the raw map into defaults map
 
-		merge(data.(map[string]interface{}), mapStruct, replaceSlice)
+		// make sure we can cast data to map[string]interface{}
+		var ok bool
+		var dataMapStruct map[string]interface{}
+		if dataMapStruct, ok = data.(map[string]interface{}); !ok {
+			return nil, errors.New("unable to cast data to map[string]interface{}")
+		}
+
+		merge(dataMapStruct, mapStruct, replaceSlice)
 
 		log.Trace().Interface("data", data).Interface("data type", f.Type().String()).Interface("result type", t.Type().String()).Interface("result", result).Interface("mapStruct", mapStruct).Msg("AFTER MERGE")
 

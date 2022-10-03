@@ -18,9 +18,9 @@ import (
 // We create separate watcher at directory level as opposed to adding directories to single fsnotify instance.
 // That way these named singletons exist for the lifetime of the fx app they are running in.
 type watcher struct {
-	waitGroup     sync.WaitGroup
-	fswatcher     *fsnotify.Watcher
-	trackers      notifiers.Trackers
+	waitGroup sync.WaitGroup
+	fswatcher *fsnotify.Watcher
+	notifiers.Trackers
 	fileToSymlink map[string]string
 	directory     string
 	fileExt       string
@@ -44,7 +44,7 @@ func NewWatcher(directory, fileExt string) (*watcher, error) {
 		directory:     filepath.Clean(directory),
 		fileExt:       fileExt,
 		fileToSymlink: make(map[string]string),
-		trackers:      notifiers.NewDefaultTrackers(),
+		Trackers:      notifiers.NewDefaultTrackers(),
 	}
 
 	return watcher, nil
@@ -52,7 +52,7 @@ func NewWatcher(directory, fileExt string) (*watcher, error) {
 
 // Start starts the watcher go routines and handles events from fsnotify.
 func (w *watcher) Start() error {
-	err := w.trackers.Start()
+	err := w.Trackers.Start()
 	if err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func (w *watcher) Start() error {
 				symLinkFilePath, _ := filepath.EvalSymlinks(filePath)
 				w.fileToSymlink[filePath] = symLinkFilePath
 				if b != nil {
-					w.trackers.WriteEvent(notifiers.Key(filename), b)
+					w.WriteEvent(notifiers.Key(filename), b)
 				}
 			}
 		}
@@ -142,11 +142,11 @@ func (w *watcher) Start() error {
 								log.Warn().Err(err).Str("file", finfo.String()).Msg("Unable to read file")
 							}
 							if b != nil {
-								w.trackers.WriteEvent(notifiers.Key(filename), b)
+								w.WriteEvent(notifiers.Key(filename), b)
 							}
 						} else if op&(fsnotify.Remove|fsnotify.Rename) != 0 {
 							delete(w.fileToSymlink, filePath)
-							w.trackers.RemoveEvent(notifiers.Key(filename))
+							w.RemoveEvent(notifiers.Key(filename))
 						}
 					}
 				}
@@ -188,29 +188,9 @@ func (w *watcher) Start() error {
 func (w *watcher) Stop() error {
 	w.fswatcher.Close()
 	w.waitGroup.Wait()
-	return w.trackers.Stop()
+	return w.Trackers.Stop()
 }
 
 func (w *watcher) getFileInfo(filename string) *filesystem.FileInfo {
 	return filesystem.NewFileInfo(w.directory, filename, w.fileExt)
-}
-
-// AddPrefixNotifier is a helper function to add a new directory notifier to watcher.
-func (w *watcher) AddPrefixNotifier(notifier notifiers.PrefixNotifier) error {
-	return w.trackers.AddPrefixNotifier(notifier)
-}
-
-// RemovePrefixNotifier is a helper function to remove an existing directory notifier from watcher.
-func (w *watcher) RemovePrefixNotifier(notifier notifiers.PrefixNotifier) error {
-	return w.trackers.RemovePrefixNotifier(notifier)
-}
-
-// AddKeyNotifier is a helper method to add a new file notifier to watcher.
-func (w *watcher) AddKeyNotifier(notifier notifiers.KeyNotifier) error {
-	return w.trackers.AddKeyNotifier(notifier)
-}
-
-// RemoveKeyNotifier is a helper method to remove an existing file notifier from watcher.
-func (w *watcher) RemoveKeyNotifier(notifier notifiers.KeyNotifier) error {
-	return w.trackers.RemoveKeyNotifier(notifier)
 }

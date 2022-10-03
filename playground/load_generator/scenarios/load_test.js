@@ -1,6 +1,7 @@
 import http from "k6/http";
 import { check, sleep } from "k6";
 import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
+import { vu } from "k6/execution";
 
 export let vuStages = [
   { duration: "10s", target: 5 },
@@ -24,19 +25,40 @@ export let options = {
       stages: vuStages,
       env: { USER_TYPE: "subscriber" },
     },
+    bots: {
+      executor: "ramping-vus",
+      stages: vuStages,
+      env: { USER_TYPE: "bot" },
+    },
   },
 };
 
 export default function () {
   let userType = __ENV.USER_TYPE;
+  let userId = vu.idInTest;
   const url = "http://service1-demo-app.demoapp.svc.cluster.local/request";
   const headers = {
     "Content-Type": "application/json",
     Cookie:
       "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
     "User-Type": userType,
+    "User-Id": userId,
   };
-  const body = {};
+  const body = {
+    request: [
+      [
+        {
+          destination: "service1-demo-app.demoapp.svc.cluster.local",
+        },
+        {
+          destination: "service2-demo-app.demoapp.svc.cluster.local",
+        },
+        {
+          destination: "service3-demo-app.demoapp.svc.cluster.local",
+        },
+      ],
+    ],
+  };
   let res = http.request("POST", url, JSON.stringify(body), {
     headers: headers,
   });

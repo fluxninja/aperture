@@ -4,8 +4,8 @@ layout:
 plugins:
   manifests.sdk.operatorframework.io/v2: {}
   scorecard.sdk.operatorframework.io/v2: {}
-projectName: aperture-operator
-repo: github.com/fluxninja/aperture-operator
+projectName: aperture
+repo: github.com/fluxninja/aperture
 resources:
 - controller: true
   group: core
@@ -19,7 +19,7 @@ resources:
   domain: fluxninja.com
   group: fluxninja.com
   kind: Agent
-  path: github.com/fluxninja/aperture-operator/api/v1alpha1
+  path: github.com/fluxninja/aperture/operator/api/agent/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -28,7 +28,7 @@ resources:
   domain: fluxninja.com
   group: fluxninja.com
   kind: Controller
-  path: github.com/fluxninja/aperture-operator/api/v1alpha1
+  path: github.com/fluxninja/aperture/operator/api/controller/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -37,6 +37,6 @@ resources:
   domain: fluxninja.com
   group: fluxninja.com
   kind: Policy
-  path: github.com/fluxninja/aperture-operator/api/v1alpha1
+  path: github.com/fluxninja/aperture/operator/api/policy/v1alpha1
   version: v1alpha1
 version: "3"

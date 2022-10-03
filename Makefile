@@ -63,7 +63,7 @@ helm-lint:
 	@echo helm lint
 	@cd ./manifests/charts && $(MAKE) helm-lint
 
-generate-blueprints:
+generate-blueprints: generate-config-markdown
 	@cd ./blueprints && $(MAKE) generate-blueprints
 
 generate-mermaid:
