@@ -299,7 +299,7 @@ DEP_TREE = {
                 {
                     "ref": "demo-app",
                     "context": GIT_ROOT,
-                    "dockerfile": GIT_ROOT + "/tools/demo_app/Dockerfile",
+                    "dockerfile": GIT_ROOT + "/tools/demoapp-go/Dockerfile",
                     "ssh": "default",
                 }
             ],

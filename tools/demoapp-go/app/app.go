@@ -15,13 +15,14 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
 
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/rs/zerolog"
+
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 const (
 	// Identifies the piece of code for purposes of otel's tracing.
-	libraryName = "demo_app/app"
+	libraryName = "demoapp-go/app"
 )
 
 // HTTPClient interface for making http calls that can be mocked in tests.

@@ -210,7 +210,7 @@ workflows:
             (go.mod|go.sum) updated-aperture true
             docs/.* updated-aperture-docs true
             manifests/charts/.* updated-aperture-charts true
-            tools/demo_app/.* updated-demo-app true
+            tools/demoapp-go/.* updated-demoapp-go true
             api/aperture/flowcontrol/v1/flowcontrol.proto updated-api-flowcontrol true
 
   filter-paths-pr:
