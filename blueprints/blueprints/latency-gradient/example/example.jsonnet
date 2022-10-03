@@ -44,7 +44,7 @@ local config = {
   },
   policy+: {
     policyName: $.common.policyName,
-    fluxMeterSelector: svcSelector,
+    fluxMeter: fluxMeter.new() + fluxMeter.withSelector(svcSelector),
     concurrencyLimiterSelector: svcSelector,
     classifiers: [
       classifier.new()

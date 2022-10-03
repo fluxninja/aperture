@@ -11,11 +11,11 @@
 | `policy.policyName`         | `string`       | `(required)` | A name of the policy, used within PromQL queries for fluxmeter metrics. |
 | `policy.evaluationInterval` | `string`       | `"0.5s"`     | How often should policy be re-evaluated.                                |
 
-#### Flux Meter Selector
+#### Flux Meter
 
-| Parameter Name             | Parameter Type         | Default      | Description          |
-| -------------------------- | ---------------------- | ------------ | -------------------- |
-| `policy.fluxMeterSelector` | `aperture.v1.Selector` | `(required)` | Flux Meter selector. |
+| Parameter Name     | Parameter Type          | Default      | Description          |
+| ------------------ | ----------------------- | ------------ | -------------------- |
+| `policy.fluxMeter` | `aperture.v1.FluxMeter` | `(required)` | Flux Meter selector. |
 
 #### Concurrency Limiter Selector
 

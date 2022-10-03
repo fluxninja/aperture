@@ -85,7 +85,7 @@ local apertureControllerMixin =
 
 local policy = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  fluxMeterSelector: fluxMeterSelector,
+  fluxMeter: fluxMeter.new() + fluxMeter.withSelector(fluxMeterSelector),
   concurrencyLimiterSelector: concurrencyLimiterSelector,
   classifiers: [
     classifier.new()

@@ -3,7 +3,7 @@ local spec = import '../../spec.libsonnet';
 local defaults = {
   policyName: error 'policyName must be set',
   evaluationInterval: '0.5s',
-  fluxMeterSelector: error 'fluxMeterSelector must be set',
+  fluxMeter: error 'fluxMeter must be set',
   concurrencyLimiterSelector: error 'concurrencyLimiterSelector must be set',
   classifiers: [],
   constants: {
@@ -39,7 +39,6 @@ local defaults = {
 local policy = spec.v1.Policy;
 local resources = spec.v1.Resources;
 local circuit = spec.v1.Circuit;
-local fluxMeter = spec.v1.FluxMeter;
 local classifier = spec.v1.Classifier;
 local selector = spec.v1.Selector;
 local component = spec.v1.Component;
@@ -109,8 +108,7 @@ function(params) {
   local policyDef =
     policy.new()
     + policy.withResources(resources.new()
-                           + resources.withFluxMetersMixin({ [$._config.policyName]: fluxMeter.new()
-                                                                                     + fluxMeter.withSelector($._config.fluxMeterSelector) })
+                           + resources.withFluxMetersMixin({ [$._config.policyName]: $._config.fluxMeter })
                            + resources.withClassifiers($._config.classifiers))
     + policy.withCircuit(
       circuit.new()

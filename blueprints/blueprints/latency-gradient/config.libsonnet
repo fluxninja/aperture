@@ -10,11 +10,11 @@
     evaluationInterval: '0.1s',
     /**
     * @section Latency Gradient Policy
-    * @subsection Flux Meter Selector
+    * @subsection Flux Meter
     *
-    * @param (policy.fluxMeterSelector: aperture.v1.Selector required) Flux Meter selector.
+    * @param (policy.fluxMeter: aperture.v1.FluxMeter required) Flux Meter selector.
     */
-    fluxMeterSelector: error 'fluxMeterSelector is not set',
+    fluxMeter: error 'fluxMeter is not set',
     /**
     * @section Latency Gradient Policy
     * @subsection Concurrency Limiter Selector
