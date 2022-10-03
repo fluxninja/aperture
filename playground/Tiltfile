@@ -291,13 +291,13 @@ DEP_TREE = {
                 }
             ]
         },
-        "demo-app": {
+        "demoapp-go": {
             "labels": ["DemoApplications"],
-            "tkenv": TANKA_ROOT + "/apps/demoapp",
+            "tkenv": TANKA_ROOT + "/apps/demoapp-go",
             "needs": ["istio"],
             "images": [
                 {
-                    "ref": "demo-app",
+                    "ref": "demoapp-go",
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/tools/demoapp-go/Dockerfile",
                     "ssh": "default",

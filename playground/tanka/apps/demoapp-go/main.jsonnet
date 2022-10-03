@@ -4,7 +4,7 @@ function(apiServer='API SERVER MISSING') {
   apiVersion: 'tanka.dev/v1alpha1',
   kind: 'Environment',
   metadata: {
-    name: 'apps/demoapp',
+    name: 'apps/demoapp-go',
   },
   spec: {
     apiServer: apiServer,

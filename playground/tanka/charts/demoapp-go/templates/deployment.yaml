@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "demo-app.fullname" . }}
+  name: {{ include "demoapp-go.fullname" . }}
   labels:
-    {{- include "demo-app.labels" . | nindent 4 }}
+    {{- include "demoapp-go.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "demo-app.selectorLabels" . | nindent 6 }}
+      {{- include "demoapp-go.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "demo-app.selectorLabels" . | nindent 8 }}
+        {{- include "demoapp-go.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "demo-app.serviceAccountName" . }}
+      serviceAccountName: {{ include "demoapp-go.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       affinity:
@@ -55,7 +55,7 @@ spec:
             #  value: "9001"
             - name: HOSTNAME
               # TODO: Don't hardcode domain
-              value: "{{ include "demo-app.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"
+              value: "{{ include "demoapp-go.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

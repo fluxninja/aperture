@@ -11,17 +11,17 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
   values:: {
   },
   service1:
-    helm.template('service1', 'charts/demo-app', {
+    helm.template('service1', 'charts/demoapp-go', {
       namespace: $.environment.namespace,
       values: $.values,
     }),
   service2:
-    helm.template('service2', 'charts/demo-app', {
+    helm.template('service2', 'charts/demoapp-go', {
       namespace: $.environment.namespace,
       values: $.values,
     }),
   service3:
-    helm.template('service3', 'charts/demo-app', {
+    helm.template('service3', 'charts/demoapp-go', {
       namespace: $.environment.namespace,
       values: $.values,
     }),

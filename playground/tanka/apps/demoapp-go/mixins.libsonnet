@@ -1,4 +1,4 @@
-local demoApp = import 'apps/demoapp/main.libsonnet';
+local demoApp = import 'apps/demoapp-go/main.libsonnet';
 
 local demoappMixin =
   demoApp {
@@ -6,7 +6,7 @@ local demoappMixin =
       replicaCount: 2,
       simplesrv+: {
         image: {
-          repository: 'docker.io/fluxninja/demo-app',
+          repository: 'docker.io/fluxninja/demoapp-go',
           tag: 'test',
         },
       },
