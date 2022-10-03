@@ -127,6 +127,6 @@ local policyMixin = {
 };
 
 {
-  policy: policyMixin,
+  latencyGradientPolicy: policyMixin,
   controller: apertureControllerMixin,
 }

@@ -67,6 +67,7 @@ func (simpleService SimpleService) Run() error {
 		hostname:     simpleService.hostname,
 		latency:      simpleService.latency,
 		rejectRatio:  simpleService.rejectRatio,
+		concurrency:  simpleService.concurrency,
 		limitClients: make(chan struct{}, simpleService.concurrency),
 	}
 	if simpleService.envoyPort == -1 {
@@ -130,6 +131,7 @@ type RequestHandler struct {
 	httpClient   HTTPClient
 	limitClients chan struct{}
 	hostname     string
+	concurrency  int
 	latency      time.Duration
 	rejectRatio  float64
 }
@@ -210,12 +212,16 @@ func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain)
 }
 
 func (h RequestHandler) processRequest(s Subrequest) (int, error) {
-	h.limitClients <- struct{}{}
-	defer func() {
-		<-h.limitClients
-	}()
-	// Fake workload
-	time.Sleep(h.latency)
+	if h.concurrency > 0 {
+		h.limitClients <- struct{}{}
+		defer func() {
+			<-h.limitClients
+		}()
+	}
+	if h.latency > 0 {
+		// Fake workload
+		time.Sleep(h.latency)
+	}
 	return http.StatusOK, nil
 }
 
