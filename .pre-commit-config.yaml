@@ -35,6 +35,7 @@ repos:
         exclude: ^(operator/config/crd/.*|docs/content/assets/.*)
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
+        exclude: ^(.*/gradlew$)
       - id: check-json
       - id: detect-private-key
         # These certs are used for ValidatingWebhook, and used within a cluster,
@@ -45,6 +46,7 @@ repos:
     rev: v0.1.17
     hooks:
       - id: shellcheck
+        exclude: ^(.*/gradlew$)
   - repo: https://github.com/fluxninja/pre-commit-golang
     rev: v1.0.0-fn
     hooks:
