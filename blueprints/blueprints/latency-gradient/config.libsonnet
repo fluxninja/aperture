@@ -26,9 +26,16 @@
     * @section Latency Gradient Policy
     * @subsection Classification Rules
     *
-    * @param (policy.classifiers: string) List of classification rules.
+    * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
     */
     classifiers: [],
+    /**
+    * @section Latency Gradient Policy
+    * @subsection Additional Circuit Components
+    *
+    * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
+    */
+    components: [],
     constants: {
       emaLimitMultiplier: '2.0',
       tolerance: '1.1',

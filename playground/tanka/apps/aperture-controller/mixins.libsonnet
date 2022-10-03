@@ -16,7 +16,11 @@ local selector = aperture.spec.v1.Selector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local controlPoint = aperture.spec.v1.ControlPoint;
-local staticBuckets = aperture.spec.v1.FluxMeterStaticBuckets;
+local constant = aperture.spec.v1.Constant;
+local component = aperture.spec.v1.Component;
+local rateLimiter = aperture.spec.v1.RateLimiter;
+local port = aperture.spec.v1.Port;
+local rateLimitPort = port.new() + port.withSignalName('RATE_LIMIT');
 
 local fluxMeterSelector = selector.new()
                           + selector.withServiceSelector(
@@ -41,6 +45,21 @@ local concurrencyLimiterSelector = selector.new()
                                      + flowSelector.withControlPoint(controlPoint.new()
                                                                      + controlPoint.withTraffic('ingress'))
                                    );
+
+local rateLimiterSelector = selector.new()
+                            + selector.withServiceSelector(
+                              serviceSelector.new()
+                              + serviceSelector.withAgentGroup('default')
+                              + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                            )
+                            + selector.withFlowSelector(
+                              flowSelector.new()
+                              + flowSelector.withControlPoint(controlPoint.new()
+                                                              + controlPoint.withTraffic('ingress'))
+                              + flowSelector.withLabelMatcher(
+                                LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
+                              )
+                            );
 
 
 local apertureControllerMixin =
@@ -112,6 +131,22 @@ local policy = latencyGradientPolicy({
       + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
     ],
   },
+  components: [
+    component.new()
+    + component.withConstant(
+      constant.new()
+      + constant.withValue(3)
+      + constant.withOutPorts({ output: rateLimitPort })
+    ),
+    component.new()
+    + component.withRateLimiter(
+      rateLimiter.new()
+      + rateLimiter.withSelector(rateLimiterSelector)
+      + rateLimiter.withInPorts({ limit: rateLimitPort })
+      + rateLimiter.withLimitResetInterval('1s')
+      + rateLimiter.withLabelKey('http.request.header.user_id'),
+    ),
+  ],
 }).policy;
 
 local policyMixin = {

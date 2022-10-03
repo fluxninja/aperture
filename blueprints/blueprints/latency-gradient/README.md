@@ -25,9 +25,15 @@
 
 #### Classification Rules
 
-| Parameter Name       | Parameter Type | Default | Description                   |
-| -------------------- | -------------- | ------- | ----------------------------- |
-| `policy.classifiers` | `string`       | `[]`    | List of classification rules. |
+| Parameter Name       | Parameter Type                  | Default | Description                   |
+| -------------------- | ------------------------------- | ------- | ----------------------------- |
+| `policy.classifiers` | `[]aperture.spec.v1.Classifier` | `[]`    | List of classification rules. |
+
+#### Additional Circuit Components
+
+| Parameter Name      | Parameter Type                 | Default | Description                            |
+| ------------------- | ------------------------------ | ------- | -------------------------------------- |
+| `policy.components` | `[]aperture.spec.v1.Component` | `[]`    | List of additional circuit components. |
 
 #### Exponential Moving Average configuration
 

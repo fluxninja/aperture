@@ -14,17 +14,6 @@ local flowSelector = aperture.spec.v1.FlowSelector;
 local controlPoint = aperture.spec.v1.ControlPoint;
 local staticBuckets = aperture.spec.v1.FluxMeterStaticBuckets;
 
-local svcSelector = {
-  sSelector: {
-    service: 'service1-demo-app.demoapp.svc.cluster.local',
-  },
-  fSelector: {
-    controlPoint: {
-      traffic: 'ingress',
-    },
-  },
-};
-
 local svcSelector = selector.new()
                     + selector.withServiceSelector(
                       serviceSelector.new()
