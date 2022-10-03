@@ -47,7 +47,7 @@ func (fr *fxRunner) processEvent(event Event) {
 		// instantiate and start a new app
 		err := fr.initApp(event.Key)
 		if err != nil {
-			logger.Error().Err(err).Msg("Failed to instanticate and start a new app")
+			logger.Error().Err(err).Msg("Failed to instantiate and start a new app")
 		}
 	case Remove:
 		logger.Info().Str("event", event.String()).Msg("key removed")

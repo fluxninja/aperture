@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -17,8 +19,8 @@ type ControllerComponent struct {
 	controlVariable runtime.Reading
 	// Controller output's last reading
 	output         runtime.Reading
-	componentIndex int
 	policyReadAPI  iface.Policy
+	componentIndex int
 }
 
 // NewControllerComponent creates a new ControllerComponent.
@@ -123,6 +125,10 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickI
 	return runtime.PortToValue{
 		"output": []runtime.Reading{output},
 	}, nil
+}
+
+// DynamicConfigUpdate is a no-op for ControllerComponent.
+func (cc *ControllerComponent) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 }
 
 // GetSignal returns the signal's last reading.

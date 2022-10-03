@@ -2,14 +2,17 @@ package controlplane
 
 import (
 	"context"
+	"encoding/json"
 
 	"go.uber.org/fx"
+	"sigs.k8s.io/yaml"
 
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/jobs"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -17,18 +20,15 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-// Fx tag to match etcd watcher name.
-var policiesDriverFxTag = "policies-driver"
-
 // policyFactoryModule module for policy factory.
 func policyFactoryModule() fx.Option {
 	return fx.Options(
-		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: common.PoliciesConfigPath}.Annotate(),
 		fx.Invoke(
 			fx.Annotate(
 				setupPolicyFxDriver,
 				fx.ParamTags(
-					config.NameTag(policiesDriverFxTag),
+					config.NameTag(policiesFxTag),
+					config.NameTag(policiesDynamicConfigFxTag),
 					common.FxOptionsFuncTag,
 				),
 			),
@@ -39,19 +39,53 @@ func policyFactoryModule() fx.Option {
 }
 
 type policyFactory struct {
-	circuitJobGroup *jobs.JobGroup
-	etcdClient      *etcdclient.Client
-	registry        status.Registry
+	circuitJobGroup      *jobs.JobGroup
+	etcdClient           *etcdclient.Client
+	registry             status.Registry
+	dynamicConfigWatcher notifiers.Watcher
 }
 
 // Main fx app.
 func setupPolicyFxDriver(
 	etcdWatcher notifiers.Watcher,
+	dynamicConfigWatcher notifiers.Watcher,
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
 ) error {
+	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
+		var dat []byte
+		switch etype {
+		case notifiers.Write:
+			policyMessage := &policylangv1.Policy{}
+			unmarshalErr := config.UnmarshalYAML(bytes, policyMessage)
+			if unmarshalErr != nil {
+				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
+				return key, nil, unmarshalErr
+			}
+
+			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
+			if wrapErr != nil {
+				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
+				return key, nil, wrapErr
+			}
+			var marshalWrapErr error
+			jsonDat, marshalWrapErr := json.Marshal(wrapper)
+			if marshalWrapErr != nil {
+				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
+				return key, nil, marshalWrapErr
+			}
+			// convert to yaml
+			dat, marshalWrapErr = yaml.JSONToYAML(jsonDat)
+			if marshalWrapErr != nil {
+				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
+				return key, nil, marshalWrapErr
+			}
+		}
+		return key, dat, nil
+	}
+
 	policiesStatusRegistry := registry.Child(iface.PoliciesRoot)
 	logger := policiesStatusRegistry.GetLogger()
 
@@ -62,9 +96,10 @@ func setupPolicyFxDriver(
 	}
 
 	factory := &policyFactory{
-		registry:        policiesStatusRegistry,
-		circuitJobGroup: circuitJobGroup,
-		etcdClient:      etcdClient,
+		registry:             policiesStatusRegistry,
+		circuitJobGroup:      circuitJobGroup,
+		etcdClient:           etcdClient,
+		dynamicConfigWatcher: dynamicConfigWatcher,
 	}
 
 	optionsFunc := []notifiers.FxOptionsFunc{factory.provideControllerPolicyFxOptions}
@@ -79,6 +114,9 @@ func setupPolicyFxDriver(
 		},
 		StatusRegistry: policiesStatusRegistry,
 	}
+
+	// content transform callback to wrap policy in config properties wrapper
+	fxDriver.SetTransformFunc(wrapPolicy)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -129,10 +167,11 @@ func (factory *policyFactory) provideControllerPolicyFxOptions(
 		return fx.Options(), err
 	}
 	return fx.Options(
-		policyFxOptions,
 		fx.Supply(
+			fx.Annotate(factory.dynamicConfigWatcher, fx.As(new(notifiers.Watcher))),
 			factory.circuitJobGroup,
 			factory.etcdClient,
 		),
+		policyFxOptions,
 	), nil
 }

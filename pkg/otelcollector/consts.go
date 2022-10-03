@@ -86,6 +86,10 @@ const (
 
 	// ApertureFeatureStatusLabel describes the status of the feature.
 	ApertureFeatureStatusLabel = "aperture.feature.status"
+	// ApertureFeatureStatusOK const for OK status.
+	ApertureFeatureStatusOK = "OK"
+	// ApertureFeatureStatusError const for error status.
+	ApertureFeatureStatusError = "Error"
 	// ApertureFlowStartTimestampLabel is the start timestamp of the flow.
 	ApertureFlowStartTimestampLabel = "aperture.flow_start_timestamp"
 	// ApertureFlowEndTimestampLabel is the end timestamp of the flow.

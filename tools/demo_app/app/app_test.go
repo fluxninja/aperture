@@ -1,7 +1,6 @@
 package app
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -54,11 +53,8 @@ func (c *recorderHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	}
 	c.recordedRequests = append(c.recordedRequests, rr)
 
-	responseString := "{}"
-	responseJSON := io.NopCloser(bytes.NewReader([]byte(responseString)))
 	response := &http.Response{
 		StatusCode: http.StatusOK,
-		Body:       responseJSON,
 	}
 
 	return response, nil

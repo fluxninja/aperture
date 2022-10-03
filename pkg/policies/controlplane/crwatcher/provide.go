@@ -1,4 +1,4 @@
-package kubernetes
+package crwatcher
 
 import (
 	"context"
@@ -12,33 +12,29 @@ import (
 
 // Constructor holds fields to create an annotated instance of Kubernetes Watcher.
 type Constructor struct {
-	// Name of watcher instance where "" means main watcher.
+	// Name of watcher instance.
 	Name string
-}
-
-// Module is a fx module that provides Kubernetes watcher.
-func Module() fx.Option {
-	return fx.Options(
-		Constructor{}.Annotate(),
-	)
+	// Name of dynamic config watcher instance.
+	DynamicConfigName string
 }
 
 // Annotate creates an annotated instance of Kubernetes Watcher.
 func (constructor Constructor) Annotate() fx.Option {
-	name := ``
-	if constructor.Name != "" {
-		name = config.NameTag(constructor.Name)
+	if constructor.Name == "" || constructor.DynamicConfigName == "" {
+		log.Panic().Msg("Kubernetes watcher name is required")
 	}
+	name := config.NameTag(constructor.Name)
+	dynamicConfigName := config.NameTag(constructor.DynamicConfigName)
 	return fx.Options(fx.Provide(
 		fx.Annotate(
 			constructor.provideWatcher,
-			fx.ResultTags(name),
+			fx.ResultTags(name, dynamicConfigName),
 		),
 	))
 }
 
 // provideWatcher creates a Kubernetes watcher to watch the Policy Custom Resource.
-func (constructor Constructor) provideWatcher(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (notifiers.Watcher, error) {
+func (constructor Constructor) provideWatcher(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (notifiers.Watcher, notifiers.Watcher, error) {
 	if os.Getenv("APERTURE_CONTROLLER_NAMESPACE") == "" {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "default")
 	}
@@ -46,7 +42,7 @@ func (constructor Constructor) provideWatcher(unmarshaller config.Unmarshaller, 
 	watcher, err := NewWatcher()
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create Policy Kubernetes watcher")
-		return nil, err
+		return nil, nil, err
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -63,5 +59,5 @@ func (constructor Constructor) provideWatcher(unmarshaller config.Unmarshaller, 
 		},
 	})
 
-	return watcher, nil
+	return watcher, watcher.GetDynamicConfigWatcher(), nil
 }

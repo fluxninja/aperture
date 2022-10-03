@@ -7,6 +7,8 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -22,21 +24,21 @@ const (
 // EMA is an Exponential Moving Average filter.
 type EMA struct {
 	lastGoodOutput runtime.Reading
+	policyReadAPI  iface.Policy
 	// The smoothing factor between 0-1. A higher value discounts older observations faster.
 	alpha float64
 	sum   float64
 	count float64
-	// The initial value of EMA is the average of the first warm_up_window number of observations.
-	warmUpWindow uint32
-	emaWindow    uint32
-	warmupCount  uint32
-	invalidCount uint32
 	// The correction factor on the maximum relative to the signal
 	correctionFactorOnMaxViolation float64
 	// The correction factor on the minimum relative to the signal
 	correctionFactorOnMinViolation float64
 	currentStage                   stage
-	policyReadAPI                  iface.Policy
+	// The initial value of EMA is the average of the first warm_up_window number of observations.
+	warmUpWindow uint32
+	emaWindow    uint32
+	warmupCount  uint32
+	invalidCount uint32
 }
 
 // Make sure EMA complies with Component interface.
@@ -96,26 +98,20 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		if input.Valid() {
 			ema.sum += input.Value()
 			ema.count++
-			// Emit the avg for the valid values in the warmup window.
-			avg, err := ema.computeAverage(minEnvelope, maxEnvelope)
-			if err != nil {
-				return retErr(err)
-			}
-			output = avg
 			// Decide to switch to EMA stage
 			if ema.warmupCount >= ema.warmUpWindow {
 				ema.currentStage = emaStage
 			}
 		} else {
-			// Emit the avg for the valid values in the warmup window.
-			avg, err := ema.computeAverage(minEnvelope, maxEnvelope)
-			if err != nil {
-				return retErr(err)
-			}
-			output = avg
 			// Immediately reset on any missing values during warmup.
 			ema.resetStages()
 		}
+		// Emit the avg for the valid values in the warmup window.
+		avg, err := ema.computeAverage()
+		if err != nil {
+			return retErr(err)
+		}
+		output = avg
 	case emaStage:
 		if input.Valid() {
 			if !ema.lastGoodOutput.Valid() {
@@ -139,6 +135,13 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		logger.Panic().Msg("unexpected ema stage")
 	}
 
+	// apply correction factor
+	var err error
+	output, err = ema.applyEnvelope(output, minEnvelope, maxEnvelope)
+	if err != nil {
+		return retErr(err)
+	}
+
 	// Set the last good output
 	if output.Valid() {
 		ema.lastGoodOutput = output
@@ -149,43 +152,45 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 	}, nil
 }
 
-func (ema *EMA) computeAverage(minEnvelope, maxEnvelope runtime.Reading) (runtime.Reading, error) {
+func (ema *EMA) computeAverage() (runtime.Reading, error) {
 	if ema.count > 0 {
 		avg := ema.sum / (ema.count)
-		envelopedAvg, err := ema.applyEnvelope(avg, minEnvelope, maxEnvelope)
-		if err != nil {
-			return runtime.InvalidReading(), err
-		}
-		return runtime.NewReading(envelopedAvg), nil
+		return runtime.NewReading(avg), nil
 	} else {
 		return runtime.InvalidReading(), nil
 	}
 }
 
-func (ema *EMA) applyEnvelope(input float64, minEnvelope, maxEnvelope runtime.Reading) (float64, error) {
+// DynamicConfigUpdate is a no-op for EMA.
+func (ema *EMA) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
+
+func (ema *EMA) applyEnvelope(output, minEnvelope, maxEnvelope runtime.Reading) (runtime.Reading, error) {
+	if !output.Valid() {
+		return output, nil
+	}
+	value := output.Value()
 	minxMaxConstraints := constraints.NewMinMaxConstraints()
 	if maxEnvelope.Valid() {
 		maxErr := minxMaxConstraints.SetMax(maxEnvelope.Value())
 		if maxErr != nil {
-			return 0, maxErr
+			return runtime.InvalidReading(), maxErr
 		}
 	}
 	if minEnvelope.Valid() {
 		minErr := minxMaxConstraints.SetMin(minEnvelope.Value())
 		if minErr != nil {
-			return 0, minErr
+			return runtime.InvalidReading(), minErr
 		}
 	}
 
-	constrainedValue, constraintType := minxMaxConstraints.Constrain(input)
-	var correctedConstrainedValue float64
+	_, constraintType := minxMaxConstraints.Constrain(value)
+	correctedValue := value
 
 	if constraintType == constraints.MinConstraint && ema.correctionFactorOnMinViolation != 1 {
-		correctedConstrainedValue *= ema.correctionFactorOnMinViolation
+		correctedValue = value * ema.correctionFactorOnMinViolation
 	} else if constraintType == constraints.MaxConstraint && ema.correctionFactorOnMaxViolation != 1 {
-		correctedConstrainedValue *= ema.correctionFactorOnMaxViolation
-	} else {
-		correctedConstrainedValue = constrainedValue
+		correctedValue = value * ema.correctionFactorOnMaxViolation
 	}
-	return correctedConstrainedValue, nil
+
+	return runtime.NewReading(correctedValue), nil
 }

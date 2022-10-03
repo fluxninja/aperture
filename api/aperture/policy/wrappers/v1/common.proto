@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package aperture.policy.wrappers.v1;
+
+message CommonAttributes {
+  // Name of the Policy.
+  string policy_name = 1;
+  // Hash of the entire Policy spec.
+  string policy_hash = 2;
+  // The index of Component of within the circuit or classifier index.
+  int64 component_index = 3;
+}

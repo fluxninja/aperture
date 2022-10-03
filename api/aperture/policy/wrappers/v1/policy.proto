@@ -5,14 +5,13 @@ package aperture.policy.wrappers.v1;
 import "aperture/policy/language/v1/classifier.proto";
 import "aperture/policy/language/v1/fluxmeter.proto";
 import "aperture/policy/language/v1/policy.proto";
+import "aperture/policy/wrappers/v1/common.proto";
 
 message PolicyWrapper {
+  // CommonAttributes
+  policy.wrappers.v1.CommonAttributes common_attributes = 1;
   // Policy
-  policy.language.v1.Policy policy = 1;
-  // Name of the Policy.
-  string policy_name = 2;
-  // Hash of the entire Policy spec.
-  string policy_hash = 3;
+  policy.language.v1.Policy policy = 2;
 }
 
 message FluxMeterWrapper {
@@ -23,34 +22,22 @@ message FluxMeterWrapper {
 }
 
 message ClassifierWrapper {
+  // CommonAttributes
+  policy.wrappers.v1.CommonAttributes common_attributes = 1;
   // Classifier
-  policy.language.v1.Classifier classifier = 1;
-  // Name of the Policy.
-  string policy_name = 2;
-  // Hash of the entire Policy spec.
-  string policy_hash = 3;
-  // Index of the classifier within Policy.
-  int64 classifier_index = 4;
+  policy.language.v1.Classifier classifier = 2;
 }
 
 message ConcurrencyLimiterWrapper {
+  // CommonAttributes
+  policy.wrappers.v1.CommonAttributes common_attributes = 1;
   // Concurrency Limiter
-  policy.language.v1.ConcurrencyLimiter concurrency_limiter = 1;
-  // The index of Component in the Circuit.
-  int64 component_index = 2;
-  // Name of the Policy.
-  string policy_name = 3;
-  // Hash of the entire Policy spec.
-  string policy_hash = 4;
+  policy.language.v1.ConcurrencyLimiter concurrency_limiter = 2;
 }
 
 message RateLimiterWrapper {
+  // CommonAttributes
+  policy.wrappers.v1.CommonAttributes common_attributes = 1;
   // Rate Limiter
-  policy.language.v1.RateLimiter rate_limiter = 1;
-  // The index of Component in the Circuit.
-  int64 component_index = 2;
-  // Name of the Policy.
-  string policy_name = 3;
-  // Hash of the entire Policy spec.
-  string policy_hash = 4;
+  policy.language.v1.RateLimiter rate_limiter = 2;
 }

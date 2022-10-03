@@ -33,6 +33,7 @@ local selector = spec.v1.Selector;
 local serviceSelector = spec.v1.ServiceSelector;
 local flowSelector = spec.v1.FlowSelector;
 local circuit = spec.v1.Circuit;
+local dynamicConfig = spec.v1.RateLimiterDynamicConfig;
 local override = spec.v1.RateLimiterOverride;
 local lazySync = spec.v1.RateLimiterLazySync;
 local port = spec.v1.Port;
@@ -73,7 +74,10 @@ function(params) {
           + rateLimiter.withSelector(svcSelector)
           + rateLimiter.withLimitResetInterval($._config.limitResetInterval)
           + rateLimiter.withLabelKey($._config.labelKey)
-          + rateLimiter.withOverrides($._config.overrides)
+          + rateLimiter.withInitConfig(
+            dynamicConfig.new()
+            + dynamicConfig.withOverrides($._config.overrides)
+          )
           + rateLimiter.withLazySync(lazySync.new()
                                      + lazySync.withEnabled($._config.lazySync.enabled)
                                      + lazySync.withNumSync($._config.lazySync.numSync))

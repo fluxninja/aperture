@@ -26,7 +26,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-var errNoQueriesReturned = errors.New("no queries returned until now")
+// ErrNoQueriesReturned is returned when no queries are returned by the policy (initial state).
+var ErrNoQueriesReturned = errors.New("no queries returned until now")
 
 const (
 	promTimeout = time.Second * 5
@@ -336,6 +337,8 @@ type PromQL struct {
 	evaluationInterval time.Duration
 }
 
+var _ runtime.Component = (*PromQL)(nil)
+
 // Make sure PromQL implements jobRegistererIfc.
 var _ jobRegistererIfc = (*PromQL)(nil)
 
@@ -351,7 +354,7 @@ func NewPromQLAndOptions(
 		componentIndex:     componentIndex,
 		lastQueryTimestamp: time.Time{},
 		// Set err to make sure the initial runs of Execute return Invalid readings.
-		err: errNoQueriesReturned,
+		err: ErrNoQueriesReturned,
 	}
 
 	// Job register is implemented by self
@@ -405,6 +408,9 @@ func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runti
 		"output": []runtime.Reading{currentReading},
 	}, nil
 }
+
+// DynamicConfigUpdate is a no-op for PromQL.
+func (promQL *PromQL) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
 
 func (promQL *PromQL) registerJob(endTimestamp time.Time) {
 	promQL.jobExecutor.registerScalarJob(
@@ -485,7 +491,7 @@ func NewTaggedQueryAndOptions(
 	taggedQuery := &TaggedQuery{
 		scalarQuery: scalarQuery,
 		// Set err to make sure the initial runs of ExecutePromQuery return error.
-		err: errNoQueriesReturned,
+		err: ErrNoQueriesReturned,
 	}
 	// taggedQuery implements jobRegisterer
 	scalarQuery.promQL.jobRegisterer = taggedQuery

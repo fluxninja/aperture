@@ -7,6 +7,8 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -84,4 +86,8 @@ func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToValue, t
 	return runtime.PortToValue{
 		"output": []runtime.Reading{output},
 	}, err
+}
+
+// DynamicConfigUpdate is a no-op for ArithmeticCombinator.
+func (arith *ArithmeticCombinator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 }

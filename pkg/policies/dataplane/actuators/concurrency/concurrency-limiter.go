@@ -282,7 +282,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	}
 
 	conLimiter := &concurrencyLimiter{
-		Component:                      wrapperMessage,
+		Component:                      wrapperMessage.GetCommonAttributes(),
 		concurrencyLimiterProto:        concurrencyLimiterMessage,
 		registry:                       reg,
 		concurrencyLimiterFactory:      conLimiterFactory,
@@ -533,8 +533,8 @@ func (conLimiter *concurrencyLimiter) GetLimiterID() iface.LimiterID {
 	// TODO: move this to limiter base.
 	return iface.LimiterID{
 		PolicyName:     conLimiter.GetPolicyName(),
-		ComponentIndex: conLimiter.GetComponentIndex(),
 		PolicyHash:     conLimiter.GetPolicyHash(),
+		ComponentIndex: conLimiter.GetComponentIndex(),
 	}
 }
 

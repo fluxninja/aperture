@@ -102,7 +102,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", flux_meter_name=\"example\"}[$__rate_interval]))\n/ sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", flux_meter_name=\"example\"}[$__rate_interval]))\n",
+          "expr": "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n/ sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",

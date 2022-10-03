@@ -17,6 +17,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/fluxmeter"
@@ -109,7 +110,7 @@ func compilePolicyWrapper(wrapperMessage *wrappersv1.PolicyWrapper, registry sta
 	}
 
 	policy := &Policy{
-		PolicyBase: wrapperMessage,
+		PolicyBase: wrapperMessage.GetCommonAttributes(),
 		registry:   registry,
 	}
 
@@ -155,7 +156,8 @@ func compilePolicyWrapper(wrapperMessage *wrappersv1.PolicyWrapper, registry sta
 	return policy, compiledCircuit, fx.Options(
 		fx.Options(resourceOptions...),
 		partialCircuitOption,
-		fx.Invoke(policy.setupCircuitJob),
+		fx.Invoke(policy.setupCircuitJob,
+			policy.setupDynamicConfig),
 	), nil
 }
 
@@ -210,6 +212,32 @@ func (policy *Policy) setupCircuitJob(
 	return nil
 }
 
+func (policy *Policy) setupDynamicConfig(
+	dynamicConfigWatcher notifiers.Watcher,
+	lifecycle fx.Lifecycle,
+) error {
+	unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
+	unmarshalNotifier := notifiers.NewUnmarshalKeyNotifier(notifiers.Key(policy.GetPolicyName()),
+		unmarshaller,
+		policy.dynamicConfigUpdate,
+	)
+
+	lifecycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			return dynamicConfigWatcher.AddKeyNotifier(unmarshalNotifier)
+		},
+		OnStop: func(_ context.Context) error {
+			return dynamicConfigWatcher.RemoveKeyNotifier(unmarshalNotifier)
+		},
+	})
+
+	return nil
+}
+
+func (policy *Policy) dynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	policy.circuit.DynamicConfigUpdate(event, unmarshaller)
+}
+
 func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error) {
 	// Get JobInfo
 	jobInfo := policy.circuitJobGroup.JobInfo(policy.jobName)
@@ -250,8 +278,10 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 	hash := base64.StdEncoding.EncodeToString(hashBytes[:])
 
 	return &wrappersv1.PolicyWrapper{
-		Policy:     policyMessage,
-		PolicyName: policyName,
-		PolicyHash: hash,
+		Policy: policyMessage,
+		CommonAttributes: &wrappersv1.CommonAttributes{
+			PolicyName: policyName,
+			PolicyHash: hash,
+		},
 	}, nil
 }
