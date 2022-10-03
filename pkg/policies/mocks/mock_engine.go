@@ -37,10 +37,10 @@ func (m *MockEngine) EXPECT() *MockEngineMockRecorder {
 }
 
 // GetConcurrencyLimiter mocks base method.
-func (m *MockEngine) GetConcurrencyLimiter(limiterID iface.LimiterID) iface.Limiter {
+func (m *MockEngine) GetConcurrencyLimiter(limiterID iface.LimiterID) iface.ConcurrencyLimiter {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetConcurrencyLimiter", limiterID)
-	ret0, _ := ret[0].(iface.Limiter)
+	ret0, _ := ret[0].(iface.ConcurrencyLimiter)
 	return ret0
 }
 
@@ -65,10 +65,10 @@ func (mr *MockEngineMockRecorder) GetFluxMeter(fluxMeterName interface{}) *gomoc
 }
 
 // GetRateLimiter mocks base method.
-func (m *MockEngine) GetRateLimiter(limiterID iface.LimiterID) iface.Limiter {
+func (m *MockEngine) GetRateLimiter(limiterID iface.LimiterID) iface.RateLimiter {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRateLimiter", limiterID)
-	ret0, _ := ret[0].(iface.Limiter)
+	ret0, _ := ret[0].(iface.RateLimiter)
 	return ret0
 }
 
@@ -93,7 +93,7 @@ func (mr *MockEngineMockRecorder) ProcessRequest(controlPoint, serviceIDs, label
 }
 
 // RegisterConcurrencyLimiter mocks base method.
-func (m *MockEngine) RegisterConcurrencyLimiter(sa iface.Limiter) error {
+func (m *MockEngine) RegisterConcurrencyLimiter(sa iface.ConcurrencyLimiter) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RegisterConcurrencyLimiter", sa)
 	ret0, _ := ret[0].(error)
@@ -135,7 +135,7 @@ func (mr *MockEngineMockRecorder) RegisterRateLimiter(l interface{}) *gomock.Cal
 }
 
 // UnregisterConcurrencyLimiter mocks base method.
-func (m *MockEngine) UnregisterConcurrencyLimiter(sa iface.Limiter) error {
+func (m *MockEngine) UnregisterConcurrencyLimiter(sa iface.ConcurrencyLimiter) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UnregisterConcurrencyLimiter", sa)
 	ret0, _ := ret[0].(error)

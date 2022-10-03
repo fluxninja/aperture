@@ -479,12 +479,6 @@ func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
 	}
 }
 
-// GetObserver is there to satisfy Limiter interface.
-func (rateLimiter *rateLimiter) GetObserver(map[string]string) prometheus.Observer {
-	// Not implemented for rate limiter
-	return nil
-}
-
 // GetCounter returns counter for tracking number of times rateLimiter was triggered.
 func (rateLimiter *rateLimiter) GetCounter() prometheus.Counter {
 	return rateLimiter.counter

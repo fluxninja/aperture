@@ -548,8 +548,3 @@ func (conLimiter *concurrencyLimiter) GetObserver(labels map[string]string) prom
 
 	return latencyHistogram
 }
-
-// GetCounter is there to satisfy Limiter interface.
-func (conLimiter *concurrencyLimiter) GetCounter() prometheus.Counter {
-	return nil
-}
