@@ -45,18 +45,13 @@ add_plugins() {
 
 	for plugin in "${wanted_plugins[@]}"; do
 		if [[ $plugin == "circleci" ]]; then
-			continue
+			asdf plugin add circleci https://github.com/lukeab/asdf-circleci-cli.git
 		fi
 		if ! array_contains "${plugin}" "${added_plugins[@]}"; then
 			printf 'Adding asdf plugin: "%s"\n' "${plugin}"
 			asdf plugin add "${plugin}"
 		fi
 	done
-
-	circleci_check=$(asdf plugin list | grep circleci)
-	if [[ $circleci_check != "circleci" ]]; then
-		asdf plugin add circleci https://github.com/lukeab/asdf-circleci-cli.git
-	fi
 }
 
 install_helm_plugins() {
