@@ -163,12 +163,20 @@ func (mj *MultiJob) RegisterJob(job Job) error {
 
 // DeregisterJob deregisters a job with the MultiJob.
 func (mj *MultiJob) DeregisterJob(name string) error {
-	_ = mj.JMS.removeMetrics(name)
-	_, err := mj.gt.deregisterJob(name)
-	return err
+	job, err := mj.gt.deregisterJob(name)
+	if err != nil {
+		return nil
+	}
+	jobMetrics := job.JobMetrics()
+	_ = jobMetrics.removeMetrics(name)
+	return nil
 }
 
 // DeregisterAll removes all jobs from the MultiJob.
 func (mj *MultiJob) DeregisterAll() {
+	for jobName, jobTracker := range mj.gt.trackers {
+		jobMetric := jobTracker.job.JobMetrics()
+		_ = jobMetric.removeMetrics(jobName)
+	}
 	mj.gt.reset()
 }

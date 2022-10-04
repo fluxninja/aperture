@@ -153,7 +153,6 @@ func (executor *jobExecutor) doJob() {
 		beforeExecution := time.Now()
 		_, err := executor.jg.gt.execute(ctx, executor)
 		if err != nil {
-			// TODO: Check the executor.Name() reflect correct service name
 			executor.JobMetrics().latencySummary.WithLabelValues(executor.Name(), "false").Observe(float64(time.Since(beforeExecution)))
 			executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("job", executor.Name()).Msg("job status unhealthy")
 			return
