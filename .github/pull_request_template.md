@@ -15,6 +15,7 @@ Contributors guide: ./CONTRIBUTING.md
 
 - [ ] Tested in playground or other setup
 - [ ] Documentation is changed or added
+- [ ] Blueprints are changed and example is verified
 - [ ] Tests and/or benchmarks are included
 - [ ] Breaking changes
 
