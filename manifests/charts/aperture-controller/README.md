@@ -165,17 +165,27 @@
 
 ### etcd
 
-| Name                    | Description                                                  | Value    |
-| ----------------------- | ------------------------------------------------------------ | -------- |
-| `etcd.enabled`          | Whether to deploy a small etcd cluster as part of this chart | `true`   |
-| `etcd.auth.rbac.create` | specifies whether to create the RBAC resources for Etcd      | `false`  |
-| `etcd.auth.token.type`  | specifies the type of token to use                           | `simple` |
+| Name                                  | Description                                                                            | Value               |
+| ------------------------------------- | -------------------------------------------------------------------------------------- | ------------------- |
+| `etcd.enabled`                        | Whether to deploy a small etcd cluster as part of this chart                           | `true`              |
+| `etcd.auth.rbac.create`               | specifies whether to create the RBAC resources for Etcd                                | `false`             |
+| `etcd.auth.token.type`                | specifies the type of token to use                                                     | `simple`            |
+| `etcd.initContainer.enabled`          | Create init container to check the health of Etcd before starting Aperture Controller. | `true`              |
+| `etcd.initContainer.image.registry`   | Init container image registry.                                                         | `docker.io/bitnami` |
+| `etcd.initContainer.image.repository` | Init container image repository.                                                       | `etcd`              |
+| `etcd.initContainer.image.tag`        | Init container image tag.                                                              | `3.5`               |
+| `etcd.initContainer.image.pullPolicy` | Init container image pull policy.                                                      | `IfNotPresent`      |
 
 
 ### prometheus
 
-| Name                 | Description                                     | Value  |
-| -------------------- | ----------------------------------------------- | ------ |
-| `prometheus.enabled` | specifies whether to deploy embedded prometheus | `true` |
+| Name                                        | Description                                                                                     | Value                   |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------- |
+| `prometheus.enabled`                        | specifies whether to deploy embedded prometheus                                                 | `true`                  |
+| `prometheus.initContainer.enabled`          | Create init container to check the readiness of Prometheus before starting Aperture Controller. | `true`                  |
+| `prometheus.initContainer.image.registry`   | Init container image registry.                                                                  | `docker.io/linuxserver` |
+| `prometheus.initContainer.image.repository` | Init container image repository.                                                                | `yq`                    |
+| `prometheus.initContainer.image.tag`        | Init container image tag.                                                                       | `3.1.0`                 |
+| `prometheus.initContainer.image.pullPolicy` | Init container image pull policy.                                                               | `IfNotPresent`          |
 
 
