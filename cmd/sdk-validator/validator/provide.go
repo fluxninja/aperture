@@ -21,7 +21,7 @@ type ConstructorIn struct {
 
 // ProvideFlowcontrolHandler .
 func ProvideFlowcontrolHandler(in ConstructorIn) (flowcontrolv1.FlowControlServiceServer, error) {
-	return &flowcontrolHandler{}, nil
+	return &FlowControlHandler{}, nil
 }
 
 // Register registers flowcontrol service on a grpc server.

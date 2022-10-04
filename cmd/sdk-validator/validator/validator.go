@@ -2,6 +2,7 @@ package validator
 
 import (
 	"context"
+	"math/rand"
 	"time"
 
 	"golang.org/x/exp/maps"
@@ -12,12 +13,15 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-type flowcontrolHandler struct {
+// FlowControlHandler .
+type FlowControlHandler struct {
 	flowcontrolv1.UnimplementedFlowControlServiceServer
+
+	RejectRatio float64
 }
 
 // Check is a dummy Check handler.
-func (f *flowcontrolHandler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*flowcontrolv1.CheckResponse, error) {
+func (f *FlowControlHandler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*flowcontrolv1.CheckResponse, error) {
 	log.Info().Msg("Received Check request")
 
 	services := []string{}
@@ -36,7 +40,7 @@ func (f *flowcontrolHandler) Check(ctx context.Context, req *flowcontrolv1.Check
 	return resp, nil
 }
 
-func (f *flowcontrolHandler) check(ctx context.Context, feature string, labels map[string]string, services []string) *flowcontrolv1.CheckResponse {
+func (f *FlowControlHandler) check(ctx context.Context, feature string, labels map[string]string, services []string) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 		FlowLabelKeys: maps.Keys(labels),
@@ -46,6 +50,13 @@ func (f *flowcontrolHandler) check(ctx context.Context, feature string, labels m
 			Type:    flowcontrolv1.ControlPointInfo_TYPE_FEATURE,
 		},
 		RejectReason: flowcontrolv1.CheckResponse_REJECT_REASON_NONE,
+	}
+
+	// randomly reject requests based on rejectRatio
+	// nolint:gosec
+	if f.RejectRatio > 0 && rand.Float64() < f.RejectRatio {
+		resp.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
+		resp.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
 	}
 
 	return resp

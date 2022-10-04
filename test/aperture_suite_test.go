@@ -14,11 +14,11 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
-	"github.com/fluxninja/aperture/cmd/sdk-validator/validator"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
@@ -148,8 +148,7 @@ var _ = BeforeSuite(func() {
 			entitycache.NewEntityCache,
 			agentinfo.ProvideAgentInfo,
 		),
-		// flowcontrol.Module,
-		validator.Module,
+		flowcontrol.Module,
 		classifier.Module,
 		otelcollector.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),

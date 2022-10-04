@@ -153,7 +153,7 @@ require (
 	github.com/digitalocean/godo v1.82.0 // indirect
 	github.com/dmarkham/enumer v1.5.6
 	github.com/docker/distribution v2.8.1+incompatible // indirect
-	github.com/docker/docker v20.10.18+incompatible // indirect
+	github.com/docker/docker v20.10.18+incompatible
 	github.com/docker/go-connections v0.4.1-0.20210727194412-58542c764a11 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/elastic/go-licenser v0.4.1 // indirect
