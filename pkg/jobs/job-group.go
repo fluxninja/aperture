@@ -219,12 +219,12 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 // It returns an error if the job is not registered.
 // It also stops the job's executor.
 func (jg *JobGroup) DeregisterJob(name string) error {
-	jobMetrics := jg.gt.trackers[name].job.JobMetrics()
-	_ = jobMetrics.removeMetrics(name)
 	job, err := jg.gt.deregisterJob(name)
 	if err != nil {
 		return err
 	}
+	jobMetrics := job.JobMetrics()
+	_ = jobMetrics.removeMetrics(name)
 	if executor, ok := job.(*jobExecutor); ok {
 		executor.stop()
 	}
