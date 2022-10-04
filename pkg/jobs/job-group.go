@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
@@ -82,6 +83,7 @@ func (jgc JobGroupConstructor) provideJobGroup(
 	gw GroupWatchers,
 	registry status.Registry,
 	unmarshaller config.Unmarshaller,
+	prometheusRegistry *prometheus.Registry,
 	lifecycle fx.Lifecycle,
 ) (*JobGroup, error) {
 	config := jgc.DefaultConfig
@@ -109,9 +111,17 @@ func (jgc JobGroupConstructor) provideJobGroup(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
+			for _, jobTracker := range jg.gt.trackers {
+				jobMetric := jobTracker.job.JobMetrics()
+				_ = jobMetric.registerJobMetrics(prometheusRegistry)
+			}
 			return jg.Start()
 		},
 		OnStop: func(_ context.Context) error {
+			for _, jobTracker := range jg.gt.trackers {
+				jobMetric := jobTracker.job.JobMetrics()
+				_ = jobMetric.unregisterJobMetrics(prometheusRegistry)
+			}
 			defer reg.Detach()
 			return jg.Stop()
 		},
@@ -209,6 +219,8 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 // It returns an error if the job is not registered.
 // It also stops the job's executor.
 func (jg *JobGroup) DeregisterJob(name string) error {
+	jobMetrics := jg.gt.trackers[name].job.JobMetrics()
+	_ = jobMetrics.removeMetrics(name)
 	job, err := jg.gt.deregisterJob(name)
 	if err != nil {
 		return err
@@ -221,6 +233,10 @@ func (jg *JobGroup) DeregisterJob(name string) error {
 
 // DeregisterAll deregisters all Jobs from the JobGroup.
 func (jg *JobGroup) DeregisterAll() {
+	for jobName, jobTracker := range jg.gt.trackers {
+		jobMetric := jobTracker.job.JobMetrics()
+		_ = jobMetric.removeMetrics(jobName)
+	}
 	jobs := jg.gt.reset()
 	for _, job := range jobs {
 		if executor, ok := job.(*jobExecutor); ok {
