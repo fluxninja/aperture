@@ -1,6 +1,7 @@
 val ktorVersion: String by project
 val kotlinVersion: String by project
 val logbackVersion: String by project
+val apertureVersion: String by project
 
 plugins {
     application
@@ -23,6 +24,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.fluxninja.aperture:aperture-java:$apertureVersion")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
