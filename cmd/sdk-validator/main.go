@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -34,7 +35,8 @@ func main() {
 	// setup flagset and flags
 	fs := flag.NewFlagSet("sdk-validator", flag.ExitOnError)
 	port := fs.String("port", "8080", "Port to start sdk-validator's grpc server on. Default is 8080.")
-	rejectRatio := fs.Float64("reject-ratio", 0.5, "Ratio of calls to reject. Default is 0.5.")
+	requests := fs.Int("requests", 10, "Number of requests to make to SDK example server. Default is 10.")
+	rejects := fs.Int64("rejects", 5, "Number of requests (out of 'requests') to reject. Default is 5.")
 	sdkDockerImage := fs.String("sdk-docker-image", "", "Location of SDK example to run. Default is ''.")
 	sdkPort := fs.String("sdk-port", "8081", "Port to expose on SDK's example container. Default is 8081.")
 	// parse flags
@@ -62,7 +64,8 @@ func main() {
 
 	// instantiate flowcontrol
 	f := &validator.FlowControlHandler{
-		RejectRatio: *rejectRatio,
+		Rejects:  *rejects,
+		Rejected: 0,
 	}
 
 	// setup grpc server and register FlowControlServiceServer instance to it
@@ -83,6 +86,13 @@ func main() {
 			log.Fatal().Err(err).Msg("Failed to stop Docker container")
 		}
 		grpcServer.GracefulStop()
+		wg.Done()
+	}()
+
+	wg.Add(1)
+	go func() {
+		rejected := confirmConnectedAndStartTraffic(*sdkPort, *requests)
+		log.Info().Int("total requests", *requests).Int64("expected rejections", *rejects).Int("got rejections", rejected).Msg("Validation complete")
 		wg.Done()
 	}()
 
@@ -154,4 +164,41 @@ func stopDockerContainer(id string) error {
 	}
 
 	return nil
+}
+
+func confirmConnectedAndStartTraffic(port string, requests int) int {
+	rejected := 0
+	url := fmt.Sprintf("http://localhost:%s", port)
+	for {
+		req, err := http.NewRequest(http.MethodGet, url+"/connected", nil)
+		if err != nil {
+			log.Error().Err(err).Str("url", req.URL.String()).Msg("Failed to create http request")
+		}
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Error().Err(err).Str("url", req.URL.String()).Msg("Failed to make http request")
+		}
+		res.Body.Close()
+		if res.StatusCode == http.StatusOK {
+			break
+		}
+	}
+	log.Info().Msg("SDK example successfully connected to validator")
+
+	superReq, err := http.NewRequest(http.MethodGet, url+"/super", nil)
+	if err != nil {
+		log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to create http request")
+	}
+	for i := 0; i < requests; i++ {
+		res, err := http.DefaultClient.Do(superReq)
+		if err != nil {
+			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to make http request")
+		}
+		res.Body.Close()
+		log.Info().Str("status", res.Status).Msg("Got response")
+		if res.StatusCode != http.StatusAccepted {
+			rejected += 1
+		}
+	}
+	return rejected
 }

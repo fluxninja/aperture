@@ -2,7 +2,7 @@ package validator
 
 import (
 	"context"
-	"math/rand"
+	"sync/atomic"
 	"time"
 
 	"golang.org/x/exp/maps"
@@ -17,7 +17,8 @@ import (
 type FlowControlHandler struct {
 	flowcontrolv1.UnimplementedFlowControlServiceServer
 
-	RejectRatio float64
+	Rejects  int64
+	Rejected int64
 }
 
 // Check is a dummy Check handler.
@@ -54,9 +55,11 @@ func (f *FlowControlHandler) check(ctx context.Context, feature string, labels m
 
 	// randomly reject requests based on rejectRatio
 	// nolint:gosec
-	if f.RejectRatio > 0 && rand.Float64() < f.RejectRatio {
+	if f.Rejected != f.Rejects {
+		log.Info().Msg("Rejecting call")
 		resp.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
 		resp.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
+		atomic.AddInt64(&f.Rejected, 1)
 	}
 
 	return resp
