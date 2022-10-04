@@ -127,6 +127,7 @@ func runDockerContainer(image string, port string) (string, error) {
 				"/var/run/docker.sock:/var/run/docker.sock",
 			},
 			PortBindings: portBindings,
+			NetworkMode:  "host",
 		},
 		nil, nil, "")
 	if err != nil {
