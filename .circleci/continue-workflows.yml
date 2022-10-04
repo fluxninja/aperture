@@ -258,6 +258,7 @@ jobs:
             helm
             kustomize
             jsonnet
+            circleci
       - run:
           name: Install additional system dependencies for pre-commit
           command: |
