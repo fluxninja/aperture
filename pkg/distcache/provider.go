@@ -4,7 +4,6 @@ package distcache
 import (
 	"context"
 	"errors"
-	"fmt"
 	stdlog "log"
 	"net"
 	"strconv"
@@ -73,27 +72,6 @@ func (dc *DistCache) AddDMapCustomConfig(name string, dmapConfig olricconfig.DMa
 // RemoveDMapCustomConfig removes a named DMap config from DistCache's config.
 func (dc *DistCache) RemoveDMapCustomConfig(name string) {
 	delete(dc.Config.DMaps.Custom, name)
-}
-
-func (dc *DistCache) registerMetrics(prometheusRegistry *prometheus.Registry) error {
-	for _, m := range dc.Metrics.allMetrics() {
-		err := prometheusRegistry.Register(m)
-		if err != nil {
-			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-				return fmt.Errorf("unable to register Olric metrics: %w", err)
-			}
-		}
-	}
-	return nil
-}
-
-func (dc *DistCache) unregisterMetrics(prometheusRegistry *prometheus.Registry) error {
-	for _, m := range dc.Metrics.allMetrics() {
-		if !prometheusRegistry.Unregister(m) {
-			return errors.New("unable to unregister Olric Metrics")
-		}
-	}
-	return nil
 }
 
 func (dc *DistCache) scrapeMetrics() {
@@ -211,15 +189,14 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			_ = dc.registerMetrics(in.PrometheusRegistry)
+			_ = dc.Metrics.registerMetrics(in.PrometheusRegistry)
 			log.Info().Msg("Starting OTEL Collector")
 			panichandler.Go(func() {
 				err := dc.Olric.Start()
+				dc.scrapeMetrics()
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to start olric")
 				}
-				// TODO: Periodically scrape metrics from DMaps struct
-				dc.scrapeMetrics()
 				_ = in.Shutdowner.Shutdown()
 			})
 			// wait for olric to start by waiting on startChan until ctx is canceled
@@ -231,7 +208,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			_ = dc.unregisterMetrics(in.PrometheusRegistry)
+			_ = dc.Metrics.unregisterMetrics(in.PrometheusRegistry)
 			err := dc.Olric.Shutdown(ctx)
 			if err != nil {
 				return err

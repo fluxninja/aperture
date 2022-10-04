@@ -1,6 +1,9 @@
 package distcache
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -53,4 +56,25 @@ func (om *OlricMetrics) allMetrics() []prometheus.Collector {
 		om.GetHits,
 		om.EvictedTotal,
 	}
+}
+
+func (om *OlricMetrics) registerMetrics(prometheusRegistry *prometheus.Registry) error {
+	for _, m := range om.allMetrics() {
+		err := prometheusRegistry.Register(m)
+		if err != nil {
+			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+				return fmt.Errorf("unable to register Olric metrics: %w", err)
+			}
+		}
+	}
+	return nil
+}
+
+func (om *OlricMetrics) unregisterMetrics(prometheusRegistry *prometheus.Registry) error {
+	for _, m := range om.allMetrics() {
+		if !prometheusRegistry.Unregister(m) {
+			return errors.New("unable to unregister Olric Metrics")
+		}
+	}
+	return nil
 }
