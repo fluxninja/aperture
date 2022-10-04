@@ -114,6 +114,7 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.l
 local latencyGradientPolicy = aperture.blueprints.policies.LatencyGradient;
 
 local selector = aperture.spec.v1.Selector;
+local fluxMeter = aperture.spec.v1.FluxMeter;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local controlPoint = aperture.spec.v1.ControlPoint;
@@ -133,7 +134,7 @@ local svcSelector =
 
 local policy = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  fluxMeterSelector: svcSelector,
+  fluxMeter: fluxMeter.new() + fluxMeter.withSelector(svcSelector),
   concurrencyLimiterSelector: svcSelector,
 }).policy;
 
