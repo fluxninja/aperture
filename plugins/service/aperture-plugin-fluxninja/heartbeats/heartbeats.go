@@ -144,6 +144,7 @@ func (h *Heartbeats) createGRPCJob(ctx context.Context, grpcClientConnBuilder gr
 		JobFunc: h.sendSingleHeartbeat,
 	}
 	job.JobName = jobName
+	job.JMS = jobs.NewJobMetrics()
 
 	return &job, nil
 }
@@ -156,6 +157,7 @@ func (h *Heartbeats) createHTTPJob(ctx context.Context, restapiClientConnection 
 		JobFunc: h.sendSingleHeartbeatByHTTP,
 	}
 	job.JobName = jobNameHTTP
+	job.JMS = jobs.NewJobMetrics()
 	return &job, nil
 }
 

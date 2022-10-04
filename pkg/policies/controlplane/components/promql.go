@@ -154,6 +154,7 @@ func (pje *promJobsExecutor) registerScalarJob(
 		),
 	}
 	job.JobName = jobName
+	job.JMS = jobs.NewJobMetrics()
 	scalarResBroker.job = job
 	pje.jobResBrokers[jobName] = scalarResBroker
 }
@@ -182,6 +183,7 @@ func (pje *promJobsExecutor) registerTaggedJob(
 		),
 	}
 	job.JobName = jobName
+	job.JMS = jobs.NewJobMetrics()
 	taggedResBroker.job = job
 	pje.jobResBrokers[jobName] = taggedResBroker
 }

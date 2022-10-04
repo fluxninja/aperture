@@ -184,6 +184,7 @@ func (policy *Policy) setupCircuitJob(
 					JobFunc: policy.executeTick,
 				}
 				job.JobName = policy.jobName
+				job.JMS = jobs.NewJobMetrics()
 				initialDelay := config.MakeDuration(0)
 				executionPeriod := config.MakeDuration(policy.evaluationInterval)
 				executionTimeout := config.MakeDuration(time.Millisecond * 100)

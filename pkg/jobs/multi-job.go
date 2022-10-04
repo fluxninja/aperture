@@ -12,6 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // MultiJobConfig holds configuration for MultiJob.
@@ -47,6 +48,7 @@ func (mjc MultiJobConstructor) provideMultiJob(
 	gws GroupWatchers,
 	jws JobWatchers,
 	jg *JobGroup,
+	prometheusRegistry *prometheus.Registry,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (*MultiJob, error) {
@@ -80,11 +82,13 @@ func (mjc MultiJobConstructor) provideMultiJob(
 			if err != nil {
 				return err
 			}
+			_ = mj.JMS.registerJobMetrics(prometheusRegistry)
 			return nil
 		},
 		OnStop: func(context.Context) error {
 			// Deregister all jobs
 			mj.gt.reset()
+			_ = mj.JMS.unregisterJobMetrics(prometheusRegistry)
 			_ = jg.DeregisterJob(mjc.Name)
 			return nil
 		},
@@ -108,6 +112,7 @@ func NewMultiJob(registry status.Registry, jws JobWatchers, gws GroupWatchers) *
 		JobBase: JobBase{
 			JobName: registry.Key(),
 			JWS:     jws,
+			JMS:     NewJobMetrics(),
 		},
 		gt: newGroupTracker(gws, registry),
 	}
@@ -121,6 +126,11 @@ func (mj *MultiJob) Name() string {
 // JobWatchers returns the list of job watchers.
 func (mj *MultiJob) JobWatchers() JobWatchers {
 	return mj.JobBase.JobWatchers()
+}
+
+// JobMetrics returns the job metrics.
+func (mj *MultiJob) JobMetrics() JobMetrics {
+	return mj.JobBase.JobMetrics()
 }
 
 // Execute executes all jobs, collects that results, and returns the aggregated status.
@@ -153,6 +163,7 @@ func (mj *MultiJob) RegisterJob(job Job) error {
 
 // DeregisterJob deregisters a job with the MultiJob.
 func (mj *MultiJob) DeregisterJob(name string) error {
+	_ = mj.JMS.removeMetrics(name)
 	_, err := mj.gt.deregisterJob(name)
 	return err
 }
