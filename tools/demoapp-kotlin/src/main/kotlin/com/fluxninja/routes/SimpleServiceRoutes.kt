@@ -1,25 +1,25 @@
 package com.fluxninja.routes
 
+import com.fluxninja.models.Request
+import com.fluxninja.models.SubrequestChain
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.request.*
-import com.fluxninja.models.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import kotlinx.coroutines.*
 
 fun Route.requestRoute(concurrency: Int, latency: Duration, rejectRation: Float) {
-    get("/request") {
+    post("/request") {
         if (rejectRation > 0 && Random.nextFloat() < rejectRation) {
             call.respond(HttpStatusCode.ServiceUnavailable)
         }
@@ -47,10 +47,10 @@ fun Route.requestRoute(concurrency: Int, latency: Duration, rejectRation: Float)
 
 fun processChain(chain: SubrequestChain, concurrency: Int, latency: Duration): HttpStatusCode {
     if (chain.subrequests.size == 1) {
-        return processRequest(chain.subrequests[0], concurrency, latency)
+        return processRequest(concurrency, latency)
     }
     val requestForwardingDestination = chain.subrequests[1].destination
-    val trimmedSubrequestChain = SubrequestChain(subrequests = chain.subrequests.slice(1 until chain.subrequests.size))
+    val trimmedSubrequestChain = SubrequestChain(subrequests = chain.subrequests.slice(1 until chain.subrequests.size-1))
     val trimmedRequest = Request(chains = listOf(trimmedSubrequestChain))
 
     return forwardRequest(requestForwardingDestination, trimmedRequest)
@@ -59,27 +59,25 @@ fun processChain(chain: SubrequestChain, concurrency: Int, latency: Duration): H
 fun forwardRequest(destinationHostname: String, requestBody: Request): HttpStatusCode {
     val jsonBody = Json.encodeToString(requestBody)
 
+    var code = HttpStatusCode.OK
     runBlocking {
-        val client = HttpClient(CIO) {
-            defaultRequest {
-                url {
-                    protocol = URLProtocol.HTTPS
-                    host = "ktor.io"
-                    path("docs/")
-                    parameters.append("token", "abc123")
-                }
-                header("X-Custom-Header", "Hello")
-            }
+        val client = HttpClient(CIO)
+        val response: HttpResponse = client.post(destinationHostname) {
+            contentType(ContentType.Application.Json)
+            setBody(jsonBody)
         }
-        val response: HttpResponse = client.get("welcome.html")
+        code = response.status
+    }
+
+    return code
 }
 
-fun processRequest(subrequest: Subrequest, concurrency: Int, latency: Duration): HttpStatusCode {
+fun processRequest(concurrency: Int, latency: Duration): HttpStatusCode {
     if (concurrency > 0) {
 
     }
 
-    l = latency.toLong(DurationUnit.MILLISECONDS)
+    val l = latency.toLong(DurationUnit.MILLISECONDS)
     if (l > 0) {
         Thread.sleep(l)
     }

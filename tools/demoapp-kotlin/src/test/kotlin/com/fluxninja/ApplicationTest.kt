@@ -1,7 +1,6 @@
 package com.fluxninja
 
 import com.fluxninja.plugins.configureRouting
-import com.fluxninja.models.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
