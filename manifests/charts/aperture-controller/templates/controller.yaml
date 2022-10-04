@@ -122,9 +122,10 @@ spec:
   {{- end }}
   {{- if or .Values.controller.initContainers .Values.etcd.enabled .Values.prometheus.enabled }}
   initContainers:
-    {{- if .Values.etcd.enabled }}
+    {{- if and .Values.etcd.enabled .Values.etcd.initContainer.enabled }}
     - name: wait-for-etcd
-      image: bitnami/etcd:3.5
+      image: {{ include "common.images.image" (dict "imageRoot" .Values.etcd.initContainer.image "global" .Values.global) }}
+      imagePullPolicy: {{ .Values.etcd.initContainer.image.pullPolicy }}
       command:
         - 'sh'
         - '-c'
@@ -137,9 +138,10 @@ spec:
         - mountPath: /etc/aperture/aperture-controller/config
           name: aperture-controller-config
     {{- end }}
-    {{- if .Values.prometheus.enabled }}
+    {{- if and .Values.prometheus.enabled .Values.prometheus.initContainer.enabled }}
     - name: wait-for-prometheus
-      image: bitnami/etcd:3.5
+      image: {{ include "common.images.image" (dict "imageRoot" .Values.prometheus.initContainer.image "global" .Values.global) }}
+      imagePullPolicy: {{ .Values.prometheus.initContainer.image.pullPolicy }}
       command:
         - 'sh'
         - '-c'
