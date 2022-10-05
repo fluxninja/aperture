@@ -45,7 +45,10 @@ add_plugins() {
 
 	for plugin in "${wanted_plugins[@]}"; do
 		if [[ $plugin == "circleci" ]]; then
-			asdf plugin add circleci https://github.com/lukeab/asdf-circleci-cli.git
+			if ! array_contains "${plugin}" "${added_plugins[@]}"; then
+				asdf plugin add circleci https://github.com/lukeab/asdf-circleci-cli.git
+			continue
+			fi
 		fi
 		if ! array_contains "${plugin}" "${added_plugins[@]}"; then
 			printf 'Adding asdf plugin: "%s"\n' "${plugin}"
