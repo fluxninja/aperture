@@ -25,6 +25,7 @@ local port = aperture.spec.v1.Port;
 local rateLimitNormalPort = port.new() + port.withSignalName('RATE_LIMIT_NORMAL');
 local rateLimitPort = port.new() + port.withSignalName('RATE_LIMIT');
 local lsfPort = port.new() + port.withSignalName('LSF');
+local lsfThreshold = port.new() + port.withSignalName('LSF_THRESHOLD');
 local zeroPort = port.new() + port.withSignalName('ZERO');
 local isBotEscalation = port.new() + port.withSignalName('IS_BOT_ESCALATION');
 
@@ -145,10 +146,16 @@ local policy = latencyGradientPolicy({
       + constant.withOutPorts({ output: rateLimitNormalPort })
     ),
     component.new()
+    + component.withConstant(
+      constant.new()
+      + constant.withValue(0.1)
+      + constant.withOutPorts({ output: lsfThreshold })
+    ),
+    component.new()
     + component.withDecider(
       decider.new()
       + decider.withOperator('gt')
-      + decider.withInPorts({ lhs: lsfPort, rhs: zeroPort })
+      + decider.withInPorts({ lhs: lsfPort, rhs: lsfThreshold })
       + decider.withOutPorts({ output: isBotEscalation })
       + decider.withTrueFor('30s')
     ),

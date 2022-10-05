@@ -11,12 +11,12 @@
 <g id="clust1" class="cluster">
 <title>cluster_s1</title>
 <polygon fill="none" stroke="black" points="8,-8 8,-167 191.19,-167 191.19,-8 8,-8"/>
-<text text-anchor="middle" x="99.6" y="-151.8" font-family="Times,serif" font-size="14.00">Constant (0)</text>
+<text text-anchor="middle" x="99.6" y="-151.8" font-family="Times,serif" font-size="14.00">Constant[0]</text>
 </g>
 <g id="clust3" class="cluster">
 <title>cluster_s3</title>
 <polygon fill="none" stroke="black" points="296.19,-8 296.19,-167 461.19,-167 461.19,-8 296.19,-8"/>
-<text text-anchor="middle" x="378.69" y="-151.8" font-family="Times,serif" font-size="14.00">RateLimiter (1)</text>
+<text text-anchor="middle" x="378.69" y="-151.8" font-family="Times,serif" font-size="14.00">RateLimiter[1]</text>
 </g>
 <!-- n2 -->
 <g id="node1" class="node">
