@@ -134,7 +134,7 @@ const (
 	ProcessorTracesToLogs = "tracestologs"
 
 	// ExporterLogging exports telemetry using Aperture logger.
-	ExporterLogging = "aperturelogging"
+	ExporterLogging = "logging"
 	// ExporterPrometheusRemoteWrite exports metrics to local prometheus instance.
 	ExporterPrometheusRemoteWrite = "prometheusremotewrite"
 	// ExporterOTLPLoopback exports OTLP data to local OTLP receiver. To be used only
