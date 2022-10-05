@@ -272,25 +272,6 @@ DEP_TREE = {
         },
     },
     APERTURE_DEMOAPP_NS: {
-        "k6-operator": {
-            "labels": ["K6"],
-            "tkenv": TANKA_ROOT + "/apps/k6-operator",
-            "child_resources": [
-                {
-                    "workload": "k6-operator-controller-manager",
-                    "resource_deps": ["cluster-bootstrap", "controller-service"],
-                    "extra_objects": [
-                        ("^k6-operator", "Namespace"),
-                        ("k6.io$", "CustomResourceDefinition"),
-                        ("^k6-operator-", "ClusterRole|ClusterRoleBinding"),
-                        ("^k6-operator-", None, "k6-operator-system"),
-                    ],
-                    "ignored_objects": [
-                        ("^k6-operator-", "Deployment|Service", "k6-operator-system")
-                    ]
-                }
-            ]
-        },
         "demo-app": {
             "labels": ["DemoApplications"],
             "tkenv": TANKA_ROOT + "/apps/demoapp",
@@ -323,6 +304,16 @@ DEP_TREE = {
                     "resource_deps": ["cluster-bootstrap", "istiod"],
                     "extra_objects": [
                         "service3-demo-app:serviceaccount"
+                    ]
+                },
+                {
+                    "workload": "wavepool-generator",
+                    "resource_deps": ["service1-demo-app", "policies"],
+                    "extra_objects": [
+                        "wavepool-config:configmap"
+                    ],
+                    "extra_pod_selectors": [
+                        {'app.kubernetes.io/component':  'wavepool-generator'},
                     ]
                 },
             ]
@@ -946,27 +937,26 @@ watch_file(GIT_ROOT + "/plugins/")
 watch_file(GIT_ROOT + "/operator/")
 
 
-run_load_generator = '''
-kubectl create configmap load-test --from-file=./load_generator/scenarios/load_test.js
-kubectl apply -f ./load_generator/scenarios/demoapp-load-test-cr.yaml
-'''
-cmd_button('demoapp-load-test-run',
-    resource='k6-operator-controller-manager',
+run_wavepool_generator = '''
+tk show --ext-str=projectRoot={0} {0}/apps/demoapp/ --target=configmap/wavepool-config --dangerous-allow-redirect | kubectl apply -f -
+tk show --ext-str=projectRoot={0} {0}/apps/demoapp/ --target=deployment/wavepool-generator --dangerous-allow-redirect | kubectl apply -f -
+'''.format(TANKA_ROOT)
+cmd_button('wavepool-start',
+    resource='wavepool-generator',
     icon_name='content_paste_go',
-    text='Run load test',
-    argv=['sh', '-c', run_load_generator],
+    text='Start Wavepool Generator',
+    argv=['sh', '-c', run_wavepool_generator],
 )
 
-delete_load_generator = '''
-# delete load-test
-kubectl delete -f ./load_generator/scenarios/demoapp-load-test-cr.yaml
-kubectl delete configmap load-test
-'''
-cmd_button('demoapp-load-test-del',
-    resource='k6-operator-controller-manager',
+delete_wavepool_generator = '''
+kubectl delete deploy wavepool-generator -n {0}
+kubectl delete configmap wavepool-config -n {0}
+'''.format(APERTURE_DEMOAPP_NS)
+cmd_button('wavepool-stop',
+    resource='wavepool-generator',
     icon_name='content_paste_off',
-    text='Delete load test',
-    argv=['sh', '-c', delete_load_generator],
+    text='Stop Wavepool Generator',
+    argv=['sh', '-c', delete_wavepool_generator],
 )
 
 declare_resources(resources, DEP_TREE, inverted_dep_tree)
