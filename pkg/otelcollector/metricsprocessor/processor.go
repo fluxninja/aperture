@@ -311,6 +311,12 @@ func (p *metricsProcessor) updateMetrics(
 		// Update workload metrics
 		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, []string{})
 		for _, decision := range checkResponse.LimiterDecisions {
+			limiterID := iface.LimiterID{
+				PolicyName:     decision.PolicyName,
+				PolicyHash:     decision.PolicyHash,
+				ComponentIndex: decision.ComponentIndex,
+			}
+
 			if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
 				labels := map[string]string{
 					metrics.PolicyNameLabel:     decision.PolicyName,
@@ -320,14 +326,12 @@ func (p *metricsProcessor) updateMetrics(
 					metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
 				}
 
-				limiterID := iface.LimiterID{
-					PolicyName:     decision.PolicyName,
-					PolicyHash:     decision.PolicyHash,
-					ComponentIndex: decision.ComponentIndex,
-				}
-
 				p.updateMetricsForWorkload(limiterID, labels, latency)
-			} // TODO: add rate limiter metrics
+			}
+
+			if rl := decision.GetRateLimiterInfo(); rl != nil {
+				p.updateMetricsForRateLimiter(limiterID)
+			}
 		}
 	}
 
@@ -362,6 +366,22 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 	latencyHistogram := limiter.GetObserver(labels)
 	if latencyHistogram != nil {
 		latencyHistogram.Observe(latency)
+	}
+}
+
+func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID) {
+	limiter := p.cfg.engine.GetRateLimiter(limiterID)
+	if limiter == nil {
+		log.Sample(zerolog.Sometimes).Warn().
+			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
+			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
+			Int64(metrics.ComponentIndexLabel, limiterID.ComponentIndex).
+			Msg("RateLimiter not found")
+		return
+	}
+	counter := limiter.GetCounter()
+	if counter != nil {
+		counter.Inc()
 	}
 }
 
