@@ -2,7 +2,6 @@ package iface
 
 import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 )
 
@@ -23,21 +22,4 @@ type Engine interface {
 	RegisterRateLimiter(l RateLimiter) error
 	UnregisterRateLimiter(l RateLimiter) error
 	GetRateLimiter(limiterID LimiterID) RateLimiter
-}
-
-// MultiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
-type MultiMatchResult struct {
-	ConcurrencyLimiters []ConcurrencyLimiter
-	FluxMeters          []FluxMeter
-	RateLimiters        []RateLimiter
-	Classifiers         []Classifier
-}
-
-// PopulateFromMultiMatcher populates result object with results from MultiMatcher.
-func (result *MultiMatchResult) PopulateFromMultiMatcher(mm *multimatcher.MultiMatcher[string, MultiMatchResult], labels map[string]string) {
-	resultCollection := mm.Match(multimatcher.Labels(labels))
-	result.ConcurrencyLimiters = append(result.ConcurrencyLimiters, resultCollection.ConcurrencyLimiters...)
-	result.FluxMeters = append(result.FluxMeters, resultCollection.FluxMeters...)
-	result.RateLimiters = append(result.RateLimiters, resultCollection.RateLimiters...)
-	result.Classifiers = append(result.Classifiers, resultCollection.Classifiers...)
 }
