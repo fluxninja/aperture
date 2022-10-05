@@ -117,6 +117,7 @@ local selector = aperture.spec.v1.Selector;
 local fluxMeter = aperture.spec.v1.FluxMeter;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
+local controlPoint = aperture.spec.v1.ControlPoint;
 
 local svcSelector =
   selector.new()
