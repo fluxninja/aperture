@@ -18,6 +18,8 @@ const (
 	SignalReadingMetricName = "signal_reading"
 	// FluxMeterMetricName name of fluxmeter metrics.
 	FluxMeterMetricName = "flux_meter"
+	// RateLimiterCounterMetricName - name of the counter describing times rate limiter was triggered.
+	RateLimiterCounterMetricName = "rate_limiter_counter"
 
 	// Workload metrics.
 

@@ -29,5 +29,17 @@ type Limiter interface {
 	GetSelector() *selectorv1.Selector
 	RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
+}
+
+// RateLimiter interface.
+type RateLimiter interface {
+	Limiter
+	TakeN(labels map[string]string, count int) (label string, ok bool, remaining int, current int)
+	GetCounter() prometheus.Counter
+}
+
+// ConcurrencyLimiter interface.
+type ConcurrencyLimiter interface {
+	Limiter
 	GetObserver(labels map[string]string) prometheus.Observer
 }

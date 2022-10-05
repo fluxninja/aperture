@@ -2,7 +2,10 @@ package rate
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"path"
+	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -20,6 +23,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/rate/ratetracker"
@@ -29,7 +33,10 @@ import (
 
 const rateLimiterStatusRoot = "rate_limiters"
 
-var fxNameTag = config.NameTag(rateLimiterStatusRoot)
+var (
+	fxNameTag       = config.NameTag(rateLimiterStatusRoot)
+	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel}
+)
 
 func rateLimiterModule() fx.Option {
 	return fx.Options(
@@ -70,6 +77,7 @@ type rateLimiterFactory struct {
 	lazySyncJobGroup     *jobs.JobGroup
 	decisionsWatcher     notifiers.Watcher
 	dynamicConfigWatcher notifiers.Watcher
+	counterVector        *prometheus.CounterVec
 	agentGroupName       string
 }
 
@@ -105,6 +113,13 @@ func setupRateLimiterFactory(
 		return err
 	}
 
+	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.RateLimiterCounterMetricName,
+		Help: "A counter measuring the number of times Rate Limiter was triggered",
+	},
+		metricLabelKeys,
+	)
+
 	rateLimiterFactory := &rateLimiterFactory{
 		engineAPI:            e,
 		distCache:            distCache,
@@ -113,6 +128,7 @@ func setupRateLimiterFactory(
 		dynamicConfigWatcher: dynamicConfigWatcher,
 		agentGroupName:       agentGroupName,
 		registry:             reg,
+		counterVector:        counterVector,
 	}
 
 	fxDriver := &notifiers.FxDriver{
@@ -128,7 +144,11 @@ func setupRateLimiterFactory(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			err := lazySyncJobGroup.Start()
+			err := prometheusRegistry.Register(rateLimiterFactory.counterVector)
+			if err != nil {
+				return err
+			}
+			err = lazySyncJobGroup.Start()
 			if err != nil {
 				return err
 			}
@@ -156,6 +176,10 @@ func setupRateLimiterFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
+			if !prometheusRegistry.Unregister(rateLimiterFactory.counterVector) {
+				err2 := fmt.Errorf("failed to unregister rate_limiter_counter metric")
+				merr = multierr.Append(merr, err2)
+			}
 			reg.Detach()
 			return merr
 		},
@@ -182,7 +206,6 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	}
 
 	rateLimiterProto := wrapperMessage.RateLimiter
-
 	rateLimiter := &rateLimiter{
 		Component:          wrapperMessage.GetCommonAttributes(),
 		rateLimiterProto:   rateLimiterProto,
@@ -206,6 +229,7 @@ type rateLimiter struct {
 	rateTracker        ratetracker.RateTracker
 	rateLimitChecker   *ratetracker.BasicRateLimitChecker
 	rateLimiterProto   *policylangv1.RateLimiter
+	counter            prometheus.Counter
 	name               string
 }
 
@@ -235,6 +259,12 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 		dynamicConfigUnmarshaller,
 		rateLimiter.dynamicConfigUpdateCallback,
 	)
+
+	metricLabels := make(prometheus.Labels)
+	metricLabels[metrics.PolicyNameLabel] = rateLimiter.GetPolicyName()
+	metricLabels[metrics.PolicyHashLabel] = rateLimiter.GetPolicyHash()
+	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(rateLimiter.GetComponentIndex(), 10)
+	rateCounterVec := rateLimiter.rateLimiterFactory.counterVector
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -283,10 +313,21 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				return err
 			}
 
+			rateCounter, err := rateCounterVec.GetMetricWith(metricLabels)
+			if err != nil {
+				logger.Error().Err(err).Msg("Failed to get rate limiter counter from vector")
+				return err
+			}
+			rateLimiter.counter = rateCounter
+
 			return nil
 		},
 		OnStop: func(context.Context) error {
 			var merr, err error
+			deleted := rateCounterVec.Delete(metricLabels)
+			if !deleted {
+				merr = multierr.Append(merr, errors.New("failed to delete rate limiter counter from its metric vector"))
+			}
 			// remove from data engine
 			err = rateLimiter.rateLimiterFactory.engineAPI.UnregisterRateLimiter(rateLimiter)
 			if err != nil {
@@ -438,8 +479,7 @@ func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
 	}
 }
 
-// GetObserver is there to satisfy Limiter interface.
-func (rateLimiter *rateLimiter) GetObserver(map[string]string) prometheus.Observer {
-	// Not implemented for rate limiter
-	return nil
+// GetCounter returns counter for tracking number of times rateLimiter was triggered.
+func (rateLimiter *rateLimiter) GetCounter() prometheus.Counter {
+	return rateLimiter.counter
 }
