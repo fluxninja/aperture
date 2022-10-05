@@ -24,6 +24,8 @@ func main() {
 	fs := flag.NewFlagSet("circuit-compiler", flag.ExitOnError)
 	policy := fs.String("policy", "", "path to policy file")
 	dot := fs.String("dot", "", "path to dot file")
+	mermaidSimple := fs.String("mermaid-simple", "", "path to mermaid file")
+
 	// parse flags
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
@@ -64,6 +66,24 @@ func main() {
 			os.Exit(1)
 		}
 		log.Info().Msg("DOT file written")
+	}
+	// if --mermaid-simple flag is set, write mermaid file
+	if *mermaidSimple != "" {
+		mermaidFile := *mermaidSimple
+		mermaid := controlplane.Mermaid(controlplane.ComponentDTO(circuit))
+		f, err := os.Create(mermaidFile)
+		if err != nil {
+			log.Error().Err(err).Msg("error creating file")
+			os.Exit(1)
+		}
+		defer f.Close()
+
+		_, err = f.WriteString(mermaid)
+		if err != nil {
+			log.Error().Err(err).Msg("error writing to file")
+			os.Exit(1)
+		}
+		log.Info().Msg("Mermaid file written")
 	}
 }
 
