@@ -128,7 +128,7 @@ repos:
         name: "jsonnet examples in docs"
         entry: "./docs/tools/scripts/validate_jsonnet.sh"
         language: script
-        files: ^(blueprints)
+        files: ^(blueprints|docs)
         pass_filenames: false
         description: "Validate jsonnet examples"
       - id: tanka-show
