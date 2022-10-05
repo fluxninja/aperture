@@ -491,8 +491,8 @@ github.com/fluxninja/go-swagger v0.29.0-fn.patch.8 h1:EdIA15vOFLFgxUMXJPtpI2TaTR
 github.com/fluxninja/go-swagger v0.29.0-fn.patch.8/go.mod h1:hHQC4q+Cd26/JhLSXAUauYmDCTAR9u4TIALMYXZbeWM=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814 h1:AHC1PtYLUw9PWqmgB9VHcxzGEm1GDYGXzC1PRtgIqqs=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814/go.mod h1:kARLh/xWGaisrwkOGOWKcqk7fagFUFthOTX7mIFVJlw=
-github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.1 h1:k7ZO3DOBXLhEVvTJDLWemN2k+zx8GVJn4WZdj4DDEfQ=
-github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.1/go.mod h1:n2KBSgs7AakuedVxLR/Tayl3EEztmngrrjZBsYS+qBI=
+github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.2 h1:OY9oqSwelEE7vObzTX0ZPB64NciabH8hl4BuX4H1Dxw=
+github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.2/go.mod h1:FPBYzfqOIQIPIY7CbqFn7wTfWQVT0ZKy2hbM6TIShKw=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
 github.com/form3tech-oss/jwt-go v3.2.3+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
