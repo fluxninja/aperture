@@ -122,6 +122,11 @@ spec:
         typed_config:
           "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
           transport_api_version: V3
+          {{- if .Values.envoyFilter.enableAuthzRequestBodyBuffering }}
+          with_request_body:
+            max_request_bytes: {{ .Values.envoyFilter.maxRequestBytes }}
+            allow_partial_message: true
+          {{- end }}
           failure_mode_allow: true
           grpc_service:
             google_grpc:
@@ -152,6 +157,11 @@ spec:
         typed_config:
           "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
           transport_api_version: V3
+          {{- if .Values.envoyFilter.enableAuthzRequestBodyBuffering }}
+          with_request_body:
+            max_request_bytes: {{ .Values.envoyFilter.maxRequestBytes }}
+            allow_partial_message: true
+          {{- end }}
           failure_mode_allow: true
           grpc_service:
             google_grpc:
