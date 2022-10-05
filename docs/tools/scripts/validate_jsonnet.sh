@@ -28,8 +28,8 @@ for f in $files; do
 	count=0
 	for jsonnet_section_file in $jsonnet_section_files; do
 		echo "Processing $f :: $jsonnet_section_file"
-		# replace github.com/fluxninja/aperture/blueprints with ../../blueprints
-		$SED -i 's/github.com\/fluxninja\/aperture\/blueprints/..\/..\/blueprints/g' "$jsonnet_section_file"
+		# replace github.com/fluxninja/aperture/blueprints with $"gitroot"/blueprints
+		$SED -i "s|github.com/fluxninja/aperture/blueprints|$gitroot/blueprints|g" "$jsonnet_section_file"
 		# fail script if any of the below commands fail
 		set -e
 		jsonnet --yaml-stream -J "$gitroot"/blueprints/vendor "$jsonnet_section_file" >tmp/output.yaml
