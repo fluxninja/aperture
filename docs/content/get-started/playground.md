@@ -94,7 +94,7 @@ service3-demo-app-788857c7cc-vlchn   2/2     Running   0          7m13s
 
 To start the simulated traffic against the demo application, navigate to K6
 resource in the Tilt UI and press the `Run load test` button. The traffic is
-designed to overload the demo application in order showcase the capabilities of
+designed to overload the demo application in order to showcase the capabilities of
 Aperture.
 
 ![Start Load Test](../assets/img/starttrafficbig.png)
