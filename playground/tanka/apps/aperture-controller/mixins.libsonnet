@@ -22,12 +22,6 @@ local rateLimiter = aperture.spec.v1.RateLimiter;
 local decider = aperture.spec.v1.Decider;
 local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
-local rateLimitNormalPort = port.new() + port.withSignalName('RATE_LIMIT_NORMAL');
-local rateLimitPort = port.new() + port.withSignalName('RATE_LIMIT');
-local lsfPort = port.new() + port.withSignalName('LSF');
-local lsfThreshold = port.new() + port.withSignalName('LSF_THRESHOLD');
-local zeroPort = port.new() + port.withSignalName('ZERO');
-local isBotEscalation = port.new() + port.withSignalName('IS_BOT_ESCALATION');
 
 local fluxMeterSelector = selector.new()
                           + selector.withServiceSelector(
@@ -143,33 +137,33 @@ local policy = latencyGradientPolicy({
     + component.withConstant(
       constant.new()
       + constant.withValue(10)
-      + constant.withOutPorts({ output: rateLimitNormalPort })
+      + constant.withOutPorts({ output: port.withSignalName('RATE_LIMIT_NORMAL') })
     ),
     component.new()
     + component.withConstant(
       constant.new()
       + constant.withValue(0.1)
-      + constant.withOutPorts({ output: lsfThreshold })
+      + constant.withOutPorts({ output: port.withSignalName('LSF_THRESHOLD') })
     ),
     component.new()
     + component.withDecider(
       decider.new()
       + decider.withOperator('gt')
-      + decider.withInPorts({ lhs: lsfPort, rhs: lsfThreshold })
-      + decider.withOutPorts({ output: isBotEscalation })
+      + decider.withInPorts({ lhs: port.withSignalName('LSF'), rhs: port.withSignalName('LSF_THRESHOLD') })
+      + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
       + decider.withTrueFor('30s')
     ),
     component.new()
     + component.withSwitcher(
       switcher.new()
-      + switcher.withInPorts({ switch: isBotEscalation, on_true: zeroPort, on_false: rateLimitNormalPort })
-      + switcher.withOutPorts({ output: rateLimitPort })
+      + switcher.withInPorts({ switch: port.withSignalName('IS_BOT_ESCALATION'), on_true: port.withSignalName('ZERO'), on_false: port.withSignalName('RATE_LIMIT_NORMAL') })
+      + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),
     component.new()
     + component.withRateLimiter(
       rateLimiter.new()
       + rateLimiter.withSelector(rateLimiterSelector)
-      + rateLimiter.withInPorts({ limit: rateLimitPort })
+      + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
       + rateLimiter.withLimitResetInterval('1s')
       + rateLimiter.withLabelKey('http.request.header.user_id')
       + rateLimiter.withDynamicConfigKey('rate_limiter'),
