@@ -11,7 +11,7 @@
 <g id="clust1" class="cluster">
 <title>cluster_s1</title>
 <polygon fill="none" stroke="black" points="8,-8 8,-167 191.19,-167 191.19,-8 8,-8"/>
-<text text-anchor="middle" x="99.6" y="-151.8" font-family="Times,serif" font-size="14.00">Constant[0] = 50.00</text>
+<text text-anchor="middle" x="99.6" y="-151.8" font-family="Times,serif" font-size="14.00">Constant[0]</text>
 </g>
 <g id="clust3" class="cluster">
 <title>cluster_s3</title>

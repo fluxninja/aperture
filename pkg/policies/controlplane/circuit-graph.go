@@ -169,9 +169,6 @@ func DOT(components []*languagev1.ComponentView, links []*languagev1.Link) strin
 			sg = clusters[components[i].ParentComponentId]
 		}
 		name := fmt.Sprintf("%s[%s]", components[i].ComponentName, strings.SplitN(components[i].ComponentId, ".", 1)[0])
-		if components[i].ComponentName == "Constant" {
-			name = fmt.Sprintf("%s = %0.2f", name, components[i].Component.Fields["value"].GetNumberValue())
-		}
 		cluster := sg.Subgraph(name, dot.ClusterOption{})
 		cluster.AttributesMap.Attr("margin", "50.0")
 		clusters[components[i].ComponentId] = cluster
