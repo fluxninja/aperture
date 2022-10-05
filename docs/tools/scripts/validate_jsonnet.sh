@@ -31,7 +31,7 @@ for f in $files; do
 		# replace github.com/fluxninja/aperture/blueprints with ../../blueprints
 		$SED -i 's/github.com\/fluxninja\/aperture\/blueprints/..\/..\/blueprints/g' "$jsonnet_section_file"
 		jsonnet --yaml-stream -J "$gitroot"/blueprints/vendor "$jsonnet_section_file" >tmp/output.yaml
-		# check whether output.yaml contains the key "kind: Policy" i.ee output of yq is true
+		# check whether output.yaml contains the key "kind: Policy" i.e. output of yq is true
 		if [ "$(yq e '.kind == "Policy"' tmp/output.yaml)" = "true" ]; then
 			# extract spec key from yaml
 			yq '.spec' tmp/output.yaml >tmp/spec.yaml
