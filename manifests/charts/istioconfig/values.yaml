@@ -12,5 +12,7 @@ envoyFilter:
   port: 8080
   ## @param envoyFilter.authzGrpcTimeout Timeout in seconds to authz requests made to aperture-agent. Note: aperture-agent scheduler has max_timeout parameter that must tuned to match the setting here.
   authzGrpcTimeout: 0.5s
+  ## @param envoyFilter.enableAuthzRequestBodyBuffering Enable buffering request body that is sent over ext authz API. Note: This is not enabled by default because it might break some streaming APIs.
+  enableAuthzRequestBodyBuffering: false
   ## @param envoyFilter.maxRequestBytes Maximum size of request that is sent over ext authz API
   maxRequestBytes: 8192
