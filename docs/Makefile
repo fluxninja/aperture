@@ -69,6 +69,10 @@ generate-mmd:
 	@echo generating mermaid files from markdown files
 	@./tools/mermaid/md_to_mmd.sh
 
+validate-jsonnet:
+	@echo validating jsonnet files
+	@./tools/scripts/validate-jsonnet.sh
+
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid: generate-mmd
 	@echo generating mermaid diagrams
@@ -89,4 +93,4 @@ generate-mermaid: generate-mmd
 		do convert $<.$$fmt -trim $<.$$fmt; \
 	done
 
-.PHONY: generate-config-markdown generate-mermaid generate-mmd
+.PHONY: generate-config-markdown generate-mermaid generate-mmd validate-jsonnet

@@ -20,7 +20,7 @@ $FIND "$blueprints_root"/blueprints -mindepth 1 -maxdepth 1 -type d | while read
 	python "${blueprints_root}"/scripts/blueprint-readme-generator.py "$dir"
 	npx prettier --write "$dir"/README.md
 	# save the contents of $dir/example/gen/policies/example.yaml for comparison
-	old_example_yaml=$(cat "$dir"/example/gen/policies/example.yaml)
+	old_example_yaml=$(cat "$dir"/example/gen/policies/example.yaml 2>/dev/null || true)
 
 	# generate example blueprint
 	python "${blueprints_root}"/scripts/aperture-generate.py --output "$dir"/example/gen/ \

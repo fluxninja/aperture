@@ -124,6 +124,13 @@ repos:
         files: ^(blueprints)|\.proto$|^requirements.txt$
         pass_filenames: false
         description: "Generate Aperture libsonnet and blueprints"
+      - id: validate-jsonnet-examples
+        name: "jsonnet examples in docs"
+        entry: "./docs/tools/scripts/validate_jsonnet.sh"
+        language: script
+        files: ^(blueprints)
+        pass_filenames: false
+        description: "Validate jsonnet examples"
       - id: tanka-show
         name: "Check tanka parses jsonnet"
         language: script
