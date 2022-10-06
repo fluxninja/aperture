@@ -1,0 +1,19 @@
+graph LR
+  users(("users"))
+  subgraph Frontend Service
+    fingress["ingress"]
+    recommendations{{"recommendations"}}
+    live-update{{"live-update"}}
+    fegress["egress"]
+  end
+  subgraph Checkout Service
+    cingress["ingress"]
+    cegress["egress"]
+  end
+  subgraph Database Service
+    dbingress["ingress"]
+  end
+  users -.-> fingress
+  fegress -.-> cingress
+  cegress -.-> dbingress
+

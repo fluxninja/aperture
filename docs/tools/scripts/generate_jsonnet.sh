@@ -25,7 +25,7 @@ for f in $files; do
 	mkdir -p "$out_dir"
 	# move existing files to tmp if they exist
 	mv "$out_dir"/* tmp 2>/dev/null || true
-	rm -f "$out_dir"/*
+	rm -f "$out_dir"/*.yaml
 
 	#shellcheck disable=SC2002,SC2016
 	cat "$f" | $SED -n '/```jsonnet/,/```/p' | $GREP -vP '^```$' >tmp/records.txt
