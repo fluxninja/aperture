@@ -8,15 +8,19 @@ import (
 	"net"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/panichandler"
@@ -31,6 +35,7 @@ const (
 // Module provides a new DistCache FX module.
 func Module() fx.Option {
 	return fx.Options(
+		jobs.JobGroupConstructor{Name: "olric", Key: defaultKey}.Annotate(),
 		fx.Provide(DistCacheConstructor{ConfigKey: defaultKey}.ProvideDistCache),
 	)
 }
@@ -60,9 +65,11 @@ type DistCacheConfig struct {
 // DistCache is a peer to peer distributed cache.
 type DistCache struct {
 	sync.Mutex
-	Config  *olricconfig.Config
-	Olric   *olric.Olric
-	Metrics *OlricMetrics
+	Config     *olricconfig.Config
+	Olric      *olric.Olric
+	Metrics    *OlricMetrics
+	jobGroup   *jobs.JobGroup
+	metricsJob *jobs.MultiJob
 }
 
 // AddDMapCustomConfig adds a named DMap config into DistCache's config.
@@ -76,13 +83,12 @@ func (dc *DistCache) RemoveDMapCustomConfig(name string) {
 	delete(dc.Config.DMaps.Custom, name)
 }
 
-func (dc *DistCache) scrapeMetrics() {
+func (dc *DistCache) scrapeMetrics() error {
 	stats, err := dc.Olric.Stats()
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
-		return
+		return err
 	}
-
 	memberID := stats.Member.ID
 	memberName := stats.Member.Name
 	metricLabels := make(prometheus.Labels)
@@ -130,6 +136,7 @@ func (dc *DistCache) scrapeMetrics() {
 	} else {
 		evictedTotalGague.Set(float64(stats.DMaps.EvictedTotal))
 	}
+	return nil
 }
 
 // DistCacheConstructorIn holds parameters of ProvideDistCache.
@@ -138,6 +145,7 @@ type DistCacheConstructorIn struct {
 	PeerDiscovery      *peers.PeerDiscovery
 	Unmarshaller       config.Unmarshaller
 	Lifecycle          fx.Lifecycle
+	JobGroup           *jobs.JobGroup `name:"olric"`
 	Shutdowner         fx.Shutdowner
 	Logger             *log.Logger
 	PrometheusRegistry *prometheus.Registry
@@ -152,8 +160,8 @@ type DistCacheConstructor struct {
 // ProvideDistCache creates a new instance of distributed cache.
 // It also hooks in the service discovery plugin.
 func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructorIn) (*DistCache, error) {
-	config := constructor.DefaultConfig
-	if err := in.Unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
+	defaultConfig := constructor.DefaultConfig
+	if err := in.Unmarshaller.UnmarshalKey(constructor.ConfigKey, &defaultConfig); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize configuration of DistCache")
 		return nil, err
 	}
@@ -167,14 +175,14 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			discovery: in.PeerDiscovery,
 		},
 	}
-	oc.ReplicaCount = config.ReplicaCount
+	oc.ReplicaCount = defaultConfig.ReplicaCount
 	oc.WriteQuorum = 1
 	oc.ReadQuorum = 1
 	oc.MemberCountQuorum = 1
 	oc.DMaps.Custom = make(map[string]olricconfig.DMap)
 	oc.Logger = stdlog.New(&OlricLogWriter{Logger: in.Logger}, "", 0)
 
-	bindAddr, port, err := net.SplitHostPort(config.BindAddr)
+	bindAddr, port, err := net.SplitHostPort(defaultConfig.BindAddr)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to split bind_addr")
 		return nil, err
@@ -187,7 +195,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	oc.BindAddr = bindAddr
 	oc.BindPort = bindPort
 
-	memberlistBindAddr, p, err := net.SplitHostPort(config.MemberlistBindAddr)
+	memberlistBindAddr, p, err := net.SplitHostPort(defaultConfig.MemberlistBindAddr)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to split memberlist bind address")
 		return nil, err
@@ -201,8 +209,8 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	oc.MemberlistConfig.BindPort = memberlistBindPort
 	memberlistAddr := oc.MemberlistConfig.BindAddr + ":" + strconv.Itoa(oc.MemberlistConfig.BindPort)
 
-	if config.MemberlistAdvertiseAddr != "" {
-		advertiseAddr, p, e := net.SplitHostPort(config.MemberlistAdvertiseAddr)
+	if defaultConfig.MemberlistAdvertiseAddr != "" {
+		advertiseAddr, p, e := net.SplitHostPort(defaultConfig.MemberlistAdvertiseAddr)
 		if e != nil {
 			log.Error().Err(e).Msg("Unable to split memberlist advertise address")
 			return nil, e
@@ -210,7 +218,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		advertisePort, _ := strconv.Atoi(p)
 		oc.MemberlistConfig.AdvertiseAddr = advertiseAddr
 		oc.MemberlistConfig.AdvertisePort = advertisePort
-		memberlistAddr = config.MemberlistAdvertiseAddr
+		memberlistAddr = defaultConfig.MemberlistAdvertiseAddr
 	}
 
 	in.PeerDiscovery.RegisterService(olricMemberlistServiceName, memberlistAddr)
@@ -230,18 +238,50 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	dc.Olric = o
 	dc.Metrics = newOlricMetrics()
+	dc.jobGroup = in.JobGroup
+	multiJob := jobs.NewMultiJob(dc.jobGroup.GetStatusRegistry().Child("olric"), nil, nil)
+	dc.metricsJob = multiJob
 
+	job := &jobs.BasicJob{
+		JobBase: jobs.JobBase{
+			JobName: "scrape-metrics",
+		},
+		JobFunc: func(ctx context.Context) (proto.Message, error) {
+			select {
+			case <-ctx.Done():
+				return &emptypb.Empty{}, nil
+			default:
+				err = dc.scrapeMetrics()
+				return &emptypb.Empty{}, err
+			}
+		},
+	}
+	err = dc.metricsJob.RegisterJob(job)
+	if err != nil {
+		return nil, err
+	}
+
+	jobConfig := jobs.JobConfig{
+		InitialDelay:     config.MakeDuration(0),
+		ExecutionPeriod:  config.MakeDuration(time.Millisecond * 300),
+		ExecutionTimeout: config.MakeDuration(time.Millisecond * 1000),
+		InitiallyHealthy: false,
+	}
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			err := dc.Metrics.registerMetrics(in.PrometheusRegistry)
 			if err != nil {
 				return err
 			}
-
+			err = dc.jobGroup.RegisterJob(job, jobConfig)
+			if err != nil {
+				return err
+			}
 			log.Info().Msg("Starting OTEL Collector")
 			panichandler.Go(func() {
-				err := dc.Olric.Start()
-				dc.scrapeMetrics()
+				log.Info().Msg("Started OTEL Collector")
+				dc.jobGroup.TriggerJob("scrape-metrics")
+				err = dc.Olric.Start()
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to start olric")
 				}
