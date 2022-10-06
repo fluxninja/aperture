@@ -13,27 +13,26 @@ import (
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
+	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otel"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/webhooks"
-	"github.com/fluxninja/aperture/pkg/webhooks/validation"
+	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
 )
 
 func main() {
 	app := platform.New(
 		platform.Config{}.Module(),
-		otel.OTELConfigConstructor{Type: otel.ControllerType}.Annotate(),
+		controller.ModuleForControllerOTEL(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			otel.ControllerOTELComponents,
 		),
 		otelcollector.Module(),
 		controlplane.Module(),
 		webhooks.Module(),
-		validation.Module(),
+		policyvalidator.Module(),
 	)
 
 	if err := app.Err(); err != nil {

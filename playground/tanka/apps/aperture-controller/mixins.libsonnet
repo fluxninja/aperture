@@ -1,32 +1,66 @@
-local latencyGradientPolicy = import '../../../../blueprints/lib/1.0/policies/latency-gradient.libsonnet';
-local aperture = import '../../../../blueprints/libsonnet/1.0/main.libsonnet';
+local aperture = import '../../../../blueprints/lib/1.0/main.libsonnet';
+
 local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
 
-local WorkloadParameters = aperture.v1.SchedulerWorkloadParameters;
-local LabelMatcher = aperture.v1.LabelMatcher;
-local Workload = aperture.v1.SchedulerWorkload;
+local latencyGradientPolicy = aperture.blueprints.policies.LatencyGradient;
 
-local classifier = aperture.v1.Classifier;
-local fluxMeter = aperture.v1.FluxMeter;
-local extractor = aperture.v1.Extractor;
-local rule = aperture.v1.Rule;
-local selector = aperture.v1.Selector;
-local serviceSelector = aperture.v1.ServiceSelector;
-local flowSelector = aperture.v1.FlowSelector;
-local controlPoint = aperture.v1.ControlPoint;
-local staticBuckets = aperture.v1.FluxMeterStaticBuckets;
+local WorkloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
+local LabelMatcher = aperture.spec.v1.LabelMatcher;
+local Workload = aperture.spec.v1.SchedulerWorkload;
 
-local svcSelector = selector.new()
-                    + selector.withServiceSelector(
-                      serviceSelector.new()
-                      + serviceSelector.withAgentGroup('default')
-                      + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
-                    )
-                    + selector.withFlowSelector(
-                      flowSelector.new()
-                      + flowSelector.withControlPoint(controlPoint.new()
-                                                      + controlPoint.withTraffic('ingress'))
-                    );
+local classifier = aperture.spec.v1.Classifier;
+local fluxMeter = aperture.spec.v1.FluxMeter;
+local extractor = aperture.spec.v1.Extractor;
+local rule = aperture.spec.v1.Rule;
+local selector = aperture.spec.v1.Selector;
+local serviceSelector = aperture.spec.v1.ServiceSelector;
+local flowSelector = aperture.spec.v1.FlowSelector;
+local controlPoint = aperture.spec.v1.ControlPoint;
+local component = aperture.spec.v1.Component;
+local rateLimiter = aperture.spec.v1.RateLimiter;
+local decider = aperture.spec.v1.Decider;
+local switcher = aperture.spec.v1.Switcher;
+local port = aperture.spec.v1.Port;
+
+local fluxMeterSelector = selector.new()
+                          + selector.withServiceSelector(
+                            serviceSelector.new()
+                            + serviceSelector.withAgentGroup('default')
+                            + serviceSelector.withService('service3-demo-app.demoapp.svc.cluster.local')
+                          )
+                          + selector.withFlowSelector(
+                            flowSelector.new()
+                            + flowSelector.withControlPoint(controlPoint.new()
+                                                            + controlPoint.withTraffic('ingress'))
+                          );
+
+local concurrencyLimiterSelector = selector.new()
+                                   + selector.withServiceSelector(
+                                     serviceSelector.new()
+                                     + serviceSelector.withAgentGroup('default')
+                                     + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                                   )
+                                   + selector.withFlowSelector(
+                                     flowSelector.new()
+                                     + flowSelector.withControlPoint(controlPoint.new()
+                                                                     + controlPoint.withTraffic('ingress'))
+                                   );
+
+local rateLimiterSelector = selector.new()
+                            + selector.withServiceSelector(
+                              serviceSelector.new()
+                              + serviceSelector.withAgentGroup('default')
+                              + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                            )
+                            + selector.withFlowSelector(
+                              flowSelector.new()
+                              + flowSelector.withControlPoint(controlPoint.new()
+                                                              + controlPoint.withTraffic('ingress'))
+                              + flowSelector.withLabelMatcher(
+                                LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
+                              )
+                            );
+
 
 local apertureControllerMixin =
   apertureControllerApp {
@@ -70,22 +104,11 @@ local apertureControllerMixin =
 
 local policy = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  fluxMeterSelector: svcSelector,
-  fluxMeters: {
-    'service1-demo-app':
-      fluxMeter.new()
-      + fluxMeter.withSelector(svcSelector)
-      + fluxMeter.withAttributeKey('workload_duration_ms')
-      + fluxMeter.withStaticBuckets(
-        staticBuckets.new()
-        + staticBuckets.withBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0])
-      ),
-  },
-
-  concurrencyLimiterSelector: svcSelector,
+  fluxMeter: fluxMeter.new() + fluxMeter.withSelector(fluxMeterSelector),
+  concurrencyLimiterSelector: concurrencyLimiterSelector,
   classifiers: [
     classifier.new()
-    + classifier.withSelector(svcSelector)
+    + classifier.withSelector(concurrencyLimiterSelector)
     + classifier.withRules({
       user_type: rule.new()
                  + rule.withExtractor(extractor.new()
@@ -108,6 +131,32 @@ local policy = latencyGradientPolicy({
       + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
     ],
   },
+  components: [
+    component.new()
+    + component.withDecider(
+      decider.new()
+      + decider.withOperator('gt')
+      + decider.withInPorts({ lhs: port.withSignalName('LSF'), rhs: port.withConstantValue(0.1) })
+      + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
+      + decider.withTrueFor('30s')
+    ),
+    component.new()
+    + component.withSwitcher(
+      switcher.new()
+      + switcher.withInPorts({ switch: port.withSignalName('IS_BOT_ESCALATION'), on_true: port.withConstantValue(0.0), on_false: port.withConstantValue(10) })
+      + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
+    ),
+    component.new()
+    + component.withRateLimiter(
+      rateLimiter.new()
+      + rateLimiter.withSelector(rateLimiterSelector)
+      + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
+      + rateLimiter.withLimitResetInterval('1s')
+      + rateLimiter.withLabelKey('http.request.header.user_id')
+      + rateLimiter.withDynamicConfigKey('rate_limiter'),
+    ),
+
+  ],
 }).policy;
 
 local policyMixin = {
@@ -123,6 +172,6 @@ local policyMixin = {
 };
 
 {
-  policy: policyMixin,
+  latencyGradientPolicy: policyMixin,
   controller: apertureControllerMixin,
 }

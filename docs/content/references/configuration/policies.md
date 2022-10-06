@@ -131,6 +131,21 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
+### RateLimiterDynamicConfig {#rate-limiter-dynamic-config}
+
+Dynamic Configuration for the rate limiter
+
+#### Properties
+
+<dl>
+<dt>overrides</dt>
+<dd>
+
+([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
+
+</dd>
+</dl>
+
 ### RateLimiterLazySync {#rate-limiter-lazy-sync}
 
 #### Properties
@@ -569,7 +584,7 @@ See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limit
 :::
 
 It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
 
 ConcurrencyLimiter configuration is split into two parts: An actuation
 strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
@@ -1834,10 +1849,22 @@ to select which label should be used as key.
 #### Properties
 
 <dl>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
 ([V1RateLimiterIns](#v1-rate-limiter-ins), `required`)
+
+</dd>
+<dt>init_config</dt>
+<dd>
+
+([RateLimiterDynamicConfig](#rate-limiter-dynamic-config)) Initial configuration
 
 </dd>
 <dt>label_key</dt>
@@ -1861,12 +1888,6 @@ label set up, set `label_key: "user"`.
 <dd>
 
 (string, default: `60s`) Time after which the limit for a given label value will be reset.
-
-</dd>
-<dt>overrides</dt>
-<dd>
-
-([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
 
 </dd>
 <dt>selector</dt>

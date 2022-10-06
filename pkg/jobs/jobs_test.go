@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"context"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -90,28 +91,64 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 			Child(registry.Key()).
 			Child(job.Name())
 
-		gotStatusMsg := livenessReg.GetStatus().GetMessage()
-		expectedStatusMsg, _ := anypb.New(wrapperspb.String(groupConfig.jobRunConfig.expectedStatusMsg))
-		if !proto.Equal(gotStatusMsg, expectedStatusMsg) {
-			t.Errorf("Expected status message to be %v, got %v", expectedStatusMsg, gotStatusMsg)
-		}
+		checkStatusMessage(t, livenessReg, groupConfig.jobRunConfig.expectedStatusMsg)
 		if groupConfig.jobRunConfig.expectedStatusMsg == "Timeout" {
 			jobGroup.TriggerJob(job.Name())
 		}
 
 		groupConfig.OnJobCompleted(nil, JobStats{})
 
+		groupConfigExpectdScheduling := groupConfig.expectedScheduling
 		_, val := jobGroup.Results()
-		if val != groupConfig.expectedScheduling {
-			t.Errorf("Expected scheduling to be %v, got %v", groupConfig.expectedScheduling, val)
+		if val != groupConfigExpectdScheduling {
+			t.Errorf("Expected scheduling to be %v, got %v", groupConfigExpectdScheduling, val)
 		}
-
+		checkStatusBeforeDeregister(t, []string{job.Name()}, groupConfigExpectdScheduling)
 	}
 	if len(groupConfig.jobs) > 1 {
 		jobGroup.DeregisterAll()
 	} else {
 		err = jobGroup.DeregisterJob(groupConfig.jobs[0].Name())
 		require.NoError(t, err)
+	}
+}
+
+func checkStatusMessage(t *testing.T, registry status.Registry, protoMsg string) {
+	var gotStatusMsg, expectuedStatusMsg *anypb.Any
+	require.False(t, registry.HasError())
+	gotStatusMsg = registry.GetStatus().GetMessage()
+	if protoMsg == "" {
+		expectuedStatusMsg, _ = anypb.New(&emptypb.Empty{})
+	} else {
+		expectuedStatusMsg, _ = anypb.New(wrapperspb.String(protoMsg))
+	}
+	if !proto.Equal(gotStatusMsg, expectuedStatusMsg) {
+		t.Errorf("Expected status message to be %v, got %v", expectuedStatusMsg, gotStatusMsg)
+	}
+}
+
+func checkStatusBeforeDeregister(t *testing.T, names []string, expectedScheduling bool) {
+	for _, name := range names {
+		jobRegistry := registry.ChildIfExists(name)
+		require.NotNil(t, jobRegistry)
+		require.Equal(t, jobRegistry.Key(), name)
+
+		if strings.Split(name, "-")[0] == "multi" {
+			checkStatusMessage(t, jobRegistry, "MultiJob")
+			continue
+		}
+		if expectedScheduling {
+			checkStatusMessage(t, jobRegistry, "")
+		} else {
+			require.True(t, jobRegistry.HasError())
+		}
+	}
+}
+
+func checkStatusAfterDeregister(t *testing.T, names []string) {
+	for _, name := range names {
+		jobRegistry := registry.ChildIfExists(name)
+		require.Nil(t, jobRegistry)
 	}
 }
 
@@ -150,6 +187,7 @@ func TestInstantRunJob(t *testing.T) {
 
 	runTest(t, groupConfig)
 	checkResults(t, counter, int32(2))
+	checkStatusAfterDeregister(t, []string{job.JobName})
 }
 
 // TestTimeoutJob tests the liveness of the job, when the job is stuck.
@@ -183,6 +221,7 @@ func TestTimeoutJob(t *testing.T) {
 	}
 	runTest(t, groupConfig)
 	checkResults(t, counter, int32(0))
+	checkStatusAfterDeregister(t, []string{job.JobName})
 }
 
 // TestMultiJobRun tests the scheduling of a multi-job containing a basic job.
@@ -238,6 +277,7 @@ func TestMultiJobRun(t *testing.T) {
 	err = multiJob.DeregisterJob(job.Name())
 	require.NoError(t, err)
 	multiJob.DeregisterAll()
+	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName})
 }
 
 // TestMultipleBasicJobs tests the scheduling and parallel run of multiple basic jobs.
@@ -284,6 +324,7 @@ func TestMultipleBasicJobs(t *testing.T) {
 	runTest(t, groupConfig)
 	checkResults(t, counter, int32(2))
 	checkResults(t, counter2, int32(10))
+	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName})
 }
 
 // TestMultipleMultiJobs tests the scheduling and parallel run of multiple multi-jobs containing multiple basic jobs.
@@ -291,8 +332,8 @@ func TestMultipleMultiJobs(t *testing.T) {
 	var counter int32
 	var counter2 int32
 	var counter3 int32
-	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multiJob1"), jws, gws)
-	multiJob2 := NewMultiJob(jobGroup.GetStatusRegistry().Child("multiJob2"), jws, gws)
+	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job1"), jws, gws)
+	multiJob2 := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job2"), jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
@@ -353,6 +394,7 @@ func TestMultipleMultiJobs(t *testing.T) {
 	checkResults(t, counter, int32(2))
 	checkResults(t, counter2, int32(10))
 	checkResults(t, counter3, int32(20))
+	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName, job3.JobName})
 }
 
 // TestSameJobTwice returns error when scheduling job with same name.
@@ -378,12 +420,13 @@ func TestSameJobTwiceAndSchedulingErrors(t *testing.T) {
 
 	err = jobGroup.RegisterJob(job2, jobConfig)
 	require.Error(t, err)
+	checkStatusBeforeDeregister(t, []string{job.JobName, job2.JobName}, false)
 
 	jobGroup.DeregisterAll()
+	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName})
 	// error when registering job multiple times, written here to achieve more coverage
 	err = jobGroup.DeregisterJob(job.Name())
 	require.Errorf(t, err, "Expected error when deregistering job multiple times")
-
 	require.Empty(t, jobGroup.JobInfo(job.Name()), "Expected error when getting job info, because job was already deregistered")
 }
 
@@ -398,5 +441,7 @@ func TestEmptyJobFunc(t *testing.T) {
 	if err == nil {
 		t.Log("Expected log message when registering job with nil job func")
 	}
+	checkStatusBeforeDeregister(t, []string{job.JobName}, false)
 	jobGroup.DeregisterAll()
+	checkStatusAfterDeregister(t, []string{job.JobName})
 }

@@ -10,10 +10,8 @@ var (
 	ConfigPrefix = path.Join("/config")
 	// DecisionsPrefix is key prefix in etcd for decisions.
 	DecisionsPrefix = path.Join("/decisions")
-	// ClassifiersConfigPath is config path in etcd for classifiers.
-	ClassifiersConfigPath = path.Join(ConfigPrefix, "classifiers")
-	// PoliciesConfigPath is config path in etcd for policies.
-	PoliciesConfigPath = path.Join(ConfigPrefix, "policies")
+	// ClassifiersPath is config path in etcd for classifiers.
+	ClassifiersPath = path.Join(ConfigPrefix, "classifiers")
 	// LoadShedDecisionsPath is decision path in etcd for load shed decisions.
 	LoadShedDecisionsPath = path.Join(DecisionsPrefix, "load_shed")
 	// AutoTokenResultsPath is config path in etcd for query tokens.
@@ -24,6 +22,8 @@ var (
 	RateLimiterConfigPath = path.Join(ConfigPrefix, "rate_limiter")
 	// RateLimiterDecisionsPath is decision path in etcd for rate limiter decisions.
 	RateLimiterDecisionsPath = path.Join(DecisionsPrefix, "rate_limiter")
+	// RateLimiterDynamicConfigPath is config path in etcd for dynamic config of rate limiter.
+	RateLimiterDynamicConfigPath = path.Join(ConfigPrefix, "rate_limiter_dynamic_config")
 	// FluxMeterConfigPath is config path in etcd for flux meters.
 	FluxMeterConfigPath = path.Join(ConfigPrefix, "flux_meter")
 )

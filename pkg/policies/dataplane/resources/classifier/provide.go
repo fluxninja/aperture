@@ -32,7 +32,7 @@ var Module fx.Option = fx.Options(
 
 func setupEtcdClassifierWatcher(etcdClient *etcdclient.Client, lc fx.Lifecycle, ai *agentinfo.AgentInfo) (notifiers.Watcher, error) {
 	agentGroup := ai.GetAgentGroup()
-	etcdPath := path.Join(common.ClassifiersConfigPath, common.AgentGroupPrefix(agentGroup))
+	etcdPath := path.Join(common.ClassifiersPath, common.AgentGroupPrefix(agentGroup))
 	etcdWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err

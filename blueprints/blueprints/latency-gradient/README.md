@@ -11,31 +11,29 @@
 | `policy.policyName`         | `string`       | `(required)` | A name of the policy, used within PromQL queries for fluxmeter metrics. |
 | `policy.evaluationInterval` | `string`       | `"0.5s"`     | How often should policy be re-evaluated.                                |
 
-#### Flux Meter Selector
+#### Flux Meter
 
-| Parameter Name             | Parameter Type         | Default      | Description          |
-| -------------------------- | ---------------------- | ------------ | -------------------- |
-| `policy.fluxMeterSelector` | `aperture.v1.Selector` | `(required)` | Flux Meter selector. |
-
-#### Flux Meters
-
-| Parameter Name                                   | Parameter Type                       | Default      | Description                                 |
-| ------------------------------------------------ | ------------------------------------ | ------------ | ------------------------------------------- |
-| `policy.fluxMeters`                              | `map[string]aperture.v1.FluxMeter`   | `{}`         | Mappings of fluxMeterName to fluxMeter.     |
-| `policy.fluxMeters[policyName].attributeKey`     | `string`                             | `(required)` | Key of the attribute in access log or span. |
-| `policy.fluxMeters[policyName].histogramBuckets` | `aperture.v1.FluxMeterStaticBuckets` | `(required)` | Flux Meter static histogram buckets.        |
+| Parameter Name     | Parameter Type          | Default      | Description          |
+| ------------------ | ----------------------- | ------------ | -------------------- |
+| `policy.fluxMeter` | `aperture.v1.FluxMeter` | `(required)` | Flux Meter selector. |
 
 #### Concurrency Limiter Selector
 
-| Parameter Name                      | Parameter Type         | Default      | Description                   |
-| ----------------------------------- | ---------------------- | ------------ | ----------------------------- |
-| `policy.concurrencyLimiterSelector` | `aperture.v1.Selector` | `(required)` | Concurrency Limiter selector. |
+| Parameter Name                      | Parameter Type              | Default      | Description                   |
+| ----------------------------------- | --------------------------- | ------------ | ----------------------------- |
+| `policy.concurrencyLimiterSelector` | `aperture.spec.v1.Selector` | `(required)` | Concurrency Limiter selector. |
 
 #### Classification Rules
 
-| Parameter Name       | Parameter Type | Default | Description                   |
-| -------------------- | -------------- | ------- | ----------------------------- |
-| `policy.classifiers` | `string`       | `[]`    | List of classification rules. |
+| Parameter Name       | Parameter Type                  | Default | Description                   |
+| -------------------- | ------------------------------- | ------- | ----------------------------- |
+| `policy.classifiers` | `[]aperture.spec.v1.Classifier` | `[]`    | List of classification rules. |
+
+#### Additional Circuit Components
+
+| Parameter Name      | Parameter Type                 | Default | Description                            |
+| ------------------- | ------------------------------ | ------- | -------------------------------------- |
+| `policy.components` | `[]aperture.spec.v1.Component` | `[]`    | List of additional circuit components. |
 
 #### Exponential Moving Average configuration
 
@@ -46,10 +44,10 @@
 
 #### Concurrency Limiter
 
-| Parameter Name                                                 | Parameter Type                    | Default | Description                                                                |
-| -------------------------------------------------------------- | --------------------------------- | ------- | -------------------------------------------------------------------------- |
-| `policy.concurrencyLimiter.defaultWorkloadParameters.priority` | `int`                             | `20`    | Workload parameters to use in case none of the configured workloads match. |
-| `policy.concurrencyLimiter.workloads`                          | `[]aperture.v1.SchedulerWorkload` | `[]`    | A list of additional workloads for the scheduler                           |
+| Parameter Name                                                 | Parameter Type                         | Default | Description                                                                |
+| -------------------------------------------------------------- | -------------------------------------- | ------- | -------------------------------------------------------------------------- |
+| `policy.concurrencyLimiter.defaultWorkloadParameters.priority` | `int`                                  | `20`    | Workload parameters to use in case none of the configured workloads match. |
+| `policy.concurrencyLimiter.workloads`                          | `[]aperture.spec.v1.SchedulerWorkload` | `[]`    | A list of additional workloads for the scheduler                           |
 
 ### FluxMeter Dashboard
 

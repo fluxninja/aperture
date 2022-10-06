@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-pushd ./api >/dev/null
+gitroot="$(git rev-parse --show-toplevel)"
+
+pushd "$gitroot"/api >/dev/null
 make buf-generate
 popd >/dev/null

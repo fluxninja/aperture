@@ -23,6 +23,12 @@ import (
 
 type object = map[string]interface{}
 
+var commonAttributes = &wrappersv1.CommonAttributes{
+	PolicyName:     "test",
+	PolicyHash:     "test",
+	ComponentIndex: 0,
+}
+
 var _ = Describe("Classifier", func() {
 	var classifier *ClassificationEngine
 
@@ -115,15 +121,18 @@ var _ = Describe("Classifier", func() {
 		BeforeEach(func() {
 			var err error
 			ars1, err = classifier.AddRules(context.TODO(), "one", &wrappersv1.ClassifierWrapper{
-				Classifier: rs1,
+				Classifier:       rs1,
+				CommonAttributes: commonAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
 			ars2, err = classifier.AddRules(context.TODO(), "two", &wrappersv1.ClassifierWrapper{
-				Classifier: rs2,
+				Classifier:       rs2,
+				CommonAttributes: commonAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
 			ars3, err = classifier.AddRules(context.TODO(), "three", &wrappersv1.ClassifierWrapper{
-				Classifier: rs3,
+				Classifier:       rs3,
+				CommonAttributes: commonAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -253,6 +262,7 @@ var _ = Describe("Classifier", func() {
 				},
 				Rules: labelRules,
 			},
+			CommonAttributes: commonAttributes,
 		})
 		return err
 	}
@@ -487,7 +497,8 @@ var _ = Describe("Classifier", func() {
 
 		It("should reject the ruleset", func() {
 			_, err := classifier.AddRules(context.TODO(), "one", &wrappersv1.ClassifierWrapper{
-				Classifier: rs,
+				Classifier:       rs,
+				CommonAttributes: commonAttributes,
 			})
 			Expect(err).To(HaveOccurred())
 		})

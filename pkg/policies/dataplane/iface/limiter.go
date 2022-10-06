@@ -5,6 +5,7 @@ import (
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 //go:generate mockgen -source=limiter.go -destination=../../mocks/mock_limiter.go -package=mocks
@@ -28,4 +29,17 @@ type Limiter interface {
 	GetSelector() *selectorv1.Selector
 	RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
+}
+
+// RateLimiter interface.
+type RateLimiter interface {
+	Limiter
+	TakeN(labels map[string]string, count int) (label string, ok bool, remaining int, current int)
+	GetCounter() prometheus.Counter
+}
+
+// ConcurrencyLimiter interface.
+type ConcurrencyLimiter interface {
+	Limiter
+	GetObserver(labels map[string]string) prometheus.Observer
 }

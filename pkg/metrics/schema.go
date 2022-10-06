@@ -18,6 +18,8 @@ const (
 	SignalReadingMetricName = "signal_reading"
 	// FluxMeterMetricName name of fluxmeter metrics.
 	FluxMeterMetricName = "flux_meter"
+	// RateLimiterCounterMetricName - name of the counter describing times rate limiter was triggered.
+	RateLimiterCounterMetricName = "rate_limiter_counter"
 
 	// Workload metrics.
 
@@ -81,6 +83,16 @@ const (
 	HandlerName = "handler_name"
 	// FeatureStatusLabel - feature status.
 	FeatureStatusLabel = "feature_status"
+	// FeatureStatusOK - feature status OK.
+	FeatureStatusOK = "OK"
+	// FeatureStatusError - feature status Error.
+	FeatureStatusError = "Error"
+	// ResponseStatusLabel - response status. A common label to denote OK or Error across all protocols.
+	ResponseStatusLabel = "response_status"
+	// ResponseStatusOK - response status OK.
+	ResponseStatusOK = FeatureStatusOK
+	// ResponseStatusError - response status Error.
+	ResponseStatusError = FeatureStatusError
 	// FlowControlCheckDecisionTypeLabel - label for decision type dropped or accepted.
 	FlowControlCheckDecisionTypeLabel = "decision_type"
 	// FlowControlCheckErrorReasonLabel - label for error reason on FCS Check request.

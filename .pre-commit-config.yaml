@@ -45,10 +45,6 @@ repos:
     rev: v0.1.17
     hooks:
       - id: shellcheck
-  - repo: https://github.com/syntaqx/git-hooks
-    rev: v0.0.17
-    hooks:
-      - id: circleci-config-validate
   - repo: https://github.com/fluxninja/pre-commit-golang
     rev: v1.0.0-fn
     hooks:
@@ -128,6 +124,13 @@ repos:
         files: ^(blueprints)|\.proto$|^requirements.txt$
         pass_filenames: false
         description: "Generate Aperture libsonnet and blueprints"
+      - id: validate-jsonnet-examples
+        name: "jsonnet examples in docs"
+        entry: "./docs/tools/scripts/validate_jsonnet.sh"
+        language: script
+        files: ^(blueprints)
+        pass_filenames: false
+        description: "Validate jsonnet examples"
       - id: tanka-show
         name: "Check tanka parses jsonnet"
         language: script
@@ -158,7 +161,9 @@ repos:
         entry: ./scripts/precommit/check-operator-spec.sh
         language: script
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.1.0
+    rev: v2.2.1
     hooks:
       - id: codespell
-        exclude: ^(.*\.svg|yarn.lock|go.sum)$
+        args:
+          - --ignore-words=./.codespellignore
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*)$

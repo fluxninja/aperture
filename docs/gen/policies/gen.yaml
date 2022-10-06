@@ -117,6 +117,16 @@ definitions:
         items:
           $ref: '#/definitions/v1MatchExpression'
         x-order: 0
+  RateLimiterDynamicConfig:
+    type: object
+    title: Dynamic Configuration for the rate limiter
+    properties:
+      overrides:
+        description: Allows to specify different limits for particular label values.
+        type: array
+        items:
+          $ref: '#/definitions/RateLimiterOverride'
+        x-order: 0
   RateLimiterLazySync:
     type: object
     properties:
@@ -466,7 +476,7 @@ definitions:
       :::
 
       It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-      Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+      Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
 
       ConcurrencyLimiter configuration is split into two parts: An actuation
       strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
@@ -1415,10 +1425,18 @@ definitions:
     type: object
     title: Limits the traffic on a control point to specified rate
     properties:
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+        x-order: 0
       in_ports:
         x-go-validate: required
-        x-order: 0
+        x-order: 1
         $ref: '#/definitions/v1RateLimiterIns'
+      init_config:
+        title: Initial configuration
+        x-order: 2
+        $ref: '#/definitions/RateLimiterDynamicConfig'
       label_key:
         description: |-
           Specifies which label the ratelimiter should be keyed by.
@@ -1429,26 +1447,20 @@ definitions:
           label set up, set `label_key: "user"`.
         type: string
         x-go-validate: required
-        x-order: 1
+        x-order: 3
       lazy_sync:
         title: Configuration of lazy-syncing behaviour of ratelimiter
-        x-order: 2
+        x-order: 4
         $ref: '#/definitions/RateLimiterLazySync'
       limit_reset_interval:
         description: Time after which the limit for a given label value will be reset.
         type: string
         x-go-default: 60s
-        x-order: 3
-      overrides:
-        description: Allows to specify different limits for particular label values.
-        type: array
-        items:
-          $ref: '#/definitions/RateLimiterOverride'
-        x-order: 4
+        x-order: 5
       selector:
         description: Which control point to apply this ratelimiter to.
         x-go-validate: required
-        x-order: 5
+        x-order: 6
         $ref: '#/definitions/v1Selector'
   v1RateLimiterIns:
     type: object

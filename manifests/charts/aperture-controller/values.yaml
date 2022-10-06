@@ -531,9 +531,22 @@ controller:
 ## @param etcd.enabled Whether to deploy a small etcd cluster as part of this chart
 ## @param etcd.auth.rbac.create specifies whether to create the RBAC resources for Etcd
 ## @param etcd.auth.token.type specifies the type of token to use
+## @param etcd.initContainer.enabled Create init container to check the health of Etcd before starting Aperture Controller.
+## @param etcd.initContainer.image.registry Init container image registry.
+## @param etcd.initContainer.image.repository Init container image repository.
+## @param etcd.initContainer.image.tag Init container image tag.
+## @param etcd.initContainer.image.pullPolicy Init container image pull policy.
+##
 ##
 etcd:
   enabled: true
+  initContainer:
+    enabled: true
+    image:
+      registry: docker.io/bitnami
+      repository: etcd
+      tag: 3.5
+      pullPolicy: IfNotPresent
   auth:
     rbac:
       create: false
@@ -542,6 +555,11 @@ etcd:
 
 ## @section prometheus
 ## @param prometheus.enabled specifies whether to deploy embedded prometheus
+## @param prometheus.initContainer.enabled Create init container to check the readiness of Prometheus before starting Aperture Controller.
+## @param prometheus.initContainer.image.registry Init container image registry.
+## @param prometheus.initContainer.image.repository Init container image repository.
+## @param prometheus.initContainer.image.tag Init container image tag.
+## @param prometheus.initContainer.image.pullPolicy Init container image pull policy.
 ## @skip prometheus.server
 ## @skip prometheus.alertmanager
 ## @skip prometheus.nodeExporter
@@ -551,6 +569,13 @@ etcd:
 ##
 prometheus:
   enabled: true
+  initContainer:
+    enabled: true
+    image:
+      registry: docker.io/linuxserver
+      repository: yq
+      tag: 3.1.0
+      pullPolicy: IfNotPresent
   server:
     image:
       tag: v2.33.5
