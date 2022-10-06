@@ -51,20 +51,6 @@ func (mr *MockLimiterMockRecorder) GetLimiterID() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLimiterID", reflect.TypeOf((*MockLimiter)(nil).GetLimiterID))
 }
 
-// GetObserver mocks base method.
-func (m *MockLimiter) GetObserver(labels map[string]string) prometheus.Observer {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetObserver", labels)
-	ret0, _ := ret[0].(prometheus.Observer)
-	return ret0
-}
-
-// GetObserver indicates an expected call of GetObserver.
-func (mr *MockLimiterMockRecorder) GetObserver(labels interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObserver", reflect.TypeOf((*MockLimiter)(nil).GetObserver), labels)
-}
-
 // GetPolicyName mocks base method.
 func (m *MockLimiter) GetPolicyName() string {
 	m.ctrl.T.Helper()
@@ -105,4 +91,207 @@ func (m *MockLimiter) RunLimiter(labels map[string]string) *flowcontrolv1.Limite
 func (mr *MockLimiterMockRecorder) RunLimiter(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockLimiter)(nil).RunLimiter), labels)
+}
+
+// MockRateLimiter is a mock of RateLimiter interface.
+type MockRateLimiter struct {
+	ctrl     *gomock.Controller
+	recorder *MockRateLimiterMockRecorder
+}
+
+// MockRateLimiterMockRecorder is the mock recorder for MockRateLimiter.
+type MockRateLimiterMockRecorder struct {
+	mock *MockRateLimiter
+}
+
+// NewMockRateLimiter creates a new mock instance.
+func NewMockRateLimiter(ctrl *gomock.Controller) *MockRateLimiter {
+	mock := &MockRateLimiter{ctrl: ctrl}
+	mock.recorder = &MockRateLimiterMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockRateLimiter) EXPECT() *MockRateLimiterMockRecorder {
+	return m.recorder
+}
+
+// GetCounter mocks base method.
+func (m *MockRateLimiter) GetCounter() prometheus.Counter {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCounter")
+	ret0, _ := ret[0].(prometheus.Counter)
+	return ret0
+}
+
+// GetCounter indicates an expected call of GetCounter.
+func (mr *MockRateLimiterMockRecorder) GetCounter() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCounter", reflect.TypeOf((*MockRateLimiter)(nil).GetCounter))
+}
+
+// GetLimiterID mocks base method.
+func (m *MockRateLimiter) GetLimiterID() iface.LimiterID {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLimiterID")
+	ret0, _ := ret[0].(iface.LimiterID)
+	return ret0
+}
+
+// GetLimiterID indicates an expected call of GetLimiterID.
+func (mr *MockRateLimiterMockRecorder) GetLimiterID() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLimiterID", reflect.TypeOf((*MockRateLimiter)(nil).GetLimiterID))
+}
+
+// GetPolicyName mocks base method.
+func (m *MockRateLimiter) GetPolicyName() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPolicyName")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetPolicyName indicates an expected call of GetPolicyName.
+func (mr *MockRateLimiterMockRecorder) GetPolicyName() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockRateLimiter)(nil).GetPolicyName))
+}
+
+// GetSelector mocks base method.
+func (m *MockRateLimiter) GetSelector() *selectorv1.Selector {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSelector")
+	ret0, _ := ret[0].(*selectorv1.Selector)
+	return ret0
+}
+
+// GetSelector indicates an expected call of GetSelector.
+func (mr *MockRateLimiterMockRecorder) GetSelector() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelector", reflect.TypeOf((*MockRateLimiter)(nil).GetSelector))
+}
+
+// RunLimiter mocks base method.
+func (m *MockRateLimiter) RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RunLimiter", labels)
+	ret0, _ := ret[0].(*flowcontrolv1.LimiterDecision)
+	return ret0
+}
+
+// RunLimiter indicates an expected call of RunLimiter.
+func (mr *MockRateLimiterMockRecorder) RunLimiter(labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockRateLimiter)(nil).RunLimiter), labels)
+}
+
+// TakeN mocks base method.
+func (m *MockRateLimiter) TakeN(labels map[string]string, count int) (string, bool, int, int) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TakeN", labels, count)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(bool)
+	ret2, _ := ret[2].(int)
+	ret3, _ := ret[3].(int)
+	return ret0, ret1, ret2, ret3
+}
+
+// TakeN indicates an expected call of TakeN.
+func (mr *MockRateLimiterMockRecorder) TakeN(labels, count interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeN", reflect.TypeOf((*MockRateLimiter)(nil).TakeN), labels, count)
+}
+
+// MockConcurrencyLimiter is a mock of ConcurrencyLimiter interface.
+type MockConcurrencyLimiter struct {
+	ctrl     *gomock.Controller
+	recorder *MockConcurrencyLimiterMockRecorder
+}
+
+// MockConcurrencyLimiterMockRecorder is the mock recorder for MockConcurrencyLimiter.
+type MockConcurrencyLimiterMockRecorder struct {
+	mock *MockConcurrencyLimiter
+}
+
+// NewMockConcurrencyLimiter creates a new mock instance.
+func NewMockConcurrencyLimiter(ctrl *gomock.Controller) *MockConcurrencyLimiter {
+	mock := &MockConcurrencyLimiter{ctrl: ctrl}
+	mock.recorder = &MockConcurrencyLimiterMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockConcurrencyLimiter) EXPECT() *MockConcurrencyLimiterMockRecorder {
+	return m.recorder
+}
+
+// GetLimiterID mocks base method.
+func (m *MockConcurrencyLimiter) GetLimiterID() iface.LimiterID {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLimiterID")
+	ret0, _ := ret[0].(iface.LimiterID)
+	return ret0
+}
+
+// GetLimiterID indicates an expected call of GetLimiterID.
+func (mr *MockConcurrencyLimiterMockRecorder) GetLimiterID() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLimiterID", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetLimiterID))
+}
+
+// GetObserver mocks base method.
+func (m *MockConcurrencyLimiter) GetObserver(labels map[string]string) prometheus.Observer {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetObserver", labels)
+	ret0, _ := ret[0].(prometheus.Observer)
+	return ret0
+}
+
+// GetObserver indicates an expected call of GetObserver.
+func (mr *MockConcurrencyLimiterMockRecorder) GetObserver(labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObserver", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetObserver), labels)
+}
+
+// GetPolicyName mocks base method.
+func (m *MockConcurrencyLimiter) GetPolicyName() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPolicyName")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetPolicyName indicates an expected call of GetPolicyName.
+func (mr *MockConcurrencyLimiterMockRecorder) GetPolicyName() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetPolicyName))
+}
+
+// GetSelector mocks base method.
+func (m *MockConcurrencyLimiter) GetSelector() *selectorv1.Selector {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSelector")
+	ret0, _ := ret[0].(*selectorv1.Selector)
+	return ret0
+}
+
+// GetSelector indicates an expected call of GetSelector.
+func (mr *MockConcurrencyLimiterMockRecorder) GetSelector() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelector", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetSelector))
+}
+
+// RunLimiter mocks base method.
+func (m *MockConcurrencyLimiter) RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RunLimiter", labels)
+	ret0, _ := ret[0].(*flowcontrolv1.LimiterDecision)
+	return ret0
+}
+
+// RunLimiter indicates an expected call of RunLimiter.
+func (mr *MockConcurrencyLimiterMockRecorder) RunLimiter(labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockConcurrencyLimiter)(nil).RunLimiter), labels)
 }

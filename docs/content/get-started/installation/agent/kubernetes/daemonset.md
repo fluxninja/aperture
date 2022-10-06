@@ -15,9 +15,6 @@ where it will get deployed on all the nodes of the cluster.
 
 ## Installation {#agent-daemonset-installation}
 
-(Consult [Supported Platforms](/get-started/supported-platforms.md) before
-installing.)
-
 The Aperture Agent in the DaemonSet mode will be installed using the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
 which will be managed by the Aperture Operator.

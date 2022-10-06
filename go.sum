@@ -163,7 +163,6 @@ github.com/bits-and-blooms/bitset v1.2.0/go.mod h1:gIdJ4wp64HaoK2YrL1Q5/N7Y16edY
 github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJmJgSg28kpZDP6UIiPt0e0Oz0kqKNGyRaWEPv84=
 github.com/blang/semver v3.1.0+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
 github.com/blang/semver v3.5.1+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
-github.com/blang/semver/v4 v4.0.0 h1:1PFHFE6yCCTv8C1TeyNNarDzntLi7wMI5i/pzqYIsAM=
 github.com/blang/semver/v4 v4.0.0/go.mod h1:IbckMUScFkM3pff0VJDNKRiT6TG/YpiHIM2yvyW5YoQ=
 github.com/bmatcuk/doublestar/v3 v3.0.0 h1:TQtVPlDnAYwcrVNB2JiGuMc++H5qzWZd9PhkNo5WyHI=
 github.com/bmatcuk/doublestar/v3 v3.0.0/go.mod h1:6PcTVMw80pCY1RVuoqu3V++99uQB3vsSYKPTd8AWA0k=
@@ -491,8 +490,8 @@ github.com/fluxninja/go-swagger v0.29.0-fn.patch.8 h1:EdIA15vOFLFgxUMXJPtpI2TaTR
 github.com/fluxninja/go-swagger v0.29.0-fn.patch.8/go.mod h1:hHQC4q+Cd26/JhLSXAUauYmDCTAR9u4TIALMYXZbeWM=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814 h1:AHC1PtYLUw9PWqmgB9VHcxzGEm1GDYGXzC1PRtgIqqs=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814/go.mod h1:kARLh/xWGaisrwkOGOWKcqk7fagFUFthOTX7mIFVJlw=
-github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.1 h1:k7ZO3DOBXLhEVvTJDLWemN2k+zx8GVJn4WZdj4DDEfQ=
-github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.1/go.mod h1:n2KBSgs7AakuedVxLR/Tayl3EEztmngrrjZBsYS+qBI=
+github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.2 h1:OY9oqSwelEE7vObzTX0ZPB64NciabH8hl4BuX4H1Dxw=
+github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.2/go.mod h1:FPBYzfqOIQIPIY7CbqFn7wTfWQVT0ZKy2hbM6TIShKw=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
 github.com/form3tech-oss/jwt-go v3.2.3+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
