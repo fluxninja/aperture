@@ -132,7 +132,7 @@ file:
 <summary>Generated Policy YAML</summary>
 
 ```yaml
-{@include: ./assets/gen/blueprints/jsonnet/blueprints_0.jsonnet.yaml}
+{@include: ./assets/gen/blueprints/jsonnet/blueprints_0.yaml}
 ```
 
 </details>
