@@ -23,6 +23,8 @@ for f in $files; do
 	filenameNoExt="${filename%.*}"
 	out_dir="$dir"/assets/gen/"$filenameNoExt"/jsonnet
 	mkdir -p "$out_dir"
+	# move existing files to tmp if they exist
+	mv "$out_dir"/* tmp 2>/dev/null || true
 	rm -f "$out_dir"/*
 
 	#shellcheck disable=SC2002,SC2016
@@ -41,16 +43,27 @@ for f in $files; do
 		# fail script if any of the below commands fail
 		set -e
 		jsonnet --yaml-stream -J "$gitroot"/blueprints/vendor "$jsonnet_section_file" >"$outfilename"
+		# run prettier
+		npx prettier --write "$outfilename"
 		if [ "$(yq e '.kind == "Policy"' "$outfilename")" = "true" ]; then
-			specfilename="$out_dir"/"$filenameNoExt"_"$count"_spec.yaml
-			mermaidfilename="$out_dir"/"$filenameNoExt"_"$count".mmd
+			specfilename="$filenameNoExt"_"$count"_spec.yaml
+			specfilepath="$out_dir"/"$specfilename"
+			mermaidfilepath="$out_dir"/"$filenameNoExt"_"$count".mmd
+			# save the contents of the existing spec file if it exists
+			old_spec_file_contents=""
+			if [ -f tmp/"$specfilename" ]; then
+				old_spec_file_contents=$(cat tmp/"$specfilename")
+			fi
 			# extract spec key from yaml
-			yq '.spec' "$outfilename" >"$specfilename"
-			git add "$specfilename"
-			# validate with circuit compiler
-			go run "$gitroot"/cmd/circuit-compiler/main.go -policy "$specfilename" --mermaid "$mermaidfilename"
-			git add "$mermaidfilename"
-
+			yq '.spec' "$outfilename" >"$specfilepath"
+			# run prettier
+			npx prettier --write "$specfilepath"
+			git add "$specfilepath"
+			if [ "$old_spec_file_contents" != "$(cat "$specfilepath")" ]; then
+				# validate with circuit compiler
+				go run "$gitroot"/cmd/circuit-compiler/main.go -policy "$specfilepath" --mermaid "$mermaidfilepath"
+				git add "$mermaidfilepath"
+			fi
 		fi
 		git add "$outfilename"
 		# unset fail on error

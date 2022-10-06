@@ -1,51 +1,45 @@
 ---
 {
-   "apiVersion": "fluxninja.com/v1alpha1",
-   "kind": "Policy",
-   "metadata": {
-      "labels": {
-         "fluxninja.com/validate": "true"
-      },
-      "name": "service1-demo-app"
-   },
-   "spec": {
-      "circuit": {
-         "components": [
-            {
-               "constant": {
-                  "out_ports": {
-                     "output": {
-                        "signal_name": "RATE_LIMIT"
-                     }
+  "apiVersion": "fluxninja.com/v1alpha1",
+  "kind": "Policy",
+  "metadata":
+    {
+      "labels": { "fluxninja.com/validate": "true" },
+      "name": "service1-demo-app",
+    },
+  "spec":
+    {
+      "circuit":
+        {
+          "components":
+            [
+              {
+                "constant":
+                  {
+                    "out_ports": { "output": { "signal_name": "RATE_LIMIT" } },
+                    "value": "120",
                   },
-                  "value": "120"
-               }
-            },
-            {
-               "rate_limiter": {
-                  "in_ports": {
-                     "limit": {
-                        "signal_name": "RATE_LIMIT"
-                     }
+              },
+              {
+                "rate_limiter":
+                  {
+                    "in_ports": { "limit": { "signal_name": "RATE_LIMIT" } },
+                    "label_key": "http.request.header.user_id",
+                    "limit_reset_interval": "60s",
+                    "selector":
+                      {
+                        "flow_selector":
+                          { "control_point": { "traffic": "ingress" } },
+                        "service_selector":
+                          {
+                            "agent_group": "default",
+                            "service": "service1-demo-app.demoapp.svc.cluster.local",
+                          },
+                      },
                   },
-                  "label_key": "http.request.header.user_id",
-                  "limit_reset_interval": "60s",
-                  "selector": {
-                     "flow_selector": {
-                        "control_point": {
-                           "traffic": "ingress"
-                        }
-                     },
-                     "service_selector": {
-                        "agent_group": "default",
-                        "service": "service1-demo-app.demoapp.svc.cluster.local"
-                     }
-                  }
-               }
-            }
-         ],
-         "evaluation_interval": "0.5s"
-      }
-   }
+              },
+            ],
+          "evaluation_interval": "0.5s",
+        },
+    },
 }
-...
