@@ -30,7 +30,7 @@ for f in $files; do
 	#shellcheck disable=SC2016
 	$AWK '{RS="```jsonnet"} NR > 1 { print $0 > "tmp/jsonnet_section_" ++i}' tmp/records.txt
 	# for each jsonnet section in tmp directory
-	jsonnet_section_files=$(find tmp -type f -name "jsonnet_section_*")
+	jsonnet_section_files=$(find tmp -type f -name "jsonnet_section_*" | sort -n)
 	count=0
 	for jsonnet_section_file in $jsonnet_section_files; do
 		echo "Processing $f :: $jsonnet_section_file"
