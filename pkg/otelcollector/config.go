@@ -275,7 +275,7 @@ func AddMetricsPipeline(cfg *OtelParams) {
 	})
 }
 
-// AddControllerMetricsPipeline adds metrics to pipeline for cotroller OTEL collector.
+// AddControllerMetricsPipeline adds metrics to pipeline for controller OTEL collector.
 func AddControllerMetricsPipeline(cfg *OtelParams) {
 	config := cfg.Config
 	addControllerPrometheusReceiver(config, cfg)
