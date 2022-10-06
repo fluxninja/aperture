@@ -30,6 +30,7 @@ import (
 const (
 	defaultKey                 = "dist_cache"
 	olricMemberlistServiceName = "olric-memberlist"
+	olricMetricsJobName        = "scrape-metrics"
 )
 
 // Module provides a new DistCache FX module.
@@ -245,7 +246,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	job := &jobs.BasicJob{
 		JobBase: jobs.JobBase{
-			JobName: "scrape-metrics",
+			JobName: olricMetricsJobName,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -282,7 +283,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			panichandler.Go(func() {
 				log.Info().Msg("Started OTEL Collector")
 				err = dc.Olric.Start()
-				dc.jobGroup.TriggerJob("scrape-metrics")
+				dc.jobGroup.TriggerJob(olricMetricsJobName)
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to start olric")
 				}
