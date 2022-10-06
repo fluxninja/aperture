@@ -1,23 +1,30 @@
-circuit:
-  components:
-    - rate_limiter:
-        in_ports:
-          limit:
-            constant_value: "50.0"
-        init_config:
-          overrides:
-            - label_value: gold
-              limit_scale_factor: 1
-        label_key: http.request.header.user_type
-        lazy_sync:
-          enabled: true
-          num_sync: 10
-        limit_reset_interval: 1s
-        selector:
-          flow_selector:
-            control_point:
-              traffic: ingress
-          service_selector:
-            agent_group: default
-            service: service1-demo-app.demoapp.svc.cluster.local
-  evaluation_interval: 0.5s
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: example
+spec:
+  circuit:
+    components:
+      - rate_limiter:
+          in_ports:
+            limit:
+              constant_value: "50.0"
+          init_config:
+            overrides:
+              - label_value: gold
+                limit_scale_factor: 1
+          label_key: http.request.header.user_type
+          lazy_sync:
+            enabled: true
+            num_sync: 10
+          limit_reset_interval: 1s
+          selector:
+            flow_selector:
+              control_point:
+                traffic: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
+    evaluation_interval: 0.5s

@@ -1,7 +1,9 @@
 digraph  {
 	subgraph cluster_s1 {
 		label="RateLimiter[0]";margin="50.0";
+		n3[label="50.00"];
 		n2[label="limit"];
+		n3->n2;
 		{rank=same; n2;};
 		
 	}

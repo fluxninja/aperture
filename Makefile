@@ -49,7 +49,7 @@ go-generate-swagger:
 	@echo Generating swagger specs from go code
 	@./scripts/go_generate_swagger.sh
 
-generate-docs: generate-blueprints generate-helm-readme generate-doc-assets
+generate-docs: generate-helm-readme generate-doc-assets
 	@echo Generating docs
 
 generate-config-markdown: go-generate-swagger generate-api
@@ -66,7 +66,7 @@ helm-lint:
 generate-blueprints: generate-config-markdown
 	@cd ./blueprints && $(MAKE) generate-blueprints
 
-generate-doc-assets:
+generate-doc-assets: generate-blueprints
 	@cd ./docs && $(MAKE) generate-jsonnet
 	@cd ./docs && $(MAKE) generate-mermaid
 

@@ -67,7 +67,7 @@ generate-config-markdown:
 
 generate-jsonnet:
 	@echo generate jsonnet
-	@./tools/scripts/generate_jsonnet.sh
+	@./tools/jsonnet/generate_jsonnet.sh
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid:
