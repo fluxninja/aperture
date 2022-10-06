@@ -1,0 +1,326 @@
+---
+{
+  "apiVersion": "fluxninja.com/v1alpha1",
+  "kind": "Policy",
+  "metadata":
+    {
+      "labels": { "fluxninja.com/validate": "true" },
+      "name": "service1-demo-app",
+    },
+  "spec":
+    {
+      "circuit":
+        {
+          "components":
+            [
+              {
+                "arithmetic_combinator":
+                  {
+                    "in_ports":
+                      {
+                        "lhs": { "signal_name": "LATENCY" },
+                        "rhs": { "constant_value": "2.0" },
+                      },
+                    "operator": "mul",
+                    "out_ports": { "output": { "signal_name": "MAX_EMA" } },
+                  },
+              },
+              {
+                "arithmetic_combinator":
+                  {
+                    "in_ports":
+                      {
+                        "lhs": { "signal_name": "LATENCY_EMA" },
+                        "rhs": { "constant_value": "1.1" },
+                      },
+                    "operator": "mul",
+                    "out_ports":
+                      { "output": { "signal_name": "LATENCY_SETPOINT" } },
+                  },
+              },
+              {
+                "arithmetic_combinator":
+                  {
+                    "in_ports":
+                      {
+                        "lhs": { "signal_name": "INCOMING_CONCURRENCY" },
+                        "rhs": { "signal_name": "DESIRED_CONCURRENCY" },
+                      },
+                    "operator": "sub",
+                    "out_ports":
+                      { "output": { "signal_name": "DELTA_CONCURRENCY" } },
+                  },
+              },
+              {
+                "arithmetic_combinator":
+                  {
+                    "in_ports":
+                      {
+                        "lhs": { "signal_name": "DELTA_CONCURRENCY" },
+                        "rhs": { "signal_name": "INCOMING_CONCURRENCY" },
+                      },
+                    "operator": "div",
+                    "out_ports": { "output": { "signal_name": "LSF" } },
+                  },
+              },
+              {
+                "arithmetic_combinator":
+                  {
+                    "in_ports":
+                      {
+                        "lhs": { "constant_value": "2.0" },
+                        "rhs": { "signal_name": "ACCEPTED_CONCURRENCY" },
+                      },
+                    "operator": "mul",
+                    "out_ports":
+                      {
+                        "output": { "signal_name": "UPPER_CONCURRENCY_LIMIT" },
+                      },
+                  },
+              },
+              {
+                "arithmetic_combinator":
+                  {
+                    "in_ports":
+                      {
+                        "lhs": { "signal_name": "LATENCY_EMA" },
+                        "rhs": { "constant_value": "1.1" },
+                      },
+                    "operator": "mul",
+                    "out_ports":
+                      { "output": { "signal_name": "LATENCY_OVERLOAD" } },
+                  },
+              },
+              {
+                "arithmetic_combinator":
+                  {
+                    "in_ports":
+                      {
+                        "lhs": { "constant_value": "5.0" },
+                        "rhs": { "signal_name": "SQRT_CONCURRENCY_INCREMENT" },
+                      },
+                    "operator": "add",
+                    "out_ports":
+                      {
+                        "output":
+                          {
+                            "signal_name": "CONCURRENCY_INCREMENT_SINGLE_TICK",
+                          },
+                      },
+                  },
+              },
+              {
+                "arithmetic_combinator":
+                  {
+                    "in_ports":
+                      {
+                        "lhs":
+                          {
+                            "signal_name": "CONCURRENCY_INCREMENT_SINGLE_TICK",
+                          },
+                        "rhs":
+                          { "signal_name": "CONCURRENCY_INCREMENT_FEEDBACK" },
+                      },
+                    "operator": "add",
+                    "out_ports":
+                      {
+                        "output":
+                          { "signal_name": "CONCURRENCY_INCREMENT_INTEGRAL" },
+                      },
+                  },
+              },
+              {
+                "min":
+                  {
+                    "in_ports":
+                      {
+                        "inputs":
+                          [
+                            { "signal_name": "CONCURRENCY_INCREMENT_INTEGRAL" },
+                            { "signal_name": "ACCEPTED_CONCURRENCY" },
+                          ],
+                      },
+                    "out_ports":
+                      {
+                        "output":
+                          { "signal_name": "CONCURRENCY_INCREMENT_NORMAL" },
+                      },
+                  },
+              },
+              {
+                "max":
+                  {
+                    "in_ports":
+                      {
+                        "inputs":
+                          [
+                            { "signal_name": "UPPER_CONCURRENCY_LIMIT" },
+                            { "constant_value": "10.0" },
+                          ],
+                      },
+                    "out_ports":
+                      { "output": { "signal_name": "MAX_CONCURRENCY" } },
+                  },
+              },
+              {
+                "sqrt":
+                  {
+                    "in_ports":
+                      { "input": { "signal_name": "ACCEPTED_CONCURRENCY" } },
+                    "out_ports":
+                      {
+                        "output":
+                          { "signal_name": "SQRT_CONCURRENCY_INCREMENT" },
+                      },
+                    "scale": "0.5",
+                  },
+              },
+              {
+                "promql":
+                  {
+                    "evaluation_interval": "1s",
+                    "out_ports": { "output": { "signal_name": "LATENCY" } },
+                    "query_string":
+                      'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED",
+                      response_status="OK",
+                      flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
+                      response_status="OK",
+                      flux_meter_name="service1-demo-app"}[5s]))',
+                  },
+              },
+              {
+                "ema":
+                  {
+                    "correction_factor_on_max_envelope_violation": "0.95",
+                    "ema_window": "1500s",
+                    "in_ports":
+                      {
+                        "input": { "signal_name": "LATENCY" },
+                        "max_envelope": { "signal_name": "MAX_EMA" },
+                      },
+                    "out_ports": { "output": { "signal_name": "LATENCY_EMA" } },
+                    "warm_up_window": "10s",
+                  },
+              },
+              {
+                "gradient_controller":
+                  {
+                    "in_ports":
+                      {
+                        "control_variable":
+                          { "signal_name": "ACCEPTED_CONCURRENCY" },
+                        "max": { "signal_name": "MAX_CONCURRENCY" },
+                        "optimize": { "signal_name": "CONCURRENCY_INCREMENT" },
+                        "setpoint": { "signal_name": "LATENCY_SETPOINT" },
+                        "signal": { "signal_name": "LATENCY" },
+                      },
+                    "max_gradient": "1.0",
+                    "min_gradient": "0.1",
+                    "out_ports":
+                      { "output": { "signal_name": "DESIRED_CONCURRENCY" } },
+                    "slope": "-1",
+                  },
+              },
+              {
+                "concurrency_limiter":
+                  {
+                    "load_shed_actuator":
+                      {
+                        "in_ports":
+                          { "load_shed_factor": { "signal_name": "LSF" } },
+                      },
+                    "scheduler":
+                      {
+                        "auto_tokens": true,
+                        "default_workload_parameters": { "priority": 20 },
+                        "out_ports":
+                          {
+                            "accepted_concurrency":
+                              { "signal_name": "ACCEPTED_CONCURRENCY" },
+                            "incoming_concurrency":
+                              { "signal_name": "INCOMING_CONCURRENCY" },
+                          },
+                        "selector":
+                          {
+                            "flow_selector":
+                              { "control_point": { "traffic": "ingress" } },
+                            "service_selector":
+                              {
+                                "agent_group": "default",
+                                "service": "service1-demo-app.demoapp.svc.cluster.local",
+                              },
+                          },
+                        "timeout_factor": "0.5",
+                        "workloads": [],
+                      },
+                  },
+              },
+              {
+                "decider":
+                  {
+                    "in_ports":
+                      {
+                        "lhs": { "signal_name": "LATENCY" },
+                        "rhs": { "signal_name": "LATENCY_OVERLOAD" },
+                      },
+                    "operator": "gt",
+                    "out_ports":
+                      { "output": { "signal_name": "IS_OVERLOAD_SWITCH" } },
+                  },
+              },
+              {
+                "switcher":
+                  {
+                    "in_ports":
+                      {
+                        "on_false":
+                          { "signal_name": "CONCURRENCY_INCREMENT_NORMAL" },
+                        "on_true": { "constant_value": "10.0" },
+                        "switch": { "signal_name": "IS_OVERLOAD_SWITCH" },
+                      },
+                    "out_ports":
+                      { "output": { "signal_name": "CONCURRENCY_INCREMENT" } },
+                  },
+              },
+              {
+                "switcher":
+                  {
+                    "in_ports":
+                      {
+                        "on_false":
+                          { "signal_name": "CONCURRENCY_INCREMENT_NORMAL" },
+                        "on_true": { "constant_value": 0 },
+                        "switch": { "signal_name": "IS_OVERLOAD_SWITCH" },
+                      },
+                    "out_ports":
+                      {
+                        "output":
+                          { "signal_name": "CONCURRENCY_INCREMENT_FEEDBACK" },
+                      },
+                  },
+              },
+            ],
+          "evaluation_interval": "0.5s",
+        },
+      "resources":
+        {
+          "classifiers": [],
+          "flux_meters":
+            {
+              "service1-demo-app":
+                {
+                  "selector":
+                    {
+                      "flow_selector":
+                        { "control_point": { "traffic": "ingress" } },
+                      "service_selector":
+                        {
+                          "agent_group": "default",
+                          "service": "service1-demo-app.demoapp.svc.cluster.local",
+                        },
+                    },
+                },
+            },
+        },
+    },
+}

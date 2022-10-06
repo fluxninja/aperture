@@ -37,6 +37,10 @@ for f in $files; do
 	mermaid_section_files=$(find tmp -type f -name "mermaid_section_*")
 	count=0
 	for mermaid_section_file in $mermaid_section_files; do
+		# skip this file if it contains "@include:"
+		if $GREP -q "@include:" "$mermaid_section_file"; then
+			continue
+		fi
 		# search for name in the comment - "%% name: <name>"
 		# if found, use the name as the mmd file name
 		name=$($GREP -P '^%% name: ' "$mermaid_section_file" | $SED -e 's/%% name: //')
@@ -56,3 +60,28 @@ for f in $files; do
 done
 
 rm -rf tmp
+
+# find all mmd files and generate svg and png files only when mmd contents change (using md5sum)
+
+# find all mmd files
+mmd_files=$(find "$docsdir"/content -type f -name "*.mmd")
+for mmd_file in $mmd_files; do
+	# generate svg and png files only when mmd contents change (using md5sum)
+	#shellcheck disable=SC2016
+	md5sum=$(md5sum "$mmd_file" | $AWK '{print $1}')
+	#shellcheck disable=SC2016
+	md5sum_file=$(cat "$mmd_file".md5sum 2>/dev/null)
+	if [ "$md5sum" != "$md5sum_file" ]; then
+		echo "generating svg and png files for $mmd_file"
+		# generate svg and png files
+		# loop formats svg and png
+		for fmt in svg png; do
+			npx -p @mermaid-js/mermaid-cli mmdc \
+				--quiet --input "$mmd_file" --configFile "$docsdir"/tools/mermaid/mermaid-theme.json --cssFile ./tools/mermaid/mermaid.css --scale 2 --output "$mmd_file"."$fmt" --backgroundColor transparent
+			git add "$mmd_file"."$fmt"
+		done
+		# update md5sum
+		echo "$md5sum" >"$mmd_file".md5sum
+		git add "$mmd_file".md5sum
+	fi
+done

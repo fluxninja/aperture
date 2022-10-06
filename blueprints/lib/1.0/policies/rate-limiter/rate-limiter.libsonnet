@@ -17,7 +17,6 @@ local defaults = {
 
 local policy = spec.v1.Policy;
 local component = spec.v1.Component;
-local constant = spec.v1.Constant;
 local rateLimiter = spec.v1.RateLimiter;
 local circuit = spec.v1.Circuit;
 local dynamicConfig = spec.v1.RateLimiterDynamicConfig;
