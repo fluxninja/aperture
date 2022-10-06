@@ -47,7 +47,9 @@ for f in $files; do
 		if [ -n "$name" ]; then
 			outfilename="$name.mmd"
 		else
-			outfilename=$(basename "$f")_$count.mmd
+			# only generate named mermaid files
+			continue
+			#outfilename=$(basename "$f")_$count.mmd
 		fi
 		# generate mmd
 		echo "generating $outfilename"
