@@ -150,15 +150,13 @@ def create_policies_yaml(output_path: Path, policies: Dict):
         LOG.info(f"Creating {dashboard_path}")
         dashboard_path.write_text(json.dumps(dashboard["dashboard"], indent=4))
 
-    for blueprint_name, blueprint in policies["policies"].items():
-        blueprint_path = output_path / "policies" / blueprint_name
-        if not blueprint_path.parent.exists():
-            blueprint_path.parent.mkdir()
+    for policy_name, policy in policies["policies"].items():
+        policy_path = output_path / "policies" / policy_name
+        if not policy_path.parent.exists():
+            policy_path.parent.mkdir()
 
-        LOG.info(f"Creating {blueprint_path}")
-        blueprint_path.write_text(yaml.dump(blueprint["policy"], default_flow_style=False))
-        #blueprint_path.write_text(json.dumps(blueprint, indent=4))
-
+        LOG.info(f"Creating {policy_path}")
+        policy_path.write_text(yaml.dump(policy, default_flow_style=False))
 
 @command_with_exit_code
 def main():

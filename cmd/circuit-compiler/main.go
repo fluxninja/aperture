@@ -10,6 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
+	"gopkg.in/yaml.v2"
 )
 
 func main() {
@@ -23,24 +24,82 @@ func main() {
 	// 2. Optional: --dot - path to dot file
 	fs := flag.NewFlagSet("circuit-compiler", flag.ExitOnError)
 	policy := fs.String("policy", "", "path to policy file")
+	cr := fs.String("cr", "", "path to policy custom resource file")
 	dot := fs.String("dot", "", "path to dot file")
 	mermaid := fs.String("mermaid", "", "path to mermaid file")
 
 	// parse flags
-	err := fs.Parse(os.Args[1:])
-	if err != nil {
-		log.Error().Err(err).Msg("failed to parse flags")
+	e := fs.Parse(os.Args[1:])
+	if e != nil {
+		log.Error().Err(e).Msg("failed to parse flags")
 		os.Exit(1)
 	}
 
-	// check if policy flag is set
-	if *policy == "" {
-		log.Error().Msg("policy flag is required")
+	// check if policy or cr is provided
+	if *policy == "" && *cr == "" || *policy != "" && *cr != "" {
+		log.Error().Msg("either --policy or --cr must be provided")
 		os.Exit(1)
 	}
-	policyFile := *policy
 
-	circuit, err := compile(policyFile)
+	var policyFile string
+
+	// check if cr is provided
+	if *cr != "" {
+		crPath := *cr
+		// extract spec key from CR and save it a temp file
+		// call compilePolicy with the temp file
+		// delete the temp file
+		crFile, err := os.ReadFile(crPath)
+		if err != nil {
+			log.Error().Err(err).Msg("failed to read CR file")
+			os.Exit(1)
+		}
+		// unmarshal yaml to map struct and extract spec key
+		var cr map[string]interface{}
+		err = yaml.Unmarshal(crFile, &cr)
+		if err != nil {
+			log.Error().Err(err).Msg("failed to unmarshal CR file")
+			os.Exit(1)
+		}
+		spec, ok := cr["spec"]
+		if !ok {
+			log.Error().Msg("failed to find spec key in CR file")
+			os.Exit(1)
+		}
+		// marshal spec to yaml
+		specYaml, err := yaml.Marshal(spec)
+		if err != nil {
+			log.Error().Err(err).Msg("failed to marshal spec key in CR file")
+			os.Exit(1)
+		}
+		// get filename from path
+		filename := filepath.Base(crPath)
+		// create temp file
+		tmpfile, err := os.CreateTemp("", filename)
+		if err != nil {
+			log.Error().Err(err).Msg("failed to create temp file")
+			os.Exit(1)
+		}
+		defer os.Remove(tmpfile.Name())
+		// write spec to temp file
+		_, err = tmpfile.Write(specYaml)
+		if err != nil {
+			log.Error().Err(err).Msg("failed to write to temp file")
+			os.Exit(1)
+		}
+		// close temp file
+		err = tmpfile.Close()
+		if err != nil {
+			log.Error().Err(err).Msg("failed to close temp file")
+			os.Exit(1)
+		}
+		// set policyFile to temp file
+		policyFile = tmpfile.Name()
+	} else {
+		policyFile = *policy
+	}
+
+	circuit, err := compilePolicy(policyFile)
 	if err != nil {
 		log.Error().Err(err).Msg("error reading policy spec")
 		os.Exit(1)
@@ -87,7 +146,7 @@ func main() {
 	}
 }
 
-func compile(path string) (controlplane.CompiledCircuit, error) {
+func compilePolicy(path string) (controlplane.CompiledCircuit, error) {
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err

@@ -108,23 +108,11 @@ local svcSelector =
                               + controlPoint.withTraffic('ingress'))
   );
 
-local policy = latencyGradientPolicy({
+local policyResource = latencyGradientPolicy({
   policyName: 'service1-demo-app',
   fluxMeter: fluxMeter.new() + fluxMeter.withSelector(svcSelector),
   concurrencyLimiterSelector: svcSelector,
-}).policy;
-
-local policyResource = {
-  kind: 'Policy',
-  apiVersion: 'fluxninja.com/v1alpha1',
-  metadata: {
-    name: 'service1-demo-app',
-    labels: {
-      'fluxninja.com/validate': 'true',
-    },
-  },
-  spec: policy,
-};
+}).policyResource;
 
 [
   policyResource,
