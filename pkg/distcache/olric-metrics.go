@@ -1,11 +1,11 @@
 package distcache
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/multierr"
 )
 
 // OlricMetrics holds metrics from Olric DMap statistics.
@@ -60,22 +60,43 @@ func (om *OlricMetrics) allMetrics() []prometheus.Collector {
 }
 
 func (om *OlricMetrics) registerMetrics(prometheusRegistry *prometheus.Registry) error {
+	var multiErr error
 	for _, m := range om.allMetrics() {
 		err := prometheusRegistry.Register(m)
 		if err != nil {
 			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-				return fmt.Errorf("unable to register Olric metrics: %w", err)
+				multiErr = multierr.Append(multiErr, err)
 			}
 		}
 	}
-	return nil
+	return multiErr
 }
 
 func (om *OlricMetrics) unregisterMetrics(prometheusRegistry *prometheus.Registry) error {
-	for _, m := range om.allMetrics() {
-		if !prometheusRegistry.Unregister(m) {
-			return errors.New("unable to unregister Olric Metrics")
-		}
+	var multiErr error
+	if !prometheusRegistry.Unregister(om.EntriesTotal) {
+		err := fmt.Errorf("failed to unregister %s metric", metrics.OlricEntriesTotalMetricName)
+		multiErr = multierr.Append(multiErr, err)
 	}
-	return nil
+	if !prometheusRegistry.Unregister(om.DeleteHits) {
+		err := fmt.Errorf("failed to unregister %s metric", metrics.OlricDeleteHitsMetricName)
+		multiErr = multierr.Append(multiErr, err)
+	}
+	if !prometheusRegistry.Unregister(om.DeleteMisses) {
+		err := fmt.Errorf("failed to unregister %s metric", metrics.OlricDeleteMissesMetricName)
+		multiErr = multierr.Append(multiErr, err)
+	}
+	if !prometheusRegistry.Unregister(om.GetMisses) {
+		err := fmt.Errorf("failed to unregister %s metric", metrics.OlricGetMissesMetricName)
+		multiErr = multierr.Append(multiErr, err)
+	}
+	if !prometheusRegistry.Unregister(om.GetHits) {
+		err := fmt.Errorf("failed to unregister %s metric", metrics.OlricGetHitsMetricName)
+		multiErr = multierr.Append(multiErr, err)
+	}
+	if !prometheusRegistry.Unregister(om.EvictedTotal) {
+		err := fmt.Errorf("failed to unregister %s metric", metrics.OlricEvictedTotalMetricName)
+		multiErr = multierr.Append(multiErr, err)
+	}
+	return multiErr
 }

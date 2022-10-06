@@ -13,6 +13,7 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
+	"go.uber.org/multierr"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
@@ -232,7 +233,11 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			_ = dc.Metrics.registerMetrics(in.PrometheusRegistry)
+			err := dc.Metrics.registerMetrics(in.PrometheusRegistry)
+			if err != nil {
+				return err
+			}
+
 			log.Info().Msg("Starting OTEL Collector")
 			panichandler.Go(func() {
 				err := dc.Olric.Start()
@@ -251,12 +256,17 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			_ = dc.Metrics.unregisterMetrics(in.PrometheusRegistry)
-			err := dc.Olric.Shutdown(ctx)
+			var multiErr error
+			err := dc.Metrics.unregisterMetrics(in.PrometheusRegistry)
 			if err != nil {
-				return err
+				multiErr = multierr.Append(multiErr, err)
 			}
-			return nil
+
+			err = dc.Olric.Shutdown(ctx)
+			if err != nil {
+				multiErr = multierr.Append(multiErr, err)
+			}
+			return multiErr
 		},
 	})
 
