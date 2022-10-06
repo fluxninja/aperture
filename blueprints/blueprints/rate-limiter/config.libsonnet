@@ -27,6 +27,7 @@
     * @param (policy.policyName: string required) An unique name for the policy created by this blueprint
     * @param (policy.evaluationInterval: string) How often should the policy be re-evaluated
     * @param (policy.rateLimit: string required) How many requests per `policy.limitResetInterval` to accept
+    * @param (policy.rateLimiterSelector: aperture.spec.v1.Selector required) A selector to match requests against
     * @param (policy.limitResetInterval: string) The window for `policy.rateLimit`
     * @param (policy.labelKey: string required) What flow label to use for rate limiting
     * @param (policy.overrides: []aperture.spec.v1.RateLimiterOverride) A list of overrides for the rate limiter
@@ -34,6 +35,7 @@
     policyName: error 'policy.policyName is required',
     evaluationInterval: '0.5s',
     rateLimit: error 'policy.rateLimit must be set',
+    rateLimiterSelector: error 'rateLimiterSelector must be set',
     limitResetInterval: '1s',
     labelKey: error 'policy.labelKey is required',
     overrides: [],
@@ -48,25 +50,6 @@
       */
       enabled: true,
       numSync: 5,
-    },
-    selector: {
-      /**
-      * @section Rate Limiter Policy
-      * @subsection Selector
-      *
-      * @param (policy.selector.serviceSelector.agentGroup: string) Which agents to install this policy on
-      * @param (policy.selector.serviceSelector.service: string required) A fully-qualified domain name of the service that this policy will apply to
-      * @param (policy.selector.flowSelector.controlPoint.traffic: string) Whether to control `ingress` or `egress` traffic
-      */
-      serviceSelector: {
-        agentGroup: 'default',
-        service: error 'policy.selector.serviceSelector.service is required',
-      },
-      flowSelector: {
-        controlPoint: {
-          traffic: 'ingress',
-        },
-      },
     },
   },
 }

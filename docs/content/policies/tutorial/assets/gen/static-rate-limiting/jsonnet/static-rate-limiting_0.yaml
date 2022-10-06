@@ -14,16 +14,9 @@
           "components":
             [
               {
-                "constant":
-                  {
-                    "out_ports": { "output": { "signal_name": "RATE_LIMIT" } },
-                    "value": "120",
-                  },
-              },
-              {
                 "rate_limiter":
                   {
-                    "in_ports": { "limit": { "signal_name": "RATE_LIMIT" } },
+                    "in_ports": { "limit": { "constant_value": 120 } },
                     "label_key": "http.request.header.user_id",
                     "limit_reset_interval": "60s",
                     "selector":

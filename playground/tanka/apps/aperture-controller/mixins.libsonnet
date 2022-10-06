@@ -16,7 +16,6 @@ local selector = aperture.spec.v1.Selector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local controlPoint = aperture.spec.v1.ControlPoint;
-local constant = aperture.spec.v1.Constant;
 local component = aperture.spec.v1.Component;
 local rateLimiter = aperture.spec.v1.RateLimiter;
 local decider = aperture.spec.v1.Decider;
@@ -134,29 +133,17 @@ local policy = latencyGradientPolicy({
   },
   components: [
     component.new()
-    + component.withConstant(
-      constant.new()
-      + constant.withValue(10)
-      + constant.withOutPorts({ output: port.withSignalName('RATE_LIMIT_NORMAL') })
-    ),
-    component.new()
-    + component.withConstant(
-      constant.new()
-      + constant.withValue(0.1)
-      + constant.withOutPorts({ output: port.withSignalName('LSF_THRESHOLD') })
-    ),
-    component.new()
     + component.withDecider(
       decider.new()
       + decider.withOperator('gt')
-      + decider.withInPorts({ lhs: port.withSignalName('LSF'), rhs: port.withSignalName('LSF_THRESHOLD') })
+      + decider.withInPorts({ lhs: port.withSignalName('LSF'), rhs: port.withConstantValue(0.1) })
       + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
       + decider.withTrueFor('30s')
     ),
     component.new()
     + component.withSwitcher(
       switcher.new()
-      + switcher.withInPorts({ switch: port.withSignalName('IS_BOT_ESCALATION'), on_true: port.withSignalName('ZERO'), on_false: port.withSignalName('RATE_LIMIT_NORMAL') })
+      + switcher.withInPorts({ switch: port.withSignalName('IS_BOT_ESCALATION'), on_true: port.withConstantValue(0.0), on_false: port.withConstantValue(10) })
       + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),
     component.new()

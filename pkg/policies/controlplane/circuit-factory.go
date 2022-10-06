@@ -191,14 +191,16 @@ func compileCircuit(
 			// Mark looped signals in InPortToSignalsMap
 			for _, signals := range removeToComp.InPortToSignalsMap {
 				for idx, signal := range signals {
-					outFromCompID, ok := outSignals[signal.Name]
-					if !ok {
-						return nil, fx.Options(), fmt.Errorf("unexpected state: signal %s is not defined in outSignals", signal.Name)
-					}
-					if outFromCompID == removeFromCompIndex {
-						// Mark signal as looped
-						signals[idx].Looped = true
-						loopedSignals[signal.Name] = true
+					if signal.SignalType == runtime.SignalTypeNamed {
+						outFromCompID, ok := outSignals[signal.Name]
+						if !ok {
+							return nil, fx.Options(), fmt.Errorf("unexpected state: signal %s is not defined in outSignals", signal.Name)
+						}
+						if outFromCompID == removeFromCompIndex {
+							// Mark signal as looped
+							signals[idx].Looped = true
+							loopedSignals[signal.Name] = true
+						}
 					}
 				}
 			}
@@ -248,17 +250,23 @@ func getPortSignals(portMapping map[string]interface{}, inSignals map[string][]i
 		// Read signal_name
 		signalName, ok := portSpec["signal_name"]
 		if ok {
-			signalNameStr, ok := signalName.(string)
-			if ok {
+			signalNameStr, okCast := signalName.(string)
+			if okCast {
 				// Fill portSignals
-				portSignals[idx] = runtime.Signal{
-					Name:   signalNameStr,
-					Looped: false,
-				}
+				portSignals[idx] = runtime.MakeSignal(runtime.SignalTypeNamed, signalNameStr, 0.0, false)
 				// Return signalNameStr and true since signal_name is present
 				return signalNameStr, true
 			}
 		}
+		constantValue, ok := portSpec["constant_value"]
+		if ok {
+			constantValueFloat, okCast := constantValue.(float64)
+			if okCast {
+				// Fill portSignals
+				portSignals[idx] = runtime.MakeSignal(runtime.SignalTypeConstant, "", constantValueFloat, false)
+			}
+		}
+
 		// Return empty string and false since signal_name is not present
 		return "", false
 	}
@@ -294,8 +302,8 @@ func getPortSignals(portMapping map[string]interface{}, inSignals map[string][]i
 			for idx, innerPortSpec := range portList {
 				innerPortSpec, isMapStruct := innerPortSpec.(map[string]interface{})
 				if isMapStruct {
-					signalName, filled := fillSignal(innerPortSpec, portSignals, idx)
-					if filled {
+					signalName, signalNameFound := fillSignal(innerPortSpec, portSignals, idx)
+					if signalNameFound {
 						err := fillInOutSignals(signalName, inSignals, outSignals, sigType, graphNodeIndex)
 						if err != nil {
 							return nil, err
@@ -307,8 +315,8 @@ func getPortSignals(portMapping map[string]interface{}, inSignals map[string][]i
 			// Initialize portMapping for this port
 			portSignals := make([]runtime.Signal, 1)
 			portToSignalMapping[port] = portSignals
-			signalName, filled := fillSignal(portSpec, portSignals, 0)
-			if filled {
+			signalName, signalNameFound := fillSignal(portSpec, portSignals, 0)
+			if signalNameFound {
 				err := fillInOutSignals(signalName, inSignals, outSignals, sigType, graphNodeIndex)
 				if err != nil {
 					return nil, err

@@ -14,75 +14,12 @@
           "components":
             [
               {
-                "constant":
-                  {
-                    "out_ports":
-                      { "output": { "signal_name": "EMA_LIMIT_MULTIPLIER" } },
-                    "value": "2.0",
-                  },
-              },
-              {
-                "constant":
-                  {
-                    "out_ports":
-                      {
-                        "output":
-                          { "signal_name": "CONCURRENCY_LIMIT_MULTIPLIER" },
-                      },
-                    "value": "2.0",
-                  },
-              },
-              {
-                "constant":
-                  {
-                    "out_ports":
-                      { "output": { "signal_name": "MIN_CONCURRENCY" } },
-                    "value": "10.0",
-                  },
-              },
-              {
-                "constant":
-                  {
-                    "out_ports":
-                      {
-                        "output":
-                          { "signal_name": "LINEAR_CONCURRENCY_INCREMENT" },
-                      },
-                    "value": "5.0",
-                  },
-              },
-              {
-                "constant":
-                  {
-                    "out_ports":
-                      {
-                        "output":
-                          { "signal_name": "CONCURRENCY_INCREMENT_OVERLOAD" },
-                      },
-                    "value": "10.0",
-                  },
-              },
-              {
-                "constant":
-                  {
-                    "out_ports": { "output": { "signal_name": "TOLERANCE" } },
-                    "value": "1.1",
-                  },
-              },
-              {
-                "constant":
-                  {
-                    "out_ports": { "output": { "signal_name": "ZERO" } },
-                    "value": 0,
-                  },
-              },
-              {
                 "arithmetic_combinator":
                   {
                     "in_ports":
                       {
                         "lhs": { "signal_name": "LATENCY" },
-                        "rhs": { "signal_name": "EMA_LIMIT_MULTIPLIER" },
+                        "rhs": { "constant_value": "2.0" },
                       },
                     "operator": "mul",
                     "out_ports": { "output": { "signal_name": "MAX_EMA" } },
@@ -94,7 +31,7 @@
                     "in_ports":
                       {
                         "lhs": { "signal_name": "LATENCY_EMA" },
-                        "rhs": { "signal_name": "TOLERANCE" },
+                        "rhs": { "constant_value": "1.1" },
                       },
                     "operator": "mul",
                     "out_ports":
@@ -131,8 +68,7 @@
                   {
                     "in_ports":
                       {
-                        "lhs":
-                          { "signal_name": "CONCURRENCY_LIMIT_MULTIPLIER" },
+                        "lhs": { "constant_value": "2.0" },
                         "rhs": { "signal_name": "ACCEPTED_CONCURRENCY" },
                       },
                     "operator": "mul",
@@ -148,7 +84,7 @@
                     "in_ports":
                       {
                         "lhs": { "signal_name": "LATENCY_EMA" },
-                        "rhs": { "signal_name": "TOLERANCE" },
+                        "rhs": { "constant_value": "1.1" },
                       },
                     "operator": "mul",
                     "out_ports":
@@ -160,8 +96,7 @@
                   {
                     "in_ports":
                       {
-                        "lhs":
-                          { "signal_name": "LINEAR_CONCURRENCY_INCREMENT" },
+                        "lhs": { "constant_value": "5.0" },
                         "rhs": { "signal_name": "SQRT_CONCURRENCY_INCREMENT" },
                       },
                     "operator": "add",
@@ -220,7 +155,7 @@
                         "inputs":
                           [
                             { "signal_name": "UPPER_CONCURRENCY_LIMIT" },
-                            { "signal_name": "MIN_CONCURRENCY" },
+                            { "constant_value": "10.0" },
                           ],
                       },
                     "out_ports":
@@ -340,8 +275,7 @@
                       {
                         "on_false":
                           { "signal_name": "CONCURRENCY_INCREMENT_NORMAL" },
-                        "on_true":
-                          { "signal_name": "CONCURRENCY_INCREMENT_OVERLOAD" },
+                        "on_true": { "constant_value": "10.0" },
                         "switch": { "signal_name": "IS_OVERLOAD_SWITCH" },
                       },
                     "out_ports":
@@ -355,7 +289,7 @@
                       {
                         "on_false":
                           { "signal_name": "CONCURRENCY_INCREMENT_NORMAL" },
-                        "on_true": { "signal_name": "ZERO" },
+                        "on_true": { "constant_value": 0 },
                         "switch": { "signal_name": "IS_OVERLOAD_SWITCH" },
                       },
                     "out_ports":

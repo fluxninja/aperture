@@ -274,11 +274,11 @@ definitions:
       lhs:
         description: Left hand side of the arithmetic operation.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       rhs:
         description: Right hand side of the arithmetic operation.
         x-order: 1
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
   v1ArithmeticCombinatorOuts:
     description: Outputs for the Arithmetic Combinator component.
     type: object
@@ -286,7 +286,7 @@ definitions:
       output:
         description: Result of arithmetic operation.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
   v1Circuit:
     description: |-
       :::info
@@ -397,7 +397,10 @@ definitions:
 
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
-      You can use the [Constant](#v1-constant) component for this.
+      You can create an input port containing the constant value instead of being connected to a signal.
+      To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+      If You need to provide the same constant signal to multiple components,
+      You can use the [Constant](#v1-constant) component.
       :::
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -440,7 +443,7 @@ definitions:
         x-order: 6
         $ref: '#/definitions/v1GradientController'
       max:
-        description: Emits the maximum of the input siganls.
+        description: Emits the maximum of the input signals.
         x-order: 7
         $ref: '#/definitions/v1Max'
       min:
@@ -473,7 +476,7 @@ definitions:
       :::
 
       It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-      Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+      Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
 
       ConcurrencyLimiter configuration is split into two parts: An actuation
       strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
@@ -517,7 +520,7 @@ definitions:
       output:
         description: The constant value is emitted to the output port.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
   v1ControlPoint:
     description: |-
       Identifies control point within a service that the rule or policy should apply to.
@@ -592,11 +595,11 @@ definitions:
       lhs:
         description: Left hand side input signal for the comparison operation.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       rhs:
         description: Right hand side input signal for the comparison operation.
         x-order: 1
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
   v1DeciderOuts:
     description: Outputs for the Decider component.
     type: object
@@ -604,7 +607,7 @@ definitions:
       output:
         description: Selected signal (1.0 or 0.0).
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
   v1EMA:
     description: |-
       At any time EMA component operates in one of the following states:
@@ -630,10 +633,10 @@ definitions:
       \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
       $$
 
-      The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
+      The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#v1-e-m-a-ins).
     type: object
     title: Exponential Moving Average (EMA) is a type of moving average that applies
-      exponenially more weight to recent signal readings
+      exponentially more weight to recent signal readings
     properties:
       correction_factor_on_max_envelope_violation:
         description: Correction factor to apply on the output value if its in violation
@@ -679,7 +682,7 @@ definitions:
       input:
         description: Input signal to be used for the EMA computation.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       max_envelope:
         description: |-
           Upper bound of the moving average.
@@ -696,14 +699,14 @@ definitions:
           The envelope logic is **not** used outside the warm-up stage!
           :::
         x-order: 1
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       min_envelope:
         description: |-
           Lower bound of the moving average.
 
           Used during the warm-up stage analogously to `max_envelope`.
         x-order: 2
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
   v1EMAOuts:
     description: Outputs for the EMA component.
     type: object
@@ -712,7 +715,7 @@ definitions:
         description: Exponential moving average of the series of reading as an output
           signal.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
   v1EqualsMatchExpression:
     description: Label selector expression of the equal form "label == value".
     type: object
@@ -796,7 +799,7 @@ definitions:
       input:
         description: Input signal for the Extrapolator component.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
   v1ExtrapolatorOuts:
     description: Outputs for the Extrapolator component.
     type: object
@@ -804,7 +807,7 @@ definitions:
       output:
         description: Extrapolated signal.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
   v1FlowSelector:
     description: |-
       :::info
@@ -1020,27 +1023,27 @@ definitions:
 
           This signal is multiplied by the gradient to produce the output.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       max:
         description: Maximum value to limit the output signal.
         x-order: 1
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       min:
         description: Minimum value to limit the output signal.
         x-order: 2
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       optimize:
         description: Optimize signal is added to the output of the gradient calculation.
         x-order: 3
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       setpoint:
         description: Setpoint to be used for the gradient computation.
         x-order: 4
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       signal:
         description: Signal to be used for the gradient computation.
         x-order: 5
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
   v1GradientControllerOuts:
     description: Outputs for the Gradient Controller component.
     type: object
@@ -1048,7 +1051,20 @@ definitions:
       output:
         description: Computed desired value of the control variable.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
+  v1InPort:
+    type: object
+    title: Components receive input from other components via InPorts
+    properties:
+      constant_value:
+        description: Constant value to be used for this InPort instead of a signal.
+        type: number
+        format: double
+        x-order: 0
+      signal_name:
+        description: Name of the incoming Signal on the InPort.
+        type: string
+        x-order: 1
   v1JSONExtractor:
     description: |-
       Example:
@@ -1183,7 +1199,7 @@ definitions:
           Load shedding factor is a fraction of [incoming
           concurrency](#v1-scheduler-outs) that needs to be dropped.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
   v1MatchExpression:
     description: |-
       MatchExpression has multiple variants, exactly one should be set.
@@ -1260,7 +1276,7 @@ definitions:
         description: Array of input signals.
         type: array
         items:
-          $ref: '#/definitions/v1Port'
+          $ref: '#/definitions/v1InPort'
         x-order: 0
   v1MaxOuts:
     description: Output for the Max component.
@@ -1269,7 +1285,7 @@ definitions:
       output:
         description: Signal with maximum value as an output signal.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
   v1Min:
     description: |-
       Takes an array of input signals and emits the signal with the minimum value
@@ -1292,7 +1308,7 @@ definitions:
         description: Array of input signals.
         type: array
         items:
-          $ref: '#/definitions/v1Port'
+          $ref: '#/definitions/v1InPort'
         x-order: 0
   v1MinOuts:
     description: Output ports for the Min component.
@@ -1301,7 +1317,15 @@ definitions:
       output:
         description: Signal with minimum value as an output signal.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
+  v1OutPort:
+    type: object
+    title: Components produce output for other components via OutPorts
+    properties:
+      signal_name:
+        description: Name of the outgoing Signal on the OutPort.
+        type: string
+        x-order: 0
   v1PathTemplateMatcher:
     description: |-
       HTTP path will be matched against given path templates.
@@ -1357,14 +1381,6 @@ definitions:
         description: Resources (FluxMeters, Classifiers etc.) to setup.
         x-order: 1
         $ref: '#/definitions/v1Resources'
-  v1Port:
-    type: object
-    title: Components are interconnected with each other via Ports
-    properties:
-      signal_name:
-        description: Name of the incoming or outgoing Signal on the Port.
-        type: string
-        x-order: 0
   v1PromQL:
     type: object
     title: Component that runs a Prometheus query periodically and returns the result
@@ -1397,7 +1413,7 @@ definitions:
       output:
         description: The result of the Prometheus query as an output signal.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
   v1RateLimiter:
     description: |-
       :::info
@@ -1461,7 +1477,7 @@ definitions:
           :::
         x-go-validate: required
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
   v1Resources:
     description: |-
       :::info
@@ -1666,14 +1682,14 @@ definitions:
 
           Value of this signal is the sum across all the relevant schedulers.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
       incoming_concurrency:
         description: |-
           Incoming concurrency is the number of incoming tokens/sec.
           This is the same as `accepted_concurrency`, but across all the flows
           entering scheduler, including rejected ones.
         x-order: 1
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
   v1Selector:
     description: |-
       :::info
@@ -1756,7 +1772,7 @@ definitions:
       input:
         description: Input signal.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
   v1SqrtOuts:
     description: Outputs for the Sqrt component.
     type: object
@@ -1764,7 +1780,7 @@ definitions:
       output:
         description: Output signal.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
   v1Switcher:
     description: |-
       `on_true` will be returned if switch input is valid and not equal to 0.0 ,
@@ -1788,15 +1804,15 @@ definitions:
       on_false:
         description: Output signal when switch is invalid or 0.0.
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       on_true:
         description: Output signal when switch is valid and not 0.0.
         x-order: 1
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
       switch:
         description: Decides whether to return on_true or on_false.
         x-order: 2
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
   v1SwitcherOuts:
     description: Outputs for the Switcher component.
     type: object
@@ -1804,7 +1820,7 @@ definitions:
       output:
         description: Selected signal (on_true or on_false).
         x-order: 0
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
 tags:
 - name: EntityCacheService
 - name: InfoService
