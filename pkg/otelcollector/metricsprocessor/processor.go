@@ -421,7 +421,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 }
 
 /*
- * IncludeList: This IncludeList is applied to logs and spans at the beginning of enrichment process.
+ * IncludeList: This IncludeList is applied to logs and spans at during the enrichment process, after check response based labels are attached and metrics have been parsed.
  */
 var (
 	_includeAttributesCommon = []string{
