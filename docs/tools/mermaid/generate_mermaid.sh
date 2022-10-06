@@ -25,7 +25,6 @@ for f in $files; do
 	filename=$(basename "$f")
 	filenameNoExt="${filename%.*}"
 	out_dir="$dir"/assets/gen/"$filenameNoExt"
-	mkdir -p "$out_dir"
 	rm -f "$out_dir"/*.mmd
 	# extract all mermaid multiline sections that start with ```mermaid and end with ``` into an array of sections
 	#shellcheck disable=SC2002,SC2016
@@ -41,6 +40,12 @@ for f in $files; do
 		if $GREP -q "@include:" "$mermaid_section_file"; then
 			continue
 		fi
+
+		# mkdir -p "$out_dir" if it doesn't exist
+		if [ ! -d "$out_dir" ]; then
+			mkdir -p "$out_dir"
+		fi
+
 		# search for name in the comment - "%% name: <name>"
 		# if found, use the name as the mmd file name
 		name=$($GREP -P '^%% name: ' "$mermaid_section_file" | $SED -e 's/%% name: //')

@@ -22,7 +22,6 @@ for f in $files; do
 	filename=$(basename "$f")
 	filenameNoExt="${filename%.*}"
 	out_dir="$dir"/assets/gen/"$filenameNoExt"/jsonnet
-	mkdir -p "$out_dir"
 	rm -rf "$out_dir"/*.jsonnet || true
 
 	#shellcheck disable=SC2002,SC2016
@@ -38,6 +37,11 @@ for f in $files; do
 		# ignore if the jsonnet file contains "@include:"
 		if $GREP -qP '@include:' "$jsonnet_section_file"; then
 			continue
+		fi
+
+		# mkdir -p "$out_dir" if it doesn't exist
+		if [ ! -d "$out_dir" ]; then
+			mkdir -p "$out_dir"
 		fi
 
 		jsonnetfilepath="$out_dir"/"$filenameNoExt"_"$count".jsonnet
