@@ -21,7 +21,7 @@ const (
 
 	// Olric DMaps metrics.
 
-	// OlricEntriesTotalMetricName - metric for the total number of entries stored during the life of this instance.
+	// OlricEntriesTotalMetricName - metric for the total number of entries (including replicas) stored during the life of this instance.
 	OlricEntriesTotalMetricName = "olric_entries_total"
 	// OlricDeleteHitsMetricName - metric for number of deletion requests resulting in an item being removed.
 	OlricDeleteHitsMetricName = "olric_delete_hits"
@@ -72,6 +72,10 @@ const (
 
 	// PROMETHEUS LABELS.
 
+	// OlricMemberIDLabel - label specifying unique identifier of the node in the cluster.
+	OlricMemberIDLabel = "olric_member_id"
+	// OlricMemberNameLabel - label specifying name of the node in the cluster.
+	OlricMemberNameLabel = "olric_member_name"
 	// PolicyNameLabel - label used in prometheus.
 	PolicyNameLabel = "policy_name"
 	// PolicyHashLabel - label used in prometheus.

@@ -10,40 +10,41 @@ import (
 
 // OlricMetrics holds metrics from Olric DMap statistics.
 type OlricMetrics struct {
-	EntriesTotal prometheus.Gauge
-	DeleteHits   prometheus.Gauge
-	DeleteMisses prometheus.Gauge
-	GetMisses    prometheus.Gauge
-	GetHits      prometheus.Gauge
-	EvictedTotal prometheus.Gauge
+	EntriesTotal *prometheus.GaugeVec
+	DeleteHits   *prometheus.GaugeVec
+	DeleteMisses *prometheus.GaugeVec
+	GetMisses    *prometheus.GaugeVec
+	GetHits      *prometheus.GaugeVec
+	EvictedTotal *prometheus.GaugeVec
 }
 
 func newOlricMetrics() *OlricMetrics {
+	olricMetricsLabels := []string{metrics.OlricMemberIDLabel, metrics.OlricMemberNameLabel}
 	return &OlricMetrics{
-		EntriesTotal: prometheus.NewGauge(prometheus.GaugeOpts{
+		EntriesTotal: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: metrics.OlricEntriesTotalMetricName,
 			Help: "Total number of entries in the DMap.",
-		}),
-		DeleteHits: prometheus.NewGauge(prometheus.GaugeOpts{
+		}, olricMetricsLabels),
+		DeleteHits: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: metrics.OlricDeleteHitsMetricName,
-			Help: "Number of entries deleted from the DMap.",
-		}),
-		DeleteMisses: prometheus.NewGauge(prometheus.GaugeOpts{
+			Help: "Number of deletion requests resulting in an item being removed in the DMap.",
+		}, olricMetricsLabels),
+		DeleteMisses: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: metrics.OlricDeleteMissesMetricName,
-			Help: "Number of entries not deleted from the DMap.",
-		}),
-		GetMisses: prometheus.NewGauge(prometheus.GaugeOpts{
+			Help: "Number of deletion requests for missing keys in the DMap.",
+		}, olricMetricsLabels),
+		GetMisses: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: metrics.OlricGetMissesMetricName,
-			Help: "Number of entries not found in the DMap.",
-		}),
-		GetHits: prometheus.NewGauge(prometheus.GaugeOpts{
+			Help: "Number of entries that have been requested and not found in the DMap.",
+		}, olricMetricsLabels),
+		GetHits: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: metrics.OlricGetHitsMetricName,
-			Help: "Number of entries found in the DMap.",
-		}),
-		EvictedTotal: prometheus.NewGauge(prometheus.GaugeOpts{
+			Help: "Number of entries that have been requested and found present in the DMap.",
+		}, olricMetricsLabels),
+		EvictedTotal: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: metrics.OlricEvictedTotalMetricName,
-			Help: "Total number of evicted entries in the DMap.",
-		}),
+			Help: "Total number of entries removed from cache to free memory for new entries in the DMap.",
+		}, olricMetricsLabels),
 	}
 }
 
