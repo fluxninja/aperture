@@ -37,6 +37,10 @@ for f in $files; do
 	mermaid_section_files=$(find tmp -type f -name "mermaid_section_*")
 	count=0
 	for mermaid_section_file in $mermaid_section_files; do
+		# skip this file if it contains "@include:"
+		if $GREP -q "@include:" "$mermaid_section_file"; then
+			continue
+		fi
 		# search for name in the comment - "%% name: <name>"
 		# if found, use the name as the mmd file name
 		name=$($GREP -P '^%% name: ' "$mermaid_section_file" | $SED -e 's/%% name: //')

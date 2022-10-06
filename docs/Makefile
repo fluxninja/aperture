@@ -69,12 +69,12 @@ generate-mmd:
 	@echo generating mermaid files from markdown files
 	@./tools/mermaid/md_to_mmd.sh
 
-validate-jsonnet:
-	@echo validating jsonnet files
-	@./tools/scripts/validate-jsonnet.sh
+generate-jsonnet:
+	@echo generate jsonnet
+	@./tools/scripts/generate_jsonnet.sh
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
-generate-mermaid: generate-mmd
+generate-mermaid: generate-mmd generate-jsonnet
 	@echo generating mermaid diagrams
 	@parallel --no-notice --gnu --halt soon,fail=1 --line-buffer --tagstring {} \
 		$(MAKE) --no-print-directory -B {}.svg ::: $(shell find . -name '*.mmd' -print)
@@ -93,4 +93,4 @@ generate-mermaid: generate-mmd
 		do convert $<.$$fmt -trim $<.$$fmt; \
 	done
 
-.PHONY: generate-config-markdown generate-mermaid generate-mmd validate-jsonnet
+.PHONY: generate-config-markdown generate-mermaid generate-mmd generate-jsonnet

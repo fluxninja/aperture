@@ -110,13 +110,6 @@ repos:
         files: '\.proto$|\.go$'
         pass_filenames: false
         description: "Generate config markdown"
-      # - id: generate-mermaid
-      #   name: "Mermaid Diagrams"
-      #   entry: "./scripts/precommit/generate_mermaid.sh"
-      #   language: script
-      #   files: '\.md$|\.mmd$'
-      #   pass_filenames: false
-      #   description: "Generate mermaid diagrams"
       - id: generate-blueprints
         name: "blueprints"
         entry: "./scripts/precommit/generate_blueprints.sh"
@@ -124,13 +117,20 @@ repos:
         files: ^(blueprints)|\.proto$|^requirements.txt$
         pass_filenames: false
         description: "Generate Aperture libsonnet and blueprints"
-      - id: validate-jsonnet-examples
+      - id: generate-jsonnet-examples
         name: "jsonnet examples in docs"
-        entry: "./docs/tools/scripts/validate_jsonnet.sh"
+        entry: "./docs/tools/scripts/generate_jsonnet.sh"
         language: script
         files: ^(blueprints|docs)
         pass_filenames: false
-        description: "Validate jsonnet examples"
+        description: "Generate jsonnet examples"
+      # - id: generate-mermaid
+      #   name: "Mermaid Diagrams"
+      #   entry: "./scripts/precommit/generate_mermaid.sh"
+      #   language: script
+      #   files: '\.md$|\.mmd$'
+      #   pass_filenames: false
+      #   description: "Generate mermaid diagrams"
       - id: tanka-show
         name: "Check tanka parses jsonnet"
         language: script

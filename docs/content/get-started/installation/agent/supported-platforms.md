@@ -9,7 +9,7 @@ keywords:
 sidebar_position: 4
 ---
 
-Below are the platforms supported for the Aperture Agent and Controller:
+Below are the platforms supported for the Aperture Agent:
 
 | Platform   | Extent of Support                                                     |
 | ---------- | --------------------------------------------------------------------- |

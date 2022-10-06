@@ -1,0 +1,139 @@
+flowchart LR
+0output((2.00))
+1output((2.00))
+2output((10.00))
+3output((5.00))
+4output((10.00))
+5output((1.10))
+6output((0.00))
+subgraph 7[ArithmeticCombinator]
+7lhs[lhs]
+7rhs[rhs]
+7output[output]
+end
+subgraph 8[ArithmeticCombinator]
+8lhs[lhs]
+8rhs[rhs]
+8output[output]
+end
+subgraph 9[ArithmeticCombinator]
+9rhs[rhs]
+9lhs[lhs]
+9output[output]
+end
+subgraph 10[ArithmeticCombinator]
+10rhs[rhs]
+10lhs[lhs]
+10output[output]
+end
+subgraph 11[ArithmeticCombinator]
+11lhs[lhs]
+11rhs[rhs]
+11output[output]
+end
+subgraph 12[ArithmeticCombinator]
+12lhs[lhs]
+12rhs[rhs]
+12output[output]
+end
+subgraph 13[ArithmeticCombinator]
+13lhs[lhs]
+13rhs[rhs]
+13output[output]
+end
+subgraph 14[ArithmeticCombinator]
+14rhs[rhs]
+14lhs[lhs]
+14output[output]
+end
+subgraph 15[Min]
+15inputs[inputs]
+15inputs[inputs]
+15output[output]
+end
+subgraph 16[Max]
+16inputs[inputs]
+16inputs[inputs]
+16output[output]
+end
+subgraph 17[Sqrt]
+17input[input]
+17output[output]
+end
+subgraph 18[PromQL]
+18output[output]
+end
+subgraph 19[EMA]
+19input[input]
+19max_envelope[max_envelope]
+19output[output]
+end
+subgraph 20[Gradient]
+20max[max]
+20control_variable[control_variable]
+20signal[signal]
+20setpoint[setpoint]
+20optimize[optimize]
+20output[output]
+end
+subgraph 21.Scheduler[ConcurrencyLimiter/Scheduler]
+21.Scheduleraccepted_concurrency[accepted_concurrency]
+21.Schedulerincoming_concurrency[incoming_concurrency]
+end
+subgraph 21.LoadShedActuator[ConcurrencyLimiter/LoadShedActuator]
+21.LoadShedActuatorload_shed_factor[load_shed_factor]
+end
+subgraph 24[Switcher]
+24on_true[on_true]
+24on_false[on_false]
+24switch[switch]
+24output[output]
+end
+subgraph 23[Switcher]
+23on_false[on_false]
+23switch[switch]
+23on_true[on_true]
+23output[output]
+end
+subgraph 22[Decider]
+22rhs[rhs]
+22lhs[lhs]
+22output[output]
+end
+10output --> |LSF| 21.LoadShedActuatorload_shed_factor
+13output --> |CONCURRENCY_INCREMENT_SINGLE_TICK| 14lhs
+18output --> |LATENCY| 7lhs
+18output --> |LATENCY| 19input
+18output --> |LATENCY| 20signal
+18output --> |LATENCY| 22lhs
+20output --> |DESIRED_CONCURRENCY| 9rhs
+23output --> |CONCURRENCY_INCREMENT| 20optimize
+2output --> |MIN_CONCURRENCY| 16inputs
+5output --> |TOLERANCE| 8rhs
+5output --> |TOLERANCE| 12rhs
+6output --> |ZERO| 24on_true
+9output --> |DELTA_CONCURRENCY| 10lhs
+12output --> |LATENCY_OVERLOAD| 22rhs
+16output --> |MAX_CONCURRENCY| 20max
+22output --> |IS_OVERLOAD_SWITCH| 23switch
+22output --> |IS_OVERLOAD_SWITCH| 24switch
+0output --> |EMA_LIMIT_MULTIPLIER| 7rhs
+3output --> |LINEAR_CONCURRENCY_INCREMENT| 13lhs
+11output --> |UPPER_CONCURRENCY_LIMIT| 16inputs
+17output --> |SQRT_CONCURRENCY_INCREMENT| 13rhs
+19output --> |LATENCY_EMA| 8lhs
+19output --> |LATENCY_EMA| 12lhs
+21.Schedulerincoming_concurrency --> |INCOMING_CONCURRENCY| 9lhs
+21.Schedulerincoming_concurrency --> |INCOMING_CONCURRENCY| 10rhs
+1output --> |CONCURRENCY_LIMIT_MULTIPLIER| 11lhs
+7output --> |MAX_EMA| 19max_envelope
+8output --> |LATENCY_SETPOINT| 20setpoint
+14output --> |CONCURRENCY_INCREMENT_INTEGRAL| 15inputs
+15output --> |CONCURRENCY_INCREMENT_NORMAL| 23on_false
+15output --> |CONCURRENCY_INCREMENT_NORMAL| 24on_false
+21.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 11rhs
+21.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 15inputs
+21.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 17input
+21.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 20control_variable
+24output --> |CONCURRENCY_INCREMENT_FEEDBACK| 14rhs
+4output --> |CONCURRENCY_INCREMENT_OVERLOAD| 23on_true
