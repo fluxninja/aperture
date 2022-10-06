@@ -337,6 +337,7 @@ func (p *metricsProcessor) updateMetrics(
 				p.updateMetricsForWorkload(limiterID, labels, latency)
 			}
 
+			// Update rate limiter metrics
 			if rl := decision.GetRateLimiterInfo(); rl != nil {
 				p.updateMetricsForRateLimiter(limiterID)
 			}
@@ -357,6 +358,18 @@ func (p *metricsProcessor) updateMetrics(
 		}
 		for _, fluxMeter := range checkResponse.FluxMeterInfos {
 			p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, attributes, treatAsZero)
+		}
+	}
+
+	if len(checkResponse.ClassifierInfos) > 0 {
+		// Update classifier metrics
+		for _, classifierInfo := range checkResponse.ClassifierInfos {
+			classifierID := iface.ClassifierID{
+				PolicyName:      classifierInfo.PolicyName,
+				PolicyHash:      classifierInfo.PolicyHash,
+				ClassifierIndex: classifierInfo.ClassifierIndex,
+			}
+			p.updateMetricsForClassifier(classifierID)
 		}
 	}
 }
@@ -388,6 +401,24 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 		return
 	}
 	counter := limiter.GetCounter()
+	if counter != nil {
+		counter.Inc()
+	}
+}
+
+func (p *metricsProcessor) updateMetricsForClassifier(classifierID iface.ClassifierID) {
+	classifier, err := p.cfg.classificationEngine.GetClassifier(classifierID)
+	if err != nil {
+		log.Sample(zerolog.Sometimes).Warn().
+			Err(err).
+			Str(metrics.PolicyNameLabel, classifierID.PolicyName).
+			Str(metrics.PolicyHashLabel, classifierID.PolicyHash).
+			Int64(metrics.ClassifierIndexLabel, classifierID.ClassifierIndex).
+			Msg("Classifier not found")
+		return
+	}
+
+	counter := classifier.GetCounter()
 	if counter != nil {
 		counter.Inc()
 	}

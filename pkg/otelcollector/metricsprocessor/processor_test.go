@@ -23,32 +23,38 @@ import (
 
 var _ = Describe("Metrics Processor", func() {
 	var (
-		pr              *prometheus.Registry
-		cfg             *Config
-		processor       *metricsProcessor
-		engine          *mocks.MockEngine
-		conLimiter      *mocks.MockConcurrencyLimiter
-		rateLimiter     *mocks.MockRateLimiter
-		summaryVec      *prometheus.SummaryVec
-		rateCounter     prometheus.Counter
-		baseCheckResp   *flowcontrolv1.CheckResponse
-		labelsFoo1      map[string]string
-		labelsFizz1     map[string]string
-		labelsFizz2     map[string]string
-		expectedLabels  map[string]interface{}
-		expectedMetrics string
+		pr                *prometheus.Registry
+		cfg               *Config
+		processor         *metricsProcessor
+		engine            *mocks.MockEngine
+		clasEngine        *mocks.MockClassificationEngine
+		conLimiter        *mocks.MockConcurrencyLimiter
+		rateLimiter       *mocks.MockRateLimiter
+		classifier        *mocks.MockClassifier
+		summaryVec        *prometheus.SummaryVec
+		rateCounter       prometheus.Counter
+		classifierCounter prometheus.Counter
+		baseCheckResp     *flowcontrolv1.CheckResponse
+		labelsFoo1        map[string]string
+		labelsFizz1       map[string]string
+		labelsFizz2       map[string]string
+		expectedLabels    map[string]interface{}
+		expectedMetrics   string
 	)
 
 	BeforeEach(func() {
 		pr = prometheus.NewRegistry()
 		ctrl := gomock.NewController(GinkgoT())
 		engine = mocks.NewMockEngine(ctrl)
+		clasEngine = mocks.NewMockClassificationEngine(ctrl)
 		conLimiter = mocks.NewMockConcurrencyLimiter(ctrl)
 		rateLimiter = mocks.NewMockRateLimiter(ctrl)
+		classifier = mocks.NewMockClassifier(ctrl)
 		expectedLabels = make(map[string]interface{})
 		cfg = &Config{
-			engine:       engine,
-			promRegistry: pr,
+			engine:               engine,
+			classificationEngine: clasEngine,
+			promRegistry:         pr,
 		}
 
 		summaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
@@ -64,6 +70,15 @@ var _ = Describe("Metrics Processor", func() {
 				m.PolicyNameLabel:     "foo",
 				m.PolicyHashLabel:     "foo-hash",
 				m.ComponentIndexLabel: "2",
+			},
+		})
+		classifierCounter = prometheus.NewCounter(prometheus.CounterOpts{
+			Name: m.ClassifierCounterMetricName,
+			Help: "dummy",
+			ConstLabels: prometheus.Labels{
+				m.PolicyNameLabel:      "foo",
+				m.PolicyHashLabel:      "foo-hash",
+				m.ClassifierIndexLabel: "1",
 			},
 		})
 
@@ -117,6 +132,38 @@ var _ = Describe("Metrics Processor", func() {
 		}
 		engine.EXPECT().GetConcurrencyLimiter(gomock.Any()).Return(conLimiter).AnyTimes()
 		engine.EXPECT().GetRateLimiter(gomock.Any()).Return(rateLimiter).AnyTimes()
+		clasEngine.EXPECT().GetClassifier(gomock.Any()).Return(classifier, nil).AnyTimes()
+	})
+
+	AfterEach(func() {
+		logs := someLogs(engine, baseCheckResp)
+		modifiedLogs, err := processor.ConsumeLogs(context.Background(), logs)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(modifiedLogs).To(Equal(logs))
+
+		By("sending proper metrics")
+		splitMetrics := strings.Split(expectedMetrics, "<split>")
+		for _, expectedMetrics := range splitMetrics {
+			if strings.Contains(expectedMetrics, m.WorkloadLatencyMetricName) {
+				expected := strings.NewReader(expectedMetrics)
+				err = testutil.CollectAndCompare(summaryVec, expected, m.WorkloadLatencyMetricName)
+				Expect(err).NotTo(HaveOccurred())
+			}
+
+			if strings.Contains(expectedMetrics, m.RateLimiterCounterMetricName) {
+				expected2 := strings.NewReader(expectedMetrics)
+				err = testutil.CollectAndCompare(rateCounter, expected2, m.RateLimiterCounterMetricName)
+				Expect(err).NotTo(HaveOccurred())
+			}
+		}
+
+		By("adding proper labels")
+		logRecords := allLogRecords(modifiedLogs)
+		Expect(logRecords).To(HaveLen(1))
+
+		for k, v := range expectedLabels {
+			Expect(logRecords[0].Attributes().AsRaw()).To(HaveKeyWithValue(k, v))
+		}
 	})
 
 	It("Processes logs for single policy - ingress", func() {
@@ -143,7 +190,10 @@ var _ = Describe("Metrics Processor", func() {
 		baseCheckResp.Services = []string{"svc1", "svc2"}
 
 		// <split> is a workaround until PR https://github.com/prometheus/client_golang/pull/1143 is released
-		expectedMetrics = `# HELP rate_limiter_counter dummy
+		expectedMetrics = `# HELP classifier_counter dummy
+# TYPE classifier_counter counter
+classifier_counter{component_index="1",policy_hash="foo-hash",policy_name="foo"} 1
+<split># HELP rate_limiter_counter dummy
 # TYPE rate_limiter_counter counter
 rate_limiter_counter{component_index="2",policy_hash="foo-hash",policy_name="foo"} 1
 <split># HELP workload_latency_ms dummy
@@ -180,7 +230,7 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 		conLimiter.EXPECT().GetObserver(labelsFoo1).Return(summary).Times(1)
 
 		rateLimiter.EXPECT().GetCounter().Return(rateCounter).Times(1)
-		testLogProcessor(processor, engine, baseCheckResp, expectedLabels, expectedMetrics, summaryVec, rateCounter, oc.ApertureSourceEnvoy)
+		classifier.EXPECT().GetCounter().Return(classifierCounter).Times(1)
 	})
 
 	It("Processes logs for single policy - feature", func() {
@@ -210,7 +260,6 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 		summary, err := summaryVec.GetMetricWith(labelsFoo1)
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetObserver(labelsFoo1).Return(summary).Times(1)
-		testLogProcessor(processor, engine, baseCheckResp, expectedLabels, expectedMetrics, summaryVec, rateCounter, oc.ApertureSourceSDK)
 	})
 
 	It("Processes logs for two policies - ingress", func() {
@@ -285,50 +334,8 @@ workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJEC
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetObserver(labelsFizz2).Return(summaryFizz2).Times(1)
 
-		testLogProcessor(processor, engine, baseCheckResp, expectedLabels, expectedMetrics, summaryVec, rateCounter, oc.ApertureSourceEnvoy)
 	})
 })
-
-func testLogProcessor(
-	processor *metricsProcessor,
-	engine *mocks.MockEngine,
-	checkResp *flowcontrolv1.CheckResponse,
-	expectedLabels map[string]interface{},
-	expectedMetrics string,
-	summaryVec *prometheus.SummaryVec,
-	rateCounter prometheus.Counter,
-	source string,
-) {
-	logs := someLogs(engine, checkResp, source)
-	modifiedLogs, err := processor.ConsumeLogs(context.Background(), logs)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(modifiedLogs).To(Equal(logs))
-
-	By("sending proper metrics")
-	splitMetrics := strings.Split(expectedMetrics, "<split>")
-	for _, expectedMetrics := range splitMetrics {
-		if strings.Contains(expectedMetrics, m.WorkloadLatencyMetricName) {
-			expected := strings.NewReader(expectedMetrics)
-			err = testutil.CollectAndCompare(summaryVec, expected, m.WorkloadLatencyMetricName)
-			Expect(err).NotTo(HaveOccurred())
-		}
-
-		if strings.Contains(expectedMetrics, m.RateLimiterCounterMetricName) {
-			expected2 := strings.NewReader(expectedMetrics)
-			err = testutil.CollectAndCompare(rateCounter, expected2, m.RateLimiterCounterMetricName)
-			Expect(err).NotTo(HaveOccurred())
-		}
-	}
-
-	By("adding proper labels")
-	logRecords := allLogRecords(modifiedLogs)
-	Expect(logRecords).To(HaveLen(1))
-
-	actualLabels := logRecords[0].Attributes().AsRaw()
-	for k, v := range expectedLabels {
-		Expect(actualLabels).To(HaveKeyWithValue(k, v))
-	}
-}
 
 // someLogs will return a plog.Logs instance with single LogRecord
 func someLogs(
