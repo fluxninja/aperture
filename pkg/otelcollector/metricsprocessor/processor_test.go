@@ -3,6 +3,7 @@ package metricsprocessor
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -11,6 +12,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/testutil"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"golang.org/x/net/context"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/util/json"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
@@ -69,7 +71,11 @@ var _ = Describe("Metrics Processor", func() {
 		processor, err = newProcessor(cfg)
 		Expect(err).NotTo(HaveOccurred())
 
+		start := time.Date(1969, time.Month(7), 20, 17, 0, 0, 0, time.UTC)
+		end := time.Date(1969, time.Month(7), 20, 17, 0, 1, 0, time.UTC)
 		baseCheckResp = &flowcontrolv1.CheckResponse{
+			Start: timestamppb.New(start),
+			End:   timestamppb.New(end),
 			ControlPointInfo: &flowcontrolv1.ControlPointInfo{
 				Type: flowcontrolv1.ControlPointInfo_TYPE_INGRESS,
 			},
@@ -134,6 +140,7 @@ var _ = Describe("Metrics Processor", func() {
 		}}
 		baseCheckResp.FluxMeterInfos = []*flowcontrolv1.FluxMeterInfo{{FluxMeterName: "bar"}}
 		baseCheckResp.FlowLabelKeys = []string{"someLabel"}
+		baseCheckResp.Services = []string{"svc1", "svc2"}
 
 		// <split> is a workaround until PR https://github.com/prometheus/client_golang/pull/1143 is released
 		expectedMetrics = `# HELP rate_limiter_counter dummy
@@ -162,6 +169,10 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 			oc.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
 			oc.ApertureWorkloadsLabel:                   []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
 			oc.ApertureDroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+
+			oc.ApertureProcessingDurationLabel: float64(1000),
+			oc.ApertureServicesLabel:           []interface{}{"svc1", "svc2"},
+			oc.ApertureControlPointLabel:       "type:TYPE_INGRESS",
 		}
 
 		summary, err := summaryVec.GetMetricWith(labelsFoo1)
@@ -169,7 +180,7 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 		conLimiter.EXPECT().GetObserver(labelsFoo1).Return(summary).Times(1)
 
 		rateLimiter.EXPECT().GetCounter().Return(rateCounter).Times(1)
-		testLogProcessor(processor, engine, baseCheckResp, expectedLabels, expectedMetrics, summaryVec, rateCounter)
+		testLogProcessor(processor, engine, baseCheckResp, expectedLabels, expectedMetrics, summaryVec, rateCounter, oc.ApertureSourceEnvoy)
 	})
 
 	It("Processes logs for single policy - feature", func() {
@@ -199,7 +210,7 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 		summary, err := summaryVec.GetMetricWith(labelsFoo1)
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetObserver(labelsFoo1).Return(summary).Times(1)
-		testLogProcessor(processor, engine, baseCheckResp, expectedLabels, expectedMetrics, summaryVec, rateCounter)
+		testLogProcessor(processor, engine, baseCheckResp, expectedLabels, expectedMetrics, summaryVec, rateCounter, oc.ApertureSourceSDK)
 	})
 
 	It("Processes logs for two policies - ingress", func() {
@@ -274,7 +285,7 @@ workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJEC
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetObserver(labelsFizz2).Return(summaryFizz2).Times(1)
 
-		testLogProcessor(processor, engine, baseCheckResp, expectedLabels, expectedMetrics, summaryVec, rateCounter)
+		testLogProcessor(processor, engine, baseCheckResp, expectedLabels, expectedMetrics, summaryVec, rateCounter, oc.ApertureSourceEnvoy)
 	})
 })
 
@@ -286,8 +297,9 @@ func testLogProcessor(
 	expectedMetrics string,
 	summaryVec *prometheus.SummaryVec,
 	rateCounter prometheus.Counter,
+	source string,
 ) {
-	logs := someLogs(engine, checkResp)
+	logs := someLogs(engine, checkResp, source)
 	modifiedLogs, err := processor.ConsumeLogs(context.Background(), logs)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(modifiedLogs).To(Equal(logs))
@@ -312,8 +324,9 @@ func testLogProcessor(
 	logRecords := allLogRecords(modifiedLogs)
 	Expect(logRecords).To(HaveLen(1))
 
+	actualLabels := logRecords[0].Attributes().AsRaw()
 	for k, v := range expectedLabels {
-		Expect(logRecords[0].Attributes().AsRaw()).To(HaveKeyWithValue(k, v))
+		Expect(actualLabels).To(HaveKeyWithValue(k, v))
 	}
 }
 
@@ -321,6 +334,7 @@ func testLogProcessor(
 func someLogs(
 	engine *mocks.MockEngine,
 	checkResponse *flowcontrolv1.CheckResponse,
+	source string,
 ) plog.Logs {
 	logs := plog.NewLogs()
 	logs.ResourceLogs().AppendEmpty()
@@ -335,7 +349,7 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
-			logRecord.Attributes().InsertString(oc.ApertureSourceLabel, oc.ApertureSourceEnvoy)
+			logRecord.Attributes().InsertString(oc.ApertureSourceLabel, source)
 			logRecord.Attributes().InsertString(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
 			logRecord.Attributes().InsertString(oc.HTTPStatusCodeLabel, "201")
 			logRecord.Attributes().InsertDouble(oc.WorkloadDurationLabel, 5)
