@@ -23,9 +23,7 @@ for f in $files; do
 	filenameNoExt="${filename%.*}"
 	out_dir="$dir"/assets/gen/"$filenameNoExt"/jsonnet
 	mkdir -p "$out_dir"
-	# move existing yaml files to tmp if they exist
-	mv "$out_dir"/*.yaml tmp 2>/dev/null || true
-	rm -f "$out_dir"/*.yaml
+	rm -rf "$out_dir"/*.jsonnet || true
 
 	#shellcheck disable=SC2002,SC2016
 	cat "$f" | $SED -n '/```jsonnet/,/```/p' | $GREP -vP '^```$' >tmp/records.txt
@@ -37,40 +35,74 @@ for f in $files; do
 	count=0
 	for jsonnet_section_file in $jsonnet_section_files; do
 		echo "Processing $f :: $jsonnet_section_file"
-		outfilename="$out_dir"/"$filenameNoExt"_"$count".yaml
-		# replace github.com/fluxninja/aperture/blueprints with $"gitroot"/blueprints
-		$SED -i "s|github.com/fluxninja/aperture/blueprints|$gitroot/blueprints|g" "$jsonnet_section_file"
-		# fail script if any of the below commands fail
-		set -e
-		jsonnet --yaml-stream -J "$gitroot"/blueprints/vendor "$jsonnet_section_file" >"$outfilename"
-		# run prettier
-		npx prettier --write "$outfilename"
-		if [ "$(yq e '.kind == "Policy"' "$outfilename")" = "true" ]; then
-			specfilename="$filenameNoExt"_"$count"_spec.yaml
-			specfilepath="$out_dir"/"$specfilename"
-			mermaidfilepath="$out_dir"/"$filenameNoExt"_"$count".mmd
-			# save the contents of the existing spec file if it exists
-			old_spec_file_contents=""
-			if [ -f tmp/"$specfilename" ]; then
-				old_spec_file_contents=$(cat tmp/"$specfilename")
-			fi
-			# extract spec key from yaml
-			yq '.spec' "$outfilename" >"$specfilepath"
-			# run prettier
-			npx prettier --write "$specfilepath"
-			git add "$specfilepath"
-			if [ "$old_spec_file_contents" != "$(cat "$specfilepath")" ]; then
-				# validate with circuit compiler
-				go run "$gitroot"/cmd/circuit-compiler/main.go -policy "$specfilepath" --mermaid "$mermaidfilepath"
-				git add "$mermaidfilepath"
-			fi
+		# ignore if the jsonnet file contains "@include:"
+		if $GREP -qP '@include:' "$jsonnet_section_file"; then
+			continue
 		fi
-		git add "$outfilename"
+
+		jsonnetfilepath="$out_dir"/"$filenameNoExt"_"$count".jsonnet
+		mv "$jsonnet_section_file" "$jsonnetfilepath"
+		# tanka fmt "$jsonnetfilepath"
+		tk fmt "$jsonnetfilepath"
+
+		git add "$jsonnetfilepath"
+
 		# unset fail on error
 		set +e
 		# increment count
 		count=$((count + 1))
 	done
+	rm -rf tmp/*
+done
+
+# find all jsonnet files in docs/content directory and generate them
+jsonnet_files=$(find "$docsdir"/content -type f -name "*.jsonnet")
+for jsonnet_file in $jsonnet_files; do
+	echo "Processing $jsonnet_file"
+	dir=$(dirname "$jsonnet_file")
+	# remove extension and add .yaml
+	yamlfilepath="${jsonnet_file%.*}".yaml
+
+	# cp jsonnet file to tmp file
+	tmpjsonnetfilepath=tmp/"$(basename "$jsonnet_file")"
+	cp "$jsonnet_file" "$tmpjsonnetfilepath"
+
+	# replace github.com/fluxninja/aperture/blueprints with $"gitroot"/blueprints
+	$SED -i "s|github.com/fluxninja/aperture/blueprints|$gitroot/blueprints|g" "$tmpjsonnetfilepath"
+	# fail script if any of the below commands fail
+	set -e
+	jsonnet --yaml-stream -J "$gitroot"/blueprints/vendor "$tmpjsonnetfilepath" >"$yamlfilepath"
+	# run prettier
+	npx prettier --write "$yamlfilepath"
+	git add "$yamlfilepath"
+
+	# if the file is a policy kind then generate mermaid diagram and spec
+	if [ "$(yq e '.kind == "Policy"' "$yamlfilepath")" = "true" ]; then
+		# generate yaml spec and mermaid diagram
+		specfilepath="${jsonnet_file%.*}"_spec.yaml
+
+		old_spec_file_contents=""
+		if [ -f "$specfilepath" ]; then
+			old_spec_file_contents=$(cat "$specfilepath")
+		fi
+
+		# extract spec from yaml file
+		yq e '.spec' "$yamlfilepath" >"$specfilepath"
+		# run prettier
+		npx prettier --write "$specfilepath"
+		git add "$specfilepath"
+
+		# compile the policy and generate mermaid if spec has changed
+		if [ "$old_spec_file_contents" != "$(cat "$specfilepath")" ]; then
+			# generate mermaid diagram
+			mermaidfilepath="${jsonnet_file%.*}".mmd
+			# compile the policy
+			go run "$gitroot"/cmd/circuit-compiler/main.go -policy "$specfilepath" --mermaid "$mermaidfilepath"
+			git add "$mermaidfilepath"
+		fi
+	fi
+	# unset fail on error
+	set +e
 	rm -rf tmp/*
 done
 
