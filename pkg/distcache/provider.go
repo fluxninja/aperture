@@ -89,6 +89,7 @@ func (dc *DistCache) scrapeMetrics() error {
 		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
 		return err
 	}
+
 	memberID := stats.Member.ID
 	memberName := stats.Member.Name
 	metricLabels := make(prometheus.Labels)
@@ -262,8 +263,10 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	}
 
 	jobConfig := jobs.JobConfig{
-		InitialDelay:     config.MakeDuration(0),
-		ExecutionPeriod:  config.MakeDuration(time.Millisecond * 300),
+		// TODO: Update jobConfig for scraping metrics from Olric instance
+		// DMap values update when distcache-rate-tracker is triggered.
+		InitialDelay:     config.MakeDuration(time.Millisecond * 300),
+		ExecutionPeriod:  config.MakeDuration(time.Millisecond * 500),
 		ExecutionTimeout: config.MakeDuration(time.Millisecond * 1000),
 		InitiallyHealthy: false,
 	}
@@ -280,8 +283,8 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			log.Info().Msg("Starting OTEL Collector")
 			panichandler.Go(func() {
 				log.Info().Msg("Started OTEL Collector")
-				dc.jobGroup.TriggerJob("scrape-metrics")
 				err = dc.Olric.Start()
+				dc.jobGroup.TriggerJob("scrape-metrics")
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to start olric")
 				}
