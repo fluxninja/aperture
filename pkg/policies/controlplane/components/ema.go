@@ -103,10 +103,10 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 				ema.currentStage = emaStage
 			}
 		} else {
-			// Immediately reset on any missing values during warmup.
+			// Immediately reset on any missing values during warm-up.
 			ema.resetStages()
 		}
-		// Emit the avg for the valid values in the warmup window.
+		// Emit the avg for the valid values in the warm-up window.
 		avg, err := ema.computeAverage()
 		if err != nil {
 			return retErr(err)

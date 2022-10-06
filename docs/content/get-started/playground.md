@@ -2,15 +2,15 @@
 title: Playground
 keywords:
   - playground
-  - proof of concept
   - policies
-  - rate limit
-  - concurrency control
+  - poc
+  - ratelimit
+  - concurrencylimit
 sidebar_position: 1
 ---
 
 Playground is a Kubernetes based environment for exploring the capabilities of
-Aperture. Additionally it is used as a development environment for Aperture.
+Aperture. Additionally, it is used as a development environment for Aperture.
 Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in
 Kubernetes. Tilt watches for changes to local files and auto-deploys any
 resources that change. This is very convenient for getting quick feedback during
@@ -66,12 +66,12 @@ application with an Istio and Envoy based service mesh configured to integrate
 with Aperture. There is an instance of Grafana running on the cluster as well
 for viewing metrics from experiments.
 
-The Playground is pre-loaded with a Latency Gradient Concurrency Control Policy
+The Playground is preloaded with a Latency Gradient Concurrency Control Policy
 which protects the demo application against sudden surges in traffic load. You
 can verify it using the following command:
 
 ```sh
-$ k get policy -n aperture-controller service1-demo-app
+$ kubectl get policy -n aperture-controller service1-demo-app
 NAME                STATUS     AGE
 service1-demo-app   uploaded   103s
 ```
@@ -94,8 +94,8 @@ service3-demo-app-788857c7cc-vlchn   2/2     Running   0          7m13s
 
 To start the simulated traffic against the demo application, navigate to K6
 resource in the Tilt UI and press the `Run load test` button. The traffic is
-designed to overload the demo application in order showcase the capabilities of
-Aperture.
+designed to overload the demo application in order to showcase the capabilities
+of Aperture.
 
 ![Start Load Test](../assets/img/starttrafficbig.png)
 

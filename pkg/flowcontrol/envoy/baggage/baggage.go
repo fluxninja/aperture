@@ -41,7 +41,7 @@ type Propagator interface {
 // concatenation of Prefix and flow label name.
 type Prefixed struct {
 	// Header prefix, eg. "uberctx-" – in lower-case, as per envoy's authz
-	// convention – (note that this differs from golang's convetions))
+	// convention – (note that this differs from golang's conventions))
 	Prefix string
 }
 

@@ -1,0 +1,140 @@
+flowchart LR
+subgraph 0[ArithmeticCombinator]
+0rhs[rhs]
+0lhs[lhs]
+0output[output]
+end
+FakeConstant0((2.00))
+FakeConstant0 --> 0rhs
+subgraph 1[ArithmeticCombinator]
+1rhs[rhs]
+1lhs[lhs]
+1output[output]
+end
+FakeConstant1((1.10))
+FakeConstant1 --> 1rhs
+subgraph 2[ArithmeticCombinator]
+2lhs[lhs]
+2rhs[rhs]
+2output[output]
+end
+subgraph 3[ArithmeticCombinator]
+3lhs[lhs]
+3rhs[rhs]
+3output[output]
+end
+subgraph 4[ArithmeticCombinator]
+4rhs[rhs]
+4lhs[lhs]
+4output[output]
+end
+FakeConstant2((2.00))
+FakeConstant2 --> 4lhs
+subgraph 5[ArithmeticCombinator]
+5lhs[lhs]
+5rhs[rhs]
+5output[output]
+end
+FakeConstant3((1.10))
+FakeConstant3 --> 5rhs
+subgraph 6[ArithmeticCombinator]
+6lhs[lhs]
+6rhs[rhs]
+6output[output]
+end
+FakeConstant4((5.00))
+FakeConstant4 --> 6lhs
+subgraph 7[ArithmeticCombinator]
+7lhs[lhs]
+7rhs[rhs]
+7output[output]
+end
+subgraph 8[Min]
+8inputs[inputs]
+8inputs[inputs]
+8output[output]
+end
+subgraph 9[Max]
+9inputs[inputs]
+9inputs[inputs]
+9output[output]
+end
+FakeConstant5((10.00))
+FakeConstant5 --> 9inputs
+subgraph 10[Sqrt]
+10input[input]
+10output[output]
+end
+subgraph 11[PromQL]
+11output[output]
+end
+subgraph 12[EMA]
+12input[input]
+12max_envelope[max_envelope]
+12output[output]
+end
+subgraph 13[Gradient]
+13signal[signal]
+13setpoint[setpoint]
+13optimize[optimize]
+13max[max]
+13control_variable[control_variable]
+13output[output]
+end
+subgraph 14.Scheduler[ConcurrencyLimiter/Scheduler]
+14.Scheduleraccepted_concurrency[accepted_concurrency]
+14.Schedulerincoming_concurrency[incoming_concurrency]
+end
+subgraph 14.LoadShedActuator[ConcurrencyLimiter/LoadShedActuator]
+14.LoadShedActuatorload_shed_factor[load_shed_factor]
+end
+subgraph 17[Switcher]
+17on_true[on_true]
+17on_false[on_false]
+17switch[switch]
+17output[output]
+end
+FakeConstant6((0.00))
+FakeConstant6 --> 17on_true
+subgraph 16[Switcher]
+16on_true[on_true]
+16on_false[on_false]
+16switch[switch]
+16output[output]
+end
+FakeConstant7((10.00))
+FakeConstant7 --> 16on_true
+subgraph 15[Decider]
+15lhs[lhs]
+15rhs[rhs]
+15output[output]
+end
+9output --> 13max
+11output --> 0lhs
+11output --> 12input
+11output --> 13signal
+11output --> 15lhs
+14.Scheduleraccepted_concurrency --> 4rhs
+14.Scheduleraccepted_concurrency --> 8inputs
+14.Scheduleraccepted_concurrency --> 10input
+14.Scheduleraccepted_concurrency --> 13control_variable
+0output --> 12max_envelope
+1output --> 13setpoint
+10output --> 6rhs
+15output --> 16switch
+15output --> 17switch
+3output --> 14.LoadShedActuatorload_shed_factor
+4output --> 9inputs
+12output --> 1lhs
+12output --> 5lhs
+13output --> 2rhs
+17output --> 7rhs
+6output --> 7lhs
+7output --> 8inputs
+8output --> 16on_false
+8output --> 17on_false
+14.Schedulerincoming_concurrency --> 2lhs
+14.Schedulerincoming_concurrency --> 3rhs
+16output --> 13optimize
+2output --> 3lhs
+5output --> 15rhs

@@ -1,14 +1,9 @@
 circuit:
   components:
-    - constant:
-        out_ports:
-          output:
-            signal_name: RATE_LIMIT
-        value: "50.0"
     - rate_limiter:
         in_ports:
           limit:
-            signal_name: RATE_LIMIT
+            constant_value: "50.0"
         init_config:
           overrides:
             - label_value: gold

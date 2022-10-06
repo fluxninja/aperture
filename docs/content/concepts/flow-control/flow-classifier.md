@@ -88,8 +88,8 @@ buffering by default, as it _might_ break some streaming APIs.
 
 ### Extractors ([reference][extractor]) {#extractors}
 
-Extractors are declarative recipes how to extract flow label value fom metadata.
-Provided extractors include:
+Extractors are declarative recipes how to extract flow label value from
+metadata. Provided extractors include:
 
 - extracting values from headers,
 - grabbing a field from json-encoded request payload,

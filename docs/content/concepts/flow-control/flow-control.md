@@ -10,6 +10,12 @@ keywords:
 
 # Flow Control
 
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import Zoom from 'react-medium-image-zoom';
+```
+
 Reliable operations at web-scale are impossible without effective flow control.
 Aperture splits the process of flow control in two layers:
 
@@ -43,6 +49,8 @@ functionality, such as checkout, billing etc. Read more about
 
 :::
 
+<Zoom>
+
 ```mermaid
 graph LR
   users(("users"))
@@ -63,6 +71,8 @@ graph LR
   fegress -.-> cingress
   cegress -.-> dbingress
 ```
+
+</Zoom>
 
 There are two types of Control Points:
 

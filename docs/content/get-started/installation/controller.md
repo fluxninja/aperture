@@ -33,12 +33,10 @@ All the configuration parameters for Aperture Controller are listed
 
 ## Installation {#controller-installation}
 
-(Consult [Supported Platforms](/get-started/supported-platforms.md) before
-installing.)
-
-The Aperture Controller will be installed using the
+The Aperture Controller is a Kubernetes based application and is installed using
+the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
-which will be managed by the Aperture Operator.
+which is managed by the Aperture Operator.
 
 Below are the steps to install or upgrade the Aperture Controller into your
 setup using the
@@ -217,8 +215,8 @@ Follow the information on [Policy](/concepts/policy/policy.md) to understand and
 design the policy circuits.
 
 Once the design is ready, follow the steps on the
-[Blueprints](/get-started/blueprints.md) to generate the Policy ConfigMap and
-apply it on the Kubernetes.
+[Blueprints](/policies/blueprints.md) to generate the Policy Custom Resource and
+apply it on a Kubernetes cluster.
 
 ## Uninstall
 
