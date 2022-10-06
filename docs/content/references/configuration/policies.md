@@ -334,13 +334,13 @@ Inputs for the Arithmetic Combinator component.
 <dt>lhs</dt>
 <dd>
 
-([V1Port](#v1-port)) Left hand side of the arithmetic operation.
+([V1InPort](#v1-in-port)) Left hand side of the arithmetic operation.
 
 </dd>
 <dt>rhs</dt>
 <dd>
 
-([V1Port](#v1-port)) Right hand side of the arithmetic operation.
+([V1InPort](#v1-in-port)) Right hand side of the arithmetic operation.
 
 </dd>
 </dl>
@@ -355,7 +355,7 @@ Outputs for the Arithmetic Combinator component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Result of arithmetic operation.
+([V1OutPort](#v1-out-port)) Result of arithmetic operation.
 
 </dd>
 </dl>
@@ -483,7 +483,10 @@ There are three categories of components:
 
 :::tip
 Sometimes you may want to use a constant value as one of component's inputs.
-You can use the [Constant](#v1-constant) component for this.
+You can create an input port containing the constant value instead of being connected to a signal.
+To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+If You need to provide the same constant signal to multiple components,
+You can use the [Constant](#v1-constant) component.
 :::
 
 See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -537,7 +540,7 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 <dt>max</dt>
 <dd>
 
-([V1Max](#v1-max)) Emits the maximum of the input siganls.
+([V1Max](#v1-max)) Emits the maximum of the input signals.
 
 </dd>
 <dt>min</dt>
@@ -581,7 +584,7 @@ See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limit
 :::
 
 It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
 
 ConcurrencyLimiter configuration is split into two parts: An actuation
 strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
@@ -639,7 +642,7 @@ Outputs for the Constant component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) The constant value is emitted to the output port.
+([V1OutPort](#v1-out-port)) The constant value is emitted to the output port.
 
 </dd>
 </dl>
@@ -733,13 +736,13 @@ Inputs for the Decider component.
 <dt>lhs</dt>
 <dd>
 
-([V1Port](#v1-port)) Left hand side input signal for the comparison operation.
+([V1InPort](#v1-in-port)) Left hand side input signal for the comparison operation.
 
 </dd>
 <dt>rhs</dt>
 <dd>
 
-([V1Port](#v1-port)) Right hand side input signal for the comparison operation.
+([V1InPort](#v1-in-port)) Right hand side input signal for the comparison operation.
 
 </dd>
 </dl>
@@ -754,14 +757,14 @@ Outputs for the Decider component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Selected signal (1.0 or 0.0).
+([V1OutPort](#v1-out-port)) Selected signal (1.0 or 0.0).
 
 </dd>
 </dl>
 
 ### v1EMA {#v1-e-m-a}
 
-Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
+Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
 
 At any time EMA component operates in one of the following states:
 
@@ -787,7 +790,7 @@ $$
 \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 $$
 
-The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
+The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#v1-e-m-a-ins).
 
 #### Properties
 
@@ -842,13 +845,13 @@ Inputs for the EMA component.
 <dt>input</dt>
 <dd>
 
-([V1Port](#v1-port)) Input signal to be used for the EMA computation.
+([V1InPort](#v1-in-port)) Input signal to be used for the EMA computation.
 
 </dd>
 <dt>max_envelope</dt>
 <dd>
 
-([V1Port](#v1-port)) Upper bound of the moving average.
+([V1InPort](#v1-in-port)) Upper bound of the moving average.
 
 Used during the warm-up stage: if the signal would exceed `max_envelope`
 it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
@@ -866,7 +869,7 @@ The envelope logic is **not** used outside the warm-up stage!
 <dt>min_envelope</dt>
 <dd>
 
-([V1Port](#v1-port)) Lower bound of the moving average.
+([V1InPort](#v1-in-port)) Lower bound of the moving average.
 
 Used during the warm-up stage analogously to `max_envelope`.
 
@@ -883,7 +886,7 @@ Outputs for the EMA component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Exponential moving average of the series of reading as an output signal.
+([V1OutPort](#v1-out-port)) Exponential moving average of the series of reading as an output signal.
 
 </dd>
 </dl>
@@ -1008,7 +1011,7 @@ Inputs for the Extrapolator component.
 <dt>input</dt>
 <dd>
 
-([V1Port](#v1-port)) Input signal for the Extrapolator component.
+([V1InPort](#v1-in-port)) Input signal for the Extrapolator component.
 
 </dd>
 </dl>
@@ -1023,7 +1026,7 @@ Outputs for the Extrapolator component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Extrapolated signal.
+([V1OutPort](#v1-out-port)) Extrapolated signal.
 
 </dd>
 </dl>
@@ -1276,7 +1279,7 @@ Inputs for the Gradient Controller component.
 <dt>control_variable</dt>
 <dd>
 
-([V1Port](#v1-port)) Actual current value of the control variable.
+([V1InPort](#v1-in-port)) Actual current value of the control variable.
 
 This signal is multiplied by the gradient to produce the output.
 
@@ -1284,31 +1287,31 @@ This signal is multiplied by the gradient to produce the output.
 <dt>max</dt>
 <dd>
 
-([V1Port](#v1-port)) Maximum value to limit the output signal.
+([V1InPort](#v1-in-port)) Maximum value to limit the output signal.
 
 </dd>
 <dt>min</dt>
 <dd>
 
-([V1Port](#v1-port)) Minimum value to limit the output signal.
+([V1InPort](#v1-in-port)) Minimum value to limit the output signal.
 
 </dd>
 <dt>optimize</dt>
 <dd>
 
-([V1Port](#v1-port)) Optimize signal is added to the output of the gradient calculation.
+([V1InPort](#v1-in-port)) Optimize signal is added to the output of the gradient calculation.
 
 </dd>
 <dt>setpoint</dt>
 <dd>
 
-([V1Port](#v1-port)) Setpoint to be used for the gradient computation.
+([V1InPort](#v1-in-port)) Setpoint to be used for the gradient computation.
 
 </dd>
 <dt>signal</dt>
 <dd>
 
-([V1Port](#v1-port)) Signal to be used for the gradient computation.
+([V1InPort](#v1-in-port)) Signal to be used for the gradient computation.
 
 </dd>
 </dl>
@@ -1323,7 +1326,28 @@ Outputs for the Gradient Controller component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Computed desired value of the control variable.
+([V1OutPort](#v1-out-port)) Computed desired value of the control variable.
+
+</dd>
+</dl>
+
+### v1InPort {#v1-in-port}
+
+Components receive input from other components via InPorts
+
+#### Properties
+
+<dl>
+<dt>constant_value</dt>
+<dd>
+
+(float64) Constant value to be used for this InPort instead of a signal.
+
+</dd>
+<dt>signal_name</dt>
+<dd>
+
+(string) Name of the incoming Signal on the InPort.
 
 </dd>
 </dl>
@@ -1493,7 +1517,7 @@ Input for the Load Shed Actuator component.
 <dt>load_shed_factor</dt>
 <dd>
 
-([V1Port](#v1-port)) Load shedding factor is a fraction of [incoming
+([V1InPort](#v1-in-port)) Load shedding factor is a fraction of [incoming
 concurrency](#v1-scheduler-outs) that needs to be dropped.
 
 </dd>
@@ -1610,7 +1634,7 @@ Inputs for the Max component.
 <dt>inputs</dt>
 <dd>
 
-([[]V1Port](#v1-port)) Array of input signals.
+([[]V1InPort](#v1-in-port)) Array of input signals.
 
 </dd>
 </dl>
@@ -1625,7 +1649,7 @@ Output for the Max component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Signal with maximum value as an output signal.
+([V1OutPort](#v1-out-port)) Signal with maximum value as an output signal.
 
 </dd>
 </dl>
@@ -1662,7 +1686,7 @@ Inputs for the Min component.
 <dt>inputs</dt>
 <dd>
 
-([[]V1Port](#v1-port)) Array of input signals.
+([[]V1InPort](#v1-in-port)) Array of input signals.
 
 </dd>
 </dl>
@@ -1677,7 +1701,22 @@ Output ports for the Min component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Signal with minimum value as an output signal.
+([V1OutPort](#v1-out-port)) Signal with minimum value as an output signal.
+
+</dd>
+</dl>
+
+### v1OutPort {#v1-out-port}
+
+Components produce output for other components via OutPorts
+
+#### Properties
+
+<dl>
+<dt>signal_name</dt>
+<dd>
+
+(string) Name of the outgoing Signal on the OutPort.
 
 </dd>
 </dl>
@@ -1749,21 +1788,6 @@ Policy specification contains a circuit that defines the controller logic and re
 </dd>
 </dl>
 
-### v1Port {#v1-port}
-
-Components are interconnected with each other via Ports
-
-#### Properties
-
-<dl>
-<dt>signal_name</dt>
-<dd>
-
-(string) Name of the incoming or outgoing Signal on the Port.
-
-</dd>
-</dl>
-
 ### v1PromQL {#v1-prom-q-l}
 
 Component that runs a Prometheus query periodically and returns the result as an output signal
@@ -1806,7 +1830,7 @@ Output for the PromQL component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) The result of the Prometheus query as an output signal.
+([V1OutPort](#v1-out-port)) The result of the Prometheus query as an output signal.
 
 </dd>
 </dl>
@@ -1884,7 +1908,7 @@ Inputs for the RateLimiter component
 <dt>limit</dt>
 <dd>
 
-([V1Port](#v1-port), `required`) Number of flows allowed per _limit_reset_interval_ per each label.
+([V1InPort](#v1-in-port), `required`) Number of flows allowed per _limit_reset_interval_ per each label.
 Negative values disable the ratelimiter.
 
 :::tip
@@ -2114,7 +2138,7 @@ Output for the Scheduler component.
 <dt>accepted_concurrency</dt>
 <dd>
 
-([V1Port](#v1-port)) Accepted concurrency is the number of accepted tokens per second.
+([V1OutPort](#v1-out-port)) Accepted concurrency is the number of accepted tokens per second.
 
 :::info
 **Accepted tokens** are tokens associated with
@@ -2130,7 +2154,7 @@ Value of this signal is the sum across all the relevant schedulers.
 <dt>incoming_concurrency</dt>
 <dd>
 
-([V1Port](#v1-port)) Incoming concurrency is the number of incoming tokens/sec.
+([V1OutPort](#v1-out-port)) Incoming concurrency is the number of incoming tokens/sec.
 This is the same as `accepted_concurrency`, but across all the flows
 entering scheduler, including rejected ones.
 
@@ -2242,7 +2266,7 @@ Inputs for the Sqrt component.
 <dt>input</dt>
 <dd>
 
-([V1Port](#v1-port)) Input signal.
+([V1InPort](#v1-in-port)) Input signal.
 
 </dd>
 </dl>
@@ -2257,7 +2281,7 @@ Outputs for the Sqrt component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Output signal.
+([V1OutPort](#v1-out-port)) Output signal.
 
 </dd>
 </dl>
@@ -2296,19 +2320,19 @@ Inputs for the Switcher component.
 <dt>on_false</dt>
 <dd>
 
-([V1Port](#v1-port)) Output signal when switch is invalid or 0.0.
+([V1InPort](#v1-in-port)) Output signal when switch is invalid or 0.0.
 
 </dd>
 <dt>on_true</dt>
 <dd>
 
-([V1Port](#v1-port)) Output signal when switch is valid and not 0.0.
+([V1InPort](#v1-in-port)) Output signal when switch is valid and not 0.0.
 
 </dd>
 <dt>switch</dt>
 <dd>
 
-([V1Port](#v1-port)) Decides whether to return on_true or on_false.
+([V1InPort](#v1-in-port)) Decides whether to return on_true or on_false.
 
 </dd>
 </dl>
@@ -2323,7 +2347,7 @@ Outputs for the Switcher component.
 <dt>output</dt>
 <dd>
 
-([V1Port](#v1-port)) Selected signal (on_true or on_false).
+([V1OutPort](#v1-out-port)) Selected signal (on_true or on_false).
 
 </dd>
 </dl>

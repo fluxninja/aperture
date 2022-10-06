@@ -10,9 +10,7 @@ import (
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/rs/zerolog"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
@@ -34,12 +32,11 @@ type rules struct {
 
 // ClassificationEngine receives classification policies and provides Classify method.
 type ClassificationEngine struct {
-	mu              sync.Mutex
-	activeRules     atomic.Value
-	registry        status.Registry
-	activeRulesets  map[rulesetID]compiler.CompiledRuleset
-	classifierProto *classificationv1.Classifier
-	nextRulesetID   rulesetID
+	mu             sync.Mutex
+	activeRules    atomic.Value
+	registry       status.Registry
+	activeRulesets map[rulesetID]compiler.CompiledRuleset
+	nextRulesetID  rulesetID
 }
 
 type rulesetID = uint64
@@ -199,14 +196,6 @@ func (c *ClassificationEngine) AddRules(
 	c.activeRulesets[id] = compiledRuleset
 	c.activateRulesets()
 	return ActiveRuleset{id: id, classificationEngine: c}, nil
-}
-
-// GetSelector returns the selector.
-func (c *ClassificationEngine) GetSelector() *selectorv1.Selector {
-	if c.classifierProto != nil {
-		return c.classifierProto.GetSelector()
-	}
-	return nil
 }
 
 // ActiveRuleset represents one of currently active set of rules.

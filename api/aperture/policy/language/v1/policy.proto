@@ -133,7 +133,10 @@ message Resources {
 //
 // :::tip
 // Sometimes you may want to use a constant value as one of component's inputs.
-// You can use the [Constant](#v1-constant) component for this.
+// You can create an input port containing the constant value instead of being connected to a signal.
+// To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+// If You need to provide the same constant signal to multiple components,
+// You can use the [Constant](#v1-constant) component.
 // :::
 //
 // See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -173,7 +176,7 @@ message Component {
     // Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.
     Extrapolator extrapolator = 11;
 
-    // Emits the maximum of the input siganls.
+    // Emits the maximum of the input signals.
     Max max = 12;
 
     // Emits the minimum of the input signals.
@@ -181,9 +184,19 @@ message Component {
   }
 }
 
-// Components are interconnected with each other via Ports
-message Port {
-  // Name of the incoming or outgoing Signal on the Port.
+// Components receive input from other components via InPorts
+message InPort {
+  oneof value {
+    // Name of the incoming Signal on the InPort.
+    string signal_name = 1;
+    // Constant value to be used for this InPort instead of a signal.
+    double constant_value = 2;
+  }
+}
+
+// Components produce output for other components via OutPorts
+message OutPort {
+  // Name of the outgoing Signal on the OutPort.
   string signal_name = 1;
 }
 
@@ -214,30 +227,30 @@ message GradientController {
   // Inputs for the Gradient Controller component.
   message Ins {
     // Signal to be used for the gradient computation.
-    Port signal = 1;
+    InPort signal = 1;
 
     // Setpoint to be used for the gradient computation.
-    Port setpoint = 2;
+    InPort setpoint = 2;
 
     // Optimize signal is added to the output of the gradient calculation.
-    Port optimize = 3;
+    InPort optimize = 3;
 
     // Maximum value to limit the output signal.
-    Port max = 4;
+    InPort max = 4;
 
     // Minimum value to limit the output signal.
-    Port min = 5;
+    InPort min = 5;
 
     // Actual current value of the control variable.
     //
     // This signal is multiplied by the gradient to produce the output.
-    Port control_variable = 6;
+    InPort control_variable = 6;
   }
 
   // Outputs for the Gradient Controller component.
   message Outs {
     // Computed desired value of the control variable.
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Input ports of the Gradient Controller.
@@ -314,7 +327,7 @@ message GradientController {
   }]; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
 }
 
-// Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
+// Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
 //
 // At any time EMA component operates in one of the following states:
 // 1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
@@ -339,12 +352,12 @@ message GradientController {
 // \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 // $$
 //
-// The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
+// The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#v1-e-m-a-ins).
 message EMA {
   // Inputs for the EMA component.
   message Ins {
     // Input signal to be used for the EMA computation.
-    Port input = 1;
+    InPort input = 1;
 
     // Upper bound of the moving average.
     //
@@ -359,18 +372,18 @@ message EMA {
     // :::note
     // The envelope logic is **not** used outside the warm-up stage!
     // :::
-    Port max_envelope = 2;
+    InPort max_envelope = 2;
 
     // Lower bound of the moving average.
     //
     // Used during the warm-up stage analogously to `max_envelope`.
-    Port min_envelope = 3;
+    InPort min_envelope = 3;
   }
 
   // Outputs for the EMA component.
   message Outs {
     // Exponential moving average of the series of reading as an output signal.
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Input ports for the EMA component.
@@ -439,16 +452,16 @@ message ArithmeticCombinator {
   // Inputs for the Arithmetic Combinator component.
   message Ins {
     // Left hand side of the arithmetic operation.
-    Port lhs = 1;
+    InPort lhs = 1;
 
     // Right hand side of the arithmetic operation.
-    Port rhs = 2;
+    InPort rhs = 2;
   }
 
   // Outputs for the Arithmetic Combinator component.
   message Outs {
     // Result of arithmetic operation.
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Input ports for the Arithmetic Combinator component.
@@ -484,16 +497,16 @@ message Decider {
   // Inputs for the Decider component.
   message Ins {
     // Left hand side input signal for the comparison operation.
-    Port lhs = 1;
+    InPort lhs = 1;
 
     // Right hand side input signal for the comparison operation.
-    Port rhs = 2;
+    InPort rhs = 2;
   }
 
   // Outputs for the Decider component.
   message Outs {
     // Selected signal (1.0 or 0.0).
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Input ports for the Decider component.
@@ -543,19 +556,19 @@ message Switcher {
   // Inputs for the Switcher component.
   message Ins {
     // Output signal when switch is valid and not 0.0.
-    Port on_true = 1;
+    InPort on_true = 1;
 
     // Output signal when switch is invalid or 0.0.
-    Port on_false = 2;
+    InPort on_false = 2;
 
     // Decides whether to return on_true or on_false.
-    Port switch = 3;
+    InPort switch = 3;
   }
 
   // Outputs for the Switcher component.
   message Outs {
     // Selected signal (on_true or on_false).
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Input ports for the Switcher component.
@@ -639,7 +652,7 @@ message RateLimiter {
     // Negative limit can be useful to _conditionally_ enable the ratelimiter
     // under certain circumstances. [Decider](#v1-decider) might be helpful.
     // :::
-    Port limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    InPort limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
         value: {
@@ -710,7 +723,7 @@ message RateLimiter {
 // :::
 //
 // It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-// Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+// Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
 //
 // ConcurrencyLimiter configuration is split into two parts: An actuation
 // strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
@@ -800,12 +813,12 @@ message Scheduler {
     // :::
     //
     // Value of this signal is the sum across all the relevant schedulers.
-    Port accepted_concurrency = 1;
+    OutPort accepted_concurrency = 1;
 
     // Incoming concurrency is the number of incoming tokens/sec.
     // This is the same as `accepted_concurrency`, but across all the flows
     // entering scheduler, including rejected ones.
-    Port incoming_concurrency = 2;
+    OutPort incoming_concurrency = 2;
   }
 
   // Output ports for the Scheduler component.
@@ -913,7 +926,7 @@ message LoadShedActuator {
   message Ins {
     // Load shedding factor is a fraction of [incoming
     // concurrency](#v1-scheduler-outs) that needs to be dropped.
-    Port load_shed_factor = 1;
+    InPort load_shed_factor = 1;
   }
 
   // Input ports for the Load Shed Actuator component.
@@ -925,7 +938,7 @@ message PromQL {
   // Output for the PromQL component.
   message Outs {
     // The result of the Prometheus query as an output signal.
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Output ports for the PromQL component.
@@ -955,7 +968,7 @@ message Constant {
   // Outputs for the Constant component.
   message Outs {
     // The constant value is emitted to the output port.
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Output ports for the Constant component.
@@ -974,13 +987,13 @@ message Sqrt {
   // Inputs for the Sqrt component.
   message Ins {
     // Input signal.
-    Port input = 1;
+    InPort input = 1;
   }
 
   // Outputs for the Sqrt component.
   message Outs {
     // Output signal.
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Input ports for the Sqrt component.
@@ -1007,13 +1020,13 @@ message Extrapolator {
   // Inputs for the Extrapolator component.
   message Ins {
     // Input signal for the Extrapolator component.
-    Port input = 1;
+    InPort input = 1;
   }
 
   // Outputs for the Extrapolator component.
   message Outs {
     // Extrapolated signal.
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Input ports for the Extrapolator component.
@@ -1040,13 +1053,13 @@ message Max {
   // Inputs for the Max component.
   message Ins {
     // Array of input signals.
-    repeated Port inputs = 1;
+    repeated InPort inputs = 1;
   }
 
   // Output for the Max component.
   message Outs {
     // Signal with maximum value as an output signal.
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Input ports for the Max component.
@@ -1062,13 +1075,13 @@ message Min {
   // Inputs for the Min component.
   message Ins {
     // Array of input signals.
-    repeated Port inputs = 1;
+    repeated InPort inputs = 1;
   }
 
   // Output ports for the Min component.
   message Outs {
     // Signal with minimum value as an output signal.
-    Port output = 1;
+    OutPort output = 1;
   }
 
   // Input ports for the Min component.
