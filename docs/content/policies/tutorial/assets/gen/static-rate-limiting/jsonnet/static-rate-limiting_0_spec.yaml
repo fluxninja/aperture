@@ -22,6 +22,6 @@
               },
           },
         ],
-      "evaluation_interval": "0.5s",
+      "evaluation_interval": "300s",
     },
 }

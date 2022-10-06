@@ -78,7 +78,7 @@ local policyDef =
   policy.new()
   + policy.withCircuit(
     circuit.new()
-    + circuit.withEvaluationInterval("0.5s")
+    + circuit.withEvaluationInterval("300s")
     + circuit.withComponents([
       component.withRateLimiter(
         rateLimiter.new()

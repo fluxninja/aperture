@@ -23,8 +23,8 @@ for f in $files; do
 	filenameNoExt="${filename%.*}"
 	out_dir="$dir"/assets/gen/"$filenameNoExt"/jsonnet
 	mkdir -p "$out_dir"
-	# move existing files to tmp if they exist
-	mv "$out_dir"/* tmp 2>/dev/null || true
+	# move existing yaml files to tmp if they exist
+	mv "$out_dir"/*.yaml tmp 2>/dev/null || true
 	rm -f "$out_dir"/*.yaml
 
 	#shellcheck disable=SC2002,SC2016
