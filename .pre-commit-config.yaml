@@ -161,7 +161,9 @@ repos:
         entry: ./scripts/precommit/check-operator-spec.sh
         language: script
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.1.0
+    rev: v2.2.1
     hooks:
       - id: codespell
+        args:
+          - --ignore-words=./.codespellignore
         exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*)$

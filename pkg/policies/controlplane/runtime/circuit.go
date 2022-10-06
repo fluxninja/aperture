@@ -57,10 +57,32 @@ func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.L
 	})
 }
 
+// SignalType enum.
+type SignalType int
+
+const (
+	// SignalTypeNamed is a named signal.
+	SignalTypeNamed = iota
+	// SignalTypeConstant is a constant signal.
+	SignalTypeConstant
+)
+
 // Signal represents a logical flow of Readings in a circuit and determines the linkage between Components.
 type Signal struct {
-	Name   string
-	Looped bool
+	Name       string
+	Value      float64
+	Looped     bool
+	SignalType SignalType
+}
+
+// MakeSignal creates a new Signal.
+func MakeSignal(signalType SignalType, name string, value float64, looped bool) Signal {
+	return Signal{
+		Name:       name,
+		Value:      value,
+		Looped:     looped,
+		SignalType: signalType,
+	}
 }
 
 // PortToSignal is a map from port name to a slice of Signals.
@@ -259,7 +281,9 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				readingList := make([]Reading, len(sigs))
 				// Check if all the sig(s) in sigs are ready
 				for index, sig := range sigs {
-					if sigReading, ok := circuitSignalReadings[sig]; ok {
+					if sig.SignalType == SignalTypeConstant {
+						readingList[index] = NewReading(sig.Value)
+					} else if sigReading, ok := circuitSignalReadings[sig]; ok {
 						// Set sigReading in readingList at index
 						readingList[index] = sigReading
 					} else {
@@ -332,7 +356,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 						// Looped signals are stored in circuit.loopedSignals for the next round
 						circuit.loopedSignals[sig] = readings[index]
 						// Store the reading in circuitSignalReadings under the same signal name without the looped flag
-						circuitSignalReadings[Signal{Name: sig.Name, Looped: false}] = readings[index]
+						circuitSignalReadings[MakeSignal(SignalTypeNamed, sig.Name, 0.0, false)] = readings[index]
 					} else {
 						// Store the reading in circuitSignalReadings
 						circuitSignalReadings[sig] = readings[index]

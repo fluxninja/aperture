@@ -9,6 +9,7 @@ import (
 
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
 // ComponentDTO takes a CompiledCircuit and returns its graph representation.
@@ -25,25 +26,32 @@ func ComponentDTO(circuit CompiledCircuit) ([]*languagev1.ComponentView, []*lang
 		var inPorts, outPorts []*languagev1.PortView
 		for name, signals := range c.InPortToSignalsMap {
 			for _, signal := range signals {
-				signalName := signal.Name
-				inPorts = append(inPorts, &languagev1.PortView{
-					PortName:   name,
-					SignalName: signalName,
-					Looped:     signal.Looped,
-				})
-				inSignalsIndex[signalName] = append(inSignalsIndex[signalName], componentData{
-					componentID: c.ComponentID,
-					portName:    name,
-				})
+				if signal.SignalType == runtime.SignalTypeNamed {
+					signalName := signal.Name
+					inPorts = append(inPorts, &languagev1.PortView{
+						PortName: name,
+						Value:    &languagev1.PortView_SignalName{SignalName: signalName},
+						Looped:   signal.Looped,
+					})
+					inSignalsIndex[signalName] = append(inSignalsIndex[signalName], componentData{
+						componentID: c.ComponentID,
+						portName:    name,
+					})
+				} else if signal.SignalType == runtime.SignalTypeConstant {
+					inPorts = append(inPorts, &languagev1.PortView{
+						PortName: name,
+						Value:    &languagev1.PortView_ConstantValue{ConstantValue: signal.Value},
+					})
+				}
 			}
 		}
 		for name, signals := range c.OutPortToSignalsMap {
 			for _, signal := range signals {
 				signalName := signal.Name
 				outPorts = append(outPorts, &languagev1.PortView{
-					PortName:   name,
-					SignalName: signalName,
-					Looped:     signal.Looped,
+					PortName: name,
+					Value:    &languagev1.PortView_SignalName{SignalName: signalName},
+					Looped:   signal.Looped,
 				})
 				outSignalsIndex[signalName] = append(outSignalsIndex[signalName], componentData{
 					componentID: c.ComponentID,
@@ -132,6 +140,10 @@ func Mermaid(components []*languagev1.ComponentView, links []*languagev1.Link) s
 		return s.String()
 	}
 
+	// prefix for fake constant components
+	fakeConstantPrefix := "FakeConstant"
+	// constantID for fake constant components
+	var constantID int
 	// subgraph for each component
 	for _, c := range components {
 		// if it's a parent component then render the subgraph for each component
@@ -143,11 +155,22 @@ func Mermaid(components []*languagev1.ComponentView, links []*languagev1.Link) s
 		} else {
 			sb.WriteString(renderComponentSubGraph(c))
 		}
+		// fake nodes for constant value ports
+		for _, inPort := range c.InPorts {
+			if constValue, ok := inPort.GetValue().(*languagev1.PortView_ConstantValue); ok {
+				// Concatenate fakeConstant prefix to constantComponentID to avoid collision with real component IDs
+				constantComponentID := fmt.Sprintf("%s%d", fakeConstantPrefix, constantID)
+				constantID++
+				sb.WriteString(fmt.Sprintf("%s((%0.2f))\n", constantComponentID, constValue.ConstantValue))
+				// link constant to component
+				sb.WriteString(fmt.Sprintf("%s --> %s\n", constantComponentID, c.ComponentId+inPort.PortName))
+			}
+		}
 	}
 
 	// links
 	for _, link := range links {
-		sb.WriteString(fmt.Sprintf("%s --> |%s| %s\n", link.Source.ComponentId+link.Source.PortName, link.SignalName, link.Target.ComponentId+link.Target.PortName))
+		sb.WriteString(fmt.Sprintf("%s --> %s\n", link.Source.ComponentId+link.Source.PortName, link.Target.ComponentId+link.Target.PortName))
 	}
 
 	return sb.String()
@@ -173,9 +196,16 @@ func DOT(components []*languagev1.ComponentView, links []*languagev1.Link) strin
 		cluster.AttributesMap.Attr("margin", "50.0")
 		clusters[components[i].ComponentId] = cluster
 		var anyIn, anyOut dot.Node
-		for j := range components[i].InPorts {
-			anyIn = cluster.Node(components[i].InPorts[j].PortName)
+		for _, inPort := range components[i].InPorts {
+			anyIn = cluster.Node(inPort.PortName)
 			cluster.AddToSameRank("input", anyIn)
+			// fake nodes for constant value ports
+			if constValue, ok := inPort.GetValue().(*languagev1.PortView_ConstantValue); ok {
+				// Concatenate fakeConstant prefix to constantComponentID to avoid collision with real component IDs
+				fromNode := cluster.Node(fmt.Sprintf("%0.2f", constValue.ConstantValue))
+				// link constant to component
+				cluster.Edge(fromNode, anyIn)
+			}
 		}
 		for j := range components[i].OutPorts {
 			anyOut = cluster.Node(components[i].OutPorts[j].PortName)
@@ -187,7 +217,7 @@ func DOT(components []*languagev1.ComponentView, links []*languagev1.Link) strin
 	}
 	for i := range links {
 		g.Edge(clusters[links[i].Source.ComponentId].Node(links[i].Source.PortName),
-			clusters[links[i].Target.ComponentId].Node(links[i].Target.PortName)).Attr("label", links[i].SignalName)
+			clusters[links[i].Target.ComponentId].Node(links[i].Target.PortName))
 	}
 	return g.String()
 }
