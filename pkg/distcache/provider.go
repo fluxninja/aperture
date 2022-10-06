@@ -263,9 +263,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	}
 
 	jobConfig := jobs.JobConfig{
-		// TODO: Update jobConfig for scraping metrics from Olric instance
-		// DMap values update when distcache-rate-tracker is triggered.
-		InitialDelay:     config.MakeDuration(time.Millisecond * 300),
+		InitialDelay:     config.MakeDuration(0),
 		ExecutionPeriod:  config.MakeDuration(time.Millisecond * 500),
 		ExecutionTimeout: config.MakeDuration(time.Millisecond * 1000),
 		InitiallyHealthy: false,
