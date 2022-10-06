@@ -31,5 +31,5 @@ failures.
 
 [circuit]: /concepts/policy/circuit.md
 [resources]: /concepts/policy/resources.md
-[blueprints]: /get-started/blueprints.md
+[blueprints]: /policies/blueprints.md
 [control-system]: https://en.wikipedia.org/wiki/Control_system

@@ -65,32 +65,13 @@ generate-config-markdown:
 	@npx prettier --prose-wrap="preserve" --write gen/policies/policies.md
 	@mv gen/policies/policies.md content/references/configuration
 
-generate-mmd:
-	@echo generating mermaid files from markdown files
-	@./tools/mermaid/md_to_mmd.sh
-
-validate-jsonnet:
-	@echo validating jsonnet files
-	@./tools/scripts/validate-jsonnet.sh
+generate-jsonnet:
+	@echo generate jsonnet
+	@./tools/scripts/generate_jsonnet.sh
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
-generate-mermaid: generate-mmd
+generate-mermaid:
 	@echo generating mermaid diagrams
-	@parallel --no-notice --gnu --halt soon,fail=1 --line-buffer --tagstring {} \
-		$(MAKE) --no-print-directory -B {}.svg ::: $(shell find . -name '*.mmd' -print)
-	@parallel --no-notice --gnu --halt soon,fail=1 --line-buffer --tagstring {} \
-		$(MAKE) --no-print-directory -B {}.png ::: $(shell find . -name '*.mmd' -print)
-	@git add -f $(shell find . -name '*.mmd.svg' -print)
-	@git add -f $(shell find . -name '*.mmd.png' -print)
+	@./tools/mermaid/generate_mermaid.sh
 
-%.mmd.png %.mmd.svg: %.mmd ./tools/mermaid/mermaid-theme.json
-	@echo MMDC $@
-	@for fmt in svg png; \
-		do npx -p @mermaid-js/mermaid-cli mmdc \
-			--quiet --input $< --configFile ./tools/mermaid/mermaid-theme.json --cssFile ./tools/mermaid/mermaid.css --scale 2 --output $<.$$fmt --backgroundColor transparent; \
-	done
-	@for fmt in png; \
-		do convert $<.$$fmt -trim $<.$$fmt; \
-	done
-
-.PHONY: generate-config-markdown generate-mermaid generate-mmd validate-jsonnet
+.PHONY: generate-config-markdown generate-mermaid generate-jsonnet

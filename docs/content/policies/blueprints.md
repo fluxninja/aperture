@@ -1,10 +1,10 @@
 ---
-title: Policy Blueprints
+title: Blueprints
 description: Policies and Dashboards pre-packaged as reusable Blueprints
 keywords:
   - jsonnet
   - grafana
-sidebar_position: 3
+sidebar_position: 1
 ---
 
 ## Introduction
@@ -14,20 +14,19 @@ Grafana Dashboards that can be used both as a guide for creating new Policies,
 and as ready-to-use Blueprints for generating Aperture Policies customized to a
 [Service][service].
 
-All Dashboards and Policies are written using the [Jsonnet][jsonnet-lang]
-language, and can be used both as jsonnet mixins or as standalone Blueprints.
+All Policies and Grafana Dashboards are written using the
+[Jsonnet][jsonnet-lang] language, and can be used both as jsonnet mixins or as
+standalone Blueprints.
 
 [jsonnet-lang]: https://jsonnet.org
 
 ## Initial Setup
 
 Blueprints can be found in the [aperture repository][aperture-repo] under
-`blueprints/` directory. See the [blueprints README.md][blueprints-readme] for
-the list of required tools and instructions on installing jsonnet dependencies
-with a help of [jsonnet bundler][jb].
+`blueprints/` directory.
 
-The Blueprint Generator (used to generate Policy files from Blueprints) also
-depends on Python 3.8+ and [jsonnet][go-jsonnet].
+The Blueprint Generator (used to generate Policy files from Blueprints) depends
+on [jsonnet][go-jsonnet].
 
 [aperture-repo]: https://github.com/fluxninja/aperture/
 [blueprints-readme]:
@@ -40,28 +39,9 @@ depends on Python 3.8+ and [jsonnet][go-jsonnet].
 The simplest way to use Aperture Blueprints is to render blueprints into policy
 and dashboard files.
 
-To generate files, `blueprints/scripts/aperture-generate.py` can be used:
-
-```sh
-$ ./scripts/aperture-generate.py --help
-usage: aperture-generate.py [-h] [--verbose] [--output OUTPUT] [--config CONFIG]
-
-Aperture Policies & Dashboards generator utility.
-
-This utility can be used to generate Aperture Policies and Grafana Dashboards "in-place". Check [blueprint's README.md][blueprints-readme] for more
-details.
-
-options:
-  -h, --help       show this help message and exit
-  --verbose        Whether to log verbose messages to stderr
-  --output OUTPUT  Output directory for json files
-  --config CONFIG  jsonnet file with blueprint configuration
-```
-
-This script takes as options an output directory path where files will be saved
-and a path to a `config.libsonnet` file with local blueprint configuration. It
-also takes the BLUEPRINT argument, which is a path to the blueprint under the
-`blueprints/` directory.
+To generate files, `blueprints/scripts/aperture-generate.py` can be used. The
+script takes as options an output directory path where files will be saved and a
+path to a `config.libsonnet` file with local blueprint configuration.
 
 Under the `blueprints/` directory, the currently available Blueprints can be
 found. Each blueprint consists of at least two files: `config.libsonnet` and
@@ -79,17 +59,13 @@ more information.
 The full command using the example looks like this:
 
 ```sh
-jb install
-./scripts/aperture-generate.py --output _gen --config blueprints/latency-gradient/example/example.jsonnet
+jb install && ./scripts/aperture-generate.py --output _gen --config blueprints/latency-gradient/example/example.jsonnet
 ```
-
-[blueprints-readme]:
-  https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
 
 ## Using aperture blueprints as a jsonnet mixins library
 
 An alternate way of using the aperture blueprints is to import them from another
-jsonnet project and render Policies or Dashboards directly in jsonnet.
+jsonnet project and render Policies or Grafana Dashboards directly in jsonnet.
 
 For example, to create a Latency Gradient Policy that can be loaded by the
 controller, you need to install aperture blueprints library with jsonnet
@@ -160,6 +136,18 @@ And then, render it with [jsonnet][jsonnet]:
 ```sh
 jsonnet --yaml-stream -J vendor [example file].jsonnet
 ```
+
+After running this command you should see the following contents in the YAML
+file:
+
+<details>
+<summary>Generated Policy YAML</summary>
+
+```yaml
+{@include: ./assets/gen/blueprints/jsonnet/blueprints_0.jsonnet.yaml}
+```
+
+</details>
 
 This can be also integrated with other Kubernetes deployment tools like
 [tanka][tk].
