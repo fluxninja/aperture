@@ -66,26 +66,26 @@ local svcSelector =
   selector.new()
   + selector.withServiceSelector(
     serviceSelector.new()
-    + serviceSelector.withAgentGroup("default")
-    + serviceSelector.withService("service1-demo-app.demoapp.svc.cluster.local")
+    + serviceSelector.withAgentGroup('default')
+    + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
   )
   + selector.withFlowSelector(
     flowSelector.new()
-    + flowSelector.withControlPoint({ traffic: "ingress" })
+    + flowSelector.withControlPoint({ traffic: 'ingress' })
   );
 
 local policyDef =
   policy.new()
   + policy.withCircuit(
     circuit.new()
-    + circuit.withEvaluationInterval("300s")
+    + circuit.withEvaluationInterval('300s')
     + circuit.withComponents([
       component.withRateLimiter(
         rateLimiter.new()
         + rateLimiter.withInPorts({ limit: port.withConstantValue(120) })
         + rateLimiter.withSelector(svcSelector)
-        + rateLimiter.withLimitResetInterval("60s")
-        + rateLimiter.withLabelKey("http.request.header.user_id")
+        + rateLimiter.withLimitResetInterval('60s')
+        + rateLimiter.withLabelKey('http.request.header.user_id')
       ),
     ]),
   );
