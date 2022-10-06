@@ -21,6 +21,21 @@ const (
 	// RateLimiterCounterMetricName - name of the counter describing times rate limiter was triggered.
 	RateLimiterCounterMetricName = "rate_limiter_counter"
 
+	// Olric DMaps metrics.
+
+	// OlricEntriesTotalMetricName - metric for the total number of entries (including replicas) stored during the life of this instance.
+	OlricEntriesTotalMetricName = "olric_entries_total"
+	// OlricDeleteHitsMetricName - metric for number of deletion requests resulting in an item being removed.
+	OlricDeleteHitsMetricName = "olric_delete_hits"
+	// OlricDeleteMissesMetricName - metric for number of deletion requests for missing keys.
+	OlricDeleteMissesMetricName = "olric_delete_misses"
+	// OlricGetMissesMetricName - metric for number of entries that have been requested and not found.
+	OlricGetMissesMetricName = "olric_get_misses"
+	// OlricGetHitsMetricName - metric for number of entries that have been requested and found present.
+	OlricGetHitsMetricName = "olric_get_hits"
+	// OlricEvictedTotalMetricName - metric for number of entries removed from cache to free memory for new entries.
+	OlricEvictedTotalMetricName = "olric_evicted_total"
+
 	// Workload metrics.
 
 	// WorkloadLatencyMetricName - metric used for grouping latencies per workload.
@@ -59,6 +74,10 @@ const (
 
 	// PROMETHEUS LABELS.
 
+	// OlricMemberIDLabel - label specifying unique identifier of the node in the cluster.
+	OlricMemberIDLabel = "olric_member_id"
+	// OlricMemberNameLabel - label specifying name of the node in the cluster.
+	OlricMemberNameLabel = "olric_member_name"
 	// PolicyNameLabel - label used in prometheus.
 	PolicyNameLabel = "policy_name"
 	// PolicyHashLabel - label used in prometheus.
