@@ -102,7 +102,7 @@ local apertureControllerMixin =
     },
   };
 
-local policy = latencyGradientPolicy({
+local policyResource = latencyGradientPolicy({
   policyName: 'service1-demo-app',
   fluxMeter: fluxMeter.new() + fluxMeter.withSelector(fluxMeterSelector),
   concurrencyLimiterSelector: concurrencyLimiterSelector,
@@ -157,21 +157,9 @@ local policy = latencyGradientPolicy({
     ),
 
   ],
-}).policy;
-
-local policyMixin = {
-  kind: 'Policy',
-  apiVersion: 'fluxninja.com/v1alpha1',
-  metadata: {
-    name: 'service1-demo-app',
-    labels: {
-      'fluxninja.com/validate': 'true',
-    },
-  },
-  spec: policy,
-};
+}).policyResource;
 
 {
-  latencyGradientPolicy: policyMixin,
+  latencyGradientPolicy: policyResource,
   controller: apertureControllerMixin,
 }
