@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+gitroot=$(git rev-parse --show-toplevel)
+
+pushd "$gitroot" >/dev/null || exit 1
+
 # check whether ggrep exists or not
 if ! [ -x "$(command -v ggrep)" ]; then
 	GREP="grep"
@@ -19,3 +23,5 @@ dirs=$("${GREP}" --include="*.go" --exclude-dir="vendor" -r "go:generate" -l | x
 
 # use parallel to execute "cd {} && go generate" in for each directory in $dirs
 parallel -j4 --no-notice "cd {} && go generate" ::: "$dirs"
+
+popd >/dev/null || exit 1

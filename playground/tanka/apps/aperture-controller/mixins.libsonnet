@@ -16,11 +16,11 @@ local selector = aperture.spec.v1.Selector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local controlPoint = aperture.spec.v1.ControlPoint;
-local constant = aperture.spec.v1.Constant;
 local component = aperture.spec.v1.Component;
 local rateLimiter = aperture.spec.v1.RateLimiter;
+local decider = aperture.spec.v1.Decider;
+local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
-local rateLimitPort = port.new() + port.withSignalName('RATE_LIMIT');
 
 local fluxMeterSelector = selector.new()
                           + selector.withServiceSelector(
@@ -133,20 +133,29 @@ local policy = latencyGradientPolicy({
   },
   components: [
     component.new()
-    + component.withConstant(
-      constant.new()
-      + constant.withValue(3)
-      + constant.withOutPorts({ output: rateLimitPort })
+    + component.withDecider(
+      decider.new()
+      + decider.withOperator('gt')
+      + decider.withInPorts({ lhs: port.withSignalName('LSF'), rhs: port.withConstantValue(0.1) })
+      + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
+      + decider.withTrueFor('30s')
+    ),
+    component.new()
+    + component.withSwitcher(
+      switcher.new()
+      + switcher.withInPorts({ switch: port.withSignalName('IS_BOT_ESCALATION'), on_true: port.withConstantValue(0.0), on_false: port.withConstantValue(10) })
+      + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),
     component.new()
     + component.withRateLimiter(
       rateLimiter.new()
       + rateLimiter.withSelector(rateLimiterSelector)
-      + rateLimiter.withInPorts({ limit: rateLimitPort })
+      + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
       + rateLimiter.withLimitResetInterval('1s')
       + rateLimiter.withLabelKey('http.request.header.user_id')
       + rateLimiter.withDynamicConfigKey('rate_limiter'),
     ),
+
   ],
 }).policy;
 

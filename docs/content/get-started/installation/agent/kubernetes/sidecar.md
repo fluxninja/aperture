@@ -34,9 +34,6 @@ The injector is configured with the following logic:
 
 ## Installation {#agent-sidecar-installation}
 
-(Consult [Supported Platforms](/get-started/supported-platforms.md) before
-installing.)
-
 The Aperture Agent in the Sidecar mode will be installed using the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
 which will be managed by the Aperture Operator.
