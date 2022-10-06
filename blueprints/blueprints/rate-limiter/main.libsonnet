@@ -7,6 +7,6 @@ local policy = lib.blueprints.policies.RateLimiter;
 {
   dashboards: {},
   policies: {
-    [std.format('%s.yaml', $._config.policy.policyName)]: policy($._config.policy),
+    [std.format('%s.yaml', $._config.policy.policyName)]: policy($._config.policy).policyResource,
   },
 } + { _config:: config }

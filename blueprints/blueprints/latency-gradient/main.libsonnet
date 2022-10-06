@@ -7,7 +7,7 @@ local dashboard = lib.blueprints.dashboards.LatencyGradient;
 
 {
   policies: {
-    [std.format('%s.yaml', $._config.policy.policyName)]: policy($._config.policy),
+    [std.format('%s.yaml', $._config.policy.policyName)]: policy($._config.policy).policyResource,
   },
   dashboards: {
     [std.format('%s.json', $._config.common.policyName)]: dashboard($._config.dashboard),
