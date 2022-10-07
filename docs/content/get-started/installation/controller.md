@@ -23,20 +23,19 @@ is referred to as the error signal. The feedback loop then works to minimize
 these error signals by determining and distributing control actions, that adjust
 these process variables and maintain their values within the optimal range.
 
-## Configuration
-
-The Aperture Controller related configurations are stored in a configmap which
-is created during the installation using Helm.
-
-All the configuration parameters for Aperture Controller are listed
-[here](/references/configuration/controller.md).
-
-## Installation {#controller-installation}
+## Controller CRD
 
 The Aperture Controller is a Kubernetes based application and is installed using
 the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
 which is managed by the Aperture Operator.
+
+The configuration for the Aperture Controller process is provided to the
+Controller CRD under the `controller.config` section. All the configuration
+parameters for Aperture Controller are listed
+[here](/references/configuration/controller.md).
+
+## Installation {#controller-installation}
 
 Below are the steps to install or upgrade the Aperture Controller into your
 setup using the
