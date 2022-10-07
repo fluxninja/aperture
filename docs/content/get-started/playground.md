@@ -92,25 +92,28 @@ service3-demo-app-788857c7cc-557zj   2/2     Running   0          7m13s
 service3-demo-app-788857c7cc-vlchn   2/2     Running   0          7m13s
 ```
 
-To start the simulated traffic against the demo application, navigate to K6
-resource in the Tilt UI and press the `Run load test` button. The traffic is
-designed to overload the demo application in order to showcase the capabilities
-of Aperture.
-
-![Start Load Test](../assets/img/starttrafficbig.png)
+Once all the resources are in the running state, simulated traffic will start
+getting generated automatically against the demo application. The traffic is
+designed to overload the demo application in order showcase the capabilities of
+Aperture.
 
 Once the traffic is running, you can visualize the decisions made by Aperture in
 Grafana. Navigate to [localhost:3000](http://localhost:3000) on your browser to
 reach Grafana. You can open the pre-loaded "FluxNinja" dashboard under
 "aperture-system" folder to a bunch of useful panels.
 
-To stop the traffic at any point of time, press the `Delete load test` button in
-the K6 resource.
+To stop the traffic at any point of time, press the `Stop Wavepool Generator`
+button in the `DemoApplications` resource.
+
+![Stop Wavepool Generator](../assets/img/stop-traffic.png)
+
+To re-start the traffic, press the `Start Wavepool Generator` button in the
+`DemoApplications` resource.
 
 :::note
 
 Every time you wish to run the traffic, make sure to press the
-`Delete load test` button first.
+`Stop Wavepool Generator` button first.
 
 :::
 
