@@ -4,6 +4,7 @@ local config = import './config.libsonnet';
 
 local policy = lib.blueprints.policies.LatencyGradient;
 local dashboard = lib.blueprints.dashboards.LatencyGradient;
+local signalsDashboard = lib.blueprints.dashboards.Signals;
 
 {
   policies: {
@@ -11,6 +12,7 @@ local dashboard = lib.blueprints.dashboards.LatencyGradient;
   },
   dashboards: {
     [std.format('%s.json', $._config.common.policyName)]: dashboard($._config.dashboard),
+    [std.format('%s-signals.json', $._config.common.policyName)]: signalsDashboard($._config.dashboard),
   },
 } +
 {

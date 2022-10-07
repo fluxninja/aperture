@@ -6,10 +6,7 @@ local timeSeriesPanel = lib.TimeSeriesPanel;
 
 
 {
-  new(title, datasource, query, axisLabel=null, unit=null)::
-    local target =
-      prometheus.target(query, intervalFactor=1)
-      + { range: true, editorMode: 'code' };
+  new(title, datasource, axisLabel=null, unit=null)::
     timeSeriesPanel.new(
       title=title,
       datasource=datasource,
@@ -17,7 +14,6 @@ local timeSeriesPanel = lib.TimeSeriesPanel;
       min_span=24,
       axis_label=axisLabel,
     ) +
-    timeSeriesPanel.withTarget(target) +
     timeSeriesPanel.withOptions(
       timeSeriesPanel.options.withLegend() +
       timeSeriesPanel.options.withTooltip()

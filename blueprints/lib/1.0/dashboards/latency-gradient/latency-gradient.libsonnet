@@ -31,7 +31,11 @@ local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
         { color: 'red', value: 80 },
       ],
     };
-  aperture.timeSeriesPanel.new(title, datasource, query, axisLabel, unit)
+  local target =
+    prometheus.target(query, intervalFactor=1)
+    + { range: true, editorMode: 'code' };
+  aperture.timeSeriesPanel.new(title, datasource, axisLabel, unit)
+  + timeSeriesPanel.withTarget(target)
   + timeSeriesPanel.defaults.withThresholds(thresholds)
   + timeSeriesPanel.withFieldConfigMixin(
     timeSeriesPanel.fieldConfig.withDefaultsMixin(

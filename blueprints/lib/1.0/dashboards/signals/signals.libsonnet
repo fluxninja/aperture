@@ -22,6 +22,18 @@ function(params) {
   local ds = $._config.datasource.name,
 
   local SignalAveragePanel =
+    local query = |||
+      increase(signal_reading_sum{signal_name=\"${signal_name}\"}[10s])
+      /
+      increase(signal_reading_count{signal_name=\"${signal_name}\"}[10s])
+    |||;
+    local target =
+      grafana.prometheus.target(query) +
+      {
+        legendFormat: 'Avg',
+        editorMode: 'code',
+        range: true,
+      };
     local thresholds =
       {
         mode: 'absolute',
@@ -30,12 +42,8 @@ function(params) {
           { color: 'red', value: 80 },
         ],
       };
-    local prometheusQuery = |||
-      increase(signal_reading_sum{signal_name=\"${signal_name}\"}[10s])
-      /
-      increase(signal_reading_count{signal_name=\"${signal_name}\"}[10s])
-    |||;
-    aperture.timeSeriesPanel.new('Signal Average', ds, prometheusQuery)
+    aperture.timeSeriesPanel.new('Signal Average', ds)
+    + timeSeriesPanel.withTarget(target)
     + timeSeriesPanel.defaults.withThresholds(thresholds)
     + timeSeriesPanel.withFieldConfigMixin(
       timeSeriesPanel.fieldConfig.withDefaultsMixin(
