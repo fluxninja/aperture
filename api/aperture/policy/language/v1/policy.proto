@@ -80,7 +80,7 @@ message Circuit {
   }]; // @gotags: default:"0.5s"
 
   // Defines a signal processing graph as a list of components.
-  repeated Component components = 2;
+  repeated Component components = 2; // @gotags: validate:"dive"
 }
 
 // Resources that need to be setup for the policy to function
@@ -94,11 +94,11 @@ message Resources {
   // FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
   //
   // FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
-  map<string, FluxMeter> flux_meters = 1;
+  map<string, FluxMeter> flux_meters = 1; // @gotags: validate:"dive"
   // Classifiers are installed in the data-plane and are used to label the requests based on payload content.
   //
   // The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
-  repeated Classifier classifiers = 2;
+  repeated Classifier classifiers = 2; // @gotags: validate:"dive"
 }
 
 // Computational block that form the circuit
@@ -618,7 +618,7 @@ message RateLimiter {
   // Dynamic Configuration for the rate limiter
   message DynamicConfig {
     // Allows to specify different limits for particular label values.
-    repeated Override overrides = 1;
+    repeated Override overrides = 1; // @gotags: validate:"dive"
   }
 
   message Override {
@@ -854,7 +854,7 @@ message Scheduler {
   // See also [workload definition in the concepts
   // section](/concepts/flow-control/concurrency-limiter.md#workload).
   // :::
-  repeated Workload workloads = 3;
+  repeated Workload workloads = 3; // @gotags: validate:"dive"
 
   // WorkloadParameters to be used if none of workloads specified in `workloads` match.
   WorkloadParameters default_workload_parameters = 4;
@@ -1053,7 +1053,7 @@ message Max {
   // Inputs for the Max component.
   message Ins {
     // Array of input signals.
-    repeated InPort inputs = 1;
+    repeated InPort inputs = 1; // @gotags: validate:"dive"
   }
 
   // Output for the Max component.
@@ -1075,7 +1075,7 @@ message Min {
   // Inputs for the Min component.
   message Ins {
     // Array of input signals.
-    repeated InPort inputs = 1;
+    repeated InPort inputs = 1; // @gotags: validate:"dive"
   }
 
   // Output ports for the Min component.

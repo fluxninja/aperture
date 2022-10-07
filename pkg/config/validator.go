@@ -24,6 +24,7 @@ func getValidate() *validator.Validate {
 
 // ValidateStruct takes interface value and validates its fields of a struct.
 func ValidateStruct(rawVal interface{}) error {
+	log.Info().Str("type", fmt.Sprintf("%T", rawVal)).Msg("ValidateStruct")
 	// validate configuration
 	err := globalValidate.Struct(rawVal)
 	if err != nil {

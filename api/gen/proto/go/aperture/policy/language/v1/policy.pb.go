@@ -218,7 +218,7 @@ type Circuit struct {
 	// This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 	EvaluationInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"0.5s"` // @gotags: default:"0.5s"
 	// Defines a signal processing graph as a list of components.
-	Components []*Component `protobuf:"bytes,2,rep,name=components,proto3" json:"components,omitempty"`
+	Components []*Component `protobuf:"bytes,2,rep,name=components,proto3" json:"components,omitempty" validate:"dive"` // @gotags: validate:"dive"
 }
 
 func (x *Circuit) Reset() {
@@ -282,11 +282,11 @@ type Resources struct {
 	// FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
 	//
 	// FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
-	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"dive"` // @gotags: validate:"dive"
 	// Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 	//
 	// The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
-	Classifiers []*Classifier `protobuf:"bytes,2,rep,name=classifiers,proto3" json:"classifiers,omitempty"`
+	Classifiers []*Classifier `protobuf:"bytes,2,rep,name=classifiers,proto3" json:"classifiers,omitempty" validate:"dive"` // @gotags: validate:"dive"
 }
 
 func (x *Resources) Reset() {
@@ -1488,7 +1488,7 @@ type Scheduler struct {
 	// See also [workload definition in the concepts
 	// section](/concepts/flow-control/concurrency-limiter.md#workload).
 	// :::
-	Workloads []*Scheduler_Workload `protobuf:"bytes,3,rep,name=workloads,proto3" json:"workloads,omitempty"`
+	Workloads []*Scheduler_Workload `protobuf:"bytes,3,rep,name=workloads,proto3" json:"workloads,omitempty" validate:"dive"` // @gotags: validate:"dive"
 	// WorkloadParameters to be used if none of workloads specified in `workloads` match.
 	DefaultWorkloadParameters *Scheduler_WorkloadParameters `protobuf:"bytes,4,opt,name=default_workload_parameters,json=defaultWorkloadParameters,proto3" json:"default_workload_parameters,omitempty"`
 	// Automatically estimate the size of a request in each workload, based on
@@ -2711,7 +2711,7 @@ type RateLimiter_DynamicConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Allows to specify different limits for particular label values.
-	Overrides []*RateLimiter_Override `protobuf:"bytes,1,rep,name=overrides,proto3" json:"overrides,omitempty"`
+	Overrides []*RateLimiter_Override `protobuf:"bytes,1,rep,name=overrides,proto3" json:"overrides,omitempty" validate:"dive"` // @gotags: validate:"dive"
 }
 
 func (x *RateLimiter_DynamicConfig) Reset() {
@@ -3418,7 +3418,7 @@ type Max_Ins struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Array of input signals.
-	Inputs []*InPort `protobuf:"bytes,1,rep,name=inputs,proto3" json:"inputs,omitempty"`
+	Inputs []*InPort `protobuf:"bytes,1,rep,name=inputs,proto3" json:"inputs,omitempty" validate:"dive"` // @gotags: validate:"dive"
 }
 
 func (x *Max_Ins) Reset() {
@@ -3516,7 +3516,7 @@ type Min_Ins struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Array of input signals.
-	Inputs []*InPort `protobuf:"bytes,1,rep,name=inputs,proto3" json:"inputs,omitempty"`
+	Inputs []*InPort `protobuf:"bytes,1,rep,name=inputs,proto3" json:"inputs,omitempty" validate:"dive"` // @gotags: validate:"dive"
 }
 
 func (x *Min_Ins) Reset() {
