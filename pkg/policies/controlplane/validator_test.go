@@ -205,13 +205,13 @@ spec:
             output:
               signal_name: "LSF"
       - concurrency_limiter:
+          selector:
+            service_selector:
+              service: "service1-demo-app.demoapp.svc.cluster.local"
+            flow_selector:
+              control_point:
+                traffic: "ingress"
           scheduler:
-            selector:
-              service_selector:
-                service: "service1-demo-app.demoapp.svc.cluster.local"
-              flow_selector:
-                control_point:
-                  traffic: "ingress"
             auto_tokens: true
             default_workload_parameters:
               priority: 20
