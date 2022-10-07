@@ -28,15 +28,15 @@ import (
 )
 
 const (
-	defaultKey                 = "dist_cache"
+	defaultKey                 = "distcache"
 	olricMemberlistServiceName = "olric-memberlist"
-	olricMetricsJobName        = "scrape-metrics"
+	distCacheMetricsJobName    = "scrape-metrics"
 )
 
 // Module provides a new DistCache FX module.
 func Module() fx.Option {
 	return fx.Options(
-		jobs.JobGroupConstructor{Name: "olric", Key: defaultKey}.Annotate(),
+		jobs.JobGroupConstructor{Name: "distcache", Key: defaultKey}.Annotate(),
 		fx.Provide(DistCacheConstructor{ConfigKey: defaultKey}.ProvideDistCache),
 	)
 }
@@ -68,7 +68,7 @@ type DistCache struct {
 	sync.Mutex
 	Config     *olricconfig.Config
 	Olric      *olric.Olric
-	Metrics    *OlricMetrics
+	Metrics    *DistCacheMetrics
 	jobGroup   *jobs.JobGroup
 	metricsJob *jobs.MultiJob
 }
@@ -94,9 +94,12 @@ func (dc *DistCache) scrapeMetrics() error {
 	memberID := stats.Member.ID
 	memberName := stats.Member.Name
 	metricLabels := make(prometheus.Labels)
-	metricLabels[metrics.OlricMemberIDLabel] = strconv.FormatUint(memberID, 10)
-	metricLabels[metrics.OlricMemberNameLabel] = memberName
+	metricLabels[metrics.DistCacheMemberIDLabel] = strconv.FormatUint(memberID, 10)
+	metricLabels[metrics.DistCacheMemberNameLabel] = memberName
 
+	if dc.Metrics == nil {
+		dc.Metrics = newDistCacheMetrics()
+	}
 	entriesTotalGauge, err := dc.Metrics.EntriesTotal.GetMetricWith(metricLabels)
 	if err != nil {
 		log.Debug().Msgf("Could not extract entries total gauge metric from olric instance: %v", err)
@@ -147,7 +150,7 @@ type DistCacheConstructorIn struct {
 	PeerDiscovery      *peers.PeerDiscovery
 	Unmarshaller       config.Unmarshaller
 	Lifecycle          fx.Lifecycle
-	JobGroup           *jobs.JobGroup `name:"olric"`
+	JobGroup           *jobs.JobGroup `name:"distcache"`
 	Shutdowner         fx.Shutdowner
 	Logger             *log.Logger
 	PrometheusRegistry *prometheus.Registry
@@ -239,14 +242,14 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	}
 
 	dc.Olric = o
-	dc.Metrics = newOlricMetrics()
+	dc.Metrics = newDistCacheMetrics()
 	dc.jobGroup = in.JobGroup
-	multiJob := jobs.NewMultiJob(dc.jobGroup.GetStatusRegistry().Child("olric"), nil, nil)
+	multiJob := jobs.NewMultiJob(dc.jobGroup.GetStatusRegistry().Child("distcache"), nil, nil)
 	dc.metricsJob = multiJob
 
 	job := &jobs.BasicJob{
 		JobBase: jobs.JobBase{
-			JobName: olricMetricsJobName,
+			JobName: distCacheMetricsJobName,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -264,7 +267,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	}
 
 	jobConfig := jobs.JobConfig{
-		InitialDelay:     config.MakeDuration(0),
+		InitialDelay:     config.MakeDuration(time.Millisecond * 100),
 		ExecutionPeriod:  config.MakeDuration(time.Millisecond * 500),
 		ExecutionTimeout: config.MakeDuration(time.Millisecond * 1000),
 		InitiallyHealthy: false,
@@ -283,7 +286,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			panichandler.Go(func() {
 				log.Info().Msg("Started OTEL Collector")
 				err = dc.Olric.Start()
-				dc.jobGroup.TriggerJob(olricMetricsJobName)
+				dc.jobGroup.TriggerJob(distCacheMetricsJobName)
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to start olric")
 				}
