@@ -1,7 +1,9 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
-  name: service1
+  labels:
+    fluxninja.com/validate: "true"
+  name: example
 spec:
   circuit:
     components:
@@ -114,7 +116,11 @@ spec:
           out_ports:
             output:
               signal_name: LATENCY
-          query_string: sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="example"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="example"}[5s]))
+          query_string:
+            sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED",
+            response_status="OK",
+            flux_meter_name="example"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
+            response_status="OK", flux_meter_name="example"}[5s]))
       - ema:
           correction_factor_on_max_envelope_violation: "0.95"
           ema_window: 1500s

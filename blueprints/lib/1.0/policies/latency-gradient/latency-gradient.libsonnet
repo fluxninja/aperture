@@ -196,5 +196,18 @@ function(params) {
         ] + $._config.components,
       ),
     ),
-  policy: policyDef,
+
+  local policyResource = {
+    kind: 'Policy',
+    apiVersion: 'fluxninja.com/v1alpha1',
+    metadata: {
+      name: $._config.policyName,
+      labels: {
+        'fluxninja.com/validate': 'true',
+      },
+    },
+    spec: policyDef,
+  },
+
+  policyResource: policyResource,
 }

@@ -34,7 +34,7 @@ $FIND "$blueprints_root"/blueprints -mindepth 1 -maxdepth 1 -type d | while read
 		mkdir -p "$dir"/example/gen/graph
 		# fail if commands below fails
 		go run -mod=mod "${blueprints_root}"/../cmd/circuit-compiler/main.go \
-			-policy "$dir"/example/gen/policies/example.yaml \
+			-cr "$dir"/example/gen/policies/example.yaml \
 			-dot "$dir"/example/gen/graph/graph.dot
 		# if exit code is not 0 then remove example.yaml
 		# shellcheck disable=SC2181
