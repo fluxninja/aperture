@@ -11,8 +11,12 @@ GIT_ROOT = str(local("git rev-parse --show-toplevel")).strip()
 PLAYGROUND_ROOT = GIT_ROOT + "/playground"
 TANKA_ROOT = GIT_ROOT + "/playground/tanka"
 TILT_OBJECTS = []
+APERTURE_GO_REPO_PATH = GIT_ROOT + "/../aperture-go"
+APERTURE_JAVA_REPO_PATH = GIT_ROOT + "/../aperture-java"
 APERTURE_AGENT_NS = "aperture-agent"
 APERTURE_CONTROLLER_NS = "aperture-controller"
+APERTURE_GO_EXAMPLE_NS = "aperture-go-example"
+APERTURE_JAVA_EXAMPLE_NS = "aperture-java-example"
 APERTURE_DEMOAPP_NS = "demoapp"
 # APERTURE_BOOKINFO_NS = "bookinfo"
 APERTURE_ISTIO_NS = "istio-system"
@@ -319,6 +323,44 @@ DEP_TREE = {
             ]
         },
     },
+    APERTURE_GO_EXAMPLE_NS: {
+        "aperture-go-example": {
+            "labels": ["Aperture"],
+            "needs": ["agent"],
+            "tkenv": TANKA_ROOT + "/apps/aperture-go-example",
+            "images": [
+                {
+                    "ref": "aperture-go-example",
+                    "context": APERTURE_GO_REPO_PATH if os.path.exists(APERTURE_GO_REPO_PATH) else "https://github.com/fluxninja/aperture-go.git#main",
+                }
+            ],
+            "child_resources": [
+                {
+                    "workload": "aperture-go-example",
+                    "resource_deps": ["agent", "controller", "cluster-bootstrap"],
+                }
+            ]
+        },
+    },
+    APERTURE_JAVA_EXAMPLE_NS: {
+        "aperture-java-example": {
+            "labels": ["Aperture"],
+            "needs": ["agent"],
+            "tkenv": TANKA_ROOT + "/apps/aperture-java-example",
+            "images": [
+                {
+                    "ref": "aperture-java-example",
+                    "context": APERTURE_JAVA_REPO_PATH if os.path.exists(APERTURE_JAVA_REPO_PATH) else "https://github.com/fluxninja/aperture-java.git#main",
+                }
+            ],
+            "child_resources": [
+                {
+                    "workload": "aperture-java-example",
+                    "resource_deps": ["agent", "controller", "cluster-bootstrap"],
+                }
+            ]
+        },
+    },
     # APERTURE_BOOKINFO_NS: {
     #     "bookinfo": {
     #         "labels": ["DemoApplications"],
@@ -370,6 +412,16 @@ def merge_dicts(*dicts):
         merged.update(d)
     return merged
 
+def build_remote_docker_img(ref, context, **kwargs):
+    if kwargs:
+        fail("build_remote_docker_img doesn't support kwargs: {}".format(kwargs))
+    custom_build(
+        ref=ref,
+        deps=[],
+        # Would be better to run as list[str], but then we can't reference the env var
+        command='docker build -t "$EXPECTED_REF" "{context}"'.format(context=context),
+    )
+
 def build_docker_img(ref, context, dockerfile="Dockerfile", **kwargs):
     # Wrapper around docker_build to not repeat image repo,
     print(
@@ -383,7 +435,14 @@ def build_docker_img(ref, context, dockerfile="Dockerfile", **kwargs):
         kwargs,
     )
     ref = IMG_REPO.rstrip("/") + "/" + ref
-    docker_build(ref, context, dockerfile=dockerfile, **kwargs)
+    if context.startswith("https://"):
+        build_remote_docker_img(ref, context, **kwargs)
+    else:
+        if not context.startswith("/"):
+            context = GIT_ROOT + "/" + context
+        if not dockerfile.startswith("/"):
+            dockerfile = context + "/" + (dockerfile or "Dockerfile")
+        docker_build(ref, context, dockerfile=dockerfile, **kwargs)
 
 
 def pull_docker_img(ref, tag):
@@ -957,6 +1016,30 @@ cmd_button('wavepool-stop',
     icon_name='content_paste_off',
     text='Stop Wavepool Generator',
     argv=['sh', '-c', delete_wavepool_generator],
+)
+
+aperture_go_pod_exec_script = '''
+# get k8s pod name from tilt resource name
+POD_NAME="$(tilt get kubernetesdiscovery "aperture-go-example" -ojsonpath='{.status.pods[0].name}')"
+kubectl exec -n aperture-go-example "$POD_NAME" -- wget -O - http://aperture-go-example:80/super
+'''
+cmd_button('aperture-go-trigger',
+        argv=['sh', '-c', aperture_go_pod_exec_script],
+        resource='aperture-go-example',
+        icon_name='ads_click',
+        text='Trigger library example',
+)
+
+aperture_java_pod_exec_script = '''
+# get k8s pod name from tilt resource name
+POD_NAME="$(tilt get kubernetesdiscovery "aperture-java-example" -ojsonpath='{.status.pods[0].name}')"
+kubectl exec -n aperture-java-example "$POD_NAME" -- wget -O - http://aperture-java-example:80/super
+'''
+cmd_button('aperture-java-trigger',
+        argv=['sh', '-c', aperture_java_pod_exec_script],
+        resource='aperture-java-example',
+        icon_name='ads_click',
+        text='Trigger library example',
 )
 
 declare_resources(resources, DEP_TREE, inverted_dep_tree)
