@@ -188,10 +188,12 @@ definitions:
         description: |-
           Label Matcher to select a Workload based on
           [flow labels](/concepts/flow-control/flow-label.md).
+        x-go-validate: required
         x-order: 0
         $ref: '#/definitions/v1LabelMatcher'
       workload_parameters:
         description: WorkloadParameters associated with flows matching the label matcher.
+        x-go-validate: required
         x-order: 1
         $ref: '#/definitions/SchedulerWorkloadParameters'
   SchedulerWorkloadParameters:
@@ -500,6 +502,12 @@ definitions:
         x-go-validate: required
         x-order: 1
         $ref: '#/definitions/v1Scheduler'
+      selector:
+        description: Selector decides the service and flows at which the concurrency
+          limiter is applied.
+        x-go-validate: required
+        x-order: 2
+        $ref: '#/definitions/v1Selector'
   v1Constant:
     type: object
     title: Component that emits a constant value as an output signal
@@ -1592,6 +1600,7 @@ definitions:
       default_workload_parameters:
         description: WorkloadParameters to be used if none of workloads specified
           in `workloads` match.
+        x-go-validate: required
         x-order: 1
         $ref: '#/definitions/SchedulerWorkloadParameters'
       max_timeout:
@@ -1620,12 +1629,6 @@ definitions:
         description: Output ports for the Scheduler component.
         x-order: 3
         $ref: '#/definitions/v1SchedulerOuts'
-      selector:
-        description: Selector decides for which service or flows the scheduler will
-          be applied.
-        x-go-validate: required
-        x-order: 4
-        $ref: '#/definitions/v1Selector'
       timeout_factor:
         description: |-
           If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
@@ -1637,7 +1640,7 @@ definitions:
         title: Timeout as a factor of tokens for a flow in a workload
         x-go-default: 0.5
         x-go-validate: gte=0.0
-        x-order: 5
+        x-order: 4
       workloads:
         description: |-
           List of workloads to be used in scheduler.
@@ -1663,7 +1666,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/SchedulerWorkload'
-        x-order: 6
+        x-order: 5
   v1SchedulerOuts:
     description: Output for the Scheduler component.
     type: object

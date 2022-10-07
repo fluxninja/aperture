@@ -25,8 +25,12 @@ func getValidate() *validator.Validate {
 // ValidateStruct takes interface value and validates its fields of a struct.
 func ValidateStruct(rawVal interface{}) error {
 	// validate configuration
+	log.Info().Msg("Validating configuration")
 	err := globalValidate.Struct(rawVal)
+	log.Info().Msg("Done validating configuration")
+	log.Info().Msgf("rawVal: %+v", rawVal)
 	if err != nil {
+		log.Info().Msg("Validation failed")
 		if _, ok := err.(*validator.InvalidValidationError); ok {
 			log.Panic().Err(err).Msg("InvalidValidationError!")
 		} else if _, ok := err.(validator.ValidationErrors); ok {

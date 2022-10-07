@@ -31,13 +31,9 @@ func NewConcurrencyLimiterOptions(
 	policyReadAPI iface.Policy,
 ) (fx.Option, string, error) {
 	// Get Agent Group Name from ConcurrencyLimiter.Scheduler.Selector.AgentGroup
-	schedulerProto := concurrencyLimiterProto.GetScheduler()
-	if schedulerProto == nil {
-		return fx.Options(), "", errors.New("concurrencyLimiter.Scheduler is nil")
-	}
-	selectorProto := schedulerProto.GetSelector()
+	selectorProto := concurrencyLimiterProto.GetSelector()
 	if selectorProto == nil {
-		return fx.Options(), "", errors.New("concurrencyLimiter.Scheduler.Selector is nil")
+		return fx.Options(), "", errors.New("concurrencyLimiter.Selector is nil")
 	}
 	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
 	etcdPath := path.Join(common.ConcurrencyLimiterConfigPath, common.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentStackIndex)))

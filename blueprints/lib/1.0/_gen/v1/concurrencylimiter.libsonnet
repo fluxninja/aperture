@@ -13,4 +13,10 @@
   withSchedulerMixin(scheduler):: {
     scheduler+: scheduler,
   },
+  withSelector(selector):: {
+    selector: selector,
+  },
+  withSelectorMixin(selector):: {
+    selector+: selector,
+  },
 }
