@@ -45,7 +45,7 @@ require (
 	github.com/open-policy-agent/opa-envoy-plugin v0.45.0-envoy
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.61.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.61.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.61.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.61.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.61.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.61.0
@@ -101,7 +101,7 @@ require (
 	github.com/go-openapi/errors v0.20.2 // indirect
 	github.com/go-openapi/runtime v0.23.3 // indirect
 	github.com/go-openapi/strfmt v0.21.3 // indirect
-	github.com/go-openapi/swag v0.22.3 // indirect
+	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/go-openapi/validate v0.22.0 // indirect
 	github.com/gobuffalo/flect v0.2.5 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
@@ -225,7 +225,7 @@ require (
 	github.com/imdario/mergo v0.3.13
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/ionos-cloud/sdk-go/v6 v6.1.3 // indirect
-	github.com/jaegertracing/jaeger v1.38.1 // indirect
+	github.com/jaegertracing/jaeger v1.37.0 // indirect
 	github.com/jessevdk/go-flags v1.5.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect

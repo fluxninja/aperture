@@ -362,11 +362,11 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
-			logRecord.Attributes().InsertString(oc.ApertureSourceLabel, source)
-			logRecord.Attributes().InsertString(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
-			logRecord.Attributes().InsertString(oc.HTTPStatusCodeLabel, "201")
-			logRecord.Attributes().InsertDouble(oc.WorkloadDurationLabel, 5)
-			logRecord.Attributes().InsertDouble(oc.EnvoyAuthzDurationLabel, 1)
+			logRecord.Attributes().PutString(oc.ApertureSourceLabel, source)
+			logRecord.Attributes().PutString(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
+			logRecord.Attributes().PutString(oc.HTTPStatusCodeLabel, "201")
+			logRecord.Attributes().PutDouble(oc.WorkloadDurationLabel, 5)
+			logRecord.Attributes().PutDouble(oc.EnvoyAuthzDurationLabel, 1)
 			for i, fm := range checkResponse.FluxMeterInfos {
 				// TODO actually return some Histogram
 				expectedCalls[i] = engine.EXPECT().GetFluxMeter(fm.GetFluxMeterName()).Return(nil)
