@@ -267,7 +267,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	}
 
 	jobConfig := jobs.JobConfig{
-		InitialDelay:     config.MakeDuration(0),
+		InitialDelay:     config.MakeDuration(time.Millisecond * 100),
 		ExecutionPeriod:  config.MakeDuration(time.Millisecond * 500),
 		ExecutionTimeout: config.MakeDuration(time.Millisecond * 1000),
 		InitiallyHealthy: false,
