@@ -11,21 +11,20 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-// Note: this is unused at this time.
 service PolicyService {
-  rpc AllPolicies(google.protobuf.Empty) returns (AllPoliciesResponse) {
+  rpc GetPolicies(google.protobuf.Empty) returns (GetPoliciesResponse) {
     option (google.api.http) = {
       get: "/v1/policies"
     };
   }
 }
 
-message AllPoliciesResponse {
-  AllPolicies all_policies = 1;
+message GetPoliciesResponse {
+  Policies policies = 1;
 }
 
-message AllPolicies {
-  map<string, Policy> all_policies = 1;
+message Policies {
+  map<string, Policy> policies = 1;
 }
 
 // Policy expresses reliability automation workflow that automatically protects services

@@ -8,9 +8,9 @@ tags:
   - name: PeerDiscoveryService
   - name: StatusService
   - name: FlowControlService
+  - name: PolicyService
   - name: FluxNinjaService
   - name: ControllerInfoService
-  - name: PolicyService
 consumes:
   - application/json
 produces:
@@ -206,12 +206,12 @@ paths:
         - PeerDiscoveryService
   /v1/policies:
     get:
-      operationId: PolicyService_AllPolicies
+      operationId: PolicyService_GetPolicies
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1AllPoliciesResponse'
+            $ref: '#/definitions/v1GetPoliciesResponse'
         default:
           description: An unexpected error response.
           schema:
@@ -620,18 +620,6 @@ definitions:
       from: "source.address # or destination.address"
       ```
     title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
-  v1AllPolicies:
-    type: object
-    properties:
-      all_policies:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Policy'
-  v1AllPoliciesResponse:
-    type: object
-    properties:
-      all_policies:
-        $ref: '#/definitions/v1AllPolicies'
   v1ArithmeticCombinator:
     type: object
     properties:
@@ -1381,6 +1369,11 @@ definitions:
       flux_meter_name:
         type: string
     description: FluxMeterInfo describes detail for each FluxMeterInfo.
+  v1GetPoliciesResponse:
+    type: object
+    properties:
+      policies:
+        $ref: '#/definitions/v1Policies'
   v1GradientController:
     type: object
     properties:
@@ -1847,6 +1840,13 @@ definitions:
       self_peer:
         $ref: '#/definitions/v1Peer'
     description: Peers holds the peer info of this peer and a mapping of address to other peers.
+  v1Policies:
+    type: object
+    properties:
+      policies:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Policy'
   v1Policy:
     type: object
     properties:
@@ -1967,6 +1967,8 @@ definitions:
         $ref: '#/definitions/v1HostInfo'
       peers:
         $ref: '#/definitions/v1Peers'
+      policies:
+        $ref: '#/definitions/v1Policies'
       process_info:
         $ref: '#/definitions/v1ProcessInfo'
       services_list:

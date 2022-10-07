@@ -5,6 +5,7 @@ package aperture.plugins.fluxninja.v1;
 import "aperture/common/info/v1/info.proto";
 import "aperture/common/peers/v1/peers.proto";
 import "aperture/common/status/v1/status.proto";
+import "aperture/policy/language/v1/policy.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
@@ -38,6 +39,7 @@ message ReportRequest {
   aperture.common.peers.v1.Peers peers = 6;
   ServicesList services_list = 8;
   aperture.common.status.v1.GroupStatus all_statuses = 9;
+  aperture.policy.language.v1.Policies policies = 10;
 }
 
 // ReportResponse is empty for now.

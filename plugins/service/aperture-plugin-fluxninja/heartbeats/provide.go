@@ -15,6 +15,7 @@ import (
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 	httpclient "github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/peers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
 )
@@ -50,6 +51,7 @@ type ConstructorIn struct {
 	AgentInfo                  *agentinfo.AgentInfo     `optional:"true"`
 	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
 	EtcdClient                 *etcdclient.Client
+	PolicyFactory              *controlplane.PolicyFactory
 }
 
 // Provide provides a new instance of Heartbeats.
@@ -59,7 +61,14 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		return nil, err
 	}
 
-	heartbeats := newHeartbeats(in.JobGroup, config, in.StatusRegistry, in.EntityCache, in.AgentInfo, in.PeersWatcher)
+	heartbeats := newHeartbeats(in.JobGroup,
+		config,
+		in.StatusRegistry,
+		in.EntityCache,
+		in.AgentInfo,
+		in.PeersWatcher,
+		in.PolicyFactory)
+
 	runCtx, cancel := context.WithCancel(context.Background())
 
 	in.Lifecycle.Append(fx.Hook{

@@ -202,6 +202,7 @@ operator-undeploy: ## Undeploy controller from the K8s cluster specified in ~/.k
 ##@ Build Dependencies
 
 ## Tool Binaries
+
 KUSTOMIZE ?= kustomize
 CONTROLLER_GEN ?= controller-gen
 ENVTEST ?= setup-envtest
