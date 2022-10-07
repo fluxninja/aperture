@@ -57,14 +57,15 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (Compi
 		return nil, false, "empty yaml", nil
 	}
 	policy := &policiesv1.Policy{}
+
 	err := config.UnmarshalYAML(yamlSrc, policy)
 	if err != nil {
-		return nil, false, err.Error(), nil
+		return nil, false, "", nil
 	}
 	registry := status.NewRegistry(log.GetGlobalLogger())
 	circuit, err := CompilePolicy(policy, registry)
 	if err != nil {
-		return nil, false, err.Error(), nil
+		return nil, false, "", err
 	}
 
 	if policy.GetResources() != nil {

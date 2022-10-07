@@ -31,12 +31,6 @@ local schedulerouts = import './schedulerouts.libsonnet';
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
   },
-  withSelector(selector):: {
-    selector: selector,
-  },
-  withSelectorMixin(selector):: {
-    selector+: selector,
-  },
   withTimeoutFactor(timeout_factor):: {
     timeout_factor: timeout_factor,
   },

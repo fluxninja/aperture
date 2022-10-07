@@ -48,7 +48,7 @@ local port = spec.v1.Port;
 local combinator = spec.v1.ArithmeticCombinator;
 local ema = spec.v1.EMA;
 local gradient = spec.v1.GradientController;
-local limiter = spec.v1.ConcurrencyLimiter;
+local concurrencyLimiter = spec.v1.ConcurrencyLimiter;
 local scheduler = spec.v1.Scheduler;
 local decider = spec.v1.Decider;
 local switcher = spec.v1.Switcher;
@@ -149,10 +149,10 @@ function(params) {
           ),
           component.withConcurrencyLimiter(
             local c = $._config.concurrencyLimiter;
-            limiter.new()
-            + limiter.withScheduler(
+            concurrencyLimiter.new()
+            + concurrencyLimiter.withSelector($._config.concurrencyLimiterSelector)
+            + concurrencyLimiter.withScheduler(
               scheduler.new()
-              + scheduler.withSelector($._config.concurrencyLimiterSelector)
               + scheduler.withAutoTokens(c.autoTokens)
               + scheduler.withTimeoutFactor(c.timeoutFactor)
               + scheduler.withDefaultWorkloadParameters(c.defaultWorkloadParameters)
@@ -162,7 +162,7 @@ function(params) {
                 incoming_concurrency: port.withSignalName('INCOMING_CONCURRENCY'),
               })
             )
-            + limiter.withLoadShedActuator(
+            + concurrencyLimiter.withLoadShedActuator(
               loadShed.withInPortsMixin({ load_shed_factor: port.withSignalName('LSF') })
             )
           ),
