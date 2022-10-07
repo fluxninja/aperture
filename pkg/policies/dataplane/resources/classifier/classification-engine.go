@@ -8,13 +8,16 @@ import (
 
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/flowlabel"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -32,20 +35,34 @@ type rules struct {
 
 // ClassificationEngine receives classification policies and provides Classify method.
 type ClassificationEngine struct {
-	mu             sync.Mutex
-	activeRules    atomic.Value
-	registry       status.Registry
-	activeRulesets map[rulesetID]compiler.CompiledRuleset
-	nextRulesetID  rulesetID
+	mu                 sync.Mutex
+	activeRules        atomic.Value
+	registry           status.Registry
+	activeRulesets     map[rulesetID]compiler.CompiledRuleset
+	nextRulesetID      rulesetID
+	classifierMapMutex sync.RWMutex
+	classifierMap      map[iface.ClassifierID]iface.Classifier
+	counterVec         *prometheus.CounterVec
 }
 
 type rulesetID = uint64
 
 // NewClassificationEngine creates a new Flow Classifier.
 func NewClassificationEngine(registry status.Registry) *ClassificationEngine {
+	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.ClassifierCounterMetricName,
+		Help: "A counter measuring the number of times classifier was triggered",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ClassifierIndexLabel,
+	})
+
 	return &ClassificationEngine{
 		activeRulesets: make(map[rulesetID]compiler.CompiledRuleset),
 		registry:       registry,
+		classifierMap:  make(map[iface.ClassifierID]iface.Classifier),
+		counterVec:     counterVector,
 	}
 }
 
@@ -254,4 +271,33 @@ func (c *ClassificationEngine) combineRulesets() rules {
 	}
 
 	return combined
+}
+
+// RegisterClassifier adds classifier to map.
+func (c *ClassificationEngine) RegisterClassifier(classifier iface.Classifier) error {
+	c.classifierMapMutex.Lock()
+	defer c.classifierMapMutex.Unlock()
+	if _, ok := c.classifierMap[classifier.GetClassifierID()]; !ok {
+		c.classifierMap[classifier.GetClassifierID()] = classifier
+	} else {
+		return fmt.Errorf("classifier id already registered")
+	}
+
+	return nil
+}
+
+// UnregisterClassifier removes classifier from map.
+func (c *ClassificationEngine) UnregisterClassifier(classifier iface.Classifier) error {
+	c.classifierMapMutex.Lock()
+	defer c.classifierMapMutex.Unlock()
+	delete(c.classifierMap, classifier.GetClassifierID())
+
+	return nil
+}
+
+// GetClassifier Lookup function for getting classifier.
+func (c *ClassificationEngine) GetClassifier(classifierID iface.ClassifierID) (iface.Classifier, error) {
+	c.classifierMapMutex.RLock()
+	defer c.classifierMapMutex.RUnlock()
+	return c.classifierMap[classifierID], nil
 }

@@ -18,20 +18,21 @@ const (
 )
 
 // NewFactory returns a new factory for the metrics processor.
-func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine) component.ProcessorFactory {
+func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine, clasEng iface.ClassificationEngine) component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
-		createDefaultConfig(promRegistry, engine),
+		createDefaultConfig(promRegistry, engine, clasEng),
 		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
 	)
 }
 
-func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.Engine) component.ProcessorCreateDefaultConfigFunc {
+func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.Engine, clasEng iface.ClassificationEngine) component.ProcessorCreateDefaultConfigFunc {
 	return func() config.Processor {
 		return &Config{
-			ProcessorSettings: config.NewProcessorSettings(config.NewComponentID(typeStr)),
-			promRegistry:      promRegistry,
-			engine:            engine,
+			ProcessorSettings:    config.NewProcessorSettings(config.NewComponentID(typeStr)),
+			promRegistry:         promRegistry,
+			engine:               engine,
+			classificationEngine: clasEng,
 		}
 	}
 }
