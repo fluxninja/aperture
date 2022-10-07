@@ -155,11 +155,11 @@ operator-vet: ## Run go vet against code.
 	go vet ./operator/...
 
 .PHONY: operator-test
-operator-test: operator-manifests operator-generate operator-fmt operator-vet envtest ## Run tests.
+operator-test: operator-manifests operator-generate operator-fmt operator-vet ## Run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./operator/... -coverprofile operator/cover.out
 
 .PHONY: operator-setup_envtest
-operator-setup_envtest: envtest ## Run tests.
+operator-setup_envtest: ## Run tests.
 	echo "$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)"
 
 ##@ Build
