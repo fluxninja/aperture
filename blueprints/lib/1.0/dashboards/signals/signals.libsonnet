@@ -23,9 +23,9 @@ function(params) {
 
   local SignalAveragePanel =
     local query = |||
-      increase(signal_reading_sum{signal_name=\"${signal_name}\"}[10s])
+      increase(signal_reading_sum{signal_name="${signal_name}"}[10s])
       /
-      increase(signal_reading_count{signal_name=\"${signal_name}\"}[10s])
+      increase(signal_reading_count{signal_name="${signal_name}"}[10s])
     |||;
     local target =
       grafana.prometheus.target(query) +
@@ -84,17 +84,14 @@ function(params) {
       },
       datasource: {
         type: 'prometheus',
+        uid: '${datasource}',
       },
-      definition: 'label_values(signal_reading, signal_name)',
+      query: 'label_values(signal_reading, signal_name)',
       hide: 0,
       includeAll: false,
       multi: false,
       name: 'signal_name',
       options: [],
-      query: {
-        query: 'label_values(signal_reading, signal_name)',
-        refId: 'StandardVariableQuery',
-      },
       refresh: 1,
       regex: '',
       skipUrlSync: false,
