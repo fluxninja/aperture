@@ -16,18 +16,11 @@ local selector = aperture.spec.v1.Selector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local controlPoint = aperture.spec.v1.ControlPoint;
-local constant = aperture.spec.v1.Constant;
 local component = aperture.spec.v1.Component;
 local rateLimiter = aperture.spec.v1.RateLimiter;
 local decider = aperture.spec.v1.Decider;
 local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
-local rateLimitNormalPort = port.new() + port.withSignalName('RATE_LIMIT_NORMAL');
-local rateLimitPort = port.new() + port.withSignalName('RATE_LIMIT');
-local lsfPort = port.new() + port.withSignalName('LSF');
-local lsfThreshold = port.new() + port.withSignalName('LSF_THRESHOLD');
-local zeroPort = port.new() + port.withSignalName('ZERO');
-local isBotEscalation = port.new() + port.withSignalName('IS_BOT_ESCALATION');
 
 local fluxMeterSelector = selector.new()
                           + selector.withServiceSelector(
@@ -109,7 +102,7 @@ local apertureControllerMixin =
     },
   };
 
-local policy = latencyGradientPolicy({
+local policyResource = latencyGradientPolicy({
   policyName: 'service1-demo-app',
   fluxMeter: fluxMeter.new() + fluxMeter.withSelector(fluxMeterSelector),
   concurrencyLimiterSelector: concurrencyLimiterSelector,
@@ -140,57 +133,33 @@ local policy = latencyGradientPolicy({
   },
   components: [
     component.new()
-    + component.withConstant(
-      constant.new()
-      + constant.withValue(10)
-      + constant.withOutPorts({ output: rateLimitNormalPort })
-    ),
-    component.new()
-    + component.withConstant(
-      constant.new()
-      + constant.withValue(0.1)
-      + constant.withOutPorts({ output: lsfThreshold })
-    ),
-    component.new()
     + component.withDecider(
       decider.new()
       + decider.withOperator('gt')
-      + decider.withInPorts({ lhs: lsfPort, rhs: lsfThreshold })
-      + decider.withOutPorts({ output: isBotEscalation })
+      + decider.withInPorts({ lhs: port.withSignalName('LSF'), rhs: port.withConstantValue(0.0) })
+      + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
       + decider.withTrueFor('30s')
     ),
     component.new()
     + component.withSwitcher(
       switcher.new()
-      + switcher.withInPorts({ switch: isBotEscalation, on_true: zeroPort, on_false: rateLimitNormalPort })
-      + switcher.withOutPorts({ output: rateLimitPort })
+      + switcher.withInPorts({ switch: port.withSignalName('IS_BOT_ESCALATION'), on_true: port.withConstantValue(0.0), on_false: port.withConstantValue(10) })
+      + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),
     component.new()
     + component.withRateLimiter(
       rateLimiter.new()
       + rateLimiter.withSelector(rateLimiterSelector)
-      + rateLimiter.withInPorts({ limit: rateLimitPort })
+      + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
       + rateLimiter.withLimitResetInterval('1s')
       + rateLimiter.withLabelKey('http.request.header.user_id')
       + rateLimiter.withDynamicConfigKey('rate_limiter'),
     ),
 
   ],
-}).policy;
-
-local policyMixin = {
-  kind: 'Policy',
-  apiVersion: 'fluxninja.com/v1alpha1',
-  metadata: {
-    name: 'service1-demo-app',
-    labels: {
-      'fluxninja.com/validate': 'true',
-    },
-  },
-  spec: policy,
-};
+}).policyResource;
 
 {
-  latencyGradientPolicy: policyMixin,
+  latencyGradientPolicy: policyResource,
   controller: apertureControllerMixin,
 }

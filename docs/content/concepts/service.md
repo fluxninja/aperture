@@ -3,6 +3,12 @@ title: Service
 sidebar_position: 0
 ---
 
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import Zoom from 'react-medium-image-zoom';
+```
+
 A service in Aperture is similar to services tracked in Kubernetes or Consul. A
 Service is a collection of entities delivering a common functionality, such as
 checkout, billing etc. Aperture maintains a mapping of entity IP addresses to
@@ -29,6 +35,8 @@ entries can also be created manually via configuration.
 Services in Aperture are additionally scoped within Agent Groups, creating two
 level hierarchy, eg.:
 
+<Zoom>
+
 ```mermaid
 graph TB
     subgraph group2
@@ -40,6 +48,8 @@ graph TB
         s2[db.mynamespace.svc.cluster.local]
     end
 ```
+
+</Zoom>
 
 In this example there are two independent _db.mynamespace.svc.cluster.local_
 services.
@@ -61,6 +71,8 @@ components][components], as published by Aperture Controller.
 
 For single-cluster deployments, a single `default` Agent Group can be used:
 
+<Zoom>
+
 ```mermaid
 graph TB
     subgraph default
@@ -70,9 +82,13 @@ graph TB
     end
 ```
 
+</Zoom>
+
 as an other extreme, if your Agent Groups already group entities into logical
 services, you can treat the Agent Group as a service and [ignore the second
 level of hierarchy][catch-all-service]:
+
+<Zoom>
 
 ```mermaid
 graph TB
@@ -86,6 +102,8 @@ graph TB
         s3[*]
     end
 ```
+
+</Zoom>
 
 [dist-counters]: /concepts/flow-control/rate-limiter.md#distributed-counters
 [components]: /concepts/flow-control/flow-control.md#components

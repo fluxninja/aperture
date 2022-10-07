@@ -20,7 +20,7 @@ to be added via the Envoy Filter.
 :::caution warning
 
 The latest Istio release (1.15) is
-[not supported](/get-started/supported-platforms.md) yet.
+[not supported](/get-started/installation/agent/supported-platforms.md) yet.
 
 :::
 

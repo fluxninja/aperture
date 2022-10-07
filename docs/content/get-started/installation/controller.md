@@ -23,22 +23,19 @@ is referred to as the error signal. The feedback loop then works to minimize
 these error signals by determining and distributing control actions, that adjust
 these process variables and maintain their values within the optimal range.
 
-## Configuration
+## Controller CRD
 
-The Aperture Controller related configurations are stored in a configmap which
-is created during the installation using Helm.
+The Aperture Controller is a Kubernetes based application and is installed using
+the
+[Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
+which is managed by the Aperture Operator.
 
-All the configuration parameters for Aperture Controller are listed
+The configuration for the Aperture Controller process is provided to the
+Controller CRD under the `controller.config` section. All the configuration
+parameters for Aperture Controller are listed
 [here](/references/configuration/controller.md).
 
 ## Installation {#controller-installation}
-
-(Consult [Supported Platforms](/get-started/supported-platforms.md) before
-installing.)
-
-The Aperture Controller will be installed using the
-[Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
-which will be managed by the Aperture Operator.
 
 Below are the steps to install or upgrade the Aperture Controller into your
 setup using the
@@ -217,8 +214,8 @@ Follow the information on [Policy](/concepts/policy/policy.md) to understand and
 design the policy circuits.
 
 Once the design is ready, follow the steps on the
-[Blueprints](/get-started/blueprints.md) to generate the Policy ConfigMap and
-apply it on the Kubernetes.
+[Blueprints](/policies/blueprints.md) to generate the Policy Custom Resource and
+apply it on a Kubernetes cluster.
 
 ## Uninstall
 

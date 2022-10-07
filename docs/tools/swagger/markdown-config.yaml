@@ -1,6 +1,6 @@
 layout:
-    application:
-      - name: markdowngen
-        source: "config"
-        target: "{{ .Target }}"
-        file_name: "{{ .Name }}.md"
+  application:
+    - name: markdowngen
+      source: "config"
+      target: "{{ .Target }}"
+      file_name: "{{ .Name }}.md"

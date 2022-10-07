@@ -21,6 +21,21 @@ const (
 	// RateLimiterCounterMetricName - name of the counter describing times rate limiter was triggered.
 	RateLimiterCounterMetricName = "rate_limiter_counter"
 
+	// DistCache metrics scraped from Olric DMaps statistics.
+
+	// DistCacheEntriesTotalMetricName - metric for the total number of entries (including replicas) stored during the life of this instance.
+	DistCacheEntriesTotalMetricName = "distcache_entries_total"
+	// DistCacheDeleteHitsMetricName - metric for number of deletion requests resulting in an item being removed.
+	DistCacheDeleteHitsMetricName = "distcache_delete_hits"
+	// DistCacheDeleteMissesMetricName - metric for number of deletion requests for missing keys.
+	DistCacheDeleteMissesMetricName = "distcache_delete_misses"
+	// DistCacheGetMissesMetricName - metric for number of entries that have been requested and not found.
+	DistCacheGetMissesMetricName = "distcache_get_misses"
+	// DistCacheGetHitsMetricName - metric for number of entries that have been requested and found present.
+	DistCacheGetHitsMetricName = "distcache_get_hits"
+	// DistCacheEvictedTotalMetricName - metric for number of entries removed from cache to free memory for new entries.
+	DistCacheEvictedTotalMetricName = "distcache_evicted_total"
+
 	// Workload metrics.
 
 	// WorkloadLatencyMetricName - metric used for grouping latencies per workload.
@@ -59,6 +74,10 @@ const (
 
 	// PROMETHEUS LABELS.
 
+	// DistCacheMemberIDLabel - label specifying unique identifier of the node in the olric cluster.
+	DistCacheMemberIDLabel = "distcache_member_id"
+	// DistCacheMemberNameLabel - label specifying name of the node in the olric cluster.
+	DistCacheMemberNameLabel = "distcache_member_name"
 	// PolicyNameLabel - label used in prometheus.
 	PolicyNameLabel = "policy_name"
 	// PolicyHashLabel - label used in prometheus.

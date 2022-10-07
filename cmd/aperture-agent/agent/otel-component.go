@@ -130,11 +130,11 @@ func addLogsPipeline(cfg *otelcollector.OtelParams) {
 	config.AddExporter(otelcollector.ExporterLogging, nil)
 
 	processors := []string{
-		otelcollector.ProcessorAgentGroup,
 		otelcollector.ProcessorMetrics,
 		otelcollector.ProcessorBatchPrerollup,
 		otelcollector.ProcessorRollup,
 		otelcollector.ProcessorBatchPostrollup,
+		otelcollector.ProcessorAgentGroup,
 	}
 
 	config.Service.AddPipeline("logs", otelcollector.Pipeline{

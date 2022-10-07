@@ -24,11 +24,11 @@ helm dependency update "${TOP_LEVEL}"/manifests/charts/aperture-controller
 tk tool charts vendor
 
 exit_code=0
-while read -r environment; do
-	env_dir=$(dirname "$environment")
+while read -r app; do
+	env_dir=$(dirname "$app")
 	tk show --dangerous-allow-redirect --ext-str=projectRoot="${TOP_LEVEL}"/playground/tanka/ "$env_dir" >/dev/null || {
 		exit_code="$?"
 		printf '\n##########\nFAILED SHOWING ENV %s\n##########\n' "${env_dir}" >&2
 	}
-done < <(find environments/ -name main.jsonnet)
+done < <(find apps/ -name main.jsonnet)
 exit "${exit_code}"
