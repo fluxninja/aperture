@@ -7,6 +7,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+//go:generate mockgen -source=classifier.go -destination=../../mocks/mock_classifier.go -package=mocks
+
 // ClassifierID is the ID of the Classifier.
 type ClassifierID struct {
 	PolicyName      string
@@ -27,6 +29,6 @@ type Classifier interface {
 	// GetClassifierID returns ClassifierID object that should uniquely identify classifier.
 	GetClassifierID() ClassifierID
 
-	// GetCounter returns the counter for the classifier
-	GetCounter() prometheus.Observer
+	// GetCounter returns the counter for the classifier.
+	GetCounter() prometheus.Counter
 }

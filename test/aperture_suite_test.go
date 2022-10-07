@@ -141,6 +141,7 @@ var _ = BeforeSuite(func() {
 				),
 			),
 		),
+		classifier.Module(),
 		fx.Provide(
 			clockwork.NewRealClock,
 			agent.AgentOTELComponents,
@@ -149,7 +150,6 @@ var _ = BeforeSuite(func() {
 			agentinfo.ProvideAgentInfo,
 		),
 		flowcontrol.Module,
-		classifier.Module,
 		otelcollector.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 		jobs.JobGroupConstructor{Name: jobGroupName}.Annotate(),

@@ -13,7 +13,7 @@ func PolicyModule() fx.Option {
 	return fx.Options(
 		actuators.Module(),
 		fluxmeter.Module(),
-		classifier.Module,
+		classifier.Module(),
 		fx.Provide(
 			ProvideEngineAPI,
 		),
