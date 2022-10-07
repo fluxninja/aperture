@@ -426,9 +426,11 @@ definitions:
         description: |-
           Label Matcher to select a Workload based on
           [flow labels](/concepts/flow-control/flow-label.md).
+        x-go-validate: required
       workload_parameters:
         $ref: '#/definitions/SchedulerWorkloadParameters'
         description: WorkloadParameters associated with flows matching the label matcher.
+        x-go-validate: required
     description: Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
   SchedulerWorkloadParameters:
     type: object
@@ -939,6 +941,10 @@ definitions:
 
           Contains configuration of per-agent scheduler, and also defines some
           output signals.
+        x-go-validate: required
+      selector:
+        $ref: '#/definitions/v1Selector'
+        description: Selector decides the service and flows at which the concurrency limiter is applied.
         x-go-validate: required
     description: |-
       :::info
@@ -2070,6 +2076,7 @@ definitions:
       default_workload_parameters:
         $ref: '#/definitions/SchedulerWorkloadParameters'
         description: WorkloadParameters to be used if none of workloads specified in `workloads` match.
+        x-go-validate: required
       max_timeout:
         type: string
         description: |-
@@ -2093,10 +2100,6 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1SchedulerOuts'
         description: Output ports for the Scheduler component.
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Selector decides for which service or flows the scheduler will be applied.
-        x-go-validate: required
       timeout_factor:
         type: number
         format: double

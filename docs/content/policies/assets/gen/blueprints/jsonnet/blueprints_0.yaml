@@ -240,18 +240,18 @@
                             "incoming_concurrency":
                               { "signal_name": "INCOMING_CONCURRENCY" },
                           },
-                        "selector":
-                          {
-                            "flow_selector":
-                              { "control_point": { "traffic": "ingress" } },
-                            "service_selector":
-                              {
-                                "agent_group": "default",
-                                "service": "service1-demo-app.demoapp.svc.cluster.local",
-                              },
-                          },
                         "timeout_factor": "0.5",
                         "workloads": [],
+                      },
+                    "selector":
+                      {
+                        "flow_selector":
+                          { "control_point": { "traffic": "ingress" } },
+                        "service_selector":
+                          {
+                            "agent_group": "default",
+                            "service": "service1-demo-app.demoapp.svc.cluster.local",
+                          },
                       },
                   },
               },

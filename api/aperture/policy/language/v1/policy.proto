@@ -728,11 +728,21 @@ message RateLimiter {
 // ConcurrencyLimiter configuration is split into two parts: An actuation
 // strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
 message ConcurrencyLimiter {
+  // Selector decides the service and flows at which the concurrency limiter is applied.
+  common.selector.v1.Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
+
   // Configuration of Weighted Fair Queuing-based workload scheduler.
   //
   // Contains configuration of per-agent scheduler, and also defines some
   // output signals.
-  Scheduler scheduler = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  Scheduler scheduler = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {
@@ -745,7 +755,7 @@ message ConcurrencyLimiter {
     // Actuator based on load shedding a portion of requests.
     //
     // Actuation strategy defines the input signal that will drive the scheduler.
-    LoadShedActuator load_shed_actuator = 2;
+    LoadShedActuator load_shed_actuator = 3;
   }
 }
 
@@ -793,11 +803,25 @@ message Scheduler {
   // Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
   message Workload {
     // WorkloadParameters associated with flows matching the label matcher.
-    WorkloadParameters workload_parameters = 1;
+    WorkloadParameters workload_parameters = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
+        }
+      }
+    }]; // @gotags: validate:"required"
 
     // Label Matcher to select a Workload based on
     // [flow labels](/concepts/flow-control/flow-label.md).
-    common.labelmatcher.v1.LabelMatcher label_matcher = 2;
+    common.labelmatcher.v1.LabelMatcher label_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
+        }
+      }
+    }]; // @gotags: validate:"required"
   }
 
   // Output for the Scheduler component.
@@ -824,16 +848,6 @@ message Scheduler {
   // Output ports for the Scheduler component.
   Outs out_ports = 1;
 
-  // Selector decides for which service or flows the scheduler will be applied.
-  common.selector.v1.Selector selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
-    }
-  }]; // @gotags: validate:"required"
-
   // List of workloads to be used in scheduler.
   //
   // Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
@@ -854,16 +868,23 @@ message Scheduler {
   // See also [workload definition in the concepts
   // section](/concepts/flow-control/concurrency-limiter.md#workload).
   // :::
-  repeated Workload workloads = 3; // @gotags: validate:"dive"
+  repeated Workload workloads = 2; // @gotags: validate:"dive"
 
   // WorkloadParameters to be used if none of workloads specified in `workloads` match.
-  WorkloadParameters default_workload_parameters = 4;
+  WorkloadParameters default_workload_parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
 
   // Automatically estimate the size of a request in each workload, based on
   // historical latency. Each workload's `tokens` will be set to average
   // latency of flows in that workload during last few seconds (exact duration
   // of this average can change).
-  bool auto_tokens = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  bool auto_tokens = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {
@@ -878,7 +899,7 @@ message Scheduler {
   // it will be rejected.
   //
   // This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
-  double timeout_factor = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  double timeout_factor = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {
@@ -910,7 +931,7 @@ message Scheduler {
   // value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
   // tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
   // :::
-  google.protobuf.Duration max_timeout = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  google.protobuf.Duration max_timeout = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {
