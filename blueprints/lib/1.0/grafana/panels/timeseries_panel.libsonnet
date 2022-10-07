@@ -122,6 +122,9 @@
   withFieldConfig(field_config):: {
     fieldConfig: field_config,
   },
+  withFieldConfigMixin(field_config):: {
+    fieldConfig+: field_config,
+  },
   withOptions(options):: {
     options: options,
   },
