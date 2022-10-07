@@ -11,5 +11,6 @@ import (
 type Config struct {
 	promRegistry             *prometheus.Registry
 	engine                   iface.Engine
+	classificationEngine     iface.ClassificationEngine
 	config.ProcessorSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct
 }

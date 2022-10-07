@@ -36,7 +36,6 @@ func main() {
 		notifiers.TrackersConstructor{Name: "entity_trackers"}.Annotate(),
 		prometheus.Module(),
 		k8s.Module(),
-		agent.ModuleForAgentOTEL(),
 		peers.Constructor{}.Module(),
 		fx.Provide(
 			agentinfo.ProvideAgentInfo,
@@ -50,9 +49,10 @@ func main() {
 		flowcontrol.Module,
 		distcache.Module(),
 		dataplane.PolicyModule(),
+		otelcollector.Module(),
+		agent.ModuleForAgentOTEL(),
 		discovery.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
-		otelcollector.Module(),
 	)
 
 	if err := app.Err(); err != nil {
