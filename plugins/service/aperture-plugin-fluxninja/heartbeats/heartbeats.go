@@ -3,10 +3,13 @@ package heartbeats
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	guuid "github.com/google/uuid"
+	"github.com/technosophos/moniker"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
@@ -102,7 +105,10 @@ func (h *Heartbeats) start(ctx context.Context, in *ConstructorIn) error {
 
 func (h *Heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdclient.Client) error {
 	etcdPath := "/fluxninja/controllerid"
-	controllerID := guuid.NewString()
+	newID := guuid.NewString()
+	parts := strings.Split(newID, "-")
+	moniker := strings.Replace(moniker.New().Name(), " ", "-", 1)
+	controllerID := fmt.Sprintf("%s-%s", moniker, parts[0])
 
 	txn := etcdClient.Client.Txn(etcdClient.Client.Ctx())
 	resp, err := txn.If(clientv3.Compare(clientv3.CreateRevision(etcdPath), "=", 0)).
