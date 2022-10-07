@@ -4,7 +4,6 @@ import (
 	"context"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/log"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -25,8 +24,8 @@ func RegisterPolicyService(server *grpc.Server, policyFactory *PolicyFactory) {
 
 // GetPolicies returns all the policies running in the system.
 func (s *PolicyService) GetPolicies(ctx context.Context, _ *emptypb.Empty) (*policylangv1.GetPoliciesResponse, error) {
-	log.Info().Msg("GetPolicies")
+	policies := s.policyFactory.GetPolicies()
 	return &policylangv1.GetPoliciesResponse{
-		Policies: s.policyFactory.GetPolicies(),
+		Policies: policies,
 	}, nil
 }

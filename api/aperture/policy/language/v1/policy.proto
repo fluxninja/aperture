@@ -20,6 +20,10 @@ service PolicyService {
 }
 
 message GetPoliciesResponse {
+  Policies policies = 1;
+}
+
+message Policies {
   map<string, Policy> policies = 1;
 }
 

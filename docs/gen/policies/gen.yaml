@@ -1830,6 +1830,6 @@ tags:
 - name: PeerDiscoveryService
 - name: StatusService
 - name: FlowControlService
+- name: PolicyService
 - name: FluxNinjaService
 - name: ControllerInfoService
-- name: PolicyService

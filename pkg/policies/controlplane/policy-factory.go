@@ -182,11 +182,13 @@ func (factory *PolicyFactory) GetPolicyWrappers() map[string]*wrappersv1.PolicyW
 }
 
 // GetPolicies returns all policies.
-func (factory *PolicyFactory) GetPolicies() map[string]*policylangv1.Policy {
+func (factory *PolicyFactory) GetPolicies() *policylangv1.Policies {
 	policyWrappers := factory.GetPolicyWrappers()
 	policies := make(map[string]*policylangv1.Policy)
 	for _, v := range policyWrappers {
 		policies[v.GetCommonAttributes().GetPolicyName()] = v.GetPolicy().DeepCopy()
 	}
-	return policies
+	return &policylangv1.Policies{
+		Policies: policies,
+	}
 }

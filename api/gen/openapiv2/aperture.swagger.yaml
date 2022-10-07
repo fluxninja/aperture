@@ -8,9 +8,9 @@ tags:
   - name: PeerDiscoveryService
   - name: StatusService
   - name: FlowControlService
+  - name: PolicyService
   - name: FluxNinjaService
   - name: ControllerInfoService
-  - name: PolicyService
 consumes:
   - application/json
 produces:
@@ -1373,9 +1373,7 @@ definitions:
     type: object
     properties:
       policies:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Policy'
+        $ref: '#/definitions/v1Policies'
   v1GradientController:
     type: object
     properties:
@@ -1842,6 +1840,13 @@ definitions:
       self_peer:
         $ref: '#/definitions/v1Peer'
     description: Peers holds the peer info of this peer and a mapping of address to other peers.
+  v1Policies:
+    type: object
+    properties:
+      policies:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Policy'
   v1Policy:
     type: object
     properties:
@@ -1962,6 +1967,8 @@ definitions:
         $ref: '#/definitions/v1HostInfo'
       peers:
         $ref: '#/definitions/v1Peers'
+      policies:
+        $ref: '#/definitions/v1Policies'
       process_info:
         $ref: '#/definitions/v1ProcessInfo'
       services_list:
