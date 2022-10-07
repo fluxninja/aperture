@@ -69,7 +69,7 @@ type ClassificationEngineIn struct {
 }
 
 // ProvideClassificationEngine provides a classifier that loads the rules from config file.
-func ProvideClassificationEngine(in ClassificationEngineIn) *ClassificationEngine {
+func ProvideClassificationEngine(in ClassificationEngineIn) (iface.ClassificationEngine, *ClassificationEngine) {
 	reg := in.Registry.Child("classifiers")
 
 	classificationEngine := NewClassificationEngine(reg)
@@ -107,7 +107,8 @@ func ProvideClassificationEngine(in ClassificationEngineIn) *ClassificationEngin
 			return nil
 		},
 	})
-	return classificationEngine
+	// Return the same object once as an interface and once as a normal classifier engine - for authz
+	return classificationEngine, classificationEngine
 }
 
 // Per classifier fx app.
@@ -146,7 +147,7 @@ func (c *ClassificationEngine) invokeMiniApp(
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.PolicyNameLabel] = wrapperMessage.CommonAttributes.GetPolicyName()
 	metricLabels[metrics.PolicyHashLabel] = wrapperMessage.CommonAttributes.GetPolicyHash()
-	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(wrapperMessage.CommonAttributes.GetComponentIndex(), 10)
+	metricLabels[metrics.ClassifierIndexLabel] = strconv.FormatInt(wrapperMessage.CommonAttributes.GetComponentIndex(), 10)
 
 	lc.Append(
 		fx.Hook{
