@@ -6,11 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"time"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
 
 	"github.com/fluxninja/aperture/pkg/log"
@@ -40,39 +42,45 @@ type SimpleService struct {
 	envoyPort   int
 	concurrency int
 	latency     time.Duration
+	rejectRatio float64
 }
 
 // NewSimpleService creates a SimpleService instance.
-func NewSimpleService(hostname string, port, envoyPort int, concurrency int, latency time.Duration) *SimpleService {
+func NewSimpleService(hostname string, port, envoyPort int,
+	concurrency int,
+	latency time.Duration,
+	rejectRatio float64,
+) *SimpleService {
 	return &SimpleService{
 		hostname:    hostname,
 		port:        port,
 		envoyPort:   envoyPort,
 		concurrency: concurrency,
 		latency:     latency,
+		rejectRatio: rejectRatio,
 	}
 }
 
 // Run starts listening for requests on given port.
 func (simpleService SimpleService) Run() error {
-	var handler *RequestHandler
+	handler := &RequestHandler{
+		hostname:     simpleService.hostname,
+		latency:      simpleService.latency,
+		rejectRatio:  simpleService.rejectRatio,
+		concurrency:  simpleService.concurrency,
+		limitClients: make(chan struct{}, simpleService.concurrency),
+	}
 	if simpleService.envoyPort == -1 {
-		handler = &RequestHandler{
-			hostname:   simpleService.hostname,
-			httpClient: &http.Client{},
-		}
+		handler.httpClient = &http.Client{}
 	} else {
 		proxyURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", simpleService.envoyPort))
 		if err != nil {
 			log.Panic().Err(err).Msgf("Failed to parse url: %v", err)
 		}
-		handler = &RequestHandler{
-			hostname:   simpleService.hostname,
-			httpClient: &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}},
-		}
+		handler.httpClient = &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}}
 	}
 
-	http.Handle("/request", limitClients(handler, simpleService.concurrency, simpleService.latency))
+	http.Handle("/request", handlerFunc(handler))
 	address := fmt.Sprintf(":%d", simpleService.port)
 
 	server := &http.Server{Addr: address}
@@ -80,17 +88,9 @@ func (simpleService SimpleService) Run() error {
 	return server.ListenAndServe()
 }
 
-func limitClients(h *RequestHandler, n int, l time.Duration) http.Handler {
-	logger := log.Sample(zerolog.Sometimes)
-
-	sem := make(chan struct{}, n)
+func handlerFunc(h *RequestHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info().Msgf("Received request: %s", r.URL.Path)
-		sem <- struct{}{}
-		defer func() {
-			<-sem
-		}()
-		time.Sleep(l)
+		log.Sample(zerolog.Sometimes).Info().Msg("received request")
 		h.ServeHTTP(w, r)
 	})
 }
@@ -126,13 +126,14 @@ type Subrequest struct {
 	Destination string `json:"destination"`
 }
 
-// Response is returned by the service after successfully processing a Request.
-type Response struct{}
-
 // RequestHandler handles processing of incoming requests.
 type RequestHandler struct {
-	httpClient HTTPClient
-	hostname   string
+	httpClient   HTTPClient
+	limitClients chan struct{}
+	hostname     string
+	concurrency  int
+	latency      time.Duration
+	rejectRatio  float64
 }
 
 func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -144,53 +145,58 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx, span := otel.Tracer(libraryName).Start(ctx, "ServeHTTP")
 	defer span.End()
 
+	// randomly reject requests based on rejectRatio
+	// nolint:gosec
+	if h.rejectRatio > 0 && rand.Float64() < h.rejectRatio {
+		span.SetStatus(codes.Error, "rejected")
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to read request body")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	err = json.Unmarshal(body, &p)
 	if err != nil {
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to unmarshal request body")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	subresponses := make([]Response, len(p.Chains))
-	for i, chain := range p.Chains {
+	code := http.StatusOK
+	for _, chain := range p.Chains {
 		if len(chain.subrequests) == 0 {
+			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Empty chain")
 			http.Error(w, "Received empty subrequest chain", http.StatusBadRequest)
 			return
 		}
 		requestDestination := chain.subrequests[0].Destination
 		if requestDestination != h.hostname {
+			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Invalid destination")
 			http.Error(w, "Invalid message destination", http.StatusBadRequest)
 			return
 		}
-		subresponses[i], err = h.processChain(ctx, chain)
+		code, err = h.processChain(ctx, chain)
 		if err != nil {
+			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to process chain")
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 	}
 
-	response := generateResponse(subresponses)
-	jsonString, err := json.Marshal(response)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	_, err = fmt.Fprintln(w, string(jsonString))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	w.WriteHeader(code)
+	if code == http.StatusOK {
+		span.SetStatus(codes.Ok, "OK")
+	} else {
+		span.SetStatus(codes.Error, "Error")
 	}
 }
 
-func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain) (Response, error) {
-	log.Info().Msg("processChain()")
+func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain) (int, error) {
 	if len(chain.subrequests) == 1 {
 		return h.processRequest(chain.subrequests[0])
 	}
@@ -205,21 +211,33 @@ func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain)
 	return h.forwardRequest(ctx, requestForwardingDestination, trimmedRequest)
 }
 
-func (h RequestHandler) processRequest(s Subrequest) (Response, error) {
-	return Response{}, nil
+func (h RequestHandler) processRequest(s Subrequest) (int, error) {
+	if h.concurrency > 0 {
+		h.limitClients <- struct{}{}
+		defer func() {
+			<-h.limitClients
+		}()
+	}
+	if h.latency > 0 {
+		// Fake workload
+		time.Sleep(h.latency)
+	}
+	return http.StatusOK, nil
 }
 
-func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname string, requestBody Request) (Response, error) {
+func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname string, requestBody Request) (int, error) {
 	address := fmt.Sprintf("http://%s/request", destinationHostname)
 
 	jsonRequest, err := json.Marshal(requestBody)
 	if err != nil {
-		return Response{}, err
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to marshal request")
+		return http.StatusBadRequest, err
 	}
 
 	request, err := http.NewRequest("POST", address, bytes.NewBuffer(jsonRequest))
 	if err != nil {
-		return Response{}, err
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to create request")
+		return http.StatusInternalServerError, err
 	}
 
 	request = request.WithContext(ctx)
@@ -229,29 +247,8 @@ func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname 
 
 	response, err := h.httpClient.Do(request)
 	if err != nil {
-		return Response{}, err
+		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to send request")
+		return http.StatusInternalServerError, err
 	}
-
-	responseBody, err := io.ReadAll(response.Body)
-	if err != nil {
-		return Response{}, err
-	}
-
-	err = response.Body.Close()
-	if err != nil {
-		return Response{}, err
-	}
-
-	var rsp Response
-
-	err = json.Unmarshal(responseBody, &rsp)
-	if err != nil {
-		return Response{}, err
-	}
-
-	return rsp, nil
-}
-
-func generateResponse(subresponses []Response) Response {
-	return Response{}
+	return response.StatusCode, nil
 }

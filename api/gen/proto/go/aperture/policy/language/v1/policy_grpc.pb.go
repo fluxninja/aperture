@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PolicyServiceClient interface {
-	AllPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllPoliciesResponse, error)
+	GetPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetPoliciesResponse, error)
 }
 
 type policyServiceClient struct {
@@ -30,9 +30,9 @@ func NewPolicyServiceClient(cc grpc.ClientConnInterface) PolicyServiceClient {
 	return &policyServiceClient{cc}
 }
 
-func (c *policyServiceClient) AllPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllPoliciesResponse, error) {
-	out := new(AllPoliciesResponse)
-	err := c.cc.Invoke(ctx, "/aperture.policy.language.v1.PolicyService/AllPolicies", in, out, opts...)
+func (c *policyServiceClient) GetPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetPoliciesResponse, error) {
+	out := new(GetPoliciesResponse)
+	err := c.cc.Invoke(ctx, "/aperture.policy.language.v1.PolicyService/GetPolicies", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -43,15 +43,15 @@ func (c *policyServiceClient) AllPolicies(ctx context.Context, in *emptypb.Empty
 // All implementations should embed UnimplementedPolicyServiceServer
 // for forward compatibility
 type PolicyServiceServer interface {
-	AllPolicies(context.Context, *emptypb.Empty) (*AllPoliciesResponse, error)
+	GetPolicies(context.Context, *emptypb.Empty) (*GetPoliciesResponse, error)
 }
 
 // UnimplementedPolicyServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedPolicyServiceServer struct {
 }
 
-func (UnimplementedPolicyServiceServer) AllPolicies(context.Context, *emptypb.Empty) (*AllPoliciesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AllPolicies not implemented")
+func (UnimplementedPolicyServiceServer) GetPolicies(context.Context, *emptypb.Empty) (*GetPoliciesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPolicies not implemented")
 }
 
 // UnsafePolicyServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -65,20 +65,20 @@ func RegisterPolicyServiceServer(s grpc.ServiceRegistrar, srv PolicyServiceServe
 	s.RegisterService(&PolicyService_ServiceDesc, srv)
 }
 
-func _PolicyService_AllPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PolicyService_GetPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PolicyServiceServer).AllPolicies(ctx, in)
+		return srv.(PolicyServiceServer).GetPolicies(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.policy.language.v1.PolicyService/AllPolicies",
+		FullMethod: "/aperture.policy.language.v1.PolicyService/GetPolicies",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PolicyServiceServer).AllPolicies(ctx, req.(*emptypb.Empty))
+		return srv.(PolicyServiceServer).GetPolicies(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -91,8 +91,8 @@ var PolicyService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PolicyServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AllPolicies",
-			Handler:    _PolicyService_AllPolicies_Handler,
+			MethodName: "GetPolicies",
+			Handler:    _PolicyService_GetPolicies_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

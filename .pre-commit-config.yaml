@@ -45,15 +45,11 @@ repos:
     rev: v0.1.17
     hooks:
       - id: shellcheck
-  - repo: https://github.com/syntaqx/git-hooks
-    rev: v0.0.17
-    hooks:
-      - id: circleci-config-validate
   - repo: https://github.com/fluxninja/pre-commit-golang
     rev: v1.0.0-fn
     hooks:
       - id: go-generate
-      - id: go-mod-tidy-repo
+      - id: go-mod-tidy
         args:
           - -compat=1.19
   - repo: meta
@@ -114,20 +110,20 @@ repos:
         files: '\.proto$|\.go$'
         pass_filenames: false
         description: "Generate config markdown"
-      # - id: generate-mermaid
-      #   name: "Mermaid Diagrams"
-      #   entry: "./scripts/precommit/generate_mermaid.sh"
-      #   language: script
-      #   files: '\.md$|\.mmd$'
-      #   pass_filenames: false
-      #   description: "Generate mermaid diagrams"
       - id: generate-blueprints
-        name: "blueprints"
+        name: "Generate Blueprints"
         entry: "./scripts/precommit/generate_blueprints.sh"
         language: script
         files: ^(blueprints)|\.proto$|^requirements.txt$
         pass_filenames: false
         description: "Generate Aperture libsonnet and blueprints"
+      - id: generate-doc-assets
+        name: "Documentation Assets"
+        entry: "./scripts/precommit/generate_doc_assets.sh"
+        language: script
+        files: ^(blueprints|docs)
+        pass_filenames: false
+        description: "Generate documentation assets"
       - id: tanka-show
         name: "Check tanka parses jsonnet"
         language: script
@@ -158,7 +154,9 @@ repos:
         entry: ./scripts/precommit/check-operator-spec.sh
         language: script
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.1.0
+    rev: v2.2.1
     hooks:
       - id: codespell
+        args:
+          - --ignore-words=./.codespellignore
         exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*)$

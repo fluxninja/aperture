@@ -10,6 +10,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/exporter/loggingexporter"
 	"go.opentelemetry.io/collector/exporter/otlpexporter"
 	"go.opentelemetry.io/collector/exporter/otlphttpexporter"
 	"go.opentelemetry.io/collector/extension/ballastextension"
@@ -27,7 +28,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
-	"github.com/fluxninja/aperture/pkg/otelcollector/loggingexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
@@ -53,6 +53,7 @@ func AgentOTELComponents(
 	cache *entitycache.EntityCache,
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
+	clasEng iface.ClassificationEngine,
 	serverGRPC *grpc.Server,
 ) (component.Factories, error) {
 	var errs error
@@ -96,7 +97,7 @@ func AgentOTELComponents(
 		memorylimiterprocessor.NewFactory(),
 		enrichmentprocessor.NewFactory(cache),
 		rollupprocessor.NewFactory(),
-		metricsprocessor.NewFactory(promRegistry, engine),
+		metricsprocessor.NewFactory(promRegistry, engine, clasEng),
 		attributesprocessor.NewFactory(),
 		tracestologsprocessor.NewFactory(),
 	)
@@ -130,11 +131,11 @@ func addLogsPipeline(cfg *otelcollector.OtelParams) {
 	config.AddExporter(otelcollector.ExporterLogging, nil)
 
 	processors := []string{
-		otelcollector.ProcessorAgentGroup,
 		otelcollector.ProcessorMetrics,
 		otelcollector.ProcessorBatchPrerollup,
 		otelcollector.ProcessorRollup,
 		otelcollector.ProcessorBatchPostrollup,
+		otelcollector.ProcessorAgentGroup,
 	}
 
 	config.Service.AddPipeline("logs", otelcollector.Pipeline{

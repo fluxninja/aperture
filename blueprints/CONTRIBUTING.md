@@ -42,13 +42,13 @@ An example:
 
 ```yaml
 local dashboard = import '../../lib/1.0/dashboards/latency-gradient.libsonnet';
-local policy = import '../../lib/1.0/policies/latency-gradient.libsonnet';
+local policyResource = import '../../lib/1.0/policies/latency-gradient.libsonnet';
 
 local config = import './config.libsonnet';
 
 {
   policies: {
-    [std.format('%s.yaml', $._config.policy.policyName)]: policy($._config.policy),
+    [std.format('%s.yaml', $._config.policy.policyName)]: policyResource($._config.policy),
   },
   dashboards: {
     [std.format('%s.json', $._config.common.policyName)]: dashboard($._config.dashboard),
@@ -159,8 +159,8 @@ Blueprints can be visualized. A blueprint is saved as a
 into an image with GraphViz:
 
 ```sh
-go run -mod=mod scripts/circuit-generator/main.go examples/gen/policies/service1-latency-gradient.yaml blueprints/latency-gradient/graph.dot
-dot -Tsvg blueprints/latency-gradient/graph.dot > blueprints/latency-gradient/graph.svg
+go run -mod=mod scripts/circuit-compiler/main.go -cr blueprints/latency-gradient/example/gen/policies/example.yaml -dot blueprints/latency-gradient/example/gen/graph/graph.dot
+dot -Tsvg  blueprints/latency-gradient/example/gen/graph/graph.dot > blueprints/latency-gradient/example/gen/graph/graph.svg
 ```
 
 Before doing so make sure that generated yamls are up-to-date.

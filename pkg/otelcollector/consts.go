@@ -86,6 +86,10 @@ const (
 
 	// ApertureFeatureStatusLabel describes the status of the feature.
 	ApertureFeatureStatusLabel = "aperture.feature.status"
+	// ApertureFeatureStatusOK const for OK status.
+	ApertureFeatureStatusOK = "OK"
+	// ApertureFeatureStatusError const for error status.
+	ApertureFeatureStatusError = "Error"
 	// ApertureFlowStartTimestampLabel is the start timestamp of the flow.
 	ApertureFlowStartTimestampLabel = "aperture.flow_start_timestamp"
 	// ApertureFlowEndTimestampLabel is the end timestamp of the flow.
@@ -130,7 +134,7 @@ const (
 	ProcessorTracesToLogs = "tracestologs"
 
 	// ExporterLogging exports telemetry using Aperture logger.
-	ExporterLogging = "aperturelogging"
+	ExporterLogging = "logging"
 	// ExporterPrometheusRemoteWrite exports metrics to local prometheus instance.
 	ExporterPrometheusRemoteWrite = "prometheusremotewrite"
 	// ExporterOTLPLoopback exports OTLP data to local OTLP receiver. To be used only

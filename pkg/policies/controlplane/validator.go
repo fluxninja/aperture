@@ -10,14 +10,14 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/status"
-	"github.com/fluxninja/aperture/pkg/webhooks/validation"
+	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
 	"go.uber.org/fx"
 )
 
 // FxOut is the output of the controlplane module.
 type FxOut struct {
 	fx.Out
-	Validator validation.PolicySpecValidator `group:"policy-validators"`
+	Validator policyvalidator.PolicySpecValidator `group:"policy-validators"`
 }
 
 // providePolicyValidator provides classification Policy Custom Resource validator
@@ -53,25 +53,30 @@ func (v *PolicySpecValidator) ValidateSpec(
 
 // ValidateAndCompile checks the validity of a single Policy and compiles it.
 func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (CompiledCircuit, bool, string, error) {
-	log.Info().Str("name", name).Msg("Validating Policy Spec")
 	if len(yamlSrc) == 0 {
 		return nil, false, "empty yaml", nil
 	}
 	policy := &policiesv1.Policy{}
+
 	err := config.UnmarshalYAML(yamlSrc, policy)
 	if err != nil {
-		return nil, false, err.Error(), nil
+		return nil, false, "", nil
 	}
 	registry := status.NewRegistry(log.GetGlobalLogger())
 	circuit, err := CompilePolicy(policy, registry)
 	if err != nil {
-		return nil, false, err.Error(), nil
+		return nil, false, "", err
 	}
 
 	if policy.GetResources() != nil {
 		for _, c := range policy.GetResources().Classifiers {
 			_, err = compiler.CompileRuleset(ctx, name, &wrappersv1.ClassifierWrapper{
 				Classifier: c,
+				CommonAttributes: &wrappersv1.CommonAttributes{
+					PolicyName:     "dummy",
+					PolicyHash:     "dummy",
+					ComponentIndex: 0,
+				},
 			})
 			if err != nil {
 				if errors.Is(err, compiler.BadExtractor) || errors.Is(err, compiler.BadSelector) ||

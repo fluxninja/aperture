@@ -8,9 +8,9 @@ tags:
   - name: PeerDiscoveryService
   - name: StatusService
   - name: FlowControlService
+  - name: PolicyService
   - name: FluxNinjaService
   - name: ControllerInfoService
-  - name: PolicyService
 consumes:
   - application/json
 produces:
@@ -206,12 +206,12 @@ paths:
         - PeerDiscoveryService
   /v1/policies:
     get:
-      operationId: PolicyService_AllPolicies
+      operationId: PolicyService_GetPolicies
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1AllPoliciesResponse'
+            $ref: '#/definitions/v1GetPoliciesResponse'
         default:
           description: An unexpected error response.
           schema:
@@ -365,6 +365,15 @@ definitions:
         description: List of subexpressions of the match expression.
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     title: List of MatchExpressions that is used for all/any matching
+  RateLimiterDynamicConfig:
+    type: object
+    properties:
+      overrides:
+        type: array
+        items:
+          $ref: '#/definitions/RateLimiterOverride'
+        description: Allows to specify different limits for particular label values.
+    title: Dynamic Configuration for the rate limiter
   RateLimiterLazySync:
     type: object
     properties:
@@ -417,9 +426,11 @@ definitions:
         description: |-
           Label Matcher to select a Workload based on
           [flow labels](/concepts/flow-control/flow-label.md).
+        x-go-validate: required
       workload_parameters:
         $ref: '#/definitions/SchedulerWorkloadParameters'
         description: WorkloadParameters associated with flows matching the label matcher.
+        x-go-validate: required
     description: Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
   SchedulerWorkloadParameters:
     type: object
@@ -609,18 +620,6 @@ definitions:
       from: "source.address # or destination.address"
       ```
     title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
-  v1AllPolicies:
-    type: object
-    properties:
-      all_policies:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Policy'
-  v1AllPoliciesResponse:
-    type: object
-    properties:
-      all_policies:
-        $ref: '#/definitions/v1AllPolicies'
   v1ArithmeticCombinator:
     type: object
     properties:
@@ -643,17 +642,17 @@ definitions:
     type: object
     properties:
       lhs:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Left hand side of the arithmetic operation.
       rhs:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Right hand side of the arithmetic operation.
     description: Inputs for the Arithmetic Combinator component.
   v1ArithmeticCombinatorOuts:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: Result of arithmetic operation.
     description: Outputs for the Arithmetic Combinator component.
   v1CheckRequest:
@@ -859,7 +858,7 @@ definitions:
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
       max:
         $ref: '#/definitions/v1Max'
-        description: Emits the maximum of the input siganls.
+        description: Emits the maximum of the input signals.
       min:
         $ref: '#/definitions/v1Min'
         description: Emits the minimum of the input signals.
@@ -906,7 +905,10 @@ definitions:
 
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
-      You can use the [Constant](#v1-constant) component for this.
+      You can create an input port containing the constant value instead of being connected to a signal.
+      To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+      If You need to provide the same constant signal to multiple components,
+      You can use the [Constant](#v1-constant) component.
       :::
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -928,13 +930,17 @@ definitions:
           Contains configuration of per-agent scheduler, and also defines some
           output signals.
         x-go-validate: required
+      selector:
+        $ref: '#/definitions/v1Selector'
+        description: Selector decides the service and flows at which the concurrency limiter is applied.
+        x-go-validate: required
     description: |-
       :::info
       See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
       :::
 
       It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
-      Concurrency is calculated in terms of total tokens which translate to (avg. latency \* inflight requests), i.e. Little's Law.
+      Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
 
       ConcurrencyLimiter configuration is split into two parts: An actuation
       strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
@@ -954,7 +960,7 @@ definitions:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: The constant value is emitted to the output port.
     description: Outputs for the Constant component.
   v1ControlPoint:
@@ -1040,17 +1046,17 @@ definitions:
     type: object
     properties:
       lhs:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Left hand side input signal for the comparison operation.
       rhs:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Right hand side input signal for the comparison operation.
     description: Inputs for the Decider component.
   v1DeciderOuts:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: Selected signal (1.0 or 0.0).
     description: Outputs for the Decider component.
   v1EMA:
@@ -1109,16 +1115,16 @@ definitions:
       \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
       $$
 
-      The EMA filter also employs a min-max-envolope logic during warm up stage, explained [here](#v1-e-m-a-ins).
-    title: Exponential Moving Average (EMA) is a type of moving average that applies exponenially more weight to recent signal readings
+      The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#v1-e-m-a-ins).
+    title: Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
   v1EMAIns:
     type: object
     properties:
       input:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Input signal to be used for the EMA computation.
       max_envelope:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: |-
           Upper bound of the moving average.
 
@@ -1134,7 +1140,7 @@ definitions:
           The envelope logic is **not** used outside the warm-up stage!
           :::
       min_envelope:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: |-
           Lower bound of the moving average.
 
@@ -1144,7 +1150,7 @@ definitions:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: Exponential moving average of the series of reading as an output signal.
     description: Outputs for the EMA component.
   v1Entity:
@@ -1243,14 +1249,14 @@ definitions:
     type: object
     properties:
       input:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Input signal for the Extrapolator component.
     description: Inputs for the Extrapolator component.
   v1ExtrapolatorOuts:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: Extrapolated signal.
     description: Outputs for the Extrapolator component.
   v1FlowSelector:
@@ -1363,6 +1369,11 @@ definitions:
       flux_meter_name:
         type: string
     description: FluxMeterInfo describes detail for each FluxMeterInfo.
+  v1GetPoliciesResponse:
+    type: object
+    properties:
+      policies:
+        $ref: '#/definitions/v1Policies'
   v1GradientController:
     type: object
     properties:
@@ -1453,32 +1464,32 @@ definitions:
     type: object
     properties:
       control_variable:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: |-
           Actual current value of the control variable.
 
           This signal is multiplied by the gradient to produce the output.
       max:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Maximum value to limit the output signal.
       min:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Minimum value to limit the output signal.
       optimize:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Optimize signal is added to the output of the gradient calculation.
       setpoint:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Setpoint to be used for the gradient computation.
       signal:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Signal to be used for the gradient computation.
     description: Inputs for the Gradient Controller component.
   v1GradientControllerOuts:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: Computed desired value of the control variable.
     description: Outputs for the Gradient Controller component.
   v1GroupStatus:
@@ -1502,6 +1513,17 @@ definitions:
         type: string
       uuid:
         type: string
+  v1InPort:
+    type: object
+    properties:
+      constant_value:
+        type: number
+        format: double
+        description: Constant value to be used for this InPort instead of a signal.
+      signal_name:
+        type: string
+        description: Name of the incoming Signal on the InPort.
+    title: Components receive input from other components via InPorts
   v1JSONExtractor:
     type: object
     properties:
@@ -1636,7 +1658,7 @@ definitions:
     type: object
     properties:
       load_shed_factor:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: |-
           Load shedding factor is a fraction of [incoming
           concurrency](#v1-scheduler-outs) that needs to be dropped.
@@ -1705,14 +1727,14 @@ definitions:
       inputs:
         type: array
         items:
-          $ref: '#/definitions/v1Port'
+          $ref: '#/definitions/v1InPort'
         description: Array of input signals.
     description: Inputs for the Max component.
   v1MaxOuts:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: Signal with maximum value as an output signal.
     description: Output for the Max component.
   v1Min:
@@ -1733,16 +1755,23 @@ definitions:
       inputs:
         type: array
         items:
-          $ref: '#/definitions/v1Port'
+          $ref: '#/definitions/v1InPort'
         description: Array of input signals.
     description: Inputs for the Min component.
   v1MinOuts:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: Signal with minimum value as an output signal.
     description: Output ports for the Min component.
+  v1OutPort:
+    type: object
+    properties:
+      signal_name:
+        type: string
+        description: Name of the outgoing Signal on the OutPort.
+    title: Components produce output for other components via OutPorts
   v1OverlappingService:
     type: object
     properties:
@@ -1811,6 +1840,13 @@ definitions:
       self_peer:
         $ref: '#/definitions/v1Peer'
     description: Peers holds the peer info of this peer and a mapping of address to other peers.
+  v1Policies:
+    type: object
+    properties:
+      policies:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Policy'
   v1Policy:
     type: object
     properties:
@@ -1827,13 +1863,6 @@ definitions:
 
       Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
     title: Policy expresses reliability automation workflow that automatically protects services
-  v1Port:
-    type: object
-    properties:
-      signal_name:
-        type: string
-        description: Name of the incoming or outgoing Signal on the Port.
-    title: Components are interconnected with each other via Ports
   v1ProcessInfo:
     type: object
     properties:
@@ -1866,15 +1895,21 @@ definitions:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: The result of the Prometheus query as an output signal.
     description: Output for the PromQL component.
   v1RateLimiter:
     type: object
     properties:
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
       in_ports:
         $ref: '#/definitions/v1RateLimiterIns'
         x-go-validate: required
+      init_config:
+        $ref: '#/definitions/RateLimiterDynamicConfig'
+        title: Initial configuration
       label_key:
         type: string
         description: |-
@@ -1892,11 +1927,6 @@ definitions:
         type: string
         description: Time after which the limit for a given label value will be reset.
         x-go-default: 60s
-      overrides:
-        type: array
-        items:
-          $ref: '#/definitions/RateLimiterOverride'
-        description: Allows to specify different limits for particular label values.
       selector:
         $ref: '#/definitions/v1Selector'
         description: Which control point to apply this ratelimiter to.
@@ -1913,7 +1943,7 @@ definitions:
     type: object
     properties:
       limit:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: |-
           Number of flows allowed per _limit\_reset\_interval_ per each label.
           Negative values disable the ratelimiter.
@@ -1937,6 +1967,8 @@ definitions:
         $ref: '#/definitions/v1HostInfo'
       peers:
         $ref: '#/definitions/v1Peers'
+      policies:
+        $ref: '#/definitions/v1Policies'
       process_info:
         $ref: '#/definitions/v1ProcessInfo'
       services_list:
@@ -2046,6 +2078,7 @@ definitions:
       default_workload_parameters:
         $ref: '#/definitions/SchedulerWorkloadParameters'
         description: WorkloadParameters to be used if none of workloads specified in `workloads` match.
+        x-go-validate: required
       max_timeout:
         type: string
         description: |-
@@ -2069,10 +2102,6 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1SchedulerOuts'
         description: Output ports for the Scheduler component.
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Selector decides for which service or flows the scheduler will be applied.
-        x-go-validate: required
       timeout_factor:
         type: number
         format: double
@@ -2121,7 +2150,7 @@ definitions:
     type: object
     properties:
       accepted_concurrency:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: |-
           Accepted concurrency is the number of accepted tokens per second.
 
@@ -2135,7 +2164,7 @@ definitions:
 
           Value of this signal is the sum across all the relevant schedulers.
       incoming_concurrency:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: |-
           Incoming concurrency is the number of incoming tokens/sec.
           This is the same as `accepted_concurrency`, but across all the flows
@@ -2233,14 +2262,14 @@ definitions:
     type: object
     properties:
       input:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Input signal.
     description: Inputs for the Sqrt component.
   v1SqrtOuts:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: Output signal.
     description: Outputs for the Sqrt component.
   v1Switcher:
@@ -2260,20 +2289,20 @@ definitions:
     type: object
     properties:
       on_false:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Output signal when switch is invalid or 0.0.
       on_true:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Output signal when switch is valid and not 0.0.
       switch:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1InPort'
         description: Decides whether to return on_true or on_false.
     description: Inputs for the Switcher component.
   v1SwitcherOuts:
     type: object
     properties:
       output:
-        $ref: '#/definitions/v1Port'
+        $ref: '#/definitions/v1OutPort'
         description: Selected signal (on_true or on_false).
     description: Outputs for the Switcher component.
   v1VersionInfo:

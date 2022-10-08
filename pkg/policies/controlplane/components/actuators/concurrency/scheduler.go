@@ -16,9 +16,11 @@ import (
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/metrics"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -176,8 +178,10 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	if s.tokensQuery != nil {
 		promValue, err := s.tokensQuery.ExecutePromQuery(tickInfo)
 		if err != nil {
-			logger.Error().Err(err).Msg("could not read tokens query from prometheus")
-			errMulti = multierr.Append(errMulti, err)
+			if err != components.ErrNoQueriesReturned {
+				logger.Error().Err(err).Msg("could not read tokens query from prometheus")
+				errMulti = multierr.Append(errMulti, err)
+			}
 		} else if promValue != nil && !reflect.DeepEqual(promValue, s.tokensPromValue) {
 			// update only if something changed
 			s.tokensPromValue = promValue
@@ -214,7 +218,9 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	acceptedValue, err := s.acceptedQuery.ExecuteScalarQuery(tickInfo)
 	if err != nil {
 		acceptedReading = runtime.InvalidReading()
-		errMulti = multierr.Append(errMulti, err)
+		if err != components.ErrNoQueriesReturned {
+			errMulti = multierr.Append(errMulti, err)
+		}
 	} else {
 		acceptedReading = runtime.NewReading(acceptedValue)
 	}
@@ -223,7 +229,9 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	incomingValue, err := s.incomingQuery.ExecuteScalarQuery(tickInfo)
 	if err != nil {
 		incomingReading = runtime.InvalidReading()
-		errMulti = multierr.Append(errMulti, err)
+		if err != components.ErrNoQueriesReturned {
+			errMulti = multierr.Append(errMulti, err)
+		}
 	} else {
 		incomingReading = runtime.NewReading(incomingValue)
 	}
@@ -231,6 +239,9 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 
 	return outPortReadings, errMulti
 }
+
+// DynamicConfigUpdate is a no-op for this component.
+func (s *Scheduler) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
 
 func (s *Scheduler) publishQueryTokens(tokens *policydecisionsv1.TokensDecision) error {
 	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
@@ -241,9 +252,11 @@ func (s *Scheduler) publishQueryTokens(tokens *policydecisionsv1.TokensDecision)
 
 	wrapper := &wrappersv1.TokensDecisionWrapper{
 		TokensDecision: tokens,
-		ComponentIndex: int64(s.componentIndex),
-		PolicyName:     policyName,
-		PolicyHash:     policyHash,
+		CommonAttributes: &wrappersv1.CommonAttributes{
+			PolicyName:     policyName,
+			PolicyHash:     policyHash,
+			ComponentIndex: int64(s.componentIndex),
+		},
 	}
 	dat, err := proto.Marshal(wrapper)
 	if err != nil {

@@ -16,19 +16,51 @@ local selector = aperture.spec.v1.Selector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local controlPoint = aperture.spec.v1.ControlPoint;
-local staticBuckets = aperture.spec.v1.FluxMeterStaticBuckets;
+local component = aperture.spec.v1.Component;
+local rateLimiter = aperture.spec.v1.RateLimiter;
+local decider = aperture.spec.v1.Decider;
+local switcher = aperture.spec.v1.Switcher;
+local port = aperture.spec.v1.Port;
 
-local svcSelector = selector.new()
-                    + selector.withServiceSelector(
-                      serviceSelector.new()
-                      + serviceSelector.withAgentGroup('default')
-                      + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
-                    )
-                    + selector.withFlowSelector(
-                      flowSelector.new()
-                      + flowSelector.withControlPoint(controlPoint.new()
-                                                      + controlPoint.withTraffic('ingress'))
-                    );
+local fluxMeterSelector = selector.new()
+                          + selector.withServiceSelector(
+                            serviceSelector.new()
+                            + serviceSelector.withAgentGroup('default')
+                            + serviceSelector.withService('service3-demo-app.demoapp.svc.cluster.local')
+                          )
+                          + selector.withFlowSelector(
+                            flowSelector.new()
+                            + flowSelector.withControlPoint(controlPoint.new()
+                                                            + controlPoint.withTraffic('ingress'))
+                          );
+
+local concurrencyLimiterSelector = selector.new()
+                                   + selector.withServiceSelector(
+                                     serviceSelector.new()
+                                     + serviceSelector.withAgentGroup('default')
+                                     + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                                   )
+                                   + selector.withFlowSelector(
+                                     flowSelector.new()
+                                     + flowSelector.withControlPoint(controlPoint.new()
+                                                                     + controlPoint.withTraffic('ingress'))
+                                   );
+
+local rateLimiterSelector = selector.new()
+                            + selector.withServiceSelector(
+                              serviceSelector.new()
+                              + serviceSelector.withAgentGroup('default')
+                              + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                            )
+                            + selector.withFlowSelector(
+                              flowSelector.new()
+                              + flowSelector.withControlPoint(controlPoint.new()
+                                                              + controlPoint.withTraffic('ingress'))
+                              + flowSelector.withLabelMatcher(
+                                LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
+                              )
+                            );
+
 
 local apertureControllerMixin =
   apertureControllerApp {
@@ -70,24 +102,13 @@ local apertureControllerMixin =
     },
   };
 
-local policy = latencyGradientPolicy({
+local policyResource = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  fluxMeterSelector: svcSelector,
-  fluxMeters: {
-    'service1-demo-app':
-      fluxMeter.new()
-      + fluxMeter.withSelector(svcSelector)
-      + fluxMeter.withAttributeKey('workload_duration_ms')
-      + fluxMeter.withStaticBuckets(
-        staticBuckets.new()
-        + staticBuckets.withBuckets([5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0])
-      ),
-  },
-
-  concurrencyLimiterSelector: svcSelector,
+  fluxMeter: fluxMeter.new() + fluxMeter.withSelector(fluxMeterSelector),
+  concurrencyLimiterSelector: concurrencyLimiterSelector,
   classifiers: [
     classifier.new()
-    + classifier.withSelector(svcSelector)
+    + classifier.withSelector(concurrencyLimiterSelector)
     + classifier.withRules({
       user_type: rule.new()
                  + rule.withExtractor(extractor.new()
@@ -110,21 +131,35 @@ local policy = latencyGradientPolicy({
       + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
     ],
   },
-}).policy;
+  components: [
+    component.new()
+    + component.withDecider(
+      decider.new()
+      + decider.withOperator('gt')
+      + decider.withInPorts({ lhs: port.withSignalName('LSF'), rhs: port.withConstantValue(0.0) })
+      + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
+      + decider.withTrueFor('30s')
+    ),
+    component.new()
+    + component.withSwitcher(
+      switcher.new()
+      + switcher.withInPorts({ switch: port.withSignalName('IS_BOT_ESCALATION'), on_true: port.withConstantValue(0.0), on_false: port.withConstantValue(10) })
+      + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
+    ),
+    component.new()
+    + component.withRateLimiter(
+      rateLimiter.new()
+      + rateLimiter.withSelector(rateLimiterSelector)
+      + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
+      + rateLimiter.withLimitResetInterval('1s')
+      + rateLimiter.withLabelKey('http.request.header.user_id')
+      + rateLimiter.withDynamicConfigKey('rate_limiter'),
+    ),
 
-local policyMixin = {
-  kind: 'Policy',
-  apiVersion: 'fluxninja.com/v1alpha1',
-  metadata: {
-    name: 'service1-demo-app',
-    labels: {
-      'fluxninja.com/validate': 'true',
-    },
-  },
-  spec: policy,
-};
+  ],
+}).policyResource;
 
 {
-  policy: policyMixin,
+  latencyGradientPolicy: policyResource,
   controller: apertureControllerMixin,
 }

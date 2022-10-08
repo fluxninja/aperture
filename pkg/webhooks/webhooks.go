@@ -126,7 +126,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	for _, validator := range h.validators {
 		ok, msg, err = validator.ValidateObject(reqCtx, aReq.Request)
 		if err != nil {
-			log.Error().Err(err).Str(h.path, "path").Msg("Validator failed to validate")
+			log.Error().Err(err).Str("path", h.path).Msg("Validator failed to validate")
 			http.Error(
 				w, "internal error occurred in validator", http.StatusInternalServerError,
 			)

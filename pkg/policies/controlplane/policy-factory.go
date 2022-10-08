@@ -2,14 +2,16 @@ package controlplane
 
 import (
 	"context"
+	"sync"
 
 	"go.uber.org/fx"
 
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/jobs"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -17,54 +19,60 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-// Fx tag to match etcd watcher name.
-var policiesDriverFxTag = "policies-driver"
-
 // policyFactoryModule module for policy factory.
 func policyFactoryModule() fx.Option {
 	return fx.Options(
-		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: common.PoliciesConfigPath}.Annotate(),
-		fx.Invoke(
+		fx.Provide(
 			fx.Annotate(
-				setupPolicyFxDriver,
+				providePolicyFactory,
 				fx.ParamTags(
-					config.NameTag(policiesDriverFxTag),
+					config.NameTag(policiesFxTag),
+					config.NameTag(policiesDynamicConfigFxTag),
 					common.FxOptionsFuncTag,
 				),
 			),
 		),
+		grpcgateway.RegisterHandler{Handler: policylangv1.RegisterPolicyServiceHandlerFromEndpoint}.Annotate(),
+		fx.Invoke(RegisterPolicyService),
 		prometheus.Module(),
 		policyModule(),
 	)
 }
 
-type policyFactory struct {
-	circuitJobGroup *jobs.JobGroup
-	etcdClient      *etcdclient.Client
-	registry        status.Registry
+// PolicyFactory factory for policies.
+type PolicyFactory struct {
+	lock                 sync.RWMutex
+	circuitJobGroup      *jobs.JobGroup
+	etcdClient           *etcdclient.Client
+	registry             status.Registry
+	dynamicConfigWatcher notifiers.Watcher
+	policyTracker        map[string]*wrappersv1.PolicyWrapper
 }
 
 // Main fx app.
-func setupPolicyFxDriver(
+func providePolicyFactory(
 	etcdWatcher notifiers.Watcher,
+	dynamicConfigWatcher notifiers.Watcher,
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
-) error {
+) (*PolicyFactory, error) {
 	policiesStatusRegistry := registry.Child(iface.PoliciesRoot)
 	logger := policiesStatusRegistry.GetLogger()
 
 	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("circuit_jobs"), 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to create job group")
-		return err
+		return nil, err
 	}
 
-	factory := &policyFactory{
-		registry:        policiesStatusRegistry,
-		circuitJobGroup: circuitJobGroup,
-		etcdClient:      etcdClient,
+	factory := &PolicyFactory{
+		registry:             policiesStatusRegistry,
+		circuitJobGroup:      circuitJobGroup,
+		etcdClient:           etcdClient,
+		dynamicConfigWatcher: dynamicConfigWatcher,
+		policyTracker:        make(map[string]*wrappersv1.PolicyWrapper),
 	}
 
 	optionsFunc := []notifiers.FxOptionsFunc{factory.provideControllerPolicyFxOptions}
@@ -99,28 +107,32 @@ func setupPolicyFxDriver(
 	})
 
 	notifiers.NotifierLifecycle(lifecycle, etcdWatcher, fxDriver)
-	return nil
+	return factory, nil
 }
 
 // provideControllerPolicyFxOptions Per policy fx app in controller.
-func (factory *policyFactory) provideControllerPolicyFxOptions(
+func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	registry status.Registry,
 ) (fx.Option, error) {
-	var wrapperMessage wrappersv1.PolicyWrapper
-	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.Policy == nil {
+	policyMessage := &policylangv1.Policy{}
+	err := unmarshaller.Unmarshal(policyMessage)
+	if err != nil {
 		registry.SetStatus(status.NewStatus(nil, err))
-		registry.GetLogger().Warn().Err(err).Msg("Failed to unmarshal policy config wrapper")
+		registry.GetLogger().Error().Err(err).Msg("Failed to unmarshal policy")
 		return fx.Options(), err
 	}
 
-	// save policy wrapper proto in status registry
-	registry.Child("policy_config").SetStatus(status.NewStatus(&wrapperMessage, nil))
+	wrapperMessage, err := hashAndPolicyWrap(policyMessage, string(key))
+	if err != nil {
+		registry.SetStatus(status.NewStatus(nil, err))
+		registry.GetLogger().Error().Err(err).Msg("Failed to wrap message in config properties")
+		return fx.Options(), err
+	}
 
 	policyFxOptions, err := newPolicyOptions(
-		&wrapperMessage,
+		wrapperMessage,
 		registry,
 	)
 	if err != nil {
@@ -129,10 +141,54 @@ func (factory *policyFactory) provideControllerPolicyFxOptions(
 		return fx.Options(), err
 	}
 	return fx.Options(
-		policyFxOptions,
 		fx.Supply(
+			fx.Annotate(factory.dynamicConfigWatcher, fx.As(new(notifiers.Watcher))),
 			factory.circuitJobGroup,
 			factory.etcdClient,
+			wrapperMessage,
 		),
+		policyFxOptions,
+		fx.Invoke(factory.trackPolicy),
 	), nil
+}
+
+func (factory *PolicyFactory) trackPolicy(wrapperMessage *wrappersv1.PolicyWrapper, lifecycle fx.Lifecycle) {
+	lifecycle.Append(fx.Hook{
+		OnStart: func(context.Context) error {
+			factory.lock.Lock()
+			defer factory.lock.Unlock()
+			factory.policyTracker[wrapperMessage.GetCommonAttributes().GetPolicyName()] = wrapperMessage
+			return nil
+		},
+		OnStop: func(context.Context) error {
+			factory.lock.Lock()
+			defer factory.lock.Unlock()
+			delete(factory.policyTracker, wrapperMessage.GetCommonAttributes().GetPolicyName())
+			return nil
+		},
+	})
+}
+
+// GetPolicyWrappers returns all policy wrappers.
+func (factory *PolicyFactory) GetPolicyWrappers() map[string]*wrappersv1.PolicyWrapper {
+	factory.lock.RLock()
+	defer factory.lock.RUnlock()
+	// deepcopy wrappers
+	policyWrappers := make(map[string]*wrappersv1.PolicyWrapper)
+	for k, v := range factory.policyTracker {
+		policyWrappers[k] = v.DeepCopy()
+	}
+	return policyWrappers
+}
+
+// GetPolicies returns all policies.
+func (factory *PolicyFactory) GetPolicies() *policylangv1.Policies {
+	policyWrappers := factory.GetPolicyWrappers()
+	policies := make(map[string]*policylangv1.Policy)
+	for _, v := range policyWrappers {
+		policies[v.GetCommonAttributes().GetPolicyName()] = v.GetPolicy().DeepCopy()
+	}
+	return &policylangv1.Policies{
+		Policies: policies,
+	}
 }

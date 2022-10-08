@@ -2,7 +2,10 @@ package rate
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"path"
+	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -19,6 +22,8 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/jobs"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/actuators/rate/ratetracker"
@@ -28,7 +33,10 @@ import (
 
 const rateLimiterStatusRoot = "rate_limiters"
 
-var fxNameTag = config.NameTag(rateLimiterStatusRoot)
+var (
+	fxNameTag       = config.NameTag(rateLimiterStatusRoot)
+	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel}
+)
 
 func rateLimiterModule() fx.Option {
 	return fx.Options(
@@ -63,12 +71,14 @@ func provideWatchers(
 }
 
 type rateLimiterFactory struct {
-	engineAPI                 iface.Engine
-	registry                  status.Registry
-	distCache                 *distcache.DistCache
-	lazySyncJobGroup          *jobs.JobGroup
-	rateLimitDecisionsWatcher notifiers.Watcher
-	agentGroupName            string
+	engineAPI            iface.Engine
+	registry             status.Registry
+	distCache            *distcache.DistCache
+	lazySyncJobGroup     *jobs.JobGroup
+	decisionsWatcher     notifiers.Watcher
+	dynamicConfigWatcher notifiers.Watcher
+	counterVector        *prometheus.CounterVec
+	agentGroupName       string
 }
 
 // main fx app.
@@ -84,7 +94,12 @@ func setupRateLimiterFactory(
 ) error {
 	agentGroupName := ai.GetAgentGroup()
 	etcdPath := path.Join(common.RateLimiterDecisionsPath)
-	rateLimitDecisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
+	decisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
+	if err != nil {
+		return err
+	}
+
+	dynamicConfigWatcher, err := etcdwatcher.NewWatcher(etcdClient, common.RateLimiterDynamicConfigPath)
 	if err != nil {
 		return err
 	}
@@ -98,13 +113,22 @@ func setupRateLimiterFactory(
 		return err
 	}
 
+	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.RateLimiterCounterMetricName,
+		Help: "A counter measuring the number of times Rate Limiter was triggered",
+	},
+		metricLabelKeys,
+	)
+
 	rateLimiterFactory := &rateLimiterFactory{
-		engineAPI:                 e,
-		distCache:                 distCache,
-		lazySyncJobGroup:          lazySyncJobGroup,
-		rateLimitDecisionsWatcher: rateLimitDecisionsWatcher,
-		agentGroupName:            agentGroupName,
-		registry:                  reg,
+		engineAPI:            e,
+		distCache:            distCache,
+		lazySyncJobGroup:     lazySyncJobGroup,
+		decisionsWatcher:     decisionsWatcher,
+		dynamicConfigWatcher: dynamicConfigWatcher,
+		agentGroupName:       agentGroupName,
+		registry:             reg,
+		counterVector:        counterVector,
 	}
 
 	fxDriver := &notifiers.FxDriver{
@@ -120,11 +144,19 @@ func setupRateLimiterFactory(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			err := lazySyncJobGroup.Start()
+			err := prometheusRegistry.Register(rateLimiterFactory.counterVector)
 			if err != nil {
 				return err
 			}
-			err = rateLimitDecisionsWatcher.Start()
+			err = lazySyncJobGroup.Start()
+			if err != nil {
+				return err
+			}
+			err = decisionsWatcher.Start()
+			if err != nil {
+				return err
+			}
+			err = dynamicConfigWatcher.Start()
 			if err != nil {
 				return err
 			}
@@ -132,13 +164,21 @@ func setupRateLimiterFactory(
 		},
 		OnStop: func(context.Context) error {
 			var err, merr error
-			err = rateLimitDecisionsWatcher.Stop()
+			err = decisionsWatcher.Stop()
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = dynamicConfigWatcher.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
 			err = lazySyncJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(rateLimiterFactory.counterVector) {
+				err2 := fmt.Errorf("failed to unregister rate_limiter_counter metric")
+				merr = multierr.Append(merr, err2)
 			}
 			reg.Detach()
 			return merr
@@ -166,9 +206,8 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	}
 
 	rateLimiterProto := wrapperMessage.RateLimiter
-
 	rateLimiter := &rateLimiter{
-		Component:          wrapperMessage,
+		Component:          wrapperMessage.GetCommonAttributes(),
 		rateLimiterProto:   rateLimiterProto,
 		rateLimiterFactory: rateLimiterFactory,
 		registry:           reg,
@@ -190,6 +229,7 @@ type rateLimiter struct {
 	rateTracker        ratetracker.RateTracker
 	rateLimitChecker   *ratetracker.BasicRateLimitChecker
 	rateLimiterProto   *policylangv1.RateLimiter
+	counter            prometheus.Counter
 	name               string
 }
 
@@ -198,27 +238,39 @@ var _ iface.RateLimiter = (*rateLimiter)(nil)
 
 func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	logger := rateLimiter.registry.GetLogger()
+	etcdKey := common.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName, rateLimiter.GetPolicyName(), rateLimiter.GetComponentIndex())
 	// decision notifier
-	unmarshaller, err := config.NewProtobufUnmarshaller(nil)
+	decisionUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
 		return err
 	}
-	decisionKey := common.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName, rateLimiter.GetPolicyName(), rateLimiter.GetComponentIndex())
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(decisionKey),
-		unmarshaller,
+		notifiers.Key(etcdKey),
+		decisionUnmarshaller,
 		rateLimiter.decisionUpdateCallback,
 	)
+	// dynamic config notifier
+	dynamicConfigUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
+	if err != nil {
+		return err
+	}
+	dynamicConfigNotifier := notifiers.NewUnmarshalKeyNotifier(
+		notifiers.Key(etcdKey),
+		dynamicConfigUnmarshaller,
+		rateLimiter.dynamicConfigUpdateCallback,
+	)
+
+	metricLabels := make(prometheus.Labels)
+	metricLabels[metrics.PolicyNameLabel] = rateLimiter.GetPolicyName()
+	metricLabels[metrics.PolicyHashLabel] = rateLimiter.GetPolicyHash()
+	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(rateLimiter.GetComponentIndex(), 10)
+	rateCounterVec := rateLimiter.rateLimiterFactory.counterVector
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var err error
 			rateLimiter.rateLimitChecker = ratetracker.NewBasicRateLimitChecker()
-			// loop through overrides
-			for _, override := range rateLimiter.rateLimiterProto.GetOverrides() {
-				label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
-				rateLimiter.rateLimitChecker.AddOverride(label, override.GetLimitScaleFactor())
-			}
+			rateLimiter.updateDynamicConfig(rateLimiter.rateLimiterProto.GetInitConfig())
 			rateLimiter.rateTracker, err = ratetracker.NewDistCacheRateTracker(
 				rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
@@ -242,9 +294,15 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				}
 			}
 			// add decisions notifier
-			err = rateLimiter.rateLimiterFactory.rateLimitDecisionsWatcher.AddKeyNotifier(decisionNotifier)
+			err = rateLimiter.rateLimiterFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add decision notifier")
+				return err
+			}
+			// add dynamic config notifier
+			err = rateLimiter.rateLimiterFactory.dynamicConfigWatcher.AddKeyNotifier(dynamicConfigNotifier)
+			if err != nil {
+				logger.Error().Err(err).Msg("Failed to add dynamic config notifier")
 				return err
 			}
 
@@ -255,18 +313,35 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				return err
 			}
 
+			rateCounter, err := rateCounterVec.GetMetricWith(metricLabels)
+			if err != nil {
+				logger.Error().Err(err).Msg("Failed to get rate limiter counter from vector")
+				return err
+			}
+			rateLimiter.counter = rateCounter
+
 			return nil
 		},
 		OnStop: func(context.Context) error {
 			var merr, err error
+			deleted := rateCounterVec.Delete(metricLabels)
+			if !deleted {
+				merr = multierr.Append(merr, errors.New("failed to delete rate limiter counter from its metric vector"))
+			}
 			// remove from data engine
 			err = rateLimiter.rateLimiterFactory.engineAPI.UnregisterRateLimiter(rateLimiter)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to unregister rate limiter")
 				merr = multierr.Append(merr, err)
 			}
+			// remove dynamic config notifier
+			err = rateLimiter.rateLimiterFactory.dynamicConfigWatcher.RemoveKeyNotifier(dynamicConfigNotifier)
+			if err != nil {
+				logger.Error().Err(err).Msg("Failed to remove dynamic config notifier")
+				merr = multierr.Append(merr, err)
+			}
 			// remove decisions notifier
-			err = rateLimiter.rateLimiterFactory.rateLimitDecisionsWatcher.RemoveKeyNotifier(decisionNotifier)
+			err = rateLimiter.rateLimiterFactory.decisionsWatcher.RemoveKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove decision notifier")
 				merr = multierr.Append(merr, err)
@@ -278,6 +353,24 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 		},
 	})
 	return nil
+}
+
+func (rateLimiter *rateLimiter) updateDynamicConfig(dynamicConfig *policylangv1.RateLimiter_DynamicConfig) {
+	logger := rateLimiter.registry.GetLogger()
+
+	if dynamicConfig == nil {
+		return
+	}
+	overrides := ratetracker.Overrides{}
+	// loop through overrides
+	for _, override := range dynamicConfig.GetOverrides() {
+		label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
+		overrides[label] = override.GetLimitScaleFactor()
+	}
+
+	logger.Debug().Interface("overrides", overrides).Str("name", rateLimiter.name).Msgf("Updating dynamic config for rate limiter")
+
+	rateLimiter.rateLimitChecker.SetOverrides(overrides)
 }
 
 // GetSelector returns the selector for the rate limiter.
@@ -340,24 +433,53 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 	if err != nil || wrapperMessage.RateLimiterDecision == nil {
 		return
 	}
-	if wrapperMessage.PolicyHash != rateLimiter.GetPolicyHash() {
+	commonAttributes := wrapperMessage.GetCommonAttributes()
+	if commonAttributes == nil {
+		log.Error().Msg("Common attributes not found")
+		return
+	}
+	if commonAttributes.PolicyHash != rateLimiter.GetPolicyHash() {
 		return
 	}
 	limitDecision := wrapperMessage.RateLimiterDecision
 	rateLimiter.rateLimitChecker.SetRateLimit(int(limitDecision.GetLimit()))
 }
 
+func (rateLimiter *rateLimiter) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := rateLimiter.registry.GetLogger()
+	if event.Type == notifiers.Remove {
+		logger.Debug().Msg("Dynamic config removed")
+		rateLimiter.rateLimitChecker.SetOverrides(ratetracker.Overrides{})
+		return
+	}
+
+	var wrapperMessage wrappersv1.RateLimiterDynamicConfigWrapper
+	err := unmarshaller.Unmarshal(&wrapperMessage)
+	if err != nil || wrapperMessage.RateLimiterDynamicConfig == nil {
+		return
+	}
+	commonAttributes := wrapperMessage.GetCommonAttributes()
+	if commonAttributes == nil {
+		log.Error().Msg("Common attributes not found")
+		return
+	}
+	if commonAttributes.PolicyHash != rateLimiter.GetPolicyHash() {
+		return
+	}
+	dynamicConfig := wrapperMessage.RateLimiterDynamicConfig
+	rateLimiter.updateDynamicConfig(dynamicConfig)
+}
+
 // GetLimiterID returns the limiter ID.
 func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
 	return iface.LimiterID{
 		PolicyName:     rateLimiter.GetPolicyName(),
-		ComponentIndex: rateLimiter.GetComponentIndex(),
 		PolicyHash:     rateLimiter.GetPolicyHash(),
+		ComponentIndex: rateLimiter.GetComponentIndex(),
 	}
 }
 
-// GetObserver is there to satisfy Limiter interface.
-func (rateLimiter *rateLimiter) GetObserver(map[string]string) prometheus.Observer {
-	// Not implemented for rate limiter
-	return nil
+// GetCounter returns counter for tracking number of times rateLimiter was triggered.
+func (rateLimiter *rateLimiter) GetCounter() prometheus.Counter {
+	return rateLimiter.counter
 }

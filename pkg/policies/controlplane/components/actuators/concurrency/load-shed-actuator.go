@@ -11,8 +11,10 @@ import (
 	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -95,6 +97,10 @@ func (lsa *LoadShedActuator) Execute(inPortReadings runtime.PortToValue, tickInf
 	return nil, nil
 }
 
+// DynamicConfigUpdate is a no-op for load shed actuator.
+func (lsa *LoadShedActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+}
+
 func (lsa *LoadShedActuator) publishLoadShedFactor(loadShedFactor float64) error {
 	logger := lsa.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Publish only if there's a change
@@ -105,9 +111,11 @@ func (lsa *LoadShedActuator) publishLoadShedFactor(loadShedFactor float64) error
 		logger.Sample(zerolog.Often).Debug().Float64("loadShedFactor", loadShedFactor).Msg("Publish load shed decision")
 		wrapper := &wrappersv1.LoadShedDecisionWrapper{
 			LoadShedDecision: lsa.decision,
-			ComponentIndex:   int64(lsa.componentIndex),
-			PolicyName:       lsa.policyReadAPI.GetPolicyName(),
-			PolicyHash:       lsa.policyReadAPI.GetPolicyHash(),
+			CommonAttributes: &wrappersv1.CommonAttributes{
+				PolicyName:     lsa.policyReadAPI.GetPolicyName(),
+				PolicyHash:     lsa.policyReadAPI.GetPolicyHash(),
+				ComponentIndex: int64(lsa.componentIndex),
+			},
 		}
 		dat, err := proto.Marshal(wrapper)
 		if err != nil {

@@ -18,10 +18,10 @@ var _ = Describe("Dataplane Engine", func() {
 	var (
 		engine iface.Engine
 
-		t             GinkgoTestReporter
-		mockCtrl      *gomock.Controller
-		mockLimiter   *mocks.MockLimiter
-		mockFluxmeter *mocks.MockFluxMeter
+		t              GinkgoTestReporter
+		mockCtrl       *gomock.Controller
+		mockConLimiter *mocks.MockConcurrencyLimiter
+		mockFluxmeter  *mocks.MockFluxMeter
 
 		selector    *selectorv1.Selector
 		histogram   goprom.Histogram
@@ -32,7 +32,7 @@ var _ = Describe("Dataplane Engine", func() {
 	BeforeEach(func() {
 		t = GinkgoTestReporter{}
 		mockCtrl = gomock.NewController(t)
-		mockLimiter = mocks.NewMockLimiter(mockCtrl)
+		mockConLimiter = mocks.NewMockConcurrencyLimiter(mockCtrl)
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
 
 		engine = ProvideEngineAPI()
@@ -68,31 +68,31 @@ var _ = Describe("Dataplane Engine", func() {
 
 	Context("Scheduler actuator", func() {
 		BeforeEach(func() {
-			mockLimiter.EXPECT().GetPolicyName().AnyTimes()
-			mockLimiter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
+			mockConLimiter.EXPECT().GetPolicyName().AnyTimes()
+			mockConLimiter.EXPECT().GetSelector().Return(selector).AnyTimes()
+			mockConLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 		})
 
 		It("Registers scheduler actuator", func() {
-			err := engine.RegisterConcurrencyLimiter(mockLimiter)
+			err := engine.RegisterConcurrencyLimiter(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("Registers scheduler actuator second time", func() {
-			err := engine.RegisterConcurrencyLimiter(mockLimiter)
-			err2 := engine.RegisterConcurrencyLimiter(mockLimiter)
+			err := engine.RegisterConcurrencyLimiter(mockConLimiter)
+			err2 := engine.RegisterConcurrencyLimiter(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(err2).To(HaveOccurred())
 		})
 
 		It("Unregisters not registered scheduler actuator", func() {
-			err := engine.UnregisterConcurrencyLimiter(mockLimiter)
+			err := engine.UnregisterConcurrencyLimiter(mockConLimiter)
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("Unregisters existing scheduler actuator", func() {
-			err := engine.RegisterConcurrencyLimiter(mockLimiter)
-			err2 := engine.UnregisterConcurrencyLimiter(mockLimiter)
+			err := engine.RegisterConcurrencyLimiter(mockConLimiter)
+			err2 := engine.UnregisterConcurrencyLimiter(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(err2).NotTo(HaveOccurred())
 		})
@@ -146,9 +146,9 @@ var _ = Describe("Dataplane Engine", func() {
 
 	Context("Multimatch", func() {
 		BeforeEach(func() {
-			mockLimiter.EXPECT().GetPolicyName().AnyTimes()
-			mockLimiter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
+			mockConLimiter.EXPECT().GetPolicyName().AnyTimes()
+			mockConLimiter.EXPECT().GetSelector().Return(selector).AnyTimes()
+			mockConLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
@@ -158,7 +158,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 		It("Return nothing for not compatible service", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
-			_ = engine.RegisterConcurrencyLimiter(mockLimiter)
+			_ = engine.RegisterConcurrencyLimiter(mockConLimiter)
 
 			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
 			svcs := []string{"testService2.testNamespace2.svc.cluster.local"}
@@ -171,7 +171,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 		It("Return matched schedulers and fluxmeters", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
-			_ = engine.RegisterConcurrencyLimiter(mockLimiter)
+			_ = engine.RegisterConcurrencyLimiter(mockConLimiter)
 
 			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
 			svcs := []string{"testService.testNamespace.svc.cluster.local"}

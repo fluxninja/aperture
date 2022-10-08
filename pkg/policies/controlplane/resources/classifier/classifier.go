@@ -36,7 +36,7 @@ func NewClassifierOptions(
 	}
 	agentGroup := selectorProto.ServiceSelector.GetAgentGroup()
 
-	etcdPath := path.Join(common.ClassifiersConfigPath, common.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))
+	etcdPath := path.Join(common.ClassifiersPath, common.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))
 	configSync := &classifierConfigSync{
 		classifierProto: classifierProto,
 		policyReadAPI:   policyBaseAPI,
@@ -57,10 +57,12 @@ func (configSync *classifierConfigSync) doSync(etcdClient *etcdclient.Client, li
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			wrapper := &wrappersv1.ClassifierWrapper{
-				PolicyName:      configSync.policyReadAPI.GetPolicyName(),
-				PolicyHash:      configSync.policyReadAPI.GetPolicyHash(),
-				ClassifierIndex: configSync.classifierIndex,
-				Classifier:      configSync.classifierProto,
+				Classifier: configSync.classifierProto,
+				CommonAttributes: &wrappersv1.CommonAttributes{
+					PolicyName:     configSync.policyReadAPI.GetPolicyName(),
+					PolicyHash:     configSync.policyReadAPI.GetPolicyHash(),
+					ComponentIndex: configSync.classifierIndex,
+				},
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {

@@ -17,13 +17,6 @@ Aperture Agent requires additional details and needs the following
 [Config Patches](https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-EnvoyConfigObjectPatch)
 to be added via the Envoy Filter.
 
-:::caution warning
-
-The latest Istio release (1.15) is
-[not supported](/get-started/supported-platforms.md) yet.
-
-:::
-
 **Note**: In all the below patches, it is presumed that the Aperture Agent is
 installed with `DaemonSet` mode and is installed in the `aperture-agent`
 namespace, which makes the target URL value
@@ -197,9 +190,8 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
    filter for inbound listener in the Istio sidecar running with the
    application.
 
-   The External Authorization filter buffers the client request body with a
-   maximum size of `8192` bytes, and forwards it to the Aperture Agent instance
-   using gRPC with a timeout of `0.01s`, having `INBOUND` value for key
+   The External Authorization filter forwards the request to the Aperture Agent
+   instance using gRPC with a timeout of `0.5s`, having `INBOUND` value for key
    `traffic-direction` metadata included in the streams initiated to the gRPC
    service. The filter will accept the client request even if the communication
    with the authorization service has failed, or if the authorization service
@@ -228,7 +220,7 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
            google_grpc:
              target_uri: aperture-agent.aperture-agent.svc.cluster.local:80
              stat_prefix: ext_authz
-           timeout: 0.01s
+           timeout: 0.5s
            initial_metadata:
              - key: traffic-direction
                value: INBOUND
@@ -241,9 +233,8 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
    filter, but for outbound listener in the Istio sidecar running with the
    application.
 
-   The External Authorization filter buffers the client request body with a
-   maximum size of `8192` bytes, and forwards it to the Aperture Agent instance
-   using gRPC with a timeout of `0.01s`, having `OUTBOUND` value for key
+   The External Authorization filter forwards the request to the Aperture Agent
+   instance using gRPC with a timeout of `0.5s`, having `OUTBOUND` value for key
    `traffic-direction` metadata included in the streams initiated to the gRPC
    service. The filter will accept the client request even if the communication
    with the authorization service has failed, or if the authorization service
@@ -272,7 +263,7 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
            google_grpc:
              target_uri: aperture-agent.aperture-agent.svc.cluster.local:80
              stat_prefix: ext_authz
-           timeout: 0.01s
+           timeout: 0.5s
            initial_metadata:
              - key: traffic-direction
                value: OUTBOUND

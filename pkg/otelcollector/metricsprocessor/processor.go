@@ -178,15 +178,22 @@ func getLabelValue(attributes pcommon.Map, labelKey, source string) (pcommon.Val
 }
 
 // addCheckResponseBasedLabels adds the following labels:
-// * `decision_type`
-// * `decision_reason`
-// * `rate_limiters`
-// * `dropping_rate_limiters`
-// * `concurrency_limiters`
-// * `dropping_concurrency_limiters`
-// * `flux_meters`.
-// * `flow_label_keys`.
-// * `classifiers`.
+// * otelcollector.ApertureProcessingDurationLabel
+// * otelcollector.ApertureServicesLabel
+// * otelcollector.ApertureControlPointLabel
+// * otelcollector.ApertureRateLimitersLabel
+// * otelcollector.ApertureDroppingRateLimitersLabel
+// * otelcollector.ApertureConcurrencyLimitersLabel
+// * otelcollector.ApertureDroppingConcurrencyLimitersLabel
+// * otelcollector.ApertureWorkloadsLabel
+// * otelcollector.ApertureDroppingWorkloadsLabel
+// * otelcollector.ApertureFluxMetersLabel
+// * otelcollector.ApertureFlowLabelKeysLabel
+// * otelcollector.ApertureClassifiersLabel
+// * otelcollector.ApertureClassifierErrorsLabel
+// * otelcollector.ApertureDecisionTypeLabel
+// * otelcollector.ApertureRejectReasonLabel
+// * otelcollector.ApertureErrorLabel.
 func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, sourceStr string) {
 	// Aperture Processing Duration
 	startTime := checkResponse.GetStart().AsTime()
@@ -202,6 +209,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
 	}
 	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
+
 	// Control Point
 	attributes.PutString(otelcollector.ApertureControlPointLabel, checkResponse.GetControlPointInfo().String())
 
@@ -311,6 +319,12 @@ func (p *metricsProcessor) updateMetrics(
 		// Update workload metrics
 		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, []string{})
 		for _, decision := range checkResponse.LimiterDecisions {
+			limiterID := iface.LimiterID{
+				PolicyName:     decision.PolicyName,
+				PolicyHash:     decision.PolicyHash,
+				ComponentIndex: decision.ComponentIndex,
+			}
+
 			if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
 				labels := map[string]string{
 					metrics.PolicyNameLabel:     decision.PolicyName,
@@ -320,14 +334,13 @@ func (p *metricsProcessor) updateMetrics(
 					metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
 				}
 
-				limiterID := iface.LimiterID{
-					PolicyName:     decision.PolicyName,
-					PolicyHash:     decision.PolicyHash,
-					ComponentIndex: decision.ComponentIndex,
-				}
-
 				p.updateMetricsForWorkload(limiterID, labels, latency)
-			} // TODO: add rate limiter metrics
+			}
+
+			// Update rate limiter metrics
+			if rl := decision.GetRateLimiterInfo(); rl != nil {
+				p.updateMetricsForRateLimiter(limiterID)
+			}
 		}
 	}
 
@@ -347,6 +360,18 @@ func (p *metricsProcessor) updateMetrics(
 			p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, attributes, treatAsZero)
 		}
 	}
+
+	if len(checkResponse.ClassifierInfos) > 0 {
+		// Update classifier metrics
+		for _, classifierInfo := range checkResponse.ClassifierInfos {
+			classifierID := iface.ClassifierID{
+				PolicyName:      classifierInfo.PolicyName,
+				PolicyHash:      classifierInfo.PolicyHash,
+				ClassifierIndex: classifierInfo.ClassifierIndex,
+			}
+			p.updateMetricsForClassifier(classifierID)
+		}
+	}
 }
 
 func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, latency float64) {
@@ -362,6 +387,40 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 	latencyHistogram := limiter.GetObserver(labels)
 	if latencyHistogram != nil {
 		latencyHistogram.Observe(latency)
+	}
+}
+
+func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID) {
+	limiter := p.cfg.engine.GetRateLimiter(limiterID)
+	if limiter == nil {
+		log.Sample(zerolog.Sometimes).Warn().
+			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
+			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
+			Int64(metrics.ComponentIndexLabel, limiterID.ComponentIndex).
+			Msg("RateLimiter not found")
+		return
+	}
+	counter := limiter.GetCounter()
+	if counter != nil {
+		counter.Inc()
+	}
+}
+
+func (p *metricsProcessor) updateMetricsForClassifier(classifierID iface.ClassifierID) {
+	classifier, err := p.cfg.classificationEngine.GetClassifier(classifierID)
+	if err != nil {
+		log.Sample(zerolog.Sometimes).Warn().
+			Err(err).
+			Str(metrics.PolicyNameLabel, classifierID.PolicyName).
+			Str(metrics.PolicyHashLabel, classifierID.PolicyHash).
+			Int64(metrics.ClassifierIndexLabel, classifierID.ClassifierIndex).
+			Msg("Classifier not found")
+		return
+	}
+
+	counter := classifier.GetCounter()
+	if counter != nil {
+		counter.Inc()
 	}
 }
 
@@ -393,7 +452,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 }
 
 /*
- * IncludeList: This IncludeList is applied to logs and spans at the beginning of enrichment process.
+ * IncludeList: This IncludeList is applied to logs and spans at during the enrichment process, after check response based labels are attached and metrics have been parsed.
  */
 var (
 	_includeAttributesCommon = []string{
@@ -414,6 +473,8 @@ var (
 		otelcollector.ApertureFlowLabelKeysLabel,
 		otelcollector.ApertureClassifiersLabel,
 		otelcollector.ApertureClassifierErrorsLabel,
+		otelcollector.ApertureServicesLabel,
+		otelcollector.ApertureControlPointLabel,
 	}
 
 	_includeAttributesHTTP = []string{

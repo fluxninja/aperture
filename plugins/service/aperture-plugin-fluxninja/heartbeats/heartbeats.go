@@ -3,10 +3,13 @@ package heartbeats
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	guuid "github.com/google/uuid"
+	"github.com/technosophos/moniker"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
@@ -27,6 +30,7 @@ import (
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/peers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
@@ -54,6 +58,7 @@ type Heartbeats struct {
 	clientConn       *grpc.ClientConn
 	statusRegistry   status.Registry
 	entityCache      *entitycache.EntityCache
+	policyFactory    *controlplane.PolicyFactory
 	ControllerInfo   *heartbeatv1.ControllerInfo
 	heartbeatsAddr   string
 	APIKey           string
@@ -67,6 +72,7 @@ func newHeartbeats(
 	entityCache *entitycache.EntityCache,
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
+	policyFactory *controlplane.PolicyFactory,
 ) *Heartbeats {
 	return &Heartbeats{
 		heartbeatsAddr: p.FluxNinjaEndpoint,
@@ -77,6 +83,7 @@ func newHeartbeats(
 		entityCache:    entityCache,
 		agentInfo:      agentInfo,
 		peersWatcher:   peersWatcher,
+		policyFactory:  policyFactory,
 	}
 }
 
@@ -102,7 +109,10 @@ func (h *Heartbeats) start(ctx context.Context, in *ConstructorIn) error {
 
 func (h *Heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdclient.Client) error {
 	etcdPath := "/fluxninja/controllerid"
-	controllerID := guuid.NewString()
+	newID := guuid.NewString()
+	parts := strings.Split(newID, "-")
+	moniker := strings.Replace(moniker.New().Name(), " ", "-", 1)
+	controllerID := fmt.Sprintf("%s-%s", moniker, parts[0])
 
 	txn := etcdClient.Client.Txn(etcdClient.Client.Ctx())
 	resp, err := txn.If(clientv3.Compare(clientv3.CreateRevision(etcdPath), "=", 0)).
@@ -210,6 +220,7 @@ func (h *Heartbeats) newHeartbeat(
 		Peers:          peers,
 		ServicesList:   servicesList,
 		AllStatuses:    h.statusRegistry.GetGroupStatus(),
+		Policies:       h.policyFactory.GetPolicies(),
 	}
 }
 
