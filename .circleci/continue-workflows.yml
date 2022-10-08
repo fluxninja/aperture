@@ -186,6 +186,8 @@ jobs:
         description: working directory
     executor: go-cimg-executor
     resource_class: large
+    environment:
+      GOMAXPROCS: 4
     steps:
       - checkout
       - run:
@@ -213,10 +215,6 @@ jobs:
             /tmp/prometheus-download-test/prometheus --version
             mv /tmp/prometheus-download-test/prometheus /home/circleci/bin/prometheus
       - run:
-          name: set GOMAXPROCS to 4
-          command: |
-            echo 'export GOMAXPROCS=4' >> $BASH_ENV
-      - run:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
           command: |
@@ -237,6 +235,8 @@ jobs:
   pre-commit:
     executor: python-cimg-executor
     resource_class: large
+    environment:
+      GOMAXPROCS: 4
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -278,10 +278,6 @@ jobs:
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
-      - run:
-          name: set GOMAXPROCS to 4
-          command: |
-            echo 'export GOMAXPROCS=4' >> $BASH_ENV
       - restore_cache:
           name: Restore go cache
           keys:
