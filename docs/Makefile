@@ -1,5 +1,8 @@
 SHELL := /bin/bash
 
+# use GOMAXPROCS from environment if set, otherwise default to 4
+export GOMAXPROCS ?= 4
+
 generate-config-markdown:
 	@# merge plugin swaggers
 	@{ \
