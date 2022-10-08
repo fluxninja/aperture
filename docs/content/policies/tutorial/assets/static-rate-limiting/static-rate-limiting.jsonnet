@@ -51,6 +51,4 @@ local policyResource = {
   spec: policyDef,
 };
 
-[
-  policyResource,
-]
+policyResource

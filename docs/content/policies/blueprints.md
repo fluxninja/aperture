@@ -114,15 +114,13 @@ local policyResource = latencyGradientPolicy({
   concurrencyLimiterSelector: svcSelector,
 }).policyResource;
 
-[
-  policyResource,
-]
+policyResource
 ```
 
 And then, render it with [jsonnet][jsonnet]:
 
 ```sh
-jsonnet --yaml-stream -J vendor [example file].jsonnet
+jsonnet -J vendor [example file].jsonnet  | yq -P
 ```
 
 After running this command you should see the following contents in the YAML

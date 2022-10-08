@@ -6,6 +6,12 @@ keywords:
 sidebar_position: 1
 ---
 
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import Zoom from 'react-medium-image-zoom';
+```
+
 ## Regulating heavy-hitters
 
 One of the simplest flow-control policies is static rate limiting. It uses
