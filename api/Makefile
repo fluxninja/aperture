@@ -17,9 +17,9 @@ buf-generate:
 	@buf lint
 	@buf generate
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
-	@rm -rfd $(GIT_ROOT)/docs/content/openapiv2
-	@mv gen/openapiv2 $(GIT_ROOT)/docs/content/openapiv2
-	@git add $(GIT_ROOT)/docs/content/openapiv2
+	@rm -rfd $(GIT_ROOT)/docs/content/assets/openapiv2
+	@mv gen/openapiv2 $(GIT_ROOT)/docs/content/assets/openapiv2
+	@git add $(GIT_ROOT)/docs/content/assets/openapiv2
 	@git add ./gen/*
 
 generate: buf-update buf-generate
