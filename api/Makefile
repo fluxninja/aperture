@@ -4,6 +4,7 @@ SHELL := /bin/bash
 export GOMAXPROCS ?= 4
 
 BUFPRESENT := $(shell command -v buf 2> /dev/null)
+GIT_ROOT := $(shell git rev-parse --show-toplevel)
 
 buf-update:
 	@echo Updating buf dependencies
@@ -16,6 +17,9 @@ buf-generate:
 	@buf lint
 	@buf generate
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
+	@rm -rfd $(GIT_ROOT)/docs/content/openapiv2
+	@mv gen/openapiv2 $(GIT_ROOT)/docs/content/openapiv2
+	@git add $(GIT_ROOT)/docs/content/openapiv2
 	@git add ./gen/*
 
 generate: buf-update buf-generate

@@ -46,7 +46,7 @@ generate-config-markdown:
 	}
 	@# policies markdown
 	@echo generating policies markdown
-	@cp ../api/gen/openapiv2/aperture.swagger.yaml gen/policies/
+	@cp content/openapiv2/aperture.swagger.yaml gen/policies/
 	@yq -i eval 'del(.paths)' gen/policies/aperture.swagger.yaml
 	@# 'mixin' is mostly used for --keep-spec-order
 	@swagger mixin gen/policies/config-swagger.yaml gen/policies/aperture.swagger.yaml --keep-spec-order --format=yaml -o gen/policies/gen.yaml
