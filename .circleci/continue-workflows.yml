@@ -124,6 +124,7 @@ jobs:
         description: Boolean for whether or not to push images to DockerHub
         default: true
     executor: <<parameters.executor>>
+    resource_class: small
     environment:
       DOCKER_BUILDKIT: 1
     steps:
@@ -235,7 +236,7 @@ jobs:
 
   pre-commit:
     executor: python-cimg-executor
-    resource_class: xlarge
+    resource_class: large
     steps:
       - add_ssh_keys:
           fingerprints:
