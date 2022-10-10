@@ -110,7 +110,7 @@ spec:
           out_ports:
             output:
               signal_name: SQRT_CONCURRENCY_INCREMENT
-          scale: "0.5"
+          scale: "0.1"
       - promql:
           evaluation_interval: 1s
           out_ports:

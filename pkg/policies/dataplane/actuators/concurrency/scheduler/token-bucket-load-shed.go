@@ -36,8 +36,8 @@ func NewTokenBucketLoadShed(now time.Time, metrics *TokenBucketLoadShedMetrics) 
 		tbls.tbb.metrics = metrics.TokenBucketMetrics
 	}
 
-	slotDuration, _ := time.ParseDuration("100ms")
-	// maintain a 1 sec window with 100ms slots for counters
+	slotDuration := time.Duration(1) * time.Second
+	// maintain a 10 sec window with 1s slots for counters
 	tbls.counter = NewWindowedCounter(now, 10, slotDuration)
 
 	tbls.lsf = 0
