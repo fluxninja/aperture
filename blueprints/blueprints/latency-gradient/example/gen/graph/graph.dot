@@ -1,13 +1,13 @@
 digraph  {
 	subgraph cluster_s1 {
 		label="ArithmeticCombinator[0]";margin="50.0";
-		n4[label="2.00"];
-		n2[label="lhs"];
+		n3[label="2.00"];
+		n4[label="lhs"];
 		n5[label="output"];
-		n3[label="rhs"];
-		n4->n3;
-		n3->n5[style="invis"];
-		{rank=same; n2;n3;};
+		n2[label="rhs"];
+		n3->n2;
+		n4->n5[style="invis"];
+		{rank=same; n2;n4;};
 		{rank=same; n5;};
 		
 	}
@@ -51,8 +51,8 @@ digraph  {
 		n22[label="rhs"];
 		n21->n20;
 		n22->n23[style="invis"];
-		{rank=same; n23;};
 		{rank=same; n20;n22;};
+		{rank=same; n23;};
 		
 	}
 	subgraph cluster_s24 {
@@ -81,9 +81,9 @@ digraph  {
 	}
 	subgraph cluster_s34 {
 		label="ArithmeticCombinator[7]";margin="50.0";
-		n36[label="lhs"];
+		n35[label="lhs"];
 		n37[label="output"];
-		n35[label="rhs"];
+		n36[label="rhs"];
 		n36->n37[style="invis"];
 		{rank=same; n35;n36;};
 		{rank=same; n37;};
@@ -108,9 +108,9 @@ digraph  {
 	}
 	subgraph cluster_s67 {
 		label="Decider[15]";margin="50.0";
-		n69[label="lhs"];
+		n68[label="lhs"];
 		n70[label="output"];
-		n68[label="rhs"];
+		n69[label="rhs"];
 		n69->n70[style="invis"];
 		{rank=same; n68;n69;};
 		{rank=same; n70;};
@@ -118,12 +118,12 @@ digraph  {
 	}
 	subgraph cluster_s50 {
 		label="EMA[12]";margin="50.0";
-		n51[label="input"];
-		n52[label="max_envelope"];
+		n52[label="input"];
+		n51[label="max_envelope"];
 		n53[label="output"];
 		n52->n53[style="invis"];
-		{rank=same; n53;};
 		{rank=same; n51;n52;};
+		{rank=same; n53;};
 		
 	}
 	subgraph cluster_s54 {
@@ -176,27 +176,27 @@ digraph  {
 	}
 	subgraph cluster_s71 {
 		label="Switcher[16]";margin="50.0";
-		n73[label="10.00"];
-		n74[label="on_false"];
-		n72[label="on_true"];
+		n74[label="10.00"];
+		n75[label="on_false"];
+		n73[label="on_true"];
 		n76[label="output"];
-		n75[label="switch"];
-		n73->n72;
+		n72[label="switch"];
+		n74->n73;
 		n75->n76[style="invis"];
-		{rank=same; n72;n74;n75;};
+		{rank=same; n72;n73;n75;};
 		{rank=same; n76;};
 		
 	}
 	subgraph cluster_s77 {
 		label="Switcher[17]";margin="50.0";
-		n79[label="0.00"];
-		n80[label="on_false"];
-		n78[label="on_true"];
+		n80[label="0.00"];
+		n81[label="on_false"];
+		n79[label="on_true"];
 		n82[label="output"];
-		n81[label="switch"];
-		n79->n78;
+		n78[label="switch"];
+		n80->n79;
 		n81->n82[style="invis"];
-		{rank=same; n78;n80;n81;};
+		{rank=same; n78;n79;n81;};
 		{rank=same; n82;};
 		
 	}
@@ -207,28 +207,28 @@ digraph  {
 	n63->n55;
 	n64->n12;
 	n64->n17;
-	n37->n39;
-	n40->n74;
-	n40->n80;
-	n70->n75;
-	n70->n81;
-	n5->n52;
-	n23->n42;
-	n47->n32;
-	n49->n2;
-	n49->n51;
-	n49->n56;
-	n49->n69;
-	n60->n13;
-	n76->n58;
-	n28->n68;
-	n44->n59;
-	n82->n35;
 	n14->n16;
+	n76->n58;
+	n5->n51;
+	n10->n57;
+	n28->n69;
+	n33->n35;
+	n40->n75;
+	n40->n81;
+	n60->n13;
+	n70->n72;
+	n70->n78;
+	n82->n36;
+	n37->n39;
+	n47->n32;
 	n18->n66;
+	n23->n42;
+	n44->n59;
+	n49->n4;
+	n49->n52;
+	n49->n56;
+	n49->n68;
 	n53->n7;
 	n53->n25;
-	n10->n57;
-	n33->n36;
 	
 }
