@@ -11,8 +11,7 @@ import "google/protobuf/empty.proto";
 
 // FluxNinjaService is used to receive health and status info from agents.
 service FluxNinjaService {
-  // Report accepts information about agents' health and applied
-  // configurations/policies.
+  // Report accepts information about agents' health and applied configurations/policies.
   rpc Report(ReportRequest) returns (ReportResponse) {
     option (google.api.http) = {
       post: "/plugins/fluxninja/v1/report"

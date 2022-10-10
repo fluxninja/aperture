@@ -16,41 +16,6 @@ consumes:
 produces:
   - application/json
 paths:
-  /plugins/fluxninja/v1/controllerinfo:
-    get:
-      operationId: ControllerInfoService_GetControllerInfo
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1ControllerInfo'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      tags:
-        - ControllerInfoService
-  /plugins/fluxninja/v1/report:
-    post:
-      summary: Report accepts information about agents' health and applied configurations/policies.
-      operationId: FluxNinjaService_Report
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1ReportResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1ReportRequest'
-      tags:
-        - FluxNinjaService
   /v1/entities:
     get:
       operationId: EntityCacheService_GetEntityCache
@@ -181,20 +146,6 @@ paths:
           type: string
       tags:
         - aperture-agent
-  /v1/policies:
-    get:
-      operationId: PolicyService_GetPolicies
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1GetPoliciesResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      tags:
-        - aperture-controller
   /v1/status/{path}:
     get:
       operationId: StatusService_GetGroupStatus

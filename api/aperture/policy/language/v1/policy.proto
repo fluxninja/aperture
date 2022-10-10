@@ -16,6 +16,11 @@ service PolicyService {
     option (google.api.http) = {
       get: "/v1/policies"
     };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: [
+        "aperture-controller"
+      ];
+    };
   }
 }
 
