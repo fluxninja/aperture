@@ -10,6 +10,7 @@ import (
 var ignoreFuncs = []string{
 	"github.com/onsi/ginkgo/v2/internal/interrupt_handler.(*InterruptHandler).registerForInterrupts.func2",
 	"github.com/onsi/ginkgo/v2/internal.(*Suite).runNode",
+	"github.com/onsi/ginkgo/v2/internal.RegisterForProgressSignal.func1",
 	"net/http.(*persistConn).readLoop",
 	"net/http.(*persistConn).writeLoop",
 	"go.opencensus.io/stats/view.(*worker).start",

@@ -11,21 +11,25 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-// Note: this is unused at this time.
 service PolicyService {
-  rpc AllPolicies(google.protobuf.Empty) returns (AllPoliciesResponse) {
+  rpc GetPolicies(google.protobuf.Empty) returns (GetPoliciesResponse) {
     option (google.api.http) = {
       get: "/v1/policies"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: [
+        "aperture-controller"
+      ];
     };
   }
 }
 
-message AllPoliciesResponse {
-  AllPolicies all_policies = 1;
+message GetPoliciesResponse {
+  Policies policies = 1;
 }
 
-message AllPolicies {
-  map<string, Policy> all_policies = 1;
+message Policies {
+  map<string, Policy> policies = 1;
 }
 
 // Policy expresses reliability automation workflow that automatically protects services
@@ -80,7 +84,7 @@ message Circuit {
   }]; // @gotags: default:"0.5s"
 
   // Defines a signal processing graph as a list of components.
-  repeated Component components = 2;
+  repeated Component components = 2; // @gotags: validate:"dive"
 }
 
 // Resources that need to be setup for the policy to function
@@ -94,11 +98,11 @@ message Resources {
   // FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
   //
   // FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
-  map<string, FluxMeter> flux_meters = 1;
+  map<string, FluxMeter> flux_meters = 1; // @gotags: validate:"dive"
   // Classifiers are installed in the data-plane and are used to label the requests based on payload content.
   //
   // The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
-  repeated Classifier classifiers = 2;
+  repeated Classifier classifiers = 2; // @gotags: validate:"dive"
 }
 
 // Computational block that form the circuit
@@ -297,7 +301,7 @@ message GradientController {
   // Remember that the gradient and output signal can be (optionally) clamped,
   // so the _slope_ might not fully describe aggressiveness of the controller.
   // :::
-  double slope = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  double slope = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {
@@ -325,6 +329,26 @@ message GradientController {
       }
     }
   }]; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
+
+  // Configuration key for DynamicConfig
+  string dynamic_config_key = 6;
+
+  // Initial configuration.
+  ControllerDynamicConfig init_config = 7;
+}
+
+// Dynamic Configuration for a Controller
+message ControllerDynamicConfig {
+  // Decides whether the controller runs in "manual_mode".
+  // In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+  bool manual_mode = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {
+        bool_value: false
+      }
+    }
+  }]; // @gotags: default:"false"
 }
 
 // Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
@@ -618,7 +642,7 @@ message RateLimiter {
   // Dynamic Configuration for the rate limiter
   message DynamicConfig {
     // Allows to specify different limits for particular label values.
-    repeated Override overrides = 1;
+    repeated Override overrides = 1; // @gotags: validate:"dive"
   }
 
   message Override {
@@ -728,11 +752,21 @@ message RateLimiter {
 // ConcurrencyLimiter configuration is split into two parts: An actuation
 // strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
 message ConcurrencyLimiter {
+  // Selector decides the service and flows at which the concurrency limiter is applied.
+  common.selector.v1.Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
+
   // Configuration of Weighted Fair Queuing-based workload scheduler.
   //
   // Contains configuration of per-agent scheduler, and also defines some
   // output signals.
-  Scheduler scheduler = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  Scheduler scheduler = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {
@@ -745,7 +779,7 @@ message ConcurrencyLimiter {
     // Actuator based on load shedding a portion of requests.
     //
     // Actuation strategy defines the input signal that will drive the scheduler.
-    LoadShedActuator load_shed_actuator = 2;
+    LoadShedActuator load_shed_actuator = 3;
   }
 }
 
@@ -793,11 +827,25 @@ message Scheduler {
   // Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
   message Workload {
     // WorkloadParameters associated with flows matching the label matcher.
-    WorkloadParameters workload_parameters = 1;
+    WorkloadParameters workload_parameters = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
+        }
+      }
+    }]; // @gotags: validate:"required"
 
     // Label Matcher to select a Workload based on
     // [flow labels](/concepts/flow-control/flow-label.md).
-    common.labelmatcher.v1.LabelMatcher label_matcher = 2;
+    common.labelmatcher.v1.LabelMatcher label_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {
+          string_value: "required"
+        }
+      }
+    }]; // @gotags: validate:"required"
   }
 
   // Output for the Scheduler component.
@@ -824,16 +872,6 @@ message Scheduler {
   // Output ports for the Scheduler component.
   Outs out_ports = 1;
 
-  // Selector decides for which service or flows the scheduler will be applied.
-  common.selector.v1.Selector selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
-    }
-  }]; // @gotags: validate:"required"
-
   // List of workloads to be used in scheduler.
   //
   // Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
@@ -854,16 +892,23 @@ message Scheduler {
   // See also [workload definition in the concepts
   // section](/concepts/flow-control/concurrency-limiter.md#workload).
   // :::
-  repeated Workload workloads = 3;
+  repeated Workload workloads = 2; // @gotags: validate:"dive"
 
   // WorkloadParameters to be used if none of workloads specified in `workloads` match.
-  WorkloadParameters default_workload_parameters = 4;
+  WorkloadParameters default_workload_parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
 
   // Automatically estimate the size of a request in each workload, based on
   // historical latency. Each workload's `tokens` will be set to average
   // latency of flows in that workload during last few seconds (exact duration
   // of this average can change).
-  bool auto_tokens = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  bool auto_tokens = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {
@@ -878,7 +923,7 @@ message Scheduler {
   // it will be rejected.
   //
   // This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
-  double timeout_factor = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  double timeout_factor = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {
@@ -910,7 +955,7 @@ message Scheduler {
   // value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
   // tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
   // :::
-  google.protobuf.Duration max_timeout = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  google.protobuf.Duration max_timeout = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {
@@ -1053,7 +1098,7 @@ message Max {
   // Inputs for the Max component.
   message Ins {
     // Array of input signals.
-    repeated InPort inputs = 1;
+    repeated InPort inputs = 1; // @gotags: validate:"dive"
   }
 
   // Output for the Max component.
@@ -1075,7 +1120,7 @@ message Min {
   // Inputs for the Min component.
   message Ins {
     // Array of input signals.
-    repeated InPort inputs = 1;
+    repeated InPort inputs = 1; // @gotags: validate:"dive"
   }
 
   // Output ports for the Min component.

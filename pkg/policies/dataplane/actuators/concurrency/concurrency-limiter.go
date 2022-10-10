@@ -257,16 +257,17 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 		return fx.Options(), err
 	}
 
-	// Loop through the workloads
-	schedulerProto := concurrencyLimiterMessage.Scheduler
-	if schedulerProto == nil {
+	// Scheduler config
+	schedulerMsg := concurrencyLimiterMessage.Scheduler
+	if schedulerMsg == nil {
 		err = fmt.Errorf("no scheduler specified")
 		reg.SetStatus(status.NewStatus(nil, err))
 		logger.Warn().Err(err).Msg("Failed to unmarshal scheduler")
 		return fx.Options(), err
 	}
 	mm := multimatcher.New[int, multiMatchResult]()
-	for workloadIndex, workloadProto := range schedulerProto.Workloads {
+	// Loop through the workloads
+	for workloadIndex, workloadProto := range schedulerMsg.Workloads {
 		labelMatcher, err := selectors.MMExprFromLabelMatcher(workloadProto.GetLabelMatcher())
 		if err != nil {
 			return fx.Options(), err
@@ -282,14 +283,14 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	}
 
 	conLimiter := &concurrencyLimiter{
-		Component:                      wrapperMessage.GetCommonAttributes(),
-		concurrencyLimiterProto:        concurrencyLimiterMessage,
-		registry:                       reg,
-		concurrencyLimiterFactory:      conLimiterFactory,
-		workloadMultiMatcher:           mm,
-		defaultWorkloadParametersProto: schedulerProto.DefaultWorkloadParameters,
-		schedulerProto:                 schedulerProto,
-		workloadLatencySummaryVec:      conLimiterFactory.workloadLatencySummaryVec,
+		Component:                    wrapperMessage.GetCommonAttributes(),
+		concurrencyLimiterMsg:        concurrencyLimiterMessage,
+		registry:                     reg,
+		concurrencyLimiterFactory:    conLimiterFactory,
+		workloadMultiMatcher:         mm,
+		defaultWorkloadParametersMsg: schedulerMsg.DefaultWorkloadParameters,
+		schedulerMsg:                 schedulerMsg,
+		workloadLatencySummaryVec:    conLimiterFactory.workloadLatencySummaryVec,
 	}
 
 	return fx.Options(
@@ -316,17 +317,17 @@ func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult 
 // concurrencyLimiter implements concurrency limiter on the dataplane side.
 type concurrencyLimiter struct {
 	iface.Component
-	scheduler                      scheduler.Scheduler
-	registry                       status.Registry
-	incomingConcurrencyCounter     prometheus.Counter
-	acceptedConcurrencyCounter     prometheus.Counter
-	workloadLatencySummaryVec      *prometheus.SummaryVec
-	concurrencyLimiterProto        *policylangv1.ConcurrencyLimiter
-	concurrencyLimiterFactory      *concurrencyLimiterFactory
-	autoTokens                     *autoTokens
-	workloadMultiMatcher           *multiMatcher
-	defaultWorkloadParametersProto *policylangv1.Scheduler_WorkloadParameters
-	schedulerProto                 *policylangv1.Scheduler
+	scheduler                    scheduler.Scheduler
+	registry                     status.Registry
+	incomingConcurrencyCounter   prometheus.Counter
+	acceptedConcurrencyCounter   prometheus.Counter
+	workloadLatencySummaryVec    *prometheus.SummaryVec
+	concurrencyLimiterMsg        *policylangv1.ConcurrencyLimiter
+	concurrencyLimiterFactory    *concurrencyLimiterFactory
+	autoTokens                   *autoTokens
+	workloadMultiMatcher         *multiMatcher
+	defaultWorkloadParametersMsg *policylangv1.Scheduler_WorkloadParameters
+	schedulerMsg                 *policylangv1.Scheduler
 }
 
 // Make sure ConcurrencyLimiter implements the iface.ConcurrencyLimiter.
@@ -348,7 +349,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	if err != nil {
 		return err
 	}
-	if conLimiter.schedulerProto.AutoTokens {
+	if conLimiter.schedulerMsg.AutoTokens {
 		autoTokens, err := autoTokensFactory.newAutoTokens(
 			conLimiter.GetPolicyName(), conLimiter.GetPolicyHash(),
 			lifecycle, conLimiter.GetComponentIndex(), conLimiter.registry)
@@ -387,7 +388,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// setup scheduler
-			conLimiter.scheduler = scheduler.NewWFQScheduler(conLimiter.schedulerProto.MaxTimeout.AsDuration(), loadShedActuator.tokenBucketLoadShed, clock, wfqMetrics)
+			conLimiter.scheduler = scheduler.NewWFQScheduler(conLimiter.schedulerMsg.MaxTimeout.AsDuration(), loadShedActuator.tokenBucketLoadShed, clock, wfqMetrics)
 
 			incomingConcurrencyCounter, err := incomingConcurrencyCounterVec.GetMetricWith(metricLabels)
 			if err != nil {
@@ -447,7 +448,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 
 // GetSelector returns selector.
 func (conLimiter *concurrencyLimiter) GetSelector() *selectorv1.Selector {
-	return conLimiter.schedulerProto.GetSelector()
+	return conLimiter.concurrencyLimiterMsg.GetSelector()
 }
 
 // RunLimiter .
@@ -469,7 +470,7 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flow
 		matchedWorkloadIndex = strconv.Itoa(smallestWorkloadIndex)
 	} else {
 		// no match, return default workload
-		matchedWorkloadProto = conLimiter.defaultWorkloadParametersProto
+		matchedWorkloadProto = conLimiter.defaultWorkloadParametersMsg
 		matchedWorkloadIndex = metrics.DefaultWorkloadIndex
 	}
 
@@ -480,7 +481,7 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flow
 	}
 	// Lookup tokens for the workload
 	var tokens uint64
-	if conLimiter.schedulerProto.AutoTokens {
+	if conLimiter.schedulerMsg.AutoTokens {
 		tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex)
 		if !ok {
 			// default to 1 if auto tokens not found
@@ -493,10 +494,10 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flow
 	}
 
 	// timeout is tokens(which is in milliseconds) * conLimiter.schedulerProto.TimeoutFactor(float64)
-	timeout := time.Duration(float64(tokens)*conLimiter.schedulerProto.TimeoutFactor) * time.Millisecond
+	timeout := time.Duration(float64(tokens)*conLimiter.schedulerMsg.TimeoutFactor) * time.Millisecond
 
-	if timeout > conLimiter.schedulerProto.MaxTimeout.AsDuration() {
-		timeout = conLimiter.schedulerProto.MaxTimeout.AsDuration()
+	if timeout > conLimiter.schedulerMsg.MaxTimeout.AsDuration() {
+		timeout = conLimiter.schedulerMsg.MaxTimeout.AsDuration()
 	}
 
 	reqContext := scheduler.RequestContext{

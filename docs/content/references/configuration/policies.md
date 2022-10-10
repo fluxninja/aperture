@@ -221,14 +221,14 @@ Workload defines a class of requests that preferably have similar properties suc
 <dt>label_matcher</dt>
 <dd>
 
-([V1LabelMatcher](#v1-label-matcher)) Label Matcher to select a Workload based on
+([V1LabelMatcher](#v1-label-matcher), `required`) Label Matcher to select a Workload based on
 [flow labels](/concepts/flow-control/flow-label.md).
 
 </dd>
 <dt>workload_parameters</dt>
 <dd>
 
-([SchedulerWorkloadParameters](#scheduler-workload-parameters)) WorkloadParameters associated with flows matching the label matcher.
+([SchedulerWorkloadParameters](#scheduler-workload-parameters), `required`) WorkloadParameters associated with flows matching the label matcher.
 
 </dd>
 </dl>
@@ -609,6 +609,12 @@ Contains configuration of per-agent scheduler, and also defines some
 output signals.
 
 </dd>
+<dt>selector</dt>
+<dd>
+
+([V1Selector](#v1-selector), `required`) Selector decides the service and flows at which the concurrency limiter is applied.
+
+</dd>
 </dl>
 
 ### v1Constant {#v1-constant}
@@ -673,6 +679,22 @@ Usually powered by integration with a proxy (like envoy) or a web framework.
 
 - Flowcontrol: Blockable atom here is a single HTTP-transaction.
 - Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
+
+</dd>
+</dl>
+
+### v1ControllerDynamicConfig {#v1-controller-dynamic-config}
+
+Dynamic Configuration for a Controller
+
+#### Properties
+
+<dl>
+<dt>manual_mode</dt>
+<dd>
+
+(bool) Decides whether the controller runs in "manual_mode".
+In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
 
 </dd>
 </dl>
@@ -1198,10 +1220,22 @@ The output can be _optionally_ clamped to desired range using `max` and
 #### Properties
 
 <dl>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
 ([V1GradientControllerIns](#v1-gradient-controller-ins)) Input ports of the Gradient Controller.
+
+</dd>
+<dt>init_config</dt>
+<dd>
+
+([V1ControllerDynamicConfig](#v1-controller-dynamic-config)) Initial configuration.
 
 </dd>
 <dt>max_gradient</dt>
@@ -2051,7 +2085,7 @@ of this average can change).
 <dt>default_workload_parameters</dt>
 <dd>
 
-([SchedulerWorkloadParameters](#scheduler-workload-parameters)) WorkloadParameters to be used if none of workloads specified in `workloads` match.
+([SchedulerWorkloadParameters](#scheduler-workload-parameters), `required`) WorkloadParameters to be used if none of workloads specified in `workloads` match.
 
 </dd>
 <dt>max_timeout</dt>
@@ -2081,12 +2115,6 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 <dd>
 
 ([V1SchedulerOuts](#v1-scheduler-outs)) Output ports for the Scheduler component.
-
-</dd>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector), `required`) Selector decides for which service or flows the scheduler will be applied.
 
 </dd>
 <dt>timeout_factor</dt>

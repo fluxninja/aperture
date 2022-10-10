@@ -41,6 +41,7 @@ func PromQLModule() fx.Option {
 		jobs.JobGroupConstructor{Name: promQLJobGroupTag, Key: iface.PoliciesRoot + ".promql_jobs_scheduler"}.Annotate(),
 		fx.Provide(fx.Annotate(
 			provideFxOptionsFunc,
+
 			fx.ParamTags(config.NameTag(promQLJobGroupTag)),
 			fx.ResultTags(common.FxOptionsFuncTag),
 		)),
@@ -48,7 +49,7 @@ func PromQLModule() fx.Option {
 }
 
 func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.API) notifiers.FxOptionsFunc {
-	return func(key notifiers.Key, unmarshaller config.Unmarshaller, _ status.Registry) (fx.Option, error) {
+	return func(key notifiers.Key, _ config.Unmarshaller, _ status.Registry) (fx.Option, error) {
 		return fx.Supply(fx.Annotated{Name: promQLJobGroupTag, Target: promQLJobGroup},
 			fx.Annotate(promAPI, fx.As(new(prometheusv1.API))),
 		), nil

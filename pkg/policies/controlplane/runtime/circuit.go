@@ -383,6 +383,9 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 
 // DynamicConfigUpdate updates the circuit with the new dynamic config.
 func (circuit *Circuit) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	// Take Circuit execution lock
+	circuit.LockExecution()
+	defer circuit.UnlockExecution()
 	// loop through all the components
 	for _, cmp := range circuit.components {
 		component := cmp.CompiledComponent.Component

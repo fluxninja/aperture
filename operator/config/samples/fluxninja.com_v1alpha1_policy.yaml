@@ -110,7 +110,7 @@ spec:
           out_ports:
             output:
               signal_name: SQRT_CONCURRENCY_INCREMENT
-          scale: "0.5"
+          scale: "0.1"
       - promql:
           evaluation_interval: 1s
           out_ports:
@@ -165,13 +165,6 @@ spec:
                 signal_name: ACCEPTED_CONCURRENCY
               incoming_concurrency:
                 signal_name: INCOMING_CONCURRENCY
-            selector:
-              flow_selector:
-                control_point:
-                  traffic: ingress
-              service_selector:
-                agent_group: default
-                service: service1-demo-app.demoapp.svc.cluster.local
             timeout_factor: "0.5"
             workloads:
               - label_matcher:
@@ -184,6 +177,13 @@ spec:
                     http.request.header.user_type: subscriber
                 workload_parameters:
                   priority: 200
+          selector:
+            flow_selector:
+              control_point:
+                traffic: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
       - decider:
           in_ports:
             lhs:

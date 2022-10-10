@@ -21,13 +21,9 @@ reset interval).
 
 ### Circuit Diagram
 
-<Zoom>
-
 ```mermaid
 {@include: ./assets/static-rate-limiting/static-rate-limiting.mmd}
 ```
-
-</Zoom>
 
 ### Policy
 
