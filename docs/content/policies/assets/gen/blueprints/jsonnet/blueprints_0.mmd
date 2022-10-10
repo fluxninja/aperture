@@ -2,8 +2,8 @@ flowchart LR
 subgraph 0[<center>ArithmeticCombinator<br/>mul</center>]
 subgraph 0_inports[ ]
 style 0_inports fill:none,stroke:none
-0lhs[lhs]
 0rhs[rhs]
+0lhs[lhs]
 end
 subgraph 0_outports[ ]
 style 0_outports fill:none,stroke:none
@@ -15,8 +15,8 @@ FakeConstant0 --> 0rhs
 subgraph 1[<center>ArithmeticCombinator<br/>mul</center>]
 subgraph 1_inports[ ]
 style 1_inports fill:none,stroke:none
-1rhs[rhs]
 1lhs[lhs]
+1rhs[rhs]
 end
 subgraph 1_outports[ ]
 style 1_outports fill:none,stroke:none
@@ -39,8 +39,8 @@ end
 subgraph 3[<center>ArithmeticCombinator<br/>div</center>]
 subgraph 3_inports[ ]
 style 3_inports fill:none,stroke:none
-3lhs[lhs]
 3rhs[rhs]
+3lhs[lhs]
 end
 subgraph 3_outports[ ]
 style 3_outports fill:none,stroke:none
@@ -50,8 +50,8 @@ end
 subgraph 4[<center>ArithmeticCombinator<br/>mul</center>]
 subgraph 4_inports[ ]
 style 4_inports fill:none,stroke:none
-4lhs[lhs]
 4rhs[rhs]
+4lhs[lhs]
 end
 subgraph 4_outports[ ]
 style 4_outports fill:none,stroke:none
@@ -76,8 +76,8 @@ FakeConstant3 --> 5rhs
 subgraph 6[<center>ArithmeticCombinator<br/>add</center>]
 subgraph 6_inports[ ]
 style 6_inports fill:none,stroke:none
-6lhs[lhs]
 6rhs[rhs]
+6lhs[lhs]
 end
 subgraph 6_outports[ ]
 style 6_outports fill:none,stroke:none
@@ -89,8 +89,8 @@ FakeConstant4 --> 6lhs
 subgraph 7[<center>ArithmeticCombinator<br/>add</center>]
 subgraph 7_inports[ ]
 style 7_inports fill:none,stroke:none
-7rhs[rhs]
 7lhs[lhs]
+7rhs[rhs]
 end
 subgraph 7_outports[ ]
 style 7_outports fill:none,stroke:none
@@ -151,11 +151,11 @@ end
 subgraph 13[Gradient]
 subgraph 13_inports[ ]
 style 13_inports fill:none,stroke:none
+13signal[signal]
 13setpoint[setpoint]
 13optimize[optimize]
 13max[max]
 13control_variable[control_variable]
-13signal[signal]
 end
 subgraph 13_outports[ ]
 style 13_outports fill:none,stroke:none
@@ -165,8 +165,8 @@ end
 subgraph 14.Scheduler[<center>ConcurrencyLimiter/Scheduler<br/>service1-demo-ap...</center>]
 subgraph 14.Scheduler_outports[ ]
 style 14.Scheduler_outports fill:none,stroke:none
-14.Schedulerincoming_concurrency[incoming_concurrency]
 14.Scheduleraccepted_concurrency[accepted_concurrency]
+14.Schedulerincoming_concurrency[incoming_concurrency]
 end
 end
 subgraph 14.LoadShedActuator[<center>ConcurrencyLimiter/LoadShedActuator<br/>service1-demo-ap...</center>]
@@ -178,9 +178,9 @@ end
 subgraph 17[Switcher]
 subgraph 17_inports[ ]
 style 17_inports fill:none,stroke:none
+17switch[switch]
 17on_true[on_true]
 17on_false[on_false]
-17switch[switch]
 end
 subgraph 17_outports[ ]
 style 17_outports fill:none,stroke:none
@@ -192,9 +192,9 @@ FakeConstant6 --> 17on_true
 subgraph 16[Switcher]
 subgraph 16_inports[ ]
 style 16_inports fill:none,stroke:none
+16on_true[on_true]
 16on_false[on_false]
 16switch[switch]
-16on_true[on_true]
 end
 subgraph 16_outports[ ]
 style 16_outports fill:none,stroke:none
@@ -206,40 +206,40 @@ FakeConstant7 --> 16on_true
 subgraph 15[<center>Decider<br/>gt for 0s</center>]
 subgraph 15_inports[ ]
 style 15_inports fill:none,stroke:none
-15rhs[rhs]
 15lhs[lhs]
+15rhs[rhs]
 end
 subgraph 15_outports[ ]
 style 15_outports fill:none,stroke:none
 15output[output]
 end
 end
-5output --> 15rhs
-6output --> 7lhs
-13output --> 2rhs
+9output --> 13max
 14.Scheduleraccepted_concurrency --> 4rhs
 14.Scheduleraccepted_concurrency --> 8inputs
 14.Scheduleraccepted_concurrency --> 10input
 14.Scheduleraccepted_concurrency --> 13control_variable
-12output --> 1lhs
-12output --> 5lhs
-1output --> 13setpoint
-4output --> 9inputs
+16output --> 13optimize
+17output --> 7rhs
+15output --> 16switch
+15output --> 17switch
+3output --> 14.LoadShedActuatorload_shed_factor
+6output --> 7lhs
 7output --> 8inputs
 11output --> 0lhs
 11output --> 12input
 11output --> 13signal
 11output --> 15lhs
+12output --> 1lhs
+12output --> 5lhs
+0output --> 12max_envelope
+10output --> 6rhs
 14.Schedulerincoming_concurrency --> 2lhs
 14.Schedulerincoming_concurrency --> 3rhs
-16output --> 13optimize
-17output --> 7rhs
-0output --> 12max_envelope
+13output --> 2rhs
+1output --> 13setpoint
 2output --> 3lhs
-3output --> 14.LoadShedActuatorload_shed_factor
+4output --> 9inputs
+5output --> 15rhs
 8output --> 16on_false
 8output --> 17on_false
-9output --> 13max
-10output --> 6rhs
-15output --> 16switch
-15output --> 17switch

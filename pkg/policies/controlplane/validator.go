@@ -54,18 +54,18 @@ func (v *PolicySpecValidator) ValidateSpec(
 // ValidateAndCompile checks the validity of a single Policy and compiles it.
 func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (CompiledCircuit, bool, string, error) {
 	if len(yamlSrc) == 0 {
-		return nil, false, "empty yaml", nil
+		return nil, false, "Empty yaml", nil
 	}
 	policy := &policiesv1.Policy{}
 
 	err := config.UnmarshalYAML(yamlSrc, policy)
 	if err != nil {
-		return nil, false, "", nil
+		return nil, false, err.Error(), nil
 	}
 	registry := status.NewRegistry(log.GetGlobalLogger())
 	circuit, err := CompilePolicy(policy, registry)
 	if err != nil {
-		return nil, false, "", err
+		return nil, false, err.Error(), err
 	}
 
 	if policy.GetResources() != nil {
@@ -83,7 +83,7 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (Compi
 					errors.Is(err, compiler.BadRego) || errors.Is(err, compiler.BadLabelName) {
 					return nil, false, err.Error(), nil
 				} else {
-					return nil, false, "", err
+					return nil, false, err.Error(), err
 				}
 			}
 		}

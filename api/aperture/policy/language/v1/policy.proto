@@ -296,7 +296,7 @@ message GradientController {
   // Remember that the gradient and output signal can be (optionally) clamped,
   // so the _slope_ might not fully describe aggressiveness of the controller.
   // :::
-  double slope = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  double slope = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {
@@ -324,6 +324,26 @@ message GradientController {
       }
     }
   }]; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
+
+  // Configuration key for DynamicConfig
+  string dynamic_config_key = 6;
+
+  // Initial configuration.
+  ControllerDynamicConfig init_config = 7;
+}
+
+// Dynamic Configuration for a Controller
+message ControllerDynamicConfig {
+  // Decides whether the controller runs in "manual_mode".
+  // In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+  bool manual_mode = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {
+        bool_value: false
+      }
+    }
+  }]; // @gotags: default:"false"
 }
 
 // Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings

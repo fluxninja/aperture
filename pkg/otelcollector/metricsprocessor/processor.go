@@ -407,10 +407,9 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 }
 
 func (p *metricsProcessor) updateMetricsForClassifier(classifierID iface.ClassifierID) {
-	classifier, err := p.cfg.classificationEngine.GetClassifier(classifierID)
-	if err != nil {
+	classifier := p.cfg.classificationEngine.GetClassifier(classifierID)
+	if classifier == nil {
 		log.Sample(zerolog.Sometimes).Warn().
-			Err(err).
 			Str(metrics.PolicyNameLabel, classifierID.PolicyName).
 			Str(metrics.PolicyHashLabel, classifierID.PolicyHash).
 			Int64(metrics.ClassifierIndexLabel, classifierID.ClassifierIndex).

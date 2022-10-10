@@ -1003,6 +1003,16 @@ definitions:
       - TYPE_EGRESS
     default: TYPE_UNKNOWN
     description: Type contains fields that represent type of ControlPointInfo.
+  v1ControllerDynamicConfig:
+    type: object
+    properties:
+      manual_mode:
+        type: boolean
+        description: |-
+          Decides whether the controller runs in "manual_mode".
+          In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+        x-go-default: false
+    title: Dynamic Configuration for a Controller
   v1ControllerInfo:
     type: object
     properties:
@@ -1377,9 +1387,15 @@ definitions:
   v1GradientController:
     type: object
     properties:
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
       in_ports:
         $ref: '#/definitions/v1GradientControllerIns'
         description: Input ports of the Gradient Controller.
+      init_config:
+        $ref: '#/definitions/v1ControllerDynamicConfig'
+        description: Initial configuration.
       max_gradient:
         type: number
         format: double
