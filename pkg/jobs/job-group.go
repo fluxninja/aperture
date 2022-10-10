@@ -230,20 +230,20 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 // It returns an error if the job is not registered.
 // It also stops the job's executor.
 func (jg *JobGroup) DeregisterJob(name string) error {
-	// var multiErr error
+	var multiErr error
 	job, err := jg.gt.deregisterJob(name)
 	if err != nil {
-		return err
+		multiErr = multierr.Append(multiErr, err)
 	}
 	jobMetrics := job.JobMetrics()
 	err = jobMetrics.removeMetrics(name)
 	if err != nil {
-		return err
+		multiErr = multierr.Append(multiErr, err)
 	}
 	if executor, ok := job.(*jobExecutor); ok {
 		executor.stop()
 	}
-	return nil
+	return multiErr
 }
 
 // DeregisterAll deregisters all Jobs from the JobGroup.
