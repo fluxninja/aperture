@@ -22,10 +22,11 @@ message ComponentView {
   string component_id = 1;
   string component_name = 2;
   string component_type = 3;
-  google.protobuf.Struct component = 4;
-  repeated PortView in_ports = 5;
-  repeated PortView out_ports = 6;
-  string parent_component_id = 7;
+  string component_description = 4;
+  google.protobuf.Struct component = 5;
+  repeated PortView in_ports = 6;
+  repeated PortView out_ports = 7;
+  string parent_component_id = 8;
 }
 
 // SourceTarget describes a link attachment to a component.

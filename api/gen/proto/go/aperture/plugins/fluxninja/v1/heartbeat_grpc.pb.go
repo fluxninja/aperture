@@ -19,8 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FluxNinjaServiceClient interface {
-	// Report accepts information about agents' health and applied
-	// configurations/policies.
+	// Report accepts information about agents' health and applied configurations/policies.
 	Report(ctx context.Context, in *ReportRequest, opts ...grpc.CallOption) (*ReportResponse, error)
 }
 
@@ -45,8 +44,7 @@ func (c *fluxNinjaServiceClient) Report(ctx context.Context, in *ReportRequest, 
 // All implementations should embed UnimplementedFluxNinjaServiceServer
 // for forward compatibility
 type FluxNinjaServiceServer interface {
-	// Report accepts information about agents' health and applied
-	// configurations/policies.
+	// Report accepts information about agents' health and applied configurations/policies.
 	Report(context.Context, *ReportRequest) (*ReportResponse, error)
 }
 

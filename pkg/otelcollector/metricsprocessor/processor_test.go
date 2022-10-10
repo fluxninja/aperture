@@ -61,7 +61,8 @@ var _ = Describe("Metrics Processor", func() {
 		summaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Name: m.WorkloadLatencyMetricName,
 			Help: "dummy",
-		}, []string{m.PolicyNameLabel, m.PolicyHashLabel, m.ComponentIndexLabel,
+		}, []string{
+			m.PolicyNameLabel, m.PolicyHashLabel, m.ComponentIndexLabel,
 			m.DecisionTypeLabel, m.WorkloadIndexLabel,
 		})
 		rateCounter = prometheus.NewCounter(prometheus.CounterOpts{
@@ -133,7 +134,7 @@ var _ = Describe("Metrics Processor", func() {
 		}
 		engine.EXPECT().GetConcurrencyLimiter(gomock.Any()).Return(conLimiter).AnyTimes()
 		engine.EXPECT().GetRateLimiter(gomock.Any()).Return(rateLimiter).AnyTimes()
-		clasEngine.EXPECT().GetClassifier(gomock.Any()).Return(classifier, nil).AnyTimes()
+		clasEngine.EXPECT().GetClassifier(gomock.Any()).Return(classifier).AnyTimes()
 	})
 
 	AfterEach(func() {
@@ -178,7 +179,9 @@ var _ = Describe("Metrics Processor", func() {
 					Remaining: 1,
 					Current:   1,
 					Label:     "test",
-				}}}
+				},
+			},
+		}
 		baseCheckResp.LimiterDecisions = append(baseCheckResp.LimiterDecisions, rateLimiterDecision)
 		baseCheckResp.ClassifierInfos = []*flowcontrolv1.ClassifierInfo{{
 			PolicyName:      "foo",
@@ -337,7 +340,6 @@ workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJEC
 		summaryFizz2, err := summaryVec.GetMetricWith(labelsFizz2)
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetObserver(labelsFizz2).Return(summaryFizz2).Times(1)
-
 	})
 })
 

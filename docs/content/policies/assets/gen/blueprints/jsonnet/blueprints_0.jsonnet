@@ -27,6 +27,4 @@ local policyResource = latencyGradientPolicy({
   concurrencyLimiterSelector: svcSelector,
 }).policyResource;
 
-[
-  policyResource,
-]
+policyResource

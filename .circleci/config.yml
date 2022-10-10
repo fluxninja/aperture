@@ -205,7 +205,7 @@ workflows:
           base-revision: << pipeline.git.base_revision >>
           config-path: .circleci/continue-workflows.yml
           mapping: |
-            (cmd|pkg|plugins|tools|api)/.* updated-aperture true
+            (cmd|pkg|plugins|api)/.* updated-aperture true
             operator/(api|config|controllers|hack)/.*|operator/main.go updated-aperture-operator true
             (go.mod|go.sum) updated-aperture true
             docs/.* updated-aperture-docs true

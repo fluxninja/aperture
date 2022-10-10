@@ -80,7 +80,7 @@ for jsonnet_file in $jsonnet_files; do
 	$SED -i "s|github.com/fluxninja/aperture/blueprints|$gitroot/blueprints|g" "$tmpjsonnetfilepath"
 	# fail script if any of the below commands fail
 	set -e
-	jsonnet --yaml-stream -J "$gitroot"/blueprints/vendor "$tmpjsonnetfilepath" >"$yamlfilepath"
+	jsonnet -J "$gitroot"/blueprints/vendor "$tmpjsonnetfilepath" | yq -P >"$yamlfilepath"
 	# run prettier
 	npx prettier --write "$yamlfilepath"
 	git add "$yamlfilepath"
