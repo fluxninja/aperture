@@ -160,4 +160,4 @@ repos:
       - id: codespell
         args:
           - --ignore-words=./.codespellignore
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/references/api/.*)$
