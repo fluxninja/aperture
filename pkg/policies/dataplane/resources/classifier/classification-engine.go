@@ -296,8 +296,8 @@ func (c *ClassificationEngine) UnregisterClassifier(classifier iface.Classifier)
 }
 
 // GetClassifier Lookup function for getting classifier.
-func (c *ClassificationEngine) GetClassifier(classifierID iface.ClassifierID) (iface.Classifier, error) {
+func (c *ClassificationEngine) GetClassifier(classifierID iface.ClassifierID) iface.Classifier {
 	c.classifierMapMutex.RLock()
 	defer c.classifierMapMutex.RUnlock()
-	return c.classifierMap[classifierID], nil
+	return c.classifierMap[classifierID]
 }

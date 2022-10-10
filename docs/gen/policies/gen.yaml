@@ -555,6 +555,17 @@ definitions:
         type: string
         x-go-validate: required,oneof=ingress egress
         x-order: 1
+  v1ControllerDynamicConfig:
+    type: object
+    title: Dynamic Configuration for a Controller
+    properties:
+      manual_mode:
+        description: |-
+          Decides whether the controller runs in "manual_mode".
+          In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+        type: boolean
+        x-go-default: false
+        x-order: 0
   v1Decider:
     description: |-
       The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
@@ -955,27 +966,35 @@ definitions:
       control variable proportionally to the relative difference between setpoint
       and actual value of the signal
     properties:
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+        x-order: 0
       in_ports:
         description: Input ports of the Gradient Controller.
-        x-order: 0
+        x-order: 1
         $ref: '#/definitions/v1GradientControllerIns'
+      init_config:
+        description: Initial configuration.
+        x-order: 2
+        $ref: '#/definitions/v1ControllerDynamicConfig'
       max_gradient:
         description: Maximum gradient which clamps the computed gradient value to
           the range, [min_gradient, max_gradient].
         type: number
         format: double
         x-go-default: 1.7976931348623157e+308
-        x-order: 1
+        x-order: 3
       min_gradient:
         description: Minimum gradient which clamps the computed gradient value to
           the range, [min_gradient, max_gradient].
         type: number
         format: double
         x-go-default: -1.7976931348623157e+308
-        x-order: 2
+        x-order: 4
       out_ports:
         description: Output ports of the Gradient Controller.
-        x-order: 3
+        x-order: 5
         $ref: '#/definitions/v1GradientControllerOuts'
       slope:
         description: |-
@@ -1020,7 +1039,7 @@ definitions:
         type: number
         format: double
         x-go-validate: required
-        x-order: 4
+        x-order: 6
   v1GradientControllerIns:
     description: Inputs for the Gradient Controller component.
     type: object

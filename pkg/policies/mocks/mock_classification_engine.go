@@ -35,12 +35,11 @@ func (m *MockClassificationEngine) EXPECT() *MockClassificationEngineMockRecorde
 }
 
 // GetClassifier mocks base method.
-func (m *MockClassificationEngine) GetClassifier(classifierID iface.ClassifierID) (iface.Classifier, error) {
+func (m *MockClassificationEngine) GetClassifier(classifierID iface.ClassifierID) iface.Classifier {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetClassifier", classifierID)
 	ret0, _ := ret[0].(iface.Classifier)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	return ret0
 }
 
 // GetClassifier indicates an expected call of GetClassifier.

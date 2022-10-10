@@ -145,6 +145,7 @@ function(params) {
             })
             + gradient.withOutPortsMixin({
               output: port.withSignalName('DESIRED_CONCURRENCY'),
+              simulated_output: port.withSignalName('SIMULATED_DESIRED_CONCURRENCY'),
             })
           ),
           component.withConcurrencyLimiter(
