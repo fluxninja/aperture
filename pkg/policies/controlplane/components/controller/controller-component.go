@@ -128,7 +128,6 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickI
 		}
 	}
 
-	outputSimulated := output
 	// Set output to control variable in-case of Manual mode
 	if cc.manualMode {
 		// wind the controller output to the control variable
@@ -143,8 +142,7 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickI
 	cc.output = output
 
 	return runtime.PortToValue{
-		"output":           []runtime.Reading{output},
-		"simulated_output": []runtime.Reading{outputSimulated},
+		"output": []runtime.Reading{output},
 	}, nil
 }
 

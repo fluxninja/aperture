@@ -150,8 +150,6 @@ spec:
           out_ports:
             output:
               signal_name: DESIRED_CONCURRENCY
-            simulated_output:
-              signal_name: SIMULATED_DESIRED_CONCURRENCY
           slope: "-1"
       - concurrency_limiter:
           load_shed_actuator:

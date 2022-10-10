@@ -25,9 +25,9 @@ digraph  {
 	}
 	subgraph cluster_s11 {
 		label="ArithmeticCombinator[2]";margin="50.0";
-		n12[label="lhs"];
+		n13[label="lhs"];
 		n14[label="output"];
-		n13[label="rhs"];
+		n12[label="rhs"];
 		n13->n14[style="invis"];
 		{rank=same; n12;n13;};
 		{rank=same; n14;};
@@ -51,8 +51,8 @@ digraph  {
 		n22[label="rhs"];
 		n21->n20;
 		n22->n23[style="invis"];
-		{rank=same; n20;n22;};
 		{rank=same; n23;};
+		{rank=same; n20;n22;};
 		
 	}
 	subgraph cluster_s24 {
@@ -75,8 +75,8 @@ digraph  {
 		n32[label="rhs"];
 		n31->n30;
 		n32->n33[style="invis"];
-		{rank=same; n33;};
 		{rank=same; n30;n32;};
+		{rank=same; n33;};
 		
 	}
 	subgraph cluster_s34 {
@@ -89,37 +89,37 @@ digraph  {
 		{rank=same; n37;};
 		
 	}
-	subgraph cluster_s62 {
-		subgraph cluster_s66 {
+	subgraph cluster_s61 {
+		subgraph cluster_s65 {
 			label="LoadShedActuator[14.LoadShedActuator]";margin="50.0";
-			n67[label="load_shed_factor"];
-			{rank=same; n67;};
+			n66[label="load_shed_factor"];
+			{rank=same; n66;};
 			
 		}
-		subgraph cluster_s63 {
+		subgraph cluster_s62 {
 			label="Scheduler[14.Scheduler]";margin="50.0";
-			n64[label="accepted_concurrency"];
-			n65[label="incoming_concurrency"];
-			{rank=same; n64;n65;};
+			n63[label="accepted_concurrency"];
+			n64[label="incoming_concurrency"];
+			{rank=same; n63;n64;};
 			
 		}
 		label="ConcurrencyLimiter[14]";margin="50.0";
 		
 	}
-	subgraph cluster_s68 {
+	subgraph cluster_s67 {
 		label="Decider[15]";margin="50.0";
-		n69[label="lhs"];
-		n71[label="output"];
-		n70[label="rhs"];
-		n70->n71[style="invis"];
-		{rank=same; n69;n70;};
-		{rank=same; n71;};
+		n68[label="lhs"];
+		n70[label="output"];
+		n69[label="rhs"];
+		n69->n70[style="invis"];
+		{rank=same; n68;n69;};
+		{rank=same; n70;};
 		
 	}
 	subgraph cluster_s50 {
 		label="EMA[12]";margin="50.0";
-		n52[label="input"];
-		n51[label="max_envelope"];
+		n51[label="input"];
+		n52[label="max_envelope"];
 		n53[label="output"];
 		n52->n53[style="invis"];
 		{rank=same; n51;n52;};
@@ -128,16 +128,15 @@ digraph  {
 	}
 	subgraph cluster_s54 {
 		label="Gradient[13]";margin="50.0";
-		n57[label="control_variable"];
-		n56[label="max"];
-		n55[label="optimize"];
-		n61[label="output"];
-		n59[label="setpoint"];
-		n58[label="signal"];
-		n60[label="simulated_output"];
-		n59->n61[style="invis"];
-		{rank=same; n60;n61;};
+		n59[label="control_variable"];
+		n58[label="max"];
+		n57[label="optimize"];
+		n60[label="output"];
+		n56[label="setpoint"];
+		n55[label="signal"];
+		n59->n60[style="invis"];
 		{rank=same; n55;n56;n57;n58;n59;};
+		{rank=same; n60;};
 		
 	}
 	subgraph cluster_s41 {
@@ -175,61 +174,61 @@ digraph  {
 		{rank=same; n47;};
 		
 	}
-	subgraph cluster_s72 {
+	subgraph cluster_s71 {
 		label="Switcher[16]";margin="50.0";
 		n75[label="10.00"];
-		n76[label="on_false"];
+		n72[label="on_false"];
 		n74[label="on_true"];
-		n77[label="output"];
+		n76[label="output"];
 		n73[label="switch"];
 		n75->n74;
-		n76->n77[style="invis"];
-		{rank=same; n73;n74;n76;};
-		{rank=same; n77;};
+		n74->n76[style="invis"];
+		{rank=same; n72;n73;n74;};
+		{rank=same; n76;};
 		
 	}
-	subgraph cluster_s78 {
+	subgraph cluster_s77 {
 		label="Switcher[17]";margin="50.0";
-		n81[label="0.00"];
-		n82[label="on_false"];
-		n80[label="on_true"];
-		n83[label="output"];
-		n79[label="switch"];
-		n81->n80;
-		n82->n83[style="invis"];
-		{rank=same; n79;n80;n82;};
-		{rank=same; n83;};
+		n79[label="0.00"];
+		n80[label="on_false"];
+		n78[label="on_true"];
+		n82[label="output"];
+		n81[label="switch"];
+		n79->n78;
+		n81->n82[style="invis"];
+		{rank=same; n78;n80;n81;};
+		{rank=same; n82;};
 		
 	}
 	rankdir="LR";splines="ortho";
-	n64->n22;
-	n64->n39;
-	n64->n46;
-	n64->n57;
-	n65->n12;
-	n65->n17;
-	n83->n36;
+	n63->n22;
+	n63->n39;
+	n63->n46;
+	n63->n59;
+	n64->n13;
+	n64->n17;
 	n14->n16;
-	n40->n76;
-	n40->n82;
-	n53->n7;
-	n53->n25;
+	n82->n36;
+	n5->n52;
 	n23->n42;
 	n37->n39;
-	n77->n55;
-	n10->n59;
-	n28->n70;
-	n33->n35;
+	n44->n58;
 	n47->n32;
-	n61->n13;
-	n71->n73;
-	n71->n79;
-	n5->n51;
-	n18->n67;
-	n44->n56;
+	n53->n7;
+	n53->n25;
+	n76->n57;
+	n18->n66;
+	n33->n35;
 	n49->n2;
-	n49->n52;
-	n49->n58;
-	n49->n69;
+	n49->n51;
+	n49->n55;
+	n49->n68;
+	n60->n12;
+	n70->n73;
+	n70->n81;
+	n10->n56;
+	n28->n69;
+	n40->n72;
+	n40->n80;
 	
 }
