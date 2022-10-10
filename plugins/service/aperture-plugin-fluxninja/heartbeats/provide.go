@@ -51,7 +51,7 @@ type ConstructorIn struct {
 	AgentInfo                  *agentinfo.AgentInfo     `optional:"true"`
 	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
 	EtcdClient                 *etcdclient.Client
-	PolicyFactory              *controlplane.PolicyFactory
+	PolicyFactory              *controlplane.PolicyFactory `optional:"true"`
 }
 
 // Provide provides a new instance of Heartbeats.
