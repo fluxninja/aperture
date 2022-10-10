@@ -4,6 +4,7 @@ package aperture.common.entitycache.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 //
 // gRPC service
@@ -15,15 +16,30 @@ service EntityCacheService {
     option (google.api.http) = {
       get: "/v1/entities"
     };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: [
+        "aperture-agent"
+      ];
+    };
   }
   rpc GetEntityByIPAddress(GetEntityByIPAddressRequest) returns (Entity) {
     option (google.api.http) = {
       get: "/v1/entities/ip-address/{ip_address}"
     };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: [
+        "aperture-agent"
+      ];
+    };
   }
   rpc GetEntityByName(GetEntityByNameRequest) returns (Entity) {
     option (google.api.http) = {
       get: "/v1/entities/name/{name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: [
+        "aperture-agent"
+      ];
     };
   }
 }

@@ -4,6 +4,7 @@ package aperture.common.peers.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 //
 // gRPC service
@@ -15,11 +16,21 @@ service PeerDiscoveryService {
     option (google.api.http) = {
       get: "/v1/peers"
     };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: [
+        "aperture-agent"
+      ];
+    };
   }
 
   rpc GetPeer(PeerRequest) returns (Peer) {
     option (google.api.http) = {
       get: "/v1/peers/address/{address}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: [
+        "aperture-agent"
+      ];
     };
   }
 }

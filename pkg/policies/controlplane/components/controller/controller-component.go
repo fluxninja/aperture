@@ -1,6 +1,7 @@
 package controller
 
 import (
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
@@ -18,21 +19,29 @@ type ControllerComponent struct {
 	// Control variable's last reading
 	controlVariable runtime.Reading
 	// Controller output's last reading
-	output         runtime.Reading
-	policyReadAPI  iface.Policy
-	componentIndex int
+	output           runtime.Reading
+	policyReadAPI    iface.Policy
+	dynamicConfigKey string
+	componentIndex   int
+	manualMode       bool
 }
 
 // NewControllerComponent creates a new ControllerComponent.
-func NewControllerComponent(controller Controller, componentIndex int, policyReadAPI iface.Policy) *ControllerComponent {
+func NewControllerComponent(controller Controller, componentIndex int, policyReadAPI iface.Policy, dynamicConfigKey string, initConfig *policylangv1.ControllerDynamicConfig) *ControllerComponent {
+	manualMode := false
+	if initConfig != nil {
+		manualMode = initConfig.ManualMode
+	}
 	return &ControllerComponent{
-		signal:          runtime.InvalidReading(),
-		setpoint:        runtime.InvalidReading(),
-		controlVariable: runtime.InvalidReading(),
-		output:          runtime.InvalidReading(),
-		controller:      controller,
-		componentIndex:  componentIndex,
-		policyReadAPI:   policyReadAPI,
+		signal:           runtime.InvalidReading(),
+		setpoint:         runtime.InvalidReading(),
+		controlVariable:  runtime.InvalidReading(),
+		output:           runtime.InvalidReading(),
+		controller:       controller,
+		componentIndex:   componentIndex,
+		policyReadAPI:    policyReadAPI,
+		dynamicConfigKey: dynamicConfigKey,
+		manualMode:       manualMode,
 	}
 }
 
@@ -119,6 +128,16 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickI
 		}
 	}
 
+	// Set output to control variable in-case of Manual mode
+	if cc.manualMode {
+		// wind the controller output to the control variable
+		windedOuput, err := cc.controller.WindOutput(output, controlVariable, cc, tickInfo)
+		if err != nil {
+			return retErr(err)
+		}
+		output = windedOuput
+	}
+
 	// Save readings for the next tick so that Controller may access them via ControllerStateReadAPI
 	cc.output = output
 
@@ -127,8 +146,18 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickI
 	}, nil
 }
 
-// DynamicConfigUpdate is a no-op for ControllerComponent.
+// DynamicConfigUpdate handles setting of controller.ControllerMode.
 func (cc *ControllerComponent) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := cc.policyReadAPI.GetStatusRegistry().GetLogger()
+	dynamicConfig := &policylangv1.ControllerDynamicConfig{}
+	if unmarshaller.IsSet(cc.dynamicConfigKey) {
+		err := unmarshaller.UnmarshalKey(cc.dynamicConfigKey, dynamicConfig)
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
+			return
+		}
+		cc.manualMode = dynamicConfig.ManualMode
+	}
 }
 
 // GetSignal returns the signal's last reading.

@@ -6,6 +6,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 // InfoService is used to provide information about the aperture system.
 service InfoService {
@@ -13,15 +14,33 @@ service InfoService {
     option (google.api.http) = {
       get: "/v1/info/version"
     };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: [
+        "aperture-agent",
+        "aperture-controller"
+      ];
+    };
   }
   rpc Process(google.protobuf.Empty) returns (ProcessInfo) {
     option (google.api.http) = {
       get: "/v1/info/process"
     };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: [
+        "aperture-agent",
+        "aperture-controller"
+      ];
+    };
   }
   rpc Host(google.protobuf.Empty) returns (HostInfo) {
     option (google.api.http) = {
       get: "/v1/info/host"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: [
+        "aperture-agent",
+        "aperture-controller"
+      ];
     };
   }
 }

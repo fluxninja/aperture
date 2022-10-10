@@ -19,6 +19,8 @@
   "startOnLoad": true,
   "flowchart": {
     "useMaxWidth": true,
-    "htmlLabels": true
+    "htmlLabels": true,
+    "nodeSpacing": 50,
+    "rankSpacing": 50
   }
 }

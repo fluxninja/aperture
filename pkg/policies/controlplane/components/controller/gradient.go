@@ -34,7 +34,7 @@ func NewGradientControllerAndOptions(gradientControllerProto *policylangv1.Gradi
 		maxGradient: gradientControllerProto.MaxGradient,
 	}
 
-	controller := NewControllerComponent(gradient, componentIndex, policyReadAPI)
+	controller := NewControllerComponent(gradient, componentIndex, policyReadAPI, gradientControllerProto.DynamicConfigKey, gradientControllerProto.InitConfig)
 
 	return controller, fx.Options(), nil
 }

@@ -38,4 +38,4 @@ plugins:
       - merge_file_name=aperture
       - allow_merge=true
       - output_format=yaml
-      - generate_unbound_methods=true
+      - generate_unbound_methods=false
