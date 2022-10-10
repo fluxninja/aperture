@@ -26,7 +26,7 @@ type TokenBucketLoadShed struct {
 }
 
 // NewTokenBucketLoadShed creates a new TokenBucketLoadShed.
-func NewTokenBucketLoadShed(now time.Time, metrics *TokenBucketLoadShedMetrics) *TokenBucketLoadShed {
+func NewTokenBucketLoadShed(now time.Time, metrics *TokenBucketLoadShedMetrics, slotCount uint8, slotDuration time.Duration) *TokenBucketLoadShed {
 	tbls := &TokenBucketLoadShed{
 		tbb: &tokenBucketBase{},
 	}
@@ -36,9 +36,8 @@ func NewTokenBucketLoadShed(now time.Time, metrics *TokenBucketLoadShedMetrics) 
 		tbls.tbb.metrics = metrics.TokenBucketMetrics
 	}
 
-	slotDuration := time.Duration(1) * time.Second
 	// maintain a 10 sec window with 1s slots for counters
-	tbls.counter = NewWindowedCounter(now, 10, slotDuration)
+	tbls.counter = NewWindowedCounter(now, slotCount, slotDuration)
 
 	tbls.lsf = 0
 	tbls.setLSFGauge(float64(tbls.lsf))
