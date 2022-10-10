@@ -20,7 +20,7 @@ import (
 
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/entitycache"
@@ -212,9 +212,9 @@ func (h *Heartbeats) newHeartbeat(
 		peers = h.peersWatcher.GetPeers()
 	}
 
-	var policies *policylangv1.Policies
+	policies := &wrappersv1.PolicyWrappers{}
 	if h.policyFactory != nil {
-		policies = h.policyFactory.GetPolicies()
+		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
 	}
 
 	return &heartbeatv1.ReportRequest{

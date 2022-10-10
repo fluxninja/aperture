@@ -798,6 +798,19 @@ definitions:
       - ERROR_EXPRESSION_NOT_MAP
     default: ERROR_NONE
     description: Error information.
+  v1CommonAttributes:
+    type: object
+    properties:
+      component_index:
+        type: string
+        format: int64
+        description: The index of Component of within the circuit or classifier index.
+      policy_hash:
+        type: string
+        description: Hash of the entire Policy spec.
+      policy_name:
+        type: string
+        description: Name of the Policy.
   v1Component:
     type: object
     properties:
@@ -1847,6 +1860,22 @@ definitions:
 
       Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
     title: Policy expresses reliability automation workflow that automatically protects services
+  v1PolicyWrapper:
+    type: object
+    properties:
+      common_attributes:
+        $ref: '#/definitions/v1CommonAttributes'
+        title: CommonAttributes
+      policy:
+        $ref: '#/definitions/v1Policy'
+        title: Policy
+  v1PolicyWrappers:
+    type: object
+    properties:
+      policy_wrappers:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1PolicyWrapper'
   v1ProcessInfo:
     type: object
     properties:
@@ -1952,7 +1981,7 @@ definitions:
       peers:
         $ref: '#/definitions/v1Peers'
       policies:
-        $ref: '#/definitions/v1Policies'
+        $ref: '#/definitions/v1PolicyWrappers'
       process_info:
         $ref: '#/definitions/v1ProcessInfo'
       services_list:
