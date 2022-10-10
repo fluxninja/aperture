@@ -8,6 +8,7 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
+	"go.uber.org/multierr"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -111,19 +112,29 @@ func (jgc JobGroupConstructor) provideJobGroup(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
+			var multiErr error
 			for _, jobTracker := range jg.gt.trackers {
 				jobMetric := jobTracker.job.JobMetrics()
-				_ = jobMetric.registerJobMetrics(prometheusRegistry)
+				err := jobMetric.registerJobMetrics(prometheusRegistry)
+				if err != nil {
+					multiErr = multierr.Append(multiErr, err)
+				}
 			}
-			return jg.Start()
+			multiErr = multierr.Append(multiErr, jg.Start())
+			return multiErr
 		},
 		OnStop: func(_ context.Context) error {
+			var multiErr error
 			for _, jobTracker := range jg.gt.trackers {
 				jobMetric := jobTracker.job.JobMetrics()
-				_ = jobMetric.unregisterJobMetrics(prometheusRegistry)
+				err := jobMetric.unregisterJobMetrics(prometheusRegistry)
+				if err != nil {
+					multiErr = multierr.Append(multiErr, err)
+				}
 			}
 			defer reg.Detach()
-			return jg.Stop()
+			multiErr = multierr.Append(multiErr, jg.Stop())
+			return multiErr
 		},
 	})
 
@@ -219,12 +230,16 @@ func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
 // It returns an error if the job is not registered.
 // It also stops the job's executor.
 func (jg *JobGroup) DeregisterJob(name string) error {
+	// var multiErr error
 	job, err := jg.gt.deregisterJob(name)
 	if err != nil {
 		return err
 	}
 	jobMetrics := job.JobMetrics()
-	_ = jobMetrics.removeMetrics(name)
+	err = jobMetrics.removeMetrics(name)
+	if err != nil {
+		return err
+	}
 	if executor, ok := job.(*jobExecutor); ok {
 		executor.stop()
 	}
@@ -235,7 +250,10 @@ func (jg *JobGroup) DeregisterJob(name string) error {
 func (jg *JobGroup) DeregisterAll() {
 	for jobName, jobTracker := range jg.gt.trackers {
 		jobMetric := jobTracker.job.JobMetrics()
-		_ = jobMetric.removeMetrics(jobName)
+		err := jobMetric.removeMetrics(jobName)
+		if err != nil {
+			log.Error().Err(err).Msgf("Failed to remove job metrics with jobName: %s", jobName)
+		}
 	}
 	jobs := jg.gt.reset()
 	for _, job := range jobs {

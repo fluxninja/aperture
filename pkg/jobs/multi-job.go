@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"go.uber.org/fx"
+	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
@@ -77,20 +78,31 @@ func (mjc MultiJobConstructor) provideMultiJob(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
+			var multiErr error
 			// Register multijob
 			err := jg.RegisterJob(mj, config.JobConfig)
 			if err != nil {
-				return err
+				multiErr = multierr.Append(multiErr, err)
 			}
-			_ = mj.JMS.registerJobMetrics(prometheusRegistry)
-			return nil
+			err = mj.JMS.registerJobMetrics(prometheusRegistry)
+			if err != nil {
+				multiErr = multierr.Append(multiErr, err)
+			}
+			return multiErr
 		},
 		OnStop: func(context.Context) error {
+			var multiErr error
 			// Deregister all jobs
 			mj.gt.reset()
-			_ = mj.JMS.unregisterJobMetrics(prometheusRegistry)
-			_ = jg.DeregisterJob(mjc.Name)
-			return nil
+			err := mj.JMS.unregisterJobMetrics(prometheusRegistry)
+			if err != nil {
+				multiErr = multierr.Append(multiErr, err)
+			}
+			err = jg.DeregisterJob(mjc.Name)
+			if err != nil {
+				multiErr = multierr.Append(multiErr, err)
+			}
+			return multiErr
 		},
 	})
 
@@ -163,20 +175,27 @@ func (mj *MultiJob) RegisterJob(job Job) error {
 
 // DeregisterJob deregisters a job with the MultiJob.
 func (mj *MultiJob) DeregisterJob(name string) error {
+	var multiErr error
 	job, err := mj.gt.deregisterJob(name)
 	if err != nil {
-		return nil
+		multiErr = multierr.Append(multiErr, err)
 	}
 	jobMetrics := job.JobMetrics()
-	_ = jobMetrics.removeMetrics(name)
-	return nil
+	err = jobMetrics.removeMetrics(name)
+	if err != nil {
+		multiErr = multierr.Append(multiErr, err)
+	}
+	return multiErr
 }
 
 // DeregisterAll removes all jobs from the MultiJob.
 func (mj *MultiJob) DeregisterAll() {
 	for jobName, jobTracker := range mj.gt.trackers {
 		jobMetric := jobTracker.job.JobMetrics()
-		_ = jobMetric.removeMetrics(jobName)
+		err := jobMetric.removeMetrics(jobName)
+		if err != nil {
+			log.Error().Err(err).Msgf("Failed to remove job metrics with jobName: %s", jobName)
+		}
 	}
 	mj.gt.reset()
 }
