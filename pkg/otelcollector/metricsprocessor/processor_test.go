@@ -134,7 +134,7 @@ var _ = Describe("Metrics Processor", func() {
 		}
 		engine.EXPECT().GetConcurrencyLimiter(gomock.Any()).Return(conLimiter).AnyTimes()
 		engine.EXPECT().GetRateLimiter(gomock.Any()).Return(rateLimiter).AnyTimes()
-		clasEngine.EXPECT().GetClassifier(gomock.Any()).Return(classifier, nil).AnyTimes()
+		clasEngine.EXPECT().GetClassifier(gomock.Any()).Return(classifier).AnyTimes()
 	})
 
 	AfterEach(func() {
