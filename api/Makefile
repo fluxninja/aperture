@@ -22,7 +22,12 @@ buf-generate:
 	@mv gen/openapiv2 $(DOCS_OPENAPI)
 	@# remove all operations on paths except the ones that have the tag 'aperture-agent'. The tag array is under - path.<operation>.tags
 	@yq eval 'del(.paths | .[] | select(.*.tags | contains(["aperture-agent"]) | not))' $(DOCS_OPENAPI)/aperture.swagger.yaml > $(DOCS_OPENAPI)/aperture-agent.swagger.yaml
+	@yq eval -i '.host = "aperture-agent"' $(DOCS_OPENAPI)/aperture-agent.swagger.yaml
+	@swagger flatten --with-flatten=remove-unused $(DOCS_OPENAPI)/aperture-agent.swagger.yaml --format=yaml --output=$(DOCS_OPENAPI)/aperture-agent.swagger.yaml
+	@# Controller
 	@yq eval 'del(.paths | .[] | select(.*.tags | contains(["aperture-controller"]) | not))' $(DOCS_OPENAPI)/aperture.swagger.yaml > $(DOCS_OPENAPI)/aperture-controller.swagger.yaml
+	@yq eval -i '.host = "aperture-controller"' $(DOCS_OPENAPI)/aperture-controller.swagger.yaml
+	@swagger flatten --with-flatten=remove-unused $(DOCS_OPENAPI)/aperture-controller.swagger.yaml --format=yaml --output $(DOCS_OPENAPI)/aperture-controller.swagger.yaml
 	@git add $(DOCS_OPENAPI)
 	@git add ./gen/*
 
