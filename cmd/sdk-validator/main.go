@@ -26,7 +26,10 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-var logger *log.Logger
+var (
+	logger *log.Logger
+	failed bool
+)
 
 func init() {
 	logger = log.NewLogger(log.GetPrettyConsoleWriter(), log.DebugLevel.String())
@@ -79,6 +82,8 @@ func main() {
 	traceHandler := &validator.TraceHandler{}
 	tracev1.RegisterTraceServiceServer(grpcServer, traceHandler)
 
+	validation := 0
+
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 	wg := sync.WaitGroup{}
@@ -103,10 +108,22 @@ func main() {
 			rejected := confirmConnectedAndStartTraffic(*sdkPort, *requests)
 			l := log.With().Int("total requests", *requests).Int64("expected rejections", *rejects).Int("got rejections", rejected).Logger()
 			if rejected != int(*rejects) {
-				l.Error().Msg("Validation failed")
-				os.Exit(1)
+				l.Error().Msg("FlowControl validation failed")
+				validation = 1
 			}
-			l.Info().Msg("Validation complete")
+
+			if failed {
+				l.Error().Msg("Span attributes validation failed")
+				validation = 1
+			}
+
+			if validation == 0 {
+				l.Info().Msg("Validation successful")
+				sigCh <- syscall.SIGTERM
+			} else {
+				l.Info().Msg("Validation failed")
+				sigCh <- syscall.SIGTERM
+			}
 			wg.Done()
 		}()
 	}
@@ -118,6 +135,7 @@ func main() {
 	}
 	wg.Wait()
 	log.Info().Msg("Successful graceful shutdown")
+	os.Exit(validation)
 }
 
 func serverInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -126,7 +144,9 @@ func serverInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySer
 	log.Info().Str("method", info.FullMethod).Dur("latency", time.Since(start)).Msg("Request served")
 	if err != nil {
 		log.Error().Err(err).Msg("Handler returned error")
-		os.Exit(1)
+	}
+	if err != nil {
+		failed = true
 	}
 	return h, err
 }

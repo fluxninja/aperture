@@ -23,50 +23,61 @@ func (t TraceHandler) Export(ctx context.Context, req *tracev1.ExportTraceServic
 	log.Trace().Msg("Received Export request")
 
 	var merr error
-	var flowStartTS, flowEndTS int64
 
 	for _, resourceSpans := range req.ResourceSpans {
 		for _, scopeSpan := range resourceSpans.ScopeSpans {
 			for _, span := range scopeSpan.Spans {
+				var err error
+				var flowStartTS, flowEndTS, workloadTS int64
 				for _, attribute := range span.Attributes {
 					switch attribute.Key {
 					case otelcollector.ApertureCheckResponseLabel:
 						log.Trace().Str("attribute", otelcollector.ApertureCheckResponseLabel).Msg("Validating attribute")
 						v := attribute.Value.GetStringValue()
 						checkResponse := &flowcontrolv1.CheckResponse{}
-						err := protojson.Unmarshal([]byte(v), checkResponse)
-						if err != nil {
-							log.Error().Err(err).Msg("Failed to validate flowcontrol CheckResponse")
-							merr = multierr.Append(merr, fmt.Errorf("invalid %s: %w", otelcollector.ApertureCheckResponseLabel, err))
+						perr := protojson.Unmarshal([]byte(v), checkResponse)
+						if perr != nil {
+							log.Error().Err(perr).Msg("Failed to validate flowcontrol CheckResponse")
+							err = multierr.Append(err, fmt.Errorf("invalid %s: %w", otelcollector.ApertureCheckResponseLabel, perr))
 						}
 					case otelcollector.ApertureSourceLabel:
 						log.Trace().Str("attribute", otelcollector.ApertureSourceLabel).Msg("Validating attribute")
 						v := attribute.Value.GetStringValue()
 						if v != "sdk" {
 							log.Error().Msg("Failed to validate source")
-							merr = multierr.Append(merr, fmt.Errorf("invalid %s", otelcollector.ApertureSourceLabel))
+							err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureSourceLabel))
 						}
 					case otelcollector.ApertureFeatureStatusLabel:
 						log.Trace().Str("attribute", otelcollector.ApertureFeatureStatusLabel).Msg("Validating attribute")
 						v := attribute.Value.GetStringValue()
 						if v != otelcollector.ApertureFeatureStatusOK && v != otelcollector.ApertureFeatureStatusError {
 							log.Error().Msg("Failed to validate feature status")
-							merr = multierr.Append(merr, fmt.Errorf("invalid %s", otelcollector.ApertureFeatureStatusLabel))
+							err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureFeatureStatusLabel))
 						}
 					case otelcollector.ApertureFlowStartTimestampLabel:
 						flowStartTS = attribute.Value.GetIntValue()
 					case otelcollector.ApertureFlowEndTimestampLabel:
 						flowEndTS = attribute.Value.GetIntValue()
+					case otelcollector.ApertureWorkloadStartTimestampLabel:
+						workloadTS = attribute.Value.GetIntValue()
 					}
+				}
+				log.Trace().Str("attribute", otelcollector.ApertureFlowStartTimestampLabel).Str("attribute", otelcollector.ApertureFlowEndTimestampLabel).Msg("Validating attribute")
+				if flowStartTS > flowEndTS {
+					log.Error().Msg("Failed to validate start and end flow timestamps")
+					err = multierr.Append(err, fmt.Errorf("invalid %s and %s", otelcollector.ApertureFlowStartTimestampLabel, otelcollector.ApertureFlowEndTimestampLabel))
+				}
+				log.Trace().Str("attribute", otelcollector.ApertureWorkloadStartTimestampLabel).Msg("Validating attribute")
+				if workloadTS == 0 {
+					log.Error().Msg("Failed to validate workload start timestamp")
+					err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureWorkloadStartTimestampLabel))
+				}
+				merr = multierr.Append(merr, err)
+				if merr != nil {
+					return &tracev1.ExportTraceServiceResponse{}, merr
 				}
 			}
 		}
-	}
-
-	log.Trace().Str("attribute", otelcollector.ApertureFlowStartTimestampLabel).Str("attribute", otelcollector.ApertureFlowEndTimestampLabel).Msg("Validating attribute")
-	if flowStartTS > flowEndTS {
-		log.Error().Msg("Failed to validate start and end flow timestamps")
-		merr = multierr.Append(merr, fmt.Errorf("invalid %s and %s", otelcollector.ApertureFlowStartTimestampLabel, otelcollector.ApertureFlowEndTimestampLabel))
 	}
 
 	log.Info().Msg("Validated span attributes")
