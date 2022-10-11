@@ -42,7 +42,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.2.0
 	github.com/onsi/gomega v1.21.1
 	github.com/open-policy-agent/opa v0.45.0
-	github.com/open-policy-agent/opa-envoy-plugin v0.43.0-envoy
+	github.com/open-policy-agent/opa-envoy-plugin v0.45.0-envoy
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.60.0
@@ -329,8 +329,8 @@ exclude github.com/prometheus/prometheus v1.8.2
 
 replace (
 	cloud.google.com/go => cloud.google.com/go v0.100.2
-	github.com/go-openapi/analysis => github.com/fluxninja/analysis v0.21.2-fn.patch.1
-	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.8
+	github.com/go-openapi/analysis => github.com/fluxninja/analysis v0.21.2-fn.patch.2
+	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.9
 	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.5
 	go.opentelemetry.io/collector/pdata => github.com/fluxninja/opentelemetry-collector/pdata v0.60.0-fn.patch.5
 )
