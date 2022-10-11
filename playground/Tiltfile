@@ -106,6 +106,7 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/operator/Dockerfile",
                     "ssh": "default",
+                    "ignore": ["cmd"],
                 }
             ],
             "port_forwards": {
@@ -198,6 +199,7 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/cmd/aperture-agent/Dockerfile",
                     "ssh": "default",
+                    "ignore": ["operator"],
                 }
             ],
             "kinds": [
@@ -286,6 +288,7 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/tools/demo_app/Dockerfile",
                     "ssh": "default",
+                    "ignore": ["operator", "plugins", "cmd"],
                 }
             ],
             "child_resources": [
