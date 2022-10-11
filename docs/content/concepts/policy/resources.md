@@ -7,8 +7,7 @@ sidebar_position: 3
 
 :::info
 
-See also
-[Resources reference](/references/configuration/policies.md#v1-resources)
+See also [Resources reference](/references/configuration/policy.md#v1-resources)
 
 :::
 
@@ -26,5 +25,5 @@ The following are the available Resource types
 
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [flow-classifier]: /concepts/flow-control/flow-classifier.md
-[promql-reference]: /references/configuration/policies.md#v1-prom-q-l
-[selector-reference]: /references/configuration/policies.md#v1-selector
+[promql-reference]: /references/configuration/policy.md#v1-prom-q-l
+[selector-reference]: /references/configuration/policy.md#v1-selector

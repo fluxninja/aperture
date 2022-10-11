@@ -3,11 +3,10 @@ FROM golang:1.19-buster AS base
 
 WORKDIR /src
 COPY --link . .
-ENV GOPRIVATE=github.com/aperture-control,github.com/fluxninja
 
 RUN --mount=type=cache,target=/go/pkg/ \
-    --mount=type=cache,target=/root/.cache/go-build/ \
-    go mod download
+  --mount=type=cache,target=/root/.cache/go-build/ \
+  go mod download
 
 # App build
 ARG GIT_COMMIT_HASH
@@ -19,21 +18,21 @@ ENV VERSION=${VERSION}
 
 FROM base AS builder
 RUN --mount=type=cache,target=/go/pkg/ \
-    --mount=type=cache,target=/root/.cache/go-build/ \
-    CGO_ENABLED=1 TARGET="/aperture-controller" PREFIX="aperture" SOURCE="./cmd/aperture-controller" LDFLAGS="-s -w" \
-    ./pkg/info/build.sh
+  --mount=type=cache,target=/root/.cache/go-build/ \
+  CGO_ENABLED=1 TARGET="/aperture-controller" PREFIX="aperture" SOURCE="./cmd/aperture-controller" LDFLAGS="-s -w" \
+  ./pkg/info/build.sh
 
 
 # BUILD PLUGINS STAGE
 FROM base AS plugins-builder
 RUN --mount=type=cache,target=/go/pkg/ \
-    --mount=type=cache,target=/root/.cache/go-build/ \
-    /bin/bash -c 'shopt -s nullglob; for plugin in ./plugins/{service,controller}/aperture-plugin-*; do\
-    echo "building plugin $plugin";\
-    CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w" \
-    ./pkg/plugins/build.sh;\
-    done\
-    '
+  --mount=type=cache,target=/root/.cache/go-build/ \
+  /bin/bash -c 'shopt -s nullglob; for plugin in ./plugins/{service,controller}/aperture-plugin-*; do\
+  echo "building plugin $plugin";\
+  CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w" \
+  ./pkg/plugins/build.sh;\
+  done\
+  '
 
 # Final image
 FROM alpine:3.15.0

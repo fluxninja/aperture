@@ -15,8 +15,8 @@ go-generate:
 
 go-mod-tidy:
 	@echo Download go.mod dependencies
-	@GOPRIVATE=github.com/fluxninja,github.com/aperture-control
 	@go mod tidy
+	@cd tools/go && go mod tidy
 
 go-test:
 	@echo Running go tests
