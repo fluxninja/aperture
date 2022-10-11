@@ -20,9 +20,15 @@ buf-generate:
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)
-	@# remove all operations on paths except the ones that have the tag 'aperture-agent'. The tag array is under - path.<operation>.tags
-	@yq eval 'del(.paths | .[] | select(.*.tags | contains(["aperture-agent"]) | not))' $(DOCS_OPENAPI)/aperture.swagger.yaml > $(DOCS_OPENAPI)/aperture-agent.swagger.yaml
-	@yq eval 'del(.paths | .[] | select(.*.tags | contains(["aperture-controller"]) | not))' $(DOCS_OPENAPI)/aperture.swagger.yaml > $(DOCS_OPENAPI)/aperture-controller.swagger.yaml
+	@{ \
+		set -e; \
+		for process in aperture-agent aperture-controller; do \
+			yq eval "del(.paths | .[] | select(.*.tags | contains([\"$$process\"]) | not))" $(DOCS_OPENAPI)/aperture.swagger.yaml > $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			yq eval -i ".host = \"$$process\"" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			yq eval -i '.schemes = ["https"]' $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			swagger flatten --with-flatten=remove-unused $(DOCS_OPENAPI)/$$process.swagger.yaml --format=yaml --output=$(DOCS_OPENAPI)/$$process.swagger.yaml; \
+		done; \
+	}
 	@git add $(DOCS_OPENAPI)
 	@git add ./gen/*
 
