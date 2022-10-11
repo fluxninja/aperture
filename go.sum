@@ -478,12 +478,12 @@ github.com/felixge/httpsnoop v1.0.2/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSw
 github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBdXk=
 github.com/felixge/httpsnoop v1.0.3/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/flowstack/go-jsonschema v0.1.1/go.mod h1:yL7fNggx1o8rm9RlgXv7hTBWxdBM0rVwpMwimd3F3N0=
-github.com/fluxninja/analysis v0.21.2-fn.patch.2 h1:LG7Dh+ipYavGrHPBQ0VfsNNiMC+MX52TRPs/YGa9PSs=
-github.com/fluxninja/analysis v0.21.2-fn.patch.2/go.mod h1:4zQ35W4neeZTqh3ol0rv/O8JBbka9QyAgQRPp9y3pfo=
+github.com/fluxninja/analysis v0.21.2-fn.patch.3 h1:A1829BqfgROVin6LqHELT234hRrwqKkkvdZgh6EZsDg=
+github.com/fluxninja/analysis v0.21.2-fn.patch.3/go.mod h1:4zQ35W4neeZTqh3ol0rv/O8JBbka9QyAgQRPp9y3pfo=
 github.com/fluxninja/datasketches-go v0.0.0-20220128132852-065685ae83e0 h1:gm58E6F4u7qk+0CHEIr3ipsyG998OkLen2/atasfiUI=
 github.com/fluxninja/datasketches-go v0.0.0-20220128132852-065685ae83e0/go.mod h1:OiaOzKtscjnrkm40xpAB11hg/RFJ9tU+ujFeAivDM3g=
-github.com/fluxninja/go-swagger v0.29.0-fn.patch.9 h1:nSsbBPV6/D6A3YCScOhQr7LAx9WXNWVAWycHKEKnoOE=
-github.com/fluxninja/go-swagger v0.29.0-fn.patch.9/go.mod h1:e8FrABBQQhi8NPbhclqeSYrAOevmkHHjnXtr4O9XANc=
+github.com/fluxninja/go-swagger v0.29.0-fn.patch.10 h1:B50np/x6BEO2paA7ZGoH0NeHl/AHTM6yMxpCVrFl2X4=
+github.com/fluxninja/go-swagger v0.29.0-fn.patch.10/go.mod h1:h3zeMrYCz5TLTdB7ECf4pTvYEbvWKC1dkPqgNt1r4r0=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814 h1:AHC1PtYLUw9PWqmgB9VHcxzGEm1GDYGXzC1PRtgIqqs=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814/go.mod h1:kARLh/xWGaisrwkOGOWKcqk7fagFUFthOTX7mIFVJlw=
 github.com/fluxninja/opentelemetry-collector v0.60.0-fn.patch.5 h1:bxrnwy6RL5q7kbPDJl6yalwcSlpSrYjoggVVQJtaqhY=
