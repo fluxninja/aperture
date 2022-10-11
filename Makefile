@@ -81,10 +81,14 @@ coverage_profile:
 show_coverage_in_browser: profile.coverprofile
 	go tool cover -html profile.coverprofile
 
-all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-blueprints helm-lint
+pre-commit-checks:
+	@echo Running pre-commit checks
+	@pre-commit run --all-files
+
+all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-blueprints helm-lint pre-commit-checks
 	@echo "Done"
 
-.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-doc-assets generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint generate-blueprints
+.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-doc-assets generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint generate-blueprints pre-commit-checks
 
 #####################################
 ###### OPERATOR section starts ######
