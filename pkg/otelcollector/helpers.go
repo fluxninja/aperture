@@ -83,8 +83,8 @@ func IterateMetrics(md pmetric.Metrics, fn func(pmetric.Metric) error) error {
 // IterateDataPoints calls given function for each metric data point. If the function returns error
 // further data point will not be processed and the error will be returned.
 func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error {
-	switch metric.DataType() {
-	case pmetric.MetricDataTypeGauge:
+	switch metric.Type() {
+	case pmetric.MetricTypeGauge:
 		dataPoints := metric.Gauge().DataPoints()
 		for i := 0; i < dataPoints.Len(); i++ {
 			err := fn(dataPoints.At(i).Attributes())
@@ -92,7 +92,7 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 				return err
 			}
 		}
-	case pmetric.MetricDataTypeSum:
+	case pmetric.MetricTypeSum:
 		dataPoints := metric.Sum().DataPoints()
 		for i := 0; i < dataPoints.Len(); i++ {
 			err := fn(dataPoints.At(i).Attributes())
@@ -100,7 +100,7 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 				return err
 			}
 		}
-	case pmetric.MetricDataTypeSummary:
+	case pmetric.MetricTypeSummary:
 		dataPoints := metric.Summary().DataPoints()
 		for i := 0; i < dataPoints.Len(); i++ {
 			err := fn(dataPoints.At(i).Attributes())
@@ -108,7 +108,7 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 				return err
 			}
 		}
-	case pmetric.MetricDataTypeHistogram:
+	case pmetric.MetricTypeHistogram:
 		dataPoints := metric.Histogram().DataPoints()
 		for i := 0; i < dataPoints.Len(); i++ {
 			err := fn(dataPoints.At(i).Attributes())
@@ -116,7 +116,7 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 				return err
 			}
 		}
-	case pmetric.MetricDataTypeExponentialHistogram:
+	case pmetric.MetricTypeExponentialHistogram:
 		dataPoints := metric.ExponentialHistogram().DataPoints()
 		for i := 0; i < dataPoints.Len(); i++ {
 			err := fn(dataPoints.At(i).Attributes())
@@ -143,12 +143,12 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 		log.Sample(zerolog.Sometimes).Warn().Str("label", label).Msg("Label does not exist in attributes map")
 		return false
 	}
-	if value.Type() != pcommon.ValueTypeString {
+	if value.Type() != pcommon.ValueTypeStr {
 		log.Sample(zerolog.Sometimes).Warn().Str("label", label).Msg("Label is not a string")
 		return false
 	}
 
-	stringVal := value.StringVal()
+	stringVal := value.Str()
 
 	for _, markerForMissing := range treatAsMissing {
 		if stringVal == markerForMissing {
@@ -173,14 +173,14 @@ func GetFloat64(attributes pcommon.Map, key string, treatAsZero []string) (float
 		return 0, false
 	}
 	if rawNewValue.Type() == pcommon.ValueTypeDouble {
-		return rawNewValue.DoubleVal(), true
+		return rawNewValue.Double(), true
 	} else if rawNewValue.Type() == pcommon.ValueTypeInt {
-		return float64(rawNewValue.IntVal()), true
-	} else if rawNewValue.Type() == pcommon.ValueTypeString {
-		newValue, err := strconv.ParseFloat(rawNewValue.StringVal(), 64)
+		return float64(rawNewValue.Int()), true
+	} else if rawNewValue.Type() == pcommon.ValueTypeStr {
+		newValue, err := strconv.ParseFloat(rawNewValue.Str(), 64)
 		if err != nil {
 			for _, treatAsZeroValue := range treatAsZero {
-				if rawNewValue.StringVal() == treatAsZeroValue {
+				if rawNewValue.Str() == treatAsZeroValue {
 					return 0, true
 				}
 			}
