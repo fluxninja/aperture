@@ -23,7 +23,7 @@ type FlowControlHandler struct {
 
 // Check is a dummy Check handler.
 func (f *FlowControlHandler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*flowcontrolv1.CheckResponse, error) {
-	log.Info().Msg("Received Check request")
+	log.Trace().Msg("Received Check request")
 
 	services := []string{}
 	rpcPeer, peerExists := peer.FromContext(ctx)
@@ -56,7 +56,7 @@ func (f *FlowControlHandler) check(ctx context.Context, feature string, labels m
 	// randomly reject requests based on rejectRatio
 	// nolint:gosec
 	if f.Rejected != f.Rejects {
-		log.Info().Msg("Rejecting call")
+		log.Trace().Msg("Rejecting call")
 		resp.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
 		resp.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
 		atomic.AddInt64(&f.Rejected, 1)

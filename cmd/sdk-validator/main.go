@@ -101,7 +101,12 @@ func main() {
 		wg.Add(1)
 		go func() {
 			rejected := confirmConnectedAndStartTraffic(*sdkPort, *requests)
-			log.Info().Int("total requests", *requests).Int64("expected rejections", *rejects).Int("got rejections", rejected).Msg("Validation complete")
+			l := log.With().Int("total requests", *requests).Int64("expected rejections", *rejects).Int("got rejections", rejected).Logger()
+			if rejected != int(*rejects) {
+				l.Error().Msg("Validation failed")
+				grpcServer.GracefulStop()
+			}
+			l.Info().Msg("Validation complete")
 			wg.Done()
 		}()
 	}
@@ -115,14 +120,13 @@ func main() {
 	log.Info().Msg("Successful graceful shutdown")
 }
 
-func serverInterceptor(ctx context.Context,
-	req interface{},
-	info *grpc.UnaryServerInfo,
-	handler grpc.UnaryHandler,
-) (interface{}, error) {
+func serverInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	start := time.Now()
 	h, err := handler(ctx, req)
-	log.Info().Str("method", info.FullMethod).Dur("latency", time.Since(start)).Err(err).Msg("Request served")
+	log.Info().Str("method", info.FullMethod).Dur("latency", time.Since(start)).Msg("Request served")
+	if err != nil {
+		log.Fatal().Err(err).Msg("Handler returned error")
+	}
 	return h, err
 }
 
@@ -218,7 +222,6 @@ func confirmConnectedAndStartTraffic(port string, requests int) int {
 			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to make http request")
 		}
 		res.Body.Close()
-		log.Info().Str("status", res.Status).Msg("Got response")
 		if res.StatusCode != http.StatusAccepted {
 			rejected += 1
 		}
