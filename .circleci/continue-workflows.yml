@@ -598,7 +598,7 @@ commands:
           keys:
             - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
-              checksum "go.mod" }}
+              checksum "tools/go/go.mod" }}
             - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
@@ -618,7 +618,7 @@ commands:
           key:
             aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
-            "go.mod" }}
+            "tools/go/go.mod" }}
           paths:
             - ~/.asdf
 
