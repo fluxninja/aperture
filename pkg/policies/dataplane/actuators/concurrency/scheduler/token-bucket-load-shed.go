@@ -17,18 +17,25 @@ type TokenBucketLoadShedMetrics struct {
 
 // TokenBucketLoadShed is a token bucket with load shedding.
 type TokenBucketLoadShed struct {
-	lock    sync.Mutex
-	tbb     *tokenBucketBase
-	counter *WindowedCounter
-	lsf     float64 // load shed factor between 0 and 1
-	// metrics
-	lsfGauge prometheus.Gauge
+	lock               sync.Mutex
+	lsfGauge           prometheus.Gauge // metrics
+	tbb                *tokenBucketBase
+	counter            *WindowedCounter
+	continuousTracking bool
+	lsf                float64 // load shed factor between 0 and 1
 }
 
 // NewTokenBucketLoadShed creates a new TokenBucketLoadShed.
-func NewTokenBucketLoadShed(now time.Time, metrics *TokenBucketLoadShedMetrics, slotCount uint8, slotDuration time.Duration) *TokenBucketLoadShed {
+func NewTokenBucketLoadShed(now time.Time,
+	slotCount uint8,
+	slotDuration time.Duration,
+	metrics *TokenBucketLoadShedMetrics,
+) *TokenBucketLoadShed {
 	tbls := &TokenBucketLoadShed{
-		tbb: &tokenBucketBase{},
+		tbb:                &tokenBucketBase{},
+		counter:            NewWindowedCounter(now, slotCount, slotDuration),
+		lsf:                0,
+		continuousTracking: false,
 	}
 
 	if metrics != nil {
@@ -36,13 +43,16 @@ func NewTokenBucketLoadShed(now time.Time, metrics *TokenBucketLoadShedMetrics, 
 		tbls.tbb.metrics = metrics.TokenBucketMetrics
 	}
 
-	// maintain a 10 sec window with 1s slots for counters
-	tbls.counter = NewWindowedCounter(now, slotCount, slotDuration)
-
-	tbls.lsf = 0
 	tbls.setLSFGauge(float64(tbls.lsf))
 
 	return tbls
+}
+
+// SetContinuousTracking sets whether to continuously track the token rate and adjust the fill rate based on load shed factor.
+func (tbls *TokenBucketLoadShed) SetContinuousTracking(continuousTracking bool) {
+	tbls.lock.Lock()
+	defer tbls.lock.Unlock()
+	tbls.continuousTracking = continuousTracking
 }
 
 // SetLoadShedFactor sets the load shed factor number between [0,1] --> 0 = no load shedding, 1 = load shed 100%.
@@ -86,17 +96,18 @@ func (tbls *TokenBucketLoadShed) PreprocessRequest(now time.Time, rContext Reque
 
 	// recalculate token rate
 	if ready {
-		// adjust fillRate based on the new tokenRate
-		tbls.tbb.setFillRate(now, tbls.counter.CalculateTokenRate()*(1-tbls.lsf))
-		log.Trace().
-			Float64("loadShedFactor", tbls.lsf).
-			Float64("calculated fillRate", tbls.tbb.getFillRate()).
-			Float64("calculated token rate", tbls.counter.CalculateTokenRate()).
-			Msg("Sliding window update - Setting fill rate")
-
-		if wasBootstrapping {
-			// This is the first time we are learning the tokenRate, initialize the token bucket
-			tbls.tbb.addTokens(tbls.tbb.getFillRate())
+		if wasBootstrapping || tbls.continuousTracking {
+			// adjust fillRate based on the new tokenRate
+			tbls.tbb.setFillRate(now, tbls.counter.CalculateTokenRate()*(1-tbls.lsf))
+			log.Trace().
+				Float64("loadShedFactor", tbls.lsf).
+				Float64("calculated fillRate", tbls.tbb.getFillRate()).
+				Float64("calculated token rate", tbls.counter.CalculateTokenRate()).
+				Msg("Sliding window update - Setting fill rate")
+			if wasBootstrapping {
+				// This is the first time we are learning the tokenRate, initialize the token bucket
+				tbls.tbb.addTokens(tbls.tbb.getFillRate())
+			}
 		}
 	}
 

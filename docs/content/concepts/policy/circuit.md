@@ -83,38 +83,38 @@ Components are divided into following functional categories to aid exploration:
   Signal(s).
   - **Arithmetic**: These Components perform basic Arithmetic operations on
     Signal(s).
-    - [Arithmetic Combinator](/references/configuration/policies.md#v1-arithmetic-combinator):
+    - [Arithmetic Combinator](/references/configuration/policy.md#v1-arithmetic-combinator):
       This Component takes two input Signals and performs a basic arithmetic
       operation to generate an output Signal.
-    - [Max](/references/configuration/policies.md#v1-max) and
-      [Min](/references/configuration/policies.md#v1-min): These Components take
+    - [Max](/references/configuration/policy.md#v1-max) and
+      [Min](/references/configuration/policy.md#v1-min): These Components take
       multiple input or output Signals and emit maximum or minimum of those
       Signals.
-    - [Sqrt](/references/configuration/policies.md#v1-sqrt): This Component
-      square roots a Signal.
-    - [Constant](/references/configuration/policies.md#v1-constant): A constant
+    - [Sqrt](/references/configuration/policy.md#v1-sqrt): This Component square
+      roots a Signal.
+    - [Constant](/references/configuration/policy.md#v1-constant): A constant
       Signal value.
   - **Transformers**: These Components statefully transform an input Signal in
     an output Signal.
-    - [EMA](/references/configuration/policies.md#v1-e-m-a): Exponential Moving
+    - [EMA](/references/configuration/policy.md#v1-e-m-a): Exponential Moving
       Average.
-    - [Extrapolator](/references/configuration/policies.md#v1-extrapolator):
+    - [Extrapolator](/references/configuration/policy.md#v1-extrapolator):
       Extrapolate a Signal based on past values.
-  - [Decider and Switcher](/references/configuration/policies.md#v1-decider):
+  - [Decider and Switcher](/references/configuration/policy.md#v1-decider):
     These Components work in tandem to make the Circuit adapt based on
     conditions.
 - **Controllers**: Controllers are an essential part of a closed loop control
   system. A Controller take as input a signal, a setpoint and emits the
   suggested value of Control Variable as output. The aim of the Controller is to
   make the Signal achieve the Setpoint.
-  - [Gradient Controller](/references/configuration/policies.md#v1-gradient-controller):
+  - [Gradient Controller](/references/configuration/policy.md#v1-gradient-controller):
     This Controller acts on the ratio of Setpoint and Signal.
 - **Actuators**: Actuators are Components which act on Signals to make real
   changes like shed traffic, change rate limits etc.
-  - [Concurrency Limiter](/references/configuration/policies.md#v1-concurrency-limiter):
+  - [Concurrency Limiter](/references/configuration/policy.md#v1-concurrency-limiter):
     Takes load shed factor as a Signal which determines the proportional of Flow
     concurrency to shed.
-  - [Rate Limiter](/references/configuration/policies.md#v1-rate-limiter): Take
+  - [Rate Limiter](/references/configuration/policy.md#v1-rate-limiter): Take
     rate limit as a Signal which determines the rate of flows handled by that
     Rate Limiter.
 
@@ -123,8 +123,8 @@ Components are divided into following functional categories to aid exploration:
 [signal]: #signal
 [looping-signals]: #looping-signals
 [components]: #components
-[policy-reference]: /references/configuration/policies.md#v1-policy
-[circuit-reference]: /references/configuration/policies.md#v1-circuit
-[promql-reference]: /references/configuration/policies.md#v1-prom-q-l
-[scheduler-reference]: /references/configuration/policies.md#v1-scheduler
+[policy-reference]: /references/configuration/policy.md#v1-policy
+[circuit-reference]: /references/configuration/policy.md#v1-circuit
+[promql-reference]: /references/configuration/policy.md#v1-prom-q-l
+[scheduler-reference]: /references/configuration/policy.md#v1-scheduler
 [flow-control-scheduler]: ../flow-control/concurrency-limiter.md#scheduler

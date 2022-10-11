@@ -44,29 +44,30 @@ generate-config-markdown:
 		done; \
 		rm merged-plugin-swagger.yaml; \
 	}
-	@# policies markdown
-	@echo generating policies markdown
-	@cp content/assets/openapiv2/aperture.swagger.yaml gen/policies/
-	@yq -i eval 'del(.paths)' gen/policies/aperture.swagger.yaml
+	@# policy markdown
+	@echo generating policy markdown
+	@cp content/assets/openapiv2/aperture.swagger.yaml gen/policy/
+	@yq -i eval 'del(.paths)' gen/policy/aperture.swagger.yaml
+	@yq -i eval 'del(.tags)' gen/policy/aperture.swagger.yaml
 	@# 'mixin' is mostly used for --keep-spec-order
-	@swagger mixin gen/policies/config-swagger.yaml gen/policies/aperture.swagger.yaml --keep-spec-order --format=yaml -o gen/policies/gen.yaml
+	@swagger mixin gen/policy/config-swagger.yaml gen/policy/aperture.swagger.yaml --keep-spec-order --format=yaml -o gen/policy/policy.yaml
 	@# Fixup .info, which is altered by 'mixin'
 	@yq -i eval-all 'select(fileIndex == 0).info = select(fileIndex == 1).info' \
-		gen/policies/gen.yaml gen/policies/config-swagger.yaml
-	@swagger flatten --with-flatten=remove-unused gen/policies/gen.yaml --format=yaml --output gen/policies/gen.yaml
-	@swagger generate markdown --spec gen/policies/gen.yaml --target gen/policies \
+		gen/policy/policy.yaml gen/policy/config-swagger.yaml
+	@swagger flatten --with-flatten=remove-unused gen/policy/policy.yaml --format=yaml --output gen/policy/policy.yaml
+	@swagger generate markdown --spec gen/policy/policy.yaml --target gen/policy \
 		--skip-validation \
 		--quiet \
 		--with-flatten=remove-unused \
-		--tags=$(name)-configuration \
+		--tags=policy-configuration \
 		--allow-template-override --template-dir tools/swagger/swagger-templates \
 		--config-file tools/swagger/markdown-config.yaml
-	@rm gen/policies/aperture.swagger.yaml
-	@# append gen/policies/metadata on top of gen/policies/policies.md
-	@cat gen/policies/metadata gen/policies/policies.md > gen/policies/policies.md.tmp
-	@mv gen/policies/policies.md.tmp gen/policies/policies.md
-	@npx prettier --prose-wrap="preserve" --write gen/policies/policies.md
-	@mv gen/policies/policies.md content/references/configuration
+	@rm gen/policy/aperture.swagger.yaml
+	@# append gen/policy/metadata on top of gen/policy/policy.md
+	@cat gen/policy/metadata gen/policy/policy.md > gen/policy/policy.md.tmp
+	@mv gen/policy/policy.md.tmp gen/policy/policy.md
+	@npx prettier --prose-wrap="preserve" --write gen/policy/policy.md
+	@mv gen/policy/policy.md content/references/configuration
 
 generate-jsonnet:
 	@echo generate jsonnet

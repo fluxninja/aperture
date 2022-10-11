@@ -1935,12 +1935,3 @@ definitions:
         type: string
       version:
         type: string
-tags:
-- name: EntityCacheService
-- name: InfoService
-- name: PeerDiscoveryService
-- name: StatusService
-- name: FlowControlService
-- name: PolicyService
-- name: FluxNinjaService
-- name: ControllerInfoService
