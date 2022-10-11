@@ -8,38 +8,14 @@ tags:
   - name: PeerDiscoveryService
   - name: StatusService
   - name: FlowControlService
+  - name: PolicyService
   - name: FluxNinjaService
   - name: ControllerInfoService
-  - name: PolicyService
 consumes:
   - application/json
 produces:
   - application/json
 paths:
-  /aperture.flowcontrol.v1.FlowControlService/Check:
-    post:
-      summary: |-
-        Check wraps the given arbitrary resource and matches the given labels
-        against Flow Control Limiters to makes a decision whether to allow/deny.
-      operationId: FlowControlService_Check
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1CheckResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          description: CheckRequest contains fields required to perform Check call.
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1CheckRequest'
-      tags:
-        - FlowControlService
   /plugins/fluxninja/v1/controllerinfo:
     get:
       operationId: ControllerInfoService_GetControllerInfo
@@ -56,9 +32,7 @@ paths:
         - ControllerInfoService
   /plugins/fluxninja/v1/report:
     post:
-      summary: |-
-        Report accepts information about agents' health and applied
-        configurations/policies.
+      summary: Report accepts information about agents' health and applied configurations/policies.
       operationId: FluxNinjaService_Report
       responses:
         "200":
@@ -90,7 +64,7 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
       tags:
-        - EntityCacheService
+        - aperture-agent
   /v1/entities/ip-address/{ip_address}:
     get:
       operationId: EntityCacheService_GetEntityByIPAddress
@@ -109,7 +83,7 @@ paths:
           required: true
           type: string
       tags:
-        - EntityCacheService
+        - aperture-agent
   /v1/entities/name/{name}:
     get:
       operationId: EntityCacheService_GetEntityByName
@@ -128,7 +102,7 @@ paths:
           required: true
           type: string
       tags:
-        - EntityCacheService
+        - aperture-agent
   /v1/info/host:
     get:
       operationId: InfoService_Host
@@ -142,7 +116,8 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
       tags:
-        - InfoService
+        - aperture-agent
+        - aperture-controller
   /v1/info/process:
     get:
       operationId: InfoService_Process
@@ -156,7 +131,8 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
       tags:
-        - InfoService
+        - aperture-agent
+        - aperture-controller
   /v1/info/version:
     get:
       operationId: InfoService_Version
@@ -170,7 +146,8 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
       tags:
-        - InfoService
+        - aperture-agent
+        - aperture-controller
   /v1/peers:
     get:
       operationId: PeerDiscoveryService_GetPeers
@@ -184,7 +161,7 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
       tags:
-        - PeerDiscoveryService
+        - aperture-agent
   /v1/peers/address/{address}:
     get:
       operationId: PeerDiscoveryService_GetPeer
@@ -203,21 +180,21 @@ paths:
           required: true
           type: string
       tags:
-        - PeerDiscoveryService
+        - aperture-agent
   /v1/policies:
     get:
-      operationId: PolicyService_AllPolicies
+      operationId: PolicyService_GetPolicies
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1AllPoliciesResponse'
+            $ref: '#/definitions/v1GetPoliciesResponse'
         default:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
       tags:
-        - PolicyService
+        - aperture-controller
   /v1/status/{path}:
     get:
       operationId: StatusService_GetGroupStatus
@@ -237,7 +214,8 @@ paths:
           type: string
           pattern: .+
       tags:
-        - StatusService
+        - aperture-agent
+        - aperture-controller
 definitions:
   CheckResponseDecisionType:
     type: string
@@ -620,18 +598,6 @@ definitions:
       from: "source.address # or destination.address"
       ```
     title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
-  v1AllPolicies:
-    type: object
-    properties:
-      all_policies:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Policy'
-  v1AllPoliciesResponse:
-    type: object
-    properties:
-      all_policies:
-        $ref: '#/definitions/v1AllPolicies'
   v1ArithmeticCombinator:
     type: object
     properties:
@@ -667,16 +633,6 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Result of arithmetic operation.
     description: Outputs for the Arithmetic Combinator component.
-  v1CheckRequest:
-    type: object
-    properties:
-      feature:
-        type: string
-      labels:
-        type: object
-        additionalProperties:
-          type: string
-    description: CheckRequest contains fields required to perform Check call.
   v1CheckResponse:
     type: object
     properties:
@@ -842,6 +798,19 @@ definitions:
       - ERROR_EXPRESSION_NOT_MAP
     default: ERROR_NONE
     description: Error information.
+  v1CommonAttributes:
+    type: object
+    properties:
+      component_index:
+        type: string
+        format: int64
+        description: The index of Component of within the circuit or classifier index.
+      policy_hash:
+        type: string
+        description: Hash of the entire Policy spec.
+      policy_name:
+        type: string
+        description: Name of the Policy.
   v1Component:
     type: object
     properties:
@@ -1015,6 +984,16 @@ definitions:
       - TYPE_EGRESS
     default: TYPE_UNKNOWN
     description: Type contains fields that represent type of ControlPointInfo.
+  v1ControllerDynamicConfig:
+    type: object
+    properties:
+      manual_mode:
+        type: boolean
+        description: |-
+          Decides whether the controller runs in "manual_mode".
+          In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+        x-go-default: false
+    title: Dynamic Configuration for a Controller
   v1ControllerInfo:
     type: object
     properties:
@@ -1381,12 +1360,23 @@ definitions:
       flux_meter_name:
         type: string
     description: FluxMeterInfo describes detail for each FluxMeterInfo.
+  v1GetPoliciesResponse:
+    type: object
+    properties:
+      policies:
+        $ref: '#/definitions/v1Policies'
   v1GradientController:
     type: object
     properties:
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
       in_ports:
         $ref: '#/definitions/v1GradientControllerIns'
         description: Input ports of the Gradient Controller.
+      init_config:
+        $ref: '#/definitions/v1ControllerDynamicConfig'
+        description: Initial configuration.
       max_gradient:
         type: number
         format: double
@@ -1847,6 +1837,13 @@ definitions:
       self_peer:
         $ref: '#/definitions/v1Peer'
     description: Peers holds the peer info of this peer and a mapping of address to other peers.
+  v1Policies:
+    type: object
+    properties:
+      policies:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Policy'
   v1Policy:
     type: object
     properties:
@@ -1863,6 +1860,22 @@ definitions:
 
       Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
     title: Policy expresses reliability automation workflow that automatically protects services
+  v1PolicyWrapper:
+    type: object
+    properties:
+      common_attributes:
+        $ref: '#/definitions/v1CommonAttributes'
+        title: CommonAttributes
+      policy:
+        $ref: '#/definitions/v1Policy'
+        title: Policy
+  v1PolicyWrappers:
+    type: object
+    properties:
+      policy_wrappers:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1PolicyWrapper'
   v1ProcessInfo:
     type: object
     properties:
@@ -1967,6 +1980,8 @@ definitions:
         $ref: '#/definitions/v1HostInfo'
       peers:
         $ref: '#/definitions/v1Peers'
+      policies:
+        $ref: '#/definitions/v1PolicyWrappers'
       process_info:
         $ref: '#/definitions/v1ProcessInfo'
       services_list:

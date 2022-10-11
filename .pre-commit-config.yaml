@@ -49,7 +49,7 @@ repos:
     rev: v1.0.0-fn
     hooks:
       - id: go-generate
-      - id: go-mod-tidy
+      - id: go-mod-tidy-repo
         args:
           - -compat=1.19
   - repo: meta
@@ -59,7 +59,7 @@ repos:
     rev: "v2.7.1"
     hooks:
       - id: prettier
-        exclude: ^(docs/content/references/configuration/.*|manifests/charts/.*/README*|.github/.*/.*.md)
+        exclude: ^(docs/content/references/.*|manifests/charts/.*/README*|.github/.*/.*.md)
         types_or:
           [
             sh,
@@ -73,6 +73,7 @@ repos:
             jsonnet,
             python3,
             terraform,
+            mdx,
           ]
   # local hooks
   - repo: local
@@ -153,10 +154,11 @@ repos:
         description: Checking if the Operator spec is changed
         entry: ./scripts/precommit/check-operator-spec.sh
         language: script
+        pass_filenames: false
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.1
     hooks:
       - id: codespell
         args:
           - --ignore-words=./.codespellignore
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/references/api/.*)$

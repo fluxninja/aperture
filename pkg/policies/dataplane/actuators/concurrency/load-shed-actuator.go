@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"time"
 
 	"github.com/jonboulle/clockwork"
 	"github.com/pkg/errors"
@@ -196,8 +197,8 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concu
 				},
 			}
 
-			// Initialize the token bucket
-			lsa.tokenBucketLoadShed = scheduler.NewTokenBucketLoadShed(clock.Now(), tokenBucketMetrics)
+			// Initialize the token bucket (non continuous tracking mode)
+			lsa.tokenBucketLoadShed = scheduler.NewTokenBucketLoadShed(clock.Now(), 10, time.Second, tokenBucketMetrics)
 
 			err = lsaFactory.loadShedDecisionWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {

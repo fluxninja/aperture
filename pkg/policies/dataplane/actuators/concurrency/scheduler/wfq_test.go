@@ -17,7 +17,9 @@ import (
 )
 
 const (
-	Tolerance = 0.15
+	_testTolerance    = 0.15
+	_testSlotDuration = time.Millisecond * 100
+	_testSlotCount    = 10
 )
 
 var (
@@ -254,7 +256,8 @@ func BenchmarkTokenBucketLoadShed(b *testing.B) {
 	}
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
-	manager := NewTokenBucketLoadShed(startTime, getMetrics())
+	manager := NewTokenBucketLoadShed(startTime, _testSlotCount, _testSlotDuration, getMetrics())
+	manager.SetContinuousTracking(true)
 	manager.SetLoadShedFactor(startTime, 1.0)
 
 	timeout := 5 * time.Millisecond
@@ -378,10 +381,10 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 			// Will not get an accurate reading if traffic rate is very low
 			if totalTokens[i] > 20 {
 				ratio := float64(acceptedTokens[i]) / float64(totalTokens[i])
-				if (ratio < 1) && math.Abs(1-ratio) > Tolerance {
+				if (ratio < 1) && math.Abs(1-ratio) > _testTolerance {
 					ratio := float64(acceptedTokens[i]) / float64(estimatedTokens[i])
-					if (ratio < 1) && math.Abs(1-ratio) > Tolerance {
-						t.Logf("Test failed because of more than %f percent unfairness %f: acceptedTokens: %d, allocatedTokens: %d\n", Tolerance*100, math.Abs(1-ratio), acceptedTokens[i], estimatedTokens[i])
+					if (ratio < 1) && math.Abs(1-ratio) > _testTolerance {
+						t.Logf("Test failed because of more than %f percent unfairness %f: acceptedTokens: %d, allocatedTokens: %d\n", _testTolerance*100, math.Abs(1-ratio), acceptedTokens[i], estimatedTokens[i])
 						t.Fail()
 					}
 				}
@@ -389,8 +392,8 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 		}
 		acceptedTokenRatio = float64(acceptedTokenSum) / float64(fillRate*float64(flowRunTime.Seconds()))
 		t.Logf("Accepted token ratio: %f\n", acceptedTokenRatio)
-		if math.Abs(1-acceptedTokenRatio) > Tolerance {
-			t.Logf("Test failed because of more than %f percent unfairness %f\n", Tolerance*100, math.Abs(1-acceptedTokenRatio))
+		if math.Abs(1-acceptedTokenRatio) > _testTolerance {
+			t.Logf("Test failed because of more than %f percent unfairness %f\n", _testTolerance*100, math.Abs(1-acceptedTokenRatio))
 			t.Fail()
 		}
 		if sched.(*WFQScheduler).queueOpen {
@@ -512,8 +515,8 @@ func TestFairnessWithinPriority(t *testing.T) {
 		tokensA := flows[i].acceptedRequests * flows[i].requestTokens
 		tokensB := flows[i+1].acceptedRequests * flows[i+1].requestTokens
 		// check fairness within priority levels
-		if math.Abs(1-float64(tokensA)/float64(tokensB)) > Tolerance {
-			t.Logf("Fairness within priority levels is not within %f percent. Accepted tokens: %d, %d", Tolerance*100, tokensA, tokensB)
+		if math.Abs(1-float64(tokensA)/float64(tokensB)) > _testTolerance {
+			t.Logf("Fairness within priority levels is not within %f percent. Accepted tokens: %d, %d", _testTolerance*100, tokensA, tokensB)
 			t.Fail()
 		}
 	}
@@ -542,7 +545,8 @@ func TestLoadShedBucket(t *testing.T) {
 	c := clockwork.NewFakeClock()
 	go updateClock(t, c, timeout, flows)
 
-	loadShedBucket := NewTokenBucketLoadShed(c.Now(), getMetrics())
+	loadShedBucket := NewTokenBucketLoadShed(c.Now(), _testSlotCount, _testSlotDuration, getMetrics())
+	loadShedBucket.SetContinuousTracking(true)
 	sched := NewWFQScheduler(timeout, loadShedBucket, c, schedMetrics)
 
 	trainAndDeplete := func() {
@@ -572,7 +576,7 @@ func TestLoadShedBucket(t *testing.T) {
 		totalSentToken = uint64(float64(totalSentToken) * (1 - lsf))
 		ratio := float64(totalAcceptedTokens) / float64(totalSentToken)
 
-		if math.Abs(ratio-1) > Tolerance {
+		if math.Abs(ratio-1) > _testTolerance {
 			t.Errorf("Load Shed Bucket Test Failed, unfairness detected: %f", ratio)
 		}
 	}
@@ -593,7 +597,8 @@ func TestPanic(t *testing.T) {
 
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
-	manager := NewTokenBucketLoadShed(startTime, getMetrics())
+	manager := NewTokenBucketLoadShed(startTime, _testSlotCount, _testSlotDuration, getMetrics())
+	manager.SetContinuousTracking(true)
 	manager.SetLoadShedFactor(startTime, 0.5)
 	if manager.LoadShedFactor() != 0.5 {
 		t.Logf("LoadShedFactor is not 0.5\n")

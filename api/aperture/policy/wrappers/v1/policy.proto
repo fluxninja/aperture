@@ -14,6 +14,10 @@ message PolicyWrapper {
   policy.language.v1.Policy policy = 2;
 }
 
+message PolicyWrappers {
+  map<string, PolicyWrapper> policy_wrappers = 1;
+}
+
 message FluxMeterWrapper {
   // Flux Meter
   policy.language.v1.FluxMeter flux_meter = 1;

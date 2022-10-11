@@ -14,7 +14,7 @@ local defaults = {
     minConcurrency: '10.0',
     linearConcurrencyIncrement: '5.0',
     concurrencyIncrementOverload: '10.0',
-    sqrtScale: '0.5',
+    sqrtScale: '0.1',
   },
   ema: {
     window: '1500s',

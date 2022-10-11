@@ -124,6 +124,7 @@ jobs:
         description: Boolean for whether or not to push images to DockerHub
         default: true
     executor: <<parameters.executor>>
+    resource_class: small
     environment:
       DOCKER_BUILDKIT: 1
     steps:
@@ -185,6 +186,8 @@ jobs:
         description: working directory
     executor: go-cimg-executor
     resource_class: large
+    environment:
+      GOMAXPROCS: 4
     steps:
       - checkout
       - run:
@@ -212,13 +215,10 @@ jobs:
             /tmp/prometheus-download-test/prometheus --version
             mv /tmp/prometheus-download-test/prometheus /home/circleci/bin/prometheus
       - run:
-          name: set GOMAXPROCS to 4
-          command: |
-            echo 'export GOMAXPROCS=4' >> $BASH_ENV
-      - run:
           name: Run tests and coverage
           working_directory: << parameters.work_dir >>
           command: |
+            go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
             envtest_path=$(make operator-setup_envtest -s)
             export KUBEBUILDER_ASSETS="${envtest_path}"
             PKGS=$(go list ./... | grep -v gen | grep -v operator/api) && gotestsum --format=testname --junitfile=unit-tests.xml --rerun-fails=2 --packages="$PKGS" -- -race -coverprofile=coverage.out -coverpkg=./... $PKGS
@@ -234,7 +234,9 @@ jobs:
 
   pre-commit:
     executor: python-cimg-executor
-    resource_class: xlarge
+    resource_class: large
+    environment:
+      GOMAXPROCS: 4
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -276,10 +278,6 @@ jobs:
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
-      - run:
-          name: set GOMAXPROCS to 4
-          command: |
-            echo 'export GOMAXPROCS=4' >> $BASH_ENV
       - restore_cache:
           name: Restore go cache
           keys:
@@ -600,7 +598,7 @@ commands:
           keys:
             - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
-              checksum "go.mod" }}
+              checksum "tools/go/go.mod" }}
             - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
@@ -620,7 +618,7 @@ commands:
           key:
             aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
-            "go.mod" }}
+            "tools/go/go.mod" }}
           paths:
             - ~/.asdf
 

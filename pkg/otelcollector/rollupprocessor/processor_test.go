@@ -53,8 +53,8 @@ var _ = Describe("Rollup processor", func() {
 				ScopeLogs().AppendEmpty().
 				LogRecords()
 			logRecord := logs.AppendEmpty()
-			logRecord.Attributes().InsertString("fizz", "buzz")
-			logRecord.Attributes().InsertString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[0]))
+			logRecord.Attributes().PutString("fizz", "buzz")
+			logRecord.Attributes().PutString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[0]))
 
 			err = logsProcessor.ConsumeLogs(context.TODO(), input)
 			Expect(err).NotTo(HaveOccurred())
@@ -81,11 +81,11 @@ var _ = Describe("Rollup processor", func() {
 				ScopeLogs().AppendEmpty().
 				LogRecords()
 			logRecord := logs.AppendEmpty()
-			logRecord.Attributes().InsertString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[0]))
+			logRecord.Attributes().PutString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[0]))
 			logRecord = logs.AppendEmpty()
-			logRecord.Attributes().InsertString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[1]))
+			logRecord.Attributes().PutString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[1]))
 			logRecord = logs.AppendEmpty()
-			logRecord.Attributes().InsertString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[2]))
+			logRecord.Attributes().PutString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[2]))
 
 			err = logsProcessor.ConsumeLogs(context.TODO(), input)
 			Expect(err).NotTo(HaveOccurred())

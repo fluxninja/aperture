@@ -1,7 +1,7 @@
 ---
-title: Policies Configuration Reference
+title: Policy Configuration Reference
 sidebar_position: 1
-sidebar_label: Policies
+sidebar_label: Policy
 ---
 
 Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
@@ -11,6 +11,31 @@ The top-level object representing a policy is [v1Policy](#v1-policy).
 <!---
 Generated File Starts
 -->
+
+## Table of contents
+
+### POLICY CONFIGURATION
+
+| Key | Reference         |
+| --- | ----------------- |
+|     | [Policy](#policy) |
+
+## Reference
+
+### _Policy_ {#policy}
+
+#### Members
+
+<dl>
+
+<dt>body</dt>
+<dd>
+
+Type: [V1Policy](#v1-policy)
+
+</dd>
+
+</dl>
 
 ## Objects
 
@@ -683,6 +708,22 @@ Usually powered by integration with a proxy (like envoy) or a web framework.
 </dd>
 </dl>
 
+### v1ControllerDynamicConfig {#v1-controller-dynamic-config}
+
+Dynamic Configuration for a Controller
+
+#### Properties
+
+<dl>
+<dt>manual_mode</dt>
+<dd>
+
+(bool) Decides whether the controller runs in "manual_mode".
+In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+
+</dd>
+</dl>
+
 ### v1Decider {#v1-decider}
 
 Type of combinator that computes the comparison operation on lhs and rhs signals
@@ -1204,10 +1245,22 @@ The output can be _optionally_ clamped to desired range using `max` and
 #### Properties
 
 <dl>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
 ([V1GradientControllerIns](#v1-gradient-controller-ins)) Input ports of the Gradient Controller.
+
+</dd>
+<dt>init_config</dt>
+<dd>
+
+([V1ControllerDynamicConfig](#v1-controller-dynamic-config)) Initial configuration.
 
 </dd>
 <dt>max_gradient</dt>

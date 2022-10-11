@@ -1,5 +1,10 @@
 aperture_path := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
+SHELL := /bin/bash
+
+# use GOMAXPROCS from environment if set, otherwise default to 4
+export GOMAXPROCS ?= 4
+
 generate-api:
 	@echo Generating API
 	@cd api && $(MAKE) generate
@@ -10,8 +15,8 @@ go-generate:
 
 go-mod-tidy:
 	@echo Download go.mod dependencies
-	@GOPRIVATE=github.com/fluxninja,github.com/aperture-control
 	@go mod tidy
+	@cd tools/go && go mod tidy
 
 go-test:
 	@echo Running go tests
@@ -76,10 +81,14 @@ coverage_profile:
 show_coverage_in_browser: profile.coverprofile
 	go tool cover -html profile.coverprofile
 
-all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-blueprints helm-lint
+pre-commit-checks:
+	@echo Running pre-commit checks
+	@pre-commit run --all-files
+
+all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-blueprints helm-lint pre-commit-checks
 	@echo "Done"
 
-.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-doc-assets generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint generate-blueprints
+.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-doc-assets generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint generate-blueprints pre-commit-checks
 
 #####################################
 ###### OPERATOR section starts ######
@@ -137,12 +146,12 @@ operator-help: ## Display this help.
 ##@ Development
 
 .PHONY: operator-manifests
-operator-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+operator-manifests: ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd:ignoreUnexportedFields=true,allowDangerousTypes=true webhook paths="./operator/..." output:crd:artifacts:config=operator/config/crd/bases output:rbac:artifacts:config=operator/config/rbac output:webhook:artifacts:config=operator/config/webhook
 	./operator/hack/create_policy_sample.sh
 
 .PHONY: operator-generate
-operator-generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+operator-generate: ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./pkg/..."
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./operator/..."
 
@@ -155,11 +164,11 @@ operator-vet: ## Run go vet against code.
 	go vet ./operator/...
 
 .PHONY: operator-test
-operator-test: operator-manifests operator-generate operator-fmt operator-vet envtest ## Run tests.
+operator-test: operator-manifests operator-generate operator-fmt operator-vet ## Run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./operator/... -coverprofile operator/cover.out
 
 .PHONY: operator-setup_envtest
-operator-setup_envtest: envtest ## Run tests.
+operator-setup_envtest: ## Run tests.
 	echo "$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)"
 
 ##@ Build
@@ -183,15 +192,15 @@ ifndef ignore-not-found
 endif
 
 .PHONY: operator-install
-operator-install: operator-manifests kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/config.
+operator-install: operator-manifests ## Install CRDs into the K8s cluster specified in ~/.kube/config.
 	$(KUSTOMIZE) build operator/config/crd | kubectl apply -f -
 
 .PHONY: operator-uninstall
-operator-uninstall: operator-manifests kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
+operator-uninstall: operator-manifests ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build operator/config/crd | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
 
 .PHONY: operator-deploy
-operator-deploy: operator-manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
+operator-deploy: operator-manifests ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd operator/config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build operator/config/default | kubectl create -f -
 
@@ -201,35 +210,11 @@ operator-undeploy: ## Undeploy controller from the K8s cluster specified in ~/.k
 
 ##@ Build Dependencies
 
-## Location to install dependencies to
-LOCALBIN ?= $(shell pwd)/bin
-$(LOCALBIN):
-	mkdir -p $(LOCALBIN)
-
 ## Tool Binaries
-KUSTOMIZE ?= $(LOCALBIN)/kustomize
-CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
-ENVTEST ?= $(LOCALBIN)/setup-envtest
 
-## Tool Versions
-KUSTOMIZE_VERSION ?= v4.5.7
-CONTROLLER_TOOLS_VERSION ?= v0.9.2
-
-KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
-.PHONY: kustomize
-kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary.
-$(KUSTOMIZE): $(LOCALBIN)
-	curl -s $(KUSTOMIZE_INSTALL_SCRIPT) | bash -s -- $(subst v,,$(KUSTOMIZE_VERSION)) $(LOCALBIN)
-
-.PHONY: controller-gen
-controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary.
-$(CONTROLLER_GEN): $(LOCALBIN)
-	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
-
-.PHONY: envtest
-envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
-$(ENVTEST): $(LOCALBIN)
-	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+KUSTOMIZE ?= kustomize
+CONTROLLER_GEN ?= controller-gen
+ENVTEST ?= setup-envtest
 
 #####################################
 ###### OPERATOR section ends ########

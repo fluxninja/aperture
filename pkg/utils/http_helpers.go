@@ -36,7 +36,7 @@ func Get(ctx context.Context, url string, headers map[string]string, timeout tim
 	defer res.Body.Close()
 	all, err := io.ReadAll(res.Body)
 	if err != nil {
-		return "", fmt.Errorf("error while reading response from oraclecloud metadata endpoint: %s", err)
+		return "", fmt.Errorf("error while reading response from endpoint: %s", err)
 	}
 
 	return string(all), nil
