@@ -1,7 +1,7 @@
 ---
-title: Policies Configuration Reference
+title: Policy Configuration Reference
 sidebar_position: 1
-sidebar_label: Policies
+sidebar_label: Policy
 ---
 
 Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
@@ -11,6 +11,31 @@ The top-level object representing a policy is [v1Policy](#v1-policy).
 <!---
 Generated File Starts
 -->
+
+## Table of contents
+
+### POLICY CONFIGURATION
+
+| Key | Reference         |
+| --- | ----------------- |
+|     | [Policy](#policy) |
+
+## Reference
+
+### _Policy_ {#policy}
+
+#### Members
+
+<dl>
+
+<dt>body</dt>
+<dd>
+
+Type: [V1Policy](#v1-policy)
+
+</dd>
+
+</dl>
 
 ## Objects
 

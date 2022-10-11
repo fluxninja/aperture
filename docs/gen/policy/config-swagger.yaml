@@ -1,7 +1,7 @@
 basePath: /aperture-controller
 info:
-  title: Policies
-  description: Policies
+  title: Policy
+  description: Policy
 paths:
   /:
     post:
@@ -16,5 +16,5 @@ paths:
         "200":
           description: A successful response.
       tags:
-        - policies-configuration
+        - policy-configuration
 swagger: "2.0"
