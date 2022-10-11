@@ -23,9 +23,9 @@ function(params) {
 
   local SignalAveragePanel =
     local query = |||
-      increase(signal_reading_sum{signal_name="${signal_name}"}[10s])
+      increase(signal_reading_sum{signal_name="${signal_name}"}[$__rate_interval])
       /
-      increase(signal_reading_count{signal_name="${signal_name}"}[10s])
+      increase(signal_reading_count{signal_name="${signal_name}"}[$__rate_interval])
     |||;
     local target =
       grafana.prometheus.target(query) +
