@@ -3,11 +3,10 @@ FROM golang:1.19 as builder
 
 WORKDIR /workspace
 COPY --link . .
-ENV GOPRIVATE=github.com/aperture-control,github.com/fluxninja
 
 RUN --mount=type=cache,target=/go/pkg/ \
-    --mount=type=cache,target=/root/.cache/go-build/ \
-    CGO_ENABLED=0 go build -a -o aperture-operator operator/main.go
+  --mount=type=cache,target=/root/.cache/go-build/ \
+  CGO_ENABLED=0 go build -a -o aperture-operator operator/main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
