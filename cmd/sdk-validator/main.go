@@ -104,7 +104,7 @@ func main() {
 			l := log.With().Int("total requests", *requests).Int64("expected rejections", *rejects).Int("got rejections", rejected).Logger()
 			if rejected != int(*rejects) {
 				l.Error().Msg("Validation failed")
-				grpcServer.GracefulStop()
+				os.Exit(1)
 			}
 			l.Info().Msg("Validation complete")
 			wg.Done()
@@ -125,7 +125,8 @@ func serverInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySer
 	h, err := handler(ctx, req)
 	log.Info().Str("method", info.FullMethod).Dur("latency", time.Since(start)).Msg("Request served")
 	if err != nil {
-		log.Fatal().Err(err).Msg("Handler returned error")
+		log.Error().Err(err).Msg("Handler returned error")
+		os.Exit(1)
 	}
 	return h, err
 }
