@@ -59,7 +59,7 @@ repos:
     rev: "v2.7.1"
     hooks:
       - id: prettier
-        exclude: ^(docs/content/references/configuration/.*|manifests/charts/.*/README*|.github/.*/.*.md)
+        exclude: ^(docs/content/references/.*|manifests/charts/.*/README*|.github/.*/.*.md)
         types_or:
           [
             sh,
@@ -73,6 +73,7 @@ repos:
             jsonnet,
             python3,
             terraform,
+            mdx,
           ]
   # local hooks
   - repo: local
