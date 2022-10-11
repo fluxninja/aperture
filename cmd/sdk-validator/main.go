@@ -11,11 +11,13 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	tracev1 "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
@@ -27,18 +29,18 @@ import (
 var logger *log.Logger
 
 func init() {
-	logger = log.NewLogger(log.GetPrettyConsoleWriter(), "debug")
+	logger = log.NewLogger(log.GetPrettyConsoleWriter(), log.DebugLevel.String())
 	log.SetGlobalLogger(logger)
 }
 
 func main() {
 	// setup flagset and flags
 	fs := flag.NewFlagSet("sdk-validator", flag.ExitOnError)
-	port := fs.String("port", "8080", "Port to start sdk-validator's grpc server on. Default is 8080.")
-	requests := fs.Int("requests", 10, "Number of requests to make to SDK example server. Default is 10.")
-	rejects := fs.Int64("rejects", 5, "Number of requests (out of 'requests') to reject. Default is 5.")
-	sdkDockerImage := fs.String("sdk-docker-image", "", "Location of SDK example to run. Default is ''.")
-	sdkPort := fs.String("sdk-port", "8081", "Port to expose on SDK's example container. Default is 8081.")
+	port := fs.String("port", "8089", "Port to start sdk-validator's grpc server on.")
+	requests := fs.Int("requests", 10, "Number of requests to make to SDK example server.")
+	rejects := fs.Int64("rejects", 5, "Number of requests (out of 'requests') to reject.")
+	sdkDockerImage := fs.String("sdk-docker-image", "", "Location of SDK example to run.")
+	sdkPort := fs.String("sdk-port", "8080", "Port to expose on SDK's example container.")
 	// parse flags
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
@@ -62,16 +64,20 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to listen")
 	}
 
-	// instantiate flowcontrol
-	f := &validator.FlowControlHandler{
+	// setup grpc server and register various server instances to it
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(serverInterceptor))
+	reflection.Register(grpcServer)
+
+	// instantiate and register flowcontrol handler
+	flowcontrolHandler := &validator.FlowControlHandler{
 		Rejects:  *rejects,
 		Rejected: 0,
 	}
+	flowcontrolv1.RegisterFlowControlServiceServer(grpcServer, flowcontrolHandler)
 
-	// setup grpc server and register FlowControlServiceServer instance to it
-	grpcServer := grpc.NewServer()
-	reflection.Register(grpcServer)
-	flowcontrolv1.RegisterFlowControlServiceServer(grpcServer, f)
+	// initiate and register otel trace handler
+	traceHandler := &validator.TraceHandler{}
+	tracev1.RegisterTraceServiceServer(grpcServer, traceHandler)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
@@ -80,28 +86,44 @@ func main() {
 	go func() {
 		s := <-sigCh
 		log.Info().Interface("signal", s).Msg("Got signal, attempting graceful shutdown")
-		log.Info().Interface("id", id).Msg("Stopping Docker container")
-		err = stopDockerContainer(id)
-		if err != nil {
-			log.Fatal().Err(err).Msg("Failed to stop Docker container")
+		if *sdkDockerImage != "" {
+			log.Info().Interface("id", id).Msg("Stopping Docker container")
+			err = stopDockerContainer(id)
+			if err != nil {
+				log.Fatal().Err(err).Msg("Failed to stop Docker container")
+			}
 		}
 		grpcServer.GracefulStop()
 		wg.Done()
 	}()
 
-	wg.Add(1)
-	go func() {
-		rejected := confirmConnectedAndStartTraffic(*sdkPort, *requests)
-		log.Info().Int("total requests", *requests).Int64("expected rejections", *rejects).Int("got rejections", rejected).Msg("Validation complete")
-		wg.Done()
-	}()
+	if *sdkDockerImage != "" {
+		wg.Add(1)
+		go func() {
+			rejected := confirmConnectedAndStartTraffic(*sdkPort, *requests)
+			log.Info().Int("total requests", *requests).Int64("expected rejections", *rejects).Int("got rejections", rejected).Msg("Validation complete")
+			wg.Done()
+		}()
+	}
 
 	// start serving traffic on grpc server
+	log.Info().Str("add", lis.Addr().String()).Msg("Starting sdk-validator")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal().Err(err).Msg("Failed to serve")
 	}
 	wg.Wait()
 	log.Info().Msg("Successful graceful shutdown")
+}
+
+func serverInterceptor(ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (interface{}, error) {
+	start := time.Now()
+	h, err := handler(ctx, req)
+	log.Info().Str("method", info.FullMethod).Dur("latency", time.Since(start)).Err(err).Msg("Request served")
+	return h, err
 }
 
 func runDockerContainer(image string, port string) (string, error) {
@@ -169,6 +191,7 @@ func stopDockerContainer(id string) error {
 func confirmConnectedAndStartTraffic(port string, requests int) int {
 	rejected := 0
 	url := fmt.Sprintf("http://localhost:%s", port)
+
 	for {
 		req, err := http.NewRequest(http.MethodGet, url+"/connected", nil)
 		if err != nil {

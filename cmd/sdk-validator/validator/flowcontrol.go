@@ -13,7 +13,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// FlowControlHandler .
+// FlowControlHandler implements FlowControlService.
 type FlowControlHandler struct {
 	flowcontrolv1.UnimplementedFlowControlServiceServer
 
