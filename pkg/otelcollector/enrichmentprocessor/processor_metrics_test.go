@@ -61,9 +61,9 @@ func metricsFromLabels(labels map[string]interface{}) pmetric.Metrics {
 	td := pmetric.NewMetrics()
 	metrics := td.ResourceMetrics().AppendEmpty().
 		ScopeMetrics().AppendEmpty().Metrics()
-	metric := metrics.AppendEmpty()
-	metric.SetDataType(pmetric.MetricDataTypeGauge)
-	metricRecord := metric.Gauge()
+	gaugeMetric := metrics.AppendEmpty()
+	gaugeMetric.SetEmptyGauge()
+	metricRecord := gaugeMetric.Gauge()
 	populateAttrsFromLabels(metricRecord.DataPoints().AppendEmpty().Attributes(), labels)
 	return td
 }
