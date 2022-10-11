@@ -256,7 +256,8 @@ func BenchmarkTokenBucketLoadShed(b *testing.B) {
 	}
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
-	manager := NewTokenBucketLoadShed(startTime, getMetrics(), _testSlotCount, _testSlotDuration)
+	manager := NewTokenBucketLoadShed(startTime, _testSlotCount, _testSlotDuration, getMetrics())
+	manager.SetContinuousTracking(true)
 	manager.SetLoadShedFactor(startTime, 1.0)
 
 	timeout := 5 * time.Millisecond
@@ -544,7 +545,8 @@ func TestLoadShedBucket(t *testing.T) {
 	c := clockwork.NewFakeClock()
 	go updateClock(t, c, timeout, flows)
 
-	loadShedBucket := NewTokenBucketLoadShed(c.Now(), getMetrics(), _testSlotCount, _testSlotDuration)
+	loadShedBucket := NewTokenBucketLoadShed(c.Now(), _testSlotCount, _testSlotDuration, getMetrics())
+	loadShedBucket.SetContinuousTracking(true)
 	sched := NewWFQScheduler(timeout, loadShedBucket, c, schedMetrics)
 
 	trainAndDeplete := func() {
@@ -595,7 +597,8 @@ func TestPanic(t *testing.T) {
 
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
-	manager := NewTokenBucketLoadShed(startTime, getMetrics(), _testSlotCount, _testSlotDuration)
+	manager := NewTokenBucketLoadShed(startTime, _testSlotCount, _testSlotDuration, getMetrics())
+	manager.SetContinuousTracking(true)
 	manager.SetLoadShedFactor(startTime, 0.5)
 	if manager.LoadShedFactor() != 0.5 {
 		t.Logf("LoadShedFactor is not 0.5\n")
