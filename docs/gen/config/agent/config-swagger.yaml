@@ -237,6 +237,11 @@ definitions:
         x-go-default: 120s
         x-go-name: ConnectionTimeout
         x-go-validate: gte=0s
+      enable_grpc_ui:
+        description: Enable gRPC ui
+        type: boolean
+        x-go-default: "false"
+        x-go-name: EnableGRPCUI
       enable_reflection:
         description: Enable Reflection
         type: boolean

@@ -1333,6 +1333,9 @@ spec:
                           connection_timeout:
                             description: Connection timeout
                             type: string
+                          enable_grpc_ui:
+                            description: Enable gRPC ui
+                            type: boolean
                           enable_reflection:
                             description: Enable Reflection
                             type: boolean

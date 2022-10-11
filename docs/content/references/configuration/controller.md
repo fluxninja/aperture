@@ -675,6 +675,12 @@ GRPCServerConfig holds configuration for GRPC Server.
 (string, `gte=0s`, default: `120s`) Connection timeout
 
 </dd>
+<dt>enable_grpc_ui</dt>
+<dd>
+
+(bool, default: `false`) Enable gRPC ui
+
+</dd>
 <dt>enable_reflection</dt>
 <dd>
 

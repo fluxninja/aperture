@@ -46,6 +46,8 @@ func GMuxServerModule() fx.Option {
 type GRPCServerConfig struct {
 	// Connection timeout
 	ConnectionTimeout config.Duration `json:"connection_timeout" validate:"gte=0s" default:"120s"`
+	// Enable gRPC ui
+	EnableGRPCUI bool `json:"enable_grpc_ui" default:"false"`
 	// Enable Reflection
 	EnableReflection bool `json:"enable_reflection" default:"false"`
 	// Buckets specification in latency histogram
@@ -126,6 +128,11 @@ func (constructor ServerConstructor) provideServer(
 				log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Starting GRPC server")
 
 				grpcServerMetrics.InitializeMetrics(server)
+
+				if config.EnableGRPCUI {
+					log.Info().Msg("Enabling grpcui will enable gRPC server reflection")
+					config.EnableReflection = true
+				}
 
 				if config.EnableReflection {
 					reflection.Register(server)
