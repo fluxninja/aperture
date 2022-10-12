@@ -986,16 +986,12 @@ resources = get_resource_list_to_deploy(to_run, run_only_listed, DEP_TREE, inver
 
 print("Will deploy resources:", ", ".join(resources))
 
-# Watch charts and code
+# Watch charts and crd definitions
 watch_file("Tiltfile")
 watch_file("./tanka/apps/")
 watch_file("./tanka/lib/")
 watch_file("./tanka/charts/")
-watch_file(GIT_ROOT + "/api/")
-watch_file(GIT_ROOT + "/cmd/")
-watch_file(GIT_ROOT + "/pkg/")
-watch_file(GIT_ROOT + "/plugins/")
-watch_file(GIT_ROOT + "/operator/")
+watch_file(GIT_ROOT + "/operator/config/crd")
 
 
 run_wavepool_generator = '''
