@@ -14,3 +14,13 @@ message TokensDecision {
 message RateLimiterDecision {
   double limit = 1;
 }
+
+message ConcurrencyDemandDecision {
+  int64 tick = 1;
+  double demand = 2;
+}
+
+message ConcurrencyMultiplierDecision {
+  int64 tick = 1;
+  double multiplier = 2;
+}

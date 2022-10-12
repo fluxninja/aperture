@@ -775,11 +775,12 @@ message ConcurrencyLimiter {
     }
   }]; // @gotags: validate:"required"
 
+  // Actuation strategy defines the input signal that will drive the scheduler.
   oneof actuation_strategy {
     // Actuator based on load shedding a portion of requests.
-    //
-    // Actuation strategy defines the input signal that will drive the scheduler.
     LoadShedActuator load_shed_actuator = 3;
+    // Actuator based on limiting the concurrency of requests.
+    ConcurrencyActuator concurrency_actuator = 4;
   }
 }
 
@@ -975,6 +976,18 @@ message LoadShedActuator {
   }
 
   // Input ports for the Load Shed Actuator component.
+  Ins in_ports = 1;
+}
+
+// Takes the concurrency input signal and publishes a concurrency limit for each scheduler in the data-plane
+message ConcurrencyActuator {
+  // Input for the Concurrency Actuator component.
+  message Ins {
+    // Desired concurrency is the desired cumulative concurrency across all schedulers in the data-plane.
+    InPort desired_concurrency = 1;
+  }
+
+  // Input ports for the Concurrency Actuator component.
   Ins in_ports = 1;
 }
 

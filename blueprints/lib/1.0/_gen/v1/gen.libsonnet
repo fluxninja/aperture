@@ -17,6 +17,8 @@
   Circuit: import 'circuit.libsonnet',
   Classifier: import 'classifier.libsonnet',
   Component: import 'component.libsonnet',
+  ConcurrencyActuator: import 'concurrencyactuator.libsonnet',
+  ConcurrencyActuatorIns: import 'concurrencyactuatorins.libsonnet',
   ConcurrencyLimiter: import 'concurrencylimiter.libsonnet',
   Constant: import 'constant.libsonnet',
   ConstantOuts: import 'constantouts.libsonnet',

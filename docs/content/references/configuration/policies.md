@@ -575,6 +575,36 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 </dd>
 </dl>
 
+### v1ConcurrencyActuator {#v1-concurrency-actuator}
+
+Takes the concurrency input signal and publishes a concurrency limit for each scheduler in the data-plane
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1ConcurrencyActuatorIns](#v1-concurrency-actuator-ins)) Input ports for the Concurrency Actuator component.
+
+</dd>
+</dl>
+
+### v1ConcurrencyActuatorIns {#v1-concurrency-actuator-ins}
+
+Input for the Concurrency Actuator component.
+
+#### Properties
+
+<dl>
+<dt>desired_concurrency</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) Desired concurrency is the desired cumulative concurrency across all schedulers in the data-plane.
+
+</dd>
+</dl>
+
 ### v1ConcurrencyLimiter {#v1-concurrency-limiter}
 
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
@@ -592,12 +622,16 @@ strategy and a scheduler. Right now, only `load_shed_actuator` strategy is avail
 #### Properties
 
 <dl>
+<dt>concurrency_actuator</dt>
+<dd>
+
+([V1ConcurrencyActuator](#v1-concurrency-actuator)) Actuator based on limiting the concurrency of requests.
+
+</dd>
 <dt>load_shed_actuator</dt>
 <dd>
 
 ([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a portion of requests.
-
-Actuation strategy defines the input signal that will drive the scheduler.
 
 </dd>
 <dt>scheduler</dt>

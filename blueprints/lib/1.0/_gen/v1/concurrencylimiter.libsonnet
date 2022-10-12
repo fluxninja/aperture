@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withConcurrencyActuator(concurrency_actuator):: {
+    concurrency_actuator: concurrency_actuator,
+  },
+  withConcurrencyActuatorMixin(concurrency_actuator):: {
+    concurrency_actuator+: concurrency_actuator,
+  },
   withLoadShedActuator(load_shed_actuator):: {
     load_shed_actuator: load_shed_actuator,
   },

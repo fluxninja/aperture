@@ -76,6 +76,10 @@ const (
 
 	// PROMETHEUS LABELS.
 
+	// InstanceLabel used to identify the host name on which an Aperture process is running.
+	InstanceLabel = "instance"
+	// ProcessUUIDLabel used to uniquely identify an Aperture process.
+	ProcessUUIDLabel = "process_uuid"
 	// DistCacheMemberIDLabel - label specifying unique identifier of the node in the olric cluster.
 	DistCacheMemberIDLabel = "distcache_member_id"
 	// DistCacheMemberNameLabel - label specifying name of the node in the olric cluster.

@@ -13,21 +13,21 @@ digraph  {
 	}
 	subgraph cluster_s6 {
 		label="ArithmeticCombinator[1]";margin="50.0";
-		n9[label="1.10"];
-		n7[label="lhs"];
+		n8[label="1.10"];
+		n9[label="lhs"];
 		n10[label="output"];
-		n8[label="rhs"];
-		n9->n8;
-		n8->n10[style="invis"];
-		{rank=same; n7;n8;};
+		n7[label="rhs"];
+		n8->n7;
+		n9->n10[style="invis"];
+		{rank=same; n7;n9;};
 		{rank=same; n10;};
 		
 	}
 	subgraph cluster_s11 {
 		label="ArithmeticCombinator[2]";margin="50.0";
-		n13[label="lhs"];
+		n12[label="lhs"];
 		n14[label="output"];
-		n12[label="rhs"];
+		n13[label="rhs"];
 		n13->n14[style="invis"];
 		{rank=same; n12;n13;};
 		{rank=same; n14;};
@@ -39,8 +39,8 @@ digraph  {
 		n18[label="output"];
 		n17[label="rhs"];
 		n17->n18[style="invis"];
-		{rank=same; n16;n17;};
 		{rank=same; n18;};
+		{rank=same; n16;n17;};
 		
 	}
 	subgraph cluster_s19 {
@@ -51,8 +51,8 @@ digraph  {
 		n22[label="rhs"];
 		n21->n20;
 		n22->n23[style="invis"];
-		{rank=same; n23;};
 		{rank=same; n20;n22;};
+		{rank=same; n23;};
 		
 	}
 	subgraph cluster_s24 {
@@ -69,13 +69,13 @@ digraph  {
 	}
 	subgraph cluster_s29 {
 		label="ArithmeticCombinator[6]";margin="50.0";
-		n31[label="5.00"];
-		n30[label="lhs"];
+		n32[label="5.00"];
+		n31[label="lhs"];
 		n33[label="output"];
-		n32[label="rhs"];
-		n31->n30;
-		n32->n33[style="invis"];
-		{rank=same; n30;n32;};
+		n30[label="rhs"];
+		n32->n31;
+		n31->n33[style="invis"];
+		{rank=same; n30;n31;};
 		{rank=same; n33;};
 		
 	}
@@ -128,12 +128,12 @@ digraph  {
 	}
 	subgraph cluster_s54 {
 		label="Gradient[13]";margin="50.0";
-		n59[label="control_variable"];
-		n58[label="max"];
-		n57[label="optimize"];
+		n56[label="control_variable"];
+		n55[label="max"];
+		n59[label="optimize"];
 		n60[label="output"];
-		n56[label="setpoint"];
-		n55[label="signal"];
+		n58[label="setpoint"];
+		n57[label="signal"];
 		n59->n60[style="invis"];
 		{rank=same; n55;n56;n57;n58;n59;};
 		{rank=same; n60;};
@@ -146,8 +146,8 @@ digraph  {
 		n44[label="output"];
 		n43->n42;
 		n42->n44[style="invis"];
-		{rank=same; n42;n42;};
 		{rank=same; n44;};
+		{rank=same; n42;n42;};
 		
 	}
 	subgraph cluster_s38 {
@@ -170,65 +170,65 @@ digraph  {
 		n46[label="input"];
 		n47[label="output"];
 		n46->n47[style="invis"];
-		{rank=same; n46;};
 		{rank=same; n47;};
+		{rank=same; n46;};
 		
 	}
 	subgraph cluster_s71 {
 		label="Switcher[16]";margin="50.0";
-		n75[label="10.00"];
-		n72[label="on_false"];
-		n74[label="on_true"];
+		n74[label="10.00"];
+		n75[label="on_false"];
+		n73[label="on_true"];
 		n76[label="output"];
-		n73[label="switch"];
-		n75->n74;
-		n74->n76[style="invis"];
-		{rank=same; n72;n73;n74;};
+		n72[label="switch"];
+		n74->n73;
+		n75->n76[style="invis"];
+		{rank=same; n72;n73;n75;};
 		{rank=same; n76;};
 		
 	}
 	subgraph cluster_s77 {
 		label="Switcher[17]";margin="50.0";
-		n79[label="0.00"];
-		n80[label="on_false"];
-		n78[label="on_true"];
+		n80[label="0.00"];
+		n81[label="on_false"];
+		n79[label="on_true"];
 		n82[label="output"];
-		n81[label="switch"];
-		n79->n78;
+		n78[label="switch"];
+		n80->n79;
 		n81->n82[style="invis"];
-		{rank=same; n78;n80;n81;};
 		{rank=same; n82;};
+		{rank=same; n78;n79;n81;};
 		
 	}
 	rankdir="LR";splines="ortho";
 	n63->n22;
 	n63->n39;
 	n63->n46;
-	n63->n59;
-	n64->n13;
+	n63->n56;
+	n64->n12;
 	n64->n17;
-	n14->n16;
-	n82->n36;
-	n5->n52;
-	n23->n42;
-	n37->n39;
-	n44->n58;
-	n47->n32;
-	n53->n7;
-	n53->n25;
-	n76->n57;
+	n60->n13;
+	n76->n59;
 	n18->n66;
+	n44->n55;
+	n37->n39;
+	n10->n58;
+	n23->n42;
+	n28->n69;
 	n33->n35;
+	n47->n30;
 	n49->n2;
 	n49->n51;
-	n49->n55;
+	n49->n57;
 	n49->n68;
-	n60->n12;
-	n70->n73;
-	n70->n81;
-	n10->n56;
-	n28->n69;
-	n40->n72;
-	n40->n80;
+	n82->n36;
+	n5->n52;
+	n14->n16;
+	n70->n72;
+	n70->n78;
+	n40->n75;
+	n40->n81;
+	n53->n9;
+	n53->n25;
 	
 }

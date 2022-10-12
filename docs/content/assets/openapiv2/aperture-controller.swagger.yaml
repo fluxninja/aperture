@@ -634,6 +634,22 @@ definitions:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
         $ref: '#/definitions/v1Switcher'
+  v1ConcurrencyActuator:
+    type: object
+    title: Takes the concurrency input signal and publishes a concurrency limit for
+      each scheduler in the data-plane
+    properties:
+      in_ports:
+        description: Input ports for the Concurrency Actuator component.
+        $ref: '#/definitions/v1ConcurrencyActuatorIns'
+  v1ConcurrencyActuatorIns:
+    description: Input for the Concurrency Actuator component.
+    type: object
+    properties:
+      desired_concurrency:
+        description: Desired concurrency is the desired cumulative concurrency across
+          all schedulers in the data-plane.
+        $ref: '#/definitions/v1InPort'
   v1ConcurrencyLimiter:
     description: |-
       :::info
@@ -649,11 +665,11 @@ definitions:
     title: Concurrency Limiter is an actuator component that regulates flows in order
       to provide active service protection
     properties:
+      concurrency_actuator:
+        description: Actuator based on limiting the concurrency of requests.
+        $ref: '#/definitions/v1ConcurrencyActuator'
       load_shed_actuator:
-        description: |-
-          Actuator based on load shedding a portion of requests.
-
-          Actuation strategy defines the input signal that will drive the scheduler.
+        description: Actuator based on load shedding a portion of requests.
         $ref: '#/definitions/v1LoadShedActuator'
       scheduler:
         description: |-

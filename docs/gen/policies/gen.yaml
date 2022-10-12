@@ -471,6 +471,24 @@ definitions:
           on third signal.
         x-order: 12
         $ref: '#/definitions/v1Switcher'
+  v1ConcurrencyActuator:
+    type: object
+    title: Takes the concurrency input signal and publishes a concurrency limit for
+      each scheduler in the data-plane
+    properties:
+      in_ports:
+        description: Input ports for the Concurrency Actuator component.
+        x-order: 0
+        $ref: '#/definitions/v1ConcurrencyActuatorIns'
+  v1ConcurrencyActuatorIns:
+    description: Input for the Concurrency Actuator component.
+    type: object
+    properties:
+      desired_concurrency:
+        description: Desired concurrency is the desired cumulative concurrency across
+          all schedulers in the data-plane.
+        x-order: 0
+        $ref: '#/definitions/v1InPort'
   v1ConcurrencyLimiter:
     description: |-
       :::info
@@ -486,12 +504,13 @@ definitions:
     title: Concurrency Limiter is an actuator component that regulates flows in order
       to provide active service protection
     properties:
-      load_shed_actuator:
-        description: |-
-          Actuator based on load shedding a portion of requests.
-
-          Actuation strategy defines the input signal that will drive the scheduler.
+      concurrency_actuator:
+        description: Actuator based on limiting the concurrency of requests.
         x-order: 0
+        $ref: '#/definitions/v1ConcurrencyActuator'
+      load_shed_actuator:
+        description: Actuator based on load shedding a portion of requests.
+        x-order: 1
         $ref: '#/definitions/v1LoadShedActuator'
       scheduler:
         description: |-
@@ -500,13 +519,13 @@ definitions:
           Contains configuration of per-agent scheduler, and also defines some
           output signals.
         x-go-validate: required
-        x-order: 1
+        x-order: 2
         $ref: '#/definitions/v1Scheduler'
       selector:
         description: Selector decides the service and flows at which the concurrency
           limiter is applied.
         x-go-validate: required
-        x-order: 2
+        x-order: 3
         $ref: '#/definitions/v1Selector'
   v1Constant:
     type: object

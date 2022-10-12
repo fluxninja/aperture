@@ -36,13 +36,13 @@ func NewLoadShedActuatorAndOptions(
 	_ *policylangv1.LoadShedActuator,
 	componentIndex int,
 	policyReadAPI iface.Policy,
-	agentGroupName string,
+	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(common.LoadShedDecisionsPath,
-		common.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
+		common.DataplaneComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex)))
 	lsa := &LoadShedActuator{
 		policyReadAPI:  policyReadAPI,
-		agentGroupName: agentGroupName,
+		agentGroupName: agentGroup,
 		componentIndex: componentIndex,
 		etcdPath:       etcdPath,
 	}
@@ -87,6 +87,8 @@ func (lsa *LoadShedActuator) Execute(inPortReadings runtime.PortToValue, tickInf
 			} else {
 				if lsfReading.Value() <= 0 {
 					lsfValue = 0
+				} else if lsfReading.Value() >= 1 {
+					lsfValue = 1
 				} else {
 					lsfValue = lsfReading.Value()
 				}

@@ -25,3 +25,17 @@ message RateLimiterDecisionWrapper {
   // Rate Limiter Decision
   policy.decisions.v1.RateLimiterDecision rate_limiter_decision = 2;
 }
+
+message ConcurrencyDemandDecisionWrapper {
+  // CommonAttributes
+  policy.wrappers.v1.CommonAttributes common_attributes = 1;
+  // Concurrency Demand Decision
+  policy.decisions.v1.ConcurrencyDemandDecision concurrency_demand_decision = 2;
+}
+
+message ConcurrencyMultiplierDecisionWrapper {
+  // CommonAttributes
+  policy.wrappers.v1.CommonAttributes common_attributes = 1;
+  // Concurrency Multiplier Decision
+  policy.decisions.v1.ConcurrencyMultiplierDecision concurrency_multiplier_decision = 2;
+}
