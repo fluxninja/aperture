@@ -41,8 +41,9 @@ func provideGRPCUIHandler(GRPClientConnectionBuilder grpcclient.ClientConnection
 	}
 
 	var h http.Handler
+	ctx, cancel := context.WithCancel(context.Background())
 	Lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(context.Context) error {
 			if serverConfig.EnableGRPCUI {
 				connWrapper := GRPClientConnectionBuilder.Build()
 				targetAddr := HTTPServer.Listener.GetListener().Addr().String()
@@ -62,6 +63,7 @@ func provideGRPCUIHandler(GRPClientConnectionBuilder grpcclient.ClientConnection
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
+			cancel()
 			return nil
 		},
 	})
