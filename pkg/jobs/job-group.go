@@ -235,11 +235,6 @@ func (jg *JobGroup) DeregisterJob(name string) error {
 	if err != nil {
 		multiErr = multierr.Append(multiErr, err)
 	}
-	jobMetrics := job.JobMetrics()
-	err = jobMetrics.removeMetrics(name)
-	if err != nil {
-		multiErr = multierr.Append(multiErr, err)
-	}
 	if executor, ok := job.(*jobExecutor); ok {
 		executor.stop()
 	}
@@ -252,7 +247,7 @@ func (jg *JobGroup) DeregisterAll() {
 		jobMetric := jobTracker.job.JobMetrics()
 		err := jobMetric.removeMetrics(jobName)
 		if err != nil {
-			log.Error().Err(err).Msgf("Failed to remove job metrics with jobName: %s", jobName)
+			log.Error().Err(err).Msgf("Failed to remove job metrics, %s", jobName)
 		}
 	}
 	jobs := jg.gt.reset()

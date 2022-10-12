@@ -91,18 +91,10 @@ func (mjc MultiJobConstructor) provideMultiJob(
 			return multiErr
 		},
 		OnStop: func(context.Context) error {
-			var multiErr error
 			// Deregister all jobs
 			mj.gt.reset()
-			err := mj.JMS.unregisterJobMetrics(prometheusRegistry)
-			if err != nil {
-				multiErr = multierr.Append(multiErr, err)
-			}
-			err = jg.DeregisterJob(mjc.Name)
-			if err != nil {
-				multiErr = multierr.Append(multiErr, err)
-			}
-			return multiErr
+			_ = jg.DeregisterJob(mjc.Name)
+			return nil
 		},
 	})
 
@@ -175,27 +167,14 @@ func (mj *MultiJob) RegisterJob(job Job) error {
 
 // DeregisterJob deregisters a job with the MultiJob.
 func (mj *MultiJob) DeregisterJob(name string) error {
-	var multiErr error
-	job, err := mj.gt.deregisterJob(name)
+	_, err := mj.gt.deregisterJob(name)
 	if err != nil {
-		multiErr = multierr.Append(multiErr, err)
+		return err
 	}
-	jobMetrics := job.JobMetrics()
-	err = jobMetrics.removeMetrics(name)
-	if err != nil {
-		multiErr = multierr.Append(multiErr, err)
-	}
-	return multiErr
+	return nil
 }
 
 // DeregisterAll removes all jobs from the MultiJob.
 func (mj *MultiJob) DeregisterAll() {
-	for jobName, jobTracker := range mj.gt.trackers {
-		jobMetric := jobTracker.job.JobMetrics()
-		err := jobMetric.removeMetrics(jobName)
-		if err != nil {
-			log.Error().Err(err).Msgf("Failed to remove job metrics with jobName: %s", jobName)
-		}
-	}
 	mj.gt.reset()
 }

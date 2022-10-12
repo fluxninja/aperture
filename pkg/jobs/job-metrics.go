@@ -48,7 +48,7 @@ func (jm *JobMetrics) removeMetrics(nameLabel string) error {
 	}
 	deleted := jm.latencySummary.DeletePartialMatch(label)
 	if deleted == 0 {
-		return fmt.Errorf("failed to remove job metrics with nameLabel: %s", nameLabel)
+		return fmt.Errorf("failed to remove job metrics, %s", nameLabel)
 	}
 	return nil
 }

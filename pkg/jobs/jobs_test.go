@@ -435,7 +435,7 @@ func TestSameJobTwiceAndSchedulingErrors(t *testing.T) {
 
 	jobGroup.DeregisterAll()
 	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName})
-	// error when registering job multiple times, written here to achieve more coverage
+	// error when deregistering job multiple times, written here to achieve more coverage
 	err = jobGroup.DeregisterJob(job.Name())
 	require.Errorf(t, err, "Expected error when deregistering job multiple times")
 	require.Empty(t, jobGroup.JobInfo(job.Name()), "Expected error when getting job info, because job was already deregistered")
