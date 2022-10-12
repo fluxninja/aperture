@@ -172,7 +172,9 @@ def update_docblock_param_defaults(repository_root: Path, jsonnet_path: Path, bl
         try:
             result = subprocess.run(["jsonnet", *jsonnet_jpaths, str(tmppath)], capture_output=True, check=True)
         except subprocess.CalledProcessError as ex:
-            logger.error(f"Error while rending jsonnet: {ex.stderr}")
+            logger.error(f"Error while rendering jsonnet: {ex.stderr}")
+            # log file for debugging
+            logger.error(f"Jsonnet file: {jsonnet_data}")
             raise typer.Exit(1)
 
         rendered_config = json.loads(result.stdout)

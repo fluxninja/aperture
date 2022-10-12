@@ -59,16 +59,17 @@ local dashboards =
     }),
 
     dashboard.new('aperture-signals')
-    + dashboard.metadata.withLabels({'fluxninja.com/grafana-instance': 'aperture-grafana'})
+    + dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' })
     + dashboard.spec.withJson(std.manifestJsonEx(signalsDashboard({
+      policyName: 'service1-demo-app',
       datasource+: {
-        name: "controller-prometheus"
-      }
+        name: 'controller-prometheus',
+      },
     }).dashboard, indent='  ', newline='\n'))
     + dashboard.spec.withDatasources({
       inputName: 'datasource',
-      datasourceName: "controller-prometheus"
-    })
+      datasourceName: 'controller-prometheus',
+    }),
   ];
 
 local grafanaMixin =
