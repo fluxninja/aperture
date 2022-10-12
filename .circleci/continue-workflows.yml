@@ -371,7 +371,7 @@ jobs:
         description: Number of requests (out of 'requests') to reject.
       sdk_port:
         type: string
-        default: 8080
+        default: "8080"
         description: Port to expose on SDK's example container.
     steps:
       - checkout
@@ -527,7 +527,7 @@ workflows:
           image: fluxninja/aperture-go-example
           tag: fluxninja/aperture-go-example:0.1.0
           use-buildkit: true
-      - validatesdk-example:
+      - validate-sdk:
           name: validate-aperture-go
           docker_image: fluxninja/aperture-go-example:0.1.0
 
