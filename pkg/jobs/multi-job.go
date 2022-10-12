@@ -91,18 +91,10 @@ func (mjc MultiJobConstructor) provideMultiJob(
 			return multiErr
 		},
 		OnStop: func(context.Context) error {
-			var multiErr error
 			// Deregister all jobs
-			err := mj.JMS.unregisterJobMetrics(prometheusRegistry)
-			if err != nil {
-				multiErr = multierr.Append(multiErr, err)
-			}
 			mj.gt.reset()
-			err = jg.DeregisterJob(mjc.Name)
-			if err != nil {
-				multiErr = multierr.Append(multiErr, err)
-			}
-			return multiErr
+			_ = jg.DeregisterJob(mjc.Name)
+			return nil
 		},
 	})
 
