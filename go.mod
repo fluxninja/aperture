@@ -96,7 +96,6 @@ require (
 	github.com/hashicorp/cronexpr v1.1.1 // indirect
 	github.com/hashicorp/nomad/api v0.0.0-20221010180233-9e7e5e081ec7 // indirect
 	github.com/jhump/protoreflect v1.12.0 // indirect
-	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/observiq/ctimefmt v1.0.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.61.0 // indirect
