@@ -21,6 +21,7 @@ import (
 	_ "github.com/fluxninja/aperture/pkg/net" // needed for docs
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
+	"github.com/fluxninja/aperture/pkg/net/grpcui"
 	"github.com/fluxninja/aperture/pkg/net/health"
 	"github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/net/listener"
@@ -148,6 +149,7 @@ func ServerModule(testMode bool) fx.Option {
 		tlsconfig.Module(),
 		http.ServerModule(),
 		grpc.GMuxServerModule(),
+		grpcui.Module(),
 		grpcgateway.Module(),
 		grpcgateway.RegisterHandler{Handler: infov1.RegisterInfoServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(grpc.RegisterInfoService),

@@ -19,6 +19,7 @@ require (
 	github.com/favadi/protoc-go-inject-tag v1.4.0
 	github.com/fluxninja/datasketches-go v0.0.0-20220916235224-7501a2d28551
 	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
+	github.com/fullstorydev/grpcui v1.3.1
 	github.com/getsentry/sentry-go v0.14.0
 	github.com/go-co-op/gocron v1.17.0
 	github.com/go-logr/zerologr v1.2.2
@@ -95,6 +96,7 @@ require (
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
+	github.com/fullstorydev/grpcurl v1.8.6 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-logr/zapr v1.2.3 // indirect
@@ -108,6 +110,7 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/cronexpr v1.1.1 // indirect
 	github.com/hashicorp/nomad/api v0.0.0-20221010180233-9e7e5e081ec7 // indirect
+	github.com/jhump/protoreflect v1.12.0 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect

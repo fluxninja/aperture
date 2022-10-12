@@ -18,7 +18,8 @@ import (
 )
 
 const (
-	defaultServerConfigKey = "server.grpc"
+	// DefaultServerConfigKey is the default key for grpc server configuration.
+	DefaultServerConfigKey = "server.grpc"
 	// Name of gmux based listener.
 	defaultGMuxListener = "grpc-gmux-listener"
 )
@@ -71,7 +72,7 @@ type ServerConstructor struct {
 // Annotate creates an annotated instance of GRPC Server.
 func (constructor ServerConstructor) Annotate() fx.Option {
 	if constructor.ConfigKey == "" {
-		constructor.ConfigKey = defaultServerConfigKey
+		constructor.ConfigKey = DefaultServerConfigKey
 	}
 
 	return fx.Options(
