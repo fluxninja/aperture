@@ -152,9 +152,12 @@ func (h *Heartbeats) createGRPCJob(ctx context.Context, grpcClientConnBuilder gr
 	h.heartbeatsClient = heartbeatv1.NewFluxNinjaServiceClient(conn)
 
 	job := jobs.BasicJob{
+		JobBase: jobs.JobBase{
+			JobName: jobName,
+			JMS:     jobs.NewJobMetrics(),
+		},
 		JobFunc: h.sendSingleHeartbeat,
 	}
-	job.JobName = jobName
 
 	return &job, nil
 }
@@ -164,9 +167,12 @@ func (h *Heartbeats) createHTTPJob(ctx context.Context, restapiClientConnection 
 
 	h.clientHTTP = restapiClientConnection
 	job := jobs.BasicJob{
+		JobBase: jobs.JobBase{
+			JobName: jobNameHTTP,
+			JMS:     jobs.NewJobMetrics(),
+		},
 		JobFunc: h.sendSingleHeartbeatByHTTP,
 	}
-	job.JobName = jobNameHTTP
 	return &job, nil
 }
 

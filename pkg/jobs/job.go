@@ -27,6 +27,8 @@ type Job interface {
 	Execute(ctx context.Context) (proto.Message, error)
 	// JobWatchers
 	JobWatchers() JobWatchers
+	// JobMetrics
+	JobMetrics() JobMetrics
 }
 
 // JobInfo contains information such as run count, last run time, etc. for a Job.
@@ -40,6 +42,7 @@ type JobInfo struct {
 type JobBase struct {
 	JobName string
 	JWS     JobWatchers
+	JMS     JobMetrics
 }
 
 // Name returns the name of the job.
@@ -50,6 +53,11 @@ func (job JobBase) Name() string {
 // JobWatchers returns the job watchers.
 func (job JobBase) JobWatchers() JobWatchers {
 	return job.JWS
+}
+
+// JobMetrics returns the job metrics.
+func (job JobBase) JobMetrics() JobMetrics {
+	return job.JMS
 }
 
 // JobConfig is config for Job
@@ -107,6 +115,11 @@ func (executor *jobExecutor) JobWatchers() JobWatchers {
 	return executor.Job.JobWatchers()
 }
 
+// JobMetrics returns the job metrics for the Job that the executor is associated with.
+func (executor *jobExecutor) JobMetrics() JobMetrics {
+	return executor.Job.JobMetrics()
+}
+
 // Execute executes the Job that the executor is associated with.
 func (executor *jobExecutor) Execute(ctx context.Context) (proto.Message, error) {
 	return executor.Job.Execute(ctx)
@@ -133,16 +146,18 @@ func (executor *jobExecutor) doJob() {
 	newDuration := newTime.Sub(now)
 
 	jobCh := make(chan bool, 1)
-
 	panichandler.Go(func() {
 		defer func() {
 			jobCh <- true
 		}()
+		beforeExecution := time.Now()
 		_, err := executor.jg.gt.execute(ctx, executor)
 		if err != nil {
+			executor.JobMetrics().latencySummary.WithLabelValues(executor.Name(), "false").Observe(float64(time.Since(beforeExecution)))
 			executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("job", executor.Name()).Msg("job status unhealthy")
 			return
 		}
+		executor.JobMetrics().latencySummary.WithLabelValues(executor.Name(), "true").Observe(float64(time.Since(beforeExecution)))
 	})
 
 	timerCh := make(chan bool, 1)
