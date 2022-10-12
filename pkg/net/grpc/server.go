@@ -98,6 +98,13 @@ func (constructor ServerConstructor) provideServer(
 		return nil, nil, err
 	}
 
+	// TODO: Remove Debug Log
+	log.Debug().Interface("config", config).Msg("GRPC Server configuration")
+	if config.EnableGRPCUI {
+		log.Info().Msg("Enabling grpcui will enable gRPC server reflection")
+		config.EnableReflection = true
+	}
+
 	grpcServerMetrics := grpc_prometheus.NewServerMetrics()
 	grpcServerMetrics.EnableHandlingTimeHistogram(
 		grpc_prometheus.WithHistogramBuckets(config.LatencyBucketsMS),
@@ -129,11 +136,6 @@ func (constructor ServerConstructor) provideServer(
 				log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Starting GRPC server")
 
 				grpcServerMetrics.InitializeMetrics(server)
-
-				if config.EnableGRPCUI {
-					log.Info().Msg("Enabling grpcui will enable gRPC server reflection")
-					config.EnableReflection = true
-				}
 
 				if config.EnableReflection {
 					reflection.Register(server)

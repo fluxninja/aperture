@@ -7,24 +7,18 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
+	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fullstorydev/grpcui/standalone"
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
 )
 
-// Module is a fx module that provides gRPC UI handler and invokes registering gRPC UI handler.
+// Module is a fx module that invokes gRPC UI handler and invokes registering gRPC UI handler.
 func Module() fx.Option {
 	return fx.Options(
-		grpcclient.ClientConstructor{Name: "grpcui-grpc-client", ConfigKey: "grpcui-grpc-client"}.Annotate(),
-		fx.Provide(fx.Annotate(
-			provideGRPCUIHandler,
-			fx.ParamTags(config.NameTag("grpcui-grpc-client")),
-		)),
-		fx.Invoke(RegisterGRPCUIHandler),
+		fx.Invoke(setupGRPCUIHandler),
 	)
 }
 
@@ -32,46 +26,55 @@ const (
 	grpcUIEndpoint = "/grpcui"
 )
 
-func provideGRPCUIHandler(GRPClientConnectionBuilder grpcclient.ClientConnectionBuilder, HTTPServer *commonhttp.Server, Unmarshaller config.Unmarshaller, Lifecycle fx.Lifecycle) (http.Handler, error) {
+func setupGRPCUIHandler(_ *grpc.Server, router *mux.Router, lifecycle fx.Lifecycle, unmarshaller config.Unmarshaller) error {
+	var err error
+	var conn *grpc.ClientConn
+	var h http.Handler
+
 	var serverConfig grpcclient.GRPCServerConfig
-	err := Unmarshaller.UnmarshalKey(grpcclient.DefaultServerConfigKey, &serverConfig)
+	err = unmarshaller.UnmarshalKey(grpcclient.DefaultServerConfigKey, &serverConfig)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize grpc server configuration!")
-		return nil, err
+		return err
 	}
 
-	var h http.Handler
-	ctx, cancel := context.WithCancel(context.Background())
-	Lifecycle.Append(fx.Hook{
+	var listenerConfig listener.ListenerConfig
+	err = unmarshaller.UnmarshalKey("server", &listenerConfig)
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to deserialize listener configuration!")
+		return err
+	}
+
+	targetAddr := listenerConfig.Addr
+
+	// TODO: Remove Debug Log
+	log.Debug().Interface("serverConfig", serverConfig).Msg("starting providegrpcuihandler -- server")
+	log.Debug().Interface("listenerConfig", listenerConfig).Msg("starting providegrpcuihandler -- listener")
+
+	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			if serverConfig.EnableGRPCUI {
-				connWrapper := GRPClientConnectionBuilder.Build()
-				targetAddr := HTTPServer.Listener.GetListener().Addr().String()
-				// TODO: Do not disable transport security.
-				conn, err := connWrapper.Dial(ctx, targetAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+				// TODO: Remove Debug Log
+				log.Debug().Str("targetAddr", targetAddr).Msg("Providegrpcuuihandler target address")
+				conn, err = grpc.DialContext(context.Background(), targetAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to create gRPC ui client connection to the server")
 					return err
 				}
 				// TODO: Connection closed before server preface received.
-				h, err = standalone.HandlerViaReflection(ctx, conn, conn.Target())
+				h, err = standalone.HandlerViaReflection(context.Background(), conn, conn.Target())
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to create gRPC ui handler")
 					return err
 				}
+				router.Handle(grpcUIEndpoint+"/", http.StripPrefix(grpcUIEndpoint, h))
 			}
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
-			cancel()
-			return nil
+		OnStop: func(context.Context) error {
+			return conn.Close()
 		},
 	})
-	return h, nil
-}
 
-// RegisterGRPCUIHandler registers gRPC UI handler to router.
-func RegisterGRPCUIHandler(router *mux.Router, handler http.Handler) {
-	log.Info().Msg("Registering gRPC UI handler")
-	router.Handle(grpcUIEndpoint, http.StripPrefix(grpcUIEndpoint, handler))
+	return nil
 }
