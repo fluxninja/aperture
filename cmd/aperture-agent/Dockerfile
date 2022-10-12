@@ -28,13 +28,15 @@ FROM base AS plugins-builder
 # Plugins build
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/ \
-  /bin/bash -c 'shopt -s nullglob; for plugin in ./plugins/{service,agent}/aperture-plugin-*; do\
-  echo "building plugin $plugin";\
-  CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w" \
-  ./pkg/plugins/build.sh;\
+  /bin/bash -c \
+  'set -euo pipefail; \
+  shopt -s nullglob; \
+  for plugin in ./plugins/{service,agent}/aperture-plugin-*; do\
+    echo "building plugin $plugin";\
+    CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w" \
+    ./pkg/plugins/build.sh;\
   done\
   '
-
 
 # Final image
 FROM alpine:3.15.0

@@ -199,7 +199,6 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/cmd/aperture-agent/Dockerfile",
                     "ssh": "default",
-                    "ignore": ["operator"],
                 }
             ],
             "kinds": [
