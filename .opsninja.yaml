@@ -1,0 +1,21 @@
+metadata:
+  repository: https://github.com/fluxninja/aperture
+
+applications:
+  aperture-agent:
+    release_tag: releases/aperture-agent/{{ version }}
+    image:
+      name: aperture-agent
+      dockerfile: cmd/aperture-agent/Dockerfile
+      push_to_dockerhub: true
+      dockerhub_image: fluxninja/aperture-agent
+    deployment: {}
+  aperture-controller:
+    release_tag: release/aperture-controller/{{ version }}
+    image:
+      name: aperture-controller
+      env_var_prefix: AGENT_CONTROLLER
+      dockerfile: cmd/aperture-agent/Dockerfile
+      push_to_dockerhub: true
+      dockerhub_image: fluxninja/aperture-agent
+    deployment: {}
