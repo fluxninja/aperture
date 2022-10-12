@@ -519,7 +519,7 @@ workflows:
           work_dir: .
 
   aperture-go:
-    when: << pipeline.paramerters.updated-aperture-go >>
+    when: << pipeline.parameters.updated-aperture-go >>
     jobs:
       - aperture_docker_build:
           docker-context: sdks/aperture-go/
