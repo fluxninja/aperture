@@ -104,6 +104,9 @@ var _ = BeforeSuite(func() {
 		},
 		"server": map[string]interface{}{
 			"addr": addr,
+			"grpc": map[string]interface{}{
+				"enable_reflection": true,
+			},
 		},
 		"config_path": configDir,
 		"sentrywriter": map[string]interface{}{

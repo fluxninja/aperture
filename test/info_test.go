@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Core", func() {
+var _ = Describe("Info", func() {
 	When("it is queried for version details", func() {
 		It("returns version details", func() {
 			resp, err := http.Get(fmt.Sprintf("http://%v/v1/info/version", addr))
