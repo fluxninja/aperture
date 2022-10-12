@@ -147,8 +147,6 @@ func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller co
 		return
 	}
 
-	at.mutex.Lock()
-	defer at.mutex.Unlock()
 	at.tokensDecision = wrapperMessage.TokensDecision
 }
 
