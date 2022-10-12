@@ -45,6 +45,9 @@ parameters:
   updated-demo-app:
     type: boolean
     default: false
+  updated-aperture-go:
+    type: boolean
+    default: false
 
 jobs:
   build-push-add-tag:
@@ -347,6 +350,36 @@ jobs:
             git diff --cached --exit-code
           when: always
 
+  validate-sdk:
+    executor: go-cimg-executor
+    parameters:
+      docker_image:
+        type: string
+        default: ""
+        description: Docker image of SDK example to validate against.
+      port:
+        type: string
+        default: "8089"
+        description: Port to start sdk-validator's grpc server on.
+      requests:
+        type: integer
+        default: 10
+        description: Number of requests to make to SDK example server.
+      rejects:
+        type: integer
+        default: 5
+        description: Number of requests (out of 'requests') to reject.
+      sdk_port:
+        type: string
+        default: 8080
+        description: Port to expose on SDK's example container.
+    steps:
+      - checkout
+      - run:
+          name: Run SDK validator
+          command: |
+            go run cmd/sdk-validator/main.go -sdk-validator-image=<<parameters.docker_image>> -port=<<parameters.port>> -requests=<<parameters.requests>> -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk_port>>
+
   gen-push-java-stubs:
     executor: python-cimg-executor
     parameters:
@@ -485,6 +518,20 @@ workflows:
           name: go-test-coverage-aperture
           work_dir: .
 
+  aperture-go:
+    when:
+      - << pipeline.paramerters.updated-aperture-go >>
+    jobs:
+      - aperture_docker_build:
+          docker-context: sdks/aperture-go/
+          dockerfile: Dockerfile
+          image: fluxninja/aperture-go-example
+          tag: fluxninja/aperture-go-example:0.1.0
+          use-buildkit: true
+      - validatesdk-example:
+          name: validate-aperture-go
+          docker_image: fluxninja/aperture-go-example:0.1.0
+
   push-to-aperture-java:
     when:
       and:
@@ -606,6 +653,7 @@ commands:
           environment:
             TOOLS: << parameters.tools >>
           command: .circleci/scripts/asdf_install.sh
+
   asdf_save_cache:
     parameters:
       cache_name:
@@ -744,6 +792,7 @@ commands:
             PARAM_GIT_COMMIT_HASH: <<parameters.git-commit-hash>>
           name: <<parameters.step-name>>
           no_output_timeout: << parameters.no_output_timeout >>
+
   aperture_docker_tag:
     description: |
       Tag source image with destination registry, image and tag
