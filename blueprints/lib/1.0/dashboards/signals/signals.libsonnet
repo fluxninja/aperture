@@ -7,6 +7,7 @@ local timeSeriesPanel = lib.TimeSeriesPanel;
 
 
 local defaults = {
+  policyName: error 'policyName must be set',
   refreshInterval: '30s',
   timeFrom: 'now-30m',
   timeTo: 'now',
@@ -23,10 +24,10 @@ function(params) {
 
   local SignalAveragePanel =
     local query = |||
-      increase(signal_reading_sum{signal_name="${signal_name}"}[10s])
+      increase(signal_reading_sum{policy_name="%(policyName)s",signal_name="${signal_name}"}[$__rate_interval])
       /
-      increase(signal_reading_count{signal_name="${signal_name}"}[10s])
-    |||;
+      increase(signal_reading_count{policy_name="%(policyName)s",signal_name="${signal_name}"}[$__rate_interval])
+    ||| % { policyName: $._config.policyName };
     local target =
       grafana.prometheus.target(query) +
       {

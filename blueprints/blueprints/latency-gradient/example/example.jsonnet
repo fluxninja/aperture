@@ -63,6 +63,9 @@ local config = {
   dashboard+: {
     policyName: $.common.policyName,
   },
+  signalsDashboard+: {
+    policyName: $.common.policyName,
+  },
 };
 
 blueprint { _config:: config }
