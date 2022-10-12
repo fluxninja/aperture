@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -21,36 +22,71 @@ var _ = Describe("Validator", Ordered, func() {
 	policySpecValidator := &controlplane.PolicySpecValidator{}
 	policyValidator := policyvalidator.NewPolicyValidator([]policyvalidator.PolicySpecValidator{policySpecValidator})
 
-	validateExample := func(contents string) {
+	validateExample := func(contents string) (request *admissionv1.AdmissionRequest) {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "aperture-controller")
 		jsonPolicy, err := yaml.YAMLToJSON([]byte(contents))
 		Expect(err).ToNot(HaveOccurred())
 		var policy policyv1alpha1.Policy
 		err = json.Unmarshal([]byte(jsonPolicy), &policy)
 		Expect(err).NotTo(HaveOccurred())
-		request := &admissionv1.AdmissionRequest{
+		request = &admissionv1.AdmissionRequest{
 			Name:      policy.Name,
 			Namespace: policy.Namespace,
 			Kind:      v1.GroupVersionKind(policy.GroupVersionKind()),
 			Object:    runtime.RawExtension{Raw: []byte(jsonPolicy)},
 		}
+		return request
+	}
 
-		ok, msg, err := policyValidator.ValidateObject(context.TODO(), request)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(msg).To(BeEmpty())
-		Expect(ok).To(BeTrue())
+	validateRequest := func(req *admissionv1.AdmissionRequest, message string) {
+		ok, msg, err := policyValidator.ValidateObject(context.TODO(), req)
+		if message == "" {
+			Expect(err).NotTo(HaveOccurred())
+			Expect(msg).To(BeEmpty())
+			Expect(ok).To(BeTrue())
+		} else {
+			Expect(err).NotTo(HaveOccurred())
+			Expect(msg).To(Equal(message))
+			Expect(ok).To(BeFalse())
+		}
 	}
 
 	It("accepts example policy for demoapp", func() {
-		validateExample(latencyGradientPolicy)
+		validateRequest(validateExample(latencyGradientPolicy), "")
 	})
 
 	It("accepts example policy for rate limit", func() {
-		validateExample(rateLimitPolicy)
+		validateRequest(validateExample(rateLimitPolicy), "")
 	})
 
 	It("accepts example policy for classification", func() {
-		validateExample(classificationPolicy)
+		validateRequest(validateExample(classificationPolicy), "")
+	})
+
+	It("does not accept example policy without ConcurrencyLimiter.selector for demoapp", func() {
+		concurrencyLimiterSelector :=
+			`concurrency_limiter:
+          selector:
+            service_selector:
+              service: "service1-demo-app.demoapp.svc.cluster.local"
+            flow_selector:
+              control_point:
+                traffic: "ingress"`
+		policy := strings.ReplaceAll(latencyGradientPolicy, concurrencyLimiterSelector, "concurrency_limiter:")
+		request := validateExample(policy)
+		msg := "policies: Key: 'Policy.Circuit.Components[9].Component.ConcurrencyLimiter.Selector' Error:Field validation for 'Selector' failed on the 'required' tag"
+		validateRequest(request, msg)
+	})
+
+	It("does not accept example policy with default Workload Priority 2000 for demoapp", func() {
+		workloadPriority :=
+			`default_workload_parameters:
+              priority: 20`
+		policy := strings.ReplaceAll(latencyGradientPolicy, workloadPriority, `default_workload_parameters:
+              priority: 2000`)
+		request := validateExample(policy)
+		msg := "policies: Key: 'Policy.Circuit.Components[9].Component.ConcurrencyLimiter.Scheduler.DefaultWorkloadParameters.Priority' Error:Field validation for 'Priority' failed on the 'lte' tag"
+		validateRequest(request, msg)
 	})
 
 	It("does not accept policy in other namespace than controller", func() {
@@ -66,11 +102,8 @@ var _ = Describe("Validator", Ordered, func() {
 			Kind:      v1.GroupVersionKind(policy.GroupVersionKind()),
 			Object:    runtime.RawExtension{Raw: []byte(jsonPolicy)},
 		}
-
-		ok, msg, err := policyValidator.ValidateObject(context.TODO(), request)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(msg).To(Equal("Policy should be created in the same namespace as Aperture Controller"))
-		Expect(ok).To(BeFalse())
+		msg := "Policy should be created in the same namespace as Aperture Controller"
+		validateRequest(request, msg)
 	})
 })
 
