@@ -10,10 +10,12 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 // CircuitModule returns fx options of Circuit for the main app.
@@ -133,19 +135,25 @@ type Circuit struct {
 	tickEndCallbacks []TickEndCallback
 	// Tick start callbacks
 	tickStartCallbacks []TickStartCallback
+	// Status registry to track signal values
+	statusRegistry status.Registry
 }
 
 // Make sure Circuit complies with CircuitAPI interface.
 var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
-func NewCircuitAndOptions(compWithPortsList []CompiledComponentAndPorts,
+func NewCircuitAndOptions(
+	compWithPortsList []CompiledComponentAndPorts,
 	policyReadAPI iface.Policy,
+	registry status.Registry,
 ) (*Circuit, fx.Option) {
+	reg := registry.Child("circuit_signals")
 	circuit := &Circuit{
-		Policy:        policyReadAPI,
-		loopedSignals: make(signalToReading),
-		components:    make([]CompiledComponentAndPorts, 0),
+		Policy:         policyReadAPI,
+		loopedSignals:  make(signalToReading),
+		components:     make([]CompiledComponentAndPorts, 0),
+		statusRegistry: reg,
 	}
 
 	// setComponents sets the Components for a Circuit
@@ -234,11 +242,26 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 		err := sc(tickInfo)
 		errMulti = multierr.Append(errMulti, err)
 	}
+	policyID := fmt.Sprintf("%s-%s", circuit.GetPolicyName(), circuit.GetPolicyHash())
+	reg := circuit.statusRegistry.Child(policyID)
+
 	// Signals for this tick
 	circuitSignalReadings := make(signalToReading)
 	defer func() {
+		signalInfo := &policylangv1.SignalMetricsInfo{
+			PolicyName:    circuit.GetPolicyName(),
+			PolicyHash:    circuit.GetPolicyHash(),
+			SignalReading: make([]*policylangv1.SignalReading, 0),
+		}
 		// log all circuitSignalReadings
 		for signal, reading := range circuitSignalReadings {
+			signalReadingProto := &policylangv1.SignalReading{
+				SignalName: signal.Name,
+				Valid:      reading.Valid(),
+				Value:      reading.Value(),
+			}
+			signalInfo.SignalReading = append(signalInfo.SignalReading, signalReadingProto)
+
 			circuitMetricsLabels := prometheus.Labels{
 				metrics.SignalNameLabel: signal.Name,
 				metrics.PolicyNameLabel: circuit.Policy.GetPolicyName(),
@@ -251,6 +274,8 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				signalSummaryVecMetric.Observe(reading.Value())
 			}
 		}
+		signalStatus := status.NewStatus(signalInfo, nil)
+		reg.SetStatus(signalStatus)
 	}()
 
 	// Populate with last run's looped signal

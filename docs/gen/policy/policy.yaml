@@ -4,14 +4,14 @@ produces:
 - application/json
 swagger: "2.0"
 info:
-  description: Policies
-  title: Policies
+  description: Policy
+  title: Policy
 basePath: /aperture-controller
 paths:
   /:
     post:
       tags:
-      - policies-configuration
+      - policy-configuration
       operationId: Policy
       parameters:
       - name: body
@@ -1843,12 +1843,3 @@ definitions:
         description: Selected signal (on_true or on_false).
         x-order: 0
         $ref: '#/definitions/v1OutPort'
-tags:
-- name: EntityCacheService
-- name: InfoService
-- name: PeerDiscoveryService
-- name: StatusService
-- name: FlowControlService
-- name: PolicyService
-- name: FluxNinjaService
-- name: ControllerInfoService

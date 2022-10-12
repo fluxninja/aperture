@@ -66,6 +66,8 @@ jb install && ./scripts/aperture-generate.py --output _gen --config blueprints/l
 
 An alternate way of using the aperture blueprints is to import them from another
 jsonnet project and render Policies or Grafana Dashboards directly in jsonnet.
+This can be also integrated with other Kubernetes deployment tools like
+[tanka][tk].
 
 For example, to create a Latency Gradient Policy that can be loaded by the
 controller, you need to install aperture blueprints library with jsonnet
@@ -134,9 +136,6 @@ file:
 ```
 
 </details>
-
-This can be also integrated with other Kubernetes deployment tools like
-[tanka][tk].
 
 [jsonnet]: https://github.com/google/go-jsonnet
 [tk]: https://grafana.com/oss/tanka/

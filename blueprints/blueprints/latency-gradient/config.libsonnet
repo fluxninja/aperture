@@ -78,12 +78,20 @@
       workloads: [],
     },
   },
+  /**
+  * @section FluxMeter Dashboard
+  *
+  * @param (dashboard.policyName: string required) Dashboard Configuration.
+  */
   dashboard: {
-    /**
-    * @section FluxMeter Dashboard
-    *
-    * @param (dashboard.policyName: string required) A name of the policy used as a promQL query filter for flux meter metrics
-    */
+    policyName: error 'policyName is not set',
+  },
+  /**
+  * @section Signals Dashboard
+  *
+  * @param (signalsDashboard.policyName: string required) Dashboard Configuration.
+  */
+  signalsDashboard: {
     policyName: error 'policyName is not set',
   },
 }

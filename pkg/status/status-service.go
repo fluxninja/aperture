@@ -2,9 +2,11 @@ package status
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -41,5 +43,10 @@ func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.Grou
 			return &statusv1.GroupStatus{}, nil
 		}
 	}
-	return registry.GetGroupStatus(), nil
+	var err error
+	if registry.HasError() {
+		err = errors.New("status registry has an error")
+		_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "503"))
+	}
+	return registry.GetGroupStatus(), err
 }

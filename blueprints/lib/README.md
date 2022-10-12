@@ -7,7 +7,7 @@ This directory contains automatically generated Jsonnet Aperture Library.
 Aperture Jsonnet Library is a set of jsonnet bindings for Aperture policies that
 is generated from the OpenAPI V2/Swagger API specification that is distributed
 as part of the fluxninja/aperture repository under
-`docs/gen/openapiv2/aperture.swagger.yaml`.
+`docs/gen/policy/policy.yaml`.
 
 ## Requirements
 
@@ -61,7 +61,7 @@ requires Python 3.10+.
 Example usage:
 
 ```sh
-python scripts/jsonnet-lib-gen.py --output-dir 1.0/ ../docs/gen/policies/gen.yaml
+python scripts/jsonnet-lib-gen.py --output-dir 1.0/ ../docs/gen/policy/policy.yaml
 ```
 
 This will update bindings from `1.0/` directory, adding and removing files in
