@@ -12,6 +12,11 @@ const (
 	// HTTPErrorMetricName - metric from http server.
 	HTTPErrorMetricName = "http_errors_total"
 
+	// Job metrics.
+
+	// JobLatencyMetricName - metric used to track latency of job execution.
+	JobLatencyMetricName = "job_latency_ms"
+
 	// Circuit metrics.
 
 	// SignalReadingMetricName - used in circuit metrics.
@@ -76,6 +81,10 @@ const (
 
 	// PROMETHEUS LABELS.
 
+	// JobNameLabel - label for specifying job name.
+	JobNameLabel = "job_name"
+	// JobOkLabel - label for checking job execution status.
+	JobOkLabel = "job_ok"
 	// DistCacheMemberIDLabel - label specifying unique identifier of the node in the olric cluster.
 	DistCacheMemberIDLabel = "distcache_member_id"
 	// DistCacheMemberNameLabel - label specifying name of the node in the olric cluster.

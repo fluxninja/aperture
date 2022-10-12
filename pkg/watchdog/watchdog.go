@@ -122,6 +122,7 @@ func (w *watchdog) start() error {
 		job := &jobs.BasicJob{
 			JobBase: jobs.JobBase{
 				JobName: "cgroup",
+				JMS:     jobs.NewJobMetrics(),
 			},
 		}
 		if w.config.CGroup.WatermarksPolicy.Enabled {
@@ -141,6 +142,7 @@ func (w *watchdog) start() error {
 		job := &jobs.BasicJob{
 			JobBase: jobs.JobBase{
 				JobName: "system",
+				JMS:     jobs.NewJobMetrics(),
 			},
 		}
 		// System memory check
