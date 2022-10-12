@@ -176,10 +176,7 @@ func (mj *MultiJob) RegisterJob(job Job) error {
 // DeregisterJob deregisters a job with the MultiJob.
 func (mj *MultiJob) DeregisterJob(name string) error {
 	_, err := mj.gt.deregisterJob(name)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // DeregisterAll removes all jobs from the MultiJob.
