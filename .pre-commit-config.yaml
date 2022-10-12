@@ -49,7 +49,7 @@ repos:
     rev: v1.0.0-fn
     hooks:
       - id: go-generate
-      - id: go-mod-tidy
+      - id: go-mod-tidy-repo
         args:
           - -compat=1.19
   - repo: meta

@@ -1024,7 +1024,7 @@ cmd_button('wavepool-stop',
 aperture_go_pod_exec_script = '''
 # get k8s pod name from tilt resource name
 POD_NAME="$(tilt get kubernetesdiscovery "aperture-go-example" -ojsonpath='{.status.pods[0].name}')"
-kubectl exec -n aperture-go-example "$POD_NAME" -- wget -O - http://aperture-go-example:80/super
+kubectl exec -n aperture-go-example "$POD_NAME" -- wget http://127.0.0.1:8080/super -O -
 '''
 cmd_button('aperture-go-trigger',
         argv=['sh', '-c', aperture_go_pod_exec_script],
@@ -1036,7 +1036,7 @@ cmd_button('aperture-go-trigger',
 aperture_java_pod_exec_script = '''
 # get k8s pod name from tilt resource name
 POD_NAME="$(tilt get kubernetesdiscovery "aperture-java-example" -ojsonpath='{.status.pods[0].name}')"
-kubectl exec -n aperture-java-example "$POD_NAME" -- wget -O - http://aperture-java-example:80/super
+kubectl exec -n aperture-java-example "$POD_NAME" -- wget http://127.0.0.1:8080/super -O -
 '''
 cmd_button('aperture-java-trigger',
         argv=['sh', '-c', aperture_java_pod_exec_script],
