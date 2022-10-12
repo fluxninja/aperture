@@ -12,7 +12,6 @@
   "links": [],
   "panels": [
     {
-      "_nextTarget": 1,
       "datasource": "$datasource",
       "defaults": {
         "color": {
@@ -127,7 +126,6 @@
       "type": "timeseries"
     },
     {
-      "_nextTarget": 1,
       "datasource": "$datasource",
       "defaults": {
         "color": {
@@ -242,7 +240,6 @@
       "type": "timeseries"
     },
     {
-      "_nextTarget": 1,
       "datasource": "$datasource",
       "defaults": {
         "color": {
@@ -357,7 +354,6 @@
       "type": "timeseries"
     },
     {
-      "_nextTarget": 1,
       "datasource": "$datasource",
       "defaults": {
         "color": {
@@ -472,7 +468,6 @@
       "type": "timeseries"
     },
     {
-      "_nextTarget": 1,
       "datasource": "$datasource",
       "defaults": {
         "color": {

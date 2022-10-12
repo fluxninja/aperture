@@ -3,6 +3,7 @@ local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixi
 
 local aperture = import '../../../../../blueprints/lib/1.0/main.libsonnet';
 local policyDashboard = aperture.blueprints.dashboards.LatencyGradient;
+local signalsDashboard = aperture.blueprints.dashboards.Signals;
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;
@@ -56,6 +57,18 @@ local dashboards =
       inputName: '${datasource}',
       datasourceName: 'operations-prometheus',
     }),
+
+    dashboard.new('aperture-signals')
+    + dashboard.metadata.withLabels({'fluxninja.com/grafana-instance': 'aperture-grafana'})
+    + dashboard.spec.withJson(std.manifestJsonEx(signalsDashboard({
+      datasource+: {
+        name: "controller-prometheus"
+      }
+    }).dashboard, indent='  ', newline='\n'))
+    + dashboard.spec.withDatasources({
+      inputName: 'datasource',
+      datasourceName: "controller-prometheus"
+    })
   ];
 
 local grafanaMixin =

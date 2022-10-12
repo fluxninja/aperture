@@ -1,5 +1,8 @@
-local lib = import '../../grafana/grafana.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
+
+local lib = import '../../grafana/grafana.libsonnet';
+
+local aperture = import '../../grafana/aperture.libsonnet';
 
 local dashboard = grafana.dashboard;
 local row = grafana.row;
@@ -19,88 +22,24 @@ local defaults = {
   datasourceFilterRegex: '',
 };
 
-local newTimeSeriesPanel(graphTitle, datasource, graphQuery, axisLabel='', unit='') =
-  local target =
-    prometheus.target(graphQuery, intervalFactor=1) +
+local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
+  local thresholds =
     {
-      range: true,
-      editorMode: 'code',
+      mode: 'absolute',
+      steps: [
+        { color: 'green', value: null },
+        { color: 'red', value: 80 },
+      ],
     };
-
-  timeSeriesPanel.new(
-    title=graphTitle,
-    datasource=datasource,
-    span=24,
-    min_span=24,
-    axis_label=axisLabel,
-  ) +
-  timeSeriesPanel.withTarget(target) +
-  timeSeriesPanel.withOptions(
-    timeSeriesPanel.options.withLegend() +
-    timeSeriesPanel.options.withTooltip()
-  ) +
-  timeSeriesPanel.withDefaults(
-    timeSeriesPanel.defaults.withColorMode('palette-classic') +
-    timeSeriesPanel.defaults.withCustom({
-      drawStyle: 'line',
-      lineInterpolation: 'linear',
-      lineWidth: 1,
-      pointSize: 5,
-      scaleDistribution: {
-        type: 'linear',
-      },
-      showPoints: 'auto',
-      spanNulls: false,
-    })
-  ) +
-  timeSeriesPanel.defaults.withThresholds({
-    mode: 'absolute',
-    steps: [
-      { color: 'green', value: null },
-      { color: 'red', value: 80 },
-    ],
-  }) +
-  timeSeriesPanel.withFieldConfig(
-    timeSeriesPanel.fieldConfig.withDefaults(
-      timeSeriesPanel.fieldConfig.defaults.withUnit(unit) +
-      timeSeriesPanel.fieldConfig.defaults.withColor({
-        mode: 'palette-classic',
-      }) +
-      timeSeriesPanel.fieldConfig.defaults.withCustom({
-        [if axisLabel != '' then 'axisLabel']: axisLabel,
-        axisPlacement: 'auto',
-        barAlignment: 0,
-        fillOpacity: 0,
-        gradientMode: 'none',
-        drawStyle: 'line',
-        hideFrom: {
-          legend: false,
-          tooltip: false,
-          viz: false,
-        },
-        lineInterpolation: 'linear',
-        lineWidth: 1,
-        pointSize: 5,
-        scaleDistribution: {
-          type: 'linear',
-        },
-        showPoints: 'auto',
-        spanNulls: false,
-        stacking: {
-          group: 'A',
-          mode: 'none',
-        },
-        thresholdsStyle: {
-          mode: 'off',
-        },
-      }) +
-      timeSeriesPanel.fieldConfig.defaults.withThresholds({
-        mode: 'absolute',
-        steps: [
-          { color: 'green', value: null },
-          { color: 'red', value: 80 },
-        ],
-      })
+  local target =
+    prometheus.target(query, intervalFactor=1)
+    + { range: true, editorMode: 'code' };
+  aperture.timeSeriesPanel.new(title, datasource, axisLabel, unit)
+  + timeSeriesPanel.withTarget(target)
+  + timeSeriesPanel.defaults.withThresholds(thresholds)
+  + timeSeriesPanel.withFieldConfigMixin(
+    timeSeriesPanel.fieldConfig.withDefaultsMixin(
+      timeSeriesPanel.fieldConfig.defaults.withThresholds(thresholds)
     )
   );
 
