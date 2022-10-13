@@ -162,8 +162,6 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		return nil, err
 	}
 
-	dc := &DistCache{}
-
 	memberlistEnv := "lan"
 	oc := olricconfig.New(memberlistEnv)
 	oc.ServiceDiscovery = map[string]interface{}{
@@ -225,21 +223,23 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		startChan <- struct{}{}
 	}
 
-	dc.Config = oc
-
-	o, err := olric.New(dc.Config)
+	o, err := olric.New(oc)
 	if err != nil {
 		return nil, err
 	}
 
-	dc.Olric = o
+	dc := &DistCache{
+		Config:  oc,
+		Olric:   o,
+		Metrics: newDistCacheMetrics(),
+	}
+
 	job := &jobs.BasicJob{
 		JobBase: jobs.JobBase{
 			JobName: distCacheMetricsJobName,
 		},
 		JobFunc: dc.scrapeMetrics,
 	}
-	dc.Metrics = newDistCacheMetrics()
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
