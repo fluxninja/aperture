@@ -365,6 +365,11 @@ jobs:
       docker-image:
         type: string
         description: A name for your Docker image
+      path:
+        default: .
+        description: |
+          Path to the directory containing your Dockerfile, defaults to . (working directory)
+        type: string
       tag:
         type: string
         description: A Docker image tag
@@ -388,6 +393,7 @@ jobs:
     steps:
       - checkout
       - aperture_docker_build:
+          path: <<parameters.path>>
           docker-context: <<parameters.docker-context>>
           dockerfile: <<parameters.dockerfile>>
           image: <<parameters.docker-image>>
@@ -541,6 +547,7 @@ workflows:
     jobs:
       - validate-sdk:
           name: validate-aperture-go
+          path: sdks/aperture-go/
           docker-image: fluxninja/aperture-go-example
           docker-context: sdks/aperture-go/
           dockerfile: Dockerfile
