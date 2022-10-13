@@ -23,11 +23,6 @@ func (job *BasicJob) JobWatchers() JobWatchers {
 	return job.JobBase.JobWatchers()
 }
 
-// JobMetrics returns the job metrics.
-func (job *BasicJob) JobMetrics() JobMetrics {
-	return job.JobBase.JobMetrics()
-}
-
 // Execute executes the job.
 func (job *BasicJob) Execute(ctx context.Context) (proto.Message, error) {
 	if job.JobFunc == nil {
