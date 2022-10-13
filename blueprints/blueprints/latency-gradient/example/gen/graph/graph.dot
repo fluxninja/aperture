@@ -13,222 +13,160 @@ digraph  {
 	}
 	subgraph cluster_s6 {
 		label="ArithmeticCombinator[1]";margin="50.0";
-		n8[label="1.10"];
-		n9[label="lhs"];
+		n9[label="1.10"];
+		n7[label="lhs"];
 		n10[label="output"];
-		n7[label="rhs"];
-		n8->n7;
-		n9->n10[style="invis"];
-		{rank=same; n7;n9;};
+		n8[label="rhs"];
+		n9->n8;
+		n8->n10[style="invis"];
+		{rank=same; n7;n8;};
 		{rank=same; n10;};
 		
 	}
 	subgraph cluster_s11 {
 		label="ArithmeticCombinator[2]";margin="50.0";
+		n13[label="2.00"];
 		n12[label="lhs"];
-		n14[label="output"];
-		n13[label="rhs"];
-		n13->n14[style="invis"];
-		{rank=same; n12;n13;};
-		{rank=same; n14;};
+		n15[label="output"];
+		n14[label="rhs"];
+		n13->n12;
+		n14->n15[style="invis"];
+		{rank=same; n12;n14;};
+		{rank=same; n15;};
 		
 	}
-	subgraph cluster_s15 {
+	subgraph cluster_s16 {
 		label="ArithmeticCombinator[3]";margin="50.0";
-		n16[label="lhs"];
-		n18[label="output"];
-		n17[label="rhs"];
-		n17->n18[style="invis"];
-		{rank=same; n18;};
-		{rank=same; n16;n17;};
+		n19[label="1.10"];
+		n17[label="lhs"];
+		n20[label="output"];
+		n18[label="rhs"];
+		n19->n18;
+		n18->n20[style="invis"];
+		{rank=same; n17;n18;};
+		{rank=same; n20;};
 		
 	}
-	subgraph cluster_s19 {
+	subgraph cluster_s21 {
 		label="ArithmeticCombinator[4]";margin="50.0";
-		n21[label="2.00"];
-		n20[label="lhs"];
-		n23[label="output"];
-		n22[label="rhs"];
-		n21->n20;
-		n22->n23[style="invis"];
-		{rank=same; n20;n22;};
-		{rank=same; n23;};
+		n23[label="5.00"];
+		n22[label="lhs"];
+		n25[label="output"];
+		n24[label="rhs"];
+		n23->n22;
+		n24->n25[style="invis"];
+		{rank=same; n22;n24;};
+		{rank=same; n25;};
 		
 	}
-	subgraph cluster_s24 {
-		label="ArithmeticCombinator[5]";margin="50.0";
-		n27[label="1.10"];
-		n25[label="lhs"];
-		n28[label="output"];
-		n26[label="rhs"];
-		n27->n26;
-		n26->n28[style="invis"];
-		{rank=same; n25;n26;};
-		{rank=same; n28;};
-		
-	}
-	subgraph cluster_s29 {
-		label="ArithmeticCombinator[6]";margin="50.0";
-		n32[label="5.00"];
-		n31[label="lhs"];
-		n33[label="output"];
-		n30[label="rhs"];
-		n32->n31;
-		n31->n33[style="invis"];
-		{rank=same; n30;n31;};
-		{rank=same; n33;};
-		
-	}
-	subgraph cluster_s34 {
-		label="ArithmeticCombinator[7]";margin="50.0";
-		n35[label="lhs"];
-		n37[label="output"];
-		n36[label="rhs"];
-		n36->n37[style="invis"];
-		{rank=same; n35;n36;};
-		{rank=same; n37;};
-		
-	}
-	subgraph cluster_s61 {
-		subgraph cluster_s65 {
-			label="LoadShedActuator[14.LoadShedActuator]";margin="50.0";
-			n66[label="load_shed_factor"];
-			{rank=same; n66;};
+	subgraph cluster_s46 {
+		subgraph cluster_s50 {
+			label="ConcurrencyActuator[10.ConcurrencyActuator]";margin="50.0";
+			n51[label="desired_concurrency"];
+			{rank=same; n51;};
 			
 		}
-		subgraph cluster_s62 {
-			label="Scheduler[14.Scheduler]";margin="50.0";
-			n63[label="accepted_concurrency"];
-			n64[label="incoming_concurrency"];
-			{rank=same; n63;n64;};
+		subgraph cluster_s47 {
+			label="Scheduler[10.Scheduler]";margin="50.0";
+			n48[label="accepted_concurrency"];
+			n49[label="incoming_concurrency"];
+			{rank=same; n48;n49;};
 			
 		}
-		label="ConcurrencyLimiter[14]";margin="50.0";
+		label="ConcurrencyLimiter[10]";margin="50.0";
 		
 	}
-	subgraph cluster_s67 {
-		label="Decider[15]";margin="50.0";
-		n68[label="lhs"];
-		n70[label="output"];
-		n69[label="rhs"];
-		n69->n70[style="invis"];
-		{rank=same; n68;n69;};
-		{rank=same; n70;};
+	subgraph cluster_s52 {
+		label="Decider[11]";margin="50.0";
+		n54[label="lhs"];
+		n55[label="output"];
+		n53[label="rhs"];
+		n54->n55[style="invis"];
+		{rank=same; n55;};
+		{rank=same; n53;n54;};
 		
 	}
-	subgraph cluster_s50 {
-		label="EMA[12]";margin="50.0";
-		n51[label="input"];
-		n52[label="max_envelope"];
-		n53[label="output"];
-		n52->n53[style="invis"];
-		{rank=same; n51;n52;};
-		{rank=same; n53;};
+	subgraph cluster_s35 {
+		label="EMA[8]";margin="50.0";
+		n37[label="input"];
+		n36[label="max_envelope"];
+		n38[label="output"];
+		n37->n38[style="invis"];
+		{rank=same; n36;n37;};
+		{rank=same; n38;};
 		
 	}
-	subgraph cluster_s54 {
-		label="Gradient[13]";margin="50.0";
-		n56[label="control_variable"];
-		n55[label="max"];
-		n59[label="optimize"];
-		n60[label="output"];
-		n58[label="setpoint"];
-		n57[label="signal"];
-		n59->n60[style="invis"];
-		{rank=same; n55;n56;n57;n58;n59;};
-		{rank=same; n60;};
+	subgraph cluster_s39 {
+		label="Gradient[9]";margin="50.0";
+		n40[label="control_variable"];
+		n44[label="max"];
+		n43[label="optimize"];
+		n45[label="output"];
+		n42[label="setpoint"];
+		n41[label="signal"];
+		n44->n45[style="invis"];
+		{rank=same; n45;};
+		{rank=same; n40;n41;n42;n43;n44;};
 		
 	}
-	subgraph cluster_s41 {
-		label="Max[9]";margin="50.0";
-		n43[label="10.00"];
-		n42[label="inputs"];
-		n44[label="output"];
-		n43->n42;
-		n42->n44[style="invis"];
-		{rank=same; n44;};
-		{rank=same; n42;n42;};
+	subgraph cluster_s26 {
+		label="Max[5]";margin="50.0";
+		n28[label="10.00"];
+		n27[label="inputs"];
+		n29[label="output"];
+		n28->n27;
+		n27->n29[style="invis"];
+		{rank=same; n29;};
+		{rank=same; n27;n27;};
 		
 	}
-	subgraph cluster_s38 {
-		label="Min[8]";margin="50.0";
-		n39[label="inputs"];
-		n40[label="output"];
-		n39->n40[style="invis"];
-		{rank=same; n39;n39;};
-		{rank=same; n40;};
+	subgraph cluster_s33 {
+		label="PromQL[7]";margin="50.0";
+		n34[label="output"];
+		{rank=same; n34;};
 		
 	}
-	subgraph cluster_s48 {
-		label="PromQL[11]";margin="50.0";
-		n49[label="output"];
-		{rank=same; n49;};
+	subgraph cluster_s30 {
+		label="Sqrt[6]";margin="50.0";
+		n31[label="input"];
+		n32[label="output"];
+		n31->n32[style="invis"];
+		{rank=same; n31;};
+		{rank=same; n32;};
 		
 	}
-	subgraph cluster_s45 {
-		label="Sqrt[10]";margin="50.0";
-		n46[label="input"];
-		n47[label="output"];
-		n46->n47[style="invis"];
-		{rank=same; n47;};
-		{rank=same; n46;};
-		
-	}
-	subgraph cluster_s71 {
-		label="Switcher[16]";margin="50.0";
-		n74[label="10.00"];
-		n75[label="on_false"];
-		n73[label="on_true"];
-		n76[label="output"];
-		n72[label="switch"];
-		n74->n73;
-		n75->n76[style="invis"];
-		{rank=same; n72;n73;n75;};
-		{rank=same; n76;};
-		
-	}
-	subgraph cluster_s77 {
-		label="Switcher[17]";margin="50.0";
-		n80[label="0.00"];
-		n81[label="on_false"];
-		n79[label="on_true"];
-		n82[label="output"];
-		n78[label="switch"];
-		n80->n79;
-		n81->n82[style="invis"];
-		{rank=same; n82;};
-		{rank=same; n78;n79;n81;};
+	subgraph cluster_s56 {
+		label="Switcher[12]";margin="50.0";
+		n59[label="100.00"];
+		n60[label="on_false"];
+		n58[label="on_true"];
+		n61[label="output"];
+		n57[label="switch"];
+		n59->n58;
+		n60->n61[style="invis"];
+		{rank=same; n57;n58;n60;};
+		{rank=same; n61;};
 		
 	}
 	rankdir="LR";splines="ortho";
-	n63->n22;
-	n63->n39;
-	n63->n46;
-	n63->n56;
-	n64->n12;
-	n64->n17;
-	n60->n13;
-	n76->n59;
-	n18->n66;
-	n44->n55;
-	n37->n39;
-	n10->n58;
-	n23->n42;
-	n28->n69;
-	n33->n35;
-	n47->n30;
-	n49->n2;
-	n49->n51;
-	n49->n57;
-	n49->n68;
-	n82->n36;
-	n5->n52;
-	n14->n16;
-	n70->n72;
-	n70->n78;
-	n40->n75;
-	n40->n81;
-	n53->n9;
-	n53->n25;
+	n48->n14;
+	n48->n31;
+	n48->n40;
+	n10->n42;
+	n20->n53;
+	n32->n24;
+	n5->n36;
+	n25->n60;
+	n55->n57;
+	n61->n43;
+	n15->n27;
+	n29->n44;
+	n34->n2;
+	n34->n37;
+	n34->n41;
+	n34->n54;
+	n38->n7;
+	n38->n17;
+	n45->n51;
 	
 }

@@ -30,26 +30,6 @@ spec:
       - arithmetic_combinator:
           in_ports:
             lhs:
-              signal_name: INCOMING_CONCURRENCY
-            rhs:
-              signal_name: DESIRED_CONCURRENCY
-          operator: sub
-          out_ports:
-            output:
-              signal_name: DELTA_CONCURRENCY
-      - arithmetic_combinator:
-          in_ports:
-            lhs:
-              signal_name: DELTA_CONCURRENCY
-            rhs:
-              signal_name: INCOMING_CONCURRENCY
-          operator: div
-          out_ports:
-            output:
-              signal_name: LSF
-      - arithmetic_combinator:
-          in_ports:
-            lhs:
               constant_value: "2.0"
             rhs:
               signal_name: ACCEPTED_CONCURRENCY
@@ -76,24 +56,6 @@ spec:
           operator: add
           out_ports:
             output:
-              signal_name: CONCURRENCY_INCREMENT_SINGLE_TICK
-      - arithmetic_combinator:
-          in_ports:
-            lhs:
-              signal_name: CONCURRENCY_INCREMENT_SINGLE_TICK
-            rhs:
-              signal_name: CONCURRENCY_INCREMENT_FEEDBACK
-          operator: add
-          out_ports:
-            output:
-              signal_name: CONCURRENCY_INCREMENT_INTEGRAL
-      - min:
-          in_ports:
-            inputs:
-              - signal_name: CONCURRENCY_INCREMENT_INTEGRAL
-              - signal_name: ACCEPTED_CONCURRENCY
-          out_ports:
-            output:
               signal_name: CONCURRENCY_INCREMENT_NORMAL
       - max:
           in_ports:
@@ -110,7 +72,7 @@ spec:
           out_ports:
             output:
               signal_name: SQRT_CONCURRENCY_INCREMENT
-          scale: "0.1"
+          scale: "1.0"
       - promql:
           evaluation_interval: 1s
           out_ports:
@@ -152,10 +114,10 @@ spec:
               signal_name: DESIRED_CONCURRENCY
           slope: "-1"
       - concurrency_limiter:
-          load_shed_actuator:
+          concurrency_actuator:
             in_ports:
-              load_shed_factor:
-                signal_name: LSF
+              desired_concurrency:
+                signal_name: DESIRED_CONCURRENCY
           scheduler:
             auto_tokens: true
             default_workload_parameters:
@@ -189,23 +151,12 @@ spec:
             on_false:
               signal_name: CONCURRENCY_INCREMENT_NORMAL
             on_true:
-              constant_value: "10.0"
+              constant_value: "100.0"
             switch:
               signal_name: IS_OVERLOAD_SWITCH
           out_ports:
             output:
               signal_name: CONCURRENCY_INCREMENT
-      - switcher:
-          in_ports:
-            on_false:
-              signal_name: CONCURRENCY_INCREMENT_NORMAL
-            on_true:
-              constant_value: 0
-            switch:
-              signal_name: IS_OVERLOAD_SWITCH
-          out_ports:
-            output:
-              signal_name: CONCURRENCY_INCREMENT_FEEDBACK
     evaluation_interval: 0.5s
   resources:
     classifiers: []

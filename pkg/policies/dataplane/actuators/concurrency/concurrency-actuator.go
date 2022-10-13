@@ -198,11 +198,13 @@ type concurrencyActuator struct {
 }
 
 func (ca *concurrencyActuator) concurrencyUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := ca.statusRegistry.GetLogger()
 	ca.lock.Lock()
 	defer ca.lock.Unlock()
+	logger.Info().Msg("concurrencyUpdateCallback")
 
 	concurrencyDecision, err := ca.processConcurrencyEvent(event, unmarshaller)
-	if err != nil {
+	if err == nil {
 		ca.concurrencyDecision = concurrencyDecision
 	}
 
@@ -210,11 +212,13 @@ func (ca *concurrencyActuator) concurrencyUpdateCallback(event notifiers.Event, 
 }
 
 func (ca *concurrencyActuator) defaultConcurrencyUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := ca.statusRegistry.GetLogger()
 	ca.lock.Lock()
 	defer ca.lock.Unlock()
+	logger.Info().Msg("defaultConcurrencyUpdateCallback")
 
 	defaultConcurrencyDecision, err := ca.processConcurrencyEvent(event, unmarshaller)
-	if err != nil {
+	if err == nil {
 		ca.defaultConcurrencyDecision = defaultConcurrencyDecision
 	}
 
@@ -222,11 +226,13 @@ func (ca *concurrencyActuator) defaultConcurrencyUpdateCallback(event notifiers.
 }
 
 func (ca *concurrencyActuator) multiplierUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := ca.statusRegistry.GetLogger()
 	ca.lock.Lock()
 	defer ca.lock.Unlock()
+	logger.Info().Msg("multiplierUpdateCallback")
 
 	concurrencyMultiplierDecision, err := ca.processMultiplierEvent(event, unmarshaller)
-	if err != nil {
+	if err == nil {
 		ca.concurrencyMultiplierDecision = concurrencyMultiplierDecision
 	}
 
@@ -243,9 +249,14 @@ func (ca *concurrencyActuator) updateConcurrency() {
 			ca.basicTokenBucket.SetPassThrough(false)
 		} else {
 			logger.Info().Msg("Using concurrency decision")
-			concurrency := ca.concurrencyDecision.GetDemand() * ca.concurrencyMultiplierDecision.Multiplier
-			ca.basicTokenBucket.SetFillRate(ca.clock.Now(), concurrency)
-			ca.basicTokenBucket.SetPassThrough(false)
+			// Ensure that tick concurrency decision and multiplier's ticks match
+			if ca.concurrencyDecision.GetTick() == ca.concurrencyMultiplierDecision.GetTick() {
+				concurrency := ca.concurrencyDecision.GetDemand() * ca.concurrencyMultiplierDecision.Multiplier
+				ca.basicTokenBucket.SetFillRate(ca.clock.Now(), concurrency)
+				ca.basicTokenBucket.SetPassThrough(false)
+			} else {
+				logger.Debug().Msg("Concurrency decision and multiplier's ticks do not match. Wait until they match to update concurrency")
+			}
 		}
 	} else {
 		ca.basicTokenBucket.SetPassThrough(true)

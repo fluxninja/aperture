@@ -12,6 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/common"
@@ -54,7 +55,7 @@ func NewConcurrencyActuatorAndOptions(
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	multiplierEtcdPath := path.Join(common.ConcurrencyDemandDecisionsPath,
+	multiplierEtcdPath := path.Join(common.ConcurrencyMultiplierDecisionsPath,
 		common.DataplaneComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex)))
 	demandDefaultEtcdPath := path.Join(common.ConcurrencyDemandDefaultDecisionsPath,
 		common.DataplaneComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex)))
@@ -122,6 +123,7 @@ func (ca *ConcurrencyActuator) setupWriter(etcdClient *etcdclient.Client, lifecy
 
 // Execute implements runtime.Component.Execute.
 func (ca *ConcurrencyActuator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+	log.Info().Msg("Executing Concurrency Actuator")
 	logger := ca.policyReadAPI.GetStatusRegistry().GetLogger()
 	var errMulti error
 

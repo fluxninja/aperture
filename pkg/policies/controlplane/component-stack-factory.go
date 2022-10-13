@@ -77,6 +77,25 @@ func newComponentStackAndOptions(
 
 			// Append loadShedActuator options
 			options = append(options, loadShedActuatorOptions)
+		} else if concurrencyActuatorProto := concurrencyLimiterProto.GetConcurrencyActuator(); concurrencyActuatorProto != nil {
+			concurrencyActuator, concurrencyActuatorOptions, concurrencyActuatorErr := concurrency.NewConcurrencyActuatorAndOptions(concurrencyActuatorProto, componentStackIndex, policyReadAPI, agentGroupName)
+			if concurrencyActuatorErr != nil {
+				return runtime.CompiledComponent{}, nil, nil, concurrencyActuatorErr
+			}
+			concurrencyActuatorMapStruct, err := encodeMapStruct(concurrencyActuatorProto)
+			if err != nil {
+				return runtime.CompiledComponent{}, nil, nil, err
+			}
+			// Append concurrencyActuator as a runtime.CompiledComponent
+			compiledComponents = append(compiledComponents, runtime.CompiledComponent{
+				Component:     concurrencyActuator,
+				MapStruct:     concurrencyActuatorMapStruct,
+				Name:          "ConcurrencyActuator",
+				ComponentType: runtime.ComponentTypeSink,
+			})
+
+			// Append concurrencyActuator options
+			options = append(options, concurrencyActuatorOptions)
 		}
 
 		concurrencyLimiterMapStruct, err := encodeMapStruct(concurrencyLimiterProto)
