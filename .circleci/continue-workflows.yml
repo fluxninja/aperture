@@ -527,7 +527,6 @@ workflows:
           docker-context: sdks/aperture-go/
           dockerfile: Dockerfile
           dockerhub-image: fluxninja/aperture-go-example
-          use-buildkit: true
           tag: "0.1.0"
       - validate-sdk:
           name: validate-aperture-go
