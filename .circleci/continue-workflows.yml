@@ -356,6 +356,18 @@ jobs:
     environment:
       DOCKER_BUILDKIT: 1
     parameters:
+      setup-remote-docker:
+        type: boolean
+        description: Setup and use CircleCI's remote Docker environment
+        default: true
+      use-docker-layer-caching:
+        type: boolean
+        description: Setup docker layer caching for optimized build
+        default: false
+      remote-docker-version:
+        type: string
+        description: Specify the remote docker version
+        default: 20.10.6
       docker-context:
         type: string
         description:
@@ -405,6 +417,12 @@ jobs:
         description: Port to expose on SDK's example container.
     steps:
       - checkout
+      - when:
+          condition: <<parameters.setup-remote-docker>>
+          steps:
+            - setup_remote_docker:
+                docker_layer_caching: <<parameters.use-docker-layer-caching>>
+                version: <<parameters.remote-docker-version>>
       - aperture_docker_build:
           docker-context: <<parameters.docker-context>>
           dockerfile: <<parameters.dockerfile>>
