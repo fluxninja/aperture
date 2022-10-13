@@ -8,6 +8,7 @@ import (
 	"net"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/panichandler"
@@ -26,7 +28,7 @@ import (
 const (
 	defaultKey                 = "dist_cache"
 	olricMemberlistServiceName = "olric-memberlist"
-	distCacheMetricsJobName    = "scrape-metrics"
+	distCacheMetricsJobName    = "dist-cache-scrape-metrics"
 )
 
 // Module provides a new DistCache FX module.
@@ -61,9 +63,10 @@ type DistCacheConfig struct {
 // DistCache is a peer to peer distributed cache.
 type DistCache struct {
 	sync.Mutex
-	Config  *olricconfig.Config
-	Olric   *olric.Olric
-	Metrics *DistCacheMetrics
+	Config   *olricconfig.Config
+	Olric    *olric.Olric
+	Metrics  *DistCacheMetrics
+	jobGroup *jobs.JobGroup
 }
 
 // AddDMapCustomConfig adds a named DMap config into DistCache's config.
@@ -77,8 +80,7 @@ func (dc *DistCache) RemoveDMapCustomConfig(name string) {
 	delete(dc.Config.DMaps.Custom, name)
 }
 
-// ScrapeMetrics scrapes metrics from DistCache DMap statistics.
-func (dc *DistCache) ScrapeMetrics(context.Context) (proto.Message, error) {
+func (dc *DistCache) scrapeMetrics(context.Context) (proto.Message, error) {
 	stats, err := dc.Olric.Stats()
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
@@ -139,11 +141,12 @@ func (dc *DistCache) ScrapeMetrics(context.Context) (proto.Message, error) {
 type DistCacheConstructorIn struct {
 	fx.In
 	PeerDiscovery      *peers.PeerDiscovery
+	PrometheusRegistry *prometheus.Registry
+	JobGroup           *jobs.JobGroup `name:"liveness"`
 	Unmarshaller       config.Unmarshaller
 	Lifecycle          fx.Lifecycle
 	Shutdowner         fx.Shutdowner
 	Logger             *log.Logger
-	PrometheusRegistry *prometheus.Registry
 }
 
 // DistCacheConstructor holds fields to create an instance of *DistCache.
@@ -232,6 +235,20 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	}
 
 	dc.Olric = o
+
+	dc.jobGroup = in.JobGroup
+	job := &jobs.BasicJob{
+		JobBase: jobs.JobBase{
+			JobName: distCacheMetricsJobName,
+		},
+		JobFunc: dc.scrapeMetrics,
+	}
+	jobConfig := jobs.JobConfig{
+		InitialDelay:     config.MakeDuration(0),
+		ExecutionPeriod:  config.MakeDuration(time.Millisecond * 500),
+		ExecutionTimeout: config.MakeDuration(time.Millisecond * 1000),
+		InitiallyHealthy: false,
+	}
 	dc.Metrics = newDistCacheMetrics()
 
 	in.Lifecycle.Append(fx.Hook{
@@ -251,11 +268,15 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				_ = in.Shutdowner.Shutdown()
 			})
 			// wait for olric to start by waiting on startChan until ctx is canceled
-			// register the scrpae metrics job after the olric started
 			select {
 			case <-ctx.Done():
 				return errors.New("olric failed to start")
 			case <-startChan:
+				err := dc.jobGroup.RegisterJob(job, jobConfig)
+				if err != nil {
+					log.Error().Err(err).Msg("Failed to register distcache scrape metrics job with jobGroup")
+					return err
+				}
 			}
 			return nil
 		},
@@ -264,6 +285,12 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			err := dc.Metrics.unregisterMetrics(in.PrometheusRegistry)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to unregister distcache metrics with Prometheus registry")
+				return err
+			}
+
+			err = dc.jobGroup.DeregisterJob(distCacheMetricsJobName)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to deregister distcache scrape metrics job with jobGroup")
 				return err
 			}
 
