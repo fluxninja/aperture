@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
+	"sync"
 	"time"
 
 	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -242,7 +244,9 @@ type scalarResultBroker struct {
 	err   error
 	cb    scalarResultCallback
 	query string
-	res   float64
+	// lock to protect concurrent access to the result
+	lock sync.RWMutex
+	res  float64
 }
 
 // Make sure scalarResultBroker complies with the jobResultBroker interface.
@@ -257,24 +261,29 @@ func (srb *scalarResultBroker) getQuery() string {
 }
 
 func (srb *scalarResultBroker) deliverResult() {
+	srb.lock.RLock()
 	srb.cb(srb.res, srb.err)
 }
 
 func (srb *scalarResultBroker) handleResult(_ context.Context, value float64, cbArgs ...interface{}) (proto.Message, error) {
+	srb.lock.Lock()
 	srb.res = value
-	srb.cb(value, nil)
+	srb.err = nil
 	return wrapperspb.Double(value), nil
 }
 
 func (srb *scalarResultBroker) handleError(err error, cbArgs ...interface{}) (proto.Message, error) {
+	srb.lock.Lock()
+	srb.res = math.NaN()
 	srb.err = err
-	srb.cb(0, err)
-	return nil, err
+	return nil, errors.New("invalid ScalaResult, error in prometheus query")
 }
 
 type taggedResultBroker struct {
-	cb    promResultCallback
-	job   jobs.Job
+	cb  promResultCallback
+	job jobs.Job
+	// lock to protect concurrent access to the result
+	lock  sync.RWMutex
 	res   prometheusmodel.Value
 	err   error
 	query string
@@ -292,19 +301,20 @@ func (prb *taggedResultBroker) getQuery() string {
 }
 
 func (prb *taggedResultBroker) deliverResult() {
+	prb.lock.RLock()
 	prb.cb(prb.res, prb.err)
 }
 
 func (prb *taggedResultBroker) handleResult(_ context.Context, value prometheusmodel.Value, cbArgs ...interface{}) (proto.Message, error) {
 	prb.res = value
-	prb.cb(value, nil)
+	prb.err = nil
 	return nil, nil
 }
 
 func (prb *taggedResultBroker) handleError(err error, cbArgs ...interface{}) (proto.Message, error) {
 	prb.err = err
-	prb.cb(nil, err)
-	return nil, err
+	prb.res = nil
+	return nil, errors.New("invalid taggedResult, error in prometheus query")
 }
 
 // Job Register can determine the type of job to register.
