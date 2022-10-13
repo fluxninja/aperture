@@ -251,9 +251,9 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			}
 
 			panichandler.Go(func() {
-				err = dc.Olric.Start()
-				if err != nil {
-					log.Error().Err(err).Msg("Failed to start distcache")
+				startErr := dc.Olric.Start()
+				if startErr != nil {
+					log.Error().Err(startErr).Msg("Failed to start distcache")
 				}
 				_ = in.Shutdowner.Shutdown()
 			})
