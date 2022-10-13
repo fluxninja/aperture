@@ -365,12 +365,6 @@ jobs:
       dockerhub-image:
         type: string
         description: Name for Docker image
-      gcr-registry:
-        type: string
-        description: Google Container Registry to push images to
-      gcr-image:
-        type: string
-        description: A name for the image pushed to GCR
       path:
         type: string
         description:
@@ -380,6 +374,16 @@ jobs:
         type: string
         description: A Docker image tag
         default: ${CIRCLE_SHA1:0:8}
+      registry:
+        type: string
+        default: docker.io
+        description: Name of registry to use, defaults to docker.io
+      gcr-registry:
+        type: string
+        description: Google Container Registry to push images to
+      gcr-image:
+        type: string
+        description: A name for the image pushed to GCR
       port:
         type: string
         default: "8089"
@@ -398,14 +402,20 @@ jobs:
         description: Port to expose on SDK's example container.
     steps:
       - checkout
-      - build-push-add-tag:
-          gcr-registry: <<parameters.gcr-registry>>
-          gcr-image: <<parameters.gcr-image>>
-          path: <<parameters.path>>
+      - aperture_docker_build:
           docker-context: <<parameters.docker-context>>
           dockerfile: <<parameters.dockerfile>>
-          dockerhub-image: <<parameters.dockerhub-image>>
+          image: <<parameters.dockerhub-image>>
+          path: <<parameters.path>>
           tag: <<parameters.tag>>
+          use-buildkit: true
+      - aperture_docker_tag:
+          source-registry: <<parameters.registry>>
+          source-image: <<parameters.dockerhub-image>>
+          source-tag: <<parameters.tag>>
+          dest-registry: <<parameters.gcr-registry>>
+          dest-image: <<parameters.gcr-image>>
+          dest-tag: <<parameters.tag>>
       - asdf_install:
           cache_name: pre-commit
           tools: |-
@@ -413,7 +423,7 @@ jobs:
       - run:
           name: Run SDK validator
           command: |
-            go run cmd/sdk-validator/main.go -sdk-docker-image=<<parameters.dockerhub-image>>:<<parameters.tag>> -port=<<parameters.port>> -requests=<<parameters.requests>> -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
+            go run cmd/sdk-validator/main.go -sdk-docker-image=<<parameters.dest-registry>>/<<parameters.dest-image>>:<<parameters.dest-tag>> -port=<<parameters.port>> -requests=<<parameters.requests>> -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
 
   gen-push-java-stubs:
     executor: python-cimg-executor
