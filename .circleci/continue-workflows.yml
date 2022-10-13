@@ -544,7 +544,6 @@ workflows:
           docker-image: fluxninja/aperture-go-example
           docker-context: sdks/aperture-go/
           dockerfile: Dockerfile
-          use-buildkit: true
 
   push-to-aperture-java:
     when:
