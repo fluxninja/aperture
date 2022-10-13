@@ -540,11 +540,9 @@ workflows:
     jobs:
       - validate-sdk:
           name: validate-aperture-go
-          docker_image: fluxninja/aperture-go-example:0.1.0
+          docker-image: fluxninja/aperture-go-example
           docker-context: sdks/aperture-go/
           dockerfile: Dockerfile
-          image: fluxninja/aperture-go-example
-          tag: fluxninja/aperture-go-example:0.1.0
           use-buildkit: true
 
   push-to-aperture-java:
