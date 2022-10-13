@@ -81,6 +81,7 @@ func main() {
 
 	mux.HandleFunc("/super", a.SuperHandler)
 	mux.HandleFunc("/connected", a.ConnectedHandler)
+	mux.HandleFunc("/health", a.HealthHandler)
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -100,7 +101,7 @@ func main() {
 	}
 }
 
-// SuperHandler handles HTTP requests on /super API endpoint.
+// SuperHandler handles HTTP requests on /super endpoint.
 func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 
@@ -131,7 +132,7 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ConnectedHandler handles HTTP requests on /connected API endpoint.
+// ConnectedHandler handles HTTP requests on /connected endpoint.
 func (a *app) ConnectedHandler(w http.ResponseWriter, r *http.Request) {
 	a.grpcClient.Connect()
 	state := a.grpcClient.GetState()
@@ -139,6 +140,12 @@ func (a *app) ConnectedHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 	}
 	_, _ = w.Write([]byte(state.String()))
+}
+
+// HealthHandler handles HTTP requests on /health endpoint.
+func (a *app) HealthHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte("Healthy"))
 }
 
 func getEnvOrDefault(envName, defaultValue string) string {
