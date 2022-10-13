@@ -13,10 +13,12 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/peers"
 )
@@ -73,6 +75,64 @@ func (dc *DistCache) AddDMapCustomConfig(name string, dmapConfig olricconfig.DMa
 // RemoveDMapCustomConfig removes a named DMap config from DistCache's config.
 func (dc *DistCache) RemoveDMapCustomConfig(name string) {
 	delete(dc.Config.DMaps.Custom, name)
+}
+
+// ScrapeMetrics scrapes metrics from DistCache DMap statistics.
+func (dc *DistCache) ScrapeMetrics(context.Context) (proto.Message, error) {
+	stats, err := dc.Olric.Stats()
+	if err != nil {
+		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
+		return nil, err
+	}
+
+	memberID := stats.Member.ID
+	memberName := stats.Member.Name
+	metricLabels := make(prometheus.Labels)
+	metricLabels[metrics.DistCacheMemberIDLabel] = strconv.FormatUint(memberID, 10)
+	metricLabels[metrics.DistCacheMemberNameLabel] = memberName
+
+	entriesTotalGauge, err := dc.Metrics.EntriesTotal.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract entries total gauge metric from olric instance: %v", err)
+	} else {
+		entriesTotalGauge.Set(float64(stats.DMaps.EntriesTotal))
+	}
+
+	deleteHitsGauge, err := dc.Metrics.DeleteHits.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract delete hits gauge metric from olric instance: %v", err)
+	} else {
+		deleteHitsGauge.Set(float64(stats.DMaps.DeleteHits))
+	}
+
+	deleteMissesGague, err := dc.Metrics.DeleteMisses.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract delete misses gauge metric from olric instance: %v", err)
+	} else {
+		deleteMissesGague.Set(float64(stats.DMaps.DeleteMisses))
+	}
+
+	getMissesGague, err := dc.Metrics.GetMisses.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract get misses gauge metric from olric instance: %v", err)
+	} else {
+		getMissesGague.Set(float64(stats.DMaps.GetMisses))
+	}
+
+	getHitsGague, err := dc.Metrics.GetHits.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract get hits gauge metric from olric instance: %v", err)
+	} else {
+		getHitsGague.Set(float64(stats.DMaps.GetHits))
+	}
+
+	evictedTotalGague, err := dc.Metrics.EvictedTotal.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract evicted total gauge metric from olric instance: %v", err)
+	} else {
+		evictedTotalGague.Set(float64(stats.DMaps.EvictedTotal))
+	}
+	return nil, nil
 }
 
 // DistCacheConstructorIn holds parameters of ProvideDistCache.
