@@ -79,11 +79,6 @@ func (job *HTTPJob) JobWatchers() JobWatchers {
 	return job.BasicJob.JobWatchers()
 }
 
-// JobMetrics returns the job metrics for the job.
-func (job *HTTPJob) JobMetrics() JobMetrics {
-	return job.BasicJob.JobMetrics()
-}
-
 // Execute executes the job.
 func (job *HTTPJob) Execute(ctx context.Context) (proto.Message, error) {
 	return job.BasicJob.Execute(ctx)

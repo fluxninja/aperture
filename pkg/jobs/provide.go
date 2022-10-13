@@ -92,7 +92,6 @@ func registerSelfChecks(sc SelfChecksIn) {
 	liveness := &BasicJob{
 		JobBase: JobBase{
 			JobName: "job-module",
-			JMS:     NewJobMetrics(),
 		},
 		JobFunc: checkSelfLiveness,
 	}
@@ -105,7 +104,6 @@ func registerSelfChecks(sc SelfChecksIn) {
 	readiness := &BasicJob{
 		JobBase: JobBase{
 			JobName: "job-module",
-			JMS:     NewJobMetrics(),
 		},
 		JobFunc: checkSelfReadiness,
 	}
