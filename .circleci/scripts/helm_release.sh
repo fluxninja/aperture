@@ -4,12 +4,12 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/fluxninja/aperture.git"
+REPO_URL="git@github.com:fluxninja/aperture.git"
 BRANCH="gh-pages"
 TARGET_DIR="."
 INDEX_DIR="."
 CHARTS_URL="https://fluxninja.github.io/aperture/"
-COMMIT_EMAIL="${CIRCLE_PROJECT_USERNAME}@users.noreply.github.com"
+COMMIT_EMAIL="ops@fluxninja.com"
 
 CHARTS=()
 CHARTS_TMP_DIR=$(mktemp -d)
@@ -79,7 +79,6 @@ upload(){
   cd aperture
   git config user.name "${CIRCLE_PROJECT_USERNAME}"
   git config user.email "${COMMIT_EMAIL}"
-  git remote set-url origin "${REPO_URL}"
   git checkout "${BRANCH}"
 
   charts=$(cd "${CHARTS_TMP_DIR}" && find . -print0 | xargs -0)
