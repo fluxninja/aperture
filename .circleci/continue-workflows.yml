@@ -390,7 +390,8 @@ jobs:
       - aperture_docker_build:
           docker-context: <<parameters.docker-context>>
           dockerfile: <<parameters.dockerfile>>
-          image: <<parameters.dockerhub-image>>
+          image: <<parameters.docker-image>>
+          tag: <<parameters.tag>>
           use-buildkit: true
       - run:
           name: Run SDK validator
