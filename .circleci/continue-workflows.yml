@@ -430,21 +430,22 @@ jobs:
           path: <<parameters.path>>
           tag: <<parameters.tag>>
           use-buildkit: true
-      # - aperture_docker_tag:
-      #     source-registry: <<parameters.registry>>
-      #     source-image: <<parameters.dockerhub-image>>
-      #     source-tag: <<parameters.tag>>
-      #     dest-registry: <<parameters.gcr-registry>>
-      #     dest-image: <<parameters.gcr-image>>
-      #     dest-tag: <<parameters.tag>>
+      - aperture_docker_tag:
+          source-registry: <<parameters.registry>>
+          source-image: <<parameters.dockerhub-image>>
+          source-tag: <<parameters.tag>>
+          dest-registry: <<parameters.gcr-registry>>
+          dest-image: <<parameters.gcr-image>>
+          dest-tag: <<parameters.tag>>
       - asdf_install:
           cache_name: pre-commit
           tools: |-
             golang
+      - gcp-gcr/gcr-auth
       - run:
           name: Run SDK validator
           command: |
-            go run cmd/sdk-validator/main.go -sdk-docker-image=<<parameters.registry>>/<<parameters.dockerhub-image>>:<<parameters.tag>> -port=<<parameters.port>> -requests=<<parameters.requests>> -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
+            go run cmd/sdk-validator/main.go -sdk-docker-image=<<parameters.gcr-registry>>/<<parameters.gcr-image>>:<<parameters.tag>> -port=<<parameters.port>> -requests=<<parameters.requests>> -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
 
   gen-push-java-stubs:
     executor: python-cimg-executor
