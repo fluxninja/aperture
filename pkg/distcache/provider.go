@@ -13,19 +13,21 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
-	"go.uber.org/multierr"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/peers"
 )
 
 const (
-	defaultKey                 = "distcache"
+	defaultKey                 = "dist_cache"
 	olricMemberlistServiceName = "olric-memberlist"
-	distCacheMetricsJobName    = "scrape-metrics"
+	distCacheMetricsJobName    = "dist-cache-scrape-metrics"
 )
 
 // Module provides a new DistCache FX module.
@@ -60,8 +62,9 @@ type DistCacheConfig struct {
 // DistCache is a peer to peer distributed cache.
 type DistCache struct {
 	sync.Mutex
-	Config *olricconfig.Config
-	Olric  *olric.Olric
+	Config  *olricconfig.Config
+	Olric   *olric.Olric
+	Metrics *DistCacheMetrics
 }
 
 // AddDMapCustomConfig adds a named DMap config into DistCache's config.
@@ -75,18 +78,76 @@ func (dc *DistCache) RemoveDMapCustomConfig(name string) {
 	delete(dc.Config.DMaps.Custom, name)
 }
 
+func (dc *DistCache) scrapeMetrics(context.Context) (proto.Message, error) {
+	stats, err := dc.Olric.Stats()
+	if err != nil {
+		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
+		return nil, err
+	}
+
+	memberID := stats.Member.ID
+	memberName := stats.Member.Name
+	metricLabels := make(prometheus.Labels)
+	metricLabels[metrics.DistCacheMemberIDLabel] = strconv.FormatUint(memberID, 10)
+	metricLabels[metrics.DistCacheMemberNameLabel] = memberName
+
+	entriesTotalGauge, err := dc.Metrics.EntriesTotal.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract entries total gauge metric from olric instance: %v", err)
+	} else {
+		entriesTotalGauge.Set(float64(stats.DMaps.EntriesTotal))
+	}
+
+	deleteHitsGauge, err := dc.Metrics.DeleteHits.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract delete hits gauge metric from olric instance: %v", err)
+	} else {
+		deleteHitsGauge.Set(float64(stats.DMaps.DeleteHits))
+	}
+
+	deleteMissesGauge, err := dc.Metrics.DeleteMisses.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract delete misses gauge metric from olric instance: %v", err)
+	} else {
+		deleteMissesGauge.Set(float64(stats.DMaps.DeleteMisses))
+	}
+
+	getMissesGauge, err := dc.Metrics.GetMisses.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract get misses gauge metric from olric instance: %v", err)
+	} else {
+		getMissesGauge.Set(float64(stats.DMaps.GetMisses))
+	}
+
+	getHitsGauge, err := dc.Metrics.GetHits.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract get hits gauge metric from olric instance: %v", err)
+	} else {
+		getHitsGauge.Set(float64(stats.DMaps.GetHits))
+	}
+
+	evictedTotalGauge, err := dc.Metrics.EvictedTotal.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract evicted total gauge metric from olric instance: %v", err)
+	} else {
+		evictedTotalGauge.Set(float64(stats.DMaps.EvictedTotal))
+	}
+	return nil, nil
+}
+
 // DistCacheConstructorIn holds parameters of ProvideDistCache.
 type DistCacheConstructorIn struct {
 	fx.In
 	PeerDiscovery      *peers.PeerDiscovery
+	PrometheusRegistry *prometheus.Registry
+	LivenessMultiJob   *jobs.MultiJob `name:"liveness.service"`
 	Unmarshaller       config.Unmarshaller
 	Lifecycle          fx.Lifecycle
 	Shutdowner         fx.Shutdowner
 	Logger             *log.Logger
-	PrometheusRegistry *prometheus.Registry
 }
 
-// DistCacheConstructor holds fields to create an instance of *DistCache.
+// DistCacheConstructor holds fields to create an instance of DistCache.
 type DistCacheConstructor struct {
 	ConfigKey     string
 	DefaultConfig DistCacheConfig
@@ -100,8 +161,6 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		log.Error().Err(err).Msg("Unable to deserialize configuration of DistCache")
 		return nil, err
 	}
-
-	dc := &DistCache{}
 
 	memberlistEnv := "lan"
 	oc := olricconfig.New(memberlistEnv)
@@ -164,19 +223,38 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		startChan <- struct{}{}
 	}
 
-	dc.Config = oc
-
-	o, err := olric.New(dc.Config)
+	o, err := olric.New(oc)
 	if err != nil {
 		return nil, err
 	}
 
-	dc.Olric = o
+	dc := &DistCache{
+		Config:  oc,
+		Olric:   o,
+		Metrics: newDistCacheMetrics(),
+	}
+
+	job := &jobs.BasicJob{
+		JobBase: jobs.JobBase{
+			JobName: distCacheMetricsJobName,
+		},
+		JobFunc: dc.scrapeMetrics,
+	}
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
+			// Register metrics with Prometheus.
+			err := dc.Metrics.registerMetrics(in.PrometheusRegistry)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to register distcache metrics with Prometheus registry")
+				return err
+			}
+
 			panichandler.Go(func() {
-				err = dc.Olric.Start()
+				startErr := dc.Olric.Start()
+				if startErr != nil {
+					log.Error().Err(startErr).Msg("Failed to start distcache")
+				}
 				_ = in.Shutdowner.Shutdown()
 			})
 			// wait for olric to start by waiting on startChan until ctx is canceled
@@ -185,15 +263,33 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				return errors.New("olric failed to start")
 			case <-startChan:
 			}
+
+			err = in.LivenessMultiJob.RegisterJob(job)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to register distcache scrape metrics job with jobGroup")
+				return err
+			}
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			var multiErr error
+			err := in.LivenessMultiJob.DeregisterJob(distCacheMetricsJobName)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to deregister distcache scrape metrics job with jobGroup")
+				return err
+			}
+
 			err = dc.Olric.Shutdown(ctx)
 			if err != nil {
-				multiErr = multierr.Append(multiErr, err)
+				return err
 			}
-			return multiErr
+
+			// Unregister metrics with Prometheus.
+			err = dc.Metrics.unregisterMetrics(in.PrometheusRegistry)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to unregister distcache metrics with Prometheus registry")
+				return err
+			}
+			return nil
 		},
 	})
 
