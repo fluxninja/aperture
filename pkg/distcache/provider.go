@@ -250,6 +250,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	job := &jobs.BasicJob{
 		JobBase: jobs.JobBase{
 			JobName: distCacheMetricsJobName,
+			JMS:     jobs.NewJobMetrics(),
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
