@@ -352,6 +352,9 @@ jobs:
 
   validate-sdk:
     executor: base-cimg-executor
+    resource_class: small
+    environment:
+      DOCKER_BUILDKIT: 1
     parameters:
       docker-context:
         type: string
