@@ -13,6 +13,7 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
+	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/fluxninja/aperture/pkg/config"
@@ -272,24 +273,25 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
+			var multiErr error
 			err := in.LivenessMultiJob.DeregisterJob(distCacheMetricsJobName)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to deregister distcache scrape metrics job with jobGroup")
-				return err
+				multiErr = multierr.Append(multiErr, err)
 			}
 
 			err = dc.Olric.Shutdown(ctx)
 			if err != nil {
-				return err
+				multiErr = multierr.Append(multiErr, err)
 			}
 
 			// Unregister metrics with Prometheus.
 			err = dc.Metrics.unregisterMetrics(in.PrometheusRegistry)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to unregister distcache metrics with Prometheus registry")
-				return err
+				multiErr = multierr.Append(multiErr, err)
 			}
-			return nil
+			return multiErr
 		},
 	})
 
