@@ -37,6 +37,12 @@
   withExtrapolatorMixin(extrapolator):: {
     extrapolator+: extrapolator,
   },
+  withFirstValid(first_valid):: {
+    first_valid: first_valid,
+  },
+  withFirstValidMixin(first_valid):: {
+    first_valid+: first_valid,
+  },
   withGradientController(gradient_controller):: {
     gradient_controller: gradient_controller,
   },
