@@ -364,7 +364,7 @@ jobs:
         default: Dockerfile
       dockerhub-image:
         type: string
-        description: A name for your Docker image
+        description: Name for Docker image
       gcr-registry:
         type: string
         description: Google Container Registry to push images to
