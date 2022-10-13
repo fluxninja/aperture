@@ -56,6 +56,7 @@ local loadShed = spec.v1.LoadShedActuator;
 local max = spec.v1.Max;
 local min = spec.v1.Min;
 local sqrt = spec.v1.Sqrt;
+local firstValid = spec.v1.FirstValid;
 
 function(params) {
   _config:: defaults + params,
@@ -99,7 +100,12 @@ function(params) {
           component.withMin(
             min.new()
             + min.withInPorts({ inputs: [port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL'), port.withSignalName('ACCEPTED_CONCURRENCY')] })
-            + min.withOutPorts({ output: port.withSignalName('CONCURRENCY_INCREMENT_NORMAL') }),
+            + min.withOutPorts({ output: port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL_CAPPED') }),
+          ),
+          component.withFirstValid(
+            firstValid.new()
+            + firstValid.withInPorts({ inputs: [port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL_CAPPED'), port.withConstantValue(0)] })
+            + firstValid.withOutPorts({ output: port.withSignalName('CONCURRENCY_INCREMENT_NORMAL') }),
           ),
           component.withMax(
             max.new()

@@ -50,32 +50,32 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 	}
 	md := origMd.Clone()
 	err := otelcollector.IterateMetrics(md, func(metric pmetric.Metric) error {
-		switch metric.DataType() {
-		case pmetric.MetricDataTypeGauge:
+		switch metric.Type() {
+		case pmetric.MetricTypeGauge:
 			dataPoints := metric.Gauge().DataPoints()
 			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
 				dp := dataPoints.At(dpIt)
 				ep.enrichMetrics(dp.Attributes())
 			}
-		case pmetric.MetricDataTypeSum:
+		case pmetric.MetricTypeSum:
 			dataPoints := metric.Sum().DataPoints()
 			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
 				dp := dataPoints.At(dpIt)
 				ep.enrichMetrics(dp.Attributes())
 			}
-		case pmetric.MetricDataTypeSummary:
+		case pmetric.MetricTypeSummary:
 			dataPoints := metric.Summary().DataPoints()
 			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
 				dp := dataPoints.At(dpIt)
 				ep.enrichMetrics(dp.Attributes())
 			}
-		case pmetric.MetricDataTypeHistogram:
+		case pmetric.MetricTypeHistogram:
 			dataPoints := metric.Histogram().DataPoints()
 			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
 				dp := dataPoints.At(dpIt)
 				ep.enrichMetrics(dp.Attributes())
 			}
-		case pmetric.MetricDataTypeExponentialHistogram:
+		case pmetric.MetricTypeExponentialHistogram:
 			dataPoints := metric.ExponentialHistogram().DataPoints()
 			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
 				dp := dataPoints.At(dpIt)
@@ -92,7 +92,7 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 	if !ok {
 		return
 	}
-	hostName := hostNamex.StringVal()
+	hostName := hostNamex.Str()
 	hostEntity, err := ep.cache.GetByName(hostName)
 	attributes.Remove(otelcollector.EntityNameLabel)
 	if err != nil {
@@ -101,7 +101,7 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 	}
 	servicesValue := pcommon.NewValueSlice()
 	for _, service := range hostEntity.Services {
-		servicesValue.SliceVal().AppendEmpty().SetStringVal(service)
+		servicesValue.Slice().AppendEmpty().SetStr(service)
 	}
 	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
 }

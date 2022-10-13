@@ -143,6 +143,15 @@ func NewComponentAndOptions(
 			Name:          "Extrapolator",
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
+	} else if firstValid := componentProto.GetFirstValid(); firstValid != nil {
+		component, option, err := components.NewFirstValidAndOptions(firstValid, componentIndex, policyReadAPI)
+		mapStruct, err := encodeMapStructOnNilErr(firstValid, err)
+		return runtime.CompiledComponent{
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "FirstValid",
+			ComponentType: runtime.ComponentTypeSignalProcessor,
+		}, nil, option, err
 	} else {
 		// Try Component Stack Factory
 		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)

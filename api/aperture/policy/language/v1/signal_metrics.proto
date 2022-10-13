@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package aperture.policy.language.v1;
+
+message SignalMetricsInfo {
+  // Name of the Policy.
+  string policy_name = 1;
+  // Hash of the entire Policy spec.
+  string policy_hash = 2;
+  // List of signals readings.
+  repeated SignalReading signal_reading = 3;
+}
+
+message SignalReading {
+  string signal_name = 1;
+  bool valid = 2;
+  double value = 3;
+}

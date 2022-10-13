@@ -130,7 +130,7 @@ up and sent to the analytics database in the cloud. This allows:
 
 For classifier-created labels, you can disable this behaviour by setting
 `hidden: true` in
-[the classification rule](/references/configuration/policies.md#v1-rule).
+[the classification rule](/references/configuration/policy.md#v1-rule).
 
 :::
 

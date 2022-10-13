@@ -1,8 +1,8 @@
-label: API
+label: Introspection API
 position: 2
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "API"
+  title: "Introspection API"
   keywords: ["api"]

@@ -20,6 +20,7 @@ import (
 
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
+	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/entitycache"
@@ -211,6 +212,11 @@ func (h *Heartbeats) newHeartbeat(
 		peers = h.peersWatcher.GetPeers()
 	}
 
+	policies := &wrappersv1.PolicyWrappers{}
+	if h.policyFactory != nil {
+		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
+	}
+
 	return &heartbeatv1.ReportRequest{
 		VersionInfo:    info.GetVersionInfo(),
 		ProcessInfo:    info.GetProcessInfo(),
@@ -220,7 +226,7 @@ func (h *Heartbeats) newHeartbeat(
 		Peers:          peers,
 		ServicesList:   servicesList,
 		AllStatuses:    h.statusRegistry.GetGroupStatus(),
-		Policies:       h.policyFactory.GetPolicies(),
+		Policies:       policies,
 	}
 }
 

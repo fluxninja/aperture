@@ -51,6 +51,12 @@
 
 ### FluxMeter Dashboard
 
-| Parameter Name         | Parameter Type | Default      | Description                                                               |
-| ---------------------- | -------------- | ------------ | ------------------------------------------------------------------------- |
-| `dashboard.policyName` | `string`       | `(required)` | A name of the policy used as a promQL query filter for flux meter metrics |
+| Parameter Name         | Parameter Type | Default      | Description              |
+| ---------------------- | -------------- | ------------ | ------------------------ |
+| `dashboard.policyName` | `string`       | `(required)` | Dashboard Configuration. |
+
+### Signals Dashboard
+
+| Parameter Name                | Parameter Type | Default      | Description              |
+| ----------------------------- | -------------- | ------------ | ------------------------ |
+| `signalsDashboard.policyName` | `string`       | `(required)` | Dashboard Configuration. |

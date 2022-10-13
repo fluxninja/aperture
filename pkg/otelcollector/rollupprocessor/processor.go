@@ -119,7 +119,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 			datasketches[key] = make(map[string]*sketches.HeapDoublesSketch)
 		}
 		rawCount, _ := rollupData[key].Get(RollupCountKey)
-		rollupData[key].PutInt(RollupCountKey, rawCount.IntVal()+1)
+		rollupData[key].PutInt(RollupCountKey, rawCount.Int()+1)
 		rp.rollupAttributes(datasketches[key], rollupData[key], logRecord.Attributes(), rollupsLog)
 		return nil
 	})
