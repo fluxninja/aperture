@@ -521,6 +521,8 @@ workflows:
     when: << pipeline.parameters.updated-aperture-go >>
     jobs:
       - build-push-add-tag:
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/aperture-go-example
           path: sdks/aperture-go/
           docker-context: sdks/aperture-go/
           dockerfile: Dockerfile
