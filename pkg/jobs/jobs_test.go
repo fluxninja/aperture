@@ -23,6 +23,7 @@ var (
 	jobGroup, err = createJobGroup() // Job group is created globally so that it can be used to schedule jobs contained in all tests, otherwise a jobgroup per test needs to be created
 	jws           JobWatchers
 	gws           GroupWatchers
+	jms           = NewJobMetrics()
 	jobConfig     = JobConfig{ // Job configuration can be manipulated in each test to test different scenarios, no need to create new job config for each test
 		InitialDelay:     config.MakeDuration(0),
 		ExecutionPeriod:  config.MakeDuration(time.Millisecond * 200),
@@ -164,6 +165,7 @@ func TestInstantRunJob(t *testing.T) {
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "instant-run-job",
+			JMS:     jms,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -197,6 +199,7 @@ func TestTimeoutJob(t *testing.T) {
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "timeout-job",
+			JMS:     jms,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			time.Sleep(time.Millisecond * 4000)
@@ -233,6 +236,7 @@ func TestMultiJobRun(t *testing.T) {
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
+			JMS:     jms,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -247,6 +251,7 @@ func TestMultiJobRun(t *testing.T) {
 	job2 := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job2",
+			JMS:     jms,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -287,6 +292,7 @@ func TestMultipleBasicJobs(t *testing.T) {
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
+			JMS:     jms,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -301,6 +307,7 @@ func TestMultipleBasicJobs(t *testing.T) {
 	job2 := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job2",
+			JMS:     jms,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -337,6 +344,7 @@ func TestMultipleMultiJobs(t *testing.T) {
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
+			JMS:     jms,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -351,6 +359,7 @@ func TestMultipleMultiJobs(t *testing.T) {
 	job2 := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job2",
+			JMS:     jms,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -366,6 +375,7 @@ func TestMultipleMultiJobs(t *testing.T) {
 	job3 := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job3",
+			JMS:     jms,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -403,6 +413,7 @@ func TestSameJobTwiceAndSchedulingErrors(t *testing.T) {
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
+			JMS:     jms,
 		},
 		JobFunc: func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -424,7 +435,7 @@ func TestSameJobTwiceAndSchedulingErrors(t *testing.T) {
 
 	jobGroup.DeregisterAll()
 	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName})
-	// error when registering job multiple times, written here to achieve more coverage
+	// error when deregistering job multiple times, written here to achieve more coverage
 	err = jobGroup.DeregisterJob(job.Name())
 	require.Errorf(t, err, "Expected error when deregistering job multiple times")
 	require.Empty(t, jobGroup.JobInfo(job.Name()), "Expected error when getting job info, because job was already deregistered")
@@ -434,6 +445,7 @@ func TestEmptyJobFunc(t *testing.T) {
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
+			JMS:     jms,
 		},
 		JobFunc: nil,
 	}
