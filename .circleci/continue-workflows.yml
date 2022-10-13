@@ -352,7 +352,6 @@ jobs:
 
   validate-sdk:
     executor: base-machine-executor
-    resource_class: small
     environment:
       DOCKER_BUILDKIT: 1
     parameters:
