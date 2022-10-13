@@ -186,13 +186,15 @@ func runDockerContainer(image string, port string) (string, error) {
 	if err = cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return "", err
 	}
+	time.Sleep(time.Second * 2)
 
 	for {
 		containerJSON, err := cli.ContainerInspect(ctx, resp.ID)
 		if err != nil {
 			return "", err
 		}
-		if containerJSON.State.Health.Status == "Healthy" {
+		// log.Info().Interface("containerJSON", containerJSON).Msg("inspect")
+		if containerJSON.State.Health.Status == "healthy" {
 			return resp.ID, nil
 		}
 	}
