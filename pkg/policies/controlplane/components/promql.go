@@ -145,10 +145,6 @@ func (pje *promJobsExecutor) registerScalarJob(
 		query: query,
 	}
 	job := &jobs.BasicJob{
-		JobBase: jobs.JobBase{
-			JobName: jobName,
-			JMS:     jobs.NewJobMetrics(),
-		},
 		JobFunc: prometheus.NewScalarQueryJob(
 			query,
 			endTimestamp,
@@ -158,6 +154,7 @@ func (pje *promJobsExecutor) registerScalarJob(
 			scalarResBroker.handleError,
 		),
 	}
+	job.JobName = jobName
 	scalarResBroker.job = job
 	pje.jobResBrokers[jobName] = scalarResBroker
 }
@@ -176,10 +173,6 @@ func (pje *promJobsExecutor) registerTaggedJob(
 		query: query,
 	}
 	job := &jobs.BasicJob{
-		JobBase: jobs.JobBase{
-			JobName: jobName,
-			JMS:     jobs.NewJobMetrics(),
-		},
 		JobFunc: prometheus.NewPromQueryJob(
 			query,
 			endTimestamp,
@@ -189,6 +182,7 @@ func (pje *promJobsExecutor) registerTaggedJob(
 			taggedResBroker.handleError,
 		),
 	}
+	job.JobName = jobName
 	taggedResBroker.job = job
 	pje.jobResBrokers[jobName] = taggedResBroker
 }

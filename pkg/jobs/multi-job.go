@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"go.uber.org/fx"
-	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
@@ -13,7 +12,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // MultiJobConfig holds configuration for MultiJob.
@@ -49,7 +47,6 @@ func (mjc MultiJobConstructor) provideMultiJob(
 	gws GroupWatchers,
 	jws JobWatchers,
 	jg *JobGroup,
-	prometheusRegistry *prometheus.Registry,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (*MultiJob, error) {
@@ -78,17 +75,12 @@ func (mjc MultiJobConstructor) provideMultiJob(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			var multiErr error
 			// Register multijob
 			err := jg.RegisterJob(mj, config.JobConfig)
 			if err != nil {
-				multiErr = multierr.Append(multiErr, err)
+				return err
 			}
-			err = mj.JMS.registerJobMetrics(prometheusRegistry)
-			if err != nil {
-				multiErr = multierr.Append(multiErr, err)
-			}
-			return multiErr
+			return nil
 		},
 		OnStop: func(context.Context) error {
 			// Deregister all jobs
@@ -116,7 +108,6 @@ func NewMultiJob(registry status.Registry, jws JobWatchers, gws GroupWatchers) *
 		JobBase: JobBase{
 			JobName: registry.Key(),
 			JWS:     jws,
-			JMS:     NewJobMetrics(),
 		},
 		gt: newGroupTracker(gws, registry),
 	}
@@ -130,11 +121,6 @@ func (mj *MultiJob) Name() string {
 // JobWatchers returns the list of job watchers.
 func (mj *MultiJob) JobWatchers() JobWatchers {
 	return mj.JobBase.JobWatchers()
-}
-
-// JobMetrics returns the job metrics.
-func (mj *MultiJob) JobMetrics() JobMetrics {
-	return mj.JobBase.JobMetrics()
 }
 
 // Execute executes all jobs, collects that results, and returns the aggregated status.
