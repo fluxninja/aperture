@@ -442,7 +442,7 @@ jobs:
           image: <<parameters.gcr-image>>
           tag: <<parameters.tag>>
       - asdf_install:
-          cache_name: pre-commit
+          cache_name: validate-sdk
           tools: |-
             golang
       - run:
@@ -465,7 +465,7 @@ jobs:
             - "14:8a:b9:90:ba:48:a4:f0:27:b0:70:d7:95:17:16:1e" # fluxninja/aperture-java R/W
       - run: *install_opsninja
       - asdf_install:
-          cache_name: pre-commit
+          cache_name: gen-push-java-stubs
           tools: |-
             buf
       - run:
