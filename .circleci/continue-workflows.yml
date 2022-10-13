@@ -351,7 +351,7 @@ jobs:
           when: always
 
   validate-sdk:
-    executor: base-cimg-executor
+    executor: base-machine-executor
     resource_class: small
     environment:
       DOCKER_BUILDKIT: 1
@@ -411,16 +411,6 @@ jobs:
         description: Port to expose on SDK's example container.
     steps:
       - checkout
-      - when:
-          condition: <<parameters.setup-remote-docker>>
-          steps:
-            - setup_remote_docker:
-                docker_layer_caching: <<parameters.use-docker-layer-caching>>
-                version: <<parameters.remote-docker-version>>
-      - run:
-          name: Run local docker registry
-          command: |
-            docker run -d -p 5000:5000 --restart=always --name registry registry:2
       - aperture_docker_build:
           docker-context: <<parameters.docker-context>>
           dockerfile: <<parameters.dockerfile>>
@@ -429,10 +419,6 @@ jobs:
           tag: <<parameters.tag>>
           registry: <<parameters.registry>>
           use-buildkit: true
-      - run:
-          name: Push to local docker registry
-          command: |
-            docker push <<parameters.registry>>/<<parameters.dockerhub-image>>:<<parameters.tag>>
       - asdf_install:
           cache_name: validate-sdk
           tools: |-
