@@ -391,14 +391,8 @@ jobs:
         default: ${CIRCLE_SHA1:0:8}
       registry:
         type: string
-        default: docker.io
+        default: localhost:5000
         description: Name of registry to use, defaults to docker.io
-      gcr-registry:
-        type: string
-        description: Google Container Registry to push images to
-      gcr-image:
-        type: string
-        description: A name for the image pushed to GCR
       port:
         type: string
         default: "8089"
@@ -423,24 +417,22 @@ jobs:
             - setup_remote_docker:
                 docker_layer_caching: <<parameters.use-docker-layer-caching>>
                 version: <<parameters.remote-docker-version>>
+      - run:
+          name: Run local docker registry
+          command: |
+            docker run -d -p 5000:5000 --restart=always --name registry registry:2
       - aperture_docker_build:
           docker-context: <<parameters.docker-context>>
           dockerfile: <<parameters.dockerfile>>
           image: <<parameters.dockerhub-image>>
           path: <<parameters.path>>
           tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
           use-buildkit: true
-      - aperture_docker_tag:
-          source-registry: <<parameters.registry>>
-          source-image: <<parameters.dockerhub-image>>
-          source-tag: <<parameters.tag>>
-          dest-registry: <<parameters.gcr-registry>>
-          dest-image: <<parameters.gcr-image>>
-          dest-tag: <<parameters.tag>>
-      - gcp-gcr/gcr-auth
-      - gcp-gcr/push-image:
-          image: <<parameters.gcr-image>>
-          tag: <<parameters.tag>>
+      - run:
+          name: Push to local docker registry
+          command: |
+            docker push <<parameters.registry>>/<<parameters.dockerhub-image>>:<<parameters.tag>>
       - asdf_install:
           cache_name: validate-sdk
           tools: |-
@@ -593,12 +585,10 @@ workflows:
     jobs:
       - validate-sdk:
           name: validate-aperture-go
-          gcr-registry: gcr.io/devel-309501
-          gcr-image: cf-fn/aperture-go-example
           path: sdks/aperture-go
           docker-context: sdks/aperture-go
           dockerfile: Dockerfile
-          dockerhub-image: fluxninja/aperture-go-example
+          dockerhub-image: aperture-go-example
 
   push-to-aperture-java:
     when:
