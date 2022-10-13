@@ -570,7 +570,8 @@ workflows:
           name: validate-aperture-go
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-go-example
-          docker-context: sdks/aperture-go
+          path: sdks/aperture-go
+          docker-context: .
           dockerfile: Dockerfile
           dockerhub-image: fluxninja/aperture-go-example
 
