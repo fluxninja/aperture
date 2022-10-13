@@ -63,7 +63,7 @@ func (dm *DistCacheMetrics) registerMetrics(prometheusRegistry *prometheus.Regis
 		err := prometheusRegistry.Register(m)
 		if err != nil {
 			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-				return fmt.Errorf("unable to register metrics: %v", err)
+				return fmt.Errorf("unable to register distcache metrics: %v", err)
 			}
 		}
 	}
@@ -73,7 +73,7 @@ func (dm *DistCacheMetrics) registerMetrics(prometheusRegistry *prometheus.Regis
 func (dm *DistCacheMetrics) unregisterMetrics(prometheusRegistry *prometheus.Registry) error {
 	for _, m := range dm.allMetrics() {
 		if !prometheusRegistry.Unregister(m) {
-			return fmt.Errorf("unable to unregister distcache metric")
+			return fmt.Errorf("unable to unregister distcache metrics")
 		}
 	}
 	return nil

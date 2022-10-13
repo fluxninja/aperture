@@ -13,7 +13,6 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
-	"go.uber.org/multierr"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
@@ -177,8 +176,18 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
+			// Register metrics with Prometheus.
+			err := dc.Metrics.registerMetrics(in.PrometheusRegistry)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to register distcache metrics with Prometheus registry")
+				return err
+			}
+
 			panichandler.Go(func() {
 				err = dc.Olric.Start()
+				if err != nil {
+					log.Error().Err(err).Msg("Failed to start distcache")
+				}
 				_ = in.Shutdowner.Shutdown()
 			})
 			// wait for olric to start by waiting on startChan until ctx is canceled
@@ -191,12 +200,18 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			var multiErr error
+			// Unregister metrics with Prometheus.
+			err := dc.Metrics.unregisterMetrics(in.PrometheusRegistry)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to unregister distcache metrics with Prometheus registry")
+				return err
+			}
+
 			err = dc.Olric.Shutdown(ctx)
 			if err != nil {
-				multiErr = multierr.Append(multiErr, err)
+				return err
 			}
-			return multiErr
+			return nil
 		},
 	})
 
