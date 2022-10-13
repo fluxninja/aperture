@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	defaultKey                 = "distcache"
+	defaultKey                 = "dist_cache"
 	olricMemberlistServiceName = "olric-memberlist"
 	distCacheMetricsJobName    = "scrape-metrics"
 )
@@ -60,8 +60,9 @@ type DistCacheConfig struct {
 // DistCache is a peer to peer distributed cache.
 type DistCache struct {
 	sync.Mutex
-	Config *olricconfig.Config
-	Olric  *olric.Olric
+	Config  *olricconfig.Config
+	Olric   *olric.Olric
+	Metrics *DistCacheMetrics
 }
 
 // AddDMapCustomConfig adds a named DMap config into DistCache's config.
@@ -172,6 +173,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	}
 
 	dc.Olric = o
+	dc.Metrics = newDistCacheMetrics()
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -180,6 +182,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				_ = in.Shutdowner.Shutdown()
 			})
 			// wait for olric to start by waiting on startChan until ctx is canceled
+			// register the scrpae metrics job after the olric started
 			select {
 			case <-ctx.Done():
 				return errors.New("olric failed to start")
