@@ -437,11 +437,14 @@ jobs:
           dest-registry: <<parameters.gcr-registry>>
           dest-image: <<parameters.gcr-image>>
           dest-tag: <<parameters.tag>>
+      - gcp-gcr/gcr-auth
+      - gcp-gcr/push-image:
+          image: <<parameters.gcr-image>>
+          tag: <<parameters.tag>>
       - asdf_install:
           cache_name: pre-commit
           tools: |-
             golang
-      - gcp-gcr/gcr-auth
       - run:
           name: Run SDK validator
           command: |
