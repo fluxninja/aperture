@@ -302,7 +302,7 @@ func DOT(components []*languagev1.ComponentView, links []*languagev1.Link) strin
 	}
 	for i := range links {
 		g.Edge(clusters[links[i].Source.ComponentId].Node(links[i].Source.PortName),
-			clusters[links[i].Target.ComponentId].Node(links[i].Target.PortName))
+			clusters[links[i].Target.ComponentId].Node(links[i].Target.PortName)).Attr("label", links[i].SignalName)
 	}
 	return g.String()
 }
