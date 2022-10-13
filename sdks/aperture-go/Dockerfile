@@ -12,6 +12,7 @@ FROM alpine:3.15.0
 
 COPY --from=builder /src/aperture-go-example /local/bin/aperture-go-example
 
-HEALTHCHECK CMD curl --fail http://localhost:8080/health || exit 1
+HEALTHCHECK --interval=1s --timeout=3s --retries=3 --start-period=1s \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 ENTRYPOINT ["/local/bin/aperture-go-example"]

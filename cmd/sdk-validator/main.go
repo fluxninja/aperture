@@ -187,7 +187,15 @@ func runDockerContainer(image string, port string) (string, error) {
 		return "", err
 	}
 
-	return resp.ID, nil
+	for {
+		containerJSON, err := cli.ContainerInspect(ctx, resp.ID)
+		if err != nil {
+			return "", err
+		}
+		if containerJSON.State.Health.Status == "Healthy" {
+			return resp.ID, nil
+		}
+	}
 }
 
 func stopDockerContainer(id string) error {
