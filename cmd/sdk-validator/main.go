@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"os"
@@ -158,13 +157,6 @@ func runDockerContainer(image string, port string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	reader, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
-	if err != nil {
-		return "", err
-	}
-	defer reader.Close()
-	_, _ = io.Copy(os.Stdout, reader)
 
 	exposedPorts, portBindings, _ := nat.ParsePortSpecs([]string{
 		fmt.Sprintf("0.0.0.0:%s:%s", port, port),
