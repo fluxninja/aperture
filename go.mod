@@ -284,6 +284,6 @@ exclude github.com/prometheus/prometheus v1.8.2
 
 replace (
 	cloud.google.com/go => cloud.google.com/go v0.100.2
-	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.62.1-fn.patch.1
-	go.opentelemetry.io/collector/pdata => github.com/fluxninja/opentelemetry-collector/pdata v0.62.1-fn.patch.1
+	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.62.1-fn.patch.2
+	go.opentelemetry.io/collector/pdata => github.com/fluxninja/opentelemetry-collector/pdata v0.62.1-fn.patch.2
 )

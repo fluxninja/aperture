@@ -72,9 +72,9 @@ func AgentOTELComponents(
 	tsw := &otlpreceiver.TraceServerWrapper{}
 	msw := &otlpreceiver.MetricServerWrapper{}
 	lsw := &otlpreceiver.LogServerWrapper{}
-	ptraceotlp.RegisterServer(serverGRPC, tsw)
-	pmetricotlp.RegisterServer(serverGRPC, msw)
-	plogotlp.RegisterServer(serverGRPC, lsw)
+	ptraceotlp.RegisterGRPCServer(serverGRPC, tsw)
+	pmetricotlp.RegisterGRPCServer(serverGRPC, msw)
+	plogotlp.RegisterGRPCServer(serverGRPC, lsw)
 
 	receivers, err := component.MakeReceiverFactoryMap(
 		otlpreceiver.NewFactory(tsw, msw, lsw),
