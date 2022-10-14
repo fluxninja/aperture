@@ -125,7 +125,7 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "30s",
+  "refresh": "10s",
   "rows": [],
   "schemaVersion": 18,
   "style": "dark",
