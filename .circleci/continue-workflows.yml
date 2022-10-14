@@ -580,6 +580,7 @@ workflows:
     when: << pipeline.parameters.updated-aperture-go >>
     jobs:
       - validate-publish-sdk:
+          name: validate-publish-aperture-go
           path: sdks/aperture-go
           docker-context: sdks/aperture-go
           dockerfile: Dockerfile
