@@ -41,10 +41,12 @@ var _ = Describe("Validator", Ordered, func() {
 	validateRequest := func(req *admissionv1.AdmissionRequest, message string) {
 		ok, msg, err := policyValidator.ValidateObject(context.TODO(), req)
 		if message == "" {
+			// Expecting Validation to be successful
 			Expect(err).NotTo(HaveOccurred())
 			Expect(msg).To(BeEmpty())
 			Expect(ok).To(BeTrue())
 		} else {
+			// Expecting Validation to fail
 			Expect(err).NotTo(HaveOccurred())
 			Expect(msg).To(Equal(message))
 			Expect(ok).To(BeFalse())
@@ -63,7 +65,16 @@ var _ = Describe("Validator", Ordered, func() {
 		validateRequest(validateExample(classificationPolicy), "")
 	})
 
-	It("does not accept example policy without ConcurrencyLimiter.selector for demoapp", func() {
+	It("accepts example policy for demoapp without PromQL.evalutation_interval", func() {
+		promQlEvaluationInterval :=
+			`evaluation_interval: "1s"
+          `
+		policy := strings.ReplaceAll(latencyGradientPolicy, promQlEvaluationInterval, "")
+		request := validateExample(policy)
+		validateRequest(request, "")
+	})
+
+	It("does not accept example policy for demoapp without ConcurrencyLimiter.selector ", func() {
 		concurrencyLimiterSelector :=
 			`concurrency_limiter:
           selector:
@@ -78,7 +89,7 @@ var _ = Describe("Validator", Ordered, func() {
 		validateRequest(request, msg)
 	})
 
-	It("does not accept example policy with default Workload Priority 2000 for demoapp", func() {
+	It("does not accept example policy for demoapp with default Workload Priority 2000", func() {
 		workloadPriority :=
 			`default_workload_parameters:
               priority: 20`
