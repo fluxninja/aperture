@@ -280,7 +280,7 @@ jobs:
             export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
-            pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
+            pip install 'git+ssh://git@github.com/fluxninja/cloud@mirror-repo#egg=opsninja&subdirectory=ops/apps/opsninja/'
       - restore_cache:
           name: Restore go cache
           keys:
@@ -350,48 +350,44 @@ jobs:
             git diff --cached --exit-code
           when: always
 
-  validate-sdk:
+  validate-mirror-sdk:
     executor: base-machine-executor
     environment:
       DOCKER_BUILDKIT: 1
     parameters:
-      setup-remote-docker:
-        type: boolean
-        description: Setup and use CircleCI's remote Docker environment
-        default: true
-      use-docker-layer-caching:
-        type: boolean
-        description: Setup docker layer caching for optimized build
-        default: false
-      remote-docker-version:
-        type: string
-        description: Specify the remote docker version
-        default: 20.10.6
       docker-context:
         type: string
         description:
-          Path to the directory containing your build context, defaults to .
+          Path to the directory containing your build context, defaults to "".
         default: .
       dockerfile:
         type: string
-        description: Name of dockerfile to use, defaults to Dockerfile
+        description: Name of docker file to use, defaults to Dockerfile.
         default: Dockerfile
-      dockerhub-image:
+      docker-image:
         type: string
         description: Name for Docker image
       path:
         type: string
         description:
-          Path to the directory containing your Dockerfile, defaults to .
+          Path to the directory containing your Dockerfile, defaults to "".
         default: .
       tag:
         type: string
-        description: A Docker image tag
+        description: Docker image tag.
         default: ${CIRCLE_SHA1:0:8}
       registry:
         type: string
-        default: localhost:5000
-        description: Name of registry to use, defaults to docker.io
+        default: docker.io
+        description: Name of registry to use, defaults to docker.io.
+      remote-repo:
+        type: string
+        default: ""
+        description: Remote repository to mirror the SDK to.
+      remote-repo-fingerprint:
+        type: string
+        default: ""
+        description: Fingerprint of remote repository to mirror the SDK to.
       port:
         type: string
         default: "8089"
@@ -410,10 +406,15 @@ jobs:
         description: Port to expose on SDK's example container.
     steps:
       - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
+            - <<parameters.remote-repo-fingerprint>> # fluxninja/<sdk> R/W
+      - run: *install_opsninja
       - aperture_docker_build:
           docker-context: <<parameters.docker-context>>
           dockerfile: <<parameters.dockerfile>>
-          image: <<parameters.dockerhub-image>>
+          image: <<parameters.docker-image>>
           path: <<parameters.path>>
           tag: <<parameters.tag>>
           registry: <<parameters.registry>>
@@ -426,6 +427,16 @@ jobs:
           name: Run SDK validator
           command: |
             go run cmd/sdk-validator/main.go -sdk-docker-image=<<parameters.registry>>/<<parameters.dockerhub-image>>:<<parameters.tag>> -port=<<parameters.port>> -requests=<<parameters.requests>> -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
+      - run:
+          name: Mirror SDK to <<parameters.remote-repo>>
+          command: |
+            export LOGURU_LEVEL=TRACE
+            export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
+             args=(
+               --remote-repo=<<parameters.remote-repo>>
+               --source-repo-sdk-path=<<parameters.path>>
+             )
+            fn release publish-sdk "${args[@]}"
 
   gen-push-java-stubs:
     executor: python-cimg-executor
@@ -568,12 +579,14 @@ workflows:
   aperture-go:
     when: << pipeline.parameters.updated-aperture-go >>
     jobs:
-      - validate-sdk:
+      - validate-mirror-sdk:
           name: validate-aperture-go
           path: sdks/aperture-go
           docker-context: sdks/aperture-go
           dockerfile: Dockerfile
-          dockerhub-image: aperture-go-example
+          docker-image: aperture-go-example
+          remote-repo-fingerprint: af:55:26:47:84:7f:0e:36:6b:74:25:19:64:4a:f2:41
+          remote-repo: fluxninja/aperture-go
 
   push-to-aperture-java:
     when:
