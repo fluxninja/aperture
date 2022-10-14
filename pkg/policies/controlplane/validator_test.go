@@ -13,7 +13,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/yaml"
 
+	policiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
 )
@@ -53,6 +55,17 @@ var _ = Describe("Validator", Ordered, func() {
 		}
 	}
 
+	extractPolicySpec := func(req *admissionv1.AdmissionRequest) *policiesv1.Policy {
+		var policy policyv1alpha1.Policy
+		err := json.Unmarshal(req.Object.Raw, &policy)
+		Expect(err).NotTo(HaveOccurred())
+
+		policySpec := &policiesv1.Policy{}
+		err = config.UnmarshalYAML(policy.Spec.Raw, policySpec)
+		Expect(err).NotTo(HaveOccurred())
+		return policySpec
+	}
+
 	It("accepts example policy for demoapp", func() {
 		validateRequest(validateExample(latencyGradientPolicy), "")
 	})
@@ -65,12 +78,28 @@ var _ = Describe("Validator", Ordered, func() {
 		validateRequest(validateExample(classificationPolicy), "")
 	})
 
-	It("accepts example policy for demoapp without PromQL evalutation_interval", func() {
+	It("accepts example policy for demoapp without PromQL evalutation_interval and sets it to default 10s", func() {
 		promQlEvaluationInterval :=
 			`evaluation_interval: "1s"
           `
 		policy := strings.ReplaceAll(latencyGradientPolicy, promQlEvaluationInterval, "")
-		validateRequest(validateExample(policy), "")
+		request := validateExample(policy)
+		validateRequest(request, "")
+
+		policySpec := extractPolicySpec(request)
+		Expect(policySpec.Circuit.GetComponents()[0].GetPromql().GetEvaluationInterval().GetSeconds()).To(Equal(int64(10)))
+	})
+
+	It("accepts example policy for rate limit without Circuit evalutation_interval and sets it to default 0.5s", func() {
+		circuitEvaluationInterval :=
+			`evaluation_interval: "0.5s"
+  `
+		policy := strings.ReplaceAll(rateLimitPolicy, circuitEvaluationInterval, "")
+		request := validateExample(policy)
+		validateRequest(request, "")
+
+		policySpec := extractPolicySpec(request)
+		Expect(policySpec.Circuit.GetEvaluationInterval().GetNanos()).To(Equal(int32(500000000)))
 	})
 
 	It("does not accept example policy for demoapp without ConcurrencyLimiter selector ", func() {
