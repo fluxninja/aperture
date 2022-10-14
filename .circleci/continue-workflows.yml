@@ -431,7 +431,7 @@ jobs:
           name: Publish SDK to <<parameters.remote-repo>>
           command: |
             export LOGURU_LEVEL=TRACE
-            export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes -o IdentityAgent=none"
+            export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
              args=(
                --remote-repo=<<parameters.remote-repo>>
                --source-repo-sdk-path=<<parameters.path>>
