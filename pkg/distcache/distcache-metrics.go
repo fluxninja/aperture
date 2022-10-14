@@ -5,10 +5,9 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
-	"go.uber.org/multierr"
 )
 
-// DistCacheMetrics holds metrics from Olric DMap statistics.
+// DistCacheMetrics holds metrics from DistCache, Olric, DMap statistics.
 type DistCacheMetrics struct {
 	EntriesTotal *prometheus.GaugeVec
 	DeleteHits   *prometheus.GaugeVec
@@ -60,43 +59,22 @@ func (dm *DistCacheMetrics) allMetrics() []prometheus.Collector {
 }
 
 func (dm *DistCacheMetrics) registerMetrics(prometheusRegistry *prometheus.Registry) error {
-	var multiErr error
 	for _, m := range dm.allMetrics() {
 		err := prometheusRegistry.Register(m)
 		if err != nil {
 			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-				multiErr = multierr.Append(multiErr, err)
+				return fmt.Errorf("unable to register distcache metrics: %v", err)
 			}
 		}
 	}
-	return multiErr
+	return nil
 }
 
 func (dm *DistCacheMetrics) unregisterMetrics(prometheusRegistry *prometheus.Registry) error {
-	var multiErr error
-	if !prometheusRegistry.Unregister(dm.EntriesTotal) {
-		err := fmt.Errorf("failed to unregister %s metric", metrics.DistCacheEntriesTotalMetricName)
-		multiErr = multierr.Append(multiErr, err)
+	for _, m := range dm.allMetrics() {
+		if !prometheusRegistry.Unregister(m) {
+			return fmt.Errorf("unable to unregister distcache metrics")
+		}
 	}
-	if !prometheusRegistry.Unregister(dm.DeleteHits) {
-		err := fmt.Errorf("failed to unregister %s metric", metrics.DistCacheDeleteHitsMetricName)
-		multiErr = multierr.Append(multiErr, err)
-	}
-	if !prometheusRegistry.Unregister(dm.DeleteMisses) {
-		err := fmt.Errorf("failed to unregister %s metric", metrics.DistCacheDeleteMissesMetricName)
-		multiErr = multierr.Append(multiErr, err)
-	}
-	if !prometheusRegistry.Unregister(dm.GetMisses) {
-		err := fmt.Errorf("failed to unregister %s metric", metrics.DistCacheGetMissesMetricName)
-		multiErr = multierr.Append(multiErr, err)
-	}
-	if !prometheusRegistry.Unregister(dm.GetHits) {
-		err := fmt.Errorf("failed to unregister %s metric", metrics.DistCacheGetHitsMetricName)
-		multiErr = multierr.Append(multiErr, err)
-	}
-	if !prometheusRegistry.Unregister(dm.EvictedTotal) {
-		err := fmt.Errorf("failed to unregister %s metric", metrics.DistCacheEvictedTotalMetricName)
-		multiErr = multierr.Append(multiErr, err)
-	}
-	return multiErr
+	return nil
 }

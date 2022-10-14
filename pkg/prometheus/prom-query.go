@@ -7,6 +7,7 @@ import (
 	"github.com/cenkalti/backoff"
 	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	prometheusmodel "github.com/prometheus/common/model"
+	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -49,7 +50,6 @@ func NewPromQueryJob(
 func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 	var result prometheusmodel.Value
 	var warnings prometheusv1.Warnings
-	var msg proto.Message
 	var err error
 
 	operation := func() error {
@@ -68,12 +68,14 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 		return nil
 	}
 
-	err = backoff.Retry(operation, backoff.WithContext(backoff.NewExponentialBackOff(), jobCtxt))
-	if err != nil {
-		msg, err = pq.errorCallback(err)
-		if err != nil {
-			return msg, err
+	merr := backoff.Retry(operation, backoff.WithContext(backoff.NewExponentialBackOff(), jobCtxt))
+	if merr != nil {
+		msg, cbErr := pq.errorCallback(err)
+		if cbErr != nil {
+			merr = multierr.Combine(merr, cbErr)
 		}
+		log.Error().Err(merr).Msg("Encountered error while executing promQL query")
+		return msg, merr
 	}
 
 	return pq.resultCallback(jobCtxt, result, pq.cbArgs...)

@@ -7,6 +7,7 @@ import (
 
 	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	prometheusmodel "github.com/prometheus/common/model"
+	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -19,6 +20,7 @@ type ScalarResultCallback func(context.Context, float64, ...interface{}) (proto.
 // ScalarQuery is a wrapper that holds prometheus query and the ScalarResultCallback that returns the result of the scalar query.
 type ScalarQuery struct {
 	scalarResultCallback ScalarResultCallback
+	errorCallback        PromErrorCallback
 	query                string
 }
 
@@ -32,23 +34,31 @@ func NewScalarQueryJob(
 	errorCallback PromErrorCallback,
 	cbArgs ...interface{},
 ) jobs.JobCallback {
-	sq := &ScalarQuery{scalarResultCallback: resultCallback, query: query}
+	sq := &ScalarQuery{scalarResultCallback: resultCallback, query: query, errorCallback: errorCallback}
 
 	return NewPromQueryJob(query, endTimestamp, promAPI, timeout, sq.execute, errorCallback, cbArgs...)
 }
 
 func (sq *ScalarQuery) execute(ctx context.Context, value prometheusmodel.Value, cbArgs ...interface{}) (proto.Message, error) {
+	retErr := func(merr error) (proto.Message, error) {
+		msg, cbErr := sq.errorCallback(merr, cbArgs...)
+		if cbErr != nil {
+			merr = multierr.Combine(merr, cbErr)
+		}
+		return msg, merr
+	}
+
 	log.Trace().Msg("ScalarQuery execute")
 	if scalar, ok := value.(*prometheusmodel.Scalar); ok {
 		return sq.scalarResultCallback(ctx, float64(scalar.Value), cbArgs...)
 	} else if vector, ok := value.(prometheusmodel.Vector); ok {
 		if len(vector) == 0 {
-			return nil, fmt.Errorf("no data returned for query: %s", sq.query)
+			return retErr(fmt.Errorf("no data returned for query: %s", sq.query))
 		} else if vector.Len() == 1 {
 			return sq.scalarResultCallback(ctx, float64(vector[0].Value), cbArgs...)
 		} else {
-			return nil, fmt.Errorf("query returned a vector with %d elements, expecting only 1 element. query: %s", vector.Len(), sq.query)
+			return retErr(fmt.Errorf("query returned a vector with %d elements, expecting only 1 element. query: %s", vector.Len(), sq.query))
 		}
 	}
-	return nil, fmt.Errorf("query returned non-scalar value: %v. query string: %s", value, sq.query)
+	return retErr(fmt.Errorf("query returned non-scalar value: %v. query string: %s", value, sq.query))
 }

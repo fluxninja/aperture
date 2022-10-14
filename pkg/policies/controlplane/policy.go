@@ -181,12 +181,9 @@ func (policy *Policy) setupCircuitJob(
 			OnStart: func(_ context.Context) error {
 				// Create a job that runs every tick i.e. evaluation_interval. Set timeout duration to half of evaluation_interval
 				job := jobs.BasicJob{
-					JobBase: jobs.JobBase{
-						JobName: policy.jobName,
-						JMS:     jobs.NewJobMetrics(),
-					},
 					JobFunc: policy.executeTick,
 				}
+				job.JobName = policy.jobName
 				initialDelay := config.MakeDuration(0)
 				executionPeriod := config.MakeDuration(policy.evaluationInterval)
 				executionTimeout := config.MakeDuration(time.Millisecond * 100)

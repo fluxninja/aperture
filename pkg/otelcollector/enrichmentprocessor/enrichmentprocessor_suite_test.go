@@ -29,9 +29,9 @@ func populateAttrsFromLabels(attr pcommon.Map, labels map[string]interface{}) {
 			attr.PutString(k, str)
 		} else if slice, ok := v.([]string); ok {
 			val := pcommon.NewValueSlice()
-			sliceVal := val.SliceVal()
+			sliceVal := val.Slice()
 			for _, s := range slice {
-				sliceVal.AppendEmpty().SetStringVal(s)
+				sliceVal.AppendEmpty().SetStr(s)
 			}
 			val.CopyTo(attr.PutEmpty(k))
 		}
