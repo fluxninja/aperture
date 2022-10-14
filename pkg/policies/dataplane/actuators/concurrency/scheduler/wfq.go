@@ -284,10 +284,12 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (admitted bool, qReque
 	// update timeout value to be global minimum
 	if rContext.Timeout != 0 && rContext.Timeout < sched.minTimeout {
 		// also see - https://github.com/fluxninja/aperture/issues/778
-		if rContext.Timeout > minNonzeroTimeout {
-			sched.minTimeout = rContext.Timeout
-			sched.auditDuration = sched.minTimeout / 2
+		timeout := rContext.Timeout
+		if rContext.Timeout < minNonzeroTimeout {
+			timeout = minNonzeroTimeout
 		}
+		sched.minTimeout = timeout
+		sched.auditDuration = sched.minTimeout / 2
 	}
 
 	if sched.manager.PreprocessRequest(now, rContext) {
