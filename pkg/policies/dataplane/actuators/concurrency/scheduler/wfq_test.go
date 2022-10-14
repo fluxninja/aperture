@@ -117,9 +117,9 @@ func (flow *flowTracker) String() string {
 type flowTrackers []*flowTracker
 
 // // // Ensures clock is updated periodically
-func updateClock(t *testing.T, clk clockwork.FakeClock, timeout time.Duration, flows flowTrackers) {
+func updateClock(t *testing.T, clk clockwork.FakeClock, flows flowTrackers) {
 	// request delay
-	minRequestDelay := timeout
+	minRequestDelay := 1 * time.Second
 	// loop through flows
 	for _, flow := range flows {
 		requestDelay := time.Duration(1e9 / flow.requestRate)
@@ -218,22 +218,21 @@ func Time(duration string) {
 // ------------------------- Benchmark Testing -------------------------
 func BenchmarkBasicTokenBucket(b *testing.B) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload1", requestTokens: 1, priority: 0},
-		{fairnessLabel: "workload2", requestTokens: 1, priority: 0},
-		{fairnessLabel: "workload3", requestTokens: 1, priority: 0},
-		{fairnessLabel: "workload4", requestTokens: 1, priority: 0},
-		{fairnessLabel: "workload5", requestTokens: 1, priority: 0},
+		{fairnessLabel: "workload1", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload2", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload3", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload4", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload5", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
 	}
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
 	manager := NewBasicTokenBucket(startTime, 0, getMetrics().TokenBucketMetrics)
 
-	timeout := 5 * time.Millisecond
 	schedMetrics := &WFQMetrics{
 		FlowsGauge:        wfqFlowsGauge,
 		HeapRequestsGauge: wfqHeapRequestsGauge,
 	}
-	sched := NewWFQScheduler(timeout, manager, c, schedMetrics)
+	sched := NewWFQScheduler(manager, c, schedMetrics)
 
 	b.Logf("iterations: %d", b.N)
 
@@ -248,11 +247,11 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 
 func BenchmarkTokenBucketLoadShed(b *testing.B) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload1", requestTokens: 1, priority: 0},
-		{fairnessLabel: "workload2", requestTokens: 1, priority: 0},
-		{fairnessLabel: "workload3", requestTokens: 1, priority: 0},
-		{fairnessLabel: "workload4", requestTokens: 1, priority: 0},
-		{fairnessLabel: "workload5", requestTokens: 1, priority: 0},
+		{fairnessLabel: "workload1", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload2", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload3", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload4", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload5", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
 	}
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
@@ -260,12 +259,11 @@ func BenchmarkTokenBucketLoadShed(b *testing.B) {
 	manager.SetContinuousTracking(true)
 	manager.SetLoadShedFactor(startTime, 1.0)
 
-	timeout := 5 * time.Millisecond
 	schedMetrics := &WFQMetrics{
 		FlowsGauge:        wfqFlowsGauge,
 		HeapRequestsGauge: wfqHeapRequestsGauge,
 	}
-	sched := NewWFQScheduler(timeout, manager, c, schedMetrics)
+	sched := NewWFQScheduler(manager, c, schedMetrics)
 
 	// bootstrap bucket
 	bootstrapTime := time.Second * 1
@@ -310,10 +308,8 @@ func calculateFillRate(flows flowTrackers, lsf float64) float64 {
 func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, noOfRuns int) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	timeout := 50 * time.Millisecond
-
 	c := clockwork.NewFakeClock()
-	go updateClock(t, c, timeout, flows)
+	go updateClock(t, c, flows)
 
 	startTime := c.Now()
 
@@ -322,7 +318,7 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 		FlowsGauge:        wfqFlowsGauge,
 		HeapRequestsGauge: wfqHeapRequestsGauge,
 	}
-	sched := NewWFQScheduler(timeout, basicBucket, c, metrics)
+	sched := NewWFQScheduler(basicBucket, c, metrics)
 	var wg sync.WaitGroup
 	var acceptedTokenRatio float64
 
@@ -429,6 +425,9 @@ func TestHighRpsFlows(t *testing.T) {
 		{fairnessLabel: "workload2", requestTokens: 5, priority: 0, requestRate: 100},
 		{fairnessLabel: "workload3", requestTokens: 5, priority: 50, requestRate: 100},
 	}
+	for _, flow := range flows {
+		flow.timeout = 50 * time.Millisecond
+	}
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 }
 
@@ -438,6 +437,9 @@ func TestLowRpsFlows(t *testing.T) {
 		{fairnessLabel: "workload1", requestTokens: 20, priority: 3, requestRate: 50},
 		{fairnessLabel: "workload2", requestTokens: 20, priority: 3, requestRate: 50},
 		{fairnessLabel: "workload3", requestTokens: 20, priority: 2, requestRate: 50},
+	}
+	for _, flow := range flows {
+		flow.timeout = 50 * time.Millisecond
 	}
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 }
@@ -449,6 +451,9 @@ func TestMixRpsFlows(t *testing.T) {
 		{fairnessLabel: "workload2", requestTokens: 15, priority: 3, requestRate: 80},
 		{fairnessLabel: "workload3", requestTokens: 10, priority: 2, requestRate: 120},
 	}
+	for _, flow := range flows {
+		flow.timeout = 50 * time.Millisecond
+	}
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 }
 
@@ -458,6 +463,9 @@ func TestSingleHighRequest(t *testing.T) {
 		{fairnessLabel: "workload1", requestTokens: 5, priority: 1, requestRate: 50},
 		{fairnessLabel: "workload2", requestTokens: 5, priority: 1, requestRate: 50},
 		{fairnessLabel: "workload3", requestTokens: 5, priority: 1, requestRate: 50},
+	}
+	for _, flow := range flows {
+		flow.timeout = 50 * time.Millisecond
 	}
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 }
@@ -469,15 +477,21 @@ func TestSingleLowRequest(t *testing.T) {
 		{fairnessLabel: "workload2", requestTokens: 8, priority: 100, requestRate: 100},
 		{fairnessLabel: "workload3", requestTokens: 8, priority: 125, requestRate: 100},
 	}
+	for _, flow := range flows {
+		flow.timeout = 50 * time.Millisecond
+	}
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 }
 
 func TestSingleLowRequestLowTimeout(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", requestTokens: 1, priority: 0, requestRate: 1, timeout: time.Millisecond * 1},
-		{fairnessLabel: "workload1", requestTokens: 8, priority: 75, requestRate: 100},
-		{fairnessLabel: "workload2", requestTokens: 8, priority: 100, requestRate: 100},
-		{fairnessLabel: "workload3", requestTokens: 8, priority: 125, requestRate: 100},
+		{fairnessLabel: "workload0", requestTokens: 1, priority: 0, requestRate: 1, timeout: time.Millisecond},
+		{fairnessLabel: "workload1", requestTokens: 8, priority: 75, requestRate: 100, timeout: 50 * time.Millisecond},
+		{fairnessLabel: "workload2", requestTokens: 8, priority: 100, requestRate: 100, timeout: 50 * time.Millisecond},
+		{fairnessLabel: "workload3", requestTokens: 8, priority: 125, requestRate: 100, timeout: 50 * time.Millisecond},
+	}
+	for _, flow := range flows {
+		flow.timeout = 50 * time.Millisecond
 	}
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 }
@@ -489,6 +503,9 @@ func TestIncreasingPriority(t *testing.T) {
 		{fairnessLabel: "workload2", requestTokens: 5, priority: 100, requestRate: 50},
 		{fairnessLabel: "workload3", requestTokens: 5, priority: 150, requestRate: 50},
 	}
+	for _, flow := range flows {
+		flow.timeout = 50 * time.Millisecond
+	}
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 3)
 }
 
@@ -499,6 +516,9 @@ func Test0FillRate(t *testing.T) {
 		{fairnessLabel: "workload2", requestTokens: 5, priority: 100, requestRate: 50},
 		{fairnessLabel: "workload3", requestTokens: 5, priority: 200, requestRate: 50},
 	}
+	for _, flow := range flows {
+		flow.timeout = 50 * time.Millisecond
+	}
 	baseOfBasicBucketTest(t, flows, 0, 1)
 }
 
@@ -508,6 +528,9 @@ func TestFairnessWithinPriority(t *testing.T) {
 		{fairnessLabel: "workload1", requestTokens: 16, priority: 50, requestRate: 50},
 		{fairnessLabel: "workload2", requestTokens: 16, priority: 100, requestRate: 50},
 		{fairnessLabel: "workload3", requestTokens: 16, priority: 100, requestRate: 50},
+	}
+	for _, flow := range flows {
+		flow.timeout = 50 * time.Millisecond
 	}
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 
@@ -533,9 +556,14 @@ func TestLoadShedBucket(t *testing.T) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	var wg sync.WaitGroup
 	lsf := 0.3
-	timeout := 30 * time.Millisecond
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", requestTokens: 5, priority: 0, requestRate: 500},
+		{
+			fairnessLabel: "workload0",
+			requestTokens: 5,
+			priority:      0,
+			requestRate:   500,
+			timeout:       30 * time.Millisecond,
+		},
 	}
 	schedMetrics := &WFQMetrics{
 		FlowsGauge:        wfqFlowsGauge,
@@ -543,11 +571,11 @@ func TestLoadShedBucket(t *testing.T) {
 	}
 
 	c := clockwork.NewFakeClock()
-	go updateClock(t, c, timeout, flows)
+	go updateClock(t, c, flows)
 
 	loadShedBucket := NewTokenBucketLoadShed(c.Now(), _testSlotCount, _testSlotDuration, getMetrics())
 	loadShedBucket.SetContinuousTracking(true)
-	sched := NewWFQScheduler(timeout, loadShedBucket, c, schedMetrics)
+	sched := NewWFQScheduler(loadShedBucket, c, schedMetrics)
 
 	trainAndDeplete := func() {
 		// Running Train and deplete the bucket
