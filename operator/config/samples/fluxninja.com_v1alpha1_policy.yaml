@@ -60,16 +60,6 @@ spec:
       - arithmetic_combinator:
           in_ports:
             lhs:
-              signal_name: LATENCY_EMA
-            rhs:
-              constant_value: "1.1"
-          operator: mul
-          out_ports:
-            output:
-              signal_name: LATENCY_OVERLOAD
-      - arithmetic_combinator:
-          in_ports:
-            lhs:
               constant_value: "5.0"
             rhs:
               signal_name: SQRT_CONCURRENCY_INCREMENT
@@ -197,7 +187,7 @@ spec:
             lhs:
               signal_name: LATENCY
             rhs:
-              signal_name: LATENCY_OVERLOAD
+              signal_name: LATENCY_SETPOINT
           operator: gt
           out_ports:
             output:
