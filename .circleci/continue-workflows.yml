@@ -409,7 +409,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-            - c5:d8:c4:22:7e:ff:b5:c3:c3:32:c2:b7:54:c7:99:1b # fluxninja/aperture-go R/W
+            - "c5:d8:c4:22:7e:ff:b5:c3:c3:32:c2:b7:54:c7:99:1b" # fluxninja/aperture-go R/W
       - run: *install_opsninja
       - aperture_docker_build:
           docker-context: <<parameters.docker-context>>
