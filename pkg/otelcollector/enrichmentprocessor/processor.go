@@ -48,7 +48,8 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 	if ep.cache == nil {
 		return pmetric.Metrics{}, fmt.Errorf("cache not provided")
 	}
-	md := origMd.Clone()
+	md := pmetric.NewMetrics()
+	origMd.CopyTo(md)
 	err := otelcollector.IterateMetrics(md, func(metric pmetric.Metric) error {
 		switch metric.Type() {
 		case pmetric.MetricTypeGauge:
