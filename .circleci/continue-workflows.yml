@@ -585,7 +585,7 @@ workflows:
           docker-context: sdks/aperture-go
           dockerfile: Dockerfile
           docker-image: aperture-go-example
-          remote-repo-fingerprint: af:55:26:47:84:7f:0e:36:6b:74:25:19:64:4a:f2:41
+          remote-repo-fingerprint: d2:45:66:23:2b:fe:6f:04:81:ba:3b:cc:ee:05:16:26
           remote-repo: fluxninja/aperture-go
 
   push-to-aperture-java:
