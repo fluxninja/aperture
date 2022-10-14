@@ -59,7 +59,7 @@ require (
 	go.etcd.io/etcd/api/v3 v3.5.5
 	go.etcd.io/etcd/client/v3 v3.5.5
 	go.opentelemetry.io/collector v0.61.0
-	go.opentelemetry.io/collector/pdata v0.61.0
+	go.opentelemetry.io/collector/pdata v0.62.1
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.1
 	go.opentelemetry.io/otel v1.10.0
 	go.opentelemetry.io/proto/otlp v0.19.0
@@ -251,7 +251,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.5 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	go.opentelemetry.io/collector/semconv v0.61.0 // indirect
+	go.opentelemetry.io/collector/semconv v0.62.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.36.1 // indirect
 	go.opentelemetry.io/contrib/zpages v0.36.1 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.32.1 // indirect
@@ -284,6 +284,6 @@ exclude github.com/prometheus/prometheus v1.8.2
 
 replace (
 	cloud.google.com/go => cloud.google.com/go v0.100.2
-	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.61.0-fn.patch.2
-	go.opentelemetry.io/collector/pdata => github.com/fluxninja/opentelemetry-collector/pdata v0.61.0-fn.patch.2
+	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.62.1-fn.patch.1
+	go.opentelemetry.io/collector/pdata => github.com/fluxninja/opentelemetry-collector/pdata v0.62.1-fn.patch.1
 )
