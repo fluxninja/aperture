@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
@@ -79,17 +80,17 @@ func (mr *MockEngineMockRecorder) GetRateLimiter(limiterID interface{}) *gomock.
 }
 
 // ProcessRequest mocks base method.
-func (m *MockEngine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) *flowcontrolv1.CheckResponse {
+func (m *MockEngine) ProcessRequest(ctx context.Context, controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) *flowcontrolv1.CheckResponse {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ProcessRequest", controlPoint, serviceIDs, labels)
+	ret := m.ctrl.Call(m, "ProcessRequest", ctx, controlPoint, serviceIDs, labels)
 	ret0, _ := ret[0].(*flowcontrolv1.CheckResponse)
 	return ret0
 }
 
 // ProcessRequest indicates an expected call of ProcessRequest.
-func (mr *MockEngineMockRecorder) ProcessRequest(controlPoint, serviceIDs, labels interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) ProcessRequest(ctx, controlPoint, serviceIDs, labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessRequest", reflect.TypeOf((*MockEngine)(nil).ProcessRequest), controlPoint, serviceIDs, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessRequest", reflect.TypeOf((*MockEngine)(nil).ProcessRequest), ctx, controlPoint, serviceIDs, labels)
 }
 
 // RegisterConcurrencyLimiter mocks base method.

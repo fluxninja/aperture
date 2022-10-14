@@ -1,6 +1,7 @@
 package iface
 
 import (
+	"context"
 	"strconv"
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
@@ -27,7 +28,7 @@ func (limiterID LimiterID) String() string {
 type Limiter interface {
 	GetPolicyName() string
 	GetSelector() *selectorv1.Selector
-	RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision
+	RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
 }
 
