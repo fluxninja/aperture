@@ -184,12 +184,6 @@ func (sched *WFQScheduler) Schedule(rContext RequestContext) bool {
 		return true
 	}
 
-	// HACK treat small timeouts as zero to avoid running heapAudits too often
-	// https://github.com/fluxninja/aperture/issues/778
-	if rContext.Timeout < minNonzeroTimeout {
-		rContext.Timeout = 0
-	}
-
 	// Unable to schedule right now, so queue the request
 	admitted, qRequest := sched.enter(rContext)
 	if admitted {
@@ -289,8 +283,11 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (admitted bool, qReque
 
 	// update timeout value to be global minimum
 	if rContext.Timeout != 0 && rContext.Timeout < sched.minTimeout {
-		sched.minTimeout = rContext.Timeout
-		sched.auditDuration = sched.minTimeout / 2
+		// also see - https://github.com/fluxninja/aperture/issues/778
+		if rContext.Timeout > minNonzeroTimeout {
+			sched.minTimeout = rContext.Timeout
+			sched.auditDuration = sched.minTimeout / 2
+		}
 	}
 
 	if sched.manager.PreprocessRequest(now, rContext) {
