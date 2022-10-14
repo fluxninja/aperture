@@ -124,12 +124,12 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 			output = runtime.NewReading(outputValue)
 		} else {
 			ema.invalidCount++
-			// emit last good EMA value
-			output = ema.lastGoodOutput
 			// If invalid count is greater than the ema window, reset the stages.
 			if ema.invalidCount >= ema.emaWindow {
 				ema.resetStages()
 			}
+			// emit last good EMA value
+			output = ema.lastGoodOutput
 		}
 	default:
 		logger.Panic().Msg("unexpected ema stage")

@@ -26,6 +26,7 @@ type Registry interface {
 var _ Registry = &registry{}
 
 // registry implements Registry.
+// Note: Please take locks from parent to child and not the other way around to avoid deadlocks.
 type registry struct {
 	mu       sync.RWMutex
 	status   *statusv1.Status
@@ -81,21 +82,38 @@ func (r *registry) ChildIfExists(key string) Registry {
 	return child
 }
 
+// Parent returns the parent Registry.
+func (r *registry) Parent() Registry {
+	return r.getParent()
+}
+
+func (r *registry) getParent() *registry {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.parent
+}
+
 // Detach detaches the child from the parent to become root.
 func (r *registry) Detach() {
-	if r.parent == nil {
-		return
-	}
+	parent := r.getParent()
+
 	// lock parent
-	r.parent.mu.Lock()
-	defer func() {
-		r.parent.mu.Unlock()
-		r.logger = r.root.logger
+	parent.mu.Lock()
+	defer parent.mu.Unlock()
+	// lock child
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	// We don't have Attach() so parent can't change to other than nil.
+	if r.parent != nil {
+		// remove child from parent
+		if r.parent.children[r.key] == r {
+			delete(r.parent.children, r.key)
+		}
+		// set parent to nil
 		r.parent = nil
+		r.logger = r.root.logger
 		r.root = r
-	}()
-	if r.parent.children[r.key] == r {
-		delete(r.parent.children, r.key)
 	}
 }
 
@@ -143,11 +161,6 @@ func (r *registry) GetGroupStatus() *statusv1.GroupStatus {
 	return groupStatus
 }
 
-// Parent returns the parent Registry.
-func (r *registry) Parent() Registry {
-	return r.parent
-}
-
 // Root returns the top-level Registry.
 func (r *registry) Root() Registry {
 	r.mu.RLock()
@@ -157,6 +170,8 @@ func (r *registry) Root() Registry {
 
 // Key returns the key of the Registry that is registered with the parent.
 func (r *registry) Key() string {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	return r.key
 }
 
@@ -177,5 +192,7 @@ func (r *registry) HasError() bool {
 
 // GetLogger returns the logger of the Registry.
 func (r *registry) GetLogger() *log.Logger {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	return r.logger
 }
