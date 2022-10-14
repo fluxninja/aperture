@@ -65,16 +65,15 @@ var _ = Describe("Validator", Ordered, func() {
 		validateRequest(validateExample(classificationPolicy), "")
 	})
 
-	It("accepts example policy for demoapp without PromQL.evalutation_interval", func() {
+	It("accepts example policy for demoapp without PromQL evalutation_interval", func() {
 		promQlEvaluationInterval :=
 			`evaluation_interval: "1s"
           `
 		policy := strings.ReplaceAll(latencyGradientPolicy, promQlEvaluationInterval, "")
-		request := validateExample(policy)
-		validateRequest(request, "")
+		validateRequest(validateExample(policy), "")
 	})
 
-	It("does not accept example policy for demoapp without ConcurrencyLimiter.selector ", func() {
+	It("does not accept example policy for demoapp without ConcurrencyLimiter selector ", func() {
 		concurrencyLimiterSelector :=
 			`concurrency_limiter:
           selector:
@@ -97,6 +96,28 @@ var _ = Describe("Validator", Ordered, func() {
               priority: 2000`)
 		request := validateExample(policy)
 		msg := "policies: Key: 'Policy.Circuit.Components[9].Component.ConcurrencyLimiter.Scheduler.DefaultWorkloadParameters.Priority' Error:Field validation for 'Priority' failed on the 'lte' tag"
+		validateRequest(request, msg)
+	})
+
+	It("does not accept example policy for rate limit without RateLimiter service selector", func() {
+		rateLimiterSelector :=
+			`selector:
+            service_selector:
+              service: "service1-demo-app.demoapp.svc.cluster.local"`
+		policy := strings.ReplaceAll(rateLimitPolicy, rateLimiterSelector, "selector:")
+		msg := "policies: Key: 'Policy.Circuit.Components[1].Component.RateLimiter.Selector.ServiceSelector' Error:Field validation for 'ServiceSelector' failed on the 'required' tag"
+		request := validateExample(policy)
+		validateRequest(request, msg)
+	})
+
+	It("does not accept example policy for classification without Classifiers service selector", func() {
+		classifierSelector :=
+			`selector:
+          service_selector:
+            service: productpage.bookinfo.svc.cluster.local`
+		policy := strings.ReplaceAll(classificationPolicy, classifierSelector, "selector:")
+		msg := "policies: Key: 'Policy.Resources.Classifiers[0].Selector.ServiceSelector' Error:Field validation for 'ServiceSelector' failed on the 'required' tag"
+		request := validateExample(policy)
 		validateRequest(request, msg)
 	})
 
@@ -373,6 +394,37 @@ spec:
               signal_name: "CONCURRENCY_INCREMENT"
   `
 
+const rateLimitPolicy = `
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  name: policies
+  namespace: aperture-controller
+  labels:
+    fluxninja.com/validate: "true"
+spec:
+  circuit:
+    evaluation_interval: "0.5s"
+    components:
+      - constant:
+          value: "250.0"
+          out_ports:
+            output:
+              signal_name: "RATE_LIMIT"
+      - rate_limiter:
+          in_ports:
+            limit:
+              signal_name: "RATE_LIMIT"
+          selector:
+            service_selector:
+              service: "service1-demo-app.demoapp.svc.cluster.local"
+            flow_selector:
+              control_point:
+                traffic: "ingress"
+          label_key: "http.request.header.user_type"
+          limit_reset_interval: "1s"
+`
+
 const classificationPolicy = `
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
@@ -405,35 +457,4 @@ spec:
                 parts := split(session, ".")
                 object := json.unmarshal(base64url.decode(parts[0]))
                 user := object.user
-`
-
-const rateLimitPolicy = `
-apiVersion: fluxninja.com/v1alpha1
-kind: Policy
-metadata:
-  name: policies
-  namespace: aperture-controller
-  labels:
-    fluxninja.com/validate: "true"
-spec:
-  circuit:
-    evaluation_interval: "0.5s"
-    components:
-      - constant:
-          value: "250.0"
-          out_ports:
-            output:
-              signal_name: "RATE_LIMIT"
-      - rate_limiter:
-          in_ports:
-            limit:
-              signal_name: "RATE_LIMIT"
-          selector:
-            service_selector:
-              service: "service1-demo-app.demoapp.svc.cluster.local"
-            flow_selector:
-              control_point:
-                traffic: "ingress"
-          label_key: "http.request.header.user_type"
-          limit_reset_interval: "1s"
 `
