@@ -69,7 +69,7 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 	}
 
 	merr := backoff.Retry(operation, backoff.WithContext(backoff.NewExponentialBackOff(), jobCtxt))
-	if err != nil {
+	if merr != nil {
 		msg, cbErr := pq.errorCallback(err)
 		if cbErr != nil {
 			// multi error combine cbErr in merr
