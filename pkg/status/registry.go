@@ -96,6 +96,9 @@ func (r *registry) getParent() *registry {
 // Detach detaches the child from the parent to become root.
 func (r *registry) Detach() {
 	parent := r.getParent()
+	if parent == nil {
+		return
+	}
 
 	// lock parent
 	parent.mu.Lock()
