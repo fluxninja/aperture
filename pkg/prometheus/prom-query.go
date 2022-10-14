@@ -75,7 +75,7 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 			// multi error combine cbErr in merr
 			merr = multierr.Combine(merr, cbErr)
 		}
-
+		log.Error().Err(merr).Msg("Encountered error while executing promQL query")
 		return msg, merr
 	}
 
