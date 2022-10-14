@@ -388,7 +388,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// setup scheduler
-			conLimiter.scheduler = scheduler.NewWFQScheduler(conLimiter.schedulerMsg.MaxTimeout.AsDuration(), loadShedActuator.tokenBucketLoadShed, clock, wfqMetrics)
+			conLimiter.scheduler = scheduler.NewWFQScheduler(loadShedActuator.tokenBucketLoadShed, clock, wfqMetrics)
 
 			incomingConcurrencyCounter, err := incomingConcurrencyCounterVec.GetMetricWith(metricLabels)
 			if err != nil {
@@ -451,8 +451,10 @@ func (conLimiter *concurrencyLimiter) GetSelector() *selectorv1.Selector {
 	return conLimiter.concurrencyLimiterMsg.GetSelector()
 }
 
-// RunLimiter .
-func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision {
+// RunLimiter processes a single flow by concurrency limiter in a blocking manner.
+//
+// Context is used to ensure that requests are not scheduled for longer than its deadline allows.
+func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadProto *policylangv1.Scheduler_WorkloadParameters
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
@@ -498,6 +500,28 @@ func (conLimiter *concurrencyLimiter) RunLimiter(labels map[string]string) *flow
 
 	if timeout > conLimiter.schedulerMsg.MaxTimeout.AsDuration() {
 		timeout = conLimiter.schedulerMsg.MaxTimeout.AsDuration()
+	}
+
+	if clientDeadline, hasDeadline := ctx.Deadline(); hasDeadline {
+		// The clientDeadline is calculated based on client's timeout, passed
+		// as grpc-timeout. Our goal is for the response to be received by the
+		// client before its deadline passes (otherwise we risk fail-open on
+		// timeout). To allow some headroom for transmitting the response to
+		// the client, we set an "internal" deadline to a bit before client's
+		// deadline, subtracting:
+		// * 2 * 1ms to account for deadline inaccuracies (observed
+		//   that Deadline() - Now() delta might end up longer than
+		//   grpc-timeout (!), usually within 1ms),
+		// * 1ms for response overhead,
+		// * 20% so that we don't always operate on the edge of the time budget.
+		clientTimeout := time.Until(clientDeadline)
+		internalTimeout := 4*clientTimeout/5 - 3*time.Millisecond
+		if internalTimeout < timeout {
+			timeout = internalTimeout
+		}
+		if timeout < 0 {
+			timeout = 0
+		}
 	}
 
 	reqContext := scheduler.RequestContext{
