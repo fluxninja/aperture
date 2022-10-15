@@ -1768,7 +1768,7 @@ definitions:
         type: string
         title: Max Timeout is the value with which the flow timeout calculated by
           `timeout_factor` is capped
-        x-go-default: 0.45s
+        x-go-default: 0.49s
       out_ports:
         description: Output ports for the Scheduler component.
         $ref: '#/definitions/v1SchedulerOuts'
