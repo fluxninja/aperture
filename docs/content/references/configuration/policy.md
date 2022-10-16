@@ -1,7 +1,7 @@
 ---
-title: Policies Configuration Reference
+title: Policy Configuration Reference
 sidebar_position: 1
-sidebar_label: Policies
+sidebar_label: Policy
 ---
 
 Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
@@ -11,6 +11,31 @@ The top-level object representing a policy is [v1Policy](#v1-policy).
 <!---
 Generated File Starts
 -->
+
+## Table of contents
+
+### POLICY CONFIGURATION
+
+| Key | Reference         |
+| --- | ----------------- |
+|     | [Policy](#policy) |
+
+## Reference
+
+### _Policy_ {#policy}
+
+#### Members
+
+<dl>
+
+<dt>body</dt>
+<dd>
+
+Type: [V1Policy](#v1-policy)
+
+</dd>
+
+</dl>
 
 ## Objects
 
@@ -528,6 +553,12 @@ See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 <dd>
 
 ([V1Extrapolator](#v1-extrapolator)) Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.
+
+</dd>
+<dt>first_valid</dt>
+<dd>
+
+([V1FirstValid](#v1-first-valid)) Picks the first valid input signal and emits it.
 
 </dd>
 <dt>gradient_controller</dt>
@@ -1083,6 +1114,57 @@ Outputs for the Extrapolator component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Extrapolated signal.
+
+</dd>
+</dl>
+
+### v1FirstValid {#v1-first-valid}
+
+Picks the first valid input signal from the array of input signals and emits it as an output signal
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1FirstValidIns](#v1-first-valid-ins)) Input ports for the FirstValid component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1FirstValidOuts](#v1-first-valid-outs)) Output ports for the FirstValid component.
+
+</dd>
+</dl>
+
+### v1FirstValidIns {#v1-first-valid-ins}
+
+Inputs for the FirstValid component.
+
+#### Properties
+
+<dl>
+<dt>inputs</dt>
+<dd>
+
+([[]V1InPort](#v1-in-port)) Array of input signals.
+
+</dd>
+</dl>
+
+### v1FirstValidOuts {#v1-first-valid-outs}
+
+Outputs for the FirstValid component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) First valid input signal as an output signal.
 
 </dd>
 </dl>
@@ -2125,7 +2207,7 @@ of this average can change).
 <dt>max_timeout</dt>
 <dd>
 
-(string, default: `0.45s`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
+(string, default: `0.49s`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
 
 :::caution
 This timeout needs to be strictly less than the timeout set on the

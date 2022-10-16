@@ -1,5 +1,8 @@
 blueprint: Latency Gradient Blueprint
 sources:
+  Signals Dashboard:
+    prefix: signalsDashboard
+    path: lib/1.0/dashboards/signals/signals.libsonnet
   FluxMeter Dashboard:
     prefix: dashboard
     path: lib/1.0/dashboards/latency-gradient/latency-gradient.libsonnet

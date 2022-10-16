@@ -4,14 +4,14 @@ produces:
 - application/json
 swagger: "2.0"
 info:
-  description: Policies
-  title: Policies
+  description: Policy
+  title: Policy
 basePath: /aperture-controller
 paths:
   /:
     post:
       tags:
-      - policies-configuration
+      - policy-configuration
       operationId: Policy
       parameters:
       - name: body
@@ -438,38 +438,42 @@ definitions:
           extrapolation interval.
         x-order: 5
         $ref: '#/definitions/v1Extrapolator'
+      first_valid:
+        description: Picks the first valid input signal and emits it.
+        x-order: 6
+        $ref: '#/definitions/v1FirstValid'
       gradient_controller:
         description: |-
           Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
-        x-order: 6
+        x-order: 7
         $ref: '#/definitions/v1GradientController'
       max:
         description: Emits the maximum of the input signals.
-        x-order: 7
+        x-order: 8
         $ref: '#/definitions/v1Max'
       min:
         description: Emits the minimum of the input signals.
-        x-order: 8
+        x-order: 9
         $ref: '#/definitions/v1Min'
       promql:
         description: Periodically runs a Prometheus query in the background and emits
           the result.
-        x-order: 9
+        x-order: 10
         $ref: '#/definitions/v1PromQL'
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
-        x-order: 10
+        x-order: 11
         $ref: '#/definitions/v1RateLimiter'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
-        x-order: 11
+        x-order: 12
         $ref: '#/definitions/v1Sqrt'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
-        x-order: 12
+        x-order: 13
         $ref: '#/definitions/v1Switcher'
   v1ConcurrencyActuator:
     type: object
@@ -844,6 +848,37 @@ definitions:
     properties:
       output:
         description: Extrapolated signal.
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
+  v1FirstValid:
+    type: object
+    title: Picks the first valid input signal from the array of input signals and
+      emits it as an output signal
+    properties:
+      in_ports:
+        description: Input ports for the FirstValid component.
+        x-order: 0
+        $ref: '#/definitions/v1FirstValidIns'
+      out_ports:
+        description: Output ports for the FirstValid component.
+        x-order: 1
+        $ref: '#/definitions/v1FirstValidOuts'
+  v1FirstValidIns:
+    description: Inputs for the FirstValid component.
+    type: object
+    properties:
+      inputs:
+        description: Array of input signals.
+        type: array
+        items:
+          $ref: '#/definitions/v1InPort'
+        x-order: 0
+  v1FirstValidOuts:
+    description: Outputs for the FirstValid component.
+    type: object
+    properties:
+      output:
+        description: First valid input signal as an output signal.
         x-order: 0
         $ref: '#/definitions/v1OutPort'
   v1FlowSelector:
@@ -1661,7 +1696,7 @@ definitions:
         type: string
         title: Max Timeout is the value with which the flow timeout calculated by
           `timeout_factor` is capped
-        x-go-default: 0.45s
+        x-go-default: 0.49s
         x-order: 2
       out_ports:
         description: Output ports for the Scheduler component.
@@ -1862,12 +1897,3 @@ definitions:
         description: Selected signal (on_true or on_false).
         x-order: 0
         $ref: '#/definitions/v1OutPort'
-tags:
-- name: EntityCacheService
-- name: InfoService
-- name: PeerDiscoveryService
-- name: StatusService
-- name: FlowControlService
-- name: PolicyService
-- name: FluxNinjaService
-- name: ControllerInfoService

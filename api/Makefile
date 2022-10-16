@@ -24,6 +24,7 @@ buf-generate:
 		set -e; \
 		for process in aperture-agent aperture-controller; do \
 			yq eval "del(.paths | .[] | select(.*.tags | contains([\"$$process\"]) | not))" $(DOCS_OPENAPI)/aperture.swagger.yaml > $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			yq eval -i "del(.tags)" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
 			yq eval -i ".host = \"$$process\"" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
 			yq eval -i '.schemes = ["https"]' $(DOCS_OPENAPI)/$$process.swagger.yaml; \
 			swagger flatten --with-flatten=remove-unused $(DOCS_OPENAPI)/$$process.swagger.yaml --format=yaml --output=$(DOCS_OPENAPI)/$$process.swagger.yaml; \

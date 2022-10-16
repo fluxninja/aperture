@@ -18,10 +18,10 @@ type TokenBucketMetrics struct {
 type tokenBucketBase struct {
 	// Token Bucket
 	latestTime      time.Time // Latest time for which we know the tokens in the bucket
-	fillRate        float64   // Tokens added per second
-	bucketCapacity  float64   // Overall capacity of the bucket, currently the same as fillRate
-	availableTokens float64   // Available Tokens as of latestTime (can be a negative or a fractional number)
 	metrics         *TokenBucketMetrics
+	fillRate        float64 // Tokens added per second
+	bucketCapacity  float64 // Overall capacity of the bucket, currently the same as fillRate
+	availableTokens float64 // Available Tokens as of latestTime (can be a negative or a fractional number)
 }
 
 func (tbb *tokenBucketBase) setFillRateGauge(v float64) {

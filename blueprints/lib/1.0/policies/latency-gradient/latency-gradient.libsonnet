@@ -56,6 +56,7 @@ local concurrencyActuator = spec.v1.ConcurrencyActuator;
 local max = spec.v1.Max;
 local min = spec.v1.Min;
 local sqrt = spec.v1.Sqrt;
+local firstValid = spec.v1.FirstValid;
 
 function(params) {
   _config:: defaults + params,
@@ -81,12 +82,22 @@ function(params) {
           component.withArithmeticCombinator(combinator.mul(port.withConstantValue(c.concurrencyLimitMultiplier),
                                                             port.withSignalName('ACCEPTED_CONCURRENCY'),
                                                             output=port.withSignalName('UPPER_CONCURRENCY_LIMIT'))),
-          component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY_EMA'),
-                                                            port.withConstantValue(c.tolerance),
-                                                            output=port.withSignalName('LATENCY_OVERLOAD'))),
           component.withArithmeticCombinator(combinator.add(port.withConstantValue(c.linearConcurrencyIncrement),
                                                             port.withSignalName('SQRT_CONCURRENCY_INCREMENT'),
-                                                            output=port.withSignalName('CONCURRENCY_INCREMENT_NORMAL'))),
+                                                            output=port.withSignalName('CONCURRENCY_INCREMENT_SINGLE_TICK'))),
+          component.withArithmeticCombinator(combinator.add(port.withSignalName('CONCURRENCY_INCREMENT_SINGLE_TICK'),
+                                                            port.withSignalName('CONCURRENCY_INCREMENT_FEEDBACK'),
+                                                            output=port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL'))),
+          component.withMin(
+            min.new()
+            + min.withInPorts({ inputs: [port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL'), port.withSignalName('ACCEPTED_CONCURRENCY')] })
+            + min.withOutPorts({ output: port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL_CAPPED') }),
+          ),
+          component.withFirstValid(
+            firstValid.new()
+            + firstValid.withInPorts({ inputs: [port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL_CAPPED'), port.withConstantValue(0)] })
+            + firstValid.withOutPorts({ output: port.withSignalName('CONCURRENCY_INCREMENT_NORMAL') }),
+          ),
           component.withMax(
             max.new()
             + max.withInPorts({ inputs: [port.withSignalName('UPPER_CONCURRENCY_LIMIT'), port.withConstantValue(c.minConcurrency)] })
@@ -157,7 +168,7 @@ function(params) {
             + decider.withOperator('gt')
             + decider.withInPortsMixin(
               decider.inPorts.withLhs(port.withSignalName('LATENCY'))
-              + decider.inPorts.withRhs(port.withSignalName('LATENCY_OVERLOAD'))
+              + decider.inPorts.withRhs(port.withSignalName('LATENCY_SETPOINT'))
             )
             + decider.withOutPortsMixin(decider.outPorts.withOutput(port.withSignalName('IS_OVERLOAD_SWITCH')))
           ),
@@ -169,6 +180,15 @@ function(params) {
               + switcher.inPorts.withSwitch(port.withSignalName('IS_OVERLOAD_SWITCH'))
             )
             + switcher.withOutPortsMixin(switcher.outPorts.withOutput(port.withSignalName('CONCURRENCY_INCREMENT')))
+          ),
+          component.withSwitcher(
+            switcher.new()
+            + switcher.withInPortsMixin(
+              switcher.inPorts.withOnTrue(port.withConstantValue(0))
+              + switcher.inPorts.withOnFalse(port.withSignalName('CONCURRENCY_INCREMENT_NORMAL'))
+              + switcher.inPorts.withSwitch(port.withSignalName('IS_OVERLOAD_SWITCH'))
+            )
+            + switcher.withOutPortsMixin(switcher.outPorts.withOutput(port.withSignalName('CONCURRENCY_INCREMENT_FEEDBACK')))
           ),
         ] + $._config.components,
       ),

@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
+	"sync"
 	"time"
 
 	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -62,7 +64,8 @@ func PromQLModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 		// Create this watcher as a singleton at the policy/circuit level
 		pje := &promJobsExecutor{
 			circuitAPI:     circuitAPI,
-			jobResBrokers:  make(jobResultBrokers),
+			inflightJobs:   make(jobResultBrokers),
+			pendingJobs:    make(jobResultBrokers),
 			promQLJobGroup: promQLJobGroup,
 		}
 		// Register TickEndCallback
@@ -118,8 +121,10 @@ type promResultCallback func(prometheusmodel.Value, error)
 type promJobsExecutor struct {
 	// CircuitAPI
 	circuitAPI runtime.CircuitAPI
-	// jobResBrokers contains a Job Result Broker for each job in the multi job
-	jobResBrokers jobResultBrokers
+	// inflightJobs contains a Job Result Broker for each job in the multi job
+	inflightJobs jobResultBrokers
+	// pendingJobs contains a Job Result Broker for each job in the multi job
+	pendingJobs jobResultBrokers
 	// Prom Multi Job
 	promMultiJob *jobs.MultiJob
 	// Job group
@@ -156,7 +161,7 @@ func (pje *promJobsExecutor) registerScalarJob(
 	}
 	job.JobName = jobName
 	scalarResBroker.job = job
-	pje.jobResBrokers[jobName] = scalarResBroker
+	pje.pendingJobs[jobName] = scalarResBroker
 }
 
 func (pje *promJobsExecutor) registerTaggedJob(
@@ -184,7 +189,7 @@ func (pje *promJobsExecutor) registerTaggedJob(
 	}
 	job.JobName = jobName
 	taggedResBroker.job = job
-	pje.jobResBrokers[jobName] = taggedResBroker
+	pje.pendingJobs[jobName] = taggedResBroker
 }
 
 // OnJobScheduled is called when the pje.promMultiJob is scheduled.
@@ -198,9 +203,11 @@ func (pje *promJobsExecutor) OnJobCompleted(_ *statusv1.Status, _ jobs.JobStats)
 	defer pje.circuitAPI.UnlockExecution()
 
 	// Provide results via callbacks
-	for _, jobResBroker := range pje.jobResBrokers {
+	for _, jobResBroker := range pje.inflightJobs {
 		jobResBroker.deliverResult()
 	}
+	// Reset inflightJobs
+	pje.inflightJobs = make(jobResultBrokers)
 	pje.jobRunning = false
 }
 
@@ -214,8 +221,8 @@ func (pje *promJobsExecutor) onTickEnd(_ runtime.TickInfo) (err error) {
 		pje.jobRunning = true
 		// Remove all the previous jobs in the multi job
 		pje.promMultiJob.DeregisterAll()
-		// Add all the new jobs to the multijob and trigger it
-		for _, jobResBroker := range pje.jobResBrokers {
+		// Add all the pendingJobs to the multijob and trigger it
+		for _, jobResBroker := range pje.pendingJobs {
 			job := jobResBroker.getJob()
 			err = pje.promMultiJob.RegisterJob(job)
 			if err != nil {
@@ -223,8 +230,10 @@ func (pje *promJobsExecutor) onTickEnd(_ runtime.TickInfo) (err error) {
 				return err
 			}
 		}
-		// Clear jobsToRun for the next tick
-		pje.jobResBrokers = make(jobResultBrokers)
+		// Move pendingJobs to inflightJobs
+		pje.inflightJobs = pje.pendingJobs
+		// Clear pendingJobs for future ticks
+		pje.pendingJobs = make(jobResultBrokers)
 		// Trigger the multi job
 		pje.promQLJobGroup.TriggerJob(pje.promMultiJob.Name())
 	}
@@ -242,7 +251,9 @@ type scalarResultBroker struct {
 	err   error
 	cb    scalarResultCallback
 	query string
-	res   float64
+	// lock to protect concurrent access to the result
+	lock sync.RWMutex
+	res  float64
 }
 
 // Make sure scalarResultBroker complies with the jobResultBroker interface.
@@ -257,24 +268,32 @@ func (srb *scalarResultBroker) getQuery() string {
 }
 
 func (srb *scalarResultBroker) deliverResult() {
+	srb.lock.RLock()
+	defer srb.lock.RUnlock()
 	srb.cb(srb.res, srb.err)
 }
 
 func (srb *scalarResultBroker) handleResult(_ context.Context, value float64, cbArgs ...interface{}) (proto.Message, error) {
+	srb.lock.Lock()
+	defer srb.lock.Unlock()
 	srb.res = value
-	srb.cb(value, nil)
+	srb.err = nil
 	return wrapperspb.Double(value), nil
 }
 
 func (srb *scalarResultBroker) handleError(err error, cbArgs ...interface{}) (proto.Message, error) {
+	srb.lock.Lock()
+	defer srb.lock.Unlock()
+	srb.res = math.NaN()
 	srb.err = err
-	srb.cb(0, err)
-	return nil, err
+	return nil, errors.New("invalid ScalaResult, error in prometheus query")
 }
 
 type taggedResultBroker struct {
-	cb    promResultCallback
-	job   jobs.Job
+	cb  promResultCallback
+	job jobs.Job
+	// lock to protect concurrent access to the result
+	lock  sync.RWMutex
 	res   prometheusmodel.Value
 	err   error
 	query string
@@ -292,19 +311,25 @@ func (prb *taggedResultBroker) getQuery() string {
 }
 
 func (prb *taggedResultBroker) deliverResult() {
+	prb.lock.RLock()
+	defer prb.lock.RUnlock()
 	prb.cb(prb.res, prb.err)
 }
 
 func (prb *taggedResultBroker) handleResult(_ context.Context, value prometheusmodel.Value, cbArgs ...interface{}) (proto.Message, error) {
+	prb.lock.Lock()
+	defer prb.lock.Unlock()
 	prb.res = value
-	prb.cb(value, nil)
+	prb.err = nil
 	return nil, nil
 }
 
 func (prb *taggedResultBroker) handleError(err error, cbArgs ...interface{}) (proto.Message, error) {
+	prb.lock.Lock()
+	defer prb.lock.Unlock()
 	prb.err = err
-	prb.cb(nil, err)
-	return nil, err
+	prb.res = nil
+	return nil, errors.New("invalid taggedResult, error in prometheus query")
 }
 
 // Job Register can determine the type of job to register.

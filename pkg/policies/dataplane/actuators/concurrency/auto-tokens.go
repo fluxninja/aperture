@@ -109,12 +109,12 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 // autoTokens struct tokens per workload.
 type autoTokens struct {
 	mutex                 sync.RWMutex
-	tokensDecision        *policydecisionsv1.TokensDecision
 	tokensDecisionWatcher notifiers.Watcher
+	registry              status.Registry
+	tokensDecision        *policydecisionsv1.TokensDecision
 	policyName            string
 	policyHash            string
 	componentIdx          int64
-	registry              status.Registry
 }
 
 func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {

@@ -53,7 +53,7 @@ func (h *Handler) CheckWithValues(
 	controlPoint selectors.ControlPoint,
 	labels map[string]string,
 ) *flowcontrolv1.CheckResponse {
-	checkResponse := h.engine.ProcessRequest(controlPoint, serviceIDs, labels)
+	checkResponse := h.engine.ProcessRequest(ctx, controlPoint, serviceIDs, labels)
 	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetRejectReason(), checkResponse.GetError())
 	return checkResponse
 }

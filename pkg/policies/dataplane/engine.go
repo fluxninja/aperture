@@ -1,6 +1,7 @@
 package dataplane
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -58,7 +59,12 @@ type Engine struct {
 }
 
 // ProcessRequest .
-func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) (response *flowcontrolv1.CheckResponse) {
+func (e *Engine) ProcessRequest(
+	ctx context.Context,
+	controlPoint selectors.ControlPoint,
+	serviceIDs []string,
+	labels map[string]string,
+) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
 		DecisionType:     flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 		FlowLabelKeys:    maps.Keys(labels),
@@ -85,7 +91,7 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	for i, rl := range mmr.rateLimiters {
 		rateLimiters[i] = rl
 	}
-	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(rateLimiters, labels)
+	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(ctx, rateLimiters, labels)
 	response.LimiterDecisions = rateLimiterDecisions
 
 	defer func() {
@@ -108,7 +114,7 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 		concurrencyLimiters[i] = cl
 	}
 
-	concurrencyLimiterDecisions, concurrencyLimitersDecisionType := runLimiters(concurrencyLimiters, labels)
+	concurrencyLimiterDecisions, concurrencyLimitersDecisionType := runLimiters(ctx, concurrencyLimiters, labels)
 	response.LimiterDecisions = append(response.LimiterDecisions, concurrencyLimiterDecisions...)
 
 	if concurrencyLimitersDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
@@ -120,7 +126,7 @@ func (e *Engine) ProcessRequest(controlPoint selectors.ControlPoint, serviceIDs 
 	return
 }
 
-func runLimiters(limiters []iface.Limiter, labels map[string]string) ([]*flowcontrolv1.LimiterDecision, flowcontrolv1.CheckResponse_DecisionType) {
+func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string) ([]*flowcontrolv1.LimiterDecision, flowcontrolv1.CheckResponse_DecisionType) {
 	var wg sync.WaitGroup
 	var once sync.Once
 	decisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))
@@ -134,7 +140,7 @@ func runLimiters(limiters []iface.Limiter, labels map[string]string) ([]*flowcon
 	execLimiter := func(limiter iface.Limiter, i int) func() {
 		return func() {
 			defer wg.Done()
-			decisions[i] = limiter.RunLimiter(labels)
+			decisions[i] = limiter.RunLimiter(ctx, labels)
 			if decisions[i].Dropped {
 				once.Do(setDecisionRejected)
 			}

@@ -101,7 +101,7 @@ signal to a Controller which determines the desired Concurrency of a Service.
 Flux Meters are a great way to measure [SLOs][google-sre-slo] of your Service
 down to fine-grained APIs.
 
-[reference]: /references/configuration/policies.md#v1-flux-meter
+[reference]: /references/configuration/policy.md#v1-flux-meter
 [flow]: /concepts/flow-control/flow-control.md#flow
 [selector]: /concepts/flow-control/selector.md
 [flow-control-integration]: /concepts/flow-control/flow-control.md#integrations
@@ -109,6 +109,6 @@ down to fine-grained APIs.
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles
 [envoy-access-log-spec]:
   https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators
-[promql-reference]: /references/configuration/policies.md#v1-prom-q-l
+[promql-reference]: /references/configuration/policy.md#v1-prom-q-l
 [signal]: /concepts/policy/circuit.md#signal
 [google-sre-slo]: https://sre.google/workbook/implementing-slos/

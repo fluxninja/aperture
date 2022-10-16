@@ -227,7 +227,7 @@ func (rp *rollupProcessor) exportLogs(ctx context.Context, rollupData map[string
 	for _, v := range rollupData {
 		logRecord := logs.AppendEmpty()
 		// TODO tgill: need to get timestamp from v
-		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(time.Now()))
+		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(time.Now().UTC()))
 		v.CopyTo(logRecord.Attributes())
 	}
 	return rp.logsNextConsumer.ConsumeLogs(ctx, ld)

@@ -185,6 +185,9 @@ message Component {
 
     // Emits the minimum of the input signals.
     Min min = 13;
+
+    // Picks the first valid input signal and emits it.
+    FirstValid first_valid = 14;
   }
 }
 
@@ -960,10 +963,10 @@ message Scheduler {
     extensions: {
       key: "x-go-default"
       value: {
-        string_value: "0.45s"
+        string_value: "0.49s"
       }
     }
-  }]; // @gotags: default:"0.45s"
+  }]; // @gotags: default:"0.49s"
 }
 
 // Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
@@ -1146,5 +1149,26 @@ message Min {
   Ins in_ports = 1;
 
   // Output ports for the Min component.
+  Outs out_ports = 2;
+}
+
+// Picks the first valid input signal from the array of input signals and emits it as an output signal
+message FirstValid {
+  // Inputs for the FirstValid component.
+  message Ins {
+    // Array of input signals.
+    repeated InPort inputs = 1; // @gotags: validate:"dive"
+  }
+
+  // Outputs for the FirstValid component.
+  message Outs {
+    // First valid input signal as an output signal.
+    OutPort output = 1;
+  }
+
+  // Input ports for the FirstValid component.
+  Ins in_ports = 1;
+
+  // Output ports for the FirstValid component.
   Outs out_ports = 2;
 }

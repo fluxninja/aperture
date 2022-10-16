@@ -17,7 +17,7 @@
     fill_opacity=0,
     gradient_mode='none',
   ):: {
-    _nextTarget: 0,
+    _nextTarget:: 0,
 
     title: title,
     type: 'timeseries',
@@ -121,6 +121,9 @@
   },
   withFieldConfig(field_config):: {
     fieldConfig: field_config,
+  },
+  withFieldConfigMixin(field_config):: {
+    fieldConfig+: field_config,
   },
   withOptions(options):: {
     options: options,
