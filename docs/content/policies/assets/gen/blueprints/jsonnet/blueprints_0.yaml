@@ -133,7 +133,7 @@ spec:
           concurrency_actuator:
             in_ports:
               desired_concurrency:
-                constant_value: 10000
+                constant_value: 1000
           scheduler:
             auto_tokens: false
             default_workload_parameters:

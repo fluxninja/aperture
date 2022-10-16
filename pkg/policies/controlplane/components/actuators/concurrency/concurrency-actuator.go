@@ -20,7 +20,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	prometheusmodel "github.com/prometheus/common/model"
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
@@ -101,18 +100,12 @@ func NewConcurrencyActuatorAndOptions(
 }
 
 func (ca *ConcurrencyActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
-	logger := ca.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			ca.writer = etcdwriter.NewWriter(etcdClient, true)
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
-			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), ca.multiplierEtcdPath)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to delete concurrency multiplier decision config")
-				return err
-			}
+		OnStop: func(context.Context) error {
 			ca.writer.Close()
 			return nil
 		},

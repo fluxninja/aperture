@@ -244,9 +244,14 @@ func (ca *concurrencyActuator) updateConcurrency() {
 	if ca.concurrencyMultiplierDecision != nil {
 		if ca.concurrencyDecision == nil {
 			logger.Info().Msg("No concurrency decision found, using default concurrency decision")
-			concurrency := ca.defaultConcurrencyDecision.GetDemand() * ca.concurrencyMultiplierDecision.Multiplier
-			ca.basicTokenBucket.SetFillRate(ca.clock.Now(), concurrency)
-			ca.basicTokenBucket.SetPassThrough(false)
+			if ca.defaultConcurrencyDecision != nil {
+				concurrency := ca.defaultConcurrencyDecision.GetDemand() * ca.concurrencyMultiplierDecision.Multiplier
+				ca.basicTokenBucket.SetFillRate(ca.clock.Now(), concurrency)
+				ca.basicTokenBucket.SetPassThrough(false)
+			} else {
+				logger.Info().Msg("No default concurrency decision found, set pass through")
+				ca.basicTokenBucket.SetPassThrough(true)
+			}
 		} else {
 			logger.Info().Msg("Using concurrency decision")
 			// Ensure that tick concurrency decision and multiplier's ticks match

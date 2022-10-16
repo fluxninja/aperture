@@ -2,8 +2,8 @@ flowchart LR
 subgraph 0[<center>ArithmeticCombinator<br/>mul</center>]
 subgraph 0_inports[ ]
 style 0_inports fill:none,stroke:none
-0lhs[lhs]
 0rhs[rhs]
+0lhs[lhs]
 end
 subgraph 0_outports[ ]
 style 0_outports fill:none,stroke:none
@@ -41,8 +41,8 @@ FakeConstant2 --> 2lhs
 subgraph 3[<center>ArithmeticCombinator<br/>add</center>]
 subgraph 3_inports[ ]
 style 3_inports fill:none,stroke:none
-3lhs[lhs]
 3rhs[rhs]
+3lhs[lhs]
 end
 subgraph 3_outports[ ]
 style 3_outports fill:none,stroke:none
@@ -129,11 +129,11 @@ end
 subgraph 11[Gradient]
 subgraph 11_inports[ ]
 style 11_inports fill:none,stroke:none
-11signal[signal]
-11setpoint[setpoint]
 11optimize[optimize]
 11max[max]
 11control_variable[control_variable]
+11signal[signal]
+11setpoint[setpoint]
 end
 subgraph 11_outports[ ]
 style 11_outports fill:none,stroke:none
@@ -156,9 +156,9 @@ end
 subgraph 15[Switcher]
 subgraph 15_inports[ ]
 style 15_inports fill:none,stroke:none
-15on_false[on_false]
 15switch[switch]
 15on_true[on_true]
+15on_false[on_false]
 end
 subgraph 15_outports[ ]
 style 15_outports fill:none,stroke:none
@@ -184,35 +184,35 @@ FakeConstant7 --> 14on_true
 subgraph 13[<center>Decider<br/>gt for 0s</center>]
 subgraph 13_inports[ ]
 style 13_inports fill:none,stroke:none
-13rhs[rhs]
 13lhs[lhs]
+13rhs[rhs]
 end
 subgraph 13_outports[ ]
 style 13_outports fill:none,stroke:none
 13output[output]
 end
 end
+15output --> |CONCURRENCY_INCREMENT_FEEDBACK| 4rhs
 0output --> |MAX_EMA| 10max_envelope
-3output --> |CONCURRENCY_INCREMENT_SINGLE_TICK| 4lhs
-6output --> |CONCURRENCY_INCREMENT_NORMAL| 14on_false
-6output --> |CONCURRENCY_INCREMENT_NORMAL| 15on_false
 7output --> |MAX_CONCURRENCY| 11max
-9output --> |LATENCY| 0lhs
-9output --> |LATENCY| 10input
-9output --> |LATENCY| 11signal
-9output --> |LATENCY| 13lhs
 14output --> |CONCURRENCY_INCREMENT| 11optimize
 1output --> |LATENCY_SETPOINT| 11setpoint
 1output --> |LATENCY_SETPOINT| 13rhs
-4output --> |CONCURRENCY_INCREMENT_INTEGRAL| 5inputs
+3output --> |CONCURRENCY_INCREMENT_SINGLE_TICK| 4lhs
 5output --> |CONCURRENCY_INCREMENT_INTEGRAL_CAPPED| 6inputs
-8output --> |SQRT_CONCURRENCY_INCREMENT| 3rhs
-2output --> |UPPER_CONCURRENCY_LIMIT| 7inputs
-10output --> |LATENCY_EMA| 1lhs
 12.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 2rhs
 12.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 5inputs
 12.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 8input
 12.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 11control_variable
+2output --> |UPPER_CONCURRENCY_LIMIT| 7inputs
+6output --> |CONCURRENCY_INCREMENT_NORMAL| 14on_false
+6output --> |CONCURRENCY_INCREMENT_NORMAL| 15on_false
+9output --> |LATENCY| 0lhs
+9output --> |LATENCY| 10input
+9output --> |LATENCY| 11signal
+9output --> |LATENCY| 13lhs
+10output --> |LATENCY_EMA| 1lhs
+4output --> |CONCURRENCY_INCREMENT_INTEGRAL| 5inputs
+8output --> |SQRT_CONCURRENCY_INCREMENT| 3rhs
 13output --> |IS_OVERLOAD_SWITCH| 14switch
 13output --> |IS_OVERLOAD_SWITCH| 15switch
-15output --> |CONCURRENCY_INCREMENT_FEEDBACK| 4rhs

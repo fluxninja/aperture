@@ -161,7 +161,7 @@ function(params) {
               })
             )
             + concurrencyLimiter.withConcurrencyActuator(
-              concurrencyActuator.withInPortsMixin({ desired_concurrency: port.withConstantValue(10000) })
+              concurrencyActuator.withInPortsMixin({ desired_concurrency: port.withConstantValue(1000) })
             )
           ),
           component.withDecider(
