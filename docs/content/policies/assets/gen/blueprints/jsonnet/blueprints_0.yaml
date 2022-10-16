@@ -32,7 +32,7 @@ spec:
             lhs:
               signal_name: INCOMING_CONCURRENCY
             rhs:
-              signal_name: DESIRED_CONCURRENCY
+              constant_value: 1000
           operator: sub
           out_ports:
             output:
@@ -155,9 +155,10 @@ spec:
               load_shed_factor:
                 signal_name: LSF
           scheduler:
-            auto_tokens: true
+            auto_tokens: false
             default_workload_parameters:
               priority: 20
+              tokens: 55
             out_ports:
               accepted_concurrency:
                 signal_name: ACCEPTED_CONCURRENCY

@@ -119,14 +119,17 @@ local policyResource = latencyGradientPolicy({
     timeoutFactor: 0.5,
     defaultWorkloadParameters: {
       priority: 20,
+      tokens: 55.0,
     },
     workloads: [
       Workload.new()
       + Workload.withWorkloadParameters(WorkloadParameters.withPriority(50))
+      + Workload.withWorkloadParameters(WorkloadParameters.withTokens(55.0))
       // match the label extracted by classifier
       + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ user_type: 'guest' })),
       Workload.new()
       + Workload.withWorkloadParameters(WorkloadParameters.withPriority(200))
+      + Workload.withWorkloadParameters(WorkloadParameters.withTokens(55.0))
       // match the http header directly
       + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
     ],

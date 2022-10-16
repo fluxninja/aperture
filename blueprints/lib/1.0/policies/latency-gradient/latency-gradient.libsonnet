@@ -27,10 +27,11 @@ local defaults = {
     maxGradient: '1.0',
   },
   concurrencyLimiter: {
-    autoTokens: true,
+    autoTokens: false,
     timeoutFactor: '0.5',
     defaultWorkloadParameters: {
       priority: 20,
+      tokens: 55.0,
     },
     workloads: [],
   },
@@ -80,7 +81,7 @@ function(params) {
                                                             port.withConstantValue(c.tolerance),
                                                             output=port.withSignalName('LATENCY_SETPOINT'))),
           component.withArithmeticCombinator(combinator.sub(port.withSignalName('INCOMING_CONCURRENCY'),
-                                                            port.withSignalName('DESIRED_CONCURRENCY'),
+                                                            port.withConstantValue(1000),
                                                             output=port.withSignalName('DELTA_CONCURRENCY'))),
           component.withArithmeticCombinator(combinator.div(port.withSignalName('DELTA_CONCURRENCY'),
                                                             port.withSignalName('INCOMING_CONCURRENCY'),
