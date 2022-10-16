@@ -27,10 +27,11 @@ local defaults = {
     maxGradient: '1.0',
   },
   concurrencyLimiter: {
-    autoTokens: true,
+    autoTokens: false,
     timeoutFactor: '0.5',
     defaultWorkloadParameters: {
       priority: 20,
+      tokens: 55.0,
     },
     workloads: [],
   },
@@ -160,7 +161,7 @@ function(params) {
               })
             )
             + concurrencyLimiter.withConcurrencyActuator(
-              concurrencyActuator.withInPortsMixin({ desired_concurrency: port.withSignalName('DESIRED_CONCURRENCY') })
+              concurrencyActuator.withInPortsMixin({ desired_concurrency: port.withConstantValue(10000) })
             )
           ),
           component.withDecider(

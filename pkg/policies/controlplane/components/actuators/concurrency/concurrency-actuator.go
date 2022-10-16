@@ -221,6 +221,9 @@ func (ca *ConcurrencyActuator) computeMultiplier(desiredConcurrency float64) flo
 }
 
 func (ca *ConcurrencyActuator) publishMultiplier(multiplier float64) error {
+	if ca.concurrencyResultTick == nil {
+		return fmt.Errorf("concurrency result tick is nil")
+	}
 	logger := ca.policyReadAPI.GetStatusRegistry().GetLogger()
 	logger.Debug().Msgf("Publishing concurrency multiplier: %f", multiplier)
 	policyName := ca.policyReadAPI.GetPolicyName()

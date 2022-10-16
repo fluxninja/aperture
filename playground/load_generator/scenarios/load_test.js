@@ -4,6 +4,8 @@ import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 import { vu } from "k6/execution";
 
 export let vuStages = [
+  { duration: "10s", target: 20 },
+  { duration: "30s", target: 20 },
   { duration: "1s", target: 400 },
   { duration: "30s", target: 400 },
   { duration: "10s", target: 20 },

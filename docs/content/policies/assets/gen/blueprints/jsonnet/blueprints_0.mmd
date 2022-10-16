@@ -54,8 +54,8 @@ FakeConstant3 --> 3lhs
 subgraph 4[<center>ArithmeticCombinator<br/>add</center>]
 subgraph 4_inports[ ]
 style 4_inports fill:none,stroke:none
-4rhs[rhs]
 4lhs[lhs]
+4rhs[rhs]
 end
 subgraph 4_outports[ ]
 style 4_outports fill:none,stroke:none
@@ -118,8 +118,8 @@ end
 subgraph 10[<center>EMA<br/>win: 1500s</center>]
 subgraph 10_inports[ ]
 style 10_inports fill:none,stroke:none
-10input[input]
 10max_envelope[max_envelope]
+10input[input]
 end
 subgraph 10_outports[ ]
 style 10_outports fill:none,stroke:none
@@ -129,11 +129,11 @@ end
 subgraph 11[Gradient]
 subgraph 11_inports[ ]
 style 11_inports fill:none,stroke:none
+11signal[signal]
+11setpoint[setpoint]
 11optimize[optimize]
 11max[max]
 11control_variable[control_variable]
-11signal[signal]
-11setpoint[setpoint]
 end
 subgraph 11_outports[ ]
 style 11_outports fill:none,stroke:none
@@ -156,9 +156,9 @@ end
 subgraph 15[Switcher]
 subgraph 15_inports[ ]
 style 15_inports fill:none,stroke:none
-15on_true[on_true]
 15on_false[on_false]
 15switch[switch]
+15on_true[on_true]
 end
 subgraph 15_outports[ ]
 style 15_outports fill:none,stroke:none
@@ -184,36 +184,35 @@ FakeConstant7 --> 14on_true
 subgraph 13[<center>Decider<br/>gt for 0s</center>]
 subgraph 13_inports[ ]
 style 13_inports fill:none,stroke:none
-13lhs[lhs]
 13rhs[rhs]
+13lhs[lhs]
 end
 subgraph 13_outports[ ]
 style 13_outports fill:none,stroke:none
 13output[output]
 end
 end
-1output --> |LATENCY_SETPOINT| 11setpoint
-1output --> |LATENCY_SETPOINT| 13rhs
-7output --> |MAX_CONCURRENCY| 11max
-13output --> |IS_OVERLOAD_SWITCH| 14switch
-13output --> |IS_OVERLOAD_SWITCH| 15switch
+0output --> |MAX_EMA| 10max_envelope
 3output --> |CONCURRENCY_INCREMENT_SINGLE_TICK| 4lhs
-5output --> |CONCURRENCY_INCREMENT_INTEGRAL_CAPPED| 6inputs
 6output --> |CONCURRENCY_INCREMENT_NORMAL| 14on_false
 6output --> |CONCURRENCY_INCREMENT_NORMAL| 15on_false
+7output --> |MAX_CONCURRENCY| 11max
 9output --> |LATENCY| 0lhs
 9output --> |LATENCY| 10input
 9output --> |LATENCY| 11signal
 9output --> |LATENCY| 13lhs
+14output --> |CONCURRENCY_INCREMENT| 11optimize
+1output --> |LATENCY_SETPOINT| 11setpoint
+1output --> |LATENCY_SETPOINT| 13rhs
+4output --> |CONCURRENCY_INCREMENT_INTEGRAL| 5inputs
+5output --> |CONCURRENCY_INCREMENT_INTEGRAL_CAPPED| 6inputs
 8output --> |SQRT_CONCURRENCY_INCREMENT| 3rhs
+2output --> |UPPER_CONCURRENCY_LIMIT| 7inputs
 10output --> |LATENCY_EMA| 1lhs
-15output --> |CONCURRENCY_INCREMENT_FEEDBACK| 4rhs
 12.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 2rhs
 12.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 5inputs
 12.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 8input
 12.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 11control_variable
-14output --> |CONCURRENCY_INCREMENT| 11optimize
-0output --> |MAX_EMA| 10max_envelope
-2output --> |UPPER_CONCURRENCY_LIMIT| 7inputs
-4output --> |CONCURRENCY_INCREMENT_INTEGRAL| 5inputs
-11output --> |DESIRED_CONCURRENCY| 12.ConcurrencyActuatordesired_concurrency
+13output --> |IS_OVERLOAD_SWITCH| 14switch
+13output --> |IS_OVERLOAD_SWITCH| 15switch
+15output --> |CONCURRENCY_INCREMENT_FEEDBACK| 4rhs

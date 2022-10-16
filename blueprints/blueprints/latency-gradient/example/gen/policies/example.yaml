@@ -133,9 +133,9 @@ spec:
           concurrency_actuator:
             in_ports:
               desired_concurrency:
-                signal_name: DESIRED_CONCURRENCY
+                constant_value: 10000
           scheduler:
-            auto_tokens: true
+            auto_tokens: false
             default_workload_parameters:
               priority: 20
             out_ports:
