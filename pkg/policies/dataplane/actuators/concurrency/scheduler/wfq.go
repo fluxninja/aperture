@@ -12,6 +12,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const (
+	// Smallest timeout that won't get treated as no timeout.
+	minNonzeroTimeout = 5 * time.Millisecond
+)
+
 // Internal structure for tracking the request in the scheduler queue.
 type queuedRequest struct {
 	enqueueTime time.Time // Time when this request was enqueued
@@ -130,9 +135,8 @@ type WFQScheduler struct {
 	auditDuration time.Duration
 	vt            uint64 // virtual time
 	// generation helps close the queue in face of concurrent requests leaving the queue while new requests also arrive.
-	generation     uint64
-	defaultTimeout time.Duration
-	queueOpen      bool // This tracks overload state
+	generation uint64
+	queueOpen  bool // This tracks overload state
 }
 
 // WFQMetrics holds metrics related to internal workings of WFQScheduler.
@@ -153,15 +157,13 @@ func (sched *WFQScheduler) GetPendingRequests() int {
 
 // NewWFQScheduler creates a new weighted fair queue scheduler,
 // timeout -- timeout for requests.
-func NewWFQScheduler(timeout time.Duration, tokenManger TokenManager, clk clockwork.Clock, metrics *WFQMetrics) Scheduler {
+func NewWFQScheduler(tokenManger TokenManager, clk clockwork.Clock, metrics *WFQMetrics) Scheduler {
 	sched := new(WFQScheduler)
 	sched.queueOpen = false
 	sched.generation = 0
 	sched.vt = 0
 	sched.flows = make(map[string]*flowInfo)
-	sched.minTimeout = timeout
 	sched.auditDuration = sched.minTimeout / 2
-	sched.defaultTimeout = timeout
 	sched.manager = tokenManger
 	sched.clk = clk
 
@@ -182,17 +184,15 @@ func (sched *WFQScheduler) Schedule(rContext RequestContext) bool {
 		return true
 	}
 
-	// Assign default timeout to this request if it is not set
-	if rContext.Timeout == 0 {
-		rContext.Timeout = sched.defaultTimeout
-	}
-
 	// Unable to schedule right now, so queue the request
-	qRequest := sched.enter(rContext)
-
-	if qRequest == nil {
+	admitted, qRequest := sched.enter(rContext)
+	if admitted {
 		// scheduler is not in overload situation and the request was able to get tokens
 		return true
+	}
+
+	if qRequest == nil {
+		return false
 	}
 
 	// scheduler is in overload situation and we have to wait for ready signal and tokens
@@ -265,14 +265,15 @@ func (sched *WFQScheduler) auditHeap(now time.Time) {
 			heap.Init(&sched.requests)
 		}
 	}
-	sched.setFlowsGauge(float64(len(sched.flows)))
-	sched.setRequestsGauge(float64(sched.requests.Len()))
 }
 
 // Attempt to queue this request.
-// If queued successfully, return a valid heapRequest.
-// Otherwise, request was handled right away without queuing - return nil.
-func (sched *WFQScheduler) enter(rContext RequestContext) (qRequest *queuedRequest) {
+//
+// Returns whether request was admitted right away without queueing.
+// If admitted == false, might return a valid heapRequest
+// If admitted == false and qRequest == nil, request was neither admitted nor
+// queued (rejected right away).
+func (sched *WFQScheduler) enter(rContext RequestContext) (admitted bool, qRequest *queuedRequest) {
 	sched.lock.Lock()
 	defer sched.lock.Unlock()
 
@@ -280,12 +281,17 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (qRequest *queuedReque
 
 	// update timeout value to be global minimum
 	if rContext.Timeout != 0 && rContext.Timeout < sched.minTimeout {
-		sched.minTimeout = rContext.Timeout
+		// also see - https://github.com/fluxninja/aperture/issues/778
+		timeout := rContext.Timeout
+		if rContext.Timeout < minNonzeroTimeout {
+			timeout = minNonzeroTimeout
+		}
+		sched.minTimeout = timeout
 		sched.auditDuration = sched.minTimeout / 2
 	}
 
 	if sched.manager.PreprocessRequest(now, rContext) {
-		return nil
+		return true, nil
 	}
 
 	// try to schedule right now
@@ -293,11 +299,16 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (qRequest *queuedReque
 		ok := sched.manager.TakeIfAvailable(now, float64(rContext.Tokens))
 		if ok {
 			// we got the tokens, no need to queue
-			return nil
+			return true, nil
 		}
 	}
 
 	// we are in overload situation, attempt to queue
+
+	if rContext.Timeout == 0 {
+		// Not possible to queue requests with zero timeout.
+		return false, nil
+	}
 
 	firstRequest := false
 
@@ -325,6 +336,7 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (qRequest *queuedReque
 	fInfo, ok := sched.flows[flowID]
 	if !ok {
 		fInfo = getFlowInfo()
+		sched.setFlowsGauge(float64(len(sched.flows)))
 		fInfo.vt = sched.vt
 		fInfo.auditTime = now
 		sched.flows[flowID] = fInfo
@@ -357,6 +369,7 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (qRequest *queuedReque
 		if !fInfo.requestOnHeap {
 			qRequest.vft = fInfo.vt + cost
 			heap.Push(&sched.requests, qRequest)
+			sched.setRequestsGauge(float64(sched.requests.Len()))
 			fInfo.requestOnHeap = true
 		} else {
 			// push to flow queue
@@ -366,7 +379,8 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (qRequest *queuedReque
 		// This is the only request in queue at this time, wake it up
 		qRequest.ready <- true
 	}
-	return qRequest
+
+	return false, qRequest
 }
 
 // adjust queue counters. Note: qRequest pointer should not be used after calling this function as it will get recycled via Pool.
@@ -402,6 +416,7 @@ func (sched *WFQScheduler) leave(rContext RequestContext, qRequest *queuedReques
 			delete(sched.flows, qRequest.flowID)
 			// send flowInfo back to the Pool
 			putFlowInfo(qRequest.fInfo)
+			sched.setFlowsGauge(float64(len(sched.flows)))
 		} else { // check whether new requests arrived in between that need loading
 			sched.loadNextFlowReq(qRequest.fInfo)
 		}
@@ -449,6 +464,7 @@ func (sched *WFQScheduler) wakeNextRequest() {
 		}
 		// Pop from queue and wake a valid request
 		qRequest := heap.Pop(&sched.requests).(*queuedRequest)
+		sched.setRequestsGauge(float64(sched.requests.Len()))
 		qRequest.fInfo.requestOnHeap = false
 		if now.Sub(qRequest.enqueueTime) < qRequest.timeout {
 			// wake up this request
@@ -469,6 +485,7 @@ func (sched *WFQScheduler) loadNextFlowReq(fInfo *flowInfo) {
 			nextReq := elm.Value.(*queuedRequest)
 			nextReq.vft = fInfo.vt + nextReq.cost
 			heap.Push(&sched.requests, nextReq)
+			sched.setRequestsGauge(float64(sched.requests.Len()))
 			fInfo.requestOnHeap = true
 		}
 	}

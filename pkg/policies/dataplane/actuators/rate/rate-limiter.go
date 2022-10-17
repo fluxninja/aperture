@@ -379,7 +379,7 @@ func (rateLimiter *rateLimiter) GetSelector() *selectorv1.Selector {
 }
 
 // RunLimiter runs the limiter.
-func (rateLimiter *rateLimiter) RunLimiter(labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (rateLimiter *rateLimiter) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
 	label, ok, remaining, current := rateLimiter.TakeN(labels, 1)
