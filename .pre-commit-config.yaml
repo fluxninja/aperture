@@ -45,6 +45,7 @@ repos:
     rev: v0.1.17
     hooks:
       - id: shellcheck
+        exclude: ^(sdks/aperture-java/gradlew)$
   - repo: https://github.com/fluxninja/pre-commit-golang
     rev: v1.0.0-fn
     hooks:
@@ -161,4 +162,4 @@ repos:
       - id: codespell
         args:
           - --ignore-words=./.codespellignore
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/references/api/.*|api/gen/proto/.*)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/references/api/.*|api/gen/proto/.*|sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol/.*)$
