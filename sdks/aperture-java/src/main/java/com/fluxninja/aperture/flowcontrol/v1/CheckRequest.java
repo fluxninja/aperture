@@ -72,7 +72,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs =
+      com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       feature_ = s;
@@ -88,7 +88,7 @@ private static final long serialVersionUID = 0L;
       getFeatureBytes() {
     java.lang.Object ref = feature_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
+      com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       feature_ = b;
@@ -104,7 +104,7 @@ private static final long serialVersionUID = 0L;
         java.lang.String, java.lang.String> defaultEntry =
             com.google.protobuf.MapEntry
             .<java.lang.String, java.lang.String>newDefaultInstance(
-                com.fluxninja.aperture.flowcontrol.v1.FlowcontrolProto.internal_static_aperture_flowcontrol_v1_CheckRequest_LabelsEntry_descriptor,
+                com.fluxninja.aperture.flowcontrol.v1.FlowcontrolProto.internal_static_aperture_flowcontrol_v1_CheckRequest_LabelsEntry_descriptor, 
                 com.google.protobuf.WireFormat.FieldType.STRING,
                 "",
                 com.google.protobuf.WireFormat.FieldType.STRING,
@@ -582,7 +582,7 @@ private static final long serialVersionUID = 0L;
         getFeatureBytes() {
       java.lang.Object ref = feature_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         feature_ = b;
@@ -601,7 +601,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
     throw new NullPointerException();
   }
-
+  
       feature_ = value;
       onChanged();
       return this;
@@ -611,7 +611,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearFeature() {
-
+      
       feature_ = getDefaultInstance().getFeature();
       onChanged();
       return this;
@@ -627,7 +627,7 @@ private static final long serialVersionUID = 0L;
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-
+      
       feature_ = value;
       onChanged();
       return this;
@@ -826,3 +826,4 @@ private static final long serialVersionUID = 0L;
   }
 
 }
+

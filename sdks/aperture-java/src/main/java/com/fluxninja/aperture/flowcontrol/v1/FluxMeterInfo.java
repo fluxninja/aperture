@@ -60,7 +60,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs =
+      com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       fluxMeterName_ = s;
@@ -76,7 +76,7 @@ private static final long serialVersionUID = 0L;
       getFluxMeterNameBytes() {
     java.lang.Object ref = fluxMeterName_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
+      com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       fluxMeterName_ = b;
@@ -430,7 +430,7 @@ private static final long serialVersionUID = 0L;
         getFluxMeterNameBytes() {
       java.lang.Object ref = fluxMeterName_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         fluxMeterName_ = b;
@@ -449,7 +449,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
     throw new NullPointerException();
   }
-
+  
       fluxMeterName_ = value;
       onChanged();
       return this;
@@ -459,7 +459,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearFluxMeterName() {
-
+      
       fluxMeterName_ = getDefaultInstance().getFluxMeterName();
       onChanged();
       return this;
@@ -475,7 +475,7 @@ private static final long serialVersionUID = 0L;
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-
+      
       fluxMeterName_ = value;
       onChanged();
       return this;
@@ -543,3 +543,4 @@ private static final long serialVersionUID = 0L;
   }
 
 }
+

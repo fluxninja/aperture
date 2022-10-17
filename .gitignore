@@ -1,4 +1,6 @@
 dist/
+build/
+.gradle/
 
 blueprints/_gen/
 blueprints/vendor/

@@ -1,7 +1,6 @@
 version: v1
 managed:
   enabled: true
-  java_multiple_files: true
   java_package_prefix: "com.fluxninja"
   go_package_prefix:
     default: github.com/fluxninja/aperture/api/gen/proto/go

@@ -290,7 +290,7 @@ java.lang.String defaultValue);
    *
    * <code>repeated .aperture.flowcontrol.v1.ClassifierInfo classifier_infos = 10 [json_name = "classifierInfos"];</code>
    */
-  java.util.List<com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo>
+  java.util.List<com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo> 
       getClassifierInfosList();
   /**
    * <pre>
@@ -315,7 +315,7 @@ java.lang.String defaultValue);
    *
    * <code>repeated .aperture.flowcontrol.v1.ClassifierInfo classifier_infos = 10 [json_name = "classifierInfos"];</code>
    */
-  java.util.List<? extends com.fluxninja.aperture.flowcontrol.v1.ClassifierInfoOrBuilder>
+  java.util.List<? extends com.fluxninja.aperture.flowcontrol.v1.ClassifierInfoOrBuilder> 
       getClassifierInfosOrBuilderList();
   /**
    * <pre>
@@ -334,7 +334,7 @@ java.lang.String defaultValue);
    *
    * <code>repeated .aperture.flowcontrol.v1.FluxMeterInfo flux_meter_infos = 11 [json_name = "fluxMeterInfos"];</code>
    */
-  java.util.List<com.fluxninja.aperture.flowcontrol.v1.FluxMeterInfo>
+  java.util.List<com.fluxninja.aperture.flowcontrol.v1.FluxMeterInfo> 
       getFluxMeterInfosList();
   /**
    * <pre>
@@ -359,7 +359,7 @@ java.lang.String defaultValue);
    *
    * <code>repeated .aperture.flowcontrol.v1.FluxMeterInfo flux_meter_infos = 11 [json_name = "fluxMeterInfos"];</code>
    */
-  java.util.List<? extends com.fluxninja.aperture.flowcontrol.v1.FluxMeterInfoOrBuilder>
+  java.util.List<? extends com.fluxninja.aperture.flowcontrol.v1.FluxMeterInfoOrBuilder> 
       getFluxMeterInfosOrBuilderList();
   /**
    * <pre>
@@ -378,7 +378,7 @@ java.lang.String defaultValue);
    *
    * <code>repeated .aperture.flowcontrol.v1.LimiterDecision limiter_decisions = 12 [json_name = "limiterDecisions"];</code>
    */
-  java.util.List<com.fluxninja.aperture.flowcontrol.v1.LimiterDecision>
+  java.util.List<com.fluxninja.aperture.flowcontrol.v1.LimiterDecision> 
       getLimiterDecisionsList();
   /**
    * <pre>
@@ -403,7 +403,7 @@ java.lang.String defaultValue);
    *
    * <code>repeated .aperture.flowcontrol.v1.LimiterDecision limiter_decisions = 12 [json_name = "limiterDecisions"];</code>
    */
-  java.util.List<? extends com.fluxninja.aperture.flowcontrol.v1.LimiterDecisionOrBuilder>
+  java.util.List<? extends com.fluxninja.aperture.flowcontrol.v1.LimiterDecisionOrBuilder> 
       getLimiterDecisionsOrBuilderList();
   /**
    * <pre>

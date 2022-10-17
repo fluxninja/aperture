@@ -211,7 +211,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs =
+      com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       policyName_ = s;
@@ -227,7 +227,7 @@ private static final long serialVersionUID = 0L;
       getPolicyNameBytes() {
     java.lang.Object ref = policyName_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
+      com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       policyName_ = b;
@@ -249,7 +249,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs =
+      com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       policyHash_ = s;
@@ -265,7 +265,7 @@ private static final long serialVersionUID = 0L;
       getPolicyHashBytes() {
     java.lang.Object ref = policyHash_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
+      com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       policyHash_ = b;
@@ -298,7 +298,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs =
+      com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       labelKey_ = s;
@@ -314,7 +314,7 @@ private static final long serialVersionUID = 0L;
       getLabelKeyBytes() {
     java.lang.Object ref = labelKey_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
+      com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       labelKey_ = b;
@@ -775,7 +775,7 @@ private static final long serialVersionUID = 0L;
         getPolicyNameBytes() {
       java.lang.Object ref = policyName_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         policyName_ = b;
@@ -794,7 +794,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
     throw new NullPointerException();
   }
-
+  
       policyName_ = value;
       onChanged();
       return this;
@@ -804,7 +804,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearPolicyName() {
-
+      
       policyName_ = getDefaultInstance().getPolicyName();
       onChanged();
       return this;
@@ -820,7 +820,7 @@ private static final long serialVersionUID = 0L;
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-
+      
       policyName_ = value;
       onChanged();
       return this;
@@ -851,7 +851,7 @@ private static final long serialVersionUID = 0L;
         getPolicyHashBytes() {
       java.lang.Object ref = policyHash_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         policyHash_ = b;
@@ -870,7 +870,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
     throw new NullPointerException();
   }
-
+  
       policyHash_ = value;
       onChanged();
       return this;
@@ -880,7 +880,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearPolicyHash() {
-
+      
       policyHash_ = getDefaultInstance().getPolicyHash();
       onChanged();
       return this;
@@ -896,7 +896,7 @@ private static final long serialVersionUID = 0L;
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-
+      
       policyHash_ = value;
       onChanged();
       return this;
@@ -917,7 +917,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setClassifierIndex(long value) {
-
+      
       classifierIndex_ = value;
       onChanged();
       return this;
@@ -927,7 +927,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearClassifierIndex() {
-
+      
       classifierIndex_ = 0L;
       onChanged();
       return this;
@@ -958,7 +958,7 @@ private static final long serialVersionUID = 0L;
         getLabelKeyBytes() {
       java.lang.Object ref = labelKey_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         labelKey_ = b;
@@ -977,7 +977,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
     throw new NullPointerException();
   }
-
+  
       labelKey_ = value;
       onChanged();
       return this;
@@ -987,7 +987,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearLabelKey() {
-
+      
       labelKey_ = getDefaultInstance().getLabelKey();
       onChanged();
       return this;
@@ -1003,7 +1003,7 @@ private static final long serialVersionUID = 0L;
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-
+      
       labelKey_ = value;
       onChanged();
       return this;
@@ -1023,7 +1023,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setErrorValue(int value) {
-
+      
       error_ = value;
       onChanged();
       return this;
@@ -1047,7 +1047,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-
+      
       error_ = value.getNumber();
       onChanged();
       return this;
@@ -1057,7 +1057,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearError() {
-
+      
       error_ = 0;
       onChanged();
       return this;
@@ -1125,3 +1125,4 @@ private static final long serialVersionUID = 0L;
   }
 
 }
+

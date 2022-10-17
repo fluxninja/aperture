@@ -16,52 +16,52 @@ public final class FlowcontrolProto {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_v1_CheckRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_v1_CheckRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_v1_CheckRequest_LabelsEntry_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_v1_CheckRequest_LabelsEntry_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_v1_CheckResponse_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_v1_CheckResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_v1_CheckResponse_TelemetryFlowLabelsEntry_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_v1_CheckResponse_TelemetryFlowLabelsEntry_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_v1_ControlPointInfo_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_v1_ControlPointInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_v1_ClassifierInfo_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_v1_ClassifierInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_v1_LimiterDecision_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_v1_LimiterDecision_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_v1_LimiterDecision_RateLimiterInfo_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_v1_LimiterDecision_RateLimiterInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_v1_LimiterDecision_ConcurrencyLimiterInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_v1_FluxMeterInfo_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_v1_FluxMeterInfo_fieldAccessorTable;
 
