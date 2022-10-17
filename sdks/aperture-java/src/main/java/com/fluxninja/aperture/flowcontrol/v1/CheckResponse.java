@@ -42,6 +42,176 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
+  private CheckResponse(
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    this();
+    if (extensionRegistry == null) {
+      throw new java.lang.NullPointerException();
+    }
+    int mutable_bitField0_ = 0;
+    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+        com.google.protobuf.UnknownFieldSet.newBuilder();
+    try {
+      boolean done = false;
+      while (!done) {
+        int tag = input.readTag();
+        switch (tag) {
+          case 0:
+            done = true;
+            break;
+          case 10: {
+            com.google.protobuf.Timestamp.Builder subBuilder = null;
+            if (start_ != null) {
+              subBuilder = start_.toBuilder();
+            }
+            start_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(start_);
+              start_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
+          case 18: {
+            com.google.protobuf.Timestamp.Builder subBuilder = null;
+            if (end_ != null) {
+              subBuilder = end_.toBuilder();
+            }
+            end_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(end_);
+              end_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
+          case 24: {
+            int rawValue = input.readEnum();
+
+            error_ = rawValue;
+            break;
+          }
+          case 34: {
+            java.lang.String s = input.readStringRequireUtf8();
+            if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+              services_ = new com.google.protobuf.LazyStringArrayList();
+              mutable_bitField0_ |= 0x00000001;
+            }
+            services_.add(s);
+            break;
+          }
+          case 42: {
+            com.fluxninja.aperture.flowcontrol.v1.ControlPointInfo.Builder subBuilder = null;
+            if (controlPointInfo_ != null) {
+              subBuilder = controlPointInfo_.toBuilder();
+            }
+            controlPointInfo_ = input.readMessage(com.fluxninja.aperture.flowcontrol.v1.ControlPointInfo.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(controlPointInfo_);
+              controlPointInfo_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
+          case 50: {
+            java.lang.String s = input.readStringRequireUtf8();
+            if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+              flowLabelKeys_ = new com.google.protobuf.LazyStringArrayList();
+              mutable_bitField0_ |= 0x00000002;
+            }
+            flowLabelKeys_.add(s);
+            break;
+          }
+          case 58: {
+            if (!((mutable_bitField0_ & 0x00000004) != 0)) {
+              telemetryFlowLabels_ = com.google.protobuf.MapField.newMapField(
+                  TelemetryFlowLabelsDefaultEntryHolder.defaultEntry);
+              mutable_bitField0_ |= 0x00000004;
+            }
+            com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+            telemetryFlowLabels__ = input.readMessage(
+                TelemetryFlowLabelsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+            telemetryFlowLabels_.getMutableMap().put(
+                telemetryFlowLabels__.getKey(), telemetryFlowLabels__.getValue());
+            break;
+          }
+          case 64: {
+            int rawValue = input.readEnum();
+
+            decisionType_ = rawValue;
+            break;
+          }
+          case 72: {
+            int rawValue = input.readEnum();
+
+            rejectReason_ = rawValue;
+            break;
+          }
+          case 82: {
+            if (!((mutable_bitField0_ & 0x00000008) != 0)) {
+              classifierInfos_ = new java.util.ArrayList<com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo>();
+              mutable_bitField0_ |= 0x00000008;
+            }
+            classifierInfos_.add(
+                input.readMessage(com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo.parser(), extensionRegistry));
+            break;
+          }
+          case 90: {
+            if (!((mutable_bitField0_ & 0x00000010) != 0)) {
+              fluxMeterInfos_ = new java.util.ArrayList<com.fluxninja.aperture.flowcontrol.v1.FluxMeterInfo>();
+              mutable_bitField0_ |= 0x00000010;
+            }
+            fluxMeterInfos_.add(
+                input.readMessage(com.fluxninja.aperture.flowcontrol.v1.FluxMeterInfo.parser(), extensionRegistry));
+            break;
+          }
+          case 98: {
+            if (!((mutable_bitField0_ & 0x00000020) != 0)) {
+              limiterDecisions_ = new java.util.ArrayList<com.fluxninja.aperture.flowcontrol.v1.LimiterDecision>();
+              mutable_bitField0_ |= 0x00000020;
+            }
+            limiterDecisions_.add(
+                input.readMessage(com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.parser(), extensionRegistry));
+            break;
+          }
+          default: {
+            if (!parseUnknownField(
+                input, unknownFields, extensionRegistry, tag)) {
+              done = true;
+            }
+            break;
+          }
+        }
+      }
+    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+      throw e.setUnfinishedMessage(this);
+    } catch (com.google.protobuf.UninitializedMessageException e) {
+      throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
+    } catch (java.io.IOException e) {
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e).setUnfinishedMessage(this);
+    } finally {
+      if (((mutable_bitField0_ & 0x00000001) != 0)) {
+        services_ = services_.getUnmodifiableView();
+      }
+      if (((mutable_bitField0_ & 0x00000002) != 0)) {
+        flowLabelKeys_ = flowLabelKeys_.getUnmodifiableView();
+      }
+      if (((mutable_bitField0_ & 0x00000008) != 0)) {
+        classifierInfos_ = java.util.Collections.unmodifiableList(classifierInfos_);
+      }
+      if (((mutable_bitField0_ & 0x00000010) != 0)) {
+        fluxMeterInfos_ = java.util.Collections.unmodifiableList(fluxMeterInfos_);
+      }
+      if (((mutable_bitField0_ & 0x00000020) != 0)) {
+        limiterDecisions_ = java.util.Collections.unmodifiableList(limiterDecisions_);
+      }
+      this.unknownFields = unknownFields.build();
+      makeExtensionsImmutable();
+    }
+  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.fluxninja.aperture.flowcontrol.v1.FlowcontrolProto.internal_static_aperture_flowcontrol_v1_CheckResponse_descriptor;
@@ -1075,7 +1245,7 @@ private static final long serialVersionUID = 0L;
     for (int i = 0; i < limiterDecisions_.size(); i++) {
       output.writeMessage(12, limiterDecisions_.get(i));
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
   @java.lang.Override
@@ -1146,7 +1316,7 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(12, limiterDecisions_.get(i));
     }
-    size += getUnknownFields().getSerializedSize();
+    size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -1191,7 +1361,7 @@ private static final long serialVersionUID = 0L;
         .equals(other.getFluxMeterInfosList())) return false;
     if (!getLimiterDecisionsList()
         .equals(other.getLimiterDecisionsList())) return false;
-    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+    if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
 
@@ -1244,7 +1414,7 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + LIMITER_DECISIONS_FIELD_NUMBER;
       hash = (53 * hash) + getLimiterDecisionsList().hashCode();
     }
-    hash = (29 * hash) + getUnknownFields().hashCode();
+    hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -1387,13 +1557,21 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.aperture.flowcontrol.v1.CheckResponse.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getClassifierInfosFieldBuilder();
+        getFluxMeterInfosFieldBuilder();
+        getLimiterDecisionsFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -1429,25 +1607,22 @@ private static final long serialVersionUID = 0L;
 
       if (classifierInfosBuilder_ == null) {
         classifierInfos_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000008);
       } else {
-        classifierInfos_ = null;
         classifierInfosBuilder_.clear();
       }
-      bitField0_ = (bitField0_ & ~0x00000008);
       if (fluxMeterInfosBuilder_ == null) {
         fluxMeterInfos_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000010);
       } else {
-        fluxMeterInfos_ = null;
         fluxMeterInfosBuilder_.clear();
       }
-      bitField0_ = (bitField0_ & ~0x00000010);
       if (limiterDecisionsBuilder_ == null) {
         limiterDecisions_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000020);
       } else {
-        limiterDecisions_ = null;
         limiterDecisionsBuilder_.clear();
       }
-      bitField0_ = (bitField0_ & ~0x00000020);
       return this;
     }
 
@@ -1698,7 +1873,7 @@ private static final long serialVersionUID = 0L;
           }
         }
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
       onChanged();
       return this;
     }
@@ -1713,125 +1888,17 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
+      com.fluxninja.aperture.flowcontrol.v1.CheckResponse parsedMessage = null;
       try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              input.readMessage(
-                  getStartFieldBuilder().getBuilder(),
-                  extensionRegistry);
-
-              break;
-            } // case 10
-            case 18: {
-              input.readMessage(
-                  getEndFieldBuilder().getBuilder(),
-                  extensionRegistry);
-
-              break;
-            } // case 18
-            case 24: {
-              error_ = input.readEnum();
-
-              break;
-            } // case 24
-            case 34: {
-              java.lang.String s = input.readStringRequireUtf8();
-              ensureServicesIsMutable();
-              services_.add(s);
-              break;
-            } // case 34
-            case 42: {
-              input.readMessage(
-                  getControlPointInfoFieldBuilder().getBuilder(),
-                  extensionRegistry);
-
-              break;
-            } // case 42
-            case 50: {
-              java.lang.String s = input.readStringRequireUtf8();
-              ensureFlowLabelKeysIsMutable();
-              flowLabelKeys_.add(s);
-              break;
-            } // case 50
-            case 58: {
-              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-              telemetryFlowLabels__ = input.readMessage(
-                  TelemetryFlowLabelsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-              internalGetMutableTelemetryFlowLabels().getMutableMap().put(
-                  telemetryFlowLabels__.getKey(), telemetryFlowLabels__.getValue());
-              break;
-            } // case 58
-            case 64: {
-              decisionType_ = input.readEnum();
-
-              break;
-            } // case 64
-            case 72: {
-              rejectReason_ = input.readEnum();
-
-              break;
-            } // case 72
-            case 82: {
-              com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo m =
-                  input.readMessage(
-                      com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo.parser(),
-                      extensionRegistry);
-              if (classifierInfosBuilder_ == null) {
-                ensureClassifierInfosIsMutable();
-                classifierInfos_.add(m);
-              } else {
-                classifierInfosBuilder_.addMessage(m);
-              }
-              break;
-            } // case 82
-            case 90: {
-              com.fluxninja.aperture.flowcontrol.v1.FluxMeterInfo m =
-                  input.readMessage(
-                      com.fluxninja.aperture.flowcontrol.v1.FluxMeterInfo.parser(),
-                      extensionRegistry);
-              if (fluxMeterInfosBuilder_ == null) {
-                ensureFluxMeterInfosIsMutable();
-                fluxMeterInfos_.add(m);
-              } else {
-                fluxMeterInfosBuilder_.addMessage(m);
-              }
-              break;
-            } // case 90
-            case 98: {
-              com.fluxninja.aperture.flowcontrol.v1.LimiterDecision m =
-                  input.readMessage(
-                      com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.parser(),
-                      extensionRegistry);
-              if (limiterDecisionsBuilder_ == null) {
-                ensureLimiterDecisionsIsMutable();
-                limiterDecisions_.add(m);
-              } else {
-                limiterDecisionsBuilder_.addMessage(m);
-              }
-              break;
-            } // case 98
-            default: {
-              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
-                done = true; // was an endgroup tag
-              }
-              break;
-            } // default:
-          } // switch (tag)
-        } // while (!done)
+        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        parsedMessage = (com.fluxninja.aperture.flowcontrol.v1.CheckResponse) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        onChanged();
-      } // finally
+        if (parsedMessage != null) {
+          mergeFrom(parsedMessage);
+        }
+      }
       return this;
     }
     private int bitField0_;
@@ -3942,18 +4009,7 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      Builder builder = newBuilder();
-      try {
-        builder.mergeFrom(input, extensionRegistry);
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(builder.buildPartial());
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e)
-            .setUnfinishedMessage(builder.buildPartial());
-      }
-      return builder.buildPartial();
+      return new CheckResponse(input, extensionRegistry);
     }
   };
 

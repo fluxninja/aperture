@@ -69,7 +69,7 @@ public final class ApertureSDK {
             .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
             .check(req);
 
-    span.setAttribute(CHECK_RESPONSE_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
+    span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
     return new Flow(
             res,

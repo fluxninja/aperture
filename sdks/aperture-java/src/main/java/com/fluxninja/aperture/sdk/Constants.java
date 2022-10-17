@@ -18,7 +18,7 @@ public final class Constants {
     public static final String CHECK_RESPONSE_LABEL = "aperture.check_response";
     public static final String FLOW_START_TIMESTAMP_LABEL = "aperture.flow_start_timestamp";
     public static final String FLOW_STOP_TIMESTAMP_LABEL = "aperture.flow_end_timestamp";
-    public static final String CHECK_RESPONSE_TIMESTAMP_LABEL = "aperture.check_response_timestamp";
+    public static final String WORKLOAD_START_TIMESTAMP_LABEL = "aperture.workload_start_timestamp";
 
     private Constants() {
     }
