@@ -6,7 +6,8 @@ import (
 
 // Config defines configuration for rollup processor.
 type Config struct {
-	config.ProcessorSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct
+	config.ProcessorSettings  `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct
+	AttributeCardinalityLimit int                      `mapstructure:"attribute_cardinality_limit"`
 }
 
 var _ config.Processor = (*Config)(nil)
