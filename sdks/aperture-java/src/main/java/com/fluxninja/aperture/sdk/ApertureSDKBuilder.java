@@ -5,6 +5,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporterBuilder;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 
@@ -58,19 +59,16 @@ public final class ApertureSDKBuilder {
       protocol = "https";
     }
 
-    String endpoint = String.format("%s://%s:%d/opentelemetry.proto.collector.trace.v1.TraceService/Export", protocol, host, port);
-
     Duration timeout = this.timeout;
     if (timeout == null) {
       timeout = DEFAULT_RPC_TIMEOUT;
     }
 
-
     ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
     FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient = FlowControlServiceGrpc.newBlockingStub(channel);
 
     OtlpGrpcSpanExporter spanExporter = OtlpGrpcSpanExporter.builder()
-            .setEndpoint(endpoint)
+            .setEndpoint(String.format("%s://%s:%d", protocol, host, port))
             .build();
     SdkTracerProvider traceProvider = SdkTracerProvider.builder()
             .addSpanProcessor(SimpleSpanProcessor.create(spanExporter))

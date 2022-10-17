@@ -76,6 +76,7 @@ public class App {
         if (flow.accepted()) {
             // Simulate work being done
             try {
+                res.status(202);
                 Thread.sleep(2000);
                 // Need to call end() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
                 // The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
@@ -87,6 +88,7 @@ public class App {
         } else {
             // Flow has been rejected by Aperture Agent.
             try {
+                res.status(403);
                 flow.end(FlowStatus.Error);
             } catch (ApertureSDKException e) {
                 e.printStackTrace();
@@ -97,9 +99,9 @@ public class App {
 
     private String handleConnectedAPI(spark.Request req, spark.Response res) {
         ConnectivityState state = this.channel.getState(true);
-        if (state.toString() != "READY") {
-            res.status(503);
-        }
+//        if (state.toString() != "READY") {
+//            res.status(503);
+//        }
         return state.toString();
     }
 
