@@ -8,7 +8,7 @@ local timeSeriesPanel = lib.TimeSeriesPanel;
 
 local defaults = {
   policyName: error 'policyName must be set',
-  refreshInterval: '30s',
+  refreshInterval: '10s',
   timeFrom: 'now-30m',
   timeTo: 'now',
   datasource: {

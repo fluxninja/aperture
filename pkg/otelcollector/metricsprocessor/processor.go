@@ -224,9 +224,9 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		otelcollector.ApertureFlowLabelKeysLabel:               pcommon.NewValueSlice(),
 		otelcollector.ApertureClassifiersLabel:                 pcommon.NewValueSlice(),
 		otelcollector.ApertureClassifierErrorsLabel:            pcommon.NewValueSlice(),
-		otelcollector.ApertureDecisionTypeLabel:                pcommon.NewValueString(checkResponse.DecisionType.String()),
-		otelcollector.ApertureRejectReasonLabel:                pcommon.NewValueString(checkResponse.GetRejectReason().String()),
-		otelcollector.ApertureErrorLabel:                       pcommon.NewValueString(checkResponse.GetError().String()),
+		otelcollector.ApertureDecisionTypeLabel:                pcommon.NewValueStr(checkResponse.DecisionType.String()),
+		otelcollector.ApertureRejectReasonLabel:                pcommon.NewValueStr(checkResponse.GetRejectReason().String()),
+		otelcollector.ApertureErrorLabel:                       pcommon.NewValueStr(checkResponse.GetError().String()),
 	}
 	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiterInfo() != nil {
@@ -303,7 +303,7 @@ func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 
 func addFlowLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse) {
 	for key, value := range checkResponse.TelemetryFlowLabels {
-		pcommon.NewValueString(value).CopyTo(attributes.PutEmpty(key))
+		pcommon.NewValueStr(value).CopyTo(attributes.PutEmpty(key))
 	}
 }
 
