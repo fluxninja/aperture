@@ -962,10 +962,10 @@ message Scheduler {
     extensions: {
       key: "x-go-default"
       value: {
-        string_value: "0.45s"
+        string_value: "0.49s"
       }
     }
-  }]; // @gotags: default:"0.45s"
+  }]; // @gotags: default:"0.49s"
 }
 
 // Takes the load shed factor input signal and publishes it to the schedulers in the data-plane

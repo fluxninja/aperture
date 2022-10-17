@@ -2173,7 +2173,7 @@ of this average can change).
 <dt>max_timeout</dt>
 <dd>
 
-(string, default: `0.45s`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
+(string, default: `0.49s`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
 
 :::caution
 This timeout needs to be strictly less than the timeout set on the
