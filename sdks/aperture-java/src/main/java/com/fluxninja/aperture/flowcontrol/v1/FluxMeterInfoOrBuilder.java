@@ -8,12 +8,12 @@ public interface FluxMeterInfoOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string flux_meter_name = 1[json_name = "fluxMeterName"];</code>
+   * <code>string flux_meter_name = 1 [json_name = "fluxMeterName"];</code>
    * @return The fluxMeterName.
    */
   java.lang.String getFluxMeterName();
   /**
-   * <code>string flux_meter_name = 1[json_name = "fluxMeterName"];</code>
+   * <code>string flux_meter_name = 1 [json_name = "fluxMeterName"];</code>
    * @return The bytes for fluxMeterName.
    */
   com.google.protobuf.ByteString

@@ -38,72 +38,6 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-  private ClassifierInfo(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    this();
-    if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
-    }
-    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
-    try {
-      boolean done = false;
-      while (!done) {
-        int tag = input.readTag();
-        switch (tag) {
-          case 0:
-            done = true;
-            break;
-          case 10: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            policyName_ = s;
-            break;
-          }
-          case 18: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            policyHash_ = s;
-            break;
-          }
-          case 24: {
-
-            classifierIndex_ = input.readInt64();
-            break;
-          }
-          case 34: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            labelKey_ = s;
-            break;
-          }
-          case 40: {
-            int rawValue = input.readEnum();
-
-            error_ = rawValue;
-            break;
-          }
-          default: {
-            if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
-              done = true;
-            }
-            break;
-          }
-        }
-      }
-    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
-    } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
-    } finally {
-      this.unknownFields = unknownFields.build();
-      makeExtensionsImmutable();
-    }
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.fluxninja.aperture.flowcontrol.v1.FlowcontrolProto.internal_static_aperture_flowcontrol_v1_ClassifierInfo_descriptor;
@@ -268,7 +202,7 @@ private static final long serialVersionUID = 0L;
   public static final int POLICY_NAME_FIELD_NUMBER = 1;
   private volatile java.lang.Object policyName_;
   /**
-   * <code>string policy_name = 1[json_name = "policyName"];</code>
+   * <code>string policy_name = 1 [json_name = "policyName"];</code>
    * @return The policyName.
    */
   @java.lang.Override
@@ -285,7 +219,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string policy_name = 1[json_name = "policyName"];</code>
+   * <code>string policy_name = 1 [json_name = "policyName"];</code>
    * @return The bytes for policyName.
    */
   @java.lang.Override
@@ -306,7 +240,7 @@ private static final long serialVersionUID = 0L;
   public static final int POLICY_HASH_FIELD_NUMBER = 2;
   private volatile java.lang.Object policyHash_;
   /**
-   * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+   * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
    * @return The policyHash.
    */
   @java.lang.Override
@@ -323,7 +257,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+   * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
    * @return The bytes for policyHash.
    */
   @java.lang.Override
@@ -344,7 +278,7 @@ private static final long serialVersionUID = 0L;
   public static final int CLASSIFIER_INDEX_FIELD_NUMBER = 3;
   private long classifierIndex_;
   /**
-   * <code>int64 classifier_index = 3[json_name = "classifierIndex"];</code>
+   * <code>int64 classifier_index = 3 [json_name = "classifierIndex"];</code>
    * @return The classifierIndex.
    */
   @java.lang.Override
@@ -355,7 +289,7 @@ private static final long serialVersionUID = 0L;
   public static final int LABEL_KEY_FIELD_NUMBER = 4;
   private volatile java.lang.Object labelKey_;
   /**
-   * <code>string label_key = 4[json_name = "labelKey"];</code>
+   * <code>string label_key = 4 [json_name = "labelKey"];</code>
    * @return The labelKey.
    */
   @java.lang.Override
@@ -372,7 +306,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string label_key = 4[json_name = "labelKey"];</code>
+   * <code>string label_key = 4 [json_name = "labelKey"];</code>
    * @return The bytes for labelKey.
    */
   @java.lang.Override
@@ -393,14 +327,14 @@ private static final long serialVersionUID = 0L;
   public static final int ERROR_FIELD_NUMBER = 5;
   private int error_;
   /**
-   * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5[json_name = "error"];</code>
+   * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5 [json_name = "error"];</code>
    * @return The enum numeric value on the wire for error.
    */
   @java.lang.Override public int getErrorValue() {
     return error_;
   }
   /**
-   * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5[json_name = "error"];</code>
+   * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5 [json_name = "error"];</code>
    * @return The error.
    */
   @java.lang.Override public com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo.Error getError() {
@@ -423,22 +357,22 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!getPolicyNameBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(policyName_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 1, policyName_);
     }
-    if (!getPolicyHashBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(policyHash_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 2, policyHash_);
     }
     if (classifierIndex_ != 0L) {
       output.writeInt64(3, classifierIndex_);
     }
-    if (!getLabelKeyBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(labelKey_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 4, labelKey_);
     }
     if (error_ != com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo.Error.ERROR_NONE.getNumber()) {
       output.writeEnum(5, error_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
   @java.lang.Override
@@ -447,24 +381,24 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!getPolicyNameBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(policyName_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, policyName_);
     }
-    if (!getPolicyHashBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(policyHash_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, policyHash_);
     }
     if (classifierIndex_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt64Size(3, classifierIndex_);
     }
-    if (!getLabelKeyBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(labelKey_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, labelKey_);
     }
     if (error_ != com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo.Error.ERROR_NONE.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(5, error_);
     }
-    size += unknownFields.getSerializedSize();
+    size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -488,7 +422,7 @@ private static final long serialVersionUID = 0L;
     if (!getLabelKey()
         .equals(other.getLabelKey())) return false;
     if (error_ != other.error_) return false;
-    if (!unknownFields.equals(other.unknownFields)) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -510,7 +444,7 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getLabelKey().hashCode();
     hash = (37 * hash) + ERROR_FIELD_NUMBER;
     hash = (53 * hash) + error_;
-    hash = (29 * hash) + unknownFields.hashCode();
+    hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -631,18 +565,13 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo.newBuilder()
     private Builder() {
-      maybeForceBuilderInitialization();
+
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-      maybeForceBuilderInitialization();
-    }
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-      }
+
     }
     @java.lang.Override
     public Builder clear() {
@@ -754,7 +683,7 @@ private static final long serialVersionUID = 0L;
       if (other.error_ != 0) {
         setErrorValue(other.getErrorValue());
       }
-      this.mergeUnknownFields(other.unknownFields);
+      this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
     }
@@ -769,23 +698,61 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo parsedMessage = null;
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       try {
-        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              policyName_ = input.readStringRequireUtf8();
+
+              break;
+            } // case 10
+            case 18: {
+              policyHash_ = input.readStringRequireUtf8();
+
+              break;
+            } // case 18
+            case 24: {
+              classifierIndex_ = input.readInt64();
+
+              break;
+            } // case 24
+            case 34: {
+              labelKey_ = input.readStringRequireUtf8();
+
+              break;
+            } // case 34
+            case 40: {
+              error_ = input.readEnum();
+
+              break;
+            } // case 40
+            default: {
+              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                done = true; // was an endgroup tag
+              }
+              break;
+            } // default:
+          } // switch (tag)
+        } // while (!done)
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        if (parsedMessage != null) {
-          mergeFrom(parsedMessage);
-        }
-      }
+        onChanged();
+      } // finally
       return this;
     }
 
     private java.lang.Object policyName_ = "";
     /**
-     * <code>string policy_name = 1[json_name = "policyName"];</code>
+     * <code>string policy_name = 1 [json_name = "policyName"];</code>
      * @return The policyName.
      */
     public java.lang.String getPolicyName() {
@@ -801,7 +768,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string policy_name = 1[json_name = "policyName"];</code>
+     * <code>string policy_name = 1 [json_name = "policyName"];</code>
      * @return The bytes for policyName.
      */
     public com.google.protobuf.ByteString
@@ -818,7 +785,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string policy_name = 1[json_name = "policyName"];</code>
+     * <code>string policy_name = 1 [json_name = "policyName"];</code>
      * @param value The policyName to set.
      * @return This builder for chaining.
      */
@@ -833,7 +800,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string policy_name = 1[json_name = "policyName"];</code>
+     * <code>string policy_name = 1 [json_name = "policyName"];</code>
      * @return This builder for chaining.
      */
     public Builder clearPolicyName() {
@@ -843,7 +810,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string policy_name = 1[json_name = "policyName"];</code>
+     * <code>string policy_name = 1 [json_name = "policyName"];</code>
      * @param value The bytes for policyName to set.
      * @return This builder for chaining.
      */
@@ -861,7 +828,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object policyHash_ = "";
     /**
-     * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+     * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
      * @return The policyHash.
      */
     public java.lang.String getPolicyHash() {
@@ -877,7 +844,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+     * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
      * @return The bytes for policyHash.
      */
     public com.google.protobuf.ByteString
@@ -894,7 +861,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+     * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
      * @param value The policyHash to set.
      * @return This builder for chaining.
      */
@@ -909,7 +876,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+     * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
      * @return This builder for chaining.
      */
     public Builder clearPolicyHash() {
@@ -919,7 +886,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+     * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
      * @param value The bytes for policyHash to set.
      * @return This builder for chaining.
      */
@@ -937,7 +904,7 @@ private static final long serialVersionUID = 0L;
 
     private long classifierIndex_ ;
     /**
-     * <code>int64 classifier_index = 3[json_name = "classifierIndex"];</code>
+     * <code>int64 classifier_index = 3 [json_name = "classifierIndex"];</code>
      * @return The classifierIndex.
      */
     @java.lang.Override
@@ -945,7 +912,7 @@ private static final long serialVersionUID = 0L;
       return classifierIndex_;
     }
     /**
-     * <code>int64 classifier_index = 3[json_name = "classifierIndex"];</code>
+     * <code>int64 classifier_index = 3 [json_name = "classifierIndex"];</code>
      * @param value The classifierIndex to set.
      * @return This builder for chaining.
      */
@@ -956,7 +923,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>int64 classifier_index = 3[json_name = "classifierIndex"];</code>
+     * <code>int64 classifier_index = 3 [json_name = "classifierIndex"];</code>
      * @return This builder for chaining.
      */
     public Builder clearClassifierIndex() {
@@ -968,7 +935,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object labelKey_ = "";
     /**
-     * <code>string label_key = 4[json_name = "labelKey"];</code>
+     * <code>string label_key = 4 [json_name = "labelKey"];</code>
      * @return The labelKey.
      */
     public java.lang.String getLabelKey() {
@@ -984,7 +951,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string label_key = 4[json_name = "labelKey"];</code>
+     * <code>string label_key = 4 [json_name = "labelKey"];</code>
      * @return The bytes for labelKey.
      */
     public com.google.protobuf.ByteString
@@ -1001,7 +968,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string label_key = 4[json_name = "labelKey"];</code>
+     * <code>string label_key = 4 [json_name = "labelKey"];</code>
      * @param value The labelKey to set.
      * @return This builder for chaining.
      */
@@ -1016,7 +983,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string label_key = 4[json_name = "labelKey"];</code>
+     * <code>string label_key = 4 [json_name = "labelKey"];</code>
      * @return This builder for chaining.
      */
     public Builder clearLabelKey() {
@@ -1026,7 +993,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string label_key = 4[json_name = "labelKey"];</code>
+     * <code>string label_key = 4 [json_name = "labelKey"];</code>
      * @param value The bytes for labelKey to set.
      * @return This builder for chaining.
      */
@@ -1044,14 +1011,14 @@ private static final long serialVersionUID = 0L;
 
     private int error_ = 0;
     /**
-     * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5[json_name = "error"];</code>
+     * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5 [json_name = "error"];</code>
      * @return The enum numeric value on the wire for error.
      */
     @java.lang.Override public int getErrorValue() {
       return error_;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5[json_name = "error"];</code>
+     * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5 [json_name = "error"];</code>
      * @param value The enum numeric value on the wire for error to set.
      * @return This builder for chaining.
      */
@@ -1062,7 +1029,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5[json_name = "error"];</code>
+     * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5 [json_name = "error"];</code>
      * @return The error.
      */
     @java.lang.Override
@@ -1072,7 +1039,7 @@ private static final long serialVersionUID = 0L;
       return result == null ? com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo.Error.UNRECOGNIZED : result;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5[json_name = "error"];</code>
+     * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5 [json_name = "error"];</code>
      * @param value The error to set.
      * @return This builder for chaining.
      */
@@ -1086,7 +1053,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5[json_name = "error"];</code>
+     * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5 [json_name = "error"];</code>
      * @return This builder for chaining.
      */
     public Builder clearError() {
@@ -1128,7 +1095,18 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new ClassifierInfo(input, extensionRegistry);
+      Builder builder = newBuilder();
+      try {
+        builder.mergeFrom(input, extensionRegistry);
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(builder.buildPartial());
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e)
+            .setUnfinishedMessage(builder.buildPartial());
+      }
+      return builder.buildPartial();
     }
   };
 

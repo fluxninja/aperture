@@ -8,23 +8,23 @@ public interface CheckRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string feature = 1[json_name = "feature"];</code>
+   * <code>string feature = 1 [json_name = "feature"];</code>
    * @return The feature.
    */
   java.lang.String getFeature();
   /**
-   * <code>string feature = 1[json_name = "feature"];</code>
+   * <code>string feature = 1 [json_name = "feature"];</code>
    * @return The bytes for feature.
    */
   com.google.protobuf.ByteString
       getFeatureBytes();
 
   /**
-   * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+   * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
   int getLabelsCount();
   /**
-   * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+   * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
   boolean containsLabels(
       java.lang.String key);
@@ -35,19 +35,21 @@ public interface CheckRequestOrBuilder extends
   java.util.Map<java.lang.String, java.lang.String>
   getLabels();
   /**
-   * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+   * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
   java.util.Map<java.lang.String, java.lang.String>
   getLabelsMap();
   /**
-   * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+   * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
 
-  java.lang.String getLabelsOrDefault(
+  /* nullable */
+java.lang.String getLabelsOrDefault(
       java.lang.String key,
-      java.lang.String defaultValue);
+      /* nullable */
+java.lang.String defaultValue);
   /**
-   * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+   * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
 
   java.lang.String getLabelsOrThrow(

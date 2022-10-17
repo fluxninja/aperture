@@ -35,63 +35,6 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-  private CheckRequest(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    this();
-    if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
-    }
-    int mutable_bitField0_ = 0;
-    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
-    try {
-      boolean done = false;
-      while (!done) {
-        int tag = input.readTag();
-        switch (tag) {
-          case 0:
-            done = true;
-            break;
-          case 10: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            feature_ = s;
-            break;
-          }
-          case 18: {
-            if (!((mutable_bitField0_ & 0x00000001) != 0)) {
-              labels_ = com.google.protobuf.MapField.newMapField(
-                  LabelsDefaultEntryHolder.defaultEntry);
-              mutable_bitField0_ |= 0x00000001;
-            }
-            com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-            labels__ = input.readMessage(
-                LabelsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-            labels_.getMutableMap().put(
-                labels__.getKey(), labels__.getValue());
-            break;
-          }
-          default: {
-            if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
-              done = true;
-            }
-            break;
-          }
-        }
-      }
-    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
-    } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
-    } finally {
-      this.unknownFields = unknownFields.build();
-      makeExtensionsImmutable();
-    }
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.fluxninja.aperture.flowcontrol.v1.FlowcontrolProto.internal_static_aperture_flowcontrol_v1_CheckRequest_descriptor;
@@ -120,7 +63,7 @@ private static final long serialVersionUID = 0L;
   public static final int FEATURE_FIELD_NUMBER = 1;
   private volatile java.lang.Object feature_;
   /**
-   * <code>string feature = 1[json_name = "feature"];</code>
+   * <code>string feature = 1 [json_name = "feature"];</code>
    * @return The feature.
    */
   @java.lang.Override
@@ -137,7 +80,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string feature = 1[json_name = "feature"];</code>
+   * <code>string feature = 1 [json_name = "feature"];</code>
    * @return The bytes for feature.
    */
   @java.lang.Override
@@ -182,13 +125,13 @@ private static final long serialVersionUID = 0L;
     return internalGetLabels().getMap().size();
   }
   /**
-   * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+   * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
 
   @java.lang.Override
   public boolean containsLabels(
       java.lang.String key) {
-    if (key == null) { throw new java.lang.NullPointerException(); }
+    if (key == null) { throw new NullPointerException("map key"); }
     return internalGetLabels().getMap().containsKey(key);
   }
   /**
@@ -200,7 +143,7 @@ private static final long serialVersionUID = 0L;
     return getLabelsMap();
   }
   /**
-   * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+   * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
   @java.lang.Override
 
@@ -208,26 +151,26 @@ private static final long serialVersionUID = 0L;
     return internalGetLabels().getMap();
   }
   /**
-   * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+   * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
   @java.lang.Override
 
   public java.lang.String getLabelsOrDefault(
       java.lang.String key,
       java.lang.String defaultValue) {
-    if (key == null) { throw new java.lang.NullPointerException(); }
+    if (key == null) { throw new NullPointerException("map key"); }
     java.util.Map<java.lang.String, java.lang.String> map =
         internalGetLabels().getMap();
     return map.containsKey(key) ? map.get(key) : defaultValue;
   }
   /**
-   * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+   * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
   @java.lang.Override
 
   public java.lang.String getLabelsOrThrow(
       java.lang.String key) {
-    if (key == null) { throw new java.lang.NullPointerException(); }
+    if (key == null) { throw new NullPointerException("map key"); }
     java.util.Map<java.lang.String, java.lang.String> map =
         internalGetLabels().getMap();
     if (!map.containsKey(key)) {
@@ -250,7 +193,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!getFeatureBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(feature_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 1, feature_);
     }
     com.google.protobuf.GeneratedMessageV3
@@ -259,7 +202,7 @@ private static final long serialVersionUID = 0L;
         internalGetLabels(),
         LabelsDefaultEntryHolder.defaultEntry,
         2);
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
   @java.lang.Override
@@ -268,7 +211,7 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!getFeatureBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(feature_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, feature_);
     }
     for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
@@ -281,7 +224,7 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, labels__);
     }
-    size += unknownFields.getSerializedSize();
+    size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -300,7 +243,7 @@ private static final long serialVersionUID = 0L;
         .equals(other.getFeature())) return false;
     if (!internalGetLabels().equals(
         other.internalGetLabels())) return false;
-    if (!unknownFields.equals(other.unknownFields)) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -317,7 +260,7 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + LABELS_FIELD_NUMBER;
       hash = (53 * hash) + internalGetLabels().hashCode();
     }
-    hash = (29 * hash) + unknownFields.hashCode();
+    hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -460,18 +403,13 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.aperture.flowcontrol.v1.CheckRequest.newBuilder()
     private Builder() {
-      maybeForceBuilderInitialization();
+
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-      maybeForceBuilderInitialization();
-    }
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-      }
+
     }
     @java.lang.Override
     public Builder clear() {
@@ -563,7 +501,7 @@ private static final long serialVersionUID = 0L;
       }
       internalGetMutableLabels().mergeFrom(
           other.internalGetLabels());
-      this.mergeUnknownFields(other.unknownFields);
+      this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
     }
@@ -578,24 +516,50 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.fluxninja.aperture.flowcontrol.v1.CheckRequest parsedMessage = null;
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       try {
-        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              feature_ = input.readStringRequireUtf8();
+
+              break;
+            } // case 10
+            case 18: {
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              labels__ = input.readMessage(
+                  LabelsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              internalGetMutableLabels().getMutableMap().put(
+                  labels__.getKey(), labels__.getValue());
+              break;
+            } // case 18
+            default: {
+              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                done = true; // was an endgroup tag
+              }
+              break;
+            } // default:
+          } // switch (tag)
+        } // while (!done)
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.fluxninja.aperture.flowcontrol.v1.CheckRequest) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        if (parsedMessage != null) {
-          mergeFrom(parsedMessage);
-        }
-      }
+        onChanged();
+      } // finally
       return this;
     }
     private int bitField0_;
 
     private java.lang.Object feature_ = "";
     /**
-     * <code>string feature = 1[json_name = "feature"];</code>
+     * <code>string feature = 1 [json_name = "feature"];</code>
      * @return The feature.
      */
     public java.lang.String getFeature() {
@@ -611,7 +575,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string feature = 1[json_name = "feature"];</code>
+     * <code>string feature = 1 [json_name = "feature"];</code>
      * @return The bytes for feature.
      */
     public com.google.protobuf.ByteString
@@ -628,7 +592,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string feature = 1[json_name = "feature"];</code>
+     * <code>string feature = 1 [json_name = "feature"];</code>
      * @param value The feature to set.
      * @return This builder for chaining.
      */
@@ -643,7 +607,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string feature = 1[json_name = "feature"];</code>
+     * <code>string feature = 1 [json_name = "feature"];</code>
      * @return This builder for chaining.
      */
     public Builder clearFeature() {
@@ -653,7 +617,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string feature = 1[json_name = "feature"];</code>
+     * <code>string feature = 1 [json_name = "feature"];</code>
      * @param value The bytes for feature to set.
      * @return This builder for chaining.
      */
@@ -696,13 +660,13 @@ private static final long serialVersionUID = 0L;
       return internalGetLabels().getMap().size();
     }
     /**
-     * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+     * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
 
     @java.lang.Override
     public boolean containsLabels(
         java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
+      if (key == null) { throw new NullPointerException("map key"); }
       return internalGetLabels().getMap().containsKey(key);
     }
     /**
@@ -714,7 +678,7 @@ private static final long serialVersionUID = 0L;
       return getLabelsMap();
     }
     /**
-     * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+     * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
     @java.lang.Override
 
@@ -722,26 +686,26 @@ private static final long serialVersionUID = 0L;
       return internalGetLabels().getMap();
     }
     /**
-     * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+     * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
     @java.lang.Override
 
     public java.lang.String getLabelsOrDefault(
         java.lang.String key,
         java.lang.String defaultValue) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
+      if (key == null) { throw new NullPointerException("map key"); }
       java.util.Map<java.lang.String, java.lang.String> map =
           internalGetLabels().getMap();
       return map.containsKey(key) ? map.get(key) : defaultValue;
     }
     /**
-     * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+     * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
     @java.lang.Override
 
     public java.lang.String getLabelsOrThrow(
         java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
+      if (key == null) { throw new NullPointerException("map key"); }
       java.util.Map<java.lang.String, java.lang.String> map =
           internalGetLabels().getMap();
       if (!map.containsKey(key)) {
@@ -756,12 +720,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+     * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
 
     public Builder removeLabels(
         java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
+      if (key == null) { throw new NullPointerException("map key"); }
       internalGetMutableLabels().getMutableMap()
           .remove(key);
       return this;
@@ -775,19 +739,22 @@ private static final long serialVersionUID = 0L;
       return internalGetMutableLabels().getMutableMap();
     }
     /**
-     * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+     * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
     public Builder putLabels(
         java.lang.String key,
         java.lang.String value) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      if (value == null) { throw new java.lang.NullPointerException(); }
+      if (key == null) { throw new NullPointerException("map key"); }
+      if (value == null) {
+  throw new NullPointerException("map value");
+}
+
       internalGetMutableLabels().getMutableMap()
           .put(key, value);
       return this;
     }
     /**
-     * <code>map&lt;string, string&gt; labels = 2[json_name = "labels"];</code>
+     * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
 
     public Builder putAllLabels(
@@ -829,7 +796,18 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new CheckRequest(input, extensionRegistry);
+      Builder builder = newBuilder();
+      try {
+        builder.mergeFrom(input, extensionRegistry);
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(builder.buildPartial());
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e)
+            .setUnfinishedMessage(builder.buildPartial());
+      }
+      return builder.buildPartial();
     }
   };
 

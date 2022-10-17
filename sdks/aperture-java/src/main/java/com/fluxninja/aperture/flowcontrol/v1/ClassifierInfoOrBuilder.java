@@ -8,54 +8,54 @@ public interface ClassifierInfoOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string policy_name = 1[json_name = "policyName"];</code>
+   * <code>string policy_name = 1 [json_name = "policyName"];</code>
    * @return The policyName.
    */
   java.lang.String getPolicyName();
   /**
-   * <code>string policy_name = 1[json_name = "policyName"];</code>
+   * <code>string policy_name = 1 [json_name = "policyName"];</code>
    * @return The bytes for policyName.
    */
   com.google.protobuf.ByteString
       getPolicyNameBytes();
 
   /**
-   * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+   * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
    * @return The policyHash.
    */
   java.lang.String getPolicyHash();
   /**
-   * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+   * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
    * @return The bytes for policyHash.
    */
   com.google.protobuf.ByteString
       getPolicyHashBytes();
 
   /**
-   * <code>int64 classifier_index = 3[json_name = "classifierIndex"];</code>
+   * <code>int64 classifier_index = 3 [json_name = "classifierIndex"];</code>
    * @return The classifierIndex.
    */
   long getClassifierIndex();
 
   /**
-   * <code>string label_key = 4[json_name = "labelKey"];</code>
+   * <code>string label_key = 4 [json_name = "labelKey"];</code>
    * @return The labelKey.
    */
   java.lang.String getLabelKey();
   /**
-   * <code>string label_key = 4[json_name = "labelKey"];</code>
+   * <code>string label_key = 4 [json_name = "labelKey"];</code>
    * @return The bytes for labelKey.
    */
   com.google.protobuf.ByteString
       getLabelKeyBytes();
 
   /**
-   * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5[json_name = "error"];</code>
+   * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5 [json_name = "error"];</code>
    * @return The enum numeric value on the wire for error.
    */
   int getErrorValue();
   /**
-   * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5[json_name = "error"];</code>
+   * <code>.aperture.flowcontrol.v1.ClassifierInfo.Error error = 5 [json_name = "error"];</code>
    * @return The error.
    */
   com.fluxninja.aperture.flowcontrol.v1.ClassifierInfo.Error getError();

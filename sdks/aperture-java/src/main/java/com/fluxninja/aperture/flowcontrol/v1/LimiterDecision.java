@@ -37,99 +37,6 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-  private LimiterDecision(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    this();
-    if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
-    }
-    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
-    try {
-      boolean done = false;
-      while (!done) {
-        int tag = input.readTag();
-        switch (tag) {
-          case 0:
-            done = true;
-            break;
-          case 10: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            policyName_ = s;
-            break;
-          }
-          case 18: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            policyHash_ = s;
-            break;
-          }
-          case 24: {
-
-            componentIndex_ = input.readInt64();
-            break;
-          }
-          case 32: {
-
-            dropped_ = input.readBool();
-            break;
-          }
-          case 40: {
-            int rawValue = input.readEnum();
-
-            reason_ = rawValue;
-            break;
-          }
-          case 50: {
-            com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo.Builder subBuilder = null;
-            if (detailsCase_ == 6) {
-              subBuilder = ((com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo) details_).toBuilder();
-            }
-            details_ =
-                input.readMessage(com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom((com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo) details_);
-              details_ = subBuilder.buildPartial();
-            }
-            detailsCase_ = 6;
-            break;
-          }
-          case 58: {
-            com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder subBuilder = null;
-            if (detailsCase_ == 7) {
-              subBuilder = ((com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo) details_).toBuilder();
-            }
-            details_ =
-                input.readMessage(com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom((com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo) details_);
-              details_ = subBuilder.buildPartial();
-            }
-            detailsCase_ = 7;
-            break;
-          }
-          default: {
-            if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
-              done = true;
-            }
-            break;
-          }
-        }
-      }
-    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
-    } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
-    } finally {
-      this.unknownFields = unknownFields.build();
-      makeExtensionsImmutable();
-    }
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.fluxninja.aperture.flowcontrol.v1.FlowcontrolProto.internal_static_aperture_flowcontrol_v1_LimiterDecision_descriptor;
@@ -256,24 +163,24 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int64 remaining = 1[json_name = "remaining"];</code>
+     * <code>int64 remaining = 1 [json_name = "remaining"];</code>
      * @return The remaining.
      */
     long getRemaining();
 
     /**
-     * <code>int64 current = 2[json_name = "current"];</code>
+     * <code>int64 current = 2 [json_name = "current"];</code>
      * @return The current.
      */
     long getCurrent();
 
     /**
-     * <code>string label = 3[json_name = "label"];</code>
+     * <code>string label = 3 [json_name = "label"];</code>
      * @return The label.
      */
     java.lang.String getLabel();
     /**
-     * <code>string label = 3[json_name = "label"];</code>
+     * <code>string label = 3 [json_name = "label"];</code>
      * @return The bytes for label.
      */
     com.google.protobuf.ByteString
@@ -307,59 +214,6 @@ private static final long serialVersionUID = 0L;
     getUnknownFields() {
       return this.unknownFields;
     }
-    private RateLimiterInfo(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 8: {
-
-              remaining_ = input.readInt64();
-              break;
-            }
-            case 16: {
-
-              current_ = input.readInt64();
-              break;
-            }
-            case 26: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              label_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.fluxninja.aperture.flowcontrol.v1.FlowcontrolProto.internal_static_aperture_flowcontrol_v1_LimiterDecision_RateLimiterInfo_descriptor;
@@ -376,7 +230,7 @@ private static final long serialVersionUID = 0L;
     public static final int REMAINING_FIELD_NUMBER = 1;
     private long remaining_;
     /**
-     * <code>int64 remaining = 1[json_name = "remaining"];</code>
+     * <code>int64 remaining = 1 [json_name = "remaining"];</code>
      * @return The remaining.
      */
     @java.lang.Override
@@ -387,7 +241,7 @@ private static final long serialVersionUID = 0L;
     public static final int CURRENT_FIELD_NUMBER = 2;
     private long current_;
     /**
-     * <code>int64 current = 2[json_name = "current"];</code>
+     * <code>int64 current = 2 [json_name = "current"];</code>
      * @return The current.
      */
     @java.lang.Override
@@ -398,7 +252,7 @@ private static final long serialVersionUID = 0L;
     public static final int LABEL_FIELD_NUMBER = 3;
     private volatile java.lang.Object label_;
     /**
-     * <code>string label = 3[json_name = "label"];</code>
+     * <code>string label = 3 [json_name = "label"];</code>
      * @return The label.
      */
     @java.lang.Override
@@ -415,7 +269,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string label = 3[json_name = "label"];</code>
+     * <code>string label = 3 [json_name = "label"];</code>
      * @return The bytes for label.
      */
     @java.lang.Override
@@ -453,10 +307,10 @@ private static final long serialVersionUID = 0L;
       if (current_ != 0L) {
         output.writeInt64(2, current_);
       }
-      if (!getLabelBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(label_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, label_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -473,10 +327,10 @@ private static final long serialVersionUID = 0L;
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(2, current_);
       }
-      if (!getLabelBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(label_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, label_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -497,7 +351,7 @@ private static final long serialVersionUID = 0L;
           != other.getCurrent()) return false;
       if (!getLabel()
           .equals(other.getLabel())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -516,7 +370,7 @@ private static final long serialVersionUID = 0L;
           getCurrent());
       hash = (37 * hash) + LABEL_FIELD_NUMBER;
       hash = (53 * hash) + getLabel().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -633,18 +487,13 @@ private static final long serialVersionUID = 0L;
 
       // Construct using com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo.newBuilder()
       private Builder() {
-        maybeForceBuilderInitialization();
+
       }
 
       private Builder(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
+
       }
       @java.lang.Override
       public Builder clear() {
@@ -742,7 +591,7 @@ private static final long serialVersionUID = 0L;
           label_ = other.label_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -757,23 +606,51 @@ private static final long serialVersionUID = 0L;
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                remaining_ = input.readInt64();
+
+                break;
+              } // case 8
+              case 16: {
+                current_ = input.readInt64();
+
+                break;
+              } // case 16
+              case 26: {
+                label_ = input.readStringRequireUtf8();
+
+                break;
+              } // case 26
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
       private long remaining_ ;
       /**
-       * <code>int64 remaining = 1[json_name = "remaining"];</code>
+       * <code>int64 remaining = 1 [json_name = "remaining"];</code>
        * @return The remaining.
        */
       @java.lang.Override
@@ -781,7 +658,7 @@ private static final long serialVersionUID = 0L;
         return remaining_;
       }
       /**
-       * <code>int64 remaining = 1[json_name = "remaining"];</code>
+       * <code>int64 remaining = 1 [json_name = "remaining"];</code>
        * @param value The remaining to set.
        * @return This builder for chaining.
        */
@@ -792,7 +669,7 @@ private static final long serialVersionUID = 0L;
         return this;
       }
       /**
-       * <code>int64 remaining = 1[json_name = "remaining"];</code>
+       * <code>int64 remaining = 1 [json_name = "remaining"];</code>
        * @return This builder for chaining.
        */
       public Builder clearRemaining() {
@@ -804,7 +681,7 @@ private static final long serialVersionUID = 0L;
 
       private long current_ ;
       /**
-       * <code>int64 current = 2[json_name = "current"];</code>
+       * <code>int64 current = 2 [json_name = "current"];</code>
        * @return The current.
        */
       @java.lang.Override
@@ -812,7 +689,7 @@ private static final long serialVersionUID = 0L;
         return current_;
       }
       /**
-       * <code>int64 current = 2[json_name = "current"];</code>
+       * <code>int64 current = 2 [json_name = "current"];</code>
        * @param value The current to set.
        * @return This builder for chaining.
        */
@@ -823,7 +700,7 @@ private static final long serialVersionUID = 0L;
         return this;
       }
       /**
-       * <code>int64 current = 2[json_name = "current"];</code>
+       * <code>int64 current = 2 [json_name = "current"];</code>
        * @return This builder for chaining.
        */
       public Builder clearCurrent() {
@@ -835,7 +712,7 @@ private static final long serialVersionUID = 0L;
 
       private java.lang.Object label_ = "";
       /**
-       * <code>string label = 3[json_name = "label"];</code>
+       * <code>string label = 3 [json_name = "label"];</code>
        * @return The label.
        */
       public java.lang.String getLabel() {
@@ -851,7 +728,7 @@ private static final long serialVersionUID = 0L;
         }
       }
       /**
-       * <code>string label = 3[json_name = "label"];</code>
+       * <code>string label = 3 [json_name = "label"];</code>
        * @return The bytes for label.
        */
       public com.google.protobuf.ByteString
@@ -868,7 +745,7 @@ private static final long serialVersionUID = 0L;
         }
       }
       /**
-       * <code>string label = 3[json_name = "label"];</code>
+       * <code>string label = 3 [json_name = "label"];</code>
        * @param value The label to set.
        * @return This builder for chaining.
        */
@@ -883,7 +760,7 @@ private static final long serialVersionUID = 0L;
         return this;
       }
       /**
-       * <code>string label = 3[json_name = "label"];</code>
+       * <code>string label = 3 [json_name = "label"];</code>
        * @return This builder for chaining.
        */
       public Builder clearLabel() {
@@ -893,7 +770,7 @@ private static final long serialVersionUID = 0L;
         return this;
       }
       /**
-       * <code>string label = 3[json_name = "label"];</code>
+       * <code>string label = 3 [json_name = "label"];</code>
        * @param value The bytes for label to set.
        * @return This builder for chaining.
        */
@@ -941,7 +818,18 @@ private static final long serialVersionUID = 0L;
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new RateLimiterInfo(input, extensionRegistry);
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
       }
     };
 
@@ -966,12 +854,12 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string workload_index = 1[json_name = "workloadIndex"];</code>
+     * <code>string workload_index = 1 [json_name = "workloadIndex"];</code>
      * @return The workloadIndex.
      */
     java.lang.String getWorkloadIndex();
     /**
-     * <code>string workload_index = 1[json_name = "workloadIndex"];</code>
+     * <code>string workload_index = 1 [json_name = "workloadIndex"];</code>
      * @return The bytes for workloadIndex.
      */
     com.google.protobuf.ByteString
@@ -1005,49 +893,6 @@ private static final long serialVersionUID = 0L;
     getUnknownFields() {
       return this.unknownFields;
     }
-    private ConcurrencyLimiterInfo(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              workloadIndex_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.fluxninja.aperture.flowcontrol.v1.FlowcontrolProto.internal_static_aperture_flowcontrol_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor;
@@ -1064,7 +909,7 @@ private static final long serialVersionUID = 0L;
     public static final int WORKLOAD_INDEX_FIELD_NUMBER = 1;
     private volatile java.lang.Object workloadIndex_;
     /**
-     * <code>string workload_index = 1[json_name = "workloadIndex"];</code>
+     * <code>string workload_index = 1 [json_name = "workloadIndex"];</code>
      * @return The workloadIndex.
      */
     @java.lang.Override
@@ -1081,7 +926,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string workload_index = 1[json_name = "workloadIndex"];</code>
+     * <code>string workload_index = 1 [json_name = "workloadIndex"];</code>
      * @return The bytes for workloadIndex.
      */
     @java.lang.Override
@@ -1113,10 +958,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getWorkloadIndexBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(workloadIndex_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, workloadIndex_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -1125,10 +970,10 @@ private static final long serialVersionUID = 0L;
       if (size != -1) return size;
 
       size = 0;
-      if (!getWorkloadIndexBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(workloadIndex_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, workloadIndex_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -1145,7 +990,7 @@ private static final long serialVersionUID = 0L;
 
       if (!getWorkloadIndex()
           .equals(other.getWorkloadIndex())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -1158,7 +1003,7 @@ private static final long serialVersionUID = 0L;
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + WORKLOAD_INDEX_FIELD_NUMBER;
       hash = (53 * hash) + getWorkloadIndex().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -1275,18 +1120,13 @@ private static final long serialVersionUID = 0L;
 
       // Construct using com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo.newBuilder()
       private Builder() {
-        maybeForceBuilderInitialization();
+
       }
 
       private Builder(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
+
       }
       @java.lang.Override
       public Builder clear() {
@@ -1372,7 +1212,7 @@ private static final long serialVersionUID = 0L;
           workloadIndex_ = other.workloadIndex_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -1387,23 +1227,41 @@ private static final long serialVersionUID = 0L;
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                workloadIndex_ = input.readStringRequireUtf8();
+
+                break;
+              } // case 10
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
       private java.lang.Object workloadIndex_ = "";
       /**
-       * <code>string workload_index = 1[json_name = "workloadIndex"];</code>
+       * <code>string workload_index = 1 [json_name = "workloadIndex"];</code>
        * @return The workloadIndex.
        */
       public java.lang.String getWorkloadIndex() {
@@ -1419,7 +1277,7 @@ private static final long serialVersionUID = 0L;
         }
       }
       /**
-       * <code>string workload_index = 1[json_name = "workloadIndex"];</code>
+       * <code>string workload_index = 1 [json_name = "workloadIndex"];</code>
        * @return The bytes for workloadIndex.
        */
       public com.google.protobuf.ByteString
@@ -1436,7 +1294,7 @@ private static final long serialVersionUID = 0L;
         }
       }
       /**
-       * <code>string workload_index = 1[json_name = "workloadIndex"];</code>
+       * <code>string workload_index = 1 [json_name = "workloadIndex"];</code>
        * @param value The workloadIndex to set.
        * @return This builder for chaining.
        */
@@ -1451,7 +1309,7 @@ private static final long serialVersionUID = 0L;
         return this;
       }
       /**
-       * <code>string workload_index = 1[json_name = "workloadIndex"];</code>
+       * <code>string workload_index = 1 [json_name = "workloadIndex"];</code>
        * @return This builder for chaining.
        */
       public Builder clearWorkloadIndex() {
@@ -1461,7 +1319,7 @@ private static final long serialVersionUID = 0L;
         return this;
       }
       /**
-       * <code>string workload_index = 1[json_name = "workloadIndex"];</code>
+       * <code>string workload_index = 1 [json_name = "workloadIndex"];</code>
        * @param value The bytes for workloadIndex to set.
        * @return This builder for chaining.
        */
@@ -1509,7 +1367,18 @@ private static final long serialVersionUID = 0L;
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ConcurrencyLimiterInfo(input, extensionRegistry);
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
       }
     };
 
@@ -1573,7 +1442,7 @@ private static final long serialVersionUID = 0L;
   public static final int POLICY_NAME_FIELD_NUMBER = 1;
   private volatile java.lang.Object policyName_;
   /**
-   * <code>string policy_name = 1[json_name = "policyName"];</code>
+   * <code>string policy_name = 1 [json_name = "policyName"];</code>
    * @return The policyName.
    */
   @java.lang.Override
@@ -1590,7 +1459,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string policy_name = 1[json_name = "policyName"];</code>
+   * <code>string policy_name = 1 [json_name = "policyName"];</code>
    * @return The bytes for policyName.
    */
   @java.lang.Override
@@ -1611,7 +1480,7 @@ private static final long serialVersionUID = 0L;
   public static final int POLICY_HASH_FIELD_NUMBER = 2;
   private volatile java.lang.Object policyHash_;
   /**
-   * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+   * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
    * @return The policyHash.
    */
   @java.lang.Override
@@ -1628,7 +1497,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+   * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
    * @return The bytes for policyHash.
    */
   @java.lang.Override
@@ -1649,7 +1518,7 @@ private static final long serialVersionUID = 0L;
   public static final int COMPONENT_INDEX_FIELD_NUMBER = 3;
   private long componentIndex_;
   /**
-   * <code>int64 component_index = 3[json_name = "componentIndex"];</code>
+   * <code>int64 component_index = 3 [json_name = "componentIndex"];</code>
    * @return The componentIndex.
    */
   @java.lang.Override
@@ -1660,7 +1529,7 @@ private static final long serialVersionUID = 0L;
   public static final int DROPPED_FIELD_NUMBER = 4;
   private boolean dropped_;
   /**
-   * <code>bool dropped = 4[json_name = "dropped"];</code>
+   * <code>bool dropped = 4 [json_name = "dropped"];</code>
    * @return The dropped.
    */
   @java.lang.Override
@@ -1671,14 +1540,14 @@ private static final long serialVersionUID = 0L;
   public static final int REASON_FIELD_NUMBER = 5;
   private int reason_;
   /**
-   * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5[json_name = "reason"];</code>
+   * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5 [json_name = "reason"];</code>
    * @return The enum numeric value on the wire for reason.
    */
   @java.lang.Override public int getReasonValue() {
     return reason_;
   }
   /**
-   * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5[json_name = "reason"];</code>
+   * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5 [json_name = "reason"];</code>
    * @return The reason.
    */
   @java.lang.Override public com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.LimiterReason getReason() {
@@ -1689,7 +1558,7 @@ private static final long serialVersionUID = 0L;
 
   public static final int RATE_LIMITER_INFO_FIELD_NUMBER = 6;
   /**
-   * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+   * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
    * @return Whether the rateLimiterInfo field is set.
    */
   @java.lang.Override
@@ -1697,7 +1566,7 @@ private static final long serialVersionUID = 0L;
     return detailsCase_ == 6;
   }
   /**
-   * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+   * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
    * @return The rateLimiterInfo.
    */
   @java.lang.Override
@@ -1708,7 +1577,7 @@ private static final long serialVersionUID = 0L;
     return com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo.getDefaultInstance();
   }
   /**
-   * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+   * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
    */
   @java.lang.Override
   public com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfoOrBuilder getRateLimiterInfoOrBuilder() {
@@ -1720,7 +1589,7 @@ private static final long serialVersionUID = 0L;
 
   public static final int CONCURRENCY_LIMITER_INFO_FIELD_NUMBER = 7;
   /**
-   * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+   * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
    * @return Whether the concurrencyLimiterInfo field is set.
    */
   @java.lang.Override
@@ -1728,7 +1597,7 @@ private static final long serialVersionUID = 0L;
     return detailsCase_ == 7;
   }
   /**
-   * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+   * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
    * @return The concurrencyLimiterInfo.
    */
   @java.lang.Override
@@ -1739,7 +1608,7 @@ private static final long serialVersionUID = 0L;
     return com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
   }
   /**
-   * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+   * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
    */
   @java.lang.Override
   public com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder getConcurrencyLimiterInfoOrBuilder() {
@@ -1763,10 +1632,10 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!getPolicyNameBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(policyName_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 1, policyName_);
     }
-    if (!getPolicyHashBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(policyHash_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 2, policyHash_);
     }
     if (componentIndex_ != 0L) {
@@ -1784,7 +1653,7 @@ private static final long serialVersionUID = 0L;
     if (detailsCase_ == 7) {
       output.writeMessage(7, (com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo) details_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
   @java.lang.Override
@@ -1793,10 +1662,10 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!getPolicyNameBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(policyName_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, policyName_);
     }
-    if (!getPolicyHashBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(policyHash_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, policyHash_);
     }
     if (componentIndex_ != 0L) {
@@ -1819,7 +1688,7 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(7, (com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo) details_);
     }
-    size += unknownFields.getSerializedSize();
+    size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -1856,7 +1725,7 @@ private static final long serialVersionUID = 0L;
       case 0:
       default:
     }
-    if (!unknownFields.equals(other.unknownFields)) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -1891,7 +1760,7 @@ private static final long serialVersionUID = 0L;
       case 0:
       default:
     }
-    hash = (29 * hash) + unknownFields.hashCode();
+    hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -2012,18 +1881,13 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.newBuilder()
     private Builder() {
-      maybeForceBuilderInitialization();
+
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-      maybeForceBuilderInitialization();
-    }
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-      }
+
     }
     @java.lang.Override
     public Builder clear() {
@@ -2038,6 +1902,12 @@ private static final long serialVersionUID = 0L;
 
       reason_ = 0;
 
+      if (rateLimiterInfoBuilder_ != null) {
+        rateLimiterInfoBuilder_.clear();
+      }
+      if (concurrencyLimiterInfoBuilder_ != null) {
+        concurrencyLimiterInfoBuilder_.clear();
+      }
       detailsCase_ = 0;
       details_ = null;
       return this;
@@ -2164,7 +2034,7 @@ private static final long serialVersionUID = 0L;
           break;
         }
       }
-      this.mergeUnknownFields(other.unknownFields);
+      this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
     }
@@ -2179,17 +2049,69 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.fluxninja.aperture.flowcontrol.v1.LimiterDecision parsedMessage = null;
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       try {
-        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              policyName_ = input.readStringRequireUtf8();
+
+              break;
+            } // case 10
+            case 18: {
+              policyHash_ = input.readStringRequireUtf8();
+
+              break;
+            } // case 18
+            case 24: {
+              componentIndex_ = input.readInt64();
+
+              break;
+            } // case 24
+            case 32: {
+              dropped_ = input.readBool();
+
+              break;
+            } // case 32
+            case 40: {
+              reason_ = input.readEnum();
+
+              break;
+            } // case 40
+            case 50: {
+              input.readMessage(
+                  getRateLimiterInfoFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              detailsCase_ = 6;
+              break;
+            } // case 50
+            case 58: {
+              input.readMessage(
+                  getConcurrencyLimiterInfoFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              detailsCase_ = 7;
+              break;
+            } // case 58
+            default: {
+              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                done = true; // was an endgroup tag
+              }
+              break;
+            } // default:
+          } // switch (tag)
+        } // while (!done)
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.fluxninja.aperture.flowcontrol.v1.LimiterDecision) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        if (parsedMessage != null) {
-          mergeFrom(parsedMessage);
-        }
-      }
+        onChanged();
+      } // finally
       return this;
     }
     private int detailsCase_ = 0;
@@ -2210,7 +2132,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object policyName_ = "";
     /**
-     * <code>string policy_name = 1[json_name = "policyName"];</code>
+     * <code>string policy_name = 1 [json_name = "policyName"];</code>
      * @return The policyName.
      */
     public java.lang.String getPolicyName() {
@@ -2226,7 +2148,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string policy_name = 1[json_name = "policyName"];</code>
+     * <code>string policy_name = 1 [json_name = "policyName"];</code>
      * @return The bytes for policyName.
      */
     public com.google.protobuf.ByteString
@@ -2243,7 +2165,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string policy_name = 1[json_name = "policyName"];</code>
+     * <code>string policy_name = 1 [json_name = "policyName"];</code>
      * @param value The policyName to set.
      * @return This builder for chaining.
      */
@@ -2258,7 +2180,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string policy_name = 1[json_name = "policyName"];</code>
+     * <code>string policy_name = 1 [json_name = "policyName"];</code>
      * @return This builder for chaining.
      */
     public Builder clearPolicyName() {
@@ -2268,7 +2190,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string policy_name = 1[json_name = "policyName"];</code>
+     * <code>string policy_name = 1 [json_name = "policyName"];</code>
      * @param value The bytes for policyName to set.
      * @return This builder for chaining.
      */
@@ -2286,7 +2208,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object policyHash_ = "";
     /**
-     * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+     * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
      * @return The policyHash.
      */
     public java.lang.String getPolicyHash() {
@@ -2302,7 +2224,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+     * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
      * @return The bytes for policyHash.
      */
     public com.google.protobuf.ByteString
@@ -2319,7 +2241,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+     * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
      * @param value The policyHash to set.
      * @return This builder for chaining.
      */
@@ -2334,7 +2256,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+     * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
      * @return This builder for chaining.
      */
     public Builder clearPolicyHash() {
@@ -2344,7 +2266,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string policy_hash = 2[json_name = "policyHash"];</code>
+     * <code>string policy_hash = 2 [json_name = "policyHash"];</code>
      * @param value The bytes for policyHash to set.
      * @return This builder for chaining.
      */
@@ -2362,7 +2284,7 @@ private static final long serialVersionUID = 0L;
 
     private long componentIndex_ ;
     /**
-     * <code>int64 component_index = 3[json_name = "componentIndex"];</code>
+     * <code>int64 component_index = 3 [json_name = "componentIndex"];</code>
      * @return The componentIndex.
      */
     @java.lang.Override
@@ -2370,7 +2292,7 @@ private static final long serialVersionUID = 0L;
       return componentIndex_;
     }
     /**
-     * <code>int64 component_index = 3[json_name = "componentIndex"];</code>
+     * <code>int64 component_index = 3 [json_name = "componentIndex"];</code>
      * @param value The componentIndex to set.
      * @return This builder for chaining.
      */
@@ -2381,7 +2303,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>int64 component_index = 3[json_name = "componentIndex"];</code>
+     * <code>int64 component_index = 3 [json_name = "componentIndex"];</code>
      * @return This builder for chaining.
      */
     public Builder clearComponentIndex() {
@@ -2393,7 +2315,7 @@ private static final long serialVersionUID = 0L;
 
     private boolean dropped_ ;
     /**
-     * <code>bool dropped = 4[json_name = "dropped"];</code>
+     * <code>bool dropped = 4 [json_name = "dropped"];</code>
      * @return The dropped.
      */
     @java.lang.Override
@@ -2401,7 +2323,7 @@ private static final long serialVersionUID = 0L;
       return dropped_;
     }
     /**
-     * <code>bool dropped = 4[json_name = "dropped"];</code>
+     * <code>bool dropped = 4 [json_name = "dropped"];</code>
      * @param value The dropped to set.
      * @return This builder for chaining.
      */
@@ -2412,7 +2334,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>bool dropped = 4[json_name = "dropped"];</code>
+     * <code>bool dropped = 4 [json_name = "dropped"];</code>
      * @return This builder for chaining.
      */
     public Builder clearDropped() {
@@ -2424,14 +2346,14 @@ private static final long serialVersionUID = 0L;
 
     private int reason_ = 0;
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5[json_name = "reason"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5 [json_name = "reason"];</code>
      * @return The enum numeric value on the wire for reason.
      */
     @java.lang.Override public int getReasonValue() {
       return reason_;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5[json_name = "reason"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5 [json_name = "reason"];</code>
      * @param value The enum numeric value on the wire for reason to set.
      * @return This builder for chaining.
      */
@@ -2442,7 +2364,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5[json_name = "reason"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5 [json_name = "reason"];</code>
      * @return The reason.
      */
     @java.lang.Override
@@ -2452,7 +2374,7 @@ private static final long serialVersionUID = 0L;
       return result == null ? com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.LimiterReason.UNRECOGNIZED : result;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5[json_name = "reason"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5 [json_name = "reason"];</code>
      * @param value The reason to set.
      * @return This builder for chaining.
      */
@@ -2466,7 +2388,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5[json_name = "reason"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.LimiterReason reason = 5 [json_name = "reason"];</code>
      * @return This builder for chaining.
      */
     public Builder clearReason() {
@@ -2479,7 +2401,7 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo, com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo.Builder, com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfoOrBuilder> rateLimiterInfoBuilder_;
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
      * @return Whether the rateLimiterInfo field is set.
      */
     @java.lang.Override
@@ -2487,7 +2409,7 @@ private static final long serialVersionUID = 0L;
       return detailsCase_ == 6;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
      * @return The rateLimiterInfo.
      */
     @java.lang.Override
@@ -2505,7 +2427,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
      */
     public Builder setRateLimiterInfo(com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo value) {
       if (rateLimiterInfoBuilder_ == null) {
@@ -2521,7 +2443,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
      */
     public Builder setRateLimiterInfo(
         com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo.Builder builderForValue) {
@@ -2535,7 +2457,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
      */
     public Builder mergeRateLimiterInfo(com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo value) {
       if (rateLimiterInfoBuilder_ == null) {
@@ -2550,14 +2472,15 @@ private static final long serialVersionUID = 0L;
       } else {
         if (detailsCase_ == 6) {
           rateLimiterInfoBuilder_.mergeFrom(value);
+        } else {
+          rateLimiterInfoBuilder_.setMessage(value);
         }
-        rateLimiterInfoBuilder_.setMessage(value);
       }
       detailsCase_ = 6;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
      */
     public Builder clearRateLimiterInfo() {
       if (rateLimiterInfoBuilder_ == null) {
@@ -2576,13 +2499,13 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
      */
     public com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo.Builder getRateLimiterInfoBuilder() {
       return getRateLimiterInfoFieldBuilder().getBuilder();
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
      */
     @java.lang.Override
     public com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfoOrBuilder getRateLimiterInfoOrBuilder() {
@@ -2596,7 +2519,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6[json_name = "rateLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo, com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfo.Builder, com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.RateLimiterInfoOrBuilder>
@@ -2620,7 +2543,7 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo, com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder, com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder> concurrencyLimiterInfoBuilder_;
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
      * @return Whether the concurrencyLimiterInfo field is set.
      */
     @java.lang.Override
@@ -2628,7 +2551,7 @@ private static final long serialVersionUID = 0L;
       return detailsCase_ == 7;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
      * @return The concurrencyLimiterInfo.
      */
     @java.lang.Override
@@ -2646,7 +2569,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
      */
     public Builder setConcurrencyLimiterInfo(com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo value) {
       if (concurrencyLimiterInfoBuilder_ == null) {
@@ -2662,7 +2585,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
      */
     public Builder setConcurrencyLimiterInfo(
         com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder builderForValue) {
@@ -2676,7 +2599,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
      */
     public Builder mergeConcurrencyLimiterInfo(com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo value) {
       if (concurrencyLimiterInfoBuilder_ == null) {
@@ -2691,14 +2614,15 @@ private static final long serialVersionUID = 0L;
       } else {
         if (detailsCase_ == 7) {
           concurrencyLimiterInfoBuilder_.mergeFrom(value);
+        } else {
+          concurrencyLimiterInfoBuilder_.setMessage(value);
         }
-        concurrencyLimiterInfoBuilder_.setMessage(value);
       }
       detailsCase_ = 7;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
      */
     public Builder clearConcurrencyLimiterInfo() {
       if (concurrencyLimiterInfoBuilder_ == null) {
@@ -2717,13 +2641,13 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
      */
     public com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder getConcurrencyLimiterInfoBuilder() {
       return getConcurrencyLimiterInfoFieldBuilder().getBuilder();
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
      */
     @java.lang.Override
     public com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder getConcurrencyLimiterInfoOrBuilder() {
@@ -2737,7 +2661,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7[json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo, com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder, com.fluxninja.aperture.flowcontrol.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder>
@@ -2790,7 +2714,18 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new LimiterDecision(input, extensionRegistry);
+      Builder builder = newBuilder();
+      try {
+        builder.mergeFrom(input, extensionRegistry);
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(builder.buildPartial());
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e)
+            .setUnfinishedMessage(builder.buildPartial());
+      }
+      return builder.buildPartial();
     }
   };
 

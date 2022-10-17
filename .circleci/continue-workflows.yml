@@ -48,6 +48,9 @@ parameters:
   updated-aperture-go:
     type: boolean
     default: false
+  updated-aperture-java:
+    type: boolean
+    default: false
 
 jobs:
   build-push-add-tag:
@@ -409,7 +412,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-            - "c5:d8:c4:22:7e:ff:b5:c3:c3:32:c2:b7:54:c7:99:1b" # fluxninja/aperture-go R/W
+            - << parameters.remote-repo-fingerprint >> # fluxninja/<sdk> R/W
       - run: *install_opsninja
       - aperture_docker_build:
           docker-context: <<parameters.docker-context>>
@@ -441,31 +444,6 @@ jobs:
                     --source-repo-sdk-path=<<parameters.path>>
                   )
                   fn release publish-sdk "${args[@]}"
-
-  gen-push-java-stubs:
-    executor: python-cimg-executor
-    parameters:
-      task-name:
-        type: string
-        default: Generate and push to aperture-java
-        description: The name of the actual task
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-            - "14:8a:b9:90:ba:48:a4:f0:27:b0:70:d7:95:17:16:1e" # fluxninja/aperture-java R/W
-      - run: *install_opsninja
-      - asdf_install:
-          cache_name: gen-push-java-stubs
-          tools: |-
-            buf
-      - run:
-          name: << parameters.task-name >>
-          command: |
-            export LOGURU_LEVEL=TRACE
-            export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
-            fn release push-to-aperture-java
 
   publish-aperture-docs:
     executor: python-cimg-executor
@@ -590,15 +568,19 @@ workflows:
           dockerfile: Dockerfile
           docker-image: aperture-go-example
           remote-repo: fluxninja/aperture-go
-          # remote-repo-fingerprint: c5:d8:c4:22:7e:ff:b5:c3:c3:32:c2:b7:54:c7:99:1b
+          remote-repo-fingerprint: "c5:d8:c4:22:7e:ff:b5:c3:c3:32:c2:b7:54:c7:99:1b"
 
-  push-to-aperture-java:
-    when:
-      and:
-        - << pipeline.parameters.updated-api-flowcontrol >>
-        - equal: [main, << pipeline.git.branch >>]
+  aperture-java:
+    when: << pipeline.parameters.updated-aperture-java >>
     jobs:
-      - gen-push-java-stubs
+      - validate-publish-sdk:
+          name: validate-publish-aperture-java
+          path: sdks/aperture-java
+          docker-context: sdks/aperture-java
+          dockerfile: Dockerfile
+          docker-image: aperture-java-example
+          remote-repo: fluxninja/aperture-java
+          remote-repo-fingerprint: "14:8a:b9:90:ba:48:a4:f0:27:b0:70:d7:95:17:16:1e"
 
   aperture-operator:
     when: << pipeline.parameters.updated-aperture-operator >>

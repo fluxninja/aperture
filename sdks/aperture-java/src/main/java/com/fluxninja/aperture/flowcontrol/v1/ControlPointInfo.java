@@ -32,55 +32,6 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-  private ControlPointInfo(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    this();
-    if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
-    }
-    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
-    try {
-      boolean done = false;
-      while (!done) {
-        int tag = input.readTag();
-        switch (tag) {
-          case 0:
-            done = true;
-            break;
-          case 8: {
-            int rawValue = input.readEnum();
-
-            type_ = rawValue;
-            break;
-          }
-          case 18: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            feature_ = s;
-            break;
-          }
-          default: {
-            if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
-              done = true;
-            }
-            break;
-          }
-        }
-      }
-    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
-    } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
-    } finally {
-      this.unknownFields = unknownFields.build();
-      makeExtensionsImmutable();
-    }
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.fluxninja.aperture.flowcontrol.v1.FlowcontrolProto.internal_static_aperture_flowcontrol_v1_ControlPointInfo_descriptor;
@@ -227,14 +178,14 @@ private static final long serialVersionUID = 0L;
   public static final int TYPE_FIELD_NUMBER = 1;
   private int type_;
   /**
-   * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1[json_name = "type"];</code>
+   * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1 [json_name = "type"];</code>
    * @return The enum numeric value on the wire for type.
    */
   @java.lang.Override public int getTypeValue() {
     return type_;
   }
   /**
-   * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1[json_name = "type"];</code>
+   * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1 [json_name = "type"];</code>
    * @return The type.
    */
   @java.lang.Override public com.fluxninja.aperture.flowcontrol.v1.ControlPointInfo.Type getType() {
@@ -246,7 +197,7 @@ private static final long serialVersionUID = 0L;
   public static final int FEATURE_FIELD_NUMBER = 2;
   private volatile java.lang.Object feature_;
   /**
-   * <code>string feature = 2[json_name = "feature"];</code>
+   * <code>string feature = 2 [json_name = "feature"];</code>
    * @return The feature.
    */
   @java.lang.Override
@@ -263,7 +214,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string feature = 2[json_name = "feature"];</code>
+   * <code>string feature = 2 [json_name = "feature"];</code>
    * @return The bytes for feature.
    */
   @java.lang.Override
@@ -298,10 +249,10 @@ private static final long serialVersionUID = 0L;
     if (type_ != com.fluxninja.aperture.flowcontrol.v1.ControlPointInfo.Type.TYPE_UNKNOWN.getNumber()) {
       output.writeEnum(1, type_);
     }
-    if (!getFeatureBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(feature_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 2, feature_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
   @java.lang.Override
@@ -314,10 +265,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(1, type_);
     }
-    if (!getFeatureBytes().isEmpty()) {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(feature_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, feature_);
     }
-    size += unknownFields.getSerializedSize();
+    size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -335,7 +286,7 @@ private static final long serialVersionUID = 0L;
     if (type_ != other.type_) return false;
     if (!getFeature()
         .equals(other.getFeature())) return false;
-    if (!unknownFields.equals(other.unknownFields)) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -350,7 +301,7 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + type_;
     hash = (37 * hash) + FEATURE_FIELD_NUMBER;
     hash = (53 * hash) + getFeature().hashCode();
-    hash = (29 * hash) + unknownFields.hashCode();
+    hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -467,18 +418,13 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.aperture.flowcontrol.v1.ControlPointInfo.newBuilder()
     private Builder() {
-      maybeForceBuilderInitialization();
+
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-      maybeForceBuilderInitialization();
-    }
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-      }
+
     }
     @java.lang.Override
     public Builder clear() {
@@ -570,7 +516,7 @@ private static final long serialVersionUID = 0L;
         feature_ = other.feature_;
         onChanged();
       }
-      this.mergeUnknownFields(other.unknownFields);
+      this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
     }
@@ -585,30 +531,53 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.fluxninja.aperture.flowcontrol.v1.ControlPointInfo parsedMessage = null;
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       try {
-        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 8: {
+              type_ = input.readEnum();
+
+              break;
+            } // case 8
+            case 18: {
+              feature_ = input.readStringRequireUtf8();
+
+              break;
+            } // case 18
+            default: {
+              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                done = true; // was an endgroup tag
+              }
+              break;
+            } // default:
+          } // switch (tag)
+        } // while (!done)
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.fluxninja.aperture.flowcontrol.v1.ControlPointInfo) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        if (parsedMessage != null) {
-          mergeFrom(parsedMessage);
-        }
-      }
+        onChanged();
+      } // finally
       return this;
     }
 
     private int type_ = 0;
     /**
-     * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1[json_name = "type"];</code>
+     * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1 [json_name = "type"];</code>
      * @return The enum numeric value on the wire for type.
      */
     @java.lang.Override public int getTypeValue() {
       return type_;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1[json_name = "type"];</code>
+     * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1 [json_name = "type"];</code>
      * @param value The enum numeric value on the wire for type to set.
      * @return This builder for chaining.
      */
@@ -619,7 +588,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1[json_name = "type"];</code>
+     * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1 [json_name = "type"];</code>
      * @return The type.
      */
     @java.lang.Override
@@ -629,7 +598,7 @@ private static final long serialVersionUID = 0L;
       return result == null ? com.fluxninja.aperture.flowcontrol.v1.ControlPointInfo.Type.UNRECOGNIZED : result;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1[json_name = "type"];</code>
+     * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1 [json_name = "type"];</code>
      * @param value The type to set.
      * @return This builder for chaining.
      */
@@ -643,7 +612,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1[json_name = "type"];</code>
+     * <code>.aperture.flowcontrol.v1.ControlPointInfo.Type type = 1 [json_name = "type"];</code>
      * @return This builder for chaining.
      */
     public Builder clearType() {
@@ -655,7 +624,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object feature_ = "";
     /**
-     * <code>string feature = 2[json_name = "feature"];</code>
+     * <code>string feature = 2 [json_name = "feature"];</code>
      * @return The feature.
      */
     public java.lang.String getFeature() {
@@ -671,7 +640,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string feature = 2[json_name = "feature"];</code>
+     * <code>string feature = 2 [json_name = "feature"];</code>
      * @return The bytes for feature.
      */
     public com.google.protobuf.ByteString
@@ -688,7 +657,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string feature = 2[json_name = "feature"];</code>
+     * <code>string feature = 2 [json_name = "feature"];</code>
      * @param value The feature to set.
      * @return This builder for chaining.
      */
@@ -703,7 +672,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string feature = 2[json_name = "feature"];</code>
+     * <code>string feature = 2 [json_name = "feature"];</code>
      * @return This builder for chaining.
      */
     public Builder clearFeature() {
@@ -713,7 +682,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string feature = 2[json_name = "feature"];</code>
+     * <code>string feature = 2 [json_name = "feature"];</code>
      * @param value The bytes for feature to set.
      * @return This builder for chaining.
      */
@@ -761,7 +730,18 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new ControlPointInfo(input, extensionRegistry);
+      Builder builder = newBuilder();
+      try {
+        builder.mergeFrom(input, extensionRegistry);
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(builder.buildPartial());
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e)
+            .setUnfinishedMessage(builder.buildPartial());
+      }
+      return builder.buildPartial();
     }
   };
 
