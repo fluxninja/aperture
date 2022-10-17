@@ -265,8 +265,6 @@ func (sched *WFQScheduler) auditHeap(now time.Time) {
 			heap.Init(&sched.requests)
 		}
 	}
-	sched.setFlowsGauge(float64(len(sched.flows)))
-	sched.setRequestsGauge(float64(sched.requests.Len()))
 }
 
 // Attempt to queue this request.
@@ -338,6 +336,7 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (admitted bool, qReque
 	fInfo, ok := sched.flows[flowID]
 	if !ok {
 		fInfo = getFlowInfo()
+		sched.setFlowsGauge(float64(len(sched.flows)))
 		fInfo.vt = sched.vt
 		fInfo.auditTime = now
 		sched.flows[flowID] = fInfo
@@ -370,6 +369,7 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (admitted bool, qReque
 		if !fInfo.requestOnHeap {
 			qRequest.vft = fInfo.vt + cost
 			heap.Push(&sched.requests, qRequest)
+			sched.setRequestsGauge(float64(sched.requests.Len()))
 			fInfo.requestOnHeap = true
 		} else {
 			// push to flow queue
@@ -379,6 +379,7 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (admitted bool, qReque
 		// This is the only request in queue at this time, wake it up
 		qRequest.ready <- true
 	}
+
 	return false, qRequest
 }
 
@@ -415,6 +416,7 @@ func (sched *WFQScheduler) leave(rContext RequestContext, qRequest *queuedReques
 			delete(sched.flows, qRequest.flowID)
 			// send flowInfo back to the Pool
 			putFlowInfo(qRequest.fInfo)
+			sched.setFlowsGauge(float64(len(sched.flows)))
 		} else { // check whether new requests arrived in between that need loading
 			sched.loadNextFlowReq(qRequest.fInfo)
 		}
@@ -462,6 +464,7 @@ func (sched *WFQScheduler) wakeNextRequest() {
 		}
 		// Pop from queue and wake a valid request
 		qRequest := heap.Pop(&sched.requests).(*queuedRequest)
+		sched.setRequestsGauge(float64(sched.requests.Len()))
 		qRequest.fInfo.requestOnHeap = false
 		if now.Sub(qRequest.enqueueTime) < qRequest.timeout {
 			// wake up this request
@@ -482,6 +485,7 @@ func (sched *WFQScheduler) loadNextFlowReq(fInfo *flowInfo) {
 			nextReq := elm.Value.(*queuedRequest)
 			nextReq.vft = fInfo.vt + nextReq.cost
 			heap.Push(&sched.requests, nextReq)
+			sched.setRequestsGauge(float64(sched.requests.Len()))
 			fInfo.requestOnHeap = true
 		}
 	}
