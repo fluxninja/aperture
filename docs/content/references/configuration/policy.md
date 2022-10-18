@@ -592,6 +592,12 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1RateLimiter](#v1-rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
 
 </dd>
+<dt>sink</dt>
+<dd>
+
+([V1Sink](#v1-sink)) Sink is a sink component that does nothing.
+
+</dd>
 <dt>sqrt</dt>
 <dd>
 
@@ -2331,6 +2337,36 @@ Empty string means all services within an agent group (catch-all).
 :::note
 One entity may belong to multiple services.
 :::
+
+</dd>
+</dl>
+
+### v1Sink {#v1-sink}
+
+Sink is a component that consumes input signals and does nothing with them
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1SinkIns](#v1-sink-ins)) Input ports for the Sink component.
+
+</dd>
+</dl>
+
+### v1SinkIns {#v1-sink-ins}
+
+Inputs for the Sink component.
+
+#### Properties
+
+<dl>
+<dt>inputs</dt>
+<dd>
+
+([[]V1InPort](#v1-in-port)) Array of input signals.
 
 </dd>
 </dl>

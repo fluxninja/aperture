@@ -87,7 +87,7 @@ function(params) {
         type: 'prometheus',
         uid: '${datasource}',
       },
-      query: 'label_values(signal_reading, signal_name)',
+      query: 'label_values(signal_reading{policy_name="%(policyName)s"}, signal_name)' % { policyName: $._config.policyName },
       hide: 0,
       includeAll: false,
       multi: false,

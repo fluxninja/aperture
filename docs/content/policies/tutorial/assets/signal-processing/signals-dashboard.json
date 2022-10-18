@@ -12,7 +12,7 @@
   "links": [],
   "panels": [
     {
-      "datasource": "$datasource",
+      "datasource": "controller-prometheus",
       "defaults": {
         "color": {
           "mode": "palette-classic"
@@ -100,7 +100,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "increase(signal_reading_sum{policy_name=\"example\",signal_name=\"${signal_name}\"}[$__rate_interval])\n/\nincrease(signal_reading_count{policy_name=\"example\",signal_name=\"${signal_name}\"}[$__rate_interval])\n",
+          "expr": "increase(signal_reading_sum{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval])\n/\nincrease(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval])\n",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Avg",
@@ -135,7 +135,7 @@
       {
         "current": {
           "text": "default",
-          "value": "$datasource"
+          "value": "controller-prometheus"
         },
         "hide": 0,
         "label": "Data Source",
@@ -161,7 +161,7 @@
         "multi": false,
         "name": "signal_name",
         "options": [],
-        "query": "label_values(signal_reading{policy_name=\"example\"}, signal_name)",
+        "query": "label_values(signal_reading{policy_name=\"signal-processing\"}, signal_name)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
