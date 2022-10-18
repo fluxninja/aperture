@@ -9,83 +9,83 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// TokenBucketLoadShedMetrics holds metrics related to internals of TokenBucketLoadShed.
-type TokenBucketLoadShedMetrics struct {
-	LSFGauge           prometheus.Gauge
+// TokenBucketLoadMultiplierMetrics holds metrics related to internals of TokenBucketLoadMultiplier.
+type TokenBucketLoadMultiplierMetrics struct {
+	LMGauge            prometheus.Gauge
 	TokenBucketMetrics *TokenBucketMetrics
 }
 
-// TokenBucketLoadShed is a token bucket with load shedding.
-type TokenBucketLoadShed struct {
+// TokenBucketLoadMultiplier is a token bucket with load multiplier.
+type TokenBucketLoadMultiplier struct {
 	lock               sync.Mutex
-	lsfGauge           prometheus.Gauge // metrics
+	lmGauge            prometheus.Gauge // metrics
 	tbb                *tokenBucketBase
 	counter            *WindowedCounter
 	continuousTracking bool
-	lsf                float64 // load shed factor between 0 and 1
+	lm                 float64 // load multiplier >=0
 }
 
-// NewTokenBucketLoadShed creates a new TokenBucketLoadShed.
-func NewTokenBucketLoadShed(now time.Time,
+// NewTokenBucketLoadMultiplier creates a new TokenBucketLoadMultiplier.
+func NewTokenBucketLoadMultiplier(now time.Time,
 	slotCount uint8,
 	slotDuration time.Duration,
-	metrics *TokenBucketLoadShedMetrics,
-) *TokenBucketLoadShed {
-	tbls := &TokenBucketLoadShed{
+	metrics *TokenBucketLoadMultiplierMetrics,
+) *TokenBucketLoadMultiplier {
+	tbls := &TokenBucketLoadMultiplier{
 		tbb:                &tokenBucketBase{},
 		counter:            NewWindowedCounter(now, slotCount, slotDuration),
-		lsf:                0,
+		lm:                 0,
 		continuousTracking: false,
 	}
 
 	if metrics != nil {
-		tbls.lsfGauge = metrics.LSFGauge
+		tbls.lmGauge = metrics.LMGauge
 		tbls.tbb.metrics = metrics.TokenBucketMetrics
 	}
 
-	tbls.setLSFGauge(float64(tbls.lsf))
+	tbls.setLMGauge(float64(tbls.lm))
 
 	return tbls
 }
 
-// SetContinuousTracking sets whether to continuously track the token rate and adjust the fill rate based on load shed factor.
-func (tbls *TokenBucketLoadShed) SetContinuousTracking(continuousTracking bool) {
+// SetContinuousTracking sets whether to continuously track the token rate and adjust the fill rate based on load multiplier.
+func (tbls *TokenBucketLoadMultiplier) SetContinuousTracking(continuousTracking bool) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 	tbls.continuousTracking = continuousTracking
 }
 
-// SetLoadShedFactor sets the load shed factor number between [0,1] --> 0 = no load shedding, 1 = load shed 100%.
-func (tbls *TokenBucketLoadShed) SetLoadShedFactor(now time.Time, lsf float64) {
+// SetLoadMultiplier sets the load multiplier number --> 0 = no load accepted, 1 = accept up to 100% of current load, 2 = accept up to 200% of current load.
+func (tbls *TokenBucketLoadMultiplier) SetLoadMultiplier(now time.Time, lm float64) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 
-	if lsf >= 0 && lsf <= 1 {
-		tbls.lsf = lsf
-		tbls.setLSFGauge(float64(tbls.lsf))
+	if lm >= 0 {
+		tbls.lm = lm
+		tbls.setLMGauge(float64(tbls.lm))
 		if !tbls.counter.IsBootstrapping() {
 			// set fillRate based on latest sched.tokenRate
-			tbls.tbb.setFillRate(now, tbls.counter.CalculateTokenRate()*(1-tbls.lsf))
+			tbls.tbb.setFillRate(now, tbls.counter.CalculateTokenRate()*tbls.lm)
 			log.Trace().
-				Float64("loadShedFactor", lsf).
+				Float64("loadMultiplier", tbls.lm).
 				Float64("calculated fillRate", tbls.tbb.getFillRate()).
 				Float64("calculated token rate", tbls.counter.CalculateTokenRate()).
 				Msg("Controller update - Setting fill rate")
 		}
 	} else {
-		log.Panic().Msgf("Load shed factor must be between 0 and 1, got %f", lsf)
+		log.Panic().Msgf("Load multiplier must be greater than 0, got %f", lm)
 	}
 }
 
-// LoadShedFactor returns the current load shed factor.
-func (tbls *TokenBucketLoadShed) LoadShedFactor() float64 {
+// LoadMultiplier returns the current load multiplier.
+func (tbls *TokenBucketLoadMultiplier) LoadMultiplier() float64 {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
-	return tbls.lsf
+	return tbls.lm
 }
 
 // PreprocessRequest preprocesses a request and makes decision whether to accept or reject the request.
-func (tbls *TokenBucketLoadShed) PreprocessRequest(now time.Time, rContext RequestContext) bool {
+func (tbls *TokenBucketLoadMultiplier) PreprocessRequest(now time.Time, rContext RequestContext) bool {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 
@@ -98,9 +98,9 @@ func (tbls *TokenBucketLoadShed) PreprocessRequest(now time.Time, rContext Reque
 	if ready {
 		if wasBootstrapping || tbls.continuousTracking {
 			// adjust fillRate based on the new tokenRate
-			tbls.tbb.setFillRate(now, tbls.counter.CalculateTokenRate()*(1-tbls.lsf))
+			tbls.tbb.setFillRate(now, tbls.counter.CalculateTokenRate()*(tbls.lm))
 			log.Trace().
-				Float64("loadShedFactor", tbls.lsf).
+				Float64("loadMultiplier", tbls.lm).
 				Float64("calculated fillRate", tbls.tbb.getFillRate()).
 				Float64("calculated token rate", tbls.counter.CalculateTokenRate()).
 				Msg("Sliding window update - Setting fill rate")
@@ -112,8 +112,7 @@ func (tbls *TokenBucketLoadShed) PreprocessRequest(now time.Time, rContext Reque
 	}
 
 	// Accept this request if we are still learning the tokenRate
-	// or if we don't intend to load shed at all
-	if tbls.counter.IsBootstrapping() || tbls.lsf == 0 {
+	if tbls.counter.IsBootstrapping() {
 		tbls.tbb.adjustTokens(now)
 		return true
 	}
@@ -122,7 +121,7 @@ func (tbls *TokenBucketLoadShed) PreprocessRequest(now time.Time, rContext Reque
 }
 
 // TakeIfAvailable takes tokens from the token bucket if available, otherwise return false.
-func (tbls *TokenBucketLoadShed) TakeIfAvailable(now time.Time, tokens float64) bool {
+func (tbls *TokenBucketLoadMultiplier) TakeIfAvailable(now time.Time, tokens float64) bool {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 	return tbls.tbb.takeIfAvailable(now, tokens)
@@ -131,14 +130,14 @@ func (tbls *TokenBucketLoadShed) TakeIfAvailable(now time.Time, tokens float64) 
 // Take takes tokens from the token bucket even if available tokens are less than asked.
 // If tokens are not available at the moment, it will return amount of wait time and checks
 // whether the operation was successful or not.
-func (tbls *TokenBucketLoadShed) Take(now time.Time, timeout time.Duration, tokens float64) (time.Duration, bool) {
+func (tbls *TokenBucketLoadMultiplier) Take(now time.Time, timeout time.Duration, tokens float64) (time.Duration, bool) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 	return tbls.tbb.take(now, timeout, tokens)
 }
 
-func (tbls *TokenBucketLoadShed) setLSFGauge(v float64) {
-	if tbls.lsfGauge != nil {
-		tbls.lsfGauge.Set(v)
+func (tbls *TokenBucketLoadMultiplier) setLMGauge(v float64) {
+	if tbls.lmGauge != nil {
+		tbls.lmGauge.Set(v)
 	}
 }

@@ -1,0 +1,52 @@
+flowchart LR
+subgraph 0[PromQL]
+subgraph 0_outports[ ]
+style 0_outports fill:none,stroke:none
+0output[output]
+end
+end
+subgraph 1[<center>EMA<br/>win: 1500s</center>]
+subgraph 1_inports[ ]
+style 1_inports fill:none,stroke:none
+1input[input]
+end
+subgraph 1_outports[ ]
+style 1_outports fill:none,stroke:none
+1output[output]
+end
+end
+subgraph 2[<center>ArithmeticCombinator<br/>mul</center>]
+subgraph 2_inports[ ]
+style 2_inports fill:none,stroke:none
+2lhs[lhs]
+2rhs[rhs]
+end
+subgraph 2_outports[ ]
+style 2_outports fill:none,stroke:none
+2output[output]
+end
+end
+FakeConstant0((1.10))
+FakeConstant0 --> 2rhs
+subgraph 3[<center>Decider<br/>gt for 0s</center>]
+subgraph 3_inports[ ]
+style 3_inports fill:none,stroke:none
+3lhs[lhs]
+3rhs[rhs]
+end
+subgraph 3_outports[ ]
+style 3_outports fill:none,stroke:none
+3output[output]
+end
+end
+subgraph 4[Sink]
+subgraph 4_inports[ ]
+style 4_inports fill:none,stroke:none
+4inputs[inputs]
+end
+end
+0output --> |LATENCY| 1input
+0output --> |LATENCY| 3lhs
+1output --> |LATENCY_EMA| 2lhs
+2output --> |LATENCY_SETPOINT| 3rhs
+3output --> |IS_OVERLOAD_SWITCH| 4inputs
