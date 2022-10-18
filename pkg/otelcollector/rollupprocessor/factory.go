@@ -23,7 +23,8 @@ func NewFactory() component.ProcessorFactory {
 
 func createDefaultConfig() config.Processor {
 	return &Config{
-		ProcessorSettings: config.NewProcessorSettings(config.NewComponentID(typeStr)),
+		ProcessorSettings:         config.NewProcessorSettings(config.NewComponentID(typeStr)),
+		AttributeCardinalityLimit: defaultAttributeCardinalityLimit,
 	}
 }
 

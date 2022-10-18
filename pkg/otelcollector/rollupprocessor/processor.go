@@ -76,10 +76,24 @@ type rollupProcessor struct {
 	logsNextConsumer consumer.Logs
 }
 
+const (
+	defaultAttributeCardinalityLimit = 250
+	// RedactedAttributeValue is a value that replaces actual attribute value
+	// in case it exceeds cardinality limit.
+	RedactedAttributeValue = "REDACTED_VIA_CARDINALITY_LIMIT"
+)
+
 var (
 	_ consumer.Logs = (*rollupProcessor)(nil)
 
-	rollupsLog = initRollupsLog()
+	rollupsLog       = initRollupsLog()
+	rollupFromFields = func() map[string]struct{} {
+		fields := map[string]struct{}{}
+		for _, rollup := range rollupsLog {
+			fields[rollup.FromField] = struct{}{}
+		}
+		return fields
+	}()
 )
 
 func newRollupProcessor(set component.ProcessorCreateSettings, cfg *Config) (*rollupProcessor, error) {
@@ -105,6 +119,7 @@ func (rp *rollupProcessor) Shutdown(context.Context) error {
 
 // ConsumeLogs implements LogsProcessor.
 func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
+	applyCardinalityLimits(ld, rp.cfg.AttributeCardinalityLimit)
 	rollupData := make(map[string]pcommon.Map)
 	datasketches := make(map[string]map[string]*sketches.HeapDoublesSketch)
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
@@ -138,6 +153,39 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 		}
 	}
 	return rp.exportLogs(ctx, rollupData)
+}
+
+func applyCardinalityLimits(ld plog.Logs, limit int) {
+	attributeValues := map[string]map[string]struct{}{}
+	// IterateLogRecords won't error, as we always return nil from the closure
+	_ = otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
+		logRecord.Attributes().Range(func(k string, v pcommon.Value) bool {
+			// Applying the cardinality limits only to string attributes, as
+			// all user-created attributes where we risk high-cardinality are
+			// string attributes.
+			if v.Type() != pcommon.ValueTypeStr {
+				return true
+			}
+			if _, toRollup := rollupFromFields[k]; toRollup {
+				return true
+			}
+			value := v.Str()
+			values, exist := attributeValues[k]
+			if !exist {
+				attributeValues[k] = map[string]struct{}{value: {}}
+				return true
+			}
+			if _, exists := values[value]; !exists {
+				if len(values) < limit {
+					values[value] = struct{}{}
+				} else {
+					v.SetStr(RedactedAttributeValue)
+				}
+			}
+			return true
+		})
+		return nil
+	})
 }
 
 func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.HeapDoublesSketch, baseAttributes, attributes pcommon.Map, rollups []*Rollup) {
