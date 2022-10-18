@@ -568,7 +568,7 @@ definitions:
         Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
         :::
       * "sink" components – they affect the real world.
-        [ConcurrencyLimiter.LoadShedActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
+        [ConcurrencyLimiter.LoadActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
         In the UI, represented by orange color.  Sink components usually come in pairs with a
         "sources" component which emits a feedback signal, like
         `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
@@ -643,21 +643,21 @@ definitions:
       See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
       :::
 
-      It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+      It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
       Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
 
       ConcurrencyLimiter configuration is split into two parts: An actuation
-      strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
+      strategy and a scheduler. Right now, only `load_actuator` strategy is available.
     type: object
     title: Concurrency Limiter is an actuator component that regulates flows in order
       to provide active service protection
     properties:
-      load_shed_actuator:
+      load_actuator:
         description: |-
-          Actuator based on load shedding a portion of requests.
+          Actuator based on limiting the accepted concurrency under incoming concurrency * load multiplier.
 
           Actuation strategy defines the input signal that will drive the scheduler.
-        $ref: '#/definitions/v1LoadShedActuator'
+        $ref: '#/definitions/v1LoadActuator'
       scheduler:
         description: |-
           Configuration of Weighted Fair Queuing-based workload scheduler.
@@ -1360,22 +1360,22 @@ definitions:
         type: object
         additionalProperties:
           type: string
-  v1LoadShedActuator:
+  v1LoadActuator:
     type: object
-    title: Takes the load shed factor input signal and publishes it to the schedulers
+    title: Takes the load multiplier input signal and publishes it to the schedulers
       in the data-plane
     properties:
       in_ports:
-        description: Input ports for the Load Shed Actuator component.
-        $ref: '#/definitions/v1LoadShedActuatorIns'
-  v1LoadShedActuatorIns:
-    description: Input for the Load Shed Actuator component.
+        description: Input ports for the Load Actuator component.
+        $ref: '#/definitions/v1LoadActuatorIns'
+  v1LoadActuatorIns:
+    description: Input for the Load Actuator component.
     type: object
     properties:
-      load_shed_factor:
+      load_multiplier:
         description: |-
-          Load shedding factor is a fraction of [incoming
-          concurrency](#v1-scheduler-outs) that needs to be dropped.
+          Load multiplier is ratio of [incoming
+          concurrency](#v1-scheduler-outs) that needs to be accepted.
         $ref: '#/definitions/v1InPort'
   v1MatchExpression:
     description: |-

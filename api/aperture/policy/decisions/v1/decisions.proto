@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package aperture.policy.decisions.v1;
 
-message LoadShedDecision {
-  double load_shed_factor = 1;
+message LoadDecision {
+  double load_multiplier = 1;
 }
 
 message TokensDecision {

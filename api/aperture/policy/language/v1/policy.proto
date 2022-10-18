@@ -130,7 +130,7 @@ message Resources {
 //   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
 //   :::
 // * "sink" components – they affect the real world.
-//   [ConcurrencyLimiter.LoadShedActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
+//   [ConcurrencyLimiter.LoadActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
 //   In the UI, represented by orange color.  Sink components usually come in pairs with a
 //   "sources" component which emits a feedback signal, like
 //   `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
@@ -749,11 +749,11 @@ message RateLimiter {
 // See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
 // :::
 //
-// It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+// It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
 // Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
 //
 // ConcurrencyLimiter configuration is split into two parts: An actuation
-// strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
+// strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 message ConcurrencyLimiter {
   // Selector decides the service and flows at which the concurrency limiter is applied.
   common.selector.v1.Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -779,10 +779,10 @@ message ConcurrencyLimiter {
   }]; // @gotags: validate:"required"
 
   oneof actuation_strategy {
-    // Actuator based on load shedding a portion of requests.
+    // Actuator based on limiting the accepted concurrency under incoming concurrency * load multiplier.
     //
     // Actuation strategy defines the input signal that will drive the scheduler.
-    LoadShedActuator load_shed_actuator = 3;
+    LoadActuator load_actuator = 3;
   }
 }
 
@@ -968,16 +968,16 @@ message Scheduler {
   }]; // @gotags: default:"0.49s"
 }
 
-// Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
-message LoadShedActuator {
-  // Input for the Load Shed Actuator component.
+// Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
+message LoadActuator {
+  // Input for the Load Actuator component.
   message Ins {
-    // Load shedding factor is a fraction of [incoming
-    // concurrency](#v1-scheduler-outs) that needs to be dropped.
-    InPort load_shed_factor = 1;
+    // Load multiplier is ratio of [incoming
+    // concurrency](#v1-scheduler-outs) that needs to be accepted.
+    InPort load_multiplier = 1;
   }
 
-  // Input ports for the Load Shed Actuator component.
+  // Input ports for the Load Actuator component.
   Ins in_ports = 1;
 }
 

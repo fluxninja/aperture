@@ -56,8 +56,8 @@ const (
 	WFQFlowsMetricName = "wfq_flows_total"
 	// WFQRequestsMetricName - weighted fair queuing number of requests gauge.
 	WFQRequestsMetricName = "wfq_requests_total"
-	// TokenBucketMetricName - a gauge that tracks the load shed factor.
-	TokenBucketMetricName = "token_bucket_lsf_ratio"
+	// TokenBucketLMMetricName - a gauge that tracks the load multiplier.
+	TokenBucketLMMetricName = "token_bucket_lm_ratio"
 	// TokenBucketFillRateMetricName - a gauge that tracks the fill rate of token bucket.
 	TokenBucketFillRateMetricName = "token_bucket_fill_rate"
 	// TokenBucketCapacityMetricName - a gauge that tracks the capacity of token bucket.
@@ -76,6 +76,10 @@ const (
 
 	// PROMETHEUS LABELS.
 
+	// InstanceLabel used to identify the host name on which an Aperture process is running.
+	InstanceLabel = "instance"
+	// ProcessUUIDLabel used to uniquely identify an Aperture process.
+	ProcessUUIDLabel = "process_uuid"
 	// DistCacheMemberIDLabel - label specifying unique identifier of the node in the olric cluster.
 	DistCacheMemberIDLabel = "distcache_member_id"
 	// DistCacheMemberNameLabel - label specifying name of the node in the olric cluster.

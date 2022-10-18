@@ -23,37 +23,37 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-type loadShedActuatorFactory struct {
-	loadShedDecisionWatcher            notifiers.Watcher
-	tokenBucketLSFGaugeVec             *prometheus.GaugeVec
+type loadActuatorFactory struct {
+	loadDecisionWatcher                notifiers.Watcher
+	tokenBucketLMGaugeVec              *prometheus.GaugeVec
 	tokenBucketFillRateGaugeVec        *prometheus.GaugeVec
 	tokenBucketBucketCapacityGaugeVec  *prometheus.GaugeVec
 	tokenBucketAvailableTokensGaugeVec *prometheus.GaugeVec
 	agentGroupName                     string
 }
 
-// newLoadShedActuatorFactory sets up the load shed module in the main fx app.
-func newLoadShedActuatorFactory(
+// newLoadActuatorFactory sets up the load actuator module in the main fx app.
+func newLoadActuatorFactory(
 	lc fx.Lifecycle,
 	etcdClient *etcdclient.Client,
 	agentGroup string,
 	prometheusRegistry *prometheus.Registry,
-) (*loadShedActuatorFactory, error) {
+) (*loadActuatorFactory, error) {
 	// Scope the sync to the agent group.
-	etcdPath := path.Join(common.LoadShedDecisionsPath, common.AgentGroupPrefix(agentGroup))
-	loadShedDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
+	etcdPath := path.Join(common.LoadDecisionsPath, common.AgentGroupPrefix(agentGroup))
+	loadDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
 	}
-	f := &loadShedActuatorFactory{
-		loadShedDecisionWatcher: loadShedDecisionWatcher,
-		agentGroupName:          agentGroup,
+	f := &loadActuatorFactory{
+		loadDecisionWatcher: loadDecisionWatcher,
+		agentGroupName:      agentGroup,
 	}
 	// Initialize and register the WFQ and Token Bucket Metric Vectors
-	f.tokenBucketLSFGaugeVec = prometheus.NewGaugeVec(
+	f.tokenBucketLMGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: metrics.TokenBucketMetricName,
-			Help: "A gauge that tracks the load shed factor",
+			Name: metrics.TokenBucketLMMetricName,
+			Help: "A gauge that tracks the load multiplier",
 		},
 		metricLabelKeys,
 	)
@@ -81,7 +81,7 @@ func newLoadShedActuatorFactory(
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			err := prometheusRegistry.Register(f.tokenBucketLSFGaugeVec)
+			err := prometheusRegistry.Register(f.tokenBucketLMGaugeVec)
 			if err != nil {
 				return err
 			}
@@ -98,7 +98,7 @@ func newLoadShedActuatorFactory(
 				return err
 			}
 
-			err = loadShedDecisionWatcher.Start()
+			err = loadDecisionWatcher.Start()
 			if err != nil {
 				return err
 			}
@@ -107,25 +107,25 @@ func newLoadShedActuatorFactory(
 		},
 		OnStop: func(_ context.Context) error {
 			var errMulti error
-			err := loadShedDecisionWatcher.Stop()
+			err := loadDecisionWatcher.Stop()
 			if err != nil {
 				errMulti = multierr.Append(errMulti, err)
 			}
 
-			if !prometheusRegistry.Unregister(f.tokenBucketLSFGaugeVec) {
-				err := fmt.Errorf("failed to unregister token_bucket_lsf metric")
+			if !prometheusRegistry.Unregister(f.tokenBucketLMGaugeVec) {
+				err := fmt.Errorf("failed to unregister " + metrics.TokenBucketLMMetricName)
 				errMulti = multierr.Append(errMulti, err)
 			}
 			if !prometheusRegistry.Unregister(f.tokenBucketFillRateGaugeVec) {
-				err := fmt.Errorf("failed to unregister token_bucket_fill_rate metric")
+				err := fmt.Errorf("failed to unregister " + metrics.TokenBucketFillRateMetricName)
 				errMulti = multierr.Append(errMulti, err)
 			}
 			if !prometheusRegistry.Unregister(f.tokenBucketBucketCapacityGaugeVec) {
-				err := fmt.Errorf("failed to unregister token_bucket_capacity metric")
+				err := fmt.Errorf("failed to unregister " + metrics.TokenBucketCapacityMetricName)
 				errMulti = multierr.Append(errMulti, err)
 			}
 			if !prometheusRegistry.Unregister(f.tokenBucketAvailableTokensGaugeVec) {
-				err := fmt.Errorf("failed to unregister token_bucket_available_tokens metric ")
+				err := fmt.Errorf("failed to unregister " + metrics.TokenBucketAvailableMetricName)
 				errMulti = multierr.Append(errMulti, err)
 			}
 			return errMulti
@@ -134,16 +134,16 @@ func newLoadShedActuatorFactory(
 	return f, nil
 }
 
-// newLoadShedActuator creates a new load shed actuator based on proto spec.
-func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concurrencyLimiter,
+// newLoadActuator creates a new load actuator based on proto spec.
+func (lsaFactory *loadActuatorFactory) newLoadActuator(conLimiter *concurrencyLimiter,
 	registry status.Registry,
 	clock clockwork.Clock,
 	lifecycle fx.Lifecycle,
 	metricLabels prometheus.Labels,
-) (*loadShedActuator, error) {
-	reg := registry.Child("load_shed_actuator")
+) (*loadActuator, error) {
+	reg := registry.Child("load_actuator")
 
-	lsa := &loadShedActuator{
+	lsa := &loadActuator{
 		conLimiter:     conLimiter,
 		clock:          clock,
 		statusRegistry: reg,
@@ -168,9 +168,9 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concu
 				return err
 			}
 
-			tokenBucketLSFGauge, err := lsaFactory.tokenBucketLSFGaugeVec.GetMetricWith(metricLabels)
+			tokenBucketLMGauge, err := lsaFactory.tokenBucketLMGaugeVec.GetMetricWith(metricLabels)
 			if err != nil {
-				return retErr(errors.Wrap(err, "Failed to get token bucket LSF gauge"))
+				return retErr(errors.Wrap(err, "Failed to get token bucket LM gauge"))
 			}
 
 			tokenBucketFillRateGauge, err := lsaFactory.tokenBucketFillRateGaugeVec.GetMetricWith(metricLabels)
@@ -188,8 +188,8 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concu
 				return retErr(errors.Wrap(err, "Failed to get token bucket available tokens gauge"))
 			}
 
-			tokenBucketMetrics := &scheduler.TokenBucketLoadShedMetrics{
-				LSFGauge: tokenBucketLSFGauge,
+			tokenBucketMetrics := &scheduler.TokenBucketLoadMultiplierMetrics{
+				LMGauge: tokenBucketLMGauge,
 				TokenBucketMetrics: &scheduler.TokenBucketMetrics{
 					FillRateGauge:        tokenBucketFillRateGauge,
 					BucketCapacityGauge:  tokenBucketBucketCapacityGauge,
@@ -198,9 +198,9 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concu
 			}
 
 			// Initialize the token bucket (non continuous tracking mode)
-			lsa.tokenBucketLoadShed = scheduler.NewTokenBucketLoadShed(clock.Now(), 10, time.Second, tokenBucketMetrics)
+			lsa.tokenBucketLoadMultiplier = scheduler.NewTokenBucketLoadMultiplier(clock.Now(), 10, time.Second, tokenBucketMetrics)
 
-			err = lsaFactory.loadShedDecisionWatcher.AddKeyNotifier(decisionNotifier)
+			err = lsaFactory.loadDecisionWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {
 				return retErr(err)
 			}
@@ -208,26 +208,26 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concu
 		},
 		OnStop: func(context.Context) error {
 			var errMulti error
-			err := lsaFactory.loadShedDecisionWatcher.RemoveKeyNotifier(decisionNotifier)
+			err := lsaFactory.loadDecisionWatcher.RemoveKeyNotifier(decisionNotifier)
 			if err != nil {
 				errMulti = multierr.Append(errMulti, err)
 			}
 
-			deleted := lsaFactory.tokenBucketLSFGaugeVec.Delete(metricLabels)
+			deleted := lsaFactory.tokenBucketLMGaugeVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_lsf gauge from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete "+metrics.TokenBucketLMMetricName+" from its metric vector"))
 			}
 			deleted = lsaFactory.tokenBucketFillRateGaugeVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_fill_rate gauge from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete "+metrics.TokenBucketFillRateMetricName+" gauge from its metric vector"))
 			}
 			deleted = lsaFactory.tokenBucketBucketCapacityGaugeVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_capacity gauge from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete "+metrics.TokenBucketCapacityMetricName+" gauge from its metric vector"))
 			}
 			deleted = lsaFactory.tokenBucketAvailableTokensGaugeVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete token_bucket_available_tokens gauge from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete "+metrics.TokenBucketAvailableMetricName+" gauge from its metric vector"))
 			}
 
 			lsa.statusRegistry.SetStatus(status.NewStatus(nil, errMulti))
@@ -237,25 +237,25 @@ func (lsaFactory *loadShedActuatorFactory) newLoadShedActuator(conLimiter *concu
 	return lsa, nil
 }
 
-// loadShedActuator saves load shed decisions received from controller.
-type loadShedActuator struct {
-	conLimiter          *concurrencyLimiter
-	clock               clockwork.Clock
-	tokenBucketLoadShed *scheduler.TokenBucketLoadShed
-	statusRegistry      status.Registry
+// loadActuator saves load decisions received from controller.
+type loadActuator struct {
+	conLimiter                *concurrencyLimiter
+	clock                     clockwork.Clock
+	tokenBucketLoadMultiplier *scheduler.TokenBucketLoadMultiplier
+	statusRegistry            status.Registry
 }
 
-func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (lsa *loadActuator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := lsa.statusRegistry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision was removed")
 		return
 	}
 
-	var wrapperMessage wrappersv1.LoadShedDecisionWrapper
+	var wrapperMessage wrappersv1.LoadDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	loadShedDecision := wrapperMessage.LoadShedDecision
-	if err != nil || loadShedDecision == nil {
+	loadDecision := wrapperMessage.LoadDecision
+	if err != nil || loadDecision == nil {
 		statusMsg := "Failed to unmarshal config wrapper"
 		logger.Warn().Err(err).Msg(statusMsg)
 		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
@@ -263,7 +263,7 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 	}
 	commonAttributes := wrapperMessage.GetCommonAttributes()
 	if commonAttributes == nil {
-		statusMsg := "Failed to get common attributes from config wrapper"
+		statusMsg := "Failed to get common attributes from config wrapperShedFactor"
 		logger.Error().Err(err).Msg(statusMsg)
 		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
@@ -277,6 +277,6 @@ func (lsa *loadShedActuator) decisionUpdateCallback(event notifiers.Event, unmar
 		return
 	}
 
-	logger.Trace().Float64("loadShedFactor", loadShedDecision.LoadShedFactor).Msg("Setting load shed factor")
-	lsa.tokenBucketLoadShed.SetLoadShedFactor(lsa.clock.Now(), loadShedDecision.LoadShedFactor)
+	logger.Trace().Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
+	lsa.tokenBucketLoadMultiplier.SetLoadMultiplier(lsa.clock.Now(), loadDecision.LoadMultiplier)
 }

@@ -26,13 +26,13 @@ var (
 	prometheusRegistry              *prometheus.Registry
 	wfqFlowsGauge                   prometheus.Gauge
 	wfqHeapRequestsGauge            prometheus.Gauge
-	tokenBucketLSFGauge             prometheus.Gauge
+	tokenBucketLMGauge              prometheus.Gauge
 	tokenBucketFillRateGauge        prometheus.Gauge
 	tokenBucketBucketCapacityGauge  prometheus.Gauge
 	tokenBucketAvailableTokensGauge prometheus.Gauge
 )
 
-func getMetrics() *TokenBucketLoadShedMetrics {
+func getMetrics() *TokenBucketLoadMultiplierMetrics {
 	prometheusRegistry = prometheus.NewRegistry()
 
 	constLabels := make(prometheus.Labels)
@@ -49,11 +49,11 @@ func getMetrics() *TokenBucketLoadShedMetrics {
 		ConstLabels: constLabels,
 	})
 	_ = prometheusRegistry.Register(wfqHeapRequestsGauge)
-	tokenBucketLSFGauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: metrics.TokenBucketMetricName,
-		Help: "A gauge that tracks the load shed factor",
+	tokenBucketLMGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: metrics.TokenBucketLMMetricName,
+		Help: "A gauge that tracks the load multiplier",
 	})
-	_ = prometheusRegistry.Register(tokenBucketLSFGauge)
+	_ = prometheusRegistry.Register(tokenBucketLMGauge)
 	tokenBucketFillRateGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: metrics.TokenBucketFillRateMetricName,
 		Help: "A gauge that tracks the fill rate of token bucket",
@@ -74,8 +74,8 @@ func getMetrics() *TokenBucketLoadShedMetrics {
 		BucketCapacityGauge:  tokenBucketBucketCapacityGauge,
 		AvailableTokensGauge: tokenBucketAvailableTokensGauge,
 	}
-	metrics := &TokenBucketLoadShedMetrics{
-		LSFGauge:           tokenBucketLSFGauge,
+	metrics := &TokenBucketLoadMultiplierMetrics{
+		LMGauge:            tokenBucketLMGauge,
 		TokenBucketMetrics: tbbMetrics,
 	}
 	return metrics
@@ -245,7 +245,7 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 	})
 }
 
-func BenchmarkTokenBucketLoadShed(b *testing.B) {
+func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	flows := flowTrackers{
 		{fairnessLabel: "workload1", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
 		{fairnessLabel: "workload2", requestTokens: 1, priority: 0, timeout: 5 * time.Millisecond},
@@ -255,9 +255,9 @@ func BenchmarkTokenBucketLoadShed(b *testing.B) {
 	}
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
-	manager := NewTokenBucketLoadShed(startTime, _testSlotCount, _testSlotDuration, getMetrics())
+	manager := NewTokenBucketLoadMultiplier(startTime, _testSlotCount, _testSlotDuration, getMetrics())
 	manager.SetContinuousTracking(true)
-	manager.SetLoadShedFactor(startTime, 1.0)
+	manager.SetLoadMultiplier(startTime, 1.0)
 
 	schedMetrics := &WFQMetrics{
 		FlowsGauge:        wfqFlowsGauge,
@@ -297,12 +297,12 @@ func totalSentTokens(flows flowTrackers) []uint64 {
 	return totalTokens
 }
 
-func calculateFillRate(flows flowTrackers, lsf float64) float64 {
+func calculateFillRate(flows flowTrackers, lm float64) float64 {
 	fillRate := float64(0)
 	for _, flow := range flows {
 		fillRate += float64(flow.requestTokens * flow.requestRate)
 	}
-	return fillRate * lsf
+	return fillRate * lm
 }
 
 func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, noOfRuns int) {
@@ -552,10 +552,10 @@ func TestTimeouts(t *testing.T) {
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 }
 
-func TestLoadShedBucket(t *testing.T) {
+func TestLoadMultiplierBucket(t *testing.T) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	var wg sync.WaitGroup
-	lsf := 0.3
+	lm := 0.3
 	flows := flowTrackers{
 		{
 			fairnessLabel: "workload0",
@@ -573,14 +573,14 @@ func TestLoadShedBucket(t *testing.T) {
 	c := clockwork.NewFakeClock()
 	go updateClock(t, c, flows)
 
-	loadShedBucket := NewTokenBucketLoadShed(c.Now(), _testSlotCount, _testSlotDuration, getMetrics())
-	loadShedBucket.SetContinuousTracking(true)
-	sched := NewWFQScheduler(loadShedBucket, c, schedMetrics)
+	loadMultiplierBucket := NewTokenBucketLoadMultiplier(c.Now(), _testSlotCount, _testSlotDuration, getMetrics())
+	loadMultiplierBucket.SetContinuousTracking(true)
+	sched := NewWFQScheduler(loadMultiplierBucket, c, schedMetrics)
 
 	trainAndDeplete := func() {
 		// Running Train and deplete the bucket
 		depleteRunTime := time.Second * 2
-		loadShedBucket.SetLoadShedFactor(c.Now(), 1.0)
+		loadMultiplierBucket.SetLoadMultiplier(c.Now(), 1.0)
 
 		runFlows(sched, &wg, flows, depleteRunTime, c)
 		wg.Wait()
@@ -588,7 +588,7 @@ func TestLoadShedBucket(t *testing.T) {
 
 	runExperiment := func() {
 		// Running Actual Experiment
-		loadShedBucket.SetLoadShedFactor(c.Now(), lsf)
+		loadMultiplierBucket.SetLoadMultiplier(c.Now(), lm)
 		flowRunTime := time.Second * 10
 		runFlows(sched, &wg, flows, flowRunTime, c)
 		wg.Wait()
@@ -601,11 +601,11 @@ func TestLoadShedBucket(t *testing.T) {
 		}
 		t.Logf("Total tokens sent: %d", totalSentToken)
 		t.Logf("Total tokens accepted: %d", totalAcceptedTokens)
-		totalSentToken = uint64(float64(totalSentToken) * (1 - lsf))
+		totalSentToken = uint64(float64(totalSentToken) * (1 - lm))
 		ratio := float64(totalAcceptedTokens) / float64(totalSentToken)
 
 		if math.Abs(ratio-1) > _testTolerance {
-			t.Errorf("Load Shed Bucket Test Failed, unfairness detected: %f", ratio)
+			t.Errorf("Load Multiplier Bucket Test Failed, unfairness detected: %f", ratio)
 		}
 	}
 
@@ -625,13 +625,13 @@ func TestPanic(t *testing.T) {
 
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
-	manager := NewTokenBucketLoadShed(startTime, _testSlotCount, _testSlotDuration, getMetrics())
+	manager := NewTokenBucketLoadMultiplier(startTime, _testSlotCount, _testSlotDuration, getMetrics())
 	manager.SetContinuousTracking(true)
-	manager.SetLoadShedFactor(startTime, 0.5)
-	if manager.LoadShedFactor() != 0.5 {
-		t.Logf("LoadShedFactor is not 0.5\n")
+	manager.SetLoadMultiplier(startTime, 0.5)
+	if manager.LoadMultiplier() != 0.5 {
+		t.Logf("LoadMultiplier is not 0.5\n")
 	}
-	manager.SetLoadShedFactor(startTime, 1.5)
+	manager.SetLoadMultiplier(startTime, 1.5)
 
 	// If the panic is not thrown, the test will fail.
 	t.Errorf("Expected panic has not been caught")

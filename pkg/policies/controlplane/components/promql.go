@@ -339,8 +339,8 @@ type jobRegistererIfc interface {
 
 // PromQL is a component that runs a Prometheus query in the background and returns the result as a signal Reading.
 type PromQL struct {
-	// Last Query Timestamp
-	lastQueryTimestamp time.Time
+	// Last Query Tick
+	tickInfo runtime.TickInfo
 	// Prometheus API
 	promAPI prometheusv1.API
 	// Policy read API
@@ -378,7 +378,6 @@ func NewPromQLAndOptions(
 		evaluationInterval: promQLProto.EvaluationInterval.AsDuration(),
 		policyReadAPI:      policyReadAPI,
 		componentIndex:     componentIndex,
-		lastQueryTimestamp: time.Time{},
 		// Set err to make sure the initial runs of Execute return Invalid readings.
 		err: ErrNoQueriesReturned,
 	}
@@ -411,9 +410,9 @@ func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API) err
 // Execute implements runtime.Component.Execute.
 func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToValue, err error) {
 	// Re-run query if evaluationInterval elapsed since last query
-	if tickInfo.Timestamp().Sub(promQL.lastQueryTimestamp) >= promQL.evaluationInterval {
+	if tickInfo.Timestamp().Sub(promQL.lastQueryTimestamp()) >= promQL.evaluationInterval {
 		// Run query
-		promQL.lastQueryTimestamp = tickInfo.Timestamp()
+		promQL.tickInfo = tickInfo
 		// Launch job only if previous one is completed
 		// Quantize endTimestamp of query based on tick interval
 		endTimestamp := tickInfo.Timestamp().Truncate(tickInfo.Interval())
@@ -454,6 +453,13 @@ func (promQL *PromQL) onScalarResult(value float64, err error) {
 	promQL.err = err
 }
 
+func (promQL *PromQL) lastQueryTimestamp() time.Time {
+	if promQL.tickInfo == nil {
+		return time.Time{}
+	}
+	return promQL.tickInfo.Timestamp()
+}
+
 // ScalarQuery is a construct that can be used by other components to get tick aligned scalar results of a PromQL query.
 type ScalarQuery struct {
 	promQL *PromQL
@@ -485,11 +491,17 @@ func NewScalarQueryAndOptions(
 }
 
 // ExecuteScalarQuery runs a ScalarQueryJob and returns the current results: value and err. This function is supposed to be run under Circuit Execution Lock (Execution of Circuit Components is protected by this lock).
-func (scalarQuery *ScalarQuery) ExecuteScalarQuery(tickInfo runtime.TickInfo) (float64, error) {
+func (scalarQuery *ScalarQuery) ExecuteScalarQuery(tickInfo runtime.TickInfo) (ScalarResult, error) {
 	inPortReadings := runtime.PortToValue{}
 	_, _ = scalarQuery.promQL.Execute(inPortReadings, tickInfo)
 	// FYI: promQL ensures that initial runs return err when no queries have returned yet.
-	return scalarQuery.promQL.value, scalarQuery.promQL.err
+	return ScalarResult{Value: scalarQuery.promQL.value, TickInfo: scalarQuery.promQL.tickInfo}, scalarQuery.promQL.err
+}
+
+// ScalarResult is the result of a ScalarQuery.
+type ScalarResult struct {
+	TickInfo runtime.TickInfo
+	Value    float64
 }
 
 // TaggedQuery is a construct that can be used by other components to get tick aligned prometheus value results of a PromQL query.
@@ -516,7 +528,7 @@ func NewTaggedQueryAndOptions(
 	}
 	taggedQuery := &TaggedQuery{
 		scalarQuery: scalarQuery,
-		// Set err to make sure the initial runs of ExecutePromQuery return error.
+		// Set err to make sure the initial runs of ExecuteTaggedQuery return error.
 		err: ErrNoQueriesReturned,
 	}
 	// taggedQuery implements jobRegisterer
@@ -540,8 +552,14 @@ func (taggedQuery *TaggedQuery) onTaggedResult(res prometheusmodel.Value, err er
 	taggedQuery.err = err
 }
 
-// ExecutePromQuery runs a PromQueryJob and returns the current results: res and err. This function is supposed to be run under Circuit Execution Lock (Execution of Circuit Components is protected by this lock).
-func (taggedQuery *TaggedQuery) ExecutePromQuery(tickInfo runtime.TickInfo) (prometheusmodel.Value, error) {
+// ExecuteTaggedQuery runs a PromQueryJob and returns the current results: res and err. This function is supposed to be run under Circuit Execution Lock (Execution of Circuit Components is protected by this lock).
+func (taggedQuery *TaggedQuery) ExecuteTaggedQuery(tickInfo runtime.TickInfo) (TaggedResult, error) {
 	_, _ = taggedQuery.scalarQuery.ExecuteScalarQuery(tickInfo)
-	return taggedQuery.res, taggedQuery.err
+	return TaggedResult{Value: taggedQuery.res, TickInfo: taggedQuery.scalarQuery.promQL.tickInfo}, taggedQuery.err
+}
+
+// TaggedResult is the result of a ScalarQuery.
+type TaggedResult struct {
+	TickInfo runtime.TickInfo
+	Value    prometheusmodel.Value
 }
