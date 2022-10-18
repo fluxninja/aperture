@@ -485,22 +485,3 @@ spec:
                 object := json.unmarshal(base64url.decode(parts[0]))
                 user := object.user
 `
-
-// func createOverride(override map[string]interface{}, modify interface{}, paths []string) map[string]interface{} {
-// 	var ok bool
-// 	var valMap map[string]interface{}
-// 	var val interface{} = override
-
-// 	for i := len(paths) - 1; i >= 0; i-- {
-// 		valMap, ok = val.(map[string]interface{})
-// 		if !ok {
-// 			return nil
-// 		}
-// 		valMap[paths[i]] = modify
-// 		modify = map[string]interface{}{
-// 			paths[i]: valMap[paths[i]],
-// 		}
-// 	}
-// 	valMap = modify.(map[string]interface{})
-// 	return valMap
-// }
