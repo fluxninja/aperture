@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: service1-demo-app
+  name: static-rate-limiting
 spec:
   circuit:
     components:

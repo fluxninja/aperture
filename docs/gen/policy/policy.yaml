@@ -465,15 +465,19 @@ definitions:
         description: Rate Limiter provides service protection by applying rate limiter.
         x-order: 11
         $ref: '#/definitions/v1RateLimiter'
+      sink:
+        description: Sink is a sink component that does nothing.
+        x-order: 12
+        $ref: '#/definitions/v1Sink'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
-        x-order: 12
+        x-order: 13
         $ref: '#/definitions/v1Sqrt'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
-        x-order: 13
+        x-order: 14
         $ref: '#/definitions/v1Switcher'
   v1ConcurrencyLimiter:
     description: |-
@@ -1798,6 +1802,24 @@ definitions:
           :::
         type: string
         x-order: 1
+  v1Sink:
+    type: object
+    title: Sink is a component that consumes input signals and does nothing with them
+    properties:
+      in_ports:
+        description: Input ports for the Sink component.
+        x-order: 0
+        $ref: '#/definitions/v1SinkIns'
+  v1SinkIns:
+    description: Inputs for the Sink component.
+    type: object
+    properties:
+      inputs:
+        description: Array of input signals.
+        type: array
+        items:
+          $ref: '#/definitions/v1InPort'
+        x-order: 0
   v1Sqrt:
     description: |-
       $$

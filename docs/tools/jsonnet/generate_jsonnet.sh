@@ -66,27 +66,29 @@ for jsonnet_file in $jsonnet_files; do
 	dir=$(dirname "$jsonnet_file")
 	# remove extension and add .yaml
 	yamlfilepath="${jsonnet_file%.*}".yaml
+	jsonfilepath="${jsonnet_file%.*}".json
 
 	# cp jsonnet file to tmp file
 	tmpjsonnetfilepath=tmp/"$(basename "$jsonnet_file")"
 	cp "$jsonnet_file" "$tmpjsonnetfilepath"
 
-	old_yaml_file_contents=""
-	if [ -f "$yamlfilepath" ]; then
-		old_yaml_file_contents=$(cat "$yamlfilepath")
-	fi
-
 	# replace github.com/fluxninja/aperture/blueprints with $"gitroot"/blueprints
 	$SED -i "s|github.com/fluxninja/aperture/blueprints|$gitroot/blueprints|g" "$tmpjsonnetfilepath"
 	# fail script if any of the below commands fail
 	set -e
-	jsonnet -J "$gitroot"/blueprints/vendor "$tmpjsonnetfilepath" | yq -P >"$yamlfilepath"
-	# run prettier
-	npx prettier --write "$yamlfilepath"
-	git add "$yamlfilepath"
-
+	jsonnet -J "$gitroot"/blueprints/vendor "$tmpjsonnetfilepath" >"$jsonfilepath"
 	# if the file is a policy kind then generate mermaid diagram
-	if [ "$(yq e '.kind == "Policy"' "$yamlfilepath")" = "true" ]; then
+	if [ "$(yq e '.kind == "Policy"' "$jsonfilepath")" = "true" ]; then
+		old_yaml_file_contents=""
+		if [ -f "$yamlfilepath" ]; then
+			old_yaml_file_contents=$(cat "$yamlfilepath")
+		fi
+		# convert the policy to yaml
+		yq -P e . "$jsonfilepath" >"$yamlfilepath"
+		rm -rf "$jsonfilepath"
+		# run prettier
+		npx prettier --write "$yamlfilepath"
+		git add "$yamlfilepath"
 		# generate mermaid diagram
 		# compile the policy and generate mermaid if yaml has changed
 		if [ "$old_yaml_file_contents" != "$(cat "$yamlfilepath")" ]; then
@@ -96,6 +98,9 @@ for jsonnet_file in $jsonnet_files; do
 			go run "$gitroot"/cmd/circuit-compiler/main.go -cr "$yamlfilepath" --mermaid "$mermaidfilepath"
 			git add "$mermaidfilepath"
 		fi
+	else
+		npx prettier --write "$jsonfilepath"
+		git add "$jsonfilepath"
 	fi
 	# unset fail on error
 	set +e

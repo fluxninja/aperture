@@ -555,7 +555,7 @@ func TestTimeouts(t *testing.T) {
 func TestLoadMultiplierBucket(t *testing.T) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	var wg sync.WaitGroup
-	lm := 0.3
+	lm := 0.7
 	flows := flowTrackers{
 		{
 			fairnessLabel: "workload0",
@@ -580,7 +580,7 @@ func TestLoadMultiplierBucket(t *testing.T) {
 	trainAndDeplete := func() {
 		// Running Train and deplete the bucket
 		depleteRunTime := time.Second * 2
-		loadMultiplierBucket.SetLoadMultiplier(c.Now(), 1.0)
+		loadMultiplierBucket.SetLoadMultiplier(c.Now(), 0.0)
 
 		runFlows(sched, &wg, flows, depleteRunTime, c)
 		wg.Wait()
@@ -601,7 +601,7 @@ func TestLoadMultiplierBucket(t *testing.T) {
 		}
 		t.Logf("Total tokens sent: %d", totalSentToken)
 		t.Logf("Total tokens accepted: %d", totalAcceptedTokens)
-		totalSentToken = uint64(float64(totalSentToken) * (1 - lm))
+		totalSentToken = uint64(float64(totalSentToken) * lm)
 		ratio := float64(totalAcceptedTokens) / float64(totalSentToken)
 
 		if math.Abs(ratio-1) > _testTolerance {
@@ -631,7 +631,7 @@ func TestPanic(t *testing.T) {
 	if manager.LoadMultiplier() != 0.5 {
 		t.Logf("LoadMultiplier is not 0.5\n")
 	}
-	manager.SetLoadMultiplier(startTime, 1.5)
+	manager.SetLoadMultiplier(startTime, -1.5)
 
 	// If the panic is not thrown, the test will fail.
 	t.Errorf("Expected panic has not been caught")

@@ -188,6 +188,9 @@ message Component {
 
     // Picks the first valid input signal and emits it.
     FirstValid first_valid = 14;
+
+    // Sink is a sink component that does nothing.
+    Sink sink = 15;
   }
 }
 
@@ -1158,4 +1161,16 @@ message FirstValid {
 
   // Output ports for the FirstValid component.
   Outs out_ports = 2;
+}
+
+// Sink is a component that consumes input signals and does nothing with them
+message Sink {
+  // Inputs for the Sink component.
+  message Ins {
+    // Array of input signals.
+    repeated InPort inputs = 1; // @gotags: validate:"dive"
+  }
+
+  // Input ports for the Sink component.
+  Ins in_ports = 1;
 }

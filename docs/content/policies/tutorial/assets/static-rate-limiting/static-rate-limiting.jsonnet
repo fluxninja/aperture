@@ -43,7 +43,7 @@ local policyResource = {
   kind: 'Policy',
   apiVersion: 'fluxninja.com/v1alpha1',
   metadata: {
-    name: 'service1-demo-app',
+    name: 'static-rate-limiting',
     labels: {
       'fluxninja.com/validate': 'true',
     },

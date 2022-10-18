@@ -629,6 +629,9 @@ definitions:
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
         $ref: '#/definitions/v1RateLimiter'
+      sink:
+        description: Sink is a sink component that does nothing.
+        $ref: '#/definitions/v1Sink'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
@@ -1879,6 +1882,22 @@ definitions:
           One entity may belong to multiple services.
           :::
         type: string
+  v1Sink:
+    type: object
+    title: Sink is a component that consumes input signals and does nothing with them
+    properties:
+      in_ports:
+        description: Input ports for the Sink component.
+        $ref: '#/definitions/v1SinkIns'
+  v1SinkIns:
+    description: Inputs for the Sink component.
+    type: object
+    properties:
+      inputs:
+        description: Array of input signals.
+        type: array
+        items:
+          $ref: '#/definitions/v1InPort'
   v1Sqrt:
     description: |-
       $$
