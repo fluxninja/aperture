@@ -8,7 +8,7 @@ import (
 )
 
 // MarshalJSON implements json.Marshaler
-func (msg *LoadShedDecisionWrapper) MarshalJSON() ([]byte, error) {
+func (msg *LoadDecisionWrapper) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -17,7 +17,7 @@ func (msg *LoadShedDecisionWrapper) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *LoadShedDecisionWrapper) UnmarshalJSON(b []byte) error {
+func (msg *LoadDecisionWrapper) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
