@@ -546,7 +546,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - gradle-v1-{{ checksum <<parameters.path>>/"build.gradle.kts" }}
+            - gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
             - gradle-v1-
       - run:
           name: Dependencies
@@ -556,7 +556,7 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-          key: gradle-v1-{{ checksum <<parameters.path>>/"build.gradle.kts" }}
+          key: gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
       # run tests!
       - run:
           name: Build
@@ -581,7 +581,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - gradle-v1-{{ checksum <<parameters.path>>/"build.gradle.kts" }}
+            - gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
             - gradle-v1-
       # See https://discuss.circleci.com/t/gpg-keys-as-environment-variables/28641
       - run:
@@ -592,7 +592,7 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-          key: gradle-v1-{{ checksum <<parameters.path>>/"build.gradle.kts" }}
+          key: gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
 
 workflows:
   version: 2
