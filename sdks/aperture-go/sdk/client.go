@@ -16,7 +16,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 
-	flowcontrolgrpc "go.buf.build/grpc/go/fluxninja/aperture/aperture/flowcontrol/v1"
+	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/v1"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
@@ -26,7 +26,7 @@ type Client interface {
 }
 
 type apertureClient struct {
-	flowControlClient flowcontrolgrpc.FlowControlServiceClient
+	flowControlClient flowcontrol.FlowControlServiceClient
 	tracer            trace.Tracer
 	timeout           time.Duration
 	exporter          *otlptrace.Exporter
@@ -64,7 +64,7 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 
 	tracer := tracerProvider.Tracer(libraryName)
 
-	fcClient := flowcontrolgrpc.NewFlowControlServiceClient(opts.ApertureAgentGRPCClientConn)
+	fcClient := flowcontrol.NewFlowControlServiceClient(opts.ApertureAgentGRPCClientConn)
 
 	var timeout time.Duration
 	if opts.CheckTimeout == 0 {
@@ -107,7 +107,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, feature string, explicit
 		labels[key] = value
 	}
 
-	req := &flowcontrolgrpc.CheckRequest{
+	req := &flowcontrol.CheckRequest{
 		Feature: feature,
 		Labels:  labels,
 	}

@@ -2,7 +2,7 @@
 package languagev1
 
 import (
-	proto "github.com/golang/protobuf/proto"
+	proto "google.golang.org/protobuf/proto"
 )
 
 // DeepCopyInto supports using GetPoliciesResponse within kubernetes types, where deepcopy-gen is used.

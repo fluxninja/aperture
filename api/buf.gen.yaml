@@ -28,7 +28,7 @@ plugins:
       - orig_name=true
       # keep this value false as we marshal the config messages to make wrappers
       - emit_defaults=false
-  - remote: buf.build/fluxninja/plugins/protoc-gen-go-deepcopy:v1.15.0
+  - remote: buf.build/fluxninja/plugins/protoc-gen-go-deepcopy:v0.2.1
     out: gen/proto/go
     opt:
       - paths=source_relative
