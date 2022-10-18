@@ -2,7 +2,7 @@
 package decisionsv1
 
 import (
-	proto "github.com/golang/protobuf/proto"
+	proto "google.golang.org/protobuf/proto"
 )
 
 // DeepCopyInto supports using LoadDecision within kubernetes types, where deepcopy-gen is used.
