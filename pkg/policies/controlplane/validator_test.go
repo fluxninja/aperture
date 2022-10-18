@@ -23,14 +23,14 @@ var _ = Describe("Validator", Ordered, func() {
 	policySpecValidator := &controlplane.PolicySpecValidator{}
 	policyValidator := policyvalidator.NewPolicyValidator([]policyvalidator.PolicySpecValidator{policySpecValidator})
 
-	createPolicyMap := func(contents string) ([]byte, map[string]interface{}) {
+	createPolicyMap := func(contents string) map[string]interface{} {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "aperture-controller")
 		jsonPolicy, err := yaml.YAMLToJSON([]byte(contents))
 		Expect(err).NotTo(HaveOccurred())
 		var policyMap map[string]interface{}
 		err = json.Unmarshal([]byte(jsonPolicy), &policyMap)
 		Expect(err).NotTo(HaveOccurred())
-		return jsonPolicy, policyMap
+		return policyMap
 	}
 
 	validateExample := func(contents string) (request *admissionv1.AdmissionRequest) {
@@ -49,7 +49,7 @@ var _ = Describe("Validator", Ordered, func() {
 		return request
 	}
 
-	validateModifiedExample := func(jsonPolicy []byte, policyMap map[string]interface{}) (request *admissionv1.AdmissionRequest) {
+	validateModifiedExample := func(policyMap map[string]interface{}) (request *admissionv1.AdmissionRequest) {
 		policyBytes, err := json.Marshal(policyMap)
 		Expect(err).NotTo(HaveOccurred())
 		var policy policyv1alpha1.Policy
@@ -103,57 +103,57 @@ var _ = Describe("Validator", Ordered, func() {
 	})
 
 	It("accepts example policy for demoapp without PromQL evalutation_interval and sets it to default 10s", func() {
-		jsonPolicy, policyMap := createPolicyMap(latencyGradientPolicy)
+		policyMap := createPolicyMap(latencyGradientPolicy)
 		err := dyno.Delete(policyMap, "evaluation_interval", "spec", "circuit", "components", 0, "promql")
 		Expect(err).NotTo(HaveOccurred())
-		request := validateModifiedExample(jsonPolicy, policyMap)
+		request := validateModifiedExample(policyMap)
 		validateRequest(request, "")
 		policySpec := extractPolicySpec(request)
 		Expect(policySpec.Circuit.GetComponents()[0].GetPromql().GetEvaluationInterval().GetSeconds()).To(Equal(int64(10)))
 	})
 
 	It("accepts example policy for rate limit without Circuit evalutation_interval and sets it to default 0.5s", func() {
-		jsonPolicy, policyMap := createPolicyMap(latencyGradientPolicy)
+		policyMap := createPolicyMap(latencyGradientPolicy)
 		err := dyno.Delete(policyMap, "evaluation_interval", "spec", "circuit", "components", 0, "promql")
 		Expect(err).NotTo(HaveOccurred())
-		request := validateModifiedExample(jsonPolicy, policyMap)
+		request := validateModifiedExample(policyMap)
 		validateRequest(request, "")
 		policySpec := extractPolicySpec(request)
 		Expect(policySpec.Circuit.GetEvaluationInterval().GetNanos()).To(Equal(int32(500000000)))
 	})
 
 	It("does not accept example policy for demoapp without ConcurrencyLimiter selector ", func() {
-		jsonPolicy, policyMap := createPolicyMap(latencyGradientPolicy)
+		policyMap := createPolicyMap(latencyGradientPolicy)
 		err := dyno.Delete(policyMap, "selector", "spec", "circuit", "components", 8, "concurrency_limiter")
 		Expect(err).NotTo(HaveOccurred())
-		request := validateModifiedExample(jsonPolicy, policyMap)
+		request := validateModifiedExample(policyMap)
 		msg := "policies: Key: 'Policy.Circuit.Components[8].Component.ConcurrencyLimiter.Selector' Error:Field validation for 'Selector' failed on the 'required' tag"
 		validateRequest(request, msg)
 	})
 
 	It("does not accept example policy for demoapp sets concurrency limiter default Workload Priority to 2000", func() {
-		jsonPolicy, policyMap := createPolicyMap(latencyGradientPolicy)
+		policyMap := createPolicyMap(latencyGradientPolicy)
 		err := dyno.Set(policyMap, 2000, "spec", "circuit", "components", 8, "concurrency_limiter", "scheduler", "default_workload_parameters", "priority")
 		Expect(err).NotTo(HaveOccurred())
-		request := validateModifiedExample(jsonPolicy, policyMap)
+		request := validateModifiedExample(policyMap)
 		msg := "policies: Key: 'Policy.Circuit.Components[8].Component.ConcurrencyLimiter.Scheduler.DefaultWorkloadParameters.Priority' Error:Field validation for 'Priority' failed on the 'lte' tag"
 		validateRequest(request, msg)
 	})
 
 	It("does not accept example policy for rate limit without RateLimiter service selector", func() {
-		jsonPolicy, policyMap := createPolicyMap(rateLimitPolicy)
+		policyMap := createPolicyMap(rateLimitPolicy)
 		err := dyno.Delete(policyMap, "service_selector", "spec", "circuit", "components", 1, "rate_limiter", "selector")
 		Expect(err).NotTo(HaveOccurred())
-		request := validateModifiedExample(jsonPolicy, policyMap)
+		request := validateModifiedExample(policyMap)
 		msg := "policies: Key: 'Policy.Circuit.Components[1].Component.RateLimiter.Selector.ServiceSelector' Error:Field validation for 'ServiceSelector' failed on the 'required' tag"
 		validateRequest(request, msg)
 	})
 
 	It("does not accept example policy for classification without Classifiers service selector", func() {
-		jsonPolicy, policyMap := createPolicyMap(classificationPolicy)
+		policyMap := createPolicyMap(classificationPolicy)
 		err := dyno.Delete(policyMap, "service_selector", "spec", "resources", "classifiers", 0, "selector")
 		Expect(err).NotTo(HaveOccurred())
-		request := validateModifiedExample(jsonPolicy, policyMap)
+		request := validateModifiedExample(policyMap)
 		msg := "policies: Key: 'Policy.Resources.Classifiers[0].Selector.ServiceSelector' Error:Field validation for 'ServiceSelector' failed on the 'required' tag"
 		validateRequest(request, msg)
 	})
