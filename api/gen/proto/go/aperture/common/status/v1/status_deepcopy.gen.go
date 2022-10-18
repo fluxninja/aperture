@@ -2,7 +2,7 @@
 package statusv1
 
 import (
-	proto "github.com/golang/protobuf/proto"
+	proto "google.golang.org/protobuf/proto"
 )
 
 // DeepCopyInto supports using GroupStatusRequest within kubernetes types, where deepcopy-gen is used.

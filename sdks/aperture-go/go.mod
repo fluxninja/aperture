@@ -3,7 +3,6 @@ module github.com/fluxninja/aperture-go
 go 1.19
 
 require (
-	go.buf.build/grpc/go/fluxninja/aperture v1.4.10
 	go.opentelemetry.io/otel v1.10.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.10.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.10.0

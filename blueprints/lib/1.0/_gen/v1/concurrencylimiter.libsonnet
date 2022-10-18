@@ -1,11 +1,11 @@
 {
   new():: {
   },
-  withLoadShedActuator(load_shed_actuator):: {
-    load_shed_actuator: load_shed_actuator,
+  withLoadActuator(load_actuator):: {
+    load_actuator: load_actuator,
   },
-  withLoadShedActuatorMixin(load_shed_actuator):: {
-    load_shed_actuator+: load_shed_actuator,
+  withLoadActuatorMixin(load_actuator):: {
+    load_actuator+: load_actuator,
   },
   withScheduler(scheduler):: {
     scheduler: scheduler,

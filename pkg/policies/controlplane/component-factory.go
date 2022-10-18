@@ -152,6 +152,15 @@ func NewComponentAndOptions(
 			Name:          "FirstValid",
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
+	} else if sink := componentProto.GetSink(); sink != nil {
+		component, option, err := components.NewSinkAndOptions(sink, componentIndex, policyReadAPI)
+		mapStruct, err := encodeMapStructOnNilErr(sink, err)
+		return runtime.CompiledComponent{
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "Sink",
+			ComponentType: runtime.ComponentTypeSink,
+		}, nil, option, err
 	} else {
 		// Try Component Stack Factory
 		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)

@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
@@ -25,7 +26,9 @@ var _ = Describe("Rollup processor", func() {
 	)
 
 	BeforeEach(func() {
-		config = &Config{}
+		config = &Config{
+			AttributeCardinalityLimit: 10,
+		}
 		testConsumer = &fakeConsumer{
 			receivedLogs:    []plog.Logs{},
 			receivedMetrics: []pmetric.Metrics{},
@@ -99,6 +102,50 @@ var _ = Describe("Rollup processor", func() {
 			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.WorkloadDurationLabel, RollupMin), float64(5)))
 			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.WorkloadDurationLabel, RollupMax), float64(7)))
 			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.WorkloadDurationLabel, RollupSumOfSquares), float64(110)))
+		})
+
+		It("applies cardinality limits", func() {
+			input := plog.NewLogs()
+			logs := input.ResourceLogs().AppendEmpty().
+				ScopeLogs().AppendEmpty().
+				LogRecords()
+
+			for i := 0; i < 30; i++ {
+				logRecord := logs.AppendEmpty()
+				logRecord.Attributes().PutString(otelcollector.WorkloadDurationLabel, strconv.Itoa(i))
+				logRecord.Attributes().PutString("low-cardinality", strconv.Itoa(i%2))
+				logRecord.Attributes().PutString("almost-high-cardinality", strconv.Itoa(i%10))
+				logRecord.Attributes().PutString("high-cardinality", strconv.Itoa(i))
+			}
+
+			err := logsProcessor.ConsumeLogs(context.TODO(), input)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(testConsumer.receivedLogs).To(HaveLen(1))
+			receivedLogRecords := testConsumer.receivedLogs[0].ResourceLogs().At(0).ScopeLogs().At(0).LogRecords()
+			Expect(receivedLogRecords.Len()).To(Equal(20))
+
+			uniqueValues := map[string]map[string]struct{}{}
+
+			for i := 0; i < receivedLogRecords.Len(); i++ {
+				attrs := receivedLogRecords.At(i).Attributes()
+				attrs.Range(func(k string, v pcommon.Value) bool {
+					value := v.AsString()
+					values, exist := uniqueValues[k]
+					if !exist {
+						values = map[string]struct{}{}
+						uniqueValues[k] = values
+					}
+					values[value] = struct{}{}
+					return true
+				})
+			}
+			Expect(uniqueValues[otelcollector.WorkloadDurationLabel+"_max"]).To(HaveLen(20))
+			Expect(uniqueValues[otelcollector.WorkloadDurationLabel+"_max"]).To(HaveKey("29"))
+			Expect(uniqueValues["low-cardinality"]).To(HaveLen(2))
+			Expect(uniqueValues["almost-high-cardinality"]).To(HaveLen(10))
+			Expect(uniqueValues["high-cardinality"]).To(HaveLen(11))
+			Expect(uniqueValues["high-cardinality"]).To(HaveKey(RedactedAttributeValue))
 		})
 	})
 })

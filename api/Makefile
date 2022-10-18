@@ -17,6 +17,8 @@ buf-generate:
 	@buf format -w
 	@buf lint
 	@buf generate
+	@rm -rf ../sdks/aperture-go/gen/proto/flowcontrol
+	@cp -R gen/proto/go/aperture/flowcontrol ../sdks/aperture-go/gen/proto/flowcontrol
 	@find gen/proto/java/com/fluxninja/aperture -mindepth 1 ! -regex '^gen/proto/java/com/fluxninja/aperture/flowcontrol\(/.*\)?' -delete
 	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol
 	@cp -R gen/proto/java/com/fluxninja/aperture/flowcontrol ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/
