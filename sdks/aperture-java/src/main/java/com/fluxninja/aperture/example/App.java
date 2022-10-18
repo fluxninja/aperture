@@ -17,12 +17,11 @@ public class App {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
+
     final private ApertureSDK apertureSDK;
     final private ManagedChannel channel;
-    public App(
-            ApertureSDK apertureSDK,
-            ManagedChannel channel
-    ){
+
+    public App(ApertureSDK apertureSDK, ManagedChannel channel){
         this.apertureSDK = apertureSDK;
         this.channel = channel;
     }
