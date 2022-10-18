@@ -10,6 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
+	"github.com/icza/dyno"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	admissionv1 "k8s.io/api/admission/v1"
@@ -21,6 +22,16 @@ import (
 var _ = Describe("Validator", Ordered, func() {
 	policySpecValidator := &controlplane.PolicySpecValidator{}
 	policyValidator := policyvalidator.NewPolicyValidator([]policyvalidator.PolicySpecValidator{policySpecValidator})
+
+	createPolicyMap := func(contents string) ([]byte, map[string]interface{}) {
+		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "aperture-controller")
+		jsonPolicy, err := yaml.YAMLToJSON([]byte(contents))
+		Expect(err).NotTo(HaveOccurred())
+		var policyMap map[string]interface{}
+		err = json.Unmarshal([]byte(jsonPolicy), &policyMap)
+		Expect(err).NotTo(HaveOccurred())
+		return jsonPolicy, policyMap
+	}
 
 	validateExample := func(contents string) (request *admissionv1.AdmissionRequest) {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "aperture-controller")
@@ -38,15 +49,7 @@ var _ = Describe("Validator", Ordered, func() {
 		return request
 	}
 
-	validateModifiedExample := func(contents string, modify interface{}, paths []string) (request *admissionv1.AdmissionRequest) {
-		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "aperture-controller")
-		jsonPolicy, err := yaml.YAMLToJSON([]byte(contents))
-		Expect(err).NotTo(HaveOccurred())
-		var policyMap map[string]interface{}
-		err = json.Unmarshal([]byte(jsonPolicy), &policyMap)
-		Expect(err).NotTo(HaveOccurred())
-		overridePolicyMap := createOverride(make(map[string]interface{}), modify, paths)
-		policyMap = overridePolicy(policyMap, overridePolicyMap)
+	validateModifiedExample := func(jsonPolicy []byte, policyMap map[string]interface{}) (request *admissionv1.AdmissionRequest) {
 		policyBytes, err := json.Marshal(policyMap)
 		Expect(err).NotTo(HaveOccurred())
 		var policy policyv1alpha1.Policy
@@ -56,7 +59,7 @@ var _ = Describe("Validator", Ordered, func() {
 			Name:      policy.Name,
 			Namespace: policy.Namespace,
 			Kind:      v1.GroupVersionKind(policy.GroupVersionKind()),
-			Object:    runtime.RawExtension{Raw: []byte(jsonPolicy)},
+			Object:    runtime.RawExtension{Raw: []byte(policyBytes)},
 		}
 		return request
 	}
@@ -99,43 +102,61 @@ var _ = Describe("Validator", Ordered, func() {
 		validateRequest(validateExample(classificationPolicy), "")
 	})
 
-	// It("accepts example policy for demoapp without PromQL evalutation_interval and sets it to default 10s", func() {
-	// 	request := validateModifiedExample(latencyGradientPolicy, "", []string{"spec", "circuit", "components", "promql", "evaluation_interval"})
-	// 	validateRequest(request, "")
-	// 	policySpec := extractPolicySpec(request)
-	// 	Expect(policySpec.Circuit.GetComponents()[0].GetPromql().GetEvaluationInterval().GetSeconds()).To(Equal(int64(10)))
-	// })
+	It("accepts example policy for demoapp without PromQL evalutation_interval and sets it to default 10s", func() {
+		jsonPolicy, policyMap := createPolicyMap(latencyGradientPolicy)
+		err := dyno.Delete(policyMap, "evaluation_interval", "spec", "circuit", "components", 0, "promql")
+		Expect(err).NotTo(HaveOccurred())
+		request := validateModifiedExample(jsonPolicy, policyMap)
+		validateRequest(request, "")
+		policySpec := extractPolicySpec(request)
+		Expect(policySpec.Circuit.GetComponents()[0].GetPromql().GetEvaluationInterval().GetSeconds()).To(Equal(int64(10)))
+	})
 
 	It("accepts example policy for rate limit without Circuit evalutation_interval and sets it to default 0.5s", func() {
-		request := validateModifiedExample(rateLimitPolicy, "", []string{"spec", "circuit", "evaluation_interval"})
+		jsonPolicy, policyMap := createPolicyMap(latencyGradientPolicy)
+		err := dyno.Delete(policyMap, "evaluation_interval", "spec", "circuit", "components", 0, "promql")
+		Expect(err).NotTo(HaveOccurred())
+		request := validateModifiedExample(jsonPolicy, policyMap)
 		validateRequest(request, "")
 		policySpec := extractPolicySpec(request)
 		Expect(policySpec.Circuit.GetEvaluationInterval().GetNanos()).To(Equal(int32(500000000)))
 	})
 
-	// It("does not accept example policy for demoapp without ConcurrencyLimiter selector ", func() {
-	// 	request := validateModifiedExample(latencyGradientPolicy, "", []string{"spec", "circuit", "components", "concurrency_limiter", "selector"})
-	// 	msg := "policies: Key: 'Policy.Circuit.Components[9].Component.ConcurrencyLimiter.Selector' Error:Field validation for 'Selector' failed on the 'required' tag"
-	// 	validateRequest(request, msg)
-	// })
+	It("does not accept example policy for demoapp without ConcurrencyLimiter selector ", func() {
+		jsonPolicy, policyMap := createPolicyMap(latencyGradientPolicy)
+		err := dyno.Delete(policyMap, "selector", "spec", "circuit", "components", 8, "concurrency_limiter")
+		Expect(err).NotTo(HaveOccurred())
+		request := validateModifiedExample(jsonPolicy, policyMap)
+		msg := "policies: Key: 'Policy.Circuit.Components[8].Component.ConcurrencyLimiter.Selector' Error:Field validation for 'Selector' failed on the 'required' tag"
+		validateRequest(request, msg)
+	})
 
-	// It("does not accept example policy for demoapp with default Workload Priority 2000", func() {
-	// 	request := validateModifiedExample(latencyGradientPolicy, 2000, []string{"spec", "circuit", "components", "concurrency_limiter", "scheduler", "default_workload_parameters"})
-	// 	msg := "policies: Key: 'Policy.Circuit.Components[9].Component.ConcurrencyLimiter.Scheduler.DefaultWorkloadParameters.Priority' Error:Field validation for 'Priority' failed on the 'lte' tag"
-	// 	validateRequest(request, msg)
-	// })
+	It("does not accept example policy for demoapp sets concurrency limiter default Workload Priority to 2000", func() {
+		jsonPolicy, policyMap := createPolicyMap(latencyGradientPolicy)
+		err := dyno.Set(policyMap, 2000, "spec", "circuit", "components", 8, "concurrency_limiter", "scheduler", "default_workload_parameters", "priority")
+		Expect(err).NotTo(HaveOccurred())
+		request := validateModifiedExample(jsonPolicy, policyMap)
+		msg := "policies: Key: 'Policy.Circuit.Components[8].Component.ConcurrencyLimiter.Scheduler.DefaultWorkloadParameters.Priority' Error:Field validation for 'Priority' failed on the 'lte' tag"
+		validateRequest(request, msg)
+	})
 
-	// It("does not accept example policy for rate limit without RateLimiter service selector", func() {
-	// 	msg := "policies: Key: 'Policy.Circuit.Components[1].Component.RateLimiter.Selector.ServiceSelector' Error:Field validation for 'ServiceSelector' failed on the 'required' tag"
-	// 	request := validateModifiedExample(rateLimitPolicy, "", []string{"spec", "circuit", "components", "rate_limiter", "selector"})
-	// 	validateRequest(request, msg)
-	// })
+	It("does not accept example policy for rate limit without RateLimiter service selector", func() {
+		jsonPolicy, policyMap := createPolicyMap(rateLimitPolicy)
+		err := dyno.Delete(policyMap, "service_selector", "spec", "circuit", "components", 1, "rate_limiter", "selector")
+		Expect(err).NotTo(HaveOccurred())
+		request := validateModifiedExample(jsonPolicy, policyMap)
+		msg := "policies: Key: 'Policy.Circuit.Components[1].Component.RateLimiter.Selector.ServiceSelector' Error:Field validation for 'ServiceSelector' failed on the 'required' tag"
+		validateRequest(request, msg)
+	})
 
-	// It("does not accept example policy for classification without Classifiers service selector", func() {
-	// 	msg := "policies: Key: 'Policy.Resources.Classifiers[0].Selector.ServiceSelector' Error:Field validation for 'ServiceSelector' failed on the 'required' tag"
-	// 	request := validateModifiedExample(classificationPolicy, "", []string{"spec", "resources", "classifiers", "selector"})
-	// 	validateRequest(request, msg)
-	// })
+	It("does not accept example policy for classification without Classifiers service selector", func() {
+		jsonPolicy, policyMap := createPolicyMap(classificationPolicy)
+		err := dyno.Delete(policyMap, "service_selector", "spec", "resources", "classifiers", 0, "selector")
+		Expect(err).NotTo(HaveOccurred())
+		request := validateModifiedExample(jsonPolicy, policyMap)
+		msg := "policies: Key: 'Policy.Resources.Classifiers[0].Selector.ServiceSelector' Error:Field validation for 'ServiceSelector' failed on the 'required' tag"
+		validateRequest(request, msg)
+	})
 
 	It("does not accept policy in other namespace than controller", func() {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "")
@@ -465,36 +486,21 @@ spec:
                 user := object.user
 `
 
-func overridePolicy(policy map[string]interface{}, override map[string]interface{}) map[string]interface{} {
-	// TODO: Optimize merging maps
-	for k, v := range override {
-		policy[k] = v
-	}
-	result := make(map[string]interface{})
-	for k, v := range policy {
-		result[k] = v
-	}
-	for k, v := range override {
-		result[k] = v
-	}
-	return policy
-}
+// func createOverride(override map[string]interface{}, modify interface{}, paths []string) map[string]interface{} {
+// 	var ok bool
+// 	var valMap map[string]interface{}
+// 	var val interface{} = override
 
-func createOverride(override map[string]interface{}, modify interface{}, paths []string) map[string]interface{} {
-	var ok bool
-	var valMap map[string]interface{}
-	var val interface{} = override
-
-	for i := len(paths) - 1; i >= 0; i-- {
-		valMap, ok = val.(map[string]interface{})
-		if !ok {
-			return nil
-		}
-		valMap[paths[i]] = modify
-		modify = map[string]interface{}{
-			paths[i]: valMap[paths[i]],
-		}
-	}
-	valMap = modify.(map[string]interface{})
-	return valMap
-}
+// 	for i := len(paths) - 1; i >= 0; i-- {
+// 		valMap, ok = val.(map[string]interface{})
+// 		if !ok {
+// 			return nil
+// 		}
+// 		valMap[paths[i]] = modify
+// 		modify = map[string]interface{}{
+// 			paths[i]: valMap[paths[i]],
+// 		}
+// 	}
+// 	valMap = modify.(map[string]interface{})
+// 	return valMap
+// }
