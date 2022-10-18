@@ -24,9 +24,9 @@ repos:
     rev: v4.2.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^(manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/proto/java/.*|sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol/.*$
+        exclude: ^(manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol/.*$
       - id: end-of-file-fixer
-        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/proto/java/.*|sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol/.*$
+        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol/.*$
       - id: check-yaml
         exclude: ^(manifests/charts/.*/(templates|files)/.*|playground/tanka/charts/.*)
         args:
@@ -70,6 +70,7 @@ repos:
             dockerfile,
             makefile,
             json,
+            java,
             markdown,
             jsonnet,
             python3,
@@ -162,4 +163,4 @@ repos:
       - id: codespell
         args:
           - --ignore-words=./.codespellignore
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/references/api/.*|api/gen/proto/.*|sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol/.*)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/references/api/.*|api/gen/.*|sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol/.*)$
