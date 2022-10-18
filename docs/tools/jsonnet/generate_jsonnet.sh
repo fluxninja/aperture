@@ -2,6 +2,7 @@
 
 gitroot=$(git rev-parse --show-toplevel)
 docsdir=$gitroot/docs
+blueprints_root="${gitroot}/blueprints"
 
 GREP="grep"
 SED="sed"
@@ -13,6 +14,11 @@ if [ "$(uname)" == "Darwin" ]; then
 	SED="gsed"
 	AWK="gawk"
 fi
+
+# run jb install in the blueprints_root
+pushd "${blueprints_root}" >/dev/null
+jb install
+popd >/dev/null
 
 rm -rf tmp || true
 mkdir -p tmp
