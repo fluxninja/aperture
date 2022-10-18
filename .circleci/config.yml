@@ -213,6 +213,8 @@ workflows:
             manifests/charts/.* updated-aperture-charts true
             tools/demo_app/.* updated-demo-app true
             api/aperture/flowcontrol/v1/flowcontrol.proto updated-api-flowcontrol true
+            sdks/aperture-go/.* updated-aperture-go true
+            sdks/aperture-java/.* updated-aperture-java true
 
   filter-paths-pr:
     when:

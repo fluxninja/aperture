@@ -17,6 +17,9 @@ buf-generate:
 	@buf format -w
 	@buf lint
 	@buf generate
+	@find gen/proto/java/com/fluxninja/aperture -mindepth 1 ! -regex '^gen/proto/java/com/fluxninja/aperture/flowcontrol\(/.*\)?' -delete
+	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol
+	@cp -R gen/proto/java/com/fluxninja/aperture/flowcontrol ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)
