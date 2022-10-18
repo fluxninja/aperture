@@ -107,7 +107,7 @@ func setupRateLimiterFactory(
 	reg := statusRegistry.Child(rateLimiterStatusRoot)
 	logger := reg.GetLogger()
 
-	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("lazy_sync_jobs"), 0, jobs.RescheduleMode, nil)
+	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("lazy_sync_jobs"), prometheusRegistry, 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to create lazy sync job group")
 		return err
@@ -236,7 +236,7 @@ type rateLimiter struct {
 // Make sure rateLimiter implements iface.Limiter.
 var _ iface.RateLimiter = (*rateLimiter)(nil)
 
-func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
+func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle, prometheusRegistry *prometheus.Registry) error {
 	logger := rateLimiter.registry.GetLogger()
 	etcdKey := common.DataplaneComponentKey(rateLimiter.rateLimiterFactory.agentGroupName, rateLimiter.GetPolicyName(), rateLimiter.GetComponentIndex())
 	// decision notifier

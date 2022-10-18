@@ -12,6 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // MultiJobConfig holds configuration for MultiJob.
@@ -47,6 +48,7 @@ func (mjc MultiJobConstructor) provideMultiJob(
 	gws GroupWatchers,
 	jws JobWatchers,
 	jg *JobGroup,
+	prometheusRegistry *prometheus.Registry,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (*MultiJob, error) {
@@ -71,7 +73,7 @@ func (mjc MultiJobConstructor) provideMultiJob(
 	}
 
 	// Create a new MultiJob instance
-	mj := NewMultiJob(jg.GetStatusRegistry().Child(mjc.Name), jwAll, gwAll)
+	mj := NewMultiJob(jg.GetStatusRegistry().Child(mjc.Name), prometheusRegistry, jwAll, gwAll)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -103,13 +105,13 @@ type MultiJob struct {
 var _ Job = (*MultiJob)(nil)
 
 // NewMultiJob creates a new instance of MultiJob.
-func NewMultiJob(registry status.Registry, jws JobWatchers, gws GroupWatchers) *MultiJob {
+func NewMultiJob(registry status.Registry, prometheusRegistry *prometheus.Registry, jws JobWatchers, gws GroupWatchers) *MultiJob {
 	return &MultiJob{
 		JobBase: JobBase{
 			JobName: registry.Key(),
 			JWS:     jws,
 		},
-		gt: newGroupTracker(gws, registry),
+		gt: newGroupTracker(gws, registry, prometheusRegistry),
 	}
 }
 

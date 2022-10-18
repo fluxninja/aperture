@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -29,7 +30,8 @@ var (
 		ExecutionTimeout: config.MakeDuration(time.Millisecond * 200),
 		InitiallyHealthy: false,
 	}
-	registry = status.NewRegistry(log.GetGlobalLogger()).Child("jobs")
+	registry           = status.NewRegistry(log.GetGlobalLogger()).Child("jobs")
+	prometheusRegistry = prometheus.NewRegistry()
 )
 
 var _ JobWatcher = (*groupConfig)(nil)
@@ -67,7 +69,7 @@ func (jws *groupConfig) OnJobCompleted(_ *statusv1.Status, _ JobStats) {
 }
 
 func createJobGroup() (*JobGroup, error) {
-	return NewJobGroup(registry, 10, RescheduleMode, gws)
+	return NewJobGroup(registry, prometheusRegistry, 10, RescheduleMode, gws)
 }
 
 func runTest(t *testing.T, groupConfig *groupConfig) {
@@ -229,7 +231,7 @@ func TestMultiJobRun(t *testing.T) {
 	var counter int32
 	var counter2 int32
 	jobConfig.InitialDelay = config.MakeDuration(0)
-	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job"), jws, gws)
+	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job"), prometheusRegistry, jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
@@ -332,8 +334,8 @@ func TestMultipleMultiJobs(t *testing.T) {
 	var counter int32
 	var counter2 int32
 	var counter3 int32
-	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job1"), jws, gws)
-	multiJob2 := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job2"), jws, gws)
+	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job1"), prometheusRegistry, jws, gws)
+	multiJob2 := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job2"), prometheusRegistry, jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
@@ -424,7 +426,7 @@ func TestSameJobTwiceAndSchedulingErrors(t *testing.T) {
 
 	jobGroup.DeregisterAll()
 	checkStatusAfterDeregister(t, []string{job.JobName, job2.JobName})
-	// error when registering job multiple times, written here to achieve more coverage
+	// error when deregistering job multiple times, written here to achieve more coverage
 	err = jobGroup.DeregisterJob(job.Name())
 	require.Errorf(t, err, "Expected error when deregistering job multiple times")
 	require.Empty(t, jobGroup.JobInfo(job.Name()), "Expected error when getting job info, because job was already deregistered")

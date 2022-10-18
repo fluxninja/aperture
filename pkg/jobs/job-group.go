@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
@@ -81,6 +82,7 @@ func (jgc JobGroupConstructor) Annotate() fx.Option {
 func (jgc JobGroupConstructor) provideJobGroup(
 	gw GroupWatchers,
 	registry status.Registry,
+	prometheusRegistry *prometheus.Registry,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (*JobGroup, error) {
@@ -102,7 +104,7 @@ func (jgc JobGroupConstructor) provideJobGroup(
 	}
 	reg := registry.Child(jgc.Name)
 
-	jg, err := NewJobGroup(reg, config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
+	jg, err := NewJobGroup(reg, prometheusRegistry, config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
 	if err != nil {
 		return nil, err
 	}
@@ -133,6 +135,7 @@ type JobGroup struct {
 // NewJobGroup creates a new JobGroup.
 func NewJobGroup(
 	statusRegistry status.Registry,
+	prometheusRegistry *prometheus.Registry,
 	maxConcurrentJobs int,
 	schedulerMode SchedulerMode,
 	gws GroupWatchers,
@@ -152,7 +155,7 @@ func NewJobGroup(
 
 	jg := &JobGroup{
 		scheduler: scheduler,
-		gt:        newGroupTracker(gws, statusRegistry),
+		gt:        newGroupTracker(gws, statusRegistry, prometheusRegistry),
 	}
 
 	return jg, nil

@@ -138,11 +138,14 @@ func (executor *jobExecutor) doJob() {
 		defer func() {
 			jobCh <- true
 		}()
+		beforeExecution := time.Now()
 		_, err := executor.jg.gt.execute(ctx, executor)
 		if err != nil {
+			executor.jg.gt.jobTrackerMetrics.latencySummary.WithLabelValues(executor.Name(), "false").Observe(float64(time.Since(beforeExecution)))
 			executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("job", executor.Name()).Msg("job status unhealthy")
 			return
 		}
+		executor.jg.gt.jobTrackerMetrics.latencySummary.WithLabelValues(executor.Name(), "true").Observe(float64(time.Since(beforeExecution)))
 	})
 
 	timerCh := make(chan bool, 1)

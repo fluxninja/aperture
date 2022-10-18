@@ -4,8 +4,6 @@ import (
 	"context"
 	"sync"
 
-	"go.uber.org/fx"
-
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -17,6 +15,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
+	clientprometheus "github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/fx"
 )
 
 // policyFactoryModule module for policy factory.
@@ -47,6 +47,7 @@ type PolicyFactory struct {
 	registry             status.Registry
 	dynamicConfigWatcher notifiers.Watcher
 	policyTracker        map[string]*wrappersv1.PolicyWrapper
+	prometheusRegistry   *clientprometheus.Registry
 }
 
 // Main fx app.
@@ -57,11 +58,12 @@ func providePolicyFactory(
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
+	prometheusRegistry *clientprometheus.Registry,
 ) (*PolicyFactory, error) {
 	policiesStatusRegistry := registry.Child(iface.PoliciesRoot)
 	logger := policiesStatusRegistry.GetLogger()
 
-	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("circuit_jobs"), 0, jobs.RescheduleMode, nil)
+	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("circuit_jobs"), prometheusRegistry, 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to create job group")
 		return nil, err
@@ -73,6 +75,7 @@ func providePolicyFactory(
 		etcdClient:           etcdClient,
 		dynamicConfigWatcher: dynamicConfigWatcher,
 		policyTracker:        make(map[string]*wrappersv1.PolicyWrapper),
+		prometheusRegistry:   prometheusRegistry,
 	}
 
 	optionsFunc := []notifiers.FxOptionsFunc{factory.provideControllerPolicyFxOptions}

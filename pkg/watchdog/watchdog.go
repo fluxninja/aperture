@@ -10,6 +10,7 @@ import (
 	"runtime/debug"
 
 	"github.com/elastic/gosigar"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -60,10 +61,11 @@ type Constructor struct {
 type WatchdogIn struct {
 	fx.In
 
-	StatusRegistry status.Registry
-	JobGroup       *jobs.JobGroup `name:"liveness"`
-	Unmarshaller   config.Unmarshaller
-	Lifecycle      fx.Lifecycle
+	StatusRegistry     status.Registry
+	PrometheusRegistry *prometheus.Registry
+	JobGroup           *jobs.JobGroup `name:"liveness"`
+	Unmarshaller       config.Unmarshaller
+	Lifecycle          fx.Lifecycle
 }
 
 type watchdog struct {
@@ -84,7 +86,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 
 	watchdogRegistry := in.StatusRegistry.Child("liveness").Child(watchdogJobName)
 
-	w := newWatchdog(in.JobGroup, watchdogRegistry, config)
+	w := newWatchdog(in.JobGroup, watchdogRegistry, in.PrometheusRegistry, config)
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -98,10 +100,10 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 	return nil
 }
 
-func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config WatchdogConfig) *watchdog {
+func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, prometheusRegistry *prometheus.Registry, config WatchdogConfig) *watchdog {
 	heapStatusRegistry := registry.Child("heap")
 
-	job := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child(watchdogJobName), nil, nil)
+	job := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child(watchdogJobName), prometheusRegistry, nil, nil)
 
 	w := &watchdog{
 		heapStatusRegistry: heapStatusRegistry,

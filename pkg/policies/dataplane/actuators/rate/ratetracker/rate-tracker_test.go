@@ -16,6 +16,7 @@ import (
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
 	"github.com/hashicorp/memberlist"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -219,7 +220,7 @@ func createJobGroup(limiter RateTracker) *jobs.JobGroup {
 
 	reg := status.NewRegistry(log.GetGlobalLogger()).Child("jobs")
 
-	group, err := jobs.NewJobGroup(reg, 0, jobs.RescheduleMode, gws)
+	group, err := jobs.NewJobGroup(reg, prometheus.NewRegistry(), 0, jobs.RescheduleMode, gws)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to create job group: %v", err))
 	}
