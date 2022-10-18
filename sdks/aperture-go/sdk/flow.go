@@ -4,7 +4,8 @@ import (
 	"errors"
 	"time"
 
-	flowcontrolproto "go.buf.build/grpc/go/fluxninja/aperture/aperture/flowcontrol/v1"
+	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/v1"
+
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -28,12 +29,12 @@ const (
 type Flow interface {
 	Accepted() bool
 	End(status FlowStatus) error
-	CheckResponse() *flowcontrolproto.CheckResponse
+	CheckResponse() *flowcontrol.CheckResponse
 }
 
 type flow struct {
 	span          trace.Span
-	checkResponse *flowcontrolproto.CheckResponse
+	checkResponse *flowcontrol.CheckResponse
 	ended         bool
 }
 
@@ -42,14 +43,14 @@ func (f *flow) Accepted() bool {
 	if f.checkResponse == nil {
 		return true
 	}
-	if f.checkResponse.DecisionType == flowcontrolproto.CheckResponse_DECISION_TYPE_ACCEPTED {
+	if f.checkResponse.DecisionType == flowcontrol.CheckResponse_DECISION_TYPE_ACCEPTED {
 		return true
 	}
 	return false
 }
 
 // CheckResponse returns the response from the server.
-func (f *flow) CheckResponse() *flowcontrolproto.CheckResponse {
+func (f *flow) CheckResponse() *flowcontrol.CheckResponse {
 	return f.checkResponse
 }
 
