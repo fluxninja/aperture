@@ -58,25 +58,25 @@ func newComponentStackAndOptions(
 		}
 
 		// Actuation Strategy
-		if loadShedActuatorProto := concurrencyLimiterProto.GetLoadShedActuator(); loadShedActuatorProto != nil {
-			loadShedActuator, loadShedActuatorOptions, loadShedActuatorErr := concurrency.NewLoadShedActuatorAndOptions(loadShedActuatorProto, componentStackIndex, policyReadAPI, agentGroupName)
-			if loadShedActuatorErr != nil {
-				return runtime.CompiledComponent{}, nil, nil, loadShedActuatorErr
+		if loadActuatorProto := concurrencyLimiterProto.GetLoadActuator(); loadActuatorProto != nil {
+			loadActuator, loadActuatorOptions, loadActuatorErr := concurrency.NewLoadActuatorAndOptions(loadActuatorProto, componentStackIndex, policyReadAPI, agentGroupName)
+			if loadActuatorErr != nil {
+				return runtime.CompiledComponent{}, nil, nil, loadActuatorErr
 			}
-			loadShedActuatorMapStruct, err := encodeMapStruct(loadShedActuatorProto)
+			loadActuatorMapStruct, err := encodeMapStruct(loadActuatorProto)
 			if err != nil {
 				return runtime.CompiledComponent{}, nil, nil, err
 			}
-			// Append loadShedActuator as a runtime.CompiledComponent
+			// Append loadActuator as a runtime.CompiledComponent
 			compiledComponents = append(compiledComponents, runtime.CompiledComponent{
-				Component:     loadShedActuator,
-				MapStruct:     loadShedActuatorMapStruct,
-				Name:          "LoadShedActuator",
+				Component:     loadActuator,
+				MapStruct:     loadActuatorMapStruct,
+				Name:          "LoadActuator",
 				ComponentType: runtime.ComponentTypeSink,
 			})
 
-			// Append loadShedActuator options
-			options = append(options, loadShedActuatorOptions)
+			// Append loadActuator options
+			options = append(options, loadActuatorOptions)
 		}
 
 		concurrencyLimiterMapStruct, err := encodeMapStruct(concurrencyLimiterProto)

@@ -501,7 +501,7 @@ There are three categories of components:
   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
   :::
 - "sink" components – they affect the real world.
-  [ConcurrencyLimiter.LoadShedActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
+  [ConcurrencyLimiter.LoadActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
   In the UI, represented by orange color. Sink components usually come in pairs with a
   "sources" component which emits a feedback signal, like
   `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
@@ -614,19 +614,19 @@ Concurrency Limiter is an actuator component that regulates flows in order to pr
 See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
 :::
 
-It is based on the actuation strategy (e.g. load shed) and workload scheduling which is based on Weighted Fair Queuing principles.
+It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
 Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
 
 ConcurrencyLimiter configuration is split into two parts: An actuation
-strategy and a scheduler. Right now, only `load_shed_actuator` strategy is available.
+strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 
 #### Properties
 
 <dl>
-<dt>load_shed_actuator</dt>
+<dt>load_actuator</dt>
 <dd>
 
-([V1LoadShedActuator](#v1-load-shed-actuator)) Actuator based on load shedding a portion of requests.
+([V1LoadActuator](#v1-load-actuator)) Actuator based on limiting the accepted concurrency under incoming concurrency \* load multiplier.
 
 Actuation strategy defines the input signal that will drive the scheduler.
 
@@ -1608,9 +1608,9 @@ Note: The requirements are ANDed.
 </dd>
 </dl>
 
-### v1LoadShedActuator {#v1-load-shed-actuator}
+### v1LoadActuator {#v1-load-actuator}
 
-Takes the load shed factor input signal and publishes it to the schedulers in the data-plane
+Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
 
 #### Properties
 
@@ -1618,23 +1618,23 @@ Takes the load shed factor input signal and publishes it to the schedulers in th
 <dt>in_ports</dt>
 <dd>
 
-([V1LoadShedActuatorIns](#v1-load-shed-actuator-ins)) Input ports for the Load Shed Actuator component.
+([V1LoadActuatorIns](#v1-load-actuator-ins)) Input ports for the Load Actuator component.
 
 </dd>
 </dl>
 
-### v1LoadShedActuatorIns {#v1-load-shed-actuator-ins}
+### v1LoadActuatorIns {#v1-load-actuator-ins}
 
-Input for the Load Shed Actuator component.
+Input for the Load Actuator component.
 
 #### Properties
 
 <dl>
-<dt>load_shed_factor</dt>
+<dt>load_multiplier</dt>
 <dd>
 
-([V1InPort](#v1-in-port)) Load shedding factor is a fraction of [incoming
-concurrency](#v1-scheduler-outs) that needs to be dropped.
+([V1InPort](#v1-in-port)) Load multiplier is ratio of [incoming
+concurrency](#v1-scheduler-outs) that needs to be accepted.
 
 </dd>
 </dl>

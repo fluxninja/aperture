@@ -113,8 +113,9 @@ func (tbb *tokenBucketBase) getFillRate() float64 {
 
 // BasicTokenBucket is a basic token bucket implementation.
 type BasicTokenBucket struct {
-	lock sync.Mutex
-	tbb  *tokenBucketBase
+	lock        sync.Mutex
+	tbb         *tokenBucketBase
+	passThrough bool
 }
 
 // NewBasicTokenBucket creates a new BasicTokenBucket with adjusted fill rate.
@@ -148,8 +149,7 @@ func (btb *BasicTokenBucket) Take(now time.Time, timeout time.Duration, tokens f
 
 // PreprocessRequest is a no-op for BasicTokenBucket and by default, it rejects the request.
 func (btb *BasicTokenBucket) PreprocessRequest(now time.Time, rContext RequestContext) bool {
-	// do nothing
-	return false
+	return btb.passThrough
 }
 
 // SetFillRate adjusts the fill rate of the BasicTokenBucket.
@@ -164,4 +164,14 @@ func (btb *BasicTokenBucket) GetFillRate() float64 {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
 	return btb.tbb.getFillRate()
+}
+
+// SetPassThrough sets the passThrough flag of the BasicTokenBucket.
+func (btb *BasicTokenBucket) SetPassThrough(passThrough bool) {
+	btb.passThrough = passThrough
+}
+
+// PassThrough returns the passThrough flag of the BasicTokenBucket.
+func (btb *BasicTokenBucket) PassThrough() bool {
+	return btb.passThrough
 }

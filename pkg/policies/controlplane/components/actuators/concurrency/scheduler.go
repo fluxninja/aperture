@@ -35,7 +35,7 @@ var (
 // Scheduler is part of the concurrency control component stack.
 type Scheduler struct {
 	policyReadAPI iface.Policy
-	// saves promValue result from tokens query to check if anything changed
+	// promValue result from tokens query
 	tokensPromValue prometheusmodel.Value
 	// Prometheus query for accepted concurrency
 	acceptedQuery *components.ScalarQuery
@@ -176,7 +176,8 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	var errMulti error
 
 	if s.tokensQuery != nil {
-		promValue, err := s.tokensQuery.ExecutePromQuery(tickInfo)
+		taggedResult, err := s.tokensQuery.ExecuteTaggedQuery(tickInfo)
+		promValue := taggedResult.Value
 		if err != nil {
 			if err != components.ErrNoQueriesReturned {
 				logger.Error().Err(err).Msg("could not read tokens query from prometheus")
@@ -202,10 +203,12 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 				}
 				err = s.publishQueryTokens(tokensDecision)
 				if err != nil {
+					errMulti = multierr.Append(errMulti, err)
 					logger.Error().Err(err).Msg("failed to publish tokens")
 				}
 			} else {
 				err = fmt.Errorf("tokens query returned a non-vector value")
+				errMulti = multierr.Append(errMulti, err)
 				logger.Error().Err(err).Msg("Failed to parse tokens")
 			}
 		}
@@ -215,7 +218,8 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 
 	outPortReadings := make(runtime.PortToValue)
 
-	acceptedValue, err := s.acceptedQuery.ExecuteScalarQuery(tickInfo)
+	acceptedScalarResult, err := s.acceptedQuery.ExecuteScalarQuery(tickInfo)
+	acceptedValue := acceptedScalarResult.Value
 	if err != nil {
 		acceptedReading = runtime.InvalidReading()
 		if err != components.ErrNoQueriesReturned {
@@ -226,7 +230,8 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	}
 	outPortReadings["accepted_concurrency"] = []runtime.Reading{acceptedReading}
 
-	incomingValue, err := s.incomingQuery.ExecuteScalarQuery(tickInfo)
+	incomingScalarResult, err := s.incomingQuery.ExecuteScalarQuery(tickInfo)
+	incomingValue := incomingScalarResult.Value
 	if err != nil {
 		incomingReading = runtime.InvalidReading()
 		if err != components.ErrNoQueriesReturned {

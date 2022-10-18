@@ -135,8 +135,8 @@ local policyResource = latencyGradientPolicy({
     component.new()
     + component.withDecider(
       decider.new()
-      + decider.withOperator('gt')
-      + decider.withInPorts({ lhs: port.withSignalName('LSF'), rhs: port.withConstantValue(0.0) })
+      + decider.withOperator('lt')
+      + decider.withInPorts({ lhs: port.withSignalName('LOAD_MULTIPLIER'), rhs: port.withConstantValue(1.0) })
       + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
       + decider.withTrueFor('30s')
     ),

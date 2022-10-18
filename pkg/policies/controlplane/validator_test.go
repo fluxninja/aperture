@@ -185,25 +185,15 @@ spec:
             output:
               signal_name: "DESIRED_CONCURRENCY"
       - arithmetic_combinator:
-          operator: "sub"
-          in_ports:
-            lhs:
-              signal_name: "INCOMING_CONCURRENCY"
-            rhs:
-              signal_name: "DESIRED_CONCURRENCY"
-          out_ports:
-            output:
-              signal_name: "DELTA_CONCURRENCY"
-      - arithmetic_combinator:
           operator: "div"
           in_ports:
             lhs:
-              signal_name: "DELTA_CONCURRENCY"
+              signal_name: "DESIRED_CONCURRENCY"
             rhs:
               signal_name: "INCOMING_CONCURRENCY"
           out_ports:
             output:
-              signal_name: "LSF"
+              signal_name: "LOAD_MULTIPLIER"
       - concurrency_limiter:
           selector:
             service_selector:
@@ -231,10 +221,10 @@ spec:
                 signal_name: "ACCEPTED_CONCURRENCY"
               incoming_concurrency:
                 signal_name: "INCOMING_CONCURRENCY"
-          load_shed_actuator:
+          load_actuator:
             in_ports:
-              load_shed_factor:
-                signal_name: "LSF"
+              load_multiplier:
+                signal_name: "LOAD_MULTIPLIER"
       - constant:
           value: "2.0"
           out_ports:
