@@ -1,0 +1,63 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: signal-processing
+spec:
+  circuit:
+    components:
+      - promql:
+          evaluation_interval: 1s
+          out_ports:
+            output:
+              signal_name: LATENCY
+          query_string:
+            sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED",
+            response_status="OK",
+            flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
+            response_status="OK", flux_meter_name="test"}[5s]))
+      - ema:
+          ema_window: 1500s
+          in_ports:
+            input:
+              signal_name: LATENCY
+          out_ports:
+            output:
+              signal_name: LATENCY_EMA
+          warm_up_window: 10s
+      - arithmetic_combinator:
+          in_ports:
+            lhs:
+              signal_name: LATENCY_EMA
+            rhs:
+              constant_value: "1.1"
+          operator: mul
+          out_ports:
+            output:
+              signal_name: LATENCY_SETPOINT
+      - decider:
+          in_ports:
+            lhs:
+              signal_name: LATENCY
+            rhs:
+              signal_name: LATENCY_SETPOINT
+          operator: gt
+          out_ports:
+            output:
+              signal_name: IS_OVERLOAD_SWITCH
+      - sink:
+          in_ports:
+            inputs:
+              - signal_name: IS_OVERLOAD_SWITCH
+    evaluation_interval: 0.5s
+  resources:
+    flux_meters:
+      test:
+        selector:
+          flow_selector:
+            control_point:
+              traffic: ingress
+          service_selector:
+            agent_group: default
+            service: service1-demo-app.demoapp.svc.cluster.local

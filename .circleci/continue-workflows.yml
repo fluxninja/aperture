@@ -20,7 +20,7 @@ executors:
       - image: cimg/python:3.10.6
   base-machine-executor:
     machine:
-      image: ubuntu-2004:202107-02
+      image: ubuntu-2204:2022.04.2
       docker_layer_caching: true
 
 parameters:
@@ -43,6 +43,12 @@ parameters:
     type: boolean
     default: false
   updated-demo-app:
+    type: boolean
+    default: false
+  updated-aperture-go:
+    type: boolean
+    default: false
+  updated-aperture-java:
     type: boolean
     default: false
 
@@ -277,7 +283,7 @@ jobs:
             export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
-            pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
+            pip3 install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
       - restore_cache:
           name: Restore go cache
           keys:
@@ -347,30 +353,97 @@ jobs:
             git diff --cached --exit-code
           when: always
 
-  gen-push-java-stubs:
-    executor: python-cimg-executor
+  validate-publish-sdk:
+    executor: base-machine-executor
+    environment:
+      DOCKER_BUILDKIT: 1
     parameters:
-      task-name:
+      docker-context:
         type: string
-        default: Generate and push to aperture-java
-        description: The name of the actual task
+        description:
+          Path to the directory containing your build context, defaults to "".
+        default: .
+      dockerfile:
+        type: string
+        description: Name of docker file to use, defaults to Dockerfile.
+        default: Dockerfile
+      docker-image:
+        type: string
+        description: Name for Docker image
+      path:
+        type: string
+        description:
+          Path to the directory containing your Dockerfile, defaults to "".
+        default: .
+      tag:
+        type: string
+        description: Docker image tag.
+        default: ${CIRCLE_SHA1:0:8}
+      registry:
+        type: string
+        default: docker.io
+        description: Name of registry to use, defaults to docker.io.
+      remote-repo:
+        type: string
+        default: ""
+        description: Remote repository to mirror the SDK to.
+      remote-repo-fingerprint:
+        type: string
+        default: ""
+        description: Fingerprint of remote repository to mirror the SDK to.
+      port:
+        type: string
+        default: "8089"
+        description: Port to start sdk-validator's grpc server on.
+      requests:
+        type: integer
+        default: 10
+        description: Number of requests to make to SDK example server.
+      rejects:
+        type: integer
+        default: 5
+        description: Number of requests (out of 'requests') to reject.
+      sdk-port:
+        type: string
+        default: "8080"
+        description: Port to expose on SDK's example container.
     steps:
       - checkout
       - add_ssh_keys:
           fingerprints:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-            - "14:8a:b9:90:ba:48:a4:f0:27:b0:70:d7:95:17:16:1e" # fluxninja/aperture-java R/W
+            - << parameters.remote-repo-fingerprint >> # fluxninja/<sdk> R/W
       - run: *install_opsninja
+      - aperture_docker_build:
+          docker-context: <<parameters.docker-context>>
+          dockerfile: <<parameters.dockerfile>>
+          image: <<parameters.docker-image>>
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
       - asdf_install:
-          cache_name: pre-commit
+          cache_name: validate-sdk
           tools: |-
-            buf
+            golang
       - run:
-          name: << parameters.task-name >>
+          name: Run SDK Validator
           command: |
-            export LOGURU_LEVEL=TRACE
-            export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
-            fn release push-to-aperture-java
+            go run cmd/sdk-validator/main.go -sdk-docker-image=<<parameters.registry>>/<<parameters.docker-image>>:<<parameters.tag>> -port=<<parameters.port>> -requests=<<parameters.requests>> -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
+      - when:
+          condition:
+            equal: [main, << pipeline.git.branch >>]
+          steps:
+            - run:
+                name: Publish SDK to <<parameters.remote-repo>>
+                command: |
+                  export LOGURU_LEVEL=TRACE
+                  export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes -o IdentityAgent=none"
+                  args=(
+                    --remote-repo=<<parameters.remote-repo>>
+                    --source-repo-sdk-path=<<parameters.path>>
+                  )
+                  fn release publish-sdk "${args[@]}"
 
   publish-aperture-docs:
     executor: python-cimg-executor
@@ -485,13 +558,29 @@ workflows:
           name: go-test-coverage-aperture
           work_dir: .
 
-  push-to-aperture-java:
-    when:
-      and:
-        - << pipeline.parameters.updated-api-flowcontrol >>
-        - equal: [main, << pipeline.git.branch >>]
+  aperture-go:
+    when: << pipeline.parameters.updated-aperture-go >>
     jobs:
-      - gen-push-java-stubs
+      - validate-publish-sdk:
+          name: validate-publish-aperture-go
+          path: sdks/aperture-go
+          docker-context: sdks/aperture-go
+          dockerfile: Dockerfile
+          docker-image: aperture-go-example
+          remote-repo: fluxninja/aperture-go
+          remote-repo-fingerprint: "c5:d8:c4:22:7e:ff:b5:c3:c3:32:c2:b7:54:c7:99:1b"
+
+  aperture-java:
+    when: << pipeline.parameters.updated-aperture-java >>
+    jobs:
+      - validate-publish-sdk:
+          name: validate-publish-aperture-java
+          path: sdks/aperture-java
+          docker-context: sdks/aperture-java
+          dockerfile: Dockerfile
+          docker-image: aperture-java-example
+          remote-repo: fluxninja/aperture-java
+          remote-repo-fingerprint: "14:8a:b9:90:ba:48:a4:f0:27:b0:70:d7:95:17:16:1e"
 
   aperture-operator:
     when: << pipeline.parameters.updated-aperture-operator >>
@@ -606,6 +695,7 @@ commands:
           environment:
             TOOLS: << parameters.tools >>
           command: .circleci/scripts/asdf_install.sh
+
   asdf_save_cache:
     parameters:
       cache_name:
@@ -744,6 +834,7 @@ commands:
             PARAM_GIT_COMMIT_HASH: <<parameters.git-commit-hash>>
           name: <<parameters.step-name>>
           no_output_timeout: << parameters.no_output_timeout >>
+
   aperture_docker_tag:
     description: |
       Tag source image with destination registry, image and tag

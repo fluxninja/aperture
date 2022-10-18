@@ -80,8 +80,8 @@ type concurrencyLimiterFactory struct {
 	engineAPI iface.Engine
 	registry  status.Registry
 
-	autoTokensFactory       *autoTokensFactory
-	loadShedActuatorFactory *loadShedActuatorFactory
+	autoTokensFactory   *autoTokensFactory
+	loadActuatorFactory *loadActuatorFactory
 
 	// WFQ Metrics.
 	wfqFlowsGaugeVec    *prometheus.GaugeVec
@@ -107,7 +107,7 @@ func setupConcurrencyLimiterFactory(
 	agentGroup := ai.GetAgentGroup()
 
 	// Create factories
-	loadShedActuatorFactory, err := newLoadShedActuatorFactory(lifecycle, etcdClient, agentGroup, prometheusRegistry)
+	loadActuatorFactory, err := newLoadActuatorFactory(lifecycle, etcdClient, agentGroup, prometheusRegistry)
 	if err != nil {
 		return err
 	}
@@ -120,10 +120,10 @@ func setupConcurrencyLimiterFactory(
 	reg := statusRegistry.Child("concurrency_limiter")
 
 	conLimiterFactory := &concurrencyLimiterFactory{
-		engineAPI:               e,
-		autoTokensFactory:       autoTokensFactory,
-		loadShedActuatorFactory: loadShedActuatorFactory,
-		registry:                reg,
+		engineAPI:           e,
+		autoTokensFactory:   autoTokensFactory,
+		loadActuatorFactory: loadActuatorFactory,
+		registry:            reg,
 	}
 
 	conLimiterFactory.wfqFlowsGaugeVec = prometheus.NewGaugeVec(
@@ -336,7 +336,7 @@ var _ iface.Limiter = &concurrencyLimiter{}
 func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	// Factories
 	conLimiterFactory := conLimiter.concurrencyLimiterFactory
-	loadShedActuatorFactory := conLimiterFactory.loadShedActuatorFactory
+	loadActuatorFactory := conLimiterFactory.loadActuatorFactory
 	autoTokensFactory := conLimiterFactory.autoTokensFactory
 	// Form metric labels
 	metricLabels := make(prometheus.Labels)
@@ -345,7 +345,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(conLimiter.GetComponentIndex(), 10)
 	// Create sub components.
 	clock := clockwork.NewRealClock()
-	loadShedActuator, err := loadShedActuatorFactory.newLoadShedActuator(conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
+	loadActuator, err := loadActuatorFactory.newLoadActuator(conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
 	if err != nil {
 		return err
 	}
@@ -388,7 +388,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// setup scheduler
-			conLimiter.scheduler = scheduler.NewWFQScheduler(loadShedActuator.tokenBucketLoadShed, clock, wfqMetrics)
+			conLimiter.scheduler = scheduler.NewWFQScheduler(loadActuator.tokenBucketLoadMultiplier, clock, wfqMetrics)
 
 			incomingConcurrencyCounter, err := incomingConcurrencyCounterVec.GetMetricWith(metricLabels)
 			if err != nil {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"os"
@@ -42,7 +41,7 @@ func main() {
 	port := fs.String("port", "8089", "Port to start sdk-validator's grpc server on.")
 	requests := fs.Int("requests", 10, "Number of requests to make to SDK example server.")
 	rejects := fs.Int64("rejects", 5, "Number of requests (out of 'requests') to reject.")
-	sdkDockerImage := fs.String("sdk-docker-image", "", "Location of SDK example to run.")
+	sdkDockerImage := fs.String("sdk-docker-image", "", "Docker image of SDK example to run.")
 	sdkPort := fs.String("sdk-port", "8080", "Port to expose on SDK's example container.")
 	// parse flags
 	err := fs.Parse(os.Args[1:])
@@ -159,13 +158,6 @@ func runDockerContainer(image string, port string) (string, error) {
 		return "", err
 	}
 
-	reader, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
-	if err != nil {
-		return "", err
-	}
-	defer reader.Close()
-	_, _ = io.Copy(os.Stdout, reader)
-
 	exposedPorts, portBindings, _ := nat.ParsePortSpecs([]string{
 		fmt.Sprintf("0.0.0.0:%s:%s", port, port),
 	})
@@ -194,8 +186,18 @@ func runDockerContainer(image string, port string) (string, error) {
 	if err = cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return "", err
 	}
+	time.Sleep(time.Second * 2)
 
-	return resp.ID, nil
+	for {
+		containerJSON, err := cli.ContainerInspect(ctx, resp.ID)
+		if err != nil {
+			return "", err
+		}
+		// log.Info().Interface("containerJSON", containerJSON).Msg("inspect")
+		if containerJSON.State.Health.Status == "healthy" {
+			return resp.ID, nil
+		}
+	}
 }
 
 func stopDockerContainer(id string) error {
