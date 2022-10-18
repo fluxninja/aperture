@@ -27,9 +27,6 @@ parameters:
   updated-aperture:
     type: boolean
     default: false
-  updated-api-flowcontrol:
-    type: boolean
-    default: false
   updated-aperture-operator:
     type: boolean
     default: false
@@ -530,6 +527,73 @@ jobs:
             fi
             fn release sync-deployment-repo "${args[@]}"
 
+  build-aperture-java:
+    parameters:
+      docker-image:
+        type: string
+        description: Docker image to be used to run gradle.
+        default: cimg/openjdk:18.0
+      path:
+        type: string
+        description: Path to aperture-java
+        default: sdks/aperture-java
+    docker:
+      - image: <<parameters.docker-image>>
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
+            - gradle-v1-
+      - run:
+          name: Dependencies
+          command: |
+            cd <<parameters.path>>
+            gradle dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
+      # run tests!
+      - run:
+          name: Build
+          command: |
+            cd <<parameters.path>>
+            gradle build --no-daemon
+      - run:
+          name: Test
+          command: |
+            cd <<parameters.path>>
+            gradle test
+
+  publish-aperture-java-release:
+    parameters:
+      path:
+        type: string
+        description: Path to aperture-java
+        default: sdks/aperture-java
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
+            - gradle-v1-
+      # See https://discuss.circleci.com/t/gpg-keys-as-environment-variables/28641
+      - run:
+          name: Publish to Sonatype
+          command: |
+            cd <<parameters.path>>
+            GPG_PRIVATE_KEY=$(echo -e ${GPG_PRIVATE_KEY}) gradle assemble publishToSonatype
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
+
 workflows:
   version: 2
 
@@ -573,6 +637,30 @@ workflows:
   aperture-java:
     when: << pipeline.parameters.updated-aperture-java >>
     jobs:
+      - build-aperture-java:
+          name: Build with OpenJDK 8
+          docker-image: cimg/openjdk:8.0
+          path: sdks/aperture-java
+      - build-aperture-java:
+          name: Build with OpenJDK 11
+          docker-image: cimg/openjdk:11.0
+          path: sdks/aperture-java
+      - build-aperture-java:
+          name: Build with OpenJDK 13
+          docker-image: cimg/openjdk:13.0
+          path: sdks/aperture-java
+      - build-aperture-java:
+          name: Build with OpenJDK 15
+          docker-image: cimg/openjdk:15.0
+          path: sdks/aperture-java
+      - build-aperture-java:
+          name: Build with OpenJDK 17
+          docker-image: cimg/openjdk:17.0
+          path: sdks/aperture-java
+      - build-aperture-java:
+          name: Build with OpenJDK 18
+          docker-image: cimg/openjdk:18.0
+          path: sdks/aperture-java
       - validate-publish-sdk:
           name: validate-publish-aperture-java
           path: sdks/aperture-java
@@ -581,6 +669,16 @@ workflows:
           docker-image: aperture-java-example
           remote-repo: fluxninja/aperture-java
           remote-repo-fingerprint: "14:8a:b9:90:ba:48:a4:f0:27:b0:70:d7:95:17:16:1e"
+
+  publish-aperture-java-snapshot:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-aperture-java >>
+    jobs:
+      - publish-aperture-java-release:
+          path: sdks/aperture-java
+          context: sonatype
 
   aperture-operator:
     when: << pipeline.parameters.updated-aperture-operator >>

@@ -11,6 +11,10 @@ executors:
     docker:
       - image: cimg/go:1.19
 
+orbs:
+  path-filtering: circleci/path-filtering@0.1.3
+  continuation: circleci/continuation@0.3.1
+
 # TODO: Sync this with continue-workflows.yml
 commands:
   asdf_install:
@@ -83,6 +87,31 @@ commands:
             asdf reshim
 
 jobs:
+  publish-aperture-java-release:
+    parameters:
+      path:
+        type: string
+        description: Path to aperture-java
+        default: sdks/aperture-java
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - gradle-v1-{{ checksum <<parameters.path>>/"build.gradle.kts" }}
+            - gradle-v1-
+      # See https://discuss.circleci.com/t/gpg-keys-as-environment-variables/28641
+      - run:
+          name: Publish to Sonatype
+          command: |
+            cd <<parameters.path>>
+            GPG_PRIVATE_KEY=$(echo -e ${GPG_PRIVATE_KEY}) gradle assemble publishToSonatype
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: gradle-v1-{{ checksum <<parameters.path>>/"build.gradle.kts" }}
+
   release-components:
     executor: base-cimg-executor
     steps:
@@ -99,6 +128,7 @@ jobs:
           command: fn circleci trigger-release --tag << pipeline.git.tag >>
       - asdf_save_cache:
           cache_name: release
+
   package-agent:
     parameters:
       executor:
@@ -174,6 +204,7 @@ jobs:
             mkdir -p dist/packages/
             nfpm package --packager "${PACKAGER}" --target dist/packages/
             ls -l dist/packages/
+
   helm-release:
     executor: base-cimg-executor
     steps:
@@ -182,12 +213,9 @@ jobs:
           name: "Package and release Helm Chart"
           command: .circleci/scripts/helm_release.sh
 
-orbs:
-  path-filtering: circleci/path-filtering@0.1.3
-  continuation: circleci/continuation@0.3.1
-
 workflows:
   version: 2
+
   filter-paths-main:
     when:
       and:
@@ -212,7 +240,6 @@ workflows:
             docs/.* updated-aperture-docs true
             manifests/charts/.* updated-aperture-charts true
             tools/demo_app/.* updated-demo-app true
-            api/aperture/flowcontrol/v1/flowcontrol.proto updated-api-flowcontrol true
             sdks/aperture-go/.* updated-aperture-go true
             sdks/aperture-java/.* updated-aperture-java true
 
@@ -228,6 +255,7 @@ workflows:
       - path-filtering/filter:
           <<: *path_filtering_job
           base-revision: main
+
   release-components:
     when:
       matches:
@@ -251,6 +279,7 @@ workflows:
             parameters:
               executor: [ubuntu-go-executor]
               goarch: [amd64]
+
   helm-release:
     when:
       matches:
@@ -272,3 +301,17 @@ workflows:
             tags:
               only: /^v.*$/
           configuration_path: .circleci/post-release.yaml
+
+  publish-aperture-java-release:
+    when:
+      matches: { value: << pipeline.git.tag >>, pattern: "^releases/.*$" }
+    jobs:
+      - publish-aperture-java-release:
+          path: sdks/aperture-java
+          context: sonatype
+          # both this and workflow's when is needed
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^releases\/.*$/
