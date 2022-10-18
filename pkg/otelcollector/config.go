@@ -10,6 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 
@@ -360,8 +361,8 @@ func buildApertureSelfScrapeConfig(name string, cfg *OtelParams) map[string]any 
 			{
 				"targets": []string{cfg.Listener.GetAddr()},
 				"labels": map[string]any{
-					"instance":     info.Hostname,
-					"process_uuid": info.UUID,
+					metrics.InstanceLabel:    info.Hostname,
+					metrics.ProcessUUIDLabel: info.UUID,
 				},
 			},
 		},

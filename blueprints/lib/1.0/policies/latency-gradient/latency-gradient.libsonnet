@@ -52,7 +52,7 @@ local concurrencyLimiter = spec.v1.ConcurrencyLimiter;
 local scheduler = spec.v1.Scheduler;
 local decider = spec.v1.Decider;
 local switcher = spec.v1.Switcher;
-local loadShed = spec.v1.LoadShedActuator;
+local loadActuator = spec.v1.LoadActuator;
 local max = spec.v1.Max;
 local min = spec.v1.Min;
 local sqrt = spec.v1.Sqrt;
@@ -79,12 +79,9 @@ function(params) {
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY_EMA'),
                                                             port.withConstantValue(c.tolerance),
                                                             output=port.withSignalName('LATENCY_SETPOINT'))),
-          component.withArithmeticCombinator(combinator.sub(port.withSignalName('INCOMING_CONCURRENCY'),
-                                                            port.withSignalName('DESIRED_CONCURRENCY'),
-                                                            output=port.withSignalName('DELTA_CONCURRENCY'))),
-          component.withArithmeticCombinator(combinator.div(port.withSignalName('DELTA_CONCURRENCY'),
+          component.withArithmeticCombinator(combinator.div(port.withSignalName('DESIRED_CONCURRENCY'),
                                                             port.withSignalName('INCOMING_CONCURRENCY'),
-                                                            output=port.withSignalName('LSF'))),
+                                                            output=port.withSignalName('LOAD_MULTIPLIER'))),
           component.withArithmeticCombinator(combinator.mul(port.withConstantValue(c.concurrencyLimitMultiplier),
                                                             port.withSignalName('ACCEPTED_CONCURRENCY'),
                                                             output=port.withSignalName('UPPER_CONCURRENCY_LIMIT'))),
@@ -165,8 +162,8 @@ function(params) {
                 incoming_concurrency: port.withSignalName('INCOMING_CONCURRENCY'),
               })
             )
-            + concurrencyLimiter.withLoadShedActuator(
-              loadShed.withInPortsMixin({ load_shed_factor: port.withSignalName('LSF') })
+            + concurrencyLimiter.withLoadActuator(
+              loadActuator.withInPortsMixin({ load_multiplier: port.withSignalName('LOAD_MULTIPLIER') })
             )
           ),
           component.withDecider(

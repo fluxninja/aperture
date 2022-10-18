@@ -30,23 +30,13 @@ spec:
       - arithmetic_combinator:
           in_ports:
             lhs:
-              signal_name: INCOMING_CONCURRENCY
-            rhs:
               signal_name: DESIRED_CONCURRENCY
-          operator: sub
-          out_ports:
-            output:
-              signal_name: DELTA_CONCURRENCY
-      - arithmetic_combinator:
-          in_ports:
-            lhs:
-              signal_name: DELTA_CONCURRENCY
             rhs:
               signal_name: INCOMING_CONCURRENCY
           operator: div
           out_ports:
             output:
-              signal_name: LSF
+              signal_name: LOAD_MULTIPLIER
       - arithmetic_combinator:
           in_ports:
             lhs:
@@ -150,10 +140,10 @@ spec:
               signal_name: DESIRED_CONCURRENCY
           slope: "-1"
       - concurrency_limiter:
-          load_shed_actuator:
+          load_actuator:
             in_ports:
-              load_shed_factor:
-                signal_name: LSF
+              load_multiplier:
+                signal_name: LOAD_MULTIPLIER
           scheduler:
             auto_tokens: true
             default_workload_parameters:

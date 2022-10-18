@@ -148,7 +148,7 @@ def create_policies_yaml(output_path: Path, policies: Dict):
             dashboard_path.parent.mkdir()
 
         LOG.info(f"Creating {dashboard_path}")
-        dashboard_path.write_text(json.dumps(dashboard["dashboard"], indent=4))
+        dashboard_path.write_text(json.dumps(dashboard, indent=4))
 
     for policy_name, policy in policies["policies"].items():
         policy_path = output_path / "policies" / policy_name

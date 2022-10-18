@@ -128,14 +128,16 @@ jsonnet -J vendor [example file].jsonnet  | yq -P
 After running this command you should see the following contents in the YAML
 file:
 
-<details>
-<summary>Generated Policy YAML</summary>
-
 ```yaml
 {@include: ./assets/gen/blueprints/jsonnet/blueprints_0.yaml}
 ```
 
-</details>
+The generated policy can be applied to the running instance of
+`aperture-controller` via `kubectl` as follows:
+
+```sh
+kubectl apply --namespace aperture-controller --filename [example file].yaml
+```
 
 [jsonnet]: https://github.com/google/go-jsonnet
 [tk]: https://grafana.com/oss/tanka/

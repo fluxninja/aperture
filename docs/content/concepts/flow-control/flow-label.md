@@ -91,6 +91,10 @@ OLAP-style telemetry data is generated as OpenTelemetry logs and is saved in an
 OLAP database. This is done by creating multi-dimensional rollups from flow
 labels.
 
+OLAP-style telemetry doesn't work well with high-cardinality labels, thus if
+high-cardinality label is detected, some of its values may be replaced with
+`REDACTED_VIA_CARDINALITY_LIMIT` string.
+
 #### Default labels
 
 These are protocol-level labels (e.g. http, network) extracted by the
