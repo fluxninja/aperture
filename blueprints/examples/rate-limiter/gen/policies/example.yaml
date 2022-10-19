@@ -18,7 +18,7 @@ spec:
           label_key: http.request.header.user_type
           lazy_sync:
             enabled: true
-            num_sync: 10
+            num_sync: 5
           limit_reset_interval: 1s
           selector:
             flow_selector:

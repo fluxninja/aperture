@@ -337,15 +337,23 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
     docblocks = extract_docblock_comments(config_path.read_text())
 
     sections = {section: [] for section in metadata["sources"].keys()}
+    # append Common to sections
+    sections["Common"] = []
+
     for block in docblocks:
-        if block.section not in sections:
+        if block.section not in sections and block.section != "Common":
             logger.error(f"Unknown docblocks @section: {block.section}")
             raise typer.Exit(1)
         sections[block.section].append(block)
 
     # Make sure that all non-required parameters have their default values updated based on library defaults
     for section, blocks in sections.items():
+        # Skip common section
+        if section == "Common":
+            continue
         path = metadata["sources"][section]["path"]
+        # append common section to blocks
+        blocks.extend(sections["Common"])
         update_docblock_param_defaults(repository_root, path, blocks)
 
     update_readme_markdown(readme_path, docblocks)

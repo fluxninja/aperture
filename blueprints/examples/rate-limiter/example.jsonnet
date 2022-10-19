@@ -1,5 +1,5 @@
-local aperture = import '../../../lib/1.0/main.libsonnet';
-local blueprint = import '../main.libsonnet';
+local aperture = import '../../lib/1.0/main.libsonnet';
+local bundle = aperture.blueprints.policies.RateLimiter.bundle;
 
 local Override = aperture.spec.v1.RateLimiterOverride;
 local LazySync = aperture.spec.v1.RateLimiterLazySync;
@@ -37,4 +37,4 @@ local config = {
   },
 };
 
-blueprint { _config:: config }
+bundle { _config:: config }

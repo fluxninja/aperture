@@ -1,9 +1,10 @@
-local lib = import '../../lib/1.0/main.libsonnet';
+local lib = import '../../main.libsonnet';
+local blueprint = import './latency-gradient.libsonnet';
 
-local config = import './config.libsonnet';
+local policy = blueprint.policy;
+local dashboard = blueprint.dashboard;
+local config = blueprint.config;
 
-local policy = lib.blueprints.policies.LatencyGradient;
-local dashboard = lib.blueprints.dashboards.LatencyGradient;
 local signalsDashboard = lib.blueprints.dashboards.Signals;
 
 {

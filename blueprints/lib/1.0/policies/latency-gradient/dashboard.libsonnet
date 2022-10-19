@@ -1,8 +1,7 @@
-local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
-
-local lib = import '../../grafana/grafana.libsonnet';
-
 local aperture = import '../../grafana/aperture.libsonnet';
+local lib = import '../../grafana/grafana.libsonnet';
+local config = import './config.libsonnet';
+local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
 local dashboard = grafana.dashboard;
 local row = grafana.row;
@@ -14,13 +13,6 @@ local barGaugePanel = grafana.barGaugePanel;
 local statPanel = grafana.statPanel;
 local annotation = grafana.annotation;
 local timeSeriesPanel = lib.TimeSeriesPanel;
-
-local defaults = {
-  policyName: error 'policyName must be set',
-  refreshInterval: '10s',
-  datasourceName: '$datasource',
-  datasourceFilterRegex: '',
-};
 
 local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
   local thresholds =
@@ -131,7 +123,7 @@ local newStatPanel(graphTitle, datasource, graphQuery) =
   };
 
 function(params) {
-  _config:: defaults + params,
+  _config:: config.common + config.dashboard + params,
 
   local p = 'service_latency',
   local ds = $._config.datasourceName,

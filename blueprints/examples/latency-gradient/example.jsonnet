@@ -1,5 +1,5 @@
-local aperture = import '../../../lib/1.0/main.libsonnet';
-local blueprint = import '../main.libsonnet';
+local aperture = import '../../lib/1.0/main.libsonnet';
+local bundle = aperture.blueprints.policies.LatencyGradient.bundle;
 
 local WorkloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
 local LabelMatcher = aperture.spec.v1.LabelMatcher;
@@ -68,4 +68,4 @@ local config = {
   },
 };
 
-blueprint { _config:: config }
+bundle { _config:: config }
