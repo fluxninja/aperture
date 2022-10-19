@@ -127,9 +127,19 @@ func addLogsPipeline(cfg *otelcollector.OtelParams) {
 	// Note: Passing map[string]interface{}{} instead of real config, so that
 	// processors' configs' default work.
 	config.AddProcessor(otelcollector.ProcessorMetrics, map[string]interface{}{})
-	config.AddBatchProcessor(otelcollector.ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
+	config.AddBatchProcessor(
+		otelcollector.ProcessorBatchPrerollup,
+		cfg.BatchPrerollup.Timeout.AsDuration(),
+		cfg.BatchPrerollup.SendBatchSize,
+		cfg.BatchPrerollup.SendBatchMaxSize,
+	)
 	config.AddProcessor(otelcollector.ProcessorRollup, map[string]interface{}{})
-	config.AddBatchProcessor(otelcollector.ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
+	config.AddBatchProcessor(
+		otelcollector.ProcessorBatchPostrollup,
+		cfg.BatchPostrollup.Timeout.AsDuration(),
+		cfg.BatchPostrollup.SendBatchSize,
+		cfg.BatchPostrollup.SendBatchMaxSize,
+	)
 	config.AddExporter(otelcollector.ExporterLogging, nil)
 
 	processors := []string{

@@ -455,13 +455,48 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 </dd>
 </dl>
 
-### BatchConfig {#batch-config}
+### BatchPostrollupConfig {#batch-postrollup-config}
 
-BatchConfig defines configuration for OTEL batch processor.
+BatchPostrollupConfig defines configuration for OTEL batch processor.
 
 #### Properties
 
 <dl>
+<dt>send_batch_max_size</dt>
+<dd>
+
+(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+into smaller units.
+
+</dd>
+<dt>send_batch_size</dt>
+<dd>
+
+(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+
+</dd>
+<dt>timeout</dt>
+<dd>
+
+(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
+
+</dd>
+</dl>
+
+### BatchPrerollupConfig {#batch-prerollup-config}
+
+BatchPrerollupConfig defines configuration for OTEL batch processor.
+
+#### Properties
+
+<dl>
+<dt>send_batch_max_size</dt>
+<dd>
+
+(uint32, `gte=0`, default: `10000`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+into smaller units.
+
+</dd>
 <dt>send_batch_size</dt>
 <dd>
 
@@ -1089,13 +1124,13 @@ OtelConfig is the configuration for the OTEL collector.
 <dt>batch_postrollup</dt>
 <dd>
 
-([BatchConfig](#batch-config))
+([BatchPostrollupConfig](#batch-postrollup-config))
 
 </dd>
 <dt>batch_prerollup</dt>
 <dd>
 
-([BatchConfig](#batch-config))
+([BatchPrerollupConfig](#batch-prerollup-config))
 
 </dd>
 </dl>
