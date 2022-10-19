@@ -42,11 +42,11 @@ script takes as options an output directory path where files will be saved and a
 path to a config libsonnet file containing blueprint customization and
 configuration.
 
-Under the `blueprints/lib/1.0/policies` directory, the currently available
-Policy Blueprints can be found. In each Blueprint, `bundle.libsonnet` can be
-used to generate the actual artifacts, and `config.libsonnet` comes with the
-default configuration for the given Policy. This can be overridden by the
-`--config` option passed to the `generate-bundle.py` script.
+Under the `blueprints/lib/1.0/blueprints` directory, the currently available
+Blueprints can be found. In each Blueprint, `bundle.libsonnet` can be used to
+generate the actual artifacts, and `config.libsonnet` comes with the default
+configuration for the given Blueprint. This can be overridden by the `--config`
+option passed to the `generate-bundle.py` script.
 
 Custom configurations can be merged with Blueprints' `config.libsonnet`
 resulting in the final configuration, according to jsonnet language rules: keys
@@ -87,7 +87,7 @@ You can then create a Policy resource with policy definition like this:
 ```jsonnet
 local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
 
-local latencyGradientPolicy = aperture.blueprints.policies.LatencyGradient.policy;
+local latencyGradientPolicy = aperture.blueprints.LatencyGradient.policy;
 
 local selector = aperture.spec.v1.Selector;
 local fluxMeter = aperture.spec.v1.FluxMeter;

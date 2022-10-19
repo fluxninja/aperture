@@ -1,5 +1,5 @@
 local aperture = import '../../lib/1.0/main.libsonnet';
-local bundle = aperture.blueprints.policies.LatencyGradient.bundle;
+local bundle = aperture.blueprints.LatencyGradient.bundle;
 
 local WorkloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
 local LabelMatcher = aperture.spec.v1.LabelMatcher;
@@ -32,7 +32,6 @@ local config = {
     policyName: 'example',
   },
   policy+: {
-    policyName: $.common.policyName,
     fluxMeter: fluxMeter.new() + fluxMeter.withSelector(svcSelector),
     concurrencyLimiterSelector: svcSelector,
     classifiers: [
@@ -60,12 +59,6 @@ local config = {
       ],
     },
   },
-  dashboard+: {
-    policyName: $.common.policyName,
-  },
-  signalsDashboard+: {
-    policyName: $.common.policyName,
-  },
 };
 
-bundle { _config:: config }
+bundle { _config+:: config }

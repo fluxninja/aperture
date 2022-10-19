@@ -1,24 +1,14 @@
 local aperture = import '../../grafana/aperture.libsonnet';
 local lib = import '../../grafana/grafana.libsonnet';
+local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
 local dashboard = grafana.dashboard;
 local timeSeriesPanel = lib.TimeSeriesPanel;
 
 
-local defaults = {
-  policyName: error 'policyName must be set',
-  refreshInterval: '10s',
-  timeFrom: 'now-30m',
-  timeTo: 'now',
-  datasource: {
-    name: '$datasource',
-    filterRegex: '',
-  },
-};
-
 function(params) {
-  _config:: defaults + params,
+  _config:: config.common + config.dashboard + params,
 
   local ds = $._config.datasource.name,
 
