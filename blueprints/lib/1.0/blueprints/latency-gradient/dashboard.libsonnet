@@ -126,7 +126,7 @@ function(params) {
   _config:: config.common + config.dashboard + params,
 
   local p = 'service_latency',
-  local ds = $._config.datasourceName,
+  local ds = $._config.datasource.name,
 
   local fluxMeterPanel =
     newTimeSeriesPanel('FluxMeter',
@@ -196,7 +196,7 @@ function(params) {
       {
         current: {
           text: 'default',
-          value: $._config.datasourceName,
+          value: $._config.datasource.name,
         },
         hide: 0,
         label: 'Data Source',
@@ -204,7 +204,7 @@ function(params) {
         options: [],
         query: 'prometheus',
         refres: 1,
-        regex: $._config.datasourceFilterRegex,
+        regex: $._config.datasource.filterRegex,
         type: 'datasource',
       }
     )
