@@ -82,13 +82,15 @@ var _ = Describe("ConfigMap for Controller", func() {
 								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
 							},
 							Otel: otelcollector.OtelConfig{
-								BatchPrerollup: otelcollector.BatchConfig{
-									Timeout:       config.MakeDuration(1 * time.Second),
-									SendBatchSize: 15000,
+								BatchPrerollup: otelcollector.BatchPrerollupConfig{
+									Timeout:          config.MakeDuration(1 * time.Second),
+									SendBatchSize:    10000,
+									SendBatchMaxSize: 20000,
 								},
-								BatchPostrollup: otelcollector.BatchConfig{
-									Timeout:       config.MakeDuration(1 * time.Second),
-									SendBatchSize: 15000,
+								BatchPostrollup: otelcollector.BatchPostrollupConfig{
+									Timeout:          config.MakeDuration(1 * time.Second),
+									SendBatchSize:    100,
+									SendBatchMaxSize: 200,
 								},
 							},
 							Etcd: etcd.EtcdConfig{
