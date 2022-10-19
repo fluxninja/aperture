@@ -13,6 +13,7 @@ type Rollup struct {
 	ToField     string     `mapstructure:"to"`
 	Type        RollupType `mapstructure:"type"`
 	TreatAsZero []string   `mapstructure:"treat_as_zero"`
+	Datasketch  bool       `mapstructure:"datasketch"`
 }
 
 // GetFromFieldValue returns value of `FromField` from attributes as float64.
