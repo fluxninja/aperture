@@ -17,7 +17,7 @@
   * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
   */
   policy: {
-    evaluationInterval: '0.1s',
+    evaluationInterval: '0.5s',
     fluxMeter: error 'fluxMeter is not set',
     concurrencyLimiterSelector: error 'concurrencyLimiterSelector is not set',
     classifiers: [],

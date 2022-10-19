@@ -14,7 +14,7 @@
 
 | Parameter Name                      | Parameter Type                  | Default      | Description                              |
 | ----------------------------------- | ------------------------------- | ------------ | ---------------------------------------- |
-| `policy.evaluationInterval`         | `string`                        | `"0.1s"`     | How often should policy be re-evaluated. |
+| `policy.evaluationInterval`         | `string`                        | `"0.5s"`     | How often should policy be re-evaluated. |
 | `policy.fluxMeter`                  | `aperture.v1.FluxMeter`         | `(required)` | Flux Meter selector.                     |
 | `policy.concurrencyLimiterSelector` | `aperture.spec.v1.Selector`     | `(required)` | Concurrency Limiter selector.            |
 | `policy.classifiers`                | `[]aperture.spec.v1.Classifier` | `[]`         | List of classification rules.            |
