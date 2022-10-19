@@ -82,10 +82,12 @@ metrics:
   pedantic: false
 otel:
   batch_postrollup:
-    send_batch_size: 15000
+    send_batch_size: 10000
+    send_batch_max_size: 20000
     timeout: 1s
   batch_prerollup:
-    send_batch_size: 15000
+    send_batch_size: 100
+    send_batch_max_size: 200
     timeout: 1s
 plugins:
   disable_plugins: false

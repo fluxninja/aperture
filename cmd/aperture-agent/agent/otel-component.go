@@ -124,10 +124,22 @@ func addLogsPipeline(cfg *otelcollector.OtelParams) {
 	config := cfg.Config
 	// Common dependencies for pipelines
 	config.AddReceiver(otelcollector.ReceiverOTLP, otlpreceiver.Config{})
-	config.AddProcessor(otelcollector.ProcessorMetrics, metricsprocessor.Config{})
-	config.AddBatchProcessor(otelcollector.ProcessorBatchPrerollup, cfg.BatchPrerollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
-	config.AddProcessor(otelcollector.ProcessorRollup, rollupprocessor.Config{})
-	config.AddBatchProcessor(otelcollector.ProcessorBatchPostrollup, cfg.BatchPostrollup.Timeout.AsDuration(), cfg.BatchPostrollup.SendBatchSize)
+	// Note: Passing map[string]interface{}{} instead of real config, so that
+	// processors' configs' default work.
+	config.AddProcessor(otelcollector.ProcessorMetrics, map[string]interface{}{})
+	config.AddBatchProcessor(
+		otelcollector.ProcessorBatchPrerollup,
+		cfg.BatchPrerollup.Timeout.AsDuration(),
+		cfg.BatchPrerollup.SendBatchSize,
+		cfg.BatchPrerollup.SendBatchMaxSize,
+	)
+	config.AddProcessor(otelcollector.ProcessorRollup, map[string]interface{}{})
+	config.AddBatchProcessor(
+		otelcollector.ProcessorBatchPostrollup,
+		cfg.BatchPostrollup.Timeout.AsDuration(),
+		cfg.BatchPostrollup.SendBatchSize,
+		cfg.BatchPostrollup.SendBatchMaxSize,
+	)
 	config.AddExporter(otelcollector.ExporterLogging, nil)
 
 	processors := []string{
