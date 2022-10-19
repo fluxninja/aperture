@@ -120,10 +120,16 @@ func (o *OTELConfig) AddDebugExtensions() {
 }
 
 // AddBatchProcessor is a helper function for adding batch processor.
-func (o *OTELConfig) AddBatchProcessor(name string, timeout time.Duration, sendBatchSize uint32) {
+func (o *OTELConfig) AddBatchProcessor(
+	name string,
+	timeout time.Duration,
+	sendBatchSize uint32,
+	sendBatchMaxSize uint32,
+) {
 	o.AddProcessor(name, batchprocessor.Config{
-		Timeout:       timeout,
-		SendBatchSize: sendBatchSize,
+		Timeout:          timeout,
+		SendBatchSize:    sendBatchSize,
+		SendBatchMaxSize: sendBatchMaxSize,
 	})
 }
 
@@ -215,20 +221,39 @@ type OtelParams struct {
 // +kubebuilder:object:generate=true
 type OtelConfig struct {
 	// BatchPrerollup configures batch prerollup processor.
-	BatchPrerollup BatchConfig `json:"batch_prerollup"`
+	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
-	BatchPostrollup BatchConfig `json:"batch_postrollup"`
+	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
 }
 
-// BatchConfig defines configuration for OTEL batch processor.
+// BatchPrerollupConfig defines configuration for OTEL batch processor.
 // swagger:model
 // +kubebuilder:object:generate=true
-type BatchConfig struct {
+type BatchPrerollupConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
 
 	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"10000"`
+
+	// SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+	// into smaller units.
+	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"10000"`
+}
+
+// BatchPostrollupConfig defines configuration for OTEL batch processor.
+// swagger:model
+// +kubebuilder:object:generate=true
+type BatchPostrollupConfig struct {
+	// Timeout sets the time after which a batch will be sent regardless of size.
+	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
+
+	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"100"`
+
+	// SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+	// into smaller units.
+	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"100"`
 }
 
 // FxIn consumes parameters via Fx.

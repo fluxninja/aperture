@@ -65,8 +65,47 @@ definitions:
     title: BackoffConfig holds configuration for GRPC Client Backoff.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
-  BatchConfig:
+  BatchPostrollupConfig:
     properties:
+      send_batch_max_size:
+        description: |-
+          SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+          into smaller units.
+        format: uint32
+        type: integer
+        x-go-default: "100"
+        x-go-name: SendBatchMaxSize
+        x-go-validate: gte=0
+      send_batch_size:
+        description: SendBatchSize is the size of a batch which after hit, will trigger
+          it to be sent.
+        format: uint32
+        type: integer
+        x-go-default: "100"
+        x-go-name: SendBatchSize
+        x-go-validate: gt=0
+      timeout:
+        description: Timeout sets the time after which a batch will be sent regardless
+          of size.
+        format: string
+        type: string
+        x-go-default: 1s
+        x-go-name: Timeout
+        x-go-validate: gt=0
+    title: BatchPostrollupConfig defines configuration for OTEL batch processor.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+  BatchPrerollupConfig:
+    properties:
+      send_batch_max_size:
+        description: |-
+          SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+          into smaller units.
+        format: uint32
+        type: integer
+        x-go-default: "10000"
+        x-go-name: SendBatchMaxSize
+        x-go-validate: gte=0
       send_batch_size:
         description: SendBatchSize is the size of a batch which after hit, will trigger
           it to be sent.
@@ -83,7 +122,7 @@ definitions:
         x-go-default: 1s
         x-go-name: Timeout
         x-go-validate: gt=0
-    title: BatchConfig defines configuration for OTEL batch processor.
+    title: BatchPrerollupConfig defines configuration for OTEL batch processor.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   ClientTLSConfig:
@@ -696,9 +735,9 @@ definitions:
   OtelConfig:
     properties:
       batch_postrollup:
-        $ref: '#/definitions/BatchConfig'
+        $ref: '#/definitions/BatchPostrollupConfig'
       batch_prerollup:
-        $ref: '#/definitions/BatchConfig'
+        $ref: '#/definitions/BatchPrerollupConfig'
     title: OtelConfig is the configuration for the OTEL collector.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
