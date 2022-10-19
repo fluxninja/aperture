@@ -12,7 +12,7 @@ sidebar_position: 1
 Aperture comes with a pre-packaged list of [Aperture Policies][policies] and
 Grafana Dashboards that can be used both as a guide for creating new Policies,
 and as ready-to-use Blueprints for generating Aperture Policies customized to a
-[Service][service].
+[Service][service] and the use-case.
 
 All Policies and Grafana Dashboards are written using the
 [Jsonnet][jsonnet-lang] language, and can be used both as jsonnet mixins or as
@@ -29,28 +29,26 @@ The Blueprint Generator (used to generate Policy files from Blueprints) depends
 on [jsonnet][go-jsonnet].
 
 [aperture-repo]: https://github.com/fluxninja/aperture/
-[blueprints-readme]:
-  https://github.com/fluxninja/aperture/blob/main/blueprints/README.md
 [jb]: https://github.com/jsonnet-bundler/jsonnet-bundler
 [go-jsonnet]: https://github.com/google/go-jsonnet
 
 ## Generating Aperture Policies and Grafana Dashboards
 
-The simplest way to use Aperture Blueprints is to render blueprints into policy
-and dashboard files.
+The simplest way to use Aperture Blueprints is to render Blueprints into Policy
+and Dashboard files.
 
-To generate files, `blueprints/scripts/aperture-generate.py` can be used. The
+To generate files, `blueprints/scripts/generate-bundle.py` can be used. The
 script takes as options an output directory path where files will be saved and a
-path to a `config.libsonnet` file with local blueprint configuration.
+path to a config libsonnet file containing blueprint customization and
+configuration.
 
-Under the `blueprints/` directory, the currently available Blueprints can be
-found. Each blueprint consists of at least two files: `config.libsonnet` and
-`main.libsonnet`. `main.libsonnet` bundles actual Policy and dashboard code
-(available under `lib/1.0`) into Blueprints, and `config.libsonnet` comes with
-the default configuration for the given Policy. This can be overridden by the
-`--config` option passed to the `aperture-generate.py` script.
+Under the `blueprints/lib/1.0/blueprints` directory, the currently available
+Blueprints can be found. In each Blueprint, `bundle.libsonnet` can be used to
+generate the actual artifacts, and `config.libsonnet` comes with the default
+configuration for the given Blueprint. This can be overridden by the `--config`
+option passed to the `generate-bundle.py` script.
 
-Custom configurations will be merged with Blueprints' `config.libsonnet`
+Custom configurations can be merged with Blueprints' `config.libsonnet`
 resulting in the final configuration, according to jsonnet language rules: keys
 can be overwritten by reusing them in the custom configuration and nested
 objects can be merged by using `+:` operator. Check the `example` directory for
@@ -59,7 +57,7 @@ more information.
 The full command using the example looks like this:
 
 ```sh
-jb install && ./scripts/aperture-generate.py --output _gen --config blueprints/latency-gradient/example/example.jsonnet
+jb install && ./scripts/generate-bundle.py --output _gen --config examples/latency-gradient/example.jsonnet
 ```
 
 ## Using aperture blueprints as a jsonnet mixins library
@@ -89,7 +87,7 @@ You can then create a Policy resource with policy definition like this:
 ```jsonnet
 local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
 
-local latencyGradientPolicy = aperture.blueprints.policies.LatencyGradient;
+local latencyGradientPolicy = aperture.blueprints.LatencyGradient.policy;
 
 local selector = aperture.spec.v1.Selector;
 local fluxMeter = aperture.spec.v1.FluxMeter;

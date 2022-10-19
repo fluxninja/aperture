@@ -194,7 +194,7 @@ spec:
           out_ports:
             output:
               signal_name: CONCURRENCY_INCREMENT_FEEDBACK
-    evaluation_interval: 0.5s
+    evaluation_interval: 0.1s
   resources:
     classifiers: []
     flux_meters:

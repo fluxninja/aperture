@@ -2,8 +2,8 @@ local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonn
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
 local aperture = import '../../../../../blueprints/lib/1.0/main.libsonnet';
-local policyDashboard = aperture.blueprints.dashboards.LatencyGradient;
-local signalsDashboard = aperture.blueprints.dashboards.Signals;
+local policyDashboard = aperture.blueprints.LatencyGradient.dashboard;
+local signalsDashboard = aperture.blueprints.SignalsDashboard.dashboard;
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;
