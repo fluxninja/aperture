@@ -16,13 +16,17 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	tracev1 "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/cmd/sdk-validator/validator"
+	"github.com/fluxninja/aperture/pkg/flowcontrol/envoy"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 var (
@@ -70,12 +74,19 @@ func main() {
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(serverInterceptor))
 	reflection.Register(grpcServer)
 
+	commonHandler := &validator.CommonHandler{}
+
 	// instantiate and register flowcontrol handler
 	flowcontrolHandler := &validator.FlowControlHandler{
-		Rejects:  *rejects,
-		Rejected: 0,
+		Rejects:       *rejects,
+		Rejected:      0,
+		CommonHandler: commonHandler,
 	}
 	flowcontrolv1.RegisterFlowControlServiceServer(grpcServer, flowcontrolHandler)
+
+	reg := status.NewRegistry(log.GetGlobalLogger())
+	authzHandler := envoy.NewHandler(classifier.NewClassificationEngine(reg), nil, commonHandler)
+	authv3.RegisterAuthorizationServer(grpcServer, authzHandler)
 
 	// initiate and register otel trace handler
 	traceHandler := &validator.TraceHandler{}
@@ -193,7 +204,6 @@ func runDockerContainer(image string, port string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		// log.Info().Interface("containerJSON", containerJSON).Msg("inspect")
 		if containerJSON.State.Health.Status == "healthy" {
 			return resp.ID, nil
 		}
