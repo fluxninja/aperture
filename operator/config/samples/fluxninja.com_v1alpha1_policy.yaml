@@ -46,7 +46,7 @@ spec:
           operator: mul
           out_ports:
             output:
-              signal_name: UPPER_CONCURRENCY_LIMIT
+              signal_name: NORMAL_CONCURRENCY_LIMIT
       - arithmetic_combinator:
           in_ports:
             lhs:
@@ -62,7 +62,7 @@ spec:
             lhs:
               signal_name: CONCURRENCY_INCREMENT_SINGLE_TICK
             rhs:
-              signal_name: CONCURRENCY_INCREMENT_FEEDBACK
+              signal_name: CONCURRENCY_INCREMENT
           operator: add
           out_ports:
             output:
@@ -83,14 +83,6 @@ spec:
           out_ports:
             output:
               signal_name: CONCURRENCY_INCREMENT_NORMAL
-      - max:
-          in_ports:
-            inputs:
-              - signal_name: UPPER_CONCURRENCY_LIMIT
-              - constant_value: "10.0"
-          out_ports:
-            output:
-              signal_name: MAX_CONCURRENCY
       - sqrt:
           in_ports:
             input:
@@ -126,7 +118,7 @@ spec:
             control_variable:
               signal_name: ACCEPTED_CONCURRENCY
             max:
-              signal_name: MAX_CONCURRENCY
+              signal_name: NORMAL_CONCURRENCY_LIMIT
             optimize:
               signal_name: CONCURRENCY_INCREMENT
             setpoint:
@@ -181,18 +173,7 @@ spec:
           operator: gt
           out_ports:
             output:
-              signal_name: IS_OVERLOAD_SWITCH
-      - switcher:
-          in_ports:
-            on_false:
-              signal_name: CONCURRENCY_INCREMENT_NORMAL
-            on_true:
-              constant_value: "10.0"
-            switch:
-              signal_name: IS_OVERLOAD_SWITCH
-          out_ports:
-            output:
-              signal_name: CONCURRENCY_INCREMENT
+              signal_name: IS_OVERLOAD
       - switcher:
           in_ports:
             on_false:
@@ -200,11 +181,11 @@ spec:
             on_true:
               constant_value: 0
             switch:
-              signal_name: IS_OVERLOAD_SWITCH
+              signal_name: IS_OVERLOAD
           out_ports:
             output:
-              signal_name: CONCURRENCY_INCREMENT_FEEDBACK
-    evaluation_interval: 0.1s
+              signal_name: CONCURRENCY_INCREMENT
+    evaluation_interval: 0.5s
   resources:
     classifiers:
       - rules:

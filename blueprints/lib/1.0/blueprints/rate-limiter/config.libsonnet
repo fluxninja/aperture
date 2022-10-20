@@ -17,7 +17,7 @@
   * @param (policy.labelKey: string required) What flow label to use for rate limiting
   */
   policy: {
-    evaluationInterval: '0.5s',
+    evaluationInterval: '300s',
     rateLimit: error 'policy.rateLimit must be set',
     rateLimiterSelector: error 'rateLimiterSelector must be set',
     limitResetInterval: '1s',
