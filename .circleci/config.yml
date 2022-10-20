@@ -240,6 +240,7 @@ workflows:
             docs/.* updated-aperture-docs true
             manifests/charts/.* updated-aperture-charts true
             tools/demo_app/.* updated-demo-app true
+            api/aperture/flowcontrol/.* updated-api-flowcontrol true
             sdks/aperture-go/.* updated-aperture-go true
             sdks/aperture-java/.* updated-aperture-java true
 

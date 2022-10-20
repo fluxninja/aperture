@@ -42,6 +42,9 @@ parameters:
   updated-demo-app:
     type: boolean
     default: false
+  updated-api-flowcontrol:
+    type: boolean
+    default: false
   updated-aperture-go:
     type: boolean
     default: false
@@ -623,7 +626,10 @@ workflows:
           work_dir: .
 
   aperture-go:
-    when: << pipeline.parameters.updated-aperture-go >>
+    when:
+      or:
+        - << pipeline.parameters.updated-api-flowcontrol >>
+        - << pipeline.parameters.updated-aperture-go >>
     jobs:
       - validate-publish-sdk:
           name: validate-publish-aperture-go
@@ -635,7 +641,10 @@ workflows:
           remote-repo-fingerprint: "c5:d8:c4:22:7e:ff:b5:c3:c3:32:c2:b7:54:c7:99:1b"
 
   aperture-java:
-    when: << pipeline.parameters.updated-aperture-java >>
+    when:
+      or:
+        - << pipeline.parameters.updated-api-flowcontrol >>
+        - << pipeline.parameters.updated-aperture-java >>
     jobs:
       - build-aperture-java:
           name: Build with OpenJDK 8
