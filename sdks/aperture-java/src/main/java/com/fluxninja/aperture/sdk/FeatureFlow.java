@@ -6,12 +6,12 @@ import io.opentelemetry.api.trace.Span;
 
 import static com.fluxninja.aperture.sdk.Constants.*;
 
-public final class Flow {
+public final class FeatureFlow {
   private final CheckResponse checkResponse;
   private final Span span;
   private boolean ended;
 
-  Flow(
+  FeatureFlow(
     CheckResponse checkResponse,
     Span span,
     boolean ended) {
