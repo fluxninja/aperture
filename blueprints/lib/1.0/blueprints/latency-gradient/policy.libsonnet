@@ -34,26 +34,26 @@ function(params) {
                            + resources.withClassifiers($._config.classifiers))
     + policy.withCircuit(
       circuit.new()
-      + circuit.withEvaluationInterval(evaluation_interval=$._config.evaluationInterval)
+      + circuit.withEvaluationInterval(evaluation_interval='0.5s')
       + circuit.withComponents(
         [
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY'),
-                                                            port.withConstantValue(c.emaLimitMultiplier),
+                                                            port.withConstantValue(c.latencyEMALimitMultiplier),
                                                             output=port.withSignalName('MAX_EMA'))),
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY_EMA'),
-                                                            port.withConstantValue(c.tolerance),
+                                                            port.withConstantValue(c.latencyToleranceMultiplier),
                                                             output=port.withSignalName('LATENCY_SETPOINT'))),
           component.withArithmeticCombinator(combinator.div(port.withSignalName('DESIRED_CONCURRENCY'),
                                                             port.withSignalName('INCOMING_CONCURRENCY'),
                                                             output=port.withSignalName('LOAD_MULTIPLIER'))),
           component.withArithmeticCombinator(combinator.mul(port.withConstantValue(c.concurrencyLimitMultiplier),
                                                             port.withSignalName('ACCEPTED_CONCURRENCY'),
-                                                            output=port.withSignalName('UPPER_CONCURRENCY_LIMIT'))),
-          component.withArithmeticCombinator(combinator.add(port.withConstantValue(c.linearConcurrencyIncrement),
+                                                            output=port.withSignalName('NORMAL_CONCURRENCY_LIMIT'))),
+          component.withArithmeticCombinator(combinator.add(port.withConstantValue(c.concurrencyLinearIncrement),
                                                             port.withSignalName('SQRT_CONCURRENCY_INCREMENT'),
                                                             output=port.withSignalName('CONCURRENCY_INCREMENT_SINGLE_TICK'))),
           component.withArithmeticCombinator(combinator.add(port.withSignalName('CONCURRENCY_INCREMENT_SINGLE_TICK'),
-                                                            port.withSignalName('CONCURRENCY_INCREMENT_FEEDBACK'),
+                                                            port.withSignalName('CONCURRENCY_INCREMENT'),
                                                             output=port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL'))),
           component.withMin(
             min.new()
@@ -65,16 +65,11 @@ function(params) {
             + firstValid.withInPorts({ inputs: [port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL_CAPPED'), port.withConstantValue(0)] })
             + firstValid.withOutPorts({ output: port.withSignalName('CONCURRENCY_INCREMENT_NORMAL') }),
           ),
-          component.withMax(
-            max.new()
-            + max.withInPorts({ inputs: [port.withSignalName('UPPER_CONCURRENCY_LIMIT'), port.withConstantValue(c.minConcurrency)] })
-            + max.withOutPorts({ output: port.withSignalName('MAX_CONCURRENCY') }),
-          ),
           component.withSqrt(
             sqrt.new()
             + sqrt.withInPorts({ input: port.withSignalName('ACCEPTED_CONCURRENCY') })
             + sqrt.withOutPorts({ output: port.withSignalName('SQRT_CONCURRENCY_INCREMENT') })
-            + sqrt.withScale($._config.constants.sqrtScale),
+            + sqrt.withScale($._config.constants.concurrencySQRTIncrementMultiplier),
           ),
           component.withPromql(
             local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
@@ -103,7 +98,7 @@ function(params) {
             + gradient.withInPorts({
               signal: port.withSignalName('LATENCY'),
               setpoint: port.withSignalName('LATENCY_SETPOINT'),
-              max: port.withSignalName('MAX_CONCURRENCY'),
+              max: port.withSignalName('NORMAL_CONCURRENCY_LIMIT'),
               control_variable: port.withSignalName('ACCEPTED_CONCURRENCY'),
               optimize: port.withSignalName('CONCURRENCY_INCREMENT'),
             })
@@ -137,25 +132,16 @@ function(params) {
               decider.inPorts.withLhs(port.withSignalName('LATENCY'))
               + decider.inPorts.withRhs(port.withSignalName('LATENCY_SETPOINT'))
             )
-            + decider.withOutPortsMixin(decider.outPorts.withOutput(port.withSignalName('IS_OVERLOAD_SWITCH')))
-          ),
-          component.withSwitcher(
-            switcher.new()
-            + switcher.withInPortsMixin(
-              switcher.inPorts.withOnTrue(port.withConstantValue(c.concurrencyIncrementOverload))
-              + switcher.inPorts.withOnFalse(port.withSignalName('CONCURRENCY_INCREMENT_NORMAL'))
-              + switcher.inPorts.withSwitch(port.withSignalName('IS_OVERLOAD_SWITCH'))
-            )
-            + switcher.withOutPortsMixin(switcher.outPorts.withOutput(port.withSignalName('CONCURRENCY_INCREMENT')))
+            + decider.withOutPortsMixin(decider.outPorts.withOutput(port.withSignalName('IS_OVERLOAD')))
           ),
           component.withSwitcher(
             switcher.new()
             + switcher.withInPortsMixin(
               switcher.inPorts.withOnTrue(port.withConstantValue(0))
               + switcher.inPorts.withOnFalse(port.withSignalName('CONCURRENCY_INCREMENT_NORMAL'))
-              + switcher.inPorts.withSwitch(port.withSignalName('IS_OVERLOAD_SWITCH'))
+              + switcher.inPorts.withSwitch(port.withSignalName('IS_OVERLOAD'))
             )
-            + switcher.withOutPortsMixin(switcher.outPorts.withOutput(port.withSignalName('CONCURRENCY_INCREMENT_FEEDBACK')))
+            + switcher.withOutPortsMixin(switcher.outPorts.withOutput(port.withSignalName('CONCURRENCY_INCREMENT')))
           ),
         ] + $._config.components,
       ),
