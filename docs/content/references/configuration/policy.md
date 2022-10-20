@@ -2153,7 +2153,7 @@ Weighted Fair Queuing-based workload scheduler
 
 :::note
 Each Agent instantiates an independent copy of the scheduler, but output
-signal are aggregated across all agents.
+signals for accepted and incoming concurrency are aggregated across all agents.
 :::
 
 See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
