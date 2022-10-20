@@ -3,6 +3,9 @@ package com.fluxninja.aperture.sdk;
 import com.fluxninja.aperture.flowcontrol.v1.CheckRequest;
 import com.fluxninja.aperture.flowcontrol.v1.CheckResponse;
 import com.fluxninja.aperture.flowcontrol.v1.FlowControlServiceGrpc;
+import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
+import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
+import com.fluxninja.generated.google.rpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
@@ -20,16 +23,19 @@ import static com.fluxninja.aperture.sdk.Constants.*;
 
 public final class ApertureSDK {
   private final FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient;
+  private final AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient;
   private final Tracer tracer;
   private final Duration timeout;
 
   ApertureSDK(
       FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,
+      AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient,
       Tracer tracer,
       Duration timeout) {
     this.flowControlClient = flowControlClient;
     this.tracer = tracer;
     this.timeout = timeout;
+    this.envoyAuthzClient = envoyAuthzClient;
   }
 
   /**
@@ -40,7 +46,7 @@ public final class ApertureSDK {
     return new ApertureSDKBuilder();
   }
 
-  public Flow startFlow(String feature, Map<String, String> explicitLabels) {
+  public ApertureAPIFlow startFlow(String feature, Map<String, String> explicitLabels) {
     Map<String, String> labels = new HashMap<>();
 
     for (Map.Entry<String, BaggageEntry> entry: Baggage.current().asMap().entrySet()) {
@@ -79,7 +85,40 @@ public final class ApertureSDK {
     }
     span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-    return new Flow(
+    return new ApertureAPIFlow(
+            res,
+            span,
+            false
+    );
+  }
+
+  public EnvoyAuthzFlow startFlowEnvoyAuthz(String feature, AttributeContext attributes) {
+    // TODO: should feature be removed or used somehow?
+    com.fluxninja.generated.envoy.service.auth.v3.CheckRequest req = com.fluxninja.generated.envoy.service.auth.v3.CheckRequest.newBuilder()
+            .setAttributes(attributes)
+            .build();
+
+    Span span = this.tracer.spanBuilder("Aperture Check").startSpan()
+            .setAttribute(FLOW_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos())
+            .setAttribute(SOURCE_LABEL, "sdk");
+
+    com.fluxninja.generated.envoy.service.auth.v3.CheckResponse res;
+    try {
+      res = this.envoyAuthzClient
+            .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
+            .check(req);
+    } catch (StatusRuntimeException e) {
+      // deadline exceeded or couldn't reach agent - request should not be blocked
+      res = com.fluxninja.generated.envoy.service.auth.v3.CheckResponse.newBuilder()
+              .setStatus(Status.newBuilder().setCode(200).build())
+              .build();
+    }
+    span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
+
+    // TODO: getResponseHeadersToAddList
+    // TODO: getResponseHeadersToRemoveList
+
+    return new EnvoyAuthzFlow(
             res,
             span,
             false

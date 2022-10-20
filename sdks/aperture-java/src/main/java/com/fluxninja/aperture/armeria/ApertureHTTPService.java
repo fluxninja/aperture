@@ -2,8 +2,9 @@ package com.fluxninja.aperture.armeria;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.Flow;
+import com.fluxninja.aperture.sdk.EnvoyAuthzFlow;
 import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
@@ -11,7 +12,6 @@ import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
 import com.linecorp.armeria.server.SimpleDecoratingHttpService;
 
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -33,8 +33,8 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
 
     @Override
     public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
-        Map<String, String> labels = HttpUtils.labelsFromRequest(req);
-        Flow flow = this.apertureSDK.startFlow("", labels);
+        AttributeContext attributes = HttpUtils.attributesFromRequest(req);
+        EnvoyAuthzFlow flow = this.apertureSDK.startFlowEnvoyAuthz("", attributes);
 
         if (flow.accepted()) {
             HttpResponse res;

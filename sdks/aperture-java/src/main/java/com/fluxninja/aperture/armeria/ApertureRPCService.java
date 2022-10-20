@@ -2,7 +2,7 @@ package com.fluxninja.aperture.armeria;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.Flow;
+import com.fluxninja.aperture.sdk.ApertureAPIFlow;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RpcRequest;
@@ -34,7 +34,7 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
     @Override
     public RpcResponse serve(ServiceRequestContext ctx, RpcRequest req) throws Exception {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
-        Flow flow = this.apertureSDK.startFlow("", labels);
+        ApertureAPIFlow flow = this.apertureSDK.startFlow("", labels);
 
         if (flow.accepted()) {
             RpcResponse res;
