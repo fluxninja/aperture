@@ -3,6 +3,7 @@ package com.fluxninja.aperture.sdk;
 import com.fluxninja.aperture.flowcontrol.v1.CheckRequest;
 import com.fluxninja.aperture.flowcontrol.v1.CheckResponse;
 import com.fluxninja.aperture.flowcontrol.v1.FlowControlServiceGrpc;
+import io.grpc.StatusRuntimeException;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
 import io.opentelemetry.api.trace.Span;
@@ -65,10 +66,17 @@ public final class ApertureSDK {
             .setAttribute(FLOW_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos())
             .setAttribute(SOURCE_LABEL, "sdk");
 
-    CheckResponse res = this.flowControlClient
-            .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
-            .check(req);
-
+    CheckResponse res;
+    try {
+      res = this.flowControlClient
+              .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
+              .check(req);
+    } catch (StatusRuntimeException e) {
+      // deadline exceeded or couldn't reach agent - request should not be blocked
+      res = CheckResponse.newBuilder()
+              .setDecisionType(CheckResponse.DecisionType.DECISION_TYPE_ACCEPTED)
+              .build();
+    }
     span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
     return new Flow(
