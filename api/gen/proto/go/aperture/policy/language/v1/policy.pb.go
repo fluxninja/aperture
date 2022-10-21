@@ -1562,7 +1562,7 @@ func (*ConcurrencyLimiter_LoadActuator) isConcurrencyLimiter_ActuationStrategy()
 //
 // :::note
 // Each Agent instantiates an independent copy of the scheduler, but output
-// signal are aggregated across all agents.
+// signals for accepted and incoming concurrency are aggregated across all agents.
 // :::
 //
 // See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
