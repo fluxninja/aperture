@@ -76,31 +76,38 @@ func (lsa *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx
 
 // Execute implements runtime.Component.Execute.
 func (lsa *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+	logger := lsa.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Get the decision from the port
 	lm, ok := inPortReadings["load_multiplier"]
 	if ok {
 		if len(lm) > 0 {
 			lmReading := lm[0]
 			var lmValue float64
-			if !lmReading.Valid() {
-				lmValue = 0
-			} else {
+			if lmReading.Valid() {
 				if lmReading.Value() <= 0 {
 					lmValue = 0
-				} else if lmReading.Value() >= 1 {
-					lmValue = 1
 				} else {
 					lmValue = lmReading.Value()
 				}
+				return nil, lsa.publishLoadMultiplier(lmValue)
+			} else {
+				logger.Sample(zerolog.Often).Info().Msg("Invalid load multiplier data")
 			}
-			return nil, lsa.publishLoadMultiplier(lmValue)
+		} else {
+			logger.Sample(zerolog.Often).Info().Msg("load_multiplier port has no reading")
 		}
+	} else {
+		logger.Sample(zerolog.Often).Info().Msg("load_multiplier port not found")
 	}
-	return nil, nil
+	return nil, lsa.publishDefaultLoadMultiplier()
 }
 
 // DynamicConfigUpdate is a no-op for load actuator.
 func (lsa *LoadActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+}
+
+func (lsa *LoadActuator) publishDefaultLoadMultiplier() error {
+	return lsa.publishLoadMultiplier(1.0)
 }
 
 func (lsa *LoadActuator) publishLoadMultiplier(loadMultiplier float64) error {

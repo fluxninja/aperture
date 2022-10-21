@@ -36,7 +36,7 @@ spec:
           operator: div
           out_ports:
             output:
-              signal_name: LOAD_MULTIPLIER
+              signal_name: DESIRED_CONCURRENCY_RATIO
       - arithmetic_combinator:
           in_ports:
             lhs:
@@ -131,6 +131,14 @@ spec:
             output:
               signal_name: DESIRED_CONCURRENCY
           slope: "-1"
+      - extrapolator:
+          in_ports:
+            input:
+              signal_name: DESIRED_CONCURRENCY_RATIO
+          max_extrapolation_interval: 5s
+          out_ports:
+            output:
+              signal_name: LOAD_MULTIPLIER
       - concurrency_limiter:
           load_actuator:
             in_ports:
