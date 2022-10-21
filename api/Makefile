@@ -17,12 +17,17 @@ buf-generate:
 	@buf format -w
 	@buf lint
 	@buf generate
+	@#inject go annotations
+	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
+	@#generate sdk flowcontrol stubs and copy them over
+	@#golang
 	@rm -rf ../sdks/aperture-go/gen/proto/flowcontrol
 	@cp -R gen/proto/go/aperture/flowcontrol ../sdks/aperture-go/gen/proto/flowcontrol
-	@find gen/proto/java/com/fluxninja/aperture -mindepth 1 ! -regex '^gen/proto/java/com/fluxninja/aperture/flowcontrol\(/.*\)?' -delete
+	@#java
 	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol
 	@cp -R gen/proto/java/com/fluxninja/aperture/flowcontrol ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/
-	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
+	@rm -rf gen/proto/java
+	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)
 	@{ \
