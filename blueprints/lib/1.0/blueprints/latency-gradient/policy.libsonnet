@@ -21,6 +21,7 @@ local max = spec.v1.Max;
 local min = spec.v1.Min;
 local sqrt = spec.v1.Sqrt;
 local firstValid = spec.v1.FirstValid;
+local extrapolator = spec.v1.Extrapolator;
 
 function(params) {
   _config:: config.common + config.policy + params,
@@ -45,7 +46,7 @@ function(params) {
                                                             output=port.withSignalName('LATENCY_SETPOINT'))),
           component.withArithmeticCombinator(combinator.div(port.withSignalName('DESIRED_CONCURRENCY'),
                                                             port.withSignalName('INCOMING_CONCURRENCY'),
-                                                            output=port.withSignalName('LOAD_MULTIPLIER'))),
+                                                            output=port.withSignalName('DESIRED_CONCURRENCY_RATIO'))),
           component.withArithmeticCombinator(combinator.mul(port.withConstantValue(c.concurrencyLimitMultiplier),
                                                             port.withSignalName('ACCEPTED_CONCURRENCY'),
                                                             output=port.withSignalName('NORMAL_CONCURRENCY_LIMIT'))),
@@ -104,6 +105,16 @@ function(params) {
             })
             + gradient.withOutPortsMixin({
               output: port.withSignalName('DESIRED_CONCURRENCY'),
+            })
+          ),
+          component.withExtrapolator(
+            extrapolator.new()
+            + extrapolator.withMaxExtrapolationInterval('5s')
+            + extrapolator.withInPortsMixin({
+              input: port.withSignalName('DESIRED_CONCURRENCY_RATIO'),
+            })
+            + extrapolator.withOutPortsMixin({
+              output: port.withSignalName('LOAD_MULTIPLIER'),
             })
           ),
           component.withConcurrencyLimiter(
