@@ -287,11 +287,19 @@ func (kc *KubernetesDiscovery) stop() {
 	kc.trackers.Purge(podTrackerPrefix)
 }
 
-// updatePodInTracker retrieves stored pod data from tracker, enriches it with new info and send the updated version.
-func (kc *KubernetesDiscovery) updatePodInTracker(podInfo podInfo) error {
+// updatePodInTracker retrieves stored pod data from tracker and does one of the
+// following based on the operation type:
+// 1. Add - enriches pod data with new info and send the updated version,
+// 2. Remove - removes pod data from the tracker.
+func (kc *KubernetesDiscovery) updatePodInTracker(podInfo podInfo, operation serviceCacheOperation) error {
 	services := kc.mapping.getServices(podInfo.Namespace, podInfo.Name)
 	key := notifiers.Key(getPodIDKey(podInfo.UID))
 	currentPodData := kc.trackers.GetCurrentValue(key)
+
+	if operation == remove {
+		kc.trackers.RemoveEvent(key)
+		return nil
+	}
 
 	var entity *entitycachev1.Entity
 
@@ -352,7 +360,7 @@ func (kc *KubernetesDiscovery) syncPodLists(e *v1.Endpoints) {
 			kc.mapping.addService(currentPod.Namespace, currentPod.Name, serviceName)
 			cacheIndexOffset--
 
-			err := kc.updatePodInTracker(currentPod)
+			err := kc.updatePodInTracker(currentPod, add)
 			if err != nil {
 				log.Error().Msgf("Tracker could not be updated: %v", err)
 			}
@@ -362,7 +370,7 @@ func (kc *KubernetesDiscovery) syncPodLists(e *v1.Endpoints) {
 			i--
 			cacheIndexOffset++
 
-			err := kc.updatePodInTracker(cachePod)
+			err := kc.updatePodInTracker(cachePod, remove)
 			if err != nil {
 				log.Error().Msgf("Tracker could not be updated: %v", err)
 			}
@@ -374,7 +382,7 @@ func (kc *KubernetesDiscovery) syncPodLists(e *v1.Endpoints) {
 		// a pod is missing from currentPods slice - it should be removed from the service
 		kc.mapping.removeService(cachePod.Namespace, cachePod.Name, serviceName)
 
-		err := kc.updatePodInTracker(cachePod)
+		err := kc.updatePodInTracker(cachePod, remove)
 		if err != nil {
 			log.Error().Msgf("Tracker could not be updated: %v", err)
 		}
@@ -429,7 +437,7 @@ func (kc *KubernetesDiscovery) renameService(e *v1.Endpoints) {
 		kc.mapping.removeService(podInfo.Namespace, podInfo.Name, oldServiceName)
 		kc.mapping.addService(podInfo.Namespace, podInfo.Name, newServiceName)
 
-		err := kc.updatePodInTracker(podInfo)
+		err := kc.updatePodInTracker(podInfo, add)
 		if err != nil {
 			log.Error().Msgf("Tracker could not be updated: %v", err)
 		}
@@ -445,7 +453,7 @@ func (kc *KubernetesDiscovery) addRemoveFromEndpoints(e *v1.Endpoints, operation
 		} else {
 			kc.mapping.removeService(pod.Namespace, pod.Name, serviceName)
 		}
-		err := kc.updatePodInTracker(pod)
+		err := kc.updatePodInTracker(pod, operation)
 		if err != nil {
 			log.Error().Msgf("Tracker could not be updated: %v", err)
 		}
