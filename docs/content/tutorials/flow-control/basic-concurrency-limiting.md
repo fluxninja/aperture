@@ -1,5 +1,5 @@
 ---
-title: Concurrency Limiting
+title: Basic Concurrency Limiting
 keywords:
   - policies
   - concurrency
@@ -23,7 +23,7 @@ To accurately model the concurrency limit of a service, it's critical to track
 it's
 [golden signals](https://sre.google/sre-book/monitoring-distributed-systems/#xref_monitoring_golden-signals).
 For instance, queue buildup can be detected by tracking deviation of current
-latency from historical normal values.
+latency from historically normal values.
 
 ### Policy
 
@@ -34,7 +34,7 @@ the policy are described separately in the Signal Processing tutorials.
 
 At a high-level, this policy consists of:
 
-- Latency EMA based Overload detection: A Flux Meter is used to gather latency
+- Latency EMA based overload detection: A Flux Meter is used to gather latency
   metrics from a [service control point](/concepts/flow-control/selector.md).
   The latency signal is then fed into EMA component to help establish a
   long-term trend that we can compare current latency against to detect
@@ -46,11 +46,11 @@ At a high-level, this policy consists of:
   the Accepted Concurrency (Control Variable).
 - Integral Optimizer: When the service is detected to be in the normal state, an
   integral optimizer is used to additively increase the concurrency on the
-  service in each execution cycle of the circuit. This design allows slowly
-  warm-up a service from cold start state or when traffic increases. This
-  protects applications from sudden spikes in traffic as it sets an upper bound
-  to the concurrency allowed on a service in each execution cycle of circuit
-  based on the observed incoming concurrency.
+  service in each execution cycle of the circuit. This design allows warming-up
+  a service from cold start state. This also protects applications from sudden
+  spikes in traffic as it sets an upper bound to the concurrency allowed on a
+  service in each execution cycle of circuit based on the observed incoming
+  concurrency.
 - Concurrency Limiting Actuator: The concurrency limits are actuated via
   [weighted-fair queueing scheduler](/concepts/flow-control/concurrency-limiter.md).
   The output of the adjustments to accepted concurrency made by gradient
@@ -65,7 +65,7 @@ At a high-level, this policy consists of:
 ```
 
 ```jsonnet
-{@include: ./assets/concurrency-limiting/concurrency-limiting.jsonnet}
+{@include: ./assets/basic-concurrency-limiting/concurrency-limiting.jsonnet}
 ```
 
 ```mdx-code-block
@@ -74,7 +74,7 @@ At a high-level, this policy consists of:
 ```
 
 ```yaml
-{@include: ./assets/concurrency-limiting/concurrency-limiting.yaml}
+{@include: ./assets/basic-concurrency-limiting/concurrency-limiting.yaml}
 ```
 
 ```mdx-code-block
@@ -87,7 +87,16 @@ At a high-level, this policy consists of:
 <Zoom>
 
 ```mermaid
-{@include: ./assets/concurrency-limiting/concurrency-limiting.mmd}
+{@include: ./assets/basic-concurrency-limiting/concurrency-limiting.mmd}
 ```
 
 </Zoom>
+
+#### Playground
+
+When the above policy is loaded in Aperture's
+[Playground](/get-started/playground.md), we will see that as the traffic spikes
+above the concurrency limit of `service1-demo-app.demoapp.svc.cluster.local`,
+controller triggers load-shed for a proportion of requests matching the
+Selector. This helps protect the service from becoming unresponsive and keeps
+the latency within the tolerance limit (`1.1`) configured in the circuit.

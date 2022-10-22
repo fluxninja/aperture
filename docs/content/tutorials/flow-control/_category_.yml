@@ -1,8 +1,8 @@
-label: Basic Flow Control
+label: Flow Control
 position: 2
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "Basic Flow Control"
+  title: "Flow Control"
   keywords: ["tutorial"]

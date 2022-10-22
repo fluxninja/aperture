@@ -71,7 +71,7 @@ service to be overloaded at that time.
 
 </Zoom>
 
-#### Monitoring the Policy
+#### Playground
 
 When the above policy is loaded in Aperture's
 [Playground](/get-started/playground.md), we will see the various signal metrics

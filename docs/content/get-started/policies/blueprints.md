@@ -85,7 +85,7 @@ even a specific release tag e.g. _v0.2.2_
 You can then create a Policy resource with policy definition like this:
 
 ```jsonnet
-{@include: ../../tutorials/basic-flow-control/assets/concurrency-limiting/concurrency-limiting.jsonnet}
+{@include: ../../tutorials/flow-control/assets/basic-concurrency-limiting/concurrency-limiting.jsonnet}
 ```
 
 And then, render it with [jsonnet][jsonnet]:
@@ -98,7 +98,7 @@ After running this command you should see the following contents in the YAML
 file:
 
 ```yaml
-{@include: ../../tutorials/basic-flow-control/assets/concurrency-limiting/concurrency-limiting.yaml}
+{@include: ../../tutorials/flow-control/assets/basic-concurrency-limiting/concurrency-limiting.yaml}
 ```
 
 The generated policy can be applied to the running instance of
@@ -109,7 +109,7 @@ kubectl apply --namespace aperture-controller --filename [example file].yaml
 ```
 
 To understand what the above policy does, please see
-[the Concurrency Limiting tutorial](/tutorials/basic-flow-control/concurrency-limiting.md).
+[the Concurrency Limiting tutorial](/tutorials/flow-control/basic-concurrency-limiting.md).
 
 [jsonnet]: https://github.com/google/go-jsonnet
 [tk]: https://grafana.com/oss/tanka/
