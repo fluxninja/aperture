@@ -12,14 +12,13 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-## Regulating heavy-hitters
-
-One of the simplest flow-control policies is static rate limiting. It uses
+One of the simplest flow-control policies is static rate limiting to regulate
+heavy-hitters. It uses
 [rate limiting actuator](/concepts/flow-control/rate-limiter.md) to block
 specific flow labels that exceed their quota within a certain timeframe (limit
 reset interval).
 
-### Example Policy
+### Policy
 
 In this example, we will be rate limiting unique users based on the `User-Id`
 header in the HTTP traffic. This header is provided by Envoy proxy under the
