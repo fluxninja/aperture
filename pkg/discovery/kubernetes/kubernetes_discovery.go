@@ -183,50 +183,50 @@ func newKubernetesServiceDiscovery(trackers notifiers.Trackers, nodeName string,
 		return nil, fmt.Errorf("node name not set")
 	}
 
-	kc := &KubernetesDiscovery{
+	kd := &KubernetesDiscovery{
 		cli:          k8sClient.GetClientSet(),
 		nodeName:     nodeName,
 		mapping:      newServicePodMapping(),
 		serviceCache: newServiceDataCache(),
 		trackers:     trackers,
 	}
-	return kc, nil
+	return kd, nil
 }
 
-func (kc *KubernetesDiscovery) start() {
-	kc.ctx, kc.cancel = context.WithCancel(context.Background())
+func (kd *KubernetesDiscovery) start() {
+	kd.ctx, kd.cancel = context.WithCancel(context.Background())
 
-	kc.waitGroup.Add(1)
+	kd.waitGroup.Add(1)
 
 	panichandler.Go(func() {
-		defer kc.waitGroup.Done()
+		defer kd.waitGroup.Done()
 
 		operation := func() error {
 			// purge notifiers
-			kc.trackers.Purge(podTrackerPrefix)
+			kd.trackers.Purge(podTrackerPrefix)
 
 			// bootstrap mapping
-			endpoints, err := kc.cli.CoreV1().Endpoints(metav1.NamespaceAll).List(kc.ctx, metav1.ListOptions{})
+			endpoints, err := kd.cli.CoreV1().Endpoints(metav1.NamespaceAll).List(kd.ctx, metav1.ListOptions{})
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to list endpoints")
 				return err
 			}
-			kc.revisionEndpointsWatch = endpoints.ResourceVersion
-			if len(kc.mapping.mapping) > 0 {
-				kc.mapping = newServicePodMapping()
+			kd.revisionEndpointsWatch = endpoints.ResourceVersion
+			if len(kd.mapping.mapping) > 0 {
+				kd.mapping = newServicePodMapping()
 			}
 			for _, eItem := range endpoints.Items {
 				e := eItem
-				kc.addRemoveFromEndpoints(&e, add)
+				kd.addRemoveFromEndpoints(&e, add)
 			}
 
 			// setup watchers
 			endpointsWatchFunc := func(options metav1.ListOptions) (apiWatch.Interface, error) {
-				return kc.cli.CoreV1().Endpoints(metav1.NamespaceAll).Watch(kc.ctx, options)
+				return kd.cli.CoreV1().Endpoints(metav1.NamespaceAll).Watch(kd.ctx, options)
 			}
 			var endpointsWatcher *watch.RetryWatcher
 
-			endpointsWatcher, err = watch.NewRetryWatcher(kc.revisionEndpointsWatch,
+			endpointsWatcher, err = watch.NewRetryWatcher(kd.revisionEndpointsWatch,
 				&cache.ListWatch{WatchFunc: endpointsWatchFunc})
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to watch endpoints")
@@ -245,30 +245,29 @@ func (kc *KubernetesDiscovery) start() {
 					switch endpointEvent.Type {
 					case apiWatch.Added:
 						endpoints := endpointEvent.Object.(*v1.Endpoints)
-						kc.serviceCache.updateService(endpoints, kc.nodeName)
-						kc.addRemoveFromEndpoints(endpoints, add)
+						kd.serviceCache.updateService(endpoints, kd.nodeName)
+						kd.addRemoveFromEndpoints(endpoints, add)
 					case apiWatch.Modified:
 						endpoints := endpointEvent.Object.(*v1.Endpoints)
-						cachedData, ok := kc.serviceCache.getServiceData(endpoints)
+						cachedData, ok := kd.serviceCache.getServiceData(endpoints)
 						if !ok {
-							endpoints := endpointEvent.Object.(*v1.Endpoints)
-							kc.serviceCache.updateService(endpoints, kc.nodeName)
-							kc.addRemoveFromEndpoints(endpoints, add)
+							kd.serviceCache.updateService(endpoints, kd.nodeName)
+							kd.addRemoveFromEndpoints(endpoints, add)
 						} else {
 							if getFQDN(endpoints) != cachedData.Name {
-								kc.renameService(endpoints)
+								kd.renameService(endpoints)
 							}
-							kc.syncPodLists(endpoints)
+							kd.syncPodLists(endpoints)
 						}
 					case apiWatch.Deleted:
 						endpoints := endpointEvent.Object.(*v1.Endpoints)
-						kc.addRemoveFromEndpoints(endpoints, remove)
-						kc.serviceCache.removeService(endpoints)
+						kd.addRemoveFromEndpoints(endpoints, remove)
+						kd.serviceCache.removeService(endpoints)
 					case apiWatch.Error:
 						log.Error().Msg("Endpoints watcher error")
 						return fmt.Errorf("endpoints watcher error")
 					}
-				case <-kc.ctx.Done():
+				case <-kd.ctx.Done():
 					log.Info().Msg("KubeClient stopped")
 					return backoff.Permanent(nil)
 				}
@@ -276,22 +275,22 @@ func (kc *KubernetesDiscovery) start() {
 		}
 		boff := backoff.NewConstantBackOff(5 * time.Second)
 
-		_ = backoff.Retry(operation, backoff.WithContext(boff, kc.ctx))
+		_ = backoff.Retry(operation, backoff.WithContext(boff, kd.ctx))
 		log.Info().Msg("Stopping kubernetes watcher")
 	})
 }
 
-func (kc *KubernetesDiscovery) stop() {
-	kc.cancel()
-	kc.waitGroup.Wait()
-	kc.trackers.Purge(podTrackerPrefix)
+func (kd *KubernetesDiscovery) stop() {
+	kd.cancel()
+	kd.waitGroup.Wait()
+	kd.trackers.Purge(podTrackerPrefix)
 }
 
 // updatePodInTracker retrieves stored pod data from tracker, enriches it with new info and send the updated version.
-func (kc *KubernetesDiscovery) updatePodInTracker(podInfo podInfo) error {
-	services := kc.mapping.getServices(podInfo.Namespace, podInfo.Name)
+func (kd *KubernetesDiscovery) updatePodInTracker(podInfo podInfo) error {
+	services := kd.mapping.getServices(podInfo.Namespace, podInfo.Name)
 	key := notifiers.Key(getPodIDKey(podInfo.UID))
-	currentPodData := kc.trackers.GetCurrentValue(key)
+	currentPodData := kd.trackers.GetCurrentValue(key)
 
 	var entity *entitycachev1.Entity
 
@@ -316,18 +315,18 @@ func (kc *KubernetesDiscovery) updatePodInTracker(podInfo podInfo) error {
 		log.Error().Msgf("Error marshaling entity: %v", err)
 		return err
 	}
-	kc.trackers.WriteEvent(key, value)
+	kd.trackers.WriteEvent(key, value)
 	return nil
 }
 
-func (kc *KubernetesDiscovery) syncPodLists(e *v1.Endpoints) {
+func (kd *KubernetesDiscovery) syncPodLists(e *v1.Endpoints) {
 	serviceName := getFQDN(e)
-	cachedService, _ := kc.serviceCache.getServiceData(e)
+	cachedService, _ := kd.serviceCache.getServiceData(e)
 
 	// assume cached pods are sorted by namespace and name
 	cachedPods := cachedService.Pods
 
-	currentPods := getServicePods(e, kc.nodeName)
+	currentPods := getServicePods(e, kd.nodeName)
 	sort.Slice(currentPods, func(i, j int) bool {
 		return podInfoOrder(currentPods[i], currentPods[j])
 	})
@@ -349,20 +348,20 @@ func (kc *KubernetesDiscovery) syncPodLists(e *v1.Endpoints) {
 		}
 		if outOfCache || podInfoOrder(currentPod, cachePod) {
 			// a pod is missing from cachedPods slice - it was added to the service
-			kc.mapping.addService(currentPod.Namespace, currentPod.Name, serviceName)
+			kd.mapping.addService(currentPod.Namespace, currentPod.Name, serviceName)
 			cacheIndexOffset--
 
-			err := kc.updatePodInTracker(currentPod)
+			err := kd.updatePodInTracker(currentPod)
 			if err != nil {
 				log.Error().Msgf("Tracker could not be updated: %v", err)
 			}
 		} else {
 			// a pod is missing from currentPods slice - it should be removed from the service
-			kc.mapping.removeService(cachePod.Namespace, cachePod.Name, serviceName)
+			kd.mapping.removeService(cachePod.Namespace, cachePod.Name, serviceName)
 			i--
 			cacheIndexOffset++
 
-			err := kc.updatePodInTracker(cachePod)
+			err := kd.updatePodInTracker(cachePod)
 			if err != nil {
 				log.Error().Msgf("Tracker could not be updated: %v", err)
 			}
@@ -372,15 +371,50 @@ func (kc *KubernetesDiscovery) syncPodLists(e *v1.Endpoints) {
 	for i := len(currentPods) + cacheIndexOffset; i < len(cachedPods); i++ {
 		cachePod := cachedPods[i]
 		// a pod is missing from currentPods slice - it should be removed from the service
-		kc.mapping.removeService(cachePod.Namespace, cachePod.Name, serviceName)
+		kd.mapping.removeService(cachePod.Namespace, cachePod.Name, serviceName)
 
-		err := kc.updatePodInTracker(cachePod)
+		err := kd.updatePodInTracker(cachePod)
 		if err != nil {
 			log.Error().Msgf("Tracker could not be updated: %v", err)
 		}
 	}
 
-	kc.serviceCache.updateServicePods(e, currentPods)
+	kd.serviceCache.updateServicePods(e, currentPods)
+}
+
+func (kd *KubernetesDiscovery) renameService(e *v1.Endpoints) {
+	newServiceName := getFQDN(e)
+	oldService, _ := kd.serviceCache.getServiceData(e)
+	oldServiceName := oldService.Name
+	for _, podInfo := range oldService.Pods {
+		kd.mapping.removeService(podInfo.Namespace, podInfo.Name, oldServiceName)
+		kd.mapping.addService(podInfo.Namespace, podInfo.Name, newServiceName)
+
+		err := kd.updatePodInTracker(podInfo)
+		if err != nil {
+			log.Error().Msgf("Tracker could not be updated: %v", err)
+		}
+	}
+}
+
+func (kd *KubernetesDiscovery) addRemoveFromEndpoints(e *v1.Endpoints, operation serviceCacheOperation) {
+	serviceName := getFQDN(e)
+	pods := getServicePods(e, kd.nodeName)
+	for _, pod := range pods {
+		if operation == add {
+			kd.mapping.addService(pod.Namespace, pod.Name, serviceName)
+		} else {
+			kd.mapping.removeService(pod.Namespace, pod.Name, serviceName)
+		}
+		err := kd.updatePodInTracker(pod)
+		if err != nil {
+			log.Error().Msgf("Tracker could not be updated: %v", err)
+		}
+	}
+}
+
+func getPodIDKey(key string) string {
+	return fmt.Sprintf("%s.%s", podTrackerPrefix, key)
 }
 
 // getFQDN return the full qualified domain name of a given service.
@@ -419,39 +453,4 @@ func getServicePods(service *v1.Endpoints, nodeName string) []podInfo {
 	}
 
 	return pods
-}
-
-func (kc *KubernetesDiscovery) renameService(e *v1.Endpoints) {
-	newServiceName := getFQDN(e)
-	oldService, _ := kc.serviceCache.getServiceData(e)
-	oldServiceName := oldService.Name
-	for _, podInfo := range oldService.Pods {
-		kc.mapping.removeService(podInfo.Namespace, podInfo.Name, oldServiceName)
-		kc.mapping.addService(podInfo.Namespace, podInfo.Name, newServiceName)
-
-		err := kc.updatePodInTracker(podInfo)
-		if err != nil {
-			log.Error().Msgf("Tracker could not be updated: %v", err)
-		}
-	}
-}
-
-func (kc *KubernetesDiscovery) addRemoveFromEndpoints(e *v1.Endpoints, operation serviceCacheOperation) {
-	serviceName := getFQDN(e)
-	pods := getServicePods(e, kc.nodeName)
-	for _, pod := range pods {
-		if operation == add {
-			kc.mapping.addService(pod.Namespace, pod.Name, serviceName)
-		} else {
-			kc.mapping.removeService(pod.Namespace, pod.Name, serviceName)
-		}
-		err := kc.updatePodInTracker(pod)
-		if err != nil {
-			log.Error().Msgf("Tracker could not be updated: %v", err)
-		}
-	}
-}
-
-func getPodIDKey(key string) string {
-	return fmt.Sprintf("%s.%s", podTrackerPrefix, key)
 }
