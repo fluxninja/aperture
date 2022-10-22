@@ -32,12 +32,6 @@ In addition, we will be configuring our rate limiter to apply these limits to
 `ingress` traffic on Kubernetes service
 `service1-demo-app.demoapp.svc.cluster.local`.
 
-#### Circuit Diagram
-
-```mermaid
-{@include: ./assets/static-rate-limiting/static-rate-limiting.mmd}
-```
-
 ```mdx-code-block
 <Tabs>
 <TabItem value="Jsonnet">
@@ -59,4 +53,10 @@ In addition, we will be configuring our rate limiter to apply these limits to
 ```mdx-code-block
 </TabItem>
 </Tabs>
+```
+
+#### Circuit Diagram
+
+```mermaid
+{@include: ./assets/static-rate-limiting/static-rate-limiting.mmd}
 ```

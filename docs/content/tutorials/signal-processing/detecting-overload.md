@@ -38,16 +38,6 @@ overloaded state. That is, if the real-time latency of the service is more than
 this setpoint (which is based on long-term EMA), then we can consider the
 service to be overloaded at that time.
 
-#### Circuit Diagram
-
-<Zoom>
-
-```mermaid
-{@include: ./assets/detecting-overload/detecting-overload.mmd}
-```
-
-</Zoom>
-
 ```mdx-code-block
 <Tabs>
 <TabItem value="Jsonnet">
@@ -70,6 +60,16 @@ service to be overloaded at that time.
 </TabItem>
 </Tabs>
 ```
+
+#### Circuit Diagram
+
+<Zoom>
+
+```mermaid
+{@include: ./assets/detecting-overload/detecting-overload.mmd}
+```
+
+</Zoom>
 
 #### Monitoring the Policy
 

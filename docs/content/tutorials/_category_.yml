@@ -1,8 +1,8 @@
-label: Tutorial
+label: Tutorials
 position: 4
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "Tutorial"
+  title: "Tutorials"
   keywords: ["tutorial"]
