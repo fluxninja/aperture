@@ -85,36 +85,7 @@ even a specific release tag e.g. _v0.2.2_
 You can then create a Policy resource with policy definition like this:
 
 ```jsonnet
-local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
-
-local latencyGradientPolicy = aperture.blueprints.LatencyGradient.policy;
-
-local selector = aperture.spec.v1.Selector;
-local fluxMeter = aperture.spec.v1.FluxMeter;
-local serviceSelector = aperture.spec.v1.ServiceSelector;
-local flowSelector = aperture.spec.v1.FlowSelector;
-local controlPoint = aperture.spec.v1.ControlPoint;
-
-local svcSelector =
-  selector.new()
-  + selector.withServiceSelector(
-    serviceSelector.new()
-    + serviceSelector.withAgentGroup('default')
-    + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
-  )
-  + selector.withFlowSelector(
-    flowSelector.new()
-    + flowSelector.withControlPoint(controlPoint.new()
-                              + controlPoint.withTraffic('ingress'))
-  );
-
-local policyResource = latencyGradientPolicy({
-  policyName: 'service1-demo-app',
-  fluxMeter: fluxMeter.new() + fluxMeter.withSelector(svcSelector),
-  concurrencyLimiterSelector: svcSelector,
-}).policyResource;
-
-policyResource
+{@include: ../../tutorials/flow-control/assets/basic-concurrency-limiting/concurrency-limiting.jsonnet}
 ```
 
 And then, render it with [jsonnet][jsonnet]:
@@ -127,7 +98,7 @@ After running this command you should see the following contents in the YAML
 file:
 
 ```yaml
-{@include: ./assets/gen/blueprints/jsonnet/blueprints_0.yaml}
+{@include: ../../tutorials/flow-control/assets/basic-concurrency-limiting/concurrency-limiting.yaml}
 ```
 
 The generated policy can be applied to the running instance of
@@ -136,6 +107,9 @@ The generated policy can be applied to the running instance of
 ```sh
 kubectl apply --namespace aperture-controller --filename [example file].yaml
 ```
+
+To understand what the above policy does, please see
+[the Concurrency Limiting tutorial](/tutorials/flow-control/basic-concurrency-limiting.md).
 
 [jsonnet]: https://github.com/google/go-jsonnet
 [tk]: https://grafana.com/oss/tanka/

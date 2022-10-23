@@ -25,11 +25,11 @@ export let options = {
       stages: vuStages,
       env: { USER_TYPE: "subscriber" },
     },
-    bots: {
-      executor: "ramping-vus",
-      stages: vuStages,
-      env: { USER_TYPE: "bot" },
-    },
+    // bots: {
+    //   executor: "ramping-vus",
+    //   stages: vuStages,
+    //   env: { USER_TYPE: "bot" },
+    // },
   },
 };
 

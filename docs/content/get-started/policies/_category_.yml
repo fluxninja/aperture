@@ -1,8 +1,8 @@
 label: Policies
-position: 4
+position: 3
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
   title: "Policies"
-  keywords: ["start"]
+  keywords: ["policies"]

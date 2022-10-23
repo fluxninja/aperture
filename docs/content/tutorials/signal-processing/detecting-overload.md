@@ -1,5 +1,5 @@
 ---
-title: Signal Processing
+title: Detecting Overload
 keywords:
   - policies
   - signals
@@ -13,8 +13,6 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-### Detecting Overload State
-
 Aperture's control-loop policies are programmable "circuits" that are evaluated
 periodically. One of the primary goals of these policies is to calculate the
 deviation from objectives and apply counter-measures such as concurrency limits
@@ -25,7 +23,7 @@ signal processing needed to translate health metrics to corrective actions.
 For instance, a policy can be written to detect overload build-up at an upstream
 service and trigger load-shedding at a downstream service.
 
-### Example Policy
+## Policy
 
 One of the most reliable metrics to detect overload state is latency of the
 service requests. In Aperture, latency of service requests can be easily
@@ -40,23 +38,13 @@ overloaded state. That is, if the real-time latency of the service is more than
 this setpoint (which is based on long-term EMA), then we can consider the
 service to be overloaded at that time.
 
-#### Circuit Diagram
-
-<Zoom>
-
-```mermaid
-{@include: ./assets/signal-processing/signal-processing.mmd}
-```
-
-</Zoom>
-
 ```mdx-code-block
 <Tabs>
 <TabItem value="Jsonnet">
 ```
 
 ```jsonnet
-{@include: ./assets/signal-processing/signal-processing.jsonnet}
+{@include: ./assets/detecting-overload/detecting-overload.jsonnet}
 ```
 
 ```mdx-code-block
@@ -65,7 +53,7 @@ service to be overloaded at that time.
 ```
 
 ```yaml
-{@include: ./assets/signal-processing/signal-processing.yaml}
+{@include: ./assets/detecting-overload/detecting-overload.yaml}
 ```
 
 ```mdx-code-block
@@ -73,38 +61,17 @@ service to be overloaded at that time.
 </Tabs>
 ```
 
-#### Monitoring the Policy
+### Circuit Diagram
 
-Signals flowing through policy's circuit are reported as Prometheus'
-[Summaries](https://prometheus.io/docs/practices/histograms/). Therefore, they
-can be monitored in real-time using tools such as
-[Grafana](https://github.com/grafana/grafana).
+<Zoom>
 
-Below is an example signal monitoring dashboard for the above policy that can be
-imported into the Grafana instance.
-
-```mdx-code-block
-<Tabs>
-<TabItem value="Jsonnet">
+```mermaid
+{@include: ./assets/detecting-overload/detecting-overload.mmd}
 ```
 
-```jsonnet
-{@include: ./assets/signal-processing/signals-dashboard.jsonnet}
-```
+</Zoom>
 
-```mdx-code-block
-</TabItem>
-<TabItem value="JSON">
-```
-
-```yaml
-{@include: ./assets/signal-processing/signals-dashboard.json}
-```
-
-```mdx-code-block
-</TabItem>
-</Tabs>
-```
+### Playground
 
 When the above policy is loaded in Aperture's
 [Playground](/get-started/playground.md), we will see the various signal metrics
@@ -112,21 +79,21 @@ collected from the execution of the policy:
 
 <Zoom>
 
-![LATENCY](./assets/signal-processing/latency.png) `LATENCY`: Signal gathered
+![LATENCY](./assets/detecting-overload/latency.png) `LATENCY`: Signal gathered
 from the periodic execution of PromQL query on Flux Meter metrics.
 
 </Zoom>
 
 <Zoom>
 
-![LATENCY_EMA](./assets/signal-processing/latency_ema.png) `LATENCY_EMA`:
+![LATENCY_EMA](./assets/detecting-overload/latency_ema.png) `LATENCY_EMA`:
 Exponential Moving Average of `LATENCY` signal.
 
 </Zoom>
 
 <Zoom>
 
-![LATENCY_SETPOINT](./assets/signal-processing/latency_setpoint.png)
+![LATENCY_SETPOINT](./assets/detecting-overload/latency_setpoint.png)
 `LATENCY_SETPOINT`: Latency above which we consider service to be overloaded.
 This is calculated by multiplying the exponential moving average with a
 tolerance factor (`LATENCY_EMA` \* `1.1`).
@@ -135,7 +102,7 @@ tolerance factor (`LATENCY_EMA` \* `1.1`).
 
 <Zoom>
 
-![IS_OVERLOAD_SWITCH](./assets/signal-processing/is_overload_switch.png)
+![IS_OVERLOAD_SWITCH](./assets/detecting-overload/is_overload_switch.png)
 `IS_OVERLOAD_SWITCH` is a signal that decides whether the overload is currently
 happening or not based on comparing `LATENCY` with `LATENCY_SETPOINT`. It's
 value is `0` when there is no overload and `1` during overloads.
