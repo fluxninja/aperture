@@ -278,29 +278,16 @@ func (kd *KubernetesDiscovery) stop() {
 
 // updatePodInTracker retrieves stored pod data from tracker, enriches it with new info and send the updated version.
 func (kd *KubernetesDiscovery) writeEntityInTracker(podInfo podInfo) error {
-	services := kd.mapping.getFQDNs(podInfo.Namespace, podInfo.Name)
-
 	key := notifiers.Key(getPodIDKey(podInfo.UID))
 
-	currentPodData := kd.trackers.GetCurrentValue(key)
-
-	var entity *entitycachev1.Entity
-
-	if len(currentPodData) > 0 {
-		err := json.Unmarshal(currentPodData, &entity)
-		if err != nil {
-			log.Error().Msgf("Error unmarshalling entity: %v", err)
-			return err
-		}
-	} else {
-		entity = &entitycachev1.Entity{}
+	services := kd.mapping.getFQDNs(podInfo.Namespace, podInfo.Name)
+	entity := &entitycachev1.Entity{
+		Services:  services,
+		IpAddress: podInfo.IPAddress,
+		Uid:       podInfo.UID,
+		Prefix:    podTrackerPrefix,
+		Name:      podInfo.Name,
 	}
-
-	entity.Services = services
-	entity.IpAddress = podInfo.IPAddress
-	entity.Uid = podInfo.UID
-	entity.Prefix = podTrackerPrefix
-	entity.Name = podInfo.Name
 
 	value, err := json.Marshal(entity)
 	if err != nil {
