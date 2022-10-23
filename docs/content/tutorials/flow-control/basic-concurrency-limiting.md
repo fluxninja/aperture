@@ -100,3 +100,9 @@ above the concurrency limit of `service1-demo-app.demoapp.svc.cluster.local`,
 controller triggers load-shed for a proportion of requests matching the
 Selector. This helps protect the service from becoming unresponsive and keeps
 the latency within the tolerance limit (`1.1`) configured in the circuit.
+
+<Zoom>
+
+![Basic Concurrency Limiting](./assets/basic-concurrency-limiting/basic-concurrency-limiting.png)
+
+</Zoom>
