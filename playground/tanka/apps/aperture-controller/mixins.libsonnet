@@ -26,7 +26,7 @@ local fluxMeterSelector = selector.new()
                           + selector.withServiceSelector(
                             serviceSelector.new()
                             + serviceSelector.withAgentGroup('default')
-                            + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                            + serviceSelector.withService('service3-demo-app.demoapp.svc.cluster.local')
                           )
                           + selector.withFlowSelector(
                             flowSelector.new()
@@ -46,20 +46,20 @@ local concurrencyLimiterSelector = selector.new()
                                                                      + controlPoint.withTraffic('ingress'))
                                    );
 
-// local rateLimiterSelector = selector.new()
-//                             + selector.withServiceSelector(
-//                               serviceSelector.new()
-//                               + serviceSelector.withAgentGroup('default')
-//                               + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
-//                             )
-//                             + selector.withFlowSelector(
-//                               flowSelector.new()
-//                               + flowSelector.withControlPoint(controlPoint.new()
-//                                                               + controlPoint.withTraffic('ingress'))
-//                               + flowSelector.withLabelMatcher(
-//                                 LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
-//                               )
-//                             );
+local rateLimiterSelector = selector.new()
+                            + selector.withServiceSelector(
+                              serviceSelector.new()
+                              + serviceSelector.withAgentGroup('default')
+                              + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                            )
+                            + selector.withFlowSelector(
+                              flowSelector.new()
+                              + flowSelector.withControlPoint(controlPoint.new()
+                                                              + controlPoint.withTraffic('ingress'))
+                              + flowSelector.withLabelMatcher(
+                                LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
+                              )
+                            );
 
 
 local apertureControllerMixin =
@@ -106,57 +106,57 @@ local policyResource = latencyGradientPolicy({
   policyName: 'service1-demo-app',
   fluxMeter: fluxMeter.new() + fluxMeter.withSelector(fluxMeterSelector),
   concurrencyLimiterSelector: concurrencyLimiterSelector,
-  // classifiers: [
-  //   classifier.new()
-  //   + classifier.withSelector(concurrencyLimiterSelector)
-  //   + classifier.withRules({
-  //     user_type: rule.new()
-  //                + rule.withExtractor(extractor.new()
-  //                                     + extractor.withFrom('request.http.headers.user-type')),
-  //   }),
-  // ],
-  // concurrencyLimiter+: {
-  //   timeoutFactor: 0.5,
-  //   defaultWorkloadParameters: {
-  //     priority: 20,
-  //   },
-  //   workloads: [
-  //     Workload.new()
-  //     + Workload.withWorkloadParameters(WorkloadParameters.withPriority(50))
-  //     // match the label extracted by classifier
-  //     + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ user_type: 'guest' })),
-  //     Workload.new()
-  //     + Workload.withWorkloadParameters(WorkloadParameters.withPriority(200))
-  //     // match the http header directly
-  //     + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
-  //   ],
-  // },
-  // components: [
-  //   component.new()
-  //   + component.withDecider(
-  //     decider.new()
-  //     + decider.withOperator('lt')
-  //     + decider.withInPorts({ lhs: port.withSignalName('LOAD_MULTIPLIER'), rhs: port.withConstantValue(1.0) })
-  //     + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
-  //     + decider.withTrueFor('30s')
-  //   ),
-  //   component.new()
-  //   + component.withSwitcher(
-  //     switcher.new()
-  //     + switcher.withInPorts({ switch: port.withSignalName('IS_BOT_ESCALATION'), on_true: port.withConstantValue(0.0), on_false: port.withConstantValue(10) })
-  //     + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
-  //   ),
-  //   component.new()
-  //   + component.withRateLimiter(
-  //     rateLimiter.new()
-  //     + rateLimiter.withSelector(rateLimiterSelector)
-  //     + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
-  //     + rateLimiter.withLimitResetInterval('1s')
-  //     + rateLimiter.withLabelKey('http.request.header.user_id')
-  //     + rateLimiter.withDynamicConfigKey('rate_limiter'),
-  //   ),
+  classifiers: [
+    classifier.new()
+    + classifier.withSelector(concurrencyLimiterSelector)
+    + classifier.withRules({
+      user_type: rule.new()
+                 + rule.withExtractor(extractor.new()
+                                      + extractor.withFrom('request.http.headers.user-type')),
+    }),
+  ],
+  concurrencyLimiter+: {
+    timeoutFactor: 0.5,
+    defaultWorkloadParameters: {
+      priority: 20,
+    },
+    workloads: [
+      Workload.new()
+      + Workload.withWorkloadParameters(WorkloadParameters.withPriority(50))
+      // match the label extracted by classifier
+      + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ user_type: 'guest' })),
+      Workload.new()
+      + Workload.withWorkloadParameters(WorkloadParameters.withPriority(200))
+      // match the http header directly
+      + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
+    ],
+  },
+  components: [
+    component.new()
+    + component.withDecider(
+      decider.new()
+      + decider.withOperator('lt')
+      + decider.withInPorts({ lhs: port.withSignalName('LOAD_MULTIPLIER'), rhs: port.withConstantValue(1.0) })
+      + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
+      + decider.withTrueFor('30s')
+    ),
+    component.new()
+    + component.withSwitcher(
+      switcher.new()
+      + switcher.withInPorts({ switch: port.withSignalName('IS_BOT_ESCALATION'), on_true: port.withConstantValue(0.0), on_false: port.withConstantValue(10) })
+      + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
+    ),
+    component.new()
+    + component.withRateLimiter(
+      rateLimiter.new()
+      + rateLimiter.withSelector(rateLimiterSelector)
+      + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
+      + rateLimiter.withLimitResetInterval('1s')
+      + rateLimiter.withLabelKey('http.request.header.user_id')
+      + rateLimiter.withDynamicConfigKey('rate_limiter'),
+    ),
 
-  // ],
+  ],
 }).policyResource;
 
 {
