@@ -18,7 +18,7 @@ heavy-hitters. It uses
 specific flow labels that exceed their quota within a certain timeframe (limit
 reset interval).
 
-### Policy
+## Policy
 
 In this example, we will be rate limiting unique users based on the `User-Id`
 header in the HTTP traffic. This header is provided by Envoy proxy under the
@@ -55,7 +55,7 @@ In addition, we will be configuring our rate limiter to apply these limits to
 </Tabs>
 ```
 
-#### Circuit Diagram
+### Circuit Diagram
 
 ```mermaid
 {@include: ./assets/static-rate-limiting/static-rate-limiting.mmd}

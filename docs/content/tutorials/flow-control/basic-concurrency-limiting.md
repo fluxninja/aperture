@@ -25,7 +25,7 @@ it's
 For instance, queue buildup can be detected by tracking deviation of current
 latency from historically normal values.
 
-### Policy
+## Policy
 
 In this policy we will be using the
 [Latency Gradient](https://github.com/fluxninja/aperture/tree/main/blueprints/lib/1.0/blueprints/latency-gradient)
@@ -82,7 +82,7 @@ At a high-level, this policy consists of:
 </Tabs>
 ```
 
-#### Circuit Diagram
+### Circuit Diagram
 
 <Zoom>
 
@@ -92,7 +92,7 @@ At a high-level, this policy consists of:
 
 </Zoom>
 
-#### Playground
+### Playground
 
 When the above policy is loaded in Aperture's
 [Playground](/get-started/playground.md), we will see that as the traffic spikes

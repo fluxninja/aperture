@@ -23,7 +23,7 @@ signal processing needed to translate health metrics to corrective actions.
 For instance, a policy can be written to detect overload build-up at an upstream
 service and trigger load-shedding at a downstream service.
 
-### Policy
+## Policy
 
 One of the most reliable metrics to detect overload state is latency of the
 service requests. In Aperture, latency of service requests can be easily
@@ -61,7 +61,7 @@ service to be overloaded at that time.
 </Tabs>
 ```
 
-#### Circuit Diagram
+### Circuit Diagram
 
 <Zoom>
 
@@ -71,7 +71,7 @@ service to be overloaded at that time.
 
 </Zoom>
 
-#### Playground
+### Playground
 
 When the above policy is loaded in Aperture's
 [Playground](/get-started/playground.md), we will see the various signal metrics
