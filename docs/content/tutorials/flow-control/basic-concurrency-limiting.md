@@ -65,7 +65,7 @@ At a high-level, this policy consists of:
 ```
 
 ```jsonnet
-{@include: ./assets/basic-concurrency-limiting/concurrency-limiting.jsonnet}
+{@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.jsonnet}
 ```
 
 ```mdx-code-block
@@ -74,7 +74,7 @@ At a high-level, this policy consists of:
 ```
 
 ```yaml
-{@include: ./assets/basic-concurrency-limiting/concurrency-limiting.yaml}
+{@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml}
 ```
 
 ```mdx-code-block
@@ -87,7 +87,7 @@ At a high-level, this policy consists of:
 <Zoom>
 
 ```mermaid
-{@include: ./assets/basic-concurrency-limiting/concurrency-limiting.mmd}
+{@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.mmd}
 ```
 
 </Zoom>
@@ -103,6 +103,6 @@ the latency within the tolerance limit (`1.1`) configured in the circuit.
 
 <Zoom>
 
-![Basic Concurrency Limiting](./assets/basic-concurrency-limiting/basic-concurrency-limiting.png)
+![Basic Concurrency Limiting](./assets/basic-concurrency-limiting/basic-concurrency-limiting-playground.png)
 
 </Zoom>

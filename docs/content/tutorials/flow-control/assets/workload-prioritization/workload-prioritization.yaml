@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: example
+  name: service1-demo-app
 spec:
   circuit:
     components:
@@ -99,8 +99,8 @@ spec:
           query_string:
             sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED",
             response_status="OK",
-            flux_meter_name="example"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
-            response_status="OK", flux_meter_name="example"}[5s]))
+            flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
+            response_status="OK", flux_meter_name="service1-demo-app"}[5s]))
       - ema:
           correction_factor_on_max_envelope_violation: "0.95"
           ema_window: 1500s
@@ -153,7 +153,7 @@ spec:
                 signal_name: ACCEPTED_CONCURRENCY
               incoming_concurrency:
                 signal_name: INCOMING_CONCURRENCY
-            timeout_factor: "0.5"
+            timeout_factor: 0.5
             workloads:
               - label_matcher:
                   match_labels:
@@ -208,7 +208,7 @@ spec:
             agent_group: default
             service: service1-demo-app.demoapp.svc.cluster.local
     flux_meters:
-      example:
+      service1-demo-app:
         selector:
           flow_selector:
             control_point:
