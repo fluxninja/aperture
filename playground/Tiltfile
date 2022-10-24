@@ -12,13 +12,14 @@ PLAYGROUND_ROOT = GIT_ROOT + "/playground"
 TANKA_ROOT = GIT_ROOT + "/playground/tanka"
 TILT_OBJECTS = []
 APERTURE_GO_REPO_PATH = GIT_ROOT + "/../aperture-go"
+APERTURE_NODEJS_REPO_PATH = GIT_ROOT + "/../aperture-nodejs"
 APERTURE_JAVA_REPO_PATH = GIT_ROOT + "/../aperture-java"
 APERTURE_AGENT_NS = "aperture-agent"
 APERTURE_CONTROLLER_NS = "aperture-controller"
 APERTURE_GO_EXAMPLE_NS = "aperture-go-example"
+APERTURE_NODEJS_EXAMPLE_NS = "aperture-nodejs-example"
 APERTURE_JAVA_EXAMPLE_NS = "aperture-java-example"
 APERTURE_DEMOAPP_NS = "demoapp"
-# APERTURE_BOOKINFO_NS = "bookinfo"
 APERTURE_ISTIO_NS = "istio-system"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
@@ -344,6 +345,25 @@ DEP_TREE = {
             ]
         },
     },
+    APERTURE_NODEJS_EXAMPLE_NS: {
+        "aperture-nodejs-example": {
+            "labels": ["Aperture"],
+            "needs": ["agent"],
+            "tkenv": TANKA_ROOT + "/apps/aperture-nodejs-example",
+            "images": [
+                {
+                    "ref": "aperture-nodejs-example",
+                    "context": APERTURE_NODEJS_REPO_PATH if os.path.exists(APERTURE_NODEJS_REPO_PATH) else "https://github.com/fluxninja/aperture-nodejs.git#main",
+                }
+            ],
+            "child_resources": [
+                {
+                    "workload": "aperture-nodejs-example",
+                    "resource_deps": ["agent", "controller", "cluster-bootstrap"],
+                }
+            ]
+        },
+    },
     APERTURE_JAVA_EXAMPLE_NS: {
         "aperture-java-example": {
             "labels": ["Aperture"],
@@ -363,37 +383,12 @@ DEP_TREE = {
             ]
         },
     },
-    # APERTURE_BOOKINFO_NS: {
-    #     "bookinfo": {
-    #         "labels": ["DemoApplications"],
-    #         "needs": ["istio"],
-    #         "tkenv": TANKA_ROOT + "/apps/bookinfo",
-    #         "child_resources": [
-    #             {
-    #                 "new_name": "bookinfo-common",
-    #                 "resource_deps": ["cluster-bootstrap", "istiod"],
-    #                 "extra_objects": [
-    #                     ("^bookinfo", None, APERTURE_BOOKINFO_NS)
-    #                 ],
-    #             },
-    #             { "workload": "details-v1", "resource_deps": ["bookinfo-common"] },
-    #             { "workload": "ratings-v1", "resource_deps": ["bookinfo-common"] },
-    #             { "workload": "productpage-v1", "resource_deps": ["bookinfo-common"] },
-    #             { "workload": "reviews-v1", "resource_deps": ["bookinfo-common"] },
-    #             { "workload": "reviews-v2", "resource_deps": ["bookinfo-common"] },
-    #             { "workload": "reviews-v3", "resource_deps": ["bookinfo-common"] },
-    #         ],
-    #     },
-    # }
 }
 
 NS_CONFIG = {
     APERTURE_DEMOAPP_NS: {
         "labels": ["istio-injection: enabled"],
     },
-    # APERTURE_BOOKINFO_NS: {
-    #     "labels": ["istio-injection: enabled"]
-    # },
 }
 
 ###############

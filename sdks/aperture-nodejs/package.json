@@ -1,0 +1,20 @@
+{
+  "name": "nodejs-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "example.js",
+  "scripts": {
+    "grpc-client": "node ./src/client.js"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/grpc-js": "1.7.1",
+    "@grpc/proto-loader": "0.7.3"
+  },
+  "engines": {
+    "node": "16.14.1",
+    "npm": "8.5.0"
+  }
+}
