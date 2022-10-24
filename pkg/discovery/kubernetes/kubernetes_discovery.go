@@ -218,8 +218,6 @@ func (kd *KubernetesDiscovery) start() {
 			}
 			defer endpointsWatcher.Stop()
 
-			// log.Debug().Interface("serviceCache", kd.serviceCache.cache).Interface("mappings", kd.mapping.mapping).Msg("starting endpoints watcher")
-
 			for {
 				// watchers added, start watching events
 				select {
