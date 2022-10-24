@@ -50,7 +50,7 @@
       latencyEMALimitMultiplier: '2.0',
       concurrencyLimitMultiplier: '2.0',
       concurrencyLinearIncrement: '5.0',
-      concurrencySQRTIncrementMultiplier: '0.1',
+      concurrencySQRTIncrementMultiplier: '1',
     },
     /**
     * @section Policy
