@@ -279,6 +279,16 @@ workflows:
             parameters:
               executor: [ubuntu-go-executor]
               goarch: [amd64]
+      - publish-aperture-java-release:
+          path: sdks/aperture-java
+          context: sonatype
+          # both this and workflow's when is needed
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^releases\/.*$/
+
 
   helm-release:
     when:
@@ -301,17 +311,3 @@ workflows:
             tags:
               only: /^v.*$/
           configuration_path: .circleci/post-release.yaml
-
-  publish-aperture-java-release:
-    when:
-      matches: { value: << pipeline.git.tag >>, pattern: "^releases/.*$" }
-    jobs:
-      - publish-aperture-java-release:
-          path: sdks/aperture-java
-          context: sonatype
-          # both this and workflow's when is needed
-          filters:
-            branches:
-              ignore: /.+/
-            tags:
-              only: /^releases\/.*$/
