@@ -17,12 +17,13 @@ class Client {
   me = new fcs.FlowControlService(URL, grpc.credentials.createInsecure());
 
   async StartFlow(featureArg, labelsArg) {
+    var checkRequest = fcs.CheckRequest({
+      feature: featureArg,
+      labels: labelsArg,
+    });
+
     return new Promise((resolve, reject) => {
-      this.me.Check(
-      {
-        feature: featureArg,
-        labels: labelsArg,
-      }, (err, response) => {
+      this.me.Check(checkRequest, (err, response) => {
         if (err) {
           console.log("Got error ", err);
           reject(err);

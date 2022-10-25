@@ -223,6 +223,7 @@ workflows:
             manifests/charts/.* updated-aperture-charts true
             playground/demo_app/.* updated-demo-app true
             sdks/aperture-go/.* updated-aperture-go true
+            sdks/aperture-js/.* updated-aperture-js true
             sdks/aperture-java/.* updated-aperture-java true
 
   filter-paths-pr:
