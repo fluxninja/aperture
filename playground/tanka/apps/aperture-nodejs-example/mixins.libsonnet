@@ -4,11 +4,11 @@ sdk
 {
   values+:: {
     image+: {
-      repository: 'docker.io/fluxninja/aperture-nodejs-example',
+      repository: 'docker.io/fluxninja/aperture-js-example',
     },
   },
   environment+:: {
-    namespace: 'aperture-nodejs-example',
-    name: 'aperture-nodejs-example',
+    namespace: 'aperture-js-example',
+    name: 'aperture-js-example',
   },
 }
