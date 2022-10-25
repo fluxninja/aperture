@@ -49,7 +49,8 @@ value to the scheduler:
 In addition, we will be configuring the scheduler to automatically assign the
 tokens that need to be obtained in order to accept requests matching a given
 workload. This continuous estimation (auto-tokens) helps with fair scheduling
-and prioritization across workloads.
+and prioritization across workloads. This additional configuration is
+highlighted in the Jsonnet spec below.
 
 ```mdx-code-block
 <Tabs>
