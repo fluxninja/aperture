@@ -1,50 +1,37 @@
-local aperture = import '../../../../blueprints/lib/1.0/main.libsonnet';
-
-local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
+local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
 
 local latencyGradientPolicy = aperture.blueprints.LatencyGradient.policy;
 
-local workloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
-local labelMatcher = aperture.spec.v1.LabelMatcher;
-local workload = aperture.spec.v1.SchedulerWorkload;
-
-local classifier = aperture.spec.v1.Classifier;
-local fluxMeter = aperture.spec.v1.FluxMeter;
-local extractor = aperture.spec.v1.Extractor;
-local rule = aperture.spec.v1.Rule;
 local selector = aperture.spec.v1.Selector;
+local fluxMeter = aperture.spec.v1.FluxMeter;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local controlPoint = aperture.spec.v1.ControlPoint;
+local classifier = aperture.spec.v1.Classifier;
+local extractor = aperture.spec.v1.Extractor;
+local rule = aperture.spec.v1.Rule;
+local workloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
+local labelMatcher = aperture.spec.v1.LabelMatcher;
+local workload = aperture.spec.v1.SchedulerWorkload;
 local component = aperture.spec.v1.Component;
 local rateLimiter = aperture.spec.v1.RateLimiter;
 local decider = aperture.spec.v1.Decider;
 local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
 
-local fluxMeterSelector = selector.new()
-                          + selector.withServiceSelector(
-                            serviceSelector.new()
-                            + serviceSelector.withAgentGroup('default')
-                            + serviceSelector.withService('service3-demo-app.demoapp.svc.cluster.local')
-                          )
-                          + selector.withFlowSelector(
-                            flowSelector.new()
-                            + flowSelector.withControlPoint(controlPoint.new()
-                                                            + controlPoint.withTraffic('ingress'))
-                          );
 
-local concurrencyLimiterSelector = selector.new()
-                                   + selector.withServiceSelector(
-                                     serviceSelector.new()
-                                     + serviceSelector.withAgentGroup('default')
-                                     + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
-                                   )
-                                   + selector.withFlowSelector(
-                                     flowSelector.new()
-                                     + flowSelector.withControlPoint(controlPoint.new()
-                                                                     + controlPoint.withTraffic('ingress'))
-                                   );
+local svcSelector =
+  selector.new()
+  + selector.withServiceSelector(
+    serviceSelector.new()
+    + serviceSelector.withAgentGroup('default')
+    + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+  )
+  + selector.withFlowSelector(
+    flowSelector.new()
+    + flowSelector.withControlPoint(controlPoint.new()
+                                    + controlPoint.withTraffic('ingress'))
+  );
 
 // Restrict this selector to only bot traffic
 local rateLimiterSelector = selector.new()
@@ -62,54 +49,13 @@ local rateLimiterSelector = selector.new()
                               )
                             );
 
-
-local apertureControllerMixin =
-  apertureControllerApp {
-    values+:: {
-      operator+: {
-        image: {
-          registry: 'docker.io/fluxninja',
-          repository: 'aperture-operator',
-          tag: 'latest',
-          pullPolicy: 'IfNotPresent',
-        },
-      },
-      controller+: {
-        createUninstallHook: false,
-        config+: {
-          plugins+: {
-            disabled_plugins: [
-              'aperture-plugin-fluxninja',
-            ],
-          },
-          log+: {
-            pretty_console: true,
-            non_blocking: true,
-            level: 'debug',
-          },
-          etcd+: {
-            endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
-          },
-          prometheus+: {
-            address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',
-          },
-        },
-        image: {
-          registry: '',
-          repository: 'docker.io/fluxninja/aperture-controller',
-          tag: 'latest',
-        },
-      },
-    },
-  };
-
 local policyResource = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  fluxMeter: fluxMeter.new() + fluxMeter.withSelector(fluxMeterSelector),
-  concurrencyLimiterSelector: concurrencyLimiterSelector,
+  fluxMeter: fluxMeter.new() + fluxMeter.withSelector(svcSelector),
+  concurrencyLimiterSelector: svcSelector,
   classifiers: [
     classifier.new()
-    + classifier.withSelector(concurrencyLimiterSelector)
+    + classifier.withSelector(svcSelector)
     + classifier.withRules({
       user_type: rule.new()
                  + rule.withExtractor(extractor.new()
@@ -132,6 +78,7 @@ local policyResource = latencyGradientPolicy({
       + workload.withLabelMatcher(labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
     ],
   },
+  // highlight-start
   components: [
     component.new()
     + component.withDecider(
@@ -161,9 +108,7 @@ local policyResource = latencyGradientPolicy({
       + rateLimiter.withDynamicConfigKey('rate_limiter'),
     ),
   ],
+  // highlight-end
 }).policyResource;
 
-{
-  latencyGradientPolicy: policyResource,
-  controller: apertureControllerMixin,
-}
+policyResource
