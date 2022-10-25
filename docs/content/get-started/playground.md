@@ -21,14 +21,6 @@ machine points at. For convenience, refer to [Prerequisites](#prerequisites-k8s)
 for deploying a local Kubernetes cluster using
 [Kind](https://kind.sigs.k8s.io/).
 
-:::note
-
-Playground is currently not supported on Apple Silicon (e.g. M1 processor)
-because of an Istio [issue](https://github.com/istio/istio/issues/36762). That
-issue will likely be resolved in the upcoming Istio release.
-
-:::
-
 ## How to Run
 
 Assuming that you have already cloned the aperture repository and brought up a
