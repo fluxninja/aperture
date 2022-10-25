@@ -193,9 +193,12 @@ func runDockerContainer(image string, port string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		// log.Info().Interface("containerJSON", containerJSON).Msg("inspect")
-		if containerJSON.State.Health.Status == "healthy" {
-			return resp.ID, nil
+		if containerJSON.State != nil {
+			if containerJSON.State.Health != nil {
+				if containerJSON.State.Health.Status == "healthy" {
+					return resp.ID, nil
+				}
+			}
 		}
 	}
 }
