@@ -18,12 +18,13 @@ to flow labels. For instance, when a service is overloaded, one of the
 escalation strategies beyond concurrency limits could be to more aggressively
 restrict traffic of each user by dynamically adjusting their rate limits.
 
-On one hand, concurrency limiter uses a WFQ scheduler and relies on
-weighted-fair queueing scheduler to make decisions at the workload level. On the
-other hand, the rate limiter uses a distributed cache to maintain global
-counters for each flow label (e.g. unique users) and restrict traffic when they
-exceed their allocated quota. These 2 technologies can be made to work together
-as we will see in the example policy below.
+To recap, [concurrency limiter](/concepts/flow-control/concurrency-limiter.md)
+relies on weighted-fair queueing scheduler to make flow-control decisions at the
+workload level. On the other hand, the
+[rate limiter](/concepts/flow-control/rate-limiter.md) uses a distributed cache
+to maintain global counters for each flow label (e.g. unique users) and
+restricts traffic when they exceed their allocated quota. These 2 technologies
+can be made to work together as we will see in the below example.
 
 ## Policy
 
@@ -87,3 +88,9 @@ In the `Latency Gradient` dashboard, the bot traffic matches `default` workload
 as we don't have the workload matching rule for the `bot` traffic. As rate
 limiting is applied before concurrency limiter, we will see that the default
 workload metrics stop reporting when `bot` traffic is completely restricted.
+
+<Zoom>
+
+![Dynamic Rate Limiting](./assets/dynamic-rate-limiting/dynamic-rate-limiting-playground.png)
+
+</Zoom>

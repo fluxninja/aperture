@@ -97,6 +97,6 @@ requests than `guest` users.
 
 <Zoom>
 
-![Basic Concurrency Limiting](./assets/workload-prioritization/workload-prioritization-playground.png)
+![Workload Prioritization](./assets/workload-prioritization/workload-prioritization-playground.png)
 
 </Zoom>
