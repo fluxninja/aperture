@@ -45,6 +45,9 @@ parameters:
   updated-aperture-go:
     type: boolean
     default: false
+  updated-aperture-js:
+    type: boolean
+    default: false
   updated-aperture-java:
     type: boolean
     default: false
@@ -645,6 +648,18 @@ workflows:
           docker-image: aperture-go-example
           remote-repo: fluxninja/aperture-go
           remote-repo-fingerprint: "c5:d8:c4:22:7e:ff:b5:c3:c3:32:c2:b7:54:c7:99:1b"
+
+  aperture-js:
+    when: << pipeline.parameters.updated-aperture-js >>
+    jobs:
+      - validate-publish-sdk:
+          name: validate-publish-aperture-js
+          path: sdks/aperture-js
+          docker-context: sdks/aperture-js
+          dockerfile: Dockerfile
+          docker-image: aperture-js-example
+          remote-repo: fluxninja/aperture-js
+          remote-repo-fingerprint: "85:0b:8a:2d:b5:10:99:4c:2a:61:9f:cf:49:d5:02:1f"
 
   aperture-java:
     when: << pipeline.parameters.updated-aperture-java >>

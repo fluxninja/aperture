@@ -1020,6 +1020,18 @@ cmd_button('aperture-go-trigger',
         text='Trigger library example',
 )
 
+aperture_js_pod_exec_script = '''
+# get k8s pod name from tilt resource name
+POD_NAME="$(tilt get kubernetesdiscovery "aperture-js-example" -ojsonpath='{.status.pods[0].name}')"
+kubectl exec -n aperture-js-example "$POD_NAME" -- wget http://127.0.0.1:8080/super -O -
+'''
+cmd_button('aperture-js-trigger',
+        argv=['sh', '-c', aperture_js_pod_exec_script],
+        resource='aperture-js-example',
+        icon_name='ads_click',
+        text='Trigger library example',
+)
+
 aperture_java_pod_exec_script = '''
 # get k8s pod name from tilt resource name
 POD_NAME="$(tilt get kubernetesdiscovery "aperture-java-example" -ojsonpath='{.status.pods[0].name}')"
