@@ -1,7 +1,7 @@
 # vim: ft=bzl sw=4
 v1alpha1.extension_repo(name='default', url='https://github.com/tilt-dev/tilt-extensions', ref='HEAD')
 load("ext://namespace", "namespace_create", "namespace_inject")
-load('ext://uibutton', 'cmd_button')
+load('ext://uibutton', 'cmd_button', 'location')
 
 #################
 ### CONSTANTS ###
@@ -11,8 +11,8 @@ GIT_ROOT = str(local("git rev-parse --show-toplevel")).strip()
 PLAYGROUND_ROOT = GIT_ROOT + "/playground"
 TANKA_ROOT = GIT_ROOT + "/playground/tanka"
 TILT_OBJECTS = []
-APERTURE_GO_REPO_PATH = GIT_ROOT + "/../aperture-go"
-APERTURE_JAVA_REPO_PATH = GIT_ROOT + "/../aperture-java"
+APERTURE_GO_REPO_PATH = GIT_ROOT + "/sdks/aperture-go"
+APERTURE_JAVA_REPO_PATH = GIT_ROOT + "/sdks/aperture-java"
 APERTURE_AGENT_NS = "aperture-agent"
 APERTURE_CONTROLLER_NS = "aperture-controller"
 APERTURE_GO_EXAMPLE_NS = "aperture-go-example"
@@ -284,10 +284,9 @@ DEP_TREE = {
             "images": [
                 {
                     "ref": "demo-app",
-                    "context": GIT_ROOT,
-                    "dockerfile": GIT_ROOT + "/tools/demo_app/Dockerfile",
+                    "context": GIT_ROOT + "/playground/demo_app",
+                    "dockerfile": GIT_ROOT + "/playground/demo_app/Dockerfile",
                     "ssh": "default",
-                    "ignore": ["operator", "plugins", "cmd"],
                 }
             ],
             "child_resources": [
@@ -992,7 +991,6 @@ watch_file("./tanka/apps/")
 watch_file("./tanka/lib/")
 watch_file("./tanka/charts/")
 watch_file(GIT_ROOT + "/operator/config/crd")
-
 
 run_wavepool_generator = '''
 tk show --ext-str=projectRoot={0} {0}/apps/demoapp/ --target=configmap/wavepool-config --dangerous-allow-redirect | kubectl apply -f -

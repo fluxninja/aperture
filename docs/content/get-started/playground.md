@@ -40,6 +40,8 @@ commands:
 $ git clone https://github.com/fluxninja/aperture.git
 # change directory to playground
 $ cd playground
+# start a local kubernetes cluster
+$ ctlptl apply -f ctlptl-kind-config.yaml
 # start Tilt and run services defined in Tiltfile
 $ tilt up
 Tilt started on http://localhost:10350/
@@ -66,9 +68,10 @@ application with an Istio and Envoy based service mesh configured to integrate
 with Aperture. There is an instance of Grafana running on the cluster as well
 for viewing metrics from experiments.
 
-The Playground is preloaded with a Latency Gradient Concurrency Control Policy
-which protects the demo application against sudden surges in traffic load. You
-can verify it using the following command:
+The Playground is preloaded with a
+[Latency Gradient Concurrency Control](/tutorials/flow-control/dynamic-rate-limiting.md)
+policy which protects the demo application against sudden surges in traffic
+load. You can verify it using the following command:
 
 ```sh
 $ kubectl get policy -n aperture-controller service1-demo-app
@@ -79,7 +82,7 @@ service1-demo-app   uploaded   103s
 The Playground comes with a demo application so that you can generate simulated
 traffic and see the policy in action. The demo application can be found in
 `demoapp` namespace. You can read more about the demo application
-[here](https://github.com/fluxninja/aperture/tree/main/tools/demo_app).
+[here](https://github.com/fluxninja/aperture/tree/main/playground/demo_app).
 
 ```sh
 $ kubectl get pods -n demoapp
