@@ -14,9 +14,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // StatusService is used to query Jobs.
 service StatusService {
   rpc GetGroupStatus(GroupStatusRequest) returns (GroupStatus) {
-    option (google.api.http) = {
-      get: "/v1/status/{path=**}"
-    };
+    option (google.api.http) = {get: "/v1/status/{path=**}"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: [
         "aperture-agent",

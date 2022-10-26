@@ -239,7 +239,7 @@ workflows:
             (go.mod|go.sum) updated-aperture true
             docs/.* updated-aperture-docs true
             manifests/charts/.* updated-aperture-charts true
-            tools/demo_app/.* updated-demo-app true
+            playground/demo_app/.* updated-demo-app true
             sdks/aperture-go/.* updated-aperture-go true
             sdks/aperture-java/.* updated-aperture-java true
 

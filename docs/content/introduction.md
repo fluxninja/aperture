@@ -34,7 +34,7 @@ flowchart TD
     blueprints[/"Blueprints"/]
     policies[/"Policies"/]
     subgraph controller["Aperture Controller"]
-        circuit[Control Circuit]
+        circuit["Control Circuit"]
     end
     subgraph databases["Aperture Databases"]
       prometheus[("Prometheus")]

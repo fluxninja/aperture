@@ -56,15 +56,16 @@ var _ = Describe("Rollup processor", func() {
 				ScopeLogs().AppendEmpty().
 				LogRecords()
 			logRecord := logs.AppendEmpty()
-			logRecord.Attributes().PutString("fizz", "buzz")
-			logRecord.Attributes().PutString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[0]))
+			logRecord.Attributes().PutStr("fizz", "buzz")
+			logRecord.Attributes().PutStr(otelcollector.ApertureSourceLabel, otelcollector.ApertureSourceEnvoy)
+			logRecord.Attributes().PutStr(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[0]))
 
 			err = logsProcessor.ConsumeLogs(context.TODO(), input)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(testConsumer.receivedLogs).To(HaveLen(1))
 			attributes := testConsumer.receivedLogs[0].ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0).Attributes().AsRaw()
-			Expect(attributes).To(HaveLen(7))
+			Expect(attributes).To(HaveLen(8))
 			Expect(attributes).To(HaveKeyWithValue(RollupCountKey, int64(1)))
 			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.WorkloadDurationLabel, RollupDatasketch), expectedSerializedDatasketch))
 			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.WorkloadDurationLabel, RollupSum), float64(5)))
@@ -80,42 +81,42 @@ var _ = Describe("Rollup processor", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			input := plog.NewLogs()
-			logs := input.ResourceLogs().AppendEmpty().
-				ScopeLogs().AppendEmpty().
-				LogRecords()
+			logs := input.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords()
 			logRecord := logs.AppendEmpty()
-			logRecord.Attributes().PutString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[0]))
+			logRecord.Attributes().PutStr(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[0]))
 			logRecord = logs.AppendEmpty()
-			logRecord.Attributes().PutString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[1]))
+			logRecord.Attributes().PutStr(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[1]))
 			logRecord = logs.AppendEmpty()
-			logRecord.Attributes().PutString(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[2]))
+			logRecord.Attributes().PutStr(otelcollector.WorkloadDurationLabel, strconv.Itoa(attributeValues[2]))
+			logRecord = logs.AppendEmpty()
+			logRecord.Attributes().PutStr(otelcollector.HTTPRequestContentLength, strconv.Itoa(1234))
 
 			err = logsProcessor.ConsumeLogs(context.TODO(), input)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(testConsumer.receivedLogs).To(HaveLen(1))
 			attributes := testConsumer.receivedLogs[0].ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0).Attributes().AsRaw()
-			Expect(attributes).To(HaveLen(6))
-			Expect(attributes).To(HaveKeyWithValue(RollupCountKey, int64(3)))
+			Expect(attributes).To(HaveLen(10))
+			Expect(attributes).To(HaveKeyWithValue(RollupCountKey, int64(4)))
 			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.WorkloadDurationLabel, RollupDatasketch), expectedSerializedDatasketch))
 			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.WorkloadDurationLabel, RollupSum), float64(18)))
 			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.WorkloadDurationLabel, RollupMin), float64(5)))
 			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.WorkloadDurationLabel, RollupMax), float64(7)))
 			Expect(attributes).To(HaveKeyWithValue(AggregateField(otelcollector.WorkloadDurationLabel, RollupSumOfSquares), float64(110)))
+			Expect(attributes).NotTo(HaveKey(AggregateField(otelcollector.HTTPRequestContentLength, RollupDatasketch)))
 		})
 
 		It("applies cardinality limits", func() {
 			input := plog.NewLogs()
-			logs := input.ResourceLogs().AppendEmpty().
-				ScopeLogs().AppendEmpty().
-				LogRecords()
+			logs := input.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords()
 
 			for i := 0; i < 30; i++ {
 				logRecord := logs.AppendEmpty()
-				logRecord.Attributes().PutString(otelcollector.WorkloadDurationLabel, strconv.Itoa(i))
-				logRecord.Attributes().PutString("low-cardinality", strconv.Itoa(i%2))
-				logRecord.Attributes().PutString("almost-high-cardinality", strconv.Itoa(i%10))
-				logRecord.Attributes().PutString("high-cardinality", strconv.Itoa(i))
+				logRecord.Attributes().PutStr(otelcollector.WorkloadDurationLabel, strconv.Itoa(i))
+				logRecord.Attributes().PutStr(otelcollector.ApertureSourceLabel, otelcollector.ApertureSourceEnvoy)
+				logRecord.Attributes().PutStr("low-cardinality", strconv.Itoa(i%2))
+				logRecord.Attributes().PutStr("almost-high-cardinality", strconv.Itoa(i%10))
+				logRecord.Attributes().PutStr("high-cardinality", strconv.Itoa(i))
 			}
 
 			err := logsProcessor.ConsumeLogs(context.TODO(), input)
