@@ -700,8 +700,8 @@ workflows:
           dockerhub-image: fluxninja/demo-app
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/demo-app
-          docker-context: .
-          dockerfile: tools/demo_app/Dockerfile
+          docker-context: ./playground/demo_app
+          dockerfile: ./playground/demo_app/Dockerfile
           use-docker-layer-caching: true
           push-to-dockerhub: false
 

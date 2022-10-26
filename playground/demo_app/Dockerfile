@@ -7,9 +7,9 @@ COPY --link . .
 
 # App build
 RUN --mount=type=cache,target=/go/pkg/ \
-    --mount=type=cache,target=/root/.cache/go-build/ <<-EOF
+  --mount=type=cache,target=/root/.cache/go-build/ <<-EOF
     go mod download
-    CGO_ENABLED=0 go build -ldflags="-w -s" -o /demo_app ./tools/demo_app/cmd/demo_app
+    CGO_ENABLED=0 go build -ldflags="-w -s" -o /demo_app .
 EOF
 
 # Final image

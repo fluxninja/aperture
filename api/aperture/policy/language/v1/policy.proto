@@ -13,13 +13,9 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 service PolicyService {
   rpc GetPolicies(google.protobuf.Empty) returns (GetPoliciesResponse) {
-    option (google.api.http) = {
-      get: "/v1/policies"
-    };
+    option (google.api.http) = {get: "/v1/policies"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: [
-        "aperture-controller"
-      ];
+      tags: ["aperture-controller"];
     };
   }
 }
@@ -77,9 +73,7 @@ message Circuit {
   google.protobuf.Duration evaluation_interval = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "0.5s"
-      }
+      value: {string_value: "0.5s"}
     }
   }]; // @gotags: default:"0.5s"
 
@@ -310,9 +304,7 @@ message GradientController {
   double slope = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
 
@@ -320,9 +312,7 @@ message GradientController {
   double min_gradient = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        number_value: -1.7976931348623157e+308
-      }
+      value: {number_value: -1.7976931348623157e+308}
     }
   }]; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
 
@@ -330,9 +320,7 @@ message GradientController {
   double max_gradient = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        number_value: 1.7976931348623157e+308
-      }
+      value: {number_value: 1.7976931348623157e+308}
     }
   }]; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
 
@@ -350,9 +338,7 @@ message ControllerDynamicConfig {
   bool manual_mode = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        bool_value: false
-      }
+      value: {bool_value: false}
     }
   }]; // @gotags: default:"false"
 }
@@ -426,9 +412,7 @@ message EMA {
   google.protobuf.Duration ema_window = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "5s"
-      }
+      value: {string_value: "5s"}
     }
   }]; // @gotags: default:"5s"
 
@@ -438,9 +422,7 @@ message EMA {
   google.protobuf.Duration warm_up_window = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "0s"
-      }
+      value: {string_value: "0s"}
     }
   }]; // @gotags: default:"0s"
 
@@ -448,15 +430,11 @@ message EMA {
   double correction_factor_on_min_envelope_violation = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        number_value: 1
-      }
+      value: {number_value: 1}
     }
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "gte=1.0"
-      }
+      value: {string_value: "gte=1.0"}
     }
   }]; // @gotags: validate:"gte=1.0" default:"1.0"
 
@@ -464,15 +442,11 @@ message EMA {
   double correction_factor_on_max_envelope_violation = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        number_value: 1
-      }
+      value: {number_value: 1}
     }
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "gte=0,lte=1.0"
-      }
+      value: {string_value: "gte=0,lte=1.0"}
     }
   }]; // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
 }
@@ -507,9 +481,7 @@ message ArithmeticCombinator {
   string operator = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "oneof=add sub mul div xor lshift rshift"
-      }
+      value: {string_value: "oneof=add sub mul div xor lshift rshift"}
     }
   }]; // @gotags: validate:"oneof=add sub mul div xor lshift rshift"
 }
@@ -549,9 +521,7 @@ message Decider {
   string operator = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "oneof=gt lt gte lte eq neq"
-      }
+      value: {string_value: "oneof=gt lt gte lte eq neq"}
     }
   }]; // @gotags: validate:"oneof=gt lt gte lte eq neq"
 
@@ -560,9 +530,7 @@ message Decider {
   google.protobuf.Duration true_for = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "0s"
-      }
+      value: {string_value: "0s"}
     }
   }]; // @gotags: default:"0s"
 
@@ -571,9 +539,7 @@ message Decider {
   google.protobuf.Duration false_for = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "0s"
-      }
+      value: {string_value: "0s"}
     }
   }]; // @gotags: default:"0s"
 }
@@ -622,9 +588,7 @@ message RateLimiter {
     bool enabled = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
-        value: {
-          bool_value: false
-        }
+        value: {bool_value: false}
       }
     }]; // @gotags: default:"false"
 
@@ -632,15 +596,11 @@ message RateLimiter {
     uint32 num_sync = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
-        value: {
-          number_value: 5
-        }
+        value: {number_value: 5}
       }
       extensions: {
         key: "x-go-validate"
-        value: {
-          string_value: "gt=0"
-        }
+        value: {string_value: "gt=0"}
       }
     }]; // @gotags: default:"5" validate:"gt=0"
   }
@@ -656,9 +616,7 @@ message RateLimiter {
     string label_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {
-          string_value: "required"
-        }
+        value: {string_value: "required"}
       }
     }]; // @gotags: validate:"required"
 
@@ -666,9 +624,7 @@ message RateLimiter {
     double limit_scale_factor = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
-        value: {
-          number_value: 1
-        }
+        value: {number_value: 1}
       }
     }]; // @gotags: default:"1.0"
   }
@@ -685,9 +641,7 @@ message RateLimiter {
     InPort limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {
-          string_value: "required"
-        }
+        value: {string_value: "required"}
       }
     }]; // @gotags: validate:"required"
   }
@@ -695,9 +649,7 @@ message RateLimiter {
   Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
 
@@ -705,9 +657,7 @@ message RateLimiter {
   common.selector.v1.Selector selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
 
@@ -715,9 +665,7 @@ message RateLimiter {
   google.protobuf.Duration limit_reset_interval = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "60s"
-      }
+      value: {string_value: "60s"}
     }
   }]; // @gotags: default:"60s"
 
@@ -730,9 +678,7 @@ message RateLimiter {
   string label_key = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
 
@@ -762,9 +708,7 @@ message ConcurrencyLimiter {
   common.selector.v1.Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
 
@@ -775,9 +719,7 @@ message ConcurrencyLimiter {
   Scheduler scheduler = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
 
@@ -806,9 +748,7 @@ message Scheduler {
     uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {
-          string_value: "gte=0,lte=255"
-        }
+        value: {string_value: "gte=0,lte=255"}
       }
     }]; // @gotags: validate:"gte=0,lte=255"
 
@@ -817,9 +757,7 @@ message Scheduler {
     uint64 tokens = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
-        value: {
-          number_value: 1
-        }
+        value: {number_value: 1}
       }
     }]; // @gotags: default:"1"
 
@@ -836,9 +774,7 @@ message Scheduler {
     WorkloadParameters workload_parameters = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {
-          string_value: "required"
-        }
+        value: {string_value: "required"}
       }
     }]; // @gotags: validate:"required"
 
@@ -847,9 +783,7 @@ message Scheduler {
     common.labelmatcher.v1.LabelMatcher label_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {
-          string_value: "required"
-        }
+        value: {string_value: "required"}
       }
     }]; // @gotags: validate:"required"
   }
@@ -904,9 +838,7 @@ message Scheduler {
   WorkloadParameters default_workload_parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
 
@@ -917,9 +849,7 @@ message Scheduler {
   bool auto_tokens = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "true"
-      }
+      value: {string_value: "true"}
     }
   }]; // @gotags: default:"true"
 
@@ -932,15 +862,11 @@ message Scheduler {
   double timeout_factor = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        number_value: 0.5
-      }
+      value: {number_value: 0.5}
     }
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "gte=0.0"
-      }
+      value: {string_value: "gte=0.0"}
     }
   }]; // @gotags: validate:"gte=0.0" default:"0.5"
 
@@ -964,9 +890,7 @@ message Scheduler {
   google.protobuf.Duration max_timeout = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "0.49s"
-      }
+      value: {string_value: "0.49s"}
     }
   }]; // @gotags: default:"0.49s"
 }
@@ -1007,9 +931,7 @@ message PromQL {
   google.protobuf.Duration evaluation_interval = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "10s"
-      }
+      value: {string_value: "10s"}
     }
   }]; // @gotags: default:"10s"
 }
@@ -1057,9 +979,7 @@ message Sqrt {
   double scale = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        number_value: 1
-      }
+      value: {number_value: 1}
     }
   }]; // @gotags default:"1.0"
 }
@@ -1090,9 +1010,7 @@ message Extrapolator {
   google.protobuf.Duration max_extrapolation_interval = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "10s"
-      }
+      value: {string_value: "10s"}
     }
   }]; // @gotags: default:"10s"
 }
