@@ -98,7 +98,6 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.62.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza v0.62.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheus v0.62.0 // indirect
-	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/prometheus/prometheus v0.39.1 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.10.0 // indirect
@@ -257,7 +256,7 @@ require (
 	go.opentelemetry.io/contrib/zpages v0.36.1 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.32.1 // indirect
 	go.opentelemetry.io/otel/metric v0.32.1 // indirect
-	go.opentelemetry.io/otel/sdk v1.10.0
+	go.opentelemetry.io/otel/sdk v1.10.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v0.32.1 // indirect
 	go.opentelemetry.io/otel/trace v1.10.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect

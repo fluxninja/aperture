@@ -106,8 +106,8 @@ running on Aperture Agent:
 
 - `service1` calls `service2`, which then calls `service3`. This call graph is
   programmed in the request payload of the traffic generator.
-- `service3` (the last service in call graph) simulates concurrency constraint
-  by limiting the number of requests it can process in parallel.
+- `service3` (the last service in the call graph) simulates concurrency
+  constraint by limiting the number of requests it can process in parallel.
 - Each service simulates an artificial workload by taking a few milliseconds to
   reply for each request.
 - Flux Meter is configured on `service3`. Flux Meter helps monitor service-level
