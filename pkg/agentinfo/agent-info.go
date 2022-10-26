@@ -18,7 +18,7 @@ const (
 // swagger:model
 // +kubebuilder:object:generate=true
 type AgentInfoConfig struct {
-	// All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
+	// All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiter etc).
 	//
 	// [Read more about agent groups here](/concepts/service.md#agent-group).
 	AgentGroup string `json:"agent_group" default:"default"`
