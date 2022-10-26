@@ -5,10 +5,10 @@ package aperture.policy.language.v1;
 import "aperture/common/selector/v1/selector.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-// FluxMeter gathers metrics for the traffic that matches its selector
+// Flux Meter gathers metrics for the traffic that matches its selector
 //
 // :::info
-// See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+// See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
 // :::
 //
 // Example of a selector that creates a histogram metric for all HTTP requests
@@ -102,7 +102,7 @@ message FluxMeter {
     }]; // @gotags: validate:"gt=0"
   }
 
-  // What latency should we measure in the histogram created by this FluxMeter.
+  // What latency should we measure in the histogram created by this Flux Meter.
   //
   // * For traffic control points, fluxmeter will measure the duration of the
   //   whole http transaction (including sending request and receiving
@@ -112,7 +112,7 @@ message FluxMeter {
   //   duration is entirely up to the user code that uses Aperture SDK.
   common.selector.v1.Selector selector = 1;
 
-  // Latency histogram buckets (in ms) for this FluxMeter.
+  // Latency histogram buckets (in ms) for this Flux Meter.
   oneof histogram_buckets {
     StaticBuckets static_buckets = 2;
     LinearBuckets linear_buckets = 3;

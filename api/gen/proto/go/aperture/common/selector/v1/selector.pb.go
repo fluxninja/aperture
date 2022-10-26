@@ -205,7 +205,7 @@ type FlowSelector struct {
 	// (and propagated in baggage).
 	//
 	// This limitation doesn't apply to selectors of other entities, like
-	// FluxMeters or actuators. It's valid to create a flow label on a control
+	// Flux Meters or Actuators. It's valid to create a flow label on a control
 	// point using classifier, and immediately use it for matching on the same
 	// control point.
 	// :::
