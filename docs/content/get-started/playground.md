@@ -9,6 +9,12 @@ keywords:
 sidebar_position: 1
 ---
 
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import Zoom from 'react-medium-image-zoom';
+```
+
 Playground is a Kubernetes based environment for exploring the capabilities of
 Aperture. Additionally, it is used as a development environment for Aperture.
 Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in
@@ -87,15 +93,60 @@ service3-demo-app-788857c7cc-557zj   2/2     Running   0          7m13s
 service3-demo-app-788857c7cc-vlchn   2/2     Running   0          7m13s
 ```
 
+<Zoom>
+
+```mermaid
+{@include: ./assets/playground/playground-app.mmd}
+```
+
+</Zoom>
+
+The above diagram shows interaction between different services and the policy
+running on Aperture Agent:
+
+- `service1` calls `service2`, which then calls `service3`. This call graph is
+  programmed in the request payload of the traffic generator.
+- `service3` (the last service in call graph) simulates concurrency constraint
+  by limiting the number of requests it can process in parallel.
+- Each service simulates an artificial workload by taking a few milliseconds to
+  reply for each request.
+- Flux Meter is configured on `service3`. Flux Meter helps monitor service-level
+  health signals such as latency, which are used in the Latency Gradient policy.
+- Concurrency Limiter and Rate Limiter are configured on `service1`. That is,
+  when the `service3` is overloaded, load shedding happens on `service1`.
+
 Once all the resources are in the running state, simulated traffic will start
 getting generated automatically against the demo application. The traffic is
 designed to overload the demo application in order showcase the capabilities of
 Aperture.
 
+The load generator is configured to generate the following traffic pattern for
+`subscriber`, `guest` and `bot` traffic types:
+
+- Ramp up to `5` concurrent users in `10s`.
+- Hold at `5` concurrent users for `2m`.
+- Ramp up to `30` concurrent users in `1m` (overloads `service3`).
+- Hold at `30` concurrent users for `2m` (overloads `service3`).
+- Ramp down to `5` concurrent users in `10s`.
+- Hold at `5` concurrent users for `2m`.
+
 Once the traffic is running, you can visualize the decisions made by Aperture in
 Grafana. Navigate to [localhost:3000](http://localhost:3000) on your browser to
 reach Grafana. You can open the pre-loaded "FluxNinja" dashboard under
 "aperture-system" folder to a bunch of useful panels.
+
+<Zoom>
+
+![Grafana Dashboard](../tutorials/flow-control/assets/dynamic-rate-limiting/dynamic-rate-limiting-playground.png)
+
+</Zoom>
+
+:::info
+
+Grafana dashboards url is
+[localhost:3000/dashboards](http://localhost:3000/dashboards)
+
+:::
 
 To stop the traffic at any point of time, press the `Stop Wavepool Generator`
 button in the `DemoApplications` resource.
@@ -107,7 +158,7 @@ To re-start the traffic, press the `Start Wavepool Generator` button in the
 
 :::note
 
-Every time you wish to run the traffic, make sure to press the
+Every time you wish to manually run the traffic, make sure to press the
 `Stop Wavepool Generator` button first.
 
 :::

@@ -1,0 +1,16 @@
+flowchart LR
+  subgraph sg1 [ ]
+    direction LR
+    s1[[service1]]
+    s2[[service2]]
+    s3[[service3]]
+    s1 ==> s2 ==> s3
+  end
+  subgraph agent1 [Aperture Agent]
+    direction TB
+    f1[Flux Meter]
+    s3 --> f1
+    r1[Rate Limiter]
+    c1[Concurrency Limiter]
+    s1 --> r1 --> c1
+  end
