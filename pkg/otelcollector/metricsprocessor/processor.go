@@ -87,6 +87,8 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			return retErr("aperture source label not recognized")
 		}
 
+		statusCode, featureStatus := statusesFromAttributes(attributes)
+		attributes.PutStr(otelcollector.ApertureResponseStatusLabel, responseStatusForTelemetry(statusCode, featureStatus))
 		addCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
 
 		// Update metrics and enforce include list to eliminate any excess attributes
@@ -346,18 +348,14 @@ func (p *metricsProcessor) updateMetrics(
 
 	if len(checkResponse.FluxMeterInfos) > 0 {
 		// Update flux meter metrics
-		statusCodeStr := ""
-		statusCode, exists := attributes.Get(otelcollector.HTTPStatusCodeLabel)
-		if exists {
-			statusCodeStr = statusCode.Str()
-		}
-		featureStatusStr := ""
-		featureStatus, exists := attributes.Get(otelcollector.ApertureFeatureStatusLabel)
-		if exists {
-			featureStatusStr = featureStatus.Str()
-		}
+		statusCode, featureStatus := statusesFromAttributes(attributes)
 		for _, fluxMeter := range checkResponse.FluxMeterInfos {
-			p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, attributes, treatAsZero)
+			p.updateMetricsForFluxMeters(
+				fluxMeter,
+				checkResponse.DecisionType,
+				statusCode, featureStatus,
+				attributes,
+				treatAsZero)
 		}
 	}
 
@@ -433,7 +431,8 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 ) {
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
-		log.Sample(zerolog.Sometimes).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
+		log.Sample(zerolog.Sometimes).Warn().
+			Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
 			Str(metrics.FeatureStatusLabel, featureStatus).
@@ -451,31 +450,55 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	}
 }
 
+func statusesFromAttributes(attributes pcommon.Map) (statusCode string, featureStatus string) {
+	rawStatusCode, exists := attributes.Get(otelcollector.HTTPStatusCodeLabel)
+	if exists {
+		statusCode = rawStatusCode.Str()
+	}
+	rawFeatureStatus, exists := attributes.Get(otelcollector.ApertureFeatureStatusLabel)
+	if exists {
+		featureStatus = rawFeatureStatus.Str()
+	}
+	return
+}
+
 func statusLabelsForMetrics(
 	decisionType flowcontrolv1.CheckResponse_DecisionType,
 	statusCode string,
 	featureStatus string,
 ) map[string]string {
-	labels := make(map[string]string)
-	// Default ResponseStatusLabel is ResponseStatusFailure
-	labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusError
-	// Set ResponseStatusLabel based on protocol specific status
-	if statusCode != "" {
-		// Set ResponseStatusLabel=ResponseStatusSuccess if status code is 2xx
-		if strings.HasPrefix(statusCode, "2") {
-			labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusOK
-		} else {
-			labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusError
-		}
-	} else if featureStatus != "" {
-		// pass through in case of feature status
-		labels[metrics.ResponseStatusLabel] = featureStatus
+	return map[string]string{
+		metrics.ResponseStatusLabel: responseStatusForMetrics(statusCode, featureStatus),
+		metrics.DecisionTypeLabel:   decisionType.String(),
+		metrics.StatusCodeLabel:     statusCode,
+		metrics.FeatureStatusLabel:  featureStatus,
 	}
+}
 
-	labels[metrics.DecisionTypeLabel] = decisionType.String()
-	labels[metrics.StatusCodeLabel] = statusCode
-	labels[metrics.FeatureStatusLabel] = featureStatus
-	return labels
+func responseStatusForMetrics(statusCode, featureStatus string) string {
+	return responseStatus(
+		statusCode,
+		featureStatus,
+		metrics.ResponseStatusOK,
+		metrics.ResponseStatusError)
+}
+
+func responseStatusForTelemetry(statusCode, featureStatus string) string {
+	return responseStatus(
+		statusCode,
+		featureStatus,
+		otelcollector.ApertureResponseStatusOK,
+		otelcollector.ApertureResponseStatusError)
+}
+
+func responseStatus(statusCode, featureStatus, okStatus, errorStatus string) string {
+	if strings.HasPrefix(statusCode, "2") {
+		return okStatus
+	}
+	if featureStatus != "" {
+		return featureStatus
+	}
+	return errorStatus
 }
 
 /*
@@ -502,6 +525,7 @@ var (
 		otelcollector.ApertureClassifierErrorsLabel,
 		otelcollector.ApertureServicesLabel,
 		otelcollector.ApertureControlPointLabel,
+		otelcollector.ApertureResponseStatusLabel,
 	}
 
 	_includeAttributesHTTP = []string{
