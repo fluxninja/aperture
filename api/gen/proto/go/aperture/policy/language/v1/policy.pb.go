@@ -134,7 +134,7 @@ type Policy struct {
 
 	// Defines the control-loop logic of the policy.
 	Circuit *Circuit `protobuf:"bytes,1,opt,name=circuit,proto3" json:"circuit,omitempty"`
-	// Resources (FluxMeters, Classifiers etc.) to setup.
+	// Resources (Flux Meters, Classifiers etc.) to setup.
 	Resources *Resources `protobuf:"bytes,2,opt,name=resources,proto3" json:"resources,omitempty"`
 }
 
@@ -273,19 +273,19 @@ func (x *Circuit) GetComponents() []*Component {
 // See also [Resources overview](/concepts/policy/resources.md).
 // :::
 //
-// Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+// Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 type Resources struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+	// Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 	//
-	// FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+	// Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
 	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"dive"` // @gotags: validate:"dive"
 	// Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 	//
-	// The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
+	// The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
 	Classifiers []*Classifier `protobuf:"bytes,2,rep,name=classifiers,proto3" json:"classifiers,omitempty" validate:"dive"` // @gotags: validate:"dive"
 }
 

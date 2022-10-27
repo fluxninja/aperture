@@ -38,7 +38,7 @@ message Policies {
 message Policy {
   // Defines the control-loop logic of the policy.
   Circuit circuit = 1;
-  // Resources (FluxMeters, Classifiers etc.) to setup.
+  // Resources (Flux Meters, Classifiers etc.) to setup.
   Resources resources = 2;
 }
 
@@ -87,15 +87,15 @@ message Circuit {
 // See also [Resources overview](/concepts/policy/resources.md).
 // :::
 //
-// Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+// Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 message Resources {
-  // FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+  // Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
   //
-  // FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+  // Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
   map<string, FluxMeter> flux_meters = 1; // @gotags: validate:"dive"
   // Classifiers are installed in the data-plane and are used to label the requests based on payload content.
   //
-  // The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
+  // The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
   repeated Classifier classifiers = 2; // @gotags: validate:"dive"
 }
 

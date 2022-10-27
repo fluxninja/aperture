@@ -510,7 +510,7 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 
 ### AgentInfoConfig {#agent-info-config}
 
-AgentInfoConfig is the configuration for the agent group etc.
+AgentInfoConfig is the configuration for the agent group and other agent attributes.
 
 #### Properties
 
@@ -518,7 +518,7 @@ AgentInfoConfig is the configuration for the agent group etc.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
+(string, default: `default`) All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
 
 [Read more about agent groups here](/concepts/service.md#agent-group).
 

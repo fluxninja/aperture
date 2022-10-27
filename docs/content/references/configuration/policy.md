@@ -1197,7 +1197,7 @@ classifier, but only if they were created at some previous control point
 (and propagated in baggage).
 
 This limitation doesn't apply to selectors of other entities, like
-FluxMeters or actuators. It's valid to create a flow label on a control
+Flux Meters or Actuators. It's valid to create a flow label on a control
 point using classifier, and immediately use it for matching on the same
 control point.
 :::
@@ -1207,10 +1207,10 @@ control point.
 
 ### v1FluxMeter {#v1-flux-meter}
 
-FluxMeter gathers metrics for the traffic that matches its selector
+Flux Meter gathers metrics for the traffic that matches its selector
 
 :::info
-See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
 :::
 
 Example of a selector that creates a histogram metric for all HTTP requests
@@ -1260,7 +1260,7 @@ For list of available attributes in Envoy access logs, refer
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector)) What latency should we measure in the histogram created by this FluxMeter.
+([V1Selector](#v1-selector)) What latency should we measure in the histogram created by this Flux Meter.
 
 - For traffic control points, fluxmeter will measure the duration of the
   whole http transaction (including sending request and receiving
@@ -1905,7 +1905,7 @@ Policy specification contains a circuit that defines the controller logic and re
 <dt>resources</dt>
 <dd>
 
-([V1Resources](#v1-resources)) Resources (FluxMeters, Classifiers etc.) to setup.
+([V1Resources](#v1-resources)) Resources (Flux Meters, Classifiers etc.) to setup.
 
 </dd>
 </dl>
@@ -2049,7 +2049,7 @@ Resources that need to be setup for the policy to function
 See also [Resources overview](/concepts/policy/resources.md).
 :::
 
-Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 
 #### Properties
 
@@ -2059,15 +2059,15 @@ Resources are typically FluxMeters, Classifiers, etc. that can be used to create
 
 ([[]V1Classifier](#v1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
-The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
+The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
 
 </dd>
 <dt>flux_meters</dt>
 <dd>
 
-(map of [V1FluxMeter](#v1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+(map of [V1FluxMeter](#v1-flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
-FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
 
 </dd>
 </dl>

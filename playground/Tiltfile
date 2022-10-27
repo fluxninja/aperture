@@ -285,7 +285,6 @@ DEP_TREE = {
                 {
                     "ref": "demo-app",
                     "context": GIT_ROOT + "/playground/demo_app",
-                    "dockerfile": GIT_ROOT + "/playground/demo_app/Dockerfile",
                     "ssh": "default",
                 }
             ],
@@ -332,7 +331,7 @@ DEP_TREE = {
             "images": [
                 {
                     "ref": "aperture-go-example",
-                    "context": APERTURE_GO_REPO_PATH if os.path.exists(APERTURE_GO_REPO_PATH) else "https://github.com/fluxninja/aperture-go.git#main",
+                    "context": APERTURE_GO_REPO_PATH,
                 }
             ],
             "child_resources": [
@@ -351,7 +350,7 @@ DEP_TREE = {
             "images": [
                 {
                     "ref": "aperture-java-example",
-                    "context": APERTURE_JAVA_REPO_PATH if os.path.exists(APERTURE_JAVA_REPO_PATH) else "https://github.com/fluxninja/aperture-java.git#main",
+                    "context": APERTURE_JAVA_REPO_PATH,
                 }
             ],
             "child_resources": [
