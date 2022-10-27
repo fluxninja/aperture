@@ -28,8 +28,8 @@ FakeConstant1 --> 1rhs
 subgraph 2[<center>ArithmeticCombinator<br/>div</center>]
 subgraph 2_inports[ ]
 style 2_inports fill:none,stroke:none
-2rhs[rhs]
 2lhs[lhs]
+2rhs[rhs]
 end
 subgraph 2_outports[ ]
 style 2_outports fill:none,stroke:none
@@ -116,8 +116,8 @@ end
 subgraph 10[<center>EMA<br/>win: 1500s</center>]
 subgraph 10_inports[ ]
 style 10_inports fill:none,stroke:none
-10input[input]
 10max_envelope[max_envelope]
+10input[input]
 end
 subgraph 10_outports[ ]
 style 10_outports fill:none,stroke:none
@@ -127,11 +127,11 @@ end
 subgraph 11[Gradient]
 subgraph 11_inports[ ]
 style 11_inports fill:none,stroke:none
-11signal[signal]
-11setpoint[setpoint]
 11optimize[optimize]
 11max[max]
 11control_variable[control_variable]
+11signal[signal]
+11setpoint[setpoint]
 end
 subgraph 11_outports[ ]
 style 11_outports fill:none,stroke:none
@@ -164,9 +164,9 @@ end
 subgraph 15[Switcher]
 subgraph 15_inports[ ]
 style 15_inports fill:none,stroke:none
-15on_true[on_true]
 15on_false[on_false]
 15switch[switch]
+15on_true[on_true]
 end
 subgraph 15_outports[ ]
 style 15_outports fill:none,stroke:none
@@ -186,28 +186,28 @@ style 14_outports fill:none,stroke:none
 14output[output]
 end
 end
-12output --> |LOAD_MULTIPLIER| 13.LoadActuatorload_multiplier
-13.Schedulerincoming_concurrency --> |INCOMING_CONCURRENCY| 2rhs
-2output --> |DESIRED_CONCURRENCY_RATIO| 12input
+11output --> |DESIRED_CONCURRENCY| 2lhs
 3output --> |NORMAL_CONCURRENCY_LIMIT| 11max
 6output --> |CONCURRENCY_INCREMENT_INTEGRAL_CAPPED| 7inputs
-8output --> |SQRT_CONCURRENCY_INCREMENT| 4rhs
-11output --> |DESIRED_CONCURRENCY| 2lhs
+10output --> |LATENCY_EMA| 1lhs
+5output --> |CONCURRENCY_INCREMENT_INTEGRAL| 6inputs
+12output --> |LOAD_MULTIPLIER| 13.LoadActuatorload_multiplier
 1output --> |LATENCY_SETPOINT| 11setpoint
 1output --> |LATENCY_SETPOINT| 14rhs
-14output --> |IS_OVERLOAD| 15switch
-15output --> |CONCURRENCY_INCREMENT| 5rhs
-15output --> |CONCURRENCY_INCREMENT| 11optimize
-0output --> |MAX_EMA| 10max_envelope
+2output --> |DESIRED_CONCURRENCY_RATIO| 12input
 4output --> |CONCURRENCY_INCREMENT_SINGLE_TICK| 5lhs
+13.Schedulerincoming_concurrency --> |INCOMING_CONCURRENCY| 2rhs
+14output --> |IS_OVERLOAD| 15switch
 7output --> |CONCURRENCY_INCREMENT_NORMAL| 15on_false
+8output --> |SQRT_CONCURRENCY_INCREMENT| 4rhs
 9output --> |LATENCY| 0lhs
 9output --> |LATENCY| 10input
 9output --> |LATENCY| 11signal
 9output --> |LATENCY| 14lhs
-5output --> |CONCURRENCY_INCREMENT_INTEGRAL| 6inputs
-10output --> |LATENCY_EMA| 1lhs
+0output --> |MAX_EMA| 10max_envelope
 13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 3rhs
 13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 6inputs
 13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 8input
 13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 11control_variable
+15output --> |CONCURRENCY_INCREMENT| 5rhs
+15output --> |CONCURRENCY_INCREMENT| 11optimize

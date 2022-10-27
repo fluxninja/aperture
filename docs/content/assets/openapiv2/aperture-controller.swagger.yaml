@@ -174,15 +174,6 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/v1MatchExpression'
-  RateLimiterDynamicConfig:
-    type: object
-    title: Dynamic Configuration for the rate limiter
-    properties:
-      overrides:
-        description: Allows to specify different limits for particular label values.
-        type: array
-        items:
-          $ref: '#/definitions/RateLimiterOverride'
   RateLimiterLazySync:
     type: object
     properties:
@@ -1126,15 +1117,15 @@ definitions:
       control variable proportionally to the relative difference between setpoint
       and actual value of the signal
     properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/v1ControllerDynamicConfig'
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
       in_ports:
         description: Input ports of the Gradient Controller.
         $ref: '#/definitions/v1GradientControllerIns'
-      init_config:
-        description: Initial configuration.
-        $ref: '#/definitions/v1ControllerDynamicConfig'
       max_gradient:
         description: Maximum gradient which clamps the computed gradient value to
           the range, [min_gradient, max_gradient].
@@ -1368,9 +1359,24 @@ definitions:
     title: Takes the load multiplier input signal and publishes it to the schedulers
       in the data-plane
     properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/v1LoadActuatorDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
       in_ports:
         description: Input ports for the Load Actuator component.
         $ref: '#/definitions/v1LoadActuatorIns'
+  v1LoadActuatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for LoadActuator
+    properties:
+      dry_run:
+        description: |-
+          Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
+          Useful for observing the behavior of Load Actuator without disrupting any real traffic.
+        type: boolean
   v1LoadActuatorIns:
     description: Input for the Load Actuator component.
     type: object
@@ -1596,15 +1602,15 @@ definitions:
     type: object
     title: Limits the traffic on a control point to specified rate
     properties:
+      default_config:
+        title: Default configuration
+        $ref: '#/definitions/v1RateLimiterDynamicConfig'
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
       in_ports:
         x-go-validate: required
         $ref: '#/definitions/v1RateLimiterIns'
-      init_config:
-        title: Initial configuration
-        $ref: '#/definitions/RateLimiterDynamicConfig'
       label_key:
         description: |-
           Specifies which label the ratelimiter should be keyed by.
@@ -1626,6 +1632,15 @@ definitions:
         description: Which control point to apply this ratelimiter to.
         x-go-validate: required
         $ref: '#/definitions/v1Selector'
+  v1RateLimiterDynamicConfig:
+    type: object
+    title: Dynamic Configuration for the rate limiter
+    properties:
+      overrides:
+        description: Allows to specify different limits for particular label values.
+        type: array
+        items:
+          $ref: '#/definitions/RateLimiterOverride'
   v1RateLimiterIns:
     type: object
     title: Inputs for the RateLimiter component

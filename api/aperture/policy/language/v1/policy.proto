@@ -327,8 +327,8 @@ message GradientController {
   // Configuration key for DynamicConfig
   string dynamic_config_key = 6;
 
-  // Initial configuration.
-  ControllerDynamicConfig init_config = 7;
+  // Default configuration.
+  ControllerDynamicConfig default_config = 7;
 }
 
 // Dynamic Configuration for a Controller
@@ -688,8 +688,8 @@ message RateLimiter {
   // Configuration key for DynamicConfig
   string dynamic_config_key = 6;
 
-  // Initial configuration
-  DynamicConfig init_config = 7;
+  // Default configuration
+  DynamicConfig default_config = 7;
 }
 
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
@@ -897,6 +897,13 @@ message Scheduler {
 
 // Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
 message LoadActuator {
+  // Dynamic Configuration for LoadActuator
+  message DynamicConfig {
+    // Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
+    // Useful for observing the behavior of Load Actuator without disrupting any real traffic.
+    bool dry_run = 1;
+  }
+
   // Input for the Load Actuator component.
   message Ins {
     // Load multiplier is ratio of [incoming
@@ -906,6 +913,12 @@ message LoadActuator {
 
   // Input ports for the Load Actuator component.
   Ins in_ports = 1;
+
+  // Configuration key for DynamicConfig.
+  string dynamic_config_key = 2;
+
+  // Default configuration.
+  DynamicConfig default_config = 3;
 }
 
 // Component that runs a Prometheus query periodically and returns the result as an output signal

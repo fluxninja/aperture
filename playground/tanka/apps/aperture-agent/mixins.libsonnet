@@ -21,7 +21,7 @@ local apertureAgentMixin =
           log+: {
             pretty_console: true,
             non_blocking: true,
-            level: 'debug',
+            level: 'info',
           },
           etcd+: {
             endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],

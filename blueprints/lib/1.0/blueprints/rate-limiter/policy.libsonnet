@@ -25,7 +25,7 @@ function(params) {
           + rateLimiter.withSelector($._config.rateLimiterSelector)
           + rateLimiter.withLimitResetInterval($._config.limitResetInterval)
           + rateLimiter.withLabelKey($._config.labelKey)
-          + rateLimiter.withInitConfig(
+          + rateLimiter.withDefaultConfig(
             dynamicConfig.new()
             + dynamicConfig.withOverrides($._config.overrides)
           )

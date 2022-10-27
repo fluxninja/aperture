@@ -156,21 +156,6 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
-### RateLimiterDynamicConfig {#rate-limiter-dynamic-config}
-
-Dynamic Configuration for the rate limiter
-
-#### Properties
-
-<dl>
-<dt>overrides</dt>
-<dd>
-
-([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
-
-</dd>
-</dl>
-
 ### RateLimiterLazySync {#rate-limiter-lazy-sync}
 
 #### Properties
@@ -1308,6 +1293,12 @@ The output can be _optionally_ clamped to desired range using `max` and
 #### Properties
 
 <dl>
+<dt>default_config</dt>
+<dd>
+
+([V1ControllerDynamicConfig](#v1-controller-dynamic-config)) Default configuration.
+
+</dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
@@ -1318,12 +1309,6 @@ The output can be _optionally_ clamped to desired range using `max` and
 <dd>
 
 ([V1GradientControllerIns](#v1-gradient-controller-ins)) Input ports of the Gradient Controller.
-
-</dd>
-<dt>init_config</dt>
-<dd>
-
-([V1ControllerDynamicConfig](#v1-controller-dynamic-config)) Initial configuration.
 
 </dd>
 <dt>max_gradient</dt>
@@ -1621,10 +1606,38 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 #### Properties
 
 <dl>
+<dt>default_config</dt>
+<dd>
+
+([V1LoadActuatorDynamicConfig](#v1-load-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig.
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
 ([V1LoadActuatorIns](#v1-load-actuator-ins)) Input ports for the Load Actuator component.
+
+</dd>
+</dl>
+
+### v1LoadActuatorDynamicConfig {#v1-load-actuator-dynamic-config}
+
+Dynamic Configuration for LoadActuator
+
+#### Properties
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+(bool) Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
+Useful for observing the behavior of Load Actuator without disrupting any real traffic.
 
 </dd>
 </dl>
@@ -1971,6 +1984,12 @@ to select which label should be used as key.
 #### Properties
 
 <dl>
+<dt>default_config</dt>
+<dd>
+
+([V1RateLimiterDynamicConfig](#v1-rate-limiter-dynamic-config)) Default configuration
+
+</dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
@@ -1981,12 +2000,6 @@ to select which label should be used as key.
 <dd>
 
 ([V1RateLimiterIns](#v1-rate-limiter-ins), `required`)
-
-</dd>
-<dt>init_config</dt>
-<dd>
-
-([RateLimiterDynamicConfig](#rate-limiter-dynamic-config)) Initial configuration
 
 </dd>
 <dt>label_key</dt>
@@ -2016,6 +2029,21 @@ label set up, set `label_key: "user"`.
 <dd>
 
 ([V1Selector](#v1-selector), `required`) Which control point to apply this ratelimiter to.
+
+</dd>
+</dl>
+
+### v1RateLimiterDynamicConfig {#v1-rate-limiter-dynamic-config}
+
+Dynamic Configuration for the rate limiter
+
+#### Properties
+
+<dl>
+<dt>overrides</dt>
+<dd>
+
+([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
 
 </dd>
 </dl>

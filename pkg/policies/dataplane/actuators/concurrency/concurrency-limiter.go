@@ -345,7 +345,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(conLimiter.GetComponentIndex(), 10)
 	// Create sub components.
 	clock := clockwork.NewRealClock()
-	loadActuator, err := loadActuatorFactory.newLoadActuator(conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
+	loadActuator, err := loadActuatorFactory.newLoadActuator(conLimiter.concurrencyLimiterMsg.GetLoadActuator(), conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
 	if err != nil {
 		return err
 	}

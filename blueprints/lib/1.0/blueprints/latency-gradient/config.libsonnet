@@ -24,6 +24,8 @@
     * @section Policy
     * @subsection Concurrency Limiter
     *
+    * @param (policy.concurrencyLimiter.autoTokens: bool) Whether tokens for workloads are computed dynamically or set statically by the user.
+    * @param (policy.concurrencyLimiter.timeoutFactor: float64) The maximum time a request can wait for tokens as a factor of tokens for a flow in a workload.
     * @param (policy.concurrencyLimiter.defaultWorkloadParameters.priority: int) Workload parameters to use in case none of the configured workloads match.
     * @param (policy.concurrencyLimiter.workloads: []aperture.spec.v1.SchedulerWorkload) A list of additional workloads for the scheduler.
     */
@@ -34,6 +36,15 @@
         priority: 20,
       },
       workloads: [],
+    },
+    /**
+    * @section Policy
+    * @subsection Dynamic Config
+    *
+    * @param (policy.dynamicConfig.dryRun: bool) Decides whether this Policy runs in dry-run mode I.E. no traffic dropped. The signals would show how this Policy behaves and when it decides to drop any traffic. Useful for evaluating a Policy without disrupting any real traffic.
+    */
+    dynamicConfig: {
+      dryRun: false,
     },
     /**
     * @section Policy

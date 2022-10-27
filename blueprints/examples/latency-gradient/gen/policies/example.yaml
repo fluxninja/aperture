@@ -1,4 +1,7 @@
 apiVersion: fluxninja.com/v1alpha1
+dynamicConfig:
+  concurrency_limiter_dynamic_config:
+    dry_run: false
 kind: Policy
 metadata:
   labels:
@@ -141,6 +144,7 @@ spec:
               signal_name: LOAD_MULTIPLIER
       - concurrency_limiter:
           load_actuator:
+            dynamic_config_key: concurrency_limiter_dynamic_config
             in_ports:
               load_multiplier:
                 signal_name: LOAD_MULTIPLIER
