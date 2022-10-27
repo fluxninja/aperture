@@ -5,7 +5,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const PROTO_PATH = path.resolve(
   path.dirname(__filename),
-  "./proto/flowcontrol.proto"
+  "./proto/flowcontrol/v1/flowcontrol.proto"
 );
 
 export const host = 'localhost';
