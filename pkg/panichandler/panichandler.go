@@ -80,7 +80,7 @@ func (r *PanicHandlerRegistry) Crash(v interface{}) {
 	stackTrace := Capture()
 	waitCh := make(chan struct{})
 
-	crashOnce.Do(func() {
+	go crashOnce.Do(func() {
 		r.mutex.RLock()
 		defer r.mutex.RUnlock()
 		wg := sync.WaitGroup{}
