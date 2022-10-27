@@ -12,8 +12,8 @@ var (
 	DecisionsPrefix = path.Join("/decisions")
 	// ClassifiersPath is config path in etcd for classifiers.
 	ClassifiersPath = path.Join(ConfigPrefix, "classifiers")
-	// LoadDecisionsPath is decision path in etcd for load decisions.
-	LoadDecisionsPath = path.Join(DecisionsPrefix, "load")
+	// LoadActuatorDecisionsPath is decision path in etcd for load decisions.
+	LoadActuatorDecisionsPath = path.Join(DecisionsPrefix, "load")
 	// AutoTokenResultsPath is config path in etcd for query tokens.
 	AutoTokenResultsPath = path.Join(ConfigPrefix, "tokens")
 	// ConcurrencyLimiterConfigPath is config path in etcd for concurrency limiter.
