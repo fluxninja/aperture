@@ -3296,8 +3296,8 @@ type LoadActuator_DynamicConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Decides whether to run the load actuator in dry-run mode. Dry run mode ensure that no traffic gets dropped by this load actuator.
-	// Useful for evaluating Load Actuator without disrupting any real traffic.
+	// Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
+	// Useful for observing the behavior of Load Actuator without disrupting any real traffic.
 	DryRun bool `protobuf:"varint,1,opt,name=dry_run,json=dryRun,proto3" json:"dry_run,omitempty"`
 }
 

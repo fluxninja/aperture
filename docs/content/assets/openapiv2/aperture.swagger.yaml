@@ -1686,8 +1686,8 @@ definitions:
       dry_run:
         type: boolean
         description: |-
-          Decides whether to run the load actuator in dry-run mode. Dry run mode ensure that no traffic gets dropped by this load actuator.
-          Useful for evaluating Load Actuator without disrupting any real traffic.
+          Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
+          Useful for observing the behavior of Load Actuator without disrupting any real traffic.
     title: Dynamic Configuration for LoadActuator
   v1LoadActuatorIns:
     type: object
