@@ -205,6 +205,8 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(
 
 			// Initialize the token bucket (non continuous tracking mode)
 			la.tokenBucketLoadMultiplier = scheduler.NewTokenBucketLoadMultiplier(clock.Now(), 10, time.Second, tokenBucketMetrics)
+			// Initialize with PassThrough mode
+			la.tokenBucketLoadMultiplier.SetPassThrough(true)
 
 			err = lsaFactory.loadDecisionWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {

@@ -90,10 +90,6 @@ func (tbls *TokenBucketLoadMultiplier) PreprocessRequest(now time.Time, rContext
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 
-	if tbls.passThrough {
-		return true
-	}
-
 	wasBootstrapping := tbls.counter.IsBootstrapping()
 
 	// Shift counter slot if needed
@@ -119,6 +115,10 @@ func (tbls *TokenBucketLoadMultiplier) PreprocessRequest(now time.Time, rContext
 	// Accept this request if we are still learning the tokenRate
 	if tbls.counter.IsBootstrapping() {
 		tbls.tbb.adjustTokens(now)
+		return true
+	}
+
+	if tbls.passThrough {
 		return true
 	}
 
