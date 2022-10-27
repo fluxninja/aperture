@@ -98,10 +98,6 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			p.updateMetrics(attributes, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
 			internal.EnforceIncludeListHTTP(attributes)
 		}
-
-		// Add dynamic Flow labels
-		internal.AddFlowLabels(attributes, checkResponse)
-
 		return nil
 	})
 	return ld, err

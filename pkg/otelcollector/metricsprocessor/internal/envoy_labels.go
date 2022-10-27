@@ -1,8 +1,9 @@
 package internal
 
 import (
-	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"go.opentelemetry.io/collector/pdata/pcommon"
+
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 // AddEnvoySpecificLabels adds labels specific to Envoy data source.
