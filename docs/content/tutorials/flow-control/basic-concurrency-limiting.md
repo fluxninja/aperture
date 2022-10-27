@@ -16,11 +16,11 @@ The most effective technique to protect services from cascading failures is to
 limit the concurrency on the service to match the processing capacity of the
 service. However, figuring out concurrency limit of a service is a hard problem
 in face of continuously changing service infrastructure. Each new version
-deployed, horizontal scaling, change in access patterns can change the
+deployed, horizontal scaling, or a change in access patterns can change the
 concurrency limit of a service.
 
 To accurately model the concurrency limit of a service, it's critical to track
-it's
+its
 [golden signals](https://sre.google/sre-book/monitoring-distributed-systems/#xref_monitoring_golden-signals).
 For instance, queue buildup can be detected by tracking deviation of current
 latency from historically normal values.
