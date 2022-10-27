@@ -56,7 +56,11 @@ func ResponseStatusForTelemetry(statusCode, featureStatus string) string {
 }
 
 func responseStatus(statusCode, featureStatus, okStatus, errorStatus string) string {
-	if strings.HasPrefix(statusCode, "2") {
+	// Checking status code this way instead of parsing int properly handles empty
+	// string as well.
+	if strings.HasPrefix(statusCode, "1") ||
+		strings.HasPrefix(statusCode, "2") ||
+		strings.HasPrefix(statusCode, "3") {
 		return okStatus
 	}
 	if featureStatus != "" {
