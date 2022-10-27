@@ -444,10 +444,38 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	// metricValue is the value at fluxMeter's AttributeKey
 	metricValue, _ := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsZero)
 
-	fluxMeterHistogram := fluxMeter.GetHistogram(decisionType, statusCode, featureStatus)
+	labels := statusLabelsForMetrics(decisionType, statusCode, featureStatus)
+	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
 	if fluxMeterHistogram != nil {
 		fluxMeterHistogram.Observe(metricValue)
 	}
+}
+
+func statusLabelsForMetrics(
+	decisionType flowcontrolv1.CheckResponse_DecisionType,
+	statusCode string,
+	featureStatus string,
+) map[string]string {
+	labels := make(map[string]string)
+	// Default ResponseStatusLabel is ResponseStatusFailure
+	labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusError
+	// Set ResponseStatusLabel based on protocol specific status
+	if statusCode != "" {
+		// Set ResponseStatusLabel=ResponseStatusSuccess if status code is 2xx
+		if strings.HasPrefix(statusCode, "2") {
+			labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusOK
+		} else {
+			labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusError
+		}
+	} else if featureStatus != "" {
+		// pass through in case of feature status
+		labels[metrics.ResponseStatusLabel] = featureStatus
+	}
+
+	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	labels[metrics.StatusCodeLabel] = statusCode
+	labels[metrics.FeatureStatusLabel] = featureStatus
+	return labels
 }
 
 /*
