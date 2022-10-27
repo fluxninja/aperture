@@ -174,14 +174,7 @@ func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
 // DynamicConfigUpdate handles overrides.
 func (limiterSync *rateLimiterSync) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
-	dynamicConfig := &policylangv1.RateLimiter_DynamicConfig{}
-	key := limiterSync.rateLimiterProto.GetDynamicConfigKey()
-	// read dynamic config
-	if unmarshaller.IsSet(key) {
-		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
-			logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
-			return
-		}
+	publishDynamicConfig := func(dynamicConfig *policylangv1.RateLimiter_DynamicConfig) {
 		wrapper := &wrappersv1.RateLimiterDynamicConfigWrapper{
 			RateLimiterDynamicConfig: dynamicConfig,
 			CommonAttributes: &wrappersv1.CommonAttributes{
@@ -200,5 +193,17 @@ func (limiterSync *rateLimiterSync) DynamicConfigUpdate(event notifiers.Event, u
 		}
 		limiterSync.dynamicConfigWriter.Write(limiterSync.dynamicConfigEtcdPath, dat)
 		logger.Info().Msg("rate limiter dynamic config updated")
+	}
+	dynamicConfig := &policylangv1.RateLimiter_DynamicConfig{}
+	key := limiterSync.rateLimiterProto.GetDynamicConfigKey()
+	// read dynamic config
+	if unmarshaller.IsSet(key) {
+		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
+			logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
+			return
+		}
+		publishDynamicConfig(dynamicConfig)
+	} else {
+		publishDynamicConfig(limiterSync.rateLimiterProto.GetDefaultConfig())
 	}
 }

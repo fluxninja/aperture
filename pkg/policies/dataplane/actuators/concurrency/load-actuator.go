@@ -9,9 +9,11 @@ import (
 	"github.com/jonboulle/clockwork"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -40,8 +42,8 @@ func newLoadActuatorFactory(
 	prometheusRegistry *prometheus.Registry,
 ) (*loadActuatorFactory, error) {
 	// Scope the sync to the agent group.
-	etcdPath := path.Join(common.LoadDecisionsPath, common.AgentGroupPrefix(agentGroup))
-	loadDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
+	etcdDecisionsPath := path.Join(common.LoadActuatorDecisionsPath, common.AgentGroupPrefix(agentGroup))
+	loadDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdDecisionsPath)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +137,9 @@ func newLoadActuatorFactory(
 }
 
 // newLoadActuator creates a new load actuator based on proto spec.
-func (lsaFactory *loadActuatorFactory) newLoadActuator(conLimiter *concurrencyLimiter,
+func (lsaFactory *loadActuatorFactory) newLoadActuator(
+	loadActuatorMsg *policylangv1.LoadActuator,
+	conLimiter *concurrencyLimiter,
 	registry status.Registry,
 	clock clockwork.Clock,
 	lifecycle fx.Lifecycle,
@@ -143,28 +147,30 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(conLimiter *concurrencyLi
 ) (*loadActuator, error) {
 	reg := registry.Child("load_actuator")
 
-	lsa := &loadActuator{
+	la := &loadActuator{
 		conLimiter:     conLimiter,
 		clock:          clock,
 		statusRegistry: reg,
 	}
 
-	unmarshaller, err := config.NewProtobufUnmarshaller(nil)
-	if err != nil {
-		return nil, err
+	etcdKey := common.DataplaneComponentKey(lsaFactory.agentGroupName, la.conLimiter.GetPolicyName(), la.conLimiter.GetComponentIndex())
+
+	decisionUnmarshaller, protoErr := config.NewProtobufUnmarshaller(nil)
+	if protoErr != nil {
+		return nil, protoErr
 	}
 
 	// decision notifier
 	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(common.DataplaneComponentKey(lsaFactory.agentGroupName, lsa.conLimiter.GetPolicyName(), lsa.conLimiter.GetComponentIndex())),
-		unmarshaller,
-		lsa.decisionUpdateCallback,
+		notifiers.Key(etcdKey),
+		decisionUnmarshaller,
+		la.decisionUpdateCallback,
 	)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			retErr := func(err error) error {
-				lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
+				la.statusRegistry.SetStatus(status.NewStatus(nil, err))
 				return err
 			}
 
@@ -198,7 +204,9 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(conLimiter *concurrencyLi
 			}
 
 			// Initialize the token bucket (non continuous tracking mode)
-			lsa.tokenBucketLoadMultiplier = scheduler.NewTokenBucketLoadMultiplier(clock.Now(), 10, time.Second, tokenBucketMetrics)
+			la.tokenBucketLoadMultiplier = scheduler.NewTokenBucketLoadMultiplier(clock.Now(), 10, time.Second, tokenBucketMetrics)
+			// Initialize with PassThrough mode
+			la.tokenBucketLoadMultiplier.SetPassThrough(true)
 
 			err = lsaFactory.loadDecisionWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {
@@ -208,9 +216,9 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(conLimiter *concurrencyLi
 		},
 		OnStop: func(context.Context) error {
 			var errMulti error
-			err := lsaFactory.loadDecisionWatcher.RemoveKeyNotifier(decisionNotifier)
-			if err != nil {
-				errMulti = multierr.Append(errMulti, err)
+			protoErr = lsaFactory.loadDecisionWatcher.RemoveKeyNotifier(decisionNotifier)
+			if protoErr != nil {
+				errMulti = multierr.Append(errMulti, protoErr)
 			}
 
 			deleted := lsaFactory.tokenBucketLMGaugeVec.Delete(metricLabels)
@@ -230,11 +238,11 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(conLimiter *concurrencyLi
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete "+metrics.TokenBucketAvailableMetricName+" gauge from its metric vector"))
 			}
 
-			lsa.statusRegistry.SetStatus(status.NewStatus(nil, errMulti))
+			la.statusRegistry.SetStatus(status.NewStatus(nil, errMulti))
 			return errMulti
 		},
 	})
-	return lsa, nil
+	return la, nil
 }
 
 // loadActuator saves load decisions received from controller.
@@ -245,10 +253,11 @@ type loadActuator struct {
 	statusRegistry            status.Registry
 }
 
-func (lsa *loadActuator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := lsa.statusRegistry.GetLogger()
+func (la *loadActuator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := la.statusRegistry.GetLogger()
 	if event.Type == notifiers.Remove {
-		logger.Debug().Msg("Decision was removed")
+		logger.Debug().Msg("Decision was removed, set pass through mode")
+		la.tokenBucketLoadMultiplier.SetPassThrough(true)
 		return
 	}
 
@@ -258,25 +267,31 @@ func (lsa *loadActuator) decisionUpdateCallback(event notifiers.Event, unmarshal
 	if err != nil || loadDecision == nil {
 		statusMsg := "Failed to unmarshal config wrapper"
 		logger.Warn().Err(err).Msg(statusMsg)
-		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
+		la.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
 	commonAttributes := wrapperMessage.GetCommonAttributes()
 	if commonAttributes == nil {
 		statusMsg := "Failed to get common attributes from config wrapperShedFactor"
 		logger.Error().Err(err).Msg(statusMsg)
-		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
+		la.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
 	// check if this decision is for the same policy id as what we have
-	if commonAttributes.PolicyHash != lsa.conLimiter.GetPolicyHash() {
+	if commonAttributes.PolicyHash != la.conLimiter.GetPolicyHash() {
 		err = errors.New("policy id mismatch")
-		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", lsa.conLimiter.GetPolicyHash(), commonAttributes.PolicyHash)
+		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", la.conLimiter.GetPolicyHash(), commonAttributes.PolicyHash)
 		logger.Warn().Err(err).Msg(statusMsg)
-		lsa.statusRegistry.SetStatus(status.NewStatus(nil, err))
+		la.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
 
-	logger.Trace().Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
-	lsa.tokenBucketLoadMultiplier.SetLoadMultiplier(lsa.clock.Now(), loadDecision.LoadMultiplier)
+	if loadDecision.PassThrough {
+		logger.Sample(zerolog.Often).Debug().Msg("Setting pass through mode")
+		la.tokenBucketLoadMultiplier.SetPassThrough(true)
+	} else {
+		logger.Sample(zerolog.Often).Debug().Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
+		la.tokenBucketLoadMultiplier.SetLoadMultiplier(la.clock.Now(), loadDecision.LoadMultiplier)
+		la.tokenBucketLoadMultiplier.SetPassThrough(false)
+	}
 }

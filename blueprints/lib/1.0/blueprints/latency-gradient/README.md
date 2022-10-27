@@ -21,10 +21,18 @@
 
 #### Concurrency Limiter
 
-| Parameter Name                                                 | Parameter Type                         | Default | Description                                                                |
-| -------------------------------------------------------------- | -------------------------------------- | ------- | -------------------------------------------------------------------------- |
-| `policy.concurrencyLimiter.defaultWorkloadParameters.priority` | `int`                                  | `20`    | Workload parameters to use in case none of the configured workloads match. |
-| `policy.concurrencyLimiter.workloads`                          | `[]aperture.spec.v1.SchedulerWorkload` | `[]`    | A list of additional workloads for the scheduler.                          |
+| Parameter Name                                                 | Parameter Type                         | Default | Description                                                                                    |
+| -------------------------------------------------------------- | -------------------------------------- | ------- | ---------------------------------------------------------------------------------------------- |
+| `policy.concurrencyLimiter.autoTokens`                         | `bool`                                 | `true`  | Whether tokens for workloads are computed dynamically or set statically by the user.           |
+| `policy.concurrencyLimiter.timeoutFactor`                      | `float64`                              | `0.5`   | The maximum time a request can wait for tokens as a factor of tokens for a flow in a workload. |
+| `policy.concurrencyLimiter.defaultWorkloadParameters.priority` | `int`                                  | `20`    | Workload parameters to use in case none of the configured workloads match.                     |
+| `policy.concurrencyLimiter.workloads`                          | `[]aperture.spec.v1.SchedulerWorkload` | `[]`    | A list of additional workloads for the scheduler.                                              |
+
+#### Dynamic Config
+
+| Parameter Name                | Parameter Type | Default | Description                                                                                                                                                                                                                           |
+| ----------------------------- | -------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `policy.dynamicConfig.dryRun` | `bool`         | `false` | Decides whether this Policy runs in dry-run mode I.E. no traffic dropped. The signals would show how this Policy behaves and when it decides to drop any traffic. Useful for evaluating a Policy without disrupting any real traffic. |
 
 #### Constants
 

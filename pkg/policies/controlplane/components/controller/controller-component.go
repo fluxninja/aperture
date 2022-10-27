@@ -21,18 +21,15 @@ type ControllerComponent struct {
 	// Controller output's last reading
 	output           runtime.Reading
 	policyReadAPI    iface.Policy
+	defaultConfig    *policylangv1.ControllerDynamicConfig
 	dynamicConfigKey string
 	componentIndex   int
 	manualMode       bool
 }
 
 // NewControllerComponent creates a new ControllerComponent.
-func NewControllerComponent(controller Controller, componentIndex int, policyReadAPI iface.Policy, dynamicConfigKey string, initConfig *policylangv1.ControllerDynamicConfig) *ControllerComponent {
-	manualMode := false
-	if initConfig != nil {
-		manualMode = initConfig.ManualMode
-	}
-	return &ControllerComponent{
+func NewControllerComponent(controller Controller, componentIndex int, policyReadAPI iface.Policy, dynamicConfigKey string, defaultConfig *policylangv1.ControllerDynamicConfig) *ControllerComponent {
+	cc := &ControllerComponent{
 		signal:           runtime.InvalidReading(),
 		setpoint:         runtime.InvalidReading(),
 		controlVariable:  runtime.InvalidReading(),
@@ -41,8 +38,10 @@ func NewControllerComponent(controller Controller, componentIndex int, policyRea
 		componentIndex:   componentIndex,
 		policyReadAPI:    policyReadAPI,
 		dynamicConfigKey: dynamicConfigKey,
-		manualMode:       manualMode,
+		defaultConfig:    defaultConfig,
 	}
+	cc.setConfig(defaultConfig)
+	return cc
 }
 
 // Execute implements runtime.Component.Execute.
@@ -131,11 +130,11 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickI
 	// Set output to control variable in-case of Manual mode
 	if cc.manualMode {
 		// wind the controller output to the control variable
-		windedOuput, err := cc.controller.WindOutput(output, controlVariable, cc, tickInfo)
+		windedOutput, err := cc.controller.WindOutput(output, controlVariable, cc, tickInfo)
 		if err != nil {
 			return retErr(err)
 		}
-		output = windedOuput
+		output = windedOutput
 	}
 
 	// Save readings for the next tick so that Controller may access them via ControllerStateReadAPI
@@ -156,7 +155,17 @@ func (cc *ControllerComponent) DynamicConfigUpdate(event notifiers.Event, unmars
 			logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
 			return
 		}
-		cc.manualMode = dynamicConfig.ManualMode
+		cc.setConfig(dynamicConfig)
+	} else {
+		cc.setConfig(cc.defaultConfig)
+	}
+}
+
+func (cc *ControllerComponent) setConfig(config *policylangv1.ControllerDynamicConfig) {
+	if config != nil {
+		cc.manualMode = config.ManualMode
+	} else {
+		cc.manualMode = false
 	}
 }
 
