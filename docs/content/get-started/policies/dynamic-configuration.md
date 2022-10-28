@@ -26,8 +26,8 @@ overrides for specific flow label keys via dynamic configuration. This prevents
 resetting of distributed counters that would otherwise happen when a policy is
 restarted.
 
-The dynamic configuration can be provided in the Policy Custom Resource itself
-under the `dynamicConfig` key. To learn more about it's usage, please see how
-the dynamic configuration is provided in the
+The dynamic configuration can be provided in the Policy Custom Resource using
+the `dynamicConfig` key. To learn more about it's usage, please see how the
+dynamic configuration is provided in the
 [Latency Gradient](https://github.com/fluxninja/aperture/blob/main/blueprints/lib/1.0/blueprints/latency-gradient/policy.libsonnet)
 Blueprint.
