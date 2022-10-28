@@ -107,19 +107,6 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 		map[string]interface{}{otelcollector.ApertureFlowLabelKeysLabel: []interface{}{"someLabel", "otherLabel"}},
 	),
 
-	Entry("Sets telemetry flow labels",
-		&flowcontrolv1.CheckResponse{
-			TelemetryFlowLabels: map[string]string{
-				"someLabel":  "someValue",
-				"otherLabel": "otherValue",
-			},
-		},
-		map[string]interface{}{
-			"someLabel":  "someValue",
-			"otherLabel": "otherValue",
-		},
-	),
-
 	Entry("Sets classifiers",
 		&flowcontrolv1.CheckResponse{
 			ClassifierInfos: []*flowcontrolv1.ClassifierInfo{
@@ -138,3 +125,16 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 		},
 	),
 )
+
+var _ = Describe("AddFlowLabels", func() {
+	attributes := pcommon.NewMap()
+	checkResponse := &flowcontrolv1.CheckResponse{
+		TelemetryFlowLabels: map[string]string{
+			"someLabel":  "someValue",
+			"otherLabel": "otherValue",
+		},
+	}
+	internal.AddFlowLabels(attributes, checkResponse)
+	Expect(attributes.AsRaw()).To(HaveKeyWithValue("someLabel", "someValue"))
+	Expect(attributes.AsRaw()).To(HaveKeyWithValue("otherLabel", "otherValue"))
+})
