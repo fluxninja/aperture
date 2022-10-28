@@ -98,6 +98,9 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			p.updateMetrics(attributes, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
 			internal.EnforceIncludeListHTTP(attributes)
 		}
+
+		// This needs to be called **after** internal.EnforceIncludeList{HTTP,SDK}.
+		internal.AddFlowLabels(attributes, checkResponse)
 		return nil
 	})
 	return ld, err

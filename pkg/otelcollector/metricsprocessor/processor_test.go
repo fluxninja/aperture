@@ -191,6 +191,7 @@ var _ = Describe("Metrics Processor", func() {
 		}}
 		baseCheckResp.FluxMeterInfos = []*flowcontrolv1.FluxMeterInfo{{FluxMeterName: "bar"}}
 		baseCheckResp.FlowLabelKeys = []string{"someLabel"}
+		baseCheckResp.TelemetryFlowLabels = map[string]string{"flowLabelKey": "flowLabelValue"}
 		baseCheckResp.Services = []string{"svc1", "svc2"}
 
 		// <split> is a workaround until PR https://github.com/prometheus/client_golang/pull/1143 is released
@@ -228,6 +229,7 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 			oc.ApertureProcessingDurationLabel: float64(1000),
 			oc.ApertureServicesLabel:           []interface{}{"svc1", "svc2"},
 			oc.ApertureControlPointLabel:       "type:TYPE_INGRESS",
+			"flowLabelKey":                     "flowLabelValue",
 		}
 		source = oc.ApertureSourceEnvoy
 
