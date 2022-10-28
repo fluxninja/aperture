@@ -112,10 +112,6 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		labels[otelcollector.ApertureFlowLabelKeysLabel].Slice().AppendEmpty().SetStr(flowLabelKey)
 	}
 
-	for key, value := range checkResponse.GetTelemetryFlowLabels() {
-		pcommon.NewValueStr(value).CopyTo(attributes.PutEmpty(key))
-	}
-
 	for _, classifier := range checkResponse.ClassifierInfos {
 		rawValue := []string{
 			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
@@ -139,5 +135,12 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 
 	for key, value := range labels {
 		value.CopyTo(attributes.PutEmpty(key))
+	}
+}
+
+// AddFlowLabels adds dynamic from labels.
+func AddFlowLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse) {
+	for key, value := range checkResponse.GetTelemetryFlowLabels() {
+		pcommon.NewValueStr(value).CopyTo(attributes.PutEmpty(key))
 	}
 }
