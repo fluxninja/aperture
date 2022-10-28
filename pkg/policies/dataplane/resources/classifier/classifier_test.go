@@ -7,11 +7,9 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/open-policy-agent/opa/ast"
 
-	labelmatcherv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/labelmatcher/v1"
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
 
@@ -23,7 +21,7 @@ import (
 
 type object = map[string]interface{}
 
-var commonAttributes = &wrappersv1.CommonAttributes{
+var commonAttributes = &policysyncv1.CommonAttributes{
 	PolicyName:     "test",
 	PolicyHash:     "test",
 	ComponentIndex: 0,
@@ -44,20 +42,20 @@ var _ = Describe("Classifier", func() {
 
 	Context("configured with some classification rules", func() {
 		// Classifier with a simple extractor-based rule
-		rs1 := &classificationv1.Classifier{
-			Selector: &selectorv1.Selector{
-				ServiceSelector: &selectorv1.ServiceSelector{
+		rs1 := &policylangv1.Classifier{
+			Selector: &policylangv1.Selector{
+				ServiceSelector: &policylangv1.ServiceSelector{
 					Service: "my-service.default.svc.cluster.local",
 				},
-				FlowSelector: &selectorv1.FlowSelector{
-					ControlPoint: &selectorv1.ControlPoint{
-						Controlpoint: &selectorv1.ControlPoint_Traffic{
+				FlowSelector: &policylangv1.FlowSelector{
+					ControlPoint: &policylangv1.ControlPoint{
+						Controlpoint: &policylangv1.ControlPoint_Traffic{
 							Traffic: "ingress",
 						},
 					},
 				},
 			},
-			Rules: map[string]*classificationv1.Rule{
+			Rules: map[string]*policylangv1.Rule{
 				"foo": {
 					Source:    headerExtractor("foo"),
 					Telemetry: true,
@@ -66,26 +64,26 @@ var _ = Describe("Classifier", func() {
 		}
 
 		// Classifier with Raw-rego rule, additionally gated for just "version one"
-		rs2 := &classificationv1.Classifier{
-			Selector: &selectorv1.Selector{
-				ServiceSelector: &selectorv1.ServiceSelector{
+		rs2 := &policylangv1.Classifier{
+			Selector: &policylangv1.Selector{
+				ServiceSelector: &policylangv1.ServiceSelector{
 					Service: "my-service.default.svc.cluster.local",
 				},
-				FlowSelector: &selectorv1.FlowSelector{
-					LabelMatcher: &labelmatcherv1.LabelMatcher{
+				FlowSelector: &policylangv1.FlowSelector{
+					LabelMatcher: &policylangv1.LabelMatcher{
 						MatchLabels: map[string]string{"version": "one"},
 					},
-					ControlPoint: &selectorv1.ControlPoint{
-						Controlpoint: &selectorv1.ControlPoint_Traffic{
+					ControlPoint: &policylangv1.ControlPoint{
+						Controlpoint: &policylangv1.ControlPoint_Traffic{
 							Traffic: "ingress",
 						},
 					},
 				},
 			},
-			Rules: map[string]*classificationv1.Rule{
+			Rules: map[string]*policylangv1.Rule{
 				"bar-twice": {
-					Source: &classificationv1.Rule_Rego_{
-						Rego: &classificationv1.Rule_Rego{
+					Source: &policylangv1.Rule_Rego_{
+						Rego: &policylangv1.Rule_Rego{
 							Source: `
 								package my.pkg
 								answer := input.attributes.request.http.headers.bar * 2
@@ -99,17 +97,17 @@ var _ = Describe("Classifier", func() {
 		}
 
 		// Classifier with a no service populated
-		rs3 := &classificationv1.Classifier{
-			Selector: &selectorv1.Selector{
-				FlowSelector: &selectorv1.FlowSelector{
-					ControlPoint: &selectorv1.ControlPoint{
-						Controlpoint: &selectorv1.ControlPoint_Traffic{
+		rs3 := &policylangv1.Classifier{
+			Selector: &policylangv1.Selector{
+				FlowSelector: &policylangv1.FlowSelector{
+					ControlPoint: &policylangv1.ControlPoint{
+						Controlpoint: &policylangv1.ControlPoint_Traffic{
 							Traffic: "ingress",
 						},
 					},
 				},
 			},
-			Rules: map[string]*classificationv1.Rule{
+			Rules: map[string]*policylangv1.Rule{
 				"fuu": {
 					Source:    headerExtractor("fuu"),
 					Telemetry: true,
@@ -120,17 +118,17 @@ var _ = Describe("Classifier", func() {
 		var ars1, ars2, ars3 ActiveRuleset
 		BeforeEach(func() {
 			var err error
-			ars1, err = classifier.AddRules(context.TODO(), "one", &wrappersv1.ClassifierWrapper{
+			ars1, err = classifier.AddRules(context.TODO(), "one", &policysyncv1.ClassifierWrapper{
 				Classifier:       rs1,
 				CommonAttributes: commonAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
-			ars2, err = classifier.AddRules(context.TODO(), "two", &wrappersv1.ClassifierWrapper{
+			ars2, err = classifier.AddRules(context.TODO(), "two", &policysyncv1.ClassifierWrapper{
 				Classifier:       rs2,
 				CommonAttributes: commonAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
-			ars3, err = classifier.AddRules(context.TODO(), "three", &wrappersv1.ClassifierWrapper{
+			ars3, err = classifier.AddRules(context.TODO(), "three", &policysyncv1.ClassifierWrapper{
 				Classifier:       rs3,
 				CommonAttributes: commonAttributes,
 			})
@@ -245,16 +243,16 @@ var _ = Describe("Classifier", func() {
 	})
 
 	// helper for setting rules with a "default" selector
-	setRulesForMyService := func(labelRules map[string]*classificationv1.Rule) error {
-		_, err := classifier.AddRules(context.TODO(), "test", &wrappersv1.ClassifierWrapper{
-			Classifier: &classificationv1.Classifier{
-				Selector: &selectorv1.Selector{
-					ServiceSelector: &selectorv1.ServiceSelector{
+	setRulesForMyService := func(labelRules map[string]*policylangv1.Rule) error {
+		_, err := classifier.AddRules(context.TODO(), "test", &policysyncv1.ClassifierWrapper{
+			Classifier: &policylangv1.Classifier{
+				Selector: &policylangv1.Selector{
+					ServiceSelector: &policylangv1.ServiceSelector{
 						Service: "my-service.default.svc.cluster.local",
 					},
-					FlowSelector: &selectorv1.FlowSelector{
-						ControlPoint: &selectorv1.ControlPoint{
-							Controlpoint: &selectorv1.ControlPoint_Traffic{
+					FlowSelector: &policylangv1.FlowSelector{
+						ControlPoint: &policylangv1.ControlPoint{
+							Controlpoint: &policylangv1.ControlPoint_Traffic{
 								Traffic: "ingress",
 							},
 						},
@@ -268,14 +266,14 @@ var _ = Describe("Classifier", func() {
 	}
 
 	Context("configured classification rules with some label flags", func() {
-		rules := map[string]*classificationv1.Rule{
+		rules := map[string]*policylangv1.Rule{
 			"foo": {
 				Source:    headerExtractor("foo"),
 				Telemetry: false,
 			},
 			"bar": {
-				Source: &classificationv1.Rule_Rego_{
-					Rego: &classificationv1.Rule_Rego{
+				Source: &policylangv1.Rule_Rego_{
+					Rego: &policylangv1.Rule_Rego{
 						Source: `
 							package my.pkg
 							answer := input.attributes.request.http.headers.bar
@@ -315,13 +313,13 @@ var _ = Describe("Classifier", func() {
 		// rulesets. But we might add support in the future, eg.:
 		// "foo/1": ...
 		// "foo/2": ...
-		rules1 := map[string]*classificationv1.Rule{
+		rules1 := map[string]*policylangv1.Rule{
 			"foo": {
 				Source:    headerExtractor("foo"),
 				Telemetry: true,
 			},
 		}
-		rules2 := map[string]*classificationv1.Rule{
+		rules2 := map[string]*policylangv1.Rule{
 			"foo": {
 				Source:    headerExtractor("xyz"),
 				Telemetry: true,
@@ -356,10 +354,10 @@ var _ = Describe("Classifier", func() {
 	})
 
 	Context("configured with same label for different rules in rego", func() {
-		rules1 := map[string]*classificationv1.Rule{
+		rules1 := map[string]*policylangv1.Rule{
 			"bar": {
-				Source: &classificationv1.Rule_Rego_{
-					Rego: &classificationv1.Rule_Rego{
+				Source: &policylangv1.Rule_Rego_{
+					Rego: &policylangv1.Rule_Rego{
 						Source: `
 							package my.pkg
 							answer := input.attributes.request.http.headers.bar * 3
@@ -370,10 +368,10 @@ var _ = Describe("Classifier", func() {
 				Telemetry: true,
 			},
 		}
-		rules2 := map[string]*classificationv1.Rule{
+		rules2 := map[string]*policylangv1.Rule{
 			"bar": {
-				Source: &classificationv1.Rule_Rego_{
-					Rego: &classificationv1.Rule_Rego{
+				Source: &policylangv1.Rule_Rego_{
+					Rego: &policylangv1.Rule_Rego{
 						Source: `
 							package my.pkg
 							answer2 := input.attributes.request.http.headers.bar * 2
@@ -412,10 +410,10 @@ var _ = Describe("Classifier", func() {
 	})
 
 	Context("incorrect rego passed", func() {
-		rules := map[string]*classificationv1.Rule{
+		rules := map[string]*policylangv1.Rule{
 			"bar-twice": {
-				Source: &classificationv1.Rule_Rego_{
-					Rego: &classificationv1.Rule_Rego{
+				Source: &policylangv1.Rule_Rego_{
+					Rego: &policylangv1.Rule_Rego{
 						Source: `
 							Package my.pkg
 							bar := input.attributes.request.http.headers.bar * 2
@@ -436,10 +434,10 @@ var _ = Describe("Classifier", func() {
 	})
 
 	Context("configured with ambiguous rules in rego", func() {
-		rules := map[string]*classificationv1.Rule{
+		rules := map[string]*policylangv1.Rule{
 			"bar": {
-				Source: &classificationv1.Rule_Rego_{
-					Rego: &classificationv1.Rule_Rego{
+				Source: &policylangv1.Rule_Rego_{
+					Rego: &policylangv1.Rule_Rego{
 						Source: `
 							package my.pkg
 							answer = input.attributes.request.http.headers.bar * 3
@@ -474,20 +472,20 @@ var _ = Describe("Classifier", func() {
 
 	Context("configured with invalid label name", func() {
 		// Classifier with a simple extractor-based rule
-		rs := &classificationv1.Classifier{
-			Selector: &selectorv1.Selector{
-				ServiceSelector: &selectorv1.ServiceSelector{
+		rs := &policylangv1.Classifier{
+			Selector: &policylangv1.Selector{
+				ServiceSelector: &policylangv1.ServiceSelector{
 					Service: "my-service.default.svc.cluster.local",
 				},
-				FlowSelector: &selectorv1.FlowSelector{
-					ControlPoint: &selectorv1.ControlPoint{
-						Controlpoint: &selectorv1.ControlPoint_Traffic{
+				FlowSelector: &policylangv1.FlowSelector{
+					ControlPoint: &policylangv1.ControlPoint{
+						Controlpoint: &policylangv1.ControlPoint_Traffic{
 							Traffic: "ingress",
 						},
 					},
 				},
 			},
-			Rules: map[string]*classificationv1.Rule{
+			Rules: map[string]*policylangv1.Rule{
 				"user-agent": {
 					Source:    headerExtractor("foo"),
 					Telemetry: true,
@@ -496,7 +494,7 @@ var _ = Describe("Classifier", func() {
 		}
 
 		It("should reject the ruleset", func() {
-			_, err := classifier.AddRules(context.TODO(), "one", &wrappersv1.ClassifierWrapper{
+			_, err := classifier.AddRules(context.TODO(), "one", &policysyncv1.ClassifierWrapper{
 				Classifier:       rs,
 				CommonAttributes: commonAttributes,
 			})
@@ -526,10 +524,10 @@ func attributesWithHeaders(headers object) ast.Value {
 	)
 }
 
-func headerExtractor(headerName string) *classificationv1.Rule_Extractor {
-	return &classificationv1.Rule_Extractor{
-		Extractor: &classificationv1.Extractor{
-			Variant: &classificationv1.Extractor_From{
+func headerExtractor(headerName string) *policylangv1.Rule_Extractor {
+	return &policylangv1.Rule_Extractor{
+		Extractor: &policylangv1.Extractor{
+			Variant: &policylangv1.Extractor_From{
 				From: "request.http.headers." + headerName,
 			},
 		},

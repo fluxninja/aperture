@@ -3,7 +3,7 @@ package iface
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 //go:generate mockgen -source=flux-meter.go -destination=../../mocks/mock_flux_meter.go -package=mocks
@@ -21,7 +21,7 @@ func (fmID FluxMeterID) String() string {
 // FluxMeter in an interface for interacting with fluxmeters.
 type FluxMeter interface {
 	// GetSelector returns the selector
-	GetSelector() *selectorv1.Selector
+	GetSelector() *policylangv1.Selector
 
 	// GetAttributeKey returns the attribute key
 	GetAttributeKey() string

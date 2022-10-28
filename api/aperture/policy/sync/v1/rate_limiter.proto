@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/policy.proto";
+import "aperture/policy/sync/v1/common_attributes.proto";
+
+message RateLimiterWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  // Rate Limiter
+  policy.language.v1.RateLimiter rate_limiter = 2;
+}
+
+message RateLimiterDynamicConfigWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  // RateLimiterDynamicConfig is the dynamic configuration for the rate limiter.
+  policy.language.v1.RateLimiter.DynamicConfig rate_limiter_dynamic_config = 2;
+}
+
+message RateLimiterDecisionWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  // Rate Limiter Decision
+  RateLimiterDecision rate_limiter_decision = 2;
+}
+
+message RateLimiterDecision {
+  double limit = 1;
+}

@@ -8,9 +8,8 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
-	policylanguagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -98,7 +97,7 @@ func setupFluxMeterModule(
 // FluxMeter describes single fluxmeter.
 type FluxMeter struct {
 	registry      status.Registry
-	selector      *selectorv1.Selector
+	selector      *policylangv1.Selector
 	histMetricVec *prometheus.HistogramVec
 	fluxMeterName string
 	attributeKey  string
@@ -116,7 +115,7 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	reg status.Registry,
 ) (fx.Option, error) {
 	logger := fluxMeterFactory.registry.GetLogger()
-	wrapperMessage := &wrappersv1.FluxMeterWrapper{}
+	wrapperMessage := &policysyncv1.FluxMeterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.FluxMeter == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
@@ -127,17 +126,17 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 
 	buckets := make([]float64, 0)
 	switch fluxMeterProto.GetHistogramBuckets().(type) {
-	case *policylanguagev1.FluxMeter_LinearBuckets_:
+	case *policylangv1.FluxMeter_LinearBuckets_:
 		if linearBuckets := fluxMeterProto.GetLinearBuckets(); linearBuckets != nil {
 			buckets = append(buckets, prometheus.LinearBuckets(
 				linearBuckets.GetStart(), linearBuckets.GetWidth(), int(linearBuckets.GetCount()))...)
 		}
-	case *policylanguagev1.FluxMeter_ExponentialBuckets_:
+	case *policylangv1.FluxMeter_ExponentialBuckets_:
 		if exponentialBuckets := fluxMeterProto.GetExponentialBuckets(); exponentialBuckets != nil {
 			buckets = append(buckets, prometheus.ExponentialBuckets(
 				exponentialBuckets.GetStart(), exponentialBuckets.GetFactor(), int(exponentialBuckets.GetCount()))...)
 		}
-	case *policylanguagev1.FluxMeter_ExponentialBucketsRange_:
+	case *policylangv1.FluxMeter_ExponentialBucketsRange_:
 		if exponentialBucketsRange := fluxMeterProto.GetExponentialBucketsRange(); exponentialBucketsRange != nil {
 			buckets = append(buckets, prometheus.ExponentialBucketsRange(
 				exponentialBucketsRange.GetMin(), exponentialBucketsRange.GetMax(), int(exponentialBucketsRange.GetCount()))...)
@@ -216,7 +215,7 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 }
 
 // GetSelector returns the selector.
-func (fluxMeter *FluxMeter) GetSelector() *selectorv1.Selector {
+func (fluxMeter *FluxMeter) GetSelector() *policylangv1.Selector {
 	return fluxMeter.selector
 }
 
