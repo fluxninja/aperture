@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+declare -A plugin_repo_list
+plugin_repo_list[circleci_plugin]=https://github.com/lukeab/asdf-circleci-cli.git
+
 git_root="$(git rev-parse --show-toplevel)"
 readonly git_root="${git_root}"
 readonly version_file="${git_root}"/.tool-versions
@@ -44,7 +47,7 @@ add_plugins() {
 		if ! array_contains "${plugin}" "${added_plugins[@]}"; then
 			printf 'Adding asdf plugin: "%s"\n' "${plugin}"
 			if [[ $plugin == "circleci" ]]; then
-				asdf plugin add circleci https://github.com/lukeab/asdf-circleci-cli.git
+				asdf plugin add circleci ${plugin_repo_list[circleci_plugin]}
 			else
 				asdf plugin add "${plugin}"
 			fi
