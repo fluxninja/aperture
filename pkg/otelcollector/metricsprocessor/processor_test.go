@@ -363,9 +363,9 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
-			logRecord.Attributes().PutString(oc.ApertureSourceLabel, source)
-			logRecord.Attributes().PutString(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
-			logRecord.Attributes().PutString(oc.HTTPStatusCodeLabel, "201")
+			logRecord.Attributes().PutStr(oc.ApertureSourceLabel, source)
+			logRecord.Attributes().PutStr(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
+			logRecord.Attributes().PutStr(oc.HTTPStatusCodeLabel, "201")
 			logRecord.Attributes().PutDouble(oc.WorkloadDurationLabel, 5)
 			logRecord.Attributes().PutDouble(oc.EnvoyAuthzDurationLabel, 1)
 			for i, fm := range checkResponse.FluxMeterInfos {

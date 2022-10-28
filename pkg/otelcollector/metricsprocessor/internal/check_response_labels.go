@@ -48,7 +48,7 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
 
 	// Control Point
-	attributes.PutString(otelcollector.ApertureControlPointLabel, checkResponse.GetControlPointInfo().String())
+	attributes.PutStr(otelcollector.ApertureControlPointLabel, checkResponse.GetControlPointInfo().String())
 
 	labels := map[string]pcommon.Value{
 		otelcollector.ApertureRateLimitersLabel:                pcommon.NewValueSlice(),
