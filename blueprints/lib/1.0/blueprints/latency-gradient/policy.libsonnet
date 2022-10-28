@@ -135,7 +135,7 @@ function(params) {
             )
             + concurrencyLimiter.withLoadActuator(
               loadActuator.withInPortsMixin({ load_multiplier: port.withSignalName('LOAD_MULTIPLIER') })
-              + loadActuator.withDynamicConfigKey('concurrency_limiter_dynamic_config')
+              + loadActuator.withDynamicConfigKey('concurrency_limiter')
             )
           ),
           component.withDecider(
@@ -171,7 +171,7 @@ function(params) {
     },
     spec: policyDef,
     dynamicConfig: {
-      concurrency_limiter_dynamic_config: loadActuatorDynamicConfig.withDryRun($._config.dynamicConfig.dryRun),
+      concurrency_limiter: loadActuatorDynamicConfig.withDryRun($._config.dynamicConfig.dryRun),
     },
   },
 
