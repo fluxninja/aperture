@@ -8,7 +8,6 @@ import (
 	reflect "reflect"
 
 	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	gomock "github.com/golang/mock/gomock"
 	prometheus "github.com/prometheus/client_golang/prometheus"
@@ -80,17 +79,17 @@ func (mr *MockFluxMeterMockRecorder) GetFluxMeterName() *gomock.Call {
 }
 
 // GetHistogram mocks base method.
-func (m *MockFluxMeter) GetHistogram(decisionType flowcontrolv1.CheckResponse_DecisionType, statusCode, featureStatus string) prometheus.Observer {
+func (m *MockFluxMeter) GetHistogram(labels map[string]string) prometheus.Observer {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetHistogram", decisionType, statusCode, featureStatus)
+	ret := m.ctrl.Call(m, "GetHistogram", labels)
 	ret0, _ := ret[0].(prometheus.Observer)
 	return ret0
 }
 
 // GetHistogram indicates an expected call of GetHistogram.
-func (mr *MockFluxMeterMockRecorder) GetHistogram(decisionType, statusCode, featureStatus interface{}) *gomock.Call {
+func (mr *MockFluxMeterMockRecorder) GetHistogram(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram), decisionType, statusCode, featureStatus)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram), labels)
 }
 
 // GetSelector mocks base method.

@@ -191,6 +191,7 @@ var _ = Describe("Metrics Processor", func() {
 		}}
 		baseCheckResp.FluxMeterInfos = []*flowcontrolv1.FluxMeterInfo{{FluxMeterName: "bar"}}
 		baseCheckResp.FlowLabelKeys = []string{"someLabel"}
+		baseCheckResp.TelemetryFlowLabels = map[string]string{"flowLabelKey": "flowLabelValue"}
 		baseCheckResp.Services = []string{"svc1", "svc2"}
 
 		// <split> is a workaround until PR https://github.com/prometheus/client_golang/pull/1143 is released
@@ -207,10 +208,11 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 `
 
 		expectedLabels = map[string]interface{}{
-			oc.ApertureDecisionTypeLabel: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
-			oc.ApertureErrorLabel:        flowcontrolv1.CheckResponse_ERROR_NONE.String(),
-			oc.ApertureRejectReasonLabel: flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
-			oc.ApertureClassifiersLabel:  []interface{}{"policy_name:foo,classifier_index:1"},
+			oc.ApertureDecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+			oc.ApertureErrorLabel:          flowcontrolv1.CheckResponse_ERROR_NONE.String(),
+			oc.ApertureRejectReasonLabel:   flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
+			oc.ApertureResponseStatusLabel: oc.ApertureResponseStatusOK,
+			oc.ApertureClassifiersLabel:    []interface{}{"policy_name:foo,classifier_index:1"},
 
 			oc.ApertureClassifierErrorsLabel: []interface{}{fmt.Sprintf("%s,policy_name:foo,classifier_index:1,policy_hash:foo-hash",
 				flowcontrolv1.ClassifierInfo_ERROR_EMPTY_RESULTSET.String())},
@@ -227,6 +229,7 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 			oc.ApertureProcessingDurationLabel: float64(1000),
 			oc.ApertureServicesLabel:           []interface{}{"svc1", "svc2"},
 			oc.ApertureControlPointLabel:       "type:TYPE_INGRESS",
+			"flowLabelKey":                     "flowLabelValue",
 		}
 		source = oc.ApertureSourceEnvoy
 
@@ -362,9 +365,9 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
-			logRecord.Attributes().PutString(oc.ApertureSourceLabel, source)
-			logRecord.Attributes().PutString(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
-			logRecord.Attributes().PutString(oc.HTTPStatusCodeLabel, "201")
+			logRecord.Attributes().PutStr(oc.ApertureSourceLabel, source)
+			logRecord.Attributes().PutStr(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
+			logRecord.Attributes().PutStr(oc.HTTPStatusCodeLabel, "201")
 			logRecord.Attributes().PutDouble(oc.WorkloadDurationLabel, 5)
 			logRecord.Attributes().PutDouble(oc.EnvoyAuthzDurationLabel, 1)
 			for i, fm := range checkResponse.FluxMeterInfos {

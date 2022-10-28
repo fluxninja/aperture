@@ -54,6 +54,12 @@ const (
 	ApertureClassifiersLabel = "aperture.classifiers"
 	// ApertureClassifierErrorsLabel describes encountered classifier errors for specified policy.
 	ApertureClassifierErrorsLabel = "aperture.classifier_errors"
+	// ApertureResponseStatusLabel label to denote OK or Error across all protocols.
+	ApertureResponseStatusLabel = "aperture.response_status"
+	// ApertureResponseStatusOK OK response across all protocols.
+	ApertureResponseStatusOK = ApertureFeatureStatusOK
+	// ApertureResponseStatusError Error response across all protocols.
+	ApertureResponseStatusError = ApertureFeatureStatusError
 
 	/* HTTP Specific labels. */
 

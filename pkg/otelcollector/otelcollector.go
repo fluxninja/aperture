@@ -7,7 +7,6 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/confmap/converter/expandconverter"
-	"go.opentelemetry.io/collector/confmap/converter/overwritepropertiesconverter"
 	"go.opentelemetry.io/collector/service"
 	logsv1 "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 	metricsv1 "go.opentelemetry.io/proto/otlp/collector/metrics/v1"
@@ -67,7 +66,6 @@ func setup(in ConstructorIn) error {
 					URIs:      uris,
 					Providers: providers,
 					Converters: []confmap.Converter{
-						overwritepropertiesconverter.New([]string{}),
 						expandconverter.New(),
 					},
 				},
