@@ -2,9 +2,12 @@ syntax = "proto3";
 
 package aperture.policy.decisions.v1;
 
+import "aperture/common/tick/v1/tick.proto";
+
 message LoadDecision {
   double load_multiplier = 1;
   bool pass_through = 2;
+  common.tick.v1.TickInfo tick_info = 3;
 }
 
 message TokensDecision {

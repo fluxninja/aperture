@@ -3,7 +3,6 @@ package concurrency
 import (
 	"context"
 	"path"
-	"sync"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
@@ -25,7 +24,6 @@ import (
 
 // LoadActuator struct.
 type LoadActuator struct {
-	dryRunLock        sync.RWMutex
 	policyReadAPI     iface.Policy
 	decisionWriter    *etcdwriter.Writer
 	loadActuatorProto *policylangv1.LoadActuator
@@ -99,7 +97,7 @@ func (la *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo run
 				} else {
 					lmValue = lmReading.Value()
 				}
-				return nil, la.publishDecision(lmValue, false)
+				return nil, la.publishDecision(tickInfo, lmValue, false)
 			} else {
 				logger.Sample(zerolog.Often).Info().Msg("Invalid load multiplier data")
 			}
@@ -109,13 +107,11 @@ func (la *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo run
 	} else {
 		logger.Sample(zerolog.Often).Info().Msg("load_multiplier port not found")
 	}
-	return nil, la.publishDefaultDecision()
+	return nil, la.publishDefaultDecision(tickInfo)
 }
 
 // DynamicConfigUpdate finds the dynamic config and syncs the decision to agent.
 func (la *LoadActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	la.dryRunLock.Lock()
-	defer la.dryRunLock.Unlock()
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	key := la.loadActuatorProto.GetDynamicConfigKey()
 	// read dynamic config
@@ -139,13 +135,11 @@ func (la *LoadActuator) setConfig(config *policylangv1.LoadActuator_DynamicConfi
 	}
 }
 
-func (la *LoadActuator) publishDefaultDecision() error {
-	return la.publishDecision(1.0, true)
+func (la *LoadActuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {
+	return la.publishDecision(tickInfo, 1.0, true)
 }
 
-func (la *LoadActuator) publishDecision(loadMultiplier float64, passThrough bool) error {
-	la.dryRunLock.RLock()
-	defer la.dryRunLock.RUnlock()
+func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool) error {
 	if la.dryRun {
 		passThrough = true
 	}
@@ -154,6 +148,7 @@ func (la *LoadActuator) publishDecision(loadMultiplier float64, passThrough bool
 	decision := &policydecisionsv1.LoadDecision{
 		LoadMultiplier: loadMultiplier,
 		PassThrough:    passThrough,
+		TickInfo:       tickInfo.Serialize(),
 	}
 	// Publish decision
 	logger.Sample(zerolog.Often).Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")
