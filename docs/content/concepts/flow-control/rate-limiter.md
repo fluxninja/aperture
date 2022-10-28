@@ -21,7 +21,7 @@ Rate Limiter is configured as a [policy][policies] component.
 
 ## Distributed Counters
 
-For each configured [Rate Limiter component][reference], every matching Aperture
+For each configured [Rate Limiter Component][reference], every matching Aperture
 Agent instantiates a copy of Rate Limiter. They're all sharing counters though,
 so conceptually they work as a single Rate Limiter. That's possible thanks to
 distributed counters, powered by [Agent-to-Agent peer-to-peer

@@ -12,9 +12,9 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-One of the simplest flow-control policies is static rate limiting to regulate
+One of the simplest flow control policies is static rate limiting to regulate
 heavy-hitters. It uses
-[rate limiting actuator](/concepts/flow-control/rate-limiter.md) to block
+[Rate Limiting Actuator](/concepts/flow-control/rate-limiter.md) to block
 specific flow labels that exceed their quota within a certain timeframe (limit
 reset interval).
 
