@@ -87,31 +87,6 @@ commands:
             asdf reshim
 
 jobs:
-  publish-aperture-java-release:
-    parameters:
-      path:
-        type: string
-        description: Path to aperture-java
-        default: sdks/aperture-java
-    docker:
-      - image: cimg/openjdk:11.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - gradle-v1-{{ checksum <<parameters.path>>/"build.gradle.kts" }}
-            - gradle-v1-
-      # See https://discuss.circleci.com/t/gpg-keys-as-environment-variables/28641
-      - run:
-          name: Publish to Sonatype
-          command: |
-            cd <<parameters.path>>
-            GPG_PRIVATE_KEY=$(echo -e ${GPG_PRIVATE_KEY}) gradle assemble publishToSonatype
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: gradle-v1-{{ checksum <<parameters.path>>/"build.gradle.kts" }}
-
   release-components:
     executor: base-cimg-executor
     steps:
@@ -301,17 +276,3 @@ workflows:
             tags:
               only: /^v.*$/
           configuration_path: .circleci/post-release.yaml
-
-  publish-aperture-java-release:
-    when:
-      matches: { value: << pipeline.git.tag >>, pattern: "^releases/.*$" }
-    jobs:
-      - publish-aperture-java-release:
-          path: sdks/aperture-java
-          context: sonatype
-          # both this and workflow's when is needed
-          filters:
-            branches:
-              ignore: /.+/
-            tags:
-              only: /^releases\/.*$/
