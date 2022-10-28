@@ -144,7 +144,7 @@ function(params) {
     newBarGaugePanel('WFQ Scheduler Heap Requests', ds, 'avg(wfq_requests_total{policy_name="%(policyName)s"})' % { policyName: $._config.policyName }),
 
   local TotalBucketLoadSchedFactor =
-    newStatPanel('Total Bucket Load Sched Factor', ds, 'avg(token_bucket_lsf_ratio{policy_name="%(policyName)s"})' % { policyName: $._config.policyName }),
+    newStatPanel('Average Load Multiplier', ds, 'avg(token_bucket_lm_ratio{policy_name="%(policyName)s"})' % { policyName: $._config.policyName }),
 
   local TokenBucketBucketCapacity =
     newStatPanel('Token Bucket Bucket Capacity', ds, 'avg(token_bucket_capacity_total{policy_name="%(policyName)s"})' % { policyName: $._config.policyName })
