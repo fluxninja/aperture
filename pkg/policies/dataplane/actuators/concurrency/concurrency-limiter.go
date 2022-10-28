@@ -14,10 +14,9 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -248,7 +247,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	reg status.Registry,
 ) (fx.Option, error) {
 	logger := conLimiterFactory.registry.GetLogger()
-	wrapperMessage := &wrappersv1.ConcurrencyLimiterWrapper{}
+	wrapperMessage := &policysyncv1.ConcurrencyLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	concurrencyLimiterMessage := wrapperMessage.ConcurrencyLimiter
 	if err != nil || concurrencyLimiterMessage == nil {
@@ -447,7 +446,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 }
 
 // GetSelector returns selector.
-func (conLimiter *concurrencyLimiter) GetSelector() *selectorv1.Selector {
+func (conLimiter *concurrencyLimiter) GetSelector() *policylangv1.Selector {
 	return conLimiter.concurrencyLimiterMsg.GetSelector()
 }
 

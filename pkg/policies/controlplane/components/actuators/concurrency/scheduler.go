@@ -13,9 +13,8 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
@@ -45,7 +44,7 @@ type Scheduler struct {
 	tokensQuery *components.TaggedQuery
 
 	// saves tokens value per workload read from prometheus
-	tokensByWorkload *policydecisionsv1.TokensDecision
+	tokensByWorkload *policysyncv1.TokensDecision
 	writer           *etcdwriter.Writer
 	agentGroupName   string
 	etcdPath         string
@@ -64,7 +63,7 @@ func NewSchedulerAndOptions(
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,
-		tokensByWorkload: &policydecisionsv1.TokensDecision{
+		tokensByWorkload: &policysyncv1.TokensDecision{
 			TokensByWorkloadIndex: make(map[string]uint64),
 		},
 		agentGroupName:  agentGroupName,
@@ -188,7 +187,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 			s.tokensPromValue = promValue
 
 			if vector, ok := promValue.(prometheusmodel.Vector); ok {
-				tokensDecision := &policydecisionsv1.TokensDecision{
+				tokensDecision := &policysyncv1.TokensDecision{
 					TokensByWorkloadIndex: make(map[string]uint64),
 				}
 				for _, sample := range vector {
@@ -248,16 +247,16 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 // DynamicConfigUpdate is a no-op for this component.
 func (s *Scheduler) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
 
-func (s *Scheduler) publishQueryTokens(tokens *policydecisionsv1.TokensDecision) error {
+func (s *Scheduler) publishQueryTokens(tokens *policysyncv1.TokensDecision) error {
 	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
 	// TODO: publish only on change
 	s.tokensByWorkload = tokens
 	policyName := s.policyReadAPI.GetPolicyName()
 	policyHash := s.policyReadAPI.GetPolicyHash()
 
-	wrapper := &wrappersv1.TokensDecisionWrapper{
+	wrapper := &policysyncv1.TokensDecisionWrapper{
 		TokensDecision: tokens,
-		CommonAttributes: &wrappersv1.CommonAttributes{
+		CommonAttributes: &policysyncv1.CommonAttributes{
 			PolicyName:     policyName,
 			PolicyHash:     policyHash,
 			ComponentIndex: int64(s.componentIndex),

@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package aperture.policy.language.v1;
 
-import "aperture/common/labelmatcher/v1/labelmatcher.proto";
-import "aperture/common/selector/v1/selector.proto";
 import "aperture/policy/language/v1/classifier.proto";
 import "aperture/policy/language/v1/fluxmeter.proto";
+import "aperture/policy/language/v1/label_matcher.proto";
+import "aperture/policy/language/v1/selector.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
@@ -654,7 +654,7 @@ message RateLimiter {
   }]; // @gotags: validate:"required"
 
   // Which control point to apply this ratelimiter to.
-  common.selector.v1.Selector selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  Selector selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}
@@ -705,7 +705,7 @@ message RateLimiter {
 // strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 message ConcurrencyLimiter {
   // Selector decides the service and flows at which the concurrency limiter is applied.
-  common.selector.v1.Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}
@@ -780,7 +780,7 @@ message Scheduler {
 
     // Label Matcher to select a Workload based on
     // [flow labels](/concepts/flow-control/flow-label.md).
-    common.labelmatcher.v1.LabelMatcher label_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    LabelMatcher label_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
         value: {string_value: "required"}

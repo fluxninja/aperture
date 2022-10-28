@@ -4,11 +4,11 @@ info:
   version: "1.0"
 tags:
   - name: EntityCacheService
+  - name: FlowControlService
   - name: InfoService
   - name: PeerDiscoveryService
-  - name: StatusService
-  - name: FlowControlService
   - name: PolicyService
+  - name: StatusService
   - name: FluxNinjaService
   - name: ControllerInfoService
 consumes:

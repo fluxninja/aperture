@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	policiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
@@ -70,9 +70,9 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (Compi
 
 	if policy.GetResources() != nil {
 		for _, c := range policy.GetResources().Classifiers {
-			_, err = compiler.CompileRuleset(ctx, name, &wrappersv1.ClassifierWrapper{
+			_, err = compiler.CompileRuleset(ctx, name, &policysyncv1.ClassifierWrapper{
 				Classifier: c,
-				CommonAttributes: &wrappersv1.CommonAttributes{
+				CommonAttributes: &policysyncv1.CommonAttributes{
 					PolicyName:     "dummy",
 					PolicyHash:     "dummy",
 					ComponentIndex: 0,

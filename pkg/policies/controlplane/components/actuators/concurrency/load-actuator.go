@@ -10,9 +10,8 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
@@ -151,15 +150,15 @@ func (la *LoadActuator) publishDecision(loadMultiplier float64, passThrough bool
 	}
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Save load multiplier in decision message
-	decision := &policydecisionsv1.LoadDecision{
+	decision := &policysyncv1.LoadDecision{
 		LoadMultiplier: loadMultiplier,
 		PassThrough:    passThrough,
 	}
 	// Publish decision
 	logger.Sample(zerolog.Often).Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")
-	wrapper := &wrappersv1.LoadDecisionWrapper{
+	wrapper := &policysyncv1.LoadDecisionWrapper{
 		LoadDecision: decision,
-		CommonAttributes: &wrappersv1.CommonAttributes{
+		CommonAttributes: &policysyncv1.CommonAttributes{
 			PolicyName:     la.policyReadAPI.GetPolicyName(),
 			PolicyHash:     la.policyReadAPI.GetPolicyHash(),
 			ComponentIndex: int64(la.componentIndex),
