@@ -3,7 +3,6 @@ package iface
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
@@ -33,6 +32,11 @@ type FluxMeter interface {
 	// GetFluxMeterID returns the flux meter ID
 	GetFluxMeterID() FluxMeterID
 
-	// GetHistogram returns the histogram observer for the flowcontrolv1.DecisionType
-	GetHistogram(decisionType flowcontrolv1.CheckResponse_DecisionType, statusCode string, featureStatus string) prometheus.Observer
+	// GetHistogram returns the histogram observer for given labels.
+	// It expects the following labels to be set:
+	//  * metrics.DecisionTypeLabel,
+	//  * metrics.ResponseStatusLabel,
+	//  * metrics.StatusCodeLabel,
+	//  * metrics.FeatureStatusLabel.
+	GetHistogram(labels map[string]string) prometheus.Observer
 }

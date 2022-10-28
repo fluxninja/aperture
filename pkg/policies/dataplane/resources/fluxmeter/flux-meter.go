@@ -3,13 +3,11 @@ package fluxmeter
 import (
 	"context"
 	"path"
-	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -239,36 +237,12 @@ func (fluxMeter *FluxMeter) GetFluxMeterID() iface.FluxMeterID {
 }
 
 // GetHistogram returns the histogram.
-func (fluxMeter *FluxMeter) GetHistogram(decisionType flowcontrolv1.CheckResponse_DecisionType,
-	statusCode string,
-	featureStatus string,
-) prometheus.Observer {
+func (fluxMeter *FluxMeter) GetHistogram(labels map[string]string) prometheus.Observer {
 	logger := fluxMeter.registry.GetLogger()
-	labels := make(map[string]string)
-	// Default ResponseStatusLabel is ResponseStatusFailure
-	labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusError
-	// Set ResponseStatusLabel based on protocol specific status
-	if statusCode != "" {
-		// Set ResponseStatusLabel=ResponseStatusSuccess if status code is 2xx
-		if strings.HasPrefix(statusCode, "2") {
-			labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusOK
-		} else {
-			labels[metrics.ResponseStatusLabel] = metrics.ResponseStatusError
-		}
-	} else if featureStatus != "" {
-		// pass through in case of feature status
-		labels[metrics.ResponseStatusLabel] = featureStatus
-	}
-
-	labels[metrics.DecisionTypeLabel] = decisionType.String()
-	labels[metrics.StatusCodeLabel] = statusCode
-	labels[metrics.FeatureStatusLabel] = featureStatus
-
 	fluxMeterHistogram, err := fluxMeter.histMetricVec.GetMetricWith(labels)
 	if err != nil {
 		logger.Warn().Err(err).Msg("Getting latency histogram")
 		return nil
 	}
-
 	return fluxMeterHistogram
 }
