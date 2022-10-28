@@ -207,10 +207,11 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 `
 
 		expectedLabels = map[string]interface{}{
-			oc.ApertureDecisionTypeLabel: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
-			oc.ApertureErrorLabel:        flowcontrolv1.CheckResponse_ERROR_NONE.String(),
-			oc.ApertureRejectReasonLabel: flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
-			oc.ApertureClassifiersLabel:  []interface{}{"policy_name:foo,classifier_index:1"},
+			oc.ApertureDecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+			oc.ApertureErrorLabel:          flowcontrolv1.CheckResponse_ERROR_NONE.String(),
+			oc.ApertureRejectReasonLabel:   flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
+			oc.ApertureResponseStatusLabel: oc.ApertureResponseStatusOK,
+			oc.ApertureClassifiersLabel:    []interface{}{"policy_name:foo,classifier_index:1"},
 
 			oc.ApertureClassifierErrorsLabel: []interface{}{fmt.Sprintf("%s,policy_name:foo,classifier_index:1,policy_hash:foo-hash",
 				flowcontrolv1.ClassifierInfo_ERROR_EMPTY_RESULTSET.String())},
@@ -362,9 +363,9 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
-			logRecord.Attributes().PutString(oc.ApertureSourceLabel, source)
-			logRecord.Attributes().PutString(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
-			logRecord.Attributes().PutString(oc.HTTPStatusCodeLabel, "201")
+			logRecord.Attributes().PutStr(oc.ApertureSourceLabel, source)
+			logRecord.Attributes().PutStr(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
+			logRecord.Attributes().PutStr(oc.HTTPStatusCodeLabel, "201")
 			logRecord.Attributes().PutDouble(oc.WorkloadDurationLabel, 5)
 			logRecord.Attributes().PutDouble(oc.EnvoyAuthzDurationLabel, 1)
 			for i, fm := range checkResponse.FluxMeterInfos {

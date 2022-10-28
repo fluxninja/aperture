@@ -33,7 +33,7 @@ Agents.
 ## Metric
 
 The default metric tracked by Flux Meter is the Flow's workload duration in
-milliseconds. The FluxMeter may be configured to track any arbitrary metric
+milliseconds. The Flux Meter may be configured to track any arbitrary metric
 coming via OpenTelemetry attributes on log or span telemetry streams from a
 [Flow Control Integration][flow-control-integration]. For instance, any of the
 metrics defined in the Envoy [access log specification][envoy-access-log-spec]

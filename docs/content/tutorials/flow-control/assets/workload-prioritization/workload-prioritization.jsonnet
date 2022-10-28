@@ -32,6 +32,9 @@ local policyResource = latencyGradientPolicy({
   policyName: 'service1-demo-app',
   fluxMeter: fluxMeter.new() + fluxMeter.withSelector(svcSelector),
   concurrencyLimiterSelector: svcSelector,
+  dynamicConfig: {
+    dryRun: false,
+  },
   // highlight-start
   classifiers: [
     classifier.new()

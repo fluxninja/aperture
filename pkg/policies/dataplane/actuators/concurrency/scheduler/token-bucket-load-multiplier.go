@@ -21,8 +21,9 @@ type TokenBucketLoadMultiplier struct {
 	lmGauge            prometheus.Gauge // metrics
 	tbb                *tokenBucketBase
 	counter            *WindowedCounter
-	continuousTracking bool
 	lm                 float64 // load multiplier >=0
+	continuousTracking bool
+	passThrough        bool
 }
 
 // NewTokenBucketLoadMultiplier creates a new TokenBucketLoadMultiplier.
@@ -117,6 +118,10 @@ func (tbls *TokenBucketLoadMultiplier) PreprocessRequest(now time.Time, rContext
 		return true
 	}
 
+	if tbls.passThrough {
+		return true
+	}
+
 	return false
 }
 
@@ -140,4 +145,19 @@ func (tbls *TokenBucketLoadMultiplier) setLMGauge(v float64) {
 	if tbls.lmGauge != nil {
 		tbls.lmGauge.Set(v)
 	}
+}
+
+// PassThrough gets value of PassThrough flag.
+func (tbls *TokenBucketLoadMultiplier) PassThrough() bool {
+	tbls.lock.Lock()
+	defer tbls.lock.Unlock()
+	return tbls.passThrough
+}
+
+// SetPassThrough sets PassThrough flag which decides whether to pass through requests.
+func (tbls *TokenBucketLoadMultiplier) SetPassThrough(passThrough bool) {
+	tbls.lock.Lock()
+	defer tbls.lock.Unlock()
+	log.Trace().Msgf("Setting passThrough to %v", passThrough)
+	tbls.passThrough = passThrough
 }

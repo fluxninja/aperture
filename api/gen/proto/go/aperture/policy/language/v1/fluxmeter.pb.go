@@ -22,10 +22,10 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// FluxMeter gathers metrics for the traffic that matches its selector
+// Flux Meter gathers metrics for the traffic that matches its selector
 //
 // :::info
-// See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+// See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
 // :::
 //
 // Example of a selector that creates a histogram metric for all HTTP requests
@@ -43,7 +43,7 @@ type FluxMeter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// What latency should we measure in the histogram created by this FluxMeter.
+	// What latency should we measure in the histogram created by this Flux Meter.
 	//
 	// * For traffic control points, fluxmeter will measure the duration of the
 	//   whole http transaction (including sending request and receiving
@@ -52,7 +52,7 @@ type FluxMeter struct {
 	//   associated with particular feature. What contributes to the span's
 	//   duration is entirely up to the user code that uses Aperture SDK.
 	Selector *v1.Selector `protobuf:"bytes,1,opt,name=selector,proto3" json:"selector,omitempty"`
-	// Latency histogram buckets (in ms) for this FluxMeter.
+	// Latency histogram buckets (in ms) for this Flux Meter.
 	//
 	// Types that are assignable to HistogramBuckets:
 	//	*FluxMeter_StaticBuckets_

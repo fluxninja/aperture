@@ -4,7 +4,8 @@ description: Monitoring signals in the policy
 keywords:
   - jsonnet
   - grafana
-sidebar_position: 2
+  - policy
+sidebar_position: 3
 ---
 
 ```mdx-code-block

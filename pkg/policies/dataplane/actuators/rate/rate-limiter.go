@@ -270,7 +270,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 		OnStart: func(context.Context) error {
 			var err error
 			rateLimiter.rateLimitChecker = ratetracker.NewBasicRateLimitChecker()
-			rateLimiter.updateDynamicConfig(rateLimiter.rateLimiterProto.GetInitConfig())
+			rateLimiter.updateDynamicConfig(rateLimiter.rateLimiterProto.GetDefaultConfig())
 			rateLimiter.rateTracker, err = ratetracker.NewDistCacheRateTracker(
 				rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,

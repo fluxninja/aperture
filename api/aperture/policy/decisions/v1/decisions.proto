@@ -4,6 +4,7 @@ package aperture.policy.decisions.v1;
 
 message LoadDecision {
   double load_multiplier = 1;
+  bool pass_through = 2;
 }
 
 message TokensDecision {
