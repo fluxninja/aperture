@@ -3,7 +3,7 @@ package com.fluxninja.aperture.armeria;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
-import com.fluxninja.generated.envoy.config.core.v3.HeaderValueOption;
+import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpStatus;
