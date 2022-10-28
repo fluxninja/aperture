@@ -207,10 +207,11 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 `
 
 		expectedLabels = map[string]interface{}{
-			oc.ApertureDecisionTypeLabel: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
-			oc.ApertureErrorLabel:        flowcontrolv1.CheckResponse_ERROR_NONE.String(),
-			oc.ApertureRejectReasonLabel: flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
-			oc.ApertureClassifiersLabel:  []interface{}{"policy_name:foo,classifier_index:1"},
+			oc.ApertureDecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+			oc.ApertureErrorLabel:          flowcontrolv1.CheckResponse_ERROR_NONE.String(),
+			oc.ApertureRejectReasonLabel:   flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
+			oc.ApertureResponseStatusLabel: oc.ApertureResponseStatusOK,
+			oc.ApertureClassifiersLabel:    []interface{}{"policy_name:foo,classifier_index:1"},
 
 			oc.ApertureClassifierErrorsLabel: []interface{}{fmt.Sprintf("%s,policy_name:foo,classifier_index:1,policy_hash:foo-hash",
 				flowcontrolv1.ClassifierInfo_ERROR_EMPTY_RESULTSET.String())},
