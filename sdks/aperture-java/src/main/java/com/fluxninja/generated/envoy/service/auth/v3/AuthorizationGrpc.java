@@ -10,7 +10,7 @@ import static io.grpc.MethodDescriptor.generateFullMethodName;
  */
 @javax.annotation.Generated(
     value = "by gRPC proto compiler (version 1.49.1)",
-    comments = "Source: envoy/envoy_authz.proto")
+    comments = "Source: envoy/authz_stripped.proto")
 @io.grpc.stub.annotations.GrpcGenerated
 public final class AuthorizationGrpc {
 
@@ -263,7 +263,7 @@ public final class AuthorizationGrpc {
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.FileDescriptor getFileDescriptor() {
-      return com.fluxninja.generated.envoy.service.auth.v3.EnvoyAuthzProto.getDescriptor();
+      return com.fluxninja.generated.envoy.service.auth.v3.AuthzStrippedProto.getDescriptor();
     }
 
     @java.lang.Override
