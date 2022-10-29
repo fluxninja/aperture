@@ -678,7 +678,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "avg(token_bucket_lsf_ratio{policy_name=\"example\"})",
+          "expr": "avg(token_bucket_lm_ratio{policy_name=\"example\"})",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "{{ instance }} - {{ policy_name }}",
@@ -686,7 +686,7 @@
           "refId": "A"
         }
       ],
-      "title": "Total Bucket Load Sched Factor",
+      "title": "Average Load Multiplier",
       "transparent": false,
       "type": "stat"
     },
