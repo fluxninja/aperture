@@ -3,8 +3,8 @@ package concurrency
 import (
 	"context"
 	"fmt"
+	"math"
 	"path"
-	"reflect"
 	"time"
 
 	prometheusmodel "github.com/prometheus/common/model"
@@ -34,8 +34,6 @@ var (
 // Scheduler is part of the concurrency control component stack.
 type Scheduler struct {
 	policyReadAPI iface.Policy
-	// promValue result from tokens query
-	tokensPromValue prometheusmodel.Value
 	// Prometheus query for accepted concurrency
 	acceptedQuery *components.ScalarQuery
 	// Prometheus query for incoming concurrency
@@ -66,10 +64,9 @@ func NewSchedulerAndOptions(
 		tokensByWorkload: &policysyncv1.TokensDecision{
 			TokensByWorkloadIndex: make(map[string]uint64),
 		},
-		agentGroupName:  agentGroupName,
-		componentIndex:  componentIndex,
-		tokensPromValue: nil,
-		etcdPath:        etcdPath,
+		agentGroupName: agentGroupName,
+		componentIndex: componentIndex,
+		etcdPath:       etcdPath,
 	}
 
 	// Prepare parameters for prometheus queries
@@ -182,10 +179,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 				logger.Error().Err(err).Msg("could not read tokens query from prometheus")
 				errMulti = multierr.Append(errMulti, err)
 			}
-		} else if promValue != nil && !reflect.DeepEqual(promValue, s.tokensPromValue) {
-			// update only if something changed
-			s.tokensPromValue = promValue
-
+		} else if promValue != nil {
 			if vector, ok := promValue.(prometheusmodel.Vector); ok {
 				tokensDecision := &policysyncv1.TokensDecision{
 					TokensByWorkloadIndex: make(map[string]uint64),
@@ -193,6 +187,10 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 				for _, sample := range vector {
 					for k, v := range sample.Metric {
 						if k == metrics.WorkloadIndexLabel {
+							// if sample.Value is NaN, continue
+							if math.IsNaN(float64(sample.Value)) {
+								continue
+							}
 							workloadIndex := string(v)
 							sampleValue := uint64(sample.Value)
 							tokensDecision.TokensByWorkloadIndex[workloadIndex] = sampleValue
