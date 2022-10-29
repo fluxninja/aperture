@@ -1,8 +1,7 @@
 package classifier
 
 import (
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -11,12 +10,12 @@ import (
 type Classifier struct {
 	iface.Classifier
 	classifierID    iface.ClassifierID
-	classifierProto *classificationv1.Classifier
+	classifierProto *policylangv1.Classifier
 	counter         prometheus.Counter
 }
 
 // GetSelector returns the selector.
-func (c *Classifier) GetSelector() *selectorv1.Selector {
+func (c *Classifier) GetSelector() *policylangv1.Selector {
 	if c.classifierProto != nil {
 		return c.classifierProto.GetSelector()
 	}

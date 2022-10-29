@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
@@ -193,7 +193,7 @@ func (c *ClassificationEngine) ActiveRules() []compiler.ReportedRule {
 func (c *ClassificationEngine) AddRules(
 	ctx context.Context,
 	name string,
-	classifierWrapper *wrappersv1.ClassifierWrapper,
+	classifierWrapper *policysyncv1.ClassifierWrapper,
 ) (ActiveRuleset, error) {
 	compiledRuleset, err := compiler.CompileRuleset(ctx, name, classifierWrapper)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 	goprom "github.com/prometheus/client_golang/prometheus"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
@@ -23,7 +23,7 @@ var _ = Describe("Dataplane Engine", func() {
 		mockConLimiter *mocks.MockConcurrencyLimiter
 		mockFluxmeter  *mocks.MockFluxMeter
 
-		selector    *selectorv1.Selector
+		selector    *policylangv1.Selector
 		histogram   goprom.Histogram
 		fluxMeterID iface.FluxMeterID
 		limiterID   iface.LimiterID
@@ -36,14 +36,14 @@ var _ = Describe("Dataplane Engine", func() {
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
 
 		engine = ProvideEngineAPI()
-		selector = &selectorv1.Selector{
-			ServiceSelector: &selectorv1.ServiceSelector{
+		selector = &policylangv1.Selector{
+			ServiceSelector: &policylangv1.ServiceSelector{
 				AgentGroup: metrics.DefaultAgentGroup,
 				Service:    "testService.testNamespace.svc.cluster.local",
 			},
-			FlowSelector: &selectorv1.FlowSelector{
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{Traffic: "ingress"},
+			FlowSelector: &policylangv1.FlowSelector{
+				ControlPoint: &policylangv1.ControlPoint{
+					Controlpoint: &policylangv1.ControlPoint_Traffic{Traffic: "ingress"},
 				},
 			},
 		}
@@ -99,10 +99,18 @@ var _ = Describe("Dataplane Engine", func() {
 	})
 
 	Context("Flux meter", func() {
+		var labels map[string]string
+
 		BeforeEach(func() {
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "200", "").Return(histogram).AnyTimes()
+			labels = map[string]string{
+				metrics.ResponseStatusLabel: metrics.ResponseStatusOK,
+				metrics.FeatureStatusLabel:  "",
+				metrics.StatusCodeLabel:     "200",
+				metrics.DecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+			}
+			mockFluxmeter.EXPECT().GetHistogram(labels).Return(histogram).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 
@@ -139,7 +147,7 @@ var _ = Describe("Dataplane Engine", func() {
 			err := engine.RegisterFluxMeter(mockFluxmeter)
 			Expect(err).NotTo(HaveOccurred())
 			fluxMeter := engine.GetFluxMeter("test")
-			h := fluxMeter.GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "200", "")
+			h := fluxMeter.GetHistogram(labels)
 			Expect(h).To(Equal(histogram))
 		})
 	})
@@ -152,7 +160,6 @@ var _ = Describe("Dataplane Engine", func() {
 
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
-			mockFluxmeter.EXPECT().GetHistogram(flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED, "503", "").Return(histogram).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 

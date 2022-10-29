@@ -14,7 +14,7 @@ import (
 	"go.uber.org/multierr"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -261,7 +261,7 @@ func (la *loadActuator) decisionUpdateCallback(event notifiers.Event, unmarshall
 		return
 	}
 
-	var wrapperMessage wrappersv1.LoadDecisionWrapper
+	var wrapperMessage policysyncv1.LoadDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	loadDecision := wrapperMessage.LoadDecision
 	if err != nil || loadDecision == nil {

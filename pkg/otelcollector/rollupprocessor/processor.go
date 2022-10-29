@@ -160,7 +160,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 				return err
 			}
 			serialized := base64.StdEncoding.EncodeToString(serializedBytes)
-			attributes.PutString(toField, serialized)
+			attributes.PutStr(toField, serialized)
 		}
 	}
 	return rp.exportLogs(ctx, rollupData)

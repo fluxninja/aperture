@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/info/v1"
+	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/info/v1"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 )

@@ -10,7 +10,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policymonitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
@@ -248,14 +248,14 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 	// Signals for this tick
 	circuitSignalReadings := make(signalToReading)
 	defer func() {
-		signalInfo := &policylangv1.SignalMetricsInfo{
+		signalInfo := &policymonitoringv1.SignalMetricsInfo{
 			PolicyName:    circuit.GetPolicyName(),
 			PolicyHash:    circuit.GetPolicyHash(),
-			SignalReading: make([]*policylangv1.SignalReading, 0),
+			SignalReading: make([]*policymonitoringv1.SignalReading, 0),
 		}
 		// log all circuitSignalReadings
 		for signal, reading := range circuitSignalReadings {
-			signalReadingProto := &policylangv1.SignalReading{
+			signalReadingProto := &policymonitoringv1.SignalReading{
 				SignalName: signal.Name,
 				Valid:      reading.Valid(),
 				Value:      reading.Value(),

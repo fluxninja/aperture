@@ -3,7 +3,7 @@ package jobs
 import (
 	"time"
 
-	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
 )
 
 // JobStats holds fields to track job statistics.

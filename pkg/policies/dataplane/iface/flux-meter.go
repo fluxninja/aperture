@@ -3,8 +3,7 @@ package iface
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 //go:generate mockgen -source=flux-meter.go -destination=../../mocks/mock_flux_meter.go -package=mocks
@@ -22,7 +21,7 @@ func (fmID FluxMeterID) String() string {
 // FluxMeter in an interface for interacting with fluxmeters.
 type FluxMeter interface {
 	// GetSelector returns the selector
-	GetSelector() *selectorv1.Selector
+	GetSelector() *policylangv1.Selector
 
 	// GetAttributeKey returns the attribute key
 	GetAttributeKey() string
@@ -33,6 +32,11 @@ type FluxMeter interface {
 	// GetFluxMeterID returns the flux meter ID
 	GetFluxMeterID() FluxMeterID
 
-	// GetHistogram returns the histogram observer for the flowcontrolv1.DecisionType
-	GetHistogram(decisionType flowcontrolv1.CheckResponse_DecisionType, statusCode string, featureStatus string) prometheus.Observer
+	// GetHistogram returns the histogram observer for given labels.
+	// It expects the following labels to be set:
+	//  * metrics.DecisionTypeLabel,
+	//  * metrics.ResponseStatusLabel,
+	//  * metrics.StatusCodeLabel,
+	//  * metrics.FeatureStatusLabel.
+	GetHistogram(labels map[string]string) prometheus.Observer
 }

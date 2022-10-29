@@ -16,7 +16,7 @@ import (
 	"go.uber.org/multierr"
 	"sigs.k8s.io/yaml"
 
-	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
+	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"

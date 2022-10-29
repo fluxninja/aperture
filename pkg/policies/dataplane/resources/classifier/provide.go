@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -128,7 +128,7 @@ func (c *ClassificationEngine) invokeMiniApp(
 	unmarshaller config.Unmarshaller,
 ) error {
 	logger := c.registry.GetLogger()
-	wrapperMessage := &wrappersv1.ClassifierWrapper{}
+	wrapperMessage := &policysyncv1.ClassifierWrapper{}
 	errM := unmarshaller.Unmarshal(wrapperMessage)
 	if errM != nil || wrapperMessage.Classifier == nil {
 		logger.Warn().Err(errM).Msg("Failed to unmarshal classifier config wrapper")

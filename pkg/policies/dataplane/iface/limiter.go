@@ -4,8 +4,8 @@ import (
 	"context"
 	"strconv"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -27,7 +27,7 @@ func (limiterID LimiterID) String() string {
 // Lifetime of this interface is per policy/component.
 type Limiter interface {
 	GetPolicyName() string
-	GetSelector() *selectorv1.Selector
+	GetSelector() *policylangv1.Selector
 	RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
 }

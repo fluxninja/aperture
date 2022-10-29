@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package aperture.policy.language.v1;
 
-import "aperture/common/selector/v1/selector.proto";
+import "aperture/policy/language/v1/selector.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 // Set of classification rules sharing a common selector
@@ -26,7 +26,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // ```
 message Classifier {
   // Defines where to apply the flow classification rule.
-  common.selector.v1.Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}

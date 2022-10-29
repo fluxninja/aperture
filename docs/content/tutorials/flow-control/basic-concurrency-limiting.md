@@ -82,6 +82,22 @@ At a high-level, this policy consists of:
 </Tabs>
 ```
 
+:::tip
+
+You can run the above policy in the `Dry Run` mode by setting the
+`dynamicConfig.dryRun` option to `true`. In the `Dry Run` mode, the policy
+doesn't actuate (i.e. traffic is never dropped) while still evaluating the
+decision it would take in each cycle. This helps understanding how the policy
+would behave as the input signals change.
+
+Note: In the `Dry Run` mode, because the policy doesn't actuate, the outcome
+would be very different in the live mode as input signals will change based on
+actuation decisions. While `Dry Run` mode is not a simulation, it's still useful
+in understanding the signal processing and decisions made in an _execution
+cycle_.
+
+:::
+
 ### Circuit Diagram
 
 <Zoom>

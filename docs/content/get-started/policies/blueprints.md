@@ -11,22 +11,22 @@ sidebar_position: 1
 ## Introduction
 
 Aperture comes with a pre-packaged list of [Aperture Policies][policies] and
-Grafana Dashboards that can be used both as a guide for creating new Policies,
-and as ready-to-use Blueprints for generating Aperture Policies customized to a
+Grafana Dashboards that can be used both as a guide for creating new policies,
+and as ready-to-use Aperture Blueprints for generating policies customized to a
 [Service][service] and the use-case.
 
-All Policies and Grafana Dashboards are written using the
+All Aperture Policies and Grafana Dashboards are written using the
 [Jsonnet][jsonnet-lang] language, and can be used both as jsonnet mixins or as
-standalone Blueprints.
+standalone Aperture Blueprints.
 
 [jsonnet-lang]: https://jsonnet.org
 
 ## Initial Setup
 
-Blueprints can be found in the [aperture repository][aperture-repo] under
-`blueprints/` directory.
+Aperture Blueprints can be found in the [Aperture Repository][aperture-repo]
+under `blueprints/` directory.
 
-The Blueprint Generator (used to generate Policy files from Blueprints) depends
+The Blueprint Generator (used to generate policy files from blueprints) depends
 on [jsonnet][go-jsonnet].
 
 [aperture-repo]: https://github.com/fluxninja/aperture/
@@ -35,21 +35,18 @@ on [jsonnet][go-jsonnet].
 
 ## Generating Aperture Policies and Grafana Dashboards
 
-The simplest way to use Aperture Blueprints is to render Blueprints into Policy
-and Dashboard files.
-
-To generate files, `blueprints/scripts/generate-bundle.py` can be used. The
-script takes as options an output directory path where files will be saved and a
-path to a config libsonnet file containing blueprint customization and
+To generate files, `blueprints/scripts/generate-bundle.py` script can be used.
+The script takes as options an output directory path where files will be saved
+and a path to a config libsonnet file containing blueprint customization and
 configuration.
 
 Under the `blueprints/lib/1.0/blueprints` directory, the currently available
-Blueprints can be found. In each Blueprint, `bundle.libsonnet` can be used to
+blueprints can be found. In each blueprint, `bundle.libsonnet` can be used to
 generate the actual artifacts, and `config.libsonnet` comes with the default
-configuration for the given Blueprint. This can be overridden by the `--config`
+configuration for the given blueprint. This can be overridden by the `--config`
 option passed to the `generate-bundle.py` script.
 
-Custom configurations can be merged with Blueprints' `config.libsonnet`
+Custom configurations can be merged with blueprints' `config.libsonnet`
 resulting in the final configuration, according to jsonnet language rules: keys
 can be overwritten by reusing them in the custom configuration and nested
 objects can be merged by using `+:` operator. Check the `example` directory for
@@ -61,15 +58,15 @@ The full command using the example looks like this:
 jb install && ./scripts/generate-bundle.py --output _gen --config examples/latency-gradient/example.jsonnet
 ```
 
-## Using aperture blueprints as a jsonnet mixins library
+## Using Aperture Blueprints as a jsonnet mixins library
 
-An alternate way of using the aperture blueprints is to import them from another
-jsonnet project and render Policies or Grafana Dashboards directly in jsonnet.
-This can be also integrated with other Kubernetes deployment tools like
+An alternate way of using the Aperture Blueprints is to import them from another
+jsonnet project and render Aperture Policies or Grafana Dashboards directly in
+jsonnet. This can be also integrated with other Kubernetes deployment tools like
 [tanka][tk].
 
 For example, to create a Latency Gradient Policy that can be loaded by the
-controller, you need to install aperture blueprints library with jsonnet
+controller, you need to install Aperture Blueprints library with jsonnet
 bundler:
 
 ```sh
@@ -83,7 +80,7 @@ even a specific release tag e.g. _v0.2.2_
 
 :::
 
-You can then create a Policy resource with policy definition like this:
+You can then create a Policy resource using Jsonnet definitions:
 
 ```jsonnet
 {@include: ../../tutorials/flow-control/assets/basic-concurrency-limiting/basic-concurrency-limiting.jsonnet}

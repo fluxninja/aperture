@@ -3,7 +3,7 @@ package runtime
 import (
 	"time"
 
-	tickv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/tick/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -16,7 +16,7 @@ type TickInfo interface {
 	NextTimestamp() time.Time
 	Tick() int
 	Interval() time.Duration
-	Serialize() *tickv1.TickInfo
+	Serialize() *policysyncv1.TickInfo
 }
 
 type tickInfo struct {
@@ -57,8 +57,8 @@ func (tickInfo *tickInfo) Interval() time.Duration {
 }
 
 // Serialize returns the proto serialized version of the tickInfo.
-func (tickInfo *tickInfo) Serialize() *tickv1.TickInfo {
-	return &tickv1.TickInfo{
+func (tickInfo *tickInfo) Serialize() *policysyncv1.TickInfo {
+	return &policysyncv1.TickInfo{
 		Timestamp:     timestamppb.New(tickInfo.timestamp),
 		NextTimestamp: timestamppb.New(tickInfo.nextTimestamp),
 		Tick:          (int64)(tickInfo.tick),

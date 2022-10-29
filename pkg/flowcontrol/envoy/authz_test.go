@@ -10,10 +10,10 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/flowcontrol/common"
 	"github.com/fluxninja/aperture/pkg/flowcontrol/envoy"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -87,20 +87,20 @@ var _ = Describe("Authorization handler", func() {
 	})
 })
 
-var service1Selector = selectorv1.Selector{
-	ServiceSelector: &selectorv1.ServiceSelector{
+var service1Selector = policylangv1.Selector{
+	ServiceSelector: &policylangv1.ServiceSelector{
 		Service: "service1-demo-app.demoapp.svc.cluster.local",
 	},
-	FlowSelector: &selectorv1.FlowSelector{
-		ControlPoint: &selectorv1.ControlPoint{
-			Controlpoint: &selectorv1.ControlPoint_Traffic{
+	FlowSelector: &policylangv1.FlowSelector{
+		ControlPoint: &policylangv1.ControlPoint{
+			Controlpoint: &policylangv1.ControlPoint_Traffic{
 				Traffic: "ingress",
 			},
 		},
 	},
 }
 
-var hardcodedRegoRules = wrappersv1.ClassifierWrapper{
+var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 	Classifier: &classificationv1.Classifier{
 		Selector: &service1Selector,
 		Rules: map[string]*classificationv1.Rule{
@@ -132,7 +132,7 @@ var hardcodedRegoRules = wrappersv1.ClassifierWrapper{
 			},
 		},
 	},
-	CommonAttributes: &wrappersv1.CommonAttributes{
+	CommonAttributes: &policysyncv1.CommonAttributes{
 		PolicyName:     "test",
 		PolicyHash:     "test",
 		ComponentIndex: 0,
