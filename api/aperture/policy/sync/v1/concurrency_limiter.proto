@@ -4,6 +4,7 @@ package aperture.policy.sync.v1;
 
 import "aperture/policy/language/v1/policy.proto";
 import "aperture/policy/sync/v1/common_attributes.proto";
+import "aperture/policy/sync/v1/tick.proto";
 
 message ConcurrencyLimiterWrapper {
   // CommonAttributes
@@ -29,6 +30,7 @@ message TokensDecisionWrapper {
 message LoadDecision {
   double load_multiplier = 1;
   bool pass_through = 2;
+  TickInfo tick_info = 3;
 }
 
 message TokensDecision {
