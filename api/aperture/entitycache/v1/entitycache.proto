@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package aperture.entitycache.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+//
+// gRPC service
+//
+
+// EntityCacheService is used to query EntityCache.
+service EntityCacheService {
+  rpc GetEntityCache(google.protobuf.Empty) returns (EntityCache) {
+    option (google.api.http) = {get: "/v1/entities"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
+  rpc GetEntityByIPAddress(GetEntityByIPAddressRequest) returns (Entity) {
+    option (google.api.http) = {get: "/v1/entities/ip-address/{ip_address}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
+  rpc GetEntityByName(GetEntityByNameRequest) returns (Entity) {
+    option (google.api.http) = {get: "/v1/entities/name/{name}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
+}
+
+message GetEntityByIPAddressRequest {
+  string ip_address = 1;
+}
+
+message GetEntityByNameRequest {
+  string name = 1;
+}
+
+//
+// Data models
+//
+
+// EntityCache contains both mappings of ip address to entity and entity name to entity.
+message EntityCache {
+  // Entities defines mapping of entities.
+  message Entities {
+    map<string, Entity> entities = 1;
+  }
+
+  Entities entities_by_ip_address = 1;
+  Entities entities_by_name = 2;
+}
+
+// Entity represents a pod, vm, etc.
+message Entity {
+  string prefix = 1;
+  string uid = 2;
+  string ip_address = 3;
+  string name = 4;
+  repeated string services = 5;
+}

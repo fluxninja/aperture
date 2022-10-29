@@ -12,10 +12,9 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/distcache"
@@ -197,7 +196,7 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	reg status.Registry,
 ) (fx.Option, error) {
 	logger := rateLimiterFactory.registry.GetLogger()
-	wrapperMessage := &wrappersv1.RateLimiterWrapper{}
+	wrapperMessage := &policysyncv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiter == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
@@ -374,7 +373,7 @@ func (rateLimiter *rateLimiter) updateDynamicConfig(dynamicConfig *policylangv1.
 }
 
 // GetSelector returns the selector for the rate limiter.
-func (rateLimiter *rateLimiter) GetSelector() *selectorv1.Selector {
+func (rateLimiter *rateLimiter) GetSelector() *policylangv1.Selector {
 	return rateLimiter.rateLimiterProto.GetSelector()
 }
 
@@ -428,7 +427,7 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 		return
 	}
 
-	var wrapperMessage wrappersv1.RateLimiterDecisionWrapper
+	var wrapperMessage policysyncv1.RateLimiterDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiterDecision == nil {
 		return
@@ -453,7 +452,7 @@ func (rateLimiter *rateLimiter) dynamicConfigUpdateCallback(event notifiers.Even
 		return
 	}
 
-	var wrapperMessage wrappersv1.RateLimiterDynamicConfigWrapper
+	var wrapperMessage policysyncv1.RateLimiterDynamicConfigWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiterDynamicConfig == nil {
 		return
