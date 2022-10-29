@@ -3,11 +3,12 @@ package internal
 import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 // AddEnvoySpecificLabels adds labels specific to Envoy data source.
-func AddEnvoySpecificLabels(attributes pcommon.Map) {
+func AddEnvoySpecificLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse) {
 	treatAsZero := []string{otelcollector.EnvoyMissingAttributeValue}
 	// Retrieve request length
 	requestLength, _ := otelcollector.GetFloat64(attributes, otelcollector.EnvoyBytesSentLabel, treatAsZero)
@@ -25,10 +26,15 @@ func AddEnvoySpecificLabels(attributes pcommon.Map) {
 	}
 
 	if responseDurationExists && authzDurationExists {
-		workloadDuration := responseDuration - authzDuration
-		// discard negative values which can happen in case of connection resets
-		if workloadDuration > 0 {
+		if checkResponse.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+			workloadDuration := 0.0
 			attributes.PutDouble(otelcollector.WorkloadDurationLabel, workloadDuration)
+		} else {
+			workloadDuration := responseDuration - authzDuration
+			// discard negative values which can happen in case of connection resets
+			if workloadDuration > 0 {
+				attributes.PutDouble(otelcollector.WorkloadDurationLabel, workloadDuration)
+			}
 		}
 	}
 }

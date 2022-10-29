@@ -81,7 +81,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 				return retErr("aperture check response label not found in Envoy access logs")
 			}
 
-			internal.AddEnvoySpecificLabels(attributes)
+			internal.AddEnvoySpecificLabels(attributes, checkResponse)
 		} else {
 			return retErr("aperture source label not recognized")
 		}
