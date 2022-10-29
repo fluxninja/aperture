@@ -25,6 +25,10 @@ func AddEnvoySpecificLabels(attributes pcommon.Map) {
 	}
 
 	if responseDurationExists && authzDurationExists {
-		attributes.PutDouble(otelcollector.WorkloadDurationLabel, responseDuration-authzDuration)
+		workloadDuration := responseDuration - authzDuration
+		// discard negative values which can happen in case of connection resets
+		if workloadDuration > 0 {
+			attributes.PutDouble(otelcollector.WorkloadDurationLabel, workloadDuration)
+		}
 	}
 }

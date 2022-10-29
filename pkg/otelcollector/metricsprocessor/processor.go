@@ -71,14 +71,14 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		if sourceStr == otelcollector.ApertureSourceSDK {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{})
 			if !success {
-				return retErr("aperture check response label not found in Envoy access logs")
+				return retErr("aperture check response label not found in SDK access logs")
 			}
 
 			internal.AddSDKSpecificLabels(attributes)
 		} else if sourceStr == otelcollector.ApertureSourceEnvoy {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
 			if !success {
-				return retErr("aperture check response label not found in SDK access logs")
+				return retErr("aperture check response label not found in Envoy access logs")
 			}
 
 			internal.AddEnvoySpecificLabels(attributes)
@@ -116,29 +116,31 @@ func (p *metricsProcessor) updateMetrics(
 	}
 	if len(checkResponse.LimiterDecisions) > 0 {
 		// Update workload metrics
-		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, []string{})
-		for _, decision := range checkResponse.LimiterDecisions {
-			limiterID := iface.LimiterID{
-				PolicyName:     decision.PolicyName,
-				PolicyHash:     decision.PolicyHash,
-				ComponentIndex: decision.ComponentIndex,
-			}
-
-			if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
-				labels := map[string]string{
-					metrics.PolicyNameLabel:     decision.PolicyName,
-					metrics.PolicyHashLabel:     decision.PolicyHash,
-					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
-					metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
-					metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
+		latency, found := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, []string{})
+		if found {
+			for _, decision := range checkResponse.LimiterDecisions {
+				limiterID := iface.LimiterID{
+					PolicyName:     decision.PolicyName,
+					PolicyHash:     decision.PolicyHash,
+					ComponentIndex: decision.ComponentIndex,
 				}
 
-				p.updateMetricsForWorkload(limiterID, labels, latency)
-			}
+				if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
+					labels := map[string]string{
+						metrics.PolicyNameLabel:     decision.PolicyName,
+						metrics.PolicyHashLabel:     decision.PolicyHash,
+						metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
+						metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
+						metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
+					}
 
-			// Update rate limiter metrics
-			if rl := decision.GetRateLimiterInfo(); rl != nil {
-				p.updateMetricsForRateLimiter(limiterID)
+					p.updateMetricsForWorkload(limiterID, labels, latency)
+				}
+
+				// Update rate limiter metrics
+				if rl := decision.GetRateLimiterInfo(); rl != nil {
+					p.updateMetricsForRateLimiter(limiterID)
+				}
 			}
 		}
 	}
@@ -238,11 +240,13 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	}
 
 	// metricValue is the value at fluxMeter's AttributeKey
-	metricValue, _ := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsZero)
+	metricValue, found := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsZero)
 
-	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, featureStatus)
-	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
-	if fluxMeterHistogram != nil {
-		fluxMeterHistogram.Observe(metricValue)
+	if found {
+		labels := internal.StatusLabelsForMetrics(decisionType, statusCode, featureStatus)
+		fluxMeterHistogram := fluxMeter.GetHistogram(labels)
+		if fluxMeterHistogram != nil {
+			fluxMeterHistogram.Observe(metricValue)
+		}
 	}
 }
