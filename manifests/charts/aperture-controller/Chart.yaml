@@ -7,12 +7,12 @@ icon: https://raw.githubusercontent.com/fluxninja/aperture/gh-pages/FluxNinja--m
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami
-    version: "=1.14.1"
+    version: "=2.1.1"
   - name: etcd
-    version: "=6.13.5"
+    version: "=8.5.8"
     repository: https://charts.bitnami.com/bitnami
     condition: etcd.enabled
   - name: prometheus
-    version: "=15.5.3"
+    version: "=15.17.0"
     repository: https://prometheus-community.github.io/helm-charts
     condition: prometheus.enabled
