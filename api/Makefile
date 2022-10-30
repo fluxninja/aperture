@@ -27,6 +27,8 @@ buf-generate:
 	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol
 	@cp -R gen/proto/java/com/fluxninja/aperture/flowcontrol ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/
 	@rm -rf gen/proto/java
+	@#javascript
+	@cp aperture/flowcontrol/v1/* ../sdks/aperture-js/proto/
 	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)

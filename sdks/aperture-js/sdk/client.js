@@ -13,19 +13,17 @@ const clientPackage = protoLoader.loadSync(PROTO_PATH, {
 
 const fcs = grpc.loadPackageDefinition(clientPackage).aperture.flowcontrol.v1;
 
-class Client {
+export class ApertureClient {
   me = new fcs.FlowControlService(URL, grpc.credentials.createInsecure());
 
   async StartFlow(featureArg, labelsArg) {
-    var checkRequest = fcs.CheckRequest({
-      feature: featureArg,
-      labels: labelsArg,
-    });
-
     return new Promise((resolve, reject) => {
-      this.me.Check(checkRequest, (err, response) => {
+      this.me.Check(
+      {
+        feature: featureArg,
+        labels: labelsArg,
+      }, (err, response) => {
         if (err) {
-          console.log("Got error ", err);
           reject(err);
         }
         console.log("Response ", response);
@@ -33,6 +31,22 @@ class Client {
       });
     });
   }
-}
 
-export const client = new Client();
+  async Shutdown() {
+    return new Promise(() => {
+      // TODO
+    });
+  }
+
+  async GetState() {
+    return new Promise((resolve, reject) => {
+      if ( this.me.getChannel().getConnectivityState(true) ) {
+        console.log("connected");
+        resolve(true);
+      }
+      else {
+        reject();
+      }
+    });
+  }
+}
