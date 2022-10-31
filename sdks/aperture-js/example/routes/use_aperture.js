@@ -1,6 +1,6 @@
 import express from 'express';
-import { ApertureClient } from "../sdk/client.js";
-import { FlowStatus } from "../sdk/flow.js";
+import { ApertureClient } from "../../sdk/client.js";
+import { FlowStatus } from "../../sdk/flow.js";
 
 // Create aperture client
 export const apertureClient = new ApertureClient();
@@ -28,7 +28,7 @@ apertureRoute.get('/', function (req, res) {
         }
     }).catch(e => {
         console.log(e);
-        res.send(`Error ocurred: ${e}\n`);
+        res.send(`Error occurred: ${e}\n`);
     });
 });
 
