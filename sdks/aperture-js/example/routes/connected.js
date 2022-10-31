@@ -13,8 +13,8 @@ connectedRouter.get('/', function (req, res) {
         } else {
             res.status(200).send('Connected\n');
         }
-    } catch(e) {
+    } catch (e) {
         console.log(e);
-        res.send(`Error ocurred: ${e}\n`);
+        res.send(`Error occurred: ${e}\n`);
     }
 });
