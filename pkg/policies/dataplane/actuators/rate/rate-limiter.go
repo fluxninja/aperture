@@ -478,7 +478,7 @@ func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
 	}
 }
 
-// GetCounter returns counter for tracking number of times rateLimiter was triggered.
-func (rateLimiter *rateLimiter) GetCounter() prometheus.Counter {
+// GetRequestCounter returns counter for tracking number of times rateLimiter was triggered.
+func (rateLimiter *rateLimiter) GetRequestCounter() prometheus.Counter {
 	return rateLimiter.counter
 }

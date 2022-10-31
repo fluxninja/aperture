@@ -117,20 +117,6 @@ func (m *MockRateLimiter) EXPECT() *MockRateLimiterMockRecorder {
 	return m.recorder
 }
 
-// GetCounter mocks base method.
-func (m *MockRateLimiter) GetCounter() prometheus.Counter {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCounter")
-	ret0, _ := ret[0].(prometheus.Counter)
-	return ret0
-}
-
-// GetCounter indicates an expected call of GetCounter.
-func (mr *MockRateLimiterMockRecorder) GetCounter() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCounter", reflect.TypeOf((*MockRateLimiter)(nil).GetCounter))
-}
-
 // GetLimiterID mocks base method.
 func (m *MockRateLimiter) GetLimiterID() iface.LimiterID {
 	m.ctrl.T.Helper()
@@ -157,6 +143,20 @@ func (m *MockRateLimiter) GetPolicyName() string {
 func (mr *MockRateLimiterMockRecorder) GetPolicyName() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockRateLimiter)(nil).GetPolicyName))
+}
+
+// GetRequestCounter mocks base method.
+func (m *MockRateLimiter) GetRequestCounter() prometheus.Counter {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRequestCounter")
+	ret0, _ := ret[0].(prometheus.Counter)
+	return ret0
+}
+
+// GetRequestCounter indicates an expected call of GetRequestCounter.
+func (mr *MockRateLimiterMockRecorder) GetRequestCounter() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockRateLimiter)(nil).GetRequestCounter))
 }
 
 // GetSelector mocks base method.
@@ -227,6 +227,20 @@ func (m *MockConcurrencyLimiter) EXPECT() *MockConcurrencyLimiterMockRecorder {
 	return m.recorder
 }
 
+// GetLatencyObserver mocks base method.
+func (m *MockConcurrencyLimiter) GetLatencyObserver(labels map[string]string) prometheus.Observer {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLatencyObserver", labels)
+	ret0, _ := ret[0].(prometheus.Observer)
+	return ret0
+}
+
+// GetLatencyObserver indicates an expected call of GetLatencyObserver.
+func (mr *MockConcurrencyLimiterMockRecorder) GetLatencyObserver(labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatencyObserver", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetLatencyObserver), labels)
+}
+
 // GetLimiterID mocks base method.
 func (m *MockConcurrencyLimiter) GetLimiterID() iface.LimiterID {
 	m.ctrl.T.Helper()
@@ -241,20 +255,6 @@ func (mr *MockConcurrencyLimiterMockRecorder) GetLimiterID() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLimiterID", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetLimiterID))
 }
 
-// GetObserver mocks base method.
-func (m *MockConcurrencyLimiter) GetObserver(labels map[string]string) prometheus.Observer {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetObserver", labels)
-	ret0, _ := ret[0].(prometheus.Observer)
-	return ret0
-}
-
-// GetObserver indicates an expected call of GetObserver.
-func (mr *MockConcurrencyLimiterMockRecorder) GetObserver(labels interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObserver", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetObserver), labels)
-}
-
 // GetPolicyName mocks base method.
 func (m *MockConcurrencyLimiter) GetPolicyName() string {
 	m.ctrl.T.Helper()
@@ -267,6 +267,20 @@ func (m *MockConcurrencyLimiter) GetPolicyName() string {
 func (mr *MockConcurrencyLimiterMockRecorder) GetPolicyName() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetPolicyName))
+}
+
+// GetRequestCounter mocks base method.
+func (m *MockConcurrencyLimiter) GetRequestCounter(labels map[string]string) prometheus.Counter {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRequestCounter", labels)
+	ret0, _ := ret[0].(prometheus.Counter)
+	return ret0
+}
+
+// GetRequestCounter indicates an expected call of GetRequestCounter.
+func (mr *MockConcurrencyLimiterMockRecorder) GetRequestCounter(labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetRequestCounter), labels)
 }
 
 // GetSelector mocks base method.

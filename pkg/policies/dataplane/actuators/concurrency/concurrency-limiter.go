@@ -91,6 +91,7 @@ type concurrencyLimiterFactory struct {
 	acceptedConcurrencyCounterVec *prometheus.CounterVec
 
 	workloadLatencySummaryVec *prometheus.SummaryVec
+	workloadCounterVec        *prometheus.CounterVec
 }
 
 // setupConcurrencyLimiterFactory sets up the concurrency limiter module in the main fx app.
@@ -159,6 +160,14 @@ func setupConcurrencyLimiterFactory(
 		Help: "Latency summary of workload",
 	}, []string{
 		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
+	conLimiterFactory.workloadCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.WorkloadCounterMetricName,
+		Help: "Counter of workload requests",
+	}, []string{
+		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel,
 		metrics.DecisionTypeLabel,
 		metrics.WorkloadIndexLabel,
 	})
@@ -196,6 +205,10 @@ func setupConcurrencyLimiterFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
+			err = prometheusRegistry.Register(conLimiterFactory.workloadCounterVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
 
 			return merr
 		},
@@ -220,6 +233,10 @@ func setupConcurrencyLimiterFactory(
 			}
 			if !prometheusRegistry.Unregister(conLimiterFactory.workloadLatencySummaryVec) {
 				err := fmt.Errorf("failed to unregister workload_latency_ms metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(conLimiterFactory.workloadCounterVec) {
+				err := fmt.Errorf("failed to unregister workload_counter metric")
 				merr = multierr.Append(merr, err)
 			}
 
@@ -289,7 +306,6 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 		workloadMultiMatcher:         mm,
 		defaultWorkloadParametersMsg: schedulerMsg.DefaultWorkloadParameters,
 		schedulerMsg:                 schedulerMsg,
-		workloadLatencySummaryVec:    conLimiterFactory.workloadLatencySummaryVec,
 	}
 
 	return fx.Options(
@@ -320,7 +336,6 @@ type concurrencyLimiter struct {
 	registry                     status.Registry
 	incomingConcurrencyCounter   prometheus.Counter
 	acceptedConcurrencyCounter   prometheus.Counter
-	workloadLatencySummaryVec    *prometheus.SummaryVec
 	concurrencyLimiterMsg        *policylangv1.ConcurrencyLimiter
 	concurrencyLimiterFactory    *concurrencyLimiterFactory
 	autoTokens                   *autoTokens
@@ -432,9 +447,13 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			if !deleted {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete accepted_concurrency counter from its metric vector"))
 			}
-			deletedCount := conLimiter.workloadLatencySummaryVec.DeletePartialMatch(metricLabels)
+			deletedCount := conLimiter.concurrencyLimiterFactory.workloadLatencySummaryVec.DeletePartialMatch(metricLabels)
 			if deletedCount == 0 {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete workload_latency_ms gauge from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete workload_latency_ms summary from its metric vector"))
+			}
+			deletedCount = conLimiter.concurrencyLimiterFactory.workloadCounterVec.DeletePartialMatch(metricLabels)
+			if deletedCount == 0 {
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete workload_requests_total counter from its metric vector"))
 			}
 
 			conLimiter.registry.SetStatus(status.NewStatus(nil, errMulti))
@@ -562,13 +581,24 @@ func (conLimiter *concurrencyLimiter) GetLimiterID() iface.LimiterID {
 	}
 }
 
-// GetObserver returns histogram for specific workload.
-func (conLimiter *concurrencyLimiter) GetObserver(labels map[string]string) prometheus.Observer {
-	latencyHistogram, err := conLimiter.workloadLatencySummaryVec.GetMetricWith(labels)
+// GetLatencyObserver returns histogram for specific workload.
+func (conLimiter *concurrencyLimiter) GetLatencyObserver(labels map[string]string) prometheus.Observer {
+	latencySummary, err := conLimiter.concurrencyLimiterFactory.workloadLatencySummaryVec.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Getting latency histogram")
 		return nil
 	}
 
-	return latencyHistogram
+	return latencySummary
+}
+
+// GetRequestCounter returns request counter for specific workload.
+func (conLimiter *concurrencyLimiter) GetRequestCounter(labels map[string]string) prometheus.Counter {
+	counter, err := conLimiter.concurrencyLimiterFactory.workloadCounterVec.GetMetricWith(labels)
+	if err != nil {
+		log.Warn().Err(err).Msg("Getting counter")
+		return nil
+	}
+
+	return counter
 }

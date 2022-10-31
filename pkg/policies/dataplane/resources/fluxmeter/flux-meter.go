@@ -178,6 +178,7 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 				metrics.ResponseStatusLabel,
 				metrics.StatusCodeLabel,
 				metrics.FeatureStatusLabel,
+				metrics.AttributeFoundLabel,
 			})
 			// Register metric with Prometheus
 			err := prometheusRegistry.Register(fluxMeter.histMetricVec)

@@ -36,11 +36,12 @@ type Limiter interface {
 type RateLimiter interface {
 	Limiter
 	TakeN(labels map[string]string, count int) (label string, ok bool, remaining int, current int)
-	GetCounter() prometheus.Counter
+	GetRequestCounter() prometheus.Counter
 }
 
 // ConcurrencyLimiter interface.
 type ConcurrencyLimiter interface {
 	Limiter
-	GetObserver(labels map[string]string) prometheus.Observer
+	GetLatencyObserver(labels map[string]string) prometheus.Observer
+	GetRequestCounter(labels map[string]string) prometheus.Counter
 }

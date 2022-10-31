@@ -9,9 +9,9 @@ import (
 // Classifier implements iface.Classifier interface.
 type Classifier struct {
 	iface.Classifier
-	classifierID    iface.ClassifierID
-	classifierProto *policylangv1.Classifier
 	counter         prometheus.Counter
+	classifierProto *policylangv1.Classifier
+	classifierID    iface.ClassifierID
 }
 
 // GetSelector returns the selector.
@@ -27,7 +27,7 @@ func (c *Classifier) GetClassifierID() iface.ClassifierID {
 	return c.classifierID
 }
 
-// GetCounter returns the counter for the classifier.
-func (c *Classifier) GetCounter() prometheus.Counter {
+// GetRequestCounter returns the counter for the classifier.
+func (c *Classifier) GetRequestCounter() prometheus.Counter {
 	return c.counter
 }

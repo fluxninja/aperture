@@ -29,6 +29,6 @@ type Classifier interface {
 	// GetClassifierID returns ClassifierID object that should uniquely identify classifier.
 	GetClassifierID() ClassifierID
 
-	// GetCounter returns the counter for the classifier.
-	GetCounter() prometheus.Counter
+	// GetRequestCounter returns the counter for the classifier.
+	GetRequestCounter() prometheus.Counter
 }

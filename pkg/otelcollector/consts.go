@@ -13,6 +13,13 @@ const (
 	// ApertureCheckResponseLabel contains JSON encoded check response struct.
 	ApertureCheckResponseLabel = "aperture.check_response"
 
+	// ResponseReceivedLabel designates whether a response was received.
+	ResponseReceivedLabel = "response_received"
+	// ResponseReceivedTrue const for true value.
+	ResponseReceivedTrue = "true"
+	// ResponseReceivedFalse const for false value.
+	ResponseReceivedFalse = "false"
+
 	/* Derived label that is applied based on content of labels. */
 
 	// ApertureServicesLabel describes services to which metrics refer.
