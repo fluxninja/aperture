@@ -30,12 +30,7 @@ server.listen(port, host, () => {
 
 // Handle graceful shutdown
 const startGracefulShutdown = () => {
-  apertureClient.Shutdown().then(() => {
-    console.log('Finished shutting down aperture client');
-  }, (error) => {
-    console.log(`Failed to shutdown aperture client: ${error}`);
-  });
-
+  apertureClient.Shutdown();
   httpTerminator.terminate().then(() => {
     console.log("Finished shutting down server")
   });
