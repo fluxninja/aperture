@@ -1,6 +1,6 @@
 export const FlowStatus = Object.freeze({
-	Ok: Symbol(0),
-	Error: Symbol(1)
+    Ok: Symbol(0),
+    Error: Symbol(1)
 })
 
 export class Flow {
@@ -12,11 +12,11 @@ export class Flow {
         return true;
     }
 
-	End(flowStatus) {
+    End(flowStatus) {
         return true;
     }
 
-	CheckResponse() {
+    CheckResponse() {
         return this.checkResponse;
     }
 }

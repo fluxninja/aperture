@@ -22,18 +22,18 @@ export class ApertureClient {
   async StartFlow(featureArg, labelsArg) {
     return new Promise((resolve, reject) => {
       this.fcsClient.Check(
-      {
-        feature: featureArg,
-        labels: labelsArg,
-      }, (err, response) => {
-        if (err) {
-          reject(err);
-        }
+        {
+          feature: featureArg,
+          labels: labelsArg,
+        }, (err, response) => {
+          if (err) {
+            reject(err);
+          }
 
-        console.log(`Response: ${response}\n`);
-        let flow = new Flow(response);
-        resolve(flow);
-      });
+          console.log(`Response: ${response}\n`);
+          let flow = new Flow(response);
+          resolve(flow);
+        });
     });
   }
 
