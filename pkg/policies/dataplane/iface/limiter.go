@@ -4,8 +4,8 @@ import (
 	"context"
 	"strconv"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -27,7 +27,7 @@ func (limiterID LimiterID) String() string {
 // Lifetime of this interface is per policy/component.
 type Limiter interface {
 	GetPolicyName() string
-	GetSelector() *selectorv1.Selector
+	GetSelector() *policylangv1.Selector
 	RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
 }
@@ -36,11 +36,12 @@ type Limiter interface {
 type RateLimiter interface {
 	Limiter
 	TakeN(labels map[string]string, count int) (label string, ok bool, remaining int, current int)
-	GetCounter() prometheus.Counter
+	GetRequestCounter() prometheus.Counter
 }
 
 // ConcurrencyLimiter interface.
 type ConcurrencyLimiter interface {
 	Limiter
-	GetObserver(labels map[string]string) prometheus.Observer
+	GetLatencyObserver(labels map[string]string) prometheus.Observer
+	GetRequestCounter(labels map[string]string) prometheus.Counter
 }

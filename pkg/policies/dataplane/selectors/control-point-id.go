@@ -1,7 +1,7 @@
 package selectors
 
 import (
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 // ControlPointID is the interface for controlPointID.
@@ -26,7 +26,7 @@ func NewControlPointID(service string, controlPoint ControlPoint) ControlPointID
 	}
 }
 
-func controlPointIDFromSelectorProto(selectorMsg *selectorv1.Selector) (ControlPointID, error) {
+func controlPointIDFromSelectorProto(selectorMsg *policylangv1.Selector) (ControlPointID, error) {
 	ctrlPt, err := controlPointFromSelectorControlPointProto(selectorMsg.FlowSelector.GetControlPoint())
 	return controlPointID{
 		service:      selectorMsg.ServiceSelector.GetService(),

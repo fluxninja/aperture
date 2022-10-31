@@ -3,8 +3,8 @@ package selectors
 import (
 	"fmt"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 // ControlPoint is the interface for controlPoint.
@@ -30,12 +30,12 @@ func NewControlPoint(type_ flowcontrolv1.ControlPointInfo_Type, feature string) 
 	}
 }
 
-func controlPointFromSelectorControlPointProto(controlPointMsg *selectorv1.ControlPoint) (ControlPoint, error) {
+func controlPointFromSelectorControlPointProto(controlPointMsg *policylangv1.ControlPoint) (ControlPoint, error) {
 	if controlPointMsg != nil && controlPointMsg.Controlpoint != nil {
 		switch cp := controlPointMsg.Controlpoint.(type) {
-		case *selectorv1.ControlPoint_Feature:
+		case *policylangv1.ControlPoint_Feature:
 			return NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_FEATURE, cp.Feature), nil
-		case *selectorv1.ControlPoint_Traffic:
+		case *policylangv1.ControlPoint_Traffic:
 			switch cp.Traffic {
 			case "ingress":
 				return NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""), nil

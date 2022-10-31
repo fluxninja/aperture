@@ -9,8 +9,7 @@ import (
 
 	"go.uber.org/fx"
 
-	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -69,7 +68,7 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 	registry status.Registry,
 ) (*autoTokens, error) {
 	at := &autoTokens{
-		tokensDecision: &policydecisionsv1.TokensDecision{
+		tokensDecision: &policysyncv1.TokensDecision{
 			TokensByWorkloadIndex: make(map[string]uint64),
 		},
 		policyName:            policyName,
@@ -111,7 +110,7 @@ type autoTokens struct {
 	mutex                 sync.RWMutex
 	tokensDecisionWatcher notifiers.Watcher
 	registry              status.Registry
-	tokensDecision        *policydecisionsv1.TokensDecision
+	tokensDecision        *policysyncv1.TokensDecision
 	policyName            string
 	policyHash            string
 	componentIdx          int64
@@ -126,7 +125,7 @@ func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller co
 		return
 	}
 
-	var wrapperMessage wrappersv1.TokensDecisionWrapper
+	var wrapperMessage policysyncv1.TokensDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.TokensDecision == nil {
 		logger.Error().Err(err).Msg("Failed to unmarshal config wrapper")

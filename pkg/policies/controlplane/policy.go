@@ -13,7 +13,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -56,7 +56,7 @@ var _ iface.Policy = (*Policy)(nil)
 
 // newPolicyOptions creates a new Policy object and returns its Fx options for the per Policy App.
 func newPolicyOptions(
-	wrapperMessage *wrappersv1.PolicyWrapper,
+	wrapperMessage *policysyncv1.PolicyWrapper,
 	registry status.Registry,
 ) (fx.Option, error) {
 	// List of options for the policy.
@@ -104,7 +104,7 @@ func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry)
 }
 
 // compilePolicyWrapper takes policyProto and returns a compiled policy.
-func compilePolicyWrapper(wrapperMessage *wrappersv1.PolicyWrapper, registry status.Registry) (*Policy, CompiledCircuit, fx.Option, error) {
+func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry status.Registry) (*Policy, CompiledCircuit, fx.Option, error) {
 	if wrapperMessage == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy wrapper message")
 	}
@@ -257,7 +257,7 @@ func (policy *Policy) GetStatusRegistry() status.Registry {
 }
 
 // hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
-func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*wrappersv1.PolicyWrapper, error) {
+func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*policysyncv1.PolicyWrapper, error) {
 	jsonDat, marshalErr := json.Marshal(policyMessage)
 	if marshalErr != nil {
 		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
@@ -277,9 +277,9 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 	}
 	hash := base64.StdEncoding.EncodeToString(hashBytes[:])
 
-	return &wrappersv1.PolicyWrapper{
+	return &policysyncv1.PolicyWrapper{
 		Policy: policyMessage,
-		CommonAttributes: &wrappersv1.CommonAttributes{
+		CommonAttributes: &policysyncv1.CommonAttributes{
 			PolicyName: policyName,
 			PolicyHash: hash,
 		},

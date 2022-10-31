@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/fluxmeter.proto";
+
+message FluxMeterWrapper {
+  // Flux Meter
+  policy.language.v1.FluxMeter flux_meter = 1;
+  // Name of Flux Meter metric.
+  string flux_meter_name = 4;
+}

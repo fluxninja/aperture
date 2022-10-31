@@ -7,7 +7,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
 	gomock "github.com/golang/mock/gomock"
 	prometheus "github.com/prometheus/client_golang/prometheus"
@@ -50,25 +50,25 @@ func (mr *MockClassifierMockRecorder) GetClassifierID() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClassifierID", reflect.TypeOf((*MockClassifier)(nil).GetClassifierID))
 }
 
-// GetCounter mocks base method.
-func (m *MockClassifier) GetCounter() prometheus.Counter {
+// GetRequestCounter mocks base method.
+func (m *MockClassifier) GetRequestCounter() prometheus.Counter {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCounter")
+	ret := m.ctrl.Call(m, "GetRequestCounter")
 	ret0, _ := ret[0].(prometheus.Counter)
 	return ret0
 }
 
-// GetCounter indicates an expected call of GetCounter.
-func (mr *MockClassifierMockRecorder) GetCounter() *gomock.Call {
+// GetRequestCounter indicates an expected call of GetRequestCounter.
+func (mr *MockClassifierMockRecorder) GetRequestCounter() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCounter", reflect.TypeOf((*MockClassifier)(nil).GetCounter))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockClassifier)(nil).GetRequestCounter))
 }
 
 // GetSelector mocks base method.
-func (m *MockClassifier) GetSelector() *selectorv1.Selector {
+func (m *MockClassifier) GetSelector() *languagev1.Selector {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSelector")
-	ret0, _ := ret[0].(*selectorv1.Selector)
+	ret0, _ := ret[0].(*languagev1.Selector)
 	return ret0
 }
 

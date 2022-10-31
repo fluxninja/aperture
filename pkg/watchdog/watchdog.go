@@ -15,7 +15,7 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/watchdog/v1"
+	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/watchdog/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"

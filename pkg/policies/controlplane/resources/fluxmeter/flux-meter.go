@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -58,7 +58,7 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &wrappersv1.FluxMeterWrapper{
+			wrapper := &policysyncv1.FluxMeterWrapper{
 				FluxMeterName: configSync.fluxMeterName,
 				FluxMeter:     configSync.fluxMeterProto,
 			}

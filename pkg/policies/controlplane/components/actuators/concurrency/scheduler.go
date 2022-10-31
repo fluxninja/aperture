@@ -3,8 +3,8 @@ package concurrency
 import (
 	"context"
 	"fmt"
+	"math"
 	"path"
-	"reflect"
 	"time"
 
 	prometheusmodel "github.com/prometheus/common/model"
@@ -13,9 +13,8 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
@@ -35,8 +34,6 @@ var (
 // Scheduler is part of the concurrency control component stack.
 type Scheduler struct {
 	policyReadAPI iface.Policy
-	// promValue result from tokens query
-	tokensPromValue prometheusmodel.Value
 	// Prometheus query for accepted concurrency
 	acceptedQuery *components.ScalarQuery
 	// Prometheus query for incoming concurrency
@@ -45,7 +42,7 @@ type Scheduler struct {
 	tokensQuery *components.TaggedQuery
 
 	// saves tokens value per workload read from prometheus
-	tokensByWorkload *policydecisionsv1.TokensDecision
+	tokensByWorkload *policysyncv1.TokensDecision
 	writer           *etcdwriter.Writer
 	agentGroupName   string
 	etcdPath         string
@@ -64,13 +61,12 @@ func NewSchedulerAndOptions(
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,
-		tokensByWorkload: &policydecisionsv1.TokensDecision{
+		tokensByWorkload: &policysyncv1.TokensDecision{
 			TokensByWorkloadIndex: make(map[string]uint64),
 		},
-		agentGroupName:  agentGroupName,
-		componentIndex:  componentIndex,
-		tokensPromValue: nil,
-		etcdPath:        etcdPath,
+		agentGroupName: agentGroupName,
+		componentIndex: componentIndex,
+		etcdPath:       etcdPath,
 	}
 
 	// Prepare parameters for prometheus queries
@@ -183,17 +179,18 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 				logger.Error().Err(err).Msg("could not read tokens query from prometheus")
 				errMulti = multierr.Append(errMulti, err)
 			}
-		} else if promValue != nil && !reflect.DeepEqual(promValue, s.tokensPromValue) {
-			// update only if something changed
-			s.tokensPromValue = promValue
-
+		} else if promValue != nil {
 			if vector, ok := promValue.(prometheusmodel.Vector); ok {
-				tokensDecision := &policydecisionsv1.TokensDecision{
+				tokensDecision := &policysyncv1.TokensDecision{
 					TokensByWorkloadIndex: make(map[string]uint64),
 				}
 				for _, sample := range vector {
 					for k, v := range sample.Metric {
 						if k == metrics.WorkloadIndexLabel {
+							// if sample.Value is NaN, continue
+							if math.IsNaN(float64(sample.Value)) {
+								continue
+							}
 							workloadIndex := string(v)
 							sampleValue := uint64(sample.Value)
 							tokensDecision.TokensByWorkloadIndex[workloadIndex] = sampleValue
@@ -248,16 +245,16 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 // DynamicConfigUpdate is a no-op for this component.
 func (s *Scheduler) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
 
-func (s *Scheduler) publishQueryTokens(tokens *policydecisionsv1.TokensDecision) error {
+func (s *Scheduler) publishQueryTokens(tokens *policysyncv1.TokensDecision) error {
 	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
 	// TODO: publish only on change
 	s.tokensByWorkload = tokens
 	policyName := s.policyReadAPI.GetPolicyName()
 	policyHash := s.policyReadAPI.GetPolicyHash()
 
-	wrapper := &wrappersv1.TokensDecisionWrapper{
+	wrapper := &policysyncv1.TokensDecisionWrapper{
 		TokensDecision: tokens,
-		CommonAttributes: &wrappersv1.CommonAttributes{
+		CommonAttributes: &policysyncv1.CommonAttributes{
 			PolicyName:     policyName,
 			PolicyHash:     policyHash,
 			ComponentIndex: int64(s.componentIndex),
