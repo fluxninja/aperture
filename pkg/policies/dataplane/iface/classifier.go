@@ -3,7 +3,7 @@ package iface
 import (
 	"fmt"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -24,11 +24,11 @@ func (cID ClassifierID) String() string {
 // Classifier interface.
 type Classifier interface {
 	// GetSelector returns the selector.
-	GetSelector() *selectorv1.Selector
+	GetSelector() *policylangv1.Selector
 
 	// GetClassifierID returns ClassifierID object that should uniquely identify classifier.
 	GetClassifierID() ClassifierID
 
-	// GetCounter returns the counter for the classifier.
-	GetCounter() prometheus.Counter
+	// GetRequestCounter returns the counter for the classifier.
+	GetRequestCounter() prometheus.Counter
 }

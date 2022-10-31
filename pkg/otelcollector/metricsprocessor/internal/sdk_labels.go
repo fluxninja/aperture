@@ -17,6 +17,13 @@ func AddSDKSpecificLabels(attributes pcommon.Map) {
 	workloadStart, workloadStartExists := getSDKLabelTimestampValue(attributes, otelcollector.ApertureWorkloadStartTimestampLabel)
 	flowEnd, flowEndExists := getSDKLabelTimestampValue(attributes, otelcollector.ApertureFlowEndTimestampLabel)
 
+	// Add ResponseReceivedLabel based on whether flowEnd is present
+	if flowEndExists {
+		attributes.PutStr(otelcollector.ResponseReceivedLabel, otelcollector.ResponseReceivedTrue)
+	} else {
+		attributes.PutStr(otelcollector.ResponseReceivedLabel, otelcollector.ResponseReceivedFalse)
+	}
+
 	if flowStartExists && flowEndExists {
 		flowDuration := flowEnd.Sub(flowStart)
 		attributes.PutDouble(otelcollector.FlowDurationLabel, float64(flowDuration.Milliseconds()))

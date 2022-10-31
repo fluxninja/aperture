@@ -71,14 +71,14 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		if sourceStr == otelcollector.ApertureSourceSDK {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{})
 			if !success {
-				return retErr("aperture check response label not found in Envoy access logs")
+				return retErr("aperture check response label not found in SDK access logs")
 			}
 
 			internal.AddSDKSpecificLabels(attributes)
 		} else if sourceStr == otelcollector.ApertureSourceEnvoy {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
 			if !success {
-				return retErr("aperture check response label not found in SDK access logs")
+				return retErr("aperture check response label not found in Envoy access logs")
 			}
 
 			internal.AddEnvoySpecificLabels(attributes)
@@ -109,14 +109,14 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 func (p *metricsProcessor) updateMetrics(
 	attributes pcommon.Map,
 	checkResponse *flowcontrolv1.CheckResponse,
-	treatAsZero []string,
+	treatAsMissing []string,
 ) {
 	if checkResponse == nil {
 		return
 	}
 	if len(checkResponse.LimiterDecisions) > 0 {
 		// Update workload metrics
-		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, []string{})
+		latency, latencyFound := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, []string{})
 		for _, decision := range checkResponse.LimiterDecisions {
 			limiterID := iface.LimiterID{
 				PolicyName:     decision.PolicyName,
@@ -129,11 +129,10 @@ func (p *metricsProcessor) updateMetrics(
 					metrics.PolicyNameLabel:     decision.PolicyName,
 					metrics.PolicyHashLabel:     decision.PolicyHash,
 					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
-					metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
 					metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
 				}
 
-				p.updateMetricsForWorkload(limiterID, labels, latency)
+				p.updateMetricsForWorkload(limiterID, labels, checkResponse.DecisionType, latency, latencyFound)
 			}
 
 			// Update rate limiter metrics
@@ -152,7 +151,7 @@ func (p *metricsProcessor) updateMetrics(
 				checkResponse.DecisionType,
 				statusCode, featureStatus,
 				attributes,
-				treatAsZero)
+				treatAsMissing)
 		}
 	}
 
@@ -169,9 +168,9 @@ func (p *metricsProcessor) updateMetrics(
 	}
 }
 
-func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, latency float64) {
-	limiter := p.cfg.engine.GetConcurrencyLimiter(limiterID)
-	if limiter == nil {
+func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, decisionType flowcontrolv1.CheckResponse_DecisionType, latency float64, latencyFound bool) {
+	concurrencyLimiter := p.cfg.engine.GetConcurrencyLimiter(limiterID)
+	if concurrencyLimiter == nil {
 		log.Sample(zerolog.Sometimes).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
@@ -179,15 +178,24 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 			Msg("ConcurrencyLimiter not found")
 		return
 	}
-	latencyHistogram := limiter.GetObserver(labels)
-	if latencyHistogram != nil {
-		latencyHistogram.Observe(latency)
+	// Observe latency only if the latency is found I.E. the request was allowed and response was received
+	if latencyFound {
+		latencyObserver := concurrencyLimiter.GetLatencyObserver(labels)
+		if latencyObserver != nil {
+			latencyObserver.Observe(latency)
+		}
+	}
+	// Add decision type label to the request counter metric
+	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	requestCounter := concurrencyLimiter.GetRequestCounter(labels)
+	if requestCounter != nil {
+		requestCounter.Inc()
 	}
 }
 
 func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID) {
-	limiter := p.cfg.engine.GetRateLimiter(limiterID)
-	if limiter == nil {
+	rateLimiter := p.cfg.engine.GetRateLimiter(limiterID)
+	if rateLimiter == nil {
 		log.Sample(zerolog.Sometimes).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
@@ -195,9 +203,9 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 			Msg("RateLimiter not found")
 		return
 	}
-	counter := limiter.GetCounter()
-	if counter != nil {
-		counter.Inc()
+	requestCounter := rateLimiter.GetRequestCounter()
+	if requestCounter != nil {
+		requestCounter.Inc()
 	}
 }
 
@@ -212,9 +220,9 @@ func (p *metricsProcessor) updateMetricsForClassifier(classifierID iface.Classif
 		return
 	}
 
-	counter := classifier.GetCounter()
-	if counter != nil {
-		counter.Inc()
+	requestCounter := classifier.GetRequestCounter()
+	if requestCounter != nil {
+		requestCounter.Inc()
 	}
 }
 
@@ -224,7 +232,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	statusCode string,
 	featureStatus string,
 	attributes pcommon.Map,
-	treatAsZero []string,
+	treatAsMissing []string,
 ) {
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
@@ -237,10 +245,17 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 		return
 	}
 
-	// metricValue is the value at fluxMeter's AttributeKey
-	metricValue, _ := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsZero)
-
 	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, featureStatus)
+
+	// metricValue is the value at fluxMeter's AttributeKey
+	metricValue, found := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsMissing)
+
+	// Add attribute found label to the flux meter metric
+	if found {
+		labels[metrics.AttributeFoundLabel] = metrics.AttributeFoundTrue
+	} else {
+		labels[metrics.AttributeFoundLabel] = metrics.AttributeFoundFalse
+	}
 	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
 	if fluxMeterHistogram != nil {
 		fluxMeterHistogram.Observe(metricValue)

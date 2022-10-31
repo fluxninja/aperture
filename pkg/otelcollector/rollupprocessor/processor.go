@@ -28,19 +28,19 @@ var rollupTypes = []RollupType{
 func initRollupsLog() []*Rollup {
 	rollupsInit := []*Rollup{
 		{
-			FromField:   otelcollector.WorkloadDurationLabel,
-			TreatAsZero: []string{},
-			Datasketch:  true,
+			FromField:      otelcollector.WorkloadDurationLabel,
+			TreatAsMissing: []string{},
+			Datasketch:     true,
 		},
 		{
-			FromField:   otelcollector.FlowDurationLabel,
-			TreatAsZero: []string{},
-			Datasketch:  true,
+			FromField:      otelcollector.FlowDurationLabel,
+			TreatAsMissing: []string{},
+			Datasketch:     true,
 		},
 		{
-			FromField:   otelcollector.ApertureProcessingDurationLabel,
-			TreatAsZero: []string{},
-			Datasketch:  true,
+			FromField:      otelcollector.ApertureProcessingDurationLabel,
+			TreatAsMissing: []string{},
+			Datasketch:     true,
 		},
 		{
 			FromField: otelcollector.HTTPRequestContentLength,
@@ -68,10 +68,10 @@ func _initRollupsPerType(rollupsInit []*Rollup, rollupTypes []RollupType) []*Rol
 			}
 
 			rollups = append(rollups, &Rollup{
-				FromField:   rollupInit.FromField,
-				ToField:     AggregateField(rollupInit.FromField, rollupType),
-				Type:        rollupType,
-				TreatAsZero: rollupInit.TreatAsZero,
+				FromField:      rollupInit.FromField,
+				ToField:        AggregateField(rollupInit.FromField, rollupType),
+				Type:           rollupType,
+				TreatAsMissing: rollupInit.TreatAsMissing,
 			})
 		}
 	}

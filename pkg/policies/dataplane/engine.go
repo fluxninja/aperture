@@ -7,8 +7,8 @@ import (
 
 	"golang.org/x/exp/maps"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
@@ -314,7 +314,7 @@ func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []st
 	return mmResult
 }
 
-func (e *Engine) register(key string, selectorProto *selectorv1.Selector, matchedCB multimatcher.MatchCallback[multiMatchResult]) error {
+func (e *Engine) register(key string, selectorProto *policylangv1.Selector, matchedCB multimatcher.MatchCallback[multiMatchResult]) error {
 	e.multiMatchersMutex.Lock()
 	defer e.multiMatchersMutex.Unlock()
 
@@ -336,7 +336,7 @@ func (e *Engine) register(key string, selectorProto *selectorv1.Selector, matche
 	return nil
 }
 
-func (e *Engine) unregister(key string, selectorProto *selectorv1.Selector) error {
+func (e *Engine) unregister(key string, selectorProto *policylangv1.Selector) error {
 	e.multiMatchersMutex.Lock()
 	defer e.multiMatchersMutex.Unlock()
 

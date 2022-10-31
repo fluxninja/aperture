@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+message TickInfo {
+  google.protobuf.Timestamp timestamp = 1;
+  google.protobuf.Timestamp next_timestamp = 2;
+  int64 tick = 3;
+  google.protobuf.Duration interval = 4;
+}

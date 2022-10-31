@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+package aperture.policy.language.v1;
+
+import "aperture/policy/language/v1/label_matcher.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Describes which flow in which service a [dataplane
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
+message Selector {
+  ServiceSelector service_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+  FlowSelector flow_selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+}
+
+// Describes which service a [dataplane
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
+message ServiceSelector {
+  // Which [agent-group](/concepts/service.md#agent-group) this
+  // selector applies to.
+  string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "default"}
+    }
+  }]; // @gotags: default:"default"
+
+  // The Fully Qualified Domain Name of the
+  // [service](/concepts/service.md) to select.
+  //
+  // In kubernetes, this is the FQDN of the Service object.
+  //
+  // Empty string means all services within an agent group (catch-all).
+  //
+  // :::note
+  // One entity may belong to multiple services.
+  // :::
+  string service = 2;
+}
+
+// Describes which flows a [dataplane
+// component](/concepts/flow-control/flow-control.md#components) should apply
+// to
+//
+// :::info
+// See also [Selector overview](/concepts/flow-control/selector.md).
+// :::
+//
+// Example:
+// ```yaml
+// control_point:
+//   traffic: ingress # Allowed values are `ingress` and `egress`.
+// label_matcher:
+//   match_labels:
+//     user_tier: gold
+//   match_expressions:
+//     - key: query
+//       operator: In
+//       values:
+//         - insert
+//         - delete
+//     - label: user_agent
+//       regex: ^(?!.*Chrome).*Safari
+// ```
+message FlowSelector {
+  // Describes
+  // [control point](/concepts/flow-control/flow-control.md#control-point)
+  // within the entity where the policy should apply to.
+  ControlPoint control_point = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+
+  // Label matcher allows to add _additional_ condition on
+  // [flow labels](/concepts/flow-control/flow-label.md)
+  // must also be satisfied (in addition to service+control point matching)
+  //
+  // :::info
+  // See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+  // :::
+  //
+  // :::note
+  // [Classifiers](#v1-classifier) _can_ use flow labels created by some other
+  // classifier, but only if they were created at some previous control point
+  // (and propagated in baggage).
+  //
+  // This limitation doesn't apply to selectors of other entities, like
+  // Flux Meters or Actuators. It's valid to create a flow label on a control
+  // point using classifier, and immediately use it for matching on the same
+  // control point.
+  // :::
+  LabelMatcher label_matcher = 2;
+}
+
+// Identifies control point within a service that the rule or policy should apply to.
+// Controlpoint is either a library feature name or one of ingress/egress traffic control point.
+message ControlPoint {
+  // @gotags: validate:"required"
+  oneof controlpoint {
+    // Name of Aperture SDK's feature.
+    // Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
+    //
+    // Note: Flowcontrol only.
+    string feature = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {string_value: "required"}
+      }
+    }]; //@gotags: validate:"required"
+
+    // Type of traffic service, either "ingress" or "egress".
+    // Apply the policy to the whole incoming/outgoing traffic of a service.
+    // Usually powered by integration with a proxy (like envoy) or a web framework.
+    //
+    // * Flowcontrol: Blockable atom here is a single HTTP-transaction.
+    // * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
+    string traffic = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {string_value: "required,oneof=ingress egress"}
+      }
+    }]; // @gotags: validate:"required,oneof=ingress egress"
+  }
+}

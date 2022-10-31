@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/extractors"
@@ -28,7 +27,7 @@ type CompiledRuleset struct {
 type LabelerWithSelector struct {
 	Labeler          *Labeler
 	LabelSelector    multimatcher.Expr
-	CommonAttributes *wrappersv1.CommonAttributes
+	CommonAttributes *policysyncv1.CommonAttributes
 }
 
 // Labeler is used to create flow labels
@@ -50,13 +49,13 @@ type Labeler struct {
 
 // ReportedRule is a rule along with its selector and label name.
 type ReportedRule struct {
-	Selector    *selectorv1.Selector
-	Rule        *classificationv1.Rule
+	Selector    *policylangv1.Selector
+	Rule        *policylangv1.Rule
 	RulesetName string
 	LabelName   string
 }
 
-func rulesetToReportedRules(rs *classificationv1.Classifier, rulesetName string) []ReportedRule {
+func rulesetToReportedRules(rs *policylangv1.Classifier, rulesetName string) []ReportedRule {
 	out := make([]ReportedRule, 0, len(rs.Rules))
 	for label, rule := range rs.Rules {
 		out = append(out, ReportedRule{
@@ -90,7 +89,7 @@ func (b badSelector) Error() string { return "invalid ruleset selector" }
 var BadLabelName = extractors.BadLabelName
 
 // CompileRuleset parses ruleset's selector and compiles its rules.
-func CompileRuleset(ctx context.Context, name string, classifierWrapper *wrappersv1.ClassifierWrapper) (CompiledRuleset, error) {
+func CompileRuleset(ctx context.Context, name string, classifierWrapper *policysyncv1.ClassifierWrapper) (CompiledRuleset, error) {
 	classifierMsg := classifierWrapper.GetClassifier()
 	if classifierMsg.Selector == nil {
 		return CompiledRuleset{}, fmt.Errorf("%w: missing selector", BadSelector)
@@ -119,7 +118,7 @@ func CompileRuleset(ctx context.Context, name string, classifierWrapper *wrapper
 //
 // Raw rego rules are compiled 1:1 to rego queries. High-level extractor-based
 // rules are compiled into a single rego query.
-func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifierWrapper *wrappersv1.ClassifierWrapper) ([]LabelerWithSelector, error) {
+func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifierWrapper *policysyncv1.ClassifierWrapper) ([]LabelerWithSelector, error) {
 	log.Trace().Msg("Classifier.compileRules starting")
 
 	commonAttributes := classifierWrapper.GetCommonAttributes()
@@ -131,7 +130,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 
 	// Group all the extractor-based rules so that we can compile them to a
 	// single rego query
-	labelExtractors := map[string]*classificationv1.Extractor{}
+	labelExtractors := map[string]*policylangv1.Extractor{}
 	labelsTelemetry := map[string]bool{} // Telemetry flag for labels created by extractors
 
 	rawRegoCount := 0
@@ -148,10 +147,10 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 		}
 
 		switch source := rule.GetSource().(type) {
-		case *classificationv1.Rule_Extractor:
+		case *policylangv1.Rule_Extractor:
 			labelExtractors[labelName] = source.Extractor
 			labelsTelemetry[labelName] = rule.GetTelemetry()
-		case *classificationv1.Rule_Rego_:
+		case *policylangv1.Rule_Rego_:
 			query, err := rego.New(
 				rego.Query(source.Rego.Query),
 				rego.Module("tmp.rego", source.Rego.Source),

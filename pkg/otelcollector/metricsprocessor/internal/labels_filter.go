@@ -31,6 +31,7 @@ var (
 		otelcollector.ApertureServicesLabel,
 		otelcollector.ApertureControlPointLabel,
 		otelcollector.ApertureResponseStatusLabel,
+		otelcollector.ResponseReceivedLabel,
 	}
 
 	_includeAttributesHTTP = []string{

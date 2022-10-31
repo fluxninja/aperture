@@ -71,7 +71,7 @@ into your cluster.
    ```
 
    ```bash
-   helm upgrade --install controller aperture/aperture-controller
+   helm upgrade --install controller aperture/aperture-controller -f values.yaml
    ```
 
 3. Alternatively, you can create the Controller Custom Resource directly on the

@@ -18,9 +18,9 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/peers/v1"
+	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/entitycache"
@@ -212,7 +212,7 @@ func (h *Heartbeats) newHeartbeat(
 		peers = h.peersWatcher.GetPeers()
 	}
 
-	policies := &wrappersv1.PolicyWrappers{}
+	policies := &policysyncv1.PolicyWrappers{}
 	if h.policyFactory != nil {
 		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
 	}

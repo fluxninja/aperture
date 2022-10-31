@@ -9,21 +9,21 @@ import (
 // done on all `FromField`s from logs/traces. Result of operation is stored in
 // `ToField`.
 type Rollup struct {
-	FromField   string     `mapstructure:"from"`
-	ToField     string     `mapstructure:"to"`
-	Type        RollupType `mapstructure:"type"`
-	TreatAsZero []string   `mapstructure:"treat_as_zero"`
-	Datasketch  bool       `mapstructure:"datasketch"`
+	FromField      string     `mapstructure:"from"`
+	ToField        string     `mapstructure:"to"`
+	Type           RollupType `mapstructure:"type"`
+	TreatAsMissing []string   `mapstructure:"treat_as_missing"`
+	Datasketch     bool       `mapstructure:"datasketch"`
 }
 
 // GetFromFieldValue returns value of `FromField` from attributes as float64.
 func (rollup *Rollup) GetFromFieldValue(attributes pcommon.Map) (float64, bool) {
-	return otelcollector.GetFloat64(attributes, rollup.FromField, rollup.TreatAsZero)
+	return otelcollector.GetFloat64(attributes, rollup.FromField, rollup.TreatAsMissing)
 }
 
 // GetToFieldValue returns value of `ToField` from attributes as float64.
 func (rollup *Rollup) GetToFieldValue(attributes pcommon.Map) (float64, bool) {
-	return otelcollector.GetFloat64(attributes, rollup.ToField, rollup.TreatAsZero)
+	return otelcollector.GetFloat64(attributes, rollup.ToField, rollup.TreatAsMissing)
 }
 
 // RollupType represents rollup type available in the processor.
