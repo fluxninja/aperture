@@ -183,6 +183,9 @@ jobs:
   helm-release:
     executor: base-cimg-executor
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "e1:10:c4:c4:f6:4e:fd:9e:e3:f6:21:5c:02:e2:ad:37" # fluxninja/aperture R/W
       - checkout
       - run:
           name: "Package and release Helm Chart"
