@@ -7,7 +7,7 @@ icon: https://raw.githubusercontent.com/fluxninja/aperture/gh-pages/FluxNinja--m
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami
-    version: "=2.1.1"
+    version: "=1.17.1"
   - name: etcd
     version: "=8.5.8"
     repository: https://charts.bitnami.com/bitnami
