@@ -101,7 +101,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n/ sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n",
+          "expr": "sum(increase(flux_meter_sum{attribute_found=\"true\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n/ sum(increase(flux_meter_count{attribute_found=\"true\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",
@@ -215,7 +215,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by(workload_index, decision_type) (rate(workload_latency_ms_count{policy_name=\"example\"}[$__rate_interval]))",
+          "expr": "sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name=\"example\"}[$__rate_interval]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",
@@ -329,7 +329,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name=\"example\",decision_type!=\"DECISION_TYPE_REJECTED\"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name=\"example\",decision_type!=\"DECISION_TYPE_REJECTED\"}[$__rate_interval])))",
+          "expr": "(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name=\"example\"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name=\"example\"}[$__rate_interval])))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",

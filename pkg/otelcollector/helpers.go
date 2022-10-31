@@ -166,7 +166,7 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 }
 
 // GetFloat64 returns float64 value from given attribute map at given key.
-func GetFloat64(attributes pcommon.Map, key string, treatAsZero []string) (float64, bool) {
+func GetFloat64(attributes pcommon.Map, key string, treatAsMissing []string) (float64, bool) {
 	rawNewValue, exists := attributes.Get(key)
 	if !exists {
 		log.Sample(zerolog.Sometimes).Trace().Str("key", key).Msg("Key not found")
@@ -179,9 +179,9 @@ func GetFloat64(attributes pcommon.Map, key string, treatAsZero []string) (float
 	} else if rawNewValue.Type() == pcommon.ValueTypeStr {
 		newValue, err := strconv.ParseFloat(rawNewValue.Str(), 64)
 		if err != nil {
-			for _, treatAsZeroValue := range treatAsZero {
-				if rawNewValue.Str() == treatAsZeroValue {
-					return 0, true
+			for _, treatAsMissingValue := range treatAsMissing {
+				if rawNewValue.Str() == treatAsMissingValue {
+					return 0, false
 				}
 			}
 			log.Sample(zerolog.Sometimes).Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Failed parsing value as float")

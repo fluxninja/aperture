@@ -132,8 +132,8 @@ function(params) {
     newTimeSeriesPanel('FluxMeter',
                        ds,
                        |||
-                         sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
-                         / sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
+                         sum(increase(flux_meter_sum{attribute_found="true", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
+                         / sum(increase(flux_meter_count{attribute_found="true", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
                        ||| % { policyName: $._config.policyName },
                        'Latency (ms)',
                        'ms'),
@@ -177,10 +177,10 @@ function(params) {
     newTimeSeriesPanel('Accepted Concurrency', ds, 'sum(rate(accepted_concurrency_ms{policy_name="%(policyName)s"}[$__rate_interval]))' % { policyName: $._config.policyName }, 'Concurrency', 'ms'),
 
   local WorkloadDecisions =
-    newTimeSeriesPanel('Workload Decisions', ds, 'sum by(workload_index, decision_type) (rate(workload_latency_ms_count{policy_name="%(policyName)s"}[$__rate_interval]))' % { policyName: $._config.policyName }, 'Decisions', 'reqps'),
+    newTimeSeriesPanel('Workload Decisions', ds, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policyName)s"}[$__rate_interval]))' % { policyName: $._config.policyName }, 'Decisions', 'reqps'),
 
   local WorkloadLatency =
-    newTimeSeriesPanel('Workload Latency (Auto Tokens)', ds, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policyName)s",decision_type!="DECISION_TYPE_REJECTED"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policyName)s",decision_type!="DECISION_TYPE_REJECTED"}[$__rate_interval])))' % { policyName: $._config.policyName }, 'Latency', 'ms'),
+    newTimeSeriesPanel('Workload Latency (Auto Tokens)', ds, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policyName)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policyName)s"}[$__rate_interval])))' % { policyName: $._config.policyName }, 'Latency', 'ms'),
 
 
   local dashboardDef =
