@@ -189,7 +189,11 @@ jobs:
       - checkout
       - run:
           name: "Package and release Helm Chart"
-          command: .circleci/scripts/helm_release.sh
+          command: |
+            export APERTURE_RW_KEY_FINGERPRINT="e1:10:c4:c4:f6:4e:fd:9e:e3:f6:21:5c:02:e2:ad:37"
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${APERTURE_RW_KEY_FINGERPRINT}" | tr -d ':')"
+            export SSH_AUTH_SOCK=""
+            .circleci/scripts/helm_release.sh
 
 workflows:
   version: 2
