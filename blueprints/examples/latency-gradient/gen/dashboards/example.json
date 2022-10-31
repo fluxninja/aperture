@@ -329,7 +329,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name=\"example\"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name=\"example\"\"}[$__rate_interval])))",
+          "expr": "(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name=\"example\"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name=\"example\"}[$__rate_interval])))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",

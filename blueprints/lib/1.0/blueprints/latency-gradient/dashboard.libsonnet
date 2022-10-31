@@ -180,7 +180,7 @@ function(params) {
     newTimeSeriesPanel('Workload Decisions', ds, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policyName)s"}[$__rate_interval]))' % { policyName: $._config.policyName }, 'Decisions', 'reqps'),
 
   local WorkloadLatency =
-    newTimeSeriesPanel('Workload Latency (Auto Tokens)', ds, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policyName)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policyName)s""}[$__rate_interval])))' % { policyName: $._config.policyName }, 'Latency', 'ms'),
+    newTimeSeriesPanel('Workload Latency (Auto Tokens)', ds, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policyName)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policyName)s"}[$__rate_interval])))' % { policyName: $._config.policyName }, 'Latency', 'ms'),
 
 
   local dashboardDef =
