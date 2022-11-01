@@ -78,29 +78,20 @@ func (r *PanicHandlerRegistry) RegisterPanicHandler(ph PanicHandler) {
 // Crash invokes each of the registered panic handler and then rethrows panic - shutting down the app.
 func (r *PanicHandlerRegistry) Crash(v interface{}) {
 	stackTrace := Capture()
-	waitCh := make(chan struct{})
-
-	go crashOnce.Do(func() {
+	crashOnce.Do(func() {
 		r.mutex.RLock()
 		defer r.mutex.RUnlock()
-		wg := sync.WaitGroup{}
-		wg.Add(len(r.Handlers))
+
+		go func() {
+			// terminate the app after 5 seconds in case the panic handler is stuck
+			time.Sleep(5 * time.Second)
+			panic(v)
+		}()
 
 		for _, handler := range r.Handlers {
-			h := handler
-			go func() {
-				defer wg.Done()
-				h(v, stackTrace)
-			}()
+			handler(v, stackTrace)
 		}
-		wg.Wait()
-		close(waitCh)
 	})
-
-	select {
-	case <-waitCh:
-	case <-time.After(5 * time.Second):
-	}
 	panic(v)
 }
 
