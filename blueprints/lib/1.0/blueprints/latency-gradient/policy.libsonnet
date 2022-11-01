@@ -74,7 +74,7 @@ function(params) {
             + sqrt.withScale($._config.constants.concurrencySQRTIncrementMultiplier),
           ),
           component.withPromql(
-            local q = 'sum(increase(flux_meter_sum{attribute_found="true", response_status="OK", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{attribute_found="true", response_status="OK", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
+            local q = 'sum(increase(flux_meter_sum{valid="true", response_status="OK", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{valid="true", response_status="OK", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
             promQL.new()
             + promQL.withQueryString(q)
             + promQL.withEvaluationInterval('1s')
