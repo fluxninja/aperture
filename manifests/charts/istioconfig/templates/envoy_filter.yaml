@@ -62,7 +62,11 @@ spec:
                   log_name: ingress
                   grpc_service:
                     google_grpc:
+                      {{- if .Values.envoyFilter.sidecarMode }}
+                      target_uri: localhost:{{ .Values.envoyFilter.port }}
+                      {{- else }}
                       target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.port }}
+                      {{- end }}
                       stat_prefix: aperture_access_log
                   transport_api_version: V3
                 body:
@@ -94,7 +98,11 @@ spec:
                   log_name: egress
                   grpc_service:
                     google_grpc:
+                      {{- if .Values.envoyFilter.sidecarMode }}
+                      target_uri: localhost:{{ .Values.envoyFilter.port }}
+                      {{- else }}
                       target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.port }}
+                      {{- end }}
                       stat_prefix: aperture_access_log
                   transport_api_version: V3
                 body:
@@ -130,7 +138,11 @@ spec:
           failure_mode_allow: true
           grpc_service:
             google_grpc:
+              {{- if .Values.envoyFilter.sidecarMode }}
+              target_uri: localhost:{{ .Values.envoyFilter.port }}
+              {{- else }}
               target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.port }}
+              {{- end }}
               stat_prefix: ext_authz
             timeout: {{ .Values.envoyFilter.authzGrpcTimeout }}
             initial_metadata:
@@ -165,7 +177,11 @@ spec:
           failure_mode_allow: true
           grpc_service:
             google_grpc:
+              {{- if .Values.envoyFilter.sidecarMode }}
+              target_uri: localhost:{{ .Values.envoyFilter.port }}
+              {{- else }}
               target_uri: {{ .Values.envoyFilter.name }}.{{ .Values.envoyFilter.namespace }}.svc.cluster.local:{{ .Values.envoyFilter.port }}
+              {{- end }}
               stat_prefix: ext_authz
             timeout: {{ .Values.envoyFilter.authzGrpcTimeout }}
             initial_metadata:
