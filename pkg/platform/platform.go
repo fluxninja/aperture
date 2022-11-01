@@ -68,7 +68,6 @@ func New(opts ...fx.Option) *fx.App {
 			panichandler.Crash(v)
 		}
 	}()
-	panichandler.RegisterPanicHandler(OnCrash)
 	return fx.New(options...)
 }
 
@@ -201,8 +200,3 @@ func stop(app *fx.App) {
 	platform.statusRegistry.Detach()
 	os.Exit(0)
 }
-
-// OnCrash is the panic handler.
-// TODO: Crash Report will be handled by Sentry plugin.
-// Need to implement Panic Handler for the platform.
-func OnCrash(interface{}, panichandler.Callstack) {}
