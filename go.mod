@@ -19,7 +19,7 @@ require (
 	github.com/fluxninja/datasketches-go v0.0.0-20220916235224-7501a2d28551
 	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
 	github.com/getsentry/sentry-go v0.14.0
-	github.com/go-co-op/gocron v1.17.0
+	github.com/go-co-op/gocron v1.17.1
 	github.com/go-logr/zerologr v1.2.2
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/golang/mock v1.6.0
