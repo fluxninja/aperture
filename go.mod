@@ -62,7 +62,7 @@ require (
 	go.opentelemetry.io/collector/exporter/loggingexporter v0.0.0-00010101000000-000000000000
 	go.opentelemetry.io/collector/exporter/otlpexporter v0.0.0-00010101000000-000000000000
 	go.opentelemetry.io/collector/exporter/otlphttpexporter v0.0.0-00010101000000-000000000000
-	go.opentelemetry.io/collector/pdata v0.63.0
+	go.opentelemetry.io/collector/pdata v0.63.1
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.4
 	go.opentelemetry.io/otel v1.11.1
 	go.opentelemetry.io/proto/otlp v0.19.0
