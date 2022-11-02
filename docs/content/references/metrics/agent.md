@@ -14,14 +14,14 @@ sidebar_label: Agent
 
 ### Labels
 
-| Name             | Example | Description |
-| ---------------- | ------- | ----------- |
-| flux_meter_name  |         |             |
-| decision_type    |         |             |
-| response_status  |         |             |
-| http_status_code |         |             |
-| feature_status   |         |             |
-| attribute_found  |         |             |
+| Name             | Example                                        | Description                                                                                                   |
+| ---------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| flux_meter_name  | service1-demo-app                              | Name of the FluxMeter                                                                                         |
+| decision_type    | DECISION_TYPE_ACCEPTED, DECISION_TYPE_REJECTED | Whether the flow was accepted or not                                                                          |
+| response_status  | Error, OK                                      | A common label to denote OK or Error across all protocols                                                     |
+| http_status_code | 200, 503                                       | HTTP status code                                                                                              |
+| feature_status   |                                                | Feature status                                                                                                |
+| valid            | true, false                                    | Label for specifying if metric is valid. A metric may be invalid if attribute is not found in flow telemetry. |
 
 ## ConcurrencyLimiter
 
@@ -36,12 +36,12 @@ sidebar_label: Agent
 
 ### Labels
 
-| Name            | Example | Description |
-| --------------- | ------- | ----------- |
-| policy_name     |         |             |
-| policy_hash     |         |             |
-| workload_index  |         |             |
-| component_index |         |             |
+| Name            | Example                                      | Description                                                     |
+| --------------- | -------------------------------------------- | --------------------------------------------------------------- |
+| policy_name     | service1-demo-app                            | Name of the policy.                                             |
+| policy_hash     | 5kZjjSgDAtGWmLnDT67SmQhZdHVmz0+GvKcOGTfWMVo= | Hash of the policy used for checking integrity of the policy.   |
+| workload_index  | 0, 1, 2, default                             | Index of the workload in order of specification in the policy.  |
+| component_index | 13                                           | Index of the component in order of specification in the policy. |
 
 ## RateLimiter
 
@@ -53,11 +53,11 @@ sidebar_label: Agent
 
 ### Labels
 
-| Name            | Example | Description |
-| --------------- | ------- | ----------- |
-| policy_name     |         |             |
-| policy_hash     |         |             |
-| component_index |         |             |
+| Name            | Example                                      | Description                                                     |
+| --------------- | -------------------------------------------- | --------------------------------------------------------------- |
+| policy_name     | service1-demo-app                            | Name of the policy.                                             |
+| policy_hash     | 5kZjjSgDAtGWmLnDT67SmQhZdHVmz0+GvKcOGTfWMVo= | Hash of the policy used for checking integrity of the policy.   |
+| component_index | 13                                           | Index of the component in order of specification in the policy. |
 
 ## Classifier
 
@@ -69,11 +69,11 @@ sidebar_label: Agent
 
 ### Labels
 
-| Name             | Example | Description |
-| ---------------- | ------- | ----------- |
-| policy_name      |         |             |
-| policy_hash      |         |             |
-| classifier_index |         |             |
+| Name             | Example                                      | Description                                                      |
+| ---------------- | -------------------------------------------- | ---------------------------------------------------------------- |
+| policy_name      | service1-demo-app                            | Name of the policy.                                              |
+| policy_hash      | 5kZjjSgDAtGWmLnDT67SmQhZdHVmz0+GvKcOGTfWMVo= | Hash of the policy used for checking integrity of the policy.    |
+| classifier_index | 0, 1                                         | Index of the classifier in order of specification in the policy. |
 
 ## Dataplane Summary
 
@@ -88,11 +88,11 @@ sidebar_label: Agent
 
 ### FlowControl Labels
 
-| Name          | Example | Description |
-| ------------- | ------- | ----------- |
-| decision_type |         |             |
-| error_reason  |         |             |
-| reject_reason |         |             |
+| Name          | Example                                                                                                                                              | Description                                              |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| decision_type | DECISION_TYPE_ACCEPTED, DECISION_TYPE_REJECTED                                                                                                       | Whether the flow was accepted or not                     |
+| error_reason  | ERROR_NONE, ERROR_MISSING_TRAFFIC_DIRECTION, ERROR_INVALID_TRAFFIC_DIRECTION, ERROR_CONVERT_TO_MAP_STRUCT, ERROR_CONVERT_TO_REGO_AST, ERROR_CLASSIFY | Error reason for FlowControl Check response.             |
+| reject_reason | REJECT_REASON_NONE, REJECT_REASON_RATE_LIMITED, REJECT_REASON_CONCURRENCY_LIMITED                                                                    | Reason why FlowControl Check response rejected the flow. |
 
 ### Distributed Cache Metrics
 
@@ -107,10 +107,10 @@ sidebar_label: Agent
 
 ### Distributed Cache Labels
 
-| Name                  | Example | Description |
-| --------------------- | ------- | ----------- |
-| distcache_member_id   |         |             |
-| distcache_member_name |         |             |
+| Name                  | Example            | Description                                               |
+| --------------------- | ------------------ | --------------------------------------------------------- |
+| distcache_member_id   | 384313659919819706 | Internal ID of distributed cache cluster member.          |
+| distcache_member_name | 10.244.1.20:3320   | Internal unique name of distributed cache cluster member. |
 
 ### Scheduler Metrics
 
@@ -125,8 +125,8 @@ sidebar_label: Agent
 
 ### Scheduler Labels
 
-| Name            | Example | Description |
-| --------------- | ------- | ----------- |
-| policy_name     |         |             |
-| policy_hash     |         |             |
-| component_index |         |             |
+| Name            | Example                                      | Description                                                     |
+| --------------- | -------------------------------------------- | --------------------------------------------------------------- |
+| policy_name     | service1-demo-app                            | Name of the policy.                                             |
+| policy_hash     | 5kZjjSgDAtGWmLnDT67SmQhZdHVmz0+GvKcOGTfWMVo= | Hash of the policy used for checking integrity of the policy.   |
+| component_index | 13                                           | Index of the component in order of specification in the policy. |

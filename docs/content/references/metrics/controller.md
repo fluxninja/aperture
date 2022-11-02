@@ -14,7 +14,8 @@ sidebar_label: Controller
 
 ### Labels
 
-| Name        | Example | Description |
-| ----------- | ------- | ----------- |
-| signal_name |         |             |
-| policy_name |         |             |
+| Name        | Example                  | Description                                                                                    |
+| ----------- | ------------------------ | ---------------------------------------------------------------------------------------------- |
+| signal_name | LATENCY_EMA, IS_OVERLOAD | Name of the signal provided in policy.                                                         |
+| policy_name | service1-demo-app        | Name of the policy.                                                                            |
+| valid       | true, false              | Label for specifying if metric is valid. A metric may be invalid if signal reading is invalid. |
