@@ -30,7 +30,7 @@ class HttpUtils {
             int httpStatusCode = flow.checkResponse().getDeniedResponse().getStatus().getCodeValue();
             return HttpStatus.valueOf(httpStatusCode);
         }
-        return HttpStatus.BAD_REQUEST;
+        return HttpStatus.FORBIDDEN;
     }
 
     protected static Map<String, String> labelsFromRequest(HttpRequest req) {
