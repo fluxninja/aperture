@@ -13,7 +13,12 @@
     "@grpc/grpc-js": "1.7.1",
     "@grpc/proto-loader": "0.7.3",
     "http-terminator": "3.2.0",
-    "express": "4.18.2"
+    "express": "4.18.2",
+    "@opentelemetry/sdk-trace-node": "1.7.0",
+    "@opentelemetry/resources": "1.7.0",
+    "@opentelemetry/sdk-trace-base": "1.7.0",
+    "@opentelemetry/semantic-conventions": "1.7.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "0.33.0"
   },
   "engines": {
     "node": "16.16.0",

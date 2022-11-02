@@ -20,7 +20,7 @@ apertureRoute.get('/', function (req, res) {
             // Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
             // The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
             flow.End(FlowStatus.Ok);
-            res.sendStatus(200);
+            res.sendStatus(202);
         } else {
             // Flow has been rejected by Aperture Agent.
             flow.End(FlowStatus.Error);
