@@ -24,7 +24,7 @@ class RpcUtils {
             case REJECT_REASON_CONCURRENCY_LIMITED:
                 return HttpStatus.SERVICE_UNAVAILABLE;
             default:
-                return HttpStatus.BAD_REQUEST;
+                return HttpStatus.FORBIDDEN;
         }
     }
 
