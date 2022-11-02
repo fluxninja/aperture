@@ -33,7 +33,9 @@ local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
     timeSeriesPanel.fieldConfig.withDefaultsMixin(
       timeSeriesPanel.fieldConfig.defaults.withThresholds(thresholds)
     )
-  );
+  ) + {
+    interval: '1s',
+  };
 
 local newBarGaugePanel(graphTitle, datasource, graphQuery) =
   local target =

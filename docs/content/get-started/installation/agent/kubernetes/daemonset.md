@@ -191,7 +191,7 @@ You should see pods for Aperture Agent and Agent Manager in `RUNNING` state and
 ## Uninstall
 
 You can uninstall the Aperture Agent and it's components by uninstalling the
-charts installed above:
+chart installed above:
 
 1. Delete the Aperture Agent chart:
 

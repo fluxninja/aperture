@@ -85,6 +85,7 @@
         "y": 0
       },
       "id": 2,
+      "interval": "1s",
       "minSpan": 24,
       "options": {
         "legend": {
@@ -199,6 +200,7 @@
         "y": 10
       },
       "id": 3,
+      "interval": "1s",
       "minSpan": 24,
       "options": {
         "legend": {
@@ -313,6 +315,7 @@
         "y": 20
       },
       "id": 4,
+      "interval": "1s",
       "minSpan": 24,
       "options": {
         "legend": {
@@ -427,6 +430,7 @@
         "y": 30
       },
       "id": 5,
+      "interval": "1s",
       "minSpan": 24,
       "options": {
         "legend": {
@@ -541,6 +545,7 @@
         "y": 30
       },
       "id": 6,
+      "interval": "1s",
       "minSpan": 24,
       "options": {
         "legend": {
