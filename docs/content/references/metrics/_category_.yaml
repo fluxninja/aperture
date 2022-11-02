@@ -1,0 +1,8 @@
+label: Metrics
+position: 3
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Metrics"
+  keywords: ["metrics"]
