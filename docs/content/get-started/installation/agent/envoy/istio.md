@@ -271,3 +271,91 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
 
 More information about the extracted values can be found on
 [this site](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log).
+
+## Installation
+
+Below are the steps to install or upgrade the example Istio EnvoyFilter into
+your setup using the
+[Aperture istioconfig Helm chart](https://artifacthub.io/packages/helm/aperture/istioconfig).
+
+By following these instructions, you will have installed the Istio EnvoyFilter
+into your cluster.
+
+1. Add the Helm chart repo in your environment:
+
+   ```bash
+   helm repo add aperture https://fluxninja.github.io/aperture/
+   helm repo update
+   ```
+
+2. Execute the below command to install or upgrade the Istio EnvoyFilter:
+
+   :::info
+
+   Replace the value of `ISTIOD_NAMESPACE_HERE` with the namespace in which
+   Istiod is running. This way, the Istio EnvoyFilter will be applied to all the
+   pods having Istio sidecar injected across namespaces.
+
+   If you want to apply the Istio EnvoyFilter to a particular namespace, replace
+   the value of `ISTIOD_NAMESPACE_HERE` with that namespace.
+
+   :::
+
+   ```bash
+   helm upgrade --install aperture-envoy-filter aperture/istioconfig -n ISTIOD_NAMESPACE_HERE
+   ```
+
+   The default values for the Aperture Agent service namespace is
+   `aperture-agent`, port is `8080` and sidecar mode is `false`. This makes the
+   Aperture Agent target URL
+   `aperture-agent.aperture-agent.svc.cluster.local:8080`. If you have installed
+   the Aperture Agent in a different namespace or different port, you can create
+   or update the `values.yaml` file and pass it with `helm upgrade`:
+
+   ```yaml
+   envoyFilter:
+     namespace: APERTURE_AGENT_NAMESPACE_HERE
+     port: APERTURE_AGENT_SERVER_PORT_HERE
+   ```
+
+   ```bash
+   helm upgrade --install aperture-envoy-filter aperture/istioconfig -n ISTIOD_NAMESPACE_HERE -f values.yaml
+   ```
+
+3. If you want to modify the default parameters of the chart, for example
+   `sidecarMode`, you can create or update the `values.yaml` file and pass it
+   with `helm upgrade`:
+
+   ```yaml
+   envoyFilter:
+     sidecarMode: true
+   ```
+
+   ```bash
+   helm upgrade --install aperture-envoy-filter aperture/istioconfig -n ISTIOD_NAMESPACE_HERE -f values.yaml
+   ```
+
+   A list of configurable parameters for the installation can be found in the
+   [README](https://artifacthub.io/packages/helm/aperture/istioconfig#parameters).
+
+## Verifying the Installation
+
+Once you have successfully deployed the resources, confirm that the Istio
+EnvoyFilter is created:
+
+```bash
+kubectl get envoyfilter aperture-envoy-filter -n ISTIOD_NAMESPACE_HERE
+```
+
+You should see a Kubernetes customer resource for the Istio EnvoyFilter.
+
+## Uninstall
+
+You can uninstall the Istio EnvoyFilter by uninstalling the chart installed
+above:
+
+1. Delete the Aperture istioconfig chart:
+
+   ```bash
+   helm uninstall aperture-envoy-filter -n ISTIOD_NAMESPACE_HERE
+   ```

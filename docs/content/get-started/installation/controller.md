@@ -220,9 +220,9 @@ Resource and apply it on a Kubernetes cluster.
 ## Uninstall
 
 You can uninstall the Aperture Controller and it's components by uninstalling
-the charts installed above:
+the chart installed above:
 
-1. Delete th Aperture Controller chart:
+1. Delete the Aperture Controller chart:
 
    ```bash
    helm uninstall controller
