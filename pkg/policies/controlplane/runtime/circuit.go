@@ -273,13 +273,17 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				metrics.SignalNameLabel: signal.Name,
 				metrics.PolicyNameLabel: circuit.Policy.GetPolicyName(),
 			}
-			signalSummaryVecMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to initialize SummaryVec")
-			}
 			if reading.Valid() {
-				signalSummaryVecMetric.Observe(reading.Value())
+				circuitMetricsLabels[metrics.ValidLabel] = metrics.ValidTrue
+			} else {
+				circuitMetricsLabels[metrics.ValidLabel] = metrics.ValidFalse
 			}
+			signalSummaryMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
+			if err != nil {
+				logger.Error().Err(err).Msg("Failed to get signal metric")
+				panic(err)
+			}
+			signalSummaryMetric.Observe(reading.Value())
 		}
 		signalStatus := status.NewStatus(signalInfo, nil)
 		reg.SetStatus(signalStatus)

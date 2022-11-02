@@ -14,7 +14,7 @@ function(params) {
 
   local SignalAveragePanel =
     local query = |||
-      increase(signal_reading_sum{policy_name="%(policyName)s",signal_name="${signal_name},valid="true"}[$__rate_interval])
+      increase(signal_reading_sum{policy_name="%(policyName)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
       /
       increase(signal_reading_count{policy_name="%(policyName)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
     ||| % { policyName: $._config.policyName };
