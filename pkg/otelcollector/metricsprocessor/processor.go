@@ -252,9 +252,9 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 
 	// Add attribute found label to the flux meter metric
 	if found {
-		labels[metrics.AttributeFoundLabel] = metrics.AttributeFoundTrue
+		labels[metrics.ValidLabel] = metrics.ValidTrue
 	} else {
-		labels[metrics.AttributeFoundLabel] = metrics.AttributeFoundFalse
+		labels[metrics.ValidLabel] = metrics.ValidFalse
 	}
 	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
 	if fluxMeterHistogram != nil {

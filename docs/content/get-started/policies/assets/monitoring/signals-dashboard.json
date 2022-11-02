@@ -78,8 +78,8 @@
         }
       },
       "gridPos": {
-        "h": 7,
-        "w": 23,
+        "h": 10,
+        "w": 24,
         "x": 0,
         "y": 0
       },
@@ -100,7 +100,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "increase(signal_reading_sum{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval])\n/\nincrease(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval])\n",
+          "expr": "increase(signal_reading_sum{policy_name=\"signal-processing\",signal_name=\"${signal_name}\",valid=\"true\"}[$__rate_interval])\n/\nincrease(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\",valid=\"true\"}[$__rate_interval])\n",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Avg",
@@ -122,6 +122,119 @@
         ]
       },
       "title": "Signal Average",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "controller-prometheus",
+      "defaults": {
+        "color": {
+          "mode": "palette-classic"
+        },
+        "custom": {
+          "drawStyle": "line",
+          "lineInterpolation": "linear",
+          "lineWidth": 1,
+          "pointSize": 5,
+          "scaleDistribution": {
+            "type": "linear"
+          },
+          "showPoints": "auto",
+          "spanNulls": false
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": null
+        }
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 3,
+      "minSpan": 24,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "span": 24,
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "avg by (valid) (rate(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval]))\n",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "green",
+            "value": null
+          },
+          {
+            "color": "red",
+            "value": 80
+          }
+        ]
+      },
+      "title": "Signal Validity (Frequency)",
       "type": "timeseries"
     }
   ],

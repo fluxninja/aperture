@@ -100,9 +100,8 @@ spec:
             output:
               signal_name: LATENCY
           query_string:
-            sum(increase(flux_meter_sum{attribute_found="true",
-            response_status="OK",
-            flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{attribute_found="true",
+            sum(increase(flux_meter_sum{valid="true", response_status="OK",
+            flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{valid="true",
             response_status="OK", flux_meter_name="service1-demo-app"}[5s]))
       - ema:
           correction_factor_on_max_envelope_violation: "0.95"

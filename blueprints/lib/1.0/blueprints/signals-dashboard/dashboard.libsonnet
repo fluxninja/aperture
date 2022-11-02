@@ -14,9 +14,9 @@ function(params) {
 
   local SignalAveragePanel =
     local query = |||
-      increase(signal_reading_sum{policy_name="%(policyName)s",signal_name="${signal_name}"}[$__rate_interval])
+      increase(signal_reading_sum{policy_name="%(policyName)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
       /
-      increase(signal_reading_count{policy_name="%(policyName)s",signal_name="${signal_name}"}[$__rate_interval])
+      increase(signal_reading_count{policy_name="%(policyName)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
     ||| % { policyName: $._config.policyName };
     local target =
       grafana.prometheus.target(query) +
@@ -34,6 +34,33 @@ function(params) {
         ],
       };
     aperture.timeSeriesPanel.new('Signal Average', ds)
+    + timeSeriesPanel.withTarget(target)
+    + timeSeriesPanel.defaults.withThresholds(thresholds)
+    + timeSeriesPanel.withFieldConfigMixin(
+      timeSeriesPanel.fieldConfig.withDefaultsMixin(
+        timeSeriesPanel.fieldConfig.defaults.withThresholds(thresholds)
+      )
+    ),
+
+  local InvalidFrequencyPanel =
+    local query = |||
+      avg by (valid) (rate(signal_reading_count{policy_name="%(policyName)s",signal_name="${signal_name}"}[$__rate_interval]))
+    ||| % { policyName: $._config.policyName };
+    local target =
+      grafana.prometheus.target(query) +
+      {
+        editorMode: 'code',
+        range: true,
+      };
+    local thresholds =
+      {
+        mode: 'absolute',
+        steps: [
+          { color: 'green', value: null },
+          { color: 'red', value: 80 },
+        ],
+      };
+    aperture.timeSeriesPanel.new('Signal Validity (Frequency)', ds)
     + timeSeriesPanel.withTarget(target)
     + timeSeriesPanel.defaults.withThresholds(thresholds)
     + timeSeriesPanel.withFieldConfigMixin(
@@ -89,5 +116,6 @@ function(params) {
       sort: 0,
       type: 'query',
     })
-    .addPanel(SignalAveragePanel, gridPos={ h: 7, w: 23, x: 0, y: 0 }),
+    .addPanel(SignalAveragePanel, gridPos={ h: 10, w: 24, x: 0, y: 0 })
+    .addPanel(InvalidFrequencyPanel, gridPos={ h: 10, w: 24, x: 0, y: 10 }),
 }
