@@ -46,7 +46,7 @@ func NewRateLimiterAndOptions(
 		return nil, fx.Options(), errors.New("selector is nil")
 	}
 	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
-	componentID := common.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
+	componentID := common.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
 	configEtcdPath := path.Join(common.RateLimiterConfigPath, componentID)
 	decisionsEtcdPath := path.Join(common.RateLimiterDecisionsPath, componentID)
 	dynamicConfigEtcdPath := path.Join(common.RateLimiterDynamicConfigPath, componentID)

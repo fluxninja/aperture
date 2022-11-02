@@ -57,7 +57,7 @@ func NewSchedulerAndOptions(
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(common.AutoTokenResultsPath,
-		common.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
+		common.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,

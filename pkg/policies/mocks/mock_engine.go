@@ -9,8 +9,8 @@ import (
 	reflect "reflect"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	iface "github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
-	selectors "github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
+	iface "github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	selectors "github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	gomock "github.com/golang/mock/gomock"
 )
 

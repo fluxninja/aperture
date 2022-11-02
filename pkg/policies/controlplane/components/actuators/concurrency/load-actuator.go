@@ -39,7 +39,7 @@ func NewLoadActuatorAndOptions(
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	componentID := common.DataplaneComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex))
+	componentID := common.FlowControlComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex))
 	decisionsEtcdPath := path.Join(common.LoadActuatorDecisionsPath, componentID)
 	dryRun := false
 	if loadActuatorProto.GetDefaultConfig() != nil {

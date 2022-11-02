@@ -31,7 +31,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 )
 
 // ModuleForAgentOTEL provides fx options for AgentOTELComponent.
