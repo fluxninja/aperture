@@ -44,12 +44,11 @@ function(params) {
 
   local InvalidFrequencyPanel =
     local query = |||
-      rate(signal_reading_count{policy_name="%(policyName)s",signal_name="${signal_name}",valid="false"}[$__rate_interval])
+      avg by (valid) (rate(signal_reading_count{policy_name="%(policyName)s",signal_name="${signal_name}"}[$__rate_interval]))
     ||| % { policyName: $._config.policyName };
     local target =
       grafana.prometheus.target(query) +
       {
-        legendFormat: 'Frequency',
         editorMode: 'code',
         range: true,
       };
@@ -61,7 +60,7 @@ function(params) {
           { color: 'red', value: 80 },
         ],
       };
-    aperture.timeSeriesPanel.new('Invalid Signal Frequency', ds)
+    aperture.timeSeriesPanel.new('Signal Validity (Frequency)', ds)
     + timeSeriesPanel.withTarget(target)
     + timeSeriesPanel.defaults.withThresholds(thresholds)
     + timeSeriesPanel.withFieldConfigMixin(
