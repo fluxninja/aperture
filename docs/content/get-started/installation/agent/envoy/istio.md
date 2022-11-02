@@ -347,7 +347,7 @@ EnvoyFilter is created:
 kubectl get envoyfilter aperture-envoy-filter -n ISTIOD_NAMESPACE_HERE
 ```
 
-You should see a Kubernetes customer resource for the Istio EnvoyFilter.
+You should see a Kubernetes custom resource for the Istio EnvoyFilter.
 
 ## Uninstall
 
