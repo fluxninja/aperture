@@ -33,7 +33,9 @@ local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
     timeSeriesPanel.fieldConfig.withDefaultsMixin(
       timeSeriesPanel.fieldConfig.defaults.withThresholds(thresholds)
     )
-  );
+  ) + {
+    interval: '1s',
+  };
 
 local newBarGaugePanel(graphTitle, datasource, graphQuery) =
   local target =
@@ -132,8 +134,8 @@ function(params) {
     newTimeSeriesPanel('FluxMeter',
                        ds,
                        |||
-                         sum(increase(flux_meter_sum{attribute_found="true", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
-                         / sum(increase(flux_meter_count{attribute_found="true", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
+                         sum(increase(flux_meter_sum{valid="true", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
+                         / sum(increase(flux_meter_count{valid="true", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
                        ||| % { policyName: $._config.policyName },
                        'Latency (ms)',
                        'ms'),

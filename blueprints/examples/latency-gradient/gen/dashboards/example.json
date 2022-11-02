@@ -85,6 +85,7 @@
         "y": 0
       },
       "id": 2,
+      "interval": "1s",
       "minSpan": 24,
       "options": {
         "legend": {
@@ -101,7 +102,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(flux_meter_sum{attribute_found=\"true\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n/ sum(increase(flux_meter_count{attribute_found=\"true\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n",
+          "expr": "sum(increase(flux_meter_sum{valid=\"true\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n/ sum(increase(flux_meter_count{valid=\"true\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",
@@ -199,6 +200,7 @@
         "y": 10
       },
       "id": 3,
+      "interval": "1s",
       "minSpan": 24,
       "options": {
         "legend": {
@@ -313,6 +315,7 @@
         "y": 20
       },
       "id": 4,
+      "interval": "1s",
       "minSpan": 24,
       "options": {
         "legend": {
@@ -427,6 +430,7 @@
         "y": 30
       },
       "id": 5,
+      "interval": "1s",
       "minSpan": 24,
       "options": {
         "legend": {
@@ -541,6 +545,7 @@
         "y": 30
       },
       "id": 6,
+      "interval": "1s",
       "minSpan": 24,
       "options": {
         "legend": {
