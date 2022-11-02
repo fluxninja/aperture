@@ -6,5 +6,15 @@ sidebar_label: Controller
 
 ## Signal
 
-| Name | Type | Labels | Unit | Description |
-| ---- | ---- | ------ | ---- | ----------- |
+### Metrics
+
+| Name           | Type    | Labels                   | Unit | Description               |
+| -------------- | ------- | ------------------------ | ---- | ------------------------- |
+| signal_reading | Summary | signal_name, policy_name |      | The reading from a signal |
+
+### Labels
+
+| Name        | Example | Description |
+| ----------- | ------- | ----------- |
+| signal_name |         |             |
+| policy_name |         |             |
