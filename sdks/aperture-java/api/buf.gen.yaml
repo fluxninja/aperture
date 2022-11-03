@@ -1,9 +1,0 @@
-version: v1
-managed:
-  enabled: true
-  java_package_prefix: com.fluxninja.generated
-plugins:
-  - remote: buf.build/protocolbuffers/plugins/java:v21.6.0-1
-    out: ../src/main/java
-  - remote: buf.build/grpc/plugins/java:v1.49.1-1
-    out: ../src/main/java

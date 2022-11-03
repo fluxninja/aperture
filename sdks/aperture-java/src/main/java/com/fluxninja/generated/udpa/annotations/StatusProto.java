@@ -50,12 +50,13 @@ public final class StatusProto {
       "\006FROZEN\020\001\022\n\n\006ACTIVE\020\002\022 \n\034NEXT_MAJOR_VERS" +
       "ION_CANDIDATE\020\003:d\n\013file_status\022\034.google." +
       "protobuf.FileOptions\030\207\200\231j \001(\0132\".udpa.ann" +
-      "otations.StatusAnnotationR\nfileStatusB\274\001" +
+      "otations.StatusAnnotationR\nfileStatusB\331\001" +
       "\n(com.fluxninja.generated.udpa.annotatio" +
-      "nsB\013StatusProtoP\001Z\"github.com/cncf/xds/g" +
-      "o/annotations\242\002\003UAX\252\002\020Udpa.Annotations\312\002" +
-      "\020Udpa\\Annotations\342\002\034Udpa\\Annotations\\GPB" +
-      "Metadata\352\002\021Udpa::Annotationsb\006proto3"
+      "nsB\013StatusProtoP\001Z?github.com/fluxninja/" +
+      "aperture/api/gen/proto/go/udpa/annotatio" +
+      "ns\242\002\003UAX\252\002\020Udpa.Annotations\312\002\020Udpa\\Annot" +
+      "ations\342\002\034Udpa\\Annotations\\GPBMetadata\352\002\021" +
+      "Udpa::Annotationsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
