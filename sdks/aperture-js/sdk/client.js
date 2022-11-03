@@ -1,4 +1,5 @@
 import grpc from "@grpc/grpc-js";
+import * as otelApi from "@opentelemetry/api";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { Resource } from "@opentelemetry/resources";
@@ -33,6 +34,7 @@ export class ApertureClient {
     tracerProvider.addSpanProcessor(new BatchSpanProcessor(exporter));
     tracerProvider.register();
     this.tracer = tracerProvider.getTracer(LIBRARY_NAME, LIBRARY_VERSION);
+    this.timeout = timeout;
   }
 
   // StartFlow takes a feature name and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
@@ -41,8 +43,13 @@ export class ApertureClient {
   // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.Accepted() on returned Flow returns as true.
   async StartFlow(featureArg, labelsArg) {
     return new Promise((resolve, reject) => {
-      // TODO - process baggage
+      let labelsMap = new Map();
+      let baggage = otelApi.propagation.getBaggage(otelApi.context.active());
+      for (const member of baggage.getAllEntries()) {
+        labelsMap[member[0]] = member[1].value;
+      }
 
+      let mergedLabels = new Map([...labelsMap, ...labelsArg])
       let span = this.tracer.startSpan("Aperture Check");
       span.setAttributes({
         FLOW_START_TIMESTAMP_LABEL: Date.now(),
@@ -53,14 +60,15 @@ export class ApertureClient {
       this.fcsClient.Check(
         {
           feature: featureArg,
-          labels: labelsArg,
-        }, (err, response) => {
+          labels: mergedLabels,
+        },
+        {deadline: Date.now() + this.timeout},
+        (err, response) => {
           span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
 
           if (err) {
             if (err.code === grpc.status.UNAVAILABLE) {
               console.log(`Aperture server unavailable. Accepting request.\n`);
-              flow.checkResponse = response;
               resolve(flow);
             }
             reject(err);
