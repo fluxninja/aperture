@@ -20,8 +20,8 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/concurrency/scheduler"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -42,7 +42,8 @@ func newLoadActuatorFactory(
 	prometheusRegistry *prometheus.Registry,
 ) (*loadActuatorFactory, error) {
 	// Scope the sync to the agent group.
-	etcdDecisionsPath := path.Join(common.LoadActuatorDecisionsPath, common.AgentGroupPrefix(agentGroup))
+	etcdDecisionsPath := path.Join(paths.LoadActuatorDecisionsPath,
+		paths.AgentGroupPrefix(agentGroup))
 	loadDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdDecisionsPath)
 	if err != nil {
 		return nil, err
@@ -153,7 +154,7 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(
 		statusRegistry: reg,
 	}
 
-	etcdKey := common.FlowControlComponentKey(lsaFactory.agentGroupName, la.conLimiter.GetPolicyName(), la.conLimiter.GetComponentIndex())
+	etcdKey := paths.FlowControlComponentKey(lsaFactory.agentGroupName, la.conLimiter.GetPolicyName(), la.conLimiter.GetComponentIndex())
 
 	decisionUnmarshaller, protoErr := config.NewProtobufUnmarshaller(nil)
 	if protoErr != nil {

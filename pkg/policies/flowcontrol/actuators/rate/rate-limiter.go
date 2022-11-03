@@ -24,9 +24,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/rate/ratetracker"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -60,7 +60,8 @@ func provideWatchers(
 ) (notifiers.Watcher, error) {
 	agentGroupName := ai.GetAgentGroup()
 
-	etcdPath := path.Join(common.RateLimiterConfigPath, common.AgentGroupPrefix(agentGroupName))
+	etcdPath := path.Join(paths.RateLimiterConfigPath,
+		paths.AgentGroupPrefix(agentGroupName))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
@@ -92,13 +93,14 @@ func setupRateLimiterFactory(
 	ai *agentinfo.AgentInfo,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
-	etcdPath := path.Join(common.RateLimiterDecisionsPath)
+	etcdPath := path.Join(paths.RateLimiterDecisionsPath)
 	decisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return err
 	}
 
-	dynamicConfigWatcher, err := etcdwatcher.NewWatcher(etcdClient, common.RateLimiterDynamicConfigPath)
+	dynamicConfigWatcher, err := etcdwatcher.NewWatcher(etcdClient,
+		paths.RateLimiterDynamicConfigPath)
 	if err != nil {
 		return err
 	}
@@ -237,7 +239,7 @@ var _ iface.RateLimiter = (*rateLimiter)(nil)
 
 func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	logger := rateLimiter.registry.GetLogger()
-	etcdKey := common.FlowControlComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
+	etcdKey := paths.FlowControlComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
 		rateLimiter.GetPolicyName(),
 		rateLimiter.GetComponentIndex())
 	// decision notifier

@@ -13,7 +13,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -28,7 +27,7 @@ func policyFactoryModule() fx.Option {
 				fx.ParamTags(
 					config.NameTag(policiesFxTag),
 					config.NameTag(policiesDynamicConfigFxTag),
-					common.FxOptionsFuncTag,
+					iface.FxOptionsFuncTag,
 				),
 			),
 		),

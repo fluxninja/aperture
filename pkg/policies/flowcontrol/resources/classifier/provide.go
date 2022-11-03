@@ -18,8 +18,8 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -41,7 +41,8 @@ func Module() fx.Option {
 
 func setupEtcdClassifierWatcher(etcdClient *etcdclient.Client, lc fx.Lifecycle, ai *agentinfo.AgentInfo) (notifiers.Watcher, error) {
 	agentGroup := ai.GetAgentGroup()
-	etcdPath := path.Join(common.ClassifiersPath, common.AgentGroupPrefix(agentGroup))
+	etcdPath := path.Join(paths.ClassifiersPath,
+		paths.AgentGroupPrefix(agentGroup))
 	etcdWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
