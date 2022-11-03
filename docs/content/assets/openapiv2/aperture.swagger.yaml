@@ -11,6 +11,7 @@ tags:
   - name: StatusService
   - name: FluxNinjaService
   - name: ControllerInfoService
+  - name: Authorization
 consumes:
   - application/json
 produces:
@@ -169,7 +170,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1Peer'
+            $ref: '#/definitions/peersv1Peer'
         default:
           description: An unexpected error response.
           schema:
@@ -217,6 +218,85 @@ paths:
         - aperture-agent
         - aperture-controller
 definitions:
+  AttributeContextHttpRequest:
+    type: object
+    properties:
+      body:
+        type: string
+        description: The HTTP request body.
+      fragment:
+        type: string
+        description: |-
+          This field is always empty, and exists for compatibility reasons. The URL fragment is
+          not submitted as part of HTTP requests; it is unknowable.
+      headers:
+        type: object
+        additionalProperties:
+          type: string
+        description: |-
+          The HTTP request headers. If multiple headers share the same key, they
+          must be merged according to the HTTP spec. All header keys must be
+          lower-cased, because HTTP header keys are case-insensitive.
+      host:
+        type: string
+        description: The HTTP request ``Host`` or '`Authority`` header value.
+      id:
+        type: string
+        description: |-
+          The unique ID for a request, which can be propagated to downstream
+          systems. The ID should have low probability of collision
+          within a single day for a specific service.
+          For HTTP requests, it should be X-Request-ID or equivalent.
+      method:
+        type: string
+        description: The HTTP request method, such as ``GET``, ``POST``.
+      path:
+        type: string
+        description: |-
+          The request target, as it appears in the first line of the HTTP request. This includes
+          the URL path and query-string. No decoding is performed.
+      protocol:
+        type: string
+        description: |-
+          The network protocol used with the request, such as "HTTP/1.0", "HTTP/1.1", or "HTTP/2".
+
+          See :repo:`headers.h:ProtocolStrings <source/common/http/headers.h>` for a list of all
+          possible values.
+      query:
+        type: string
+        description: |-
+          This field is always empty, and exists for compatibility reasons. The HTTP URL query is
+          included in ``path`` field.
+      raw_body:
+        type: string
+        format: byte
+        description: |-
+          The HTTP request body in bytes. This is used instead of
+          :ref:`body <envoy_v3_api_field_service.auth.v3.AttributeContext.HttpRequest.body>` when
+          :ref:`pack_as_bytes <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.BufferSettings.pack_as_bytes>`
+          is set to true.
+      scheme:
+        type: string
+        description: The HTTP URL scheme, such as ``http`` and ``https``.
+      size:
+        type: string
+        format: int64
+        description: The HTTP request size in bytes. If unknown, it must be -1.
+    title: |-
+      This message defines attributes for an HTTP request.
+      HTTP/1.x, HTTP/2, gRPC are all considered as HTTP requests.
+      [#next-free-field: 13]
+  AttributeContextRequest:
+    type: object
+    properties:
+      http:
+        $ref: '#/definitions/AttributeContextHttpRequest'
+        description: Represents an HTTP request or an HTTP-like request.
+      time:
+        type: string
+        format: date-time
+        description: The timestamp when the proxy receives the first byte of the request.
+    description: Represents a network request, such as an HTTP request.
   CheckResponseDecisionType:
     type: string
     enum:
@@ -311,6 +391,24 @@ definitions:
           format: double
         x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
     description: StaticBuckets holds the static value of the buckets where latency histogram will be stored.
+  HeaderValueOptionHeaderAppendAction:
+    type: string
+    enum:
+      - APPEND_IF_EXISTS_OR_ADD
+      - ADD_IF_ABSENT
+      - OVERWRITE_IF_EXISTS_OR_ADD
+    default: APPEND_IF_EXISTS_OR_ADD
+    description: |-
+      Describes the supported actions types for header append action.
+
+       - APPEND_IF_EXISTS_OR_ADD: This action will append the specified value to the existing values if the header
+      already exists. If the header doesn't exist then this will add the header with
+      specified key and value.
+       - ADD_IF_ABSENT: This action will add the header if it doesn't already exist. If the header
+      already exists then this will be a no-op.
+       - OVERWRITE_IF_EXISTS_OR_ADD: This action will overwrite the specified value by discarding any existing values if
+      the header already exists. If the header doesn't exist then this will add the header
+      with specified key and value.
   LimiterDecisionConcurrencyLimiterInfo:
     type: object
     properties:
@@ -427,18 +525,131 @@ definitions:
           This override is applicable only if `auto_tokens` is set to false.
         x-go-default: 1
     description: WorkloadParameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
+  SocketAddressProtocol:
+    type: string
+    enum:
+      - TCP
+      - UDP
+    default: TCP
+  authv3CheckResponse:
+    type: object
+    properties:
+      denied_response:
+        $ref: '#/definitions/v3DeniedHttpResponse'
+        description: Supplies http attributes for a denied response.
+      dynamic_metadata:
+        type: object
+        description: |-
+          - :ref:`envoy.filters.http.ext_authz <config_http_filters_ext_authz_dynamic_metadata>` for HTTP filter.
+          - :ref:`envoy.filters.network.ext_authz <config_network_filters_ext_authz_dynamic_metadata>` for network filter.
+        title: |-
+          Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
+          filter. This metadata lives in a namespace specified by the canonical name of extension filter
+          that requires it:
+      ok_response:
+        $ref: '#/definitions/v3OkHttpResponse'
+        description: Supplies http attributes for an ok response.
+      status:
+        $ref: '#/definitions/googlerpcStatus'
+        description: |-
+          Status ``OK`` allows the request. Any other status indicates the request should be denied, and
+          for HTTP filter, if not overridden by :ref:`denied HTTP response status <envoy_v3_api_field_service.auth.v3.DeniedHttpResponse.status>`
+          Envoy sends ``403 Forbidden`` HTTP status code by default.
+    description: Intended for gRPC and Network Authorization servers ``only``.
+  flowcontrolv1CheckResponse:
+    type: object
+    properties:
+      classifier_infos:
+        type: array
+        items:
+          $ref: '#/definitions/v1ClassifierInfo'
+        description: classifiers that were matched for this request.
+      control_point_info:
+        $ref: '#/definitions/v1ControlPointInfo'
+        title: control_point of request
+      decision_type:
+        $ref: '#/definitions/CheckResponseDecisionType'
+        description: decision_type contains what the decision was.
+      end:
+        type: string
+        format: date-time
+        title: end timestamp
+      error:
+        $ref: '#/definitions/v1CheckResponseError'
+        description: error information.
+      flow_label_keys:
+        type: array
+        items:
+          type: string
+        description: flow label keys that were matched for this request.
+      flux_meter_infos:
+        type: array
+        items:
+          $ref: '#/definitions/v1FluxMeterInfo'
+        description: flux meters that were matched for this request.
+      limiter_decisions:
+        type: array
+        items:
+          $ref: '#/definitions/v1LimiterDecision'
+        description: limiter_decisions contains information about decision made by each limiter.
+      reject_reason:
+        $ref: '#/definitions/CheckResponseRejectReason'
+        description: reject_reason contains the reason for the rejection.
+      services:
+        type: array
+        items:
+          type: string
+        title: services that matched
+      start:
+        type: string
+        format: date-time
+        title: start timestamp
+      telemetry_flow_labels:
+        type: object
+        additionalProperties:
+          type: string
+        description: telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
+    description: CheckResponse contains fields that represent decision made by Check call.
   googlerpcStatus:
     type: object
     properties:
       code:
         type: integer
         format: int32
+        description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
       details:
         type: array
         items:
           $ref: '#/definitions/protobufAny'
+        description: |-
+          A list of messages that carry the error details.  There is a common set of
+          message types for APIs to use.
       message:
         type: string
+        description: |-
+          A developer-facing error message, which should be in English. Any
+          user-facing error message should be localized and sent in the
+          [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+    description: |-
+      The `Status` type defines a logical error model that is suitable for
+      different programming environments, including REST APIs and RPC APIs. It is
+      used by [gRPC](https://github.com/grpc). Each `Status` message contains
+      three pieces of data: error code, error message, and error details.
+
+      You can find out more about this error model and how to work with it in the
+      [API Design Guide](https://cloud.google.com/apis/design/errors).
+  peersv1Peer:
+    type: object
+    properties:
+      address:
+        type: string
+      hostname:
+        type: string
+      services:
+        type: object
+        additionalProperties:
+          type: string
+    description: Peer holds peer info and services.
   protobufAny:
     type: object
     properties:
@@ -556,6 +767,18 @@ definitions:
             "@type": "type.googleapis.com/google.protobuf.Duration",
             "value": "1.212s"
           }
+  protobufNullValue:
+    type: string
+    enum:
+      - NULL_VALUE
+    default: NULL_VALUE
+    description: |-
+      `NullValue` is a singleton enumeration to represent the null value for the
+      `Value` type union.
+
+       The JSON representation for `NullValue` is JSON `null`.
+
+       - NULL_VALUE: Null value.
   statusv1Status:
     type: object
     properties:
@@ -624,60 +847,6 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Result of arithmetic operation.
     description: Outputs for the Arithmetic Combinator component.
-  v1CheckResponse:
-    type: object
-    properties:
-      classifier_infos:
-        type: array
-        items:
-          $ref: '#/definitions/v1ClassifierInfo'
-        description: classifiers that were matched for this request.
-      control_point_info:
-        $ref: '#/definitions/v1ControlPointInfo'
-        title: control_point of request
-      decision_type:
-        $ref: '#/definitions/CheckResponseDecisionType'
-        description: decision_type contains what the decision was.
-      end:
-        type: string
-        format: date-time
-        title: end timestamp
-      error:
-        $ref: '#/definitions/v1CheckResponseError'
-        description: error information.
-      flow_label_keys:
-        type: array
-        items:
-          type: string
-        description: flow label keys that were matched for this request.
-      flux_meter_infos:
-        type: array
-        items:
-          $ref: '#/definitions/v1FluxMeterInfo'
-        description: flux meters that were matched for this request.
-      limiter_decisions:
-        type: array
-        items:
-          $ref: '#/definitions/v1LimiterDecision'
-        description: limiter_decisions contains information about decision made by each limiter.
-      reject_reason:
-        $ref: '#/definitions/CheckResponseRejectReason'
-        description: reject_reason contains the reason for the rejection.
-      services:
-        type: array
-        items:
-          type: string
-        title: services that matched
-      start:
-        type: string
-        format: date-time
-        title: start timestamp
-      telemetry_flow_labels:
-        type: object
-        additionalProperties:
-          type: string
-        description: telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
-    description: CheckResponse contains fields that represent decision made by Check call.
   v1CheckResponseError:
     type: string
     enum:
@@ -1853,27 +2022,15 @@ definitions:
       If a match occurs, the value associated with the path template will be treated as a result.
       In case of multiple path templates matching, the most specific one will be chosen.
     title: Matches HTTP Path to given path templates
-  v1Peer:
-    type: object
-    properties:
-      address:
-        type: string
-      hostname:
-        type: string
-      services:
-        type: object
-        additionalProperties:
-          type: string
-    description: Peer holds peer info and services.
   v1Peers:
     type: object
     properties:
       peers:
         type: object
         additionalProperties:
-          $ref: '#/definitions/v1Peer'
+          $ref: '#/definitions/peersv1Peer'
       self_peer:
-        $ref: '#/definitions/v1Peer'
+        $ref: '#/definitions/peersv1Peer'
     description: Peers holds the peer info of this peer and a mapping of address to other peers.
   v1Policies:
     type: object
@@ -2398,3 +2555,458 @@ definitions:
         type: string
       version:
         type: string
+  v3Address:
+    type: object
+    properties:
+      envoy_internal_address:
+        $ref: '#/definitions/v3EnvoyInternalAddress'
+        description: |-
+          Specifies a user-space address handled by :ref:`internal listeners
+          <envoy_v3_api_field_config.listener.v3.Listener.internal_listener>`.
+      pipe:
+        $ref: '#/definitions/v3Pipe'
+      socket_address:
+        $ref: '#/definitions/v3SocketAddress'
+    description: |-
+      Addresses specify either a logical or physical address and port, which are
+      used to tell Envoy where to bind/listen, connect to upstream and find
+      management servers.
+  v3AttributeContext:
+    type: object
+    properties:
+      context_extensions:
+        type: object
+        additionalProperties:
+          type: string
+        description: |-
+          This is analogous to http_request.headers, however these contents will not be sent to the
+          upstream server. Context_extensions provide an extension mechanism for sending additional
+          information to the auth server without modifying the proto definition. It maps to the
+          internal opaque context in the filter chain.
+      destination:
+        $ref: '#/definitions/v3AttributeContextPeer'
+        description: |-
+          The destination of a network activity, such as accepting a TCP connection.
+          In a multi hop network activity, the destination represents the receiver of
+          the last hop.
+      metadata_context:
+        $ref: '#/definitions/v3ConfigCoreMetadata'
+        description: Dynamic metadata associated with the request.
+      request:
+        $ref: '#/definitions/AttributeContextRequest'
+        description: Represents a network request, such as an HTTP request.
+      source:
+        $ref: '#/definitions/v3AttributeContextPeer'
+        description: |-
+          The source of a network activity, such as starting a TCP connection.
+          In a multi hop network activity, the source represents the sender of the
+          last hop.
+    description: |-
+      An attribute is a piece of metadata that describes an activity on a network.
+      For example, the size of an HTTP request, or the status code of an HTTP response.
+
+      Each attribute has a type and a name, which is logically defined as a proto message field
+      of the ``AttributeContext``. The ``AttributeContext`` is a collection of individual attributes
+      supported by Envoy authorization system.
+      [#comment: The following items are left out of this proto
+      Request.Auth field for jwt tokens
+      Request.Api for api management
+      Origin peer that originated the request
+      Caching Protocol
+      request_context return values to inject back into the filter chain
+      peer.claims -- from X.509 extensions
+      Configuration
+      - field mask to send
+      - which return values from request_context are copied back
+      - which return values are copied into request_headers]
+      [#next-free-field: 12]
+  v3AttributeContextPeer:
+    type: object
+    properties:
+      address:
+        $ref: '#/definitions/v3Address'
+        description: |-
+          The address of the peer, this is typically the IP address.
+          It can also be UDS path, or others.
+      certificate:
+        type: string
+        description: |-
+          The X.509 certificate used to authenticate the identify of this peer.
+          When present, the certificate contents are encoded in URL and PEM format.
+      labels:
+        type: object
+        additionalProperties:
+          type: string
+        description: |-
+          The labels associated with the peer.
+          These could be pod labels for Kubernetes or tags for VMs.
+          The source of the labels could be an X.509 certificate or other configuration.
+      principal:
+        type: string
+        description: |-
+          The authenticated identity of this peer.
+          For example, the identity associated with the workload such as a service account.
+          If an X.509 certificate is used to assert the identity this field should be sourced from
+          ``URI Subject Alternative Names``, ``DNS Subject Alternate Names`` or ``Subject`` in that order.
+          The primary identity should be the principal. The principal format is issuer specific.
+
+          Example:
+          *    SPIFFE format is ``spiffe://trust-domain/path``
+          *    Google account format is ``https://accounts.google.com/{userid}``
+      service:
+        type: string
+        description: |-
+          The canonical service name of the peer.
+          It should be set to :ref:`the HTTP x-envoy-downstream-service-cluster
+          <config_http_conn_man_headers_downstream-service-cluster>`
+          If a more trusted source of the service name is available through mTLS/secure naming, it
+          should be used.
+    title: |-
+      This message defines attributes for a node that handles a network request.
+      The node can be either a service or an application that sends, forwards,
+      or receives the request. Service peers should fill in the ``service``,
+      ``principal``, and ``labels`` as appropriate.
+      [#next-free-field: 6]
+  v3ConfigCoreMetadata:
+    type: object
+    properties:
+      filter_metadata:
+        type: object
+        additionalProperties:
+          type: object
+        description: |-
+          Key is the reverse DNS filter name, e.g. com.acme.widget. The ``envoy.*``
+          namespace is reserved for Envoy's built-in filters.
+          If both ``filter_metadata`` and
+          :ref:`typed_filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.typed_filter_metadata>`
+          fields are present in the metadata with same keys,
+          only ``typed_filter_metadata`` field will be parsed.
+      typed_filter_metadata:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/protobufAny'
+        description: |-
+          Key is the reverse DNS filter name, e.g. com.acme.widget. The ``envoy.*``
+          namespace is reserved for Envoy's built-in filters.
+          The value is encoded as google.protobuf.Any.
+          If both :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>`
+          and ``typed_filter_metadata`` fields are present in the metadata with same keys,
+          only ``typed_filter_metadata`` field will be parsed.
+    description: |-
+      Metadata provides additional inputs to filters based on matched listeners,
+      filter chains, routes and endpoints. It is structured as a map, usually from
+      filter name (in reverse DNS format) to metadata specific to the filter. Metadata
+      key-values for a filter are merged as connection and request handling occurs,
+      with later values for the same key overriding earlier values.
+
+      An example use of metadata is providing additional values to
+      http_connection_manager in the envoy.http_connection_manager.access_log
+      namespace.
+
+      Another example use of metadata is to per service config info in cluster metadata, which may get
+      consumed by multiple filters.
+
+      For load balancing, Metadata provides a means to subset cluster endpoints.
+      Endpoints have a Metadata object associated and routes contain a Metadata
+      object to match against. There are some well defined metadata used today for
+      this purpose:
+
+      * ``{"envoy.lb": {"canary": <bool> }}`` This indicates the canary status of an
+        endpoint and is also used during header processing
+        (x-envoy-upstream-canary) and for stats purposes.
+      [#next-major-version: move to type/metadata/v2]
+  v3DeniedHttpResponse:
+    type: object
+    properties:
+      body:
+        type: string
+        description: |-
+          This field allows the authorization service to send a response body data
+          to the downstream client.
+      headers:
+        type: array
+        items:
+          $ref: '#/definitions/v3HeaderValueOption'
+        description: |-
+          This field allows the authorization service to send HTTP response headers
+          to the downstream client. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>` defaults to
+          false when used in this message.
+      status:
+        $ref: '#/definitions/v3HttpStatus'
+        description: |-
+          This field allows the authorization service to send an HTTP response status code to the
+          downstream client. If not set, Envoy sends ``403 Forbidden`` HTTP status code by default.
+    description: HTTP attributes for a denied response.
+  v3EnvoyInternalAddress:
+    type: object
+    properties:
+      endpoint_id:
+        type: string
+        description: |-
+          Specifies an endpoint identifier to distinguish between multiple endpoints for the same internal listener in a
+          single upstream pool. Only used in the upstream addresses for tracking changes to individual endpoints. This, for
+          example, may be set to the final destination IP for the target internal listener.
+      server_listener_name:
+        type: string
+        description: |-
+          Specifies the :ref:`name <envoy_v3_api_field_config.listener.v3.Listener.name>` of the
+          internal listener.
+    title: |-
+      The address represents an envoy internal listener.
+      [#comment: TODO(asraa): When address available, remove workaround from test/server/server_fuzz_test.cc:30.]
+  v3HeaderValue:
+    type: object
+    properties:
+      key:
+        type: string
+        description: Header name.
+      value:
+        type: string
+        description: |-
+          Header value.
+
+          The same :ref:`format specifier <config_access_log_format>` as used for
+          :ref:`HTTP access logging <config_access_log>` applies here, however
+          unknown header values are replaced with the empty string instead of ``-``.
+    description: Header name/value pair.
+  v3HeaderValueOption:
+    type: object
+    properties:
+      append:
+        type: boolean
+        description: |-
+          Should the value be appended? If true (default), the value is appended to
+          existing values. Otherwise it replaces any existing values.
+          This field is deprecated and please use
+          :ref:`append_action <envoy_v3_api_field_config.core.v3.HeaderValueOption.append_action>` as replacement.
+
+          .. note::
+            The :ref:`external authorization service <envoy_v3_api_msg_service.auth.v3.CheckResponse>` and
+            :ref:`external processor service <envoy_v3_api_msg_service.ext_proc.v3.ProcessingResponse>` have
+            default value (``false``) for this field.
+      append_action:
+        $ref: '#/definitions/HeaderValueOptionHeaderAppendAction'
+        description: |-
+          Describes the action taken to append/overwrite the given value for an existing header
+          or to only add this header if it's absent.
+          Value defaults to :ref:`APPEND_IF_EXISTS_OR_ADD
+          <envoy_v3_api_enum_value_config.core.v3.HeaderValueOption.HeaderAppendAction.APPEND_IF_EXISTS_OR_ADD>`.
+      header:
+        $ref: '#/definitions/v3HeaderValue'
+        description: Header name/value pair that this option applies to.
+      keep_empty_value:
+        type: boolean
+        description: |-
+          Is the header value allowed to be empty? If false (default), custom headers with empty values are dropped,
+          otherwise they are added.
+    description: Header name/value pair plus option to control append behavior.
+  v3HttpStatus:
+    type: object
+    properties:
+      code:
+        $ref: '#/definitions/v3StatusCode'
+        description: Supplies HTTP response code.
+    description: HTTP status.
+  v3OkHttpResponse:
+    type: object
+    properties:
+      dynamic_metadata:
+        type: object
+        description: |-
+          This field has been deprecated in favor of :ref:`CheckResponse.dynamic_metadata
+          <envoy_v3_api_field_service.auth.v3.CheckResponse.dynamic_metadata>`. Until it is removed,
+          setting this field overrides :ref:`CheckResponse.dynamic_metadata
+          <envoy_v3_api_field_service.auth.v3.CheckResponse.dynamic_metadata>`.
+      headers:
+        type: array
+        items:
+          $ref: '#/definitions/v3HeaderValueOption'
+        description: |-
+          HTTP entity headers in addition to the original request headers. This allows the authorization
+          service to append, to add or to override headers from the original request before
+          dispatching it to the upstream. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>` defaults to
+          false when used in this message. By setting the ``append`` field to ``true``,
+          the filter will append the correspondent header value to the matched request header.
+          By leaving ``append`` as false, the filter will either add a new header, or override an existing
+          one if there is a match.
+      headers_to_remove:
+        type: array
+        items:
+          type: string
+        description: |-
+          HTTP entity headers to remove from the original request before dispatching
+          it to the upstream. This allows the authorization service to act on auth
+          related headers (like ``Authorization``), process them, and consume them.
+          Under this model, the upstream will either receive the request (if it's
+          authorized) or not receive it (if it's not), but will not see headers
+          containing authorization credentials.
+
+          Pseudo headers (such as ``:authority``, ``:method``, ``:path`` etc), as well as
+          the header ``Host``, may not be removed as that would make the request
+          malformed. If mentioned in ``headers_to_remove`` these special headers will
+          be ignored.
+
+          When using the HTTP service this must instead be set by the HTTP
+          authorization service as a comma separated list like so:
+          ``x-envoy-auth-headers-to-remove: one-auth-header, another-auth-header``.
+      query_parameters_to_remove:
+        type: array
+        items:
+          type: string
+        description: |-
+          This field allows the authorization service to specify which query parameters
+          should be removed from the original request before it is sent upstream. Each
+          element in this list is a case-sensitive query parameter name to be removed.
+      query_parameters_to_set:
+        type: array
+        items:
+          $ref: '#/definitions/v3QueryParameter'
+        description: |-
+          This field allows the authorization service to set (and overwrite) query
+          string parameters on the original request before it is sent upstream.
+      response_headers_to_add:
+        type: array
+        items:
+          $ref: '#/definitions/v3HeaderValueOption'
+        description: |-
+          This field allows the authorization service to send HTTP response headers
+          to the downstream client on success. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>`
+          defaults to false when used in this message.
+    title: |-
+      HTTP attributes for an OK response.
+      [#next-free-field: 9]
+  v3Pipe:
+    type: object
+    properties:
+      mode:
+        type: integer
+        format: int64
+        description: The mode for the Pipe. Not applicable for abstract sockets.
+      path:
+        type: string
+        description: |-
+          Unix Domain Socket path. On Linux, paths starting with '@' will use the
+          abstract namespace. The starting '@' is replaced by a null byte by Envoy.
+          Paths starting with '@' will result in an error in environments other than
+          Linux.
+  v3QueryParameter:
+    type: object
+    properties:
+      key:
+        type: string
+        description: The key of the query parameter. Case sensitive.
+      value:
+        type: string
+        description: The value of the query parameter.
+    description: Query parameter name/value pair.
+  v3SocketAddress:
+    type: object
+    properties:
+      address:
+        type: string
+        description: |-
+          The address for this socket. :ref:`Listeners <config_listeners>` will bind
+          to the address. An empty address is not allowed. Specify ``0.0.0.0`` or ``::``
+          to bind to any address. [#comment:TODO(zuercher) reinstate when implemented:
+          It is possible to distinguish a Listener address via the prefix/suffix matching
+          in :ref:`FilterChainMatch <envoy_v3_api_msg_config.listener.v3.FilterChainMatch>`.] When used
+          within an upstream :ref:`BindConfig <envoy_v3_api_msg_config.core.v3.BindConfig>`, the address
+          controls the source address of outbound connections. For :ref:`clusters
+          <envoy_v3_api_msg_config.cluster.v3.Cluster>`, the cluster type determines whether the
+          address must be an IP (``STATIC`` or ``EDS`` clusters) or a hostname resolved by DNS
+          (``STRICT_DNS`` or ``LOGICAL_DNS`` clusters). Address resolution can be customized
+          via :ref:`resolver_name <envoy_v3_api_field_config.core.v3.SocketAddress.resolver_name>`.
+      ipv4_compat:
+        type: boolean
+        description: |-
+          When binding to an IPv6 address above, this enables `IPv4 compatibility
+          <https://tools.ietf.org/html/rfc3493#page-11>`_. Binding to ``::`` will
+          allow both IPv4 and IPv6 connections, with peer IPv4 addresses mapped into
+          IPv6 space as ``::FFFF:<IPv4-address>``.
+      named_port:
+        type: string
+        description: |-
+          This is only valid if :ref:`resolver_name
+          <envoy_v3_api_field_config.core.v3.SocketAddress.resolver_name>` is specified below and the
+          named resolver is capable of named port resolution.
+      port_value:
+        type: integer
+        format: int64
+      protocol:
+        $ref: '#/definitions/SocketAddressProtocol'
+      resolver_name:
+        type: string
+        description: |-
+          The name of the custom resolver. This must have been registered with Envoy. If
+          this is empty, a context dependent default applies. If the address is a concrete
+          IP address, no resolution will occur. If address is a hostname this
+          should be set for resolution other than DNS. Specifying a custom resolver with
+          ``STRICT_DNS`` or ``LOGICAL_DNS`` will generate an error at runtime.
+    title: '[#next-free-field: 7]'
+  v3StatusCode:
+    type: string
+    enum:
+      - Empty
+      - Continue
+      - OK
+      - Created
+      - Accepted
+      - NonAuthoritativeInformation
+      - NoContent
+      - ResetContent
+      - PartialContent
+      - MultiStatus
+      - AlreadyReported
+      - IMUsed
+      - MultipleChoices
+      - MovedPermanently
+      - Found
+      - SeeOther
+      - NotModified
+      - UseProxy
+      - TemporaryRedirect
+      - PermanentRedirect
+      - BadRequest
+      - Unauthorized
+      - PaymentRequired
+      - Forbidden
+      - NotFound
+      - MethodNotAllowed
+      - NotAcceptable
+      - ProxyAuthenticationRequired
+      - RequestTimeout
+      - Conflict
+      - Gone
+      - LengthRequired
+      - PreconditionFailed
+      - PayloadTooLarge
+      - URITooLong
+      - UnsupportedMediaType
+      - RangeNotSatisfiable
+      - ExpectationFailed
+      - MisdirectedRequest
+      - UnprocessableEntity
+      - Locked
+      - FailedDependency
+      - UpgradeRequired
+      - PreconditionRequired
+      - TooManyRequests
+      - RequestHeaderFieldsTooLarge
+      - InternalServerError
+      - NotImplemented
+      - BadGateway
+      - ServiceUnavailable
+      - GatewayTimeout
+      - HTTPVersionNotSupported
+      - VariantAlsoNegotiates
+      - InsufficientStorage
+      - LoopDetected
+      - NotExtended
+      - NetworkAuthenticationRequired
+    default: Empty
+    description: |-
+      - Empty: Empty - This code not part of the HTTP status code specification, but it is needed for proto
+      `enum` type.
+    title: |-
+      HTTP response codes supported in Envoy.
+      For more details: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml

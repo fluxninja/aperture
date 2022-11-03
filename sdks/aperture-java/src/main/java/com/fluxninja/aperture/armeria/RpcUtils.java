@@ -1,6 +1,6 @@
 package com.fluxninja.aperture.armeria;
 
-import com.fluxninja.aperture.flowcontrol.v1.CheckResponse;
+import com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FeatureFlow;
 import com.fluxninja.aperture.sdk.FlowStatus;

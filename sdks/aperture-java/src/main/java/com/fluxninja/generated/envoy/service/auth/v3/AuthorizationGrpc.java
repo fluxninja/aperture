@@ -10,7 +10,7 @@ import static io.grpc.MethodDescriptor.generateFullMethodName;
  */
 @javax.annotation.Generated(
     value = "by gRPC proto compiler (version 1.49.1)",
-    comments = "Source: envoy/authz_stripped.proto")
+    comments = "Source: envoy/service/auth/v3/authz_stripped.proto")
 @io.grpc.stub.annotations.GrpcGenerated
 public final class AuthorizationGrpc {
 

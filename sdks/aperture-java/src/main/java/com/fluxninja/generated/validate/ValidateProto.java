@@ -360,12 +360,12 @@ public final class ValidateProto {
       "tions\030\260\010 \001(\010R\007ignored::\n\010required\022\035.goog" +
       "le.protobuf.OneofOptions\030\257\010 \001(\010R\010require" +
       "d:J\n\005rules\022\035.google.protobuf.FieldOption" +
-      "s\030\257\010 \001(\0132\024.validate.FieldRulesR\005rulesB\245\001" +
+      "s\030\257\010 \001(\0132\024.validate.FieldRulesR\005rulesB\252\001" +
       "\n com.fluxninja.generated.validateB\rVali" +
-      "dateProtoP\001Z2github.com/envoyproxy/proto" +
-      "c-gen-validate/validate\242\002\003VXX\252\002\010Validate" +
-      "\312\002\010Validate\342\002\024Validate\\GPBMetadata\352\002\010Val" +
-      "idate"
+      "dateProtoP\001Z7github.com/fluxninja/apertu" +
+      "re/api/gen/proto/go/validate\242\002\003VXX\252\002\010Val" +
+      "idate\312\002\010Validate\342\002\024Validate\\GPBMetadata\352" +
+      "\002\010Validate"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

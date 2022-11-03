@@ -1,6 +1,6 @@
 package com.fluxninja.aperture.sdk;
 
-import com.fluxninja.aperture.flowcontrol.v1.FlowControlServiceGrpc;
+import com.fluxninja.generated.aperture.flowcontrol.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
