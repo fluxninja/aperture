@@ -297,14 +297,14 @@ public final class AuthzStrippedProto {
       "\n\035NetworkAuthenticationRequired\020\377\0032e\n\rAu" +
       "thorization\022T\n\005Check\022#.envoy.service.aut" +
       "h.v3.CheckRequest\032$.envoy.service.auth.v" +
-      "3.CheckResponse\"\000B\222\002\n-com.fluxninja.gene" +
+      "3.CheckResponse\"\000B\212\002\n-com.fluxninja.gene" +
       "rated.envoy.service.auth.v3B\022AuthzStripp" +
-      "edProtoP\001ZKgithub.com/fluxninja/aperture" +
-      "/api/gen/proto/go/envoy/service/auth/v3;" +
-      "authv3\210\001\001\242\002\003ESA\252\002\025Envoy.Service.Auth.V3\312" +
-      "\002\025Envoy\\Service\\Auth\\V3\342\002!Envoy\\Service\\" +
-      "Auth\\V3\\GPBMetadata\352\002\030Envoy::Service::Au" +
-      "th::V3\272\200\310\321\006\002\020\002b\006proto3"
+      "edProtoP\001ZCgithub.com/envoyproxy/go-cont" +
+      "rol-plane/envoy/service/auth/v3;authv3\210\001" +
+      "\001\242\002\003ESA\252\002\025Envoy.Service.Auth.V3\312\002\025Envoy\\" +
+      "Service\\Auth\\V3\342\002!Envoy\\Service\\Auth\\V3\\" +
+      "GPBMetadata\352\002\030Envoy::Service::Auth::V3\272\200" +
+      "\310\321\006\002\020\002b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

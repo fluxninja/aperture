@@ -50,13 +50,12 @@ public final class VersioningProto {
       "ous_message_type\030\001 \001(\tR\023previousMessageT" +
       "ype:j\n\nversioning\022\037.google.protobuf.Mess" +
       "ageOptions\030\323\210\341\003 \001(\0132&.udpa.annotations.V" +
-      "ersioningAnnotationR\nversioningB\335\001\n(com." +
+      "ersioningAnnotationR\nversioningB\300\001\n(com." +
       "fluxninja.generated.udpa.annotationsB\017Ve" +
-      "rsioningProtoP\001Z?github.com/fluxninja/ap" +
-      "erture/api/gen/proto/go/udpa/annotations" +
-      "\242\002\003UAX\252\002\020Udpa.Annotations\312\002\020Udpa\\Annotat" +
-      "ions\342\002\034Udpa\\Annotations\\GPBMetadata\352\002\021Ud" +
-      "pa::Annotationsb\006proto3"
+      "rsioningProtoP\001Z\"github.com/cncf/xds/go/" +
+      "annotations\242\002\003UAX\252\002\020Udpa.Annotations\312\002\020U" +
+      "dpa\\Annotations\342\002\034Udpa\\Annotations\\GPBMe" +
+      "tadata\352\002\021Udpa::Annotationsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
