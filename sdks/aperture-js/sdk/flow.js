@@ -1,4 +1,3 @@
-import { fcs } from "./utils.js";
 import {
     FEATURE_STATUS_LABEL,
     CHECK_RESPONSE_LABEL,
@@ -21,7 +20,7 @@ export class Flow {
         if (this.checkResponse === undefined) {
             return true;
         }
-        if (this.checkResponse.DecisionType === fcs.CheckResponse_DECISION_TYPE_ACCEPTED) {
+        if (this.checkResponse.decision_type === 'DECISION_TYPE_ACCEPTED') {
             return true;
         }
         return false;
