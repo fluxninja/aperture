@@ -92,6 +92,10 @@ To install Aperture system, please follow the
 To learn how to write Aperture policies, please read the
 [Tutorials](https://docs.fluxninja.com/docs/category/tutorials).
 
+### 🎥 Demo Video
+
+[![How Concurrency Limits Help Protect Against Cascading Failures](https://img.youtube.com/vi/m070bAvrDHM/0.jpg)](https://youtu.be/m070bAvrDHM)
+
 ## 👷 Contributing
 
 [Reporting bugs](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
