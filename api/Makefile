@@ -25,12 +25,12 @@ buf-generate:
 	@cp -R gen/proto/go/aperture/flowcontrol ../sdks/aperture-go/gen/proto/flowcontrol
 	@#java
 	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/generated
-	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol
 	@cp -R gen/proto/java/com/fluxninja/generated ../sdks/aperture-java/src/main/java/com/fluxninja/generated
 	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/generated/aperture
 	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/generated/grpc
 	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/generated/google/api
-	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/
+	@mkdir ../sdks/aperture-java/src/main/java/com/fluxninja/generated/aperture
+	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol ../sdks/aperture-java/src/main/java/com/fluxninja/generated/aperture/flowcontrol
 	@rm -rf gen/proto/java
 	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)
