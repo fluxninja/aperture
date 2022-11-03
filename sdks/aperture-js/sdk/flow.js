@@ -6,9 +6,9 @@ import {
 } from "./consts.js";
 
 export const FlowStatus = Object.freeze({
-    Ok: Symbol(0),
-    Error: Symbol(1)
-})
+    Ok: "Ok",
+    Error: "Error"
+});
 
 export class Flow {
     constructor(span, checkResponse = null) {
@@ -33,11 +33,11 @@ export class Flow {
         }
         this.ended = true;
 
-        this.span.setAttributes({
-            FEATURE_STATUS_LABEL: flowStatus,
-            CHECK_RESPONSE_LABEL: this.checkResponse,
-            FLOW_END_TIMESTAMP_LABEL: Date.now(),
-        });
+        this.span.setAttribute(FEATURE_STATUS_LABEL, flowStatus);
+        this.span.setAttribute(CHECK_RESPONSE_LABEL, JSON.stringify(this.checkResponse));
+        this.span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
+
+        let attr = this.span.attributes;
         this.span.end();
     }
 
