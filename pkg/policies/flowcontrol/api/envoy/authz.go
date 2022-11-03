@@ -108,15 +108,22 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	}
 
 	ctrlPt := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_UNKNOWN, "")
+	trafficDirectionHeader := ""
 	headers, _ := metadata.FromIncomingContext(ctx)
 	if dirHeader, exists := headers["traffic-direction"]; exists && len(dirHeader) > 0 {
-		switch dirHeader[0] {
+		trafficDirectionHeader = dirHeader[0]
+	} else if dirHeader, exists := req.GetAttributes().GetContextExtensions()["traffic-direction"]; exists && len(dirHeader) > 0 {
+		trafficDirectionHeader = dirHeader
+	}
+
+	if trafficDirectionHeader != "" {
+		switch trafficDirectionHeader {
 		case "INBOUND":
 			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
 		case "OUTBOUND":
 			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, "")
 		default:
-			log.Sample(zerolog.Sometimes).Error().Str("traffic-direction", dirHeader[0]).Msg("invalid traffic-direction header")
+			log.Sample(zerolog.Sometimes).Error().Str("traffic-direction", trafficDirectionHeader).Msg("invalid traffic-direction header")
 			checkResponse := &flowcontrolv1.CheckResponse{
 				Error:            flowcontrolv1.CheckResponse_ERROR_INVALID_TRAFFIC_DIRECTION,
 				ControlPointInfo: ctrlPt.ToControlPointInfoProto(),
