@@ -93,13 +93,12 @@ public final class DeprecationProto {
       "yDefaultEnum:l\n deprecated_at_minor_vers" +
       "ion_enum\022!.google.protobuf.EnumValueOpti" +
       "ons\030\301\276\263V \001(\tR\034deprecatedAtMinorVersionEn" +
-      "umB\344\001\n)com.fluxninja.generated.envoy.ann" +
-      "otationsB\020DeprecationProtoP\001Z@github.com" +
-      "/fluxninja/aperture/api/gen/proto/go/env" +
-      "oy/annotations\242\002\003EAX\252\002\021Envoy.Annotations" +
-      "\312\002\021Envoy\\Annotations\342\002\035Envoy\\Annotations" +
-      "\\GPBMetadata\352\002\022Envoy::Annotationsb\006proto" +
-      "3"
+      "umB\334\001\n)com.fluxninja.generated.envoy.ann" +
+      "otationsB\020DeprecationProtoP\001Z8github.com" +
+      "/envoyproxy/go-control-plane/envoy/annot" +
+      "ations\242\002\003EAX\252\002\021Envoy.Annotations\312\002\021Envoy" +
+      "\\Annotations\342\002\035Envoy\\Annotations\\GPBMeta" +
+      "data\352\002\022Envoy::Annotationsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
