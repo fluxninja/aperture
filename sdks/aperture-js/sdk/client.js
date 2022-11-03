@@ -45,16 +45,16 @@ export class ApertureClient {
     return new Promise((resolve, reject) => {
       let labelsMap = new Map();
       let baggage = otelApi.propagation.getBaggage(otelApi.context.active());
-      for (const member of baggage.getAllEntries()) {
-        labelsMap[member[0]] = member[1].value;
+      if (baggage !== undefined) {
+        for (const member of baggage.getAllEntries()) {
+          labelsMap[member[0]] = member[1].value;
+        }
       }
 
       let mergedLabels = new Map([...labelsMap, ...labelsArg])
       let span = this.tracer.startSpan("Aperture Check");
-      span.setAttributes({
-        FLOW_START_TIMESTAMP_LABEL: Date.now(),
-        SOURCE_LABEL: "sdk",
-      });
+      span.setAttribute(FLOW_START_TIMESTAMP_LABEL, Date.now());
+      span.setAttribute(SOURCE_LABEL, "sdk");
       let flow = new Flow(span);
 
       this.fcsClient.Check(
@@ -74,7 +74,6 @@ export class ApertureClient {
             reject(err);
           }
 
-          console.log(`Response: ${response}\n`);
           flow.checkResponse = response;
           resolve(flow);
         });
