@@ -1,4 +1,4 @@
-package com.fluxninja.aperture.flowcontrol.v1;
+package com.fluxninja.generated.aperture.flowcontrol.v1;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
 
@@ -18,29 +18,29 @@ public final class FlowControlServiceGrpc {
   public static final String SERVICE_NAME = "aperture.flowcontrol.v1.FlowControlService";
 
   // Static method descriptors that strictly reflect the proto.
-  private static volatile io.grpc.MethodDescriptor<com.fluxninja.aperture.flowcontrol.v1.CheckRequest,
-      com.fluxninja.aperture.flowcontrol.v1.CheckResponse> getCheckMethod;
+  private static volatile io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest,
+      com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse> getCheckMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "Check",
-      requestType = com.fluxninja.aperture.flowcontrol.v1.CheckRequest.class,
-      responseType = com.fluxninja.aperture.flowcontrol.v1.CheckResponse.class,
+      requestType = com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest.class,
+      responseType = com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<com.fluxninja.aperture.flowcontrol.v1.CheckRequest,
-      com.fluxninja.aperture.flowcontrol.v1.CheckResponse> getCheckMethod() {
-    io.grpc.MethodDescriptor<com.fluxninja.aperture.flowcontrol.v1.CheckRequest, com.fluxninja.aperture.flowcontrol.v1.CheckResponse> getCheckMethod;
+  public static io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest,
+      com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse> getCheckMethod() {
+    io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest, com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse> getCheckMethod;
     if ((getCheckMethod = FlowControlServiceGrpc.getCheckMethod) == null) {
       synchronized (FlowControlServiceGrpc.class) {
         if ((getCheckMethod = FlowControlServiceGrpc.getCheckMethod) == null) {
           FlowControlServiceGrpc.getCheckMethod = getCheckMethod =
-              io.grpc.MethodDescriptor.<com.fluxninja.aperture.flowcontrol.v1.CheckRequest, com.fluxninja.aperture.flowcontrol.v1.CheckResponse>newBuilder()
+              io.grpc.MethodDescriptor.<com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest, com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "Check"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  com.fluxninja.aperture.flowcontrol.v1.CheckRequest.getDefaultInstance()))
+                  com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  com.fluxninja.aperture.flowcontrol.v1.CheckResponse.getDefaultInstance()))
+                  com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse.getDefaultInstance()))
               .setSchemaDescriptor(new FlowControlServiceMethodDescriptorSupplier("Check"))
               .build();
         }
@@ -105,8 +105,8 @@ public final class FlowControlServiceGrpc {
      * Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
      * </pre>
      */
-    public void check(com.fluxninja.aperture.flowcontrol.v1.CheckRequest request,
-        io.grpc.stub.StreamObserver<com.fluxninja.aperture.flowcontrol.v1.CheckResponse> responseObserver) {
+    public void check(com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest request,
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCheckMethod(), responseObserver);
     }
 
@@ -116,8 +116,8 @@ public final class FlowControlServiceGrpc {
             getCheckMethod(),
             io.grpc.stub.ServerCalls.asyncUnaryCall(
               new MethodHandlers<
-                com.fluxninja.aperture.flowcontrol.v1.CheckRequest,
-                com.fluxninja.aperture.flowcontrol.v1.CheckResponse>(
+                com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest,
+                com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse>(
                   this, METHODID_CHECK)))
           .build();
     }
@@ -145,8 +145,8 @@ public final class FlowControlServiceGrpc {
      * Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
      * </pre>
      */
-    public void check(com.fluxninja.aperture.flowcontrol.v1.CheckRequest request,
-        io.grpc.stub.StreamObserver<com.fluxninja.aperture.flowcontrol.v1.CheckResponse> responseObserver) {
+    public void check(com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest request,
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getCheckMethod(), getCallOptions()), request, responseObserver);
     }
@@ -174,7 +174,7 @@ public final class FlowControlServiceGrpc {
      * Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
      * </pre>
      */
-    public com.fluxninja.aperture.flowcontrol.v1.CheckResponse check(com.fluxninja.aperture.flowcontrol.v1.CheckRequest request) {
+    public com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse check(com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getCheckMethod(), getCallOptions(), request);
     }
@@ -202,8 +202,8 @@ public final class FlowControlServiceGrpc {
      * Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
      * </pre>
      */
-    public com.google.common.util.concurrent.ListenableFuture<com.fluxninja.aperture.flowcontrol.v1.CheckResponse> check(
-        com.fluxninja.aperture.flowcontrol.v1.CheckRequest request) {
+    public com.google.common.util.concurrent.ListenableFuture<com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse> check(
+        com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getCheckMethod(), getCallOptions()), request);
     }
@@ -229,8 +229,8 @@ public final class FlowControlServiceGrpc {
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
         case METHODID_CHECK:
-          serviceImpl.check((com.fluxninja.aperture.flowcontrol.v1.CheckRequest) request,
-              (io.grpc.stub.StreamObserver<com.fluxninja.aperture.flowcontrol.v1.CheckResponse>) responseObserver);
+          serviceImpl.check((com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest) request,
+              (io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -254,7 +254,7 @@ public final class FlowControlServiceGrpc {
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.FileDescriptor getFileDescriptor() {
-      return com.fluxninja.aperture.flowcontrol.v1.FlowcontrolProto.getDescriptor();
+      return com.fluxninja.generated.aperture.flowcontrol.v1.FlowcontrolProto.getDescriptor();
     }
 
     @java.lang.Override

@@ -1,8 +1,8 @@
 package com.fluxninja.aperture.sdk;
 
-import com.fluxninja.aperture.flowcontrol.v1.CheckRequest;
-import com.fluxninja.aperture.flowcontrol.v1.CheckResponse;
-import com.fluxninja.aperture.flowcontrol.v1.FlowControlServiceGrpc;
+import com.fluxninja.generated.aperture.flowcontrol.v1.CheckRequest;
+import com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse;
+import com.fluxninja.generated.aperture.flowcontrol.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
 import com.fluxninja.generated.google.rpc.Status;

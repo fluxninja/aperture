@@ -16,7 +16,7 @@ buf-generate:
 	@rm -rfd gen/proto gen/openapiv2
 	@buf format -w
 	@buf lint
-	@buf generate
+	@buf generate --include-imports
 	@#inject go annotations
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
 	@#generate sdk flowcontrol stubs and copy them over
@@ -24,8 +24,13 @@ buf-generate:
 	@rm -rf ../sdks/aperture-go/gen/proto/flowcontrol
 	@cp -R gen/proto/go/aperture/flowcontrol ../sdks/aperture-go/gen/proto/flowcontrol
 	@#java
+	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/generated
 	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/flowcontrol
-	@cp -R gen/proto/java/com/fluxninja/aperture/flowcontrol ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/
+	@cp -R gen/proto/java/com/fluxninja/generated ../sdks/aperture-java/src/main/java/com/fluxninja/generated
+	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/generated/aperture
+	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/generated/grpc
+	@rm -rf ../sdks/aperture-java/src/main/java/com/fluxninja/generated/google/api
+	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol ../sdks/aperture-java/src/main/java/com/fluxninja/aperture/
 	@rm -rf gen/proto/java
 	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)

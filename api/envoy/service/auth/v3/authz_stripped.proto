@@ -1,31 +1,30 @@
 syntax = "proto3";
 
 /*
-  This file is based on envoy/service/auth/v3/external_auth.proto
-  To reduce the amount of generated code, it contains inlined dependencies from:
-  - envoy/config/core/v3/base.proto
-  - envoy/service/auth/v3/attribute_context.proto
-  - envoy/type/v3/http_status.proto
- */
+   This file is based on envoy/service/auth/v3/external_auth.proto
+   To reduce the amount of generated code, it contains inlined dependencies from:
+   - envoy/config/core/v3/base.proto
+   - envoy/service/auth/v3/attribute_context.proto
+   - envoy/type/v3/http_status.proto
+*/
 
 package envoy.service.auth.v3;
 
+import "envoy/annotations/deprecation.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "google/rpc/status.proto";
-
-import "envoy/annotations/deprecation.proto";
 import "udpa/annotations/status.proto";
 import "udpa/annotations/versioning.proto";
 import "validate/validate.proto";
 
-option java_package = "io.envoyproxy.envoy.service.auth.v3";
-option java_outer_classname = "ExternalAuthProto";
-option java_multiple_files = true;
 option go_package = "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3;authv3";
 option java_generic_services = true;
+option java_multiple_files = true;
+option java_outer_classname = "ExternalAuthProto";
+option java_package = "io.envoyproxy.envoy.service.auth.v3";
 option (udpa.annotations.file_status).package_version_status = ACTIVE;
 
 // [#protodoc-title: Authorization Service ]
@@ -38,8 +37,7 @@ option (udpa.annotations.file_status).package_version_status = ACTIVE;
 service Authorization {
   // Performs authorization check based on the attributes associated with the
   // incoming request, and returns status `OK` or not `OK`.
-  rpc Check(CheckRequest) returns (CheckResponse) {
-  }
+  rpc Check(CheckRequest) returns (CheckResponse) {}
 }
 
 message CheckRequest {
@@ -51,8 +49,7 @@ message CheckRequest {
 
 // HTTP attributes for a denied response.
 message DeniedHttpResponse {
-  option (udpa.annotations.versioning).previous_message_type =
-      "envoy.service.auth.v2.DeniedHttpResponse";
+  option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.DeniedHttpResponse";
 
   // This field allows the authorization service to send an HTTP response status code to the
   // downstream client. If not set, Envoy sends ``403 Forbidden`` HTTP status code by default.
@@ -71,8 +68,7 @@ message DeniedHttpResponse {
 // HTTP attributes for an OK response.
 // [#next-free-field: 9]
 message OkHttpResponse {
-  option (udpa.annotations.versioning).previous_message_type =
-      "envoy.service.auth.v2.OkHttpResponse";
+  option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.OkHttpResponse";
 
   // HTTP entity headers in addition to the original request headers. This allows the authorization
   // service to append, to add or to override headers from the original request before
@@ -104,8 +100,10 @@ message OkHttpResponse {
   // <envoy_v3_api_field_service.auth.v3.CheckResponse.dynamic_metadata>`. Until it is removed,
   // setting this field overrides :ref:`CheckResponse.dynamic_metadata
   // <envoy_v3_api_field_service.auth.v3.CheckResponse.dynamic_metadata>`.
-  google.protobuf.Struct dynamic_metadata = 3
-      [deprecated = true, (envoy.annotations.deprecated_at_minor_version) = "3.0"];
+  google.protobuf.Struct dynamic_metadata = 3 [
+    deprecated = true,
+    (envoy.annotations.deprecated_at_minor_version) = "3.0"
+  ];
 
   // This field allows the authorization service to send HTTP response headers
   // to the downstream client on success. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>`
@@ -124,8 +122,7 @@ message OkHttpResponse {
 
 // Intended for gRPC and Network Authorization servers ``only``.
 message CheckResponse {
-  option (udpa.annotations.versioning).previous_message_type =
-      "envoy.service.auth.v2.CheckResponse";
+  option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.CheckResponse";
 
   // Status ``OK`` allows the request. Any other status indicates the request should be denied, and
   // for HTTP filter, if not overridden by :ref:`denied HTTP response status <envoy_v3_api_field_service.auth.v3.DeniedHttpResponse.status>`
@@ -153,34 +150,38 @@ message CheckResponse {
 }
 
 /*
-  REPLACEMENTS FOR import "envoy/config/core/v3/base.proto";
-  - HeaderValueOption
-  - QueryParameter
- */
+   REPLACEMENTS FOR import "envoy/config/core/v3/base.proto";
+   - HeaderValueOption
+   - QueryParameter
+*/
 
 // Header name/value pair.
 message HeaderValue {
   option (udpa.annotations.versioning).previous_message_type = "envoy.api.v2.core.HeaderValue";
 
   // Header name.
-  string key = 1
-  [(validate.rules).string =
-  {min_len: 1 max_bytes: 16384 well_known_regex: HTTP_HEADER_NAME strict: false}];
+  string key = 1 [(validate.rules).string = {
+    min_len: 1
+    max_bytes: 16384
+    well_known_regex: HTTP_HEADER_NAME
+    strict: false
+  }];
 
   // Header value.
   //
   // The same :ref:`format specifier <config_access_log_format>` as used for
   // :ref:`HTTP access logging <config_access_log>` applies here, however
   // unknown header values are replaced with the empty string instead of ``-``.
-  string value = 2 [
-    (validate.rules).string = {max_bytes: 16384 well_known_regex: HTTP_HEADER_VALUE strict: false}
-  ];
+  string value = 2 [(validate.rules).string = {
+    max_bytes: 16384
+    well_known_regex: HTTP_HEADER_VALUE
+    strict: false
+  }];
 }
 
 // Header name/value pair plus option to control append behavior.
 message HeaderValueOption {
-  option (udpa.annotations.versioning).previous_message_type =
-      "envoy.api.v2.core.HeaderValueOption";
+  option (udpa.annotations.versioning).previous_message_type = "envoy.api.v2.core.HeaderValueOption";
 
   // Describes the supported actions types for header append action.
   enum HeaderAppendAction {
@@ -211,8 +212,10 @@ message HeaderValueOption {
   //   The :ref:`external authorization service <envoy_v3_api_msg_service.auth.v3.CheckResponse>` and
   //   :ref:`external processor service <envoy_v3_api_msg_service.ext_proc.v3.ProcessingResponse>` have
   //   default value (``false``) for this field.
-  google.protobuf.BoolValue append = 2
-  [deprecated = true, (envoy.annotations.deprecated_at_minor_version) = "3.0"];
+  google.protobuf.BoolValue append = 2 [
+    deprecated = true,
+    (envoy.annotations.deprecated_at_minor_version) = "3.0"
+  ];
 
   // Describes the action taken to append/overwrite the given value for an existing header
   // or to only add this header if it's absent.
@@ -235,11 +238,11 @@ message QueryParameter {
 }
 
 /*
-  REPLACEMENTS FOR import "envoy/service/auth/v3/attribute_context.proto";
-  - AttributeContext
-  - also need Address from "envoy/config/core/v3/address.proto"
-  - also need Metadata from "envoy/config/core/v3/base.proto"
- */
+   REPLACEMENTS FOR import "envoy/service/auth/v3/attribute_context.proto";
+   - AttributeContext
+   - also need Address from "envoy/config/core/v3/address.proto"
+   - also need Metadata from "envoy/config/core/v3/base.proto"
+*/
 
 // An attribute is a piece of metadata that describes an activity on a network.
 // For example, the size of an HTTP request, or the status code of an HTTP response.
@@ -260,8 +263,7 @@ message QueryParameter {
 // - which return values are copied into request_headers]
 // [#next-free-field: 12]
 message AttributeContext {
-  option (udpa.annotations.versioning).previous_message_type =
-      "envoy.service.auth.v2.AttributeContext";
+  option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.AttributeContext";
 
   // This message defines attributes for a node that handles a network request.
   // The node can be either a service or an application that sends, forwards,
@@ -269,8 +271,7 @@ message AttributeContext {
   // ``principal``, and ``labels`` as appropriate.
   // [#next-free-field: 6]
   message Peer {
-    option (udpa.annotations.versioning).previous_message_type =
-        "envoy.service.auth.v2.AttributeContext.Peer";
+    option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.AttributeContext.Peer";
 
     // The address of the peer, this is typically the IP address.
     // It can also be UDS path, or others.
@@ -306,8 +307,7 @@ message AttributeContext {
 
   // Represents a network request, such as an HTTP request.
   message Request {
-    option (udpa.annotations.versioning).previous_message_type =
-        "envoy.service.auth.v2.AttributeContext.Request";
+    option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.AttributeContext.Request";
 
     // The timestamp when the proxy receives the first byte of the request.
     google.protobuf.Timestamp time = 1;
@@ -320,8 +320,7 @@ message AttributeContext {
   // HTTP/1.x, HTTP/2, gRPC are all considered as HTTP requests.
   // [#next-free-field: 13]
   message HttpRequest {
-    option (udpa.annotations.versioning).previous_message_type =
-        "envoy.service.auth.v2.AttributeContext.HttpRequest";
+    option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.AttributeContext.HttpRequest";
 
     // The unique ID for a request, which can be propagated to downstream
     // systems. The ID should have low probability of collision
@@ -538,10 +537,10 @@ message ConfigCoreMetadata {
 }
 
 /*
-  REPLACEMENTS FOR import "envoy/type/v3/http_status.proto";
-  - StatusCode
-  - HttpStatus
- */
+   REPLACEMENTS FOR import "envoy/type/v3/http_status.proto";
+   - StatusCode
+   - HttpStatus
+*/
 
 // HTTP response codes supported in Envoy.
 // For more details: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
@@ -668,5 +667,8 @@ message HttpStatus {
   option (udpa.annotations.versioning).previous_message_type = "envoy.type.HttpStatus";
 
   // Supplies HTTP response code.
-  StatusCode code = 1 [(validate.rules).enum = {defined_only: true not_in: 0}];
+  StatusCode code = 1 [(validate.rules).enum = {
+    defined_only: true
+    not_in: 0
+  }];
 }

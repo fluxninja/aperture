@@ -1,6 +1,6 @@
 package com.fluxninja.aperture.sdk;
 
-import com.fluxninja.aperture.flowcontrol.v1.CheckResponse;
+import com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.api.trace.Span;
 
