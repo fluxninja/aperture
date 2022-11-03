@@ -340,23 +340,23 @@ If `sysctl fs.inotify.{max_queued_events,max_user_instances,max_user_watches}`
 less than:
 
 ```sh
-fs.inotify.max_queued_events = 16384
-fs.inotify.max_user_instances = 1024
-fs.inotify.max_user_watches = 524288
+fs.inotify.max_queued_events=16384
+fs.inotify.max_user_instances=1024
+fs.inotify.max_user_watches=524288
 ```
 
 change it, using (temporary method):
 
 ```sh
-sudo sysctl fs.inotify.max_queued_events = 16384
-sudo sysctl fs.inotify.max_user_instances = 1024
-sudo sysctl fs.inotify.max_user_watches = 524288
+sudo sysctl fs.inotify.max_queued_events=16384
+sudo sysctl fs.inotify.max_user_instances=1024
+sudo sysctl fs.inotify.max_user_watches=524288
 ```
 
 or add following lines to `/etc/sysctl.conf`:
 
 ```sh
-fs.inotify.max_queued_events = 16384
-fs.inotify.max_user_instances = 1024
-fs.inotify.max_user_watches = 524288
+fs.inotify.max_queued_events=16384
+fs.inotify.max_user_instances=1024
+fs.inotify.max_user_watches=524288
 ```
