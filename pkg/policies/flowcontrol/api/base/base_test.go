@@ -1,4 +1,4 @@
-package common_test
+package base_test
 
 import (
 	"context"
@@ -17,7 +17,7 @@ import (
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/common"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/base"
 )
 
 var (
@@ -48,8 +48,8 @@ var _ = BeforeEach(func() {
 		}.Module(),
 		fx.Provide(agentinfo.ProvideAgentInfo),
 		fx.Supply(entities),
-		fx.Provide(common.ProvideNopMetrics),
-		fx.Provide(common.ProvideHandler),
+		fx.Provide(base.ProvideNopMetrics),
+		fx.Provide(base.ProvideHandler),
 		fx.Provide(flowcontrol.NewEngine),
 		grpcclient.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 		fx.Populate(&svc),

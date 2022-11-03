@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/common"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/base"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/envoy"
 	"go.uber.org/fx"
 )
@@ -12,7 +12,7 @@ import (
 // externally.
 func Module() fx.Option {
 	return fx.Options(
-		common.Module(),
+		base.Module(),
 		envoy.Module(),
 	)
 }

@@ -15,7 +15,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/common"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/base"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/envoy"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
@@ -42,7 +42,7 @@ var _ = AfterEach(func() {
 })
 
 type AcceptingHandler struct {
-	common.HandlerWithValues
+	base.HandlerWithValues
 }
 
 func (s *AcceptingHandler) CheckWithValues(
