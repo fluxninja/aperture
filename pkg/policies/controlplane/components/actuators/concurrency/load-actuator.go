@@ -15,9 +15,9 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/rs/zerolog"
 )
 
@@ -39,8 +39,8 @@ func NewLoadActuatorAndOptions(
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	componentID := common.DataplaneComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex))
-	decisionsEtcdPath := path.Join(common.LoadActuatorDecisionsPath, componentID)
+	componentID := paths.FlowControlComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex))
+	decisionsEtcdPath := path.Join(paths.LoadActuatorDecisionsPath, componentID)
 	dryRun := false
 	if loadActuatorProto.GetDefaultConfig() != nil {
 		dryRun = loadActuatorProto.GetDefaultConfig().GetDryRun()
