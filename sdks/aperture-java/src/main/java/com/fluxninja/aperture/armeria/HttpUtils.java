@@ -74,7 +74,7 @@ class HttpUtils {
     protected static HttpRequest updateHeaders(HttpRequest req, List<HeaderValueOption> newHeaders) {
         RequestHeadersBuilder newHeadersBuilder = req.headers().toBuilder();
         for (HeaderValueOption newHeader: newHeaders) {
-            String headerKey = newHeader.getHeader().getKey();
+            String headerKey = newHeader.getHeader().getKey().toLowerCase();
             String headerValue = newHeader.getHeader().getValue();
             if (!newHeader.getKeepEmptyValue() && headerValue.isEmpty()) {
                 newHeadersBuilder = newHeadersBuilder.removeAndThen(headerKey);
@@ -99,12 +99,6 @@ class HttpUtils {
             }
             extractedHeaders.put(headerKey, header.getValue());
         }
-        int requestSize = -1;
-        if (extractedHeaders.containsKey("content-length")) {
-            requestSize = Integer.parseInt(extractedHeaders.get("content-length"));
-        } else if (extractedHeaders.containsKey("Content-Length")) {
-            requestSize = Integer.parseInt(extractedHeaders.get("content-length"));
-        }
 
         return builder
                 .putContextExtensions("traffic-direction", "INBOUND")
@@ -114,7 +108,7 @@ class HttpUtils {
                         .setPath(req.path())
                         .setHost(req.authority())
                         .setScheme(req.scheme())
-                        .setSize(requestSize)
+                        .setSize(headers.contentLength())
                         .setProtocol("HTTP/2")
                         .putAllHeaders(extractedHeaders)));
     }

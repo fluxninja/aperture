@@ -23,12 +23,6 @@ public class TrafficFlow {
     }
 
     public boolean accepted() {
-        if (this.checkResponse == null || !this.checkResponse.hasStatus()) {
-            return true;
-        }
-        if (this.checkResponse.hasDeniedResponse()) {
-            return false;
-        }
         return this.checkResponse.getStatus().getCode() == Code.OK_VALUE;
     }
 
