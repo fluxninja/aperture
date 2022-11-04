@@ -30,8 +30,9 @@ import (
 )
 
 var (
-	logger *log.Logger
-	failed bool
+	logger      *log.Logger
+	spanFailed  bool
+	authzFailed bool
 )
 
 func init() {
@@ -134,8 +135,12 @@ func main() {
 				validation = 1
 			}
 
-			if failed {
+			if spanFailed {
 				l.Error().Msg("Span attributes validation failed")
+				validation = 1
+			}
+			if authzFailed {
+				l.Error().Msg("Authz validation failed")
 				validation = 1
 			}
 
@@ -166,7 +171,11 @@ func serverInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySer
 	log.Info().Str("method", info.FullMethod).Dur("latency", time.Since(start)).Msg("Request served")
 	if err != nil {
 		log.Error().Err(err).Msg("Handler returned error")
-		failed = true
+		if info.FullMethod == "/opentelemetry.proto.collector.trace.v1.TraceService/Export" {
+			spanFailed = true
+		} else if info.FullMethod == "/envoy.service.auth.v3.Authorization/Check" {
+			authzFailed = true
+		}
 	}
 	return h, err
 }
