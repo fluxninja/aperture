@@ -1,0 +1,674 @@
+syntax = "proto3";
+
+/*
+   This file is based on envoy/service/auth/v3/external_auth.proto
+   To reduce the amount of generated code, it contains inlined dependencies from:
+   - envoy/config/core/v3/base.proto
+   - envoy/service/auth/v3/attribute_context.proto
+   - envoy/type/v3/http_status.proto
+*/
+
+package envoy.service.auth.v3;
+
+import "envoy/annotations/deprecation.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/rpc/status.proto";
+import "udpa/annotations/status.proto";
+import "udpa/annotations/versioning.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3;authv3";
+option java_generic_services = true;
+option java_multiple_files = true;
+option java_outer_classname = "ExternalAuthProto";
+option java_package = "io.envoyproxy.envoy.service.auth.v3";
+option (udpa.annotations.file_status).package_version_status = ACTIVE;
+
+// [#protodoc-title: Authorization Service ]
+
+// The authorization service request messages used by external authorization :ref:`network filter
+// <config_network_filters_ext_authz>` and :ref:`HTTP filter <config_http_filters_ext_authz>`.
+
+// A generic interface for performing authorization check on incoming
+// requests to a networked service.
+service Authorization {
+  // Performs authorization check based on the attributes associated with the
+  // incoming request, and returns status `OK` or not `OK`.
+  rpc Check(CheckRequest) returns (CheckResponse) {}
+}
+
+message CheckRequest {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.CheckRequest";
+
+  // The request attributes.
+  AttributeContext attributes = 1;
+}
+
+// HTTP attributes for a denied response.
+message DeniedHttpResponse {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.DeniedHttpResponse";
+
+  // This field allows the authorization service to send an HTTP response status code to the
+  // downstream client. If not set, Envoy sends ``403 Forbidden`` HTTP status code by default.
+  HttpStatus status = 1;
+
+  // This field allows the authorization service to send HTTP response headers
+  // to the downstream client. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>` defaults to
+  // false when used in this message.
+  repeated HeaderValueOption headers = 2;
+
+  // This field allows the authorization service to send a response body data
+  // to the downstream client.
+  string body = 3;
+}
+
+// HTTP attributes for an OK response.
+// [#next-free-field: 9]
+message OkHttpResponse {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.OkHttpResponse";
+
+  // HTTP entity headers in addition to the original request headers. This allows the authorization
+  // service to append, to add or to override headers from the original request before
+  // dispatching it to the upstream. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>` defaults to
+  // false when used in this message. By setting the ``append`` field to ``true``,
+  // the filter will append the correspondent header value to the matched request header.
+  // By leaving ``append`` as false, the filter will either add a new header, or override an existing
+  // one if there is a match.
+  repeated HeaderValueOption headers = 2;
+
+  // HTTP entity headers to remove from the original request before dispatching
+  // it to the upstream. This allows the authorization service to act on auth
+  // related headers (like ``Authorization``), process them, and consume them.
+  // Under this model, the upstream will either receive the request (if it's
+  // authorized) or not receive it (if it's not), but will not see headers
+  // containing authorization credentials.
+  //
+  // Pseudo headers (such as ``:authority``, ``:method``, ``:path`` etc), as well as
+  // the header ``Host``, may not be removed as that would make the request
+  // malformed. If mentioned in ``headers_to_remove`` these special headers will
+  // be ignored.
+  //
+  // When using the HTTP service this must instead be set by the HTTP
+  // authorization service as a comma separated list like so:
+  // ``x-envoy-auth-headers-to-remove: one-auth-header, another-auth-header``.
+  repeated string headers_to_remove = 5;
+
+  // This field has been deprecated in favor of :ref:`CheckResponse.dynamic_metadata
+  // <envoy_v3_api_field_service.auth.v3.CheckResponse.dynamic_metadata>`. Until it is removed,
+  // setting this field overrides :ref:`CheckResponse.dynamic_metadata
+  // <envoy_v3_api_field_service.auth.v3.CheckResponse.dynamic_metadata>`.
+  google.protobuf.Struct dynamic_metadata = 3 [
+    deprecated = true,
+    (envoy.annotations.deprecated_at_minor_version) = "3.0"
+  ];
+
+  // This field allows the authorization service to send HTTP response headers
+  // to the downstream client on success. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>`
+  // defaults to false when used in this message.
+  repeated HeaderValueOption response_headers_to_add = 6;
+
+  // This field allows the authorization service to set (and overwrite) query
+  // string parameters on the original request before it is sent upstream.
+  repeated QueryParameter query_parameters_to_set = 7;
+
+  // This field allows the authorization service to specify which query parameters
+  // should be removed from the original request before it is sent upstream. Each
+  // element in this list is a case-sensitive query parameter name to be removed.
+  repeated string query_parameters_to_remove = 8;
+}
+
+// Intended for gRPC and Network Authorization servers ``only``.
+message CheckResponse {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.CheckResponse";
+
+  // Status ``OK`` allows the request. Any other status indicates the request should be denied, and
+  // for HTTP filter, if not overridden by :ref:`denied HTTP response status <envoy_v3_api_field_service.auth.v3.DeniedHttpResponse.status>`
+  // Envoy sends ``403 Forbidden`` HTTP status code by default.
+  google.rpc.Status status = 1;
+
+  // An message that contains HTTP response attributes. This message is
+  // used when the authorization service needs to send custom responses to the
+  // downstream client or, to modify/add request headers being dispatched to the upstream.
+  oneof http_response {
+    // Supplies http attributes for a denied response.
+    DeniedHttpResponse denied_response = 2;
+
+    // Supplies http attributes for an ok response.
+    OkHttpResponse ok_response = 3;
+  }
+
+  // Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
+  // filter. This metadata lives in a namespace specified by the canonical name of extension filter
+  // that requires it:
+  //
+  // - :ref:`envoy.filters.http.ext_authz <config_http_filters_ext_authz_dynamic_metadata>` for HTTP filter.
+  // - :ref:`envoy.filters.network.ext_authz <config_network_filters_ext_authz_dynamic_metadata>` for network filter.
+  google.protobuf.Struct dynamic_metadata = 4;
+}
+
+/*
+   REPLACEMENTS FOR import "envoy/config/core/v3/base.proto";
+   - HeaderValueOption
+   - QueryParameter
+*/
+
+// Header name/value pair.
+message HeaderValue {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.api.v2.core.HeaderValue";
+
+  // Header name.
+  string key = 1 [(validate.rules).string = {
+    min_len: 1
+    max_bytes: 16384
+    well_known_regex: HTTP_HEADER_NAME
+    strict: false
+  }];
+
+  // Header value.
+  //
+  // The same :ref:`format specifier <config_access_log_format>` as used for
+  // :ref:`HTTP access logging <config_access_log>` applies here, however
+  // unknown header values are replaced with the empty string instead of ``-``.
+  string value = 2 [(validate.rules).string = {
+    max_bytes: 16384
+    well_known_regex: HTTP_HEADER_VALUE
+    strict: false
+  }];
+}
+
+// Header name/value pair plus option to control append behavior.
+message HeaderValueOption {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.api.v2.core.HeaderValueOption";
+
+  // Describes the supported actions types for header append action.
+  enum HeaderAppendAction {
+    // This action will append the specified value to the existing values if the header
+    // already exists. If the header doesn't exist then this will add the header with
+    // specified key and value.
+    APPEND_IF_EXISTS_OR_ADD = 0;
+
+    // This action will add the header if it doesn't already exist. If the header
+    // already exists then this will be a no-op.
+    ADD_IF_ABSENT = 1;
+
+    // This action will overwrite the specified value by discarding any existing values if
+    // the header already exists. If the header doesn't exist then this will add the header
+    // with specified key and value.
+    OVERWRITE_IF_EXISTS_OR_ADD = 2;
+  }
+
+  // Header name/value pair that this option applies to.
+  HeaderValue header = 1 [(validate.rules).message = {required: true}];
+
+  // Should the value be appended? If true (default), the value is appended to
+  // existing values. Otherwise it replaces any existing values.
+  // This field is deprecated and please use
+  // :ref:`append_action <envoy_v3_api_field_config.core.v3.HeaderValueOption.append_action>` as replacement.
+  //
+  // .. note::
+  //   The :ref:`external authorization service <envoy_v3_api_msg_service.auth.v3.CheckResponse>` and
+  //   :ref:`external processor service <envoy_v3_api_msg_service.ext_proc.v3.ProcessingResponse>` have
+  //   default value (``false``) for this field.
+  google.protobuf.BoolValue append = 2 [
+    deprecated = true,
+    (envoy.annotations.deprecated_at_minor_version) = "3.0"
+  ];
+
+  // Describes the action taken to append/overwrite the given value for an existing header
+  // or to only add this header if it's absent.
+  // Value defaults to :ref:`APPEND_IF_EXISTS_OR_ADD
+  // <envoy_v3_api_enum_value_config.core.v3.HeaderValueOption.HeaderAppendAction.APPEND_IF_EXISTS_OR_ADD>`.
+  HeaderAppendAction append_action = 3 [(validate.rules).enum = {defined_only: true}];
+
+  // Is the header value allowed to be empty? If false (default), custom headers with empty values are dropped,
+  // otherwise they are added.
+  bool keep_empty_value = 4;
+}
+
+// Query parameter name/value pair.
+message QueryParameter {
+  // The key of the query parameter. Case sensitive.
+  string key = 1 [(validate.rules).string = {min_len: 1}];
+
+  // The value of the query parameter.
+  string value = 2;
+}
+
+/*
+   REPLACEMENTS FOR import "envoy/service/auth/v3/attribute_context.proto";
+   - AttributeContext
+   - also need Address from "envoy/config/core/v3/address.proto"
+   - also need Metadata from "envoy/config/core/v3/base.proto"
+*/
+
+// An attribute is a piece of metadata that describes an activity on a network.
+// For example, the size of an HTTP request, or the status code of an HTTP response.
+//
+// Each attribute has a type and a name, which is logically defined as a proto message field
+// of the ``AttributeContext``. The ``AttributeContext`` is a collection of individual attributes
+// supported by Envoy authorization system.
+// [#comment: The following items are left out of this proto
+// Request.Auth field for jwt tokens
+// Request.Api for api management
+// Origin peer that originated the request
+// Caching Protocol
+// request_context return values to inject back into the filter chain
+// peer.claims -- from X.509 extensions
+// Configuration
+// - field mask to send
+// - which return values from request_context are copied back
+// - which return values are copied into request_headers]
+// [#next-free-field: 12]
+message AttributeContext {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.AttributeContext";
+
+  // This message defines attributes for a node that handles a network request.
+  // The node can be either a service or an application that sends, forwards,
+  // or receives the request. Service peers should fill in the ``service``,
+  // ``principal``, and ``labels`` as appropriate.
+  // [#next-free-field: 6]
+  message Peer {
+    option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.AttributeContext.Peer";
+
+    // The address of the peer, this is typically the IP address.
+    // It can also be UDS path, or others.
+    Address address = 1;
+
+    // The canonical service name of the peer.
+    // It should be set to :ref:`the HTTP x-envoy-downstream-service-cluster
+    // <config_http_conn_man_headers_downstream-service-cluster>`
+    // If a more trusted source of the service name is available through mTLS/secure naming, it
+    // should be used.
+    string service = 2;
+
+    // The labels associated with the peer.
+    // These could be pod labels for Kubernetes or tags for VMs.
+    // The source of the labels could be an X.509 certificate or other configuration.
+    map<string, string> labels = 3;
+
+    // The authenticated identity of this peer.
+    // For example, the identity associated with the workload such as a service account.
+    // If an X.509 certificate is used to assert the identity this field should be sourced from
+    // ``URI Subject Alternative Names``, ``DNS Subject Alternate Names`` or ``Subject`` in that order.
+    // The primary identity should be the principal. The principal format is issuer specific.
+    //
+    // Example:
+    // *    SPIFFE format is ``spiffe://trust-domain/path``
+    // *    Google account format is ``https://accounts.google.com/{userid}``
+    string principal = 4;
+
+    // The X.509 certificate used to authenticate the identify of this peer.
+    // When present, the certificate contents are encoded in URL and PEM format.
+    string certificate = 5;
+  }
+
+  // Represents a network request, such as an HTTP request.
+  message Request {
+    option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.AttributeContext.Request";
+
+    // The timestamp when the proxy receives the first byte of the request.
+    google.protobuf.Timestamp time = 1;
+
+    // Represents an HTTP request or an HTTP-like request.
+    HttpRequest http = 2;
+  }
+
+  // This message defines attributes for an HTTP request.
+  // HTTP/1.x, HTTP/2, gRPC are all considered as HTTP requests.
+  // [#next-free-field: 13]
+  message HttpRequest {
+    option (udpa.annotations.versioning).previous_message_type = "envoy.service.auth.v2.AttributeContext.HttpRequest";
+
+    // The unique ID for a request, which can be propagated to downstream
+    // systems. The ID should have low probability of collision
+    // within a single day for a specific service.
+    // For HTTP requests, it should be X-Request-ID or equivalent.
+    string id = 1;
+
+    // The HTTP request method, such as ``GET``, ``POST``.
+    string method = 2;
+
+    // The HTTP request headers. If multiple headers share the same key, they
+    // must be merged according to the HTTP spec. All header keys must be
+    // lower-cased, because HTTP header keys are case-insensitive.
+    map<string, string> headers = 3;
+
+    // The request target, as it appears in the first line of the HTTP request. This includes
+    // the URL path and query-string. No decoding is performed.
+    string path = 4;
+
+    // The HTTP request ``Host`` or '`Authority`` header value.
+    string host = 5;
+
+    // The HTTP URL scheme, such as ``http`` and ``https``.
+    string scheme = 6;
+
+    // This field is always empty, and exists for compatibility reasons. The HTTP URL query is
+    // included in ``path`` field.
+    string query = 7;
+
+    // This field is always empty, and exists for compatibility reasons. The URL fragment is
+    // not submitted as part of HTTP requests; it is unknowable.
+    string fragment = 8;
+
+    // The HTTP request size in bytes. If unknown, it must be -1.
+    int64 size = 9;
+
+    // The network protocol used with the request, such as "HTTP/1.0", "HTTP/1.1", or "HTTP/2".
+    //
+    // See :repo:`headers.h:ProtocolStrings <source/common/http/headers.h>` for a list of all
+    // possible values.
+    string protocol = 10;
+
+    // The HTTP request body.
+    string body = 11;
+
+    // The HTTP request body in bytes. This is used instead of
+    // :ref:`body <envoy_v3_api_field_service.auth.v3.AttributeContext.HttpRequest.body>` when
+    // :ref:`pack_as_bytes <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.BufferSettings.pack_as_bytes>`
+    // is set to true.
+    bytes raw_body = 12;
+  }
+
+  // The source of a network activity, such as starting a TCP connection.
+  // In a multi hop network activity, the source represents the sender of the
+  // last hop.
+  Peer source = 1;
+
+  // The destination of a network activity, such as accepting a TCP connection.
+  // In a multi hop network activity, the destination represents the receiver of
+  // the last hop.
+  Peer destination = 2;
+
+  // Represents a network request, such as an HTTP request.
+  Request request = 4;
+
+  // This is analogous to http_request.headers, however these contents will not be sent to the
+  // upstream server. Context_extensions provide an extension mechanism for sending additional
+  // information to the auth server without modifying the proto definition. It maps to the
+  // internal opaque context in the filter chain.
+  map<string, string> context_extensions = 10;
+
+  // Dynamic metadata associated with the request.
+  ConfigCoreMetadata metadata_context = 11;
+}
+
+message Pipe {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.api.v2.core.Pipe";
+
+  // Unix Domain Socket path. On Linux, paths starting with '@' will use the
+  // abstract namespace. The starting '@' is replaced by a null byte by Envoy.
+  // Paths starting with '@' will result in an error in environments other than
+  // Linux.
+  string path = 1 [(validate.rules).string = {min_len: 1}];
+
+  // The mode for the Pipe. Not applicable for abstract sockets.
+  uint32 mode = 2 [(validate.rules).uint32 = {lte: 511}];
+}
+
+// The address represents an envoy internal listener.
+// [#comment: TODO(asraa): When address available, remove workaround from test/server/server_fuzz_test.cc:30.]
+message EnvoyInternalAddress {
+  oneof address_name_specifier {
+    option (validate.required) = true;
+
+    // Specifies the :ref:`name <envoy_v3_api_field_config.listener.v3.Listener.name>` of the
+    // internal listener.
+    string server_listener_name = 1;
+  }
+
+  // Specifies an endpoint identifier to distinguish between multiple endpoints for the same internal listener in a
+  // single upstream pool. Only used in the upstream addresses for tracking changes to individual endpoints. This, for
+  // example, may be set to the final destination IP for the target internal listener.
+  string endpoint_id = 2;
+}
+
+// [#next-free-field: 7]
+message SocketAddress {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.api.v2.core.SocketAddress";
+
+  enum Protocol {
+    TCP = 0;
+    UDP = 1;
+  }
+
+  Protocol protocol = 1 [(validate.rules).enum = {defined_only: true}];
+
+  // The address for this socket. :ref:`Listeners <config_listeners>` will bind
+  // to the address. An empty address is not allowed. Specify ``0.0.0.0`` or ``::``
+  // to bind to any address. [#comment:TODO(zuercher) reinstate when implemented:
+  // It is possible to distinguish a Listener address via the prefix/suffix matching
+  // in :ref:`FilterChainMatch <envoy_v3_api_msg_config.listener.v3.FilterChainMatch>`.] When used
+  // within an upstream :ref:`BindConfig <envoy_v3_api_msg_config.core.v3.BindConfig>`, the address
+  // controls the source address of outbound connections. For :ref:`clusters
+  // <envoy_v3_api_msg_config.cluster.v3.Cluster>`, the cluster type determines whether the
+  // address must be an IP (``STATIC`` or ``EDS`` clusters) or a hostname resolved by DNS
+  // (``STRICT_DNS`` or ``LOGICAL_DNS`` clusters). Address resolution can be customized
+  // via :ref:`resolver_name <envoy_v3_api_field_config.core.v3.SocketAddress.resolver_name>`.
+  string address = 2 [(validate.rules).string = {min_len: 1}];
+
+  oneof port_specifier {
+    option (validate.required) = true;
+
+    uint32 port_value = 3 [(validate.rules).uint32 = {lte: 65535}];
+
+    // This is only valid if :ref:`resolver_name
+    // <envoy_v3_api_field_config.core.v3.SocketAddress.resolver_name>` is specified below and the
+    // named resolver is capable of named port resolution.
+    string named_port = 4;
+  }
+
+  // The name of the custom resolver. This must have been registered with Envoy. If
+  // this is empty, a context dependent default applies. If the address is a concrete
+  // IP address, no resolution will occur. If address is a hostname this
+  // should be set for resolution other than DNS. Specifying a custom resolver with
+  // ``STRICT_DNS`` or ``LOGICAL_DNS`` will generate an error at runtime.
+  string resolver_name = 5;
+
+  // When binding to an IPv6 address above, this enables `IPv4 compatibility
+  // <https://tools.ietf.org/html/rfc3493#page-11>`_. Binding to ``::`` will
+  // allow both IPv4 and IPv6 connections, with peer IPv4 addresses mapped into
+  // IPv6 space as ``::FFFF:<IPv4-address>``.
+  bool ipv4_compat = 6;
+}
+
+// Addresses specify either a logical or physical address and port, which are
+// used to tell Envoy where to bind/listen, connect to upstream and find
+// management servers.
+message Address {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.api.v2.core.Address";
+
+  oneof address {
+    option (validate.required) = true;
+
+    SocketAddress socket_address = 1;
+
+    Pipe pipe = 2;
+
+    // Specifies a user-space address handled by :ref:`internal listeners
+    // <envoy_v3_api_field_config.listener.v3.Listener.internal_listener>`.
+    EnvoyInternalAddress envoy_internal_address = 3;
+  }
+}
+
+// Metadata provides additional inputs to filters based on matched listeners,
+// filter chains, routes and endpoints. It is structured as a map, usually from
+// filter name (in reverse DNS format) to metadata specific to the filter. Metadata
+// key-values for a filter are merged as connection and request handling occurs,
+// with later values for the same key overriding earlier values.
+//
+// An example use of metadata is providing additional values to
+// http_connection_manager in the envoy.http_connection_manager.access_log
+// namespace.
+//
+// Another example use of metadata is to per service config info in cluster metadata, which may get
+// consumed by multiple filters.
+//
+// For load balancing, Metadata provides a means to subset cluster endpoints.
+// Endpoints have a Metadata object associated and routes contain a Metadata
+// object to match against. There are some well defined metadata used today for
+// this purpose:
+//
+// * ``{"envoy.lb": {"canary": <bool> }}`` This indicates the canary status of an
+//   endpoint and is also used during header processing
+//   (x-envoy-upstream-canary) and for stats purposes.
+// [#next-major-version: move to type/metadata/v2]
+message ConfigCoreMetadata {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.api.v2.core.Metadata";
+
+  // Key is the reverse DNS filter name, e.g. com.acme.widget. The ``envoy.*``
+  // namespace is reserved for Envoy's built-in filters.
+  // If both ``filter_metadata`` and
+  // :ref:`typed_filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.typed_filter_metadata>`
+  // fields are present in the metadata with same keys,
+  // only ``typed_filter_metadata`` field will be parsed.
+  map<string, google.protobuf.Struct> filter_metadata = 1;
+
+  // Key is the reverse DNS filter name, e.g. com.acme.widget. The ``envoy.*``
+  // namespace is reserved for Envoy's built-in filters.
+  // The value is encoded as google.protobuf.Any.
+  // If both :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>`
+  // and ``typed_filter_metadata`` fields are present in the metadata with same keys,
+  // only ``typed_filter_metadata`` field will be parsed.
+  map<string, google.protobuf.Any> typed_filter_metadata = 2;
+}
+
+/*
+   REPLACEMENTS FOR import "envoy/type/v3/http_status.proto";
+   - StatusCode
+   - HttpStatus
+*/
+
+// HTTP response codes supported in Envoy.
+// For more details: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+enum StatusCode {
+  // Empty - This code not part of the HTTP status code specification, but it is needed for proto
+  // `enum` type.
+  Empty = 0;
+
+  Continue = 100;
+
+  OK = 200;
+
+  Created = 201;
+
+  Accepted = 202;
+
+  NonAuthoritativeInformation = 203;
+
+  NoContent = 204;
+
+  ResetContent = 205;
+
+  PartialContent = 206;
+
+  MultiStatus = 207;
+
+  AlreadyReported = 208;
+
+  IMUsed = 226;
+
+  MultipleChoices = 300;
+
+  MovedPermanently = 301;
+
+  Found = 302;
+
+  SeeOther = 303;
+
+  NotModified = 304;
+
+  UseProxy = 305;
+
+  TemporaryRedirect = 307;
+
+  PermanentRedirect = 308;
+
+  BadRequest = 400;
+
+  Unauthorized = 401;
+
+  PaymentRequired = 402;
+
+  Forbidden = 403;
+
+  NotFound = 404;
+
+  MethodNotAllowed = 405;
+
+  NotAcceptable = 406;
+
+  ProxyAuthenticationRequired = 407;
+
+  RequestTimeout = 408;
+
+  Conflict = 409;
+
+  Gone = 410;
+
+  LengthRequired = 411;
+
+  PreconditionFailed = 412;
+
+  PayloadTooLarge = 413;
+
+  URITooLong = 414;
+
+  UnsupportedMediaType = 415;
+
+  RangeNotSatisfiable = 416;
+
+  ExpectationFailed = 417;
+
+  MisdirectedRequest = 421;
+
+  UnprocessableEntity = 422;
+
+  Locked = 423;
+
+  FailedDependency = 424;
+
+  UpgradeRequired = 426;
+
+  PreconditionRequired = 428;
+
+  TooManyRequests = 429;
+
+  RequestHeaderFieldsTooLarge = 431;
+
+  InternalServerError = 500;
+
+  NotImplemented = 501;
+
+  BadGateway = 502;
+
+  ServiceUnavailable = 503;
+
+  GatewayTimeout = 504;
+
+  HTTPVersionNotSupported = 505;
+
+  VariantAlsoNegotiates = 506;
+
+  InsufficientStorage = 507;
+
+  LoopDetected = 508;
+
+  NotExtended = 510;
+
+  NetworkAuthenticationRequired = 511;
+}
+
+// HTTP status.
+message HttpStatus {
+  option (udpa.annotations.versioning).previous_message_type = "envoy.type.HttpStatus";
+
+  // Supplies HTTP response code.
+  StatusCode code = 1 [(validate.rules).enum = {
+    defined_only: true
+    not_in: 0
+  }];
+}

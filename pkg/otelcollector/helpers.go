@@ -1,13 +1,16 @@
 package otelcollector
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"strconv"
+	"strings"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/utils"
@@ -129,11 +132,16 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 }
 
 // GetStruct is a helper for decoding complex structs encoded into an attribute
-// as a json-encoded string.
+// as string.
+//
+// The attribute can be encoded as either:
+// * JSON.
+// * base64'd protobuf wire format, if `output` is `proto.Message`.
+//
 // Takes:
 // attributes to read from
 // label key to read in attributes
-// output interface that is filled via json unmarshal
+// output interface that is filled via json/proto unmarshal
 // treatAsMissing is a list of values that are treated as attribute missing from source
 //
 // Returns true is label was decoded successfully, false otherwise.
@@ -157,9 +165,21 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 		}
 	}
 
+	if msg, isProto := output.(proto.Message); isProto && !strings.HasPrefix(stringVal, "{") {
+		wireMsg, err := base64.StdEncoding.DecodeString(stringVal)
+		if err != nil {
+			log.Sample(zerolog.Sometimes).Error().Err(err).Str("label", label).Msg("Failed to unmarshal as base64")
+		}
+		err = proto.Unmarshal(wireMsg, msg)
+		if err != nil {
+			log.Sample(zerolog.Sometimes).Error().Err(err).Str("label", label).Msg("Failed to unmarshal as protobuf")
+		}
+		return true
+	}
+
 	err := json.Unmarshal([]byte(stringVal), output)
 	if err != nil {
-		log.Sample(zerolog.Sometimes).Error().Err(err).Str("label", label).Msg("Failed to unmarshal")
+		log.Sample(zerolog.Sometimes).Error().Err(err).Str("label", label).Msg("Failed to unmarshal as json")
 	}
 
 	return true

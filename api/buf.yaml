@@ -3,11 +3,15 @@ name: buf.build/fluxninja/aperture
 deps:
   - buf.build/googleapis/googleapis
   - buf.build/grpc-ecosystem/grpc-gateway
+  - buf.build/envoyproxy/envoy
 lint:
   use:
     - DEFAULT
   except:
     - ENUM_ZERO_VALUE_SUFFIX
+    - ENUM_VALUE_UPPER_SNAKE_CASE
+    - ENUM_VALUE_PREFIX
+    - SERVICE_SUFFIX
     - RPC_REQUEST_STANDARD_NAME
     - RPC_RESPONSE_STANDARD_NAME
     - RPC_REQUEST_RESPONSE_UNIQUE

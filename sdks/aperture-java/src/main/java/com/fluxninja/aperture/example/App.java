@@ -2,7 +2,7 @@ package com.fluxninja.aperture.example;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.Flow;
+import com.fluxninja.aperture.sdk.FeatureFlow;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
@@ -69,7 +69,7 @@ public class App {
         labels.put("user", "kenobi");
 
         // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow.
-        Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels);
+        FeatureFlow flow = this.apertureSDK.startFlow("awesomeFeature", labels);
 
         // See whether flow was accepted by Aperture Agent.
         if (flow.accepted()) {

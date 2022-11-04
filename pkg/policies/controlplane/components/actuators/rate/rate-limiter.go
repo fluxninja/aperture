@@ -16,9 +16,9 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 )
 
 type rateLimiterSync struct {
@@ -46,10 +46,10 @@ func NewRateLimiterAndOptions(
 		return nil, fx.Options(), errors.New("selector is nil")
 	}
 	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
-	componentID := common.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
-	configEtcdPath := path.Join(common.RateLimiterConfigPath, componentID)
-	decisionsEtcdPath := path.Join(common.RateLimiterDecisionsPath, componentID)
-	dynamicConfigEtcdPath := path.Join(common.RateLimiterDynamicConfigPath, componentID)
+	componentID := paths.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
+	configEtcdPath := path.Join(paths.RateLimiterConfigPath, componentID)
+	decisionsEtcdPath := path.Join(paths.RateLimiterDecisionsPath, componentID)
+	dynamicConfigEtcdPath := path.Join(paths.RateLimiterDynamicConfigPath, componentID)
 
 	limiterSync := &rateLimiterSync{
 		rateLimiterProto:      rateLimiterProto,

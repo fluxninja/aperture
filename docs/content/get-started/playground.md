@@ -67,7 +67,7 @@ with Aperture. There is an instance of Grafana running on the cluster as well
 for viewing metrics from experiments.
 
 The Playground is preloaded with a
-[Latency Gradient Concurrency Control](/tutorials/flow-control/dynamic-rate-limiting.md)
+[Latency Gradient Concurrency Control](/tutorials/flow-control/basic-concurrency-limiting.md)
 policy which protects the demo application against sudden surges in traffic
 load. You can verify it using the following command:
 
@@ -340,23 +340,23 @@ If `sysctl fs.inotify.{max_queued_events,max_user_instances,max_user_watches}`
 less than:
 
 ```sh
-fs.inotify.max_queued_events = 16384
-fs.inotify.max_user_instances = 1024
-fs.inotify.max_user_watches = 524288
+fs.inotify.max_queued_events=16384
+fs.inotify.max_user_instances=1024
+fs.inotify.max_user_watches=524288
 ```
 
 change it, using (temporary method):
 
 ```sh
-sudo sysctl fs.inotify.max_queued_events = 16384
-sudo sysctl fs.inotify.max_user_instances = 1024
-sudo sysctl fs.inotify.max_user_watches = 524288
+sudo sysctl fs.inotify.max_queued_events=16384
+sudo sysctl fs.inotify.max_user_instances=1024
+sudo sysctl fs.inotify.max_user_watches=524288
 ```
 
 or add following lines to `/etc/sysctl.conf`:
 
 ```sh
-fs.inotify.max_queued_events = 16384
-fs.inotify.max_user_instances = 1024
-fs.inotify.max_user_watches = 524288
+fs.inotify.max_queued_events=16384
+fs.inotify.max_user_instances=1024
+fs.inotify.max_user_watches=524288
 ```

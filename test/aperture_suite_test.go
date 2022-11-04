@@ -18,15 +18,15 @@ import (
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/test/harness"
@@ -142,14 +142,14 @@ var _ = BeforeSuite(func() {
 			),
 		),
 		classifier.Module(),
+		api.Module(),
 		fx.Provide(
 			clockwork.NewRealClock,
 			agent.AgentOTELComponents,
-			dataplane.ProvideEngineAPI,
 			entitycache.NewEntityCache,
 			agentinfo.ProvideAgentInfo,
+			flowcontrol.NewEngine,
 		),
-		flowcontrol.Module,
 		otelcollector.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 		jobs.JobGroupConstructor{Name: jobGroupName}.Annotate(),

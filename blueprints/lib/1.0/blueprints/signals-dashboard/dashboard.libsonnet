@@ -40,7 +40,9 @@ function(params) {
       timeSeriesPanel.fieldConfig.withDefaultsMixin(
         timeSeriesPanel.fieldConfig.defaults.withThresholds(thresholds)
       )
-    ),
+    ) + {
+      interval: '1s',
+    },
 
   local InvalidFrequencyPanel =
     local query = |||
@@ -67,7 +69,9 @@ function(params) {
       timeSeriesPanel.fieldConfig.withDefaultsMixin(
         timeSeriesPanel.fieldConfig.defaults.withThresholds(thresholds)
       )
-    ),
+    ) + {
+      interval: '1s',
+    },
 
   dashboard:
     dashboard.new(
