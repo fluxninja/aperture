@@ -16,7 +16,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 
-	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/v1"
+	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/check/v1"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.

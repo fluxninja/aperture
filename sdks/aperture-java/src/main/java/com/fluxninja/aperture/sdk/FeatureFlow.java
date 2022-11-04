@@ -1,6 +1,6 @@
 package com.fluxninja.aperture.sdk;
 
-import com.fluxninja.generated.aperture.flowcontrol.v1.CheckResponse;
+import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.api.trace.Span;
 
@@ -12,9 +12,9 @@ public final class FeatureFlow {
   private boolean ended;
 
   FeatureFlow(
-    CheckResponse checkResponse,
-    Span span,
-    boolean ended) {
+      CheckResponse checkResponse,
+      Span span,
+      boolean ended) {
     this.checkResponse = checkResponse;
     this.span = span;
     this.ended = ended;
@@ -45,8 +45,8 @@ public final class FeatureFlow {
     }
 
     this.span.setAttribute(FEATURE_STATUS_LABEL, statusCode.name())
-            .setAttribute(CHECK_RESPONSE_LABEL, checkResponseJSONBytes)
-            .setAttribute(FLOW_STOP_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
+        .setAttribute(CHECK_RESPONSE_LABEL, checkResponseJSONBytes)
+        .setAttribute(FLOW_STOP_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
     this.span.end();
   }
