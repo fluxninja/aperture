@@ -69,10 +69,6 @@ analyzing, and actuating, facilitated by agents and a controller.
 
 [![Build Indestructible Applications with Aperture Flow Control](https://img.youtube.com/vi/sEl4SMo3KNo/0.jpg)](https://www.youtube.com/watch?v=sEl4SMo3KNo)
 
-## ▶️ Demo Video
-
-[![Demo Video](https://img.youtube.com/vi/m070bAvrDHM/0.jpg)](https://www.youtube.com/watch?v=m070bAvrDHM)
-
 ## 🏗️ Architecture
 
 ![Aperture Architecture Overview](./docs/content/assets/gen/introduction/architecture_simple.mmd.svg)
