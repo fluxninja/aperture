@@ -101,12 +101,14 @@ const (
 	SignalNameLabel = "signal_name"
 	// FluxMeterNameLabel - specifying flux meter's name.
 	FluxMeterNameLabel = "flux_meter_name"
-	// AttributeFoundLabel - label for specifying if attribute was found.
-	AttributeFoundLabel = "attribute_found"
-	// AttributeFoundTrue - if attribute was found.
-	AttributeFoundTrue = "true"
-	// AttributeFoundFalse - if attribute was not found.
-	AttributeFoundFalse = "false"
+	// ValidLabel - label for specifying if metric is valid.
+	// In case of FluxMeter a metric may be invalid if attribute is not found in flow telemetry.
+	// In case of Signal metrics, a metric may be invalid if signal reading is invalid.
+	ValidLabel = "valid"
+	// ValidTrue - if attribute was found.
+	ValidTrue = "true"
+	// ValidFalse - if attribute was not found.
+	ValidFalse = "false"
 	// ClassifierIndexLabel - prometheus label specifying clasiffier index.
 	ClassifierIndexLabel = "classifier_index"
 	// StatusCodeLabel - http status code.

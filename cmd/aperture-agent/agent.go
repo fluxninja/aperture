@@ -18,15 +18,13 @@ import (
 	"github.com/fluxninja/aperture/pkg/discovery"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
-	"github.com/fluxninja/aperture/pkg/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/platform"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
@@ -46,13 +44,11 @@ func main() {
 			agent.AddAgentInfoAttribute,
 		),
 		entitycache.Module(),
-		flowcontrol.Module,
 		distcache.Module(),
-		dataplane.PolicyModule(),
+		flowcontrol.Module(),
 		otelcollector.Module(),
 		agent.ModuleForAgentOTEL(),
 		discovery.Module(),
-		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 	)
 
 	if err := app.Err(); err != nil {

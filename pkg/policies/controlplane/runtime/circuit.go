@@ -33,7 +33,7 @@ type CircuitMetrics struct {
 var circuitMetrics = &CircuitMetrics{}
 
 func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.Lifecycle) {
-	circuitMetricsLabels := []string{metrics.SignalNameLabel, metrics.PolicyNameLabel}
+	circuitMetricsLabels := []string{metrics.SignalNameLabel, metrics.PolicyNameLabel, metrics.ValidLabel}
 	circuitMetrics.SignalSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name:       metrics.SignalReadingMetricName,
 		Help:       "The reading from a signal",
@@ -123,10 +123,12 @@ type signalToReading map[Signal]Reading
 
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
 type Circuit struct {
-	// Policy Read API
-	iface.Policy
 	// Execution lock is taken when circuit needs to execute
 	executionLock sync.Mutex
+	// Policy Read API
+	iface.Policy
+	// Status registry to track signal values
+	statusRegistry status.Registry
 	// Looped signals persistence across ticks
 	loopedSignals signalToReading
 	// Components
@@ -135,8 +137,6 @@ type Circuit struct {
 	tickEndCallbacks []TickEndCallback
 	// Tick start callbacks
 	tickStartCallbacks []TickStartCallback
-	// Status registry to track signal values
-	statusRegistry status.Registry
 }
 
 // Make sure Circuit complies with CircuitAPI interface.
@@ -188,16 +188,23 @@ func NewCircuitAndOptions(
 
 // Setup handle lifecycle of the inner metrics of Circuit.
 func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
-	circuitMetricsLabels := make(map[string]prometheus.Labels, 0)
+	var circuitMetricsLabels []prometheus.Labels
 
 	for _, component := range circuit.components {
 		for _, outPort := range component.OutPortToSignalsMap {
 			for _, signal := range outPort {
-				l := prometheus.Labels{
-					metrics.SignalNameLabel: signal.Name,
-					metrics.PolicyNameLabel: circuit.GetPolicyName(),
-				}
-				circuitMetricsLabels[signal.Name] = l
+				circuitMetricsLabels = append(circuitMetricsLabels,
+					prometheus.Labels{
+						metrics.SignalNameLabel: signal.Name,
+						metrics.PolicyNameLabel: circuit.GetPolicyName(),
+						metrics.ValidLabel:      metrics.ValidFalse,
+					},
+					prometheus.Labels{
+						metrics.SignalNameLabel: signal.Name,
+						metrics.PolicyNameLabel: circuit.GetPolicyName(),
+						metrics.ValidLabel:      metrics.ValidTrue,
+					},
+				)
 			}
 		}
 	}
@@ -205,10 +212,10 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var merr error
-			for signalName, labels := range circuitMetricsLabels {
+			for _, labels := range circuitMetricsLabels {
 				_, err := circuitMetrics.SignalSummaryVec.GetMetricWith(labels)
 				if err != nil {
-					err = errors.Wrapf(err, "failed to create metrics for %s", signalName)
+					err = errors.Wrapf(err, "failed to create metrics for %+v", labels)
 					merr = multierr.Append(merr, err)
 				}
 			}
@@ -216,10 +223,10 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 		},
 		OnStop: func(context.Context) error {
 			var merr error
-			for signalName, labels := range circuitMetricsLabels {
+			for _, labels := range circuitMetricsLabels {
 				deleted := circuitMetrics.SignalSummaryVec.Delete(labels)
 				if !deleted {
-					err := fmt.Errorf("failed to delete metrics for %s", signalName)
+					err := fmt.Errorf("failed to delete metrics for %+v", labels)
 					merr = multierr.Append(merr, err)
 				}
 			}
@@ -266,13 +273,17 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				metrics.SignalNameLabel: signal.Name,
 				metrics.PolicyNameLabel: circuit.Policy.GetPolicyName(),
 			}
-			signalSummaryVecMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to initialize SummaryVec")
-			}
 			if reading.Valid() {
-				signalSummaryVecMetric.Observe(reading.Value())
+				circuitMetricsLabels[metrics.ValidLabel] = metrics.ValidTrue
+			} else {
+				circuitMetricsLabels[metrics.ValidLabel] = metrics.ValidFalse
 			}
+			signalSummaryMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
+			if err != nil {
+				logger.Error().Err(err).Msg("Failed to get signal metric")
+				panic(err)
+			}
+			signalSummaryMetric.Observe(reading.Value())
 		}
 		signalStatus := status.NewStatus(signalInfo, nil)
 		reg.SetStatus(signalStatus)

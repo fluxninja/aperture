@@ -2,8 +2,10 @@ package com.fluxninja.aperture.armeria;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.Flow;
 import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
+import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
@@ -11,7 +13,7 @@ import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 
-import java.util.Map;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -33,13 +35,17 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
 
     @Override
     public HttpResponse execute(ClientRequestContext ctx, HttpRequest req) throws Exception {
-        Map<String, String> labels = HttpUtils.labelsFromRequest(req);
-        Flow flow = this.apertureSDK.startFlow("", labels);
+        AttributeContext attributes = HttpUtils.attributesFromRequest(req);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(attributes);
 
         if (flow.accepted()) {
             HttpResponse res;
             try {
-                res = unwrap().execute(ctx, req);
+                List<HeaderValueOption> newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                HttpRequest newRequest = HttpUtils.updateHeaders(req, newHeaders);
+                ctx.updateRequest(newRequest);
+
+                res = unwrap().execute(ctx, newRequest);
                 flow.end(FlowStatus.OK);
             } catch (ApertureSDKException e) {
                 // ending flow failed

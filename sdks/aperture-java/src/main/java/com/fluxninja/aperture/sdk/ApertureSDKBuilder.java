@@ -1,6 +1,7 @@
 package com.fluxninja.aperture.sdk;
 
-import com.fluxninja.aperture.flowcontrol.v1.FlowControlServiceGrpc;
+import com.fluxninja.generated.aperture.flowcontrol.v1.FlowControlServiceGrpc;
+import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.opentelemetry.api.trace.Tracer;
@@ -65,6 +66,7 @@ public final class ApertureSDKBuilder {
 
     ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
     FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient = FlowControlServiceGrpc.newBlockingStub(channel);
+    AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient = AuthorizationGrpc.newBlockingStub(channel);
 
     OtlpGrpcSpanExporter spanExporter = OtlpGrpcSpanExporter.builder()
             .setEndpoint(String.format("%s://%s:%d", protocol, host, port))
@@ -76,6 +78,7 @@ public final class ApertureSDKBuilder {
 
     return new ApertureSDK(
             flowControlClient,
+            envoyAuthzClient,
             tracer,
             timeout);
   }

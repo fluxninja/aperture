@@ -11,8 +11,8 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -36,7 +36,8 @@ func NewConcurrencyLimiterOptions(
 		return fx.Options(), "", errors.New("concurrencyLimiter.Selector is nil")
 	}
 	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
-	etcdPath := path.Join(common.ConcurrencyLimiterConfigPath, common.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentStackIndex)))
+	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath,
+		paths.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentStackIndex)))
 	configSync := &concurrencyLimiterConfigSync{
 		concurrencyLimiterProto: concurrencyLimiterProto,
 		policyBaseAPI:           policyReadAPI,

@@ -14,7 +14,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/rs/zerolog"
 )
 
@@ -252,9 +252,9 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 
 	// Add attribute found label to the flux meter metric
 	if found {
-		labels[metrics.AttributeFoundLabel] = metrics.AttributeFoundTrue
+		labels[metrics.ValidLabel] = metrics.ValidTrue
 	} else {
-		labels[metrics.AttributeFoundLabel] = metrics.AttributeFoundFalse
+		labels[metrics.ValidLabel] = metrics.ValidFalse
 	}
 	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
 	if fluxMeterHistogram != nil {

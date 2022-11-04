@@ -313,9 +313,9 @@ Additionally, `agent-group` field can be configured using the annotation like:
 ## Uninstall
 
 You can uninstall the Aperture Agent and it's components by uninstalling the
-charts installed above:
+chart installed above:
 
-1. Delete th Aperture Agent chart:
+1. Delete the Aperture Agent chart:
 
    ```bash
    helm uninstall agent

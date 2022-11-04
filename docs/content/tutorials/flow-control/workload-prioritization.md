@@ -101,3 +101,10 @@ requests than `guest` users.
 ![Workload Prioritization](./assets/workload-prioritization/workload-prioritization-playground.png)
 
 </Zoom>
+
+### Demo Video
+
+The below demo video shows the basic concurrency limiter and workload
+prioritization policy in action within Aperture Playground.
+
+[![Demo Video](https://img.youtube.com/vi/m070bAvrDHM/0.jpg)](https://www.youtube.com/watch?v=m070bAvrDHM)

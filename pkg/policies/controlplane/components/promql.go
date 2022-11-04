@@ -21,7 +21,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/prometheus"
@@ -45,7 +44,7 @@ func PromQLModule() fx.Option {
 			provideFxOptionsFunc,
 
 			fx.ParamTags(config.NameTag(promQLJobGroupTag)),
-			fx.ResultTags(common.FxOptionsFuncTag),
+			fx.ResultTags(iface.FxOptionsFuncTag),
 		)),
 	)
 }

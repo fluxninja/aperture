@@ -8,7 +8,7 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/resources/classifier/compiler"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
 	"go.uber.org/fx"
