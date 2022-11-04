@@ -166,8 +166,6 @@ func serverInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySer
 	log.Info().Str("method", info.FullMethod).Dur("latency", time.Since(start)).Msg("Request served")
 	if err != nil {
 		log.Error().Err(err).Msg("Handler returned error")
-	}
-	if err != nil {
 		failed = true
 	}
 	return h, err
