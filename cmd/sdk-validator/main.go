@@ -110,8 +110,9 @@ func main() {
 		l := log.With().Int("total requests", *requests).Int64("expected rejections", 0).Int("got rejections", rejected).Logger()
 		if rejected != 0 {
 			l.Error().Msg("Fail-open validation failed")
+		} else {
+			l.Info().Msg("Fail-open validation successful")
 		}
-		l.Info().Msg("Fail-open validation successful")
 
 		if *sdkDockerImage != "" {
 			log.Info().Interface("id", id).Msg("Stopping Docker container")
@@ -273,7 +274,7 @@ func startTraffic(url string, requests int) int {
 			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to make http request")
 		}
 		res.Body.Close()
-		if res.StatusCode != http.StatusAccepted {
+		if (res.StatusCode > 400 && res.StatusCode < 500) || (res.StatusCode > 500 && res.StatusCode < 600) {
 			rejected += 1
 		}
 	}
