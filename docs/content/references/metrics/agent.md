@@ -18,9 +18,9 @@ sidebar_label: Agent
 | ---------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | flux_meter_name  | service1-demo-app                              | Name of the FluxMeter                                                                                         |
 | decision_type    | DECISION_TYPE_ACCEPTED, DECISION_TYPE_REJECTED | Whether the flow was accepted or not                                                                          |
-| response_status  | Error, OK                                      | A common label to denote OK or Error across all protocols                                                     |
+| response_status  | OK, Error                                      | A common label to denote OK or Error across all protocols                                                     |
 | http_status_code | 200, 503                                       | HTTP status code                                                                                              |
-| feature_status   |                                                | Feature status                                                                                                |
+| feature_status   | OK, Error                                      | Feature status                                                                                                |
 | valid            | true, false                                    | Label for specifying if metric is valid. A metric may be invalid if attribute is not found in flow telemetry. |
 
 ## ConcurrencyLimiter
