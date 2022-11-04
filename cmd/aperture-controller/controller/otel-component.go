@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
@@ -32,7 +34,9 @@ func ModuleForControllerOTEL() fx.Option {
 }
 
 // ControllerOTELComponents constructs OTEL Collector Factories for Controller.
-func ControllerOTELComponents() (component.Factories, error) {
+func ControllerOTELComponents(
+	alerter alerts.Alerter,
+) (component.Factories, error) {
 	var errs error
 
 	extensions, err := component.MakeExtensionFactoryMap(
@@ -45,6 +49,7 @@ func ControllerOTELComponents() (component.Factories, error) {
 
 	receivers, err := component.MakeReceiverFactoryMap(
 		prometheusreceiver.NewFactory(),
+		alertsreceiver.NewFactory(alerter),
 	)
 	errs = multierr.Append(errs, err)
 
@@ -73,5 +78,7 @@ func ControllerOTELComponents() (component.Factories, error) {
 
 func provideController(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
 	otelcollector.AddControllerMetricsPipeline(cfg)
+	cfg.Config.AddExporter(otelcollector.ExporterLogging, nil)
+	otelcollector.AddAlertsPipeline(cfg)
 	return cfg.Config
 }

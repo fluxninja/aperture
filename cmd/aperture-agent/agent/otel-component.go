@@ -25,8 +25,10 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/grpc"
 
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
@@ -55,6 +57,7 @@ func AgentOTELComponents(
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
 	serverGRPC *grpc.Server,
+	alerter alerts.Alerter,
 ) (component.Factories, error) {
 	var errs error
 
@@ -80,6 +83,7 @@ func AgentOTELComponents(
 		otlpreceiver.NewFactory(tsw, msw, lsw),
 		prometheusreceiver.NewFactory(),
 		filelogreceiver.NewFactory(),
+		alertsreceiver.NewFactory(alerter),
 	)
 	errs = multierr.Append(errs, err)
 
@@ -117,6 +121,7 @@ func provideAgent(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
 	addLogsPipeline(cfg)
 	addTracesPipeline(cfg)
 	otelcollector.AddMetricsPipeline(cfg)
+	otelcollector.AddAlertsPipeline(cfg)
 	return cfg.Config
 }
 

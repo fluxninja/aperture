@@ -126,6 +126,8 @@ const (
 	ReceiverOTLP = "otlp"
 	// ReceiverPrometheus collects metrics from environment and services.
 	ReceiverPrometheus = "prometheus"
+	// ReceiverAlerts collects alerts from alerter.
+	ReceiverAlerts = "alerts"
 
 	// ProcessorEnrichment enriches metrics with discovery data.
 	ProcessorEnrichment = "enrichment"
@@ -138,6 +140,9 @@ const (
 	// ProcessorBatchPostrollup batches data after rolling up, as roll up process
 	// shrinks number of data points significantly.
 	ProcessorBatchPostrollup = "batch/postrollup"
+	// ProcessorBatchAlerts batches alerts before passing them to exporters.
+	// This reduces number of calls to the Alertmanager.
+	ProcessorBatchAlerts = "batch/alerts"
 	// ProcessorRollup rolls up data to decrease cardinality.
 	ProcessorRollup = "rollup"
 	// ProcessorAgentGroup adds `agent_group` attribute.
