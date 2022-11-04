@@ -104,6 +104,8 @@ require (
 	github.com/prometheus/prometheus v0.39.1 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.11.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.11.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.11.1 // indirect
 	golang.org/x/tools v0.2.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
 	gonum.org/v1/gonum v0.12.0 // indirect
@@ -256,6 +258,7 @@ require (
 	go.opentelemetry.io/collector/semconv v0.63.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.36.4 // indirect
 	go.opentelemetry.io/contrib/zpages v0.36.4 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.11.1
 	go.opentelemetry.io/otel/exporters/prometheus v0.33.0 // indirect
 	go.opentelemetry.io/otel/metric v0.33.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.11.1 // indirect

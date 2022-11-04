@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	checkv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	gomock "github.com/golang/mock/gomock"
@@ -81,10 +81,10 @@ func (mr *MockLimiterMockRecorder) GetSelector() *gomock.Call {
 }
 
 // RunLimiter mocks base method.
-func (m *MockLimiter) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (m *MockLimiter) RunLimiter(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels)
-	ret0, _ := ret[0].(*flowcontrolv1.LimiterDecision)
+	ret0, _ := ret[0].(*checkv1.LimiterDecision)
 	return ret0
 }
 
@@ -174,10 +174,10 @@ func (mr *MockRateLimiterMockRecorder) GetSelector() *gomock.Call {
 }
 
 // RunLimiter mocks base method.
-func (m *MockRateLimiter) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (m *MockRateLimiter) RunLimiter(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels)
-	ret0, _ := ret[0].(*flowcontrolv1.LimiterDecision)
+	ret0, _ := ret[0].(*checkv1.LimiterDecision)
 	return ret0
 }
 
@@ -298,10 +298,10 @@ func (mr *MockConcurrencyLimiterMockRecorder) GetSelector() *gomock.Call {
 }
 
 // RunLimiter mocks base method.
-func (m *MockConcurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (m *MockConcurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels)
-	ret0, _ := ret[0].(*flowcontrolv1.LimiterDecision)
+	ret0, _ := ret[0].(*checkv1.LimiterDecision)
 	return ret0
 }
 
