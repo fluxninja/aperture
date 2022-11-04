@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fluxninja/datasketches-go/sketches"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/datasketches-go/sketches"
 )
 
 var rollupTypes = []RollupType{
