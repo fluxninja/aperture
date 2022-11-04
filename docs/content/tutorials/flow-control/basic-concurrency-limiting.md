@@ -122,3 +122,10 @@ the latency within the tolerance limit (`1.1`) configured in the circuit.
 ![Basic Concurrency Limiting](./assets/basic-concurrency-limiting/basic-concurrency-limiting-playground.png)
 
 </Zoom>
+
+### Demo Video
+
+The below demo video shows the basic concurrency limiter and workload
+prioritization policy in action within Aperture Playground.
+
+[![Demo Video](https://img.youtube.com/vi/m070bAvrDHM/0.jpg)](https://www.youtube.com/watch?v=m070bAvrDHM)
