@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/go-openapi/strfmt"
+	"github.com/prometheus/alertmanager/api/v2/models"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
@@ -12,12 +14,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
-// Alert TODO as we will switch to prom client struct anyway.
+// Alert is a wrapper around models.PostableAlert with handy transform methods.
 type Alert struct {
-	StartsAt     string            `json:"startsAt"`
-	Annotations  map[string]string `json:"annotations"`
-	Labels       map[string]string `json:"labels"`
-	GeneratorURL string            `json:"generatorURL"`
+	models.PostableAlert
 }
 
 // AlertsFromLogs gets slice of alerts from OTEL Logs.
@@ -28,20 +27,27 @@ func AlertsFromLogs(ld plog.Logs) []*Alert {
 	err := otelcollector.IterateLogRecords(ld, func(lr plog.LogRecord) error {
 		a := &Alert{}
 		attributes := lr.Attributes()
-		startsAt, exists := attributes.Get(otelcollector.AlertStartsAtLabel)
+		rawStartsAt, exists := attributes.Get(otelcollector.AlertStartsAtLabel)
 		if !exists {
 			log.Sample(zerolog.Sometimes).Trace().
 				Str("key", otelcollector.AlertStartsAtLabel).Msg("Key not found")
 			return nil
 		}
-		a.StartsAt = startsAt.AsString()
+		startsAt, err := strfmt.ParseDateTime(rawStartsAt.AsString())
+		if err != nil {
+			log.Sample(zerolog.Sometimes).Trace().
+				Str("key", otelcollector.AlertStartsAtLabel).
+				Str("value", rawStartsAt.AsString()).
+				Msg("Invalid startsAt")
+		}
+		a.StartsAt = startsAt
 		generatorURL, exists := attributes.Get(otelcollector.AlertGeneratorURLLabel)
 		if !exists {
 			log.Sample(zerolog.Sometimes).Trace().
 				Str("key", otelcollector.AlertGeneratorURLLabel).Msg("Key not found")
 			return nil
 		}
-		a.GeneratorURL = generatorURL.AsString()
+		a.GeneratorURL = strfmt.URI(generatorURL.AsString())
 		annotations := map[string]string{}
 		labels := map[string]string{}
 		attributes.Range(func(k string, v pcommon.Value) bool {
@@ -75,8 +81,8 @@ func (a *Alert) AsLogs() plog.Logs {
 		ScopeLogs().AppendEmpty().
 		LogRecords().AppendEmpty()
 	attributes := logRecord.Attributes()
-	attributes.PutStr(otelcollector.AlertStartsAtLabel, a.StartsAt)
-	attributes.PutStr(otelcollector.AlertGeneratorURLLabel, a.GeneratorURL)
+	attributes.PutStr(otelcollector.AlertStartsAtLabel, a.StartsAt.String())
+	attributes.PutStr(otelcollector.AlertGeneratorURLLabel, string(a.GeneratorURL))
 	populateMapWithPrefix(attributes, a.Labels, otelcollector.AlertLabelsLabelPrefix)
 	populateMapWithPrefix(attributes, a.Annotations, otelcollector.AlertAnnotationsLabelPrefix)
 	return ld

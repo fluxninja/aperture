@@ -3,8 +3,10 @@ package alerts_test
 import (
 	"fmt"
 
+	"github.com/go-openapi/strfmt"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/prometheus/alertmanager/api/v2/models"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 
@@ -20,8 +22,8 @@ var _ = Describe("Alert", func() {
 			Expect(ld.LogRecordCount()).To(Equal(1))
 			otelcollector.IterateLogRecords(ld, func(lr plog.LogRecord) error {
 				attributes := lr.Attributes()
-				expectKeyWithValue(attributes, otelcollector.AlertStartsAtLabel, alert.StartsAt)
-				expectKeyWithValue(attributes, otelcollector.AlertGeneratorURLLabel, alert.GeneratorURL)
+				expectKeyWithValue(attributes, otelcollector.AlertStartsAtLabel, alert.StartsAt.String())
+				expectKeyWithValue(attributes, otelcollector.AlertGeneratorURLLabel, string(alert.GeneratorURL))
 				for k, v := range alert.Annotations {
 					expectKeyWithValue(attributes, otelcollector.AlertAnnotationsLabelPrefix+k, v)
 				}
@@ -55,16 +57,22 @@ func exampleAlert(index ...int) *alerts.Alert {
 		index = []int{0}
 	}
 	idx := index[0]
+	startsAt, err := strfmt.ParseDateTime(fmt.Sprintf("2022-10-26T07:44:14.10%vZ", idx))
+	Expect(err).NotTo(HaveOccurred())
 	return &alerts.Alert{
-		StartsAt:     fmt.Sprintf("2022-10-26T07:44:14.10%vZ", idx),
-		GeneratorURL: fmt.Sprintf("https://www.example.org/alertSource%v", idx),
-		Annotations: map[string]string{
-			"one": fmt.Sprintf("eleven%v", idx),
-			"two": fmt.Sprintf("twelve%v", idx),
-		},
-		Labels: map[string]string{
-			"foo":  fmt.Sprintf("bar%v", idx),
-			"fizz": fmt.Sprintf("buzz%v", idx),
+		models.PostableAlert{
+			StartsAt: startsAt,
+			Annotations: map[string]string{
+				"one": fmt.Sprintf("eleven%v", idx),
+				"two": fmt.Sprintf("twelve%v", idx),
+			},
+			Alert: models.Alert{
+				GeneratorURL: strfmt.URI(fmt.Sprintf("https://www.example.org/alertSource%v", idx)),
+				Labels: map[string]string{
+					"foo":  fmt.Sprintf("bar%v", idx),
+					"fizz": fmt.Sprintf("buzz%v", idx),
+				},
+			},
 		},
 	}
 }
@@ -79,8 +87,8 @@ func exampleLogs() plog.Logs {
 		alert := exampleAlert(i)
 		lr := logRecords.AppendEmpty()
 		attributes := lr.Attributes()
-		attributes.PutStr(otelcollector.AlertStartsAtLabel, alert.StartsAt)
-		attributes.PutStr(otelcollector.AlertGeneratorURLLabel, alert.GeneratorURL)
+		attributes.PutStr(otelcollector.AlertStartsAtLabel, alert.StartsAt.String())
+		attributes.PutStr(otelcollector.AlertGeneratorURLLabel, string(alert.GeneratorURL))
 		for k, v := range alert.Annotations {
 			attributes.PutStr(otelcollector.AlertAnnotationsLabelPrefix+k, v)
 		}

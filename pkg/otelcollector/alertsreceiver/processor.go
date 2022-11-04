@@ -3,10 +3,11 @@ package alertsreceiver
 import (
 	"context"
 
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
+
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 type alertsReceiver struct {
