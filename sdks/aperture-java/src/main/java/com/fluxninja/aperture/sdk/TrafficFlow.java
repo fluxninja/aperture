@@ -36,19 +36,26 @@ public class TrafficFlow {
         }
         this.ended = true;
 
-        String checkResponseJSONBytes = "";
+        String serializedFlowcontrolCheckResponse = "";
         if (this.checkResponse.hasDynamicMetadata()
                 && this.checkResponse.getDynamicMetadata().getFieldsMap().containsKey("aperture.check_response")) {
             Value featureResponse = this.checkResponse.getDynamicMetadata().getFieldsMap().get("aperture.check_response");
-            try {
-                checkResponseJSONBytes = JsonFormat.printer().print(featureResponse);
-            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-                throw new ApertureSDKException(e);
+            if (featureResponse.hasStringValue()) {
+                // If checkResponse comes pre-serialized from envoy, pass it
+                // through as-is.
+                serializedFlowcontrolCheckResponse = featureResponse.getStringValue();
+            } else {
+                // Otherwise, serialize it.
+                try {
+                    serializedFlowcontrolCheckResponse = JsonFormat.printer().print(featureResponse);
+                } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                    throw new ApertureSDKException(e);
+                }
             }
         }
 
         this.span.setAttribute(FEATURE_STATUS_LABEL, statusCode.name())
-                .setAttribute(CHECK_RESPONSE_LABEL, checkResponseJSONBytes)
+                .setAttribute(CHECK_RESPONSE_LABEL, serializedFlowcontrolCheckResponse)
                 .setAttribute(FLOW_STOP_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
         this.span.end();
