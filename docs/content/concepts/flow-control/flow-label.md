@@ -97,9 +97,9 @@ high-cardinality label is detected, some of its values may be replaced with
 
 #### Default labels
 
-These are protocol-level labels (e.g. http, network) extracted by the
-configurated service mesh/middleware and are available to be referenced in
-[Selectors][selector], execept for a few high-cardinality ones.
+These are protocol-level labels (e.g. http, network) extracted by the configured
+service mesh/middleware and are available to be referenced in
+[Selectors][selector], except for a few high-cardinality ones.
 
 #### Labels extracted from baggage
 
@@ -113,8 +113,8 @@ SDK][aperture-go].
 
 :::note
 
-In the case of a clash, the Flow Label generated from the source takes
-predendence over the source below it:
+In the case of a clash, the Flow Label will be applied in the following
+precedence over:
 
 1. User-defined
 2. Baggage
