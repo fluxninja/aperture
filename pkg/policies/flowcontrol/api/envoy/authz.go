@@ -2,6 +2,7 @@ package envoy
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"regexp"
@@ -18,8 +19,7 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -87,11 +87,20 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	start := time.Now()
 
 	createExtAuthzResponse := func(checkResponse *flowcontrolv1.CheckResponse) *ext_authz.CheckResponse {
-		marshalledCheckResponse, err := protoMessageAsPbValue(checkResponse)
+		// We don't care about the particular format we send the CheckResponse,
+		// Envoy can treat is as black-box. The only thing we care about is for
+		// it to be deserializable by logs processing pipeline.
+		// Using protobuf wire format as it's faster to serialize/deserialize
+		// than using protojson or roundtripping through structpb.Struct.
+		// Additional base64 encoding step is used, as there's no way to push
+		// binary data through dynamic metadata and envoy's access log
+		// formatter. Overhead of this base64 encoding is small though.
+		marshalledCheckResponse, err := proto.Marshal(checkResponse)
 		if err != nil {
 			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to marshal check response")
 			return nil
 		}
+		checkResponseBase64 := base64.StdEncoding.EncodeToString(marshalledCheckResponse)
 
 		// record the end time of the request
 		end := time.Now()
@@ -101,7 +110,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		return &ext_authz.CheckResponse{
 			DynamicMetadata: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
-					otelcollector.ApertureCheckResponseLabel: marshalledCheckResponse,
+					otelcollector.ApertureCheckResponseLabel: structpb.NewStringValue(checkResponseBase64),
 				},
 			},
 		}
@@ -257,28 +266,6 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	}
 
 	return resp, nil
-}
-
-// Functions below transform our classes/proto to structpb.Value required to be sent
-// via DynamicMetadata
-// "The External Authorization filter supports emitting dynamic metadata as an opaque google.protobuf.Struct."
-// from envoy documentation
-
-func protoMessageAsPbValue(message protoreflect.ProtoMessage) (*structpb.Value, error) {
-	mBytes, err := protojson.Marshal(message)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to marshal proto message into JSON")
-		return nil, err
-
-	}
-	mStruct := new(structpb.Struct)
-	err = protojson.Unmarshal(mBytes, mStruct)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to unmarshal JSON bytes into structpb.Struct")
-		return nil, err
-	}
-
-	return structpb.NewStructValue(mStruct), nil
 }
 
 // merges two flow labels maps.
