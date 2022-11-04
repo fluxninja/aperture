@@ -153,4 +153,15 @@ const (
 	// ExporterOTLPLoopback exports OTLP data to local OTLP receiver. To be used only
 	// with ProcessorSpanToLog.
 	ExporterOTLPLoopback = "otlp/loopback"
+
+	/* Specific to alerts pipeline. */
+
+	// AlertStartsAtLabel describes the time at which the alert started.
+	AlertStartsAtLabel = "startsAt"
+	// AlertGeneratorURLLabel describes.
+	AlertGeneratorURLLabel = "generatorURL"
+	// AlertLabelsLabelPrefix is a prefix attached to label key when alert is flattened.
+	AlertLabelsLabelPrefix = "labels."
+	// AlertAnnotationsLabelPrefix is a prefix attached to label key when alert is flattened.
+	AlertAnnotationsLabelPrefix = "annotations."
 )
