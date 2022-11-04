@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/exp/maps"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/panichandler"
@@ -126,7 +126,9 @@ func (e *Engine) ProcessRequest(
 	return
 }
 
-func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string) ([]*flowcontrolv1.LimiterDecision, flowcontrolv1.CheckResponse_DecisionType) {
+func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string) ([]*flowcontrolv1.LimiterDecision,
+	flowcontrolv1.CheckResponse_DecisionType,
+) {
 	var wg sync.WaitGroup
 	var once sync.Once
 	decisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))

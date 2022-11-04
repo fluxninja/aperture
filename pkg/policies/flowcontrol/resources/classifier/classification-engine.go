@@ -11,7 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
@@ -37,12 +37,12 @@ type rules struct {
 type ClassificationEngine struct {
 	mu                 sync.Mutex
 	activeRules        atomic.Value
+	classifierMapMutex sync.RWMutex
 	registry           status.Registry
 	activeRulesets     map[rulesetID]compiler.CompiledRuleset
-	nextRulesetID      rulesetID
-	classifierMapMutex sync.RWMutex
 	classifierMap      map[iface.ClassifierID]iface.Classifier
 	counterVec         *prometheus.CounterVec
+	nextRulesetID      rulesetID
 }
 
 type rulesetID = uint64

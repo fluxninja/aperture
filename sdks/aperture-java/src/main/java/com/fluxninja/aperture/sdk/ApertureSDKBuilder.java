@@ -1,6 +1,6 @@
 package com.fluxninja.aperture.sdk;
 
-import com.fluxninja.generated.aperture.flowcontrol.v1.FlowControlServiceGrpc;
+import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -21,7 +21,8 @@ public final class ApertureSDKBuilder {
   private int port;
   private boolean useHttps = false;
 
-  ApertureSDKBuilder() {}
+  ApertureSDKBuilder() {
+  }
 
   public ApertureSDKBuilder setHost(String host) {
     this.host = host;
@@ -55,7 +56,7 @@ public final class ApertureSDKBuilder {
     }
 
     String protocol = "http";
-    if(this.useHttps) {
+    if (this.useHttps) {
       protocol = "https";
     }
 
@@ -65,21 +66,22 @@ public final class ApertureSDKBuilder {
     }
 
     ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
-    FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient = FlowControlServiceGrpc.newBlockingStub(channel);
+    FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient = FlowControlServiceGrpc
+        .newBlockingStub(channel);
     AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient = AuthorizationGrpc.newBlockingStub(channel);
 
     OtlpGrpcSpanExporter spanExporter = OtlpGrpcSpanExporter.builder()
-            .setEndpoint(String.format("%s://%s:%d", protocol, host, port))
-            .build();
+        .setEndpoint(String.format("%s://%s:%d", protocol, host, port))
+        .build();
     SdkTracerProvider traceProvider = SdkTracerProvider.builder()
-            .addSpanProcessor(SimpleSpanProcessor.create(spanExporter))
-            .build();
+        .addSpanProcessor(SimpleSpanProcessor.create(spanExporter))
+        .build();
     Tracer tracer = traceProvider.tracerBuilder(LIBRARY_NAME).build();
 
     return new ApertureSDK(
-            flowControlClient,
-            envoyAuthzClient,
-            tracer,
-            timeout);
+        flowControlClient,
+        envoyAuthzClient,
+        tracer,
+        timeout);
   }
 }
