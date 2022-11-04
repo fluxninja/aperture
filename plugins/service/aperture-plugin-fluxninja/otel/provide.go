@@ -25,9 +25,10 @@ import (
 const (
 	receiverPrometheus = "prometheus/fluxninja"
 
-	processorBatchMetricsSlow = "batch/metrics-slow"
-	processorRollup           = "rollup"
-	processorAttributes       = "attributes/fluxninja"
+	processorBatchMetricsSlow   = "batch/metrics-slow"
+	processorRollup             = "rollup"
+	processorAttributes         = "attributes/fluxninja"
+	processorResourceAttributes = "transform/fluxninja"
 
 	exporterFluxninja = "otlp/fluxninja"
 )
@@ -67,6 +68,7 @@ func provideOtelConfig(baseConfig *otelcollector.OTELConfig,
 			controllerID := heartbeats.ControllerInfo.Id
 
 			addAttributesProcessor(config, controllerID)
+			addResourceAttributesProcessor(config, controllerID)
 
 			if logsPipeline, exists := baseConfig.Service.Pipeline("logs"); exists {
 				addFNToPipeline("logs", config, logsPipeline)
@@ -102,6 +104,16 @@ func addAttributesProcessor(config *otelcollector.OTELConfig, controllerID strin
 	})
 }
 
+func addResourceAttributesProcessor(config *otelcollector.OTELConfig, controllerID string) {
+	config.AddProcessor(processorResourceAttributes, map[string]interface{}{
+		"logs": map[string]interface{}{
+			"statements": []string{
+				fmt.Sprintf(`set(resource.attributes["%v"], "%v")`, "controller_id", controllerID),
+			},
+		},
+	})
+}
+
 func addFNToPipeline(
 	name string,
 	config *otelcollector.OTELConfig,
@@ -120,7 +132,11 @@ func addMetricsSlowPipeline(baseConfig, config *otelcollector.OTELConfig) {
 		Processors: []string{
 			otelcollector.ProcessorEnrichment,
 			processorBatchMetricsSlow,
+			// TODO this duplication of `controller_id` insertion should be cleaned up
+			// when telemetry logs pipeline is update to follow the same rules as alerts
+			// pipeline.
 			processorAttributes,
+			processorResourceAttributes,
 		},
 		Exporters: []string{exporterFluxninja},
 	})

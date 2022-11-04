@@ -1,8 +1,7 @@
 package alerts
 
 import (
-	"fmt"
-	"strings"
+	"time"
 
 	"github.com/go-openapi/strfmt"
 	"github.com/prometheus/alertmanager/api/v2/models"
@@ -14,9 +13,36 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
+// specialLabels are alert labels which are propagated in dedicated fields in OTEL logs.
+var specialLabels = map[string]struct{}{
+	otelcollector.AlertNameLabel:         {},
+	otelcollector.AlertSeverityLabel:     {},
+	otelcollector.AlertGeneratorURLLabel: {},
+}
+
 // Alert is a wrapper around models.PostableAlert with handy transform methods.
 type Alert struct {
 	models.PostableAlert
+}
+
+// Name gets the alert name from labels. Returns empty string if label not found.
+func (a *Alert) Name() string {
+	return a.Labels[otelcollector.AlertNameLabel]
+}
+
+// SetName sets the alert name in labels. Overwrites previous value if exists.
+func (a *Alert) SetName(name string) {
+	a.Labels[otelcollector.AlertNameLabel] = name
+}
+
+// Severity gets the alert severity from labels. Returns empty string if label not found.
+func (a *Alert) Severity() string {
+	return a.Labels[otelcollector.AlertSeverityLabel]
+}
+
+// SetSeverity sets the alert severity in labels. Overwrites previous value if exists.
+func (a *Alert) SetSeverity(severity string) {
+	a.Labels[otelcollector.AlertSeverityLabel] = severity
 }
 
 // AlertsFromLogs gets slice of alerts from OTEL Logs.
@@ -24,51 +50,33 @@ func AlertsFromLogs(ld plog.Logs) []*Alert {
 	// We can't preallocate size, as we don't know how many of those log records
 	// has incorrect data and will be dropped.
 	alerts := []*Alert{}
-	err := otelcollector.IterateLogRecords(ld, func(lr plog.LogRecord) error {
-		a := &Alert{}
-		attributes := lr.Attributes()
-		rawStartsAt, exists := attributes.Get(otelcollector.AlertStartsAtLabel)
-		if !exists {
-			log.Sample(zerolog.Sometimes).Trace().
-				Str("key", otelcollector.AlertStartsAtLabel).Msg("Key not found")
-			return nil
-		}
-		startsAt, err := strfmt.ParseDateTime(rawStartsAt.AsString())
-		if err != nil {
-			log.Sample(zerolog.Sometimes).Trace().
-				Str("key", otelcollector.AlertStartsAtLabel).
-				Str("value", rawStartsAt.AsString()).
-				Msg("Invalid startsAt")
-		}
-		a.StartsAt = startsAt
-		generatorURL, exists := attributes.Get(otelcollector.AlertGeneratorURLLabel)
+	resourceLogsSlice := ld.ResourceLogs()
+	for resourceLogsIt := 0; resourceLogsIt < resourceLogsSlice.Len(); resourceLogsIt++ {
+		resourceLogs := resourceLogsSlice.At(resourceLogsIt)
+		resourceAttributes := resourceLogs.Resource().Attributes()
+		generatorURL, exists := resourceAttributes.Get(otelcollector.AlertGeneratorURLLabel)
 		if !exists {
 			log.Sample(zerolog.Sometimes).Trace().
 				Str("key", otelcollector.AlertGeneratorURLLabel).Msg("Key not found")
 			return nil
 		}
-		a.GeneratorURL = strfmt.URI(generatorURL.AsString())
-		annotations := map[string]string{}
-		labels := map[string]string{}
-		attributes.Range(func(k string, v pcommon.Value) bool {
-			if strings.HasPrefix(k, otelcollector.AlertAnnotationsLabelPrefix) {
-				trimmed := strings.TrimPrefix(k, otelcollector.AlertAnnotationsLabelPrefix)
-				annotations[trimmed] = v.AsString()
+		scopeLogsSlice := resourceLogs.ScopeLogs()
+		for scopeLogsIt := 0; scopeLogsIt < scopeLogsSlice.Len(); scopeLogsIt++ {
+			scopeLogs := scopeLogsSlice.At(scopeLogsIt)
+			logsSlice := scopeLogs.LogRecords()
+			for logsIt := 0; logsIt < logsSlice.Len(); logsIt++ {
+				logRecord := logsSlice.At(logsIt)
+				a := &Alert{}
+				a.StartsAt = strfmt.DateTime(logRecord.Timestamp().AsTime())
+				a.GeneratorURL = strfmt.URI(generatorURL.AsString())
+				a.Labels = models.LabelSet(mapFromAttributes(resourceAttributes, specialLabels))
+				a.SetSeverity(logRecord.SeverityText())
+				a.SetName(logRecord.Body().AsString())
+				attributes := logRecord.Attributes()
+				a.Annotations = models.LabelSet(mapFromAttributes(attributes, map[string]struct{}{}))
+				alerts = append(alerts, a)
 			}
-			if strings.HasPrefix(k, otelcollector.AlertLabelsLabelPrefix) {
-				trimmed := strings.TrimPrefix(k, otelcollector.AlertLabelsLabelPrefix)
-				labels[trimmed] = v.AsString()
-			}
-			return true
-		})
-		a.Annotations = annotations
-		a.Labels = labels
-		alerts = append(alerts, a)
-		return nil
-	})
-	if err != nil {
-		// This should not happen, as we don't return error anywhere in the IterateLogs func.
-		log.Sample(zerolog.Sometimes).Trace().Err(err).Msg("Getting alerts from logs")
+		}
 	}
 	return alerts
 }
@@ -76,20 +84,40 @@ func AlertsFromLogs(ld plog.Logs) []*Alert {
 // AsLogs returns alert as OTEL Logs.
 func (a *Alert) AsLogs() plog.Logs {
 	ld := plog.NewLogs()
-	logRecord := ld.
-		ResourceLogs().AppendEmpty().
-		ScopeLogs().AppendEmpty().
-		LogRecords().AppendEmpty()
+	resource := ld.ResourceLogs().AppendEmpty()
+	resourceAttributes := resource.Resource().Attributes()
+	// Labels in AM are used to identify identical instances of an alert. This corresponds
+	// with the resource notion in OTLP protocol, which describes the source of a log.
+	populateAttributesFromMap(resourceAttributes, a.Labels, specialLabels)
+	resourceAttributes.PutStr(otelcollector.AlertGeneratorURLLabel, string(a.GeneratorURL))
+
+	logRecord := resource.ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
+	logRecord.SetTimestamp(pcommon.NewTimestampFromTime(time.Time(a.StartsAt)))
+	logRecord.SetSeverityText(a.Severity())
+	pcommon.NewValueStr(a.Name()).CopyTo(logRecord.Body())
+
 	attributes := logRecord.Attributes()
-	attributes.PutStr(otelcollector.AlertStartsAtLabel, a.StartsAt.String())
-	attributes.PutStr(otelcollector.AlertGeneratorURLLabel, string(a.GeneratorURL))
-	populateMapWithPrefix(attributes, a.Labels, otelcollector.AlertLabelsLabelPrefix)
-	populateMapWithPrefix(attributes, a.Annotations, otelcollector.AlertAnnotationsLabelPrefix)
+	populateAttributesFromMap(attributes, a.Annotations, map[string]struct{}{})
 	return ld
 }
 
-func populateMapWithPrefix(attributes pcommon.Map, values map[string]string, prefix string) {
+func populateAttributesFromMap(attributes pcommon.Map, values map[string]string, ignore map[string]struct{}) {
 	for k, v := range values {
-		attributes.PutStr(fmt.Sprintf("%v%v", prefix, k), v)
+		if _, ok := ignore[k]; ok {
+			continue
+		}
+		attributes.PutStr(k, v)
 	}
+}
+
+func mapFromAttributes(attributes pcommon.Map, ignore map[string]struct{}) map[string]string {
+	result := map[string]string{}
+	attributes.Range(func(k string, v pcommon.Value) bool {
+		if _, exists := ignore[k]; exists {
+			return true
+		}
+		result[k] = v.AsString()
+		return true
+	})
+	return result
 }

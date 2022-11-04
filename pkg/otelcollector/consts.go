@@ -149,8 +149,8 @@ const (
 	ProcessorRollup = "rollup"
 	// ProcessorAgentGroup adds `agent_group` attribute.
 	ProcessorAgentGroup = "attributes/agent_group"
-	// ProcessorInstance adds `instance` attribute.
-	ProcessorInstance = "attributes/instance"
+	// ProcessorAgentResourceLabels adds `instance` and `agent_group` resource attributes.
+	ProcessorAgentResourceLabels = "transform/agent_resource_labels"
 	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured
 	// log exporter.
 	ProcessorTracesToLogs = "tracestologs"
@@ -165,12 +165,10 @@ const (
 
 	/* Specific to alerts pipeline. */
 
-	// AlertStartsAtLabel describes the time at which the alert started.
-	AlertStartsAtLabel = "startsAt"
 	// AlertGeneratorURLLabel describes.
-	AlertGeneratorURLLabel = "generatorURL"
-	// AlertLabelsLabelPrefix is a prefix attached to label key when alert is flattened.
-	AlertLabelsLabelPrefix = "labels."
-	// AlertAnnotationsLabelPrefix is a prefix attached to label key when alert is flattened.
-	AlertAnnotationsLabelPrefix = "annotations."
+	AlertGeneratorURLLabel = "generator_url"
+	// AlertNameLabel describes name of the alert.
+	AlertNameLabel = "alertname"
+	// AlertSeverityLabel also known as log level. Human readable string.
+	AlertSeverityLabel = "severity"
 )
