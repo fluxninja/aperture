@@ -33,4 +33,13 @@ func AddAgentInfoAttribute(in FxIn) {
 			},
 		},
 	})
+	in.BaseConfig.AddProcessor(otelcollector.ProcessorInstance, map[string]interface{}{
+		"actions": []map[string]interface{}{
+			{
+				"key":    otelcollector.InstanceLabel,
+				"action": "insert",
+				"value":  info.Hostname,
+			},
+		},
+	})
 }

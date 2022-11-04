@@ -119,6 +119,8 @@ const (
 
 	// AgentGroupLabel describes agent group to which metrics refer.
 	AgentGroupLabel = "agent_group"
+	// InstanceLabel describes agent group to which metrics refer.
+	InstanceLabel = "instance"
 
 	/* Specific to Agent and Controller OTEL collector factories. */
 
@@ -147,6 +149,8 @@ const (
 	ProcessorRollup = "rollup"
 	// ProcessorAgentGroup adds `agent_group` attribute.
 	ProcessorAgentGroup = "attributes/agent_group"
+	// ProcessorInstance adds `instance` attribute.
+	ProcessorInstance = "attributes/instance"
 	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured
 	// log exporter.
 	ProcessorTracesToLogs = "tracestologs"

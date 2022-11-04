@@ -121,7 +121,7 @@ func provideAgent(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
 	addLogsPipeline(cfg)
 	addTracesPipeline(cfg)
 	otelcollector.AddMetricsPipeline(cfg)
-	otelcollector.AddAlertsPipeline(cfg)
+	otelcollector.AddAlertsPipeline(cfg, otelcollector.AgentGroupLabel, otelcollector.ProcessorInstance)
 	return cfg.Config
 }
 

@@ -331,7 +331,7 @@ func AddControllerMetricsPipeline(cfg *OtelParams) {
 }
 
 // AddAlertsPipeline adds reusable alerts pipeline.
-func AddAlertsPipeline(cfg *OtelParams) {
+func AddAlertsPipeline(cfg *OtelParams, extraProcessors ...string) {
 	config := cfg.Config
 	config.AddReceiver(ReceiverAlerts, map[string]any{})
 	config.AddBatchProcessor(
@@ -340,9 +340,11 @@ func AddAlertsPipeline(cfg *OtelParams) {
 		cfg.BatchAlerts.SendBatchSize,
 		cfg.BatchAlerts.SendBatchMaxSize,
 	)
+	processors := []string{ProcessorBatchAlerts}
+	processors = append(processors, extraProcessors...)
 	config.Service.AddPipeline("logs/alerts", Pipeline{
 		Receivers:  []string{ReceiverAlerts},
-		Processors: []string{ProcessorBatchAlerts},
+		Processors: processors,
 		Exporters:  []string{ExporterLogging},
 	})
 }
