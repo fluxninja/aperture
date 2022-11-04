@@ -69,6 +69,10 @@ analyzing, and actuating, facilitated by agents and a controller.
 
 [![Build Indestructible Applications with Aperture Flow Control](https://img.youtube.com/vi/sEl4SMo3KNo/0.jpg)](https://www.youtube.com/watch?v=sEl4SMo3KNo)
 
+## ▶️ Demo Video
+
+[![Demo Video](https://img.youtube.com/vi/m070bAvrDHM/0.jpg)](https://www.youtube.com/watch?v=m070bAvrDHM)
+
 ## 🏗️ Architecture
 
 ![Aperture Architecture Overview](./docs/content/assets/gen/introduction/architecture_simple.mmd.svg)
@@ -77,7 +81,7 @@ analyzing, and actuating, facilitated by agents and a controller.
 
 ### 🎮 Playground
 
-To try aperture in a local Kubernetes environment, refer to
+To try Aperture in a local Kubernetes environment, refer to
 [Playground docs](https://docs.fluxninja.com/docs/get-started/playground/).
 
 ![Latency Gradient Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
