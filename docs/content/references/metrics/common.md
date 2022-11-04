@@ -24,11 +24,11 @@ for more information.
 
 ### Metrics
 
-| Name                            | Type      | Labels                                                                                | Unit            | Description                                     |
-| ------------------------------- | --------- | ------------------------------------------------------------------------------------- | --------------- | ----------------------------------------------- |
-| http_requests_total             | Counter   | agent_group, instance, job, process_uuid, handler_name, http_method, http_status_code | count (no unit) | Total number of requests received               |
-| http_errors_total               | Counter   | agent_group, instance, job, process_uuid, handler_name, http_method, http_status_code | count (no unit) | Total number of errors that occurred            |
-| http_requests_latency_ms_bucket | Histogram | agent_group, instance, job, process_uuid, handler_name, http_method, http_status_code | ms              | Latency of the requests processed by the server |
+| Name                     | Type      | Labels                                                                                | Unit            | Description                                     |
+| ------------------------ | --------- | ------------------------------------------------------------------------------------- | --------------- | ----------------------------------------------- |
+| http_requests_total      | Counter   | agent_group, instance, job, process_uuid, handler_name, http_method, http_status_code | count (no unit) | Total number of requests received               |
+| http_errors_total        | Counter   | agent_group, instance, job, process_uuid, handler_name, http_method, http_status_code | count (no unit) | Total number of errors that occurred            |
+| http_requests_latency_ms | Histogram | agent_group, instance, job, process_uuid, handler_name, http_method, http_status_code | ms              | Latency of the requests processed by the server |
 
 ### Labels
 
