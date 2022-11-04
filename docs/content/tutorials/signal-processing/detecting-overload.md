@@ -29,6 +29,17 @@ One of the most reliable metrics to detect overload state is latency of the
 service requests. In Aperture, latency of service requests can be easily
 reported using a [Flux Meter](/concepts/flow-control/flux-meter.md).
 
+:::tip
+
+It is recommended to apply the Flux Meter to a single type of workload in order
+to avoid mixing the latency measurements across distinct workloads. For example,
+if there are Select and Insert API calls on the same service, it is recommended
+to measure the latency of only one of those workloads using a Flux Meter. Refer
+[FlowSelector](/concepts/flow-control/selector.md#flowselector) on how to apply
+the Flux Meter Selector to a subset of API calls for a service.
+
+:::
+
 In this example, we will be computing exponential moving average (EMA) of
 latency, gathered periodically from a
 [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query on
