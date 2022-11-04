@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/rs/zerolog"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -15,7 +16,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	"github.com/rs/zerolog"
 )
 
 type metricsProcessor struct {
