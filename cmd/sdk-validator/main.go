@@ -64,6 +64,8 @@ func main() {
 		log.Info().Str("image", *sdkDockerImage).Str("id", id).Msg("Container started")
 	}
 
+	sdkURL := fmt.Sprintf("http://localhost:%s", *sdkPort)
+
 	// create listener for grpc server
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", *port))
 	if err != nil {
@@ -101,6 +103,16 @@ func main() {
 	go func() {
 		s := <-sigCh
 		log.Info().Interface("signal", s).Msg("Got signal, attempting graceful shutdown")
+		grpcServer.GracefulStop()
+
+		log.Info().Msg("Validating fail-open behavior")
+		rejected := startTraffic(sdkURL, *requests)
+		l := log.With().Int("total requests", *requests).Int64("expected rejections", 0).Int("got rejections", rejected).Logger()
+		if rejected != 0 {
+			l.Error().Msg("Fail-open validation failed")
+		}
+		l.Info().Msg("Fail-open validation successful")
+
 		if *sdkDockerImage != "" {
 			log.Info().Interface("id", id).Msg("Stopping Docker container")
 			err = stopDockerContainer(id)
@@ -108,14 +120,13 @@ func main() {
 				log.Fatal().Err(err).Msg("Failed to stop Docker container")
 			}
 		}
-		grpcServer.GracefulStop()
 		wg.Done()
 	}()
 
 	if *sdkDockerImage != "" {
 		wg.Add(1)
 		go func() {
-			rejected := confirmConnectedAndStartTraffic(*sdkPort, *requests)
+			rejected := confirmConnectedAndStartTraffic(sdkURL, *requests)
 			l := log.With().Int("total requests", *requests).Int64("expected rejections", *rejects).Int("got rejections", rejected).Logger()
 			if rejected != int(*rejects) {
 				l.Error().Msg("FlowControl validation failed")
@@ -229,10 +240,7 @@ func stopDockerContainer(id string) error {
 	return nil
 }
 
-func confirmConnectedAndStartTraffic(port string, requests int) int {
-	rejected := 0
-	url := fmt.Sprintf("http://localhost:%s", port)
-
+func confirmConnectedAndStartTraffic(url string, requests int) int {
 	for {
 		req, err := http.NewRequest(http.MethodGet, url+"/connected", nil)
 		if err != nil {
@@ -249,6 +257,12 @@ func confirmConnectedAndStartTraffic(port string, requests int) int {
 	}
 	log.Info().Msg("SDK example successfully connected to validator")
 
+	rejected := startTraffic(url, requests)
+	return rejected
+}
+
+func startTraffic(url string, requests int) int {
+	rejected := 0
 	superReq, err := http.NewRequest(http.MethodGet, url+"/super", nil)
 	if err != nil {
 		log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to create http request")
