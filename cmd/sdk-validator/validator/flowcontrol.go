@@ -9,16 +9,16 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"github.com/fluxninja/aperture/pkg/flowcontrol/common"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/base"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
 // FlowControlHandler implements FlowControlService.
 type FlowControlHandler struct {
 	flowcontrolv1.UnimplementedFlowControlServiceServer
 
-	CommonHandler common.HandlerWithValues
+	CommonHandler base.HandlerWithValues
 	Rejects       int64
 	Rejected      int64
 }
