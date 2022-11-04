@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/info/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	fswatcher "github.com/fluxninja/aperture/pkg/filesystem/watcher"
@@ -103,7 +104,10 @@ func (cfg Config) Module() fx.Option {
 	)
 
 	options := fx.Options(
-		fx.Provide(provideFlagSetBuilder),
+		fx.Provide(
+			provideFlagSetBuilder,
+			alerts.ProvideAlerter,
+		),
 		config.ModuleConfig{MergeConfig: cfg.MergeConfig, UnknownFlags: false, ExitOnHelp: true}.Module(),
 		config.LogModule(),
 		health.Module(),
