@@ -17,6 +17,8 @@ go-mod-tidy:
 	@echo Download go.mod dependencies
 	@go mod tidy
 	@cd tools/go && go mod tidy
+	@cd sdks/aperture-go && go mod tidy
+	@cd playground/demo_app && go mod tidy
 
 go-test:
 	@echo Running go tests
