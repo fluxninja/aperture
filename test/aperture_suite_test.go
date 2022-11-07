@@ -25,8 +25,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/test/harness"
@@ -142,7 +142,7 @@ var _ = BeforeSuite(func() {
 			),
 		),
 		classifier.Module(),
-		api.Module(),
+		service.Module(),
 		fx.Provide(
 			clockwork.NewRealClock,
 			agent.AgentOTELComponents,
