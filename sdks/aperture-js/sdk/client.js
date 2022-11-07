@@ -22,17 +22,17 @@ export class ApertureClient {
   constructor(timeout = 200) {
     this.fcsClient = new fcs.FlowControlService(URL, grpc.credentials.createInsecure());
 
-    let exporter = new OTLPTraceExporter({
+    this.exporter = new OTLPTraceExporter({
       url: URL,
       credentials: grpc.credentials.createInsecure(),
     });
     let res = this.#newResource();
-    let tracerProvider = new NodeTracerProvider({
+    this.tracerProvider = new NodeTracerProvider({
       resource: res,
     });
-    tracerProvider.addSpanProcessor(new BatchSpanProcessor(exporter));
-    tracerProvider.register();
-    this.tracer = tracerProvider.getTracer(LIBRARY_NAME, LIBRARY_VERSION);
+    this.tracerProvider.addSpanProcessor(new BatchSpanProcessor(this.exporter));
+    this.tracerProvider.register();
+    this.tracer = this.tracerProvider.getTracer(LIBRARY_NAME, LIBRARY_VERSION);
     this.timeout = timeout;
   }
 
@@ -67,7 +67,7 @@ export class ApertureClient {
 
           if (err) {
             if (err.code === grpc.status.UNAVAILABLE) {
-              console.log(`Aperture server unavailable. Accepting request.\n`);
+              console.log(`Aperture server unavailable. Accepting request.`);
               resolve(flow);
             }
             reject(err);
@@ -81,6 +81,8 @@ export class ApertureClient {
 
   Shutdown() {
     grpc.closeClient(this.fcsClient);
+    this.exporter.shutdown();
+    this.tracerProvider.shutdown();
     return;
   }
 

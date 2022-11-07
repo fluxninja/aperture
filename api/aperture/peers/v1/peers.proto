@@ -13,24 +13,16 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // PeerDiscoveryService is used to query Peers.
 service PeerDiscoveryService {
   rpc GetPeers(google.protobuf.Empty) returns (Peers) {
-    option (google.api.http) = {
-      get: "/v1/peers"
-    };
+    option (google.api.http) = {get: "/v1/peers"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: [
-        "aperture-agent"
-      ];
+      tags: ["aperture-agent"];
     };
   }
 
   rpc GetPeer(PeerRequest) returns (Peer) {
-    option (google.api.http) = {
-      get: "/v1/peers/address/{address}"
-    };
+    option (google.api.http) = {get: "/v1/peers/address/{address}"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: [
-        "aperture-agent"
-      ];
+      tags: ["aperture-agent"];
     };
   }
 }

@@ -9,12 +9,12 @@ connectedRouter.get('/', function (req, res) {
         let clientState = apertureClient.GetState();
         console.log(`Client state ${clientState}`);
         if (clientState != grpc.connectivityState.READY) {
-            res.status(503).send('Unavailable\n');
+            res.status(503).send('Unavailable');
         } else {
-            res.status(200).send('Connected\n');
+            res.status(200).send('Connected');
         }
     } catch (e) {
         console.log(e);
-        res.send(`Error occurred: ${e}\n`);
+        res.send(`Error occurred: ${e}`);
     }
 });

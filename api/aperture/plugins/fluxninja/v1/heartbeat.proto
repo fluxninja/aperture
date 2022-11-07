@@ -23,9 +23,7 @@ service FluxNinjaService {
 // ControllerInfoService is used to read controllerID to which agent/controller belong.
 service ControllerInfoService {
   rpc GetControllerInfo(google.protobuf.Empty) returns (ControllerInfo) {
-    option (google.api.http) = {
-      get: "/plugins/fluxninja/v1/controllerinfo"
-    };
+    option (google.api.http) = {get: "/plugins/fluxninja/v1/controllerinfo"};
   }
 }
 

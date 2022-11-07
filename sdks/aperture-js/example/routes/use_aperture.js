@@ -15,7 +15,7 @@ apertureRoute.get('/', function (req, res) {
         // See whether flow was accepted by Aperture Agent.
         if (flow.Accepted()) {
             // Simulate work being done
-            sleep(2000).then(() => { console.log("Work done!\n"); });
+            sleep(2000).then(() => { console.log("Work done!"); });
 
             // Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
             // The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
@@ -28,7 +28,7 @@ apertureRoute.get('/', function (req, res) {
         }
     }).catch(e => {
         console.log(e);
-        res.send(`Error occurred: ${e}\n`);
+        res.send(`Error occurred: ${e}`);
     });
 });
 

@@ -16,17 +16,13 @@ message Selector {
   ServiceSelector service_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
   FlowSelector flow_selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
 }
@@ -44,9 +40,7 @@ message ServiceSelector {
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {
-        string_value: "default"
-      }
+      value: {string_value: "default"}
     }
   }]; // @gotags: default:"default"
 
@@ -94,9 +88,7 @@ message FlowSelector {
   ControlPoint control_point = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
 
@@ -133,9 +125,7 @@ message ControlPoint {
     string feature = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {
-          string_value: "required"
-        }
+        value: {string_value: "required"}
       }
     }]; //@gotags: validate:"required"
 
@@ -148,9 +138,7 @@ message ControlPoint {
     string traffic = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {
-          string_value: "required,oneof=ingress egress"
-        }
+        value: {string_value: "required,oneof=ingress egress"}
       }
     }]; // @gotags: validate:"required,oneof=ingress egress"
   }

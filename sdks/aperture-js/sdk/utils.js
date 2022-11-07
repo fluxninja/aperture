@@ -3,7 +3,7 @@ import protoLoader from "@grpc/proto-loader";
 import { PROTO_PATH } from "./consts.js";
 
 const clientPackage = protoLoader.loadSync(PROTO_PATH, {
-    keepCase: true,
+    keepCase: false,
     longs: String,
     enums: String,
     defaults: true,

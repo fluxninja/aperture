@@ -20,7 +20,7 @@ export class Flow {
         if (this.checkResponse === undefined) {
             return true;
         }
-        if (this.checkResponse.decision_type === 'DECISION_TYPE_ACCEPTED') {
+        if (this.checkResponse.decisionType === 'DECISION_TYPE_ACCEPTED') {
             return true;
         }
         return false;
