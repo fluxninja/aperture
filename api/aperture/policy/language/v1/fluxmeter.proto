@@ -27,7 +27,9 @@ message FluxMeter {
     repeated double buckets = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
-        value: {string_value: "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"}
+        value: {
+          string_value: "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+        }
       }
     }]; // @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
   }
@@ -45,7 +47,9 @@ message FluxMeter {
     int32 count = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {string_value: "gt=0"}
+        value: {
+          string_value: "gt=0"
+        }
       }
     }]; // @gotags: validate:"gt=0"
   }
@@ -58,7 +62,9 @@ message FluxMeter {
     double start = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {string_value: "gt=0"}
+        value: {
+          string_value: "gt=0"
+        }
       }
     }]; // @gotags: validate:"gt=0.0"
 
@@ -66,7 +72,9 @@ message FluxMeter {
     double factor = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {string_value: "gt=1.0"}
+        value: {
+          string_value: "gt=1.0"
+        }
       }
     }]; // @gotags: validate:"gt=1.0"
 
@@ -74,7 +82,9 @@ message FluxMeter {
     int32 count = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {string_value: "gt=0"}
+        value: {
+          string_value: "gt=0"
+        }
       }
     }]; // @gotags: validate:"gt=0"
   }
@@ -86,7 +96,9 @@ message FluxMeter {
     double min = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {string_value: "gt=0"}
+        value: {
+          string_value: "gt=0"
+        }
       }
     }]; // @gotags: validate:"gt=0.0"
 
@@ -97,7 +109,9 @@ message FluxMeter {
     int32 count = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {string_value: "gt=0"}
+        value: {
+          string_value: "gt=0"
+        }
       }
     }]; // @gotags: validate:"gt=0"
   }
@@ -130,7 +144,9 @@ message FluxMeter {
   string attribute_key = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {string_value: "workload_duration_ms"}
+      value: {
+        string_value: "workload_duration_ms"
+      }
     }
   }]; // @gotags: default:"workload_duration_ms"
 }

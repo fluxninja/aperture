@@ -10,4 +10,4 @@ const clientPackage = protoLoader.loadSync(PROTO_PATH, {
     oneofs: true,
 });
 
-export const fcs = grpc.loadPackageDefinition(clientPackage).aperture.flowcontrol.v1;
+export const fcs = grpc.loadPackageDefinition(clientPackage).aperture.flowcontrol.check.v1;

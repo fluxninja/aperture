@@ -37,7 +37,9 @@ message K8sLabelMatcherRequirement {
   string key = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
 
@@ -46,7 +48,9 @@ message K8sLabelMatcherRequirement {
   string operator = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "oneof=In NotIn Exists DoesNotExists"}
+      value: {
+        string_value: "oneof=In NotIn Exists DoesNotExists"
+      }
     }
   }]; // @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
 
@@ -91,7 +95,9 @@ message MatchExpression {
     string label_exists = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {string_value: "required"}
+        value: {
+          string_value: "required"
+        }
       }
     }]; // @gotags: validate:"required"
 
@@ -109,7 +115,9 @@ message EqualsMatchExpression {
   string label = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
 
@@ -123,7 +131,9 @@ message MatchesMatchExpression {
   string label = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
 
@@ -132,7 +142,9 @@ message MatchesMatchExpression {
   string regex = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
 }

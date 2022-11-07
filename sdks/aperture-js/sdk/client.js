@@ -18,7 +18,6 @@ import {
 import { Flow } from "./flow.js";
 
 
-
 export class ApertureClient {
   constructor(timeout = 200) {
     this.fcsClient = new fcs.FlowControlService(URL, grpc.credentials.createInsecure());
@@ -62,7 +61,7 @@ export class ApertureClient {
           feature: featureArg,
           labels: mergedLabels,
         },
-        {deadline: Date.now() + this.timeout},
+        { deadline: Date.now() + this.timeout },
         (err, response) => {
           span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
 

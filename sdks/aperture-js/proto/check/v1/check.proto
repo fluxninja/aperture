@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package aperture.flowcontrol.v1;
+package aperture.flowcontrol.check.v1;
 
 import "google/protobuf/timestamp.proto";
 
