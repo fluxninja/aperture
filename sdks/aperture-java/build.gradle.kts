@@ -11,7 +11,7 @@ plugins {
 }
 
 application {
-    mainClass.set("com.fluxninja.aperture.example.App")
+    mainClass.set("com.fluxninja.aperture.example.ArmeriaServer")
 }
 
 apply(from = "version.gradle.kts")

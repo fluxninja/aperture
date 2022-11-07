@@ -2,11 +2,14 @@ package validator
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	tracev1 "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	"go.uber.org/multierr"
-	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -35,9 +38,22 @@ func (t TraceHandler) Export(ctx context.Context, req *tracev1.ExportTraceServic
 						log.Trace().Str("attribute", otelcollector.ApertureCheckResponseLabel).Msg("Validating attribute")
 						v := attribute.Value.GetStringValue()
 						checkResponse := &flowcontrolv1.CheckResponse{}
-						perr := protojson.Unmarshal([]byte(v), checkResponse)
+						var wireMsg []byte
+						if !strings.HasPrefix(v, "{") {
+							wireMsg, err = base64.StdEncoding.DecodeString(v)
+							if err != nil {
+								log.Error().Err(err).Msg("Failed to unmarshal as base64")
+							}
+							perr := proto.Unmarshal(wireMsg, checkResponse)
+							if err != nil {
+								log.Error().Err(err).Msg("Failed to unmarshal as protobuf")
+								err = multierr.Append(err, fmt.Errorf("invalid %s: %w", otelcollector.ApertureCheckResponseLabel, perr))
+							}
+							continue
+						}
+						perr := json.Unmarshal([]byte(v), checkResponse)
 						if perr != nil {
-							log.Error().Err(perr).Msg("Failed to validate flowcontrol CheckResponse")
+							log.Error().Err(err).Msg("Failed to unmarshal as json")
 							err = multierr.Append(err, fmt.Errorf("invalid %s: %w", otelcollector.ApertureCheckResponseLabel, perr))
 						}
 					case otelcollector.ApertureSourceLabel:
@@ -50,7 +66,7 @@ func (t TraceHandler) Export(ctx context.Context, req *tracev1.ExportTraceServic
 					case otelcollector.ApertureFeatureStatusLabel:
 						log.Trace().Str("attribute", otelcollector.ApertureFeatureStatusLabel).Msg("Validating attribute")
 						v := attribute.Value.GetStringValue()
-						if v != otelcollector.ApertureFeatureStatusOK && v != otelcollector.ApertureFeatureStatusError {
+						if v != otelcollector.ApertureFeatureStatusOK && v != otelcollector.ApertureFeatureStatusError && v != "Unset" {
 							log.Error().Msg("Failed to validate feature status")
 							err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureFeatureStatusLabel))
 						}
