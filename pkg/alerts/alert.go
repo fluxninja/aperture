@@ -20,6 +20,19 @@ var specialLabels = map[string]struct{}{
 	otelcollector.AlertGeneratorURLLabel: {},
 }
 
+// NewAlert created new instance of Alert with StartsAt set to now.
+func NewAlert() *Alert {
+	return &Alert{
+		PostableAlert: models.PostableAlert{
+			Alert: models.Alert{
+				Labels: models.LabelSet(map[string]string{}),
+			},
+			Annotations: models.LabelSet(map[string]string{}),
+			StartsAt:    strfmt.DateTime(time.Now().UTC()),
+		},
+	}
+}
+
 // Alert is a wrapper around models.PostableAlert with handy transform methods.
 type Alert struct {
 	models.PostableAlert
@@ -43,6 +56,27 @@ func (a *Alert) Severity() string {
 // SetSeverity sets the alert severity in labels. Overwrites previous value if exists.
 func (a *Alert) SetSeverity(severity string) {
 	a.Labels[otelcollector.AlertSeverityLabel] = severity
+}
+
+// SetAnnotations overwrites all the current annotations with the one provided.
+func (a *Alert) SetAnnotations(annotations map[string]string) {
+	a.Annotations = models.LabelSet(annotations)
+}
+
+// SetAnnotation sets a single annotation. It overwrites the previous value if exists.
+func (a *Alert) SetAnnotation(key, value string) {
+	a.Annotations[key] = value
+}
+
+// SetLabels overwrites all the current annotations with the one provided.
+// Caution: this will overwrite also name and severity!
+func (a *Alert) SetLabels(labels map[string]string) {
+	a.Labels = models.LabelSet(labels)
+}
+
+// SetLabel sets a single annotation. It overwrites the previous value if exists.
+func (a *Alert) SetLabel(key, value string) {
+	a.Labels[key] = value
 }
 
 // AlertsFromLogs gets slice of alerts from OTEL Logs.
