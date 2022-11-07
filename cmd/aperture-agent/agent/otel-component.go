@@ -6,6 +6,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"github.com/prometheus/client_golang/prometheus"
@@ -104,6 +105,7 @@ func AgentOTELComponents(
 		metricsprocessor.NewFactory(promRegistry, engine, clasEng),
 		attributesprocessor.NewFactory(),
 		tracestologsprocessor.NewFactory(),
+		transformprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
 

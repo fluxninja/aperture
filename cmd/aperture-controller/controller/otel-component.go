@@ -8,6 +8,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/exporter/loggingexporter"
@@ -65,6 +66,7 @@ func ControllerOTELComponents(
 	processors, err := component.MakeProcessorFactoryMap(
 		batchprocessor.NewFactory(),
 		attributesprocessor.NewFactory(),
+		transformprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
 

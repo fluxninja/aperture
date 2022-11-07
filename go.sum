@@ -47,6 +47,10 @@ github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbt
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
 github.com/agnivade/levenshtein v1.1.1 h1:QY8M92nrzkmr798gCo3kmMyqXFzdQVpxLlGPRBij0P8=
 github.com/agnivade/levenshtein v1.1.1/go.mod h1:veldBMzWxcCG2ZvUTKD2kJNRdCk5hVbJomOvKkmgYbo=
+github.com/alecthomas/assert/v2 v2.0.3 h1:WKqJODfOiQG0nEJKFKzDIG3E29CN2/4zR9XGJzKIkbg=
+github.com/alecthomas/participle/v2 v2.0.0-beta.5 h1:y6dsSYVb1G5eK6mgmy+BgI3Mw35a3WghArZ/Hbebrjo=
+github.com/alecthomas/participle/v2 v2.0.0-beta.5/go.mod h1:RC764t6n4L8D8ITAJv0qdokritYSNR3wV5cVwmIEaMM=
+github.com/alecthomas/repr v0.1.0 h1:ENn2e1+J3k09gyj2shc0dHr/yjaWSHRlrJ4DPMevDqE=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
@@ -515,6 +519,7 @@ github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb/go.mod h1:+NfK9FKe
 github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d/go.mod h1:+NfK9FKeTrX5uv1uIXGdwYDTeHna2qgaIlx54MXqjAM=
 github.com/hetznercloud/hcloud-go v1.35.3 h1:WCmFAhLRooih2QHAsbCbEdpIHnshQQmrPqsr3rHE1Ow=
 github.com/hetznercloud/hcloud-go v1.35.3/go.mod h1:mepQwR6va27S3UQthaEPGS86jtzSY9xWL1e9dyxXpgA=
+github.com/hexops/gotextdiff v1.0.3 h1:gitA9+qJrrTCsiCl7+kh75nPqQt1cx4ZkudSTLoUqJM=
 github.com/hjson/hjson-go/v4 v4.0.0 h1:wlm6IYYqHjOdXH1gHev4VoXCaW20HdQAGCxdOEEg2cs=
 github.com/hjson/hjson-go/v4 v4.0.0/go.mod h1:KaYt3bTw3zhBjYqnXkYywcYctk0A2nxeEFTse3rH13E=
 github.com/iancoleman/strcase v0.2.0/go.mod h1:iwCmte+B7n89clKwxIoIXy/HfoL7AsD47ZCWhYzw7ho=
@@ -705,6 +710,8 @@ github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal 
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.63.0/go.mod h1:Vo92E1v3sPewq/74L573iW9dCJl40na+Heum93YGbPQ=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/sharedcomponent v0.63.0 h1:fFwJGoSCkiKmAT8fbIzMZwhoabB5S/7VOvD5B/jZuCQ=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/sharedcomponent v0.63.0/go.mod h1:vbltCC8k3EUnIwhh6QARUcSKqpXMrMaEs0gdqRVWAl8=
+github.com/open-telemetry/opentelemetry-collector-contrib/pkg/ottl v0.63.0 h1:7SXfjVIXlCowDIw6vBzAd8xQvSdzZR+ktJiWjQmpxWk=
+github.com/open-telemetry/opentelemetry-collector-contrib/pkg/ottl v0.63.0/go.mod h1:Jbg+c3isJ1kHqgjns/7NuBGEUlaChBmZfFSNkTtjYyk=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/resourcetotelemetry v0.63.0 h1:17Bw6z1FOtHeK446eAHHt6TBzmpYaufCMuEDpbZAAyA=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/resourcetotelemetry v0.63.0/go.mod h1:UDUauqPQgqflOJVnOD3Ut4iVuTaGg1Y9G6yA+mRCXF8=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza v0.63.0 h1:2/DBbtCcEFOg2h64UkO2cMFrDFD5CzhYizUxm7dLOEY=
@@ -715,6 +722,8 @@ github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometh
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheusremotewrite v0.63.0/go.mod h1:38eAa1uMg9XACyE3WfGQ0wogequ0iO8bMtrySQIkVZ0=
 github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.63.0 h1:6+LmD1djirBkC8rKDQoSEYcYaGNfdPvwxQvfJrjHtNM=
 github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.63.0/go.mod h1:7ZuYh9HCR5n4338uRfgxK6Z9QTHzSi8jl+x8d4SufWQ=
+github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.63.0 h1:fYtQ+H95+58iAVni05+/sEC2YudXw1CTfBcILhJOmzM=
+github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.63.0/go.mod h1:Y4J6p600T1SVUUTbAK5kC8ay/BM2VNzCYbOoRwSEskg=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.63.0 h1:KO1sCQee4BNiHSPYva48rLP1CSZU3OO9I5hMvRyHv5M=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.63.0/go.mod h1:btv5RdH5zJE5DdmlLneH7Y8IIehE3bZ87eoL4Y4WlCs=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.63.0 h1:ZbozlgAgr+Ozn6AAI4BJ3+zIKDX4tFBYFxMhsEnrt6Y=

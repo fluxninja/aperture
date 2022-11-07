@@ -47,6 +47,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.63.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.63.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.63.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.63.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.63.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.63.0
 	github.com/pkg/errors v0.9.1
@@ -88,6 +89,7 @@ require (
 )
 
 require (
+	github.com/alecthomas/participle/v2 v2.0.0-beta.5 // indirect
 	github.com/antonmedv/expr v1.9.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/bmatcuk/doublestar/v3 v3.0.0 // indirect
@@ -108,6 +110,7 @@ require (
 	github.com/observiq/ctimefmt v1.0.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.63.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/ottl v0.63.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza v0.63.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheus v0.63.0 // indirect
 	github.com/prometheus/prometheus v0.39.1 // indirect
