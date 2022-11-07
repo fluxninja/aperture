@@ -21,6 +21,7 @@ require (
 	github.com/getsentry/sentry-go v0.14.0
 	github.com/go-co-op/gocron v1.17.1
 	github.com/go-logr/zerologr v1.2.2
+	github.com/go-openapi/strfmt v0.21.3
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
@@ -98,7 +99,6 @@ require (
 	github.com/go-openapi/errors v0.20.2 // indirect
 	github.com/go-openapi/loads v0.21.1 // indirect
 	github.com/go-openapi/spec v0.20.6 // indirect
-	github.com/go-openapi/strfmt v0.21.3 // indirect
 	github.com/go-openapi/swag v0.22.1 // indirect
 	github.com/go-openapi/validate v0.22.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
