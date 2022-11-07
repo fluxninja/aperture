@@ -16,6 +16,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	tracev1 "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -23,11 +24,15 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/cmd/sdk-validator/validator"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 var (
-	logger *log.Logger
-	failed bool
+	logger      *log.Logger
+	spanFailed  bool
+	authzFailed bool
 )
 
 func init() {
@@ -60,6 +65,8 @@ func main() {
 		log.Info().Str("image", *sdkDockerImage).Str("id", id).Msg("Container started")
 	}
 
+	sdkURL := fmt.Sprintf("http://localhost:%s", *sdkPort)
+
 	// create listener for grpc server
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", *port))
 	if err != nil {
@@ -70,12 +77,20 @@ func main() {
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(serverInterceptor))
 	reflection.Register(grpcServer)
 
-	// instantiate and register flowcontrol handler
-	flowcontrolHandler := &validator.FlowControlHandler{
+	commonHandler := &validator.CommonHandler{
 		Rejects:  *rejects,
 		Rejected: 0,
 	}
+
+	// instantiate and register flowcontrol handler
+	flowcontrolHandler := &validator.FlowControlHandler{
+		CommonHandler: commonHandler,
+	}
 	flowcontrolv1.RegisterFlowControlServiceServer(grpcServer, flowcontrolHandler)
+
+	reg := status.NewRegistry(log.GetGlobalLogger())
+	authzHandler := envoy.NewHandler(classifier.NewClassificationEngine(reg), nil, commonHandler)
+	authv3.RegisterAuthorizationServer(grpcServer, authzHandler)
 
 	// initiate and register otel trace handler
 	traceHandler := &validator.TraceHandler{}
@@ -90,6 +105,17 @@ func main() {
 	go func() {
 		s := <-sigCh
 		log.Info().Interface("signal", s).Msg("Got signal, attempting graceful shutdown")
+		grpcServer.GracefulStop()
+
+		log.Info().Msg("Validating fail-open behavior")
+		rejected := startTraffic(sdkURL, *requests)
+		l := log.With().Int("total requests", *requests).Int64("expected rejections", 0).Int("got rejections", rejected).Logger()
+		if rejected != 0 {
+			l.Error().Msg("Fail-open validation failed")
+		} else {
+			l.Info().Msg("Fail-open validation successful")
+		}
+
 		if *sdkDockerImage != "" {
 			log.Info().Interface("id", id).Msg("Stopping Docker container")
 			err = stopDockerContainer(id)
@@ -97,22 +123,25 @@ func main() {
 				log.Fatal().Err(err).Msg("Failed to stop Docker container")
 			}
 		}
-		grpcServer.GracefulStop()
 		wg.Done()
 	}()
 
 	if *sdkDockerImage != "" {
 		wg.Add(1)
 		go func() {
-			rejected := confirmConnectedAndStartTraffic(*sdkPort, *requests)
+			rejected := confirmConnectedAndStartTraffic(sdkURL, *requests)
 			l := log.With().Int("total requests", *requests).Int64("expected rejections", *rejects).Int("got rejections", rejected).Logger()
 			if rejected != int(*rejects) {
 				l.Error().Msg("FlowControl validation failed")
 				validation = 1
 			}
 
-			if failed {
+			if spanFailed {
 				l.Error().Msg("Span attributes validation failed")
+				validation = 1
+			}
+			if authzFailed {
+				l.Error().Msg("Authz validation failed")
 				validation = 1
 			}
 
@@ -143,9 +172,11 @@ func serverInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySer
 	log.Info().Str("method", info.FullMethod).Dur("latency", time.Since(start)).Msg("Request served")
 	if err != nil {
 		log.Error().Err(err).Msg("Handler returned error")
-	}
-	if err != nil {
-		failed = true
+		if info.FullMethod == "/opentelemetry.proto.collector.trace.v1.TraceService/Export" {
+			spanFailed = true
+		} else if info.FullMethod == "/envoy.service.auth.v3.Authorization/Check" {
+			authzFailed = true
+		}
 	}
 	return h, err
 }
@@ -218,10 +249,7 @@ func stopDockerContainer(id string) error {
 	return nil
 }
 
-func confirmConnectedAndStartTraffic(port string, requests int) int {
-	rejected := 0
-	url := fmt.Sprintf("http://localhost:%s", port)
-
+func confirmConnectedAndStartTraffic(url string, requests int) int {
 	for {
 		req, err := http.NewRequest(http.MethodGet, url+"/connected", nil)
 		if err != nil {
@@ -238,6 +266,12 @@ func confirmConnectedAndStartTraffic(port string, requests int) int {
 	}
 	log.Info().Msg("SDK example successfully connected to validator")
 
+	rejected := startTraffic(url, requests)
+	return rejected
+}
+
+func startTraffic(url string, requests int) int {
+	rejected := 0
 	superReq, err := http.NewRequest(http.MethodGet, url+"/super", nil)
 	if err != nil {
 		log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to create http request")
@@ -248,7 +282,7 @@ func confirmConnectedAndStartTraffic(port string, requests int) int {
 			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to make http request")
 		}
 		res.Body.Close()
-		if res.StatusCode != http.StatusAccepted {
+		if (res.StatusCode > 400 && res.StatusCode < 500) || (res.StatusCode > 500 && res.StatusCode < 600) {
 			rejected += 1
 		}
 	}

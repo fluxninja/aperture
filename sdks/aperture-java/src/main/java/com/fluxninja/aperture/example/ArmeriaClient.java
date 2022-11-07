@@ -26,12 +26,11 @@ public class ArmeriaClient {
             return;
         }
 
-        WebClient client = Clients.builder("http://localhost:10101")
+        WebClient client = Clients.builder("http://localhost:8080")
                 .decorator(ApertureHTTPClient.newDecorator(apertureSDK))
                 .build(WebClient.class);
 
-        HttpResponse res = client.get("http/base");
+        HttpResponse res = client.get("notsuper");
         System.out.println(res);
     }
-
 }
