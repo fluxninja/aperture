@@ -659,7 +659,7 @@ workflows:
           dockerfile: Dockerfile
           docker-image: aperture-js-example
           remote-repo: fluxninja/aperture-js
-          remote-repo-fingerprint: "85:0b:8a:2d:b5:10:99:4c:2a:61:9f:cf:49:d5:02:1f"
+          remote-repo-fingerprint: "2b:10:dc:0b:ba:45:2e:6c:6d:d0:f4:b9:c3:e9:38:37"
 
   aperture-java:
     when: << pipeline.parameters.updated-aperture-java >>
