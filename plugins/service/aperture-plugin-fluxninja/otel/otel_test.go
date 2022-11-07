@@ -192,6 +192,13 @@ func basePluginOTELConfig() *otelcollector.OTELConfig {
 			},
 		},
 	})
+	cfg.AddProcessor("transform/fluxninja", map[string]interface{}{
+		"logs": map[string]interface{}{
+			"statements": []string{
+				`set(resource.attributes["controller_id"], "controllero")`,
+			},
+		},
+	})
 	cfg.AddExporter("otlp/fluxninja", map[string]interface{}{
 		"endpoint": "http://localhost:1234",
 		"headers": map[string]interface{}{
@@ -210,7 +217,7 @@ func basePluginOTELConfig() *otelcollector.OTELConfig {
 
 func testPipelineWithFN() otelcollector.Pipeline {
 	p := testPipeline()
-	p.Processors = append(p.Processors, "attributes/fluxninja")
+	p.Processors = append(p.Processors, "attributes/fluxninja", "transform/fluxninja")
 	p.Exporters = append(p.Exporters, "otlp/fluxninja")
 	return p
 }

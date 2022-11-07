@@ -119,7 +119,10 @@ func addFNToPipeline(
 	config *otelcollector.OTELConfig,
 	pipeline otelcollector.Pipeline,
 ) {
-	pipeline.Processors = append(pipeline.Processors, processorAttributes)
+	// TODO this duplication of `controller_id` insertion should be cleaned up
+	// when telemetry logs pipeline is update to follow the same rules as alerts
+	// pipeline.
+	pipeline.Processors = append(pipeline.Processors, processorAttributes, processorResourceAttributes)
 	pipeline.Exporters = append(pipeline.Exporters, exporterFluxninja)
 	config.Service.AddPipeline(name, pipeline)
 }
@@ -132,11 +135,7 @@ func addMetricsSlowPipeline(baseConfig, config *otelcollector.OTELConfig) {
 		Processors: []string{
 			otelcollector.ProcessorEnrichment,
 			processorBatchMetricsSlow,
-			// TODO this duplication of `controller_id` insertion should be cleaned up
-			// when telemetry logs pipeline is update to follow the same rules as alerts
-			// pipeline.
 			processorAttributes,
-			processorResourceAttributes,
 		},
 		Exporters: []string{exporterFluxninja},
 	})
