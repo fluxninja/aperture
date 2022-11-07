@@ -19,7 +19,8 @@ ENV VERSION=${VERSION}
 FROM base AS builder
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/ \
-  CGO_ENABLED=1 TARGET="/aperture-controller" PREFIX="aperture" SOURCE="./cmd/aperture-controller" LDFLAGS="-s -w" \
+  CGO_ENABLED=1 TARGET="/aperture-controller" PREFIX="aperture" SOURCE="./cmd/aperture-controller" \
+  LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
   ./pkg/info/build.sh
 
 
@@ -32,7 +33,8 @@ RUN --mount=type=cache,target=/go/pkg/ \
   shopt -s nullglob; \
   for plugin in ./plugins/{service,controller}/aperture-plugin-*; do\
     echo "building plugin $plugin";\
-    CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w" \
+    CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" \
+    LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
       ./pkg/plugins/build.sh;\
   done\
   '

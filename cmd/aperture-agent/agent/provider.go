@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"fmt"
 	"path"
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -30,6 +31,16 @@ func AddAgentInfoAttribute(in FxIn) {
 				"key":    otelcollector.AgentGroupLabel,
 				"action": "insert",
 				"value":  in.AgentInfo.GetAgentGroup(),
+			},
+		},
+	})
+	in.BaseConfig.AddProcessor(otelcollector.ProcessorAgentResourceLabels, map[string]interface{}{
+		"logs": map[string]interface{}{
+			"statements": []string{
+				fmt.Sprintf(`set(resource.attributes["%v"], "%v")`,
+					otelcollector.AgentGroupLabel, in.AgentInfo.GetAgentGroup()),
+				fmt.Sprintf(`set(resource.attributes["%v"], "%v")`,
+					otelcollector.InstanceLabel, info.Hostname),
 			},
 		},
 	})

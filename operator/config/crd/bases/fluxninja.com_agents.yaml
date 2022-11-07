@@ -1275,6 +1275,25 @@ spec:
                   otel:
                     description: OTEL configuration.
                     properties:
+                      batch_alerts:
+                        description: BatchAlerts configures batch alerts processor.
+                        properties:
+                          send_batch_max_size:
+                            description: SendBatchMaxSize is the upper limit of the
+                              batch size. Bigger batches will be split into smaller
+                              units.
+                            format: int32
+                            type: integer
+                          send_batch_size:
+                            description: SendBatchSize is the size of a batch which
+                              after hit, will trigger it to be sent.
+                            format: int32
+                            type: integer
+                          timeout:
+                            description: Timeout sets the time after which a batch
+                              will be sent regardless of size.
+                            type: string
+                        type: object
                       batch_postrollup:
                         description: BatchPostrollup configures batch postrollup processor.
                         properties:

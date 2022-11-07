@@ -224,7 +224,18 @@ jobs:
             go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
             envtest_path=$(make operator-setup_envtest -s)
             export KUBEBUILDER_ASSETS="${envtest_path}"
-            PKGS=$(go list ./... | grep -v gen | grep -v operator/api) && gotestsum --format=testname --junitfile=unit-tests.xml --rerun-fails=2 --packages="$PKGS" -- -race -coverprofile=coverage.out -coverpkg=./... $PKGS
+            PKGS=$(go list ./... | grep -v gen | grep -v operator/api) && \
+              gotestsum \
+                --format=testname \
+                --junitfile=unit-tests.xml \
+                --rerun-fails=2 \
+                --packages="$PKGS" \
+                -- \
+                  -race \
+                  -coverprofile=coverage.out \
+                  -coverpkg=./... \
+                  -ldflags='-extldflags "-Wl,--allow-multiple-definition"' \
+              $PKGS
             mkdir -p /tmp/test-results
             mv unit-tests.xml /tmp/test-results
       - codecov/upload
