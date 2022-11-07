@@ -17,7 +17,6 @@ import {
 } from "./consts.js";
 import { Flow } from "./flow.js";
 
-
 export class ApertureClient {
   constructor(timeout = 200) {
     this.fcsClient = new fcs.FlowControlService(URL, grpc.credentials.createInsecure());
