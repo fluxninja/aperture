@@ -77,12 +77,13 @@ func main() {
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(serverInterceptor))
 	reflection.Register(grpcServer)
 
-	commonHandler := &validator.CommonHandler{}
+	commonHandler := &validator.CommonHandler{
+		Rejects:  *rejects,
+		Rejected: 0,
+	}
 
 	// instantiate and register flowcontrol handler
 	flowcontrolHandler := &validator.FlowControlHandler{
-		Rejects:       *rejects,
-		Rejected:      0,
 		CommonHandler: commonHandler,
 	}
 	flowcontrolv1.RegisterFlowControlServiceServer(grpcServer, flowcontrolHandler)

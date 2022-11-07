@@ -66,7 +66,7 @@ func (t TraceHandler) Export(ctx context.Context, req *tracev1.ExportTraceServic
 					case otelcollector.ApertureFeatureStatusLabel:
 						log.Trace().Str("attribute", otelcollector.ApertureFeatureStatusLabel).Msg("Validating attribute")
 						v := attribute.Value.GetStringValue()
-						if v != otelcollector.ApertureFeatureStatusOK && v != otelcollector.ApertureFeatureStatusError {
+						if v != otelcollector.ApertureFeatureStatusOK && v != otelcollector.ApertureFeatureStatusError && v != "Unset" {
 							log.Error().Msg("Failed to validate feature status")
 							err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureFeatureStatusLabel))
 						}

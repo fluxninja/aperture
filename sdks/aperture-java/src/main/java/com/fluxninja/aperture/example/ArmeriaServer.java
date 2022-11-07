@@ -19,6 +19,23 @@ public class ArmeriaServer {
             }
         };
     }
+    public static HttpService createHealthService() {
+        return new AbstractHttpService() {
+            @Override
+            protected HttpResponse doGet(ServiceRequestContext ctx, HttpRequest req) {
+                return HttpResponse.of("Healthy");
+            }
+        };
+    }
+    public static HttpService createConnectedHTTPService() {
+        return new AbstractHttpService() {
+            @Override
+            protected HttpResponse doGet(ServiceRequestContext ctx, HttpRequest req) {
+                return HttpResponse.of("");
+            }
+        };
+    }
+
     public static void main(String[] args) {
         final String agentHost = "localhost";
         final int agentPort = 8089;
@@ -35,17 +52,17 @@ public class ArmeriaServer {
             return;
         }
         ServerBuilder serverBuilder = Server.builder();
-        serverBuilder.http(10101);
-        serverBuilder.service("/http/base", createHelloHTTPService());
+        serverBuilder.http(8080);
+        serverBuilder.service("/notsuper", createHelloHTTPService());
+        serverBuilder.service("/health", createHealthService());
+        serverBuilder.service("/connected", createConnectedHTTPService());
 
         ApertureHTTPService decoratedService = createHelloHTTPService()
             .decorate(ApertureHTTPService.newDecorator(apertureSDK));
-        serverBuilder.service("/http/decorated", decoratedService);
+        serverBuilder.service("/super", decoratedService);
 
         Server server = serverBuilder.build();
         CompletableFuture<Void> future = server.start();
         future.join();
     }
-
-
 }

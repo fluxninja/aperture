@@ -2,7 +2,6 @@ package validator
 
 import (
 	"context"
-	"sync/atomic"
 	"time"
 
 	"google.golang.org/grpc/peer"
@@ -19,8 +18,6 @@ type FlowControlHandler struct {
 	flowcontrolv1.UnimplementedFlowControlServiceServer
 
 	CommonHandler check.HandlerWithValues
-	Rejects       int64
-	Rejected      int64
 }
 
 // Check is a dummy Check handler.
@@ -35,13 +32,6 @@ func (f *FlowControlHandler) Check(ctx context.Context, req *flowcontrolv1.Check
 
 	start := time.Now()
 	resp := f.CommonHandler.CheckWithValues(ctx, services, selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_FEATURE, req.Feature), req.Labels)
-	// randomly reject requests based on rejectRatio
-	if f.Rejected != f.Rejects {
-		log.Trace().Msg("Rejecting call")
-		resp.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
-		resp.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
-		atomic.AddInt64(&f.Rejected, 1)
-	}
 	end := time.Now()
 
 	resp.Start = timestamppb.New(start)
