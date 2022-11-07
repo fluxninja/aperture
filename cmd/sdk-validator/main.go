@@ -24,8 +24,8 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/cmd/sdk-validator/validator"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/envoy"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 

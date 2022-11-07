@@ -5,14 +5,14 @@ import (
 
 	"golang.org/x/exp/maps"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/base"
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 )
 
 // CommonHandler implements common.HandlerWithValues.
 type CommonHandler struct {
-	base.HandlerWithValues
+	check.HandlerWithValues
 }
 
 // CheckWithValues is a dummy function for creating *flowcontrolv1.CheckResponse from given parameters.

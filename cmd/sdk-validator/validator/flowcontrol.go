@@ -10,15 +10,15 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/api/base"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 )
 
 // FlowControlHandler implements FlowControlService.
 type FlowControlHandler struct {
 	flowcontrolv1.UnimplementedFlowControlServiceServer
 
-	CommonHandler base.HandlerWithValues
+	CommonHandler check.HandlerWithValues
 	Rejects       int64
 	Rejected      int64
 }
