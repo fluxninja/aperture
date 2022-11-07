@@ -119,6 +119,8 @@ const (
 
 	// AgentGroupLabel describes agent group to which metrics refer.
 	AgentGroupLabel = "agent_group"
+	// InstanceLabel describes agent group to which metrics refer.
+	InstanceLabel = "instance"
 
 	/* Specific to Agent and Controller OTEL collector factories. */
 
@@ -126,6 +128,8 @@ const (
 	ReceiverOTLP = "otlp"
 	// ReceiverPrometheus collects metrics from environment and services.
 	ReceiverPrometheus = "prometheus"
+	// ReceiverAlerts collects alerts from alerter.
+	ReceiverAlerts = "alerts"
 
 	// ProcessorEnrichment enriches metrics with discovery data.
 	ProcessorEnrichment = "enrichment"
@@ -138,10 +142,15 @@ const (
 	// ProcessorBatchPostrollup batches data after rolling up, as roll up process
 	// shrinks number of data points significantly.
 	ProcessorBatchPostrollup = "batch/postrollup"
+	// ProcessorBatchAlerts batches alerts before passing them to exporters.
+	// This reduces number of calls to the Alertmanager.
+	ProcessorBatchAlerts = "batch/alerts"
 	// ProcessorRollup rolls up data to decrease cardinality.
 	ProcessorRollup = "rollup"
 	// ProcessorAgentGroup adds `agent_group` attribute.
 	ProcessorAgentGroup = "attributes/agent_group"
+	// ProcessorAgentResourceLabels adds `instance` and `agent_group` resource attributes.
+	ProcessorAgentResourceLabels = "transform/agent_resource_labels"
 	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured
 	// log exporter.
 	ProcessorTracesToLogs = "tracestologs"
@@ -153,4 +162,13 @@ const (
 	// ExporterOTLPLoopback exports OTLP data to local OTLP receiver. To be used only
 	// with ProcessorSpanToLog.
 	ExporterOTLPLoopback = "otlp/loopback"
+
+	/* Specific to alerts pipeline. */
+
+	// AlertGeneratorURLLabel describes.
+	AlertGeneratorURLLabel = "generator_url"
+	// AlertNameLabel describes name of the alert.
+	AlertNameLabel = "alertname"
+	// AlertSeverityLabel also known as log level. Human readable string.
+	AlertSeverityLabel = "severity"
 )

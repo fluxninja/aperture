@@ -224,6 +224,8 @@ type OtelConfig struct {
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
 	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
+	// BatchAlerts configures batch alerts processor.
+	BatchAlerts BatchAlertsConfig `json:"batch_alerts"`
 }
 
 // BatchPrerollupConfig defines configuration for OTEL batch processor.
@@ -245,6 +247,21 @@ type BatchPrerollupConfig struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type BatchPostrollupConfig struct {
+	// Timeout sets the time after which a batch will be sent regardless of size.
+	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
+
+	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"100"`
+
+	// SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+	// into smaller units.
+	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"100"`
+}
+
+// BatchAlertsConfig defines configuration for OTEL batch processor.
+// swagger:model
+// +kubebuilder:object:generate=true
+type BatchAlertsConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
 
@@ -310,6 +327,25 @@ func AddControllerMetricsPipeline(cfg *OtelParams) {
 		Receivers:  []string{ReceiverPrometheus},
 		Processors: []string{},
 		Exporters:  []string{ExporterPrometheusRemoteWrite},
+	})
+}
+
+// AddAlertsPipeline adds reusable alerts pipeline.
+func AddAlertsPipeline(cfg *OtelParams, extraProcessors ...string) {
+	config := cfg.Config
+	config.AddReceiver(ReceiverAlerts, map[string]any{})
+	config.AddBatchProcessor(
+		ProcessorBatchAlerts,
+		cfg.BatchAlerts.Timeout.AsDuration(),
+		cfg.BatchAlerts.SendBatchSize,
+		cfg.BatchAlerts.SendBatchMaxSize,
+	)
+	processors := []string{ProcessorBatchAlerts}
+	processors = append(processors, extraProcessors...)
+	config.Service.AddPipeline("logs/alerts", Pipeline{
+		Receivers:  []string{ReceiverAlerts},
+		Processors: processors,
+		Exporters:  []string{ExporterLogging},
 	})
 }
 

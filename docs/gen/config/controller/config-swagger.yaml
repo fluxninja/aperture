@@ -19,6 +19,20 @@ definitions:
       as usage+(limit-usage)*factor.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+  AlerterConfig:
+    properties:
+      channel_size:
+        description: |-
+          ChannelSize size of the alerts channel in the alerter. Alerts should be
+          consument from it quickly, so no big sizes are needed.
+        format: int64
+        type: integer
+        x-go-default: "100"
+        x-go-name: ChannelSize
+        x-go-validate: gt=0
+    title: AlerterConfig for alerter.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/alerts
   BackoffConfig:
     properties:
       base_delay:
@@ -52,6 +66,36 @@ definitions:
     title: BackoffConfig holds configuration for GRPC Client Backoff.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
+  BatchAlertsConfig:
+    properties:
+      send_batch_max_size:
+        description: |-
+          SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+          into smaller units.
+        format: uint32
+        type: integer
+        x-go-default: "100"
+        x-go-name: SendBatchMaxSize
+        x-go-validate: gte=0
+      send_batch_size:
+        description: SendBatchSize is the size of a batch which after hit, will trigger
+          it to be sent.
+        format: uint32
+        type: integer
+        x-go-default: "100"
+        x-go-name: SendBatchSize
+        x-go-validate: gt=0
+      timeout:
+        description: Timeout sets the time after which a batch will be sent regardless
+          of size.
+        format: string
+        type: string
+        x-go-default: 1s
+        x-go-name: Timeout
+        x-go-validate: gt=0
+    title: BatchAlertsConfig defines configuration for OTEL batch processor.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   BatchPostrollupConfig:
     properties:
       send_batch_max_size:
@@ -656,6 +700,8 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
   OtelConfig:
     properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
       batch_postrollup:
         $ref: '#/definitions/BatchPostrollupConfig'
       batch_prerollup:

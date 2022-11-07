@@ -6,6 +6,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"github.com/prometheus/client_golang/prometheus"
@@ -25,8 +26,10 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/grpc"
 
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
@@ -55,6 +58,7 @@ func AgentOTELComponents(
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
 	serverGRPC *grpc.Server,
+	alerter alerts.Alerter,
 ) (component.Factories, error) {
 	var errs error
 
@@ -80,6 +84,7 @@ func AgentOTELComponents(
 		otlpreceiver.NewFactory(tsw, msw, lsw),
 		prometheusreceiver.NewFactory(),
 		filelogreceiver.NewFactory(),
+		alertsreceiver.NewFactory(alerter),
 	)
 	errs = multierr.Append(errs, err)
 
@@ -100,6 +105,7 @@ func AgentOTELComponents(
 		metricsprocessor.NewFactory(promRegistry, engine, clasEng),
 		attributesprocessor.NewFactory(),
 		tracestologsprocessor.NewFactory(),
+		transformprocessor.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
 
@@ -117,6 +123,7 @@ func provideAgent(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
 	addLogsPipeline(cfg)
 	addTracesPipeline(cfg)
 	otelcollector.AddMetricsPipeline(cfg)
+	otelcollector.AddAlertsPipeline(cfg, otelcollector.ProcessorAgentResourceLabels)
 	return cfg.Config
 }
 

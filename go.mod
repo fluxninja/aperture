@@ -21,6 +21,7 @@ require (
 	github.com/getsentry/sentry-go v0.14.0
 	github.com/go-co-op/gocron v1.17.1
 	github.com/go-logr/zerologr v1.2.2
+	github.com/go-openapi/strfmt v0.21.3
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
@@ -46,9 +47,11 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.63.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.63.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.63.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.63.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.63.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.63.0
 	github.com/pkg/errors v0.9.1
+	github.com/prometheus/alertmanager v0.24.0
 	github.com/prometheus/client_golang v1.13.0
 	github.com/prometheus/common v0.37.0
 	github.com/rs/zerolog v1.28.0
@@ -86,23 +89,33 @@ require (
 )
 
 require (
+	github.com/alecthomas/participle/v2 v2.0.0-beta.5 // indirect
 	github.com/antonmedv/expr v1.9.0 // indirect
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/bmatcuk/doublestar/v3 v3.0.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/zapr v1.2.3 // indirect
+	github.com/go-openapi/analysis v0.21.2 // indirect
+	github.com/go-openapi/errors v0.20.2 // indirect
+	github.com/go-openapi/loads v0.21.1 // indirect
+	github.com/go-openapi/spec v0.20.6 // indirect
 	github.com/go-openapi/swag v0.22.1 // indirect
+	github.com/go-openapi/validate v0.22.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/cronexpr v1.1.1 // indirect
 	github.com/hashicorp/nomad/api v0.0.0-20221010180233-9e7e5e081ec7 // indirect
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/observiq/ctimefmt v1.0.0 // indirect
+	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.63.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/ottl v0.63.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza v0.63.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheus v0.63.0 // indirect
 	github.com/prometheus/prometheus v0.39.1 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
+	go.mongodb.org/mongo-driver v1.10.2 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.11.1 // indirect
 	golang.org/x/tools v0.2.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
