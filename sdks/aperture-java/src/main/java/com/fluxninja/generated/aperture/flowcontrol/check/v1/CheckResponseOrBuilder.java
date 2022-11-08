@@ -63,25 +63,6 @@ public interface CheckResponseOrBuilder extends
 
   /**
    * <pre>
-   * error information.
-   * </pre>
-   *
-   * <code>.aperture.flowcontrol.check.v1.CheckResponse.Error error = 3 [json_name = "error"];</code>
-   * @return The enum numeric value on the wire for error.
-   */
-  int getErrorValue();
-  /**
-   * <pre>
-   * error information.
-   * </pre>
-   *
-   * <code>.aperture.flowcontrol.check.v1.CheckResponse.Error error = 3 [json_name = "error"];</code>
-   * @return The error.
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error getError();
-
-  /**
-   * <pre>
    * services that matched
    * </pre>
    *

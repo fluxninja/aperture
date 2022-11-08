@@ -159,7 +159,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("classifies input by returning flow labels", func() {
-			_, labels, err := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
@@ -169,7 +169,6 @@ var _ = Describe("Classifier", func() {
 					"bar": 21,
 				}),
 			)
-			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
 				"foo":       fl("hello"),
 				"bar-twice": fl("42"),
@@ -177,7 +176,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("doesn't classify if direction doesn't match", func() {
-			_, labels, err := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, ""),
@@ -187,12 +186,11 @@ var _ = Describe("Classifier", func() {
 					"bar": 21,
 				}),
 			)
-			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(BeEmpty())
 		})
 
 		It("skips rules with non-matching labels", func() {
-			_, labels, err := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
@@ -202,7 +200,6 @@ var _ = Describe("Classifier", func() {
 					"bar": 21,
 				}),
 			)
-			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
 				"foo": fl("hello"),
 			}))
@@ -212,7 +209,7 @@ var _ = Describe("Classifier", func() {
 			BeforeEach(func() { ars1.Drop() })
 
 			It("removes removes subset of rules", func() {
-				_, labels, err := classifier.Classify(
+				_, labels := classifier.Classify(
 					context.TODO(),
 					[]string{"my-service.default.svc.cluster.local"},
 					selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
@@ -222,7 +219,6 @@ var _ = Describe("Classifier", func() {
 						"bar": 21,
 					}),
 				)
-				Expect(err).NotTo(HaveOccurred())
 				Expect(labels).To(Equal(flowlabel.FlowLabels{
 					"bar-twice": fl("42"),
 				}))
@@ -290,7 +286,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("marks the returned flow labels with those flags", func() {
-			_, labels, err := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
@@ -300,7 +296,6 @@ var _ = Describe("Classifier", func() {
 					"bar": 21,
 				}),
 			)
-			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
 				"foo": flowlabel.FlowLabelValue{Value: "hello", Telemetry: false},
 				"bar": flowlabel.FlowLabelValue{Value: "21", Telemetry: true},
@@ -334,7 +329,7 @@ var _ = Describe("Classifier", func() {
 		It("classifies and returns flow labels (overwrite order not specified)", func() {
 			// Perhaps we can specify order by sorting rulesets? (eg. giving
 			// them names from filenames)
-			_, labels, err := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
@@ -345,7 +340,6 @@ var _ = Describe("Classifier", func() {
 					"bar": 21,
 				}),
 			)
-			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(SatisfyAny(
 				Equal(flowlabel.FlowLabels{"foo": fl("cos")}),
 				Equal(flowlabel.FlowLabels{"foo": fl("hello")}),
@@ -391,7 +385,7 @@ var _ = Describe("Classifier", func() {
 		It("classifies and returns flow labels (overwrite order not specified)", func() {
 			// Perhaps we can specify order by sorting rulesets? (eg. giving
 			// them names from filenames)
-			_, labels, err := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
@@ -401,7 +395,6 @@ var _ = Describe("Classifier", func() {
 					"bar": 21,
 				}),
 			)
-			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(SatisfyAny(
 				Equal(flowlabel.FlowLabels{"bar": fl("63")}),
 				Equal(flowlabel.FlowLabels{"bar": fl("42")}),
@@ -455,7 +448,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("classifies and returns empty flow labels - could not decide which rego to use", func() {
-			_, labels, err := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
@@ -465,7 +458,6 @@ var _ = Describe("Classifier", func() {
 					"bar": 21,
 				}),
 			)
-			Expect(err).NotTo(HaveOccurred())
 			Expect(labels).To(Equal(flowlabel.FlowLabels{}))
 		})
 	})

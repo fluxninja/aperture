@@ -3,8 +3,6 @@ package envoy
 import (
 	"context"
 	"encoding/base64"
-	"errors"
-	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -17,8 +15,10 @@ import (
 	"github.com/rs/zerolog"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
+	grpc_codes "google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
+	grpc_status "google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -116,7 +116,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		}
 	}
 
-	ctrlPt := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_UNKNOWN, "")
+	var ctrlPt selectors.ControlPoint
 	trafficDirectionHeader := ""
 	headers, _ := metadata.FromIncomingContext(ctx)
 	if dirHeader, exists := headers["traffic-direction"]; exists && len(dirHeader) > 0 {
@@ -132,21 +132,14 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		case "OUTBOUND":
 			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, "")
 		default:
-			log.Sample(zerolog.Sometimes).Error().Str("traffic-direction", trafficDirectionHeader).Msg("invalid traffic-direction header")
-			checkResponse := &flowcontrolv1.CheckResponse{
-				Error:            flowcontrolv1.CheckResponse_ERROR_INVALID_TRAFFIC_DIRECTION,
-				ControlPointInfo: ctrlPt.ToControlPointInfoProto(),
-			}
-			resp := createExtAuthzResponse(checkResponse)
-			return resp, errors.New("invalid traffic-direction")
+			// TODO(krdln) metrics
+			log.Sample(zerolog.Sometimes).Warn().Str("traffic-direction", trafficDirectionHeader).Msg("invalid traffic-direction")
+			return nil, grpc_status.Error(grpc_codes.InvalidArgument, "invalid traffic-direction")
 		}
 	} else {
-		log.Sample(zerolog.Sometimes).Error().Msg("traffic-direction not set")
-		checkResponse := &flowcontrolv1.CheckResponse{
-			Error: flowcontrolv1.CheckResponse_ERROR_MISSING_TRAFFIC_DIRECTION,
-		}
-		resp := createExtAuthzResponse(checkResponse)
-		return resp, errors.New("invalid traffic-direction")
+		// TODO(krdln) metrics
+		log.Sample(zerolog.Sometimes).Warn().Msg("missing traffic-direction")
+		return nil, grpc_status.Error(grpc_codes.InvalidArgument, "missing traffic-direction")
 	}
 
 	var svcs []string
@@ -165,22 +158,20 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 	input, err := envoyauth.RequestToInput(req, logger, nil)
 	if err != nil {
-		checkResponse := &flowcontrolv1.CheckResponse{
-			Error:    flowcontrolv1.CheckResponse_ERROR_CONVERT_TO_MAP_STRUCT,
-			Services: svcs,
-		}
-		resp := createExtAuthzResponse(checkResponse)
-		return resp, fmt.Errorf("converting raw input into rego input failed: %v", err)
+		// TODO(krdln) This conversion should be made infallible instead.
+		// https://github.com/fluxninja/aperture/issues/903
+		// TODO(krdln) metrics
+		log.Sample(zerolog.Sometimes).Warn().Err(err).Msg("converting raw input into rego input failed")
+		return nil, grpc_status.Error(grpc_codes.InvalidArgument, "converting raw input into rego input failed")
 	}
 
 	inputValue, err := ast.InterfaceToValue(input)
 	if err != nil {
-		checkLabelsResponse := &flowcontrolv1.CheckResponse{
-			Error:    flowcontrolv1.CheckResponse_ERROR_CONVERT_TO_REGO_AST,
-			Services: svcs,
-		}
-		resp := createExtAuthzResponse(checkLabelsResponse)
-		return resp, fmt.Errorf("converting rego input to value failed: %v", err)
+		// RequestToInput should never produce anything that's not convertible
+		// to ast.Value, so in theory it shouldn't happen.
+		// TODO(krdln) metrics
+		log.Sample(zerolog.Sometimes).Warn().Err(err).Msg("converting rego input to value failed")
+		return nil, grpc_status.Error(grpc_codes.Internal, "converting rego input to value failed")
 	}
 
 	// Default flow labels from Authz request
@@ -194,16 +185,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	// Baggage can overwrite request flow labels
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
 
-	classifierMsgs, newFlowLabels, err := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), inputValue)
-	if err != nil {
-		checkResponse := &flowcontrolv1.CheckResponse{
-			Error:           flowcontrolv1.CheckResponse_ERROR_CLASSIFY,
-			Services:        svcs,
-			ClassifierInfos: classifierMsgs,
-		}
-		resp := createExtAuthzResponse(checkResponse)
-		return resp, fmt.Errorf("failed to classify: %v", err)
-	}
+	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), inputValue)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)
@@ -214,6 +196,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	// Add new flow labels to baggage
 	newHeaders, err := h.propagator.Inject(newFlowLabels, existingHeaders)
 	if err != nil {
+		// TODO(krdln) metrics
 		log.Sample(zerolog.Sometimes).Warn().Err(err).Msg("Failed to inject baggage into headers")
 	}
 
@@ -267,17 +250,3 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 	return resp, nil
 }
-
-// merges two flow labels maps.
-//
-// If key exists in both, the value from second one will be taken.
-// Nil maps should be handled fine.
-/*func mergeFlowLabels(first, second classification.FlowLabels) classification.FlowLabels {
-	if first == nil {
-		return second
-	}
-	for k, v := range second {
-		first[k] = v
-	}
-	return first
-}*/

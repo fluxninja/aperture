@@ -232,6 +232,17 @@ definitions:
       - REJECT_REASON_CONCURRENCY_LIMITED
     default: REJECT_REASON_NONE
     description: RejectReason contains fields that give further information about rejection.
+  ClassifierInfoError:
+    type: string
+    enum:
+      - ERROR_NONE
+      - ERROR_EVAL_FAILED
+      - ERROR_EMPTY_RESULTSET
+      - ERROR_AMBIGUOUS_RESULTSET
+      - ERROR_MULTI_EXPRESSION
+      - ERROR_EXPRESSION_NOT_MAP
+    default: ERROR_NONE
+    description: Error information.
   EntityCacheEntities:
     type: object
     properties:
@@ -642,9 +653,6 @@ definitions:
         type: string
         format: date-time
         title: end timestamp
-      error:
-        $ref: '#/definitions/v1CheckResponseError'
-        description: error information.
       flow_label_keys:
         type: array
         items:
@@ -678,17 +686,6 @@ definitions:
           type: string
         description: telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
     description: CheckResponse contains fields that represent decision made by Check call.
-  v1CheckResponseError:
-    type: string
-    enum:
-      - ERROR_NONE
-      - ERROR_MISSING_TRAFFIC_DIRECTION
-      - ERROR_INVALID_TRAFFIC_DIRECTION
-      - ERROR_CONVERT_TO_MAP_STRUCT
-      - ERROR_CONVERT_TO_REGO_AST
-      - ERROR_CLASSIFY
-    default: ERROR_NONE
-    description: Error information.
   v1Circuit:
     type: object
     properties:
@@ -770,7 +767,7 @@ definitions:
         type: string
         format: int64
       error:
-        $ref: '#/definitions/v1ClassifierInfoError'
+        $ref: '#/definitions/ClassifierInfoError'
       label_key:
         type: string
       policy_hash:
@@ -778,17 +775,6 @@ definitions:
       policy_name:
         type: string
     description: ClassifierInfo describes details for each ClassifierInfo.
-  v1ClassifierInfoError:
-    type: string
-    enum:
-      - ERROR_NONE
-      - ERROR_EVAL_FAILED
-      - ERROR_EMPTY_RESULTSET
-      - ERROR_AMBIGUOUS_RESULTSET
-      - ERROR_MULTI_EXPRESSION
-      - ERROR_EXPRESSION_NOT_MAP
-    default: ERROR_NONE
-    description: Error information.
   v1CommonAttributes:
     type: object
     properties:

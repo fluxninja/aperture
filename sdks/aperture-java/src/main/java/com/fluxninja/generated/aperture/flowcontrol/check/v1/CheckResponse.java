@@ -20,7 +20,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private CheckResponse() {
-    error_ = 0;
     services_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     flowLabelKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     decisionType_ = 0;
@@ -85,12 +84,6 @@ private static final long serialVersionUID = 0L;
               end_ = subBuilder.buildPartial();
             }
 
-            break;
-          }
-          case 24: {
-            int rawValue = input.readEnum();
-
-            error_ = rawValue;
             break;
           }
           case 34: {
@@ -239,154 +232,6 @@ private static final long serialVersionUID = 0L;
 
   /**
    * <pre>
-   * Error information.
-   * </pre>
-   *
-   * Protobuf enum {@code aperture.flowcontrol.check.v1.CheckResponse.Error}
-   */
-  public enum Error
-      implements com.google.protobuf.ProtocolMessageEnum {
-    /**
-     * <code>ERROR_NONE = 0;</code>
-     */
-    ERROR_NONE(0),
-    /**
-     * <code>ERROR_MISSING_TRAFFIC_DIRECTION = 1;</code>
-     */
-    ERROR_MISSING_TRAFFIC_DIRECTION(1),
-    /**
-     * <code>ERROR_INVALID_TRAFFIC_DIRECTION = 2;</code>
-     */
-    ERROR_INVALID_TRAFFIC_DIRECTION(2),
-    /**
-     * <code>ERROR_CONVERT_TO_MAP_STRUCT = 3;</code>
-     */
-    ERROR_CONVERT_TO_MAP_STRUCT(3),
-    /**
-     * <code>ERROR_CONVERT_TO_REGO_AST = 4;</code>
-     */
-    ERROR_CONVERT_TO_REGO_AST(4),
-    /**
-     * <code>ERROR_CLASSIFY = 5;</code>
-     */
-    ERROR_CLASSIFY(5),
-    UNRECOGNIZED(-1),
-    ;
-
-    /**
-     * <code>ERROR_NONE = 0;</code>
-     */
-    public static final int ERROR_NONE_VALUE = 0;
-    /**
-     * <code>ERROR_MISSING_TRAFFIC_DIRECTION = 1;</code>
-     */
-    public static final int ERROR_MISSING_TRAFFIC_DIRECTION_VALUE = 1;
-    /**
-     * <code>ERROR_INVALID_TRAFFIC_DIRECTION = 2;</code>
-     */
-    public static final int ERROR_INVALID_TRAFFIC_DIRECTION_VALUE = 2;
-    /**
-     * <code>ERROR_CONVERT_TO_MAP_STRUCT = 3;</code>
-     */
-    public static final int ERROR_CONVERT_TO_MAP_STRUCT_VALUE = 3;
-    /**
-     * <code>ERROR_CONVERT_TO_REGO_AST = 4;</code>
-     */
-    public static final int ERROR_CONVERT_TO_REGO_AST_VALUE = 4;
-    /**
-     * <code>ERROR_CLASSIFY = 5;</code>
-     */
-    public static final int ERROR_CLASSIFY_VALUE = 5;
-
-
-    public final int getNumber() {
-      if (this == UNRECOGNIZED) {
-        throw new java.lang.IllegalArgumentException(
-            "Can't get the number of an unknown enum value.");
-      }
-      return value;
-    }
-
-    /**
-     * @param value The numeric wire value of the corresponding enum entry.
-     * @return The enum associated with the given numeric wire value.
-     * @deprecated Use {@link #forNumber(int)} instead.
-     */
-    @java.lang.Deprecated
-    public static Error valueOf(int value) {
-      return forNumber(value);
-    }
-
-    /**
-     * @param value The numeric wire value of the corresponding enum entry.
-     * @return The enum associated with the given numeric wire value.
-     */
-    public static Error forNumber(int value) {
-      switch (value) {
-        case 0: return ERROR_NONE;
-        case 1: return ERROR_MISSING_TRAFFIC_DIRECTION;
-        case 2: return ERROR_INVALID_TRAFFIC_DIRECTION;
-        case 3: return ERROR_CONVERT_TO_MAP_STRUCT;
-        case 4: return ERROR_CONVERT_TO_REGO_AST;
-        case 5: return ERROR_CLASSIFY;
-        default: return null;
-      }
-    }
-
-    public static com.google.protobuf.Internal.EnumLiteMap<Error>
-        internalGetValueMap() {
-      return internalValueMap;
-    }
-    private static final com.google.protobuf.Internal.EnumLiteMap<
-        Error> internalValueMap =
-          new com.google.protobuf.Internal.EnumLiteMap<Error>() {
-            public Error findValueByNumber(int number) {
-              return Error.forNumber(number);
-            }
-          };
-
-    public final com.google.protobuf.Descriptors.EnumValueDescriptor
-        getValueDescriptor() {
-      if (this == UNRECOGNIZED) {
-        throw new java.lang.IllegalStateException(
-            "Can't get the descriptor of an unrecognized enum value.");
-      }
-      return getDescriptor().getValues().get(ordinal());
-    }
-    public final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptorForType() {
-      return getDescriptor();
-    }
-    public static final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptor() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.getDescriptor().getEnumTypes().get(0);
-    }
-
-    private static final Error[] VALUES = values();
-
-    public static Error valueOf(
-        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-      if (desc.getType() != getDescriptor()) {
-        throw new java.lang.IllegalArgumentException(
-          "EnumValueDescriptor is not for this type.");
-      }
-      if (desc.getIndex() == -1) {
-        return UNRECOGNIZED;
-      }
-      return VALUES[desc.getIndex()];
-    }
-
-    private final int value;
-
-    private Error(int value) {
-      this.value = value;
-    }
-
-    // @@protoc_insertion_point(enum_scope:aperture.flowcontrol.check.v1.CheckResponse.Error)
-  }
-
-  /**
-   * <pre>
    * RejectReason contains fields that give further information about rejection.
    * </pre>
    *
@@ -480,7 +325,7 @@ private static final long serialVersionUID = 0L;
     }
     public static final com.google.protobuf.Descriptors.EnumDescriptor
         getDescriptor() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.getDescriptor().getEnumTypes().get(1);
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.getDescriptor().getEnumTypes().get(0);
     }
 
     private static final RejectReason[] VALUES = values();
@@ -592,7 +437,7 @@ private static final long serialVersionUID = 0L;
     }
     public static final com.google.protobuf.Descriptors.EnumDescriptor
         getDescriptor() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.getDescriptor().getEnumTypes().get(2);
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.getDescriptor().getEnumTypes().get(1);
     }
 
     private static final DecisionType[] VALUES = values();
@@ -692,33 +537,6 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public com.google.protobuf.TimestampOrBuilder getEndOrBuilder() {
     return getEnd();
-  }
-
-  public static final int ERROR_FIELD_NUMBER = 3;
-  private int error_;
-  /**
-   * <pre>
-   * error information.
-   * </pre>
-   *
-   * <code>.aperture.flowcontrol.check.v1.CheckResponse.Error error = 3 [json_name = "error"];</code>
-   * @return The enum numeric value on the wire for error.
-   */
-  @java.lang.Override public int getErrorValue() {
-    return error_;
-  }
-  /**
-   * <pre>
-   * error information.
-   * </pre>
-   *
-   * <code>.aperture.flowcontrol.check.v1.CheckResponse.Error error = 3 [json_name = "error"];</code>
-   * @return The error.
-   */
-  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error getError() {
-    @SuppressWarnings("deprecation")
-    com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error.valueOf(error_);
-    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error.UNRECOGNIZED : result;
   }
 
   public static final int SERVICES_FIELD_NUMBER = 4;
@@ -1212,9 +1030,6 @@ private static final long serialVersionUID = 0L;
     if (end_ != null) {
       output.writeMessage(2, getEnd());
     }
-    if (error_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error.ERROR_NONE.getNumber()) {
-      output.writeEnum(3, error_);
-    }
     for (int i = 0; i < services_.size(); i++) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 4, services_.getRaw(i));
     }
@@ -1261,10 +1076,6 @@ private static final long serialVersionUID = 0L;
     if (end_ != null) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getEnd());
-    }
-    if (error_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error.ERROR_NONE.getNumber()) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(3, error_);
     }
     {
       int dataSize = 0;
@@ -1341,7 +1152,6 @@ private static final long serialVersionUID = 0L;
       if (!getEnd()
           .equals(other.getEnd())) return false;
     }
-    if (error_ != other.error_) return false;
     if (!getServicesList()
         .equals(other.getServicesList())) return false;
     if (hasControlPointInfo() != other.hasControlPointInfo()) return false;
@@ -1380,8 +1190,6 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + END_FIELD_NUMBER;
       hash = (53 * hash) + getEnd().hashCode();
     }
-    hash = (37 * hash) + ERROR_FIELD_NUMBER;
-    hash = (53 * hash) + error_;
     if (getServicesCount() > 0) {
       hash = (37 * hash) + SERVICES_FIELD_NUMBER;
       hash = (53 * hash) + getServicesList().hashCode();
@@ -1588,8 +1396,6 @@ private static final long serialVersionUID = 0L;
         end_ = null;
         endBuilder_ = null;
       }
-      error_ = 0;
-
       services_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       bitField0_ = (bitField0_ & ~0x00000001);
       if (controlPointInfoBuilder_ == null) {
@@ -1660,7 +1466,6 @@ private static final long serialVersionUID = 0L;
       } else {
         result.end_ = endBuilder_.build();
       }
-      result.error_ = error_;
       if (((bitField0_ & 0x00000001) != 0)) {
         services_ = services_.getUnmodifiableView();
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -1760,9 +1565,6 @@ private static final long serialVersionUID = 0L;
       }
       if (other.hasEnd()) {
         mergeEnd(other.getEnd());
-      }
-      if (other.error_ != 0) {
-        setErrorValue(other.getErrorValue());
       }
       if (!other.services_.isEmpty()) {
         if (services_.isEmpty()) {
@@ -2211,80 +2013,6 @@ private static final long serialVersionUID = 0L;
         end_ = null;
       }
       return endBuilder_;
-    }
-
-    private int error_ = 0;
-    /**
-     * <pre>
-     * error information.
-     * </pre>
-     *
-     * <code>.aperture.flowcontrol.check.v1.CheckResponse.Error error = 3 [json_name = "error"];</code>
-     * @return The enum numeric value on the wire for error.
-     */
-    @java.lang.Override public int getErrorValue() {
-      return error_;
-    }
-    /**
-     * <pre>
-     * error information.
-     * </pre>
-     *
-     * <code>.aperture.flowcontrol.check.v1.CheckResponse.Error error = 3 [json_name = "error"];</code>
-     * @param value The enum numeric value on the wire for error to set.
-     * @return This builder for chaining.
-     */
-    public Builder setErrorValue(int value) {
-      
-      error_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * error information.
-     * </pre>
-     *
-     * <code>.aperture.flowcontrol.check.v1.CheckResponse.Error error = 3 [json_name = "error"];</code>
-     * @return The error.
-     */
-    @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error getError() {
-      @SuppressWarnings("deprecation")
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error.valueOf(error_);
-      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error.UNRECOGNIZED : result;
-    }
-    /**
-     * <pre>
-     * error information.
-     * </pre>
-     *
-     * <code>.aperture.flowcontrol.check.v1.CheckResponse.Error error = 3 [json_name = "error"];</code>
-     * @param value The error to set.
-     * @return This builder for chaining.
-     */
-    public Builder setError(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Error value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      
-      error_ = value.getNumber();
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * error information.
-     * </pre>
-     *
-     * <code>.aperture.flowcontrol.check.v1.CheckResponse.Error error = 3 [json_name = "error"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearError() {
-      
-      error_ = 0;
-      onChanged();
-      return this;
     }
 
     private com.google.protobuf.LazyStringList services_ = com.google.protobuf.LazyStringArrayList.EMPTY;
