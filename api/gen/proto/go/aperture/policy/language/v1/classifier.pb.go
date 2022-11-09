@@ -103,13 +103,12 @@ func (x *Classifier) GetRules() map[string]*Rule {
 //
 // Flow classification rule extracts a value from request metadata.
 // More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
-// See <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.
+// See https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.
 // There are two ways to define a flow classification rule:
 // * Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.
 // * Rego expression.
 //
 // Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
-// [attribute-context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto)
 //
 // Example of Declarative JSON extractor:
 // ```yaml
@@ -119,7 +118,7 @@ func (x *Classifier) GetRules() map[string]*Rule {
 //     pointer: /user/name
 // ```
 //
-// Example of Rego module which also disables propagation of a label:
+// Example of Rego module which also disables propagation by disabling telemetry:
 // ```yaml
 // rego:
 //   query: data.user_from_cookie.user
@@ -132,8 +131,9 @@ func (x *Classifier) GetRules() map[string]*Rule {
 //     parts: split(session, '.')
 //     object: json.unmarshal(base64url.decode(parts[0]))
 //     user: object.user
-// propagate: false
+// telemetry: false
 // ```
+// [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 type Rule struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -144,7 +144,7 @@ type Rule struct {
 	//	*Rule_Rego_
 	Source isRule_Source `protobuf_oneof:"source"`
 	// Decides if the created flow label should be available as an attribute in OLAP telemetry and
-	// propagated in [baggage](/concepts/flow-control/flow-label.md#baggage))
+	// propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
 	//
 	// :::note
 	// The flow label is always accessible in Aperture Policies regardless of this setting.
@@ -228,7 +228,7 @@ type Rule_Extractor struct {
 }
 
 type Rule_Rego_ struct {
-	// Rego module to extract a value from the rego module.
+	// Rego module to extract a value from.
 	Rego *Rule_Rego `protobuf:"bytes,2,opt,name=rego,proto3,oneof"`
 }
 
@@ -348,7 +348,7 @@ type Extractor_From struct {
 	// ```yaml
 	// from: request.http.headers.user-agent
 	// ```
-	// [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto"
+	// [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 	From string `protobuf:"bytes,1,opt,name=from,proto3,oneof"`
 }
 
