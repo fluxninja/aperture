@@ -145,13 +145,13 @@ func (c *ClassificationEngine) Classify(
 	ctrlPt selectors.ControlPoint,
 	labelsForMatching map[string]string,
 	input ast.Value,
-) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels, error) {
+) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels) {
 	logSampled := c.registry.GetLogger().Sample(zerolog.Sometimes)
 	flowLabels := make(flowlabel.FlowLabels)
 
 	r, ok := c.activeRules.Load().(rules)
 	if !ok {
-		return nil, flowLabels, nil
+		return nil, flowLabels
 	}
 
 	var classifierMsgs []*flowcontrolv1.ClassifierInfo
@@ -176,7 +176,7 @@ func (c *ClassificationEngine) Classify(
 		classifierMsgs = append(classifierMsgs, c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)
 	}
 
-	return classifierMsgs, flowLabels, nil
+	return classifierMsgs, flowLabels
 }
 
 // ActiveRules returns a slice of uncompiled Rules which are currently active.

@@ -29,7 +29,6 @@ import (
 // * otelcollector.ApertureClassifierErrorsLabel
 // * otelcollector.ApertureDecisionTypeLabel
 // * otelcollector.ApertureRejectReasonLabel
-// * otelcollector.ApertureErrorLabel,
 // * dynamic flow labels.
 func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, sourceStr string) {
 	// Aperture Processing Duration
@@ -63,7 +62,6 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		otelcollector.ApertureClassifierErrorsLabel:            pcommon.NewValueSlice(),
 		otelcollector.ApertureDecisionTypeLabel:                pcommon.NewValueStr(checkResponse.DecisionType.String()),
 		otelcollector.ApertureRejectReasonLabel:                pcommon.NewValueStr(checkResponse.GetRejectReason().String()),
-		otelcollector.ApertureErrorLabel:                       pcommon.NewValueStr(checkResponse.GetError().String()),
 	}
 	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiterInfo() != nil {

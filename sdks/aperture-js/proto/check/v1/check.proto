@@ -18,16 +18,6 @@ message CheckRequest {
 
 // CheckResponse contains fields that represent decision made by Check call.
 message CheckResponse {
-  // Error information.
-  enum Error {
-    ERROR_NONE = 0;
-    ERROR_MISSING_TRAFFIC_DIRECTION = 1;
-    ERROR_INVALID_TRAFFIC_DIRECTION = 2;
-    ERROR_CONVERT_TO_MAP_STRUCT = 3;
-    ERROR_CONVERT_TO_REGO_AST = 4;
-    ERROR_CLASSIFY = 5;
-  }
-
   // RejectReason contains fields that give further information about rejection.
   enum RejectReason {
     REJECT_REASON_NONE = 0;
@@ -45,8 +35,6 @@ message CheckResponse {
   google.protobuf.Timestamp start = 1;
   // end timestamp
   google.protobuf.Timestamp end = 2;
-  // error information.
-  Error error = 3;
   // services that matched
   repeated string services = 4;
   // control_point of request

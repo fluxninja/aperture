@@ -214,7 +214,6 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 
 		expectedLabels = map[string]interface{}{
 			oc.ApertureDecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
-			oc.ApertureErrorLabel:          flowcontrolv1.CheckResponse_ERROR_NONE.String(),
 			oc.ApertureRejectReasonLabel:   flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
 			oc.ApertureResponseStatusLabel: oc.ApertureResponseStatusOK,
 			oc.ApertureClassifiersLabel:    []interface{}{"policy_name:foo,classifier_index:1"},
@@ -319,7 +318,6 @@ workload_latency_ms_count{component_index="2",policy_hash="fizz-hash",policy_nam
 
 		expectedLabels = map[string]interface{}{
 			oc.ApertureDecisionTypeLabel:         flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
-			oc.ApertureErrorLabel:                flowcontrolv1.CheckResponse_ERROR_NONE.String(),
 			oc.ApertureRateLimitersLabel:         []interface{}{},
 			oc.ApertureDroppingRateLimitersLabel: []interface{}{},
 			oc.ApertureConcurrencyLimitersLabel: []interface{}{
