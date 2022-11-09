@@ -19,6 +19,9 @@ local dataSources =
         type: 'prometheus',
         access: 'proxy',
         url: 'http://controller-prometheus-server',
+        jsonData: {
+          timeInterval: '1s',
+        },
       }),
     operationsPrometheus:
       dataSource.new('operations-prometheus') +
