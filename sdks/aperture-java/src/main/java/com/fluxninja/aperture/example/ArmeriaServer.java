@@ -11,6 +11,11 @@ import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 public class ArmeriaServer {
+
+    public static final String DEFAULT_APP_PORT = "8080";
+    public static final String DEFAULT_AGENT_HOST = "localhost";
+    public static final String DEFAULT_AGENT_PORT = "8089";
+
     public static HttpService createHelloHTTPService() {
         return new AbstractHttpService() {
             @Override
@@ -37,14 +42,20 @@ public class ArmeriaServer {
     }
 
     public static void main(String[] args) {
-        final String agentHost = "localhost";
-        final int agentPort = 8089;
+        String agentHost = System.getenv("FN_AGENT_HOST");
+        if (agentHost == null) {
+            agentHost = DEFAULT_AGENT_HOST;
+        }
+        String agentPort = System.getenv("FN_AGENT_PORT");
+        if (agentPort == null) {
+            agentPort = DEFAULT_AGENT_PORT;
+        }
 
         ApertureSDK apertureSDK;
         try {
             apertureSDK = ApertureSDK.builder()
                     .setHost(agentHost)
-                    .setPort(agentPort)
+                    .setPort(Integer.parseInt(agentPort))
                     .setDuration(Duration.ofMillis(1000))
                     .build();
         } catch (ApertureSDKException e) {
