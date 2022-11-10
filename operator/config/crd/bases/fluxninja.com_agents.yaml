@@ -1332,6 +1332,28 @@ spec:
                               will be sent regardless of size.
                             type: string
                         type: object
+                      ports:
+                        description: Ports configures debug, health and extension
+                          ports values.
+                        properties:
+                          debug_port:
+                            description: Port on which otel collector exposes prometheus
+                              metrics on /metrics path.
+                            format: int32
+                            type: integer
+                          health_check_port:
+                            description: Port on which health check extension in exposed.
+                            format: int32
+                            type: integer
+                          pprof_port:
+                            description: Port on which pprof extension in exposed.
+                            format: int32
+                            type: integer
+                          zpages_port:
+                            description: Port on which zpages extension in exposed.
+                            format: int32
+                            type: integer
+                        type: object
                     type: object
                   peer_discovery:
                     description: Peer discovery configuration.

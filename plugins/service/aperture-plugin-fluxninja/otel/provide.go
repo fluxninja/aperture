@@ -60,7 +60,7 @@ func provideOtelConfig(baseConfig *otelcollector.OTELConfig,
 	}
 
 	config := otelcollector.NewOTELConfig()
-	config.AddDebugExtensions()
+	log.Warn().Msgf("DARIA LOG PLUGIN OTEL CONFIG: %+v", config)
 	addFluxninjaExporter(config, &pluginConfig, grpcClientConfig, httpClientConfig)
 
 	lifecycle.Append(fx.Hook{

@@ -86,6 +86,12 @@ var _ = Describe("ConfigMap for Agent", func() {
 									SendBatchSize:    100,
 									SendBatchMaxSize: 200,
 								},
+								Ports: otelcollector.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
 							},
 							Etcd: etcd.EtcdConfig{
 								Endpoints: []string{"http://agent-etcd:2379"},
