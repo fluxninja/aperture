@@ -706,6 +706,8 @@ definitions:
         $ref: '#/definitions/BatchPostrollupConfig'
       batch_prerollup:
         $ref: '#/definitions/BatchPrerollupConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
     title: OtelConfig is the configuration for the OTEL collector.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
@@ -748,6 +750,40 @@ definitions:
     title: PolicyCommon holds common configuration for Watchdog policies.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+  PortsConfig:
+    properties:
+      debug_port:
+        description: Port on which otel collector exposes prometheus metrics on /metrics
+          path.
+        format: uint32
+        type: integer
+        x-go-default: "8888"
+        x-go-name: DebugPort
+        x-go-validate: gte=0
+      health_check_port:
+        description: Port on which health check extension in exposed.
+        format: uint32
+        type: integer
+        x-go-default: "13133"
+        x-go-name: HealthCheckPort
+        x-go-validate: gte=0
+      pprof_port:
+        description: Port on which pprof extension in exposed.
+        format: uint32
+        type: integer
+        x-go-default: "1777"
+        x-go-name: PprofPort
+        x-go-validate: gte=0
+      zpages_port:
+        description: Port on which zpages extension in exposed.
+        format: uint32
+        type: integer
+        x-go-default: "55679"
+        x-go-name: ZpagesPort
+        x-go-validate: gte=0
+    title: PortsConfig defines configuration for OTEL debug and extension ports.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   ProfilersConfig:
     properties:
       cpu_profiler:

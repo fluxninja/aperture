@@ -120,6 +120,11 @@ otel:
     send_batch_size: 100
     send_batch_max_size: 200
     timeout: 1s
+  ports:
+    debug_port: 8888
+    health_check_port: 13133
+    pprof_port: 1777
+    zpages_port: 55679
 peer_discovery:
   advertisement_addr: ""
 plugins:
