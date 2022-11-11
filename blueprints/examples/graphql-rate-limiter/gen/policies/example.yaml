@@ -1,0 +1,58 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: example
+spec:
+  circuit:
+    components:
+      - rate_limiter:
+          default_config:
+            overrides: []
+          in_ports:
+            limit:
+              constant_value: "20.0"
+          label_key: user_id
+          lazy_sync:
+            enabled: true
+            num_sync: 5
+          limit_reset_interval: 1s
+          selector:
+            flow_selector:
+              control_point:
+                traffic: ingress
+            service_selector:
+              agent_group: default
+              service: service-graphql-demo-app.demoapp.svc.cluster.local
+    evaluation_interval: 300s
+  resources:
+    classifiers:
+      - rules:
+          user_id:
+            rego:
+              query: data.graphql_example.userID
+              source: "package graphql_example\n\nquery_ast :=
+                graphql.parse_query(input.parsed_body.query)\n\
+                \ncreateTodoByUserIds[name] := value {\n  some
+                operation\n  walk(query_ast,\
+                \ [_, operation])\n  operation.Name ==
+                \"createTodo\"\n  count(operation.SelectionSet)\
+                \ > 0\n  some selection\n  walk(operation.SelectionSet, [_,
+                selection])\n\
+                \  selection.Name ==
+                \"createTodo\"\n  count(selection.Arguments) >\
+                \ 0\n  argument := selection.Arguments[_]\n  argument.Name ==
+                \"input\"\
+                \n  count(argument.Value.Children) > 0\n  child :=
+                argument.Value.Children[_]\n\
+                \  child.Name == \"userId\"\n  name := child.Name\n  value :=
+                child.Value.Raw\n\
+                }\n\nuserID := createTodoByUserIds.userId\n"
+        selector:
+          flow_selector:
+            control_point:
+              traffic: ingress
+          service_selector:
+            agent_group: default
+            service: service-graphql-demo-app.demoapp.svc.cluster.local

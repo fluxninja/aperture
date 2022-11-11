@@ -28,3 +28,5 @@ spec:
               agent_group: default
               service: service1-demo-app.demoapp.svc.cluster.local
     evaluation_interval: 300s
+  resources:
+    classifiers: []

@@ -22,6 +22,7 @@
     rateLimiterSelector: error 'rateLimiterSelector must be set',
     limitResetInterval: '1s',
     labelKey: error 'policy.labelKey is required',
+    classifiers: [],
     /**
     * @section Policy
     * @subsection Overrides
