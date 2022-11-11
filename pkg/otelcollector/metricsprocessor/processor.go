@@ -137,7 +137,12 @@ func (p *metricsProcessor) updateMetrics(
 
 			// Update rate limiter metrics
 			if rl := decision.GetRateLimiterInfo(); rl != nil {
-				p.updateMetricsForRateLimiter(limiterID)
+				labels := map[string]string{
+					metrics.PolicyNameLabel:     decision.PolicyName,
+					metrics.PolicyHashLabel:     decision.PolicyHash,
+					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
+				}
+				p.updateMetricsForRateLimiter(limiterID, labels, checkResponse.DecisionType)
 			}
 		}
 	}
@@ -193,7 +198,7 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 	}
 }
 
-func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID) {
+func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID, labels map[string]string, decisionType flowcontrolv1.CheckResponse_DecisionType) {
 	rateLimiter := p.cfg.engine.GetRateLimiter(limiterID)
 	if rateLimiter == nil {
 		log.Sample(zerolog.Sometimes).Warn().
@@ -203,7 +208,9 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 			Msg("RateLimiter not found")
 		return
 	}
-	requestCounter := rateLimiter.GetRequestCounter()
+	// Add decision type label to the request counter metric
+	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	requestCounter := rateLimiter.GetRequestCounter(labels)
 	if requestCounter != nil {
 		requestCounter.Inc()
 	}
