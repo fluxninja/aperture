@@ -37,7 +37,7 @@ commands:
 ```sh
 $ git clone https://github.com/fluxninja/aperture.git
 # change directory to playground
-$ cd playground
+$ cd aperture/playground
 # start a local kubernetes cluster
 $ ctlptl apply -f ctlptl-kind-config.yaml
 # start Tilt and run services defined in Tiltfile
