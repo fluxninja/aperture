@@ -10,7 +10,6 @@ sidebar_position: 1
 
 ```mdx-code-block
 import {apertureVersion} from '@site/src/version';
-import CodeBlock from '@theme/CodeBlock';
 ```
 
 ## Introduction
