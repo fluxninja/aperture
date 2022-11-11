@@ -12,6 +12,10 @@ keywords:
   - cloud
 ---
 
+```mdx-code-block
+export const apertureVersion = "0.9.0";
+```
+
 # Introduction
 
 ```mdx-code-block
