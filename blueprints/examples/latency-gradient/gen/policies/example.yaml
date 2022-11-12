@@ -114,7 +114,7 @@ spec:
           out_ports:
             output:
               signal_name: LATENCY_EMA
-          warm_up_window: 10s
+          warm_up_window: 60s
       - gradient_controller:
           in_ports:
             control_variable:
