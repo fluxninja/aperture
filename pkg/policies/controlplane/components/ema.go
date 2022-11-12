@@ -35,10 +35,11 @@ type EMA struct {
 	correctionFactorOnMinViolation float64
 	currentStage                   stage
 	// The initial value of EMA is the average of the first warm_up_window number of observations.
-	warmUpWindow uint32
-	emaWindow    uint32
-	warmupCount  uint32
-	invalidCount uint32
+	warmupWindow      uint32
+	emaWindow         uint32
+	warmupCount       uint32
+	invalidCount      uint32
+	validDuringWarmup bool
 }
 
 // Make sure EMA complies with Component interface.
@@ -61,9 +62,10 @@ func NewEMAAndOptions(emaProto *policylangv1.EMA,
 		correctionFactorOnMinViolation: emaProto.CorrectionFactorOnMinEnvelopeViolation,
 		correctionFactorOnMaxViolation: emaProto.CorrectionFactorOnMaxEnvelopeViolation,
 		alpha:                          alpha,
-		warmUpWindow:                   warmUpWindow,
+		warmupWindow:                   warmUpWindow,
 		emaWindow:                      uint32(emaWindow),
 		policyReadAPI:                  policyReadAPI,
+		validDuringWarmup:              emaProto.ValidDuringWarmup,
 	}
 	ema.resetStages()
 	return ema, fx.Options(), nil
@@ -99,19 +101,24 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 			ema.sum += input.Value()
 			ema.count++
 			// Decide to switch to EMA stage
-			if ema.warmupCount >= ema.warmUpWindow {
+			if ema.warmupCount >= ema.warmupWindow {
 				ema.currentStage = emaStage
 			}
 		} else {
 			// Immediately reset on any missing values during warm-up.
 			ema.resetStages()
 		}
-		// Emit the avg for the valid values in the warm-up window.
-		avg, err := ema.computeAverage()
-		if err != nil {
-			return retErr(err)
+		// Emit valid output during emaStage or during warm-up if configured to do so.
+		if ema.currentStage == emaStage || ema.validDuringWarmup {
+			// Emit the avg value of input signal during the warm-up window.
+			avg, err := ema.computeAverage()
+			if err != nil {
+				return retErr(err)
+			}
+			output = avg
+		} else {
+			output = runtime.InvalidReading()
 		}
-		output = avg
 	case emaStage:
 		if input.Valid() {
 			if !ema.lastGoodOutput.Valid() {
@@ -135,15 +142,14 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		logger.Panic().Msg("unexpected ema stage")
 	}
 
-	// apply correction factor
-	var err error
-	output, err = ema.applyEnvelope(output, minEnvelope, maxEnvelope)
-	if err != nil {
-		return retErr(err)
-	}
-
 	// Set the last good output
 	if output.Valid() {
+		// apply correction
+		var err error
+		output, err = ema.applyCorrection(output, minEnvelope, maxEnvelope)
+		if err != nil {
+			return retErr(err)
+		}
 		ema.lastGoodOutput = output
 	}
 	// Returns Exponential Moving Average of a series of readings.
@@ -164,10 +170,7 @@ func (ema *EMA) computeAverage() (runtime.Reading, error) {
 // DynamicConfigUpdate is a no-op for EMA.
 func (ema *EMA) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
 
-func (ema *EMA) applyEnvelope(output, minEnvelope, maxEnvelope runtime.Reading) (runtime.Reading, error) {
-	if !output.Valid() {
-		return output, nil
-	}
+func (ema *EMA) applyCorrection(output, minEnvelope, maxEnvelope runtime.Reading) (runtime.Reading, error) {
 	value := output.Value()
 	minxMaxConstraints := constraints.NewMinMaxConstraints()
 	if maxEnvelope.Valid() {

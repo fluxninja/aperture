@@ -869,6 +869,12 @@ The EMA filter also employs a min-max-envelope logic during warm up stage, expla
 ([V1EMAOuts](#v1-e-m-a-outs)) Output ports for the EMA component.
 
 </dd>
+<dt>valid_during_warmup</dt>
+<dd>
+
+(bool) Whether the output is valid during the warm up stage.
+
+</dd>
 <dt>warm_up_window</dt>
 <dd>
 

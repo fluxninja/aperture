@@ -49,7 +49,7 @@
 | Parameter Name                | Parameter Type | Default   | Description                                                                                   |
 | ----------------------------- | -------------- | --------- | --------------------------------------------------------------------------------------------- |
 | `policy.ema.window`           | `string`       | `"1500s"` | How far back to look when calculating moving average.                                         |
-| `policy.ema.warmUpWindow`     | `string`       | `"10s"`   | How much time to give circuit to learn the average value before we start emitting EMA values. |
+| `policy.ema.warmUpWindow`     | `string`       | `"60s"`   | How much time to give circuit to learn the average value before we start emitting EMA values. |
 | `policy.ema.correctionFactor` | `string`       | `0.95`    | Factor that is applied to the EMA value when it's above the maximum envelope.                 |
 
 #### Gradient Controller

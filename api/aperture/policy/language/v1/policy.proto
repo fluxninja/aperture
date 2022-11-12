@@ -449,6 +449,14 @@ message EMA {
       value: {string_value: "gte=0,lte=1.0"}
     }
   }]; // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
+
+  // Whether the output is valid during the warm up stage.
+  bool valid_during_warmup = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {bool_value: false}
+    }
+  }]; // @gotags: default:"false"
 }
 
 // Type of combinator that computes the arithmetic operation on the operand signals
