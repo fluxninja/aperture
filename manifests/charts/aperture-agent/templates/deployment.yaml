@@ -129,6 +129,18 @@ spec:
             - containerPort: 8080
               name: metrics
               protocol: TCP
+            - containerPort: 8888
+              name: otel-debug
+              protocol: TCP
+            - containerPort: 13133
+              name: otel-healthcheck
+              protocol: TCP
+            - containerPort: 1777
+              name: otel-pprof
+              protocol: TCP
+            - containerPort: 55679
+              name: otel-zpages
+              protocol: TCP
           {{- if .Values.operator.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.operator.livenessProbe "enabled") "context" $) | nindent 12 }}
             httpGet:
