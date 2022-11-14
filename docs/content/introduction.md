@@ -13,10 +13,8 @@ keywords:
 ---
 
 ```mdx-code-block
-export const apertureVersion = "0.9.0";
+export const apertureVersion = "0.10.0";
 ```
-
-# Introduction
 
 ```mdx-code-block
 import Tabs from '@theme/Tabs';
