@@ -9,7 +9,7 @@ sidebar_position: 1
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '@site/src/version';
+import {apertureVersion} from '../../introduction.md';
 ```
 
 ## Introduction
@@ -134,6 +134,6 @@ To understand what the above policy does, please see the
 tutorial.
 
 [jsonnet]: https://github.com/google/go-jsonnet
-
-[tk]: https://grafana.com/oss/tanka/ [policies]: /concepts/policy/policy.md
+[tk]: https://grafana.com/oss/tanka/
+[policies]: /concepts/policy/policy.md
 [service]: /concepts/service.md
