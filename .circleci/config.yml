@@ -159,7 +159,7 @@ jobs:
           environment:
             CGO_ENABLED: "1"
             PREFIX: "aperture"
-            LDFLAGS: "-s -w"
+            LDFLAGS: "-s -w -extldflags \"-Wl,--allow-multiple-definition\""
       - run:
           name: Install nFPM
           command: |
