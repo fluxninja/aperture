@@ -684,6 +684,11 @@ definitions:
         description: Output ports for the EMA component.
         x-order: 4
         $ref: '#/definitions/v1EMAOuts'
+      valid_during_warmup:
+        description: Whether the output is valid during the warm up stage.
+        type: boolean
+        x-go-default: false
+        x-order: 5
       warm_up_window:
         description: |-
           Duration of EMA warming up window.
@@ -691,7 +696,7 @@ definitions:
           The initial value of the EMA is the average of signal readings received during the warm up window.
         type: string
         x-go-default: 0s
-        x-order: 5
+        x-order: 6
   v1EMAIns:
     description: Inputs for the EMA component.
     type: object

@@ -73,7 +73,7 @@
     */
     ema: {
       window: '1500s',
-      warmUpWindow: '10s',
+      warmUpWindow: '60s',
       correctionFactor: '0.95',
     },
     /**

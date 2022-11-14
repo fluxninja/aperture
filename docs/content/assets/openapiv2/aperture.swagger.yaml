@@ -1058,6 +1058,10 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1EMAOuts'
         description: Output ports for the EMA component.
+      valid_during_warmup:
+        type: boolean
+        description: Whether the output is valid during the warm up stage.
+        x-go-default: false
       warm_up_window:
         type: string
         description: |-
