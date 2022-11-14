@@ -563,6 +563,23 @@ def schedule_pvc_deletion(namespace, selector):
         ]
     )
 
+def add_to_image_tag(resource_info):
+    for key, val in resource_info.items():
+        if key == "images":
+            for i,all_img in enumerate(val):
+                if i == 0:
+                    all_img["build_args"] = {"RACE":"yes"}
+
+def add_race_arg(dep_tree):
+    for _, resources in dep_tree.items():
+        for resource, resource_info in resources.items():
+            if resource == "agent":
+                add_to_image_tag(resource_info)
+            if resource == "controller":
+                add_to_image_tag(resource_info)
+
+
+
 #####################
 ### OPTION PARSER ###
 #####################
@@ -953,6 +970,7 @@ config.define_bool("manual", usage="Set trigger mode to manual")
 config.define_bool("only", usage="Only deploy explicitly resources, without handling dependencies")
 config.define_bool("verbose", usage="Enable verbose logging")
 config.define_bool("trace", usage="Enable trace logging")
+config.define_bool("race",usage="Enable race detector for agent and controller")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
 config.set_enabled_resources([])
@@ -964,6 +982,8 @@ if cfg.get("list-resources", False):
 if cfg.get("manual", False):
     trigger_mode(TRIGGER_MODE_MANUAL)
 
+if cfg.get("race",False):
+    add_race_arg(DEP_TREE)
 
 cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false"))
 TRACE = cfg_trace == True

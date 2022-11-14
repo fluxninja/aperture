@@ -15,6 +15,8 @@ ARG GIT_BRANCH
 ENV GIT_BRANCH=${GIT_BRANCH}
 ARG VERSION
 ENV VERSION=${VERSION}
+ARG RACE
+ENV RACE=${RACE}
 
 FROM base AS builder
 RUN --mount=type=cache,target=/go/pkg/ \
