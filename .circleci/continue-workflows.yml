@@ -20,7 +20,7 @@ executors:
       - image: cimg/python:3.10.6
   base-machine-executor:
     machine:
-      image: ubuntu-2204:2022.04.2
+      image: ubuntu-2204:2022.10.2
       docker_layer_caching: true
 
 parameters:
