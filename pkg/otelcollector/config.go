@@ -326,8 +326,6 @@ func NewOtelConfig(in FxIn) (*OtelParams, error) {
 		return nil, err
 	}
 
-	log.Warn().Msgf("DARIA LOG OTEL CONFIG: %+v, USER CONFIG: %+v", config, userCfg)
-
 	config.SetDebugPort(&userCfg)
 	config.AddDebugExtensions(&userCfg)
 
