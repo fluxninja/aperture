@@ -6,7 +6,7 @@ public final class Constants {
   // Library name and version can be used by the user to create a resource that
   // connects to telemetry export.
   public static final String LIBRARY_NAME = "aperture-java";
-  public static final String LIBRARY_VERSION = "0.13.0";
+  public static final String LIBRARY_VERSION = "0.19.0";
 
   // Config defaults.
   public static final Duration DEFAULT_RPC_TIMEOUT = Duration.ofMillis(200);
