@@ -326,8 +326,6 @@ func NewOtelConfig(in FxIn) (*OtelParams, error) {
 		return nil, err
 	}
 
-	log.Warn().Msgf("DARIA LOG OTEL CONFIG: %+v, USER CONFIG: %+v", config, userCfg)
-
 	config.SetDebugPort(&userCfg)
 	config.AddDebugExtensions(&userCfg)
 
@@ -339,6 +337,18 @@ func NewOtelConfig(in FxIn) (*OtelParams, error) {
 		Config:     config,
 	}
 	return cfg, nil
+}
+
+// NewDefaultOtelConfig creates OtelConfig with all the default values set.
+func NewDefaultOtelConfig() *OtelConfig {
+	return &OtelConfig{
+		Ports: PortsConfig{
+			DebugPort:       8888,
+			HealthCheckPort: 13133,
+			PprofPort:       1777,
+			ZpagesPort:      55679,
+		},
+	}
 }
 
 // AddMetricsPipeline adds metrics to pipeline for agent OTEL collector.
