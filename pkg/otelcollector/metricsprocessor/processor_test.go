@@ -15,7 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/util/json"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	m "github.com/fluxninja/aperture/pkg/metrics"
 	oc "github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
@@ -32,6 +32,7 @@ var _ = Describe("Metrics Processor", func() {
 		rateLimiter       *mocks.MockRateLimiter
 		classifier        *mocks.MockClassifier
 		summaryVec        *prometheus.SummaryVec
+		counterVec        *prometheus.CounterVec
 		rateCounter       prometheus.Counter
 		classifierCounter prometheus.Counter
 		baseCheckResp     *flowcontrolv1.CheckResponse
@@ -63,7 +64,14 @@ var _ = Describe("Metrics Processor", func() {
 			Help: "dummy",
 		}, []string{
 			m.PolicyNameLabel, m.PolicyHashLabel, m.ComponentIndexLabel,
-			m.DecisionTypeLabel, m.WorkloadIndexLabel,
+			m.WorkloadIndexLabel,
+		})
+		counterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+			Name: m.WorkloadCounterMetricName,
+			Help: "dummy",
+		}, []string{
+			m.PolicyNameLabel, m.PolicyHashLabel, m.ComponentIndexLabel,
+			m.WorkloadIndexLabel, m.DecisionTypeLabel,
 		})
 		rateCounter = prometheus.NewCounter(prometheus.CounterOpts{
 			Name: m.RateLimiterCounterMetricName,
@@ -115,21 +123,18 @@ var _ = Describe("Metrics Processor", func() {
 			m.PolicyNameLabel:     "foo",
 			m.PolicyHashLabel:     "foo-hash",
 			m.ComponentIndexLabel: "1",
-			m.DecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
 			m.WorkloadIndexLabel:  "0",
 		}
 		labelsFizz1 = map[string]string{
 			m.PolicyNameLabel:     "fizz",
 			m.PolicyHashLabel:     "fizz-hash",
 			m.ComponentIndexLabel: "1",
-			m.DecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
 			m.WorkloadIndexLabel:  "1",
 		}
 		labelsFizz2 = map[string]string{
 			m.PolicyNameLabel:     "fizz",
 			m.PolicyHashLabel:     "fizz-hash",
 			m.ComponentIndexLabel: "2",
-			m.DecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
 			m.WorkloadIndexLabel:  "2",
 		}
 		engine.EXPECT().GetConcurrencyLimiter(gomock.Any()).Return(conLimiter).AnyTimes()
@@ -191,6 +196,7 @@ var _ = Describe("Metrics Processor", func() {
 		}}
 		baseCheckResp.FluxMeterInfos = []*flowcontrolv1.FluxMeterInfo{{FluxMeterName: "bar"}}
 		baseCheckResp.FlowLabelKeys = []string{"someLabel"}
+		baseCheckResp.TelemetryFlowLabels = map[string]string{"flowLabelKey": "flowLabelValue"}
 		baseCheckResp.Services = []string{"svc1", "svc2"}
 
 		// <split> is a workaround until PR https://github.com/prometheus/client_golang/pull/1143 is released
@@ -202,15 +208,15 @@ classifier_counter{component_index="1",policy_hash="foo-hash",policy_name="foo"}
 rate_limiter_counter{component_index="2",policy_hash="foo-hash",policy_name="foo"} 1
 <split># HELP workload_latency_ms dummy
 # TYPE workload_latency_ms summary
-workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+workload_latency_ms_sum{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 `
 
 		expectedLabels = map[string]interface{}{
-			oc.ApertureDecisionTypeLabel: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
-			oc.ApertureErrorLabel:        flowcontrolv1.CheckResponse_ERROR_NONE.String(),
-			oc.ApertureRejectReasonLabel: flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
-			oc.ApertureClassifiersLabel:  []interface{}{"policy_name:foo,classifier_index:1"},
+			oc.ApertureDecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+			oc.ApertureRejectReasonLabel:   flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
+			oc.ApertureResponseStatusLabel: oc.ApertureResponseStatusOK,
+			oc.ApertureClassifiersLabel:    []interface{}{"policy_name:foo,classifier_index:1"},
 
 			oc.ApertureClassifierErrorsLabel: []interface{}{fmt.Sprintf("%s,policy_name:foo,classifier_index:1,policy_hash:foo-hash",
 				flowcontrolv1.ClassifierInfo_ERROR_EMPTY_RESULTSET.String())},
@@ -227,15 +233,19 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 			oc.ApertureProcessingDurationLabel: float64(1000),
 			oc.ApertureServicesLabel:           []interface{}{"svc1", "svc2"},
 			oc.ApertureControlPointLabel:       "type:TYPE_INGRESS",
+			"flowLabelKey":                     "flowLabelValue",
 		}
 		source = oc.ApertureSourceEnvoy
 
 		summary, err := summaryVec.GetMetricWith(labelsFoo1)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetObserver(labelsFoo1).Return(summary).Times(1)
+		conLimiter.EXPECT().GetLatencyObserver(labelsFoo1).Return(summary).Times(1)
+		counter, err := counterVec.GetMetricWith(insertRejectLabel(labelsFoo1))
+		Expect(err).NotTo(HaveOccurred())
+		conLimiter.EXPECT().GetRequestCounter(insertRejectLabel(labelsFoo1)).Return(counter).Times(1)
 
-		rateLimiter.EXPECT().GetCounter().Return(rateCounter).Times(1)
-		classifier.EXPECT().GetCounter().Return(classifierCounter).Times(1)
+		rateLimiter.EXPECT().GetRequestCounter().Return(rateCounter).Times(1)
+		classifier.EXPECT().GetRequestCounter().Return(classifierCounter).Times(1)
 	})
 
 	It("Processes logs for single policy - feature", func() {
@@ -247,8 +257,8 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 
 		expectedMetrics = `# HELP workload_latency_ms dummy
 # TYPE workload_latency_ms summary
-workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+workload_latency_ms_sum{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 `
 
 		expectedLabels = map[string]interface{}{
@@ -265,7 +275,10 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 
 		summary, err := summaryVec.GetMetricWith(labelsFoo1)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetObserver(labelsFoo1).Return(summary).Times(1)
+		conLimiter.EXPECT().GetLatencyObserver(labelsFoo1).Return(summary).Times(1)
+		counter, err := counterVec.GetMetricWith(insertRejectLabel(labelsFoo1))
+		Expect(err).NotTo(HaveOccurred())
+		conLimiter.EXPECT().GetRequestCounter(insertRejectLabel(labelsFoo1)).Return(counter).Times(1)
 	})
 
 	It("Processes logs for two policies - ingress", func() {
@@ -295,17 +308,16 @@ workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJEC
 
 		expectedMetrics = `# HELP workload_latency_ms dummy
 # TYPE workload_latency_ms summary
-workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
-workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
-workload_latency_ms_sum{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-workload_latency_ms_count{component_index="1",decision_type="DECISION_TYPE_REJECTED",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
-workload_latency_ms_sum{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
-workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJECTED",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
+workload_latency_ms_sum{component_index="1",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
+workload_latency_ms_count{component_index="1",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
+workload_latency_ms_sum{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+workload_latency_ms_sum{component_index="2",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
+workload_latency_ms_count{component_index="2",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 `
 
 		expectedLabels = map[string]interface{}{
 			oc.ApertureDecisionTypeLabel:         flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
-			oc.ApertureErrorLabel:                flowcontrolv1.CheckResponse_ERROR_NONE.String(),
 			oc.ApertureRateLimitersLabel:         []interface{}{},
 			oc.ApertureDroppingRateLimitersLabel: []interface{}{},
 			oc.ApertureConcurrencyLimitersLabel: []interface{}{
@@ -331,15 +343,24 @@ workload_latency_ms_count{component_index="2",decision_type="DECISION_TYPE_REJEC
 
 		summaryFoo, err := summaryVec.GetMetricWith(labelsFoo1)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetObserver(labelsFoo1).Return(summaryFoo).Times(1)
+		conLimiter.EXPECT().GetLatencyObserver(labelsFoo1).Return(summaryFoo).Times(1)
+		counterFoo, err := counterVec.GetMetricWith(insertRejectLabel(labelsFoo1))
+		Expect(err).NotTo(HaveOccurred())
+		conLimiter.EXPECT().GetRequestCounter(insertRejectLabel(labelsFoo1)).Return(counterFoo).Times(1)
 
 		summaryFizz1, err := summaryVec.GetMetricWith(labelsFizz1)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetObserver(labelsFizz1).Return(summaryFizz1).Times(1)
+		conLimiter.EXPECT().GetLatencyObserver(labelsFizz1).Return(summaryFizz1).Times(1)
+		counterFizz1, err := counterVec.GetMetricWith(insertRejectLabel(labelsFizz1))
+		Expect(err).NotTo(HaveOccurred())
+		conLimiter.EXPECT().GetRequestCounter(insertRejectLabel(labelsFizz1)).Return(counterFizz1).Times(1)
 
 		summaryFizz2, err := summaryVec.GetMetricWith(labelsFizz2)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetObserver(labelsFizz2).Return(summaryFizz2).Times(1)
+		conLimiter.EXPECT().GetLatencyObserver(labelsFizz2).Return(summaryFizz2).Times(1)
+		counterFizz2, err := counterVec.GetMetricWith(insertRejectLabel(labelsFizz2))
+		Expect(err).NotTo(HaveOccurred())
+		conLimiter.EXPECT().GetRequestCounter(insertRejectLabel(labelsFizz2)).Return(counterFizz2).Times(1)
 	})
 })
 
@@ -362,9 +383,9 @@ func someLogs(
 			logRecord := instrumentationLogsSlice.At(j).LogRecords().AppendEmpty()
 			marshalledCheckResponse, err := json.Marshal(checkResponse)
 			Expect(err).NotTo(HaveOccurred())
-			logRecord.Attributes().PutString(oc.ApertureSourceLabel, source)
-			logRecord.Attributes().PutString(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
-			logRecord.Attributes().PutString(oc.HTTPStatusCodeLabel, "201")
+			logRecord.Attributes().PutStr(oc.ApertureSourceLabel, source)
+			logRecord.Attributes().PutStr(oc.ApertureCheckResponseLabel, string(marshalledCheckResponse))
+			logRecord.Attributes().PutStr(oc.HTTPStatusCodeLabel, "201")
 			logRecord.Attributes().PutDouble(oc.WorkloadDurationLabel, 5)
 			logRecord.Attributes().PutDouble(oc.EnvoyAuthzDurationLabel, 1)
 			for i, fm := range checkResponse.FluxMeterInfos {
@@ -395,4 +416,14 @@ func allLogRecords(logs plog.Logs) []plog.LogRecord {
 	}
 
 	return logRecords
+}
+
+func insertRejectLabel(labels map[string]string) map[string]string {
+	// create a copy of labels
+	newLabels := make(map[string]string, len(labels))
+	for k, v := range labels {
+		newLabels[k] = v
+	}
+	newLabels[m.DecisionTypeLabel] = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String()
+	return newLabels
 }

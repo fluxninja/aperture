@@ -12,7 +12,9 @@ keywords:
   - cloud
 ---
 
-# Introduction
+```mdx-code-block
+export const apertureVersion = "0.10.0";
+```
 
 ```mdx-code-block
 import Tabs from '@theme/Tabs';
@@ -34,7 +36,7 @@ flowchart TD
     blueprints[/"Blueprints"/]
     policies[/"Policies"/]
     subgraph controller["Aperture Controller"]
-        circuit[Control Circuit]
+        circuit["Control Circuit"]
     end
     subgraph databases["Aperture Databases"]
       prometheus[("Prometheus")]

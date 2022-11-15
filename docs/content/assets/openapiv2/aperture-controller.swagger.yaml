@@ -174,15 +174,6 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/v1MatchExpression'
-  RateLimiterDynamicConfig:
-    type: object
-    title: Dynamic Configuration for the rate limiter
-    properties:
-      overrides:
-        description: Allows to specify different limits for particular label values.
-        type: array
-        items:
-          $ref: '#/definitions/RateLimiterOverride'
   RateLimiterLazySync:
     type: object
     properties:
@@ -833,6 +824,10 @@ definitions:
       out_ports:
         description: Output ports for the EMA component.
         $ref: '#/definitions/v1EMAOuts'
+      valid_during_warmup:
+        description: Whether the output is valid during the warm up stage.
+        type: boolean
+        x-go-default: false
       warm_up_window:
         description: |-
           Duration of EMA warming up window.
@@ -1037,7 +1032,7 @@ definitions:
           (and propagated in baggage).
 
           This limitation doesn't apply to selectors of other entities, like
-          FluxMeters or actuators. It's valid to create a flow label on a control
+          Flux Meters or Actuators. It's valid to create a flow label on a control
           point using classifier, and immediately use it for matching on the same
           control point.
           :::
@@ -1049,7 +1044,7 @@ definitions:
   v1FluxMeter:
     description: |-
       :::info
-      See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+      See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
       :::
 
       Example of a selector that creates a histogram metric for all HTTP requests
@@ -1063,7 +1058,7 @@ definitions:
             traffic: ingress
       ```
     type: object
-    title: FluxMeter gathers metrics for the traffic that matches its selector
+    title: Flux Meter gathers metrics for the traffic that matches its selector
     properties:
       attribute_key:
         description: |-
@@ -1083,7 +1078,7 @@ definitions:
         $ref: '#/definitions/FluxMeterLinearBuckets'
       selector:
         description: |-
-          What latency should we measure in the histogram created by this FluxMeter.
+          What latency should we measure in the histogram created by this Flux Meter.
 
           * For traffic control points, fluxmeter will measure the duration of the
             whole http transaction (including sending request and receiving
@@ -1126,15 +1121,15 @@ definitions:
       control variable proportionally to the relative difference between setpoint
       and actual value of the signal
     properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/v1ControllerDynamicConfig'
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
       in_ports:
         description: Input ports of the Gradient Controller.
         $ref: '#/definitions/v1GradientControllerIns'
-      init_config:
-        description: Initial configuration.
-        $ref: '#/definitions/v1ControllerDynamicConfig'
       max_gradient:
         description: Maximum gradient which clamps the computed gradient value to
           the range, [min_gradient, max_gradient].
@@ -1368,9 +1363,24 @@ definitions:
     title: Takes the load multiplier input signal and publishes it to the schedulers
       in the data-plane
     properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/v1LoadActuatorDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
       in_ports:
         description: Input ports for the Load Actuator component.
         $ref: '#/definitions/v1LoadActuatorIns'
+  v1LoadActuatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for LoadActuator
+    properties:
+      dry_run:
+        description: |-
+          Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
+          Useful for observing the behavior of Load Actuator without disrupting any real traffic.
+        type: boolean
   v1LoadActuatorIns:
     description: Input for the Load Actuator component.
     type: object
@@ -1546,7 +1556,7 @@ definitions:
         description: Defines the control-loop logic of the policy.
         $ref: '#/definitions/v1Circuit'
       resources:
-        description: Resources (FluxMeters, Classifiers etc.) to setup.
+        description: Resources (Flux Meters, Classifiers etc.) to setup.
         $ref: '#/definitions/v1Resources'
   v1ProcessInfo:
     type: object
@@ -1596,15 +1606,15 @@ definitions:
     type: object
     title: Limits the traffic on a control point to specified rate
     properties:
+      default_config:
+        title: Default configuration
+        $ref: '#/definitions/v1RateLimiterDynamicConfig'
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
       in_ports:
         x-go-validate: required
         $ref: '#/definitions/v1RateLimiterIns'
-      init_config:
-        title: Initial configuration
-        $ref: '#/definitions/RateLimiterDynamicConfig'
       label_key:
         description: |-
           Specifies which label the ratelimiter should be keyed by.
@@ -1626,6 +1636,15 @@ definitions:
         description: Which control point to apply this ratelimiter to.
         x-go-validate: required
         $ref: '#/definitions/v1Selector'
+  v1RateLimiterDynamicConfig:
+    type: object
+    title: Dynamic Configuration for the rate limiter
+    properties:
+      overrides:
+        description: Allows to specify different limits for particular label values.
+        type: array
+        items:
+          $ref: '#/definitions/RateLimiterOverride'
   v1RateLimiterIns:
     type: object
     title: Inputs for the RateLimiter component
@@ -1647,7 +1666,7 @@ definitions:
       See also [Resources overview](/concepts/policy/resources.md).
       :::
 
-      Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+      Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
     type: object
     title: Resources that need to be setup for the policy to function
     properties:
@@ -1655,15 +1674,15 @@ definitions:
         description: |-
           Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
-          The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
+          The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
         type: array
         items:
           $ref: '#/definitions/v1Classifier'
       flux_meters:
         description: |-
-          FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+          Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
-          FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+          Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
         type: object
         additionalProperties:
           $ref: '#/definitions/v1FluxMeter'
@@ -1731,7 +1750,7 @@ definitions:
     description: |-
       :::note
       Each Agent instantiates an independent copy of the scheduler, but output
-      signal are aggregated across all agents.
+      signals for accepted and incoming concurrency are aggregated across all agents.
       :::
 
       See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.

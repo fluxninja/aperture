@@ -112,12 +112,23 @@ metrics:
   enable_process_collector: false
   pedantic: false
 otel:
+  batch_alerts:
+    send_batch_max_size: 100
+    send_batch_size: 100
+    timeout: 1s
   batch_postrollup:
-    send_batch_size: 15000
+    send_batch_max_size: 200
+    send_batch_size: 100
     timeout: 1s
   batch_prerollup:
-    send_batch_size: 15000
+    send_batch_max_size: 20000
+    send_batch_size: 10000
     timeout: 1s
+  ports:
+    debug_port: 8888
+    health_check_port: 13133
+    pprof_port: 1777
+    zpages_port: 55679
 peer_discovery:
   advertisement_addr: ""
 plugins:

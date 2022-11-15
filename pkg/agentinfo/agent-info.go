@@ -14,11 +14,11 @@ const (
 //   schema:
 //     "$ref": "#/definitions/AgentInfoConfig"
 
-// AgentInfoConfig is the configuration for the agent group etc.
+// AgentInfoConfig is the configuration for the agent group and other agent attributes.
 // swagger:model
 // +kubebuilder:object:generate=true
 type AgentInfoConfig struct {
-	// All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
+	// All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
 	//
 	// [Read more about agent groups here](/concepts/service.md#agent-group).
 	AgentGroup string `json:"agent_group" default:"default"`

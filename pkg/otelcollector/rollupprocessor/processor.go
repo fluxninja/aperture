@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fluxninja/datasketches-go/sketches"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/datasketches-go/sketches"
 )
 
 var rollupTypes = []RollupType{
@@ -28,16 +28,19 @@ var rollupTypes = []RollupType{
 func initRollupsLog() []*Rollup {
 	rollupsInit := []*Rollup{
 		{
-			FromField:   otelcollector.WorkloadDurationLabel,
-			TreatAsZero: []string{},
+			FromField:      otelcollector.WorkloadDurationLabel,
+			TreatAsMissing: []string{},
+			Datasketch:     true,
 		},
 		{
-			FromField:   otelcollector.FlowDurationLabel,
-			TreatAsZero: []string{},
+			FromField:      otelcollector.FlowDurationLabel,
+			TreatAsMissing: []string{},
+			Datasketch:     true,
 		},
 		{
-			FromField:   otelcollector.ApertureProcessingDurationLabel,
-			TreatAsZero: []string{},
+			FromField:      otelcollector.ApertureProcessingDurationLabel,
+			TreatAsMissing: []string{},
+			Datasketch:     true,
 		},
 		{
 			FromField: otelcollector.HTTPRequestContentLength,
@@ -59,11 +62,16 @@ func _initRollupsPerType(rollupsInit []*Rollup, rollupTypes []RollupType) []*Rol
 	var rollups []*Rollup
 	for _, rollupInit := range rollupsInit {
 		for _, rollupType := range rollupTypes {
+
+			if rollupType == RollupDatasketch && !rollupInit.Datasketch {
+				continue
+			}
+
 			rollups = append(rollups, &Rollup{
-				FromField:   rollupInit.FromField,
-				ToField:     AggregateField(rollupInit.FromField, rollupType),
-				Type:        rollupType,
-				TreatAsZero: rollupInit.TreatAsZero,
+				FromField:      rollupInit.FromField,
+				ToField:        AggregateField(rollupInit.FromField, rollupType),
+				Type:           rollupType,
+				TreatAsMissing: rollupInit.TreatAsMissing,
 			})
 		}
 	}
@@ -120,13 +128,16 @@ func (rp *rollupProcessor) Shutdown(context.Context) error {
 // ConsumeLogs implements LogsProcessor.
 func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
 	applyCardinalityLimits(ld, rp.cfg.AttributeCardinalityLimit)
+
 	rollupData := make(map[string]pcommon.Map)
 	datasketches := make(map[string]map[string]*sketches.HeapDoublesSketch)
+
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		key := rp.key(logRecord.Attributes(), rollupsLog)
+		attributes := logRecord.Attributes()
+		key := rp.key(attributes, rollupsLog)
 		_, exists := rollupData[key]
 		if !exists {
-			rollupData[key] = logRecord.Attributes()
+			rollupData[key] = attributes
 			rollupData[key].PutInt(RollupCountKey, 0)
 		}
 		_, exists = datasketches[key]
@@ -135,7 +146,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 		}
 		rawCount, _ := rollupData[key].Get(RollupCountKey)
 		rollupData[key].PutInt(RollupCountKey, rawCount.Int()+1)
-		rp.rollupAttributes(datasketches[key], rollupData[key], logRecord.Attributes(), rollupsLog)
+		rp.rollupAttributes(datasketches[key], rollupData[key], attributes, rollupsLog)
 		return nil
 	})
 	if err != nil {
@@ -149,7 +160,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 				return err
 			}
 			serialized := base64.StdEncoding.EncodeToString(serializedBytes)
-			attributes.PutString(toField, serialized)
+			attributes.PutStr(toField, serialized)
 		}
 	}
 	return rp.exportLogs(ctx, rollupData)
@@ -188,7 +199,12 @@ func applyCardinalityLimits(ld plog.Logs, limit int) {
 	})
 }
 
-func (rp *rollupProcessor) rollupAttributes(datasketches map[string]*sketches.HeapDoublesSketch, baseAttributes, attributes pcommon.Map, rollups []*Rollup) {
+func (rp *rollupProcessor) rollupAttributes(
+	datasketches map[string]*sketches.HeapDoublesSketch,
+	baseAttributes,
+	attributes pcommon.Map,
+	rollups []*Rollup,
+) {
 	// TODO tgill: need to track latest timestamp from attributes as the timestamp in baseAttributes
 	for _, rollup := range rollups {
 		switch rollup.Type {

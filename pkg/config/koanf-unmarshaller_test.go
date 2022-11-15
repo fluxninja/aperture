@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	selectorv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/selector/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 type simpleTestConfig struct {
@@ -451,14 +451,14 @@ var _ = Describe("Duration", func() {
 
 var _ = Describe("ProtobufUnmarshaller", func() {
 	Context("when unmarshalling a protobuf", func() {
-		selector := &selectorv1.Selector{
-			ServiceSelector: &selectorv1.ServiceSelector{
+		selector := &policylangv1.Selector{
+			ServiceSelector: &policylangv1.ServiceSelector{
 				AgentGroup: "ag",
 				Service:    "s.n.svc.cluster.local",
 			},
-			FlowSelector: &selectorv1.FlowSelector{
-				ControlPoint: &selectorv1.ControlPoint{
-					Controlpoint: &selectorv1.ControlPoint_Traffic{
+			FlowSelector: &policylangv1.FlowSelector{
+				ControlPoint: &policylangv1.ControlPoint{
+					Controlpoint: &policylangv1.ControlPoint_Traffic{
 						Traffic: "egress",
 					},
 				},
@@ -471,7 +471,7 @@ var _ = Describe("ProtobufUnmarshaller", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		It("parses selectorBytes content into newSel and matches both contents", func() {
-			var newSel selectorv1.Selector
+			var newSel policylangv1.Selector
 			err := unmarshaller.Unmarshal(&newSel)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(newSel.String()).To(Equal(selector.String()))

@@ -23,15 +23,30 @@ definitions:
     properties:
       agent_group:
         description: |-
-          All agents within an agent_group receive the same data-plane configuration (e.g. schedulers, FluxMeters, rate limiter).
+          All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
 
           [Read more about agent groups here](/concepts/service.md#agent-group).
         type: string
         x-go-default: default
         x-go-name: AgentGroup
-    title: AgentInfoConfig is the configuration for the agent group etc.
+    title: AgentInfoConfig is the configuration for the agent group and other agent
+      attributes.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
+  AlerterConfig:
+    properties:
+      channel_size:
+        description: |-
+          ChannelSize size of the alerts channel in the alerter. Alerts should be
+          consument from it quickly, so no big sizes are needed.
+        format: int64
+        type: integer
+        x-go-default: "100"
+        x-go-name: ChannelSize
+        x-go-validate: gt=0
+    title: AlerterConfig for alerter.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/alerts
   BackoffConfig:
     properties:
       base_delay:
@@ -65,8 +80,77 @@ definitions:
     title: BackoffConfig holds configuration for GRPC Client Backoff.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
-  BatchConfig:
+  BatchAlertsConfig:
     properties:
+      send_batch_max_size:
+        description: |-
+          SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+          into smaller units.
+        format: uint32
+        type: integer
+        x-go-default: "100"
+        x-go-name: SendBatchMaxSize
+        x-go-validate: gte=0
+      send_batch_size:
+        description: SendBatchSize is the size of a batch which after hit, will trigger
+          it to be sent.
+        format: uint32
+        type: integer
+        x-go-default: "100"
+        x-go-name: SendBatchSize
+        x-go-validate: gt=0
+      timeout:
+        description: Timeout sets the time after which a batch will be sent regardless
+          of size.
+        format: string
+        type: string
+        x-go-default: 1s
+        x-go-name: Timeout
+        x-go-validate: gt=0
+    title: BatchAlertsConfig defines configuration for OTEL batch processor.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+  BatchPostrollupConfig:
+    properties:
+      send_batch_max_size:
+        description: |-
+          SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+          into smaller units.
+        format: uint32
+        type: integer
+        x-go-default: "100"
+        x-go-name: SendBatchMaxSize
+        x-go-validate: gte=0
+      send_batch_size:
+        description: SendBatchSize is the size of a batch which after hit, will trigger
+          it to be sent.
+        format: uint32
+        type: integer
+        x-go-default: "100"
+        x-go-name: SendBatchSize
+        x-go-validate: gt=0
+      timeout:
+        description: Timeout sets the time after which a batch will be sent regardless
+          of size.
+        format: string
+        type: string
+        x-go-default: 1s
+        x-go-name: Timeout
+        x-go-validate: gt=0
+    title: BatchPostrollupConfig defines configuration for OTEL batch processor.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+  BatchPrerollupConfig:
+    properties:
+      send_batch_max_size:
+        description: |-
+          SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+          into smaller units.
+        format: uint32
+        type: integer
+        x-go-default: "10000"
+        x-go-name: SendBatchMaxSize
+        x-go-validate: gte=0
       send_batch_size:
         description: SendBatchSize is the size of a batch which after hit, will trigger
           it to be sent.
@@ -83,7 +167,7 @@ definitions:
         x-go-default: 1s
         x-go-name: Timeout
         x-go-validate: gt=0
-    title: BatchConfig defines configuration for OTEL batch processor.
+    title: BatchPrerollupConfig defines configuration for OTEL batch processor.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   ClientTLSConfig:
@@ -695,10 +779,14 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
   OtelConfig:
     properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
       batch_postrollup:
-        $ref: '#/definitions/BatchConfig'
+        $ref: '#/definitions/BatchPostrollupConfig'
       batch_prerollup:
-        $ref: '#/definitions/BatchConfig'
+        $ref: '#/definitions/BatchPrerollupConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
     title: OtelConfig is the configuration for the OTEL collector.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
@@ -753,6 +841,40 @@ definitions:
     title: PolicyCommon holds common configuration for Watchdog policies.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+  PortsConfig:
+    properties:
+      debug_port:
+        description: Port on which otel collector exposes prometheus metrics on /metrics
+          path.
+        format: uint32
+        type: integer
+        x-go-default: "8888"
+        x-go-name: DebugPort
+        x-go-validate: gte=0
+      health_check_port:
+        description: Port on which health check extension in exposed.
+        format: uint32
+        type: integer
+        x-go-default: "13133"
+        x-go-name: HealthCheckPort
+        x-go-validate: gte=0
+      pprof_port:
+        description: Port on which pprof extension in exposed.
+        format: uint32
+        type: integer
+        x-go-default: "1777"
+        x-go-name: PprofPort
+        x-go-validate: gte=0
+      zpages_port:
+        description: Port on which zpages extension in exposed.
+        format: uint32
+        type: integer
+        x-go-default: "55679"
+        x-go-name: ZpagesPort
+        x-go-validate: gte=0
+    title: PortsConfig defines configuration for OTEL debug and extension ports.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   ProfilersConfig:
     properties:
       cpu_profiler:

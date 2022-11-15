@@ -893,8 +893,8 @@ spec:
                     properties:
                       agent_group:
                         description: "All agents within an agent_group receive the
-                          same data-plane configuration (e.g. schedulers, FluxMeters,
-                          rate limiter). \n [Read more about agent groups here](/concepts/service.md#agent-group)."
+                          same data-plane configuration (e.g. Flux Meters, Rate Limiters
+                          etc). \n [Read more about agent groups here](/concepts/service.md#agent-group)."
                         type: string
                     type: object
                   client:
@@ -1275,9 +1275,34 @@ spec:
                   otel:
                     description: OTEL configuration.
                     properties:
+                      batch_alerts:
+                        description: BatchAlerts configures batch alerts processor.
+                        properties:
+                          send_batch_max_size:
+                            description: SendBatchMaxSize is the upper limit of the
+                              batch size. Bigger batches will be split into smaller
+                              units.
+                            format: int32
+                            type: integer
+                          send_batch_size:
+                            description: SendBatchSize is the size of a batch which
+                              after hit, will trigger it to be sent.
+                            format: int32
+                            type: integer
+                          timeout:
+                            description: Timeout sets the time after which a batch
+                              will be sent regardless of size.
+                            type: string
+                        type: object
                       batch_postrollup:
                         description: BatchPostrollup configures batch postrollup processor.
                         properties:
+                          send_batch_max_size:
+                            description: SendBatchMaxSize is the upper limit of the
+                              batch size. Bigger batches will be split into smaller
+                              units.
+                            format: int32
+                            type: integer
                           send_batch_size:
                             description: SendBatchSize is the size of a batch which
                               after hit, will trigger it to be sent.
@@ -1291,6 +1316,12 @@ spec:
                       batch_prerollup:
                         description: BatchPrerollup configures batch prerollup processor.
                         properties:
+                          send_batch_max_size:
+                            description: SendBatchMaxSize is the upper limit of the
+                              batch size. Bigger batches will be split into smaller
+                              units.
+                            format: int32
+                            type: integer
                           send_batch_size:
                             description: SendBatchSize is the size of a batch which
                               after hit, will trigger it to be sent.
@@ -1300,6 +1331,28 @@ spec:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
+                        type: object
+                      ports:
+                        description: Ports configures debug, health and extension
+                          ports values.
+                        properties:
+                          debug_port:
+                            description: Port on which otel collector exposes prometheus
+                              metrics on /metrics path.
+                            format: int32
+                            type: integer
+                          health_check_port:
+                            description: Port on which health check extension in exposed.
+                            format: int32
+                            type: integer
+                          pprof_port:
+                            description: Port on which pprof extension in exposed.
+                            format: int32
+                            type: integer
+                          zpages_port:
+                            description: Port on which zpages extension in exposed.
+                            format: int32
+                            type: integer
                         type: object
                     type: object
                   peer_discovery:

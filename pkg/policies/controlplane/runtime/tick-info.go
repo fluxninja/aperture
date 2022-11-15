@@ -1,6 +1,12 @@
 package runtime
 
-import "time"
+import (
+	"time"
+
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+)
 
 var _ TickInfo = (*tickInfo)(nil)
 
@@ -10,6 +16,7 @@ type TickInfo interface {
 	NextTimestamp() time.Time
 	Tick() int
 	Interval() time.Duration
+	Serialize() *policysyncv1.TickInfo
 }
 
 type tickInfo struct {
@@ -47,4 +54,14 @@ func (tickInfo *tickInfo) Tick() int {
 // Interval returns the interval of the tickInfo.
 func (tickInfo *tickInfo) Interval() time.Duration {
 	return tickInfo.interval
+}
+
+// Serialize returns the proto serialized version of the tickInfo.
+func (tickInfo *tickInfo) Serialize() *policysyncv1.TickInfo {
+	return &policysyncv1.TickInfo{
+		Timestamp:     timestamppb.New(tickInfo.timestamp),
+		NextTimestamp: timestamppb.New(tickInfo.nextTimestamp),
+		Tick:          (int64)(tickInfo.tick),
+		Interval:      durationpb.New(tickInfo.interval),
+	}
 }

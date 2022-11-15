@@ -7,13 +7,12 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -28,7 +27,7 @@ func policyFactoryModule() fx.Option {
 				fx.ParamTags(
 					config.NameTag(policiesFxTag),
 					config.NameTag(policiesDynamicConfigFxTag),
-					common.FxOptionsFuncTag,
+					iface.FxOptionsFuncTag,
 				),
 			),
 		),
@@ -46,7 +45,7 @@ type PolicyFactory struct {
 	etcdClient           *etcdclient.Client
 	registry             status.Registry
 	dynamicConfigWatcher notifiers.Watcher
-	policyTracker        map[string]*wrappersv1.PolicyWrapper
+	policyTracker        map[string]*policysyncv1.PolicyWrapper
 }
 
 // Main fx app.
@@ -72,7 +71,7 @@ func providePolicyFactory(
 		circuitJobGroup:      circuitJobGroup,
 		etcdClient:           etcdClient,
 		dynamicConfigWatcher: dynamicConfigWatcher,
-		policyTracker:        make(map[string]*wrappersv1.PolicyWrapper),
+		policyTracker:        make(map[string]*policysyncv1.PolicyWrapper),
 	}
 
 	optionsFunc := []notifiers.FxOptionsFunc{factory.provideControllerPolicyFxOptions}
@@ -152,7 +151,7 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 	), nil
 }
 
-func (factory *PolicyFactory) trackPolicy(wrapperMessage *wrappersv1.PolicyWrapper, lifecycle fx.Lifecycle) {
+func (factory *PolicyFactory) trackPolicy(wrapperMessage *policysyncv1.PolicyWrapper, lifecycle fx.Lifecycle) {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			factory.lock.Lock()
@@ -170,11 +169,11 @@ func (factory *PolicyFactory) trackPolicy(wrapperMessage *wrappersv1.PolicyWrapp
 }
 
 // GetPolicyWrappers returns all policy wrappers.
-func (factory *PolicyFactory) GetPolicyWrappers() map[string]*wrappersv1.PolicyWrapper {
+func (factory *PolicyFactory) GetPolicyWrappers() map[string]*policysyncv1.PolicyWrapper {
 	factory.lock.RLock()
 	defer factory.lock.RUnlock()
 	// deepcopy wrappers
-	policyWrappers := make(map[string]*wrappersv1.PolicyWrapper)
+	policyWrappers := make(map[string]*policysyncv1.PolicyWrapper)
 	for k, v := range factory.policyTracker {
 		policyWrappers[k] = v.DeepCopy()
 	}

@@ -16,3 +16,5 @@ envoyFilter:
   enableAuthzRequestBodyBuffering: false
   ## @param envoyFilter.maxRequestBytes Maximum size of request that is sent over ext authz API
   maxRequestBytes: 8192
+  ## @param envoyFilter.sidecarMode Aperture Agent installed using the Sidecar mode
+  sidecarMode: false

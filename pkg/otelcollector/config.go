@@ -4,6 +4,7 @@ package otelcollector
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"sort"
 	"time"
 
@@ -108,22 +109,45 @@ func (o *OTELConfig) AddExporter(name string, value interface{}) {
 	o.Exporters[name] = value
 }
 
-// AddDebugExtensions adds common debug extextions and enables them.
-func (o *OTELConfig) AddDebugExtensions() {
-	o.AddExtension("health_check", nil)
+// SetDebugPort configures debug port on which OTEL server /metrics as specified by user.
+func (o *OTELConfig) SetDebugPort(userCfg *OtelConfig) {
+	portInput := fmt.Sprintf(":%d", userCfg.Ports.DebugPort)
+	if val, ok := o.Service.Telemetry["metrics"]; ok {
+		if val, ok := val.(map[string]interface{}); ok {
+			val["address"] = portInput
+			o.Service.Telemetry["metrics"] = val
+		}
+	} else {
+		addressMap := make(map[string]interface{})
+		addressMap["address"] = portInput
+		o.Service.Telemetry["metrics"] = addressMap
+	}
+}
+
+// AddDebugExtensions adds common debug extensions and enables them.
+func (o *OTELConfig) AddDebugExtensions(userCfg *OtelConfig) {
+	o.AddExtension("health_check", map[string]interface{}{
+		"endpoint": fmt.Sprintf("localhost:%d", userCfg.Ports.HealthCheckPort),
+	})
 	o.AddExtension("pprof", map[string]interface{}{
-		"endpoint": "localhost:1777",
+		"endpoint": fmt.Sprintf("localhost:%d", userCfg.Ports.PprofPort),
 	})
 	o.AddExtension("zpages", map[string]interface{}{
-		"endpoint": "localhost:55679",
+		"endpoint": fmt.Sprintf("localhost:%d", userCfg.Ports.ZpagesPort),
 	})
 }
 
 // AddBatchProcessor is a helper function for adding batch processor.
-func (o *OTELConfig) AddBatchProcessor(name string, timeout time.Duration, sendBatchSize uint32) {
+func (o *OTELConfig) AddBatchProcessor(
+	name string,
+	timeout time.Duration,
+	sendBatchSize uint32,
+	sendBatchMaxSize uint32,
+) {
 	o.AddProcessor(name, batchprocessor.Config{
-		Timeout:       timeout,
-		SendBatchSize: sendBatchSize,
+		Timeout:          timeout,
+		SendBatchSize:    sendBatchSize,
+		SendBatchMaxSize: sendBatchMaxSize,
 	})
 }
 
@@ -215,20 +239,72 @@ type OtelParams struct {
 // +kubebuilder:object:generate=true
 type OtelConfig struct {
 	// BatchPrerollup configures batch prerollup processor.
-	BatchPrerollup BatchConfig `json:"batch_prerollup"`
+	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
-	BatchPostrollup BatchConfig `json:"batch_postrollup"`
+	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
+	// BatchAlerts configures batch alerts processor.
+	BatchAlerts BatchAlertsConfig `json:"batch_alerts"`
+	// Ports configures debug, health and extension ports values.
+	Ports PortsConfig `json:"ports"`
 }
 
-// BatchConfig defines configuration for OTEL batch processor.
+// PortsConfig defines configuration for OTEL debug and extension ports.
 // swagger:model
 // +kubebuilder:object:generate=true
-type BatchConfig struct {
+type PortsConfig struct {
+	// Port on which otel collector exposes prometheus metrics on /metrics path.
+	DebugPort uint32 `json:"debug_port" validate:"gte=0" default:"8888"`
+	// Port on which health check extension in exposed.
+	HealthCheckPort uint32 `json:"health_check_port" validate:"gte=0" default:"13133"`
+	// Port on which pprof extension in exposed.
+	PprofPort uint32 `json:"pprof_port" validate:"gte=0" default:"1777"`
+	// Port on which zpages extension in exposed.
+	ZpagesPort uint32 `json:"zpages_port" validate:"gte=0" default:"55679"`
+}
+
+// BatchPrerollupConfig defines configuration for OTEL batch processor.
+// swagger:model
+// +kubebuilder:object:generate=true
+type BatchPrerollupConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
 
 	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"10000"`
+
+	// SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+	// into smaller units.
+	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"10000"`
+}
+
+// BatchPostrollupConfig defines configuration for OTEL batch processor.
+// swagger:model
+// +kubebuilder:object:generate=true
+type BatchPostrollupConfig struct {
+	// Timeout sets the time after which a batch will be sent regardless of size.
+	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
+
+	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"100"`
+
+	// SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+	// into smaller units.
+	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"100"`
+}
+
+// BatchAlertsConfig defines configuration for OTEL batch processor.
+// swagger:model
+// +kubebuilder:object:generate=true
+type BatchAlertsConfig struct {
+	// Timeout sets the time after which a batch will be sent regardless of size.
+	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
+
+	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"100"`
+
+	// SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+	// into smaller units.
+	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"100"`
 }
 
 // FxIn consumes parameters via Fx.
@@ -244,12 +320,15 @@ type FxIn struct {
 // NewOtelConfig returns OTEL parameters for OTEL collectors.
 func NewOtelConfig(in FxIn) (*OtelParams, error) {
 	config := NewOTELConfig()
-	config.AddDebugExtensions()
 
 	var userCfg OtelConfig
 	if err := in.Unmarshaller.UnmarshalKey("otel", &userCfg); err != nil {
 		return nil, err
 	}
+
+	config.SetDebugPort(&userCfg)
+	config.AddDebugExtensions(&userCfg)
+
 	cfg := &OtelParams{
 		OtelConfig: userCfg,
 		Listener:   in.Listener,
@@ -258,6 +337,18 @@ func NewOtelConfig(in FxIn) (*OtelParams, error) {
 		Config:     config,
 	}
 	return cfg, nil
+}
+
+// NewDefaultOtelConfig creates OtelConfig with all the default values set.
+func NewDefaultOtelConfig() *OtelConfig {
+	return &OtelConfig{
+		Ports: PortsConfig{
+			DebugPort:       8888,
+			HealthCheckPort: 13133,
+			PprofPort:       1777,
+			ZpagesPort:      55679,
+		},
+	}
 }
 
 // AddMetricsPipeline adds metrics to pipeline for agent OTEL collector.
@@ -285,6 +376,25 @@ func AddControllerMetricsPipeline(cfg *OtelParams) {
 		Receivers:  []string{ReceiverPrometheus},
 		Processors: []string{},
 		Exporters:  []string{ExporterPrometheusRemoteWrite},
+	})
+}
+
+// AddAlertsPipeline adds reusable alerts pipeline.
+func AddAlertsPipeline(cfg *OtelParams, extraProcessors ...string) {
+	config := cfg.Config
+	config.AddReceiver(ReceiverAlerts, map[string]any{})
+	config.AddBatchProcessor(
+		ProcessorBatchAlerts,
+		cfg.BatchAlerts.Timeout.AsDuration(),
+		cfg.BatchAlerts.SendBatchSize,
+		cfg.BatchAlerts.SendBatchMaxSize,
+	)
+	processors := []string{ProcessorBatchAlerts}
+	processors = append(processors, extraProcessors...)
+	config.Service.AddPipeline("logs/alerts", Pipeline{
+		Receivers:  []string{ReceiverAlerts},
+		Processors: processors,
+		Exporters:  []string{ExporterLogging},
 	})
 }
 
