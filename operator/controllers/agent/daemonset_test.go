@@ -106,7 +106,14 @@ var _ = Describe("Agent Daemonset", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelcollector.OtelConfig{
+								Ports: otelcollector.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
+							},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
@@ -216,6 +223,26 @@ var _ = Describe("Agent Daemonset", func() {
 											ContainerPort: 3322,
 											Protocol:      corev1.ProtocolTCP,
 										},
+										{
+											Name:          OtelDebugPort,
+											ContainerPort: 8888,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelHealthcheckPort,
+											ContainerPort: 13133,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelPprofPort,
+											ContainerPort: 1777,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelZpagesPort,
+											ContainerPort: 55679,
+											Protocol:      corev1.ProtocolTCP,
+										},
 									},
 									TerminationMessagePath:   "/dev/termination-log",
 									TerminationMessagePolicy: corev1.TerminationMessageReadFile,
@@ -277,7 +304,14 @@ var _ = Describe("Agent Daemonset", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelcollector.OtelConfig{
+								Ports: otelcollector.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
+							},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
@@ -485,6 +519,26 @@ var _ = Describe("Agent Daemonset", func() {
 										{
 											Name:          MemberList,
 											ContainerPort: 3322,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelDebugPort,
+											ContainerPort: 8888,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelHealthcheckPort,
+											ContainerPort: 13133,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelPprofPort,
+											ContainerPort: 1777,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelZpagesPort,
+											ContainerPort: 55679,
 											Protocol:      corev1.ProtocolTCP,
 										},
 									},

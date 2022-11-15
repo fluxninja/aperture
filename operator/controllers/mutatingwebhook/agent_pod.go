@@ -95,6 +95,26 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 			ContainerPort: memberListPort,
 			Protocol:      corev1.ProtocolTCP,
 		},
+		{
+			Name:          controllers.OtelDebugPort,
+			ContainerPort: int32(spec.ConfigSpec.Otel.Ports.DebugPort),
+			Protocol:      corev1.ProtocolTCP,
+		},
+		{
+			Name:          controllers.OtelHealthcheckPort,
+			ContainerPort: int32(spec.ConfigSpec.Otel.Ports.HealthCheckPort),
+			Protocol:      corev1.ProtocolTCP,
+		},
+		{
+			Name:          controllers.OtelPprofPort,
+			ContainerPort: int32(spec.ConfigSpec.Otel.Ports.PprofPort),
+			Protocol:      corev1.ProtocolTCP,
+		},
+		{
+			Name:          controllers.OtelZpagesPort,
+			ContainerPort: int32(spec.ConfigSpec.Otel.Ports.ZpagesPort),
+			Protocol:      corev1.ProtocolTCP,
+		},
 	}
 
 	if container.LivenessProbe == nil {
