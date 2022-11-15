@@ -18,7 +18,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
-	"github.com/rs/zerolog"
 )
 
 // LoadActuator struct.
@@ -98,13 +97,13 @@ func (la *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo run
 				}
 				return nil, la.publishDecision(tickInfo, lmValue, false)
 			} else {
-				logger.Sample(zerolog.Often).Info().Msg("Invalid load multiplier data")
+				logger.Autosample().Info().Msg("Invalid load multiplier data")
 			}
 		} else {
-			logger.Sample(zerolog.Often).Info().Msg("load_multiplier port has no reading")
+			logger.Autosample().Info().Msg("load_multiplier port has no reading")
 		}
 	} else {
-		logger.Sample(zerolog.Often).Info().Msg("load_multiplier port not found")
+		logger.Autosample().Info().Msg("load_multiplier port not found")
 	}
 	return nil, la.publishDefaultDecision(tickInfo)
 }
@@ -150,7 +149,7 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 		TickInfo:       tickInfo.Serialize(),
 	}
 	// Publish decision
-	logger.Sample(zerolog.Often).Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")
+	logger.Autosample().Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")
 	wrapper := &policysyncv1.LoadDecisionWrapper{
 		LoadDecision: decision,
 		CommonAttributes: &policysyncv1.CommonAttributes{

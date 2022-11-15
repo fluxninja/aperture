@@ -14,7 +14,6 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/utils"
-	"github.com/rs/zerolog"
 )
 
 // IterateLogRecords calls given function for each logRecord. If the function
@@ -148,11 +147,12 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error 
 func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAsMissing []string) bool {
 	value, ok := attributes.Get(label)
 	if !ok {
-		log.Sample(zerolog.Sometimes).Warn().Str("label", label).Msg("Label does not exist in attributes map")
+		log.Sample(noAttrSampler).
+			Warn().Str("label", label).Msg("Label does not exist in attributes map")
 		return false
 	}
 	if value.Type() != pcommon.ValueTypeStr {
-		log.Sample(zerolog.Sometimes).Warn().Str("label", label).Msg("Label is not a string")
+		log.Sample(notStringSampler).Warn().Str("label", label).Msg("Label is not a string")
 		return false
 	}
 
@@ -160,7 +160,8 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 
 	for _, markerForMissing := range treatAsMissing {
 		if stringVal == markerForMissing {
-			log.Sample(zerolog.Sometimes).Info().Str("label", label).Msg("Missing attribute from source")
+			log.Sample(missingAttrSampler).
+				Info().Str("label", label).Msg("Missing attribute from source")
 			return false
 		}
 	}
@@ -168,18 +169,21 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 	if msg, isProto := output.(proto.Message); isProto && !strings.HasPrefix(stringVal, "{") {
 		wireMsg, err := base64.StdEncoding.DecodeString(stringVal)
 		if err != nil {
-			log.Sample(zerolog.Sometimes).Error().Err(err).Str("label", label).Msg("Failed to unmarshal as base64")
+			log.Sample(failedBase64Sampler).
+				Warn().Err(err).Str("label", label).Msg("Failed to unmarshal as base64")
 		}
 		err = proto.Unmarshal(wireMsg, msg)
 		if err != nil {
-			log.Sample(zerolog.Sometimes).Error().Err(err).Str("label", label).Msg("Failed to unmarshal as protobuf")
+			log.Sample(failedProtoSampler).
+				Warn().Err(err).Str("label", label).Msg("Failed to unmarshal as protobuf")
 		}
 		return true
 	}
 
 	err := json.Unmarshal([]byte(stringVal), output)
 	if err != nil {
-		log.Sample(zerolog.Sometimes).Error().Err(err).Str("label", label).Msg("Failed to unmarshal as json")
+		log.Sample(failedJSONSampler).
+			Warn().Err(err).Str("label", label).Msg("Failed to unmarshal as json")
 	}
 
 	return true
@@ -189,7 +193,7 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 func GetFloat64(attributes pcommon.Map, key string, treatAsMissing []string) (float64, bool) {
 	rawNewValue, exists := attributes.Get(key)
 	if !exists {
-		log.Sample(zerolog.Sometimes).Trace().Str("key", key).Msg("Key not found")
+		log.Trace().Str("key", key).Msg("Key not found")
 		return 0, false
 	}
 	if rawNewValue.Type() == pcommon.ValueTypeDouble {
@@ -204,14 +208,28 @@ func GetFloat64(attributes pcommon.Map, key string, treatAsMissing []string) (fl
 					return 0, false
 				}
 			}
-			log.Sample(zerolog.Sometimes).Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Failed parsing value as float")
+			log.Sample(failedFloatSampler).
+				Warn().Str("key", key).Str("value", rawNewValue.AsString()).
+				Msg("Failed parsing value as float")
 			return 0, false
 		}
 		return newValue, true
 	}
-	log.Sample(zerolog.Sometimes).Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Unsupported value type")
+	log.Sample(unsupportedFloatTypeSampler).
+		Warn().Str("key", key).Str("value", rawNewValue.AsString()).Msg("Unsupported value type")
 	return 0, false
 }
+
+var (
+	noAttrSampler               = log.NewRatelimitingSampler()
+	notStringSampler            = log.NewRatelimitingSampler()
+	missingAttrSampler          = log.NewRatelimitingSampler()
+	failedBase64Sampler         = log.NewRatelimitingSampler()
+	failedProtoSampler          = log.NewRatelimitingSampler()
+	failedJSONSampler           = log.NewRatelimitingSampler()
+	failedFloatSampler          = log.NewRatelimitingSampler()
+	unsupportedFloatTypeSampler = log.NewRatelimitingSampler()
+)
 
 // Max returns the maximum value of the given values.
 func Max(a, b float64) float64 {
