@@ -52,8 +52,8 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		retErr := func(errMsg string) error {
-			log.Sample(zerolog.Sometimes).Warn().Msg(errMsg)
+		retErr := func(sampler zerolog.Sampler, errMsg string) error {
+			log.Sample(sampler).Warn().Msg(errMsg)
 			return fmt.Errorf(errMsg)
 		}
 		// Attributes
@@ -65,25 +65,34 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		// Source specific processing
 		source, exists := attributes.Get(otelcollector.ApertureSourceLabel)
 		if !exists {
-			return retErr("aperture source label not found")
+			return retErr(noSourceLabelSampler, "aperture source label not found")
 		}
 		sourceStr := source.Str()
 		if sourceStr == otelcollector.ApertureSourceSDK {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{})
 			if !success {
-				return retErr("aperture check response label not found in SDK access logs")
+				return retErr(
+					noSDKCheckResponseSampler,
+					"aperture check response label not found in SDK access logs",
+				)
 			}
 
 			internal.AddSDKSpecificLabels(attributes)
 		} else if sourceStr == otelcollector.ApertureSourceEnvoy {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
 			if !success {
-				return retErr("aperture check response label not found in Envoy access logs")
+				return retErr(
+					noEnvoyCheckResponseSampler,
+					"aperture check response label not found in Envoy access logs",
+				)
 			}
 
 			internal.AddEnvoySpecificLabels(attributes)
 		} else {
-			return retErr("aperture source label not recognized")
+			return retErr(
+				unrecognizedSourceLabelSampler,
+				"aperture source label not recognized",
+			)
 		}
 
 		statusCode, featureStatus := internal.StatusesFromAttributes(attributes)
@@ -105,6 +114,13 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 	})
 	return ld, err
 }
+
+var (
+	noSourceLabelSampler           = log.NewRatelimitingSampler()
+	noSDKCheckResponseSampler      = log.NewRatelimitingSampler()
+	noEnvoyCheckResponseSampler    = log.NewRatelimitingSampler()
+	unrecognizedSourceLabelSampler = log.NewRatelimitingSampler()
+)
 
 func (p *metricsProcessor) updateMetrics(
 	attributes pcommon.Map,
@@ -171,7 +187,7 @@ func (p *metricsProcessor) updateMetrics(
 func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, decisionType flowcontrolv1.CheckResponse_DecisionType, latency float64, latencyFound bool) {
 	concurrencyLimiter := p.cfg.engine.GetConcurrencyLimiter(limiterID)
 	if concurrencyLimiter == nil {
-		log.Sample(zerolog.Sometimes).Warn().
+		log.Sample(noConcurrencyLimiterSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
 			Int64(metrics.ComponentIndexLabel, limiterID.ComponentIndex).
@@ -196,7 +212,7 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID) {
 	rateLimiter := p.cfg.engine.GetRateLimiter(limiterID)
 	if rateLimiter == nil {
-		log.Sample(zerolog.Sometimes).Warn().
+		log.Sample(noRateLimiterSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
 			Int64(metrics.ComponentIndexLabel, limiterID.ComponentIndex).
@@ -212,7 +228,7 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 func (p *metricsProcessor) updateMetricsForClassifier(classifierID iface.ClassifierID) {
 	classifier := p.cfg.classificationEngine.GetClassifier(classifierID)
 	if classifier == nil {
-		log.Sample(zerolog.Sometimes).Warn().
+		log.Sample(noClassifierSampler).Warn().
 			Str(metrics.PolicyNameLabel, classifierID.PolicyName).
 			Str(metrics.PolicyHashLabel, classifierID.PolicyHash).
 			Int64(metrics.ClassifierIndexLabel, classifierID.ClassifierIndex).
@@ -236,8 +252,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 ) {
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
-		log.Sample(zerolog.Sometimes).Warn().
-			Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
+		log.Sample(noFluxMeterSampler).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
 			Str(metrics.FeatureStatusLabel, featureStatus).
@@ -261,3 +276,10 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 		fluxMeterHistogram.Observe(metricValue)
 	}
 }
+
+var (
+	noConcurrencyLimiterSampler = log.NewRatelimitingSampler()
+	noRateLimiterSampler        = log.NewRatelimitingSampler()
+	noClassifierSampler         = log.NewRatelimitingSampler()
+	noFluxMeterSampler          = log.NewRatelimitingSampler()
+)

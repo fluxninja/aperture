@@ -3,7 +3,6 @@ package internal
 import (
 	"time"
 
-	"github.com/rs/zerolog"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/fluxninja/aperture/pkg/log"
@@ -49,7 +48,8 @@ func getLabelTimestampValue(attributes pcommon.Map, labelKey, source string) (ti
 func getLabelValue(attributes pcommon.Map, labelKey, source string) (pcommon.Value, bool) {
 	value, exists := attributes.Get(labelKey)
 	if !exists {
-		log.Sample(zerolog.Sometimes).Warn().Str("source", source).Str("key", labelKey).Msg("Label not found")
+		log.Sample(noLabelSampler).
+			Warn().Str("source", source).Str("key", labelKey).Msg("Label not found")
 		return pcommon.Value{}, false
 	}
 	return value, exists
@@ -60,9 +60,16 @@ func _getLabelTimestampValue(value pcommon.Value, labelKey, source string) (time
 	if value.Type() == pcommon.ValueTypeInt {
 		valueInt = value.Int()
 	} else {
-		log.Sample(zerolog.Sometimes).Warn().Str("source", source).Str("key", labelKey).Msg("Failed to parse a timestamp field")
+		log.Sample(badTimestampSampler).
+			Warn().Str("source", source).Str("key", labelKey).
+			Msg("Failed to parse a timestamp field")
 		return time.Time{}, false
 	}
 
 	return time.Unix(0, valueInt), true
 }
+
+var (
+	noLabelSampler      = log.NewRatelimitingSampler()
+	badTimestampSampler = log.NewRatelimitingSampler()
+)
