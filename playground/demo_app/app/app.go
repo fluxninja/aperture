@@ -16,7 +16,6 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/rs/zerolog"
 )
 
 const (
@@ -90,7 +89,7 @@ func (simpleService SimpleService) Run() error {
 
 func handlerFunc(h *RequestHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Sample(zerolog.Sometimes).Info().Msg("received request")
+		log.Autosample().Info().Msg("received request")
 		h.ServeHTTP(w, r)
 	})
 }
@@ -155,13 +154,13 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to read request body")
+		log.Autosample().Warn().Err(err).Msg("Failed to read request body")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	err = json.Unmarshal(body, &p)
 	if err != nil {
-		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to unmarshal request body")
+		log.Autosample().Warn().Err(err).Msg("Failed to unmarshal request body")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -169,19 +168,19 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	code := http.StatusOK
 	for _, chain := range p.Chains {
 		if len(chain.subrequests) == 0 {
-			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Empty chain")
+			log.Autosample().Warn().Err(err).Msg("Empty chain")
 			http.Error(w, "Received empty subrequest chain", http.StatusBadRequest)
 			return
 		}
 		requestDestination := chain.subrequests[0].Destination
 		if requestDestination != h.hostname {
-			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Invalid destination")
+			log.Autosample().Warn().Err(err).Msg("Invalid destination")
 			http.Error(w, "Invalid message destination", http.StatusBadRequest)
 			return
 		}
 		code, err = h.processChain(ctx, chain)
 		if err != nil {
-			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to process chain")
+			log.Autosample().Warn().Err(err).Msg("Failed to process chain")
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -230,13 +229,13 @@ func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname 
 
 	jsonRequest, err := json.Marshal(requestBody)
 	if err != nil {
-		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to marshal request")
-		return http.StatusBadRequest, err
+		log.Bug().Err(err).Msg("bug: Failed to marshal request")
+		return http.StatusInternalServerError, err
 	}
 
 	request, err := http.NewRequest("POST", address, bytes.NewBuffer(jsonRequest))
 	if err != nil {
-		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to create request")
+		log.Autosample().Error().Err(err).Msg("Failed to create request")
 		return http.StatusInternalServerError, err
 	}
 
@@ -247,7 +246,7 @@ func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname 
 
 	response, err := h.httpClient.Do(request)
 	if err != nil {
-		log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to send request")
+		log.Autosample().Error().Err(err).Msg("Failed to send request")
 		return http.StatusInternalServerError, err
 	}
 	return response.StatusCode, nil
