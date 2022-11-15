@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withAlerter(alerter):: {
+    alerter: alerter,
+  },
+  withAlerterMixin(alerter):: {
+    alerter+: alerter,
+  },
   withArithmeticCombinator(arithmetic_combinator):: {
     arithmetic_combinator: arithmetic_combinator,
   },
