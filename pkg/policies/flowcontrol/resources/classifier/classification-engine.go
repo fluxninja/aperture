@@ -9,7 +9,6 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rs/zerolog"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -66,6 +65,13 @@ func NewClassificationEngine(registry status.Registry) *ClassificationEngine {
 	}
 }
 
+var (
+	evalFailedSampler         = log.NewRatelimitingSampler()
+	emptyResultsetSampler     = log.NewRatelimitingSampler()
+	ambiguousResultsetSampler = log.NewRatelimitingSampler()
+	not1ExprSampler           = log.NewRatelimitingSampler()
+)
+
 func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	flowLabels flowlabel.FlowLabels,
 	mm *multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector],
@@ -73,7 +79,6 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	input ast.Value,
 ) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
 	logger := c.registry.GetLogger()
-	logSampled := logger.Sample(zerolog.Sometimes)
 	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.ClassifierInfo_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.ClassifierInfo{
 			PolicyName:      labelerWithSelector.CommonAttributes.PolicyName,
@@ -88,23 +93,23 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 		labeler := labelerWithSelector.Labeler
 		resultSet, err := labeler.Query.Eval(ctx, rego.EvalParsedInput(input))
 		if err != nil {
-			logSampled.Warn().Msg("Rego: Evaluation failed")
+			logger.Sample(evalFailedSampler).Warn().Msg("Rego: Evaluation failed")
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_EVAL_FAILED)
 			continue
 		}
 
 		if len(resultSet) == 0 {
-			logSampled.Warn().Msg("Rego: Empty resultSet")
+			logger.Sample(emptyResultsetSampler).Warn().Msg("Rego: Empty resultSet")
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_EMPTY_RESULTSET)
 			continue
 		} else if len(resultSet) > 1 {
-			logSampled.Warn().Msg("Rego: Ambiguous resultSet")
+			logger.Sample(ambiguousResultsetSampler).Warn().Msg("Rego: Ambiguous resultSet")
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_AMBIGUOUS_RESULTSET)
 			continue
 		}
 
-		if len(resultSet[0].Expressions) != 1 {
-			logger.Warn().Msg("Rego: Expected exactly one expression")
+		if nExpressions := len(resultSet[0].Expressions); nExpressions != 1 {
+			logger.Sample(not1ExprSampler).Warn().Int("n", nExpressions).Msg("Rego: Expected exactly one expression")
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_MULTI_EXPRESSION)
 			continue
 		}
@@ -120,7 +125,7 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 			// multi-label-query
 			variables, isMap := resultSet[0].Expressions[0].Value.(map[string]interface{})
 			if !isMap {
-				logger.Error().Msg("Rego: Expression's not a map (bug)")
+				logger.Bug().Msg("bug: Rego: Expression is not a map")
 				appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_EXPRESSION_NOT_MAP)
 				continue
 			}
@@ -146,7 +151,6 @@ func (c *ClassificationEngine) Classify(
 	labelsForMatching map[string]string,
 	input ast.Value,
 ) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels) {
-	logSampled := c.registry.GetLogger().Sample(zerolog.Sometimes)
 	flowLabels := make(flowlabel.FlowLabels)
 
 	r, ok := c.activeRules.Load().(rules)
@@ -170,7 +174,7 @@ func (c *ClassificationEngine) Classify(
 		cpID := selectors.NewControlPointID(svc, ctrlPt)
 		mm, ok := r.MultiMatcherByControlPointID[cpID]
 		if !ok {
-			logSampled.Trace().Interface("controlPointID", cpID).Msg("No labelers for controlPointID")
+			c.registry.GetLogger().Trace().Interface("controlPointID", cpID).Msg("No labelers for controlPointID")
 			continue
 		}
 		classifierMsgs = append(classifierMsgs, c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)

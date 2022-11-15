@@ -6,7 +6,6 @@ require (
 	github.com/fluxninja/aperture v0.7.0
 	github.com/onsi/ginkgo/v2 v2.4.0
 	github.com/onsi/gomega v1.22.1
-	github.com/rs/zerolog v1.28.0
 	go.opentelemetry.io/otel v1.11.1
 	go.opentelemetry.io/otel/sdk v1.11.1
 )
@@ -22,6 +21,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/rs/zerolog v1.28.0 // indirect
 	go.opentelemetry.io/otel/trace v1.11.1 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
