@@ -20,7 +20,7 @@ executors:
       - image: cimg/python:3.10.6
   base-machine-executor:
     machine:
-      image: ubuntu-2204:2022.04.2
+      image: ubuntu-2204:2022.10.2
       docker_layer_caching: true
 
 parameters:
@@ -426,6 +426,10 @@ jobs:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
             - << parameters.remote-repo-fingerprint >> # fluxninja/<sdk> R/W
       - run: *install_opsninja
+      - run:
+          name: Workaround for old expired Heroku apt key
+          command: |
+            sudo rm -rf /etc/apt/sources.list.d/heroku.list
       - aperture_docker_build:
           docker-context: <<parameters.docker-context>>
           dockerfile: <<parameters.dockerfile>>

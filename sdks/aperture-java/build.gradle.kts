@@ -2,6 +2,7 @@ import java.time.Duration
 
 plugins {
     id("application")
+    id("com.github.johnrengelman.shadow")
     id("java")
     id("com.google.protobuf")
     id("io.github.gradle-nexus.publish-plugin")
