@@ -1,11 +1,13 @@
 package components
 
 import (
+	"strings"
 	"time"
 
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -18,6 +20,8 @@ type Alerter struct {
 	severity       string
 	resolveTimeout time.Duration
 	alertChannels  []string
+	alerterIface   *alerts.SimpleAlerter
+	policyReadAPI  iface.Policy
 }
 
 // Make sure Alerter complies with Component interface.
@@ -30,6 +34,8 @@ func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ int, policyReadA
 		severity:       alerterProto.Severity,
 		resolveTimeout: alerterProto.ResolveTimeout.AsDuration(),
 		alertChannels:  make([]string, 0),
+		alerterIface:   alerts.NewSimpleAlerter(100),
+		policyReadAPI:  policyReadAPI,
 	}
 	alerter.alertChannels = append(alerter.alertChannels, alerterProto.AlertChannels...)
 
@@ -37,15 +43,30 @@ func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ int, policyReadA
 }
 
 // Execute implements runtime.Component.Execute.
-func (alerter *Alerter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (a *Alerter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	signalValue := inPortReadings.ReadSingleValuePort("alert")
 	if !signalValue.Valid() {
 		return nil, nil
 	}
 
+	a.alerterIface.AddAlert(a.createAlert())
+
 	return nil, nil
 }
 
 // DynamicConfigUpdate is a no-op for Alerter.
-func (alerter *Alerter) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (a *Alerter) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+}
+
+func (a *Alerter) createAlert() *alerts.Alert {
+	newAlert := alerts.NewAlert()
+	newAlert.SetName(a.name)
+	newAlert.SetSeverity(a.severity)
+	newAlert.SetLabel("policy_name", a.policyReadAPI.GetPolicyName())
+	newAlert.SetLabel("type", "alerter")
+	newAlert.SetAnnotations(map[string]string{
+		"alert_channels":  strings.Join(a.alertChannels, ","),
+		"resolve_timeout": a.resolveTimeout.String(),
+	})
+	return newAlert
 }
