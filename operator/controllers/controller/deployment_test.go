@@ -112,7 +112,14 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelcollector.OtelConfig{
+								Ports: otelcollector.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
+							},
 						},
 					},
 					Image: common.ControllerImage{
@@ -203,6 +210,26 @@ var _ = Describe("Controller Deployment", func() {
 										{
 											Name:          Server,
 											ContainerPort: 80,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelDebugPort,
+											ContainerPort: 8888,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelHealthcheckPort,
+											ContainerPort: 13133,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelPprofPort,
+											ContainerPort: 1777,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelZpagesPort,
+											ContainerPort: 55679,
 											Protocol:      corev1.ProtocolTCP,
 										},
 									},
@@ -308,7 +335,14 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelcollector.OtelConfig{
+								Ports: otelcollector.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
+							},
 						},
 					},
 					CommonSpec: common.CommonSpec{
@@ -499,6 +533,26 @@ var _ = Describe("Controller Deployment", func() {
 										{
 											Name:          Server,
 											ContainerPort: 80,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelDebugPort,
+											ContainerPort: 8888,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelHealthcheckPort,
+											ContainerPort: 13133,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelPprofPort,
+											ContainerPort: 1777,
+											Protocol:      corev1.ProtocolTCP,
+										},
+										{
+											Name:          OtelZpagesPort,
+											ContainerPort: 55679,
 											Protocol:      corev1.ProtocolTCP,
 										},
 									},

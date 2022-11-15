@@ -60,7 +60,6 @@ func provideOtelConfig(baseConfig *otelcollector.OTELConfig,
 	}
 
 	config := otelcollector.NewOTELConfig()
-	config.AddDebugExtensions()
 	addFluxninjaExporter(config, &pluginConfig, grpcClientConfig, httpClientConfig)
 
 	lifecycle.Append(fx.Hook{
