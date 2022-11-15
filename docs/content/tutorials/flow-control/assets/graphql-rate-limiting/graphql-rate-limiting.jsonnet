@@ -1,42 +1,40 @@
-local aperture = import '../../lib/1.0/main.libsonnet';
-local bundle = aperture.blueprints.RateLimiter.bundle;
+local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
 
-local LazySync = aperture.spec.v1.RateLimiterLazySync;
+local policy = aperture.spec.v1.Policy;
+local resources = aperture.spec.v1.Resources;
+local component = aperture.spec.v1.Component;
+local rateLimiter = aperture.spec.v1.RateLimiter;
 local selector = aperture.spec.v1.Selector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
-local fluxMeter = aperture.spec.v1.FluxMeter;
-local controlPoint = aperture.spec.v1.ControlPoint;
+local circuit = aperture.spec.v1.Circuit;
+local port = aperture.spec.v1.Port;
 local classifier = aperture.spec.v1.Classifier;
 local rule = aperture.spec.v1.Rule;
 local rego = aperture.spec.v1.RuleRego;
 
-local svcSelector = selector.new()
-                    + selector.withServiceSelector(
-                      serviceSelector.new()
-                      + serviceSelector.withAgentGroup('default')
-                      + serviceSelector.withService('service-graphql-demo-app.demoapp.svc.cluster.local')
-                    )
-                    + selector.withFlowSelector(
-                      flowSelector.new()
-                      + flowSelector.withControlPoint(controlPoint.new()
-                                                      + controlPoint.withTraffic('ingress'))
-                    );
+local svcSelector =
+  selector.new()
+  + selector.withServiceSelector(
+    serviceSelector.new()
+    + serviceSelector.withAgentGroup('default')
+    + serviceSelector.withService('service-graphql-demo-app.demoapp.svc.cluster.local')
+  )
+  + selector.withFlowSelector(
+    flowSelector.new()
+    + flowSelector.withControlPoint({ traffic: 'ingress' })
+  );
 
-local config = {
-  common+: {
-    policyName: 'example',
-  },
-  policy+: {
-    rateLimiterSelector: svcSelector,
-    rateLimit: '20.0',
-    labelKey: 'user_id',
-    limitResetInterval: '1s',
-    classifiers: [
+local policyDef =
+  policy.new()
+  + policy.withResources(
+    resources.new()
+    + resources.withClassifiers(
       classifier.new()
       + classifier.withSelector(svcSelector)
       + classifier.withRules({
         user_id: rule.new()
+                 + rule.withTelemetry(true)
                  + rule.withRego(
                    local source = |||
                      package graphql_example
@@ -68,8 +66,33 @@ local config = {
                    + rego.withSource(source)
                  ),
       }),
-    ],
+    )
+  )
+  + policy.withCircuit(
+    circuit.new()
+    + circuit.withEvaluationInterval('300s')
+    + circuit.withComponents([
+      component.withRateLimiter(
+        rateLimiter.new()
+        + rateLimiter.withInPorts({ limit: port.withConstantValue(10) })
+        + rateLimiter.withSelector(svcSelector)
+        + rateLimiter.withLimitResetInterval('1s')
+        + rateLimiter.withLabelKey('user_id')
+        + rateLimiter.withLazySync({ enabled: false, num_sync: 5 })
+      ),
+    ]),
+  );
+
+local policyResource = {
+  kind: 'Policy',
+  apiVersion: 'fluxninja.com/v1alpha1',
+  metadata: {
+    name: 'graphql-static-rate-limiting',
+    labels: {
+      'fluxninja.com/validate': 'true',
+    },
   },
+  spec: policyDef,
 };
 
-bundle { _config+:: config }
+policyResource
