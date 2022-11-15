@@ -40,10 +40,6 @@ import (
 var _ = Describe("Namespace controller", func() {
 	Context("testing Reconcile", func() {
 		var instance *agentv1alpha1.Agent
-		namespaceTestReconciler := &NamespaceReconciler{
-			Client: K8sClient,
-			Scheme: K8sManager.GetScheme(),
-		}
 
 		BeforeEach(func() {
 			instance = DefaultAgentInstance.DeepCopy()
