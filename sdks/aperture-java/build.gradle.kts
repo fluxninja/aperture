@@ -69,6 +69,8 @@ dependencies {
 
 // Publishing
 java {
+    setSourceCompatibility("11")
+    setTargetCompatibility("11")
     withJavadocJar()
     withSourcesJar()
 }
