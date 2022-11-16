@@ -18,7 +18,7 @@ var _ = Describe("Component factory", func() {
 	Context("With unimplemented component type", func() {
 		compProto := &policylangv1.Component{}
 		It("Returns error if component type is not one of specified", func() {
-			_, _, _, err := controlplane.NewComponentAndOptions(compProto, 0, nil)
+			_, _, _, err := controlplane.NewComponentAndOptions(compProto, 0, nil, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
@@ -46,7 +46,7 @@ var _ = Describe("Component factory", func() {
 		}
 		It("Creates Alerter component", func() {
 			alerterComponent := &components.Alerter{}
-			component, options, err := components.NewAlerterAndOptions(alerterProto, 0, nil)
+			component, options, err := components.NewAlerterAndOptions(alerterProto, 0, nil, nil)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(reflect.TypeOf(component)).To(Equal(reflect.TypeOf(alerterComponent)))
 			Expect(options).To(BeNil())

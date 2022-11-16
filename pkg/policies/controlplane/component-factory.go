@@ -6,6 +6,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
@@ -33,6 +34,7 @@ func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentIndex int,
 	policyReadAPI iface.Policy,
+	alerterIface alerts.Alerter,
 ) (runtime.CompiledComponent, []runtime.CompiledComponent, fx.Option, error) {
 	// Factory parser to determine what kind of component to create
 	if gradientController := componentProto.GetGradientController(); gradientController != nil {
@@ -162,7 +164,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSink,
 		}, nil, option, err
 	} else if alerter := componentProto.GetAlerter(); alerter != nil {
-		component, option, err := components.NewAlerterAndOptions(alerter, componentIndex, policyReadAPI)
+		component, option, err := components.NewAlerterAndOptions(alerter, componentIndex, policyReadAPI, alerterIface)
 		mapStruct, err := encodeMapStructOnNilErr(alerter, err)
 		return runtime.CompiledComponent{
 			Component:     component,

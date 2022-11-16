@@ -8,6 +8,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -46,6 +47,7 @@ type PolicyFactory struct {
 	registry             status.Registry
 	dynamicConfigWatcher notifiers.Watcher
 	policyTracker        map[string]*policysyncv1.PolicyWrapper
+	alerterIface         alerts.Alerter
 }
 
 // Main fx app.
@@ -56,6 +58,7 @@ func providePolicyFactory(
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
+	alerterIface alerts.Alerter,
 ) (*PolicyFactory, error) {
 	policiesStatusRegistry := registry.Child(iface.PoliciesRoot)
 	logger := policiesStatusRegistry.GetLogger()
@@ -72,6 +75,7 @@ func providePolicyFactory(
 		etcdClient:           etcdClient,
 		dynamicConfigWatcher: dynamicConfigWatcher,
 		policyTracker:        make(map[string]*policysyncv1.PolicyWrapper),
+		alerterIface:         alerterIface,
 	}
 
 	optionsFunc := []notifiers.FxOptionsFunc{factory.provideControllerPolicyFxOptions}
@@ -133,6 +137,7 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 	policyFxOptions, err := newPolicyOptions(
 		wrapperMessage,
 		registry,
+		factory.alerterIface,
 	)
 	if err != nil {
 		registry.SetStatus(status.NewStatus(nil, err))

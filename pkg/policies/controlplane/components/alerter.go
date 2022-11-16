@@ -20,7 +20,7 @@ type Alerter struct {
 	severity       string
 	resolveTimeout time.Duration
 	alertChannels  []string
-	alerterIface   *alerts.SimpleAlerter
+	alerterIface   alerts.Alerter
 	policyReadAPI  iface.Policy
 }
 
@@ -28,14 +28,18 @@ type Alerter struct {
 var _ runtime.Component = (*Alerter)(nil)
 
 // NewAlerterAndOptions creates alerter and its fx options.
-func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewAlerterAndOptions(
+	alerterProto *policylangv1.Alerter,
+	_ int, policyReadAPI iface.Policy,
+	alerterIface alerts.Alerter,
+) (runtime.Component, fx.Option, error) {
 	alerter := &Alerter{
 		name:           alerterProto.AlertName,
 		severity:       alerterProto.Severity,
 		resolveTimeout: alerterProto.ResolveTimeout.AsDuration(),
 		alertChannels:  make([]string, 0),
-		alerterIface:   alerts.NewSimpleAlerter(100),
 		policyReadAPI:  policyReadAPI,
+		alerterIface:   alerterIface,
 	}
 	alerter.alertChannels = append(alerter.alertChannels, alerterProto.AlertChannels...)
 
@@ -49,7 +53,9 @@ func (a *Alerter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.T
 		return nil, nil
 	}
 
-	a.alerterIface.AddAlert(a.createAlert())
+	if a.alerterIface != nil {
+		a.alerterIface.AddAlert(a.createAlert())
+	}
 
 	return nil, nil
 }

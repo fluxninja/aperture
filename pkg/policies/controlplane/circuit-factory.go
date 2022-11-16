@@ -9,6 +9,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -34,6 +35,7 @@ type CompiledCircuit []*CompiledComponent
 func compileCircuit(
 	circuitProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
+	alerterIface alerts.Alerter,
 ) (CompiledCircuit, fx.Option, error) {
 	logger := policyReadAPI.GetStatusRegistry().GetLogger()
 	// List of runtime.CompiledComponent. The index of CompiledComponent in compiledCircuit is referred as graphNodeIndex.
@@ -48,7 +50,7 @@ func compileCircuit(
 
 	for compIndex, componentProto := range circuitProto {
 		// Create component
-		compiledComp, compiledSubComps, compOption, compErr := NewComponentAndOptions(componentProto, compIndex, policyReadAPI)
+		compiledComp, compiledSubComps, compOption, compErr := NewComponentAndOptions(componentProto, compIndex, policyReadAPI, alerterIface)
 		if compErr != nil {
 			return nil, fx.Options(), compErr
 		}

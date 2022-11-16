@@ -14,6 +14,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -58,10 +59,11 @@ var _ iface.Policy = (*Policy)(nil)
 func newPolicyOptions(
 	wrapperMessage *policysyncv1.PolicyWrapper,
 	registry status.Registry,
+	alerterIface alerts.Alerter,
 ) (fx.Option, error) {
 	// List of options for the policy.
 	policyOptions := []fx.Option{}
-	policy, compiledCircuit, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage, registry)
+	policy, compiledCircuit, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage, registry, alerterIface)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +98,7 @@ func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry)
 	if err != nil {
 		return nil, err
 	}
-	_, compWithPortsList, _, err := compilePolicyWrapper(wrapperMessage, registry)
+	_, compWithPortsList, _, err := compilePolicyWrapper(wrapperMessage, registry, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +106,11 @@ func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry)
 }
 
 // compilePolicyWrapper takes policyProto and returns a compiled policy.
-func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry status.Registry) (*Policy, CompiledCircuit, fx.Option, error) {
+func compilePolicyWrapper(
+	wrapperMessage *policysyncv1.PolicyWrapper,
+	registry status.Registry,
+	alerterIface alerts.Alerter,
+) (*Policy, CompiledCircuit, fx.Option, error) {
 	if wrapperMessage == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy wrapper message")
 	}
@@ -147,7 +153,7 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 		// Read evaluation interval
 		policy.evaluationInterval = policyProto.GetCircuit().GetEvaluationInterval().AsDuration()
 
-		compiledCircuit, partialCircuitOption, err = compileCircuit(policyProto.GetCircuit().Components, policy)
+		compiledCircuit, partialCircuitOption, err = compileCircuit(policyProto.GetCircuit().Components, policy, alerterIface)
 		if err != nil {
 			return nil, nil, nil, err
 		}
