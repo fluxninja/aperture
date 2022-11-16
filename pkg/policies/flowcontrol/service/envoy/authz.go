@@ -12,7 +12,6 @@ import (
 	"github.com/open-policy-agent/opa-envoy-plugin/envoyauth"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/logging"
-	"github.com/rs/zerolog"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	grpc_codes "google.golang.org/grpc/codes"
@@ -68,6 +67,13 @@ type Handler struct {
 
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)
 
+var (
+	missingTrafficDirectionSampler = log.NewRatelimitingSampler()
+	invalidTrafficDirectionSampler = log.NewRatelimitingSampler()
+	failedReqToInputSampler        = log.NewRatelimitingSampler()
+	failedBaggageInjectionSampler  = log.NewRatelimitingSampler()
+)
+
 // sanitizeBaggageHeaderValue excludes characters that should be url escaped
 // Otherwise both baggage.String method and envoy itself will do it.
 func sanitizeBaggageHeaderValue(value string) string {
@@ -97,7 +103,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		// formatter. Overhead of this base64 encoding is small though.
 		marshalledCheckResponse, err := proto.Marshal(checkResponse)
 		if err != nil {
-			log.Sample(zerolog.Sometimes).Error().Err(err).Msg("Failed to marshal check response")
+			log.Bug().Err(err).Msg("bug: Failed to marshal check response")
 			return nil
 		}
 		checkResponseBase64 := base64.StdEncoding.EncodeToString(marshalledCheckResponse)
@@ -133,12 +139,14 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, "")
 		default:
 			// TODO(krdln) metrics
-			log.Sample(zerolog.Sometimes).Warn().Str("traffic-direction", trafficDirectionHeader).Msg("invalid traffic-direction")
+			log.Sample(invalidTrafficDirectionSampler).
+				Warn().Str("traffic-direction", trafficDirectionHeader).Msg("invalid traffic-direction")
 			return nil, grpc_status.Error(grpc_codes.InvalidArgument, "invalid traffic-direction")
 		}
 	} else {
 		// TODO(krdln) metrics
-		log.Sample(zerolog.Sometimes).Warn().Msg("missing traffic-direction")
+		log.Sample(missingTrafficDirectionSampler).
+			Warn().Msg("missing traffic-direction")
 		return nil, grpc_status.Error(grpc_codes.InvalidArgument, "missing traffic-direction")
 	}
 
@@ -161,7 +169,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		// TODO(krdln) This conversion should be made infallible instead.
 		// https://github.com/fluxninja/aperture/issues/903
 		// TODO(krdln) metrics
-		log.Sample(zerolog.Sometimes).Warn().Err(err).Msg("converting raw input into rego input failed")
+		log.Sample(failedReqToInputSampler).
+			Warn().Err(err).Msg("converting raw input into rego input failed")
 		return nil, grpc_status.Error(grpc_codes.InvalidArgument, "converting raw input into rego input failed")
 	}
 
@@ -170,7 +179,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		// RequestToInput should never produce anything that's not convertible
 		// to ast.Value, so in theory it shouldn't happen.
 		// TODO(krdln) metrics
-		log.Sample(zerolog.Sometimes).Warn().Err(err).Msg("converting rego input to value failed")
+		log.Bug().Err(err).Msg("bug: converting rego input to value failed")
 		return nil, grpc_status.Error(grpc_codes.Internal, "converting rego input to value failed")
 	}
 
@@ -197,7 +206,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	newHeaders, err := h.propagator.Inject(newFlowLabels, existingHeaders)
 	if err != nil {
 		// TODO(krdln) metrics
-		log.Sample(zerolog.Sometimes).Warn().Err(err).Msg("Failed to inject baggage into headers")
+		log.Sample(failedBaggageInjectionSampler).
+			Warn().Err(err).Msg("Failed to inject baggage into headers")
 	}
 
 	// Make the freshly created flow labels available to flowcontrol.
@@ -244,7 +254,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 				},
 			}
 		} else {
-			log.Sample(zerolog.Sometimes).Error().Msg("Unexpected reject reason: " + checkResponse.RejectReason.String())
+			log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
 		}
 	}
 

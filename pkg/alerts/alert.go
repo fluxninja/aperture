@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-openapi/strfmt"
 	"github.com/prometheus/alertmanager/api/v2/models"
-	"github.com/rs/zerolog"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 
@@ -90,7 +89,7 @@ func AlertsFromLogs(ld plog.Logs) []*Alert {
 		resourceAttributes := resourceLogs.Resource().Attributes()
 		generatorURL, exists := resourceAttributes.Get(otelcollector.AlertGeneratorURLLabel)
 		if !exists {
-			log.Sample(zerolog.Sometimes).Trace().
+			log.Trace().
 				Str("key", otelcollector.AlertGeneratorURLLabel).Msg("Key not found")
 			return nil
 		}
