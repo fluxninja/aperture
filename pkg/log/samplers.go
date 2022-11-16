@@ -30,14 +30,20 @@ func NewRatelimitingSampler() zerolog.Sampler {
 	}
 }
 
-func getAutosampler() zerolog.Sampler {
+// GetAutosampler returns a sampler based on caller's caller location.
+//
+// Samplers are created using NewRatelimitingSampler().
+//
+// In most cases, this function shouldn't be used directly, unless implementing
+// some other helpers similar to Autosample() or Bug().
+func GetAutosampler() zerolog.Sampler {
 	// We want separate sampler for every callsite of Autosample() and Bug().
 	// Usage of Caller has some runtime cost, but that's acceptable:
 	// * for Autosample() a more performant (and verbose) alternative exists,
 	// * Bug() in theory never happens, so we shouldn't care too much about perf.
 	callerPC, _, _, pcValid := runtime.Caller(2)
 	if !pcValid {
-		bugWithSampler(global, badCallerSampler).Msg("bug: Cannot get caller info")
+		BugWithSampler(global, badCallerSampler).Msg("bug: Cannot get caller info")
 		callerPC = 0
 	}
 	if sampler := getExistingAutosampler(callerPC); sampler != nil {
@@ -58,7 +64,10 @@ func getExistingAutosampler(callerPC uintptr) zerolog.Sampler {
 	return autoSamplers[callerPC]
 }
 
-func bugWithSampler(lg *Logger, sampler zerolog.Sampler) *zerolog.Event {
+// BugWithSampler is like Bug() but without auto-sampler logic
+//
+// In most cases, using Bug() directly should be preferred.
+func BugWithSampler(lg *Logger, sampler zerolog.Sampler) *zerolog.Event {
 	return lg.Sample(sampler).Warn().Bool(bugKey, true)
 }
 

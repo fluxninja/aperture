@@ -7,26 +7,27 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/genproto/googleapis/rpc/code"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
+	grpc_status "google.golang.org/grpc/status"
 
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
 var (
-	ctx        context.Context
-	cancel     context.CancelFunc
-	classifier *classification.ClassificationEngine
-	handler    *envoy.Handler
+	ctx    context.Context
+	cancel context.CancelFunc
 )
 
 var _ = BeforeEach(func() {
@@ -41,9 +42,7 @@ var _ = AfterEach(func() {
 	}
 })
 
-type AcceptingHandler struct {
-	check.HandlerWithValues
-}
+type AcceptingHandler struct{}
 
 func (s *AcceptingHandler) CheckWithValues(
 	context.Context,
@@ -58,31 +57,53 @@ func (s *AcceptingHandler) CheckWithValues(
 }
 
 var _ = Describe("Authorization handler", func() {
+	var handler *envoy.Handler
+
 	When("it is queried with a request", func() {
 		BeforeEach(func() {
-			classifier = classification.NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger()))
+			classifier := classification.NewClassificationEngine(
+				status.NewRegistry(log.GetGlobalLogger()),
+			)
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
 			Expect(err).NotTo(HaveOccurred())
-			handler = envoy.NewHandler(classifier, nil, &AcceptingHandler{})
+			entities := entitycache.NewEntityCache()
+			entities.Put(&entitycachev1.Entity{
+				IpAddress: "1.2.3.4",
+				Services:  []string{service1Selector.ServiceSelector.Service},
+			})
+			handler = envoy.NewHandler(classifier, entities, &AcceptingHandler{})
 		})
 		It("returns ok response", func() {
-			Eventually(func(g Gomega) {
-				ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer())
-				// add "traffic-direction" header to ctx
-				ctxWithIp = metadata.NewIncomingContext(ctxWithIp, metadata.Pairs("traffic-direction", "INBOUND"))
-				resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
-				g.Expect(err).NotTo(HaveOccurred())
-				g.Expect(code.Code(resp.GetStatus().GetCode())).To(Equal(code.Code_OK))
-			}).Should(Succeed())
+			ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer("1.2.3.4"))
+			// add "traffic-direction" header to ctx
+			ctxWithIp = metadata.NewIncomingContext(
+				ctxWithIp,
+				metadata.Pairs("traffic-direction", "INBOUND"),
+			)
+			resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(code.Code(resp.GetStatus().GetCode())).To(Equal(code.Code_OK))
 		})
 		It("injects metadata", func() {
-			Eventually(func(g Gomega) {
-				ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer())
-				ctxWithIp = metadata.NewIncomingContext(ctxWithIp, metadata.Pairs("traffic-direction", "INBOUND"))
-				resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
-				g.Expect(err).NotTo(HaveOccurred())
-				g.Expect(resp.GetDynamicMetadata()).ShouldNot(BeNil())
-			}).Should(Succeed())
+			ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer("1.2.3.4"))
+			ctxWithIp = metadata.NewIncomingContext(
+				ctxWithIp,
+				metadata.Pairs("traffic-direction", "INBOUND"),
+			)
+			resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(resp.GetDynamicMetadata()).ShouldNot(BeNil())
+		})
+		It("handles entity cache lookup failure", func() {
+			ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer("9.9.9.9"))
+			ctxWithIp = metadata.NewIncomingContext(
+				ctxWithIp,
+				metadata.Pairs("traffic-direction", "INBOUND"),
+			)
+			_, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
+			Expect(err).To(HaveOccurred())
+			status, _ := grpc_status.FromError(err)
+			Expect(status.Code()).To(Equal(codes.NotFound))
 		})
 	})
 })
@@ -144,6 +165,6 @@ type fakeAddr string
 func (a fakeAddr) Network() string { return "tcp" }
 func (a fakeAddr) String() string  { return string(a) }
 
-func newFakeRpcPeer() *peer.Peer {
-	return &peer.Peer{Addr: fakeAddr("1.2.3.4:54321")}
+func newFakeRpcPeer(ip string) *peer.Peer {
+	return &peer.Peer{Addr: fakeAddr(ip + ":54321")}
 }
