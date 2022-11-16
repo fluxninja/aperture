@@ -47,7 +47,7 @@ subprojects {
 dependencies {
     implementation(platform("io.opentelemetry:opentelemetry-bom-alpha:1.18.0-alpha"))
     implementation("io.opentelemetry:opentelemetry-sdk-trace:1.18.0")
-    implementation("io.opentelemetry:opentelemetry-exporter-otlp-trace:1.14.0")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.18.0")
     implementation("io.opentelemetry:opentelemetry-exporter-logging:1.18.0")
     implementation("com.sparkjava:spark-core:2.9.4")
     implementation("io.grpc:grpc-protobuf:1.44.0")
