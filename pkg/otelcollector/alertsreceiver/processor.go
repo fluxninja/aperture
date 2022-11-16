@@ -3,7 +3,6 @@ package alertsreceiver
 import (
 	"context"
 
-	"github.com/rs/zerolog"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 
@@ -54,7 +53,7 @@ func (p *alertsReceiver) run(ctx context.Context) {
 		err := p.logsConsumer.ConsumeLogs(ctx, alert.AsLogs())
 		// We do not care much about those errors. Alerts can be dropped sometimes,
 		// they are sent all the time anyway.
-		log.Sample(zerolog.Sometimes).Debug().Err(err).Msg("ConsumeLogs failed")
+		log.Autosample().Debug().Err(err).Msg("ConsumeLogs failed")
 	case <-ctx.Done():
 		return
 	}

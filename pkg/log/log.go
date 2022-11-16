@@ -47,6 +47,8 @@ const (
 	componentKey = "component"
 	// Sampled is a field key that are used with Sampled value as a bool to the logger context.
 	sampledKey = "sampled"
+	// BugKey is a field key that is used for Bug() events.
+	bugKey = "bug"
 )
 
 // Logger is wrapper around zerolog.Logger and io.writers.
@@ -261,6 +263,65 @@ func (lg *Logger) Sample(sampler zerolog.Sampler) *Logger {
 // Sample returns the global logger with the s sampler.
 func Sample(sampler zerolog.Sampler) *Logger {
 	return global.Sample(sampler)
+}
+
+// Autosample returns the current logger with sampler based on caller location.
+//
+// Sampler will be created using NewRatelimitingSampler()
+//
+// This is basically shorthand for:
+//
+// ```go
+// var mySampler = NewRatelimitingSampler()
+// ...
+// Logger.Sample(mySampler)
+// ```
+//
+// The "auto" part has a slight runtime cost though, so the full should be
+// preferred for cases where performance matters, like on datapath.
+func (lg *Logger) Autosample() *Logger {
+	return lg.Sample(getAutosampler())
+}
+
+// Autosample returns the global logger with sampler based on caller location.
+//
+// See Logger.Autosample().
+func Autosample() *Logger {
+	// Note: not calling global.Autosample() as it might mess up with caller
+	// depth in getAutosampler().
+	return Sample(getAutosampler())
+}
+
+// Bug starts a new message with "bug" level
+//
+// "Bug" is the same level as "warn", but it's intended for programmer's
+// errors, where normally you'd want to use "panic", but:
+// * error is not affecting the service as-a-whole,
+// * there's reasonable way to continue,
+// * restarting service won't fix the error.
+//
+// You might want to use Bug() for cases like hitting "impossible" case of a
+// switch in an rpc call, or similar.
+//
+// Additionally, every callsite of Bug will be automatically ratelimited (like
+// with Autosample).
+//
+// Also, automatic bug-reporting may be integrated here.
+//
+// You must call Msg on the returned event in order to send the event.
+func (lg *Logger) Bug() *zerolog.Event {
+	return bugWithSampler(lg, getAutosampler())
+}
+
+// Bug starts a new message with "bug" level
+//
+// See Logger.Bug()
+//
+// You must call Msg on the returned event in order to send the event.
+func Bug() *zerolog.Event {
+	// Note: not calling global.Bug() as it might mess up with caller depth in
+	// getAutosampler().
+	return bugWithSampler(global, getAutosampler())
 }
 
 // Hook returns the current logger with the h hook.
