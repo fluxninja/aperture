@@ -25,6 +25,7 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	"k8s.io/client-go/dynamic"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/discovery"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -112,6 +113,20 @@ func main() {
 	dynamicClient, err := dynamic.NewForConfig(ctrl.GetConfigOrDie())
 	if err != nil {
 		setupLog.Error(err, "unable to create Dynamic Client")
+		os.Exit(1)
+	}
+
+	// Creating the discovery client
+	discoveryClient, err := discovery.NewDiscoveryClientForConfig(ctrl.GetConfigOrDie())
+	if err != nil {
+		setupLog.Error(err, "unable to create Discovery Client")
+		os.Exit(1)
+	}
+
+	// Querying the local kubernetes version
+	controllers.CurrentKubernetesVersion, err = discoveryClient.ServerVersion()
+	if err != nil {
+		setupLog.Error(err, "unable to get the local kubernetes version")
 		os.Exit(1)
 	}
 

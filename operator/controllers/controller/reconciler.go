@@ -34,6 +34,7 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
+	apimachineryversion "k8s.io/apimachinery/pkg/version"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
@@ -174,6 +175,12 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		} else if instance.Status.Resources == controllers.FailedStatus {
 			return ctrl.Result{}, nil
 		}
+	}
+
+	// Checking if the Minimum kubernetes version condition is satisfied.
+	if len(instance.Status.Resources) == 0 && apimachineryversion.CompareKubeAwareVersionStrings(controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion) == 1 {
+		r.Recorder.Event(instance, corev1.EventTypeWarning, "MinimumKubernetesVersionFail",
+		fmt.Sprintf("Kubernetes version %v is not supported. Please use a kubernetes cluster with version %v or above", controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion))
 	}
 
 	instance.Status.Resources = "creating"

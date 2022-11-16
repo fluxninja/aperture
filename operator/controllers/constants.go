@@ -25,6 +25,7 @@ import (
 	"k8s.io/client-go/dynamic"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	apimachineryversion "k8s.io/apimachinery/pkg/version"
 )
 
 const (
@@ -104,6 +105,8 @@ const (
 	OtelPprofPort = "otel-pprof"
 	// OtelZpagesPort string.
 	OtelZpagesPort = "otel-zpages"
+	//  MinimumKubernetesVersion defines minimum kubernetes version required by Aperture
+	MinimumKubernetesVersion = "v1.23.0"
 )
 
 var (
@@ -142,4 +145,6 @@ var (
 	CertDir = filepath.Join(".", "certs")
 	// PoliciesDir defines policies directory for tests.
 	PoliciesDir = filepath.Join(".", "policies")
+	// Stores current kubernetes version
+	CurrentKubernetesVersion *apimachineryversion.Info
 )
