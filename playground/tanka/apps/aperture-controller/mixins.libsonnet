@@ -2,11 +2,11 @@ local aperture = import '../../../../blueprints/lib/1.0/main.libsonnet';
 
 local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
 
-local latencyGradientPolicy = aperture.blueprints.policies.LatencyGradient;
+local latencyGradientPolicy = aperture.blueprints.LatencyGradient.policy;
 
-local WorkloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
-local LabelMatcher = aperture.spec.v1.LabelMatcher;
-local Workload = aperture.spec.v1.SchedulerWorkload;
+local workloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
+local labelMatcher = aperture.spec.v1.LabelMatcher;
+local workload = aperture.spec.v1.SchedulerWorkload;
 
 local classifier = aperture.spec.v1.Classifier;
 local fluxMeter = aperture.spec.v1.FluxMeter;
@@ -46,6 +46,7 @@ local concurrencyLimiterSelector = selector.new()
                                                                      + controlPoint.withTraffic('ingress'))
                                    );
 
+// Restrict this selector to only bot traffic
 local rateLimiterSelector = selector.new()
                             + selector.withServiceSelector(
                               serviceSelector.new()
@@ -57,7 +58,7 @@ local rateLimiterSelector = selector.new()
                               + flowSelector.withControlPoint(controlPoint.new()
                                                               + controlPoint.withTraffic('ingress'))
                               + flowSelector.withLabelMatcher(
-                                LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
+                                labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
                               )
                             );
 
@@ -84,7 +85,7 @@ local apertureControllerMixin =
           log+: {
             pretty_console: true,
             non_blocking: true,
-            level: 'debug',
+            level: 'info',
           },
           etcd+: {
             endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
@@ -121,14 +122,14 @@ local policyResource = latencyGradientPolicy({
       priority: 20,
     },
     workloads: [
-      Workload.new()
-      + Workload.withWorkloadParameters(WorkloadParameters.withPriority(50))
+      workload.new()
+      + workload.withWorkloadParameters(workloadParameters.withPriority(50))
       // match the label extracted by classifier
-      + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ user_type: 'guest' })),
-      Workload.new()
-      + Workload.withWorkloadParameters(WorkloadParameters.withPriority(200))
+      + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'guest' })),
+      workload.new()
+      + workload.withWorkloadParameters(workloadParameters.withPriority(200))
       // match the http header directly
-      + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
+      + workload.withLabelMatcher(labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
     ],
   },
   components: [
@@ -143,7 +144,11 @@ local policyResource = latencyGradientPolicy({
     component.new()
     + component.withSwitcher(
       switcher.new()
-      + switcher.withInPorts({ switch: port.withSignalName('IS_BOT_ESCALATION'), on_true: port.withConstantValue(0.0), on_false: port.withConstantValue(10) })
+      + switcher.withInPorts({
+        switch: port.withSignalName('IS_BOT_ESCALATION'),
+        on_true: port.withConstantValue(0.0),
+        on_false: port.withConstantValue(10),
+      })
       + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),
     component.new()
@@ -155,7 +160,6 @@ local policyResource = latencyGradientPolicy({
       + rateLimiter.withLabelKey('http.request.header.user_id')
       + rateLimiter.withDynamicConfigKey('rate_limiter'),
     ),
-
   ],
 }).policyResource;
 

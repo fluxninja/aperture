@@ -122,7 +122,7 @@ func bytesToStrUnsafe(data []byte) string {
 }
 
 // sentryPanicHandler is a panic handler that sends the fatal level event to Sentry with diagnostic information.
-func (s *SentryWriter) sentryPanicHandler(e interface{}, stacktrace panichandler.Callstack) {
+func (s *SentryWriter) sentryPanicHandler(e interface{}, _ panichandler.Callstack) {
 	duration, _ := time.ParseDuration(SentryFlushWait)
 
 	// Crash Log
@@ -215,14 +215,6 @@ func (s *SentryWriter) sentryPanicHandler(e interface{}, stacktrace panichandler
 			Message:  "No Version Information found",
 		})
 	}
-
-	// Stacktrace
-	sentry.AddBreadcrumb(&sentry.Breadcrumb{
-		Type:     "debug",
-		Category: "Stacktrace",
-		Level:    sentry.LevelInfo,
-		Data:     stacktrace.GetEntries(),
-	})
 
 	sentry.CurrentHub().Recover(e)
 	sentry.Flush(duration)

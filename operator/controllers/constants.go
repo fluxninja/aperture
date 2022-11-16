@@ -96,6 +96,14 @@ const (
 	PolicyValidatingWebhookName = "policy-validator.fluxninja.com"
 	// PolicyValidatingWebhookURI defines Validating Webhook URI for Policy.
 	PolicyValidatingWebhookURI = "/validate/policy"
+	// OtelDebugPort string.
+	OtelDebugPort = "otel-debug"
+	// OtelHealthcheckPort string.
+	OtelHealthcheckPort = "otel-health"
+	// OtelPprofPort string.
+	OtelPprofPort = "otel-pprof"
+	// OtelZpagesPort string.
+	OtelZpagesPort = "otel-zpages"
 )
 
 var (

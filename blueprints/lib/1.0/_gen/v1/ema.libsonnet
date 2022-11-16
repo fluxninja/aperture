@@ -43,6 +43,12 @@ local emaouts = import './emaouts.libsonnet';
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
   },
+  withValidDuringWarmup(valid_during_warmup):: {
+    valid_during_warmup: valid_during_warmup,
+  },
+  withValidDuringWarmupMixin(valid_during_warmup):: {
+    valid_during_warmup+: valid_during_warmup,
+  },
   withWarmUpWindow(warm_up_window):: {
     warm_up_window: warm_up_window,
   },

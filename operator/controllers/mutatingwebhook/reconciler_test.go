@@ -36,10 +36,6 @@ var _ = Describe("MutatingWebhookConfiguration controller", Ordered, func() {
 	Context("testing Reconcile", func() {
 
 		var instance *admissionregistrationv1.MutatingWebhookConfiguration
-		mutatingWebhookTestReconciler := &MutatingWebhookReconciler{
-			Client: K8sClient,
-			Scheme: K8sManager.GetScheme(),
-		}
 
 		BeforeEach(func() {
 			mutatingWebhookTestReconciler.AgentManager = true

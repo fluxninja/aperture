@@ -6,10 +6,10 @@ import (
 	"path"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
@@ -36,7 +36,8 @@ func NewClassifierOptions(
 	}
 	agentGroup := selectorProto.ServiceSelector.GetAgentGroup()
 
-	etcdPath := path.Join(common.ClassifiersPath, common.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))
+	etcdPath := path.Join(paths.ClassifiersPath,
+		paths.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))
 	configSync := &classifierConfigSync{
 		classifierProto: classifierProto,
 		policyReadAPI:   policyBaseAPI,
@@ -56,9 +57,9 @@ func (configSync *classifierConfigSync) doSync(etcdClient *etcdclient.Client, li
 	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &wrappersv1.ClassifierWrapper{
+			wrapper := &policysyncv1.ClassifierWrapper{
 				Classifier: configSync.classifierProto,
-				CommonAttributes: &wrappersv1.CommonAttributes{
+				CommonAttributes: &policysyncv1.CommonAttributes{
 					PolicyName:     configSync.policyReadAPI.GetPolicyName(),
 					PolicyHash:     configSync.policyReadAPI.GetPolicyHash(),
 					ComponentIndex: configSync.classifierIndex,

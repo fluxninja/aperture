@@ -156,21 +156,6 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
-### RateLimiterDynamicConfig {#rate-limiter-dynamic-config}
-
-Dynamic Configuration for the rate limiter
-
-#### Properties
-
-<dl>
-<dt>overrides</dt>
-<dd>
-
-([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
-
-</dd>
-</dl>
-
 ### RateLimiterLazySync {#rate-limiter-lazy-sync}
 
 #### Properties
@@ -884,6 +869,12 @@ The EMA filter also employs a min-max-envelope logic during warm up stage, expla
 ([V1EMAOuts](#v1-e-m-a-outs)) Output ports for the EMA component.
 
 </dd>
+<dt>valid_during_warmup</dt>
+<dd>
+
+(bool) Whether the output is valid during the warm up stage.
+
+</dd>
 <dt>warm_up_window</dt>
 <dd>
 
@@ -1197,7 +1188,7 @@ classifier, but only if they were created at some previous control point
 (and propagated in baggage).
 
 This limitation doesn't apply to selectors of other entities, like
-FluxMeters or actuators. It's valid to create a flow label on a control
+Flux Meters or Actuators. It's valid to create a flow label on a control
 point using classifier, and immediately use it for matching on the same
 control point.
 :::
@@ -1207,10 +1198,10 @@ control point.
 
 ### v1FluxMeter {#v1-flux-meter}
 
-FluxMeter gathers metrics for the traffic that matches its selector
+Flux Meter gathers metrics for the traffic that matches its selector
 
 :::info
-See also [FluxMeter overview](/concepts/flow-control/flux-meter.md).
+See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
 :::
 
 Example of a selector that creates a histogram metric for all HTTP requests
@@ -1260,7 +1251,7 @@ For list of available attributes in Envoy access logs, refer
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector)) What latency should we measure in the histogram created by this FluxMeter.
+([V1Selector](#v1-selector)) What latency should we measure in the histogram created by this Flux Meter.
 
 - For traffic control points, fluxmeter will measure the duration of the
   whole http transaction (including sending request and receiving
@@ -1308,6 +1299,12 @@ The output can be _optionally_ clamped to desired range using `max` and
 #### Properties
 
 <dl>
+<dt>default_config</dt>
+<dd>
+
+([V1ControllerDynamicConfig](#v1-controller-dynamic-config)) Default configuration.
+
+</dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
@@ -1318,12 +1315,6 @@ The output can be _optionally_ clamped to desired range using `max` and
 <dd>
 
 ([V1GradientControllerIns](#v1-gradient-controller-ins)) Input ports of the Gradient Controller.
-
-</dd>
-<dt>init_config</dt>
-<dd>
-
-([V1ControllerDynamicConfig](#v1-controller-dynamic-config)) Initial configuration.
 
 </dd>
 <dt>max_gradient</dt>
@@ -1621,10 +1612,38 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 #### Properties
 
 <dl>
+<dt>default_config</dt>
+<dd>
+
+([V1LoadActuatorDynamicConfig](#v1-load-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig.
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
 ([V1LoadActuatorIns](#v1-load-actuator-ins)) Input ports for the Load Actuator component.
+
+</dd>
+</dl>
+
+### v1LoadActuatorDynamicConfig {#v1-load-actuator-dynamic-config}
+
+Dynamic Configuration for LoadActuator
+
+#### Properties
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+(bool) Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
+Useful for observing the behavior of Load Actuator without disrupting any real traffic.
 
 </dd>
 </dl>
@@ -1905,7 +1924,7 @@ Policy specification contains a circuit that defines the controller logic and re
 <dt>resources</dt>
 <dd>
 
-([V1Resources](#v1-resources)) Resources (FluxMeters, Classifiers etc.) to setup.
+([V1Resources](#v1-resources)) Resources (Flux Meters, Classifiers etc.) to setup.
 
 </dd>
 </dl>
@@ -1971,6 +1990,12 @@ to select which label should be used as key.
 #### Properties
 
 <dl>
+<dt>default_config</dt>
+<dd>
+
+([V1RateLimiterDynamicConfig](#v1-rate-limiter-dynamic-config)) Default configuration
+
+</dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
@@ -1981,12 +2006,6 @@ to select which label should be used as key.
 <dd>
 
 ([V1RateLimiterIns](#v1-rate-limiter-ins), `required`)
-
-</dd>
-<dt>init_config</dt>
-<dd>
-
-([RateLimiterDynamicConfig](#rate-limiter-dynamic-config)) Initial configuration
 
 </dd>
 <dt>label_key</dt>
@@ -2020,6 +2039,21 @@ label set up, set `label_key: "user"`.
 </dd>
 </dl>
 
+### v1RateLimiterDynamicConfig {#v1-rate-limiter-dynamic-config}
+
+Dynamic Configuration for the rate limiter
+
+#### Properties
+
+<dl>
+<dt>overrides</dt>
+<dd>
+
+([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
+
+</dd>
+</dl>
+
 ### v1RateLimiterIns {#v1-rate-limiter-ins}
 
 Inputs for the RateLimiter component
@@ -2049,7 +2083,7 @@ Resources that need to be setup for the policy to function
 See also [Resources overview](/concepts/policy/resources.md).
 :::
 
-Resources are typically FluxMeters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
+Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 
 #### Properties
 
@@ -2059,15 +2093,15 @@ Resources are typically FluxMeters, Classifiers, etc. that can be used to create
 
 ([[]V1Classifier](#v1-classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
-The flow labels created by Classifiers can be matched by FluxMeters to create metrics for control purposes.
+The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
 
 </dd>
 <dt>flux_meters</dt>
 <dd>
 
-(map of [V1FluxMeter](#v1-flux-meter)) FluxMeters are installed in the data-plane and form the observability leg of the feedback loop.
+(map of [V1FluxMeter](#v1-flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
-FluxMeters'-created metrics can be consumed as input to the circuit via the PromQL component.
+Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
 
 </dd>
 </dl>
@@ -2153,7 +2187,7 @@ Weighted Fair Queuing-based workload scheduler
 
 :::note
 Each Agent instantiates an independent copy of the scheduler, but output
-signal are aggregated across all agents.
+signals for accepted and incoming concurrency are aggregated across all agents.
 :::
 
 See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.

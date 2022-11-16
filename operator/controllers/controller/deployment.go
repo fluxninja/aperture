@@ -111,6 +111,26 @@ func deploymentForController(instance *controllerv1alpha1.Controller, log logr.L
 									ContainerPort: serverPort,
 									Protocol:      controllers.TCP,
 								},
+								{
+									Name:          controllers.OtelDebugPort,
+									ContainerPort: int32(spec.ConfigSpec.Otel.Ports.DebugPort),
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          controllers.OtelHealthcheckPort,
+									ContainerPort: int32(spec.ConfigSpec.Otel.Ports.HealthCheckPort),
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          controllers.OtelPprofPort,
+									ContainerPort: int32(spec.ConfigSpec.Otel.Ports.PprofPort),
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          controllers.OtelZpagesPort,
+									ContainerPort: int32(spec.ConfigSpec.Otel.Ports.ZpagesPort),
+									Protocol:      corev1.ProtocolTCP,
+								},
 							},
 							TerminationMessagePath:   "/dev/termination-log",
 							TerminationMessagePolicy: corev1.TerminationMessageReadFile,

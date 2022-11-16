@@ -6,68 +6,75 @@ import (
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
+	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/rs/zerolog"
 )
 
 // LoadActuator struct.
 type LoadActuator struct {
-	policyReadAPI  iface.Policy
-	decision       *policydecisionsv1.LoadDecision
-	etcdPath       string
-	writer         *etcdwriter.Writer
-	agentGroupName string
-	componentIndex int
+	policyReadAPI     iface.Policy
+	decisionWriter    *etcdwriter.Writer
+	loadActuatorProto *policylangv1.LoadActuator
+	decisionsEtcdPath string
+	agentGroupName    string
+	componentIndex    int
+	dryRun            bool
 }
 
 // NewLoadActuatorAndOptions creates load actuator and its fx options.
 func NewLoadActuatorAndOptions(
-	_ *policylangv1.LoadActuator,
+	loadActuatorProto *policylangv1.LoadActuator,
 	componentIndex int,
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	etcdPath := path.Join(common.LoadDecisionsPath,
-		common.DataplaneComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex)))
-	lsa := &LoadActuator{
-		policyReadAPI:  policyReadAPI,
-		agentGroupName: agentGroup,
-		componentIndex: componentIndex,
-		etcdPath:       etcdPath,
+	componentID := paths.FlowControlComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex))
+	decisionsEtcdPath := path.Join(paths.LoadActuatorDecisionsPath, componentID)
+	dryRun := false
+	if loadActuatorProto.GetDefaultConfig() != nil {
+		dryRun = loadActuatorProto.GetDefaultConfig().GetDryRun()
 	}
-	lsa.decision = &policydecisionsv1.LoadDecision{}
+	lsa := &LoadActuator{
+		policyReadAPI:     policyReadAPI,
+		agentGroupName:    agentGroup,
+		componentIndex:    componentIndex,
+		decisionsEtcdPath: decisionsEtcdPath,
+		loadActuatorProto: loadActuatorProto,
+		dryRun:            dryRun,
+	}
 
 	return lsa, fx.Options(
 		fx.Invoke(lsa.setupWriter),
 	), nil
 }
 
-func (lsa *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
-	logger := lsa.policyReadAPI.GetStatusRegistry().GetLogger()
+func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			lsa.writer = etcdwriter.NewWriter(etcdClient, true)
+			la.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), lsa.etcdPath)
+			var merr, err error
+			la.decisionWriter.Close()
+			_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), la.decisionsEtcdPath)
 			if err != nil {
-				logger.Error().Err(err).Msg("Failed to delete load decision config")
-				return err
+				logger.Error().Err(err).Msg("Failed to delete load decisions")
+				merr = multierr.Append(merr, err)
 			}
-			lsa.writer.Close()
-			return nil
+			return merr
 		},
 	})
 
@@ -75,46 +82,81 @@ func (lsa *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx
 }
 
 // Execute implements runtime.Component.Execute.
-func (lsa *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (la *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Get the decision from the port
 	lm, ok := inPortReadings["load_multiplier"]
 	if ok {
 		if len(lm) > 0 {
 			lmReading := lm[0]
 			var lmValue float64
-			if !lmReading.Valid() {
-				lmValue = 0
-			} else {
+			if lmReading.Valid() {
 				if lmReading.Value() <= 0 {
 					lmValue = 0
-				} else if lmReading.Value() >= 1 {
-					lmValue = 1
 				} else {
 					lmValue = lmReading.Value()
 				}
+				return nil, la.publishDecision(tickInfo, lmValue, false)
+			} else {
+				logger.Sample(zerolog.Often).Info().Msg("Invalid load multiplier data")
 			}
-			return nil, lsa.publishLoadMultiplier(lmValue)
+		} else {
+			logger.Sample(zerolog.Often).Info().Msg("load_multiplier port has no reading")
 		}
+	} else {
+		logger.Sample(zerolog.Often).Info().Msg("load_multiplier port not found")
 	}
-	return nil, nil
+	return nil, la.publishDefaultDecision(tickInfo)
 }
 
-// DynamicConfigUpdate is a no-op for load actuator.
-func (lsa *LoadActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+// DynamicConfigUpdate finds the dynamic config and syncs the decision to agent.
+func (la *LoadActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
+	key := la.loadActuatorProto.GetDynamicConfigKey()
+	// read dynamic config
+	if unmarshaller.IsSet(key) {
+		dynamicConfig := &policylangv1.LoadActuator_DynamicConfig{}
+		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
+			logger.Error().Err(err).Msg("Failed to unmarshal dynamic config")
+			return
+		}
+		la.setConfig(dynamicConfig)
+	} else {
+		la.setConfig(la.loadActuatorProto.GetDefaultConfig())
+	}
 }
 
-func (lsa *LoadActuator) publishLoadMultiplier(loadMultiplier float64) error {
-	logger := lsa.policyReadAPI.GetStatusRegistry().GetLogger()
+func (la *LoadActuator) setConfig(config *policylangv1.LoadActuator_DynamicConfig) {
+	if config != nil {
+		la.dryRun = config.GetDryRun()
+	} else {
+		la.dryRun = false
+	}
+}
+
+func (la *LoadActuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {
+	return la.publishDecision(tickInfo, 1.0, true)
+}
+
+func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool) error {
+	if la.dryRun {
+		passThrough = true
+	}
+	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Save load multiplier in decision message
-	lsa.decision.LoadMultiplier = loadMultiplier
+	decision := &policysyncv1.LoadDecision{
+		LoadMultiplier: loadMultiplier,
+		PassThrough:    passThrough,
+		TickInfo:       tickInfo.Serialize(),
+	}
 	// Publish decision
-	logger.Sample(zerolog.Often).Debug().Float64("loadMultiplier", loadMultiplier).Msg("Publish load decision")
-	wrapper := &wrappersv1.LoadDecisionWrapper{
-		LoadDecision: lsa.decision,
-		CommonAttributes: &wrappersv1.CommonAttributes{
-			PolicyName:     lsa.policyReadAPI.GetPolicyName(),
-			PolicyHash:     lsa.policyReadAPI.GetPolicyHash(),
-			ComponentIndex: int64(lsa.componentIndex),
+	logger.Sample(zerolog.Often).Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")
+	wrapper := &policysyncv1.LoadDecisionWrapper{
+		LoadDecision: decision,
+		CommonAttributes: &policysyncv1.CommonAttributes{
+			PolicyName:     la.policyReadAPI.GetPolicyName(),
+			PolicyHash:     la.policyReadAPI.GetPolicyHash(),
+			ComponentIndex: int64(la.componentIndex),
 		},
 	}
 	dat, err := proto.Marshal(wrapper)
@@ -122,6 +164,6 @@ func (lsa *LoadActuator) publishLoadMultiplier(loadMultiplier float64) error {
 		logger.Error().Err(err).Msg("Failed to marshal policy decision")
 		return err
 	}
-	lsa.writer.Write(lsa.etcdPath, dat)
+	la.decisionWriter.Write(la.decisionsEtcdPath, dat)
 	return nil
 }

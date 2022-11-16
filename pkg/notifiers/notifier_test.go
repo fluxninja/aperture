@@ -4,8 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/stretchr/testify/require"
+
+	"github.com/fluxninja/aperture/pkg/config"
 )
 
 type testConfig struct {
@@ -44,7 +45,7 @@ func createEvent(t *testing.T, key Key, value []byte, action EventType) Event {
 // notifierFunc just prints the action that is being performed on a given notifier.
 // Recalled event.String() for getting more coverage but printing the function leads to numerous log undesired log messages.
 func notifierFunc(event Event) {
-	event.String()
+	_ = event.String()
 }
 
 // transformFunc is a mock func that reverses the content of any bytes given to it if the action is valid.

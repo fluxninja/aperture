@@ -11,7 +11,8 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/info/v1"
+	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/info/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	fswatcher "github.com/fluxninja/aperture/pkg/filesystem/watcher"
@@ -69,7 +70,6 @@ func New(opts ...fx.Option) *fx.App {
 			panichandler.Crash(v)
 		}
 	}()
-	panichandler.RegisterPanicHandler(OnCrash)
 	return fx.New(options...)
 }
 
@@ -105,7 +105,10 @@ func (cfg Config) Module() fx.Option {
 	)
 
 	options := fx.Options(
-		fx.Provide(provideFlagSetBuilder),
+		fx.Provide(
+			provideFlagSetBuilder,
+			alerts.ProvideAlerter,
+		),
 		config.ModuleConfig{MergeConfig: cfg.MergeConfig, UnknownFlags: false, ExitOnHelp: true}.Module(),
 		config.LogModule(),
 		health.Module(),
@@ -203,8 +206,3 @@ func stop(app *fx.App) {
 	platform.statusRegistry.Detach()
 	os.Exit(0)
 }
-
-// OnCrash is the panic handler.
-// TODO: Crash Report will be handled by Sentry plugin.
-// Need to implement Panic Handler for the platform.
-func OnCrash(interface{}, panichandler.Callstack) {}

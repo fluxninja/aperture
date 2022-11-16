@@ -20,7 +20,7 @@ executors:
       - image: cimg/python:3.10.6
   base-machine-executor:
     machine:
-      image: ubuntu-2204:2022.04.2
+      image: ubuntu-2204:2022.10.2
       docker_layer_caching: true
 
 parameters:
@@ -43,6 +43,9 @@ parameters:
     type: boolean
     default: false
   updated-aperture-go:
+    type: boolean
+    default: false
+  updated-aperture-js:
     type: boolean
     default: false
   updated-aperture-java:
@@ -224,7 +227,18 @@ jobs:
             go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
             envtest_path=$(make operator-setup_envtest -s)
             export KUBEBUILDER_ASSETS="${envtest_path}"
-            PKGS=$(go list ./... | grep -v gen | grep -v operator/api) && gotestsum --format=testname --junitfile=unit-tests.xml --rerun-fails=2 --packages="$PKGS" -- -race -coverprofile=coverage.out -coverpkg=./... $PKGS
+            PKGS=$(go list ./... | grep -v gen | grep -v operator/api) && \
+              gotestsum \
+                --format=testname \
+                --junitfile=unit-tests.xml \
+                --rerun-fails=2 \
+                --packages="$PKGS" \
+                -- \
+                  -race \
+                  -coverprofile=coverage.out \
+                  -coverpkg=./... \
+                  -ldflags='-extldflags "-Wl,--allow-multiple-definition"' \
+              $PKGS
             mkdir -p /tmp/test-results
             mv unit-tests.xml /tmp/test-results
       - codecov/upload
@@ -263,6 +277,7 @@ jobs:
             helm
             kustomize
             jsonnet
+            circleci
       - run:
           name: Install additional system dependencies for pre-commit
           command: |
@@ -411,6 +426,10 @@ jobs:
             - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
             - << parameters.remote-repo-fingerprint >> # fluxninja/<sdk> R/W
       - run: *install_opsninja
+      - run:
+          name: Workaround for old expired Heroku apt key
+          command: |
+            sudo rm -rf /etc/apt/sources.list.d/heroku.list
       - aperture_docker_build:
           docker-context: <<parameters.docker-context>>
           dockerfile: <<parameters.dockerfile>>
@@ -634,6 +653,18 @@ workflows:
           remote-repo: fluxninja/aperture-go
           remote-repo-fingerprint: "c5:d8:c4:22:7e:ff:b5:c3:c3:32:c2:b7:54:c7:99:1b"
 
+  aperture-js:
+    when: << pipeline.parameters.updated-aperture-js >>
+    jobs:
+      - validate-publish-sdk:
+          name: validate-publish-aperture-js
+          path: sdks/aperture-js
+          docker-context: sdks/aperture-js
+          dockerfile: Dockerfile
+          docker-image: aperture-js-example
+          remote-repo: fluxninja/aperture-js
+          remote-repo-fingerprint: "2b:10:dc:0b:ba:45:2e:6c:6d:d0:f4:b9:c3:e9:38:37"
+
   aperture-java:
     when: << pipeline.parameters.updated-aperture-java >>
     jobs:
@@ -700,8 +731,8 @@ workflows:
           dockerhub-image: fluxninja/demo-app
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/demo-app
-          docker-context: .
-          dockerfile: tools/demo_app/Dockerfile
+          docker-context: ./playground/demo_app
+          dockerfile: ./playground/demo_app/Dockerfile
           use-docker-layer-caching: true
           push-to-dockerhub: false
 

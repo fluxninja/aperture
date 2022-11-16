@@ -107,6 +107,11 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 		basePluginOTELConfigWithPipeline("logs", testPipelineWithFN()),
 	),
 	Entry(
+		"add FN exporters to alerts pipeline",
+		baseOTELConfigWithPipeline("logs/alerts", testPipeline()),
+		basePluginOTELConfigWithPipeline("logs/alerts", testPipelineWithFN()),
+	),
+	Entry(
 		"add metrics/slow pipeline if metrics/fast pipeline exists",
 		baseOTELConfigWithPipeline("metrics/fast", testPipeline()),
 		basePluginOTELConfigWithMetrics("metrics/slow"),
@@ -142,8 +147,9 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELCon
 		},
 	})
 	cfg.AddProcessor("batch/metrics-slow", batchprocessor.Config{
-		SendBatchSize: 10000,
-		Timeout:       10 * time.Second,
+		SendBatchSize:    10000,
+		SendBatchMaxSize: 10000,
+		Timeout:          10 * time.Second,
 	})
 	processors := []string{
 		"batch/metrics-slow",
@@ -186,6 +192,13 @@ func basePluginOTELConfig() *otelcollector.OTELConfig {
 			},
 		},
 	})
+	cfg.AddProcessor("transform/fluxninja", map[string]interface{}{
+		"logs": map[string]interface{}{
+			"statements": []string{
+				`set(resource.attributes["controller_id"], "controllero")`,
+			},
+		},
+	})
 	cfg.AddExporter("otlp/fluxninja", map[string]interface{}{
 		"endpoint": "http://localhost:1234",
 		"headers": map[string]interface{}{
@@ -204,7 +217,7 @@ func basePluginOTELConfig() *otelcollector.OTELConfig {
 
 func testPipelineWithFN() otelcollector.Pipeline {
 	p := testPipeline()
-	p.Processors = append(p.Processors, "attributes/fluxninja")
+	p.Processors = append(p.Processors, "attributes/fluxninja", "transform/fluxninja")
 	p.Exporters = append(p.Exporters, "otlp/fluxninja")
 	return p
 }

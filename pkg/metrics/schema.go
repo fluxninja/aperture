@@ -47,6 +47,9 @@ const (
 	// WorkloadLatencyCountMetricName - metric from workload histogram.
 	WorkloadLatencyCountMetricName = "workload_latency_ms_count"
 
+	// WorkloadCounterMetricName - metric used for counting workload requests.
+	WorkloadCounterMetricName = "workload_requests_total"
+
 	// AcceptedConcurrencyMetricName - metric for measuring latencies of accepted requests.
 	AcceptedConcurrencyMetricName = "accepted_concurrency_ms"
 	// IncomingConcurrencyMetricName - metric for measuring latencies of all incoming requests.
@@ -98,6 +101,14 @@ const (
 	SignalNameLabel = "signal_name"
 	// FluxMeterNameLabel - specifying flux meter's name.
 	FluxMeterNameLabel = "flux_meter_name"
+	// ValidLabel - label for specifying if metric is valid.
+	// In case of FluxMeter a metric may be invalid if attribute is not found in flow telemetry.
+	// In case of Signal metrics, a metric may be invalid if signal reading is invalid.
+	ValidLabel = "valid"
+	// ValidTrue - if attribute was found.
+	ValidTrue = "true"
+	// ValidFalse - if attribute was not found.
+	ValidFalse = "false"
 	// ClassifierIndexLabel - prometheus label specifying clasiffier index.
 	ClassifierIndexLabel = "classifier_index"
 	// StatusCodeLabel - http status code.

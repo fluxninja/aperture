@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/classifier.proto";
+import "aperture/policy/sync/v1/common_attributes.proto";
+
+message ClassifierWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  // Classifier
+  policy.language.v1.Classifier classifier = 2;
+}

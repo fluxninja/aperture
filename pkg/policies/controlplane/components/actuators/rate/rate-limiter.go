@@ -10,22 +10,21 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	policydecisionsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/decisions/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	wrappersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/wrappers/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 )
 
 type rateLimiterSync struct {
 	policyReadAPI         iface.Policy
 	rateLimiterProto      *policylangv1.RateLimiter
-	decision              *policydecisionsv1.RateLimiterDecision
+	decision              *policysyncv1.RateLimiterDecision
 	configEtcdPath        string
 	decisionsEtcdPath     string
 	dynamicConfigEtcdPath string
@@ -47,14 +46,14 @@ func NewRateLimiterAndOptions(
 		return nil, fx.Options(), errors.New("selector is nil")
 	}
 	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
-	componentID := common.DataplaneComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
-	configEtcdPath := path.Join(common.RateLimiterConfigPath, componentID)
-	decisionsEtcdPath := path.Join(common.RateLimiterDecisionsPath, componentID)
-	dynamicConfigEtcdPath := path.Join(common.RateLimiterDynamicConfigPath, componentID)
+	componentID := paths.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
+	configEtcdPath := path.Join(paths.RateLimiterConfigPath, componentID)
+	decisionsEtcdPath := path.Join(paths.RateLimiterDecisionsPath, componentID)
+	dynamicConfigEtcdPath := path.Join(paths.RateLimiterDynamicConfigPath, componentID)
 
 	limiterSync := &rateLimiterSync{
 		rateLimiterProto:      rateLimiterProto,
-		decision:              &policydecisionsv1.RateLimiterDecision{},
+		decision:              &policysyncv1.RateLimiterDecision{},
 		policyReadAPI:         policyReadAPI,
 		configEtcdPath:        configEtcdPath,
 		decisionsEtcdPath:     decisionsEtcdPath,
@@ -73,9 +72,9 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &wrappersv1.RateLimiterWrapper{
+			wrapper := &policysyncv1.RateLimiterWrapper{
 				RateLimiter: limiterSync.rateLimiterProto,
-				CommonAttributes: &wrappersv1.CommonAttributes{
+				CommonAttributes: &policysyncv1.CommonAttributes{
 					PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
 					PolicyHash:     limiterSync.policyReadAPI.GetPolicyHash(),
 					ComponentIndex: int64(limiterSync.componentIndex),
@@ -150,9 +149,9 @@ func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
 		limiterSync.decision.Limit = limitValue
 		// Publish decision
 		logger.Debug().Float64("limit", limitValue).Msg("publishing rate limiter decision")
-		wrapper := &wrappersv1.RateLimiterDecisionWrapper{
+		wrapper := &policysyncv1.RateLimiterDecisionWrapper{
 			RateLimiterDecision: limiterSync.decision,
-			CommonAttributes: &wrappersv1.CommonAttributes{
+			CommonAttributes: &policysyncv1.CommonAttributes{
 				PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
 				PolicyHash:     limiterSync.policyReadAPI.GetPolicyHash(),
 				ComponentIndex: int64(limiterSync.componentIndex),
@@ -174,17 +173,10 @@ func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
 // DynamicConfigUpdate handles overrides.
 func (limiterSync *rateLimiterSync) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
-	dynamicConfig := &policylangv1.RateLimiter_DynamicConfig{}
-	key := limiterSync.rateLimiterProto.GetDynamicConfigKey()
-	// read dynamic config
-	if unmarshaller.IsSet(key) {
-		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
-			logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
-			return
-		}
-		wrapper := &wrappersv1.RateLimiterDynamicConfigWrapper{
+	publishDynamicConfig := func(dynamicConfig *policylangv1.RateLimiter_DynamicConfig) {
+		wrapper := &policysyncv1.RateLimiterDynamicConfigWrapper{
 			RateLimiterDynamicConfig: dynamicConfig,
-			CommonAttributes: &wrappersv1.CommonAttributes{
+			CommonAttributes: &policysyncv1.CommonAttributes{
 				PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
 				PolicyHash:     limiterSync.policyReadAPI.GetPolicyHash(),
 				ComponentIndex: int64(limiterSync.componentIndex),
@@ -200,5 +192,17 @@ func (limiterSync *rateLimiterSync) DynamicConfigUpdate(event notifiers.Event, u
 		}
 		limiterSync.dynamicConfigWriter.Write(limiterSync.dynamicConfigEtcdPath, dat)
 		logger.Info().Msg("rate limiter dynamic config updated")
+	}
+	dynamicConfig := &policylangv1.RateLimiter_DynamicConfig{}
+	key := limiterSync.rateLimiterProto.GetDynamicConfigKey()
+	// read dynamic config
+	if unmarshaller.IsSet(key) {
+		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
+			logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
+			return
+		}
+		publishDynamicConfig(dynamicConfig)
+	} else {
+		publishDynamicConfig(limiterSync.rateLimiterProto.GetDefaultConfig())
 	}
 }

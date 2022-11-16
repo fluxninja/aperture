@@ -4,12 +4,12 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/fluxninja/aperture.git"
+REPO_URL="git@github.com:fluxninja/aperture.git"
 BRANCH="gh-pages"
 TARGET_DIR="."
 INDEX_DIR="."
 CHARTS_URL="https://fluxninja.github.io/aperture/"
-COMMIT_EMAIL="${CIRCLE_PROJECT_USERNAME}@users.noreply.github.com"
+COMMIT_EMAIL="ops@fluxninja.com"
 
 CHARTS=()
 CHARTS_TMP_DIR=$(mktemp -d)
@@ -51,7 +51,7 @@ dependencies() {
 
 version_check() {
 # Refer the issue for the Regex https://github.com/semver/semver/issues/232
-rx='^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
+rx='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$'
 if [[ $VERSION_CMD =~ $rx ]]; then
  echo "INFO:<-->Version $VERSION_CMD"
 else
@@ -79,7 +79,6 @@ upload(){
   cd aperture
   git config user.name "${CIRCLE_PROJECT_USERNAME}"
   git config user.email "${COMMIT_EMAIL}"
-  git remote set-url origin "${REPO_URL}"
   git checkout "${BRANCH}"
 
   charts=$(cd "${CHARTS_TMP_DIR}" && find . -print0 | xargs -0)
