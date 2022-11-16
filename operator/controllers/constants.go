@@ -105,7 +105,7 @@ const (
 	OtelPprofPort = "otel-pprof"
 	// OtelZpagesPort string.
 	OtelZpagesPort = "otel-zpages"
-	//  MinimumKubernetesVersion defines minimum kubernetes version required by Aperture
+	// MinimumKubernetesVersion defines minimum kubernetes version required by Aperture.
 	MinimumKubernetesVersion = "v1.23.0"
 )
 
@@ -145,6 +145,6 @@ var (
 	CertDir = filepath.Join(".", "certs")
 	// PoliciesDir defines policies directory for tests.
 	PoliciesDir = filepath.Join(".", "policies")
-	// Stores current kubernetes version
+	// CurrentKubernetesVersion defines local kubernetes version.
 	CurrentKubernetesVersion *apimachineryversion.Info
 )
