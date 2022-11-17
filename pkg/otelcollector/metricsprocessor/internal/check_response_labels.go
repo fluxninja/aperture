@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	"github.com/rs/zerolog"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/fluxninja/aperture/pkg/log"
@@ -37,7 +36,8 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	if !startTime.IsZero() && !endTime.IsZero() {
 		attributes.PutDouble(otelcollector.ApertureProcessingDurationLabel, float64(endTime.Sub(startTime).Milliseconds()))
 	} else {
-		log.Sample(zerolog.Sometimes).Warn().Msgf("Aperture processing duration not found in %s access logs", sourceStr)
+		log.Sample(noDurationSampler).
+			Warn().Msgf("Aperture processing duration not found in %s access logs", sourceStr)
 	}
 	// Services
 	servicesValue := pcommon.NewValueSlice()
@@ -135,6 +135,8 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		value.CopyTo(attributes.PutEmpty(key))
 	}
 }
+
+var noDurationSampler = log.NewRatelimitingSampler()
 
 // AddFlowLabels adds dynamic from labels.
 func AddFlowLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse) {
