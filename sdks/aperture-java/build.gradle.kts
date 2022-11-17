@@ -52,7 +52,7 @@ dependencies {
     implementation("com.sparkjava:spark-core:2.9.4")
     implementation("io.grpc:grpc-protobuf:1.44.0")
     implementation("io.grpc:grpc-stub:1.44.0")
-    implementation("org.slf4j:slf4j-simple:2.0.1")
+    implementation("org.slf4j:slf4j-simple:1.7.0")
     implementation("com.google.protobuf:protobuf-java-util:3.21.6")
     implementation("com.linecorp.armeria:armeria:1.20.0")
 
