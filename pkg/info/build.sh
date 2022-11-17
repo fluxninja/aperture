@@ -25,6 +25,6 @@ LDFLAGS="\
 "
 if [[ -z "${RACE}" ]]; then
     go build --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
-elif [[ -n "${RACE}" ]]; then
+else
     go build --race --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
 fi

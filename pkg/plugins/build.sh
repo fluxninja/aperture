@@ -19,9 +19,8 @@ LDFLAGS="\
     -X 'main.GitBranch=${GIT_BRANCH}' \
     -X 'main.GitCommitHash=${GIT_COMMIT_HASH}' \
 "
-
 if [[ -z "${RACE}" ]]; then
     go build -buildmode=plugin --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
-elif [[ -n "${RACE}" ]]; then
+else
     go build -buildmode=plugin --race --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
 fi
