@@ -5,12 +5,14 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
@@ -65,16 +67,18 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	// record the start time of the request
 	start := time.Now()
 
-	var serviceIDs []string
-
 	rpcPeer, peerExists := peer.FromContext(ctx)
-	if peerExists {
-		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
-		entity, err := h.entityCache.GetByIP(clientIP)
-		if err == nil {
-			serviceIDs = entity.Services
-		}
+	if !peerExists {
+		return nil, grpc.Bug().Msg("cannot get peer info")
 	}
+
+	clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
+	entity, err := h.entityCache.GetByIP(clientIP)
+	if err != nil {
+		return nil, grpc.LoggedError(log.Sample(unknownEntitySampler).Warn()).
+			Str("IP", clientIP).Code(codes.NotFound).Msg("unknown entity")
+	}
+	serviceIDs := entity.Services
 
 	// CheckWithValues already pushes result to metrics
 	resp := h.CheckWithValues(
@@ -88,3 +92,5 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	resp.End = timestamppb.New(end)
 	return resp, nil
 }
+
+var unknownEntitySampler = log.NewRatelimitingSampler()

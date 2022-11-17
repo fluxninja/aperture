@@ -63,7 +63,9 @@ public final class ApertureSDK {
       labels.put(entry.getKey(), value);
     }
 
-    labels.putAll(explicitLabels);
+    if (explicitLabels != null) {
+      labels.putAll(explicitLabels);
+    }
 
     CheckRequest req = CheckRequest.newBuilder()
         .setFeature(feature)

@@ -1,0 +1,74 @@
+version: 2.1
+
+# this allows to use CircleCI's dynamic configuration feature
+setup: true
+
+orbs:
+  path-filtering: circleci/path-filtering@0.1.3
+  continuation: circleci/continuation@0.3.1
+
+jobs:
+  publish-release:
+    docker:
+      - image: cimg/openjdk:11.0
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - gradle-v1-{{ checksum "build.gradle.kts" }}
+            - gradle-v1-
+      # See https://discuss.circleci.com/t/gpg-keys-as-environment-variables/28641
+      - run: GPG_PRIVATE_KEY=$(echo -e ${GPG_PRIVATE_KEY}) gradle assemble publishToSonatype
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: gradle-v1-{{ checksum "build.gradle.kts" }}
+
+workflows:
+  version: 2
+  filter-paths-main:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - not:
+            matches:
+              &is_not_empty_tag {
+                value: << pipeline.git.tag >>,
+                pattern: "^.+$",
+              }
+        - not: &scheduled
+            equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+    jobs:
+      - path-filtering/filter: &path_filtering_job
+          base-revision: << pipeline.git.base_revision >>
+          config-path: .circleci/continue-workflows.yml
+          mapping: |
+            (src/main/java/com/fluxninja/aperture/.*|.*gradle.kts) updated-sdk true
+
+  filter-paths-pr:
+    when:
+      and:
+        - not:
+            equal: [main, << pipeline.git.branch >>]
+        - not:
+            matches: *is_not_empty_tag
+        - not: *scheduled
+    jobs:
+      - path-filtering/filter:
+          <<: *path_filtering_job
+          base-revision: main
+
+  publish-release:
+    when:
+      matches:
+        { value: << pipeline.git.tag >>, pattern: "^releases/.*$" }
+    jobs:
+      - publish-release:
+          context: sonatype
+          # both this and workflow's when is needed
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^releases\/.*$/

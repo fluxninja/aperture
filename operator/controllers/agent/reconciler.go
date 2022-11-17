@@ -168,6 +168,12 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		}
 	}
 
+	// Checking if the Minimum kubernetes version condition is satisfied.
+	if len(instance.Status.Resources) == 0 && !controllers.MinimumKubernetesVersionBool {
+		r.Recorder.Event(instance, corev1.EventTypeWarning, "MinimumKubernetesVersionFail",
+			fmt.Sprintf("Kubernetes version %v is not supported. Please use a kubernetes cluster with version %v or above.", controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion))
+	}
+
 	instance.Status.Resources = "creating"
 	if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
 		return ctrl.Result{}, err
