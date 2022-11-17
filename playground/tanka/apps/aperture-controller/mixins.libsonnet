@@ -161,14 +161,6 @@ local policyResource = latencyGradientPolicy({
       + rateLimiter.withLabelKey('http.request.header.user_id')
       + rateLimiter.withDynamicConfigKey('rate_limiter'),
     ),
-    component.new()
-    + component.withAlerter(
-      alerter.new()
-      + alerter.withInPorts({ alert: port.withSignalName('LATENCY') })
-      + alerter.withAlertName('Test alerter')
-      + alerter.withSeverity('crit')
-      + alerter.withResolveTimeout('30s'),
-    ),
   ],
 }).policyResource;
 

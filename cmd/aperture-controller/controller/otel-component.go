@@ -30,7 +30,10 @@ func ModuleForControllerOTEL() fx.Option {
 				provideController,
 				fx.ResultTags(otelcollector.BaseFxTag),
 			),
-			ControllerOTELComponents,
+			fx.Annotate(
+				ControllerOTELComponents,
+				fx.ParamTags(alerts.AlertsFxTag),
+			),
 		),
 	)
 }
