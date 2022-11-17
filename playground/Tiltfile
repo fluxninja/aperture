@@ -565,23 +565,6 @@ def schedule_pvc_deletion(namespace, selector):
         ]
     )
 
-def add_to_image_tag(resource_info):
-    for key, val in resource_info.items():
-        if key == "images":
-            for i,all_img in enumerate(val):
-                if i == 0:
-                    all_img["build_args"] = {"RACE":"yes"}
-
-def add_race_arg(dep_tree):
-    for _, resources in dep_tree.items():
-        for resource, resource_info in resources.items():
-            if resource == "agent":
-                add_to_image_tag(resource_info)
-            if resource == "controller":
-                add_to_image_tag(resource_info)
-
-
-
 #####################
 ### OPTION PARSER ###
 #####################
