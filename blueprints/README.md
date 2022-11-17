@@ -1,4 +1,4 @@
 # Aperture Blueprints
 
 Please refer
-[Blueprints docs](https://docs.fluxninja.com/docs/policies/blueprints).
+[Blueprints docs](https://docs.fluxninja.com/docs/get-started/policies/blueprints).

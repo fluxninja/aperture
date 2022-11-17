@@ -1,4 +1,4 @@
 {
   spec: import 'spec.libsonnet',
-  blueprints: import 'blueprints.libsonnet',
+  blueprints: import 'blueprints/blueprints.libsonnet',
 }

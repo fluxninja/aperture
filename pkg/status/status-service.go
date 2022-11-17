@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 

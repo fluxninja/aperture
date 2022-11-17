@@ -1,0 +1,39 @@
+version: 2.1
+
+parameters:
+  updated-sdk:
+    type: boolean
+    default: false
+
+jobs:
+  publish-release:
+    docker:
+      - image: cimg/openjdk:11.0
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - gradle-v1-{{ checksum "build.gradle.kts" }}
+            - gradle-v1-
+      # See https://discuss.circleci.com/t/gpg-keys-as-environment-variables/28641
+      - run:
+          name: Publish to Sonatype
+          command: |
+            GPG_PRIVATE_KEY=$(echo -e ${GPG_PRIVATE_KEY}) gradle assemble publishToSonatype
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: gradle-v1-{{ checksum "build.gradle.kts" }}
+
+workflows:
+  version: 2
+
+  publish-snapshot:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-sdk >>
+    jobs:
+      - publish-release:
+          context: sonatype

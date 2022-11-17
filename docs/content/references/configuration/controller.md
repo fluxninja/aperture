@@ -455,13 +455,76 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 </dd>
 </dl>
 
-### BatchConfig {#batch-config}
+### BatchAlertsConfig {#batch-alerts-config}
 
-BatchConfig defines configuration for OTEL batch processor.
+BatchAlertsConfig defines configuration for OTEL batch processor.
 
 #### Properties
 
 <dl>
+<dt>send_batch_max_size</dt>
+<dd>
+
+(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+into smaller units.
+
+</dd>
+<dt>send_batch_size</dt>
+<dd>
+
+(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+
+</dd>
+<dt>timeout</dt>
+<dd>
+
+(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
+
+</dd>
+</dl>
+
+### BatchPostrollupConfig {#batch-postrollup-config}
+
+BatchPostrollupConfig defines configuration for OTEL batch processor.
+
+#### Properties
+
+<dl>
+<dt>send_batch_max_size</dt>
+<dd>
+
+(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+into smaller units.
+
+</dd>
+<dt>send_batch_size</dt>
+<dd>
+
+(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+
+</dd>
+<dt>timeout</dt>
+<dd>
+
+(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
+
+</dd>
+</dl>
+
+### BatchPrerollupConfig {#batch-prerollup-config}
+
+BatchPrerollupConfig defines configuration for OTEL batch processor.
+
+#### Properties
+
+<dl>
+<dt>send_batch_max_size</dt>
+<dd>
+
+(uint32, `gte=0`, default: `10000`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+into smaller units.
+
+</dd>
 <dt>send_batch_size</dt>
 <dd>
 
@@ -1086,16 +1149,28 @@ OtelConfig is the configuration for the OTEL collector.
 #### Properties
 
 <dl>
+<dt>batch_alerts</dt>
+<dd>
+
+([BatchAlertsConfig](#batch-alerts-config))
+
+</dd>
 <dt>batch_postrollup</dt>
 <dd>
 
-([BatchConfig](#batch-config))
+([BatchPostrollupConfig](#batch-postrollup-config))
 
 </dd>
 <dt>batch_prerollup</dt>
 <dd>
 
-([BatchConfig](#batch-config))
+([BatchPrerollupConfig](#batch-prerollup-config))
+
+</dd>
+<dt>ports</dt>
+<dd>
+
+([PortsConfig](#ports-config))
 
 </dd>
 </dl>
@@ -1129,6 +1204,39 @@ PluginsConfig holds configuration for plugins.
 <dd>
 
 (string, default: `default`) Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
+
+</dd>
+</dl>
+
+### PortsConfig {#ports-config}
+
+PortsConfig defines configuration for OTEL debug and extension ports.
+
+#### Properties
+
+<dl>
+<dt>debug_port</dt>
+<dd>
+
+(uint32, `gte=0`, default: `8888`) Port on which otel collector exposes prometheus metrics on /metrics path.
+
+</dd>
+<dt>health_check_port</dt>
+<dd>
+
+(uint32, `gte=0`, default: `13133`) Port on which health check extension in exposed.
+
+</dd>
+<dt>pprof_port</dt>
+<dd>
+
+(uint32, `gte=0`, default: `1777`) Port on which pprof extension in exposed.
+
+</dd>
+<dt>zpages_port</dt>
+<dd>
+
+(uint32, `gte=0`, default: `55679`) Port on which zpages extension in exposed.
 
 </dd>
 </dl>

@@ -2,13 +2,14 @@
 /.circleci/                                  @FluxNinja/devops
 /.github/                                    @FluxNinja/devops
 /manifests/                                  @FluxNinja/devops
+/operator/                                   @FluxNinja/devops
 /playground/                                 @FluxNinja/devops
-/libsonnet/                                  @FluxNinja/devops
+/blueprints/                                 @FluxNinja/devops
 /packaging/                                  @FluxNinja/devops
 /nfpm.yaml                                   @FluxNinja/devops
+/docs/tools                                  @FluxNinja/devops
 /docs/content                                @FluxNinja/documentation
-/docs/diagrams                               @FluxNinja/documentation
+/README.md                                   @FluxNinja/documentation
 /pkg/policies                                @FluxNinja/aperturecore
 /pkg/multimatcher                            @FluxNinja/aperturecore
-/pkg/flowcontrol                             @FluxNinja/aperturecore
 /pkg/distcache                               @FluxNinja/aperturecore

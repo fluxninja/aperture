@@ -79,7 +79,14 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelcollector.OtelConfig{
+								Ports: otelcollector.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
+							},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -121,6 +128,26 @@ var _ = Describe("Sidecar container for Agent", func() {
 					{
 						Name:          MemberList,
 						ContainerPort: 3322,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelDebugPort,
+						ContainerPort: 8888,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelHealthcheckPort,
+						ContainerPort: 13133,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelPprofPort,
+						ContainerPort: 1777,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelZpagesPort,
+						ContainerPort: 55679,
 						Protocol:      corev1.ProtocolTCP,
 					},
 				},
@@ -185,7 +212,14 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelcollector.OtelConfig{
+								Ports: otelcollector.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
+							},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -262,6 +296,26 @@ var _ = Describe("Sidecar container for Agent", func() {
 						ContainerPort: 3322,
 						Protocol:      corev1.ProtocolTCP,
 					},
+					{
+						Name:          OtelDebugPort,
+						ContainerPort: 8888,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelHealthcheckPort,
+						ContainerPort: 13133,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelPprofPort,
+						ContainerPort: 1777,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelZpagesPort,
+						ContainerPort: 55679,
+						Protocol:      corev1.ProtocolTCP,
+					},
 				},
 				LivenessProbe: &corev1.Probe{
 					InitialDelaySeconds: 10,
@@ -336,7 +390,14 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":8000",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelcollector.OtelConfig{
+								Ports: otelcollector.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
+							},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -428,6 +489,26 @@ var _ = Describe("Sidecar container for Agent", func() {
 					{
 						Name:          MemberList,
 						ContainerPort: 3322,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelDebugPort,
+						ContainerPort: 8888,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelHealthcheckPort,
+						ContainerPort: 13133,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelPprofPort,
+						ContainerPort: 1777,
+						Protocol:      corev1.ProtocolTCP,
+					},
+					{
+						Name:          OtelZpagesPort,
+						ContainerPort: 55679,
 						Protocol:      corev1.ProtocolTCP,
 					},
 				},
@@ -561,7 +642,14 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelcollector.OtelConfig{
+								Ports: otelcollector.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
+							},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -607,6 +695,26 @@ var _ = Describe("Pod modification for Agent", func() {
 								{
 									Name:          MemberList,
 									ContainerPort: 3322,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          OtelDebugPort,
+									ContainerPort: 8888,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          OtelHealthcheckPort,
+									ContainerPort: 13133,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          OtelPprofPort,
+									ContainerPort: 1777,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          OtelZpagesPort,
+									ContainerPort: 55679,
 									Protocol:      corev1.ProtocolTCP,
 								},
 							},
@@ -687,7 +795,14 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelcollector.OtelConfig{
+								Ports: otelcollector.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
+							},
 						},
 						DistCache: distcache.DistCacheConfig{
 							MemberlistBindAddr: ":3322",
@@ -789,6 +904,26 @@ var _ = Describe("Pod modification for Agent", func() {
 								{
 									Name:          MemberList,
 									ContainerPort: 3322,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          OtelDebugPort,
+									ContainerPort: 8888,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          OtelHealthcheckPort,
+									ContainerPort: 13133,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          OtelPprofPort,
+									ContainerPort: 1777,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          OtelZpagesPort,
+									ContainerPort: 55679,
 									Protocol:      corev1.ProtocolTCP,
 								},
 							},

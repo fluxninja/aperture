@@ -13,6 +13,13 @@ const (
 	// ApertureCheckResponseLabel contains JSON encoded check response struct.
 	ApertureCheckResponseLabel = "aperture.check_response"
 
+	// ResponseReceivedLabel designates whether a response was received.
+	ResponseReceivedLabel = "response_received"
+	// ResponseReceivedTrue const for true value.
+	ResponseReceivedTrue = "true"
+	// ResponseReceivedFalse const for false value.
+	ResponseReceivedFalse = "false"
+
 	/* Derived label that is applied based on content of labels. */
 
 	// ApertureServicesLabel describes services to which metrics refer.
@@ -38,9 +45,9 @@ const (
 	ApertureRateLimitersLabel = "aperture.rate_limiters"
 	// ApertureDroppingRateLimitersLabel describes rate limiters dropping the traffic.
 	ApertureDroppingRateLimitersLabel = "aperture.dropping_rate_limiters"
-	// ApertureConcurrencyLimitersLabel describes rate limiters matched to the traffic.
+	// ApertureConcurrencyLimitersLabel describes concurrency limiters matched to the traffic.
 	ApertureConcurrencyLimitersLabel = "aperture.concurrency_limiters"
-	// ApertureDroppingConcurrencyLimitersLabel describes rate limiters dropping the traffic.
+	// ApertureDroppingConcurrencyLimitersLabel describes concurrency limiters dropping the traffic.
 	ApertureDroppingConcurrencyLimitersLabel = "aperture.dropping_concurrency_limiters"
 	// ApertureWorkloadsLabel describes workloads matched to the traffic.
 	ApertureWorkloadsLabel = "aperture.workloads"
@@ -54,6 +61,12 @@ const (
 	ApertureClassifiersLabel = "aperture.classifiers"
 	// ApertureClassifierErrorsLabel describes encountered classifier errors for specified policy.
 	ApertureClassifierErrorsLabel = "aperture.classifier_errors"
+	// ApertureResponseStatusLabel label to denote OK or Error across all protocols.
+	ApertureResponseStatusLabel = "aperture.response_status"
+	// ApertureResponseStatusOK OK response across all protocols.
+	ApertureResponseStatusOK = ApertureFeatureStatusOK
+	// ApertureResponseStatusError Error response across all protocols.
+	ApertureResponseStatusError = ApertureFeatureStatusError
 
 	/* HTTP Specific labels. */
 
@@ -106,6 +119,8 @@ const (
 
 	// AgentGroupLabel describes agent group to which metrics refer.
 	AgentGroupLabel = "agent_group"
+	// InstanceLabel describes agent group to which metrics refer.
+	InstanceLabel = "instance"
 
 	/* Specific to Agent and Controller OTEL collector factories. */
 
@@ -113,6 +128,8 @@ const (
 	ReceiverOTLP = "otlp"
 	// ReceiverPrometheus collects metrics from environment and services.
 	ReceiverPrometheus = "prometheus"
+	// ReceiverAlerts collects alerts from alerter.
+	ReceiverAlerts = "alerts"
 
 	// ProcessorEnrichment enriches metrics with discovery data.
 	ProcessorEnrichment = "enrichment"
@@ -125,10 +142,15 @@ const (
 	// ProcessorBatchPostrollup batches data after rolling up, as roll up process
 	// shrinks number of data points significantly.
 	ProcessorBatchPostrollup = "batch/postrollup"
+	// ProcessorBatchAlerts batches alerts before passing them to exporters.
+	// This reduces number of calls to the Alertmanager.
+	ProcessorBatchAlerts = "batch/alerts"
 	// ProcessorRollup rolls up data to decrease cardinality.
 	ProcessorRollup = "rollup"
 	// ProcessorAgentGroup adds `agent_group` attribute.
 	ProcessorAgentGroup = "attributes/agent_group"
+	// ProcessorAgentResourceLabels adds `instance` and `agent_group` resource attributes.
+	ProcessorAgentResourceLabels = "transform/agent_resource_labels"
 	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured
 	// log exporter.
 	ProcessorTracesToLogs = "tracestologs"
@@ -140,4 +162,13 @@ const (
 	// ExporterOTLPLoopback exports OTLP data to local OTLP receiver. To be used only
 	// with ProcessorSpanToLog.
 	ExporterOTLPLoopback = "otlp/loopback"
+
+	/* Specific to alerts pipeline. */
+
+	// AlertGeneratorURLLabel describes.
+	AlertGeneratorURLLabel = "generator_url"
+	// AlertNameLabel describes name of the alert.
+	AlertNameLabel = "alertname"
+	// AlertSeverityLabel also known as log level. Human readable string.
+	AlertSeverityLabel = "severity"
 )

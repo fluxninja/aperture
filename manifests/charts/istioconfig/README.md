@@ -14,5 +14,6 @@ This Chart inserts Envoy filters that integrate with Aperture Agent.
 | `envoyFilter.authzGrpcTimeout`                | Timeout in seconds to authz requests made to aperture-agent. Note: aperture-agent scheduler has max_timeout parameter that must tuned to match the setting here. | `0.5s`           |
 | `envoyFilter.enableAuthzRequestBodyBuffering` | Enable buffering request body that is sent over ext authz API. Note: This is not enabled by default because it might break some streaming APIs.                  | `false`          |
 | `envoyFilter.maxRequestBytes`                 | Maximum size of request that is sent over ext authz API                                                                                                          | `8192`           |
+| `envoyFilter.sidecarMode`                     | Aperture Agent installed using the Sidecar mode                                                                                                                  | `false`          |
 
 

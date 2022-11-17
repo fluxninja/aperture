@@ -16,7 +16,7 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/watchdog/v1"
+	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/watchdog/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -181,7 +181,7 @@ func (w *watchdog) start() error {
 				if hp != nil {
 					details, e := hp.checkHeap()
 					if e != nil {
-						log.Sample(zerolog.Rarely).Error().Err(e).Msg("Heap check failed")
+						log.Autosample().Warn().Err(e).Msg("Heap check failed")
 					}
 					w.heapStatusRegistry.SetStatus(status.NewStatus(details, nil))
 				}
@@ -270,7 +270,7 @@ func (policy *systemWatermarks) Check(ctx context.Context) (proto.Message, error
 	log.Debug().Msg("System watermarks check triggered")
 	msg, err := check(policy, ctx, systemUsage)
 	if err != nil {
-		log.Sample(zerolog.Rarely).Error().Err(err).Msg("System watermarks check failed")
+		log.Autosample().Warn().Err(err).Msg("System watermarks check failed")
 	}
 	return msg, nil
 }
@@ -284,7 +284,7 @@ func (policy *systemAdaptive) Check(ctx context.Context) (proto.Message, error) 
 	log.Debug().Msg("System adaptive check triggered")
 	msg, err := check(policy, ctx, systemUsage)
 	if err != nil {
-		log.Sample(zerolog.Rarely).Error().Err(err).Msg("System adaptive check failed")
+		log.Autosample().Warn().Err(err).Msg("System adaptive check failed")
 	}
 	return msg, nil
 }

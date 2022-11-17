@@ -16,13 +16,12 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/common/status/v1"
+	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/common"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/prometheus"
@@ -46,7 +45,7 @@ func PromQLModule() fx.Option {
 			provideFxOptionsFunc,
 
 			fx.ParamTags(config.NameTag(promQLJobGroupTag)),
-			fx.ResultTags(common.FxOptionsFuncTag),
+			fx.ResultTags(iface.FxOptionsFuncTag),
 		)),
 	)
 }

@@ -77,7 +77,7 @@ analyzing, and actuating, facilitated by agents and a controller.
 
 ### 🎮 Playground
 
-To try aperture in a local Kubernetes environment, refer to
+To try Aperture in a local Kubernetes environment, refer to
 [Playground docs](https://docs.fluxninja.com/docs/get-started/playground/).
 
 ![Latency Gradient Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
@@ -85,8 +85,16 @@ To try aperture in a local Kubernetes environment, refer to
 ### 🏎️ Installation
 
 To install Aperture system, please follow the
-[Installation](https://docs.fluxninja.com/docs/development/category/installation)
-guide.
+[Installation](https://docs.fluxninja.com/docs/category/installation) guide.
+
+### 📖 Tutorials
+
+To learn how to write Aperture policies, please read the
+[Tutorials](https://docs.fluxninja.com/docs/category/tutorials).
+
+### 🎥 Demo Video
+
+[![How Concurrency Limits Help Protect Against Cascading Failures](https://img.youtube.com/vi/m070bAvrDHM/0.jpg)](https://youtu.be/m070bAvrDHM)
 
 ## 👷 Contributing
 

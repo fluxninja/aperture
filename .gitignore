@@ -31,6 +31,12 @@ unit-tests*
 # Go workspace file
 go.work*
 
+# Pprof and flamegraph files
+/cpu*.txt
+/cpu*.svg
+/profile*.svg
+/pprof.*.pb
+
 ### Go Patch ###
 /vendor/
 /Godeps/
@@ -93,3 +99,6 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Logs
+*.log

@@ -1,0 +1,21 @@
+flowchart LR
+  subgraph loadgen [Load Generator]
+    direction LR
+    k6([k6])
+  end
+  subgraph demoapp [Demo Application]
+    direction LR
+    s1[[service1]]
+    s2[[service2]]
+    s3[[service3]]
+    s1 ==> s2 ==> s3
+  end
+  subgraph agent [Aperture Agent]
+    direction TB
+    f1[Flux Meter]
+    r1[Rate</br>Limiter]
+    c1[Concurrency</br>Limiter]
+  end
+  k6 ==> s1
+  s3 --> f1
+  s1 --> r1 --> c1

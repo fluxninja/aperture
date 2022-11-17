@@ -3,20 +3,19 @@ package metricsprocessor
 import (
 	"context"
 	"fmt"
-	"strings"
-	"time"
 
+	"github.com/rs/zerolog"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/policies/dataplane/iface"
-	"github.com/rs/zerolog"
+	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 )
 
 type metricsProcessor struct {
@@ -53,8 +52,8 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
 	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		retErr := func(errMsg string) error {
-			log.Sample(zerolog.Sometimes).Warn().Msg(errMsg)
+		retErr := func(sampler zerolog.Sampler, errMsg string) error {
+			log.Sample(sampler).Warn().Msg(errMsg)
 			return fmt.Errorf(errMsg)
 		}
 		// Attributes
@@ -66,258 +65,74 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		// Source specific processing
 		source, exists := attributes.Get(otelcollector.ApertureSourceLabel)
 		if !exists {
-			return retErr("aperture source label not found")
+			return retErr(noSourceLabelSampler, "aperture source label not found")
 		}
 		sourceStr := source.Str()
 		if sourceStr == otelcollector.ApertureSourceSDK {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{})
 			if !success {
-				return retErr("aperture check response label not found in Envoy access logs")
+				return retErr(
+					noSDKCheckResponseSampler,
+					"aperture check response label not found in SDK access logs",
+				)
 			}
 
-			addSDKSpecificLabels(attributes)
+			internal.AddSDKSpecificLabels(attributes)
 		} else if sourceStr == otelcollector.ApertureSourceEnvoy {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
 			if !success {
-				return retErr("aperture check response label not found in SDK access logs")
+				return retErr(
+					noEnvoyCheckResponseSampler,
+					"aperture check response label not found in Envoy access logs",
+				)
 			}
 
-			addEnvoySpecificLabels(attributes)
+			internal.AddEnvoySpecificLabels(attributes)
 		} else {
-			return retErr("aperture source label not recognized")
+			return retErr(
+				unrecognizedSourceLabelSampler,
+				"aperture source label not recognized",
+			)
 		}
 
-		addCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
+		statusCode, featureStatus := internal.StatusesFromAttributes(attributes)
+		attributes.PutStr(otelcollector.ApertureResponseStatusLabel, internal.ResponseStatusForTelemetry(statusCode, featureStatus))
+		internal.AddCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
 
 		// Update metrics and enforce include list to eliminate any excess attributes
 		if sourceStr == otelcollector.ApertureSourceSDK {
 			p.updateMetrics(attributes, checkResponse, []string{})
-			enforceIncludeListSDK(attributes)
+			internal.EnforceIncludeListSDK(attributes)
 		} else if sourceStr == otelcollector.ApertureSourceEnvoy {
 			p.updateMetrics(attributes, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
-			enforceIncludeListHTTP(attributes)
+			internal.EnforceIncludeListHTTP(attributes)
 		}
 
-		// Add dynamic Flow labels
-		addFlowLabels(attributes, checkResponse)
-
+		// This needs to be called **after** internal.EnforceIncludeList{HTTP,SDK}.
+		internal.AddFlowLabels(attributes, checkResponse)
 		return nil
 	})
 	return ld, err
 }
 
-func addSDKSpecificLabels(attributes pcommon.Map) {
-	// Compute durations
-	flowStart, flowStartExists := getSDKLabelTimestampValue(attributes, otelcollector.ApertureFlowStartTimestampLabel)
-	workloadStart, workloadStartExists := getSDKLabelTimestampValue(attributes, otelcollector.ApertureWorkloadStartTimestampLabel)
-	flowEnd, flowEndExists := getSDKLabelTimestampValue(attributes, otelcollector.ApertureFlowEndTimestampLabel)
-
-	if flowStartExists && flowEndExists {
-		flowDuration := flowEnd.Sub(flowStart)
-		attributes.PutDouble(otelcollector.FlowDurationLabel, float64(flowDuration.Milliseconds()))
-	}
-	if workloadStartExists && flowEndExists {
-		workloadDuration := flowEnd.Sub(workloadStart)
-		attributes.PutDouble(otelcollector.WorkloadDurationLabel, float64(workloadDuration.Milliseconds()))
-	}
-}
-
-func addEnvoySpecificLabels(attributes pcommon.Map) {
-	treatAsZero := []string{otelcollector.EnvoyMissingAttributeValue}
-	// Retrieve request length
-	requestLength, _ := otelcollector.GetFloat64(attributes, otelcollector.EnvoyBytesSentLabel, treatAsZero)
-	attributes.PutDouble(otelcollector.HTTPRequestContentLength, requestLength)
-	// Retrieve response lengths
-	responseLength, _ := otelcollector.GetFloat64(attributes, otelcollector.EnvoyBytesReceivedLabel, treatAsZero)
-	attributes.PutDouble(otelcollector.HTTPResponseContentLength, responseLength)
-
-	// Compute durations
-	responseDuration, responseDurationExists := otelcollector.GetFloat64(attributes, otelcollector.EnvoyResponseDurationLabel, treatAsZero)
-	authzDuration, authzDurationExists := otelcollector.GetFloat64(attributes, otelcollector.EnvoyAuthzDurationLabel, treatAsZero)
-
-	if responseDurationExists {
-		attributes.PutDouble(otelcollector.FlowDurationLabel, responseDuration)
-	}
-
-	if responseDurationExists && authzDurationExists {
-		attributes.PutDouble(otelcollector.WorkloadDurationLabel, responseDuration-authzDuration)
-	}
-}
-
-func getSDKLabelTimestampValue(attributes pcommon.Map, labelKey string) (time.Time, bool) {
-	return getLabelTimestampValue(attributes, labelKey, otelcollector.ApertureSourceSDK)
-}
-
-func getLabelTimestampValue(attributes pcommon.Map, labelKey, source string) (time.Time, bool) {
-	value, exists := getLabelValue(attributes, labelKey, source)
-	if !exists {
-		return time.Time{}, false
-	}
-	return _getLabelTimestampValue(value, labelKey, source)
-}
-
-func _getLabelTimestampValue(value pcommon.Value, labelKey, source string) (time.Time, bool) {
-	var valueInt int64
-	if value.Type() == pcommon.ValueTypeInt {
-		valueInt = value.Int()
-	} else {
-		log.Sample(zerolog.Sometimes).Warn().Str("source", source).Str("key", labelKey).Msg("Failed to parse a timestamp field")
-		return time.Time{}, false
-	}
-
-	return time.Unix(0, valueInt), true
-}
-
-func getLabelValue(attributes pcommon.Map, labelKey, source string) (pcommon.Value, bool) {
-	value, exists := attributes.Get(labelKey)
-	if !exists {
-		log.Sample(zerolog.Sometimes).Warn().Str("source", source).Str("key", labelKey).Msg("Label not found")
-		return pcommon.Value{}, false
-	}
-	return value, exists
-}
-
-// addCheckResponseBasedLabels adds the following labels:
-// * otelcollector.ApertureProcessingDurationLabel
-// * otelcollector.ApertureServicesLabel
-// * otelcollector.ApertureControlPointLabel
-// * otelcollector.ApertureRateLimitersLabel
-// * otelcollector.ApertureDroppingRateLimitersLabel
-// * otelcollector.ApertureConcurrencyLimitersLabel
-// * otelcollector.ApertureDroppingConcurrencyLimitersLabel
-// * otelcollector.ApertureWorkloadsLabel
-// * otelcollector.ApertureDroppingWorkloadsLabel
-// * otelcollector.ApertureFluxMetersLabel
-// * otelcollector.ApertureFlowLabelKeysLabel
-// * otelcollector.ApertureClassifiersLabel
-// * otelcollector.ApertureClassifierErrorsLabel
-// * otelcollector.ApertureDecisionTypeLabel
-// * otelcollector.ApertureRejectReasonLabel
-// * otelcollector.ApertureErrorLabel.
-func addCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, sourceStr string) {
-	// Aperture Processing Duration
-	startTime := checkResponse.GetStart().AsTime()
-	endTime := checkResponse.GetEnd().AsTime()
-	if !startTime.IsZero() && !endTime.IsZero() {
-		attributes.PutDouble(otelcollector.ApertureProcessingDurationLabel, float64(endTime.Sub(startTime).Milliseconds()))
-	} else {
-		log.Sample(zerolog.Sometimes).Warn().Msgf("Aperture processing duration not found in %s access logs", sourceStr)
-	}
-	// Services
-	servicesValue := pcommon.NewValueSlice()
-	for _, service := range checkResponse.Services {
-		servicesValue.Slice().AppendEmpty().SetStr(service)
-	}
-	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
-
-	// Control Point
-	attributes.PutString(otelcollector.ApertureControlPointLabel, checkResponse.GetControlPointInfo().String())
-
-	labels := map[string]pcommon.Value{
-		otelcollector.ApertureRateLimitersLabel:                pcommon.NewValueSlice(),
-		otelcollector.ApertureDroppingRateLimitersLabel:        pcommon.NewValueSlice(),
-		otelcollector.ApertureConcurrencyLimitersLabel:         pcommon.NewValueSlice(),
-		otelcollector.ApertureDroppingConcurrencyLimitersLabel: pcommon.NewValueSlice(),
-		otelcollector.ApertureWorkloadsLabel:                   pcommon.NewValueSlice(),
-		otelcollector.ApertureDroppingWorkloadsLabel:           pcommon.NewValueSlice(),
-		otelcollector.ApertureFluxMetersLabel:                  pcommon.NewValueSlice(),
-		otelcollector.ApertureFlowLabelKeysLabel:               pcommon.NewValueSlice(),
-		otelcollector.ApertureClassifiersLabel:                 pcommon.NewValueSlice(),
-		otelcollector.ApertureClassifierErrorsLabel:            pcommon.NewValueSlice(),
-		otelcollector.ApertureDecisionTypeLabel:                pcommon.NewValueStr(checkResponse.DecisionType.String()),
-		otelcollector.ApertureRejectReasonLabel:                pcommon.NewValueStr(checkResponse.GetRejectReason().String()),
-		otelcollector.ApertureErrorLabel:                       pcommon.NewValueStr(checkResponse.GetError().String()),
-	}
-	for _, decision := range checkResponse.LimiterDecisions {
-		if decision.GetRateLimiterInfo() != nil {
-			rawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value := strings.Join(rawValue, ",")
-			labels[otelcollector.ApertureRateLimitersLabel].Slice().AppendEmpty().SetStr(value)
-			if decision.Dropped {
-				labels[otelcollector.ApertureDroppingRateLimitersLabel].Slice().AppendEmpty().SetStr(value)
-			}
-		}
-		if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
-			rawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value := strings.Join(rawValue, ",")
-			labels[otelcollector.ApertureConcurrencyLimitersLabel].Slice().AppendEmpty().SetStr(value)
-			if decision.Dropped {
-				labels[otelcollector.ApertureDroppingConcurrencyLimitersLabel].Slice().AppendEmpty().SetStr(value)
-			}
-
-			workloadsRawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
-				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.GetWorkloadIndex()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value = strings.Join(workloadsRawValue, ",")
-			labels[otelcollector.ApertureWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
-			if decision.Dropped {
-				labels[otelcollector.ApertureDroppingWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
-			}
-		}
-	}
-	for _, fluxMeter := range checkResponse.FluxMeterInfos {
-		value := fluxMeter.GetFluxMeterName()
-		labels[otelcollector.ApertureFluxMetersLabel].Slice().AppendEmpty().SetStr(value)
-	}
-
-	for _, flowLabelKey := range checkResponse.GetFlowLabelKeys() {
-		labels[otelcollector.ApertureFlowLabelKeysLabel].Slice().AppendEmpty().SetStr(flowLabelKey)
-	}
-
-	for _, classifier := range checkResponse.ClassifierInfos {
-		rawValue := []string{
-			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
-			fmt.Sprintf("%s:%v", metrics.ClassifierIndexLabel, classifier.ClassifierIndex),
-		}
-		value := strings.Join(rawValue, ",")
-		labels[otelcollector.ApertureClassifiersLabel].Slice().AppendEmpty().SetStr(value)
-
-		// add errors as attributes as well
-		if classifier.Error != flowcontrolv1.ClassifierInfo_ERROR_NONE {
-			errorsValue := []string{
-				classifier.Error.String(),
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
-				fmt.Sprintf("%s:%v", metrics.ClassifierIndexLabel, classifier.ClassifierIndex),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, classifier.PolicyHash),
-			}
-			joinedValue := strings.Join(errorsValue, ",")
-			labels[otelcollector.ApertureClassifierErrorsLabel].Slice().AppendEmpty().SetStr(joinedValue)
-		}
-	}
-
-	for key, value := range labels {
-		value.CopyTo(attributes.PutEmpty(key))
-	}
-}
-
-func addFlowLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse) {
-	for key, value := range checkResponse.TelemetryFlowLabels {
-		pcommon.NewValueStr(value).CopyTo(attributes.PutEmpty(key))
-	}
-}
+var (
+	noSourceLabelSampler           = log.NewRatelimitingSampler()
+	noSDKCheckResponseSampler      = log.NewRatelimitingSampler()
+	noEnvoyCheckResponseSampler    = log.NewRatelimitingSampler()
+	unrecognizedSourceLabelSampler = log.NewRatelimitingSampler()
+)
 
 func (p *metricsProcessor) updateMetrics(
 	attributes pcommon.Map,
 	checkResponse *flowcontrolv1.CheckResponse,
-	treatAsZero []string,
+	treatAsMissing []string,
 ) {
 	if checkResponse == nil {
 		return
 	}
 	if len(checkResponse.LimiterDecisions) > 0 {
 		// Update workload metrics
-		latency, _ := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, []string{})
+		latency, latencyFound := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, []string{})
 		for _, decision := range checkResponse.LimiterDecisions {
 			limiterID := iface.LimiterID{
 				PolicyName:     decision.PolicyName,
@@ -330,11 +145,10 @@ func (p *metricsProcessor) updateMetrics(
 					metrics.PolicyNameLabel:     decision.PolicyName,
 					metrics.PolicyHashLabel:     decision.PolicyHash,
 					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
-					metrics.DecisionTypeLabel:   checkResponse.DecisionType.String(),
 					metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
 				}
 
-				p.updateMetricsForWorkload(limiterID, labels, latency)
+				p.updateMetricsForWorkload(limiterID, labels, checkResponse.DecisionType, latency, latencyFound)
 			}
 
 			// Update rate limiter metrics
@@ -346,18 +160,14 @@ func (p *metricsProcessor) updateMetrics(
 
 	if len(checkResponse.FluxMeterInfos) > 0 {
 		// Update flux meter metrics
-		statusCodeStr := ""
-		statusCode, exists := attributes.Get(otelcollector.HTTPStatusCodeLabel)
-		if exists {
-			statusCodeStr = statusCode.Str()
-		}
-		featureStatusStr := ""
-		featureStatus, exists := attributes.Get(otelcollector.ApertureFeatureStatusLabel)
-		if exists {
-			featureStatusStr = featureStatus.Str()
-		}
+		statusCode, featureStatus := internal.StatusesFromAttributes(attributes)
 		for _, fluxMeter := range checkResponse.FluxMeterInfos {
-			p.updateMetricsForFluxMeters(fluxMeter, checkResponse.DecisionType, statusCodeStr, featureStatusStr, attributes, treatAsZero)
+			p.updateMetricsForFluxMeters(
+				fluxMeter,
+				checkResponse.DecisionType,
+				statusCode, featureStatus,
+				attributes,
+				treatAsMissing)
 		}
 	}
 
@@ -374,42 +184,51 @@ func (p *metricsProcessor) updateMetrics(
 	}
 }
 
-func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, latency float64) {
-	limiter := p.cfg.engine.GetConcurrencyLimiter(limiterID)
-	if limiter == nil {
-		log.Sample(zerolog.Sometimes).Warn().
+func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, decisionType flowcontrolv1.CheckResponse_DecisionType, latency float64, latencyFound bool) {
+	concurrencyLimiter := p.cfg.engine.GetConcurrencyLimiter(limiterID)
+	if concurrencyLimiter == nil {
+		log.Sample(noConcurrencyLimiterSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
 			Int64(metrics.ComponentIndexLabel, limiterID.ComponentIndex).
 			Msg("ConcurrencyLimiter not found")
 		return
 	}
-	latencyHistogram := limiter.GetObserver(labels)
-	if latencyHistogram != nil {
-		latencyHistogram.Observe(latency)
+	// Observe latency only if the latency is found I.E. the request was allowed and response was received
+	if latencyFound {
+		latencyObserver := concurrencyLimiter.GetLatencyObserver(labels)
+		if latencyObserver != nil {
+			latencyObserver.Observe(latency)
+		}
+	}
+	// Add decision type label to the request counter metric
+	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	requestCounter := concurrencyLimiter.GetRequestCounter(labels)
+	if requestCounter != nil {
+		requestCounter.Inc()
 	}
 }
 
 func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID) {
-	limiter := p.cfg.engine.GetRateLimiter(limiterID)
-	if limiter == nil {
-		log.Sample(zerolog.Sometimes).Warn().
+	rateLimiter := p.cfg.engine.GetRateLimiter(limiterID)
+	if rateLimiter == nil {
+		log.Sample(noRateLimiterSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
 			Int64(metrics.ComponentIndexLabel, limiterID.ComponentIndex).
 			Msg("RateLimiter not found")
 		return
 	}
-	counter := limiter.GetCounter()
-	if counter != nil {
-		counter.Inc()
+	requestCounter := rateLimiter.GetRequestCounter()
+	if requestCounter != nil {
+		requestCounter.Inc()
 	}
 }
 
 func (p *metricsProcessor) updateMetricsForClassifier(classifierID iface.ClassifierID) {
 	classifier := p.cfg.classificationEngine.GetClassifier(classifierID)
 	if classifier == nil {
-		log.Sample(zerolog.Sometimes).Warn().
+		log.Sample(noClassifierSampler).Warn().
 			Str(metrics.PolicyNameLabel, classifierID.PolicyName).
 			Str(metrics.PolicyHashLabel, classifierID.PolicyHash).
 			Int64(metrics.ClassifierIndexLabel, classifierID.ClassifierIndex).
@@ -417,9 +236,9 @@ func (p *metricsProcessor) updateMetricsForClassifier(classifierID iface.Classif
 		return
 	}
 
-	counter := classifier.GetCounter()
-	if counter != nil {
-		counter.Inc()
+	requestCounter := classifier.GetRequestCounter()
+	if requestCounter != nil {
+		requestCounter.Inc()
 	}
 }
 
@@ -429,11 +248,11 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	statusCode string,
 	featureStatus string,
 	attributes pcommon.Map,
-	treatAsZero []string,
+	treatAsMissing []string,
 ) {
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
-		log.Sample(zerolog.Sometimes).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
+		log.Sample(noFluxMeterSampler).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
 			Str(metrics.FeatureStatusLabel, featureStatus).
@@ -441,59 +260,26 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 		return
 	}
 
-	// metricValue is the value at fluxMeter's AttributeKey
-	metricValue, _ := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsZero)
+	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, featureStatus)
 
-	fluxMeterHistogram := fluxMeter.GetHistogram(decisionType, statusCode, featureStatus)
+	// metricValue is the value at fluxMeter's AttributeKey
+	metricValue, found := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsMissing)
+
+	// Add attribute found label to the flux meter metric
+	if found {
+		labels[metrics.ValidLabel] = metrics.ValidTrue
+	} else {
+		labels[metrics.ValidLabel] = metrics.ValidFalse
+	}
+	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
 	if fluxMeterHistogram != nil {
 		fluxMeterHistogram.Observe(metricValue)
 	}
 }
 
-/*
- * IncludeList: This IncludeList is applied to logs and spans at during the enrichment process, after check response based labels are attached and metrics have been parsed.
- */
 var (
-	_includeAttributesCommon = []string{
-		otelcollector.ApertureSourceLabel,
-		otelcollector.WorkloadDurationLabel,
-		otelcollector.FlowDurationLabel,
-		otelcollector.ApertureProcessingDurationLabel,
-		otelcollector.ApertureDecisionTypeLabel,
-		otelcollector.ApertureErrorLabel,
-		otelcollector.ApertureRejectReasonLabel,
-		otelcollector.ApertureRateLimitersLabel,
-		otelcollector.ApertureDroppingRateLimitersLabel,
-		otelcollector.ApertureConcurrencyLimitersLabel,
-		otelcollector.ApertureDroppingConcurrencyLimitersLabel,
-		otelcollector.ApertureWorkloadsLabel,
-		otelcollector.ApertureDroppingWorkloadsLabel,
-		otelcollector.ApertureFluxMetersLabel,
-		otelcollector.ApertureFlowLabelKeysLabel,
-		otelcollector.ApertureClassifiersLabel,
-		otelcollector.ApertureClassifierErrorsLabel,
-		otelcollector.ApertureServicesLabel,
-		otelcollector.ApertureControlPointLabel,
-	}
-
-	_includeAttributesHTTP = []string{
-		otelcollector.HTTPStatusCodeLabel,
-		otelcollector.HTTPRequestContentLength,
-		otelcollector.HTTPResponseContentLength,
-	}
-
-	_includeAttributesSDK = []string{
-		otelcollector.ApertureFeatureStatusLabel,
-	}
-
-	includeListHTTP = otelcollector.FormIncludeList(append(_includeAttributesCommon, _includeAttributesHTTP...))
-	includeListSDK  = otelcollector.FormIncludeList(append(_includeAttributesCommon, _includeAttributesSDK...))
+	noConcurrencyLimiterSampler = log.NewRatelimitingSampler()
+	noRateLimiterSampler        = log.NewRatelimitingSampler()
+	noClassifierSampler         = log.NewRatelimitingSampler()
+	noFluxMeterSampler          = log.NewRatelimitingSampler()
 )
-
-func enforceIncludeListHTTP(attributes pcommon.Map) {
-	otelcollector.EnforceIncludeList(attributes, includeListHTTP)
-}
-
-func enforceIncludeListSDK(attributes pcommon.Map) {
-	otelcollector.EnforceIncludeList(attributes, includeListSDK)
-}

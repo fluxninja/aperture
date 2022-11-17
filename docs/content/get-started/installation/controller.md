@@ -71,7 +71,7 @@ into your cluster.
    ```
 
    ```bash
-   helm upgrade --install controller aperture/aperture-controller
+   helm upgrade --install controller aperture/aperture-controller -f values.yaml
    ```
 
 3. Alternatively, you can create the Controller Custom Resource directly on the
@@ -214,15 +214,15 @@ Follow the information on [Policy](/concepts/policy/policy.md) to understand and
 design the policy circuits.
 
 Once the design is ready, follow the steps on the
-[Blueprints](/policies/blueprints.md) to generate the Policy Custom Resource and
-apply it on a Kubernetes cluster.
+[Blueprints](/get-started/policies/blueprints.md) to generate the Policy Custom
+Resource and apply it on a Kubernetes cluster.
 
 ## Uninstall
 
 You can uninstall the Aperture Controller and it's components by uninstalling
-the charts installed above:
+the chart installed above:
 
-1. Delete th Aperture Controller chart:
+1. Delete the Aperture Controller chart:
 
    ```bash
    helm uninstall controller

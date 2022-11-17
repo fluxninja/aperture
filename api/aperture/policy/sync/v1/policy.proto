@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/policy.proto";
+import "aperture/policy/sync/v1/common_attributes.proto";
+
+message PolicyWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  // Policy
+  policy.language.v1.Policy policy = 2;
+}
+
+message PolicyWrappers {
+  map<string, PolicyWrapper> policy_wrappers = 1;
+}

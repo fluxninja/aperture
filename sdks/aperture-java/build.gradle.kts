@@ -1,7 +1,9 @@
 import java.time.Duration
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 
 plugins {
     id("application")
+    id("com.github.johnrengelman.shadow")
     id("java")
     id("com.google.protobuf")
     id("io.github.gradle-nexus.publish-plugin")
@@ -10,8 +12,17 @@ plugins {
     signing
 }
 
+val relocateShadowJar = tasks.register<ConfigureShadowRelocation>("relocateShadowJar") {
+    target = tasks.shadowJar.get()
+    prefix = "apertureshadow"
+}
+tasks.shadowJar.get().dependsOn(relocateShadowJar.get())
+tasks.shadowJar {
+    mergeServiceFiles()
+}
+
 application {
-    mainClass.set("com.fluxninja.aperture.example.App")
+    mainClass.set("com.fluxninja.aperture.example.ArmeriaServer")
 }
 
 apply(from = "version.gradle.kts")
@@ -46,12 +57,12 @@ subprojects {
 dependencies {
     implementation(platform("io.opentelemetry:opentelemetry-bom-alpha:1.18.0-alpha"))
     implementation("io.opentelemetry:opentelemetry-sdk-trace:1.18.0")
-    implementation("io.opentelemetry:opentelemetry-exporter-otlp-trace:1.14.0")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.18.0")
     implementation("io.opentelemetry:opentelemetry-exporter-logging:1.18.0")
     implementation("com.sparkjava:spark-core:2.9.4")
     implementation("io.grpc:grpc-protobuf:1.44.0")
     implementation("io.grpc:grpc-stub:1.44.0")
-    implementation("org.slf4j:slf4j-simple:2.0.1")
+    implementation("org.slf4j:slf4j-simple:1.7.0")
     implementation("com.google.protobuf:protobuf-java-util:3.21.6")
     implementation("com.linecorp.armeria:armeria:1.20.0")
 
@@ -68,6 +79,8 @@ dependencies {
 
 // Publishing
 java {
+    setSourceCompatibility("1.8")
+    setTargetCompatibility("1.8")
     withJavadocJar()
     withSourcesJar()
 }
