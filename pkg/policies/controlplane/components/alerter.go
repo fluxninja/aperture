@@ -20,7 +20,7 @@ type Alerter struct {
 	severity       string
 	resolveTimeout time.Duration
 	alertChannels  []string
-	alerterIface   *alerts.SimpleAlerter
+	alerterIface   alerts.Alerter
 	policyReadAPI  iface.Policy
 }
 
@@ -34,12 +34,18 @@ func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ int, policyReadA
 		severity:       alerterProto.Severity,
 		resolveTimeout: alerterProto.ResolveTimeout.AsDuration(),
 		alertChannels:  make([]string, 0),
-		alerterIface:   alerts.NewSimpleAlerter(100),
 		policyReadAPI:  policyReadAPI,
 	}
 	alerter.alertChannels = append(alerter.alertChannels, alerterProto.AlertChannels...)
 
-	return alerter, fx.Options(), nil
+	return alerter, fx.Options(
+		fx.Invoke(
+			alerter.setup,
+		)), nil
+}
+
+func (a *Alerter) setup(alerterIface *alerts.SimpleAlerter) {
+	a.alerterIface = alerterIface
 }
 
 // Execute implements runtime.Component.Execute.

@@ -49,7 +49,7 @@ var _ = Describe("Component factory", func() {
 			component, options, err := components.NewAlerterAndOptions(alerterProto, 0, nil)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(reflect.TypeOf(component)).To(Equal(reflect.TypeOf(alerterComponent)))
-			Expect(options).To(BeNil())
+			Expect(options).NotTo(BeNil())
 		})
 	})
 
