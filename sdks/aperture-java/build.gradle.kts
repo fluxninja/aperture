@@ -1,4 +1,5 @@
 import java.time.Duration
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 
 plugins {
     id("application")
@@ -9,6 +10,15 @@ plugins {
 
     `maven-publish`
     signing
+}
+
+val relocateShadowJar = tasks.register<ConfigureShadowRelocation>("relocateShadowJar") {
+    target = tasks.shadowJar.get()
+    prefix = "apertureshadow"
+}
+tasks.shadowJar.get().dependsOn(relocateShadowJar.get())
+tasks.shadowJar {
+    mergeServiceFiles()
 }
 
 application {
@@ -69,6 +79,8 @@ dependencies {
 
 // Publishing
 java {
+    setSourceCompatibility("1.8")
+    setTargetCompatibility("1.8")
     withJavadocJar()
     withSourcesJar()
 }
