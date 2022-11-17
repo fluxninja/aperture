@@ -22,10 +22,10 @@ import (
 
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	apimachineryversion "k8s.io/apimachinery/pkg/version"
 	"k8s.io/client-go/dynamic"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	apimachineryversion "k8s.io/apimachinery/pkg/version"
 )
 
 const (
