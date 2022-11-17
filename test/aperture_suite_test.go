@@ -15,6 +15,7 @@ import (
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -141,6 +142,7 @@ var _ = BeforeSuite(func() {
 				),
 			),
 		),
+		alerts.Module(),
 		classifier.Module(),
 		service.Module(),
 		fx.Provide(
