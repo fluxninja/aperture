@@ -142,12 +142,14 @@ var _ = BeforeSuite(func() {
 				),
 			),
 		),
-		alerts.Module(),
 		classifier.Module(),
 		service.Module(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			agent.AgentOTELComponents,
+			fx.Annotate(
+				agent.AgentOTELComponents,
+				fx.ParamTags(alerts.AlertsFxTag),
+			),
 			entitycache.NewEntityCache,
 			agentinfo.ProvideAgentInfo,
 			flowcontrol.NewEngine,
