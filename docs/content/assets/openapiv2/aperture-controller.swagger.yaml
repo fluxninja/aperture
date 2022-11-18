@@ -424,6 +424,36 @@ definitions:
         description: Attribute path pointing to some string - eg. "source.address".
         type: string
         x-go-validate: required
+  v1Alerter:
+    description: Alerter reacts to a signal and generates alert to send to alert manager.
+    type: object
+    properties:
+      alert_channels:
+        description: A list of alert channel strings.
+        type: array
+        items:
+          type: string
+      alert_name:
+        description: Name of the alert.
+        type: string
+      in_ports:
+        description: Input ports for the Alerter component.
+        $ref: '#/definitions/v1AlerterIns'
+      resolve_timeout:
+        description: Duration of alert resolver.
+        type: string
+        x-go-default: 5m
+      severity:
+        description: Severity of the alert, one of 'info', 'warn' or 'crit'.
+        type: string
+        x-go-validate: oneof=info warn crit
+  v1AlerterIns:
+    description: Inputs for the Alerter component.
+    type: object
+    properties:
+      alert:
+        description: Signal which Alerter is monitoring.
+        $ref: '#/definitions/v1InPort'
   v1ArithmeticCombinator:
     type: object
     title: Type of combinator that computes the arithmetic operation on the operand
@@ -576,6 +606,10 @@ definitions:
     type: object
     title: Computational block that form the circuit
     properties:
+      alerter:
+        description: Alerter reacts to a signal and generates alert to send to alert
+          manager.
+        $ref: '#/definitions/v1Alerter'
       arithmetic_combinator:
         description: Applies the given operator on input operands (signals) and emits
           the result.

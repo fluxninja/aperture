@@ -21,6 +21,7 @@ local rateLimiter = aperture.spec.v1.RateLimiter;
 local decider = aperture.spec.v1.Decider;
 local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
+local alerter = aperture.spec.v1.Alerter;
 
 local fluxMeterSelector = selector.new()
                           + selector.withServiceSelector(
@@ -85,7 +86,7 @@ local apertureControllerMixin =
           log+: {
             pretty_console: true,
             non_blocking: true,
-            level: 'info',
+            level: 'debug',
           },
           etcd+: {
             endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],

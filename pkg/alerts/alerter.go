@@ -1,5 +1,10 @@
 package alerts
 
+import "github.com/fluxninja/aperture/pkg/config"
+
+// AlertsFxTag - name tag for alerter in fx.
+var AlertsFxTag = config.NameTag("AlertsFx")
+
 // Alerter is responsible for receiving alerts and propagating them to the channel
 // returned by AlertsChan().
 type Alerter interface {
@@ -14,7 +19,7 @@ type SimpleAlerter struct {
 }
 
 // NewSimpleAlerter returns new instance of SimpleAlerter with channel of given size.
-func NewSimpleAlerter(channelSize int) *SimpleAlerter {
+func NewSimpleAlerter(channelSize int) Alerter {
 	return &SimpleAlerter{
 		alertsCh: make(chan *Alert, channelSize),
 	}

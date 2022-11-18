@@ -46,19 +46,22 @@ func ModuleForAgentOTEL() fx.Option {
 				provideAgent,
 				fx.ResultTags(otelcollector.BaseFxTag),
 			),
-			AgentOTELComponents,
+			fx.Annotate(
+				AgentOTELComponents,
+				fx.ParamTags(alerts.AlertsFxTag),
+			),
 		),
 	)
 }
 
 // AgentOTELComponents constructs OTEL Collector Factories for Agent.
 func AgentOTELComponents(
+	alerter alerts.Alerter,
 	cache *entitycache.EntityCache,
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
 	serverGRPC *grpc.Server,
-	alerter alerts.Alerter,
 ) (component.Factories, error) {
 	var errs error
 
