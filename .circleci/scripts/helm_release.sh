@@ -100,7 +100,18 @@ upload(){
   git add ${INDEX_DIR}/index.yaml
 
   git commit -m "Publish $charts"
-  git push origin ${BRANCH}
+
+  retry_counter=10
+  while true; do
+    (( retry_counter-- )) || break
+
+    set +e
+    if git push origin ${BRANCH}; then
+      break
+    fi
+    set -e
+    sleep 1
+  done
 
   popd >& /dev/null
   rm -rf "$tmpDir"
