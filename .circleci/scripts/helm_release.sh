@@ -23,12 +23,10 @@ main(){
   retry_counter=10
   while true;do
     (( retry_counter-- )) || break
-    set +e
     if upload; then
       echo "git push passed"
       break
     fi
-    set -e
     sleep 1
   done
 }
@@ -114,10 +112,10 @@ upload(){
   if git push origin ${BRANCH}; then
     echo "git push passed"
   else
+    popd >& /dev/null
+    rm -rf "$tmpDir"
     return 1
   fi
-  popd >& /dev/null
-  rm -rf "$tmpDir"
 }
 
 main
