@@ -26,10 +26,12 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/grpc"
 
+	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
@@ -64,6 +66,7 @@ func AgentOTELComponents(
 	clasEng iface.ClassificationEngine,
 	serverGRPC *grpc.Server,
 	controlPointCache *controlpointcache.ControlPointCache,
+	alertMgr *alertmanager.AlertManager,
 ) (component.Factories, error) {
 	var errs error
 
@@ -99,6 +102,7 @@ func AgentOTELComponents(
 		otlpexporter.NewFactory(),
 		otlphttpexporter.NewFactory(),
 		prometheusremotewriteexporter.NewFactory(),
+		alertsexporter.NewFactory(alertMgr),
 	)
 	errs = multierr.Append(errs, err)
 
