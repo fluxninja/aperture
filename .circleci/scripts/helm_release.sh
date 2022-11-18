@@ -83,6 +83,7 @@ package() {
 upload(){
   tmpDir=$(mktemp -d)
   pushd "$tmpDir" >& /dev/null
+  trap 'popd &>/dev/null && rm -rf "$tmpDir"' RETURN
 
   git clone "${REPO_URL}"
   cd aperture
@@ -112,12 +113,8 @@ upload(){
   if git push origin ${BRANCH}; then
     echo "git push passed"
   else
-    popd >& /dev/null
-    rm -rf "$tmpDir"
     return 1
   fi
-  popd >& /dev/null
-  rm -rf "$tmpDir"
 }
 
 main
