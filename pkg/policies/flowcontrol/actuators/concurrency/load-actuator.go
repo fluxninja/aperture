@@ -9,7 +9,6 @@ import (
 	"github.com/jonboulle/clockwork"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
@@ -288,10 +287,10 @@ func (la *loadActuator) decisionUpdateCallback(event notifiers.Event, unmarshall
 	}
 
 	if loadDecision.PassThrough {
-		logger.Sample(zerolog.Often).Debug().Msg("Setting pass through mode")
+		logger.Autosample().Debug().Msg("Setting pass through mode")
 		la.tokenBucketLoadMultiplier.SetPassThrough(true)
 	} else {
-		logger.Sample(zerolog.Often).Debug().Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
+		logger.Autosample().Debug().Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
 		la.tokenBucketLoadMultiplier.SetLoadMultiplier(la.clock.Now(), loadDecision.LoadMultiplier)
 		la.tokenBucketLoadMultiplier.SetPassThrough(false)
 	}
