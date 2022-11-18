@@ -13,7 +13,7 @@ keywords:
 ---
 
 ```mdx-code-block
-export const apertureVersion = "0.10.0";
+export const apertureVersion = "0.11.0";
 ```
 
 ```mdx-code-block
