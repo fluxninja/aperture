@@ -21,9 +21,10 @@ func ClientModule() fx.Option {
 
 // ClientConstructor holds fields to create an annotated instance of HTTP client.
 type ClientConstructor struct {
-	Name          string
-	ConfigKey     string
-	DefaultConfig HTTPClientConfig
+	Name           string
+	ConfigKey      string
+	DefaultConfig  HTTPClientConfig
+	ProvidedConfig *HTTPClientConfig
 }
 
 // HTTPClientConfig holds configuration for HTTP Client.
@@ -72,8 +73,8 @@ type HTTPClientConfig struct {
 
 // Annotate creates an annotated instance of HTTP Client.
 func (constructor ClientConstructor) Annotate() fx.Option {
-	if constructor.ConfigKey == "" {
-		log.Panic().Msg("config key not provided")
+	if constructor.ConfigKey == "" && constructor.ProvidedConfig == nil {
+		log.Panic().Msg("config key not provided, provided config is nil")
 	}
 
 	name := config.NameTag(constructor.Name)
@@ -89,11 +90,14 @@ func (constructor ClientConstructor) Annotate() fx.Option {
 
 func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (*http.Client, *MiddlewareChain, *HTTPClientConfig, error) {
 	var err error
-
 	config := constructor.DefaultConfig
-	if err = unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
-		log.Error().Err(err).Msg("Unable to deserialize httpclient configuration!")
-		return nil, nil, nil, err
+	if constructor.ConfigKey != "" {
+		if err = unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
+			log.Error().Err(err).Msg("Unable to deserialize httpclient configuration!")
+			return nil, nil, nil, err
+		}
+	} else {
+		config = *constructor.ProvidedConfig
 	}
 
 	tlsConfig, err := config.ClientTLSConfig.GetTLSConfig()
