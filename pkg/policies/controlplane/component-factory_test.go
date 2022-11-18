@@ -39,6 +39,20 @@ var _ = Describe("Component factory", func() {
 		})
 	})
 
+	Context("Alerter", func() {
+		alerterProto := &policylangv1.Alerter{
+			AlertName: "testName",
+			Severity:  "crit",
+		}
+		It("Creates Alerter component", func() {
+			alerterComponent := &components.Alerter{}
+			component, options, err := components.NewAlerterAndOptions(alerterProto, 0, nil)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(reflect.TypeOf(component)).To(Equal(reflect.TypeOf(alerterComponent)))
+			Expect(options).NotTo(BeNil())
+		})
+	})
+
 	Context("Switcher", func() {
 		switcherProto := &policylangv1.Switcher{}
 		It("Creates Switcher component", func() {

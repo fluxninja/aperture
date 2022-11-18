@@ -67,13 +67,13 @@ func (a *Alert) SetAnnotation(key, value string) {
 	a.Annotations[key] = value
 }
 
-// SetLabels overwrites all the current annotations with the one provided.
+// SetLabels overwrites all the current labels with the one provided.
 // Caution: this will overwrite also name and severity!
 func (a *Alert) SetLabels(labels map[string]string) {
 	a.Labels = models.LabelSet(labels)
 }
 
-// SetLabel sets a single annotation. It overwrites the previous value if exists.
+// SetLabel sets a single label. It overwrites the previous value if exists.
 func (a *Alert) SetLabel(key, value string) {
 	a.Labels[key] = value
 }

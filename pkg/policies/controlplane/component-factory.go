@@ -161,6 +161,15 @@ func NewComponentAndOptions(
 			Name:          "Sink",
 			ComponentType: runtime.ComponentTypeSink,
 		}, nil, option, err
+	} else if alerter := componentProto.GetAlerter(); alerter != nil {
+		component, option, err := components.NewAlerterAndOptions(alerter, componentIndex, policyReadAPI)
+		mapStruct, err := encodeMapStructOnNilErr(alerter, err)
+		return runtime.CompiledComponent{
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "Alerter",
+			ComponentType: runtime.ComponentTypeSink,
+		}, nil, option, err
 	} else {
 		// Try Component Stack Factory
 		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
