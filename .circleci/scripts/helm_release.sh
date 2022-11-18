@@ -111,8 +111,11 @@ upload(){
   git add ${INDEX_DIR}/index.yaml
 
   git commit -m "Publish $charts"
-  git push origin ${BRANCH}
-
+  if git push origin ${BRANCH}; then
+    echo "git push passed"
+  else
+    return 1
+  fi
   popd >& /dev/null
   rm -rf "$tmpDir"
 }
