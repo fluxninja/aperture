@@ -116,6 +116,8 @@ upload(){
     rm -rf "$tmpDir"
     return 1
   fi
+  popd >& /dev/null
+  rm -rf "$tmpDir"
 }
 
 main
