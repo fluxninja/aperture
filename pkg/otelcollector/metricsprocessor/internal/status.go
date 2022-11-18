@@ -10,15 +10,15 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
-// StatusesFromAttributes gets HTTP status code and Feature status from attributes.
-func StatusesFromAttributes(attributes pcommon.Map) (statusCode string, featureStatus string) {
+// StatusesFromAttributes gets HTTP status code and Flow status from attributes.
+func StatusesFromAttributes(attributes pcommon.Map) (statusCode string, flowStatus string) {
 	rawStatusCode, exists := attributes.Get(otelcollector.HTTPStatusCodeLabel)
 	if exists {
 		statusCode = rawStatusCode.Str()
 	}
-	rawFeatureStatus, exists := attributes.Get(otelcollector.ApertureFeatureStatusLabel)
+	rawFlowStatus, exists := attributes.Get(otelcollector.ApertureFlowStatusLabel)
 	if exists {
-		featureStatus = rawFeatureStatus.Str()
+		flowStatus = rawFlowStatus.Str()
 	}
 	return
 }
@@ -27,35 +27,34 @@ func StatusesFromAttributes(attributes pcommon.Map) (statusCode string, featureS
 func StatusLabelsForMetrics(
 	decisionType flowcontrolv1.CheckResponse_DecisionType,
 	statusCode string,
-	featureStatus string,
+	flowStatus string,
 ) map[string]string {
 	return map[string]string{
-		metrics.ResponseStatusLabel: responseStatusForMetrics(statusCode, featureStatus),
-		metrics.DecisionTypeLabel:   decisionType.String(),
-		metrics.StatusCodeLabel:     statusCode,
-		metrics.FeatureStatusLabel:  featureStatus,
+		metrics.DecisionTypeLabel: decisionType.String(),
+		metrics.StatusCodeLabel:   statusCode,
+		metrics.FlowStatusLabel:   flowStatusForMetrics(statusCode, flowStatus),
 	}
 }
 
-func responseStatusForMetrics(statusCode, featureStatus string) string {
-	return responseStatus(
+func flowStatusForMetrics(statusCode, flowStatusStr string) string {
+	return flowStatus(
 		statusCode,
-		featureStatus,
-		metrics.ResponseStatusOK,
-		metrics.ResponseStatusError)
+		flowStatusStr,
+		metrics.FlowStatusOK,
+		metrics.FlowStatusError)
 }
 
-// ResponseStatusForTelemetry returns response status for telemetry based on
-// HTTP status code and Feature status.
-func ResponseStatusForTelemetry(statusCode, featureStatus string) string {
-	return responseStatus(
+// FlowStatusForTelemetry returns protocol independent Flow status for telemetry based on
+// HTTP status code and Flow status.
+func FlowStatusForTelemetry(statusCode, flowStatusStr string) string {
+	return flowStatus(
 		statusCode,
-		featureStatus,
-		otelcollector.ApertureResponseStatusOK,
-		otelcollector.ApertureResponseStatusError)
+		flowStatusStr,
+		otelcollector.ApertureFlowStatusOK,
+		otelcollector.ApertureFlowStatusError)
 }
 
-func responseStatus(statusCode, featureStatus, okStatus, errorStatus string) string {
+func flowStatus(statusCode, flowStatusStr, okStatus, errorStatus string) string {
 	// Checking status code this way instead of parsing int properly handles empty
 	// string as well.
 	if strings.HasPrefix(statusCode, "1") ||
@@ -63,8 +62,8 @@ func responseStatus(statusCode, featureStatus, okStatus, errorStatus string) str
 		strings.HasPrefix(statusCode, "3") {
 		return okStatus
 	}
-	if featureStatus != "" {
-		return featureStatus
+	if flowStatusStr != "" {
+		return flowStatusStr
 	}
 	return errorStatus
 }

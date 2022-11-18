@@ -28,7 +28,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 	authz_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy/baggage"
 )
@@ -68,10 +67,9 @@ type Handler struct {
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)
 
 var (
-	missingTrafficDirectionSampler = log.NewRatelimitingSampler()
-	invalidTrafficDirectionSampler = log.NewRatelimitingSampler()
-	failedReqToInputSampler        = log.NewRatelimitingSampler()
-	failedBaggageInjectionSampler  = log.NewRatelimitingSampler()
+	missingControlPointSampler    = log.NewRatelimitingSampler()
+	failedReqToInputSampler       = log.NewRatelimitingSampler()
+	failedBaggageInjectionSampler = log.NewRatelimitingSampler()
 )
 
 // sanitizeBaggageHeaderValue excludes characters that should be url escaped
@@ -122,32 +120,19 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		}
 	}
 
-	var ctrlPt selectors.ControlPoint
-	trafficDirectionHeader := ""
+	ctrlPt := ""
 	headers, _ := metadata.FromIncomingContext(ctx)
-	if dirHeader, exists := headers["traffic-direction"]; exists && len(dirHeader) > 0 {
-		trafficDirectionHeader = dirHeader[0]
-	} else if dirHeader, exists := req.GetAttributes().GetContextExtensions()["traffic-direction"]; exists && len(dirHeader) > 0 {
-		trafficDirectionHeader = dirHeader
+	if ctrlPtHeader, exists := headers["control-point"]; exists && len(ctrlPtHeader) > 0 {
+		ctrlPt = ctrlPtHeader[0]
+	} else if ctrlPtHeader, exists := req.GetAttributes().GetContextExtensions()["control-point"]; exists && len(ctrlPtHeader) > 0 {
+		ctrlPt = ctrlPtHeader
 	}
 
-	if trafficDirectionHeader != "" {
-		switch trafficDirectionHeader {
-		case "INBOUND":
-			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
-		case "OUTBOUND":
-			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, "")
-		default:
-			// TODO(krdln) metrics
-			log.Sample(invalidTrafficDirectionSampler).
-				Warn().Str("traffic-direction", trafficDirectionHeader).Msg("invalid traffic-direction")
-			return nil, grpc_status.Error(grpc_codes.InvalidArgument, "invalid traffic-direction")
-		}
-	} else {
+	if ctrlPt == "" {
 		// TODO(krdln) metrics
-		log.Sample(missingTrafficDirectionSampler).
-			Warn().Msg("missing traffic-direction")
-		return nil, grpc_status.Error(grpc_codes.InvalidArgument, "missing traffic-direction")
+		log.Sample(missingControlPointSampler).
+			Warn().Msg("missing control-point")
+		return nil, grpc_status.Error(grpc_codes.InvalidArgument, "missing control-point")
 	}
 
 	var svcs []string

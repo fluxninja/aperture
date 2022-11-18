@@ -11,12 +11,10 @@ import (
 	"google.golang.org/grpc/peer"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -48,7 +46,7 @@ type AcceptingHandler struct {
 func (s *AcceptingHandler) CheckWithValues(
 	context.Context,
 	[]string,
-	selectors.ControlPoint,
+	string,
 	map[string]string,
 ) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
@@ -68,8 +66,8 @@ var _ = Describe("Authorization handler", func() {
 		It("returns ok response", func() {
 			Eventually(func(g Gomega) {
 				ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer())
-				// add "traffic-direction" header to ctx
-				ctxWithIp = metadata.NewIncomingContext(ctxWithIp, metadata.Pairs("traffic-direction", "INBOUND"))
+				// add "control-point" header to ctx
+				ctxWithIp = metadata.NewIncomingContext(ctxWithIp, metadata.Pairs("control-point", "ingress"))
 				resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
 				g.Expect(err).NotTo(HaveOccurred())
 				g.Expect(code.Code(resp.GetStatus().GetCode())).To(Equal(code.Code_OK))
@@ -78,7 +76,7 @@ var _ = Describe("Authorization handler", func() {
 		It("injects metadata", func() {
 			Eventually(func(g Gomega) {
 				ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer())
-				ctxWithIp = metadata.NewIncomingContext(ctxWithIp, metadata.Pairs("traffic-direction", "INBOUND"))
+				ctxWithIp = metadata.NewIncomingContext(ctxWithIp, metadata.Pairs("control-point", "ingress"))
 				resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
 				g.Expect(err).NotTo(HaveOccurred())
 				g.Expect(resp.GetDynamicMetadata()).ShouldNot(BeNil())
@@ -92,21 +90,17 @@ var service1Selector = policylangv1.Selector{
 		Service: "service1-demo-app.demoapp.svc.cluster.local",
 	},
 	FlowSelector: &policylangv1.FlowSelector{
-		ControlPoint: &policylangv1.ControlPoint{
-			Controlpoint: &policylangv1.ControlPoint_Traffic{
-				Traffic: "ingress",
-			},
-		},
+		ControlPoint: "ingress",
 	},
 }
 
 var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
-	Classifier: &classificationv1.Classifier{
+	Classifier: &policylangv1.Classifier{
 		Selector: &service1Selector,
-		Rules: map[string]*classificationv1.Rule{
+		Rules: map[string]*policylangv1.Rule{
 			"destination": {
-				Source: &classificationv1.Rule_Rego_{
-					Rego: &classificationv1.Rule_Rego{
+				Source: &policylangv1.Rule_Rego_{
+					Rego: &policylangv1.Rule_Rego{
 						Source: `
 						package envoy.authz
 						destination := v {
@@ -118,8 +112,8 @@ var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 				},
 			},
 			"source": {
-				Source: &classificationv1.Rule_Rego_{
-					Rego: &classificationv1.Rule_Rego{
+				Source: &policylangv1.Rule_Rego_{
+					Rego: &policylangv1.Rule_Rego{
 						Source: `
 						package envoy.authz
 						source := v {

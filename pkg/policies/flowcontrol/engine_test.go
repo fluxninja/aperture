@@ -10,7 +10,6 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
 )
 
@@ -42,9 +41,7 @@ var _ = Describe("Dataplane Engine", func() {
 				Service:    "testService.testNamespace.svc.cluster.local",
 			},
 			FlowSelector: &policylangv1.FlowSelector{
-				ControlPoint: &policylangv1.ControlPoint{
-					Controlpoint: &policylangv1.ControlPoint_Traffic{Traffic: "ingress"},
-				},
+				ControlPoint: "ingress",
 			},
 		}
 		histogram = goprom.NewHistogram(goprom.HistogramOpts{
@@ -106,7 +103,7 @@ var _ = Describe("Dataplane Engine", func() {
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
 			labels = map[string]string{
 				metrics.ResponseStatusLabel: metrics.ResponseStatusOK,
-				metrics.FeatureStatusLabel:  "",
+				metrics.FlowStatusLabel:     "",
 				metrics.StatusCodeLabel:     "200",
 				metrics.DecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
 			}
@@ -167,7 +164,7 @@ var _ = Describe("Dataplane Engine", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
 			_ = engine.RegisterConcurrencyLimiter(mockConLimiter)
 
-			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
+			controlPoint := "ingress"
 			svcs := []string{"testService2.testNamespace2.svc.cluster.local"}
 			labels := map[string]string{"service": "whatever"}
 
@@ -180,7 +177,7 @@ var _ = Describe("Dataplane Engine", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
 			_ = engine.RegisterConcurrencyLimiter(mockConLimiter)
 
-			controlPoint := selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
+			controlPoint := "ingress"
 			svcs := []string{"testService.testNamespace.svc.cluster.local"}
 			labels := map[string]string{"service": "testService.testNamespace.svc.cluster.local"}
 

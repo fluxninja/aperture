@@ -12,7 +12,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
 // Handler implements the flowcontrol.v1 Service
@@ -41,7 +40,7 @@ type HandlerWithValues interface {
 	CheckWithValues(
 		context.Context,
 		[]string,
-		selectors.ControlPoint,
+		string,
 		map[string]string,
 	) *flowcontrolv1.CheckResponse
 }
@@ -50,7 +49,7 @@ type HandlerWithValues interface {
 func (h *Handler) CheckWithValues(
 	ctx context.Context,
 	serviceIDs []string,
-	controlPoint selectors.ControlPoint,
+	controlPoint string,
 	labels map[string]string,
 ) *flowcontrolv1.CheckResponse {
 	checkResponse := h.engine.ProcessRequest(ctx, controlPoint, serviceIDs, labels)
@@ -80,7 +79,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	resp := h.CheckWithValues(
 		ctx,
 		serviceIDs,
-		selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_FEATURE, req.Feature),
+		req.ControlPoint,
 		req.Labels,
 	)
 	end := time.Now()

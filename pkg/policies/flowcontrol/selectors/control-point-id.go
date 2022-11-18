@@ -7,19 +7,19 @@ import (
 // ControlPointID is the interface for controlPointID.
 type ControlPointID interface {
 	Service() string
-	ControlPoint() ControlPoint
+	ControlPoint() string
 }
 
 type controlPointID struct {
 	service      string
-	controlPoint ControlPoint
+	controlPoint string
 }
 
 // controlPointID implements the ControlPointID interface.
 var _ ControlPointID = (*controlPointID)(nil)
 
 // NewControlPointID returns a controlPointID.
-func NewControlPointID(service string, controlPoint ControlPoint) ControlPointID {
+func NewControlPointID(service string, controlPoint string) ControlPointID {
 	return controlPointID{
 		service:      service,
 		controlPoint: controlPoint,
@@ -27,11 +27,11 @@ func NewControlPointID(service string, controlPoint ControlPoint) ControlPointID
 }
 
 func controlPointIDFromSelectorProto(selectorMsg *policylangv1.Selector) (ControlPointID, error) {
-	ctrlPt, err := controlPointFromSelectorControlPointProto(selectorMsg.FlowSelector.GetControlPoint())
+	ctrlPt := selectorMsg.FlowSelector.GetControlPoint()
 	return controlPointID{
 		service:      selectorMsg.ServiceSelector.GetService(),
 		controlPoint: ctrlPt,
-	}, err
+	}, nil
 }
 
 // Service returns the service name.
@@ -40,6 +40,6 @@ func (p controlPointID) Service() string {
 }
 
 // ControlPoint returns the control point.
-func (p controlPointID) ControlPoint() ControlPoint {
+func (p controlPointID) ControlPoint() string {
 	return p.controlPoint
 }

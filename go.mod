@@ -93,8 +93,10 @@ require (
 	github.com/antonmedv/expr v1.9.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/bmatcuk/doublestar/v3 v3.0.0 // indirect
+	github.com/dmarkham/enumer v1.5.7 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
+	github.com/favadi/protoc-go-inject-tag v1.4.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/zapr v1.2.3 // indirect
 	github.com/go-openapi/analysis v0.21.2 // indirect
@@ -113,6 +115,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/ottl v0.63.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza v0.63.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheus v0.63.0 // indirect
+	github.com/pascaldekloe/name v1.0.0 // indirect
 	github.com/prometheus/prometheus v0.39.1 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	go.mongodb.org/mongo-driver v1.10.2 // indirect

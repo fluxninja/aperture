@@ -134,8 +134,8 @@ function(params) {
     newTimeSeriesPanel('FluxMeter',
                        ds,
                        |||
-                         sum(increase(flux_meter_sum{valid="true", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
-                         / sum(increase(flux_meter_count{valid="true", response_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
+                         sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
+                         / sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
                        ||| % { policyName: $._config.policyName },
                        'Latency (ms)',
                        'ms'),
