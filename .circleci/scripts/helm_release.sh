@@ -19,7 +19,18 @@ main(){
   locate
   dependencies
   package
-  upload
+
+  retry_counter=10
+  while true;do
+    (( retry_counter-- )) || break
+    set +e
+    if upload; then
+      echo "git push passed"
+      break
+    fi
+    set -e
+    sleep 1
+  done
 }
 
 install_helm(){
@@ -100,18 +111,7 @@ upload(){
   git add ${INDEX_DIR}/index.yaml
 
   git commit -m "Publish $charts"
-
-  retry_counter=10
-  while true; do
-    (( retry_counter-- )) || break
-
-    set +e
-    if git push origin ${BRANCH}; then
-      break
-    fi
-    set -e
-    sleep 1
-  done
+  git push origin ${BRANCH}
 
   popd >& /dev/null
   rm -rf "$tmpDir"
