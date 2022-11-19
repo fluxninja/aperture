@@ -12,7 +12,7 @@ service FlowControlService {
 
 // CheckRequest contains fields required to perform Check call.
 message CheckRequest {
-  string feature = 1;
+  string control_point = 1;
   map<string, string> labels = 2;
 }
 
@@ -38,7 +38,7 @@ message CheckResponse {
   // services that matched
   repeated string services = 4;
   // control_point of request
-  ControlPointInfo control_point_info = 5;
+  string control_point = 5;
   // flow label keys that were matched for this request.
   repeated string flow_label_keys = 6;
   // telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
@@ -53,19 +53,6 @@ message CheckResponse {
   repeated FluxMeterInfo flux_meter_infos = 11;
   // limiter_decisions contains information about decision made by each limiter.
   repeated LimiterDecision limiter_decisions = 12;
-}
-
-message ControlPointInfo {
-  // Type contains fields that represent type of ControlPointInfo.
-  enum Type {
-    TYPE_UNKNOWN = 0;
-    TYPE_FEATURE = 1;
-    TYPE_INGRESS = 2;
-    TYPE_EGRESS = 3;
-  }
-
-  Type type = 1;
-  string feature = 2;
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.

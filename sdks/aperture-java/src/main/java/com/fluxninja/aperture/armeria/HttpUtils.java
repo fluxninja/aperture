@@ -101,7 +101,7 @@ class HttpUtils {
         }
 
         return builder
-                .putContextExtensions("traffic-direction", "INBOUND")
+                .putContextExtensions("control-point", "ingress")
                 .setRequest(AttributeContext.Request.newBuilder()
                 .setHttp(AttributeContext.HttpRequest.newBuilder()
                         .setMethod(req.method().toString())

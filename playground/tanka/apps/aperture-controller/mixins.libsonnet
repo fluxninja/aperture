@@ -21,6 +21,7 @@ local rateLimiter = aperture.spec.v1.RateLimiter;
 local decider = aperture.spec.v1.Decider;
 local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
+local alerter = aperture.spec.v1.Alerter;
 
 local fluxMeterSelector = selector.new()
                           + selector.withServiceSelector(
@@ -30,8 +31,7 @@ local fluxMeterSelector = selector.new()
                           )
                           + selector.withFlowSelector(
                             flowSelector.new()
-                            + flowSelector.withControlPoint(controlPoint.new()
-                                                            + controlPoint.withTraffic('ingress'))
+                            + flowSelector.withControlPoint('ingress')
                           );
 
 local concurrencyLimiterSelector = selector.new()
@@ -42,8 +42,7 @@ local concurrencyLimiterSelector = selector.new()
                                    )
                                    + selector.withFlowSelector(
                                      flowSelector.new()
-                                     + flowSelector.withControlPoint(controlPoint.new()
-                                                                     + controlPoint.withTraffic('ingress'))
+                                     + flowSelector.withControlPoint('ingress')
                                    );
 
 // Restrict this selector to only bot traffic
@@ -55,8 +54,7 @@ local rateLimiterSelector = selector.new()
                             )
                             + selector.withFlowSelector(
                               flowSelector.new()
-                              + flowSelector.withControlPoint(controlPoint.new()
-                                                              + controlPoint.withTraffic('ingress'))
+                              + flowSelector.withControlPoint('ingress')
                               + flowSelector.withLabelMatcher(
                                 labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
                               )
@@ -85,7 +83,7 @@ local apertureControllerMixin =
           log+: {
             pretty_console: true,
             non_blocking: true,
-            level: 'info',
+            level: 'debug',
           },
           etcd+: {
             endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],

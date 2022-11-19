@@ -10,7 +10,6 @@ import (
 
 	checkv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	iface "github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	selectors "github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -80,7 +79,7 @@ func (mr *MockEngineMockRecorder) GetRateLimiter(limiterID interface{}) *gomock.
 }
 
 // ProcessRequest mocks base method.
-func (m *MockEngine) ProcessRequest(ctx context.Context, controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) *checkv1.CheckResponse {
+func (m *MockEngine) ProcessRequest(ctx context.Context, controlPoint string, serviceIDs []string, labels map[string]string) *checkv1.CheckResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessRequest", ctx, controlPoint, serviceIDs, labels)
 	ret0, _ := ret[0].(*checkv1.CheckResponse)

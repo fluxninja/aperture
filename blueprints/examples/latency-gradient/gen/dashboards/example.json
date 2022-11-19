@@ -102,7 +102,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(flux_meter_sum{valid=\"true\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n/ sum(increase(flux_meter_count{valid=\"true\", response_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n",
+          "expr": "sum(increase(flux_meter_sum{valid=\"true\", flow_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n/ sum(increase(flux_meter_count{valid=\"true\", flow_status=\"OK\", flux_meter_name=\"example\"}[$__rate_interval]))\n",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",

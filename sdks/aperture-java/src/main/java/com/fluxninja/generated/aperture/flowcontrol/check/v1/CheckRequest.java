@@ -20,7 +20,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private CheckRequest() {
-    feature_ = "";
+    controlPoint_ = "";
   }
 
   @java.lang.Override
@@ -57,7 +57,7 @@ private static final long serialVersionUID = 0L;
           case 10: {
             java.lang.String s = input.readStringRequireUtf8();
 
-            feature_ = s;
+            controlPoint_ = s;
             break;
           }
           case 18: {
@@ -119,38 +119,38 @@ private static final long serialVersionUID = 0L;
             com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest.Builder.class);
   }
 
-  public static final int FEATURE_FIELD_NUMBER = 1;
-  private volatile java.lang.Object feature_;
+  public static final int CONTROL_POINT_FIELD_NUMBER = 1;
+  private volatile java.lang.Object controlPoint_;
   /**
-   * <code>string feature = 1 [json_name = "feature"];</code>
-   * @return The feature.
+   * <code>string control_point = 1 [json_name = "controlPoint"];</code>
+   * @return The controlPoint.
    */
   @java.lang.Override
-  public java.lang.String getFeature() {
-    java.lang.Object ref = feature_;
+  public java.lang.String getControlPoint() {
+    java.lang.Object ref = controlPoint_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      feature_ = s;
+      controlPoint_ = s;
       return s;
     }
   }
   /**
-   * <code>string feature = 1 [json_name = "feature"];</code>
-   * @return The bytes for feature.
+   * <code>string control_point = 1 [json_name = "controlPoint"];</code>
+   * @return The bytes for controlPoint.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getFeatureBytes() {
-    java.lang.Object ref = feature_;
+      getControlPointBytes() {
+    java.lang.Object ref = controlPoint_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      feature_ = b;
+      controlPoint_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
@@ -252,8 +252,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(feature_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, feature_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(controlPoint_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, controlPoint_);
     }
     com.google.protobuf.GeneratedMessageV3
       .serializeStringMapTo(
@@ -270,8 +270,8 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(feature_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, feature_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(controlPoint_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, controlPoint_);
     }
     for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
          : internalGetLabels().getMap().entrySet()) {
@@ -298,8 +298,8 @@ private static final long serialVersionUID = 0L;
     }
     com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest) obj;
 
-    if (!getFeature()
-        .equals(other.getFeature())) return false;
+    if (!getControlPoint()
+        .equals(other.getControlPoint())) return false;
     if (!internalGetLabels().equals(
         other.internalGetLabels())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
@@ -313,8 +313,8 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + FEATURE_FIELD_NUMBER;
-    hash = (53 * hash) + getFeature().hashCode();
+    hash = (37 * hash) + CONTROL_POINT_FIELD_NUMBER;
+    hash = (53 * hash) + getControlPoint().hashCode();
     if (!internalGetLabels().getMap().isEmpty()) {
       hash = (37 * hash) + LABELS_FIELD_NUMBER;
       hash = (53 * hash) + internalGetLabels().hashCode();
@@ -478,7 +478,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      feature_ = "";
+      controlPoint_ = "";
 
       internalGetMutableLabels().clear();
       return this;
@@ -508,7 +508,7 @@ private static final long serialVersionUID = 0L;
     public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest buildPartial() {
       com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest(this);
       int from_bitField0_ = bitField0_;
-      result.feature_ = feature_;
+      result.controlPoint_ = controlPoint_;
       result.labels_ = internalGetLabels();
       result.labels_.makeImmutable();
       onBuilt();
@@ -559,8 +559,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest other) {
       if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest.getDefaultInstance()) return this;
-      if (!other.getFeature().isEmpty()) {
-        feature_ = other.feature_;
+      if (!other.getControlPoint().isEmpty()) {
+        controlPoint_ = other.controlPoint_;
         onChanged();
       }
       internalGetMutableLabels().mergeFrom(
@@ -595,78 +595,78 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.lang.Object feature_ = "";
+    private java.lang.Object controlPoint_ = "";
     /**
-     * <code>string feature = 1 [json_name = "feature"];</code>
-     * @return The feature.
+     * <code>string control_point = 1 [json_name = "controlPoint"];</code>
+     * @return The controlPoint.
      */
-    public java.lang.String getFeature() {
-      java.lang.Object ref = feature_;
+    public java.lang.String getControlPoint() {
+      java.lang.Object ref = controlPoint_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        feature_ = s;
+        controlPoint_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>string feature = 1 [json_name = "feature"];</code>
-     * @return The bytes for feature.
+     * <code>string control_point = 1 [json_name = "controlPoint"];</code>
+     * @return The bytes for controlPoint.
      */
     public com.google.protobuf.ByteString
-        getFeatureBytes() {
-      java.lang.Object ref = feature_;
+        getControlPointBytes() {
+      java.lang.Object ref = controlPoint_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        feature_ = b;
+        controlPoint_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>string feature = 1 [json_name = "feature"];</code>
-     * @param value The feature to set.
+     * <code>string control_point = 1 [json_name = "controlPoint"];</code>
+     * @param value The controlPoint to set.
      * @return This builder for chaining.
      */
-    public Builder setFeature(
+    public Builder setControlPoint(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
   
-      feature_ = value;
+      controlPoint_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>string feature = 1 [json_name = "feature"];</code>
+     * <code>string control_point = 1 [json_name = "controlPoint"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearFeature() {
+    public Builder clearControlPoint() {
       
-      feature_ = getDefaultInstance().getFeature();
+      controlPoint_ = getDefaultInstance().getControlPoint();
       onChanged();
       return this;
     }
     /**
-     * <code>string feature = 1 [json_name = "feature"];</code>
-     * @param value The bytes for feature to set.
+     * <code>string control_point = 1 [json_name = "controlPoint"];</code>
+     * @param value The bytes for controlPoint to set.
      * @return This builder for chaining.
      */
-    public Builder setFeatureBytes(
+    public Builder setControlPointBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
       
-      feature_ = value;
+      controlPoint_ = value;
       onChanged();
       return this;
     }

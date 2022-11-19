@@ -72,8 +72,6 @@ const (
 	FlowControlRequestsMetricName = "flowcontrol_requests_total"
 	// FlowControlDecisionsMetricName - counter for Check requests per decision type.
 	FlowControlDecisionsMetricName = "flowcontrol_decisions_total"
-	// FlowControlErrorReasonsMetricName - metric for error reason on FCS Check requests.
-	FlowControlErrorReasonsMetricName = "flowcontrol_error_reasons_total"
 	// FlowControlRejectReasonsMetricName - metric for reject reason on FCS Check requests.
 	FlowControlRejectReasonsMetricName = "flowcontrol_reject_reasons_total"
 
@@ -117,18 +115,12 @@ const (
 	MethodLabel = "http_method"
 	// HandlerName - name of the http handler. Defaults to 'default'.
 	HandlerName = "handler_name"
-	// FeatureStatusLabel - feature status.
-	FeatureStatusLabel = "feature_status"
-	// FeatureStatusOK - feature status OK.
-	FeatureStatusOK = "OK"
-	// FeatureStatusError - feature status Error.
-	FeatureStatusError = "Error"
-	// ResponseStatusLabel - response status. A common label to denote OK or Error across all protocols.
-	ResponseStatusLabel = "response_status"
-	// ResponseStatusOK - response status OK.
-	ResponseStatusOK = FeatureStatusOK
-	// ResponseStatusError - response status Error.
-	ResponseStatusError = FeatureStatusError
+	// FlowStatusLabel - flow status.
+	FlowStatusLabel = "flow_status"
+	// FlowStatusOK - flow status OK.
+	FlowStatusOK = "OK"
+	// FlowStatusError - flow status Error.
+	FlowStatusError = "Error"
 	// FlowControlCheckDecisionTypeLabel - label for decision type dropped or accepted.
 	FlowControlCheckDecisionTypeLabel = "decision_type"
 	// FlowControlCheckErrorReasonLabel - label for error reason on FCS Check request.

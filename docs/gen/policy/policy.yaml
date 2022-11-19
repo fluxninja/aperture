@@ -237,6 +237,42 @@ definitions:
         type: string
         x-go-validate: required
         x-order: 0
+  v1Alerter:
+    description: Alerter reacts to a signal and generates alert to send to alert manager.
+    type: object
+    properties:
+      alert_channels:
+        description: A list of alert channel strings.
+        type: array
+        items:
+          type: string
+        x-order: 0
+      alert_name:
+        description: Name of the alert.
+        type: string
+        x-order: 1
+      in_ports:
+        description: Input ports for the Alerter component.
+        x-order: 2
+        $ref: '#/definitions/v1AlerterIns'
+      resolve_timeout:
+        description: Duration of alert resolver.
+        type: string
+        x-go-default: 5m
+        x-order: 3
+      severity:
+        description: Severity of the alert, one of 'info', 'warn' or 'crit'.
+        type: string
+        x-go-validate: oneof=info warn crit
+        x-order: 4
+  v1AlerterIns:
+    description: Inputs for the Alerter component.
+    type: object
+    properties:
+      alert:
+        description: Signal which Alerter is monitoring.
+        x-order: 0
+        $ref: '#/definitions/v1InPort'
   v1ArithmeticCombinator:
     type: object
     title: Type of combinator that computes the arithmetic operation on the operand
@@ -399,75 +435,80 @@ definitions:
     type: object
     title: Computational block that form the circuit
     properties:
+      alerter:
+        description: Alerter reacts to a signal and generates alert to send to alert
+          manager.
+        x-order: 0
+        $ref: '#/definitions/v1Alerter'
       arithmetic_combinator:
         description: Applies the given operator on input operands (signals) and emits
           the result.
-        x-order: 0
+        x-order: 1
         $ref: '#/definitions/v1ArithmeticCombinator'
       concurrency_limiter:
         description: Concurrency Limiter provides service protection by applying prioritized
           load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-        x-order: 1
+        x-order: 2
         $ref: '#/definitions/v1ConcurrencyLimiter'
       constant:
         description: Emits a constant signal.
-        x-order: 2
+        x-order: 3
         $ref: '#/definitions/v1Constant'
       decider:
         description: Decider emits the binary result of comparison operator on two
           operands.
-        x-order: 3
+        x-order: 4
         $ref: '#/definitions/v1Decider'
       ema:
         description: Exponential Moving Average filter.
-        x-order: 4
+        x-order: 5
         $ref: '#/definitions/v1EMA'
       extrapolator:
         description: Takes an input signal and emits the extrapolated value; either
           mirroring the input value or repeating the last known value up to the maximum
           extrapolation interval.
-        x-order: 5
+        x-order: 6
         $ref: '#/definitions/v1Extrapolator'
       first_valid:
         description: Picks the first valid input signal and emits it.
-        x-order: 6
+        x-order: 7
         $ref: '#/definitions/v1FirstValid'
       gradient_controller:
         description: |-
           Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
-        x-order: 7
+        x-order: 8
         $ref: '#/definitions/v1GradientController'
       max:
         description: Emits the maximum of the input signals.
-        x-order: 8
+        x-order: 9
         $ref: '#/definitions/v1Max'
       min:
         description: Emits the minimum of the input signals.
-        x-order: 9
+        x-order: 10
         $ref: '#/definitions/v1Min'
       promql:
         description: Periodically runs a Prometheus query in the background and emits
           the result.
-        x-order: 10
+        x-order: 11
         $ref: '#/definitions/v1PromQL'
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
-        x-order: 11
+        x-order: 12
         $ref: '#/definitions/v1RateLimiter'
       sink:
         description: Sink is a sink component that does nothing.
-        x-order: 12
+        x-order: 13
         $ref: '#/definitions/v1Sink'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
-        x-order: 13
+        x-order: 14
         $ref: '#/definitions/v1Sqrt'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
-        x-order: 14
+        x-order: 15
         $ref: '#/definitions/v1Switcher'
   v1ConcurrencyLimiter:
     description: |-
@@ -527,32 +568,6 @@ definitions:
         description: The constant value is emitted to the output port.
         x-order: 0
         $ref: '#/definitions/v1OutPort'
-  v1ControlPoint:
-    description: |-
-      Identifies control point within a service that the rule or policy should apply to.
-      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
-    type: object
-    properties:
-      feature:
-        description: |-
-          Name of Aperture SDK's feature.
-          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
-
-          Note: Flowcontrol only.
-        type: string
-        x-go-validate: required
-        x-order: 0
-      traffic:
-        description: |-
-          Type of traffic service, either "ingress" or "egress".
-          Apply the policy to the whole incoming/outgoing traffic of a service.
-          Usually powered by integration with a proxy (like envoy) or a web framework.
-
-          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
-          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
-        type: string
-        x-go-validate: required,oneof=ingress egress
-        x-order: 1
   v1ControllerDynamicConfig:
     type: object
     title: Dynamic Configuration for a Controller
@@ -869,8 +884,7 @@ definitions:
 
       Example:
       ```yaml
-      control_point:
-        traffic: ingress # Allowed values are `ingress` and `egress`.
+      control_point: ingress
       label_matcher:
         match_labels:
           user_tier: gold
@@ -885,18 +899,19 @@ definitions:
       ```
     type: object
     title: |-
-      Describes which flows a [dataplane
+      Describes which flows a [flow control
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:
       control_point:
         description: |-
-          Describes
-          [control point](/concepts/flow-control/flow-control.md#control-point)
-          within the entity where the policy should apply to.
+          [Control Point](/concepts/flow-control/flow-control.md#control-point)
+          identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
+          block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
+          or filter chains.
+        type: string
         x-go-validate: required
         x-order: 0
-        $ref: '#/definitions/v1ControlPoint'
       label_matcher:
         description: |-
           :::info
@@ -921,6 +936,9 @@ definitions:
         $ref: '#/definitions/v1LabelMatcher'
   v1FluxMeter:
     description: |-
+      Flux Meter gathers metrics for the traffic that matches its selector.
+      The histogram created by Flux Meter measures the workload latency by default.
+
       :::info
       See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
       :::
@@ -932,11 +950,9 @@ definitions:
         service_selector:
           service: myservice.mynamespace.svc.cluster.local
         flow_selector:
-          control_point:
-            traffic: ingress
+          control_point: ingress
       ```
     type: object
-    title: Flux Meter gathers metrics for the traffic that matches its selector
     properties:
       attribute_key:
         description: |-
@@ -959,15 +975,7 @@ definitions:
         x-order: 3
         $ref: '#/definitions/FluxMeterLinearBuckets'
       selector:
-        description: |-
-          What latency should we measure in the histogram created by this Flux Meter.
-
-          * For traffic control points, fluxmeter will measure the duration of the
-            whole http transaction (including sending request and receiving
-            response).
-          * For feature control points, fluxmeter will measure execution of the span
-            associated with particular feature. What contributes to the span's
-            duration is entirely up to the user code that uses Aperture SDK.
+        description: The selection criteria for the traffic that will be measured.
         x-order: 4
         $ref: '#/definitions/v1Selector'
       static_buckets:
@@ -1781,7 +1789,7 @@ definitions:
       :::
     type: object
     title: |-
-      Describes which flow in which service a [dataplane
+      Describes which flow in which service a [flow control
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:
@@ -1800,7 +1808,7 @@ definitions:
       :::
     type: object
     title: |-
-      Describes which service a [dataplane
+      Describes which service a [flow control
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:

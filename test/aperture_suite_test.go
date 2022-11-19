@@ -15,6 +15,7 @@ import (
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -145,7 +146,10 @@ var _ = BeforeSuite(func() {
 		service.Module(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			agent.AgentOTELComponents,
+			fx.Annotate(
+				agent.AgentOTELComponents,
+				fx.ParamTags(alerts.AlertsFxTag),
+			),
 			entitycache.NewEntityCache,
 			agentinfo.ProvideAgentInfo,
 			flowcontrol.NewEngine,

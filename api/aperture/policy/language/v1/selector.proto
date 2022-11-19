@@ -5,7 +5,7 @@ package aperture.policy.language.v1;
 import "aperture/policy/language/v1/label_matcher.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-// Describes which flow in which service a [dataplane
+// Describes which flow in which service a [flow control
 // component](/concepts/flow-control/flow-control.md#components) should apply
 // to
 //
@@ -27,7 +27,7 @@ message Selector {
   }]; // @gotags: validate:"required"
 }
 
-// Describes which service a [dataplane
+// Describes which service a [flow control
 // component](/concepts/flow-control/flow-control.md#components) should apply
 // to
 //
@@ -57,7 +57,7 @@ message ServiceSelector {
   string service = 2;
 }
 
-// Describes which flows a [dataplane
+// Describes which flows a [flow control
 // component](/concepts/flow-control/flow-control.md#components) should apply
 // to
 //
@@ -67,8 +67,7 @@ message ServiceSelector {
 //
 // Example:
 // ```yaml
-// control_point:
-//   traffic: ingress # Allowed values are `ingress` and `egress`.
+// control_point: ingress
 // label_matcher:
 //   match_labels:
 //     user_tier: gold
@@ -82,10 +81,11 @@ message ServiceSelector {
 //       regex: ^(?!.*Chrome).*Safari
 // ```
 message FlowSelector {
-  // Describes
-  // [control point](/concepts/flow-control/flow-control.md#control-point)
-  // within the entity where the policy should apply to.
-  ControlPoint control_point = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  // [Control Point](/concepts/flow-control/flow-control.md#control-point)
+  // identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
+  // block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
+  // or filter chains.
+  string control_point = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}
@@ -111,35 +111,4 @@ message FlowSelector {
   // control point.
   // :::
   LabelMatcher label_matcher = 2;
-}
-
-// Identifies control point within a service that the rule or policy should apply to.
-// Controlpoint is either a library feature name or one of ingress/egress traffic control point.
-message ControlPoint {
-  // @gotags: validate:"required"
-  oneof controlpoint {
-    // Name of Aperture SDK's feature.
-    // Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
-    //
-    // Note: Flowcontrol only.
-    string feature = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; //@gotags: validate:"required"
-
-    // Type of traffic service, either "ingress" or "egress".
-    // Apply the policy to the whole incoming/outgoing traffic of a service.
-    // Usually powered by integration with a proxy (like envoy) or a web framework.
-    //
-    // * Flowcontrol: Blockable atom here is a single HTTP-transaction.
-    // * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
-    string traffic = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required,oneof=ingress egress"}
-      }
-    }]; // @gotags: validate:"required,oneof=ingress egress"
-  }
 }

@@ -8,16 +8,16 @@ public interface CheckRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string feature = 1 [json_name = "feature"];</code>
-   * @return The feature.
+   * <code>string control_point = 1 [json_name = "controlPoint"];</code>
+   * @return The controlPoint.
    */
-  java.lang.String getFeature();
+  java.lang.String getControlPoint();
   /**
-   * <code>string feature = 1 [json_name = "feature"];</code>
-   * @return The bytes for feature.
+   * <code>string control_point = 1 [json_name = "controlPoint"];</code>
+   * @return The bytes for controlPoint.
    */
   com.google.protobuf.ByteString
-      getFeatureBytes();
+      getControlPointBytes();
 
   /**
    * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>

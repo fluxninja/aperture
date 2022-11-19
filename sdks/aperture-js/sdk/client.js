@@ -1,25 +1,28 @@
 import grpc from "@grpc/grpc-js";
 import * as otelApi from "@opentelemetry/api";
-import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
-import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
-import { Resource } from "@opentelemetry/resources";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
+import { Resource } from "@opentelemetry/resources";
+import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
+import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
+import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 
-import { fcs } from "./utils.js";
 import {
-  URL,
+  FLOW_START_TIMESTAMP_LABEL,
   LIBRARY_NAME,
   LIBRARY_VERSION,
-  FLOW_START_TIMESTAMP_LABEL,
   SOURCE_LABEL,
+  URL,
   WORKLOAD_START_TIMESTAMP_LABEL,
 } from "./consts.js";
 import { Flow } from "./flow.js";
+import { fcs } from "./utils.js";
 
 export class ApertureClient {
   constructor(timeout = 200) {
-    this.fcsClient = new fcs.FlowControlService(URL, grpc.credentials.createInsecure());
+    this.fcsClient = new fcs.FlowControlService(
+      URL,
+      grpc.credentials.createInsecure(),
+    );
 
     this.exporter = new OTLPTraceExporter({
       url: URL,
@@ -35,11 +38,11 @@ export class ApertureClient {
     this.timeout = timeout;
   }
 
-  // StartFlow takes a feature name and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
+  // StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
   // Return value is a Flow.
   // The call returns immediately in case connection with Aperture Agent is not established.
   // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.Accepted() on returned Flow returns as true.
-  async StartFlow(featureArg, labelsArg) {
+  async StartFlow(controlPointArg, labelsArg) {
     return new Promise((resolve, reject) => {
       let labelsMap = new Map();
       let baggage = otelApi.propagation.getBaggage(otelApi.context.active());
@@ -49,7 +52,7 @@ export class ApertureClient {
         }
       }
 
-      let mergedLabels = new Map([...labelsMap, ...labelsArg])
+      let mergedLabels = new Map([...labelsMap, ...labelsArg]);
       let span = this.tracer.startSpan("Aperture Check");
       span.setAttribute(FLOW_START_TIMESTAMP_LABEL, Date.now());
       span.setAttribute(SOURCE_LABEL, "sdk");
@@ -57,7 +60,7 @@ export class ApertureClient {
 
       this.fcsClient.Check(
         {
-          feature: featureArg,
+          control_point: controlPointArg,
           labels: mergedLabels,
         },
         { deadline: Date.now() + this.timeout },
@@ -74,7 +77,8 @@ export class ApertureClient {
 
           flow.checkResponse = response;
           resolve(flow);
-        });
+        },
+      );
     });
   }
 

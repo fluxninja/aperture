@@ -19,7 +19,16 @@ main(){
   locate
   dependencies
   package
-  upload
+
+  retry_counter=10
+  while true;do
+    (( retry_counter-- )) || break
+    if upload; then
+      echo "git push passed"
+      break
+    fi
+    sleep 1
+  done
 }
 
 install_helm(){
@@ -74,6 +83,7 @@ package() {
 upload(){
   tmpDir=$(mktemp -d)
   pushd "$tmpDir" >& /dev/null
+  trap 'popd &>/dev/null && rm -rf "$tmpDir"' RETURN
 
   git clone "${REPO_URL}"
   cd aperture
@@ -88,11 +98,11 @@ upload(){
   if [[ -f "${INDEX_DIR}/index.yaml" ]]; then
     echo "Found index, merging changes"
     helm repo index "${CHARTS_TMP_DIR}" --url ${CHARTS_URL} --merge "${INDEX_DIR}/index.yaml"
-    mv -f "${CHARTS_TMP_DIR}"/*.tgz ${TARGET_DIR}
-    mv -f "${CHARTS_TMP_DIR}"/index.yaml ${INDEX_DIR}/index.yaml
+    cp -f "${CHARTS_TMP_DIR}"/*.tgz ${TARGET_DIR}
+    cp -f "${CHARTS_TMP_DIR}"/index.yaml ${INDEX_DIR}/index.yaml
   else
     echo "No index found, generating a new one"
-    mv -f "${CHARTS_TMP_DIR}"/*.tgz ${TARGET_DIR}
+    cp -f "${CHARTS_TMP_DIR}"/*.tgz ${TARGET_DIR}
     helm repo index ${INDEX_DIR} --url ${CHARTS_URL}
   fi
 
@@ -100,10 +110,11 @@ upload(){
   git add ${INDEX_DIR}/index.yaml
 
   git commit -m "Publish $charts"
-  git push origin ${BRANCH}
-
-  popd >& /dev/null
-  rm -rf "$tmpDir"
+  if git push origin ${BRANCH}; then
+    echo "git push passed"
+  else
+    return 1
+  fi
 }
 
 main
