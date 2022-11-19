@@ -21,7 +21,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Flux Meter gathers metrics for the traffic that matches its selector
+// Flux Meter gathers metrics for the traffic that matches its selector.
+// The histogram created by Flux Meter measures the workload latency by default.
 //
 // :::info
 // See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
@@ -34,22 +35,14 @@ const (
 //   service_selector:
 //     service: myservice.mynamespace.svc.cluster.local
 //   flow_selector:
-//     control_point:
-//       traffic: ingress
+//     control_point: ingress
 // ```
 type FluxMeter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// What latency should we measure in the histogram created by this Flux Meter.
-	//
-	// * For traffic control points, fluxmeter will measure the duration of the
-	//   whole http transaction (including sending request and receiving
-	//   response).
-	// * For feature control points, fluxmeter will measure execution of the span
-	//   associated with particular feature. What contributes to the span's
-	//   duration is entirely up to the user code that uses Aperture SDK.
+	// The selection criteria for the traffic that will be measured.
 	Selector *Selector `protobuf:"bytes,1,opt,name=selector,proto3" json:"selector,omitempty"`
 	// Latency histogram buckets (in ms) for this Flux Meter.
 	//

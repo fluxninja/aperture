@@ -90,14 +90,13 @@ spec:
           service_selector:
             service: "service1-demo-app.demoapp.svc.cluster.local"
           flow_selector:
-            control_point:
-              traffic: "ingress"
+            control_point: "ingress"
     classifiers:
       - selector:
           service_selector:
             service: service1-demo-app.demoapp.svc.cluster.local
           flow_selector:
-            control_point: { traffic: ingress }
+            control_point: ingress
         rules:
           # An example rule using extractor.
           # See following RFC for list of available extractors and their syntax.
@@ -199,8 +198,7 @@ spec:
             service_selector:
               service: "service1-demo-app.demoapp.svc.cluster.local"
             flow_selector:
-              control_point:
-                traffic: "ingress"
+              control_point: "ingress"
           scheduler:
             auto_tokens: true
             default_workload_parameters:
@@ -334,7 +332,7 @@ spec:
           service_selector:
             service: productpage.bookinfo.svc.cluster.local
           flow_selector:
-            control_point: { traffic: ingress }
+            control_point: ingress
         rules:
           ua:
             extractor:
@@ -378,8 +376,7 @@ spec:
             service_selector:
               service: "service1-demo-app.demoapp.svc.cluster.local"
             flow_selector:
-              control_point:
-                traffic: "ingress"
+              control_point: "ingress"
           label_key: "http.request.header.user_type"
           limit_reset_interval: "1s"
 `

@@ -735,36 +735,6 @@ Outputs for the Constant component.
 </dd>
 </dl>
 
-### v1ControlPoint {#v1-control-point}
-
-Identifies control point within a service that the rule or policy should apply to.
-Controlpoint is either a library feature name or one of ingress/egress traffic control point.
-
-#### Properties
-
-<dl>
-<dt>feature</dt>
-<dd>
-
-(string, `required`) Name of Aperture SDK's feature.
-Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
-
-Note: Flowcontrol only.
-
-</dd>
-<dt>traffic</dt>
-<dd>
-
-(string, `required,oneof=ingress egress`) Type of traffic service, either "ingress" or "egress".
-Apply the policy to the whole incoming/outgoing traffic of a service.
-Usually powered by integration with a proxy (like envoy) or a web framework.
-
-- Flowcontrol: Blockable atom here is a single HTTP-transaction.
-- Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
-
-</dd>
-</dl>
-
 ### v1ControllerDynamicConfig {#v1-controller-dynamic-config}
 
 Dynamic Configuration for a Controller
@@ -1194,7 +1164,7 @@ Outputs for the FirstValid component.
 
 ### v1FlowSelector {#v1-flow-selector}
 
-Describes which flows a [dataplane
+Describes which flows a [flow control
 component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
@@ -1205,8 +1175,7 @@ See also [Selector overview](/concepts/flow-control/selector.md).
 Example:
 
 ```yaml
-control_point:
-  traffic: ingress # Allowed values are `ingress` and `egress`.
+control_point: ingress
 label_matcher:
   match_labels:
     user_tier: gold
@@ -1226,9 +1195,10 @@ label_matcher:
 <dt>control_point</dt>
 <dd>
 
-([V1ControlPoint](#v1-control-point), `required`) Describes
-[control point](/concepts/flow-control/flow-control.md#control-point)
-within the entity where the policy should apply to.
+(string, `required`) [Control Point](/concepts/flow-control/flow-control.md#control-point)
+identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
+block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
+or filter chains.
 
 </dd>
 <dt>label_matcher</dt>
@@ -1258,7 +1228,8 @@ control point.
 
 ### v1FluxMeter {#v1-flux-meter}
 
-Flux Meter gathers metrics for the traffic that matches its selector
+Flux Meter gathers metrics for the traffic that matches its selector.
+The histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
@@ -1272,8 +1243,7 @@ selector:
   service_selector:
     service: myservice.mynamespace.svc.cluster.local
   flow_selector:
-    control_point:
-      traffic: ingress
+    control_point: ingress
 ```
 
 #### Properties
@@ -1311,14 +1281,7 @@ For list of available attributes in Envoy access logs, refer
 <dt>selector</dt>
 <dd>
 
-([V1Selector](#v1-selector)) What latency should we measure in the histogram created by this Flux Meter.
-
-- For traffic control points, fluxmeter will measure the duration of the
-  whole http transaction (including sending request and receiving
-  response).
-- For feature control points, fluxmeter will measure execution of the span
-  associated with particular feature. What contributes to the span's
-  duration is entirely up to the user code that uses Aperture SDK.
+([V1Selector](#v1-selector)) The selection criteria for the traffic that will be measured.
 
 </dd>
 <dt>static_buckets</dt>
@@ -2373,7 +2336,7 @@ entering scheduler, including rejected ones.
 
 ### v1Selector {#v1-selector}
 
-Describes which flow in which service a [dataplane
+Describes which flow in which service a [flow control
 component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
@@ -2400,7 +2363,7 @@ See also [Selector overview](/concepts/flow-control/selector.md).
 
 ### v1ServiceSelector {#v1-service-selector}
 
-Describes which service a [dataplane
+Describes which service a [flow control
 component](/concepts/flow-control/flow-control.md#components) should apply
 to
 

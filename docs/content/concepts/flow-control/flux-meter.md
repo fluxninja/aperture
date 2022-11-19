@@ -65,8 +65,7 @@ following labels:
 <!-- TODO tgill: update once we start following OTEL semantic convention on metric labels -->
 3. `status_code`: HTTP status code of the Flow. Relevant only for Traffic based
    Control Points.
-4. `feature_status`: Status from SDK. Relevant only for Feature based Control
-   Points.
+4. `flow_status`: Protocol independent status for the Flow.
 5. Other common labels available at all Agent such as `instance`.
 
 Query to get average duration (assuming default Flux Meter metric):

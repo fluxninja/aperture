@@ -31,8 +31,7 @@ local fluxMeterSelector = selector.new()
                           )
                           + selector.withFlowSelector(
                             flowSelector.new()
-                            + flowSelector.withControlPoint(controlPoint.new()
-                                                            + controlPoint.withTraffic('ingress'))
+                            + flowSelector.withControlPoint('ingress')
                           );
 
 local concurrencyLimiterSelector = selector.new()
@@ -43,8 +42,7 @@ local concurrencyLimiterSelector = selector.new()
                                    )
                                    + selector.withFlowSelector(
                                      flowSelector.new()
-                                     + flowSelector.withControlPoint(controlPoint.new()
-                                                                     + controlPoint.withTraffic('ingress'))
+                                     + flowSelector.withControlPoint('ingress')
                                    );
 
 // Restrict this selector to only bot traffic
@@ -56,8 +54,7 @@ local rateLimiterSelector = selector.new()
                             )
                             + selector.withFlowSelector(
                               flowSelector.new()
-                              + flowSelector.withControlPoint(controlPoint.new()
-                                                              + controlPoint.withTraffic('ingress'))
+                              + flowSelector.withControlPoint('ingress')
                               + flowSelector.withLabelMatcher(
                                 labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
                               )

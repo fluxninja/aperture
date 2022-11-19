@@ -28,7 +28,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 	authz_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy/baggage"
 )
@@ -61,11 +60,9 @@ type Handler struct {
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)
 
 var (
-	missingTrafficDirectionSampler = log.NewRatelimitingSampler()
-	invalidTrafficDirectionSampler = log.NewRatelimitingSampler()
-	unknownEntitySampler           = log.NewRatelimitingSampler()
-	failedReqToInputSampler        = log.NewRatelimitingSampler()
-	failedBaggageInjectionSampler  = log.NewRatelimitingSampler()
+	missingControlPointSampler    = log.NewRatelimitingSampler()
+	failedReqToInputSampler       = log.NewRatelimitingSampler()
+	failedBaggageInjectionSampler = log.NewRatelimitingSampler()
 )
 
 // sanitizeBaggageHeaderValue excludes characters that should be url escaped
@@ -116,44 +113,29 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		}
 	}
 
-	var ctrlPt selectors.ControlPoint
-	trafficDirectionHeader := ""
+	ctrlPt := ""
 	headers, _ := metadata.FromIncomingContext(ctx)
-	if dirHeader, exists := headers["traffic-direction"]; exists && len(dirHeader) > 0 {
-		trafficDirectionHeader = dirHeader[0]
-	} else if dirHeader, exists := req.GetAttributes().GetContextExtensions()["traffic-direction"]; exists && len(dirHeader) > 0 {
-		trafficDirectionHeader = dirHeader
+	if ctrlPtHeader, exists := headers["control-point"]; exists && len(ctrlPtHeader) > 0 {
+		ctrlPt = ctrlPtHeader[0]
+	} else if ctrlPtHeader, exists := req.GetAttributes().GetContextExtensions()["control-point"]; exists && len(ctrlPtHeader) > 0 {
+		ctrlPt = ctrlPtHeader
 	}
 
-	if trafficDirectionHeader != "" {
-		switch trafficDirectionHeader {
-		case "INBOUND":
-			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, "")
-		case "OUTBOUND":
-			ctrlPt = selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, "")
-		default:
-			// TODO(krdln) metrics
-			return nil, grpc.LoggedError(log.Sample(invalidTrafficDirectionSampler).Warn()).
-				Code(codes.InvalidArgument).Msg("invalid traffic-direction")
-		}
-	} else {
+	if ctrlPt == "" {
 		// TODO(krdln) metrics
-		return nil, grpc.LoggedError(log.Sample(missingTrafficDirectionSampler).Warn()).
-			Code(codes.InvalidArgument).Msg("missing traffic-direction")
+		return nil, grpc.LoggedError(log.Sample(missingControlPointSampler).Warn()).
+			Code(codes.InvalidArgument).Msg("missing control-point")
 	}
 
+	var svcs []string
 	rpcPeer, peerExists := peer.FromContext(ctx)
-	if !peerExists {
-		return nil, grpc.Bug().Msg("cannot get peer info")
+	if peerExists {
+		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
+		entity, err := h.entityCache.GetByIP(clientIP)
+		if err == nil {
+			svcs = entity.Services
+		}
 	}
-
-	clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
-	entity, err := h.entityCache.GetByIP(clientIP)
-	if err != nil {
-		return nil, grpc.LoggedError(log.Sample(unknownEntitySampler).Warn()).
-			Str("IP", clientIP).Code(codes.NotFound).Msg("unknown entity")
-	}
-	svcs := entity.Services
 
 	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
 

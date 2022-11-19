@@ -568,32 +568,6 @@ definitions:
         description: The constant value is emitted to the output port.
         x-order: 0
         $ref: '#/definitions/v1OutPort'
-  v1ControlPoint:
-    description: |-
-      Identifies control point within a service that the rule or policy should apply to.
-      Controlpoint is either a library feature name or one of ingress/egress traffic control point.
-    type: object
-    properties:
-      feature:
-        description: |-
-          Name of Aperture SDK's feature.
-          Feature corresponds to a block of code that can be "switched off" which usually is a "named opentelemetry's Span".
-
-          Note: Flowcontrol only.
-        type: string
-        x-go-validate: required
-        x-order: 0
-      traffic:
-        description: |-
-          Type of traffic service, either "ingress" or "egress".
-          Apply the policy to the whole incoming/outgoing traffic of a service.
-          Usually powered by integration with a proxy (like envoy) or a web framework.
-
-          * Flowcontrol: Blockable atom here is a single HTTP-transaction.
-          * Classification: Apply the classification rules to every incoming/outgoing request and attach the resulting flow labels to baggage and telemetry.
-        type: string
-        x-go-validate: required,oneof=ingress egress
-        x-order: 1
   v1ControllerDynamicConfig:
     type: object
     title: Dynamic Configuration for a Controller
@@ -910,8 +884,7 @@ definitions:
 
       Example:
       ```yaml
-      control_point:
-        traffic: ingress # Allowed values are `ingress` and `egress`.
+      control_point: ingress
       label_matcher:
         match_labels:
           user_tier: gold
@@ -926,18 +899,19 @@ definitions:
       ```
     type: object
     title: |-
-      Describes which flows a [dataplane
+      Describes which flows a [flow control
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:
       control_point:
         description: |-
-          Describes
-          [control point](/concepts/flow-control/flow-control.md#control-point)
-          within the entity where the policy should apply to.
+          [Control Point](/concepts/flow-control/flow-control.md#control-point)
+          identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
+          block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
+          or filter chains.
+        type: string
         x-go-validate: required
         x-order: 0
-        $ref: '#/definitions/v1ControlPoint'
       label_matcher:
         description: |-
           :::info
@@ -962,6 +936,9 @@ definitions:
         $ref: '#/definitions/v1LabelMatcher'
   v1FluxMeter:
     description: |-
+      Flux Meter gathers metrics for the traffic that matches its selector.
+      The histogram created by Flux Meter measures the workload latency by default.
+
       :::info
       See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
       :::
@@ -973,11 +950,9 @@ definitions:
         service_selector:
           service: myservice.mynamespace.svc.cluster.local
         flow_selector:
-          control_point:
-            traffic: ingress
+          control_point: ingress
       ```
     type: object
-    title: Flux Meter gathers metrics for the traffic that matches its selector
     properties:
       attribute_key:
         description: |-
@@ -1000,15 +975,7 @@ definitions:
         x-order: 3
         $ref: '#/definitions/FluxMeterLinearBuckets'
       selector:
-        description: |-
-          What latency should we measure in the histogram created by this Flux Meter.
-
-          * For traffic control points, fluxmeter will measure the duration of the
-            whole http transaction (including sending request and receiving
-            response).
-          * For feature control points, fluxmeter will measure execution of the span
-            associated with particular feature. What contributes to the span's
-            duration is entirely up to the user code that uses Aperture SDK.
+        description: The selection criteria for the traffic that will be measured.
         x-order: 4
         $ref: '#/definitions/v1Selector'
       static_buckets:
@@ -1822,7 +1789,7 @@ definitions:
       :::
     type: object
     title: |-
-      Describes which flow in which service a [dataplane
+      Describes which flow in which service a [flow control
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:
@@ -1841,7 +1808,7 @@ definitions:
       :::
     type: object
     title: |-
-      Describes which service a [dataplane
+      Describes which service a [flow control
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:

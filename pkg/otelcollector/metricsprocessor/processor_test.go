@@ -99,11 +99,9 @@ var _ = Describe("Metrics Processor", func() {
 		start := time.Date(1969, time.Month(7), 20, 17, 0, 0, 0, time.UTC)
 		end := time.Date(1969, time.Month(7), 20, 17, 0, 1, 0, time.UTC)
 		baseCheckResp = &flowcontrolv1.CheckResponse{
-			Start: timestamppb.New(start),
-			End:   timestamppb.New(end),
-			ControlPointInfo: &flowcontrolv1.ControlPointInfo{
-				Type: flowcontrolv1.ControlPointInfo_TYPE_INGRESS,
-			},
+			Start:        timestamppb.New(start),
+			End:          timestamppb.New(end),
+			ControlPoint: "ingress",
 			DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
 			LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 				{
@@ -213,10 +211,10 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 `
 
 		expectedLabels = map[string]interface{}{
-			oc.ApertureDecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
-			oc.ApertureRejectReasonLabel:   flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
-			oc.ApertureResponseStatusLabel: oc.ApertureResponseStatusOK,
-			oc.ApertureClassifiersLabel:    []interface{}{"policy_name:foo,classifier_index:1"},
+			oc.ApertureDecisionTypeLabel: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+			oc.ApertureRejectReasonLabel: flowcontrolv1.CheckResponse_REJECT_REASON_NONE.String(),
+			oc.ApertureFlowStatusLabel:   oc.ApertureFlowStatusOK,
+			oc.ApertureClassifiersLabel:  []interface{}{"policy_name:foo,classifier_index:1"},
 
 			oc.ApertureClassifierErrorsLabel: []interface{}{fmt.Sprintf("%s,policy_name:foo,classifier_index:1,policy_hash:foo-hash",
 				flowcontrolv1.ClassifierInfo_ERROR_EMPTY_RESULTSET.String())},
@@ -232,7 +230,7 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 
 			oc.ApertureProcessingDurationLabel: float64(1000),
 			oc.ApertureServicesLabel:           []interface{}{"svc1", "svc2"},
-			oc.ApertureControlPointLabel:       "type:TYPE_INGRESS",
+			oc.ApertureControlPointLabel:       "ingress",
 			"flowLabelKey":                     "flowLabelValue",
 		}
 		source = oc.ApertureSourceEnvoy
@@ -249,10 +247,7 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 	})
 
 	It("Processes logs for single policy - feature", func() {
-		baseCheckResp.ControlPointInfo = &flowcontrolv1.ControlPointInfo{
-			Type:    flowcontrolv1.ControlPointInfo_TYPE_FEATURE,
-			Feature: "featureX",
-		}
+		baseCheckResp.ControlPoint = "featureX"
 		baseCheckResp.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
 
 		expectedMetrics = `# HELP workload_latency_ms dummy

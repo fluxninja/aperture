@@ -37,11 +37,9 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 
 	Entry("Sets control point",
 		&flowcontrolv1.CheckResponse{
-			ControlPointInfo: &flowcontrolv1.ControlPointInfo{
-				Type: flowcontrolv1.ControlPointInfo_TYPE_INGRESS,
-			},
+			ControlPoint: "ingress",
 		},
-		map[string]interface{}{otelcollector.ApertureControlPointLabel: "type:TYPE_INGRESS"},
+		map[string]interface{}{otelcollector.ApertureControlPointLabel: "ingress"},
 	),
 
 	Entry("Sets rate limiters",
