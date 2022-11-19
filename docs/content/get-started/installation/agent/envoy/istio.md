@@ -191,8 +191,8 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
    application.
 
    The External Authorization filter forwards the request to the Aperture Agent
-   instance using gRPC with a timeout of `0.5s`, having `INBOUND` value for key
-   `traffic-direction` metadata included in the streams initiated to the gRPC
+   instance using gRPC with a timeout of `0.5s`, having `ingress` value for key
+   `control-point` metadata included in the streams initiated to the gRPC
    service. The filter will accept the client request even if the communication
    with the authorization service has failed, or if the authorization service
    has returned a HTTP 5xx error.
@@ -222,8 +222,8 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
              stat_prefix: ext_authz
            timeout: 0.5s
            initial_metadata:
-             - key: traffic-direction
-               value: INBOUND
+             - key: control-point
+               value: ingress
    ```
 
 4. The below patch also inserts the
@@ -234,8 +234,8 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
    application.
 
    The External Authorization filter forwards the request to the Aperture Agent
-   instance using gRPC with a timeout of `0.5s`, having `OUTBOUND` value for key
-   `traffic-direction` metadata included in the streams initiated to the gRPC
+   instance using gRPC with a timeout of `0.5s`, having `egress` value for key
+   `control-point` metadata included in the streams initiated to the gRPC
    service. The filter will accept the client request even if the communication
    with the authorization service has failed, or if the authorization service
    has returned a HTTP 5xx error.
@@ -265,8 +265,8 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
              stat_prefix: ext_authz
            timeout: 0.5s
            initial_metadata:
-             - key: traffic-direction
-               value: OUTBOUND
+             - key: control-point
+               value: egress
    ```
 
 More information about the extracted values can be found on

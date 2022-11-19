@@ -100,9 +100,9 @@ spec:
             output:
               signal_name: LATENCY
           query_string:
-            sum(increase(flux_meter_sum{valid="true", response_status="OK",
+            sum(increase(flux_meter_sum{valid="true", flow_status="OK",
             flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{valid="true",
-            response_status="OK", flux_meter_name="service1-demo-app"}[5s]))
+            flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))
       - ema:
           correction_factor_on_max_envelope_violation: "0.95"
           ema_window: 1500s
@@ -160,8 +160,7 @@ spec:
             workloads: []
           selector:
             flow_selector:
-              control_point:
-                traffic: ingress
+              control_point: ingress
             service_selector:
               agent_group: default
               service: service1-demo-app.demoapp.svc.cluster.local
@@ -193,8 +192,7 @@ spec:
       service1-demo-app:
         selector:
           flow_selector:
-            control_point:
-              traffic: ingress
+            control_point: ingress
           service_selector:
             agent_group: default
             service: service1-demo-app.demoapp.svc.cluster.local

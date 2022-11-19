@@ -5,16 +5,13 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
 // Handler implements the flowcontrol.v1 Service
@@ -43,7 +40,7 @@ type HandlerWithValues interface {
 	CheckWithValues(
 		context.Context,
 		[]string,
-		selectors.ControlPoint,
+		string,
 		map[string]string,
 	) *flowcontrolv1.CheckResponse
 }
@@ -52,7 +49,7 @@ type HandlerWithValues interface {
 func (h *Handler) CheckWithValues(
 	ctx context.Context,
 	serviceIDs []string,
-	controlPoint selectors.ControlPoint,
+	controlPoint string,
 	labels map[string]string,
 ) *flowcontrolv1.CheckResponse {
 	checkResponse := h.engine.ProcessRequest(ctx, controlPoint, serviceIDs, labels)
@@ -67,24 +64,23 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	// record the start time of the request
 	start := time.Now()
 
-	rpcPeer, peerExists := peer.FromContext(ctx)
-	if !peerExists {
-		return nil, grpc.Bug().Msg("cannot get peer info")
-	}
+	var serviceIDs []string
 
-	clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
-	entity, err := h.entityCache.GetByIP(clientIP)
-	if err != nil {
-		return nil, grpc.LoggedError(log.Sample(unknownEntitySampler).Warn()).
-			Str("IP", clientIP).Code(codes.NotFound).Msg("unknown entity")
+	rpcPeer, peerExists := peer.FromContext(ctx)
+	if peerExists {
+
+		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
+		entity, err := h.entityCache.GetByIP(clientIP)
+		if err == nil {
+			serviceIDs = entity.Services
+		}
 	}
-	serviceIDs := entity.Services
 
 	// CheckWithValues already pushes result to metrics
 	resp := h.CheckWithValues(
 		ctx,
 		serviceIDs,
-		selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_FEATURE, req.Feature),
+		req.ControlPoint,
 		req.Labels,
 	)
 	end := time.Now()
@@ -92,5 +88,3 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	resp.End = timestamppb.New(end)
 	return resp, nil
 }
-
-var unknownEntitySampler = log.NewRatelimitingSampler()

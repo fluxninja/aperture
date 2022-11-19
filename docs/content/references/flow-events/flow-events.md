@@ -15,7 +15,6 @@ database like Druid. This data can be visualized in FluxNinja Cloud.
 | -------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------- |
 | aperture.source                        | single      | sdk, envoy                                                                                                                                                                | Aperture Flow source                               | SDKs, Envoy               |
 | aperture.decision_type                 | single      | DECISION_TYPE_ACCEPTED, DECISION_TYPE_REJECTED                                                                                                                            | Decision type taken by policy                      | SDKs, Envoy               |
-| aperture.error                         | single      | ERROR_NONE, ERROR_MISSING_TRAFFIC_DIRECTION, ERROR_INVALID_TRAFFIC_DIRECTION, ERROR_CONVERT_TO_MAP_STRUCT, ERROR_CONVERT_TO_REGO_AST, ERROR_CLASSIFY                      | Error reason of the decision taken by policy       | SDKs, Envoy               |
 | aperture.reject_reason                 | single      | REJECT_REASON_NONE, REJECT_REASON_RATE_LIMITED, REJECT_REASON_CONCURRENCY_LIMITED                                                                                         | Reject reason of the decision taken by policy      | SDKs, Envoy               |
 | aperture.rate_limiters                 | multi-value | "policy_name:s1, component_index:18, policy_hash:5kZjj"                                                                                                                   | Rate limiters matched to the traffic               | SDKs, Envoy               |
 | aperture.dropping_rate_limiters        | multi-value | "policy_name:s1, component_index:18, policy_hash:5kZjj"                                                                                                                   | Rate limiters dropping the traffic                 | SDKs, Envoy               |
@@ -29,7 +28,7 @@ database like Druid. This data can be visualized in FluxNinja Cloud.
 | aperture.classifier_errors             | multi-value | "[ERROR_NONE, ERROR_EVAL_FAILED, ERROR_EMPTY_RESULTSET, ERROR_AMBIGUOUS_RESULTSET, ERROR_MULTI_EXPRESSION, ERROR_EXPRESSION_NOT_MAP], policy_name:s1, classifier_index:0" | Encountered classifier errors for specified policy | SDKs, Envoy               |
 | aperture.services                      | multi-value | s1.demoapp.svc.cluster.local, s2.demoapp.svc.cluster.local                                                                                                                | Services to which metrics refer                    | SDKs, Envoy               |
 | aperture.control_point                 | single      | type:TYPE_INGRESS, type:TYPE_EGRESS                                                                                                                                       | Control point to which metrics refer               | SDKs, Envoy               |
-| aperture.response_status               | single      | OK, Error                                                                                                                                                                 | Denotes OK or Error across all protocols           | SDKs, Envoy               |
+| aperture.flow.status                   | single      | OK, Error                                                                                                                                                                 | Denotes OK or Error across all protocols           | SDKs, Envoy               |
 | response_received                      | single      | true, false                                                                                                                                                               | Designates whether a response was received         | SDKs, envoy               |
 
 ### HTTP
@@ -48,10 +47,9 @@ database like Druid. This data can be visualized in FluxNinja Cloud.
 
 ### SDK
 
-| Name                    | Type   | Example Values | Description                                      | Flow Control Integrations |
-| ----------------------- | ------ | -------------- | ------------------------------------------------ | ------------------------- |
-| aperture.feature.status | single | OK, Error      | Status of the feature                            | SDKs                      |
-| {user-defined-labels}   |        |                | Explicitly passed through FlowStart call in SDKs | SDKs                      |
+| Name                  | Type | Example Values | Description                                      | Flow Control Integrations |
+| --------------------- | ---- | -------------- | ------------------------------------------------ | ------------------------- |
+| {user-defined-labels} |      |                | Explicitly passed through FlowStart call in SDKs | SDKs                      |
 
 ## Metric Columns
 

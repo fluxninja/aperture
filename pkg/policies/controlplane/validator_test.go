@@ -192,14 +192,13 @@ spec:
           service_selector:
             service: "service1-demo-app.demoapp.svc.cluster.local"
           flow_selector:
-            control_point:
-              traffic: "ingress"
+            control_point: "ingress"
     classifiers:
       - selector:
           service_selector:
             service: service1-demo-app.demoapp.svc.cluster.local
           flow_selector:
-            control_point: { traffic: ingress }
+            control_point: ingress
         rules:
           # An example rule using extractor.
           # See following RFC for list of available extractors and their syntax.
@@ -301,8 +300,7 @@ spec:
             service_selector:
               service: "service1-demo-app.demoapp.svc.cluster.local"
             flow_selector:
-              control_point:
-                traffic: "ingress"
+              control_point: "ingress"
           scheduler:
             auto_tokens: true
             default_workload_parameters:
@@ -421,6 +419,40 @@ spec:
               signal_name: "CONCURRENCY_INCREMENT"
   `
 
+const classificationPolicy = `
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  name: policies
+  namespace: aperture-controller
+  labels:
+    fluxninja.com/validate: "true"
+spec:
+  resources:
+    classifiers:
+      - selector:
+          service_selector:
+            service: productpage.bookinfo.svc.cluster.local
+          flow_selector:
+            control_point: ingress
+        rules:
+          ua:
+            extractor:
+              from: request.http.headers.user-agent
+          user:
+            rego:
+              query: data.user_from_cookie.user
+              source: |
+                package user_from_cookie
+                cookies := split(input.attributes.request.http.headers.cookie, "; ")
+                cookie := cookies[_]
+                cookie.startswith("session=")
+                session := substring(cookie, count("session="), -1)
+                parts := split(session, ".")
+                object := json.unmarshal(base64url.decode(parts[0]))
+                user := object.user
+`
+
 const rateLimitPolicy = `
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
@@ -446,42 +478,7 @@ spec:
             service_selector:
               service: "service1-demo-app.demoapp.svc.cluster.local"
             flow_selector:
-              control_point:
-                traffic: "ingress"
+              control_point: "ingress"
           label_key: "http.request.header.user_type"
           limit_reset_interval: "1s"
-`
-
-const classificationPolicy = `
-apiVersion: fluxninja.com/v1alpha1
-kind: Policy
-metadata:
-  name: policies
-  namespace: aperture-controller
-  labels:
-    fluxninja.com/validate: "true"
-spec:
-  resources:
-    classifiers:
-      - selector:
-          service_selector:
-            service: productpage.bookinfo.svc.cluster.local
-          flow_selector:
-            control_point: { traffic: ingress }
-        rules:
-          ua:
-            extractor:
-              from: request.http.headers.user-agent
-          user:
-            rego:
-              query: data.user_from_cookie.user
-              source: |
-                package user_from_cookie
-                cookies := split(input.attributes.request.http.headers.cookie, "; ")
-                cookie := cookies[_]
-                cookie.startswith("session=")
-                session := substring(cookie, count("session="), -1)
-                parts := split(session, ".")
-                object := json.unmarshal(base64url.decode(parts[0]))
-                user := object.user
 `

@@ -21,7 +21,6 @@
   ConcurrencyLimiter: import 'concurrencylimiter.libsonnet',
   Constant: import 'constant.libsonnet',
   ConstantOuts: import 'constantouts.libsonnet',
-  ControlPoint: import 'controlpoint.libsonnet',
   ControllerDynamicConfig: import 'controllerdynamicconfig.libsonnet',
   Decider: import 'decider.libsonnet',
   DeciderIns: import 'deciderins.libsonnet',

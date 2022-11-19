@@ -148,8 +148,8 @@ spec:
             initial_metadata:
               # Note: If there's more than one header in this list, make sure
               # to update the OUTBOUND filter also.
-              - key: traffic-direction
-                value: INBOUND
+              - key: control-point
+                value: ingress
 
   - applyTo: HTTP_FILTER
     match:
@@ -163,7 +163,7 @@ spec:
     patch:
       operation: INSERT_BEFORE
       filterClass: AUTHZ
-      # Use the same configuration for egress, with different traffic-direction header.
+      # Use the same configuration for egress, with different control-point header.
       value:
         name: envoy.filters.http.ext_authz
         typed_config:
@@ -185,5 +185,5 @@ spec:
               stat_prefix: ext_authz
             timeout: {{ .Values.envoyFilter.authzGrpcTimeout }}
             initial_metadata:
-              - key: traffic-direction
-                value: OUTBOUND
+              - key: control-point
+                value: egress
