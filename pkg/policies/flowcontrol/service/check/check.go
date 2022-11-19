@@ -68,6 +68,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 
 	rpcPeer, peerExists := peer.FromContext(ctx)
 	if peerExists {
+
 		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
 		entity, err := h.entityCache.GetByIP(clientIP)
 		if err == nil {

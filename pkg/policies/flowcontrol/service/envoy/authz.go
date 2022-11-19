@@ -14,10 +14,9 @@ import (
 	"github.com/open-policy-agent/opa/logging"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
-	grpc_codes "google.golang.org/grpc/codes"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
-	grpc_status "google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -25,6 +24,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
@@ -35,19 +35,12 @@ import (
 // NewHandler creates new authorization handler for authz api
 //
 // Authz will use the given classifier to inject flow labels and return them as
-// metadata in the response to the Check calls
-//
-// entityCache can be nil. In this case services will be guessed based on Host
-// header.  No-entity-cache support is mostly so that authz can be experimented
-// with without the need for tagger to run.
+// metadata in the response to the Check calls.
 func NewHandler(
 	classifier *classification.ClassificationEngine,
 	entityCache *entitycache.EntityCache,
 	fcHandler check.HandlerWithValues,
 ) *Handler {
-	if entityCache == nil {
-		log.Warn().Msg("Authz: No entity cache, will guess services based on Host header")
-	}
 	return &Handler{
 		classifier:  classifier,
 		entityCache: entityCache,
@@ -130,20 +123,17 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 	if ctrlPt == "" {
 		// TODO(krdln) metrics
-		log.Sample(missingControlPointSampler).
-			Warn().Msg("missing control-point")
-		return nil, grpc_status.Error(grpc_codes.InvalidArgument, "missing control-point")
+		return nil, grpc.LoggedError(log.Sample(missingControlPointSampler).Warn()).
+			Code(codes.InvalidArgument).Msg("missing control-point")
 	}
 
 	var svcs []string
 	rpcPeer, peerExists := peer.FromContext(ctx)
 	if peerExists {
 		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
-		if h.entityCache != nil {
-			entity, err := h.entityCache.GetByIP(clientIP)
-			if err == nil {
-				svcs = entity.Services
-			}
+		entity, err := h.entityCache.GetByIP(clientIP)
+		if err == nil {
+			svcs = entity.Services
 		}
 	}
 
@@ -154,9 +144,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		// TODO(krdln) This conversion should be made infallible instead.
 		// https://github.com/fluxninja/aperture/issues/903
 		// TODO(krdln) metrics
-		log.Sample(failedReqToInputSampler).
-			Warn().Err(err).Msg("converting raw input into rego input failed")
-		return nil, grpc_status.Error(grpc_codes.InvalidArgument, "converting raw input into rego input failed")
+		return nil, grpc.LoggedError(log.Sample(failedReqToInputSampler).Warn()).
+			Err(err).Code(codes.InvalidArgument).Msg("converting raw input into rego input failed")
 	}
 
 	inputValue, err := ast.InterfaceToValue(input)
@@ -164,8 +153,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		// RequestToInput should never produce anything that's not convertible
 		// to ast.Value, so in theory it shouldn't happen.
 		// TODO(krdln) metrics
-		log.Bug().Err(err).Msg("bug: converting rego input to value failed")
-		return nil, grpc_status.Error(grpc_codes.Internal, "converting rego input to value failed")
+		return nil, grpc.Bug().Err(err).Msg("converting rego input to value failed")
 	}
 
 	// Default flow labels from Authz request
@@ -208,8 +196,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 	resp := createExtAuthzResponse(checkResponse)
 
-	// Check if fcResponse error is set
-	if checkResponse.DecisionType != flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+	switch checkResponse.DecisionType {
+	case flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED:
 		resp.Status = &status.Status{
 			Code: int32(code.Code_OK),
 		}
@@ -218,11 +206,12 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 				Headers: newHeaders,
 			},
 		}
-	} else {
+	case flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED:
 		resp.Status = &status.Status{
 			Code: int32(code.Code_UNAVAILABLE),
 		}
-		if checkResponse.RejectReason == flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED {
+		switch checkResponse.RejectReason {
+		case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
 			resp.HttpResponse = &ext_authz.CheckResponse_DeniedResponse{
 				DeniedResponse: &ext_authz.DeniedHttpResponse{
 					Status: &envoy_type.HttpStatus{
@@ -230,7 +219,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 					},
 				},
 			}
-		} else if checkResponse.RejectReason == flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED {
+		case flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED:
 			resp.HttpResponse = &ext_authz.CheckResponse_DeniedResponse{
 				DeniedResponse: &ext_authz.DeniedHttpResponse{
 					Status: &envoy_type.HttpStatus{
@@ -238,9 +227,12 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 					},
 				},
 			}
-		} else {
+		default:
 			log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
 		}
+	default:
+		return nil, grpc.Bug().Stringer("type", checkResponse.DecisionType).
+			Msg("unexpected decision type")
 	}
 
 	return resp, nil

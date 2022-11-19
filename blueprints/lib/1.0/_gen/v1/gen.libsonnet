@@ -10,6 +10,8 @@
   SchedulerWorkload: import 'schedulerworkload.libsonnet',
   SchedulerWorkloadParameters: import 'schedulerworkloadparameters.libsonnet',
   AddressExtractor: import 'addressextractor.libsonnet',
+  Alerter: import 'alerter.libsonnet',
+  AlerterIns: import 'alerterins.libsonnet',
   ArithmeticCombinator: import 'arithmeticcombinator.libsonnet',
   ArithmeticCombinatorIns: import 'arithmeticcombinatorins.libsonnet',
   ArithmeticCombinatorOuts: import 'arithmeticcombinatorouts.libsonnet',

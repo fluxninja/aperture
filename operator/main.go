@@ -23,6 +23,8 @@ import (
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
+	apimachineryversion "k8s.io/apimachinery/pkg/util/version"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
@@ -114,6 +116,24 @@ func main() {
 		setupLog.Error(err, "unable to create Dynamic Client")
 		os.Exit(1)
 	}
+
+	// Creating the discovery client
+	discoveryClient, err := discovery.NewDiscoveryClientForConfig(ctrl.GetConfigOrDie())
+	if err != nil {
+		setupLog.Error(err, "unable to create Discovery Client")
+		os.Exit(1)
+	}
+
+	// Querying the local kubernetes version
+	serverVersion, err := discoveryClient.ServerVersion()
+	if err != nil {
+		setupLog.Error(err, "unable to get the local kubernetes version")
+		os.Exit(1)
+	}
+	controllers.CurrentKubernetesVersion = apimachineryversion.MustParseSemantic(serverVersion.String())
+
+	// Checking if the minimum kubernetes version is satisfied
+	controllers.MinimumKubernetesVersionBool = controllers.CurrentKubernetesVersion.AtLeast(apimachineryversion.MustParseSemantic(controllers.MinimumKubernetesVersion))
 
 	var server *webhook.Server
 

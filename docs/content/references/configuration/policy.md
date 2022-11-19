@@ -304,6 +304,60 @@ from: "source.address # or destination.address"
 </dd>
 </dl>
 
+### v1Alerter {#v1-alerter}
+
+Alerter reacts to a signal and generates alert to send to alert manager.
+
+#### Properties
+
+<dl>
+<dt>alert_channels</dt>
+<dd>
+
+([]string) A list of alert channel strings.
+
+</dd>
+<dt>alert_name</dt>
+<dd>
+
+(string) Name of the alert.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+([V1AlerterIns](#v1-alerter-ins)) Input ports for the Alerter component.
+
+</dd>
+<dt>resolve_timeout</dt>
+<dd>
+
+(string, default: `5m`) Duration of alert resolver.
+
+</dd>
+<dt>severity</dt>
+<dd>
+
+(string, `oneof=info warn crit`) Severity of the alert, one of 'info', 'warn' or 'crit'.
+
+</dd>
+</dl>
+
+### v1AlerterIns {#v1-alerter-ins}
+
+Inputs for the Alerter component.
+
+#### Properties
+
+<dl>
+<dt>alert</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) Signal which Alerter is monitoring.
+
+</dd>
+</dl>
+
 ### v1ArithmeticCombinator {#v1-arithmetic-combinator}
 
 Type of combinator that computes the arithmetic operation on the operand signals
@@ -504,6 +558,12 @@ See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 #### Properties
 
 <dl>
+<dt>alerter</dt>
+<dd>
+
+([V1Alerter](#v1-alerter)) Alerter reacts to a signal and generates alert to send to alert manager.
+
+</dd>
 <dt>arithmetic_combinator</dt>
 <dd>
 

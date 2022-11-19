@@ -280,7 +280,7 @@ func Sample(sampler zerolog.Sampler) *Logger {
 // The "auto" part has a slight runtime cost though, so the full should be
 // preferred for cases where performance matters, like on datapath.
 func (lg *Logger) Autosample() *Logger {
-	return lg.Sample(getAutosampler())
+	return lg.Sample(GetAutosampler())
 }
 
 // Autosample returns the global logger with sampler based on caller location.
@@ -289,7 +289,7 @@ func (lg *Logger) Autosample() *Logger {
 func Autosample() *Logger {
 	// Note: not calling global.Autosample() as it might mess up with caller
 	// depth in getAutosampler().
-	return Sample(getAutosampler())
+	return Sample(GetAutosampler())
 }
 
 // Bug starts a new message with "bug" level
@@ -310,7 +310,7 @@ func Autosample() *Logger {
 //
 // You must call Msg on the returned event in order to send the event.
 func (lg *Logger) Bug() *zerolog.Event {
-	return bugWithSampler(lg, getAutosampler())
+	return BugWithSampler(lg, GetAutosampler())
 }
 
 // Bug starts a new message with "bug" level
@@ -321,7 +321,7 @@ func (lg *Logger) Bug() *zerolog.Event {
 func Bug() *zerolog.Event {
 	// Note: not calling global.Bug() as it might mess up with caller depth in
 	// getAutosampler().
-	return bugWithSampler(global, getAutosampler())
+	return BugWithSampler(global, GetAutosampler())
 }
 
 // Hook returns the current logger with the h hook.

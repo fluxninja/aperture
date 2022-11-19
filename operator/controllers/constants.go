@@ -22,6 +22,7 @@ import (
 
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	apimachineryversion "k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/client-go/dynamic"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -104,6 +105,8 @@ const (
 	OtelPprofPort = "otel-pprof"
 	// OtelZpagesPort string.
 	OtelZpagesPort = "otel-zpages"
+	// MinimumKubernetesVersion defines minimum kubernetes version required by Aperture.
+	MinimumKubernetesVersion = "v1.23.0"
 )
 
 var (
@@ -142,4 +145,8 @@ var (
 	CertDir = filepath.Join(".", "certs")
 	// PoliciesDir defines policies directory for tests.
 	PoliciesDir = filepath.Join(".", "policies")
+	// CurrentKubernetesVersion is pointer of type `apimachineryversion.Version`, which defines local kubernetes version.
+	CurrentKubernetesVersion *apimachineryversion.Version
+	// MinimumKubernetesVersionBool defines if minimum kubernetes version required by Aperture is met.
+	MinimumKubernetesVersionBool bool
 )

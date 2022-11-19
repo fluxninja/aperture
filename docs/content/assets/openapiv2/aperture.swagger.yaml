@@ -600,6 +600,36 @@ definitions:
       from: "source.address # or destination.address"
       ```
     title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
+  v1Alerter:
+    type: object
+    properties:
+      alert_channels:
+        type: array
+        items:
+          type: string
+        description: A list of alert channel strings.
+      alert_name:
+        type: string
+        description: Name of the alert.
+      in_ports:
+        $ref: '#/definitions/v1AlerterIns'
+        description: Input ports for the Alerter component.
+      resolve_timeout:
+        type: string
+        description: Duration of alert resolver.
+        x-go-default: 5m
+      severity:
+        type: string
+        description: Severity of the alert, one of 'info', 'warn' or 'crit'.
+        x-go-validate: oneof=info warn crit
+    description: Alerter reacts to a signal and generates alert to send to alert manager.
+  v1AlerterIns:
+    type: object
+    properties:
+      alert:
+        $ref: '#/definitions/v1InPort'
+        description: Signal which Alerter is monitoring.
+    description: Inputs for the Alerter component.
   v1ArithmeticCombinator:
     type: object
     properties:
@@ -791,6 +821,9 @@ definitions:
   v1Component:
     type: object
     properties:
+      alerter:
+        $ref: '#/definitions/v1Alerter'
+        description: Alerter reacts to a signal and generates alert to send to alert manager.
       arithmetic_combinator:
         $ref: '#/definitions/v1ArithmeticCombinator'
         description: Applies the given operator on input operands (signals) and emits the result.
