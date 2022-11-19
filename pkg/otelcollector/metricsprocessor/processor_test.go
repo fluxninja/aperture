@@ -230,7 +230,7 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 
 			oc.ApertureProcessingDurationLabel: float64(1000),
 			oc.ApertureServicesLabel:           []interface{}{"svc1", "svc2"},
-			oc.ApertureControlPointLabel:       "type:TYPE_INGRESS",
+			oc.ApertureControlPointLabel:       "ingress",
 			"flowLabelKey":                     "flowLabelValue",
 		}
 		source = oc.ApertureSourceEnvoy

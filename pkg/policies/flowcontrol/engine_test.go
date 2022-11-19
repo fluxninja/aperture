@@ -102,10 +102,9 @@ var _ = Describe("Dataplane Engine", func() {
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
 			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
 			labels = map[string]string{
-				metrics.ResponseStatusLabel: metrics.ResponseStatusOK,
-				metrics.FlowStatusLabel:     "",
-				metrics.StatusCodeLabel:     "200",
-				metrics.DecisionTypeLabel:   flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
+				metrics.FlowStatusLabel:   metrics.FlowStatusOK,
+				metrics.StatusCodeLabel:   "200",
+				metrics.DecisionTypeLabel: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
 			}
 			mockFluxmeter.EXPECT().GetHistogram(labels).Return(histogram).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()

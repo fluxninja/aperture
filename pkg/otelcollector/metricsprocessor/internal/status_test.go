@@ -37,11 +37,10 @@ var _ = Describe("Status", func() {
 		expectedResponseStatus string,
 	) {
 		result := internal.StatusLabelsForMetrics(decisionType, statusCode, flowStatus)
-		Expect(result).To(HaveLen(4))
+		Expect(result).To(HaveLen(3))
 		Expect(result).To(HaveKeyWithValue(metrics.FlowStatusLabel, expectedResponseStatus))
 		Expect(result).To(HaveKeyWithValue(metrics.DecisionTypeLabel, decisionType.String()))
 		Expect(result).To(HaveKeyWithValue(metrics.StatusCodeLabel, statusCode))
-		Expect(result).To(HaveKeyWithValue(metrics.FlowStatusLabel, flowStatus))
 	},
 		Entry("Works for HTTP status OK",
 			flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
