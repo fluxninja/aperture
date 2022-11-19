@@ -6,12 +6,12 @@ import io.opentelemetry.api.trace.Span;
 
 import static com.fluxninja.aperture.sdk.Constants.*;
 
-public final class FeatureFlow {
+public final class Flow {
   private final CheckResponse checkResponse;
   private final Span span;
   private boolean ended;
 
-  FeatureFlow(
+  Flow(
       CheckResponse checkResponse,
       Span span,
       boolean ended) {
@@ -44,7 +44,7 @@ public final class FeatureFlow {
       throw new ApertureSDKException(e);
     }
 
-    this.span.setAttribute(FEATURE_STATUS_LABEL, statusCode.name())
+    this.span.setAttribute(FLOW_STATUS_LABEL, statusCode.name())
         .setAttribute(CHECK_RESPONSE_LABEL, checkResponseJSONBytes)
         .setAttribute(FLOW_STOP_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 

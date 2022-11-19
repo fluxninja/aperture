@@ -14,6 +14,7 @@ keywords:
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
+import {apertureVersion} from '../../introduction.md';
 ```
 
 Reliable operations at web-scale are impossible without effective flow control.
@@ -74,15 +75,13 @@ graph LR
 
 </Zoom>
 
-There are two types of Control Points:
+In the above diagram, each service has **Traffic** Control Points. Every
+incoming API request to a service is a Flow at its **ingress** Control Point.
+Likewise every outgoing request from a service is a Flow at its **egress**
+Control Point.
 
-- **Traffic** Control Points. Every incoming API request to a service is a Flow
-  at its **ingress** Control Point. Likewise every outgoing request from a
-  service is a Flow at its **egress** Control Point.
-
-- **Feature** Control Points. Aperture SDK wraps any function call or code
-  snippet inside the Service code as a Feature Control Point. Every invocation
-  of the Feature is a Flow from the perspective of Aperture.
+In addition, "Frontend" service has **Feature** Control Points identifying
+_recommendations_ and _live-update_ features inside the Frontend service's code.
 
 :::note
 
@@ -97,16 +96,28 @@ belonging to the same service.
 For Aperture to be able to act at any of the Control Points, you need to install
 integrations that will communicate with the Aperture Agent.
 
-- _Traffic_ Control Points: We provide integration instructions for
-  [Istio/Envoy][istio].
+- _Traffic_ Control Points: Web framework and service-mesh based integrations
+  expose control points at in the traffic path of a service.
 
-  In principle, any web proxy or web framework could be integrated with Aperture
-  in this way. Envoy integration uses [Envoy's External Authorization
-  API][ext-authz].
+  In principle, any web proxy or web framework can be integrated with Aperture
+  in this way. These integrations use [Envoy's External Authorization
+  API][ext-authz]. Integrations with several popular web frameworks are
+  available.
 
-- _Feature_ Control Points: We provide [Aperture SDK][aperture-go] in Go.
+  We provide integration instructions for [Istio/Envoy][istio]. The user can
+  name the Control Point to identify a particular filter chain in Envoy. In case
+  of insertion via Istio, the <a
+  href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/manifests/charts/istioconfig/templates/envoy_filter.yaml`}>default
+  filter config</a>, assigns _ingress_ and _egress_ Control Points as
+  [identified by Istio][istio-patch-context].
 
-  The library provides API to begin a flow which translates to a
+- _Feature_ Control Points: We provide <a
+  href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/sdks/`}>Aperture
+  SDKs</a>[][aperture-go] for popular languages. Aperture SDK wraps any function
+  call or code snippet inside the Service code as a Feature Control Point. Every
+  invocation of the Feature is a Flow from the perspective of Aperture.
+
+  The SDK provides API to begin a flow which translates to a
   [flowcontrol.v1.Check][flowcontrol-proto] call into Agent. Response of this
   call contains a decision on whether to allow or reject the flow. The execution
   of a feature may be gated based on this decision. There is an API to end a
@@ -115,12 +126,12 @@ integrations that will communicate with the Aperture Agent.
 
 :::note
 
-Exact instructions on custom proxies / web frameworks / library integrations
-will be added in the future.
+Exact instructions on custom proxies / web frameworks / SDK integrations will be
+added in the future.
 
 :::
 
-## Dataplane Components {#components}
+## Flow Control Components {#components}
 
 Agent uses the following observability and control components (in order of
 execution):
@@ -151,3 +162,5 @@ we recommend to start with concepts like [services][service] and
 [flow-label]: /concepts/flow-control/flow-label.md
 [flowcontrol-proto]:
   https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.v1
+[istio-patch-context]:
+  https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-PatchContext

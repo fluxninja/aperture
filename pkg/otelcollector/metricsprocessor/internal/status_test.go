@@ -16,56 +16,55 @@ var _ = Describe("Status", func() {
 		It("Read both statuses if exist", func() {
 			attributes := pcommon.NewMap()
 			attributes.PutStr(otelcollector.HTTPStatusCodeLabel, "201")
-			attributes.PutStr(otelcollector.ApertureFeatureStatusLabel, otelcollector.ApertureResponseStatusOK)
-			statusCode, featureStatus := internal.StatusesFromAttributes(attributes)
+			attributes.PutStr(otelcollector.ApertureFlowStatusLabel, otelcollector.ApertureFlowStatusOK)
+			statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
 			Expect(statusCode).To(Equal("201"))
-			Expect(featureStatus).To(Equal(otelcollector.ApertureResponseStatusOK))
+			Expect(flowStatus).To(Equal(otelcollector.ApertureFlowStatusOK))
 		})
 
 		It("Defaults to empty if not exist", func() {
 			attributes := pcommon.NewMap()
-			statusCode, featureStatus := internal.StatusesFromAttributes(attributes)
+			statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
 			Expect(statusCode).To(Equal(""))
-			Expect(featureStatus).To(Equal(""))
+			Expect(flowStatus).To(Equal(""))
 		})
 	})
 
 	DescribeTable("StatusLabelsForMetrics", func(
 		decisionType flowcontrolv1.CheckResponse_DecisionType,
 		statusCode string,
-		featureStatus string,
+		flowStatus string,
 		expectedResponseStatus string,
 	) {
-		result := internal.StatusLabelsForMetrics(decisionType, statusCode, featureStatus)
-		Expect(result).To(HaveLen(4))
-		Expect(result).To(HaveKeyWithValue(metrics.ResponseStatusLabel, expectedResponseStatus))
+		result := internal.StatusLabelsForMetrics(decisionType, statusCode, flowStatus)
+		Expect(result).To(HaveLen(3))
+		Expect(result).To(HaveKeyWithValue(metrics.FlowStatusLabel, expectedResponseStatus))
 		Expect(result).To(HaveKeyWithValue(metrics.DecisionTypeLabel, decisionType.String()))
 		Expect(result).To(HaveKeyWithValue(metrics.StatusCodeLabel, statusCode))
-		Expect(result).To(HaveKeyWithValue(metrics.FeatureStatusLabel, featureStatus))
 	},
 		Entry("Works for HTTP status OK",
 			flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 			"201",
 			"",
-			metrics.ResponseStatusOK,
+			metrics.FlowStatusOK,
 		),
 		Entry("Works for HTTP status Error",
 			flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 			"404",
 			"",
-			metrics.ResponseStatusError,
+			metrics.FlowStatusError,
 		),
-		Entry("Works for Feature status OK",
+		Entry("Works for Flow status OK",
 			flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 			"",
-			metrics.FeatureStatusOK,
-			metrics.ResponseStatusOK,
+			metrics.FlowStatusOK,
+			metrics.FlowStatusOK,
 		),
-		Entry("Works for Feature status Error",
+		Entry("Works for Flow status Error",
 			flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 			"",
-			metrics.FeatureStatusError,
-			metrics.ResponseStatusError,
+			metrics.FlowStatusError,
+			metrics.FlowStatusError,
 		),
 	)
 })

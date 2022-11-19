@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/open-policy-agent/opa/ast"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -16,7 +15,6 @@ import (
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 	. "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/compiler"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
 type object = map[string]interface{}
@@ -48,11 +46,7 @@ var _ = Describe("Classifier", func() {
 					Service: "my-service.default.svc.cluster.local",
 				},
 				FlowSelector: &policylangv1.FlowSelector{
-					ControlPoint: &policylangv1.ControlPoint{
-						Controlpoint: &policylangv1.ControlPoint_Traffic{
-							Traffic: "ingress",
-						},
-					},
+					ControlPoint: "ingress",
 				},
 			},
 			Rules: map[string]*policylangv1.Rule{
@@ -73,11 +67,7 @@ var _ = Describe("Classifier", func() {
 					LabelMatcher: &policylangv1.LabelMatcher{
 						MatchLabels: map[string]string{"version": "one"},
 					},
-					ControlPoint: &policylangv1.ControlPoint{
-						Controlpoint: &policylangv1.ControlPoint_Traffic{
-							Traffic: "ingress",
-						},
-					},
+					ControlPoint: "ingress",
 				},
 			},
 			Rules: map[string]*policylangv1.Rule{
@@ -100,11 +90,7 @@ var _ = Describe("Classifier", func() {
 		rs3 := &policylangv1.Classifier{
 			Selector: &policylangv1.Selector{
 				FlowSelector: &policylangv1.FlowSelector{
-					ControlPoint: &policylangv1.ControlPoint{
-						Controlpoint: &policylangv1.ControlPoint_Traffic{
-							Traffic: "ingress",
-						},
-					},
+					ControlPoint: "ingress",
 				},
 			},
 			Rules: map[string]*policylangv1.Rule{
@@ -162,7 +148,7 @@ var _ = Describe("Classifier", func() {
 			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
+				"ingress",
 				map[string]string{"version": "one", "other": "tag"},
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -179,7 +165,7 @@ var _ = Describe("Classifier", func() {
 			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_EGRESS, ""),
+				"egress",
 				map[string]string{"version": "one"},
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -193,7 +179,7 @@ var _ = Describe("Classifier", func() {
 			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
+				"ingress",
 				map[string]string{"version": "two"},
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -212,7 +198,7 @@ var _ = Describe("Classifier", func() {
 				_, labels := classifier.Classify(
 					context.TODO(),
 					[]string{"my-service.default.svc.cluster.local"},
-					selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
+					"ingress",
 					map[string]string{"version": "one"},
 					attributesWithHeaders(object{
 						"foo": "hello",
@@ -247,11 +233,7 @@ var _ = Describe("Classifier", func() {
 						Service: "my-service.default.svc.cluster.local",
 					},
 					FlowSelector: &policylangv1.FlowSelector{
-						ControlPoint: &policylangv1.ControlPoint{
-							Controlpoint: &policylangv1.ControlPoint_Traffic{
-								Traffic: "ingress",
-							},
-						},
+						ControlPoint: "ingress",
 					},
 				},
 				Rules: labelRules,
@@ -289,7 +271,7 @@ var _ = Describe("Classifier", func() {
 			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
+				"ingress",
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -332,7 +314,7 @@ var _ = Describe("Classifier", func() {
 			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
+				"ingress",
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -388,7 +370,7 @@ var _ = Describe("Classifier", func() {
 			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
+				"ingress",
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -451,7 +433,7 @@ var _ = Describe("Classifier", func() {
 			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
-				selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_INGRESS, ""),
+				"ingress",
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
@@ -470,11 +452,7 @@ var _ = Describe("Classifier", func() {
 					Service: "my-service.default.svc.cluster.local",
 				},
 				FlowSelector: &policylangv1.FlowSelector{
-					ControlPoint: &policylangv1.ControlPoint{
-						Controlpoint: &policylangv1.ControlPoint_Traffic{
-							Traffic: "ingress",
-						},
-					},
+					ControlPoint: "ingress",
 				},
 			},
 			Rules: map[string]*policylangv1.Rule{

@@ -19,18 +19,18 @@ type simpleTestConfig struct {
 
 type nestedTestConfig struct {
 	Name       string
-	Type       int
 	TestConfig struct {
 		testName string
 		testBool bool
 	}
+	Type int
 }
 
 type defaultTestConfig struct {
-	Name   string
 	Type   *string
-	Val    int
+	Name   string
 	Values []int `json:"values" default:"[1,2,3]"`
+	Val    int
 }
 
 type testStruct struct {
@@ -457,11 +457,7 @@ var _ = Describe("ProtobufUnmarshaller", func() {
 				Service:    "s.n.svc.cluster.local",
 			},
 			FlowSelector: &policylangv1.FlowSelector{
-				ControlPoint: &policylangv1.ControlPoint{
-					Controlpoint: &policylangv1.ControlPoint_Traffic{
-						Traffic: "egress",
-					},
-				},
+				ControlPoint: "egress",
 			},
 		}
 		selectorBytes, err := proto.Marshal(selector)

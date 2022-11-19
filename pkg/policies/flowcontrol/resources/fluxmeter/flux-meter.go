@@ -176,9 +176,8 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
 			}, []string{
 				metrics.DecisionTypeLabel,
-				metrics.ResponseStatusLabel,
 				metrics.StatusCodeLabel,
-				metrics.FeatureStatusLabel,
+				metrics.FlowStatusLabel,
 				metrics.ValidLabel,
 			})
 			// Register metric with Prometheus

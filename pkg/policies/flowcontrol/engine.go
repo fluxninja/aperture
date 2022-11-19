@@ -61,15 +61,15 @@ type Engine struct {
 // ProcessRequest .
 func (e *Engine) ProcessRequest(
 	ctx context.Context,
-	controlPoint selectors.ControlPoint,
+	controlPoint string,
 	serviceIDs []string,
 	labels map[string]string,
 ) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
-		DecisionType:     flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
-		FlowLabelKeys:    maps.Keys(labels),
-		Services:         serviceIDs,
-		ControlPointInfo: controlPoint.ToControlPointInfoProto(),
+		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
+		FlowLabelKeys: maps.Keys(labels),
+		Services:      serviceIDs,
+		ControlPoint:  controlPoint,
 	}
 
 	mmr := e.getMatches(controlPoint, serviceIDs, labels)
@@ -291,7 +291,7 @@ func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.RateLimiter {
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.
-func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) *multiMatchResult {
+func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map[string]string) *multiMatchResult {
 	e.multiMatchersMutex.RLock()
 	defer e.multiMatchersMutex.RUnlock()
 

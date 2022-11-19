@@ -107,27 +107,20 @@ public interface CheckResponseOrBuilder extends
    * control_point of request
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-   * @return Whether the controlPointInfo field is set.
+   * <code>string control_point = 5 [json_name = "controlPoint"];</code>
+   * @return The controlPoint.
    */
-  boolean hasControlPointInfo();
+  java.lang.String getControlPoint();
   /**
    * <pre>
    * control_point of request
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-   * @return The controlPointInfo.
+   * <code>string control_point = 5 [json_name = "controlPoint"];</code>
+   * @return The bytes for controlPoint.
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo getControlPointInfo();
-  /**
-   * <pre>
-   * control_point of request
-   * </pre>
-   *
-   * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfoOrBuilder getControlPointInfoOrBuilder();
+  com.google.protobuf.ByteString
+      getControlPointBytes();
 
   /**
    * <pre>

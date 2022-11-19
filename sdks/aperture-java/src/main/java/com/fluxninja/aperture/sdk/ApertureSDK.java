@@ -48,7 +48,7 @@ public final class ApertureSDK {
     return new ApertureSDKBuilder();
   }
 
-  public FeatureFlow startFlow(String feature, Map<String, String> explicitLabels) {
+  public Flow startFlow(String controlPoint, Map<String, String> explicitLabels) {
     Map<String, String> labels = new HashMap<>();
 
     for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -68,7 +68,7 @@ public final class ApertureSDK {
     }
 
     CheckRequest req = CheckRequest.newBuilder()
-        .setFeature(feature)
+        .setControlPoint(controlPoint)
         .putAllLabels(labels)
         .build();
 
@@ -89,7 +89,7 @@ public final class ApertureSDK {
     }
     span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-    return new FeatureFlow(
+    return new Flow(
         res,
         span,
         false);

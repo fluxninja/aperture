@@ -95,8 +95,8 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			)
 		}
 
-		statusCode, featureStatus := internal.StatusesFromAttributes(attributes)
-		attributes.PutStr(otelcollector.ApertureResponseStatusLabel, internal.ResponseStatusForTelemetry(statusCode, featureStatus))
+		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
+		attributes.PutStr(otelcollector.ApertureFlowStatusLabel, internal.FlowStatusForTelemetry(statusCode, flowStatus))
 		internal.AddCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
 
 		// Update metrics and enforce include list to eliminate any excess attributes
@@ -160,12 +160,12 @@ func (p *metricsProcessor) updateMetrics(
 
 	if len(checkResponse.FluxMeterInfos) > 0 {
 		// Update flux meter metrics
-		statusCode, featureStatus := internal.StatusesFromAttributes(attributes)
+		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
 		for _, fluxMeter := range checkResponse.FluxMeterInfos {
 			p.updateMetricsForFluxMeters(
 				fluxMeter,
 				checkResponse.DecisionType,
-				statusCode, featureStatus,
+				statusCode, flowStatus,
 				attributes,
 				treatAsMissing)
 		}
@@ -246,7 +246,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	fluxMeterMessage *flowcontrolv1.FluxMeterInfo,
 	decisionType flowcontrolv1.CheckResponse_DecisionType,
 	statusCode string,
-	featureStatus string,
+	flowStatus string,
 	attributes pcommon.Map,
 	treatAsMissing []string,
 ) {
@@ -255,12 +255,12 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 		log.Sample(noFluxMeterSampler).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
-			Str(metrics.FeatureStatusLabel, featureStatus).
+			Str(metrics.FlowStatusLabel, flowStatus).
 			Msg("FluxMeter not found")
 		return
 	}
 
-	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, featureStatus)
+	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, flowStatus)
 
 	// metricValue is the value at fluxMeter's AttributeKey
 	metricValue, found := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsMissing)

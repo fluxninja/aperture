@@ -22,8 +22,7 @@ local svcSelector = selector.new()
                     )
                     + selector.withFlowSelector(
                       flowSelector.new()
-                      + flowSelector.withControlPoint(controlPoint.new()
-                                                      + controlPoint.withTraffic('ingress'))
+                      + flowSelector.withControlPoint('ingress')
                     );
 
 
