@@ -160,10 +160,7 @@ type PeerDiscovery struct {
 }
 
 // NewPeerDiscovery creates a new PeerDiscovery.
-func NewPeerDiscovery(prefix string,
-	client *etcdclient.Client,
-	watchers PeerWatchers,
-) (*PeerDiscovery, error) {
+func NewPeerDiscovery(prefix string, client *etcdclient.Client, watchers PeerWatchers) (*PeerDiscovery, error) {
 	var err error
 	pd := &PeerDiscovery{
 		peers: &peersv1.Peers{
