@@ -365,9 +365,5 @@ func getServicePods(endpoints *v1.Endpoints, nodeName string) []podInfo {
 		}
 	}
 
-	if endpoints.Namespace == "demoapp" {
-		log.Debug().Interface("pods", pods).Msg("getServicePods")
-	}
-
 	return pods
 }
