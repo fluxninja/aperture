@@ -242,7 +242,14 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetRequestCounter(insertRejectLabel(labelsFoo1)).Return(counter).Times(1)
 
-		rateLimiter.EXPECT().GetRequestCounter().Return(rateCounter).Times(1)
+		labels := map[string]string{
+			m.PolicyNameLabel:     "foo",
+			m.PolicyHashLabel:     "foo-hash",
+			m.ComponentIndexLabel: "2",
+			m.DecisionTypeLabel:   "DECISION_TYPE_REJECTED",
+		}
+
+		rateLimiter.EXPECT().GetRequestCounter(labels).Return(rateCounter).Times(1)
 		classifier.EXPECT().GetRequestCounter().Return(classifierCounter).Times(1)
 	})
 

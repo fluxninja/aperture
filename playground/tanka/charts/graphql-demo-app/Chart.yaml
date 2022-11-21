@@ -1,0 +1,5 @@
+apiVersion: v2
+name: graphql-demo-app
+description: An example app for demo purposes
+type: application
+version: 0.1.0

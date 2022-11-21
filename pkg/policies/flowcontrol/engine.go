@@ -9,6 +9,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
@@ -91,6 +92,7 @@ func (e *Engine) ProcessRequest(
 	for i, rl := range mmr.rateLimiters {
 		rateLimiters[i] = rl
 	}
+	log.Info().Interface("labels", labels).Msg("Running limiters with labels")
 	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(ctx, rateLimiters, labels)
 	response.LimiterDecisions = rateLimiterDecisions
 
