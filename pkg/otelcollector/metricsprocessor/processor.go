@@ -95,8 +95,8 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			)
 		}
 
-		statusCode, featureStatus := internal.StatusesFromAttributes(attributes)
-		attributes.PutStr(otelcollector.ApertureResponseStatusLabel, internal.ResponseStatusForTelemetry(statusCode, featureStatus))
+		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
+		attributes.PutStr(otelcollector.ApertureFlowStatusLabel, internal.FlowStatusForTelemetry(statusCode, flowStatus))
 		internal.AddCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
 
 		// Update metrics and enforce include list to eliminate any excess attributes
@@ -153,19 +153,24 @@ func (p *metricsProcessor) updateMetrics(
 
 			// Update rate limiter metrics
 			if rl := decision.GetRateLimiterInfo(); rl != nil {
-				p.updateMetricsForRateLimiter(limiterID)
+				labels := map[string]string{
+					metrics.PolicyNameLabel:     decision.PolicyName,
+					metrics.PolicyHashLabel:     decision.PolicyHash,
+					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
+				}
+				p.updateMetricsForRateLimiter(limiterID, labels, checkResponse.DecisionType)
 			}
 		}
 	}
 
 	if len(checkResponse.FluxMeterInfos) > 0 {
 		// Update flux meter metrics
-		statusCode, featureStatus := internal.StatusesFromAttributes(attributes)
+		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
 		for _, fluxMeter := range checkResponse.FluxMeterInfos {
 			p.updateMetricsForFluxMeters(
 				fluxMeter,
 				checkResponse.DecisionType,
-				statusCode, featureStatus,
+				statusCode, flowStatus,
 				attributes,
 				treatAsMissing)
 		}
@@ -209,7 +214,7 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 	}
 }
 
-func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID) {
+func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID, labels map[string]string, decisionType flowcontrolv1.CheckResponse_DecisionType) {
 	rateLimiter := p.cfg.engine.GetRateLimiter(limiterID)
 	if rateLimiter == nil {
 		log.Sample(noRateLimiterSampler).Warn().
@@ -219,7 +224,9 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 			Msg("RateLimiter not found")
 		return
 	}
-	requestCounter := rateLimiter.GetRequestCounter()
+	// Add decision type label to the request counter metric
+	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	requestCounter := rateLimiter.GetRequestCounter(labels)
 	if requestCounter != nil {
 		requestCounter.Inc()
 	}
@@ -246,7 +253,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	fluxMeterMessage *flowcontrolv1.FluxMeterInfo,
 	decisionType flowcontrolv1.CheckResponse_DecisionType,
 	statusCode string,
-	featureStatus string,
+	flowStatus string,
 	attributes pcommon.Map,
 	treatAsMissing []string,
 ) {
@@ -255,12 +262,12 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 		log.Sample(noFluxMeterSampler).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
 			Str(metrics.DecisionTypeLabel, decisionType.String()).
 			Str(metrics.StatusCodeLabel, statusCode).
-			Str(metrics.FeatureStatusLabel, featureStatus).
+			Str(metrics.FlowStatusLabel, flowStatus).
 			Msg("FluxMeter not found")
 		return
 	}
 
-	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, featureStatus)
+	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, flowStatus)
 
 	// metricValue is the value at fluxMeter's AttributeKey
 	metricValue, found := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsMissing)

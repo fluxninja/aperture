@@ -34,7 +34,7 @@ const rateLimiterStatusRoot = "rate_limiters"
 
 var (
 	fxNameTag       = config.NameTag(rateLimiterStatusRoot)
-	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel}
+	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel, metrics.DecisionTypeLabel}
 )
 
 func rateLimiterModule() fx.Option {
@@ -117,9 +117,7 @@ func setupRateLimiterFactory(
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.RateLimiterCounterMetricName,
 		Help: "A counter measuring the number of times Rate Limiter was triggered",
-	},
-		metricLabelKeys,
-	)
+	}, metricLabelKeys)
 
 	rateLimiterFactory := &rateLimiterFactory{
 		engineAPI:            e,
@@ -230,7 +228,6 @@ type rateLimiter struct {
 	rateTracker        ratetracker.RateTracker
 	rateLimitChecker   *ratetracker.BasicRateLimitChecker
 	rateLimiterProto   *policylangv1.RateLimiter
-	counter            prometheus.Counter
 	name               string
 }
 
@@ -316,19 +313,12 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				return err
 			}
 
-			rateCounter, err := rateCounterVec.GetMetricWith(metricLabels)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to get rate limiter counter from vector")
-				return err
-			}
-			rateLimiter.counter = rateCounter
-
 			return nil
 		},
 		OnStop: func(context.Context) error {
 			var merr, err error
-			deleted := rateCounterVec.Delete(metricLabels)
-			if !deleted {
+			deleted := rateCounterVec.DeletePartialMatch(metricLabels)
+			if deleted == 0 {
 				merr = multierr.Append(merr, errors.New("failed to delete rate limiter counter from its metric vector"))
 			}
 			// remove from data engine
@@ -483,6 +473,12 @@ func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
 }
 
 // GetRequestCounter returns counter for tracking number of times rateLimiter was triggered.
-func (rateLimiter *rateLimiter) GetRequestCounter() prometheus.Counter {
-	return rateLimiter.counter
+func (rateLimiter *rateLimiter) GetRequestCounter(labels map[string]string) prometheus.Counter {
+	counter, err := rateLimiter.rateLimiterFactory.counterVector.GetMetricWith(labels)
+	if err != nil {
+		log.Warn().Err(err).Msg("Failed to get counter")
+		return nil
+	}
+
+	return counter
 }

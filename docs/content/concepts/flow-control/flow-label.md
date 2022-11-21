@@ -27,20 +27,20 @@ For each _traffic_ [control point][control-point] (where flows are http or grpc
 requests), some basic metadata is available as _request labels_. These are
 `http.method` , `http.target`, `http.host`, `http.scheme`,
 `http.request_content_length` and `http.flavor`. Additionally all (non-pseudo)
-headers are available as `http.request.header.header_name`, eg.
+headers are available as `http.request.header.header_name`, e.g.
 `http.request.header.user_agent` (note the snake_case!). Values of these labels
 are described by [OpenTelemetry semantic conventions for HTTP
 spans][otel-conventions]. The only exception is `http.host` attribute, which is
 equal to Host/Authority header. This is thus similar to `net.peer.name` OTEL
-attribute, but is provided for both ingress and egress control points.
+attribute.
 
 ### Baggage {#baggage}
 
 Baggage propagation is a powerful concept that allows attaching metadata to a
 whole request chain or to a whole [trace][traces]. If you already have baggage
 propagation configured in your system, you can access the baggage as flow
-labels. This is supported on both _traffic_ and _feature_ [control
-points][control-point].
+labels. This is supported on service-mesh (Envoy) and web framework based
+control point insertion.
 
 - _traffic_: Baggage is pulled from the [_baggage_][baggage] header
 - _feature_: Baggage is automatically pulled from context on each `Check()`

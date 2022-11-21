@@ -9,7 +9,6 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 )
 
@@ -31,7 +30,7 @@ func (f *FlowControlHandler) Check(ctx context.Context, req *flowcontrolv1.Check
 	}
 
 	start := time.Now()
-	resp := f.CommonHandler.CheckWithValues(ctx, services, selectors.NewControlPoint(flowcontrolv1.ControlPointInfo_TYPE_FEATURE, req.Feature), req.Labels)
+	resp := f.CommonHandler.CheckWithValues(ctx, services, req.ControlPoint, req.Labels)
 	end := time.Now()
 
 	resp.Start = timestamppb.New(start)

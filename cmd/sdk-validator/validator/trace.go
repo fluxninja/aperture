@@ -63,12 +63,12 @@ func (t TraceHandler) Export(ctx context.Context, req *tracev1.ExportTraceServic
 							log.Error().Msg("Failed to validate source")
 							err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureSourceLabel))
 						}
-					case otelcollector.ApertureFeatureStatusLabel:
-						log.Trace().Str("attribute", otelcollector.ApertureFeatureStatusLabel).Msg("Validating attribute")
+					case otelcollector.ApertureFlowStatusLabel:
+						log.Trace().Str("attribute", otelcollector.ApertureFlowStatusLabel).Msg("Validating attribute")
 						v := attribute.Value.GetStringValue()
-						if v != otelcollector.ApertureFeatureStatusOK && v != otelcollector.ApertureFeatureStatusError && v != "Unset" {
-							log.Error().Msg("Failed to validate feature status")
-							err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureFeatureStatusLabel))
+						if v != otelcollector.ApertureFlowStatusOK && v != otelcollector.ApertureFlowStatusError && v != "Unset" {
+							log.Error().Msg("Failed to validate flow status")
+							err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureFlowStatusLabel))
 						}
 					case otelcollector.ApertureFlowStartTimestampLabel:
 						flowStartTS = attribute.Value.GetIntValue()

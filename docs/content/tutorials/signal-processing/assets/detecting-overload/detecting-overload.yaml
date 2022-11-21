@@ -14,9 +14,9 @@ spec:
               signal_name: LATENCY
           query_string:
             sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED",
-            response_status="OK",
+            flow_status="OK",
             flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
-            response_status="OK", flux_meter_name="test"}[5s]))
+            flow_status="OK", flux_meter_name="test"}[5s]))
       - ema:
           ema_window: 1500s
           in_ports:

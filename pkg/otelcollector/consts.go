@@ -37,8 +37,6 @@ const (
 
 	// ApertureDecisionTypeLabel describes the decision type taken by policy.
 	ApertureDecisionTypeLabel = "aperture.decision_type"
-	// ApertureErrorLabel describes the error reason of the decision taken by policy.
-	ApertureErrorLabel = "aperture.error"
 	// ApertureRejectReasonLabel describes the reject reason of the decision taken by policy.
 	ApertureRejectReasonLabel = "aperture.reject_reason"
 	// ApertureRateLimitersLabel describes rate limiters matched to the traffic.
@@ -61,12 +59,12 @@ const (
 	ApertureClassifiersLabel = "aperture.classifiers"
 	// ApertureClassifierErrorsLabel describes encountered classifier errors for specified policy.
 	ApertureClassifierErrorsLabel = "aperture.classifier_errors"
-	// ApertureResponseStatusLabel label to denote OK or Error across all protocols.
-	ApertureResponseStatusLabel = "aperture.response_status"
-	// ApertureResponseStatusOK OK response across all protocols.
-	ApertureResponseStatusOK = ApertureFeatureStatusOK
-	// ApertureResponseStatusError Error response across all protocols.
-	ApertureResponseStatusError = ApertureFeatureStatusError
+	// ApertureFlowStatusLabel label to denote OK or Error across all protocols.
+	ApertureFlowStatusLabel = "aperture.flow.status"
+	// ApertureFlowStatusOK const for OK status.
+	ApertureFlowStatusOK = "OK"
+	// ApertureFlowStatusError const for error status.
+	ApertureFlowStatusError = "Error"
 
 	/* HTTP Specific labels. */
 
@@ -97,12 +95,6 @@ const (
 
 	/* SDK specific labels. */
 
-	// ApertureFeatureStatusLabel describes the status of the feature.
-	ApertureFeatureStatusLabel = "aperture.feature.status"
-	// ApertureFeatureStatusOK const for OK status.
-	ApertureFeatureStatusOK = "OK"
-	// ApertureFeatureStatusError const for error status.
-	ApertureFeatureStatusError = "Error"
 	// ApertureFlowStartTimestampLabel is the start timestamp of the flow.
 	ApertureFlowStartTimestampLabel = "aperture.flow_start_timestamp"
 	// ApertureFlowEndTimestampLabel is the end timestamp of the flow.

@@ -2,7 +2,7 @@ package com.fluxninja.aperture.armeria;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.FeatureFlow;
+import com.fluxninja.aperture.sdk.Flow;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RpcRequest;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class RpcUtils {
-  protected static HttpStatus handleRejectedFlow(FeatureFlow flow) {
+  protected static HttpStatus handleRejectedFlow(Flow flow) {
     CheckResponse.RejectReason reason = flow.checkResponse().getRejectReason();
     try {
       flow.end(FlowStatus.Unset);
