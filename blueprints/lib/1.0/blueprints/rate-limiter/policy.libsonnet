@@ -2,9 +2,10 @@ local spec = import '../../spec.libsonnet';
 local config = import './config.libsonnet';
 
 local policy = spec.v1.Policy;
+local resources = spec.v1.Resources;
+local circuit = spec.v1.Circuit;
 local component = spec.v1.Component;
 local rateLimiter = spec.v1.RateLimiter;
-local circuit = spec.v1.Circuit;
 local dynamicConfig = spec.v1.RateLimiterDynamicConfig;
 local override = spec.v1.RateLimiterOverride;
 local lazySync = spec.v1.RateLimiterLazySync;
@@ -15,6 +16,8 @@ function(params) {
 
   local policyDef =
     policy.new()
+    + policy.withResources(resources.new()
+                           + resources.withClassifiers($._config.classifiers))
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval($._config.evaluationInterval)

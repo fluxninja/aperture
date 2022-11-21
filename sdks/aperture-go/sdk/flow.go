@@ -11,21 +11,21 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-// FlowStatus represents status of feature execution.
+// FlowStatus represents status of flow execution.
 type FlowStatus uint8
 
-// User passes a code to indicate status of feature execution.
+// User passes a code to indicate status of flow execution.
 //
 //go:generate enumer -type=FlowStatus -output=flow-status-string.go
 const (
-	// OK indicates successful feature execution.
+	// OK indicates successful flow execution.
 	OK FlowStatus = iota
-	// Error indicate error on feature execution.
+	// Error indicate error on flow execution.
 	Error
 )
 
 // Flow is the interface that is returned to the user every time a Check call through ApertureClient is made.
-// The user can check the status of the check call, response from the server, and end the flow once the feature is executed.
+// The user can check the status of the check call, response from the server, and end the flow once the workload is executed.
 type Flow interface {
 	Accepted() bool
 	End(status FlowStatus) error
@@ -66,7 +66,7 @@ func (f *flow) End(statusCode FlowStatus) error {
 		return err
 	}
 	f.span.SetAttributes(
-		attribute.String(featureStatusLabel, statusCode.String()),
+		attribute.String(flowStatusLabel, statusCode.String()),
 		attribute.String(checkResponseLabel, string(checkResponseJSONBytes)),
 		attribute.Int64(flowEndTimestampLabel, time.Now().UnixNano()),
 	)

@@ -16,26 +16,29 @@ import (
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 
-// IterateLogRecords calls given function for each logRecord. If the function
-// returns error further logRecords will not be processed and the error will be returned.
-func IterateLogRecords(ld plog.Logs, fn func(plog.LogRecord) error) error {
-	resourceLogsSlice := ld.ResourceLogs()
-	for resourceLogsIt := 0; resourceLogsIt < resourceLogsSlice.Len(); resourceLogsIt++ {
-		resourceLogs := resourceLogsSlice.At(resourceLogsIt)
-		scopeLogsSlice := resourceLogs.ScopeLogs()
-		for scopeLogsIt := 0; scopeLogsIt < scopeLogsSlice.Len(); scopeLogsIt++ {
-			scopeLogs := scopeLogsSlice.At(scopeLogsIt)
-			logsSlice := scopeLogs.LogRecords()
-			for logsIt := 0; logsIt < logsSlice.Len(); logsIt++ {
-				logRecord := logsSlice.At(logsIt)
-				err := fn(logRecord)
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-	return nil
+// IterAction describes whether to keep or discard an item processed by an iteration callback.
+type IterAction bool
+
+const (
+	// Keep means keep this item and continue.
+	Keep IterAction = true
+	// Discard means remove this item and continue.
+	Discard = false
+)
+
+// IterateLogRecords calls given function for each logRecord.
+//
+// The callback should return whether a log record should be kept or removed.
+func IterateLogRecords(ld plog.Logs, fn func(plog.LogRecord) IterAction) {
+	ld.ResourceLogs().RemoveIf(func(resourceLogs plog.ResourceLogs) bool {
+		resourceLogs.ScopeLogs().RemoveIf(func(scopeLogs plog.ScopeLogs) bool {
+			scopeLogs.LogRecords().RemoveIf(func(logRecord plog.LogRecord) bool {
+				return fn(logRecord) == Discard //nolint:gosimple
+			})
+			return scopeLogs.LogRecords().Len() == 0
+		})
+		return resourceLogs.ScopeLogs().Len() == 0
+	})
 }
 
 // IterateSpans calls given function for each span. If the function returns error

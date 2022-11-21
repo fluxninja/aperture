@@ -6,6 +6,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -28,6 +29,7 @@ func policyFactoryModule() fx.Option {
 					config.NameTag(policiesFxTag),
 					config.NameTag(policiesDynamicConfigFxTag),
 					iface.FxOptionsFuncTag,
+					alerts.AlertsFxTag,
 				),
 			),
 		),
@@ -43,6 +45,7 @@ type PolicyFactory struct {
 	lock                 sync.RWMutex
 	circuitJobGroup      *jobs.JobGroup
 	etcdClient           *etcdclient.Client
+	alerterIface         alerts.Alerter
 	registry             status.Registry
 	dynamicConfigWatcher notifiers.Watcher
 	policyTracker        map[string]*policysyncv1.PolicyWrapper
@@ -54,6 +57,7 @@ func providePolicyFactory(
 	etcdWatcher notifiers.Watcher,
 	dynamicConfigWatcher notifiers.Watcher,
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
+	alerterIface alerts.Alerter,
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
@@ -72,6 +76,7 @@ func providePolicyFactory(
 		registry:             policiesStatusRegistry,
 		circuitJobGroup:      circuitJobGroup,
 		etcdClient:           etcdClient,
+		alerterIface:         alerterIface,
 		dynamicConfigWatcher: dynamicConfigWatcher,
 		policyTracker:        make(map[string]*policysyncv1.PolicyWrapper),
 		prometheusRegistry:   prometheusRegistry,
@@ -147,6 +152,7 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 			fx.Annotate(factory.dynamicConfigWatcher, fx.As(new(notifiers.Watcher))),
 			factory.circuitJobGroup,
 			factory.etcdClient,
+			factory.alerterIface,
 			wrapperMessage,
 		),
 		policyFxOptions,

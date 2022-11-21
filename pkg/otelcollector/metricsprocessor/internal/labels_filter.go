@@ -16,7 +16,6 @@ var (
 		otelcollector.FlowDurationLabel,
 		otelcollector.ApertureProcessingDurationLabel,
 		otelcollector.ApertureDecisionTypeLabel,
-		otelcollector.ApertureErrorLabel,
 		otelcollector.ApertureRejectReasonLabel,
 		otelcollector.ApertureRateLimitersLabel,
 		otelcollector.ApertureDroppingRateLimitersLabel,
@@ -30,7 +29,7 @@ var (
 		otelcollector.ApertureClassifierErrorsLabel,
 		otelcollector.ApertureServicesLabel,
 		otelcollector.ApertureControlPointLabel,
-		otelcollector.ApertureResponseStatusLabel,
+		otelcollector.ApertureFlowStatusLabel,
 		otelcollector.ResponseReceivedLabel,
 	}
 
@@ -41,7 +40,7 @@ var (
 	}
 
 	_includeAttributesSDK = []string{
-		otelcollector.ApertureFeatureStatusLabel,
+		otelcollector.ApertureFlowStatusLabel,
 	}
 
 	includeListHTTP = otelcollector.FormIncludeList(append(_includeAttributesCommon, _includeAttributesHTTP...))

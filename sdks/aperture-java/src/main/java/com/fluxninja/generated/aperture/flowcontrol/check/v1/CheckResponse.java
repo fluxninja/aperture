@@ -21,6 +21,7 @@ private static final long serialVersionUID = 0L;
   }
   private CheckResponse() {
     services_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    controlPoint_ = "";
     flowLabelKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     decisionType_ = 0;
     rejectReason_ = 0;
@@ -96,16 +97,9 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 42: {
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.Builder subBuilder = null;
-            if (controlPointInfo_ != null) {
-              subBuilder = controlPointInfo_.toBuilder();
-            }
-            controlPointInfo_ = input.readMessage(com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(controlPointInfo_);
-              controlPointInfo_ = subBuilder.buildPartial();
-            }
+            java.lang.String s = input.readStringRequireUtf8();
 
+            controlPoint_ = s;
             break;
           }
           case 50: {
@@ -590,42 +584,50 @@ private static final long serialVersionUID = 0L;
     return services_.getByteString(index);
   }
 
-  public static final int CONTROL_POINT_INFO_FIELD_NUMBER = 5;
-  private com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo controlPointInfo_;
+  public static final int CONTROL_POINT_FIELD_NUMBER = 5;
+  private volatile java.lang.Object controlPoint_;
   /**
    * <pre>
    * control_point of request
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-   * @return Whether the controlPointInfo field is set.
+   * <code>string control_point = 5 [json_name = "controlPoint"];</code>
+   * @return The controlPoint.
    */
   @java.lang.Override
-  public boolean hasControlPointInfo() {
-    return controlPointInfo_ != null;
+  public java.lang.String getControlPoint() {
+    java.lang.Object ref = controlPoint_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      controlPoint_ = s;
+      return s;
+    }
   }
   /**
    * <pre>
    * control_point of request
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-   * @return The controlPointInfo.
+   * <code>string control_point = 5 [json_name = "controlPoint"];</code>
+   * @return The bytes for controlPoint.
    */
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo getControlPointInfo() {
-    return controlPointInfo_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.getDefaultInstance() : controlPointInfo_;
-  }
-  /**
-   * <pre>
-   * control_point of request
-   * </pre>
-   *
-   * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-   */
-  @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfoOrBuilder getControlPointInfoOrBuilder() {
-    return getControlPointInfo();
+  public com.google.protobuf.ByteString
+      getControlPointBytes() {
+    java.lang.Object ref = controlPoint_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      controlPoint_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
   }
 
   public static final int FLOW_LABEL_KEYS_FIELD_NUMBER = 6;
@@ -1033,8 +1035,8 @@ private static final long serialVersionUID = 0L;
     for (int i = 0; i < services_.size(); i++) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 4, services_.getRaw(i));
     }
-    if (controlPointInfo_ != null) {
-      output.writeMessage(5, getControlPointInfo());
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(controlPoint_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 5, controlPoint_);
     }
     for (int i = 0; i < flowLabelKeys_.size(); i++) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 6, flowLabelKeys_.getRaw(i));
@@ -1085,9 +1087,8 @@ private static final long serialVersionUID = 0L;
       size += dataSize;
       size += 1 * getServicesList().size();
     }
-    if (controlPointInfo_ != null) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, getControlPointInfo());
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(controlPoint_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, controlPoint_);
     }
     {
       int dataSize = 0;
@@ -1154,11 +1155,8 @@ private static final long serialVersionUID = 0L;
     }
     if (!getServicesList()
         .equals(other.getServicesList())) return false;
-    if (hasControlPointInfo() != other.hasControlPointInfo()) return false;
-    if (hasControlPointInfo()) {
-      if (!getControlPointInfo()
-          .equals(other.getControlPointInfo())) return false;
-    }
+    if (!getControlPoint()
+        .equals(other.getControlPoint())) return false;
     if (!getFlowLabelKeysList()
         .equals(other.getFlowLabelKeysList())) return false;
     if (!internalGetTelemetryFlowLabels().equals(
@@ -1194,10 +1192,8 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + SERVICES_FIELD_NUMBER;
       hash = (53 * hash) + getServicesList().hashCode();
     }
-    if (hasControlPointInfo()) {
-      hash = (37 * hash) + CONTROL_POINT_INFO_FIELD_NUMBER;
-      hash = (53 * hash) + getControlPointInfo().hashCode();
-    }
+    hash = (37 * hash) + CONTROL_POINT_FIELD_NUMBER;
+    hash = (53 * hash) + getControlPoint().hashCode();
     if (getFlowLabelKeysCount() > 0) {
       hash = (37 * hash) + FLOW_LABEL_KEYS_FIELD_NUMBER;
       hash = (53 * hash) + getFlowLabelKeysList().hashCode();
@@ -1398,12 +1394,8 @@ private static final long serialVersionUID = 0L;
       }
       services_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       bitField0_ = (bitField0_ & ~0x00000001);
-      if (controlPointInfoBuilder_ == null) {
-        controlPointInfo_ = null;
-      } else {
-        controlPointInfo_ = null;
-        controlPointInfoBuilder_ = null;
-      }
+      controlPoint_ = "";
+
       flowLabelKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       bitField0_ = (bitField0_ & ~0x00000002);
       internalGetMutableTelemetryFlowLabels().clear();
@@ -1471,11 +1463,7 @@ private static final long serialVersionUID = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
       }
       result.services_ = services_;
-      if (controlPointInfoBuilder_ == null) {
-        result.controlPointInfo_ = controlPointInfo_;
-      } else {
-        result.controlPointInfo_ = controlPointInfoBuilder_.build();
-      }
+      result.controlPoint_ = controlPoint_;
       if (((bitField0_ & 0x00000002) != 0)) {
         flowLabelKeys_ = flowLabelKeys_.getUnmodifiableView();
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -1576,8 +1564,9 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       }
-      if (other.hasControlPointInfo()) {
-        mergeControlPointInfo(other.getControlPointInfo());
+      if (!other.getControlPoint().isEmpty()) {
+        controlPoint_ = other.controlPoint_;
+        onChanged();
       }
       if (!other.flowLabelKeys_.isEmpty()) {
         if (flowLabelKeys_.isEmpty()) {
@@ -2161,33 +2150,25 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo controlPointInfo_;
-    private com.google.protobuf.SingleFieldBuilderV3<
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfoOrBuilder> controlPointInfoBuilder_;
+    private java.lang.Object controlPoint_ = "";
     /**
      * <pre>
      * control_point of request
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-     * @return Whether the controlPointInfo field is set.
+     * <code>string control_point = 5 [json_name = "controlPoint"];</code>
+     * @return The controlPoint.
      */
-    public boolean hasControlPointInfo() {
-      return controlPointInfoBuilder_ != null || controlPointInfo_ != null;
-    }
-    /**
-     * <pre>
-     * control_point of request
-     * </pre>
-     *
-     * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-     * @return The controlPointInfo.
-     */
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo getControlPointInfo() {
-      if (controlPointInfoBuilder_ == null) {
-        return controlPointInfo_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.getDefaultInstance() : controlPointInfo_;
+    public java.lang.String getControlPoint() {
+      java.lang.Object ref = controlPoint_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        controlPoint_ = s;
+        return s;
       } else {
-        return controlPointInfoBuilder_.getMessage();
+        return (java.lang.String) ref;
       }
     }
     /**
@@ -2195,125 +2176,74 @@ private static final long serialVersionUID = 0L;
      * control_point of request
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
+     * <code>string control_point = 5 [json_name = "controlPoint"];</code>
+     * @return The bytes for controlPoint.
      */
-    public Builder setControlPointInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo value) {
-      if (controlPointInfoBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        controlPointInfo_ = value;
-        onChanged();
+    public com.google.protobuf.ByteString
+        getControlPointBytes() {
+      java.lang.Object ref = controlPoint_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        controlPoint_ = b;
+        return b;
       } else {
-        controlPointInfoBuilder_.setMessage(value);
+        return (com.google.protobuf.ByteString) ref;
       }
-
-      return this;
     }
     /**
      * <pre>
      * control_point of request
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
+     * <code>string control_point = 5 [json_name = "controlPoint"];</code>
+     * @param value The controlPoint to set.
+     * @return This builder for chaining.
      */
-    public Builder setControlPointInfo(
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.Builder builderForValue) {
-      if (controlPointInfoBuilder_ == null) {
-        controlPointInfo_ = builderForValue.build();
-        onChanged();
-      } else {
-        controlPointInfoBuilder_.setMessage(builderForValue.build());
-      }
-
-      return this;
-    }
-    /**
-     * <pre>
-     * control_point of request
-     * </pre>
-     *
-     * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-     */
-    public Builder mergeControlPointInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo value) {
-      if (controlPointInfoBuilder_ == null) {
-        if (controlPointInfo_ != null) {
-          controlPointInfo_ =
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.newBuilder(controlPointInfo_).mergeFrom(value).buildPartial();
-        } else {
-          controlPointInfo_ = value;
-        }
-        onChanged();
-      } else {
-        controlPointInfoBuilder_.mergeFrom(value);
-      }
-
-      return this;
-    }
-    /**
-     * <pre>
-     * control_point of request
-     * </pre>
-     *
-     * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-     */
-    public Builder clearControlPointInfo() {
-      if (controlPointInfoBuilder_ == null) {
-        controlPointInfo_ = null;
-        onChanged();
-      } else {
-        controlPointInfo_ = null;
-        controlPointInfoBuilder_ = null;
-      }
-
-      return this;
-    }
-    /**
-     * <pre>
-     * control_point of request
-     * </pre>
-     *
-     * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
-     */
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.Builder getControlPointInfoBuilder() {
-      
+    public Builder setControlPoint(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      controlPoint_ = value;
       onChanged();
-      return getControlPointInfoFieldBuilder().getBuilder();
+      return this;
     }
     /**
      * <pre>
      * control_point of request
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
+     * <code>string control_point = 5 [json_name = "controlPoint"];</code>
+     * @return This builder for chaining.
      */
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfoOrBuilder getControlPointInfoOrBuilder() {
-      if (controlPointInfoBuilder_ != null) {
-        return controlPointInfoBuilder_.getMessageOrBuilder();
-      } else {
-        return controlPointInfo_ == null ?
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.getDefaultInstance() : controlPointInfo_;
-      }
+    public Builder clearControlPoint() {
+      
+      controlPoint_ = getDefaultInstance().getControlPoint();
+      onChanged();
+      return this;
     }
     /**
      * <pre>
      * control_point of request
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.ControlPointInfo control_point_info = 5 [json_name = "controlPointInfo"];</code>
+     * <code>string control_point = 5 [json_name = "controlPoint"];</code>
+     * @param value The bytes for controlPoint to set.
+     * @return This builder for chaining.
      */
-    private com.google.protobuf.SingleFieldBuilderV3<
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfoOrBuilder> 
-        getControlPointInfoFieldBuilder() {
-      if (controlPointInfoBuilder_ == null) {
-        controlPointInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.ControlPointInfoOrBuilder>(
-                getControlPointInfo(),
-                getParentForChildren(),
-                isClean());
-        controlPointInfo_ = null;
-      }
-      return controlPointInfoBuilder_;
+    public Builder setControlPointBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      controlPoint_ = value;
+      onChanged();
+      return this;
     }
 
     private com.google.protobuf.LazyStringList flowLabelKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;

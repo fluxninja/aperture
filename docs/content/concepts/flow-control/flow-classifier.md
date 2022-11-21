@@ -51,16 +51,16 @@ Labels are not namespaced in any way.
 
 ## Selector
 
-Each classifier needs to specify which control point it will be run at. Most
-likely, you'll want to classify ingress traffic to your service:
+Each classifier needs to specify which control point it will be run at. For
+instance, the following selector is for the "ingress" control point at a
+service:
 
 ```yaml
 selector:
   service_selector:
     service: service1.default.svc.cluster.local
   flow_selector:
-    control_point:
-      traffic: ingress
+    control_point: ingress
 ```
 
 You can be more precise by adding a [label matcher][label-matcher] and e.g. gate

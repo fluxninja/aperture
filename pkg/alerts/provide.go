@@ -18,16 +18,22 @@ type AlerterConfig struct {
 	ChannelSize int `json:"channel_size" validate:"gt=0" default:"100"`
 }
 
-// FxIn describes parameters passed to alerter constructor.
-type FxIn struct {
-	fx.In
-	Unmarshaller config.Unmarshaller
+// Module is a fx module that constructs annotated instance of alerts.Alerter.
+func Module() fx.Option {
+	return fx.Options(
+		fx.Provide(
+			fx.Annotate(
+				ProvideAlerter,
+				fx.ResultTags(AlertsFxTag),
+			),
+		),
+	)
 }
 
 // ProvideAlerter creates an alerter.
-func ProvideAlerter(in FxIn) (Alerter, error) {
+func ProvideAlerter(unmarshaller config.Unmarshaller) (Alerter, error) {
 	var cfg AlerterConfig
-	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
+	if err := unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize alerter configuration!")
 		return nil, err
 	}

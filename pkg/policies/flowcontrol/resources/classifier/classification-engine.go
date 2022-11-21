@@ -147,7 +147,7 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 func (c *ClassificationEngine) Classify(
 	ctx context.Context,
 	svcs []string,
-	ctrlPt selectors.ControlPoint,
+	ctrlPt string,
 	labelsForMatching map[string]string,
 	input ast.Value,
 ) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels) {

@@ -9,6 +9,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
@@ -61,15 +62,15 @@ type Engine struct {
 // ProcessRequest .
 func (e *Engine) ProcessRequest(
 	ctx context.Context,
-	controlPoint selectors.ControlPoint,
+	controlPoint string,
 	serviceIDs []string,
 	labels map[string]string,
 ) (response *flowcontrolv1.CheckResponse) {
 	response = &flowcontrolv1.CheckResponse{
-		DecisionType:     flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
-		FlowLabelKeys:    maps.Keys(labels),
-		Services:         serviceIDs,
-		ControlPointInfo: controlPoint.ToControlPointInfoProto(),
+		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
+		FlowLabelKeys: maps.Keys(labels),
+		Services:      serviceIDs,
+		ControlPoint:  controlPoint,
 	}
 
 	mmr := e.getMatches(controlPoint, serviceIDs, labels)
@@ -91,6 +92,7 @@ func (e *Engine) ProcessRequest(
 	for i, rl := range mmr.rateLimiters {
 		rateLimiters[i] = rl
 	}
+	log.Info().Interface("labels", labels).Msg("Running limiters with labels")
 	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(ctx, rateLimiters, labels)
 	response.LimiterDecisions = rateLimiterDecisions
 
@@ -291,7 +293,7 @@ func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.RateLimiter {
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.
-func (e *Engine) getMatches(controlPoint selectors.ControlPoint, serviceIDs []string, labels map[string]string) *multiMatchResult {
+func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map[string]string) *multiMatchResult {
 	e.multiMatchersMutex.RLock()
 	defer e.multiMatchersMutex.RUnlock()
 

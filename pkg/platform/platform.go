@@ -106,10 +106,10 @@ func (cfg Config) Module() fx.Option {
 	options := fx.Options(
 		fx.Provide(
 			provideFlagSetBuilder,
-			alerts.ProvideAlerter,
 		),
 		config.ModuleConfig{MergeConfig: cfg.MergeConfig, UnknownFlags: false, ExitOnHelp: true}.Module(),
 		config.LogModule(),
+		alerts.Module(),
 		health.Module(),
 		http.ProxyModule(),
 		metrics.Module(),
