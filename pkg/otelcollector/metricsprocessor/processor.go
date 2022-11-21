@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/rs/zerolog"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -51,11 +50,7 @@ func (p *metricsProcessor) Capabilities() consumer.Capabilities {
 
 // ConsumeLogs receives plog.Logs for consumption then returns updated logs with policy labels and metrics.
 func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.Logs, error) {
-	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
-		retErr := func(sampler zerolog.Sampler, errMsg string) error {
-			log.Sample(sampler).Warn().Msg(errMsg)
-			return fmt.Errorf(errMsg)
-		}
+	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
 		// Attributes
 		attributes := logRecord.Attributes()
 
@@ -65,34 +60,32 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		// Source specific processing
 		source, exists := attributes.Get(otelcollector.ApertureSourceLabel)
 		if !exists {
-			return retErr(noSourceLabelSampler, "aperture source label not found")
+			log.Sample(noSourceLabelSampler).Warn().Msg("aperture source label not found")
+			return otelcollector.Discard
 		}
 		sourceStr := source.Str()
 		if sourceStr == otelcollector.ApertureSourceSDK {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{})
 			if !success {
-				return retErr(
-					noSDKCheckResponseSampler,
-					"aperture check response label not found in SDK access logs",
-				)
+				log.Sample(noSDKCheckResponseSampler).Warn().
+					Msg("aperture check response label not found in SDK access logs")
+				return otelcollector.Discard
 			}
 
 			internal.AddSDKSpecificLabels(attributes)
 		} else if sourceStr == otelcollector.ApertureSourceEnvoy {
 			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
 			if !success {
-				return retErr(
-					noEnvoyCheckResponseSampler,
-					"aperture check response label not found in Envoy access logs",
-				)
+				log.Sample(noEnvoyCheckResponseSampler).Warn().
+					Msg("aperture check response label not found in Envoy access logs")
+				return otelcollector.Discard
 			}
 
 			internal.AddEnvoySpecificLabels(attributes)
 		} else {
-			return retErr(
-				unrecognizedSourceLabelSampler,
-				"aperture source label not recognized",
-			)
+			log.Sample(unrecognizedSourceLabelSampler).Warn().
+				Msg("aperture source label not recognized")
+			return otelcollector.Discard
 		}
 
 		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
@@ -110,9 +103,9 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 
 		// This needs to be called **after** internal.EnforceIncludeList{HTTP,SDK}.
 		internal.AddFlowLabels(attributes, checkResponse)
-		return nil
+		return otelcollector.Keep
 	})
-	return ld, err
+	return ld, nil
 }
 
 var (
