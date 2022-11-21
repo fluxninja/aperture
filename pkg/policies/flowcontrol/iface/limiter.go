@@ -4,9 +4,10 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 //go:generate mockgen -source=limiter.go -destination=../../mocks/mock_limiter.go -package=mocks
@@ -36,7 +37,7 @@ type Limiter interface {
 type RateLimiter interface {
 	Limiter
 	TakeN(labels map[string]string, count int) (label string, ok bool, remaining int, current int)
-	GetRequestCounter() prometheus.Counter
+	GetRequestCounter(labels map[string]string) prometheus.Counter
 }
 
 // ConcurrencyLimiter interface.
