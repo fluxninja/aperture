@@ -8,7 +8,7 @@ sidebar_label: Controller
 See also [Aperture Controller installation](/get-started/installation/controller.md).
 :::
 
-List of all config parameters for Aperture Agent.
+List of all config parameters for Aperture Controller.
 
 <!---
 Generated File Starts
