@@ -11,7 +11,6 @@ import (
 
 	"github.com/elastic/gosigar"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
