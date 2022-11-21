@@ -132,7 +132,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 	rollupData := make(map[string]pcommon.Map)
 	datasketches := make(map[string]map[string]*sketches.HeapDoublesSketch)
 
-	err := otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
+	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
 		attributes := logRecord.Attributes()
 		key := rp.key(attributes, rollupsLog)
 		_, exists := rollupData[key]
@@ -147,17 +147,15 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 		rawCount, _ := rollupData[key].Get(RollupCountKey)
 		rollupData[key].PutInt(RollupCountKey, rawCount.Int()+1)
 		rp.rollupAttributes(datasketches[key], rollupData[key], attributes, rollupsLog)
-		return nil
+		return otelcollector.Keep
 	})
-	if err != nil {
-		return err
-	}
 	for k, v := range datasketches {
 		attributes := rollupData[k]
 		for toField, sketch := range v {
 			serializedBytes, err := sketch.Compact().Serialize()
 			if err != nil {
-				return err
+				// Serialize() should never return error, unless there's a bug in sketches library.
+				log.Bug().Err(err).Msg("Sketch.Serialize() failed")
 			}
 			serialized := base64.StdEncoding.EncodeToString(serializedBytes)
 			attributes.PutStr(toField, serialized)
@@ -168,8 +166,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 
 func applyCardinalityLimits(ld plog.Logs, limit int) {
 	attributeValues := map[string]map[string]struct{}{}
-	// IterateLogRecords won't error, as we always return nil from the closure
-	_ = otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) error {
+	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
 		logRecord.Attributes().Range(func(k string, v pcommon.Value) bool {
 			// Applying the cardinality limits only to string attributes, as
 			// all user-created attributes where we risk high-cardinality are
@@ -195,7 +192,7 @@ func applyCardinalityLimits(ld plog.Logs, limit int) {
 			}
 			return true
 		})
-		return nil
+		return otelcollector.Keep
 	})
 }
 
@@ -308,7 +305,7 @@ func (rp *rollupProcessor) key(am pcommon.Map, rollups []*Rollup) string {
 	}
 	key, err := json.Marshal(raw)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed marshaling map to JSON")
+		log.Bug().Err(err).Msg("key: Failed marshaling map to JSON")
 		return ""
 	}
 	return string(key)
