@@ -50,7 +50,7 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 	}
 	md := pmetric.NewMetrics()
 	origMd.CopyTo(md)
-	err := otelcollector.IterateMetrics(md, func(metric pmetric.Metric) error {
+	otelcollector.IterateMetrics(md, func(metric pmetric.Metric) {
 		switch metric.Type() {
 		case pmetric.MetricTypeGauge:
 			dataPoints := metric.Gauge().DataPoints()
@@ -83,9 +83,8 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 				ep.enrichMetrics(dp.Attributes())
 			}
 		}
-		return nil
 	})
-	return md, err
+	return md, nil
 }
 
 func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
