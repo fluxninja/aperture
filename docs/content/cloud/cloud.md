@@ -8,10 +8,10 @@ keywords:
 
 # FluxNinja Cloud
 
-:::info Join the Cloud Waitlist
+:::info Join the FluxNinja Cloud Beta
 
-FluxNinja Cloud is inviting beta users. Please join the wait list
-[here](https://cloud.fluxninja.com/)
+FluxNinja Cloud is inviting beta users. Please sign in
+[here](https://app.fluxninja.com/sign-in)
 
 :::
 
