@@ -41,9 +41,8 @@ func IterateLogRecords(ld plog.Logs, fn func(plog.LogRecord) IterAction) {
 	})
 }
 
-// IterateSpans calls given function for each span. If the function returns error
-// further span will not be processed and the error will be returned.
-func IterateSpans(td ptrace.Traces, fn func(ptrace.Span) error) error {
+// IterateSpans calls given function for each span.
+func IterateSpans(td ptrace.Traces, fn func(ptrace.Span)) {
 	resourceSpansSlice := td.ResourceSpans()
 	for resourceSpansIt := 0; resourceSpansIt < resourceSpansSlice.Len(); resourceSpansIt++ {
 		resourceSpans := resourceSpansSlice.At(resourceSpansIt)
@@ -53,19 +52,14 @@ func IterateSpans(td ptrace.Traces, fn func(ptrace.Span) error) error {
 			spansSlice := scopeSpans.Spans()
 			for spansIt := 0; spansIt < spansSlice.Len(); spansIt++ {
 				span := spansSlice.At(spansIt)
-				err := fn(span)
-				if err != nil {
-					return err
-				}
+				fn(span)
 			}
 		}
 	}
-	return nil
 }
 
-// IterateMetrics calls given function for each metric. If the function returns error
-// further metric will not be processed and the error will be returned.
-func IterateMetrics(md pmetric.Metrics, fn func(pmetric.Metric) error) error {
+// IterateMetrics calls given function for each metric.
+func IterateMetrics(md pmetric.Metrics, fn func(pmetric.Metric)) {
 	resourceMetricsSlice := md.ResourceMetrics()
 	for resourceMetricsIt := 0; resourceMetricsIt < resourceMetricsSlice.Len(); resourceMetricsIt++ {
 		resourceMetrics := resourceMetricsSlice.At(resourceMetricsIt)
@@ -75,62 +69,41 @@ func IterateMetrics(md pmetric.Metrics, fn func(pmetric.Metric) error) error {
 			metricsSlice := scopeMetrics.Metrics()
 			for metricsIt := 0; metricsIt < metricsSlice.Len(); metricsIt++ {
 				span := metricsSlice.At(metricsIt)
-				err := fn(span)
-				if err != nil {
-					return err
-				}
+				fn(span)
 			}
 		}
 	}
-	return nil
 }
 
-// IterateDataPoints calls given function for each metric data point. If the function returns error
-// further data point will not be processed and the error will be returned.
-func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map) error) error {
+// IterateDataPoints calls given function for each metric data point.
+func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map)) {
 	switch metric.Type() {
 	case pmetric.MetricTypeGauge:
 		dataPoints := metric.Gauge().DataPoints()
 		for i := 0; i < dataPoints.Len(); i++ {
-			err := fn(dataPoints.At(i).Attributes())
-			if err != nil {
-				return err
-			}
+			fn(dataPoints.At(i).Attributes())
 		}
 	case pmetric.MetricTypeSum:
 		dataPoints := metric.Sum().DataPoints()
 		for i := 0; i < dataPoints.Len(); i++ {
-			err := fn(dataPoints.At(i).Attributes())
-			if err != nil {
-				return err
-			}
+			fn(dataPoints.At(i).Attributes())
 		}
 	case pmetric.MetricTypeSummary:
 		dataPoints := metric.Summary().DataPoints()
 		for i := 0; i < dataPoints.Len(); i++ {
-			err := fn(dataPoints.At(i).Attributes())
-			if err != nil {
-				return err
-			}
+			fn(dataPoints.At(i).Attributes())
 		}
 	case pmetric.MetricTypeHistogram:
 		dataPoints := metric.Histogram().DataPoints()
 		for i := 0; i < dataPoints.Len(); i++ {
-			err := fn(dataPoints.At(i).Attributes())
-			if err != nil {
-				return err
-			}
+			fn(dataPoints.At(i).Attributes())
 		}
 	case pmetric.MetricTypeExponentialHistogram:
 		dataPoints := metric.ExponentialHistogram().DataPoints()
 		for i := 0; i < dataPoints.Len(); i++ {
-			err := fn(dataPoints.At(i).Attributes())
-			if err != nil {
-				return err
-			}
+			fn(dataPoints.At(i).Attributes())
 		}
 	}
-	return nil
 }
 
 // GetStruct is a helper for decoding complex structs encoded into an attribute

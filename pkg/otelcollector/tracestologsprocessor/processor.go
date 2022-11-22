@@ -91,16 +91,12 @@ func (p *tracesToLogsProcessor) ConsumeTraces(ctx context.Context, traces ptrace
 func (p *tracesToLogsProcessor) tracesToLogs(ctx context.Context, traces ptrace.Traces) error {
 	p.lock.Lock()
 
-	l, err := p.buildLogs(traces)
+	l := p.buildLogs(traces)
 
 	// This component no longer needs to read the log once built, so it is safe to unlock.
 	p.lock.Unlock()
 
-	if err != nil {
-		return err
-	}
-
-	if err = p.logsExporter.ConsumeLogs(ctx, l); err != nil {
+	if err := p.logsExporter.ConsumeLogs(ctx, l); err != nil {
 		return err
 	}
 
@@ -109,10 +105,10 @@ func (p *tracesToLogsProcessor) tracesToLogs(ctx context.Context, traces ptrace.
 
 // buildLogs collects the computed raw log data, builds the log object and
 // writes the raw log data into the log object.
-func (p *tracesToLogsProcessor) buildLogs(traces ptrace.Traces) (plog.Logs, error) {
+func (p *tracesToLogsProcessor) buildLogs(traces ptrace.Traces) plog.Logs {
 	l := plog.NewLogs()
 
-	err := otelcollector.IterateSpans(traces, func(s ptrace.Span) error {
+	otelcollector.IterateSpans(traces, func(s ptrace.Span) {
 		spanAttributes := s.Attributes()
 
 		ill := l.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty()
@@ -121,12 +117,7 @@ func (p *tracesToLogsProcessor) buildLogs(traces ptrace.Traces) (plog.Logs, erro
 		lr := ill.LogRecords().AppendEmpty()
 
 		spanAttributes.CopyTo(lr.Attributes())
-
-		return nil
 	})
-	if err != nil {
-		return plog.Logs{}, err
-	}
 
-	return l, nil
+	return l
 }
