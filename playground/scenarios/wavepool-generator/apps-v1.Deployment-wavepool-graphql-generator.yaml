@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wavepool-generator
+  namespace: demoapp
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: wavepool-generator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: wavepool-generator
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - args:
+        - while true; do k6 run -v /tmp/test.js; done
+        command:
+        - /bin/sh
+        - -xc
+        image: loadimpact/k6:latest
+        imagePullPolicy: Always
+        name: wavepool-generator
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /tmp
+          name: graphql-js-file
+      volumes:
+      - configMap:
+          name: wavepool-config
+        name: graphql-js-file

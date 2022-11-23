@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: service
+    app.kubernetes.io/managed-by: Helmraiser
+    app.kubernetes.io/name: graphql-demo-app
+    helm.sh/chart: graphql-demo-app-0.1.0
+  name: service-graphql-demo-app
+  namespace: demoapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: service
+      app.kubernetes.io/name: graphql-demo-app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: service
+        app.kubernetes.io/name: graphql-demo-app
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: service
+              topologyKey: kubernetes.io/hostname
+            weight: 50
+      containers:
+      - env:
+        - name: PORT
+          value: "8099"
+        - name: HOSTNAME
+          value: service-graphql-demo-app.demoapp.svc.cluster.local
+        image: docker.io/fluxninja/graphql-demo-app:test
+        imagePullPolicy: IfNotPresent
+        name: simplesrv
+        ports:
+        - containerPort: 8099
+          name: srvhttp
+          protocol: TCP
+        securityContext: {}
+      securityContext: {}
+      serviceAccountName: service-graphql-demo-app
