@@ -25,7 +25,8 @@ func Module() fx.Option {
 }
 
 type AlertManagerConfig struct {
-	Name             string                       `json:"name"`
+	Name             string                       `json:"name" validate:"required"`
+	Address          string                       `json:"address" validate:"required,hostname_port|url|fqdn"`
 	HttpClientConfig *httpclient.HTTPClientConfig `json:"http_client"`
 }
 
@@ -39,6 +40,7 @@ func ProvideNamedAlertManagerClients(unmarshaller config.Unmarshaller) fx.Option
 
 	var optionList []fx.Option
 	for _, configItem := range configList {
+		log.Warn().Msgf("DARIA LOG ALERT CLIENT NAME: %+v", configItem.Name)
 		options := amclient.ProvideNamedClient(configItem.Name, configItem.HttpClientConfig)
 		optionList = append(optionList, options)
 	}
