@@ -389,12 +389,14 @@ func AddAlertsPipeline(cfg *OtelParams, extraProcessors ...string) {
 		cfg.BatchAlerts.SendBatchSize,
 		cfg.BatchAlerts.SendBatchMaxSize,
 	)
+	config.AddExporter(ExporterAlerts, nil)
+
 	processors := []string{ProcessorBatchAlerts}
 	processors = append(processors, extraProcessors...)
 	config.Service.AddPipeline("logs/alerts", Pipeline{
 		Receivers:  []string{ReceiverAlerts},
 		Processors: processors,
-		Exporters:  []string{ExporterLogging},
+		Exporters:  []string{ExporterLogging, ExporterAlerts},
 	})
 }
 
