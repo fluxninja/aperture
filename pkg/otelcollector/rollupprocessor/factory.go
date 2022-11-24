@@ -21,9 +21,9 @@ func NewFactory() component.ProcessorFactory {
 		component.WithLogsProcessor(CreateLogsProcessor, component.StabilityLevelInDevelopment))
 }
 
-func createDefaultConfig() config.Processor {
+func createDefaultConfig() component.ProcessorConfig {
 	return &Config{
-		ProcessorSettings:         config.NewProcessorSettings(config.NewComponentID(typeStr)),
+		ProcessorSettings:         config.NewProcessorSettings(component.NewID(typeStr)),
 		AttributeCardinalityLimit: defaultAttributeCardinalityLimit,
 	}
 }
@@ -32,7 +32,7 @@ func createDefaultConfig() config.Processor {
 func CreateLogsProcessor(
 	_ context.Context,
 	set component.ProcessorCreateSettings,
-	cfg config.Processor,
+	cfg component.ProcessorConfig,
 	nextConsumer consumer.Logs,
 ) (component.LogsProcessor, error) {
 	return newRollupLogsProcessor(set, nextConsumer, cfg.(*Config))

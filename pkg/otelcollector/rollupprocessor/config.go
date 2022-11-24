@@ -1,6 +1,7 @@
 package rollupprocessor
 
 import (
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/config"
 )
 
@@ -10,4 +11,4 @@ type Config struct {
 	AttributeCardinalityLimit int                      `mapstructure:"attribute_cardinality_limit"`
 }
 
-var _ config.Processor = (*Config)(nil)
+var _ component.ProcessorConfig = (*Config)(nil)

@@ -1,6 +1,7 @@
 package tracestologsprocessor
 
 import (
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/config"
 )
 
@@ -10,7 +11,7 @@ type Config struct {
 	LogsExporter             string                   `mapstructure:"logs_exporter"`
 }
 
-var _ config.Processor = (*Config)(nil)
+var _ component.ProcessorConfig = (*Config)(nil)
 
 // Validate checks if the exporter configuration is valid.
 func (cfg *Config) Validate() error {

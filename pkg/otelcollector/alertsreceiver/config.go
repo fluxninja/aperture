@@ -1,6 +1,7 @@
 package alertsreceiver
 
 import (
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/config"
 
 	"github.com/fluxninja/aperture/pkg/alerts"
@@ -13,4 +14,4 @@ type Config struct {
 	alerter alerts.Alerter
 }
 
-var _ config.Receiver = (*Config)(nil)
+var _ component.ReceiverConfig = (*Config)(nil)
