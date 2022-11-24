@@ -16,24 +16,25 @@ import (
 	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
 )
 
-var (
-	// AlertMgrClientConfigKey is the key used to store the AlertManagerClientConfig in the config.
-	configKey           = "alertmanagers"
-	AlertMgrClientFxKey = config.GroupTag("alertmgr_clients")
-)
+var configKey = "alertmanagers"
 
 // AlertManagerConfig main level config for alertmanager.
+// swagger:model
+// +kubebuilder:object:generate=true
 type AlertManagerConfig struct {
-	Clients []AlertManagerClientConfig `json:"clients" validate:"required"`
+	Clients []AlertManagerClientConfig `json:"clients,omitempty"`
 }
 
 // AlertManagerClientConfig config for single alertmanager client.
+// swagger:model AlertManagerClientConfig
+// +kubebuilder:object:generate=true
 type AlertManagerClientConfig struct {
-	Name             string                      `json:"name" validate:"required"`
-	Address          string                      `json:"address" validate:"required,hostname_port|url|fqdn"`
-	HttpClientConfig commonhttp.HTTPClientConfig `json:"http_client"`
+	Name       string                      `json:"name,omitempty"`
+	Address    string                      `json:"address,omitempty" validate:"hostname_port|url|fqdn"`
+	HTTPConfig commonhttp.HTTPClientConfig `json:"http_client,omitempty"`
 }
 
+// ProvideNamedAlertManagerClients provides a list of alertmanager clients from configuration.
 func ProvideNamedAlertManagerClients(unmarshaller config.Unmarshaller) []AlertManagerClient {
 	clientSlice := []AlertManagerClient{}
 
@@ -44,7 +45,7 @@ func ProvideNamedAlertManagerClients(unmarshaller config.Unmarshaller) []AlertMa
 	}
 
 	for _, configItem := range config.Clients {
-		httpClient, err := commonhttp.ClientFromConfig(configItem.HttpClientConfig)
+		httpClient, err := commonhttp.ClientFromConfig(configItem.HTTPConfig)
 		if err != nil {
 			log.Warn().Msg("Could not create http client from config")
 			continue
@@ -57,12 +58,13 @@ func ProvideNamedAlertManagerClients(unmarshaller config.Unmarshaller) []AlertMa
 
 // AlertManagerClient provides an interface for alert manager client.
 type AlertManagerClient interface {
-	SendAlert(ctx context.Context, alerts prommodels.PostableAlerts) error
+	SendAlerts(ctx context.Context, alerts prommodels.PostableAlerts) error
+	GetName() string
 }
 
 // RealAlertManagerClient implements AlertManagerClient interface.
 type RealAlertManagerClient struct {
-	name            string
+	Name            string
 	httpClient      *http.Client
 	promAlertClient *promclient.Alertmanager
 }
@@ -74,14 +76,15 @@ func CreateClient(name, address string, httpClient *http.Client) AlertManagerCli
 	promClient := promclient.New(transport, strfmt.NewFormats())
 
 	alertMgrClient := &RealAlertManagerClient{
-		name:            name,
+		Name:            name,
 		promAlertClient: promClient,
 		httpClient:      httpClient,
 	}
 	return alertMgrClient
 }
 
-func (ac *RealAlertManagerClient) SendAlert(ctx context.Context, alerts prommodels.PostableAlerts) error {
+// SendAlerts sends postable alerts via configured alertmanager http client.
+func (ac *RealAlertManagerClient) SendAlerts(ctx context.Context, alerts prommodels.PostableAlerts) error {
 	postAlertParams := &promalert.PostAlertsParams{
 		Context:    ctx,
 		HTTPClient: ac.httpClient,
@@ -90,4 +93,9 @@ func (ac *RealAlertManagerClient) SendAlert(ctx context.Context, alerts prommode
 	_, err := ac.promAlertClient.Alert.PostAlerts(postAlertParams)
 
 	return err
+}
+
+// GetName getter func for alert manager client name.
+func (ac *RealAlertManagerClient) GetName() string {
+	return ac.Name
 }

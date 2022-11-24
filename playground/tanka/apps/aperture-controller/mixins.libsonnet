@@ -93,14 +93,14 @@ local apertureControllerMixin =
           },
           alertmanagers+: {
             clients: [
-            {
-              name: "test1",
-              address: "http://ingestion-service.cloud.svc.cluster.local:80",
-            },
-            {
-              name: "test2",
-              address: "http://ingestion-service.cloud.svc.cluster.local:80",
-            },
+              {
+                name: 'test1',
+                address: 'http://ingestion-service.cloud.svc.cluster.local:80',
+              },
+              {
+                name: 'test2',
+                address: 'http://ingestion-service.cloud.svc.cluster.local:80',
+              },
             ],
           },
         },
