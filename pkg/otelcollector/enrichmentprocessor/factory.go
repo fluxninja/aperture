@@ -21,7 +21,7 @@ func NewFactory(cache *entitycache.EntityCache) component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
 		createDefaultConfig(cache),
-		component.WithMetricsProcessor(createMetricsProcessor, component.StabilityLevelInDevelopment),
+		component.WithMetricsProcessor(createMetricsProcessor, component.StabilityLevelDevelopment),
 	)
 }
 

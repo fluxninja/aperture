@@ -22,7 +22,7 @@ func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine, clasEng 
 	return component.NewProcessorFactory(
 		typeStr,
 		createDefaultConfig(promRegistry, engine, clasEng),
-		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
+		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelDevelopment),
 	)
 }
 

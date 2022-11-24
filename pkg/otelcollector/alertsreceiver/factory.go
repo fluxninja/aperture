@@ -12,7 +12,7 @@ import (
 
 const (
 	typeStr   = "alerts"
-	stability = component.StabilityLevelInDevelopment
+	stability = component.StabilityLevelDevelopment
 )
 
 // NewFactory creates a factory for alerts receiver.
