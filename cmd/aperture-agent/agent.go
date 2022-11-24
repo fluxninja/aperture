@@ -40,7 +40,7 @@ func main() {
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
 			agent.ProvidePeersPrefix,
-			controlpointcache.Provide(),
+			controlpointcache.Provide,
 		),
 		fx.Invoke(
 			agent.AddAgentInfoAttribute,
