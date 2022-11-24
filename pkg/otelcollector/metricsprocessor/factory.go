@@ -28,7 +28,7 @@ func NewFactory(
 	return component.NewProcessorFactory(
 		typeStr,
 		createDefaultConfig(promRegistry, engine, clasEng, controlPointCache),
-		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
+		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelDevelopment),
 	)
 }
 
