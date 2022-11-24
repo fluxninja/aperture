@@ -3,6 +3,7 @@ package alertsexporter
 import (
 	"context"
 
+	"github.com/go-openapi/strfmt"
 	prommodels "github.com/prometheus/alertmanager/api/v2/models"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
@@ -13,11 +14,7 @@ import (
 )
 
 type alertsExporter struct {
-	cfg          *Config
-	logsConsumer consumer.Logs
-
-	// shutdown kills the long running context. Should be set in Start()
-	shutdown func()
+	cfg *Config
 }
 
 func newExporter(cfg *Config) (*alertsExporter, error) {
@@ -53,8 +50,12 @@ func (ex *alertsExporter) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
 	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
 		attributes := logRecord.Attributes()
 
+		genURLStr := ""
+		if genURL, ok := attributes.Get(otelcollector.AlertGeneratorURLLabel); ok {
+			genURLStr = genURL.Str()
+		}
 		singleAlert := prommodels.Alert{
-			GeneratorURL: attributes.Get(otelcollector.AlertGeneratorURLLabel),
+			GeneratorURL: strfmt.URI(genURLStr),
 		}
 		postableAlert := &prommodels.PostableAlert{
 			Alert: singleAlert,
@@ -65,7 +66,10 @@ func (ex *alertsExporter) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
 	})
 
 	for _, amClient := range ex.cfg.alertMgr.Clients {
-		amClient.SendAlert(ctx, alerts)
+		err := amClient.SendAlerts(ctx, alerts)
+		if err != nil {
+			log.Warn().Err(err).Msgf("could not send alerts for client: %+v", amClient.GetName())
+		}
 	}
 
 	return nil
