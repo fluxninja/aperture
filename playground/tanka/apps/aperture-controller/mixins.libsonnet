@@ -83,7 +83,7 @@ local apertureControllerMixin =
           log+: {
             pretty_console: true,
             non_blocking: true,
-            level: 'debug',
+            level: 'info',
           },
           etcd+: {
             endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
@@ -91,16 +91,18 @@ local apertureControllerMixin =
           prometheus+: {
             address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',
           },
-          alertmanagers+: [
+          alertmanagers+: {
+            clients: [
             {
               name: "test1",
-              address: "http://agent-service.cloud.svc.cluster.local:80",
+              address: "http://ingestion-service.cloud.svc.cluster.local:80",
             },
             {
               name: "test2",
-              address: "http://agent-service.cloud.svc.cluster.local:80",
+              address: "http://ingestion-service.cloud.svc.cluster.local:80",
             },
-          ],
+            ],
+          },
         },
         image: {
           registry: '',

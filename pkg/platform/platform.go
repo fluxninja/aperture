@@ -119,7 +119,6 @@ func (cfg Config) Module() fx.Option {
 		profilers.Module(),
 		ServerModule(false),
 		etcdclient.Module(),
-		alertmanager.Module(),
 		jobs.Module(),
 		status.Module(),
 		fx.Populate(&platform.statusRegistry),
@@ -127,6 +126,7 @@ func (cfg Config) Module() fx.Option {
 		fx.Supply(registry),
 		fx.Populate(&platform.unmarshaller),
 		fx.Populate(&platform.dotgraph),
+		alertmanager.Module(),
 	)
 	if pluginOptions != nil {
 		options = fx.Options(
