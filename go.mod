@@ -21,6 +21,7 @@ require (
 	github.com/getsentry/sentry-go v0.14.0
 	github.com/go-co-op/gocron v1.17.1
 	github.com/go-logr/zerologr v1.2.2
+	github.com/go-openapi/runtime v0.23.3
 	github.com/go-openapi/strfmt v0.21.3
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/golang/mock v1.6.0
@@ -106,7 +107,6 @@ require (
 	github.com/go-openapi/analysis v0.21.2 // indirect
 	github.com/go-openapi/errors v0.20.2 // indirect
 	github.com/go-openapi/loads v0.21.1 // indirect
-	github.com/go-openapi/runtime v0.23.3 // indirect
 	github.com/go-openapi/spec v0.20.6 // indirect
 	github.com/go-openapi/swag v0.22.1 // indirect
 	github.com/go-openapi/validate v0.22.0 // indirect
@@ -121,6 +121,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/ottl v0.64.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza v0.64.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheus v0.64.0 // indirect
+	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/prometheus/prometheus v0.39.1 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	go.mongodb.org/mongo-driver v1.10.2 // indirect
