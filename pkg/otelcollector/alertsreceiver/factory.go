@@ -23,10 +23,10 @@ func NewFactory(alerter alerts.Alerter) component.ReceiverFactory {
 		component.WithLogsReceiver(createLogsReceiver, stability))
 }
 
-func createDefaultConfig(alerter alerts.Alerter) func() config.Receiver {
-	return func() config.Receiver {
+func createDefaultConfig(alerter alerts.Alerter) func() component.ReceiverConfig {
+	return func() component.ReceiverConfig {
 		return &Config{
-			ReceiverSettings: config.NewReceiverSettings(config.NewComponentID(typeStr)),
+			ReceiverSettings: config.NewReceiverSettings(component.NewID(typeStr)),
 			alerter:          alerter,
 		}
 	}
@@ -35,7 +35,7 @@ func createDefaultConfig(alerter alerts.Alerter) func() config.Receiver {
 func createLogsReceiver(
 	_ context.Context,
 	_ component.ReceiverCreateSettings,
-	rConf config.Receiver,
+	rConf component.ReceiverConfig,
 	consumer consumer.Logs,
 ) (component.LogsReceiver, error) {
 	cfg := rConf.(*Config)

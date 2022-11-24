@@ -27,9 +27,9 @@ func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine, clasEng 
 }
 
 func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.Engine, clasEng iface.ClassificationEngine) component.ProcessorCreateDefaultConfigFunc {
-	return func() config.Processor {
+	return func() component.ProcessorConfig {
 		return &Config{
-			ProcessorSettings:    config.NewProcessorSettings(config.NewComponentID(typeStr)),
+			ProcessorSettings:    config.NewProcessorSettings(component.NewID(typeStr)),
 			promRegistry:         promRegistry,
 			engine:               engine,
 			classificationEngine: clasEng,
@@ -40,7 +40,7 @@ func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.Engine,
 func createLogsProcessor(
 	ctx context.Context,
 	params component.ProcessorCreateSettings,
-	cfg config.Processor,
+	cfg component.ProcessorConfig,
 	nextLogsConsumer consumer.Logs,
 ) (component.LogsProcessor, error) {
 	cfgTyped := cfg.(*Config)
