@@ -44,6 +44,6 @@ func (ex *alertsExporter) Capabilities() consumer.Capabilities {
 
 // ConsumeLogs is TODO.
 func (ex *alertsExporter) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
-	log.Warn().Msgf("DARIA LOG CONSUME LOGS IN EXPORTER")
+	log.Error().Msgf("DARIA LOG CONSUME LOGS IN EXPORTER")
 	return nil
 }
