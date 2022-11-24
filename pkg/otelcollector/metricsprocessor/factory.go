@@ -9,6 +9,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/processor/processorhelper"
 
+	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 )
 
@@ -18,21 +19,32 @@ const (
 )
 
 // NewFactory returns a new factory for the metrics processor.
-func NewFactory(promRegistry *prometheus.Registry, engine iface.Engine, clasEng iface.ClassificationEngine) component.ProcessorFactory {
+func NewFactory(
+	promRegistry *prometheus.Registry,
+	engine iface.Engine,
+	clasEng iface.ClassificationEngine,
+	controlPointCache *controlpointcache.ControlPointCache,
+) component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
-		createDefaultConfig(promRegistry, engine, clasEng),
+		createDefaultConfig(promRegistry, engine, clasEng, controlPointCache),
 		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelInDevelopment),
 	)
 }
 
-func createDefaultConfig(promRegistry *prometheus.Registry, engine iface.Engine, clasEng iface.ClassificationEngine) component.ProcessorCreateDefaultConfigFunc {
+func createDefaultConfig(
+	promRegistry *prometheus.Registry,
+	engine iface.Engine,
+	clasEng iface.ClassificationEngine,
+	controlPointCache *controlpointcache.ControlPointCache,
+) component.ProcessorCreateDefaultConfigFunc {
 	return func() component.ProcessorConfig {
 		return &Config{
 			ProcessorSettings:    config.NewProcessorSettings(component.NewID(typeStr)),
 			promRegistry:         promRegistry,
 			engine:               engine,
 			classificationEngine: clasEng,
+			controlPointCache:    controlPointCache,
 		}
 	}
 }
