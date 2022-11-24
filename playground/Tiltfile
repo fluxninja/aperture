@@ -785,6 +785,22 @@ def render_yaml(manifests_path, env_vars=None):
         )
     )
 
+
+def render_jsonnet(manifests_path, jsonnet_args=None):
+    if not jsonnet_args:
+        jsonnet_args = []
+    print(jsonnet_args)
+
+    wrapped_k8s_yaml(
+        namespace_inject(
+            local(
+                quiet=True,
+                command=["jsonnet"] + jsonnet_args + [manifests_path]
+            ),
+            APERTURE_DEMOAPP_NS
+        )
+    )
+
 def process_aperture_scenario(scenario_path):
     app_manifest = read_json(scenario_path + "/metadata.json")
     app_manifest["manifests_path"] = scenario_path + "/" + "manifests"
@@ -795,9 +811,10 @@ def process_aperture_scenario(scenario_path):
     DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-app"] = app_manifest
 
     policies = {
-        "renderer": "yaml",
+        "renderer": "jsonnet",
+        "jsonnet_args": ["--yaml-stream"],
         "labels": "TestScenarioApplication",
-        "manifests_path": scenario_path + "/" + "policies",
+        "manifests_path": scenario_path + "/" + "policies/policy.jsonnet",
         "resource_deps": ["scenario-app"],
         "child_resources": [
             {
@@ -824,9 +841,9 @@ def process_aperture_scenario(scenario_path):
         },
         "child_resources": [
             {
-                "workload": "wavepool-graphql-generator",
+                "workload": "wavepool-generator",
                 "extra_objects": [
-                    "wavepool-graphql-config:configmap"
+                    "wavepool-config:configmap"
                 ]
             }
         ]
@@ -930,6 +947,9 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
                 render_tanka(tkenv, env_vars)
             elif renderer == "yaml":
                 render_yaml(manifests_path, env_vars)
+            elif renderer == "jsonnet":
+                jsonnet_args = app_config.get("jsonnet_args", [])
+                render_jsonnet(manifests_path, jsonnet_args)
             else:
                 fail("Tanka app is not found for %s." % app)
 
