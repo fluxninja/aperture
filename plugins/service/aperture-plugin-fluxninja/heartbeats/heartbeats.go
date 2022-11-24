@@ -222,13 +222,12 @@ func (h *Heartbeats) newHeartbeat(
 	}
 
 	rawControlPoints := h.controlPointCache.GetAllAndClear()
-	controlPoints := make([]*heartbeatv1.ControlPoint, len(rawControlPoints))
-	i := 0
+	controlPoints := make([]*heartbeatv1.ControlPoint, 0, len(rawControlPoints))
 	for cp := range rawControlPoints {
-		controlPoints[i] = &heartbeatv1.ControlPoint{
+		controlPoints = append(controlPoints, &heartbeatv1.ControlPoint{
 			Name:        cp.Name,
 			ServiceName: cp.Service,
-		}
+		})
 	}
 
 	return &heartbeatv1.ReportRequest{
