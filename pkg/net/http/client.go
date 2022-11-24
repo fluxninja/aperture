@@ -21,10 +21,9 @@ func ClientModule() fx.Option {
 
 // ClientConstructor holds fields to create an annotated instance of HTTP client.
 type ClientConstructor struct {
-	Name           string
-	ConfigKey      string
-	DefaultConfig  HTTPClientConfig
-	ProvidedConfig *HTTPClientConfig
+	Name          string
+	ConfigKey     string
+	DefaultConfig HTTPClientConfig
 }
 
 // HTTPClientConfig holds configuration for HTTP Client.
@@ -73,8 +72,8 @@ type HTTPClientConfig struct {
 
 // Annotate creates an annotated instance of HTTP Client.
 func (constructor ClientConstructor) Annotate() fx.Option {
-	if constructor.ConfigKey == "" && constructor.ProvidedConfig == nil {
-		log.Panic().Msg("config key not provided, provided config is nil")
+	if constructor.ConfigKey == "" {
+		log.Panic().Msg("config key not provided")
 	}
 
 	name := config.NameTag(constructor.Name)
@@ -91,18 +90,41 @@ func (constructor ClientConstructor) Annotate() fx.Option {
 func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (*http.Client, *MiddlewareChain, *HTTPClientConfig, error) {
 	var err error
 	config := constructor.DefaultConfig
-	if constructor.ConfigKey != "" {
-		if err = unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
-			log.Error().Err(err).Msg("Unable to deserialize httpclient configuration!")
-			return nil, nil, nil, err
-		}
-	} else {
-		config = *constructor.ProvidedConfig
+	if err = unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
+		log.Error().Err(err).Msg("Unable to deserialize httpclient configuration!")
+		return nil, nil, nil, err
 	}
 
-	tlsConfig, err := config.ClientTLSConfig.GetTLSConfig()
+	client, err := ClientFromConfig(config)
 	if err != nil {
 		return nil, nil, nil, err
+	}
+
+	// return a middleware chain -- call invokes on this object to chain middleware functions
+	mwc := &MiddlewareChain{
+		client:      client,
+		middlewares: []Middleware{},
+	}
+
+	lifecycle.Append(fx.Hook{
+		OnStart: func(context.Context) error {
+			// build middleware chain
+			mwc.buildChain()
+			return nil
+		},
+		OnStop: func(context.Context) error {
+			return nil
+		},
+	})
+
+	return client, mwc, &config, nil
+}
+
+// ClientFromConfig creates http client from already parsed config.
+func ClientFromConfig(config HTTPClientConfig) (*http.Client, error) {
+	tlsConfig, err := config.ClientTLSConfig.GetTLSConfig()
+	if err != nil {
+		return nil, err
 	}
 
 	transport := &http.Transport{
@@ -135,24 +157,7 @@ func (constructor ClientConstructor) provideHTTPClient(unmarshaller config.Unmar
 		Timeout:   config.Timeout.AsDuration(),
 	}
 
-	// return a middleware chain -- call invokes on this object to chain middleware functions
-	mwc := &MiddlewareChain{
-		client:      client,
-		middlewares: []Middleware{},
-	}
-
-	lifecycle.Append(fx.Hook{
-		OnStart: func(context.Context) error {
-			// build middleware chain
-			mwc.buildChain()
-			return nil
-		},
-		OnStop: func(context.Context) error {
-			return nil
-		},
-	})
-
-	return client, mwc, &config, nil
+	return client, nil
 }
 
 // inspired by https://github.com/improbable-eng/go-httpwares/blob/master/tripperware.go
