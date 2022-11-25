@@ -91,6 +91,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
 		attributes.PutStr(otelcollector.ApertureFlowStatusLabel, internal.FlowStatusForTelemetry(statusCode, flowStatus))
 		internal.AddCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
+		p.populateControlPointCache(checkResponse)
 
 		// Update metrics and enforce include list to eliminate any excess attributes
 		if sourceStr == otelcollector.ApertureSourceSDK {
@@ -274,6 +275,12 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
 	if fluxMeterHistogram != nil {
 		fluxMeterHistogram.Observe(metricValue)
+	}
+}
+
+func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv1.CheckResponse) {
+	for _, service := range checkResponse.GetServices() {
+		p.cfg.controlPointCache.Put(checkResponse.GetControlPoint(), service)
 	}
 }
 

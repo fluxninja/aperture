@@ -16,6 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/json"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	m "github.com/fluxninja/aperture/pkg/metrics"
 	oc "github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
@@ -24,6 +25,7 @@ import (
 var _ = Describe("Metrics Processor", func() {
 	var (
 		pr                *prometheus.Registry
+		cpCache           *controlpointcache.ControlPointCache
 		cfg               *Config
 		processor         *metricsProcessor
 		engine            *mocks.MockEngine
@@ -46,6 +48,7 @@ var _ = Describe("Metrics Processor", func() {
 
 	BeforeEach(func() {
 		pr = prometheus.NewRegistry()
+		cpCache = controlpointcache.NewControlPointCache()
 		ctrl := gomock.NewController(GinkgoT())
 		engine = mocks.NewMockEngine(ctrl)
 		clasEngine = mocks.NewMockClassificationEngine(ctrl)
@@ -57,6 +60,7 @@ var _ = Describe("Metrics Processor", func() {
 			engine:               engine,
 			classificationEngine: clasEngine,
 			promRegistry:         pr,
+			controlPointCache:    cpCache,
 		}
 
 		summaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
@@ -168,6 +172,13 @@ var _ = Describe("Metrics Processor", func() {
 
 		for k, v := range expectedLabels {
 			Expect(logRecords[0].Attributes().AsRaw()).To(HaveKeyWithValue(k, v))
+		}
+
+		By("populating control point cache")
+
+		cp := cpCache.GetAllAndClear()
+		for _, service := range baseCheckResp.GetServices() {
+			Expect(cp).To(HaveKey(controlpointcache.ControlPoint{Name: baseCheckResp.GetControlPoint(), Service: service}))
 		}
 	})
 

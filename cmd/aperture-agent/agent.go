@@ -15,6 +15,7 @@ import (
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	"github.com/fluxninja/aperture/pkg/discovery"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
@@ -39,6 +40,7 @@ func main() {
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
 			agent.ProvidePeersPrefix,
+			controlpointcache.Provide,
 		),
 		fx.Invoke(
 			agent.AddAgentInfoAttribute,

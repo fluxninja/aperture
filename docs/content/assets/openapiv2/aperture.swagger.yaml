@@ -960,6 +960,14 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: The constant value is emitted to the output port.
     description: Outputs for the Constant component.
+  v1ControlPoint:
+    type: object
+    properties:
+      name:
+        type: string
+      service_name:
+        type: string
+    description: ControlPoint contains info about a control point on a given service.
   v1ControllerDynamicConfig:
     type: object
     properties:
@@ -1997,6 +2005,10 @@ definitions:
         type: string
       all_statuses:
         $ref: '#/definitions/v1GroupStatus'
+      control_points:
+        type: array
+        items:
+          $ref: '#/definitions/v1ControlPoint'
       controller_info:
         $ref: '#/definitions/v1ControllerInfo'
       host_info:

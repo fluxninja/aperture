@@ -8,6 +8,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -52,6 +53,7 @@ type ConstructorIn struct {
 	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
 	EtcdClient                 *etcdclient.Client
 	PolicyFactory              *controlplane.PolicyFactory `optional:"true"`
+	ControlPointCache          *controlpointcache.ControlPointCache
 }
 
 // Provide provides a new instance of Heartbeats.
@@ -61,13 +63,16 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		return nil, err
 	}
 
-	heartbeats := newHeartbeats(in.JobGroup,
+	heartbeats := newHeartbeats(
+		in.JobGroup,
 		config,
 		in.StatusRegistry,
 		in.EntityCache,
 		in.AgentInfo,
 		in.PeersWatcher,
-		in.PolicyFactory)
+		in.PolicyFactory,
+		in.ControlPointCache,
+	)
 
 	runCtx, cancel := context.WithCancel(context.Background())
 

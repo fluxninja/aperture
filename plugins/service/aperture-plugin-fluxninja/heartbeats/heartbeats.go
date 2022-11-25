@@ -23,6 +23,7 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/info"
@@ -50,20 +51,21 @@ const (
 
 type Heartbeats struct {
 	heartbeatv1.UnimplementedControllerInfoServiceServer
-	heartbeatsClient heartbeatv1.FluxNinjaServiceClient
-	peersWatcher     *peers.PeerDiscovery
-	clientHTTP       *http.Client
-	agentInfo        *agentinfo.AgentInfo
-	interval         config.Duration
-	jobGroup         *jobs.JobGroup
-	clientConn       *grpc.ClientConn
-	statusRegistry   status.Registry
-	entityCache      *entitycache.EntityCache
-	policyFactory    *controlplane.PolicyFactory
-	ControllerInfo   *heartbeatv1.ControllerInfo
-	heartbeatsAddr   string
-	APIKey           string
-	jobName          string
+	heartbeatsClient  heartbeatv1.FluxNinjaServiceClient
+	peersWatcher      *peers.PeerDiscovery
+	clientHTTP        *http.Client
+	agentInfo         *agentinfo.AgentInfo
+	interval          config.Duration
+	jobGroup          *jobs.JobGroup
+	clientConn        *grpc.ClientConn
+	statusRegistry    status.Registry
+	entityCache       *entitycache.EntityCache
+	policyFactory     *controlplane.PolicyFactory
+	ControllerInfo    *heartbeatv1.ControllerInfo
+	heartbeatsAddr    string
+	APIKey            string
+	jobName           string
+	controlPointCache *controlpointcache.ControlPointCache
 }
 
 func newHeartbeats(
@@ -74,17 +76,19 @@ func newHeartbeats(
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
+	controlPointCache *controlpointcache.ControlPointCache,
 ) *Heartbeats {
 	return &Heartbeats{
-		heartbeatsAddr: p.FluxNinjaEndpoint,
-		interval:       p.HeartbeatInterval,
-		APIKey:         p.APIKey,
-		jobGroup:       jobGroup,
-		statusRegistry: statusRegistry,
-		entityCache:    entityCache,
-		agentInfo:      agentInfo,
-		peersWatcher:   peersWatcher,
-		policyFactory:  policyFactory,
+		heartbeatsAddr:    p.FluxNinjaEndpoint,
+		interval:          p.HeartbeatInterval,
+		APIKey:            p.APIKey,
+		jobGroup:          jobGroup,
+		statusRegistry:    statusRegistry,
+		entityCache:       entityCache,
+		agentInfo:         agentInfo,
+		peersWatcher:      peersWatcher,
+		policyFactory:     policyFactory,
+		controlPointCache: controlPointCache,
 	}
 }
 
@@ -217,6 +221,15 @@ func (h *Heartbeats) newHeartbeat(
 		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
 	}
 
+	rawControlPoints := h.controlPointCache.GetAllAndClear()
+	controlPoints := make([]*heartbeatv1.ControlPoint, 0, len(rawControlPoints))
+	for cp := range rawControlPoints {
+		controlPoints = append(controlPoints, &heartbeatv1.ControlPoint{
+			Name:        cp.Name,
+			ServiceName: cp.Service,
+		})
+	}
+
 	return &heartbeatv1.ReportRequest{
 		VersionInfo:    info.GetVersionInfo(),
 		ProcessInfo:    info.GetProcessInfo(),
@@ -227,6 +240,7 @@ func (h *Heartbeats) newHeartbeat(
 		ServicesList:   servicesList,
 		AllStatuses:    h.statusRegistry.GetGroupStatus(),
 		Policies:       policies,
+		ControlPoints:  controlPoints,
 	}
 }
 

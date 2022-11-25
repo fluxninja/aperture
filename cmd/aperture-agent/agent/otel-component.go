@@ -27,6 +27,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
@@ -62,6 +63,7 @@ func AgentOTELComponents(
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
 	serverGRPC *grpc.Server,
+	controlPointCache *controlpointcache.ControlPointCache,
 ) (component.Factories, error) {
 	var errs error
 
@@ -105,7 +107,7 @@ func AgentOTELComponents(
 		memorylimiterprocessor.NewFactory(),
 		enrichmentprocessor.NewFactory(cache),
 		rollupprocessor.NewFactory(),
-		metricsprocessor.NewFactory(promRegistry, engine, clasEng),
+		metricsprocessor.NewFactory(promRegistry, engine, clasEng, controlPointCache),
 		attributesprocessor.NewFactory(),
 		tracestologsprocessor.NewFactory(),
 		transformprocessor.NewFactory(),
