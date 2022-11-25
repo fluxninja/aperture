@@ -238,7 +238,7 @@ func AgentEnv(instance *agentv1alpha1.Agent, agentGroup string) []corev1.EnvVar 
 						Name: SecretName(instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaPlugin),
 					},
 					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
-					Optional: pointer.BoolPtr(false),
+					Optional: pointer.Bool(false),
 				},
 			},
 		})
@@ -266,7 +266,7 @@ func AgentVolumes(agentSpec agentv1alpha1.AgentSpec) []corev1.Volume {
 			Name: "aperture-agent-config",
 			VolumeSource: corev1.VolumeSource{
 				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32Ptr(420),
+					DefaultMode: pointer.Int32(420),
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: AgentServiceName,
 					},
@@ -307,7 +307,7 @@ func ControllerEnv(instance *controllerv1alpha1.Controller) []corev1.EnvVar {
 						Name: SecretName(instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin),
 					},
 					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
-					Optional: pointer.BoolPtr(false),
+					Optional: pointer.Bool(false),
 				},
 			},
 		})
@@ -350,7 +350,7 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 			Name: "aperture-controller-config",
 			VolumeSource: corev1.VolumeSource{
 				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32Ptr(420),
+					DefaultMode: pointer.Int32(420),
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: ControllerServiceName,
 					},
@@ -367,11 +367,11 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 			Name: "etc-aperture-classification",
 			VolumeSource: corev1.VolumeSource{
 				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32Ptr(420),
+					DefaultMode: pointer.Int32(420),
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: "classification",
 					},
-					Optional: pointer.BoolPtr(true),
+					Optional: pointer.Bool(true),
 				},
 			},
 		},
@@ -379,7 +379,7 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 			Name: "server-cert",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					DefaultMode: pointer.Int32Ptr(420),
+					DefaultMode: pointer.Int32(420),
 					SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 				},
 			},
