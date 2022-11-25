@@ -18,7 +18,7 @@ func NewFactory() component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
 		createDefaultConfig,
-		component.WithLogsProcessor(CreateLogsProcessor, component.StabilityLevelInDevelopment))
+		component.WithLogsProcessor(CreateLogsProcessor, component.StabilityLevelDevelopment))
 }
 
 func createDefaultConfig() component.ProcessorConfig {
