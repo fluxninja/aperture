@@ -51,7 +51,7 @@ func podMutatingWebhookConfiguration(instance *agentv1alpha1.Agent) (*admissionr
 					Service: &admissionregistrationv1.ServiceReference{
 						Name:      os.Getenv("APERTURE_OPERATOR_SERVICE_NAME"),
 						Namespace: os.Getenv("APERTURE_OPERATOR_NAMESPACE"),
-						Path:      pointer.StringPtr(controllers.MutatingWebhookURI),
+						Path:      pointer.String(controllers.MutatingWebhookURI),
 						Port:      pointer.Int32(443),
 					},
 				},
@@ -78,7 +78,7 @@ func podMutatingWebhookConfiguration(instance *agentv1alpha1.Agent) (*admissionr
 				AdmissionReviewVersions: []string{controllers.V1Version},
 				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-				TimeoutSeconds:          pointer.Int32Ptr(10),
+				TimeoutSeconds:          pointer.Int32(10),
 			},
 		},
 	}

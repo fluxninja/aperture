@@ -53,7 +53,7 @@ func agentMutatingWebhookConfiguration() (*admissionregistrationv1.MutatingWebho
 					Service: &admissionregistrationv1.ServiceReference{
 						Name:      os.Getenv("APERTURE_OPERATOR_SERVICE_NAME"),
 						Namespace: os.Getenv("APERTURE_OPERATOR_NAMESPACE"),
-						Path:      pointer.StringPtr(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI)),
+						Path:      pointer.String(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI)),
 						Port:      pointer.Int32(443),
 					},
 				},
@@ -72,7 +72,7 @@ func agentMutatingWebhookConfiguration() (*admissionregistrationv1.MutatingWebho
 				AdmissionReviewVersions: []string{controllers.V1Version},
 				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-				TimeoutSeconds:          pointer.Int32Ptr(10),
+				TimeoutSeconds:          pointer.Int32(10),
 			},
 		},
 	}
@@ -106,7 +106,7 @@ func controllerMutatingWebhookConfiguration() (*admissionregistrationv1.Mutating
 					Service: &admissionregistrationv1.ServiceReference{
 						Name:      os.Getenv("APERTURE_OPERATOR_SERVICE_NAME"),
 						Namespace: os.Getenv("APERTURE_OPERATOR_NAMESPACE"),
-						Path:      pointer.StringPtr(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI)),
+						Path:      pointer.String(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI)),
 						Port:      pointer.Int32(443),
 					},
 				},
@@ -125,7 +125,7 @@ func controllerMutatingWebhookConfiguration() (*admissionregistrationv1.Mutating
 				AdmissionReviewVersions: []string{controllers.V1Version},
 				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-				TimeoutSeconds:          pointer.Int32Ptr(10),
+				TimeoutSeconds:          pointer.Int32(10),
 			},
 		},
 	}

@@ -42,7 +42,7 @@ func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cer
 					Service: &admissionregistrationv1.ServiceReference{
 						Name:      controllers.ControllerServiceName,
 						Namespace: instance.GetNamespace(),
-						Path:      pointer.StringPtr(controllers.PolicyValidatingWebhookURI),
+						Path:      pointer.String(controllers.PolicyValidatingWebhookURI),
 						Port:      pointer.Int32(serverPort),
 					},
 					CABundle: cert,
@@ -66,7 +66,7 @@ func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cer
 				AdmissionReviewVersions: []string{controllers.V1Version},
 				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-				TimeoutSeconds:          pointer.Int32Ptr(10),
+				TimeoutSeconds:          pointer.Int32(10),
 			},
 		},
 	}
