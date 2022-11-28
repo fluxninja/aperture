@@ -2152,20 +2152,22 @@ extractor:
     pointer: /user/name
 ```
 
-Example of Rego module which also disables propagation by disabling telemetry:
+Example of Rego module which also disables telemetry visibility of label:
 
 ```yaml
 rego:
   query: data.user_from_cookie.user
   source: |
-    package: user_from_cookie
-    cookies: split(input.attributes.request.http.headers.cookie, ';')
-    cookie: cookies[_]
-    cookie.startswith: ('session=')
-    session: substring(cookie, count('session='), -1)
-    parts: split(session, '.')
-    object: json.unmarshal(base64url.decode(parts[0]))
-    user: object.user
+    package user_from_cookie
+    cookies := split(input.attributes.request.http.headers.cookie, "; ")
+    user := user {
+        cookie := cookies[_]
+        startswith(cookie, "session=")
+        session := substring(cookie, count("session="), -1)
+        parts := split(session, ".")
+        object := json.unmarshal(base64url.decode(parts[0]))
+        user := object.user
+    }
 telemetry: false
 ```
 

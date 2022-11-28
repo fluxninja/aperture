@@ -139,7 +139,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 
 	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
 
-	input, err := envoyauth.RequestToInput(req, logger, nil)
+	skipRequestBodyParse := false
+	input, err := envoyauth.RequestToInput(req, logger, nil, skipRequestBodyParse)
 	if err != nil {
 		// TODO(krdln) This conversion should be made infallible instead.
 		// https://github.com/fluxninja/aperture/issues/903
