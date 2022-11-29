@@ -19,10 +19,13 @@ var specialLabels = map[string]struct{}{
 	otelcollector.AlertGeneratorURLLabel: {},
 }
 
+// AlertOption is a type for constructor options.
+type AlertOption func(*Alert)
+
 // NewAlert created new instance of Alert with StartsAt set to now.
-func NewAlert() *Alert {
-	return &Alert{
-		PostableAlert: models.PostableAlert{
+func NewAlert(opts ...AlertOption) *Alert {
+	newAlert := &Alert{
+		postableAlert: models.PostableAlert{
 			Alert: models.Alert{
 				Labels: models.LabelSet(map[string]string{}),
 			},
@@ -30,52 +33,74 @@ func NewAlert() *Alert {
 			StartsAt:    strfmt.DateTime(time.Now().UTC()),
 		},
 	}
+
+	for _, opt := range opts {
+		opt(newAlert)
+	}
+	return newAlert
 }
 
 // Alert is a wrapper around models.PostableAlert with handy transform methods.
 type Alert struct {
-	models.PostableAlert
+	postableAlert models.PostableAlert
 }
 
 // Name gets the alert name from labels. Returns empty string if label not found.
 func (a *Alert) Name() string {
-	return a.Labels[otelcollector.AlertNameLabel]
+	return a.postableAlert.Labels[otelcollector.AlertNameLabel]
 }
 
 // SetName sets the alert name in labels. Overwrites previous value if exists.
 func (a *Alert) SetName(name string) {
-	a.Labels[otelcollector.AlertNameLabel] = name
+	a.postableAlert.Labels[otelcollector.AlertNameLabel] = name
+}
+
+// WithName is an option function for constructor.
+func WithName(name string) AlertOption {
+	return func(a *Alert) {
+		a.postableAlert.Labels[otelcollector.AlertNameLabel] = name
+	}
 }
 
 // Severity gets the alert severity from labels. Returns empty string if label not found.
 func (a *Alert) Severity() string {
-	return a.Labels[otelcollector.AlertSeverityLabel]
+	return a.postableAlert.Labels[otelcollector.AlertSeverityLabel]
 }
 
 // SetSeverity sets the alert severity in labels. Overwrites previous value if exists.
 func (a *Alert) SetSeverity(severity string) {
-	a.Labels[otelcollector.AlertSeverityLabel] = severity
+	a.postableAlert.Labels[otelcollector.AlertSeverityLabel] = severity
 }
 
-// SetAnnotations overwrites all the current annotations with the one provided.
-func (a *Alert) SetAnnotations(annotations map[string]string) {
-	a.Annotations = models.LabelSet(annotations)
+// WithSeverity is an option function for constructor.
+func WithSeverity(severity string) AlertOption {
+	return func(a *Alert) {
+		a.postableAlert.Labels[otelcollector.AlertSeverityLabel] = severity
+	}
 }
 
 // SetAnnotation sets a single annotation. It overwrites the previous value if exists.
 func (a *Alert) SetAnnotation(key, value string) {
-	a.Annotations[key] = value
+	a.postableAlert.Annotations[key] = value
 }
 
-// SetLabels overwrites all the current labels with the one provided.
-// Caution: this will overwrite also name and severity!
-func (a *Alert) SetLabels(labels map[string]string) {
-	a.Labels = models.LabelSet(labels)
+// WithAnnotation is an option function for constructor.
+func WithAnnotation(key, value string) AlertOption {
+	return func(a *Alert) {
+		a.postableAlert.Annotations[key] = value
+	}
 }
 
 // SetLabel sets a single label. It overwrites the previous value if exists.
 func (a *Alert) SetLabel(key, value string) {
-	a.Labels[key] = value
+	a.postableAlert.Labels[key] = value
+}
+
+// WithLabel is an option function for constructor.
+func WithLabel(key, value string) AlertOption {
+	return func(a *Alert) {
+		a.postableAlert.Labels[key] = value
+	}
 }
 
 // AlertsFromLogs gets slice of alerts from OTEL Logs.
@@ -100,13 +125,13 @@ func AlertsFromLogs(ld plog.Logs) []*Alert {
 			for logsIt := 0; logsIt < logsSlice.Len(); logsIt++ {
 				logRecord := logsSlice.At(logsIt)
 				a := &Alert{}
-				a.StartsAt = strfmt.DateTime(logRecord.Timestamp().AsTime())
-				a.GeneratorURL = strfmt.URI(generatorURL.AsString())
-				a.Labels = models.LabelSet(mapFromAttributes(resourceAttributes, specialLabels))
+				a.postableAlert.StartsAt = strfmt.DateTime(logRecord.Timestamp().AsTime())
+				a.postableAlert.GeneratorURL = strfmt.URI(generatorURL.AsString())
+				a.postableAlert.Labels = models.LabelSet(mapFromAttributes(resourceAttributes, specialLabels))
 				a.SetSeverity(logRecord.SeverityText())
 				a.SetName(logRecord.Body().AsString())
 				attributes := logRecord.Attributes()
-				a.Annotations = models.LabelSet(mapFromAttributes(attributes, map[string]struct{}{}))
+				a.postableAlert.Annotations = models.LabelSet(mapFromAttributes(attributes, map[string]struct{}{}))
 				alerts = append(alerts, a)
 			}
 		}
@@ -121,16 +146,16 @@ func (a *Alert) AsLogs() plog.Logs {
 	resourceAttributes := resource.Resource().Attributes()
 	// Labels in AM are used to identify identical instances of an alert. This corresponds
 	// with the resource notion in OTLP protocol, which describes the source of a log.
-	populateAttributesFromMap(resourceAttributes, a.Labels, specialLabels)
-	resourceAttributes.PutStr(otelcollector.AlertGeneratorURLLabel, string(a.GeneratorURL))
+	populateAttributesFromMap(resourceAttributes, a.postableAlert.Labels, specialLabels)
+	resourceAttributes.PutStr(otelcollector.AlertGeneratorURLLabel, string(a.postableAlert.GeneratorURL))
 
 	logRecord := resource.ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
-	logRecord.SetTimestamp(pcommon.NewTimestampFromTime(time.Time(a.StartsAt)))
+	logRecord.SetTimestamp(pcommon.NewTimestampFromTime(time.Time(a.postableAlert.StartsAt)))
 	logRecord.SetSeverityText(a.Severity())
 	pcommon.NewValueStr(a.Name()).CopyTo(logRecord.Body())
 
 	attributes := logRecord.Attributes()
-	populateAttributesFromMap(attributes, a.Annotations, map[string]struct{}{})
+	populateAttributesFromMap(attributes, a.postableAlert.Annotations, map[string]struct{}{})
 	return ld
 }
 
