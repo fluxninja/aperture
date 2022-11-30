@@ -67,8 +67,8 @@ with Aperture. There is an instance of Grafana running on the cluster as well
 for viewing metrics from experiments.
 
 The Playground is preloaded with a
-[Latency Gradient Concurrency Control](/tutorials/flow-control/basic-concurrency-limiting.md)
-policy which protects the demo application against sudden surges in traffic
+[Latency Gradient Policy](/tutorials/flow-control/basic-concurrency-limiting.md)
+ which protects the demo application against sudden surges in traffic
 load. You can verify it using the following command:
 
 ```sh
