@@ -1,0 +1,1 @@
+rootProject.name = "aperture-java-tomcat-example"
