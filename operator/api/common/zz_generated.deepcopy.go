@@ -122,6 +122,7 @@ func (in *CommonConfigSpec) DeepCopyInto(out *CommonConfigSpec) {
 	out.Prometheus = in.Prometheus
 	in.Server.DeepCopyInto(&out.Server)
 	in.Watchdog.DeepCopyInto(&out.Watchdog)
+	in.Alertmanagers.DeepCopyInto(&out.Alertmanagers)
 	in.BundledPluginsSpec.DeepCopyInto(&out.BundledPluginsSpec)
 }
 

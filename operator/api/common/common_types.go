@@ -18,6 +18,7 @@ limitations under the License.
 package common
 
 import (
+	amclient "github.com/fluxninja/aperture/pkg/alertmanager/client"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -340,6 +341,10 @@ type CommonConfigSpec struct {
 	// Watchdog configuration.
 	//+kubebuilder:validation:Optional
 	Watchdog watchdog.WatchdogConfig `json:"watchdog"`
+
+	// Alert Managers configuration.
+	//+kubebuilder:validation:Optional
+	Alertmanagers amclient.AlertManagerConfig `json:"alertmanagers,omitempty"`
 
 	// BundledPluginsSpec defines configuration for bundled plugins.
 	//+kubebuilder:validation:Optional

@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/info/v1"
+	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -125,6 +126,7 @@ func (cfg Config) Module() fx.Option {
 		fx.Supply(registry),
 		fx.Populate(&platform.unmarshaller),
 		fx.Populate(&platform.dotgraph),
+		alertmanager.Module(),
 	)
 	if pluginOptions != nil {
 		options = fx.Options(
