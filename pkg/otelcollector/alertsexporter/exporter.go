@@ -44,7 +44,6 @@ func (ex *alertsExporter) Capabilities() consumer.Capabilities {
 
 // ConsumeLogs sends alert from logs to alert manager clients.
 func (ex *alertsExporter) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
-	log.Error().Msgf("DARIA LOG CONSUME LOGS IN EXPORTER")
 	alerts := prommodels.PostableAlerts{}
 
 	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
