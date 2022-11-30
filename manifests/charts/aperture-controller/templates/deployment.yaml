@@ -79,7 +79,7 @@ spec:
       {{- end }}
       containers:
         - name: aperture-operator
-          image: {{ include "common.images.image" (dict "imageRoot" .Values.operator.image "global" .Values.global) }}
+          image: {{ include "controller-operator.image" (dict "image" .Values.operator.image "context" . $) }}
           imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
           {{- if .Values.operator.containerSecurityContext.enabled }}
           securityContext: {{- omit .Values.operator.containerSecurityContext "enabled" | toYaml | nindent 12 }}

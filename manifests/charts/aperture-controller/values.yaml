@@ -50,7 +50,7 @@ operator:
   image:
     registry: docker.io/fluxninja
     repository: aperture-operator
-    tag: latest
+    tag: ~
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
     ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -77,17 +77,19 @@ operator:
   ##
   podLabels: {}
   ## @param operator.updateStrategy.type Set up update strategy for Aperture Operator installation.
+  ## @param operator.updateStrategy.rollingUpdate.maxSurge Set up maximum number of Pods that can be created over the desired number of Pods.
+  ## @param operator.updateStrategy.rollingUpdate.maxUnavailable Set up maximum number of Pods that can be unavailable during the update process.
   ## Set to Recreate if you use persistent volume that cannot be mounted by more than one pods to make sure the pods is destroyed first.
   ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   ## Example:
   ## updateStrategy:
-  ##  type: RollingUpdate
-  ##  rollingUpdate:
-  ##    maxSurge: 25%
-  ##    maxUnavailable: 25%
+  ##  type: Recreate
   ##
   updateStrategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
   ## @param operator.priorityClassName pods' priorityClassName
   ##
   priorityClassName: ""
