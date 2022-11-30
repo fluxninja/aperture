@@ -982,6 +982,10 @@ spec:
                               type: object
                             name:
                               type: string
+                          required:
+                          - address
+                          - http_client
+                          - name
                           type: object
                         type: array
                     type: object

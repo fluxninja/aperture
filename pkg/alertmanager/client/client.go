@@ -29,9 +29,9 @@ type AlertManagerConfig struct {
 // swagger:model AlertManagerClientConfig
 // +kubebuilder:object:generate=true
 type AlertManagerClientConfig struct {
-	Name       string                      `json:"name,omitempty"`
-	Address    string                      `json:"address,omitempty" validate:"hostname_port|url|fqdn"`
-	HTTPConfig commonhttp.HTTPClientConfig `json:"http_client,omitempty"`
+	Name       string                      `json:"name"`
+	Address    string                      `json:"address" validate:"hostname_port|url|fqdn"`
+	HTTPConfig commonhttp.HTTPClientConfig `json:"http_client"`
 }
 
 // ProvideNamedAlertManagerClients provides a list of alertmanager clients from configuration.
