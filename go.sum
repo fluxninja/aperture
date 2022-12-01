@@ -104,8 +104,8 @@ github.com/buraksezer/connpool v0.6.0 h1:NnTWkd3OH3BAn4qbeI+Ks1XDzU0DQRgOfF+SxsU
 github.com/buraksezer/connpool v0.6.0/go.mod h1:qPiG7gKXo+EjrwG/yqn2StZM4ek6gcYnnGgFIVKN6b0=
 github.com/buraksezer/consistent v0.10.0 h1:hqBgz1PvNLC5rkWcEBVAL9dFMBWz6I0VgUCW25rrZlU=
 github.com/buraksezer/consistent v0.10.0/go.mod h1:6BrVajWq7wbKZlTOUPs/XVfR8c0maujuPowduSpZqmw=
-github.com/buraksezer/olric v0.4.9 h1:dCJbLtEWmBP/6rIQtsi2I0HG7evE+BduOOEVM8BLX10=
-github.com/buraksezer/olric v0.4.9/go.mod h1:kFohMoEizS/hAdYI13W3mfDZhwGeZyz/uXnGCgzCiGE=
+github.com/buraksezer/olric v0.4.10 h1:1ZmEIUMER1SkX8CnwKJlHHf0bofuk82GkIjh4WuSdZQ=
+github.com/buraksezer/olric v0.4.10/go.mod h1:kFohMoEizS/hAdYI13W3mfDZhwGeZyz/uXnGCgzCiGE=
 github.com/bytecodealliance/wasmtime-go v1.0.0 h1:9u9gqaUiaJeN5IoD1L7egD8atOnTGyJcNp8BhkL9cUU=
 github.com/cenkalti/backoff v2.2.1+incompatible h1:tNowT99t7UNflLxfYYSlKYsBpXdEet03Pg2g16Swow4=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
