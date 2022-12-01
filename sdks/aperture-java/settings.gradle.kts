@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "aperture-java"
+include("lib", "examples:armeria", "examples:standalone")
