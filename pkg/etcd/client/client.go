@@ -98,7 +98,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 				TLS:       tlsConfig,
 				Username:  config.Username,
 				Password:  config.Password,
-				Logger:    zap.New(log.NewZapAdapter(in.Logger, "etcd-client")),
+				Logger:    zap.New(log.NewZapAdapter(in.Logger, "etcd-client"), zap.IncreaseLevel(zap.WarnLevel)),
 			})
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to initialize etcd client")

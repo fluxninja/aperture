@@ -888,6 +888,107 @@ spec:
               config:
                 description: Controller Configuration
                 properties:
+                  alertmanagers:
+                    description: Alert Managers configuration.
+                    properties:
+                      clients:
+                        items:
+                          description: AlertManagerClientConfig config for single
+                            alertmanager client. swagger:model AlertManagerClientConfig
+                          properties:
+                            address:
+                              type: string
+                            http_client:
+                              description: HTTPClientConfig holds configuration for
+                                HTTP Client. swagger:model
+                              properties:
+                                disable_compression:
+                                  description: Disable Compression
+                                  type: boolean
+                                disable_keep_alives:
+                                  description: Disable HTTP Keep Alives
+                                  type: boolean
+                                expect_continue_timeout:
+                                  description: Expect Continue Timeout. 0 = no timeout.
+                                  type: string
+                                idle_connection_timeout:
+                                  description: Idle Connection Timeout. 0 = no timeout.
+                                  type: string
+                                key_log_file:
+                                  description: SSL key log file (useful for debugging
+                                    with wireshark)
+                                  type: string
+                                max_conns_per_host:
+                                  description: Max Connections Per Host. 0 = no limit.
+                                  type: integer
+                                max_idle_connections:
+                                  description: Max Idle Connections. 0 = no limit.
+                                  type: integer
+                                max_idle_connections_per_host:
+                                  description: Max Idle Connections per host. 0 =
+                                    no limit.
+                                  type: integer
+                                max_response_header_bytes:
+                                  description: Max Response Header Bytes. 0 = no limit.
+                                  format: int64
+                                  type: integer
+                                network_keep_alive:
+                                  description: Network level keep-alive duration
+                                  type: string
+                                network_timeout:
+                                  description: Timeout for making network connection
+                                  type: string
+                                proxy_connect_header:
+                                  additionalProperties:
+                                    items:
+                                      type: string
+                                    type: array
+                                  description: Proxy Connect Header - map[string][]string
+                                  type: object
+                                read_buffer_size:
+                                  description: Read Buffer Size. 0 = 4KB
+                                  type: integer
+                                response_header_timeout:
+                                  description: Response Header Timeout. 0 = no timeout.
+                                  type: string
+                                timeout:
+                                  description: HTTP client timeout - Timeouts includes
+                                    connection time, redirects, reading the response
+                                    etc. 0 = no timeout.
+                                  type: string
+                                tls:
+                                  description: Client TLS configuration
+                                  properties:
+                                    ca_file:
+                                      type: string
+                                    cert_file:
+                                      type: string
+                                    insecure_skip_verify:
+                                      type: boolean
+                                    key_file:
+                                      type: string
+                                    key_log_file:
+                                      type: string
+                                  type: object
+                                tls_handshake_timeout:
+                                  description: TLS Handshake Timeout. 0 = no timeout
+                                  type: string
+                                use_proxy:
+                                  description: Use Proxy
+                                  type: boolean
+                                write_buffer_size:
+                                  description: Write Buffer Size. 0 = 4KB.
+                                  type: integer
+                              type: object
+                            name:
+                              type: string
+                          required:
+                          - address
+                          - http_client
+                          - name
+                          type: object
+                        type: array
+                    type: object
                   client:
                     description: Client configuration such as proxy settings.
                     properties:

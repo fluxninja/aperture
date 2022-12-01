@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
@@ -41,6 +43,7 @@ func ModuleForControllerOTEL() fx.Option {
 // ControllerOTELComponents constructs OTEL Collector Factories for Controller.
 func ControllerOTELComponents(
 	alerter alerts.Alerter,
+	alertMgr *alertmanager.AlertManager,
 ) (component.Factories, error) {
 	var errs error
 
@@ -63,6 +66,7 @@ func ControllerOTELComponents(
 		otlphttpexporter.NewFactory(),
 		prometheusremotewriteexporter.NewFactory(),
 		loggingexporter.NewFactory(),
+		alertsexporter.NewFactory(alertMgr),
 	)
 	errs = multierr.Append(errs, err)
 

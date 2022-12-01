@@ -33,6 +33,30 @@ definitions:
       attributes.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
+  AlertManagerClientConfig:
+    properties:
+      address:
+        type: string
+        x-go-name: Address
+        x-go-validate: hostname_port|url|fqdn
+      http_client:
+        $ref: '#/definitions/HTTPClientConfig'
+      name:
+        type: string
+        x-go-name: Name
+    title: AlertManagerClientConfig config for single alertmanager client.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/client
+  AlertManagerConfig:
+    properties:
+      clients:
+        items:
+          $ref: '#/definitions/AlertManagerClientConfig'
+        type: array
+        x-go-name: Clients
+    title: AlertManagerConfig main level config for alertmanager.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/client
   AlerterConfig:
     properties:
       channel_size:

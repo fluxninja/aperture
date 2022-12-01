@@ -154,6 +154,8 @@ const (
 	// ExporterOTLPLoopback exports OTLP data to local OTLP receiver. To be used only
 	// with ProcessorSpanToLog.
 	ExporterOTLPLoopback = "otlp/loopback"
+	// ExporterAlerts exports alerts via alertmanager clients.
+	ExporterAlerts = "alerts"
 
 	/* Specific to alerts pipeline. */
 

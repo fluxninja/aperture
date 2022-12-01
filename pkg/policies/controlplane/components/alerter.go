@@ -65,14 +65,14 @@ func (a *Alerter) DynamicConfigUpdate(event notifiers.Event, unmarshaller config
 }
 
 func (a *Alerter) createAlert() *alerts.Alert {
-	newAlert := alerts.NewAlert()
-	newAlert.SetName(a.name)
-	newAlert.SetSeverity(a.severity)
-	newAlert.SetLabel("policy_name", a.policyReadAPI.GetPolicyName())
-	newAlert.SetLabel("type", "alerter")
-	newAlert.SetAnnotations(map[string]string{
-		"alert_channels":  strings.Join(a.alertChannels, ","),
-		"resolve_timeout": a.resolveTimeout.String(),
-	})
+	newAlert := alerts.NewAlert(
+		alerts.WithName(a.name),
+		alerts.WithSeverity(a.severity),
+		alerts.WithLabel("policy_name", a.policyReadAPI.GetPolicyName()),
+		alerts.WithLabel("type", "alerter"),
+		alerts.WithAnnotation("alert_channels", strings.Join(a.alertChannels, ",")),
+		alerts.WithAnnotation("resolve_timeout", a.resolveTimeout.String()),
+	)
+
 	return newAlert
 }
