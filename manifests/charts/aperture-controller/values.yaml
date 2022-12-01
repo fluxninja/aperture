@@ -542,6 +542,8 @@ controller:
 ##
 etcd:
   enabled: true
+  autoCompactionMode: periodic
+  autoCompactionRetention: 10m
   initContainer:
     enabled: true
     image:
