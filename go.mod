@@ -81,7 +81,7 @@ require (
 	go.uber.org/fx v1.18.2
 	go.uber.org/goleak v1.2.0
 	go.uber.org/multierr v1.8.0
-	go.uber.org/zap v1.23.0
+	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20221114191408-850992195362
 	golang.org/x/net v0.2.0
 	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6
