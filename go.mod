@@ -42,7 +42,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.4.0
 	github.com/onsi/gomega v1.23.0
 	github.com/open-policy-agent/opa v0.46.1
-	github.com/open-policy-agent/opa-envoy-plugin v0.45.0-envoy-10
+	github.com/open-policy-agent/opa-envoy-plugin v0.46.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.66.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.66.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.66.0
