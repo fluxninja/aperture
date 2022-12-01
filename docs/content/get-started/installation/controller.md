@@ -35,10 +35,35 @@ Controller CRD under the `controller.config` section. All the configuration
 parameters for Aperture Controller are listed
 [here](/references/configuration/controller.md).
 
+## Upgrade Procedure {#controller-upgrade-procedure}
+
+By following these instructions, you will have deployed the upgraded version of
+Aperture Controller into your cluster.
+
+1. Update the Helm chart repo in your environment:
+
+   ```bash
+   helm repo update
+   ```
+
+2. Use the same `values.yaml` file created as part of
+   [Installation Steps](#controller-installation) and pass it with below
+   command:
+
+   ```bash
+   helm template --include-crds --no-hooks controller aperture/aperture-controller -f values.yaml | kubectl apply -f -
+   ```
+
+3. If you have deployed the Aperture Controller into a namespace other than
+   `default`, use the `-n` flag:
+
+   ```bash
+   helm template --include-crds --no-hooks controller aperture/aperture-controller -f values.yaml -n aperture-controller | kubectl apply -f -
+   ```
+
 ## Installation {#controller-installation}
 
-Below are the steps to install or upgrade the Aperture Controller into your
-setup using the
+Below are the steps to install the Aperture Controller into your setup using the
 [Aperture Controller Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-controller).
 
 By following these instructions, you will have deployed the Aperture Controller
@@ -52,7 +77,7 @@ into your cluster.
    ```
 
 2. Configure the below parameters for the Controller Custom Resource by creating
-   a `values.yaml` with below parameters and pass it with `helm upgrade`:
+   a `values.yaml` with below parameters and pass it with `helm install`:
 
    :::info
 
@@ -71,14 +96,14 @@ into your cluster.
    ```
 
    ```bash
-   helm upgrade --install controller aperture/aperture-controller -f values.yaml
+   helm install controller aperture/aperture-controller -f values.yaml
    ```
 
 3. Alternatively, you can create the Controller Custom Resource directly on the
    Kubernetes cluster using the below steps:
 
    1. Create a `values.yaml` for starting the operator and disabling the
-      creation of Controller Custom Resource and pass it with `helm upgrade`:
+      creation of Controller Custom Resource and pass it with `helm install`:
 
       ```yaml
       controller:
@@ -86,7 +111,7 @@ into your cluster.
       ```
 
       ```bash
-      helm upgrade --install controller aperture/aperture-controller -f values.yaml
+      helm install controller aperture/aperture-controller -f values.yaml
       ```
 
    2. Create a YAML file with below specifications:
@@ -125,7 +150,7 @@ into your cluster.
 4. The chart installs Prometheus and Etcd instances by default. If you don't
    want to install and use your existing instances of Prometheus or Etcd,
    configure below values in the `values.yaml` file and pass it with
-   `helm upgrade`:
+   `helm install`:
 
    ```yaml
    controller:
@@ -150,7 +175,7 @@ into your cluster.
    Controller.
 
    ```bash
-   helm upgrade --install controller aperture/aperture-controller -f values.yaml
+   helm install controller aperture/aperture-controller -f values.yaml
    ```
 
    A list of all the configurable parameters for Etcd are available
@@ -163,7 +188,7 @@ into your cluster.
 
 5. If you want to modify the default parameters or the Aperture Controller
    config, for example `log`, you can create or update the `values.yaml` file
-   and pass it with `helm upgrade`:
+   and pass it with `helm install`:
 
    ```yaml
    controller:
@@ -178,7 +203,7 @@ into your cluster.
    ```
 
    ```bash
-   helm upgrade --install controller aperture/aperture-controller -f values.yaml
+   helm install controller aperture/aperture-controller -f values.yaml
    ```
 
    All the config parameters for the Aperture Controller are available
@@ -191,7 +216,7 @@ into your cluster.
    `default`, use the `-n` flag:
 
    ```bash
-   helm upgrade --install controller aperture/aperture-controller -n aperture-controller --create-namespace
+   helm install controller aperture/aperture-controller -n aperture-controller --create-namespace
    ```
 
 ## Verifying the Installation

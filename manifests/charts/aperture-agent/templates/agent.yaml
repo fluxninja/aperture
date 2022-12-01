@@ -14,9 +14,8 @@ metadata:
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 spec:
-  {{- if or .Values.agent.image.registry .Values.agent.image.repository .Values.agent.image.tag .Values.agent.image.pullPolicy .Values.agent.image.pullSecrets }}
-  image: {{ .Values.agent.image | toYaml | nindent 4 }}
-  {{- end }}
+  image: {{ omit .Values.agent.image "tag" | toYaml | nindent 4 }}
+    tag: {{ default (trimPrefix "v" .Chart.AppVersion) .Values.agent.image.tag }}
   {{- if .Values.agent.service.annotations }}
   service:
     annotations: {{ .Values.agent.service.annotations | toYaml | indent 6 }}

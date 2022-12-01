@@ -57,6 +57,7 @@ type AgentReconciler struct {
 	Recorder         record.EventRecorder
 	ApertureInjector *mutatingwebhook.ApertureInjector
 	resourcesDeleted bool
+	defaultsExecuted bool
 }
 
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
@@ -159,13 +160,14 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		}
 	}
 
-	if instance.Annotations == nil || instance.Annotations[controllers.DefaulterAnnotationKey] != "true" {
+	if instance.Annotations == nil || instance.Annotations[controllers.DefaulterAnnotationKey] != "true" || !r.defaultsExecuted {
 		err = r.checkDefaults(ctx, instance)
 		if err != nil {
 			return ctrl.Result{}, err
 		} else if instance.Status.Resources == controllers.FailedStatus {
 			return ctrl.Result{}, nil
 		}
+		r.defaultsExecuted = true
 	}
 
 	// Checking if the Minimum kubernetes version condition is satisfied.
