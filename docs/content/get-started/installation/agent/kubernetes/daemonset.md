@@ -13,7 +13,7 @@ The Aperture Agent can be installed as a
 [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
 where it will get deployed on all the nodes of the cluster.
 
-## Upgradation {#agent-daemonset-upgradation}
+## Upgrade Procedure {#agent-daemonset-upgrade-procedure}
 
 By following these instructions, you will have deployed the upgraded version of
 Aperture Agent into your cluster.

@@ -35,7 +35,7 @@ Controller CRD under the `controller.config` section. All the configuration
 parameters for Aperture Controller are listed
 [here](/references/configuration/controller.md).
 
-## Upgradation {#controller-upgradation}
+## Upgrade Procedure {#controller-upgrade-procedure}
 
 By following these instructions, you will have deployed the upgraded version of
 Aperture Controller into your cluster.

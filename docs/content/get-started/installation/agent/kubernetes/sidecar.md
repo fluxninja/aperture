@@ -32,7 +32,7 @@ The injector is configured with the following logic:
   is listed under `.spec.sidecar.enableNamespacesByDefault`. This is not enabled
   by default, so generally this means the pod is not injected.
 
-## Upgradation {#agent-sidecar-upgradation}
+## Upgrade Procedure {#agent-sidecar-upgrade-procedure}
 
 By following these instructions, you will have deployed the upgraded version of
 Aperture Agent into your cluster.
