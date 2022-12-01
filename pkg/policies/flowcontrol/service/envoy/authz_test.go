@@ -18,6 +18,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -67,7 +68,11 @@ var _ = Describe("Authorization handler", func() {
 				IpAddress: "1.2.3.4",
 				Services:  []string{service1Selector.ServiceSelector.Service},
 			})
-			handler = envoy.NewHandler(classifier, entities, &AcceptingHandler{})
+			handler = envoy.NewHandler(
+				classifier,
+				servicegetter.FromEntityCache(entities),
+				&AcceptingHandler{},
+			)
 		})
 		It("returns ok response", func() {
 			ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer("1.2.3.4"))

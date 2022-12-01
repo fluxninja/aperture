@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"regexp"
-	"strings"
 	"time"
 
 	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
@@ -16,13 +15,11 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/peer"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
@@ -30,6 +27,7 @@ import (
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 	authz_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy/baggage"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 )
 
 // NewHandler creates new authorization handler for authz api
@@ -38,23 +36,23 @@ import (
 // metadata in the response to the Check calls.
 func NewHandler(
 	classifier *classification.ClassificationEngine,
-	entityCache *entitycache.EntityCache,
+	serviceGetter servicegetter.ServiceGetter,
 	fcHandler check.HandlerWithValues,
 ) *Handler {
 	return &Handler{
-		classifier:  classifier,
-		entityCache: entityCache,
-		propagator:  authz_baggage.W3Baggage{},
-		fcHandler:   fcHandler,
+		classifier:    classifier,
+		serviceGetter: serviceGetter,
+		propagator:    authz_baggage.W3Baggage{},
+		fcHandler:     fcHandler,
 	}
 }
 
 // Handler implements envoy.service.auth.v3.Authorization and handles Check call.
 type Handler struct {
-	entityCache *entitycache.EntityCache
-	classifier  *classification.ClassificationEngine
-	propagator  authz_baggage.Propagator
-	fcHandler   check.HandlerWithValues
+	serviceGetter servicegetter.ServiceGetter
+	classifier    *classification.ClassificationEngine
+	propagator    authz_baggage.Propagator
+	fcHandler     check.HandlerWithValues
 }
 
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)
@@ -127,18 +125,9 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 			Code(codes.InvalidArgument).Msg("missing control-point")
 	}
 
-	var svcs []string
-	rpcPeer, peerExists := peer.FromContext(ctx)
-	if peerExists {
-		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
-		entity, err := h.entityCache.GetByIP(clientIP)
-		if err == nil {
-			svcs = entity.Services
-		}
-	}
+	svcs := h.serviceGetter.ServicesFromContext(ctx)
 
 	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
-
 	skipRequestBodyParse := false
 	input, err := envoyauth.RequestToInput(req, logger, nil, skipRequestBodyParse)
 	if err != nil {

@@ -23,10 +23,10 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/cmd/sdk-validator/validator"
-	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -90,8 +90,11 @@ func main() {
 	flowcontrolv1.RegisterFlowControlServiceServer(grpcServer, flowcontrolHandler)
 
 	reg := status.NewRegistry(log.GetGlobalLogger())
-	entities := entitycache.NewEntityCache()
-	authzHandler := envoy.NewHandler(classifier.NewClassificationEngine(reg), entities, commonHandler)
+	authzHandler := envoy.NewHandler(
+		classifier.NewClassificationEngine(reg),
+		servicegetter.NewEmpty(),
+		commonHandler,
+	)
 	authv3.RegisterAuthorizationServer(grpcServer, authzHandler)
 
 	// initiate and register otel trace handler
