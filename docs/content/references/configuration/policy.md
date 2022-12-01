@@ -613,6 +613,12 @@ See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 
 </dd>
+<dt>load_actuator_alerter</dt>
+<dd>
+
+([V1LoadActuatorAlerter](#v1-load-actuator-alerter)) LoadActuatorAlerter reacts if load_multiplier signal is less than 1.
+
+</dd>
 <dt>max</dt>
 <dd>
 
@@ -1651,6 +1657,27 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 <dd>
 
 ([V1LoadActuatorIns](#v1-load-actuator-ins)) Input ports for the Load Actuator component.
+
+</dd>
+</dl>
+
+### v1LoadActuatorAlerter {#v1-load-actuator-alerter}
+
+LoadActuatorAlerter extends basic alerter.
+
+#### Properties
+
+<dl>
+<dt>base_alerter</dt>
+<dd>
+
+([V1Alerter](#v1-alerter)) Common alerter config
+
+</dd>
+<dt>type</dt>
+<dd>
+
+(string, default: `load-actuator-alerter`) Type of alerter.
 
 </dd>
 </dl>

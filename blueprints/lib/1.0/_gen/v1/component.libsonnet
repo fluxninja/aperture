@@ -55,6 +55,12 @@
   withGradientControllerMixin(gradient_controller):: {
     gradient_controller+: gradient_controller,
   },
+  withLoadActuatorAlerter(load_actuator_alerter):: {
+    load_actuator_alerter: load_actuator_alerter,
+  },
+  withLoadActuatorAlerterMixin(load_actuator_alerter):: {
+    load_actuator_alerter+: load_actuator_alerter,
+  },
   withMax(max):: {
     max: max,
   },

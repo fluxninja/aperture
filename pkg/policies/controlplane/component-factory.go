@@ -7,6 +7,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/concurrency"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -168,6 +169,15 @@ func NewComponentAndOptions(
 			Component:     component,
 			MapStruct:     mapStruct,
 			Name:          "Alerter",
+			ComponentType: runtime.ComponentTypeSink,
+		}, nil, option, err
+	} else if laAlerter := componentProto.GetLoadActuatorAlerter(); laAlerter != nil {
+		component, option, err := concurrency.NewLoadActuatorAlerterAndOptions(laAlerter, componentIndex, policyReadAPI)
+		mapStruct, err := encodeMapStructOnNilErr(laAlerter, err)
+		return runtime.CompiledComponent{
+			Component:     component,
+			MapStruct:     mapStruct,
+			Name:          "LoadActuatorAlerter",
 			ComponentType: runtime.ComponentTypeSink,
 		}, nil, option, err
 	} else {

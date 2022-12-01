@@ -188,6 +188,9 @@ message Component {
 
     // Alerter reacts to a signal and generates alert to send to alert manager.
     Alerter alerter = 16;
+
+    // LoadActuatorAlerter reacts if load_multiplier signal is less than 1.
+    LoadActuatorAlerter load_actuator_alerter = 17;
   }
 }
 
@@ -1149,4 +1152,18 @@ message Alerter {
 
   // A list of alert channel strings.
   repeated string alert_channels = 5;
+}
+
+// LoadActuatorAlerter extends basic alerter.
+message LoadActuatorAlerter {
+  // Common alerter config
+  Alerter base_alerter = 1;
+
+  // Type of alerter.
+  string type = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "load-actuator-alerter"}
+    }
+  }];
 }

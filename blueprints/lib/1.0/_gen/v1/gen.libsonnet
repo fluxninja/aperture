@@ -47,6 +47,7 @@
   K8sLabelMatcherRequirement: import 'k8slabelmatcherrequirement.libsonnet',
   LabelMatcher: import 'labelmatcher.libsonnet',
   LoadActuator: import 'loadactuator.libsonnet',
+  LoadActuatorAlerter: import 'loadactuatoralerter.libsonnet',
   LoadActuatorDynamicConfig: import 'loadactuatordynamicconfig.libsonnet',
   LoadActuatorIns: import 'loadactuatorins.libsonnet',
   MatchExpression: import 'matchexpression.libsonnet',

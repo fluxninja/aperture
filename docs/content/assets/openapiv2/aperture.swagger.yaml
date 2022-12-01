@@ -850,6 +850,9 @@ definitions:
         description: |-
           Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
+      load_actuator_alerter:
+        $ref: '#/definitions/v1LoadActuatorAlerter'
+        description: LoadActuatorAlerter reacts if load_multiplier signal is less than 1.
       max:
         $ref: '#/definitions/v1Max'
         description: Emits the maximum of the input signals.
@@ -1664,6 +1667,17 @@ definitions:
         $ref: '#/definitions/v1LoadActuatorIns'
         description: Input ports for the Load Actuator component.
     title: Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
+  v1LoadActuatorAlerter:
+    type: object
+    properties:
+      base_alerter:
+        $ref: '#/definitions/v1Alerter'
+        title: Common alerter config
+      type:
+        type: string
+        description: Type of alerter.
+        x-go-default: load-actuator-alerter
+    description: LoadActuatorAlerter extends basic alerter.
   v1LoadActuatorDynamicConfig:
     type: object
     properties:

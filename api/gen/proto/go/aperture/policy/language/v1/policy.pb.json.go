@@ -966,3 +966,19 @@ func (msg *Alerter_Ins) UnmarshalJSON(b []byte) error {
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
+
+// MarshalJSON implements json.Marshaler
+func (msg *LoadActuatorAlerter) MarshalJSON() ([]byte, error) {
+	return protojson.MarshalOptions{
+		UseEnumNumbers:  false,
+		EmitUnpopulated: false,
+		UseProtoNames:   true,
+	}.Marshal(msg)
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (msg *LoadActuatorAlerter) UnmarshalJSON(b []byte) error {
+	return protojson.UnmarshalOptions{
+		DiscardUnknown: false,
+	}.Unmarshal(b, msg)
+}

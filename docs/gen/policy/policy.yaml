@@ -479,36 +479,41 @@ definitions:
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
         x-order: 8
         $ref: '#/definitions/v1GradientController'
+      load_actuator_alerter:
+        description: LoadActuatorAlerter reacts if load_multiplier signal is less
+          than 1.
+        x-order: 9
+        $ref: '#/definitions/v1LoadActuatorAlerter'
       max:
         description: Emits the maximum of the input signals.
-        x-order: 9
+        x-order: 10
         $ref: '#/definitions/v1Max'
       min:
         description: Emits the minimum of the input signals.
-        x-order: 10
+        x-order: 11
         $ref: '#/definitions/v1Min'
       promql:
         description: Periodically runs a Prometheus query in the background and emits
           the result.
-        x-order: 11
+        x-order: 12
         $ref: '#/definitions/v1PromQL'
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
-        x-order: 12
+        x-order: 13
         $ref: '#/definitions/v1RateLimiter'
       sink:
         description: Sink is a sink component that does nothing.
-        x-order: 13
+        x-order: 14
         $ref: '#/definitions/v1Sink'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
-        x-order: 14
+        x-order: 15
         $ref: '#/definitions/v1Sqrt'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
-        x-order: 15
+        x-order: 16
         $ref: '#/definitions/v1Switcher'
   v1ConcurrencyLimiter:
     description: |-
@@ -1267,6 +1272,19 @@ definitions:
         description: Input ports for the Load Actuator component.
         x-order: 2
         $ref: '#/definitions/v1LoadActuatorIns'
+  v1LoadActuatorAlerter:
+    description: LoadActuatorAlerter extends basic alerter.
+    type: object
+    properties:
+      base_alerter:
+        title: Common alerter config
+        x-order: 0
+        $ref: '#/definitions/v1Alerter'
+      type:
+        description: Type of alerter.
+        type: string
+        x-go-default: load-actuator-alerter
+        x-order: 1
   v1LoadActuatorDynamicConfig:
     type: object
     title: Dynamic Configuration for LoadActuator
