@@ -1,4 +1,4 @@
-package com.fluxninja.aperture.example;
+package com.fluxninja.example;
 
 import com.fluxninja.aperture.armeria.ApertureHTTPClient;
 import com.fluxninja.aperture.sdk.ApertureSDK;
