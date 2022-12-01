@@ -68,8 +68,8 @@ for viewing metrics from experiments.
 
 The Playground is preloaded with a
 [Latency Gradient Policy](/tutorials/flow-control/basic-concurrency-limiting.md)
- which protects the demo application against sudden surges in traffic
-load. You can verify it using the following command:
+which protects the demo application against sudden surges in traffic load. You
+can verify it using the following command:
 
 ```sh
 $ kubectl get policy -n aperture-controller service1-demo-app
