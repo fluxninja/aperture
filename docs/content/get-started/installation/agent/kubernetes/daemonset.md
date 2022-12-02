@@ -13,14 +13,39 @@ The Aperture Agent can be installed as a
 [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
 where it will get deployed on all the nodes of the cluster.
 
+## Upgrade Procedure {#agent-daemonset-upgrade-procedure}
+
+By following these instructions, you will have deployed the upgraded version of
+Aperture Agent into your cluster.
+
+1. Update the Helm chart repo in your environment:
+
+   ```bash
+   helm repo update
+   ```
+
+2. Use the same `values.yaml` file created as part of
+   [Installation Steps](#agent-daemonset-installation) and pass it with below
+   command:
+
+   ```bash
+   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml | kubectl apply -f -
+   ```
+
+3. If you have deployed the Aperture Agent into a namespace other than
+   `default`, use the `-n` flag:
+
+   ```bash
+   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml -n aperture-agent | kubectl apply -f -
+   ```
+
 ## Installation {#agent-daemonset-installation}
 
 The Aperture Agent in the DaemonSet mode will be installed using the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
 which will be managed by the Aperture Operator.
 
-Below are the steps to install or upgrade the Aperture Agent into your setup
-using the
+Below are the steps to install the Aperture Agent into your setup using the
 [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent).
 
 By following these instructions, you will have deployed the Aperture Agent into
@@ -35,7 +60,7 @@ your cluster.
 
 2. Configure the below parameters of Plugins, Etcd and Prometheus for the Agent
    Custom Resource by creating a `values.yaml` with below parameters and pass it
-   with `helm upgrade`:
+   with `helm install`:
 
    :::info
 
@@ -80,14 +105,14 @@ your cluster.
    ```
 
    ```bash
-   helm upgrade --install agent aperture/aperture-agent -f values.yaml
+   helm install agent aperture/aperture-agent -f values.yaml
    ```
 
 3. Alternatively, you can create the Agent Custom Resource directly on the
    Kubernetes cluster using the below steps:
 
    1. Create a `values.yaml` for just starting the operator and disabling the
-      creation of Agent Custom Resource and pass it with `helm upgrade`:
+      creation of Agent Custom Resource and pass it with `helm install`:
 
       ```yaml
       agent:
@@ -95,7 +120,7 @@ your cluster.
       ```
 
       ```bash
-      helm upgrade --install agent aperture/aperture-agent -f values.yaml
+      helm install agent aperture/aperture-agent -f values.yaml
       ```
 
    2. Create a YAML file with below specifications:
@@ -133,7 +158,7 @@ your cluster.
 
 4. If you want to modify the default parameters or the Aperture Agent config,
    for example `log`, you can create or update the `values.yaml` file and pass
-   it with `helm upgrade`:
+   it with `helm install`:
 
    ```yaml
    agent:
@@ -152,7 +177,7 @@ your cluster.
    ```
 
    ```bash
-   helm upgrade --install agent aperture/aperture-agent -f values.yaml
+   helm install agent aperture/aperture-agent -f values.yaml
    ```
 
    All the config parameters for the Aperture Agent are available
@@ -165,7 +190,7 @@ your cluster.
    `default`, use the `-n` flag:
 
    ```bash
-   helm upgrade --install agent aperture/aperture-agent -n aperture-agent --create-namespace
+   helm install agent aperture/aperture-agent -n aperture-agent --create-namespace
    ```
 
 6. Refer steps on the

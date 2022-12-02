@@ -19,6 +19,20 @@ Compile all warnings into a single message.
 {{- end -}}
 
 {{/*
+Get image tag for operator.
+{{ include "controller-operator.image" ( dict "image" .Values.path.to.the.image "context" $.context $) }}
+*/}}
+{{- define "controller-operator.image" -}}
+{{- $tag := get .image "tag" -}}
+{{- $newImage := .image -}}
+{{- if (not $tag) -}}
+    {{- $tag = trimPrefix "v" .context.Chart.AppVersion -}}
+{{- end -}}
+{{- $_ := set $newImage "tag" $tag -}}
+{{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
+{{- end -}}
+
+{{/*
 Create the endpoint of the etcd for Aperture Controller
 {{ include "controller.etcd.endpoints" ( dict "etcd" .Values.path.to.the.etcd "context" $.context $) }}
 */}}
