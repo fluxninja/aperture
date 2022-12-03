@@ -7,6 +7,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
+//go:generate mockgen -source policy.go -package mocks -destination ../../mocks/mock-policy.go
+
 const (
 	// PoliciesRoot - path in config and status registry for policies results.
 	PoliciesRoot = "policies"

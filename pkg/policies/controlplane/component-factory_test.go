@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -12,6 +13,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
+	"github.com/fluxninja/aperture/pkg/policies/mocks"
 )
 
 var _ = Describe("Component factory", func() {
@@ -40,13 +42,21 @@ var _ = Describe("Component factory", func() {
 	})
 
 	Context("Alerter", func() {
-		alerterProto := &policylangv1.Alerter{
-			AlertName: "testName",
-			Severity:  "crit",
-		}
+		var policyAPI *mocks.MockPolicy
+		var alerterProto *policylangv1.Alerter
+		BeforeEach(func() {
+			ctrl := gomock.NewController(GinkgoT())
+			policyAPI = mocks.NewMockPolicy(ctrl)
+			alerterProto = &policylangv1.Alerter{
+				AlertName: "testName",
+				Severity:  "crit",
+			}
+			policyAPI.EXPECT().GetPolicyName().Return("test1").AnyTimes()
+		})
+
 		It("Creates Alerter component", func() {
 			alerterComponent := &components.Alerter{}
-			component, options, err := components.NewAlerterAndOptions(alerterProto, 0, nil)
+			component, options, err := components.NewAlerterAndOptions(alerterProto, 0, policyAPI)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(reflect.TypeOf(component)).To(Equal(reflect.TypeOf(alerterComponent)))
 			Expect(options).NotTo(BeNil())
@@ -78,20 +88,4 @@ var _ = Describe("Component factory", func() {
 			})
 		})
 	})
-
-	// Context("EMA", func() {
-	// 	emaProto := &policylangv1.EMA{
-	// 		EmaWindow:                      durationpb.New(2000 * time.Millisecond),
-	// 		WarmUpWindow:                   durationpb.New(500 * time.Millisecond),
-	// 		CorrectionFactorOnMinViolation: 2.0,
-	// 		CorrectionFactorOnMaxViolation: 0.9,
-	// 	}
-	// 	It("Should not return error", func() {
-	// 		emaComponent := &component.EMA{}
-	// 		component, options, err := component.NewEMAAndOptions(emaProto, 0, nil)
-	// 		Expect(err).NotTo(HaveOccurred())
-	// 		Expect(reflect.TypeOf(component)).To(Equal(reflect.TypeOf(emaComponent)))
-	// 		Expect(options).To(BeNil())
-	// 	})
-	// })
 })
