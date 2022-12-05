@@ -4,6 +4,10 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
 }
 
+subprojects {
+    group = "com.fluxninja.aperture"
+}
+
 apply(from = "version.gradle.kts")
 
 nexusPublishing {
