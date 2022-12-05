@@ -1,4 +1,4 @@
-package com.fluxninja.aperture.example;
+package com.fluxninja.example;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
