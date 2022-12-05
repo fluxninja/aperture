@@ -2,7 +2,6 @@ package static
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -14,13 +13,13 @@ import (
 )
 
 var (
-	ctrl         *gomock.Controller
-	mockTrackers *mocks.MockTrackers
+	ctrl            *gomock.Controller
+	mockEventWriter *mocks.MockEventWriter
 )
 
 var _ = BeforeEach(func() {
 	ctrl = gomock.NewController(GinkgoT())
-	mockTrackers = mocks.NewMockTrackers(ctrl)
+	mockEventWriter = mocks.NewMockEventWriter(ctrl)
 })
 
 var _ = Describe("Static service discovery", func() {
@@ -67,7 +66,7 @@ var _ = Describe("Static service discovery", func() {
 				Name:      someName,
 			}
 
-			expectedEntityKey := notifiers.Key(fmt.Sprintf("%v.%v", staticEntityTrackerPrefix, someUID))
+			expectedEntityKey := notifiers.Key(someUID)
 			serializedExpectedEntity, err := json.Marshal(expectedEntity)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -148,7 +147,7 @@ var _ = Describe("Static service discovery", func() {
 				Name:      someName,
 			}
 
-			expectedEntityKey := notifiers.Key(fmt.Sprintf("%v.%v", staticEntityTrackerPrefix, someUID))
+			expectedEntityKey := notifiers.Key(someUID)
 			serializedExpectedEntity, err := json.Marshal(expectedEntity)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -162,8 +161,6 @@ var _ = Describe("Static service discovery", func() {
 	})
 })
 
-func CreateStaticDiscoveryWithFakeTracker(config StaticDiscoveryConfig) (*StaticDiscovery, *mocks.MockTrackers) {
-	sd, err := newStaticServiceDiscovery(mockTrackers, config)
-	Expect(err).NotTo(HaveOccurred())
-	return sd, mockTrackers
+func CreateStaticDiscoveryWithFakeTracker(config StaticDiscoveryConfig) (*StaticDiscovery, *mocks.MockEventWriter) {
+	return newStaticServiceDiscovery(mockEventWriter, config), mockEventWriter
 }

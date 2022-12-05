@@ -125,13 +125,18 @@ type notifierOp struct {
 	op             int
 }
 
+// EventWriter can be used to inject events into a tracker collection.
+type EventWriter interface {
+	WriteEvent(key Key, value []byte)
+	RemoveEvent(key Key)
+	Purge(prefix string)
+}
+
 // Trackers is the interface of a tracker collection.
 type Trackers interface {
 	Watcher
-	WriteEvent(key Key, value []byte)
-	RemoveEvent(key Key)
+	EventWriter
 	GetCurrentValue(key Key) []byte
-	Purge(prefix string)
 }
 
 // DefaultTrackers is a collection of key trackers.
@@ -428,4 +433,35 @@ func (t *DefaultTrackers) Stop() error {
 
 func (t *DefaultTrackers) stop() {
 	t.cancel()
+}
+
+// NewPrefixedEventWriter returns an event writer which keys will be
+// automatically prefixed with given prefix.
+//
+// It's recommended that prefix ends up some kind of delimiter, like `.` or `/`.
+func NewPrefixedEventWriter(prefix string, ew EventWriter) EventWriter {
+	return &prefixedEventWriter{
+		prefix: prefix,
+		parent: ew,
+	}
+}
+
+type prefixedEventWriter struct {
+	prefix string
+	parent EventWriter
+}
+
+// WriteEvent implements EventWriter interface.
+func (ew *prefixedEventWriter) WriteEvent(key Key, value []byte) {
+	ew.parent.WriteEvent(Key(ew.prefix+string(key)), value)
+}
+
+// RemoveEvent implements EventWriter interface.
+func (ew *prefixedEventWriter) RemoveEvent(key Key) {
+	ew.parent.RemoveEvent(Key(ew.prefix + string(key)))
+}
+
+// Purge implements EventWriter interface.
+func (ew *prefixedEventWriter) Purge(prefix string) {
+	ew.parent.Purge(ew.prefix + prefix)
 }

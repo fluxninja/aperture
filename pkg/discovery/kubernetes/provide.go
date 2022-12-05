@@ -8,9 +8,9 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
+	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -33,7 +33,7 @@ type FxIn struct {
 	Lifecycle        fx.Lifecycle
 	StatusRegistry   status.Registry
 	KubernetesClient k8s.K8sClient
-	EntityTrackers   notifiers.Trackers `name:"entity_trackers"`
+	EntityTrackers   *entitycache.EntityTrackers
 }
 
 // InvokeKubernetesServiceDiscovery creates a Kubernetes service discovery.
@@ -45,7 +45,8 @@ func InvokeKubernetesServiceDiscovery(in FxIn) error {
 	}
 
 	if cfg.DiscoveryEnabled {
-		kd, err := newKubernetesServiceDiscovery(in.EntityTrackers, cfg.NodeName, in.KubernetesClient)
+		entityEvents := in.EntityTrackers.RegisterServiceDiscovery(podTrackerPrefix)
+		kd, err := newKubernetesServiceDiscovery(entityEvents, cfg.NodeName, in.KubernetesClient)
 		if err != nil {
 			log.Info().Err(err).Msg("Failed to create Kubernetes discovery service")
 			return nil
