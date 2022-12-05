@@ -27,6 +27,7 @@ func NewEmpty() ServiceGetter { return emptyServiceGetter{} }
 type ecServiceGetter struct {
 	entityCache    *entitycache.EntityCache
 	ecHasDiscovery bool
+	metrics        *Metrics
 }
 
 // ServicesFromContext returns list of services associated with IP extracted from context
@@ -34,12 +35,18 @@ type ecServiceGetter struct {
 // The returned list of services depends only on state of entityCache.
 // However, emitted warnings will depend on whether service discovery is enabled or not.
 func (sg *ecServiceGetter) ServicesFromContext(ctx context.Context) []string {
+	svcs, ok := sg.servicesFromContext(ctx)
+	sg.metrics.inc(ok)
+	return svcs
+}
+
+func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []string, ok bool) {
 	rpcPeer, peerExists := peer.FromContext(ctx)
 	if !peerExists {
 		if sg.ecHasDiscovery {
 			log.Bug().Msg("cannot get client info from context")
 		}
-		return nil
+		return nil, false
 	}
 
 	tcpAddr, isTCPAddr := rpcPeer.Addr.(*net.TCPAddr)
@@ -47,7 +54,7 @@ func (sg *ecServiceGetter) ServicesFromContext(ctx context.Context) []string {
 		if sg.ecHasDiscovery {
 			log.Bug().Msg("client addr is not TCP")
 		}
-		return nil
+		return nil, false
 
 	}
 
@@ -58,27 +65,35 @@ func (sg *ecServiceGetter) ServicesFromContext(ctx context.Context) []string {
 			log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", clientIP).
 				Msg("cannot get services")
 		}
-		return nil
+		return nil, false
 	}
 
-	return entity.Services
+	return entity.Services, true
 }
 
 var noEntitySampler = log.NewRatelimitingSampler()
 
-// ProvideFromEntityCache provides an EntityCache-powered ServiceGetter.
-func ProvideFromEntityCache(
-	entityCache *entitycache.EntityCache,
-	entityTrackers *entitycache.EntityTrackers,
-	lc fx.Lifecycle,
-) ServiceGetter {
-	sg := &ecServiceGetter{entityCache: entityCache}
+// FxIn are FX arguments to ProvideFromEntityCache.
+type FxIn struct {
+	fx.In
+	Lifecycle      fx.Lifecycle
+	EntityCache    *entitycache.EntityCache
+	EntityTrackers *entitycache.EntityTrackers
+	Metrics        *Metrics `optional:"true"`
+}
 
-	lc.Append(fx.Hook{
+// ProvideFromEntityCache provides an EntityCache-powered ServiceGetter.
+func ProvideFromEntityCache(in FxIn) ServiceGetter {
+	sg := &ecServiceGetter{
+		entityCache: in.EntityCache,
+		metrics:     in.Metrics,
+	}
+
+	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			// Checking this flag on OnStart so that all registrations done in
 			// provide/invoke stage would be visible.
-			sg.ecHasDiscovery = entityTrackers.HasDiscovery()
+			sg.ecHasDiscovery = in.EntityTrackers.HasDiscovery()
 			return nil
 		},
 		OnStop: func(context.Context) error { return nil },
