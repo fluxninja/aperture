@@ -50,6 +50,10 @@ public class ArmeriaServer {
         if (agentPort == null) {
             agentPort = DEFAULT_AGENT_PORT;
         }
+        String appPort = System.getenv("FN_APP_PORT");
+        if (appPort == null) {
+            appPort = DEFAULT_APP_PORT;
+        }
 
         ApertureSDK apertureSDK;
         try {
@@ -63,7 +67,7 @@ public class ArmeriaServer {
             return;
         }
         ServerBuilder serverBuilder = Server.builder();
-        serverBuilder.http(8080);
+        serverBuilder.http(Integer.parseInt(appPort));
         serverBuilder.service("/notsuper", createHelloHTTPService());
         serverBuilder.service("/health", createHealthService());
         serverBuilder.service("/connected", createConnectedHTTPService());
