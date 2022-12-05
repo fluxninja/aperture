@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://java.sun.com/xml/ns/javaee"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+        version="3.0">
+    <display-name>Aperture Tomcat Example</display-name>
+
+    <!-- Servlet mapping -->
+    <servlet>
+        <description>
+        </description>
+        <display-name>ExampleServlet</display-name>
+        <servlet-name>ApertureServlet</servlet-name>
+        <servlet-class>com.fluxninja.example.servlet.ApertureServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ApertureServlet</servlet-name>
+        <url-pattern>/aperture</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ApertureServlet</servlet-name>
+        <url-pattern>/aperture_agented</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ApertureServlet</servlet-name>
+        <url-pattern>/aperture_agented_imported</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>ApertureFilter</filter-name>
+        <filter-class>com.fluxninja.example.filter.ApertureFilter</filter-class>
+        <init-param>
+            <param-name>agent_host</param-name>
+            <param-value>localhost</param-value>
+        </init-param>
+        <init-param>
+            <param-name>agent_port</param-name>
+            <param-value>8089</param-value>
+        </init-param>
+    </filter>
+    <filter>
+        <filter-name>ApertureFilterImported</filter-name>
+        <filter-class>com.fluxninja.aperture.tomcat7.ApertureFilter</filter-class>
+        <init-param>
+            <param-name>agent_host</param-name>
+            <param-value>localhost</param-value>
+        </init-param>
+        <init-param>
+            <param-name>agent_port</param-name>
+            <param-value>8089</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>ApertureFilter</filter-name>
+        <url-pattern>/aperture_agented</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>ApertureFilterImported</filter-name>
+        <url-pattern>/aperture_agented_imported</url-pattern>
+    </filter-mapping>
+
+</web-app>
