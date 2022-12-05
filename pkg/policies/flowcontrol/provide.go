@@ -17,8 +17,8 @@ func Module() fx.Option {
 		fluxmeter.Module(),
 		classifier.Module(),
 		service.Module(),
+		servicegetter.Module,
 		fx.Provide(
-			servicegetter.ProvideFromEntityCache,
 			NewEngine,
 		),
 	)
