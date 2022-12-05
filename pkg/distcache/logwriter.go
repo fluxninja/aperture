@@ -15,11 +15,11 @@ type OlricLogWriter struct {
 func (ol *OlricLogWriter) Write(message []byte) (int, error) {
 	message = bytes.TrimSpace(message)
 	if len(message) < 2 {
-		ol.Logger.Info().Msg(string(message))
+		ol.Logger.Debug().Msg(string(message))
 	} else {
 		switch message[1] {
 		case 'I':
-			ol.Logger.Info().Msg(string(message[7:]))
+			ol.Logger.Debug().Msg(string(message[7:]))
 		case 'W':
 			ol.Logger.Warn().Msg(string(message[7:]))
 		case 'E':
@@ -27,7 +27,7 @@ func (ol *OlricLogWriter) Write(message []byte) (int, error) {
 		case 'D':
 			ol.Logger.Debug().Msg(string(message[8:]))
 		default:
-			ol.Logger.Info().Msg(string(message))
+			ol.Logger.Debug().Msg(string(message))
 		}
 	}
 	return len(message), nil
