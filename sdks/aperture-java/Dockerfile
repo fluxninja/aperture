@@ -2,7 +2,7 @@
 
 FROM --platform=linux/amd64 gradle:7.5.1-jdk18-alpine AS builder
 
-WORKDIR /lib/src
+WORKDIR /examples/armeria-example/src
 
 COPY --link . .
 
