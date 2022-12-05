@@ -68,6 +68,9 @@ const (
 	// TokenBucketAvailableMetricName - a gauge that tracks the number of tokens available in token bucket.
 	TokenBucketAvailableMetricName = "token_bucket_available_tokens_total"
 
+	// ServiceLookupsMetricName - counter for IP to services lookups.
+	ServiceLookupsMetricName = "service_lookups_total"
+
 	// FlowControlRequestsMetricName - counter for Check requests for flowcontrol.
 	FlowControlRequestsMetricName = "flowcontrol_requests_total"
 	// FlowControlDecisionsMetricName - counter for Check requests per decision type.
@@ -115,6 +118,12 @@ const (
 	MethodLabel = "http_method"
 	// HandlerName - name of the http handler. Defaults to 'default'.
 	HandlerName = "handler_name"
+	// ServiceLookupsStatusLabel - status for ServiceLookupsMetricName.
+	ServiceLookupsStatusLabel = "status"
+	// ServiceLookupsStatusOK - service lookup status OK.
+	ServiceLookupsStatusOK = FlowStatusOK
+	// ServiceLookupsStatusError - service lookup status Error.
+	ServiceLookupsStatusError = FlowStatusError
 	// FlowStatusLabel - flow status.
 	FlowStatusLabel = "flow_status"
 	// FlowStatusOK - flow status OK.
