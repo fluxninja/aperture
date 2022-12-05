@@ -29,6 +29,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/test/harness"
@@ -152,6 +153,7 @@ var _ = BeforeSuite(func() {
 				fx.ParamTags(alerts.AlertsFxTag),
 			),
 			entitycache.NewEntityCache,
+			servicegetter.NewEmpty,
 			agentinfo.ProvideAgentInfo,
 			flowcontrol.NewEngine,
 			controlpointcache.Provide,

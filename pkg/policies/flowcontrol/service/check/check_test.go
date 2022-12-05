@@ -18,6 +18,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 )
 
 var (
@@ -48,6 +49,7 @@ var _ = BeforeEach(func() {
 		}.Module(),
 		fx.Provide(agentinfo.ProvideAgentInfo),
 		fx.Supply(entities),
+		fx.Provide(servicegetter.FromEntityCache),
 		fx.Provide(check.ProvideNopMetrics),
 		fx.Provide(check.ProvideHandler),
 		fx.Provide(flowcontrol.NewEngine),

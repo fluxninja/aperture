@@ -2,7 +2,6 @@ package static
 
 import (
 	"encoding/json"
-	"fmt"
 
 	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -11,15 +10,18 @@ import (
 
 // StaticDiscovery reads entities from config and writes them to tracker.
 type StaticDiscovery struct {
-	trackers notifiers.Trackers
-	services []*ServiceConfig
+	entityEvents notifiers.EventWriter
+	services     []*ServiceConfig
 }
 
-func newStaticServiceDiscovery(trackers notifiers.Trackers, config StaticDiscoveryConfig) (*StaticDiscovery, error) {
+func newStaticServiceDiscovery(
+	entityEvents notifiers.EventWriter,
+	config StaticDiscoveryConfig,
+) *StaticDiscovery {
 	return &StaticDiscovery{
-		trackers: trackers,
-		services: config.Services,
-	}, nil
+		entityEvents: entityEvents,
+		services:     config.Services,
+	}
 }
 
 // start loads all configured entities into the tracker.
@@ -33,14 +35,14 @@ func (sd *StaticDiscovery) start() error {
 			log.Error().Msgf("Error marshaling entity: %v", err)
 			return err
 		}
-		sd.trackers.WriteEvent(key, value)
+		sd.entityEvents.WriteEvent(key, value)
 	}
 	log.Info().Msgf("Uploaded %v pre-configured entities to tracker", len(entities))
 	return nil
 }
 
 func (sd *StaticDiscovery) stop() error {
-	sd.trackers.Purge(staticEntityTrackerPrefix)
+	sd.entityEvents.Purge("")
 	return nil
 }
 
@@ -52,7 +54,7 @@ func (sd *StaticDiscovery) entitiesFromConfig() map[string]*entitycachev1.Entity
 	for _, service := range sd.services {
 		serviceName := service.Name
 		for _, e := range service.Entities {
-			key := fmt.Sprintf("%s.%s", staticEntityTrackerPrefix, e.UID)
+			key := e.UID
 
 			var entity *entitycachev1.Entity
 			var ok bool

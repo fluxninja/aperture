@@ -11,6 +11,65 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
+// MockEventWriter is a mock of EventWriter interface.
+type MockEventWriter struct {
+	ctrl     *gomock.Controller
+	recorder *MockEventWriterMockRecorder
+}
+
+// MockEventWriterMockRecorder is the mock recorder for MockEventWriter.
+type MockEventWriterMockRecorder struct {
+	mock *MockEventWriter
+}
+
+// NewMockEventWriter creates a new mock instance.
+func NewMockEventWriter(ctrl *gomock.Controller) *MockEventWriter {
+	mock := &MockEventWriter{ctrl: ctrl}
+	mock.recorder = &MockEventWriterMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockEventWriter) EXPECT() *MockEventWriterMockRecorder {
+	return m.recorder
+}
+
+// Purge mocks base method.
+func (m *MockEventWriter) Purge(prefix string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Purge", prefix)
+}
+
+// Purge indicates an expected call of Purge.
+func (mr *MockEventWriterMockRecorder) Purge(prefix interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Purge", reflect.TypeOf((*MockEventWriter)(nil).Purge), prefix)
+}
+
+// RemoveEvent mocks base method.
+func (m *MockEventWriter) RemoveEvent(key notifiers.Key) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "RemoveEvent", key)
+}
+
+// RemoveEvent indicates an expected call of RemoveEvent.
+func (mr *MockEventWriterMockRecorder) RemoveEvent(key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveEvent", reflect.TypeOf((*MockEventWriter)(nil).RemoveEvent), key)
+}
+
+// WriteEvent mocks base method.
+func (m *MockEventWriter) WriteEvent(key notifiers.Key, value []byte) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "WriteEvent", key, value)
+}
+
+// WriteEvent indicates an expected call of WriteEvent.
+func (mr *MockEventWriterMockRecorder) WriteEvent(key, value interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteEvent", reflect.TypeOf((*MockEventWriter)(nil).WriteEvent), key, value)
+}
+
 // MockTrackers is a mock of Trackers interface.
 type MockTrackers struct {
 	ctrl     *gomock.Controller
