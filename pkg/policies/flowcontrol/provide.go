@@ -7,6 +7,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/fluxmeter"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 )
 
 // Module returns the fx options for dataplane side pieces of policy.
@@ -16,6 +17,7 @@ func Module() fx.Option {
 		fluxmeter.Module(),
 		classifier.Module(),
 		service.Module(),
+		servicegetter.Module,
 		fx.Provide(
 			NewEngine,
 		),

@@ -145,14 +145,18 @@ type KubernetesDiscovery struct {
 	cli                    kubernetes.Interface
 	ctx                    context.Context
 	cancel                 context.CancelFunc
-	trackers               notifiers.Trackers
+	entityEvents           notifiers.EventWriter
 	mapping                *servicePodMapping
 	serviceCache           *serviceDataCache
 	nodeName               string
 	revisionEndpointsWatch string
 }
 
-func newKubernetesServiceDiscovery(trackers notifiers.Trackers, nodeName string, k8sClient k8s.K8sClient) (*KubernetesDiscovery, error) {
+func newKubernetesServiceDiscovery(
+	entityEvents notifiers.EventWriter,
+	nodeName string,
+	k8sClient k8s.K8sClient,
+) (*KubernetesDiscovery, error) {
 	if k8sClient.GetErrNotInCluster() {
 		log.Info().Msg("Not in Kubernetes cluster, could not create Kubernetes service discovery")
 		return nil, k8sClient.GetErr()
@@ -172,7 +176,7 @@ func newKubernetesServiceDiscovery(trackers notifiers.Trackers, nodeName string,
 		nodeName:     nodeName,
 		mapping:      newServicePodMapping(),
 		serviceCache: newServiceDataCache(),
-		trackers:     trackers,
+		entityEvents: entityEvents,
 	}
 	return kd, nil
 }
@@ -187,7 +191,7 @@ func (kd *KubernetesDiscovery) start() {
 
 		operation := func() error {
 			// purge notifiers
-			kd.trackers.Purge(podTrackerPrefix)
+			kd.entityEvents.Purge("")
 
 			// bootstrap mapping
 			endpoints, err := kd.cli.CoreV1().Endpoints(metav1.NamespaceAll).List(kd.ctx, metav1.ListOptions{})
@@ -238,10 +242,7 @@ func (kd *KubernetesDiscovery) start() {
 						if ok {
 							for _, cachedPod := range cachedPods {
 								kd.mapping.removeService(cachedPod.Namespace, cachedPod.Name, fqdn)
-								err := kd.removeEntityFromTracker(cachedPod)
-								if err != nil {
-									log.Error().Err(err).Msg("Failed to remove entity from tracker")
-								}
+								kd.removeEntityFromTracker(cachedPod)
 							}
 							kd.serviceCache.removeService(endpoints)
 						}
@@ -271,13 +272,11 @@ func (kd *KubernetesDiscovery) start() {
 func (kd *KubernetesDiscovery) stop() {
 	kd.cancel()
 	kd.waitGroup.Wait()
-	kd.trackers.Purge(podTrackerPrefix)
+	kd.entityEvents.Purge("")
 }
 
 // updatePodInTracker retrieves stored pod data from tracker, enriches it with new info and send the updated version.
 func (kd *KubernetesDiscovery) writeEntityInTracker(podInfo podInfo) error {
-	key := notifiers.Key(getPodIDKey(podInfo.UID))
-
 	services := kd.mapping.getFQDNs(podInfo.Namespace, podInfo.Name)
 	entity := &entitycachev1.Entity{
 		Services:  services,
@@ -293,15 +292,13 @@ func (kd *KubernetesDiscovery) writeEntityInTracker(podInfo podInfo) error {
 		return err
 	}
 
-	kd.trackers.WriteEvent(key, value)
+	kd.entityEvents.WriteEvent(notifiers.Key(podInfo.UID), value)
 	return nil
 }
 
 // updatePodInTracker retrieves stored pod data from tracker, enriches it with new info and send the updated version.
-func (kd *KubernetesDiscovery) removeEntityFromTracker(podInfo podInfo) error {
-	key := notifiers.Key(getPodIDKey(podInfo.UID))
-	kd.trackers.RemoveEvent(key)
-	return nil
+func (kd *KubernetesDiscovery) removeEntityFromTracker(podInfo podInfo) {
+	kd.entityEvents.RemoveEvent(notifiers.Key(podInfo.UID))
 }
 
 func (kd *KubernetesDiscovery) updateMappingFromEndpoints(endpoints *v1.Endpoints, operation serviceCacheOperation) {
@@ -317,16 +314,9 @@ func (kd *KubernetesDiscovery) updateMappingFromEndpoints(endpoints *v1.Endpoint
 			}
 		} else {
 			kd.mapping.removeService(pod.Namespace, pod.Name, fqdn)
-			err := kd.removeEntityFromTracker(pod)
-			if err != nil {
-				log.Error().Msgf("Tracker could not be updated: %v", err)
-			}
+			kd.removeEntityFromTracker(pod)
 		}
 	}
-}
-
-func getPodIDKey(key string) string {
-	return fmt.Sprintf("%s.%s", podTrackerPrefix, key)
 }
 
 // getFQDN return the full qualified domain name of a given service.

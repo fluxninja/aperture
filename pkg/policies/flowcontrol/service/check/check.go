@@ -2,16 +2,14 @@ package check
 
 import (
 	"context"
-	"strings"
 	"time"
 
-	"google.golang.org/grpc/peer"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 )
 
 // Handler implements the flowcontrol.v1 Service
@@ -19,19 +17,21 @@ import (
 // It also accepts a pointer to an EntityCache for services lookup.
 type Handler struct {
 	flowcontrolv1.UnimplementedFlowControlServiceServer
-	entityCache *entitycache.EntityCache
-	metrics     Metrics
-	engine      iface.Engine
+	serviceGetter servicegetter.ServiceGetter
+	metrics       Metrics
+	engine        iface.Engine
 }
 
-// NewHandler creates an empty flowcontrol Handler
-//
-// It also accepts a pointer to an EntityCache for Infra Labels lookup.
-func NewHandler(entityCache *entitycache.EntityCache, metrics Metrics, engine iface.Engine) *Handler {
+// NewHandler creates a flowcontrol Handler.
+func NewHandler(
+	serviceGetter servicegetter.ServiceGetter,
+	metrics Metrics,
+	engine iface.Engine,
+) *Handler {
 	return &Handler{
-		entityCache: entityCache,
-		metrics:     metrics,
-		engine:      engine,
+		serviceGetter: serviceGetter,
+		metrics:       metrics,
+		engine:        engine,
 	}
 }
 
@@ -64,22 +64,10 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	// record the start time of the request
 	start := time.Now()
 
-	var serviceIDs []string
-
-	rpcPeer, peerExists := peer.FromContext(ctx)
-	if peerExists {
-
-		clientIP := strings.Split(rpcPeer.Addr.String(), ":")[0]
-		entity, err := h.entityCache.GetByIP(clientIP)
-		if err == nil {
-			serviceIDs = entity.Services
-		}
-	}
-
 	// CheckWithValues already pushes result to metrics
 	resp := h.CheckWithValues(
 		ctx,
-		serviceIDs,
+		h.serviceGetter.ServicesFromContext(ctx),
 		req.ControlPoint,
 		req.Labels,
 	)
