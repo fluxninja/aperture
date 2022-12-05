@@ -26,7 +26,7 @@ import (
 func NewRatelimitingSampler() zerolog.Sampler {
 	return &zerolog.BurstSampler{
 		Burst:  1,
-		Period: 5 * time.Second,
+		Period: 5 * time.Minute,
 	}
 }
 
