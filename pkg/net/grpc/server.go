@@ -6,10 +6,14 @@ import (
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
+	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -102,14 +106,20 @@ func (constructor ServerConstructor) provideServer(
 
 	// Connection timeout from config
 	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))
-
+	var logrusLogger *logrus.Logger
+	logrusEntry := logrus.NewEntry(logrusLogger)
+	grpc_logrus.ReplaceGrpcLogger(logrusEntry)
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
+		grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
+		grpc_logrus.UnaryServerInterceptor(logrusEntry),
 		grpcServerMetrics.UnaryServerInterceptor(),
 		otelgrpc.UnaryServerInterceptor(),
 	}
 	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
 
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
+		grpc_ctxtags.StreamServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
+		grpc_logrus.StreamServerInterceptor(logrusEntry),
 		grpcServerMetrics.StreamServerInterceptor(),
 		otelgrpc.StreamServerInterceptor(),
 	}

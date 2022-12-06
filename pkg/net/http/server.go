@@ -206,6 +206,8 @@ func (s *Server) monitoringMiddleware(next http.Handler) http.Handler {
 		ctx.handlerName = defaultHandlerName
 		startTime := time.Now()
 		rec := newStatusRecorder(w)
+		log.Error().Msg("BINGO")
+
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
 		next.ServeHTTP(rec, r.WithContext(ctx))
 
