@@ -241,6 +241,19 @@ definitions:
     description: Alerter reacts to a signal and generates alert to send to alert manager.
     type: object
     properties:
+      alerter_config:
+        title: Alerter configuration
+        x-order: 0
+        $ref: '#/definitions/v1AlerterConfig'
+      in_ports:
+        description: Input ports for the Alerter component.
+        x-order: 1
+        $ref: '#/definitions/v1AlerterIns'
+  v1AlerterConfig:
+    description: AlerterConfig is a common config for separate alerter components
+      and alerters embedded in other components.
+    type: object
+    properties:
       alert_channels:
         description: A list of alert channel strings.
         type: array
@@ -251,20 +264,16 @@ definitions:
         description: Name of the alert.
         type: string
         x-order: 1
-      in_ports:
-        description: Input ports for the Alerter component.
-        x-order: 2
-        $ref: '#/definitions/v1AlerterIns'
       resolve_timeout:
         description: Duration of alert resolver.
         type: string
         x-go-default: 5m
-        x-order: 3
+        x-order: 2
       severity:
         description: Severity of the alert, one of 'info', 'warn' or 'crit'.
         type: string
         x-go-validate: oneof=info warn crit
-        x-order: 4
+        x-order: 3
   v1AlerterIns:
     description: Inputs for the Alerter component.
     type: object
@@ -1255,17 +1264,21 @@ definitions:
     title: Takes the load multiplier input signal and publishes it to the schedulers
       in the data-plane
     properties:
+      alerter_config:
+        description: Configuration for embedded alerter.
+        x-order: 0
+        $ref: '#/definitions/v1AlerterConfig'
       default_config:
         description: Default configuration.
-        x-order: 0
+        x-order: 1
         $ref: '#/definitions/v1LoadActuatorDynamicConfig'
       dynamic_config_key:
         description: Configuration key for DynamicConfig.
         type: string
-        x-order: 1
+        x-order: 2
       in_ports:
         description: Input ports for the Load Actuator component.
-        x-order: 2
+        x-order: 3
         $ref: '#/definitions/v1LoadActuatorIns'
   v1LoadActuatorDynamicConfig:
     type: object

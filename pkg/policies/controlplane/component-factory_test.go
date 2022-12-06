@@ -41,8 +41,10 @@ var _ = Describe("Component factory", func() {
 
 	Context("Alerter", func() {
 		alerterProto := &policylangv1.Alerter{
-			AlertName: "testName",
-			Severity:  "crit",
+			AlerterConfig: &policylangv1.AlerterConfig{
+				AlertName: "testName",
+				Severity:  "crit",
+			},
 		}
 		It("Creates Alerter component", func() {
 			alerterComponent := &components.Alerter{}

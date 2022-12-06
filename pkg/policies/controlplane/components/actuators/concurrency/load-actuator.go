@@ -3,6 +3,9 @@ package concurrency
 import (
 	"context"
 	"path"
+	"strconv"
+	"strings"
+	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
@@ -11,6 +14,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
@@ -29,6 +33,8 @@ type LoadActuator struct {
 	agentGroupName    string
 	componentIndex    int
 	dryRun            bool
+	alerterIface      alerts.Alerter
+	alerterConfig     *policylangv1.AlerterConfig
 }
 
 // NewLoadActuatorAndOptions creates load actuator and its fx options.
@@ -51,6 +57,7 @@ func NewLoadActuatorAndOptions(
 		decisionsEtcdPath: decisionsEtcdPath,
 		loadActuatorProto: loadActuatorProto,
 		dryRun:            dryRun,
+		alerterConfig:     loadActuatorProto.AlerterConfig,
 	}
 
 	return lsa, fx.Options(
@@ -58,7 +65,8 @@ func NewLoadActuatorAndOptions(
 	), nil
 }
 
-func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, alerterIface *alerts.SimpleAlerter) error {
+	la.alerterIface = alerterIface
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -94,6 +102,10 @@ func (la *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo run
 					lmValue = 0
 				} else {
 					lmValue = lmReading.Value()
+				}
+
+				if lmReading.Value() < 1 {
+					la.alerterIface.AddAlert(la.createAlert())
 				}
 				return nil, la.publishDecision(tickInfo, lmValue, false)
 			} else {
@@ -165,4 +177,25 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 	}
 	la.decisionWriter.Write(la.decisionsEtcdPath, dat)
 	return nil
+}
+
+func (la *LoadActuator) createAlert() *alerts.Alert {
+	newAlert := alerts.NewAlert(
+		alerts.WithName("Load Shed Event"),
+		alerts.WithSeverity(la.alerterConfig.Severity),
+		alerts.WithLabel("policy_name", la.policyReadAPI.GetPolicyName()),
+		alerts.WithLabel("type", "concurrency_limiter"),
+		alerts.WithLabel("agent_group", la.agentGroupName),
+		alerts.WithLabel("component_index", strconv.Itoa(la.componentIndex)),
+		alerts.WithAnnotation("alert_channels", strings.Join(la.alerterConfig.AlertChannels, ",")),
+	)
+
+	evalTimeout := time.Duration(2 * la.alerterConfig.ResolveTimeout.AsDuration().Milliseconds())
+	timeout, _ := time.ParseDuration("5s")
+	if evalTimeout > timeout {
+		timeout = evalTimeout
+	}
+	newAlert.SetAnnotation("resolve_timeout", timeout.String())
+
+	return newAlert
 }

@@ -603,6 +603,16 @@ definitions:
   v1Alerter:
     type: object
     properties:
+      alerter_config:
+        $ref: '#/definitions/v1AlerterConfig'
+        title: Alerter configuration
+      in_ports:
+        $ref: '#/definitions/v1AlerterIns'
+        description: Input ports for the Alerter component.
+    description: Alerter reacts to a signal and generates alert to send to alert manager.
+  v1AlerterConfig:
+    type: object
+    properties:
       alert_channels:
         type: array
         items:
@@ -611,9 +621,6 @@ definitions:
       alert_name:
         type: string
         description: Name of the alert.
-      in_ports:
-        $ref: '#/definitions/v1AlerterIns'
-        description: Input ports for the Alerter component.
       resolve_timeout:
         type: string
         description: Duration of alert resolver.
@@ -622,7 +629,7 @@ definitions:
         type: string
         description: Severity of the alert, one of 'info', 'warn' or 'crit'.
         x-go-validate: oneof=info warn crit
-    description: Alerter reacts to a signal and generates alert to send to alert manager.
+    description: AlerterConfig is a common config for separate alerter components and alerters embedded in other components.
   v1AlerterIns:
     type: object
     properties:
@@ -1654,6 +1661,9 @@ definitions:
   v1LoadActuator:
     type: object
     properties:
+      alerter_config:
+        $ref: '#/definitions/v1AlerterConfig'
+        description: Configuration for embedded alerter.
       default_config:
         $ref: '#/definitions/v1LoadActuatorDynamicConfig'
         description: Default configuration.
