@@ -428,6 +428,17 @@ definitions:
     description: Alerter reacts to a signal and generates alert to send to alert manager.
     type: object
     properties:
+      alerter_config:
+        title: Alerter configuration
+        $ref: '#/definitions/v1AlerterConfig'
+      in_ports:
+        description: Input ports for the Alerter component.
+        $ref: '#/definitions/v1AlerterIns'
+  v1AlerterConfig:
+    description: AlerterConfig is a common config for separate alerter components
+      and alerters embedded in other components.
+    type: object
+    properties:
       alert_channels:
         description: A list of alert channel strings.
         type: array
@@ -436,9 +447,6 @@ definitions:
       alert_name:
         description: Name of the alert.
         type: string
-      in_ports:
-        description: Input ports for the Alerter component.
-        $ref: '#/definitions/v1AlerterIns'
       resolve_timeout:
         description: Duration of alert resolver.
         type: string
@@ -1366,6 +1374,9 @@ definitions:
     title: Takes the load multiplier input signal and publishes it to the schedulers
       in the data-plane
     properties:
+      alerter_config:
+        description: Configuration for embedded alerter.
+        $ref: '#/definitions/v1AlerterConfig'
       default_config:
         description: Default configuration.
         $ref: '#/definitions/v1LoadActuatorDynamicConfig'

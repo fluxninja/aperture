@@ -6,37 +6,16 @@ local alerterins = import './alerterins.libsonnet';
     },
   },
   inPorts:: alerterins,
-  withAlertChannels(alert_channels):: {
-    alert_channels:
-      if std.isArray(alert_channels)
-      then alert_channels
-      else [alert_channels],
+  withAlerterConfig(alerter_config):: {
+    alerter_config: alerter_config,
   },
-  withAlertChannelsMixin(alert_channels):: {
-    alert_channels+: alert_channels,
-  },
-  withAlertName(alert_name):: {
-    alert_name: alert_name,
-  },
-  withAlertNameMixin(alert_name):: {
-    alert_name+: alert_name,
+  withAlerterConfigMixin(alerter_config):: {
+    alerter_config+: alerter_config,
   },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
-  },
-  withResolveTimeout(resolve_timeout):: {
-    resolve_timeout: resolve_timeout,
-  },
-  withResolveTimeoutMixin(resolve_timeout):: {
-    resolve_timeout+: resolve_timeout,
-  },
-  withSeverity(severity):: {
-    severity: severity,
-  },
-  withSeverityMixin(severity):: {
-    severity+: severity,
   },
 }

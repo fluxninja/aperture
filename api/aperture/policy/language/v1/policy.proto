@@ -930,6 +930,9 @@ message LoadActuator {
 
   // Default configuration.
   DynamicConfig default_config = 3;
+
+  // Configuration for embedded alerter.
+  AlerterConfig alerter_config = 4;
 }
 
 // Component that runs a Prometheus query periodically and returns the result as an output signal
@@ -1117,6 +1120,31 @@ message Sink {
   Ins in_ports = 1;
 }
 
+// AlerterConfig is a common config for separate alerter components and alerters embedded in other components.
+message AlerterConfig {
+  // Name of the alert.
+  string alert_name = 1;
+
+  // Severity of the alert, one of 'info', 'warn' or 'crit'.
+  string severity = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "oneof=info warn crit"}
+    }
+  }];
+
+  // Duration of alert resolver.
+  google.protobuf.Duration resolve_timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "5m"}
+    }
+  }];
+
+  // A list of alert channel strings.
+  repeated string alert_channels = 4;
+}
+
 // Alerter reacts to a signal and generates alert to send to alert manager.
 message Alerter {
   // Inputs for the Alerter component.
@@ -1128,25 +1156,6 @@ message Alerter {
   // Input ports for the Alerter component.
   Ins in_ports = 1;
 
-  // Name of the alert.
-  string alert_name = 2;
-
-  // Severity of the alert, one of 'info', 'warn' or 'crit'.
-  string severity = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "oneof=info warn crit"}
-    }
-  }];
-
-  // Duration of alert resolver.
-  google.protobuf.Duration resolve_timeout = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "5m"}
-    }
-  }];
-
-  // A list of alert channel strings.
-  repeated string alert_channels = 5;
+  // Alerter configuration
+  AlerterConfig alerter_config = 2;
 }

@@ -311,6 +311,27 @@ Alerter reacts to a signal and generates alert to send to alert manager.
 #### Properties
 
 <dl>
+<dt>alerter_config</dt>
+<dd>
+
+([V1AlerterConfig](#v1-alerter-config)) Alerter configuration
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+([V1AlerterIns](#v1-alerter-ins)) Input ports for the Alerter component.
+
+</dd>
+</dl>
+
+### v1AlerterConfig {#v1-alerter-config}
+
+AlerterConfig is a common config for separate alerter components and alerters embedded in other components.
+
+#### Properties
+
+<dl>
 <dt>alert_channels</dt>
 <dd>
 
@@ -321,12 +342,6 @@ Alerter reacts to a signal and generates alert to send to alert manager.
 <dd>
 
 (string) Name of the alert.
-
-</dd>
-<dt>in_ports</dt>
-<dd>
-
-([V1AlerterIns](#v1-alerter-ins)) Input ports for the Alerter component.
 
 </dd>
 <dt>resolve_timeout</dt>
@@ -1635,6 +1650,12 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 #### Properties
 
 <dl>
+<dt>alerter_config</dt>
+<dd>
+
+([V1AlerterConfig](#v1-alerter-config)) Configuration for embedded alerter.
+
+</dd>
 <dt>default_config</dt>
 <dd>
 
