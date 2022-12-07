@@ -1,4 +1,4 @@
-package controlplane
+package circuitcompiler
 
 import (
 	"errors"
@@ -14,31 +14,31 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// circuitFactoryModule for circuit factory run via the main app.
-func circuitFactoryModule() fx.Option {
+// Module for circuit compiler run via the main app.
+func Module() fx.Option {
 	return fx.Options(
 		runtime.CircuitModule(),
 	)
 }
 
-// CompiledComponent is composed of runtime.CompiledComponent, ComponentID and ParentComponentID.
-type CompiledComponent struct {
+// Component is composed of runtime.Component, ComponentID and ParentComponentID.
+type Component struct {
 	runtime.CompiledComponentAndPorts
 	ComponentID       string
 	ParentComponentID string
 }
 
-// CompiledCircuit is a list of CompiledComponent(s).
-type CompiledCircuit []*CompiledComponent
+// Circuit is a list of CompiledComponent(s).
+type Circuit []*Component
 
-// compileCircuit takes a circuitProto and returns list of CompiledCircuit.
-func compileCircuit(
+// Compile compiles a protobuf circuit definition into a Circuit.
+func Compile(
 	circuitProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
-) (CompiledCircuit, fx.Option, error) {
+) (Circuit, fx.Option, error) {
 	logger := policyReadAPI.GetStatusRegistry().GetLogger()
 	// List of runtime.CompiledComponent. The index of CompiledComponent in compiledCircuit is referred as graphNodeIndex.
-	var compiledCircuit CompiledCircuit
+	var compiledCircuit Circuit
 	// Map from signal name to a list of graphNodeIndex(es) which accept the signal as input.
 	inSignals := make(map[string][]int)
 	// Map from signal name to the graphNodeIndex which emits the signal as output.
@@ -57,7 +57,7 @@ func compileCircuit(
 
 		compID := strconv.Itoa(compIndex)
 		// Add Component to compiledCircuit
-		compiledCircuit = append(compiledCircuit, &CompiledComponent{
+		compiledCircuit = append(compiledCircuit, &Component{
 			CompiledComponentAndPorts: runtime.CompiledComponentAndPorts{
 				CompiledComponent:   compiledComp,
 				InPortToSignalsMap:  make(runtime.PortToSignal),
@@ -68,7 +68,7 @@ func compileCircuit(
 
 		// Add SubComponents to compiledCircuit
 		for _, subComp := range compiledSubComps {
-			compiledCircuit = append(compiledCircuit, &CompiledComponent{
+			compiledCircuit = append(compiledCircuit, &Component{
 				CompiledComponentAndPorts: runtime.CompiledComponentAndPorts{
 					CompiledComponent:   subComp,
 					InPortToSignalsMap:  make(runtime.PortToSignal),
