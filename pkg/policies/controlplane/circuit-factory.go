@@ -9,6 +9,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -48,7 +49,7 @@ func compileCircuit(
 
 	for compIndex, componentProto := range circuitProto {
 		// Create component
-		compiledComp, compiledSubComps, compOption, compErr := NewComponentAndOptions(componentProto, compIndex, policyReadAPI)
+		compiledComp, compiledSubComps, compOption, compErr := components.NewComponentAndOptions(componentProto, compIndex, policyReadAPI)
 		if compErr != nil {
 			return nil, fx.Options(), compErr
 		}

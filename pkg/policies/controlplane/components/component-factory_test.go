@@ -1,4 +1,4 @@
-package controlplane_test
+package components_test
 
 import (
 	"reflect"
@@ -9,7 +9,6 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
 )
@@ -18,7 +17,7 @@ var _ = Describe("Component factory", func() {
 	Context("With unimplemented component type", func() {
 		compProto := &policylangv1.Component{}
 		It("Returns error if component type is not one of specified", func() {
-			_, _, _, err := controlplane.NewComponentAndOptions(compProto, 0, nil)
+			_, _, _, err := components.NewComponentAndOptions(compProto, 0, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
