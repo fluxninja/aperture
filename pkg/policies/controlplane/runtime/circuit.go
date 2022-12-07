@@ -178,6 +178,7 @@ func NewCircuitAndOptions(
 	// Set components in circuit
 	err := setComponents(compWithPortsList)
 	if err != nil {
+		// FIXME don't hide this error contents
 		return nil, fx.Options()
 	}
 
