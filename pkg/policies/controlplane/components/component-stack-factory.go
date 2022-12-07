@@ -1,4 +1,4 @@
-package controlplane
+package components
 
 import (
 	"fmt"

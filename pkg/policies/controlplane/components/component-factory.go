@@ -1,4 +1,4 @@
-package controlplane
+package components
 
 import (
 	"encoding/json"
@@ -6,25 +6,25 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// componentFactoryModule for component factory run via the main app.
-func componentFactoryModule() fx.Option {
+// FactoryModule for component factory run via the main app.
+func FactoryModule() fx.Option {
 	return fx.Options(
-		components.PromQLModule(),
+		promql.Module(),
 	)
 }
 
-// componentFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
-func componentFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
+// FactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
+func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	return fx.Options(
 		componentStackFactoryModuleForPolicyApp(circuitAPI),
-		components.PromQLModuleForPolicyApp(circuitAPI),
+		promql.ModuleForPolicyApp(circuitAPI),
 	)
 }
 
@@ -54,7 +54,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSink,
 		}, nil, option, err
 	} else if ema := componentProto.GetEma(); ema != nil {
-		component, option, err := components.NewEMAAndOptions(ema, componentIndex, policyReadAPI)
+		component, option, err := NewEMAAndOptions(ema, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(ema, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -63,7 +63,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if arithmeticCombinator := componentProto.GetArithmeticCombinator(); arithmeticCombinator != nil {
-		component, option, err := components.NewArithmeticCombinatorAndOptions(arithmeticCombinator, componentIndex, policyReadAPI)
+		component, option, err := NewArithmeticCombinatorAndOptions(arithmeticCombinator, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(arithmeticCombinator, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -72,7 +72,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if promQL := componentProto.GetPromql(); promQL != nil {
-		component, option, err := components.NewPromQLAndOptions(promQL, componentIndex, policyReadAPI)
+		component, option, err := promql.NewPromQLAndOptions(promQL, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(promQL, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -81,7 +81,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if constant := componentProto.GetConstant(); constant != nil {
-		component, option, err := components.NewConstantAndOptions(constant, componentIndex, policyReadAPI)
+		component, option, err := NewConstantAndOptions(constant, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(constant, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -90,7 +90,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSource,
 		}, nil, option, err
 	} else if decider := componentProto.GetDecider(); decider != nil {
-		component, option, err := components.NewDeciderAndOptions(decider, componentIndex, policyReadAPI)
+		component, option, err := NewDeciderAndOptions(decider, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(decider, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -99,7 +99,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if switcher := componentProto.GetSwitcher(); switcher != nil {
-		component, option, err := components.NewSwitcherAndOptions(switcher, componentIndex, policyReadAPI)
+		component, option, err := NewSwitcherAndOptions(switcher, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(switcher, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -108,7 +108,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if sqrt := componentProto.GetSqrt(); sqrt != nil {
-		component, option, err := components.NewSqrtAndOptions(sqrt, componentIndex, policyReadAPI)
+		component, option, err := NewSqrtAndOptions(sqrt, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(sqrt, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -117,7 +117,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if max := componentProto.GetMax(); max != nil {
-		component, option, err := components.NewMaxAndOptions(max, componentIndex, policyReadAPI)
+		component, option, err := NewMaxAndOptions(max, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(max, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -126,7 +126,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if min := componentProto.GetMin(); min != nil {
-		component, option, err := components.NewMinAndOptions(min, componentIndex, policyReadAPI)
+		component, option, err := NewMinAndOptions(min, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(min, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -135,7 +135,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if extrapolator := componentProto.GetExtrapolator(); extrapolator != nil {
-		component, option, err := components.NewExtrapolatorAndOptions(extrapolator, componentIndex, policyReadAPI)
+		component, option, err := NewExtrapolatorAndOptions(extrapolator, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(extrapolator, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -144,7 +144,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if firstValid := componentProto.GetFirstValid(); firstValid != nil {
-		component, option, err := components.NewFirstValidAndOptions(firstValid, componentIndex, policyReadAPI)
+		component, option, err := NewFirstValidAndOptions(firstValid, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(firstValid, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -153,7 +153,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSignalProcessor,
 		}, nil, option, err
 	} else if sink := componentProto.GetSink(); sink != nil {
-		component, option, err := components.NewSinkAndOptions(sink, componentIndex, policyReadAPI)
+		component, option, err := NewSinkAndOptions(sink, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(sink, err)
 		return runtime.CompiledComponent{
 			Component:     component,
@@ -162,7 +162,7 @@ func NewComponentAndOptions(
 			ComponentType: runtime.ComponentTypeSink,
 		}, nil, option, err
 	} else if alerter := componentProto.GetAlerter(); alerter != nil {
-		component, option, err := components.NewAlerterAndOptions(alerter, componentIndex, policyReadAPI)
+		component, option, err := NewAlerterAndOptions(alerter, componentIndex, policyReadAPI)
 		mapStruct, err := encodeMapStructOnNilErr(alerter, err)
 		return runtime.CompiledComponent{
 			Component:     component,

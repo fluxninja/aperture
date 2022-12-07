@@ -18,6 +18,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/fluxmeter"
@@ -28,7 +29,7 @@ import (
 // policyModule returns Fx options of Policy for the Main App.
 func policyModule() fx.Option {
 	// Circuit module options
-	componentFactoryOptions := componentFactoryModule()
+	componentFactoryOptions := components.FactoryModule()
 
 	return fx.Options(
 		circuitFactoryModule(),
@@ -82,7 +83,7 @@ func newPolicyOptions(
 	circuit, circuitOption := runtime.NewCircuitAndOptions(compWithPortsList, policy, registry)
 	policyOptions = append(policyOptions, circuitOption)
 
-	policyOptions = append(policyOptions, componentFactoryModuleForPolicyApp(circuit))
+	policyOptions = append(policyOptions, components.FactoryModuleForPolicyApp(circuit))
 
 	policyOptions = append(policyOptions, fx.Supply(fx.Annotate(circuit, fx.As(new(runtime.CircuitAPI)))))
 	policy.circuit = circuit
