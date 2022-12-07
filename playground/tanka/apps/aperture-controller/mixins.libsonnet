@@ -91,18 +91,6 @@ local apertureControllerMixin =
           prometheus+: {
             address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',
           },
-          alertmanagers+: {
-            clients: [
-              {
-                name: 'test1',
-                address: 'http://ingestion-service.cloud.svc.cluster.local:80',
-              },
-              {
-                name: 'test2',
-                address: 'http://ingestion-service.cloud.svc.cluster.local:80',
-              },
-            ],
-          },
         },
         image: {
           registry: '',
