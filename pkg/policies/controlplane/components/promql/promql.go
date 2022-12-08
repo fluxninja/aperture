@@ -362,6 +362,12 @@ type PromQL struct {
 	evaluationInterval time.Duration
 }
 
+// Name implements runtime.Component.
+func (*PromQL) Name() string { return "PromQL" }
+
+// Type implements runtime.Component.
+func (*PromQL) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
 var _ runtime.Component = (*PromQL)(nil)
 
 // Make sure PromQL implements jobRegistererIfc.

@@ -42,6 +42,12 @@ type EMA struct {
 	validDuringWarmup bool
 }
 
+// Name implements runtime.Component.
+func (*EMA) Name() string { return "EMA" }
+
+// Type implements runtime.Component.
+func (*EMA) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
 // Make sure EMA complies with Component interface.
 var _ runtime.Component = (*EMA)(nil)
 
