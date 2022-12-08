@@ -16,11 +16,13 @@ var _ = Describe("Alert", func() {
 			alerts.WithName("buzz"),
 			alerts.WithSeverity("error"),
 		)
+		finalAlert := alert
+		finalAlert.SetLabel("is_alert", "true")
 		ld := alert.AsLogs()
 		Expect(ld.LogRecordCount()).To(Equal(1))
 		actual := alerts.AlertsFromLogs(ld)
 		Expect(actual).To(HaveLen(1))
-		Expect(actual[0]).To(Equal(alert))
+		Expect(actual[0]).To(Equal(finalAlert))
 	})
 })
 
