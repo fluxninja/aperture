@@ -2,6 +2,7 @@ package concurrency
 
 import (
 	"context"
+	"fmt"
 	"path"
 	"strconv"
 	"strings"
@@ -19,6 +20,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -205,6 +207,9 @@ func (la *LoadActuator) createAlert() *alerts.Alert {
 		alerts.WithLabel("agent_group", la.agentGroupName),
 		alerts.WithLabel("component_index", strconv.Itoa(la.componentIndex)),
 		alerts.WithAnnotation("alert_channels", strings.Join(la.alerterConfig.AlertChannels, ",")),
+		alerts.WithGeneratorURL(
+			fmt.Sprintf("http://%s/%s/%d", info.GetHostInfo().Hostname, la.policyReadAPI.GetPolicyName(), la.componentIndex),
+		),
 	)
 
 	evalTimeout := time.Duration(2 * la.alerterConfig.ResolveTimeout.AsDuration().Milliseconds())

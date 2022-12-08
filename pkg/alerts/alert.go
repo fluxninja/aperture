@@ -103,6 +103,18 @@ func WithLabel(key, value string) AlertOption {
 	}
 }
 
+// SetGeneratorURL sets a generator URL. It overwrites the previous value if exists.
+func (a *Alert) SetGeneratorURL(value string) {
+	a.postableAlert.GeneratorURL = strfmt.URI(value)
+}
+
+// WithGeneratorURL is an option function for constructor.
+func WithGeneratorURL(value string) AlertOption {
+	return func(a *Alert) {
+		a.postableAlert.GeneratorURL = strfmt.URI(value)
+	}
+}
+
 // AlertsFromLogs gets slice of alerts from OTEL Logs.
 func AlertsFromLogs(ld plog.Logs) []*Alert {
 	// We can't preallocate size, as we don't know how many of those log records

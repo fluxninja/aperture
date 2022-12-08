@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -78,6 +80,9 @@ func (a *Alerter) createAlert() *alerts.Alert {
 		alerts.WithLabel("type", "alerter"),
 		alerts.WithAnnotation("alert_channels", strings.Join(a.alertChannels, ",")),
 		alerts.WithAnnotation("resolve_timeout", a.resolveTimeout.String()),
+		alerts.WithGeneratorURL(
+			fmt.Sprintf("http://%s/%s/%s", info.GetHostInfo().Hostname, a.policyReadAPI.GetPolicyName(), a.name),
+		),
 	)
 
 	return newAlert
