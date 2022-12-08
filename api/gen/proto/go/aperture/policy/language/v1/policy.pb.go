@@ -2305,7 +2305,7 @@ type AlerterConfig struct {
 	// Name of the alert.
 	AlertName string `protobuf:"bytes,1,opt,name=alert_name,json=alertName,proto3" json:"alert_name,omitempty" default:"alert"` // @gotags: default:"alert"
 	// Severity of the alert, one of 'info', 'warn' or 'crit'.
-	Severity string `protobuf:"bytes,2,opt,name=severity,proto3" json:"severity,omitempty" default:"info"` // @gotags: default:"info"
+	Severity string `protobuf:"bytes,2,opt,name=severity,proto3" json:"severity,omitempty" default:"info" validate:"oneof=info warn crit"` // @gotags: default:"info" validate:"oneof=info warn crit"
 	// Duration of alert resolver.
 	ResolveTimeout *durationpb.Duration `protobuf:"bytes,3,opt,name=resolve_timeout,json=resolveTimeout,proto3" json:"resolve_timeout,omitempty" default:"5m"` // @gotags: default:"5m"
 	// A list of alert channel strings.
