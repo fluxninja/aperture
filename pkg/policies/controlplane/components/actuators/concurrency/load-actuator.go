@@ -11,6 +11,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -57,8 +58,18 @@ func NewLoadActuatorAndOptions(
 		decisionsEtcdPath: decisionsEtcdPath,
 		loadActuatorProto: loadActuatorProto,
 		dryRun:            dryRun,
-		alerterConfig:     loadActuatorProto.AlerterConfig,
 	}
+
+	alerterConfig := loadActuatorProto.GetAlerterConfig()
+	if alerterConfig == nil {
+		alerterConfig = &policylangv1.AlerterConfig{
+			AlertName:      "Load Shed Event",
+			Severity:       "info",
+			ResolveTimeout: durationpb.New(5 * time.Second),
+			AlertChannels:  make([]string, 0),
+		}
+	}
+	lsa.alerterConfig = alerterConfig
 
 	return lsa, fx.Options(
 		fx.Invoke(lsa.setupWriter),

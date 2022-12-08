@@ -447,6 +447,7 @@ definitions:
       alert_name:
         description: Name of the alert.
         type: string
+        x-go-default: alert
       resolve_timeout:
         description: Duration of alert resolver.
         type: string
@@ -454,6 +455,7 @@ definitions:
       severity:
         description: Severity of the alert, one of 'info', 'warn' or 'crit'.
         type: string
+        x-go-default: info
         x-go-validate: oneof=info warn crit
   v1AlerterIns:
     description: Inputs for the Alerter component.

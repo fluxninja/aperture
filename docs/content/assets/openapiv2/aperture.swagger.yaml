@@ -621,6 +621,7 @@ definitions:
       alert_name:
         type: string
         description: Name of the alert.
+        x-go-default: alert
       resolve_timeout:
         type: string
         description: Duration of alert resolver.
@@ -628,6 +629,7 @@ definitions:
       severity:
         type: string
         description: Severity of the alert, one of 'info', 'warn' or 'crit'.
+        x-go-default: info
         x-go-validate: oneof=info warn crit
     description: AlerterConfig is a common config for separate alerter components and alerters embedded in other components.
   v1AlerterIns:
