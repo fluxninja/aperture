@@ -1,4 +1,4 @@
-package components
+package promql
 
 import (
 	"context"
@@ -36,8 +36,8 @@ const (
 
 var promQLJobGroupTag = iface.PoliciesRoot + "promql_jobs"
 
-// PromQLModule returns fx options for PromQL in the main app.
-func PromQLModule() fx.Option {
+// Module returns fx options for PromQL in the main app.
+func Module() fx.Option {
 	return fx.Options(
 		jobs.JobGroupConstructor{Name: promQLJobGroupTag, Key: iface.PoliciesRoot + ".promql_jobs_scheduler"}.Annotate(),
 		fx.Provide(fx.Annotate(
@@ -57,8 +57,8 @@ func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.AP
 	}
 }
 
-// PromQLModuleForPolicyApp returns fx options for PromQL in the policy app. Invoked only once per policy.
-func PromQLModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
+// ModuleForPolicyApp returns fx options for PromQL in the policy app. Invoked only once per policy.
+func ModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	providePromJobsExecutor := func(promQLJobGroup *jobs.JobGroup, lifecycle fx.Lifecycle) (*promJobsExecutor, error) {
 		// Create this watcher as a singleton at the policy/circuit level
 		pje := &promJobsExecutor{
@@ -361,6 +361,12 @@ type PromQL struct {
 	// Interval of time between evaluations
 	evaluationInterval time.Duration
 }
+
+// Name implements runtime.Component.
+func (*PromQL) Name() string { return "PromQL" }
+
+// Type implements runtime.Component.
+func (*PromQL) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
 var _ runtime.Component = (*PromQL)(nil)
 

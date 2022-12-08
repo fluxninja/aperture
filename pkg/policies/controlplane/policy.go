@@ -18,6 +18,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitcompiler"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/fluxmeter"
@@ -28,10 +30,10 @@ import (
 // policyModule returns Fx options of Policy for the Main App.
 func policyModule() fx.Option {
 	// Circuit module options
-	componentFactoryOptions := componentFactoryModule()
+	componentFactoryOptions := components.FactoryModule()
 
 	return fx.Options(
-		circuitFactoryModule(),
+		circuitcompiler.Module(),
 		componentFactoryOptions,
 	)
 }
@@ -70,19 +72,15 @@ func newPolicyOptions(
 		fx.Annotate(policy, fx.As(new(iface.Policy))),
 	))
 
-	compWithPortsList := make([]runtime.CompiledComponentAndPorts, 0, len(compiledCircuit))
-	for _, compiledComponent := range compiledCircuit {
-		// Skip nil component
-		if compiledComponent.CompiledComponent.Component != nil {
-			compWithPortsList = append(compWithPortsList, compiledComponent.CompiledComponentAndPorts)
-		}
-	}
-
 	// Create circuit
-	circuit, circuitOption := runtime.NewCircuitAndOptions(compWithPortsList, policy, registry)
+	circuit, circuitOption := runtime.NewCircuitAndOptions(
+		compiledCircuit.ToComponentsWithPorts(),
+		policy,
+		registry,
+	)
 	policyOptions = append(policyOptions, circuitOption)
 
-	policyOptions = append(policyOptions, componentFactoryModuleForPolicyApp(circuit))
+	policyOptions = append(policyOptions, components.FactoryModuleForPolicyApp(circuit))
 
 	policyOptions = append(policyOptions, fx.Supply(fx.Annotate(circuit, fx.As(new(runtime.CircuitAPI)))))
 	policy.circuit = circuit
@@ -91,7 +89,7 @@ func newPolicyOptions(
 }
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
-func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry) (CompiledCircuit, error) {
+func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry) (circuitcompiler.Circuit, error) {
 	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter")
 	if err != nil {
 		return nil, err
@@ -104,7 +102,7 @@ func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry)
 }
 
 // compilePolicyWrapper takes policyProto and returns a compiled policy.
-func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry status.Registry) (*Policy, CompiledCircuit, fx.Option, error) {
+func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry status.Registry) (*Policy, circuitcompiler.Circuit, fx.Option, error) {
 	if wrapperMessage == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy wrapper message")
 	}
@@ -139,7 +137,7 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 			resourceOptions = append(resourceOptions, classifierOption)
 		}
 	}
-	var compiledCircuit CompiledCircuit
+	var compiledCircuit circuitcompiler.Circuit
 	partialCircuitOption := fx.Options()
 	var err error
 
@@ -147,7 +145,7 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 		// Read evaluation interval
 		policy.evaluationInterval = policyProto.GetCircuit().GetEvaluationInterval().AsDuration()
 
-		compiledCircuit, partialCircuitOption, err = compileCircuit(policyProto.GetCircuit().Components, policy)
+		compiledCircuit, partialCircuitOption, err = circuitcompiler.Compile(policyProto.GetCircuit().Components, policy)
 		if err != nil {
 			return nil, nil, nil, err
 		}

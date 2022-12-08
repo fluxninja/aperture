@@ -22,6 +22,12 @@ type Extrapolator struct {
 	lastValidTimestamp time.Time
 }
 
+// Name implements runtime.Component.
+func (*Extrapolator) Name() string { return "Extrapolator" }
+
+// Type implements runtime.Component.
+func (*Extrapolator) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
 // Make sure Extrapolator complies with Component interface.
 var _ runtime.Component = (*Extrapolator)(nil)
 

@@ -12,6 +12,12 @@ import (
 // FirstValid picks the first valid input signal from the array of input signals and emits it as an output signal.
 type FirstValid struct{}
 
+// Name implements runtime.Component.
+func (*FirstValid) Name() string { return "FirstValid" }
+
+// Type implements runtime.Component.
+func (*FirstValid) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
 // Make sure FirstValid complies with Component interface.
 var _ runtime.Component = (*FirstValid)(nil)
 

@@ -20,7 +20,7 @@ import (
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
@@ -35,11 +35,11 @@ var (
 type Scheduler struct {
 	policyReadAPI iface.Policy
 	// Prometheus query for accepted concurrency
-	acceptedQuery *components.ScalarQuery
+	acceptedQuery *promql.ScalarQuery
 	// Prometheus query for incoming concurrency
-	incomingQuery *components.ScalarQuery
+	incomingQuery *promql.ScalarQuery
 	// Prometheus query for tokens based on ms latency
-	tokensQuery *components.TaggedQuery
+	tokensQuery *promql.TaggedQuery
 
 	// saves tokens value per workload read from prometheus
 	tokensByWorkload *policysyncv1.TokensDecision
@@ -48,6 +48,12 @@ type Scheduler struct {
 	etcdPath         string
 	componentIndex   int
 }
+
+// Name implements runtime.Component.
+func (*Scheduler) Name() string { return "Scheduler" }
+
+// Type implements runtime.Component.
+func (*Scheduler) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
 // NewSchedulerAndOptions creates scheduler and its fx options.
 func NewSchedulerAndOptions(
@@ -79,7 +85,7 @@ func NewSchedulerAndOptions(
 		componentIndex,
 	)
 
-	acceptedQuery, acceptedQueryOptions, acceptedQueryErr := components.NewScalarQueryAndOptions(
+	acceptedQuery, acceptedQueryOptions, acceptedQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
 			metrics.AcceptedConcurrencyMetricName,
 			policyParams),
@@ -93,7 +99,7 @@ func NewSchedulerAndOptions(
 	}
 	scheduler.acceptedQuery = acceptedQuery
 
-	incomingQuery, incomingQueryOptions, incomingQueryErr := components.NewScalarQueryAndOptions(
+	incomingQuery, incomingQueryOptions, incomingQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
 			metrics.IncomingConcurrencyMetricName,
 			policyParams),
@@ -110,7 +116,7 @@ func NewSchedulerAndOptions(
 	// add decision_type filter to the params
 	autoTokensPolicyParams := policyParams + ",decision_type!=\"DECISION_TYPE_REJECTED\""
 	if schedulerProto.AutoTokens {
-		tokensQuery, tokensQueryOptions, tokensQueryErr := components.NewTaggedQueryAndOptions(
+		tokensQuery, tokensQueryOptions, tokensQueryErr := promql.NewTaggedQueryAndOptions(
 			fmt.Sprintf("sum by (%s) (increase(%s{%s}[30m])) / sum by (%s) (increase(%s{%s}[30m]))",
 				metrics.WorkloadIndexLabel,
 				metrics.WorkloadLatencySumMetricName,
@@ -175,7 +181,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 		taggedResult, err := s.tokensQuery.ExecuteTaggedQuery(tickInfo)
 		promValue := taggedResult.Value
 		if err != nil {
-			if err != components.ErrNoQueriesReturned {
+			if err != promql.ErrNoQueriesReturned {
 				logger.Error().Err(err).Msg("could not read tokens query from prometheus")
 				errMulti = multierr.Append(errMulti, err)
 			}
@@ -219,7 +225,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	acceptedValue := acceptedScalarResult.Value
 	if err != nil {
 		acceptedReading = runtime.InvalidReading()
-		if err != components.ErrNoQueriesReturned {
+		if err != promql.ErrNoQueriesReturned {
 			errMulti = multierr.Append(errMulti, err)
 		}
 	} else {
@@ -231,7 +237,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	incomingValue := incomingScalarResult.Value
 	if err != nil {
 		incomingReading = runtime.InvalidReading()
-		if err != components.ErrNoQueriesReturned {
+		if err != promql.ErrNoQueriesReturned {
 			errMulti = multierr.Append(errMulti, err)
 		}
 	} else {

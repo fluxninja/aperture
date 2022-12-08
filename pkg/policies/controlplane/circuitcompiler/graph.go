@@ -1,4 +1,4 @@
-package controlplane
+package circuitcompiler
 
 import (
 	"fmt"
@@ -12,8 +12,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// ComponentDTO takes a CompiledCircuit and returns its graph representation.
-func ComponentDTO(circuit CompiledCircuit) ([]*policymonitoringv1.ComponentView, []*policymonitoringv1.Link) {
+// ComponentDTO takes a Circuit and returns its graph representation.
+func ComponentDTO(circuit Circuit) ([]*policymonitoringv1.ComponentView, []*policymonitoringv1.Link) {
 	var componentsDTO []*policymonitoringv1.ComponentView
 	var links []*policymonitoringv1.Link
 	type componentData struct {
@@ -91,8 +91,8 @@ func ComponentDTO(circuit CompiledCircuit) ([]*policymonitoringv1.ComponentView,
 			return fmt.Sprintf("%s/%s", agentGroup, service)
 		}
 
-		componentName := c.CompiledComponent.Name
-		mapStruct := c.CompiledComponent.MapStruct
+		componentName := c.Component.Name()
+		mapStruct := c.MapStruct
 		componentDescription := ""
 		switch componentName {
 		case "Constant":
@@ -117,7 +117,7 @@ func ComponentDTO(circuit CompiledCircuit) ([]*policymonitoringv1.ComponentView,
 			ComponentId:          c.ComponentID,
 			ComponentName:        componentName,
 			ComponentDescription: componentDescription,
-			ComponentType:        string(c.CompiledComponent.ComponentType),
+			ComponentType:        string(c.Component.Type()),
 			Component:            componentMap,
 			InPorts:              convertPortViews(inPorts),
 			OutPorts:             convertPortViews(outPorts),

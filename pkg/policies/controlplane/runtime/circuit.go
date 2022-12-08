@@ -77,13 +77,20 @@ type Signal struct {
 	SignalType SignalType
 }
 
-// MakeSignal creates a new Signal.
-func MakeSignal(signalType SignalType, name string, value float64, looped bool) Signal {
+// MakeNamedSignal creates a new named Signal.
+func MakeNamedSignal(name string, looped bool) Signal {
 	return Signal{
+		SignalType: SignalTypeNamed,
 		Name:       name,
-		Value:      value,
 		Looped:     looped,
-		SignalType: signalType,
+	}
+}
+
+// MakeConstantSignal creates a new constant Signal.
+func MakeConstantSignal(value float64) Signal {
+	return Signal{
+		SignalType: SignalTypeConstant,
+		Value:      value,
 	}
 }
 
@@ -104,19 +111,20 @@ const (
 	ComponentTypeSignalProcessor ComponentType = "SignalProcessor"
 )
 
-// CompiledComponent consists of a Component, its MapStruct and Name.
+// CompiledComponent consists of a Component, its Ports and its MapStruct representation.
 type CompiledComponent struct {
-	Component     Component
-	MapStruct     map[string]any
-	Name          string
-	ComponentType ComponentType
+	Component Component
+	Ports     Ports
+	// Json-serialized proto representation of the component's config, encoded
+	// as MapStruct.  Note: Ports is also part of MapStruct
+	MapStruct map[string]any
 }
 
 // CompiledComponentAndPorts consists of a CompiledComponent and its In and Out ports.
 type CompiledComponentAndPorts struct {
+	CompiledComponent
 	InPortToSignalsMap  PortToSignal
 	OutPortToSignalsMap PortToSignal
-	CompiledComponent   CompiledComponent
 }
 
 type signalToReading map[Signal]Reading
@@ -178,6 +186,7 @@ func NewCircuitAndOptions(
 	// Set components in circuit
 	err := setComponents(compWithPortsList)
 	if err != nil {
+		// FIXME don't hide this error contents
 		return nil, fx.Options()
 	}
 
@@ -331,13 +340,13 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				componentInPortReadings[port] = readingList
 			}
 			// log the component being executed
-			logger.Trace().Str("component", cmp.CompiledComponent.Name).
+			logger.Trace().Str("component", cmp.Component.Name()).
 				Int("tick", tickInfo.Tick()).
 				Interface("in_ports", componentInPortReadings).
 				Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).
 				Msg("Executing component")
 			// If control reaches this point, the component is ready to execute
-			componentOutPortReadings, err := cmp.CompiledComponent.Component.Execute(
+			componentOutPortReadings, err := cmp.Component.Execute(
 				/* pass signal */
 				componentInPortReadings,
 				/* pass tick info */
@@ -392,7 +401,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 						// Looped signals are stored in circuit.loopedSignals for the next round
 						circuit.loopedSignals[sig] = readings[index]
 						// Store the reading in circuitSignalReadings under the same signal name without the looped flag
-						circuitSignalReadings[MakeSignal(SignalTypeNamed, sig.Name, 0.0, false)] = readings[index]
+						circuitSignalReadings[MakeNamedSignal(sig.Name, false)] = readings[index]
 					} else {
 						// Store the reading in circuitSignalReadings
 						circuitSignalReadings[sig] = readings[index]

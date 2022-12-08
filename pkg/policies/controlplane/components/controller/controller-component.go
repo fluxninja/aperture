@@ -23,18 +23,27 @@ type ControllerComponent struct {
 	policyReadAPI    iface.Policy
 	defaultConfig    *policylangv1.ControllerDynamicConfig
 	dynamicConfigKey string
+	componentName    string
 	componentIndex   int
 	manualMode       bool
 }
 
 // NewControllerComponent creates a new ControllerComponent.
-func NewControllerComponent(controller Controller, componentIndex int, policyReadAPI iface.Policy, dynamicConfigKey string, defaultConfig *policylangv1.ControllerDynamicConfig) *ControllerComponent {
+func NewControllerComponent(
+	controller Controller,
+	componentName string,
+	componentIndex int,
+	policyReadAPI iface.Policy,
+	dynamicConfigKey string,
+	defaultConfig *policylangv1.ControllerDynamicConfig,
+) *ControllerComponent {
 	cc := &ControllerComponent{
 		signal:           runtime.InvalidReading(),
 		setpoint:         runtime.InvalidReading(),
 		controlVariable:  runtime.InvalidReading(),
 		output:           runtime.InvalidReading(),
 		controller:       controller,
+		componentName:    componentName,
 		componentIndex:   componentIndex,
 		policyReadAPI:    policyReadAPI,
 		dynamicConfigKey: dynamicConfigKey,
@@ -42,6 +51,14 @@ func NewControllerComponent(controller Controller, componentIndex int, policyRea
 	}
 	cc.setConfig(defaultConfig)
 	return cc
+}
+
+// Name implements runtime.Component.
+func (cc *ControllerComponent) Name() string { return cc.componentName }
+
+// Type implements runtime.Component.
+func (cc *ControllerComponent) Type() runtime.ComponentType {
+	return runtime.ComponentTypeSignalProcessor
 }
 
 // Execute implements runtime.Component.Execute.

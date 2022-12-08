@@ -51,6 +51,12 @@ type Decider struct {
 	operator comparisonOperator
 }
 
+// Name implements runtime.Component.
+func (*Decider) Name() string { return "Decider" }
+
+// Type implements runtime.Component.
+func (*Decider) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
 // Make sure Decider complies with Component interface.
 var _ runtime.Component = (*Decider)(nil)
 
