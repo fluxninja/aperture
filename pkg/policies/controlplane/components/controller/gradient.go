@@ -22,7 +22,11 @@ type GradientController struct {
 var _ Controller = (*GradientController)(nil)
 
 // NewGradientControllerAndOptions creates a Gradient Controller Component and its fx options.
-func NewGradientControllerAndOptions(gradientControllerProto *policylangv1.GradientController, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewGradientControllerAndOptions(
+	gradientControllerProto *policylangv1.GradientController,
+	componentIndex int,
+	policyReadAPI iface.Policy,
+) (runtime.Component, fx.Option, error) {
 	// Make sure max is greater than min
 	if gradientControllerProto.MaxGradient < gradientControllerProto.MinGradient {
 		return nil, nil, fmt.Errorf("max_gradient must be greater than min_gradient")
@@ -34,7 +38,14 @@ func NewGradientControllerAndOptions(gradientControllerProto *policylangv1.Gradi
 		maxGradient: gradientControllerProto.MaxGradient,
 	}
 
-	controller := NewControllerComponent(gradient, componentIndex, policyReadAPI, gradientControllerProto.DynamicConfigKey, gradientControllerProto.DefaultConfig)
+	controller := NewControllerComponent(
+		gradient,
+		"Gradient",
+		componentIndex,
+		policyReadAPI,
+		gradientControllerProto.DynamicConfigKey,
+		gradientControllerProto.DefaultConfig,
+	)
 
 	return controller, fx.Options(), nil
 }

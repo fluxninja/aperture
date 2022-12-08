@@ -33,6 +33,14 @@ type ArithmeticCombinator struct {
 	operator arithmeticOperator
 }
 
+// Name implements runtime.Component.
+func (*ArithmeticCombinator) Name() string { return "ArithmeticCombinator" }
+
+// Type implements runtime.Component.
+func (*ArithmeticCombinator) Type() runtime.ComponentType {
+	return runtime.ComponentTypeSignalProcessor
+}
+
 // Make sure ArithmeticCombinator complies with Component interface.
 var _ runtime.Component = (*ArithmeticCombinator)(nil)
 

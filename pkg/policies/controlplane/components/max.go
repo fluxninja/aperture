@@ -15,6 +15,12 @@ import (
 // Max takes array of signals and emits maximum value.
 type Max struct{}
 
+// Name implements runtime.Component.
+func (*Max) Name() string { return "Max" }
+
+// Type implements runtime.Component.
+func (*Max) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
 // Make sure Max complies with Component interface.
 var _ runtime.Component = (*Max)(nil)
 

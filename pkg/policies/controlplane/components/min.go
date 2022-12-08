@@ -15,6 +15,12 @@ import (
 // Min takes array of signals and emits minimum value.
 type Min struct{}
 
+// Name implements runtime.Component.
+func (*Min) Name() string { return "Min" }
+
+// Type implements runtime.Component.
+func (*Min) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
 // Make sure Min complies with Component interface.
 var _ runtime.Component = (*Min)(nil)
 

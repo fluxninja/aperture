@@ -38,6 +38,12 @@ type LoadActuator struct {
 	alerterConfig     *policylangv1.AlerterConfig
 }
 
+// Name implements runtime.Component.
+func (*LoadActuator) Name() string { return "LoadActuator" }
+
+// Type implements runtime.Component.
+func (*LoadActuator) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
+
 // NewLoadActuatorAndOptions creates load actuator and its fx options.
 func NewLoadActuatorAndOptions(
 	loadActuatorProto *policylangv1.LoadActuator,
