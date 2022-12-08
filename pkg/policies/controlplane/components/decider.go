@@ -51,7 +51,13 @@ type Decider struct {
 	operator comparisonOperator
 }
 
-// Make sure Decider complies with Component interface.
+// Name implements runtime.Component.
+func (*Decider) Name() string { return "Decider" }
+
+// Type implements runtime.Component.
+func (*Decider) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
+// Make runtime.runtimesure Decider complies return runtime.with Component interface.
 var _ runtime.Component = (*Decider)(nil)
 
 // NewDeciderAndOptions creates timed controller and its fx options.

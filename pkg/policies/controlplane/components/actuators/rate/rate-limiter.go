@@ -34,7 +34,13 @@ type rateLimiterSync struct {
 	componentIndex        int
 }
 
-// NewRateLimiterAndOptions creates fx options for RateLimiter and also returns agent group name associated with it.
+// Name implements runtime.Component.
+func (*rateLimiterSync) Name() string { return "RateLimiter" }
+
+// Type implements runtime.Component.
+func (*rateLimiterSync) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
+
+// NewRateLimiterAndOptions runtime.runtimecreates fx options return runtime.for RateLimiter and also returns agent group name associated with it.
 func NewRateLimiterAndOptions(
 	rateLimiterProto *policylangv1.RateLimiter,
 	componentIndex int,

@@ -72,16 +72,12 @@ func newPolicyOptions(
 		fx.Annotate(policy, fx.As(new(iface.Policy))),
 	))
 
-	compWithPortsList := make([]runtime.CompiledComponentAndPorts, 0, len(compiledCircuit))
-	for _, compiledComponent := range compiledCircuit {
-		// Skip nil component
-		if compiledComponent.CompiledComponent.Component != nil {
-			compWithPortsList = append(compWithPortsList, compiledComponent.CompiledComponentAndPorts)
-		}
-	}
-
 	// Create circuit
-	circuit, circuitOption := runtime.NewCircuitAndOptions(compWithPortsList, policy, registry)
+	circuit, circuitOption := runtime.NewCircuitAndOptions(
+		compiledCircuit.ToComponentsWithPorts(),
+		policy,
+		registry,
+	)
 	policyOptions = append(policyOptions, circuitOption)
 
 	policyOptions = append(policyOptions, components.FactoryModuleForPolicyApp(circuit))

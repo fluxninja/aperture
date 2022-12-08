@@ -33,7 +33,15 @@ type ArithmeticCombinator struct {
 	operator arithmeticOperator
 }
 
-// Make sure ArithmeticCombinator complies with Component interface.
+// Name implements runtime.Component.
+func (*ArithmeticCombinator) Name() string { return "ArithmeticCombinator" }
+
+// Type implements runtime.Component.
+func (*ArithmeticCombinator) Type() runtime.ComponentType {
+	return runtime.ComponentTypeSignalProcessor
+}
+
+// Make runtime.runtimesure ArithmeticCombinator complies return runtime.with Component interface.
 var _ runtime.Component = (*ArithmeticCombinator)(nil)
 
 // NewArithmeticCombinatorAndOptions returns a new ArithmeticCombinator and its Fx options.

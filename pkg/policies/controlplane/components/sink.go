@@ -12,7 +12,13 @@ import (
 // Sink is a component that consumes array of input signals and does nothing with them.
 type Sink struct{}
 
-// Make sure Sink implements Component interface.
+// Name implements runtime.Component.
+func (*Sink) Name() string { return "Sink" }
+
+// Type implements runtime.Component.
+func (*Sink) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
+
+// Make runtime.runtimesure Sink implements return runtime.Component interface.
 var _ runtime.Component = (*Sink)(nil)
 
 // NewSinkAndOptions creates a new Sink component.

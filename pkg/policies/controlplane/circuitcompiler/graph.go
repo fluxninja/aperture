@@ -91,8 +91,8 @@ func ComponentDTO(circuit Circuit) ([]*policymonitoringv1.ComponentView, []*poli
 			return fmt.Sprintf("%s/%s", agentGroup, service)
 		}
 
-		componentName := c.CompiledComponent.Name
-		mapStruct := c.CompiledComponent.MapStruct
+		componentName := c.Component.Name()
+		mapStruct := c.MapStruct
 		componentDescription := ""
 		switch componentName {
 		case "Constant":
@@ -117,7 +117,7 @@ func ComponentDTO(circuit Circuit) ([]*policymonitoringv1.ComponentView, []*poli
 			ComponentId:          c.ComponentID,
 			ComponentName:        componentName,
 			ComponentDescription: componentDescription,
-			ComponentType:        string(c.CompiledComponent.ComponentType),
+			ComponentType:        string(c.Component.Type()),
 			Component:            componentMap,
 			InPorts:              convertPortViews(inPorts),
 			OutPorts:             convertPortViews(outPorts),
