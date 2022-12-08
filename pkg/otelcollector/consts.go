@@ -165,4 +165,6 @@ const (
 	AlertNameLabel = "alertname"
 	// AlertSeverityLabel also known as log level. Human readable string.
 	AlertSeverityLabel = "severity"
+	// IsAlertLabel helps to differentiate normal logs from alert logs.
+	IsAlertLabel = "is_alert"
 )

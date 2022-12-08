@@ -148,6 +148,7 @@ func (a *Alert) AsLogs() plog.Logs {
 	// with the resource notion in OTLP protocol, which describes the source of a log.
 	populateAttributesFromMap(resourceAttributes, a.postableAlert.Labels, specialLabels)
 	resourceAttributes.PutStr(otelcollector.AlertGeneratorURLLabel, string(a.postableAlert.GeneratorURL))
+	resourceAttributes.PutBool(otelcollector.IsAlertLabel, true)
 
 	logRecord := resource.ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
 	logRecord.SetTimestamp(pcommon.NewTimestampFromTime(time.Time(a.postableAlert.StartsAt)))
