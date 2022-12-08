@@ -10,6 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitcompiler"
 	"gopkg.in/yaml.v2"
 )
 
@@ -111,7 +112,7 @@ func main() {
 	// check if the dot flag is set
 	if *dot != "" {
 		dotFile := *dot
-		dot := controlplane.DOT(controlplane.ComponentDTO(circuit))
+		dot := circuitcompiler.DOT(circuitcompiler.ComponentDTO(circuit))
 		f, err := os.Create(dotFile)
 		if err != nil {
 			log.Error().Err(err).Msg("error creating file")
@@ -129,7 +130,7 @@ func main() {
 	// if --mermaid flag is set, write mermaid file
 	if *mermaid != "" {
 		mermaidFile := *mermaid
-		mermaid := controlplane.Mermaid(controlplane.ComponentDTO(circuit))
+		mermaid := circuitcompiler.Mermaid(circuitcompiler.ComponentDTO(circuit))
 		f, err := os.Create(mermaidFile)
 		if err != nil {
 			log.Error().Err(err).Msg("error creating file")
@@ -146,13 +147,18 @@ func main() {
 	}
 }
 
-func compilePolicy(path string) (controlplane.CompiledCircuit, error) {
+func compilePolicy(path string) (circuitcompiler.Circuit, error) {
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 	ctx := context.Background()
 
+	// FIXME This ValidateAndCompile function validates the policy as a whole –
+	// circuit, but also the other resource classifiers, fluxmeters.  This
+	// command is called "circuit-compiler" though, so it's bit... surprising.
+	// If we compiled just a circuit, we could drop dependency on
+	// `controlplane` package.
 	circuit, valid, msg, err := controlplane.ValidateAndCompile(ctx, filepath.Base(path), yamlFile)
 	if err != nil {
 		return nil, err
