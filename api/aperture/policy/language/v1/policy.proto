@@ -1123,7 +1123,12 @@ message Sink {
 // AlerterConfig is a common config for separate alerter components and alerters embedded in other components.
 message AlerterConfig {
   // Name of the alert.
-  string alert_name = 1;
+  string alert_name = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "alert"}
+    }
+  }]; // @gotags: default:"alert"
 
   // Severity of the alert, one of 'info', 'warn' or 'crit'.
   string severity = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1131,7 +1136,11 @@ message AlerterConfig {
       key: "x-go-validate"
       value: {string_value: "oneof=info warn crit"}
     }
-  }];
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "info"}
+    }
+  }]; // @gotags: default:"info" validate:"oneof=info warn crit"
 
   // Duration of alert resolver.
   google.protobuf.Duration resolve_timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1139,7 +1148,7 @@ message AlerterConfig {
       key: "x-go-default"
       value: {string_value: "5m"}
     }
-  }];
+  }]; // @gotags: default:"5m"
 
   // A list of alert channel strings.
   repeated string alert_channels = 4;

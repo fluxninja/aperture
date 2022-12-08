@@ -341,7 +341,7 @@ AlerterConfig is a common config for separate alerter components and alerters em
 <dt>alert_name</dt>
 <dd>
 
-(string) Name of the alert.
+(string, default: `alert`) Name of the alert.
 
 </dd>
 <dt>resolve_timeout</dt>
@@ -353,7 +353,7 @@ AlerterConfig is a common config for separate alerter components and alerters em
 <dt>severity</dt>
 <dd>
 
-(string, `oneof=info warn crit`) Severity of the alert, one of 'info', 'warn' or 'crit'.
+(string, `oneof=info warn crit`, default: `info`) Severity of the alert, one of 'info', 'warn' or 'crit'.
 
 </dd>
 </dl>
