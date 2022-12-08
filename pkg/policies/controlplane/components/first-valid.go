@@ -12,11 +12,18 @@ import (
 // FirstValid picks the first valid input signal from the array of input signals and emits it as an output signal.
 type FirstValid struct{}
 
+func (*FirstValid) Name() string                { return "FirstValid" }
+func (*FirstValid) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
 // Make sure FirstValid complies with Component interface.
 var _ runtime.Component = (*FirstValid)(nil)
 
 // NewFirstValidAndOptions creates a new FirstValid component and its Fx option.
-func NewFirstValidAndOptions(firstValidProto *policylangv1.FirstValid, componentIndex int, policyReadAPI iface.Policy) (*FirstValid, fx.Option, error) {
+func NewFirstValidAndOptions(
+	firstValidProto *policylangv1.FirstValid,
+	componentIndex int,
+	policyReadAPI iface.Policy,
+) (runtime.Component, fx.Option, error) {
 	return &FirstValid{}, fx.Options(), nil
 }
 

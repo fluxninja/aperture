@@ -77,13 +77,20 @@ type Signal struct {
 	SignalType SignalType
 }
 
-// MakeSignal creates a new Signal.
-func MakeSignal(signalType SignalType, name string, value float64, looped bool) Signal {
+// MakeNamedSignal creates a new named Signal
+func MakeNamedSignal(name string, looped bool) Signal {
 	return Signal{
+		SignalType: SignalTypeNamed,
 		Name:       name,
-		Value:      value,
 		Looped:     looped,
-		SignalType: signalType,
+	}
+}
+
+// MakeConstantSignal creates a new constant Signal.
+func MakeConstantSignal(value float64) Signal {
+	return Signal{
+		SignalType: SignalTypeConstant,
+		Value:      value,
 	}
 }
 
@@ -104,19 +111,20 @@ const (
 	ComponentTypeSignalProcessor ComponentType = "SignalProcessor"
 )
 
-// CompiledComponent consists of a Component, its MapStruct and Name.
+// CompiledComponent consists of a Component, its Ports and its MapStruct representation
 type CompiledComponent struct {
-	Component     Component
-	MapStruct     map[string]any
-	Name          string
-	ComponentType ComponentType
+	Component Component
+	Ports     Ports
+	// Json-serialized proto representation of the component's config, encoded
+	// as MapStruct.  Note: Ports is also part of MapStruct
+	MapStruct map[string]any
 }
 
 // CompiledComponentAndPorts consists of a CompiledComponent and its In and Out ports.
 type CompiledComponentAndPorts struct {
+	CompiledComponent
 	InPortToSignalsMap  PortToSignal
 	OutPortToSignalsMap PortToSignal
-	CompiledComponent   CompiledComponent
 }
 
 type signalToReading map[Signal]Reading

@@ -31,6 +31,16 @@ type Component struct {
 // Circuit is a list of CompiledComponent(s).
 type Circuit []*Component
 
+// ToComponentsWithPorts converts circuit to list of CompiledComponentAndPorts
+// (dropping information about ComponentIDs).
+func (c Circuit) ToComponentsWithPorts() []runtime.CompiledComponentAndPorts {
+	componentsWithPorts := make([]runtime.CompiledComponentAndPorts, 0, len(c))
+	for _, component := range c {
+		componentsWithPorts = append(componentsWithPorts, component.CompiledComponentAndPorts)
+	}
+	return componentsWithPorts
+}
+
 // Compile compiles a protobuf circuit definition into a Circuit.
 func Compile(
 	circuitProto []*policylangv1.Component,
@@ -39,10 +49,6 @@ func Compile(
 	logger := policyReadAPI.GetStatusRegistry().GetLogger()
 	// List of runtime.CompiledComponent. The index of CompiledComponent in compiledCircuit is referred as graphNodeIndex.
 	var compiledCircuit Circuit
-	// Map from signal name to a list of graphNodeIndex(es) which accept the signal as input.
-	inSignals := make(map[string][]int)
-	// Map from signal name to the graphNodeIndex which emits the signal as output.
-	outSignals := make(map[string]int)
 
 	// List of Fx options for components.
 	componentOptions := []fx.Option{}
@@ -80,40 +86,26 @@ func Compile(
 		}
 	}
 
-	for graphNodeIndex, compiledComp := range compiledCircuit {
-		mapStruct := compiledComp.CompiledComponent.MapStruct
-		logger.Trace().Msgf("mapStruct: %+v", mapStruct)
+	// Map from signal name to a list of graphNodeIndex(es) which accept the signal as input.
+	inSignals := make(map[string][]int)
+	// Map from signal name to the graphNodeIndex which emits the signal as output.
+	outSignals := make(map[string]int)
 
-		// Read in_ports in mapStruct
-		inPorts, ok := mapStruct["in_ports"]
-		logger.Trace().Interface("inPorts", inPorts).Bool("ok", ok).Str("componentName", compiledComp.CompiledComponent.Name).Msg("mapStruct[in_ports]")
-		if ok {
-			// Convert in_ports to map[string]interface{}
-			inPortsMap, castOk := inPorts.(map[string]interface{})
-			if castOk {
-				inPortToSignalsMap, err := getInPortSignals(inPortsMap, inSignals, graphNodeIndex)
-				if err != nil {
-					return nil, nil, err
-				}
-				logger.Trace().Msgf("inPortToSignalsMap: %+v", inPortToSignalsMap)
-				compiledComp.InPortToSignalsMap = inPortToSignalsMap
-			}
+	for graphNodeIndex, compiledComp := range compiledCircuit {
+		logger.Trace().
+			Str("componentName", compiledComp.Component.Name()).
+			Interface("ports", compiledComp.Ports).
+			Send()
+
+		compiledComp.InPortToSignalsMap = getInPortSignals(compiledComp.Ports.InPorts, inSignals, graphNodeIndex)
+		logger.Trace().Interface("inPortToSignalsMap", compiledComp.InPortToSignalsMap).Send()
+
+		var err
+		compiledComp.OutPortToSignalsMap, err = getOutPortSignals(outPortsMap, outSignals, graphNodeIndex)
+		if err != nil {
+			return nil, nil, err
 		}
-		// Read out_ports in mapStruct
-		outPorts, ok := mapStruct["out_ports"]
-		logger.Trace().Interface("outPorts", outPorts).Bool("ok", ok).Str("componentName", compiledComp.CompiledComponent.Name).Msg("mapStruct[out_ports]")
-		if ok {
-			// Convert out_ports to map[string]interface{}
-			outPortsMap, castOk := outPorts.(map[string]interface{})
-			if castOk {
-				outPortToSignalsMap, err := getOutPortSignals(outPortsMap, outSignals, graphNodeIndex)
-				if err != nil {
-					return nil, nil, err
-				}
-				logger.Trace().Msgf("inPortToSignalsMap: %+v", outPortToSignalsMap)
-				compiledComp.OutPortToSignalsMap = outPortToSignalsMap
-			}
-		}
+		logger.Trace().Interface("outPortToSignalsMap", compiledComp.OutPortToSignalsMap).Send()
 	}
 
 	// Sanitization of inSignals i.e. all inSignals should be defined in outSignals
@@ -235,96 +227,67 @@ const (
 	outSignalType
 )
 
-func getInPortSignals(portMapping map[string]interface{}, inSignals map[string][]int, graphNodeIndex int) (runtime.PortToSignal, error) {
-	return getPortSignals(portMapping, inSignals, nil, inSignalType, graphNodeIndex)
+func getInPortSignals(
+	portMapping map[string][]runtime.Port,
+	signalConsumers map[string][]int,
+	graphNodeIndex int,
+) runtime.PortToSignal {
+	portToSignal := getPortSignals(portMapping, graphNodeIndex)
+
+	for _, signals := range portToSignal {
+		for _, signal := range signals {
+			if signal.SignalType == runtime.SignalTypeNamed {
+				signalConsumers[signal.Name] = append(signalConsumers[signal.Name], graphNodeIndex)
+			}
+		}
+	}
+
+	return portToSignal
 }
 
-func getOutPortSignals(portMapping map[string]interface{}, outSignals map[string]int, graphNodeIndex int) (runtime.PortToSignal, error) {
-	return getPortSignals(portMapping, nil, outSignals, outSignalType, graphNodeIndex)
+func getOutPortSignals(
+	portMapping map[string][]runtime.Port,
+	signalProducers map[string]int,
+	graphNodeIndex int,
+) (runtime.PortToSignal, error) {
+	portToSignal := getPortSignals(portMapping, graphNodeIndex)
+
+	for _, signals := range portToSignal {
+		for _, signal := range signals {
+			if signal.SignalType == runtime.SignalTypeNamed {
+				if _, ok := signalProducers[signal.Name]; !ok {
+					signalProducers[signal.Name] = graphNodeIndex
+				} else {
+					return nil, errors.New("duplicate signal definition for signal name: " + signal.Name)
+				}
+			}
+		}
+	}
+
+	return portToSignal, nil
 }
 
 // getPortSignals takes a port mapping and returns a PortToSignal map and signals list.
-func getPortSignals(portMapping map[string]interface{}, inSignals map[string][]int, outSignals map[string]int, sigType signalType, graphNodeIndex int) (runtime.PortToSignal, error) {
-	// fillSignal takes a portSpec and fills portSignals at idx with Signal.
-	// Returns the signal name from the port spec and a bool indicating if a valid signal name was found in the portSpec.
-	fillSignal := func(portSpec map[string]interface{}, portSignals []runtime.Signal, idx int) (string, bool) {
-		// Read signal_name
-		signalName, ok := portSpec["signal_name"]
-		if ok {
-			signalNameStr, okCast := signalName.(string)
-			if okCast {
-				// Fill portSignals
-				portSignals[idx] = runtime.MakeSignal(runtime.SignalTypeNamed, signalNameStr, 0.0, false)
-				// Return signalNameStr and true since signal_name is present
-				return signalNameStr, true
-			}
-		}
-		constantValue, ok := portSpec["constant_value"]
-		if ok {
-			constantValueFloat, okCast := constantValue.(float64)
-			if okCast {
-				// Fill portSignals
-				portSignals[idx] = runtime.MakeSignal(runtime.SignalTypeConstant, "", constantValueFloat, false)
-			}
-		}
-
-		// Return empty string and false since signal_name is not present
-		return "", false
-	}
-
-	fillInOutSignals := func(signalName string, inSignals map[string][]int, outSignals map[string]int, sigType signalType, graphNodeIndex int) error {
-		if sigType == inSignalType {
-			// Add signals from inSignalsList to inSignals
-			inSignals[signalName] = append(inSignals[signalName], graphNodeIndex)
-		} else if sigType == outSignalType {
-			// Check if signal is already present in outSignals
-			if _, ok := outSignals[signalName]; !ok {
-				outSignals[signalName] = graphNodeIndex
-			} else {
-				return errors.New("duplicate signal definition for signal name: " + signalName)
-			}
-		}
-		return nil
-	}
-
+func getPortSignals(portMapping map[string][]runtime.Port, graphNodeIndex int) runtime.PortToSignal {
 	portToSignalMapping := make(runtime.PortToSignal)
 
-	// Iterate each port
-	for port, portMap := range portMapping {
-		// Convert portMap to map[string][]interface{}
-		portList, isList := portMap.([]interface{})
-		// Convert portMap to map[string]interface{}
-		portSpec, isSpec := portMap.(map[string]interface{})
-		if isList {
-			// Initialize portMapping for this port
-			portSignals := make([]runtime.Signal, len(portList))
-			portToSignalMapping[port] = portSignals
-			// iterate each port spec
-			for idx, innerPortSpec := range portList {
-				innerPortSpec, isMapStruct := innerPortSpec.(map[string]interface{})
-				if isMapStruct {
-					signalName, signalNameFound := fillSignal(innerPortSpec, portSignals, idx)
-					if signalNameFound {
-						err := fillInOutSignals(signalName, inSignals, outSignals, sigType, graphNodeIndex)
-						if err != nil {
-							return nil, err
-						}
-					}
-				}
-			}
-		} else if isSpec {
-			// Initialize portMapping for this port
-			portSignals := make([]runtime.Signal, 1)
-			portToSignalMapping[port] = portSignals
-			signalName, signalNameFound := fillSignal(portSpec, portSignals, 0)
-			if signalNameFound {
-				err := fillInOutSignals(signalName, inSignals, outSignals, sigType, graphNodeIndex)
-				if err != nil {
-					return nil, err
-				}
+	for port, portList := range portMapping {
+		portSignals := make([]runtime.Signal, 0, len(portList))
+		for _, portSpec := range portList {
+			if portSpec.SignalName != nil {
+				portSignals = append(
+					portSignals,
+					runtime.MakeNamedSignal(*portSpec.SignalName, false),
+				)
+			} else if portSpec.ConstantValue != nil {
+				portSignals = append(
+					portSignals,
+					runtime.MakeConstantSignal(*portSpec.ConstantValue),
+				)
 			}
 		}
+		portToSignalMapping[port] = portSignals
 	}
 
-	return portToSignalMapping, nil
+	return portToSignalMapping
 }

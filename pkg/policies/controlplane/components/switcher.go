@@ -13,7 +13,10 @@ import (
 // Switcher switches between two inputs based on third input.
 type Switcher struct{}
 
-// Make sure Switcher complies with Component interface.
+func (*Switcher) Name() string                { return "Switcher" }
+func (*Switcher) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
+// Make runtime.runtimesure Switcher complies return runtime.with Component interface.
 var _ runtime.Component = (*Switcher)(nil)
 
 // NewSwitcherAndOptions creates a new Switcher Component.

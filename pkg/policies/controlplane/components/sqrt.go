@@ -17,6 +17,9 @@ type Sqrt struct {
 	scale float64
 }
 
+func (*Sqrt) Name() string                { return "Sqrt" }
+func (*Sqrt) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
 // Make sure Sqrt complies with Component interface.
 var _ runtime.Component = (*Sqrt)(nil)
 

@@ -24,6 +24,9 @@ type Alerter struct {
 	policyReadAPI  iface.Policy
 }
 
+func (*Alerter) Name() string                { return "Alerter" }
+func (*Alerter) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
+
 // Make sure Alerter complies with Component interface.
 var _ runtime.Component = (*Alerter)(nil)
 

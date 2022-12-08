@@ -12,11 +12,14 @@ import (
 
 // Constant is a constant signal.
 type Constant struct {
-	// The value of the constant setpoint.
+	// The value of the constant signal to be emitted.
 	value float64
 }
 
-// NewConstantAndOptions creates constant setpoint and its fx options.
+func (*Constant) Name() string                { return "Constant" }
+func (*Constant) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
+
+// NewConstantAndOptions runtime.runtimecreates constant setpoint return runtime.and its fx options.
 func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	con := Constant{
 		value: constant.Value,
