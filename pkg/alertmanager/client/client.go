@@ -11,6 +11,7 @@ import (
 	promalert "github.com/prometheus/alertmanager/api/v2/client/alert"
 	prommodels "github.com/prometheus/alertmanager/api/v2/models"
 
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
@@ -58,7 +59,7 @@ func ProvideNamedAlertManagerClients(unmarshaller config.Unmarshaller) []AlertMa
 
 // AlertManagerClient provides an interface for alert manager client.
 type AlertManagerClient interface {
-	SendAlerts(ctx context.Context, alerts prommodels.PostableAlerts) error
+	SendAlerts(ctx context.Context, alerts []*alerts.Alert) error
 	GetName() string
 }
 
@@ -84,11 +85,16 @@ func CreateClient(name, address string, httpClient *http.Client) AlertManagerCli
 }
 
 // SendAlerts sends postable alerts via configured alertmanager http client.
-func (ac *RealAlertManagerClient) SendAlerts(ctx context.Context, alerts prommodels.PostableAlerts) error {
+func (ac *RealAlertManagerClient) SendAlerts(ctx context.Context, alerts []*alerts.Alert) error {
+	postableAlerts := make([]*prommodels.PostableAlert, len(alerts))
+	for i, alert := range alerts {
+		postableAlert := alert.PostableAlert()
+		postableAlerts[i] = &postableAlert
+	}
 	postAlertParams := &promalert.PostAlertsParams{
 		Context:    ctx,
 		HTTPClient: ac.httpClient,
-		Alerts:     alerts,
+		Alerts:     prommodels.PostableAlerts(postableAlerts),
 	}
 	_, err := ac.promAlertClient.Alert.PostAlerts(postAlertParams)
 
