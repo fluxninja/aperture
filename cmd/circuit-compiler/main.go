@@ -112,7 +112,7 @@ func main() {
 	// check if the dot flag is set
 	if *dot != "" {
 		dotFile := *dot
-		dot := circuitcompiler.DOT(circuitcompiler.ComponentDTO(circuit))
+		dot := circuitcompiler.DOT(circuit.ToGraphView())
 		f, err := os.Create(dotFile)
 		if err != nil {
 			log.Error().Err(err).Msg("error creating file")
@@ -130,7 +130,7 @@ func main() {
 	// if --mermaid flag is set, write mermaid file
 	if *mermaid != "" {
 		mermaidFile := *mermaid
-		mermaid := circuitcompiler.Mermaid(circuitcompiler.ComponentDTO(circuit))
+		mermaid := circuitcompiler.Mermaid(circuit.ToGraphView())
 		f, err := os.Create(mermaidFile)
 		if err != nil {
 			log.Error().Err(err).Msg("error creating file")
@@ -147,7 +147,7 @@ func main() {
 	}
 }
 
-func compilePolicy(path string) (circuitcompiler.Circuit, error) {
+func compilePolicy(path string) (*circuitcompiler.Circuit, error) {
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err

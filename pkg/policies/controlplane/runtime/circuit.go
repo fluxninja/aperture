@@ -111,20 +111,31 @@ const (
 	ComponentTypeSignalProcessor ComponentType = "SignalProcessor"
 )
 
-// CompiledComponent consists of a Component, its Ports and its MapStruct representation.
-type CompiledComponent struct {
-	Component Component
-	Ports     Ports
-	// Json-serialized proto representation of the component's config, encoded
-	// as MapStruct.  Note: Ports is also part of MapStruct
-	MapStruct map[string]any
+// ConfiguredComponent consists of a Component, its PortMapping and its Config.
+//
+// This struct is not directly used by the runtime.
+type ConfiguredComponent struct {
+	Component
+	// Which signals this component wants to have connected on its ports.
+	PortMapping PortMapping
+	// MapStruct representation of proto config that was used to create this
+	// component.  This Config is used only for observability purposes.
+	//
+	// Note: PortMapping is also part of Config.
+	Config map[string]any
 }
 
-// CompiledComponentAndPorts consists of a CompiledComponent and its In and Out ports.
-type CompiledComponentAndPorts struct {
-	CompiledComponent
-	InPortToSignalsMap  PortToSignal
-	OutPortToSignalsMap PortToSignal
+// CompiledComponent consists of a Component and its In and Out ports.
+//
+// This representation of component is ready to be used by a circuit.
+type CompiledComponent struct {
+	Component
+	// Note: These maps may seem to repeat information from
+	// ConfiguredComponent.Ports, but the most important difference (apart from
+	// different map value types), is that the following maps have the looped
+	// signals resolved.
+	InPortToSignals  PortToSignal
+	OutPortToSignals PortToSignal
 }
 
 type signalToReading map[Signal]Reading
@@ -140,7 +151,7 @@ type Circuit struct {
 	// Looped signals persistence across ticks
 	loopedSignals signalToReading
 	// Components
-	components []CompiledComponentAndPorts
+	components []CompiledComponent
 	// Tick end callbacks
 	tickEndCallbacks []TickEndCallback
 	// Tick start callbacks
@@ -152,7 +163,7 @@ var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
 func NewCircuitAndOptions(
-	compWithPortsList []CompiledComponentAndPorts,
+	compiledComponents []CompiledComponent,
 	policyReadAPI iface.Policy,
 	registry status.Registry,
 ) (*Circuit, fx.Option) {
@@ -160,19 +171,19 @@ func NewCircuitAndOptions(
 	circuit := &Circuit{
 		Policy:         policyReadAPI,
 		loopedSignals:  make(signalToReading),
-		components:     make([]CompiledComponentAndPorts, 0),
+		components:     make([]CompiledComponent, 0),
 		statusRegistry: reg,
 	}
 
 	// setComponents sets the Components for a Circuit
-	setComponents := func(components []CompiledComponentAndPorts) error {
+	setComponents := func(components []CompiledComponent) error {
 		if len(circuit.components) > 0 {
 			return errors.New("circuit already has components")
 		}
 		circuit.components = components
 		// Populate loopedSignals
 		for _, component := range components {
-			for _, outPort := range component.OutPortToSignalsMap {
+			for _, outPort := range component.OutPortToSignals {
 				for _, signal := range outPort {
 					if signal.Looped {
 						circuit.loopedSignals[signal] = InvalidReading()
@@ -184,7 +195,7 @@ func NewCircuitAndOptions(
 	}
 
 	// Set components in circuit
-	err := setComponents(compWithPortsList)
+	err := setComponents(compiledComponents)
 	if err != nil {
 		// FIXME don't hide this error contents
 		return nil, fx.Options()
@@ -200,7 +211,7 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 	var circuitMetricsLabels []prometheus.Labels
 
 	for _, component := range circuit.components {
-		for _, outPort := range component.OutPortToSignalsMap {
+		for _, outPort := range component.OutPortToSignals {
 			for _, signal := range outPort {
 				circuitMetricsLabels = append(circuitMetricsLabels,
 					prometheus.Labels{
@@ -321,7 +332,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				continue
 			}
 			// Check readiness of cmp by checking in_ports
-			for port, sigs := range cmp.InPortToSignalsMap {
+			for port, sigs := range cmp.InPortToSignals {
 				// Reading list for this port
 				readingList := make([]Reading, len(sigs))
 				// Check if all the sig(s) in sigs are ready
@@ -340,13 +351,13 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				componentInPortReadings[port] = readingList
 			}
 			// log the component being executed
-			logger.Trace().Str("component", cmp.Component.Name()).
+			logger.Trace().Str("component", cmp.Name()).
 				Int("tick", tickInfo.Tick()).
 				Interface("in_ports", componentInPortReadings).
-				Interface("InPortToSignalsMap", cmp.InPortToSignalsMap).
+				Interface("InPortToSignalsMap", cmp.InPortToSignals).
 				Msg("Executing component")
 			// If control reaches this point, the component is ready to execute
-			componentOutPortReadings, err := cmp.Component.Execute(
+			componentOutPortReadings, err := cmp.Execute(
 				/* pass signal */
 				componentInPortReadings,
 				/* pass tick info */
@@ -363,7 +374,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				errMulti = multierr.Append(errMulti, err)
 			}
 			// Fill any missing values from cmp.outPortsMapping in componentOutPortReadings with invalid readings
-			for port, signals := range cmp.OutPortToSignalsMap {
+			for port, signals := range cmp.OutPortToSignals {
 				if _, ok := componentOutPortReadings[port]; !ok {
 					// Fill with invalid readings
 					componentOutPortReadings[port] = make([]Reading, len(signals))
@@ -379,7 +390,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				}
 			}
 			// Update circuitSignalReadings with componentOutPortReadings while iterating through outPortsMapping
-			for port, signals := range cmp.OutPortToSignalsMap {
+			for port, signals := range cmp.OutPortToSignals {
 				for index, sig := range signals {
 					readings, ok := componentOutPortReadings[port]
 					if !ok {
@@ -433,9 +444,8 @@ func (circuit *Circuit) DynamicConfigUpdate(event notifiers.Event, unmarshaller 
 	defer circuit.UnlockExecution()
 	// loop through all the components
 	for _, cmp := range circuit.components {
-		component := cmp.CompiledComponent.Component
 		// update the dynamic config
-		component.DynamicConfigUpdate(event, unmarshaller)
+		cmp.DynamicConfigUpdate(event, unmarshaller)
 	}
 }
 

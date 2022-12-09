@@ -53,7 +53,7 @@ func (v *PolicySpecValidator) ValidateSpec(
 }
 
 // ValidateAndCompile checks the validity of a single Policy and compiles it.
-func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (circuitcompiler.Circuit, bool, string, error) {
+func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circuitcompiler.Circuit, bool, string, error) {
 	if len(yamlSrc) == 0 {
 		return nil, false, "Empty yaml", nil
 	}
