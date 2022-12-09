@@ -22,7 +22,7 @@ var specialLabels = map[string]struct{}{
 // AlertOption is a type for constructor options.
 type AlertOption func(*Alert)
 
-// NewAlert created new instance of Alert with StartsAt set to now.
+// NewAlert creates new instance of Alert with StartsAt set to now.
 func NewAlert(opts ...AlertOption) *Alert {
 	newAlert := &Alert{
 		postableAlert: models.PostableAlert{
@@ -38,6 +38,13 @@ func NewAlert(opts ...AlertOption) *Alert {
 		opt(newAlert)
 	}
 	return newAlert
+}
+
+// NewAlertFromPostableAlert creates new alert with given PostableAlert.
+func NewAlertFromPostableAlert(postabelAlert models.PostableAlert) *Alert {
+	return &Alert{
+		postableAlert: postabelAlert,
+	}
 }
 
 // Alert is a wrapper around models.PostableAlert with handy transform methods.
@@ -70,6 +77,11 @@ func (a *Alert) Severity() string {
 // SetSeverity sets the alert severity in labels. Overwrites previous value if exists.
 func (a *Alert) SetSeverity(severity string) {
 	a.postableAlert.Labels[otelcollector.AlertSeverityLabel] = severity
+}
+
+// PostableAlert returns the underlying PostableAlert struct.
+func (a *Alert) PostableAlert() models.PostableAlert {
+	return a.postableAlert
 }
 
 // WithSeverity is an option function for constructor.

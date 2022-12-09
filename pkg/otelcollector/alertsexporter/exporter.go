@@ -3,14 +3,12 @@ package alertsexporter
 import (
 	"context"
 
-	"github.com/go-openapi/strfmt"
-	prommodels "github.com/prometheus/alertmanager/api/v2/models"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
 
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 type alertsExporter struct {
@@ -25,12 +23,12 @@ func newExporter(cfg *Config) (*alertsExporter, error) {
 	return ex, nil
 }
 
-// Start is TODO.
+// Start implements the Component interface.
 func (ex *alertsExporter) Start(_ context.Context, _ component.Host) error {
 	return nil
 }
 
-// Shutdown is TODO.
+// Shutdown implements the Component interface.
 func (ex *alertsExporter) Shutdown(_ context.Context) error {
 	return nil
 }
@@ -44,25 +42,7 @@ func (ex *alertsExporter) Capabilities() consumer.Capabilities {
 
 // ConsumeLogs sends alert from logs to alert manager clients.
 func (ex *alertsExporter) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
-	alerts := prommodels.PostableAlerts{}
-
-	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
-		attributes := logRecord.Attributes()
-
-		genURLStr := ""
-		if genURL, ok := attributes.Get(otelcollector.AlertGeneratorURLLabel); ok {
-			genURLStr = genURL.Str()
-		}
-		singleAlert := prommodels.Alert{
-			GeneratorURL: strfmt.URI(genURLStr),
-		}
-		postableAlert := &prommodels.PostableAlert{
-			Alert: singleAlert,
-		}
-		alerts = append(alerts, postableAlert)
-
-		return otelcollector.Keep
-	})
+	alerts := alerts.AlertsFromLogs(ld)
 
 	for _, amClient := range ex.cfg.alertMgr.Clients {
 		err := amClient.SendAlerts(ctx, alerts)
