@@ -33,7 +33,7 @@ func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentIndex int,
 	policyReadAPI iface.Policy,
-) (runtime.CompiledComponent, []runtime.CompiledComponent, fx.Option, error) {
+) (runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
 	var ctor componentConstructor
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
@@ -72,12 +72,12 @@ func NewComponentAndOptions(
 
 	component, config, option, err := ctor(componentIndex, policyReadAPI)
 	if err != nil {
-		return runtime.CompiledComponent{}, nil, nil, err
+		return runtime.ConfiguredComponent{}, nil, nil, err
 	}
 
-	compiledComponent, err := prepareCompiledComponent(component, config)
+	compiledComponent, err := prepareConfiguredComponent(component, config)
 	if err != nil {
-		return runtime.CompiledComponent{}, nil, nil, err
+		return runtime.ConfiguredComponent{}, nil, nil, err
 	}
 
 	return compiledComponent, nil, option, nil
@@ -98,24 +98,24 @@ func mkCtor[Config any, Comp runtime.Component](
 	}
 }
 
-func prepareCompiledComponent(
+func prepareConfiguredComponent(
 	component runtime.Component,
 	config any,
-) (runtime.CompiledComponent, error) {
+) (runtime.ConfiguredComponent, error) {
 	mapStruct, err := encodeMapStruct(config)
 	if err != nil {
-		return runtime.CompiledComponent{}, err
+		return runtime.ConfiguredComponent{}, err
 	}
 
 	ports, err := runtime.PortsFromMapStruct(mapStruct)
 	if err != nil {
-		return runtime.CompiledComponent{}, err
+		return runtime.ConfiguredComponent{}, err
 	}
 
-	return runtime.CompiledComponent{
-		Component: component,
-		MapStruct: mapStruct,
-		Ports:     ports,
+	return runtime.ConfiguredComponent{
+		Component:   component,
+		Config:      mapStruct,
+		PortMapping: ports,
 	}, nil
 }
 

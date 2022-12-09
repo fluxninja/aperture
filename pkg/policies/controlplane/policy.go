@@ -74,7 +74,7 @@ func newPolicyOptions(
 
 	// Create circuit
 	circuit, circuitOption := runtime.NewCircuitAndOptions(
-		compiledCircuit.ToComponentsWithPorts(),
+		compiledCircuit.Components(),
 		policy,
 		registry,
 	)
@@ -89,20 +89,20 @@ func newPolicyOptions(
 }
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
-func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry) (circuitcompiler.Circuit, error) {
+func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry) (*circuitcompiler.Circuit, error) {
 	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter")
 	if err != nil {
 		return nil, err
 	}
-	_, compWithPortsList, _, err := compilePolicyWrapper(wrapperMessage, registry)
+	_, circuit, _, err := compilePolicyWrapper(wrapperMessage, registry)
 	if err != nil {
 		return nil, err
 	}
-	return compWithPortsList, nil
+	return circuit, nil
 }
 
 // compilePolicyWrapper takes policyProto and returns a compiled policy.
-func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry status.Registry) (*Policy, circuitcompiler.Circuit, fx.Option, error) {
+func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry status.Registry) (*Policy, *circuitcompiler.Circuit, fx.Option, error) {
 	if wrapperMessage == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy wrapper message")
 	}
@@ -137,7 +137,7 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 			resourceOptions = append(resourceOptions, classifierOption)
 		}
 	}
-	var compiledCircuit circuitcompiler.Circuit
+	var compiledCircuit *circuitcompiler.Circuit
 	partialCircuitOption := fx.Options()
 	var err error
 
@@ -145,7 +145,10 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 		// Read evaluation interval
 		policy.evaluationInterval = policyProto.GetCircuit().GetEvaluationInterval().AsDuration()
 
-		compiledCircuit, partialCircuitOption, err = circuitcompiler.Compile(policyProto.GetCircuit().Components, policy)
+		compiledCircuit, partialCircuitOption, err = circuitcompiler.CompileFromProto(
+			policyProto.GetCircuit().Components,
+			policy,
+		)
 		if err != nil {
 			return nil, nil, nil, err
 		}

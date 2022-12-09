@@ -4,11 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/looplab/tarjan"
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -21,105 +23,140 @@ func Module() fx.Option {
 	)
 }
 
-// Component is composed of runtime.Component, ComponentID and ParentComponentID.
+// Component is runtime.CompiledComponent annotated with IDs.
 type Component struct {
-	runtime.CompiledComponentAndPorts
+	runtime.CompiledComponent
 	ComponentID       string
 	ParentComponentID string
 }
 
-// Circuit is a list of CompiledComponent(s).
-type Circuit []*Component
-
-// ToComponentsWithPorts converts circuit to list of CompiledComponentAndPorts
-// (dropping information about ComponentIDs).
-func (c Circuit) ToComponentsWithPorts() []runtime.CompiledComponentAndPorts {
-	componentsWithPorts := make([]runtime.CompiledComponentAndPorts, 0, len(c))
-	for _, component := range c {
-		componentsWithPorts = append(componentsWithPorts, component.CompiledComponentAndPorts)
-	}
-	return componentsWithPorts
+// Circuit is a compiled Circuit
+//
+// Circuit can also be converted to its graph view.
+type Circuit struct {
+	components   []runtime.CompiledComponent
+	configs      []runtime.ConfiguredComponent
+	componentIDs []ComponentID
 }
 
-// Compile compiles a protobuf circuit definition into a Circuit.
-func Compile(
+// Components returns a list of CompiledComponents, ready to create runtime.Circuit.
+func (circuit *Circuit) Components() []runtime.CompiledComponent { return circuit.components }
+
+// CompileFromProto compiles a protobuf circuit definition into a Circuit.
+//
+// This is helper for CreateComponents + Compile.
+func CompileFromProto(
 	circuitProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
-) (Circuit, fx.Option, error) {
-	logger := policyReadAPI.GetStatusRegistry().GetLogger()
-	// List of runtime.CompiledComponent. The index of CompiledComponent in compiledCircuit is referred as graphNodeIndex.
-	var compiledCircuit Circuit
+) (*Circuit, fx.Option, error) {
+	configuredComponents, componentIDs, option, err := CreateComponents(circuitProto, policyReadAPI)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	// List of Fx options for components.
-	componentOptions := []fx.Option{}
+	compiledComponents, err := Compile(
+		configuredComponents,
+		policyReadAPI.GetStatusRegistry().GetLogger(),
+	)
+	if err != nil {
+		return nil, option, err
+	}
+
+	return &Circuit{
+		configs:      configuredComponents,
+		components:   compiledComponents,
+		componentIDs: componentIDs,
+	}, option, nil
+}
+
+// ComponentID is a component identifier based on position in original proto list of components.
+type ComponentID string
+
+func subcomponentID(parentID ComponentID, subcomponent runtime.Component) ComponentID {
+	return ComponentID(string(parentID) + "." + subcomponent.Name())
+}
+
+// ParentID returns ID of parent component.
+func (id ComponentID) ParentID() ComponentID {
+	parentID, _, _ := strings.Cut(string(id), ".")
+	return ComponentID(parentID)
+}
+
+// CreateComponents creates circuit components along with their identifiers and fx options.
+//
+// Note that number of returned components might be greater than number of
+// components in circuitProto, as some components may have their subcomponents.
+func CreateComponents(
+	circuitProto []*policylangv1.Component,
+	policyReadAPI iface.Policy,
+) ([]runtime.ConfiguredComponent, []ComponentID, fx.Option, error) {
+	var configuredComponents []runtime.ConfiguredComponent
+	var ids []ComponentID
+	var options []fx.Option
 
 	for compIndex, componentProto := range circuitProto {
 		// Create component
-		compiledComp, compiledSubComps, compOption, compErr := components.NewComponentAndOptions(componentProto, compIndex, policyReadAPI)
-		if compErr != nil {
-			return nil, fx.Options(), compErr
+		component, subcomponents, compOption, err := components.NewComponentAndOptions(
+			componentProto,
+			compIndex,
+			policyReadAPI,
+		)
+		if err != nil {
+			return nil, nil, nil, err
 		}
-		componentOptions = append(componentOptions, compOption)
+		options = append(options, compOption)
 
-		compID := strconv.Itoa(compIndex)
+		compID := ComponentID(strconv.Itoa(compIndex))
 		// Add Component to compiledCircuit
-		compiledCircuit = append(compiledCircuit, &Component{
-			CompiledComponentAndPorts: runtime.CompiledComponentAndPorts{
-				CompiledComponent:   compiledComp,
-				InPortToSignalsMap:  make(runtime.PortToSignal),
-				OutPortToSignalsMap: make(runtime.PortToSignal),
-			},
-			ComponentID: compID,
-		})
+		configuredComponents = append(configuredComponents, component)
+		ids = append(ids, compID)
 
 		// Add SubComponents to compiledCircuit
-		for _, subComp := range compiledSubComps {
-			compiledCircuit = append(compiledCircuit, &Component{
-				CompiledComponentAndPorts: runtime.CompiledComponentAndPorts{
-					CompiledComponent:   subComp,
-					InPortToSignalsMap:  make(runtime.PortToSignal),
-					OutPortToSignalsMap: make(runtime.PortToSignal),
-				},
-				ComponentID:       compID + "." + subComp.Component.Name(),
-				ParentComponentID: compID,
-			})
+		for _, subComp := range subcomponents {
+			configuredComponents = append(configuredComponents, subComp)
+			ids = append(ids, subcomponentID(compID, subComp))
 		}
 	}
 
-	// Map from signal name to a list of graphNodeIndex(es) which accept the signal as input.
+	return configuredComponents, ids, fx.Options(options...), nil
+}
+
+// Compile compiles list of prepared components into a circuit and validates it.
+func Compile(configuredComponents []runtime.ConfiguredComponent, logger *log.Logger) ([]runtime.CompiledComponent, error) {
+	// A list of compiled components. The index of Component in the list is
+	// referred as componentIndex. Order of components is the same as in
+	// configuredComponents.
+	compiledCircuit := make([]runtime.CompiledComponent, 0, len(configuredComponents))
+
+	// Map from signal name to a list of componentIndex(es) which accept the signal as input.
 	inSignals := make(map[string][]int)
-	// Map from signal name to the graphNodeIndex which emits the signal as output.
+	// Map from signal name to the componentIndex which emits the signal as output.
 	outSignals := make(map[string]int)
 
-	for graphNodeIndex, compiledComp := range compiledCircuit {
-		logger.Trace().
-			Str("componentName", compiledComp.Component.Name()).
-			Interface("ports", compiledComp.Ports).
-			Send()
+	for componentIndex, comp := range configuredComponents {
+		logger.Trace().Str("componentName", comp.Name()).Interface("ports", comp.PortMapping).Send()
 
-		compiledComp.InPortToSignalsMap = getInPortSignals(
-			compiledComp.Ports.InPorts,
-			inSignals,
-			graphNodeIndex,
-		)
-		logger.Trace().Interface("inPortToSignalsMap", compiledComp.InPortToSignalsMap).Send()
+		inPortToSignals := getInPortSignals(comp.PortMapping.Ins, inSignals, componentIndex)
+		logger.Trace().Interface("inPortToSignals", inPortToSignals).Send()
 
 		var err error
-		compiledComp.OutPortToSignalsMap, err = getOutPortSignals(
-			compiledComp.Ports.OutPorts,
-			outSignals,
-			graphNodeIndex,
-		)
+		outPortToSignals, err := getOutPortSignals(comp.PortMapping.Outs, outSignals, componentIndex)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
-		logger.Trace().Interface("outPortToSignalsMap", compiledComp.OutPortToSignalsMap).Send()
+		logger.Trace().Interface("outPortToSignals", outPortToSignals).Send()
+
+		compiledCircuit = append(compiledCircuit, runtime.CompiledComponent{
+			Component:        comp.Component,
+			InPortToSignals:  inPortToSignals,
+			OutPortToSignals: outPortToSignals,
+		})
 	}
 
 	// Sanitization of inSignals i.e. all inSignals should be defined in outSignals
 	for signal := range inSignals {
 		if _, ok := outSignals[signal]; !ok {
-			return nil, fx.Options(), errors.New("undefined signal: " + signal)
+			return nil, errors.New("undefined signal: " + signal)
 		}
 	}
 
@@ -127,9 +164,9 @@ func Compile(
 	// Create a graph for Tarjan's algorithm
 	graph := make(map[interface{}][]interface{})
 
-	for graphNodeIndex, compWithPorts := range compiledCircuit {
+	for componentIndex, comp := range compiledCircuit {
 		destCompIndexes := make([]interface{}, 0)
-		for _, signals := range compWithPorts.OutPortToSignalsMap {
+		for _, signals := range comp.OutPortToSignals {
 			for _, signal := range signals {
 				// Lookup signal in inSignals
 				componentIndexes, ok := inSignals[signal.Name]
@@ -144,9 +181,9 @@ func Compile(
 				}
 			}
 		}
-		// Add graphNodeIndex:destCompIndexes in graph
+		// Add componentIndex:destCompIndexes in graph
 		if len(destCompIndexes) > 0 {
-			graph[graphNodeIndex] = destCompIndexes
+			graph[componentIndex] = destCompIndexes
 		}
 	}
 
@@ -157,20 +194,20 @@ func Compile(
 
 	// Iterate over loops
 	for _, loop := range loops {
-		// Need to break loop at smallest graphNodeIndex. Find smallest graphNodeIndex in loop
+		// Need to break loop at smallest componentIndex. Find smallest componentIndex in loop
 		if len(loop) > 0 {
 			smallestCompIndex, ok := loop[0].(int)
 			if !ok {
-				return nil, fx.Options(), errors.New("loop contains non-int component id")
+				return nil, errors.New("loop contains non-int component id")
 			}
 			smallestCompIndexLoopIdx := 0
 			for loopIdx, compIndexIfc := range loop {
-				graphNodeIndex, ok := compIndexIfc.(int)
+				componentIndex, ok := compIndexIfc.(int)
 				if !ok {
-					return nil, fx.Options(), errors.New("loop contains non-int component id")
+					return nil, errors.New("loop contains non-int component id")
 				}
-				if graphNodeIndex < smallestCompIndex {
-					smallestCompIndex = graphNodeIndex
+				if componentIndex < smallestCompIndex {
+					smallestCompIndex = componentIndex
 					smallestCompIndexLoopIdx = loopIdx
 				}
 			}
@@ -181,21 +218,21 @@ func Compile(
 			removeFromCompIndex := loop[removeFromCompIndexLoopIdx].(int)
 			// Remove connections from components at removeFromCompIndex to removeToCompIndex
 			if removeToCompIndex >= len(compiledCircuit) {
-				return nil, fx.Options(), errors.New("removeToCompId is out of range")
+				return nil, errors.New("removeToCompId is out of range")
 			}
 			removeToComp := compiledCircuit[removeToCompIndex]
 			if removeFromCompIndex >= len(compiledCircuit) {
-				return nil, fx.Options(), errors.New("removeFromCompId is out of range")
+				return nil, errors.New("removeFromCompId is out of range")
 			}
 			removeFromComp := compiledCircuit[removeFromCompIndex]
 			loopedSignals := make(map[string]bool)
 			// Mark looped signals in InPortToSignalsMap
-			for _, signals := range removeToComp.InPortToSignalsMap {
+			for _, signals := range removeToComp.InPortToSignals {
 				for idx, signal := range signals {
 					if signal.SignalType == runtime.SignalTypeNamed {
 						outFromCompID, ok := outSignals[signal.Name]
 						if !ok {
-							return nil, fx.Options(), fmt.Errorf("unexpected state: signal %s is not defined in outSignals", signal.Name)
+							return nil, fmt.Errorf("unexpected state: signal %s is not defined in outSignals", signal.Name)
 						}
 						if outFromCompID == removeFromCompIndex {
 							// Mark signal as looped
@@ -206,7 +243,7 @@ func Compile(
 				}
 			}
 			// Mark looped signals in OutPortToSignalsMap
-			for _, signals := range removeFromComp.OutPortToSignalsMap {
+			for _, signals := range removeFromComp.OutPortToSignals {
 				for idx, signal := range signals {
 					if _, ok := loopedSignals[signal.Name]; ok {
 						// Mark signal as looped
@@ -216,7 +253,7 @@ func Compile(
 			}
 		} else {
 			// Loop is empty
-			return nil, fx.Options(), errors.New("got an empty loop from tarjan.Connections")
+			return nil, errors.New("got an empty loop from tarjan.Connections")
 		}
 	}
 
@@ -225,20 +262,20 @@ func Compile(
 		logger.Trace().Msgf("compIndex: %d, compiledComp: %+v", compIndex, compiledComp)
 	}
 
-	return compiledCircuit, fx.Options(componentOptions...), nil
+	return compiledCircuit, nil
 }
 
 func getInPortSignals(
 	portMapping map[string][]runtime.Port,
 	signalConsumers map[string][]int,
-	graphNodeIndex int,
+	componentIndex int,
 ) runtime.PortToSignal {
-	portToSignal := getPortSignals(portMapping, graphNodeIndex)
+	portToSignal := getPortSignals(portMapping, componentIndex)
 
 	for _, signals := range portToSignal {
 		for _, signal := range signals {
 			if signal.SignalType == runtime.SignalTypeNamed {
-				signalConsumers[signal.Name] = append(signalConsumers[signal.Name], graphNodeIndex)
+				signalConsumers[signal.Name] = append(signalConsumers[signal.Name], componentIndex)
 			}
 		}
 	}
@@ -249,15 +286,15 @@ func getInPortSignals(
 func getOutPortSignals(
 	portMapping map[string][]runtime.Port,
 	signalProducers map[string]int,
-	graphNodeIndex int,
+	componentIndex int,
 ) (runtime.PortToSignal, error) {
-	portToSignal := getPortSignals(portMapping, graphNodeIndex)
+	portToSignal := getPortSignals(portMapping, componentIndex)
 
 	for _, signals := range portToSignal {
 		for _, signal := range signals {
 			if signal.SignalType == runtime.SignalTypeNamed {
 				if _, ok := signalProducers[signal.Name]; !ok {
-					signalProducers[signal.Name] = graphNodeIndex
+					signalProducers[signal.Name] = componentIndex
 				} else {
 					return nil, errors.New("duplicate signal definition for signal name: " + signal.Name)
 				}
@@ -269,7 +306,7 @@ func getOutPortSignals(
 }
 
 // getPortSignals takes a port mapping and returns a PortToSignal map and signals list.
-func getPortSignals(portMapping map[string][]runtime.Port, graphNodeIndex int) runtime.PortToSignal {
+func getPortSignals(portMapping map[string][]runtime.Port, componentIndex int) runtime.PortToSignal {
 	portToSignalMapping := make(runtime.PortToSignal)
 
 	for port, portList := range portMapping {
