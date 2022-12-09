@@ -33,6 +33,7 @@ type AlertManagerClientConfig struct {
 	Name       string                      `json:"name"`
 	Address    string                      `json:"address" validate:"hostname_port|url|fqdn"`
 	HTTPConfig commonhttp.HTTPClientConfig `json:"http_client"`
+	BasePath   string                      `json:"base_path" default:"/"`
 }
 
 // ProvideNamedAlertManagerClients provides a list of alertmanager clients from configuration.
@@ -51,7 +52,7 @@ func ProvideNamedAlertManagerClients(unmarshaller config.Unmarshaller) []AlertMa
 			log.Warn().Msg("Could not create http client from config")
 			continue
 		}
-		amClient := CreateClient(configItem.Name, configItem.Address, httpClient)
+		amClient := CreateClient(configItem.Name, configItem.Address, configItem.BasePath, httpClient)
 		clientSlice = append(clientSlice, amClient)
 	}
 	return clientSlice
@@ -71,9 +72,9 @@ type RealAlertManagerClient struct {
 }
 
 // CreateClient creates a new alertmanager client with provided http client.
-func CreateClient(name, address string, httpClient *http.Client) AlertManagerClient {
+func CreateClient(name, address, basePath string, httpClient *http.Client) AlertManagerClient {
 	hu, _ := url.Parse(address)
-	transport := runtimeclient.NewWithClient(hu.Host, "/", []string{"http"}, httpClient)
+	transport := runtimeclient.NewWithClient(hu.Host, basePath, []string{"http"}, httpClient)
 	promClient := promclient.New(transport, strfmt.NewFormats())
 
 	alertMgrClient := &RealAlertManagerClient{

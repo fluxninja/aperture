@@ -898,6 +898,8 @@ spec:
                           properties:
                             address:
                               type: string
+                            base_path:
+                              type: string
                             http_client:
                               description: HTTPClientConfig holds configuration for
                                 HTTP Client. swagger:model
@@ -984,6 +986,7 @@ spec:
                               type: string
                           required:
                           - address
+                          - base_path
                           - http_client
                           - name
                           type: object
