@@ -1,10 +1,11 @@
-package components
+package circuitfactory
 
 import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/mapstruct"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/promql"
@@ -40,31 +41,31 @@ func NewComponentAndOptions(
 	case *policylangv1.Component_RateLimiter:
 		ctor = mkCtor(config.RateLimiter, rate.NewRateLimiterAndOptions)
 	case *policylangv1.Component_Ema:
-		ctor = mkCtor(config.Ema, NewEMAAndOptions)
+		ctor = mkCtor(config.Ema, components.NewEMAAndOptions)
 	case *policylangv1.Component_ArithmeticCombinator:
-		ctor = mkCtor(config.ArithmeticCombinator, NewArithmeticCombinatorAndOptions)
+		ctor = mkCtor(config.ArithmeticCombinator, components.NewArithmeticCombinatorAndOptions)
 	case *policylangv1.Component_Promql:
 		ctor = mkCtor(config.Promql, promql.NewPromQLAndOptions)
 	case *policylangv1.Component_Constant:
-		ctor = mkCtor(config.Constant, NewConstantAndOptions)
+		ctor = mkCtor(config.Constant, components.NewConstantAndOptions)
 	case *policylangv1.Component_Decider:
-		ctor = mkCtor(config.Decider, NewDeciderAndOptions)
+		ctor = mkCtor(config.Decider, components.NewDeciderAndOptions)
 	case *policylangv1.Component_Switcher:
-		ctor = mkCtor(config.Switcher, NewSwitcherAndOptions)
+		ctor = mkCtor(config.Switcher, components.NewSwitcherAndOptions)
 	case *policylangv1.Component_Sqrt:
-		ctor = mkCtor(config.Sqrt, NewSqrtAndOptions)
+		ctor = mkCtor(config.Sqrt, components.NewSqrtAndOptions)
 	case *policylangv1.Component_Max:
-		ctor = mkCtor(config.Max, NewMaxAndOptions)
+		ctor = mkCtor(config.Max, components.NewMaxAndOptions)
 	case *policylangv1.Component_Min:
-		ctor = mkCtor(config.Min, NewMinAndOptions)
+		ctor = mkCtor(config.Min, components.NewMinAndOptions)
 	case *policylangv1.Component_Extrapolator:
-		ctor = mkCtor(config.Extrapolator, NewExtrapolatorAndOptions)
+		ctor = mkCtor(config.Extrapolator, components.NewExtrapolatorAndOptions)
 	case *policylangv1.Component_FirstValid:
-		ctor = mkCtor(config.FirstValid, NewFirstValidAndOptions)
+		ctor = mkCtor(config.FirstValid, components.NewFirstValidAndOptions)
 	case *policylangv1.Component_Sink:
-		ctor = mkCtor(config.Sink, NewSinkAndOptions)
+		ctor = mkCtor(config.Sink, components.NewSinkAndOptions)
 	case *policylangv1.Component_Alerter:
-		ctor = mkCtor(config.Alerter, NewAlerterAndOptions)
+		ctor = mkCtor(config.Alerter, components.NewAlerterAndOptions)
 	default:
 		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
 	}

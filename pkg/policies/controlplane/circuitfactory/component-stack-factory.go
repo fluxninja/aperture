@@ -1,4 +1,4 @@
-package components
+package circuitfactory
 
 import (
 	"fmt"

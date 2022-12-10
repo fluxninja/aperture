@@ -1,4 +1,4 @@
-package circuitcompiler
+package circuitfactory
 
 import (
 	"fmt"
